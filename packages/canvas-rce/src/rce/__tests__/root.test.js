@@ -16,41 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import assert from 'assert'
-import proxyquire from 'proxyquire'
-import Bridge from '../../src/bridge'
-import sinon from 'sinon'
 import ReactDOM from 'react-dom'
-
-class fakeRCEWrapper extends React.Component {
-  static displayName() {
-    return 'FakeRCEWrapper'
-  }
-
-  render() {
-    return null
-  }
-}
-
-fakeRCEWrapper['@noCallThru'] = true
-
-const RceModule = proxyquire('../../src/rce/root', {
-  './RCEWrapper': fakeRCEWrapper,
-  './tinyRCE': {
-    '@noCallThru': true,
-    DOM: {loadCSS: () => {}}
-  },
-  '../../locales/index': {'@noCallThru': true}
-})
+import {renderIntoDiv} from '../root'
+import Bridge from '../../bridge'
+import FakeEditor from '../plugins/shared/__tests__/FakeEditor'
 
 describe('RceModule', () => {
   let target
   let props
 
   beforeEach(() => {
-    target = document.createElement('div')
+    const div = document.createElement('div')
+    div.id = 'fixture'
+    div.innerHTML = '<div id="flash_screenreader_holder" role="alert"/><div id="target"/>'
+    document.body.appendChild(div)
+
+    target = document.getElementById('target')
+
     props = {
+      tinymce: new FakeEditor(),
+      liveRegion: () => document.getElementById('flash_screenreader_holder'),
       editorOptions: () => {
         return {}
       }
@@ -58,23 +43,24 @@ describe('RceModule', () => {
   })
 
   afterEach(() => {
+    document.body.removeChild(document.getElementById('fixture'))
     Bridge.focusEditor(null)
   })
 
   it('bridges newly rendered editors', done => {
-    const callback = rendered => {
-      assert.equal(Bridge.activeEditor(), rendered)
+    renderIntoDiv(target, props, rendered => {
+      expect(Bridge.activeEditor()).toBe(rendered)
       done()
-    }
-    RceModule.renderIntoDiv(target, props, callback)
+    })
   })
 
-  it('handleUnmount unmounts root component', () => {
-    sinon.stub(ReactDOM, 'unmountComponentAtNode')
-    RceModule.renderIntoDiv(target, props, wrapper => {
+  it('handleUnmount unmounts root component', done => {
+    const unmountSpy = jest.spyOn(ReactDOM, 'unmountComponentAtNode')
+
+    renderIntoDiv(target, props, wrapper => {
       wrapper.props.handleUnmount()
+      expect(unmountSpy).toHaveBeenCalledWith(target)
+      done()
     })
-    sinon.assert.calledWithExactly(ReactDOM.unmountComponentAtNode, target)
-    ReactDOM.unmountComponentAtNode.restore()
   })
 })

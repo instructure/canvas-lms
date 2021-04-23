@@ -19,104 +19,150 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {Button} from '@instructure/ui-buttons'
-import {RadioInput, RadioInputGroup, Select} from '@instructure/ui-forms'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-view'
+import CanvasRce from '../src/rce/CanvasRce'
 import '@instructure/canvas-theme'
 
-import {renderIntoDiv, renderSidebarIntoDiv} from '../src/async'
 import locales from '../src/locales'
-import CanvasRce from '../src/rce/CanvasRce'
 import * as fakeSource from '../src/sidebar/sources/fake'
 
-function getProps(textareaId, state) {
-  return {
-    language: state.lang,
-
-    editorOptions: () => {
-      return {
-        directionality: state.dir,
-        height: '250px',
-        plugins:
-          'instructure-context-bindings, instructure-embeds, instructure-ui-icons, instructure_equation, ' +
-          'instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, ' +
-          'instructure_links, table, lists, instructure_condensed_buttons, instructure_documents',
-        // todo: add "instructure_embed" when the wiki sidebar work is done
-        external_plugins: {},
-        menubar: true
-      }
-    },
-
-    textareaClassName: 'exampleClassOne',
-    textareaId,
-    onFocus: () => console.log('rce focused'), // eslint-disable-line no-console
-    onBlur: () => console.log('rce blurred'), // eslint-disable-line no-console
-
-    trayProps: {
-      canUploadFiles: true,
-      contextId: state.contextId,
-      contextType: state.contextType,
-      host: state.host,
-      jwt: state.jwt,
-      source: state.jwt && state.sourceType === 'real' ? undefined : fakeSource
-    }
-  }
-}
-
 function renderDemos(state) {
-  const {host, jwt, contextType, contextId, sourceType} = state
-
-  renderIntoDiv(document.getElementById('editor1'), getProps('textarea1', state))
-
-  renderIntoDiv(document.getElementById('editor2'), getProps('textarea2', state))
-
-  ReactDOM.render(
-    <CanvasRce rceProps={getProps('textarea3', state)} />,
-    document.getElementById('editor3')
-  )
-
-  const parsedUrl = new URL(window.location.href)
-  if (parsedUrl.searchParams.get('sidebar') === 'no') {
-    return
-  }
-
-  const sidebarEl = document.getElementById('sidebar')
-  ReactDOM.render(<div />, sidebarEl)
-  renderSidebarIntoDiv(sidebarEl, {
-    source: jwt && sourceType === 'real' ? undefined : fakeSource,
+  const {
+    canvas_exists,
+    canvas_origin,
+    dir,
     host,
     jwt,
     contextType,
     contextId,
-    canUploadFiles: true
-  })
+    userId,
+    sourceType,
+    lang
+  } = state
+  let trayProps
+
+  if (canvas_exists) {
+    trayProps = {
+      canUploadFiles: true,
+      contextId,
+      contextType,
+      containingContext: {
+        contextType,
+        contextId,
+        userId
+      },
+      filesTabDisabled: false,
+      host,
+      jwt,
+      refreshToken:
+        sourceType === 'real'
+          ? refreshCanvasToken.bind(null, canvas_origin)
+          : () => {
+              Promise.resolve({jwt})
+            },
+      source: jwt && sourceType === 'real' ? undefined : fakeSource,
+      themeUrl: ''
+    }
+  }
+
+  document.documentElement.setAttribute('dir', dir)
+  document.documentElement.setAttribute('lang', lang)
+
+  ReactDOM.render(
+    <CanvasRce
+      language={lang}
+      textareaId="textarea3"
+      defaultContent="hello RCE"
+      height={350}
+      trayProps={trayProps}
+    />,
+    document.getElementById('content')
+  )
 }
 
 function getSetting(settingKey, defaultValue) {
-  return localStorage.getItem(settingKey) || defaultValue
+  let val = localStorage.getItem(settingKey) || defaultValue
+  if (typeof defaultValue === 'boolean') {
+    val = val === 'true'
+  }
+  return val
+}
+
+function saveSetting(settingKey, settingValue) {
+  localStorage.setItem(settingKey, settingValue)
 }
 
 function saveSettings(state) {
-  ;['dir', 'sourceType', 'lang', 'host', 'jwt', 'contextType', 'contextId'].forEach(settingKey => {
-    localStorage.setItem(settingKey, state[settingKey])
+  ;[
+    'canvas_exists',
+    'dir',
+    'sourceType',
+    'lang',
+    'host',
+    'jwt',
+    'contextType',
+    'contextId',
+    'userId'
+  ].forEach(settingKey => {
+    saveSetting(settingKey, state[settingKey])
   })
+}
+
+// adapted from canvas-lms/ui/shared/rce/jwt.js
+function refreshCanvasToken(canvas_origin, initialToken) {
+  let token = initialToken
+  let promise = null
+
+  return done => {
+    if (promise === null) {
+      promise = fetch(`${canvas_origin}/api/v1/jwts/refresh`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({jwt: token})
+      }).then(resp => {
+        promise = null
+        token = resp.data.token
+        return token
+      })
+    }
+
+    if (typeof done === 'function') {
+      promise.then(done)
+    }
+
+    return promise
+  }
 }
 
 class DemoOptions extends Component {
   state = {
+    canvas_origin: getSetting('canvas_origin', 'http://localhost:3000'),
+    canvas_exists: getSetting('canvas_exists', false),
     dir: getSetting('dir', 'ltr'),
     sourceType: getSetting('sourceType', 'fake'),
     lang: getSetting('lang', 'en'),
-    host: getSetting('host', 'https://rich-content-iad.inscloudgate.net'),
-    jwt: getSetting('jwt', ''),
+    host: getSetting('host', 'http:/who.cares'), // 'https://rich-content-iad.inscloudgate.net'
+    jwt: getSetting('jwt', 'doesnotmatteriffake'),
     contextType: getSetting('contextType', 'course'),
-    contextId: getSetting('contextId', '1')
+    contextId: getSetting('contextId', '1'),
+    userId: getSetting('userId', '1')
   }
 
   handleChange = () => {
+    const canvas_exists = getSetting('canvas_exists', false)
+    const refresh = canvas_exists !== this.state.canvas_exists
     document.documentElement.setAttribute('dir', this.state.dir)
     saveSettings(this.state)
-    renderDemos(this.state)
+    if (refresh) {
+      window.location.reload()
+    } else {
+      renderDemos(this.state)
+    }
   }
 
   componentDidMount() {
@@ -125,79 +171,145 @@ class DemoOptions extends Component {
 
   render() {
     return (
-      <ToggleDetails expanded summary="Configuration Options">
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            this.handleChange()
-          }}
-        >
-          <RadioInputGroup
-            description="Source Type"
-            variant="toggle"
-            name="source"
-            onChange={(event, value) => this.setState({sourceType: value})}
-            value={this.state.sourceType}
-          >
-            <RadioInput label="Fake" value="fake" />
+      <form
+        onSubmit={e => {
+          e.preventDefault()
+          this.handleChange()
+        }}
+      >
+        <FormFieldGroup layout="stacked" description="Configuration Options">
+          <View as="div" padding="x-small" margin="0 0 small">
+            <RadioInputGroup
+              description="Text Direction"
+              variant="simple"
+              layout="columns"
+              name="dir"
+              value={this.state.dir}
+              onChange={(event, value) => this.setState({dir: value})}
+            >
+              <RadioInput label="LTR" value="ltr" />
+              <RadioInput label="RTL" value="rtl" />
+            </RadioInputGroup>
 
-            <RadioInput label="Real" value="real" />
-          </RadioInputGroup>
+            <SimpleSelect
+              renderLabel="Language"
+              value={this.state.lang}
+              onChange={(_e, option) => this.setState({lang: option.value})}
+            >
+              {['en', ...Object.keys(locales)].map(locale => (
+                <SimpleSelect.Option id={locale} key={locale} value={locale}>
+                  {locale}
+                </SimpleSelect.Option>
+              ))}
+            </SimpleSelect>
 
-          <RadioInputGroup
-            description="Text Direction"
-            variant="toggle"
-            name="dir"
-            value={this.state.dir}
-            onChange={(event, value) => this.setState({dir: value})}
-          >
-            <RadioInput label="LTR" value="ltr" />
-            <RadioInput label="RTL" value="rtl" />
-          </RadioInputGroup>
+            <View as="div" margin="medium 0 0 0">
+              <RadioInputGroup
+                description="Canvas"
+                variant="simple"
+                layout="columns"
+                name="canvas_exists"
+                onChange={(_event, value) => {
+                  this.setState(_state => {
+                    const newState = {
+                      canvas_exists: value === 'yes'
+                    }
+                    if (value === 'yes') {
+                      newState.expandRCS = true
+                    }
+                    return newState
+                  })
+                }}
+                value={this.state.canvas_exists ? 'yes' : 'no'}
+              >
+                <RadioInput label="Exists" value="yes" />
+                <RadioInput label="Does not" value="no" />
+              </RadioInputGroup>
+            </View>
+          </View>
 
-          <Select
-            label="Language"
-            value={this.state.lang}
-            onChange={(_e, option) => this.setState({lang: option.value})}
-          >
-            {['en', ...Object.keys(locales)].map(locale => (
-              <option key={locale} value={locale}>
-                {locale}
-              </option>
-            ))}
-          </Select>
+          {/* Talking to real canvas doesn't work for now, so don't even show the UI */}
+          {this.state.canvas_exists && this.state.sourceType === 'real' && (
+            <ToggleDetails
+              expanded={this.state.expandRCS}
+              variant="filled"
+              summary="RCS"
+              onToggle={(_event, expanded) => this.setState({expandRCS: expanded})}
+            >
+              <View as="div" margin="small 0 0 0">
+                <RadioInputGroup
+                  description="Source Type"
+                  variant="simple"
+                  layout="columns"
+                  name="source"
+                  onChange={(event, value) => {
+                    this.setState(state => {
+                      return {
+                        sourceType: value,
+                        jwt: state.jwt || 'doesnotmatter',
+                        host: state.host || 'does.not.matter'
+                      }
+                    })
+                  }}
+                  value={this.state.sourceType}
+                  disabled={!this.state.canvas_exists}
+                >
+                  <RadioInput label="Fake" value="fake" />
 
-          <TextInput
-            renderLabel="API Host"
-            value={this.state.host}
-            onChange={e => this.setState({host: e.target.value})}
-          />
+                  <RadioInput label="Real" value="real" />
+                </RadioInputGroup>
 
-          <TextInput
-            renderLabel="Canvas JWT"
-            value={this.state.jwt}
-            onChange={e => this.setState({jwt: e.target.value})}
-          />
+                <TextInput
+                  renderLabel="API Host"
+                  value={this.state.host}
+                  onChange={e => this.setState({host: e.target.value})}
+                  interaction={this.state.canvas_exists ? 'enabled' : 'disabled'}
+                />
 
-          <Select
-            label="Context Type"
-            selectedOption={this.state.contextType}
-            onChange={(_e, option) => this.setState({contextType: option.value})}
-          >
-            <option value="course">Course</option>
-            <option value="group">Group</option>
-            <option value="user">User</option>
-          </Select>
+                <TextInput
+                  renderLabel="Canvas JWT"
+                  value={this.state.jwt}
+                  onChange={e => this.setState({jwt: e.target.value})}
+                  interaction={this.state.canvas_exists ? 'enabled' : 'disabled'}
+                />
 
-          <TextInput
-            renderLabel="Context ID"
-            value={this.state.contextId}
-            onChange={e => this.setState({contextId: e.target.value})}
-          />
+                <SimpleSelect
+                  renderLabel="Context Type"
+                  value={this.state.contextType}
+                  onChange={(_e, option) => this.setState({contextType: option.value})}
+                  interaction={this.state.canvas_exists ? 'enabled' : 'disabled'}
+                >
+                  <SimpleSelect.Option id="course" value="course">
+                    Course
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="group" value="group">
+                    Group
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="user" value="user">
+                    User
+                  </SimpleSelect.Option>
+                </SimpleSelect>
+
+                <TextInput
+                  renderLabel="Context ID"
+                  value={this.state.contextId}
+                  onChange={e => this.setState({contextId: e.target.value})}
+                  interaction={this.state.canvas_exists ? 'enabled' : 'disabled'}
+                />
+
+                <TextInput
+                  renderLabel="User ID"
+                  value={this.state.userId}
+                  onChange={e => this.setState({userId: e.target.value})}
+                  interaction={this.state.canvas_exists ? 'enabled' : 'disabled'}
+                />
+              </View>
+            </ToggleDetails>
+          )}
 
           <Button type="submit">Update</Button>
-        </form>
-      </ToggleDetails>
+        </FormFieldGroup>
+      </form>
     )
   }
 }

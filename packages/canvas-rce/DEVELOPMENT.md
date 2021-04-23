@@ -1,13 +1,13 @@
 # Canvas Rich Content Editor - Development Guide
 
-This guide is written for those planning to develop `canvas-rce` itself.  It will
+This guide is written for those planning to develop `canvas-rce` itself. It will
 guide you to getting things set up in a way that allows you to get off the
 ground and get going quickly.
 
 ## Canvas RCE API
 
 In order for all features of `canvas-rce` to work you'll also need a running copy
-of `canvas-rce-api`.  You can get it from [canvas-rce-api](https://github.com/instructure/canvas-rce-api).  You'll want to follow the setup instructions for it in that repository as
+of `canvas-rce-api`. You can get it from [canvas-rce-api](https://github.com/instructure/canvas-rce-api). You'll want to follow the setup instructions for it in that repository as
 they will be the most up to date.
 
 To configure canvas to find the canvas-rce-api, include in `canvas-lms/config/dynamic_settings.yml`:
@@ -30,19 +30,26 @@ Here we'll talk about how to develop on `canvas-rce` without the use of Canvas.
 You can get the "demo" development environment up and running by executing:
 
 ```shell
-
-yarn dev
-
+yarn demo:dev
 ```
 
-Then navigate to http://localhost:8080/demo.html and you will see the `canvas-rce` editor.
+Then navigate to http://localhost:8080/ and you will see the `canvas-rce` editor.
 Any changes you make to files under `/src` will be reflected in this editor.
+
+## Standalone demo
+
+```shell
+yarn demo:build
+yarn demo
+```
+
+Builds then loads the demo from the filesystem.
 
 ### Developing inside Canvas
 
 Because this package lives in the Canvas packages workspace, you can make modifications to it without first needing to do a `yarn install` in Canvas.
 
-You can start up the watch mode of this package by running `yarn build:watch` inside the `canvas-rce` directory.  Then in Canvas proper, you can run `yarn build:js:watch` and things generally work out.  If for some reason you get errors with the watch modes, you can fallback to the regular builds `yarn build:canvas` inside of `canvas-rce` and `yarn build:js` inside of Canvas. 
+You can start up the watch mode of this package by running `yarn build:watch` inside the `canvas-rce` directory. Then in Canvas proper, you can run `yarn build:js:watch` and things generally work out. If for some reason you get errors with the watch modes, you can fallback to the regular builds `yarn build:canvas` inside of `canvas-rce` and `yarn build:js` inside of Canvas.
 
 ## Plugins
 
@@ -50,10 +57,9 @@ Canvas RCE specific plugins require using the [Canvas RCE API](#Canvas-RCE-API) 
 by default the demo environment provides a fake shim so that you can develop without actually
 needing to use `canvas-rce-api` or Canvas.
 
-There is a section available on the page that allows you to connect to a real `canvas-rce-api
-`instance and to a real Canvas instance.  You can put a URL pointing to a running
-`canvas-rce-api` instance as well as a JWT from Canvas.  You can get the JWT from Canvas by
-going to any page with an RCE instance and typing `ENV.JWT` into the JavaScript console.  If you do these things you will pull real data from Canvas into the RCE demo environment.
+There is a section available on the page that allows you to connect to a real `canvas-rce-api`instance and to a real Canvas instance. You can put a URL pointing to a running
+`canvas-rce-api` instance as well as a JWT from Canvas. You can get the JWT from Canvas by
+going to any page with an RCE instance and typing `ENV.JWT` into the JavaScript console. If you do these things you will pull real data from Canvas into the RCE demo environment.
 
 ### Adding New Plugins
 
@@ -103,8 +109,8 @@ formatMessage namespace, and loads the TinyMCE translations.
 #### Example
 
 ```js
-import formatMessage from "../format-message";
-import locale from "../../locales/locale-code.json";
-import "../rce/languages/tinymce_locale";
-formatMessage.addLocale({ "locale-code": locale });
+import formatMessage from '../format-message'
+import locale from '../../locales/locale-code.json'
+import '../rce/languages/tinymce_locale'
+formatMessage.addLocale({'locale-code': locale})
 ```

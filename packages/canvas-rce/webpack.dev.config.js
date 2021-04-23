@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@testing-library/jest-dom/extend-expect'
+const {merge} = require('webpack-merge')
+const demoConfig = require('./webpack.demo.config')
+const {WebpackPluginServe: Serve} = require('webpack-plugin-serve')
 
-if (!('matchMedia' in window)) {
-  window.matchMedia = () => ({
-    matches: false,
-    addListener: () => {},
-    removeListener: () => {}
-  })
-  window.matchMedia._mocked = true
-}
+const serve = new Serve({
+  host: 'localhost',
+  port: 8080,
+  static: [demoConfig.output.path],
+  open: true,
+  liveReload: true
+})
 
-if (!('createRange' in document)) {
-  // enough for tinymce so these specs pass
-  Object.getPrototypeOf(document).createRange = () => ({
-    commonAncestorContainer: window.document?.body,
-    collapsed: true
-  })
-}
+module.exports = merge(demoConfig, {
+  watch: true,
+  entry: {
+    demo: ['webpack-plugin-serve/client']
+  },
+  plugins: [serve]
+})

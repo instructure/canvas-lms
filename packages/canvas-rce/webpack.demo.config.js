@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,15 +17,21 @@
  */
 
 const path = require('path')
+const {merge} = require('webpack-merge')
 const sharedConfig = require('./webpack.shared.config')
 
-module.exports = {
-  ...sharedConfig,
+const APP_FILE = path.join(__dirname, 'demo', 'app.js')
+// I'm not sure, but I think the demo output dir is 'github-pages`
+// for when it could be hosted on github as a working demo.
+const OUTPUT_DIR = path.join(__dirname, 'github-pages', 'dist')
+
+module.exports = merge(sharedConfig, {
+  mode: 'development',
+  devtool: 'eval-source-map',
   entry: {
-    demo: [path.join(__dirname, 'demo', 'app.js')]
+    demo: [APP_FILE]
   },
   output: {
-    path: path.join(__dirname, 'github-pages'),
-    filename: '[name].js'
+    path: OUTPUT_DIR
   }
-}
+})

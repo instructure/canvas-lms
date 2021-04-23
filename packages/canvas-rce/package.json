@@ -24,8 +24,10 @@
     "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha -r jsdom-global/register 'test/**/*.test.js'",
     "test:jest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/canvas-theme --require ./babel-register.js",
-    "demo": "webpack -p",
-    "dev": "webpack-dev-server -d --content-base github-pages/",
+    "demo": "scripts/demo.sh",
+    "demo:clean": "rm -f github-pages/dist/*",
+    "demo:build": "webpack -c ./webpack.demo.config.js",
+    "demo:dev": "yarn demo:clean && cp ./github-pages/index.html ./github-pages/dist && webpack -c ./webpack.dev.config.js",
     "build:all": "scripts/build.js",
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch",
@@ -33,7 +35,7 @@
     "prepublishOnly": "yarn test && yarn build:all",
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
-    "clean": "rm -rf lib && rm -rf es && rm -rf coverage"
+    "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean"
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
@@ -173,7 +175,8 @@
     "testcafe": "^1.9.0",
     "testcafe-react-selectors": "^3.3.0",
     "webpack": "^4",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3"
+    "webpack-merge": "^5",
+    "webpack-nano": "^1",
+    "webpack-plugin-serve": "^1"
   }
 }
