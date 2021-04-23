@@ -1750,6 +1750,7 @@ nn:
   actions_taken_6fb20fd0: Gjennomført
   activate_key_name_a99df672: "Aktiver nøkkel %{name}"
   activate_this_key_6cd98f4b: "Aktiver denne nøkkelen"
+  active_announcements_6b67f33b: "Aktive kunngjeringar"
   active_d7e32718: Aktiv
   active_enrollments_count_report_66bc3cae: "Rapport over antal aktive medlemskap"
   active_terms_83df727e: "Aktive semester"
@@ -4348,6 +4349,7 @@ nn:
         new: "Opprette ei ny hending"
   calendars_a756c286: Kalendrar
   calendars_toggle_list_visibility_488db143: "Vis/skjul liste i kalender"
+  campus_vue_submission_data_18f72868: "Campus Vue innleveringsdata"
   can_create_and_update_submission_results_for_assig_51e7033d: "Kan opprette og oppdatere innleveringsresultata for oppgåver tilknytta verktøyet."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Kan opprette og sjå oppgåvedata som er tilknytta verktøyet i vurderingsoversikta."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "kan opprette, endre namn på og redigere sider som standard"
@@ -4806,6 +4808,7 @@ nn:
   collapse_subdiscussion_89af1f5c: "Skjul underordna diskusjon"
   collapse_tutorial_tray_66ee7dc1: "Skjul opplæringsmeny"
   collapsed_510aa02a: Skjult
+  collection_of_responsive_improvements_throughout_c_dedfe6dc: "Samling av responsive forbetringar i heile Canvas"
   colombia_57_c6c75620: "Colombia (+57)"
   colombia_919c87f9: Colombia
   color_a363e1b0: Farge
@@ -4985,6 +4988,7 @@ nn:
   conferences_a0a8984b: Konferansar
   conferences_tutorial_tray_6f071ce2: "Konferansar opplæringsmeny"
   conferencing_6a6d9b55: Konferanse
+  confetti_for_on_time_submissions_394e16ce: "Konfetti for innleveringar innan frist"
   config_url_e96ceaf3: Konfigurasjons-URL
   configurate_tool_app_5a721f2c: "Vil du konfigurere %{tool}-appen?"
   configuration_location_ee0f6592: Konfigurasjonsstad
@@ -6969,6 +6973,7 @@ nn:
   current_score_6c81792: "Gjeldande resultat"
   current_score_74777363: "gjeldande resultat"
   current_slack_api_key_9eba6a5: "Gjeldande Slack-API-nøkkel:"
+  current_terms_bcf31fb2: "Gjeldande vilkår"
   current_theme_62e5e8cf: "Gjeldande tema"
   current_total_67bf5f72: "Gjeldande totalt:"
   current_volume_level_c55ab825: "Gjeldande volumnivå"
@@ -8651,6 +8656,7 @@ nn:
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
   everyone_else_cc5f6888: "Alle andre"
+  everyone_public_45ff1f25: "Alle (offentleg)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Kun ei vurdering kan ha dominans"
@@ -10682,6 +10688,7 @@ nn:
   how_do_i_record_a_meeting_ae3a0d4e: "Korleis tar eg opp eit møte?"
   how_do_i_share_my_screen_c280e585: "Korleis deler eg skjerm?"
   how_do_i_start_a_meeting_e8a9e67b: "Korleis startar eg eit møte?"
+  how_do_i_upload_a_file_to_a_course_e8332cfe: "Korleis lastar eg opp ei fil i eit emne? "
   how_do_i_use_course_settings_1e8467e6: "Kva kan eg gjere med emne-innstillingar?"
   how_do_i_use_speedgrader_e18e4ca2: "Korleis brukar eg SpeedGrader?"
   how_do_i_use_the_pages_index_page_dafb986c: "Korleis brukar eg sideoversikta?"
@@ -10919,6 +10926,7 @@ nn:
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder karakterane for oppgåva når du du sender ho til institusjonen sitt SIS"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder vurderingane for oppgåva når du synkroniserer ho til institusjonen sitt SIS"
   include_unpublished_assignments_83ebbaec: "Inkluder upubliserte oppgåver"
+  include_unpublished_courses_2fde6389: "inkluder upubliserte emne"
   include_unpublished_courses_7a0e7aab: "Inkluder upubliserte emne"
   include_unsubmitted_and_deleted_submissions_101225c7: "Inkluder usende og sletta innleveringar"
   include_unsubmitted_deleted_submissions_99fc2aad: "Inkluder usendte og sletta innleveringar"
@@ -11803,6 +11811,7 @@ nn:
   m2c_name: Moodle-import
   macedonian_6ed541af: Makedonsk
   magenta_4a65993c: Magenta
+  mailbox_selection_92d9cbf: Meldingsboksutval
   main_navigation_3f080c80: Hovednavigasjon
   main_text_color_7d65ab1b: Hovudtekstfarge
   make_key_developername_invisible_212ecf72: "Gjer nøkkel %{developerName} usynleg"
@@ -11843,6 +11852,7 @@ nn:
   manage_module_name_dfe16816: "Administrere %{module_name}"
   manage_name_7f55f792: "Administrer %{name}"
   manage_options_for_name_83278ad0: "Administrer alternativ for %{name}"
+  manage_pages_4d2adeb6: "Administrer sider"
   manage_profile_pictures_40c958ce: "Administrer profilbilete"
   manage_rubrics_5d274f6a: "Administrer vurderingsskjema"
   manage_snapshots_1dc4b79d: "Administrer "
@@ -13991,6 +14001,7 @@ nn:
   name_override_score_7f6a5216: "%{name} overstyr resultat"
   name_quiz_15f55961: "%{name} (Quiz)"
   name_unposted_current_score_e98e95fd: "%{name} gjeldande resultat er ikkje posta"
+  name_unposted_final_grade_798491b7: "%{name} sluttresultat ikkje posta"
   name_unposted_final_score_124708d2: "%{name}sluttresultat ikkje posta"
   name_user_e44eebed: "%{name}  Brukar"
   names_and_role_ebff0149: "Namn og rolle"
@@ -14022,6 +14033,7 @@ nn:
   new_analytics_f6147886: "Nye analysar"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjering"
+  new_announcement_in_course_name_title_84607f44: "Nye kunngjeringar i %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Ny kunngjering: %{title}"
   new_announcement_title_course_da7c0ca6: "Ny kunngjering %{title}, %{course}"
   new_anonymous_comment_by_student_author_id_for_ass_6e579da4: "Ny anonym kommentar gjort av student (%{author_id}) for %{assignment_title}, Student (%{user_id}), %{course_name}."
@@ -14239,6 +14251,7 @@ nn:
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Merk at nokre attributtar kan hende ikkje har innhald for Clever-brukarar. "
   note_this_is_not_your_official_score_f2d4582f: "*MERK*: Dette er IKKJE det offisielle resultatet ditt."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Merk: Denne påloggingskontoen brukar delegert godkjenning, men tillet godkjenning gjennom reservepassord i Canvas. Passordfelta i dette skjemaet oppdaterer reservepassordet i Canvas, *ikkje* den delegerte godkjenninga."
+  note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "MERK: vi prøver å gjere om samanslåinga så langt som mogleg, men det kan hende at samanslåtte brukarar ikkje gjenoppstår fullt og heilt som tidlegare. "
   notes_6cfc3988: "Merknader:"
   notes_c42e0fd5: Merknader
   notes_for_name_2eefac11: "Merknader til %{name}"
@@ -14590,6 +14603,7 @@ nn:
       remember_auth: "Hugs autorisasjonen"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: Objekttype
+  observe_student_mastery_a1f01a: "Observer meistring hos student"
   observees: 
     being_observed: "Studentar er observerte"
     new_observee_pairing_code: "Paringskode for student"
@@ -16172,6 +16186,7 @@ nn:
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Sp: Kva er svart, kvit, svart, kvit? Sv: Ein panda som rullar ned ei skråning."
   qatar_974_7e9684ca: "Qatar (+974)"
   qatar_d52a8d27: Qatar
+  qr_code_display_was_canceled_96234bf2: "Vising av QR-kode er kansellert"
   qr_for_mobile_login_1b1560ce: "QR-kode for mobilinnlogging"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI-eksport sidan %{date}*"
@@ -17540,6 +17555,7 @@ nn:
   recent_history_unavailable_in_test_d1753d0d: "Nyleg historikk er utilgengeleg i testmiljøet"
   recent_student: 
     last_logged_in: "sist pålogga %{last_login}"
+  recent_web_conferences_a7c0ab70: "Nylege webkonferansar"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} minkande gjennomsnitt"
   recently_deleted_courses_title: "Nyleg sletta emne"
   recipient_input: 
@@ -17719,6 +17735,7 @@ nn:
   reply_to_topic_12412b0f: "Svar til emne"
   report_has_been_aborted_2b5763ed: "Rapporten er avbroten"
   report_issue_b5f1db0e: "Rapporter problem"
+  report_start_date_f961d8f8: "Startdato for rapport"
   reported_3de7086a: Rapportert
   reports_1b9ab7a7: Rapportar
   reports_account_settings_78f5336a: "Rapportar (kontoinnstillingar)"
@@ -18373,6 +18390,7 @@ nn:
   select_a_module_optional_7edb5cb0: "Veil ein modul (valfri)"
   select_a_predefined_color_c77ab2f5: "Vel ein førehandsdefinert farge."
   select_a_provisional_grade_7106e3d5: "Velg ei mellombels vurdering"
+  select_all_assignments_bd07b919: "Vel alle oppgåver"
   select_all_count_courses_4fc63811: 
     one: "Vel (%{count}) emne"
     other: "Vel alle (%{count}) emne"
@@ -19982,6 +20000,7 @@ nn:
     errors_update_failed: "Oppdatering mislukkast"
   submissions_folder_9db8dadf: Innleveringsmappe
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "innleveringsmappene må opprettast i ein brukar- eller gruppekontekst"
+  submissions_graded_status_f689110d: "Innleveringar - vurderingstatus"
   submit_a3cc6859: Send!
   submit_a_comment_7edbf648: "Send ein kommentar"
   submit_a_feature_idea_2d4baa3d: "Send ein funksjonsidé"
@@ -20386,6 +20405,7 @@ nn:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Denne brukaren er ikkje student på dette emnet"
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
+  the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
   the_term_to_report_on_5f586e7c: "Semesteret som rapporten gjeld for"
   the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Semesteret som rapporten gjeld for (for rapporttype kun student)"
@@ -21188,12 +21208,14 @@ nn:
     butterfly_display_name: Sommarfugl
     einstein_rosen_trophy_description: "Skildring av Einstein Rosen Trophy"
     four_leaf_clover_display_name: "Four Leaf Clover"
+    gift_description: Gaveskildring
     magic_mystery_thumbs_up_display_name: "Magic Mystery tommel opp"
     medal_display_name: Medalje
     ninja_description: Ninja-skildring
     ninja_display_name: Ninja
     panda_display_name: Panda
     panda_unicycle_display_name: "Panda eitthjulsykkel"
+    pinwheel_description: Pinwheel-skildring
     star_display_name: "Merk med stjerne"
     thumbs_up_description: "Skildring av \"Tommel opp\""
     thumbs_up_display_name: "Tommel opp"
@@ -21641,6 +21663,7 @@ nn:
         student: Student
       journal_header: Faglærarprotokoll
       page_title: Faglærarprotokoll
+  user_notes_7fccf1d6: "Merknader frå brukar"
   user_observees_40cec795: Observatørar
   user_observer_csv_3592a9cf: "CSV-fil over observatørar"
   user_observers_454d4303: Observatørar
@@ -22466,6 +22489,7 @@ nn:
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Du må velje ei mappe å laste opp migrert innhald til"
   you_must_select_an_assignment_group_c16a2168: "Du må velje ei oppgåvegruppe."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du må innstille med eit tal som er større enn eller likt %{min}"
+  you_must_set_usage_rights_87fc1382: "Du må spesifisere bruksrettar"
   you_must_specify_a_usage_right_5eb57f87: "Du må spesifisere ein bruksrett."
   you_must_use_a_number_912ce4bd: "Du må bruke eit tal"
   you_must_use_a_positive_number_203b86fe: "Du må bruke eit positivt tal"
