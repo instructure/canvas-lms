@@ -2363,6 +2363,41 @@ describe CalendarEventsApiController, type: :request do
         end
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        @c0 = @course
+        @a0 = @c0.assignments.create(workflow_state: 'published', due_at: 1.day.from_now)
+        @shard1.activate do
+          @shard1_account = Account.create!
+          @c1 = course_with_teacher(user: @me, account: @shard1_account, enrollment_state: 'active').course
+          @a1 = @c1.assignments.create(workflow_state: 'published', due_at: 2.days.from_now)
+        end
+      end
+
+      it "paginates assignments from multiple shards correctly" do
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1",
+                        controller: 'calendar_events_api', action: 'index', format: 'json', type: 'assignment',
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, per_page: 1)
+        expect(json.size).to eq 1
+        expect(json[0]['id']).to eq @a0.asset_string
+
+        links = Api.parse_pagination_links(response.headers['Link'])
+        next_link = links.detect { |link| link[:rel] == 'next' }
+        expect(next_link).not_to be_nil
+
+        json = api_call(:get, next_link[:uri].to_s, controller: 'calendar_events_api', action: 'index',
+                        format: 'json', type: 'assignment', context_codes: [@c0.asset_string, @c1.global_asset_string],
+                        all_events: 1, per_page: 1, page: next_link['page'])
+        expect(json.size).to eq 1
+        expect(json[0]['id']).to eq @a1.asset_string
+
+        links = Api.parse_pagination_links(response.headers['Link'])
+        expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
+      end
+    end
   end
 
   context "user index" do
