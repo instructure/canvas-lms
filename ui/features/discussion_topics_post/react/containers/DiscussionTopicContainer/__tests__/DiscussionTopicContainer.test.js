@@ -142,6 +142,7 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to delete topic', async () => {
+    window.confirm = jest.fn(() => true)
     const {getByTestId, findByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByTestId('delete'))
