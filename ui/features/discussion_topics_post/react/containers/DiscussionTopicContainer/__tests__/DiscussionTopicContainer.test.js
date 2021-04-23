@@ -168,7 +168,7 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Send to:')).toBeTruthy()
   })
 
-  it('renders a modal to copy content', async () => {
+  it.skip('renders a modal to copy content', async () => {
     const container = setup(discussionTopicMock)
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
