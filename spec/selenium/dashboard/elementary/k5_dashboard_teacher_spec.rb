@@ -296,5 +296,11 @@ describe "teacher k5 dashboard" do
 
       expect(teacher_preview).to be_displayed
     end
+
+    it 'shows a sample preview for teacher view of the course schedule tab' do
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(teacher_preview).to be_displayed
+    end
   end
 end

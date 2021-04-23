@@ -39,7 +39,7 @@ describe "student k5 dashboard schedule" do
 
   context 'entry' do
     it 'navigates to planner when Schedule is clicked' do
-      create_dated_assignment('Today Assignment', @now)
+      create_dated_assignment(@subject_course, 'Today Assignment', @now)
 
       get "/"
 
@@ -57,7 +57,7 @@ describe "student k5 dashboard schedule" do
         ["Previous Assignment", 7.days.ago(@now)],
         ["Future Assignment", 7.days.from_now(@now)]
       ].each do |assignment_info|
-        create_dated_assignment(assignment_info[0], assignment_info[1])
+        create_dated_assignment(@subject_course, assignment_info[0], assignment_info[1])
       end
     end
 
@@ -67,8 +67,7 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
-      # These expects will be uncommented when a week ending issue is resolved.  LS-2042
-      # expect(end_of_week_date).to include(ending_weekday_calculation(@now))
+      expect(end_of_week_date).to include(ending_weekday_calculation(@now))
     end
 
     it 'navigates to previous week with previous button' do
@@ -79,7 +78,7 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.ago(@now)))
-      # expect(end_of_week_date).to include(ending_weekday_calculation(1.week.ago(@now)))
+      expect(end_of_week_date).to include(ending_weekday_calculation(1.week.ago(@now)))
     end
 
     it 'navigates to next week with the forward button' do
@@ -90,7 +89,7 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.from_now(@now)))
-      # expect(end_of_week_date).to include(ending_weekday_calculation(1.week.from_now(@now)))
+      expect(end_of_week_date).to include(ending_weekday_calculation(1.week.from_now(@now)))
     end
 
     it 'navigates back to current week with today button' do
@@ -105,13 +104,13 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
-      # expect(end_of_week_date).to include(ending_weekday_calculation(@now))
+      expect(end_of_week_date).to include(ending_weekday_calculation(@now))
     end
   end
 
   context 'missing items dropdown' do
     it 'finds no missing dropdown if there are no missing items' do
-      assignment = create_dated_assignment('missing assignment', @now)
+      assignment = create_dated_assignment(@subject_course, 'missing assignment', @now)
       assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
 
       get "/#schedule"
@@ -120,7 +119,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'finds the missing dropdown if there are missing items' do
-      create_dated_assignment('missing assignment', 1.day.ago(@now))
+      create_dated_assignment(@subject_course, 'missing assignment', 1.day.ago(@now))
 
       get "/#schedule"
 
@@ -128,8 +127,8 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'shows missing items and count if there are missing items' do
-      create_dated_assignment('missing assignment1', 1.day.ago(@now))
-      create_dated_assignment('missing assignment2', 1.day.ago(@now))
+      create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
+      create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
 
 
       get "/#schedule"
@@ -138,8 +137,8 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'shows the list of missing assignments in dropdown' do
-      assignment1 = create_dated_assignment('missing assignment1', 1.day.ago(@now))
-      create_dated_assignment('missing assignment2', 1.day.ago(@now))
+      assignment1 = create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
+      create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
 
       get "/#schedule"
       wait_for_ajaximations
@@ -155,7 +154,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'clicking list twice hides missing assignments' do
-      create_dated_assignment('missing assignment1', 1.day.ago(@now))
+      create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
 
       get "/#schedule"
       wait_for_ajaximations
@@ -170,6 +169,48 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(missing_assignments_exist?).to be_falsey
+    end
+  end
+
+  context 'course-scoped schedule tab included items' do
+    it 'shows schedule info for course items' do
+      create_dated_assignment(@subject_course, 'today assignment1', @now)
+
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(today_header).to be_displayed
+      expect(schedule_item.text).to include('today assignment1')
+    end
+
+    it 'shows course missing item in dropdown' do
+      create_dated_assignment(@subject_course, 'yesterday assignment1', 1.day.ago(@now))
+
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(items_missing_exists?).to be_truthy
+    end
+  end
+
+  context 'course-scoped schedule tab excluded items' do
+    before(:once) do
+      course_with_student(
+        active_all: true,
+        user: @student,
+        course_name: 'Social Studies'
+      )
+      create_dated_assignment(@course, 'assignment for other course', @now)
+    end
+
+    it 'does not show schedule info for non course item' do
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(schedule_item_exists?).to be_falsey
+    end
+
+    it 'does not show non-course missing item in dropdown' do
+      get "/courses/#{@subject_course.id}#schedule"
+
+      expect(items_missing_exists?).to be_falsey
     end
   end
 end

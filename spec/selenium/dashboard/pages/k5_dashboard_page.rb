@@ -277,6 +277,10 @@ module K5PageObject
     "[title='Drag to reorder or move item to another module']"
   end
 
+  def schedule_item_selector
+    ".PlannerItem-styles__title a"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -556,6 +560,9 @@ module K5PageObject
     f(drag_handle_selector)
   end
 
+  def schedule_item
+    f(schedule_item_selector)
+  end
 
   #----------------------- Actions & Methods -------------------------
 
@@ -728,6 +735,10 @@ module K5PageObject
     (current_date.end_of_week(:sunday)).strftime("%B %-d")
   end
 
+  def schedule_item_exists?
+    element_exists?(schedule_item_selector)
+  end
+
   #----------------------------Create Content---------------------#
 
   def new_announcement(course, title, message)
@@ -764,8 +775,8 @@ module K5PageObject
     tool
   end
 
-  def create_dated_assignment(assignment_title, assignment_due_at)
-    @subject_course.assignments.create!(
+  def create_dated_assignment(course, assignment_title, assignment_due_at)
+    course.assignments.create!(
       title: assignment_title,
       grading_type: 'points',
       points_possible: 100,
@@ -849,7 +860,7 @@ module K5PageObject
     @module_title = "Course Module"
     @course_module = @subject_course.context_modules.create!(:name => @module_title)
     @module_assignment_title = "General Assignment"
-    assignment = create_dated_assignment(@module_assignment_title, 1.day.from_now)
+    assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
     @course_module.add_item(:id => assignment.id, :type => 'assignment')
   end
 end
