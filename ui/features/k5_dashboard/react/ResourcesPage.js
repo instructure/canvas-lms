@@ -17,9 +17,10 @@
  */
 
 import I18n from 'i18n!dashboard_pages_ResourcesPage'
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import StaffContactInfoLayout from './StaffContactInfoLayout'
+import useImmediate from '@canvas/use-immediate-hook'
 import {fetchCourseInstructors, fetchCourseApps} from '@canvas/k5/react/utils'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -70,38 +71,41 @@ const fetchApps = cards =>
       }, [])
     )
 
-export default function ResourcesPage({cards, visible = false}) {
+export default function ResourcesPage({cards, cardsSettled, visible}) {
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
   const [isAppsLoading, setAppsLoading] = useState(false)
   const [isStaffLoading, setStaffLoading] = useState(false)
 
-  useEffect(() => {
-    setAppsLoading(true)
-    fetchApps(cards)
-      .then(data => {
-        setApps(data)
-        setAppsLoading(false)
-      })
-      .catch(err => {
-        setAppsLoading(false)
-        showFlashError(I18n.t('Failed to load apps.'))(err)
-      })
+  useImmediate(
+    () => {
+      if (cards && cardsSettled) {
+        setAppsLoading(true)
+        fetchApps(cards)
+          .then(data => {
+            setApps(data)
+            setAppsLoading(false)
+          })
+          .catch(err => {
+            setAppsLoading(false)
+            showFlashError(I18n.t('Failed to load apps.'))(err)
+          })
 
-    setStaffLoading(true)
-    fetchStaff(cards)
-      .then(data => {
-        setStaff(data)
-        setStaffLoading(false)
-      })
-      .catch(err => {
-        setStaffLoading(false)
-        showFlashError(I18n.t('Failed to load staff.'))(err)
-      })
-
-    // Cards are only ever loaded once on the page, so this only runs on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+        setStaffLoading(true)
+        fetchStaff(cards)
+          .then(data => {
+            setStaff(data)
+            setStaffLoading(false)
+          })
+          .catch(err => {
+            setStaffLoading(false)
+            showFlashError(I18n.t('Failed to load staff.'))(err)
+          })
+      }
+    },
+    [cards, cardsSettled],
+    {deep: true}
+  )
 
   return (
     <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
@@ -113,5 +117,6 @@ export default function ResourcesPage({cards, visible = false}) {
 
 ResourcesPage.propTypes = {
   cards: PropTypes.array.isRequired,
-  visible: PropTypes.bool
+  cardsSettled: PropTypes.bool.isRequired,
+  visible: PropTypes.bool.isRequired
 }

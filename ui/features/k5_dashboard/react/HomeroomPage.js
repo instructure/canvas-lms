@@ -77,8 +77,7 @@ export const fetchHomeroomAnnouncements = cards =>
       )
   ).then(announcements => announcements.filter(a => a))
 
-export const HomeroomPage = props => {
-  const {cards, visible, canCreateCourses} = props
+export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
@@ -93,14 +92,16 @@ export const HomeroomPage = props => {
           })
         )
 
-        setAnnouncementsLoading(true)
-        fetchHomeroomAnnouncements(cards)
-          .then(setHomeroomAnnouncements)
-          .catch(showFlashError(I18n.t('Failed to load announcements.')))
-          .finally(() => setAnnouncementsLoading(false))
+        if (cardsSettled) {
+          setAnnouncementsLoading(true)
+          fetchHomeroomAnnouncements(cards)
+            .then(setHomeroomAnnouncements)
+            .catch(showFlashError(I18n.t('Failed to load announcements.')))
+            .finally(() => setAnnouncementsLoading(false))
+        }
       }
     },
-    [cards],
+    [cards, cardsSettled],
     // Need to do deep comparison on cards to only re-trigger if they actually changed
     // (they shouldn't after they're set the first time)
     {deep: true}
@@ -177,6 +178,7 @@ export const HomeroomPage = props => {
 
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
+  cardsSettled: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   canCreateCourses: PropTypes.bool.isRequired
 }
