@@ -273,11 +273,13 @@ export const handlers = [
     return res(
       ctx.data({
         deleteDiscussionEntry: {
-          discussionEntry: {
-            ...defaultEntry,
-            deleted: true,
-            message: null
-          },
+          discussionEntry: mswAssign(
+            {...defaultEntry},
+            {
+              deleted: true,
+              message: null
+            }
+          ),
           errors: null,
           __typename: 'DeleteDiscussionEntryPayload'
         }
@@ -288,11 +290,14 @@ export const handlers = [
     return res(
       ctx.data({
         updateDiscussionTopic: {
-          discussionTopic: {
-            id: 'RGlzY3Vzc2lvbi0x',
-            published: req.body.variables.published,
-            __typename: 'Discussion'
-          },
+          discussionTopic: mswAssign(
+            {...defaultTopic},
+            {
+              id: 'RGlzY3Vzc2lvbi0x',
+              published: req.body.variables.published,
+              __typename: 'Discussion'
+            }
+          ),
           __typename: 'UpdateDiscussionTopicPayload'
         }
       })
@@ -302,11 +307,14 @@ export const handlers = [
     return res(
       ctx.data({
         subscribeToDiscussionTopic: {
-          discussionTopic: {
-            id: 'RGlzY3Vzc2lvbi0x',
-            subscribed: req.body.variables.subscribed,
-            __typename: 'Discussion'
-          },
+          discussionTopic: mswAssign(
+            {...defaultTopic},
+            {
+              id: 'RGlzY3Vzc2lvbi0x',
+              subscribed: req.body.variables.subscribed,
+              __typename: 'Discussion'
+            }
+          ),
           __typename: 'SubscribeToDiscussionTopicPayload'
         }
       })
