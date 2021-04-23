@@ -71,7 +71,7 @@ const defaultEntry = {
         message: '<p>This is the child reply</p>',
         ratingCount: 1,
         ratingSum: 0,
-        rating: 'false',
+        rating: false,
         read: true,
         subentriesCount: 0,
         rootEntryParticipantCounts: null,
