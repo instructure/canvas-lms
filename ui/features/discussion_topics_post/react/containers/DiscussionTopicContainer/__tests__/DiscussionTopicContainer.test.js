@@ -161,18 +161,18 @@ describe('DiscussionTopicContainer', () => {
 
   it('renders a modal to send content', async () => {
     const container = setup(discussionTopicMock)
-    const kebob = await container.getByTestId('discussion-post-menu-trigger')
+    const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
-    const sendToButton = await container.getByText('Send To...')
+    const sendToButton = await container.findByText('Send To...')
     fireEvent.click(sendToButton)
     expect(await container.findByText('Send to:')).toBeTruthy()
   })
 
   it('renders a modal to copy content', async () => {
     const container = setup(discussionTopicMock)
-    const kebob = await container.getByTestId('discussion-post-menu-trigger')
+    const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
-    const copyToButton = await container.getByText('Copy To...')
+    const copyToButton = await container.findByText('Copy To...')
     fireEvent.click(copyToButton)
     expect(await container.findByText('Select a Course')).toBeTruthy()
   })
