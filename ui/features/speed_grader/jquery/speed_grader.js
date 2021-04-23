@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextArea} from '@instructure/ui-text-area'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
@@ -32,6 +31,7 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AssessmentAuditButton from '../react/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
+import CommentArea from '../react/CommentArea'
 import originalityReportSubmissionKey from '@canvas/grading/originalityReportSubmissionKey'
 import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -656,21 +656,12 @@ function renderCommentTextArea() {
   // unmounting is a temporary workaround for INSTUI-870 to allow
   // for textarea minheight to be reset
   unmountCommentTextArea()
-  function textareaRef(textarea) {
+  function getTextAreaRef(textarea) {
     $add_a_comment_textarea = $(textarea)
   }
 
-  const textAreaProps = {
-    height: '4rem',
-    id: 'speed_grader_comment_textarea',
-    label: <ScreenReaderContent>{I18n.t('Add a Comment')}</ScreenReaderContent>,
-    placeholder: I18n.t('Add a Comment'),
-    resize: 'vertical',
-    textareaRef
-  }
-
   ReactDOM.render(
-    <TextArea {...textAreaProps} />,
+    <CommentArea getTextAreaRef={getTextAreaRef} />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )
 }

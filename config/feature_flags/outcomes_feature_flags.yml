@@ -48,4 +48,4 @@ assignment_comment_library:
   state: hidden
   applies_to: RootAccount
   display_name: Comment Library
-  description: Adds comment bank for assignment comments within speedgrader
+  description: Adds comment library for assignment comments within speedgrader

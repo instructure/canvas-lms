@@ -934,6 +934,9 @@ class GradebooksController < ApplicationController
         env[:filter_speed_grader_by_student_group_feature_enabled] =
           @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group)
 
+        env[:assignment_comment_library_feature_enabled] =
+          @context.root_account.feature_enabled?(:assignment_comment_library)
+
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
 
