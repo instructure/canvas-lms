@@ -286,6 +286,18 @@ If you would like to test or preview any notifications, simply trigger the email
 through its normal actions, and it should immediately show up in the emulated
 webmail inbox available here: http://mail.canvas.docker/
 
+### Canvas RCE API
+
+The Canvas RCE relies on the Canvas RCE API service.
+
+Add `docker-compose/rce-api.override.yml` to your `COMPOSE_FILE` var in `.env`.
+
+Set `rich-content-service` `app-host` to `"http://rce.canvas.docker:3000"` in `config/dynamic_settings.yml`.
+```
+rich-content-service:
+  app-host: "http://rce.canvas.docker:3000"
+```
+
 ## Tips
 
 It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.

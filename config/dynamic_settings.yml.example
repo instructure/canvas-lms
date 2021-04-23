@@ -31,7 +31,10 @@ development:
         client-id: some_client_id
         client-secret: some_client_secret
       rich-content-service:
-        app-host: "rce.docker"
+        # if you're running canvas-rce-api on its own
+        app-host: "rce.canvas.docker"
+        # if you're running canvas-rce-api with docker-compose/rce-api.override.yml in .env
+        app-host: "http://rce.canvas.docker:3000"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
       fullstory:
