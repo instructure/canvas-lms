@@ -102,6 +102,18 @@ pipeline {
                       docker-compose run pulsar-admin ./scripts/bootstrap.sh
                       docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
                     """
+                  } catch(Exception ex) {
+                    // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
+                    // which means we don't think we can retry, so just let it die.
+                    sh "docker-compose logs pulsar | grep \"zoo keeper disconnected\""
+                    // if we got here, we DO think we can retry because this is a pulsar boot issue,
+                    // so ditch the container and try again.
+                    sh """
+                      docker-compose stop pulsar
+                      docker-compose rm -f pulsar
+                      docker-compose run pulsar-admin ./scripts/bootstrap.sh
+                      docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
+                    """
                   } finally {
                     sh """
                       echo \"*********PULSAR LOGS*********\"
