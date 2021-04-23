@@ -35,6 +35,8 @@ module MicrosoftSync
     # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
     ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
     STANDARD_RETRY_DELAY = {delay_amount: [5, 20, 100].freeze}.freeze
+    MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
+    MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
 
     # SyncCanceled errors are semi-expected errors -- so we raise them they will
     # cleanup_after_failure but not produce a failed job.
@@ -45,6 +47,9 @@ module MicrosoftSync
     class MissingOwners < SyncCanceled; end
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < SyncCanceled; end
+    # Can happen when the Course has more then 25k members's enrolled or 100
+    # owner's enrolled
+    class MaxEnrollmentsReached < SyncCanceled; end
 
     attr_reader :group
     delegate :course, to: :group
@@ -54,7 +59,7 @@ module MicrosoftSync
     end
 
     def initial_step
-      :step_ensure_class_group_exists
+      :step_ensure_max_enrollments_in_a_course
     end
 
     def max_retries
@@ -74,7 +79,16 @@ module MicrosoftSync
       group.update!(last_synced_at: Time.zone.now)
     end
 
-    # First step of a full sync. Create group on the Microsoft side.
+    # The first step that checks if the max enrollments in a curse were reached
+    # before starting the full sync with the Microsoft side.
+    def step_ensure_max_enrollments_in_a_course(_mem_data, _job_state_data)
+      raise_max_enrollment_members_reached if max_enrollment_members_reached?
+      raise_max_enrollment_owners_reached if max_enrollment_owners_reached?
+
+      StateMachineJob::NextStep.new(:step_ensure_class_group_exists)
+    end
+
+    # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
       # TODO: as we continue building the job we could possibly just use the
       # group.ms_group_id and if we get an error know we have to create it.
@@ -148,6 +162,7 @@ module MicrosoftSync
       owners = graph_service_helpers.get_group_users_aad_ids(group.ms_group_id, owners: true)
 
       diff = MembershipDiff.new(members, owners)
+
       UserMapping.enrollments_and_aads(course).find_each do |enrollment|
         diff.set_local_member(enrollment.aad_id, enrollment.type)
       end
@@ -166,6 +181,9 @@ module MicrosoftSync
           'corresponding to the instructors of the Canvas course could be found on the ' \
           'Microsoft side.'
       end
+
+      raise_max_enrollment_members_reached if diff.max_enrollment_members_reached?
+      raise_max_enrollment_owners_reached if diff.max_enrollment_owners_reached?
 
       batch_size = GraphService::GROUP_USERS_ADD_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
@@ -235,6 +253,35 @@ module MicrosoftSync
 
     def graph_service
       @graph_service ||= graph_service_helpers.graph_service
+    end
+
+    def max_enrollment_members_reached?
+      course
+        .enrollments
+        .select(:user_id)
+        .limit(MAX_ENROLLMENT_MEMBERS + 1)
+        .distinct
+        .count > MAX_ENROLLMENT_MEMBERS
+    end
+
+    def max_enrollment_owners_reached?
+      course
+        .enrollments
+        .where(type: MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES)
+        .select(:user_id)
+        .limit(MAX_ENROLLMENT_OWNERS + 1)
+        .distinct
+        .count > MAX_ENROLLMENT_OWNERS
+    end
+
+    def raise_max_enrollment_members_reached
+      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
+          "#{MAX_ENROLLMENT_MEMBERS} members in a team."
+    end
+
+    def raise_max_enrollment_owners_reached
+      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
+          "#{MAX_ENROLLMENT_OWNERS} owners in a team."
     end
   end
 end
