@@ -85,10 +85,10 @@ export const Discussion = {
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
-    entryCounts: {
+    entryCounts: shape({
       unreadCount: number,
       repliesCount: number
-    },
+    }),
     author: User.shape,
     editor: User.shape,
     assignment: Assignment.shape,

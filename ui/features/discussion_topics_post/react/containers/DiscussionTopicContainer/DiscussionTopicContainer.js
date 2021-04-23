@@ -279,7 +279,7 @@ DiscussionTopicContainer.propTypes = {
    * Providing this property will result in the graded info
    * to be rendered
    */
-  discussionTopic: PropTypes.instanceOf(Discussion.shape).isRequired,
+  discussionTopic: Discussion.shape.isRequired,
   /**
    * Behavior for clicking the reply button,
    * Providing this property will result in
