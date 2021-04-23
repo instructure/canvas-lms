@@ -21,7 +21,9 @@ import React from 'react'
 import {Like} from '../Like'
 
 const setup = props => {
-  return render(<Like isLiked onClick={Function.prototype} likeCount={0} {...props} />)
+  return render(
+    <Like isLiked onClick={Function.prototype} delimiterKey="like" likeCount={0} {...props} />
+  )
 }
 
 describe('Like', () => {
@@ -52,7 +54,7 @@ describe('Like', () => {
     expect(queryByText('Like post')).toBeTruthy()
     expect(queryByText('Unlike post')).toBeFalsy()
 
-    rerender(<Like onClick={Function.prototype} isLiked likeCount={0} />)
+    rerender(<Like onClick={Function.prototype} isLiked delimiterKey="like" likeCount={0} />)
 
     expect(queryByTestId('not-liked-icon')).toBeFalsy()
     expect(queryByTestId('liked-icon')).toBeTruthy()
