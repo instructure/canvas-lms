@@ -116,11 +116,12 @@ module Importers
       item.saved_by = :migration
       item.mark_as_importing!(migration)
       master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
+      new_record = item.new_record?
 
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
-      if item.new_record? || item.deleted? || master_migration
+      if new_record || item.deleted? || master_migration
         if item.can_unpublish?
           item.workflow_state = (hash[:workflow_state] || 'published')
         else
@@ -199,12 +200,11 @@ module Importers
 
       item.allowed_attempts = hash[:allowed_attempts] if hash[:allowed_attempts]
 
-      if !item.new_record? && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
+      if !new_record && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
         # is a date-restricted master course item - clear their old overrides because we're mean
         item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
-
-      item.needs_update_cached_due_dates = true if item.new_record? || item.update_cached_due_dates?
+      item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
       # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
       # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,
@@ -320,15 +320,18 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
-      if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
-        (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
-        # check if it's going to fail the weird post_to_sis validation requiring due dates
-        # either because the date is already nil or we're going to remove it later
-        migration.add_warning(
-          t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
-            :assignment_name => item.title))
-      elsif !hash[:post_to_sis].nil?
-        item.post_to_sis = hash[:post_to_sis]
+      # Only set post_to_sis if this is a new assignment or if the content is locked
+      if new_record || item.editing_restricted?(:any)
+        if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
+          (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
+          # check if it's going to fail the weird post_to_sis validation requiring due dates
+          # either because the date is already nil or we're going to remove it later
+          migration.add_warning(
+            t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
+              :assignment_name => item.title))
+        elsif !hash[:post_to_sis].nil?
+          item.post_to_sis = hash[:post_to_sis]
+        end
       end
 
       [:turnitin_enabled, :vericite_enabled].each do |prop|
@@ -365,7 +368,7 @@ module Importers
         # is not scheduled, even though that's the date we want.
         item.skip_schedule_peer_reviews = true
       end
-      item.needs_update_cached_due_dates = true if item.new_record? || item.update_cached_due_dates?
+      item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
       item.lti_resource_link_lookup_uuid = hash['resource_link_lookup_uuid']

@@ -787,7 +787,6 @@ describe "Importing assignments" do
       expect(migration).to_not receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
-
   end
 
   describe "post_policy" do
@@ -836,6 +835,65 @@ describe "Importing assignments" do
     it "does not update the assignment's post policy if no post_policy element is present and not anonymous or moderated" do
       assignment_hash.delete(:post_policy)
       expect(imported_assignment.post_policy).not_to be_post_manually
+    end
+  end
+
+  describe "post_to_sis" do
+    let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
+    let(:course) { Course.create! }
+    let(:account) { course.account }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_hash) do
+      {
+        "migration_id" => migration_id,
+        "title" => "post_to_sis",
+        "post_to_sis" => false,
+        "date_shift_options" => {
+          "remove_dates": true
+        }
+      }.with_indifferent_access
+    end
+
+    let(:imported_assignment) do
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      course.assignments.find_by(migration_id: migration_id)
+    end
+
+    it "adds a warning to the migration if the post_to_sis validation will fail without due dates" do
+      assignment_hash[:post_to_sis] = true
+      account.settings = {
+        sis_syncing: { value: true },
+        sis_require_assignment_due_date: { value: true }
+      }
+      account.save!
+      account.enable_feature!(:new_sis_integrations)
+
+      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
+      expect(migration).to receive(:add_warning).with("The Sync to SIS setting could not be enabled for the assignment \"#{assignment_hash['title']}\" without a due date.")
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+    end
+
+    it "sets post_to_sis if provided" do
+      assignment_hash[:post_to_sis] = true
+      expect(imported_assignment.post_to_sis).to eq(assignment_hash['post_to_sis'])
+    end
+
+    it "does not change the value set on the assignment if previously imported" do
+      imported_assignment
+      imported_assignment.update(post_to_sis: !assignment_hash['post_to_sis'])
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      imported_assignment.reload
+      expect(imported_assignment.post_to_sis).not_to eq(assignment_hash['post_to_sis'])
+    end
+
+    it "does change the value if the blueprint has been locked" do
+      imported_assignment
+      imported_assignment.update(post_to_sis: !assignment_hash['post_to_sis'])
+      allow(Assignment).to receive(:where).and_return([imported_assignment])
+      allow(imported_assignment).to receive(:editing_restricted?).with(:any).and_return(true)
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      imported_assignment.reload
+      expect(imported_assignment.post_to_sis).to eq(assignment_hash['post_to_sis'])
     end
   end
 end
