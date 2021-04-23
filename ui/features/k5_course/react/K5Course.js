@@ -46,14 +46,18 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {fetchCourseApps, fetchCourseTabs, TAB_IDS} from '@canvas/k5/react/utils'
-import k5Theme, {theme} from '@canvas/k5/react/k5-theme'
+import {
+  fetchCourseApps,
+  fetchCourseTabs,
+  DEFAULT_COURSE_COLOR,
+  TAB_IDS
+} from '@canvas/k5/react/utils'
+import {theme} from '@canvas/k5/react/k5-theme'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import ManageCourseTray from './ManageCourseTray'
 
-const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const HERO_HEIGHT_PX = 400
 
 const COURSE_TABS = [
@@ -134,6 +138,7 @@ export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
+  color,
   courseOverview,
   id,
   imageUrl,
@@ -219,7 +224,11 @@ export function K5Course({
               </Button>
             </View>
           )}
-          <CourseHeaderHero name={name} image={imageUrl} backgroundColor={DEFAULT_COLOR} />
+          <CourseHeaderHero
+            name={name}
+            image={imageUrl}
+            backgroundColor={color || DEFAULT_COURSE_COLOR}
+          />
         </K5Tabs>
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
@@ -239,6 +248,7 @@ K5Course.propTypes = {
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
+  color: PropTypes.string,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,

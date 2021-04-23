@@ -83,11 +83,18 @@ describe('K-5 Subject Course', () => {
       expect(hero.style.getPropertyValue('background-image')).toBe(`url(${imageUrl})`)
     })
 
-    it('displays a gray background on the hero header if no image is set', () => {
+    it('displays the course color if one is set but no course image is set', () => {
+      const {getByTestId} = render(<K5Course {...defaultProps} color="#bb8" />)
+      const hero = getByTestId('k5-course-header-hero')
+
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(187, 187, 136)')
+    })
+
+    it('displays a gray background on the hero header if no course color or image is set', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} />)
       const hero = getByTestId('k5-course-header-hero')
 
-      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(199, 205, 209)')
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(57, 75, 88)')
     })
 
     it('displays the course name', () => {

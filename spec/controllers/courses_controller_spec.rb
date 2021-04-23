@@ -1603,6 +1603,15 @@ describe CoursesController do
         expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
       end
 
+      it "sets COURSE.color appropriately in js_env" do
+        @course.course_color = "#BB8"
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:color]).to eq('#BB8')
+      end
+
       it "loads announcements on home page when course is a k5 homeroom course" do
         @course.homeroom_course = true
         @course.save!

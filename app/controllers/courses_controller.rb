@@ -2076,6 +2076,7 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    name: @context.name,
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
+                   color: @k5_mode ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
