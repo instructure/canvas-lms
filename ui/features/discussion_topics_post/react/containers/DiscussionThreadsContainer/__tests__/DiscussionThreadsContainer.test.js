@@ -117,14 +117,6 @@ describe('DiscussionThreadContainer', () => {
     expect(container).toBeTruthy()
   })
 
-  it('should render when threads are null', () => {
-    const {container} = setup({
-      ...defaultProps(),
-      threads: null
-    })
-    expect(container).toBeTruthy()
-  })
-
   it('renders discussion entries', async () => {
     const {queryByText, getByTestId, findByText} = setup(defaultProps())
     expect(await findByText('This is the parent reply')).toBeTruthy()
