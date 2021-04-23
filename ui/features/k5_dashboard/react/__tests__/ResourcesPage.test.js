@@ -55,6 +55,7 @@ describe('ResourcesPage', () => {
         originalName: 'English Class'
       }
     ],
+    cardsSettled: true,
     ...overrides
   })
 

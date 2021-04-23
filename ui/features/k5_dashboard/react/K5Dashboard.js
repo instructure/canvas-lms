@@ -90,6 +90,7 @@ export const K5Dashboard = ({
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
   const [focusMissingItems, setFocusMissingItems] = useState(false)
+  const [cardsSettled, setCardsSettled] = useState(false)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -100,7 +101,10 @@ export const K5Dashboard = ({
 
   useEffect(() => {
     if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
-      loadCardDashboard(setCards)
+      loadCardDashboard((dc, cardsFinishedLoading) => {
+        setCards(dc)
+        setCardsSettled(cardsFinishedLoading)
+      })
     }
   }, [cards, currentTab])
 
@@ -124,6 +128,7 @@ export const K5Dashboard = ({
           assignmentsDueToday,
           assignmentsMissing,
           assignmentsCompletedForToday,
+          cardsSettled,
           loadingOpportunities,
           isStudent: plannerEnabled,
           responsiveSize,
@@ -143,14 +148,13 @@ export const K5Dashboard = ({
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
-        {cards && (
-          <HomeroomPage
-            cards={cards}
-            isStudent={plannerEnabled}
-            responsiveSize={responsiveSize}
-            visible={currentTab === TAB_IDS.HOMEROOM}
-          />
-        )}
+        <HomeroomPage
+          cards={cards}
+          cardsSettled={cardsSettled}
+          isStudent={plannerEnabled}
+          responsiveSize={responsiveSize}
+          visible={currentTab === TAB_IDS.HOMEROOM}
+        />
         {plannerInitialized && (
           <SchedulePage
             visible={currentTab === TAB_IDS.SCHEDULE}
@@ -159,7 +163,13 @@ export const K5Dashboard = ({
         )}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
-        {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
+        {cards && (
+          <ResourcesPage
+            cards={cards}
+            cardsSettled={cardsSettled}
+            visible={currentTab === TAB_IDS.RESOURCES}
+          />
+        )}
       </K5DashboardContext.Provider>
     </View>
   )

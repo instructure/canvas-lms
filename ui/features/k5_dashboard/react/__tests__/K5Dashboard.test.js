@@ -21,6 +21,7 @@ import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
+import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
@@ -157,6 +158,7 @@ const apps = [
 ]
 const defaultEnv = {
   current_user: currentUser,
+  current_user_id: '1',
   K5_MODE: true,
   FEATURES: {
     canvas_for_elementary: true,
@@ -175,7 +177,7 @@ const defaultProps = {
   timeZone: defaultEnv.TIMEZONE
 }
 
-beforeAll(() => {
+beforeEach(() => {
   moxios.install()
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
     status: 200,
@@ -278,20 +280,16 @@ beforeAll(() => {
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
   fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
-})
-
-afterAll(() => {
-  moxios.uninstall()
-  fetchMock.restore()
-})
-
-beforeEach(() => {
   global.ENV = defaultEnv
 })
 
 afterEach(() => {
+  moxios.uninstall()
+  fetchMock.restore()
   global.ENV = {}
+  resetDashboardCards()
   resetPlanner()
+  sessionStorage.clear()
   window.location.hash = ''
 })
 
@@ -400,6 +398,32 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Assignment 1')).toBeInTheDocument()
       expect(getByText('Assignment 2')).toBeInTheDocument()
     })
+
+    it('only fetches announcements and LTIs based on cards once per page load', done => {
+      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
+      moxios.withMock(() => {
+        render(<K5Dashboard {...defaultProps} />)
+
+        // Don't respond immediately, let the cards from sessionStorage return first
+        moxios.wait(() =>
+          moxios.requests
+            .mostRecent()
+            .respondWith({
+              status: 200,
+              response: dashboardCards
+            })
+            .then(() => {
+              // Expect one announcement request for each card
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(2)
+              // Expect one LTI request for each non-homeroom card
+              expect(
+                fetchMock.calls('/api/v1/courses/1/external_tools/visible_course_nav_tools').length
+              ).toBe(1)
+              done()
+            })
+        )
+      })
+    })
   })
 
   describe('Schedule Section', () => {
@@ -443,14 +467,14 @@ describe('K-5 Dashboard', () => {
     })
 
     it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
-      const {findByRole, getByRole} = render(
+      const {findAllByRole, getAllByRole} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      const todayButton = await findByRole('button', {name: 'Jump to Today'})
+      const todayButton = (await findAllByRole('button', {name: 'Today'}))[0]
       expect(todayButton).toBeEnabled()
-      const previousButton = getByRole('button', {name: 'View previous week'})
+      const previousButton = getAllByRole('button', {name: 'View previous week'})[0]
       await waitFor(() => expect(previousButton).toBeEnabled())
-      const nextButton = getByRole('button', {name: 'View next week'})
+      const nextButton = getAllByRole('button', {name: 'View next week'})[0]
       expect(nextButton).toBeEnabled()
     })
 
