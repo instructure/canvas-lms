@@ -29,6 +29,7 @@ import htmlEscape from 'html-escape'
 import './validate'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/datetime'
+import '@canvas/util/jquery/fixDialogButtons'
 
 $nodes = {}
 templates = {teacherDialog, studentDialog, parentDialog, newParentDialog, samlDialog}
