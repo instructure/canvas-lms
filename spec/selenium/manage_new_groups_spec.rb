@@ -253,7 +253,6 @@ describe "manage groups" do
   end
 
   it "should let students create groups and invite other users" do
-    skip('puma bump causing some spec fragility FOO-1869')
     course_with_student_logged_in(:active_all => true)
     student_in_course(:course => @course, :active_all => true, :name => "other student")
     other_student = @student
