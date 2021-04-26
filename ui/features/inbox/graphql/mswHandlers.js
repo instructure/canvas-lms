@@ -107,6 +107,22 @@ export const handlers = [
           body: 'this is a message for the inbox',
           author: User.mock({_id: '1', name: 'Charles Xavier'}),
           recipients: [User.mock({_id: '1', name: 'Charels Xavier'})]
+        }),
+        ConversationMessage.mock({
+          _id: '2800',
+          id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjj0',
+          createdAt: '2021-03-16T12:09:23-05:00',
+          body: 'Watch out for that Magneto guy',
+          author: User.mock({_id: '1', name: 'Charles Xavier'}),
+          recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
+        }),
+        ConversationMessage.mock({
+          _id: '2801',
+          id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjj1',
+          createdAt: '2021-03-16T12:09:23-04:00',
+          body: 'Wolverine is not so bad when you get to know him',
+          author: User.mock({_id: '1', name: 'Charles Xavier'}),
+          recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
         })
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationParticipantsConnection.nodes = [

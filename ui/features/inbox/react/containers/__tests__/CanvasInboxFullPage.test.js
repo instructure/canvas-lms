@@ -55,7 +55,7 @@ describe('CanvasInbox Full Page', () => {
   }
 
   test('toggles between inbox and sent scopes', async () => {
-    const container = await setup()
+    const container = setup()
     await waitForApolloLoading()
     const conversationNode = await container.findByTestId('conversation')
     expect(conversationNode).toHaveTextContent('this is a message for the inbox')
@@ -75,5 +75,17 @@ describe('CanvasInbox Full Page', () => {
     const sentConversationNodes = await container.findAllByTestId('conversation')
     expect(sentConversationNodes[0]).toHaveTextContent('this is the first reply message')
     expect(sentConversationNodes[1]).toHaveTextContent('this is the second reply message')
+  })
+
+  it('renders the conversation messages', async () => {
+    const container = setup()
+
+    const conversation = await container.findByTestId('messageListItem-Checkbox')
+    fireEvent.click(conversation)
+
+    expect(await container.findByText('Watch out for that Magneto guy')).toBeInTheDocument()
+    expect(
+      await container.findByText('Wolverine is not so bad when you get to know him')
+    ).toBeInTheDocument()
   })
 })
