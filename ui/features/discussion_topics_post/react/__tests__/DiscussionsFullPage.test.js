@@ -23,6 +23,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {handlers} from '../../graphql/mswHandlers'
 import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
+import {graphql} from 'msw'
 import React from 'react'
 
 describe('DiscussionsFullPage', () => {
@@ -143,6 +144,36 @@ describe('DiscussionsFullPage', () => {
       expect(
         await container.getByText('Published').closest('button').hasAttribute('disabled')
       ).toBeTruthy()
+    })
+  })
+
+  describe('error handling', () => {
+    it('should render generic error page when DISCUSSION_QUERY returns null', async () => {
+      server.use(
+        graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+          return res.once(ctx.data({legacyNode: null}))
+        })
+      )
+
+      const container = setup()
+      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
+    })
+
+    it('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
+      server.use(
+        graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+          return res.once(
+            ctx.errors([
+              {
+                message: 'generic error'
+              }
+            ])
+          )
+        })
+      )
+
+      const container = setup()
+      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
     })
   })
 })

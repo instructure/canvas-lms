@@ -37,7 +37,11 @@ const DiscussionTopicManager = props => {
     }
   })
 
-  if (discussionTopicQuery.error) {
+  if (discussionTopicQuery.loading) {
+    return <LoadingIndicator />
+  }
+
+  if (discussionTopicQuery.error || !discussionTopicQuery?.data?.legacyNode) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -45,14 +49,6 @@ const DiscussionTopicManager = props => {
         errorCategory={I18n.t('Discussion Topic Post Error Page')}
       />
     )
-  }
-
-  if (discussionTopicQuery.loading) {
-    return <LoadingIndicator />
-  }
-
-  if (!discussionTopicQuery?.data?.legacyNode) {
-    return null
   }
 
   return (
