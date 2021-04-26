@@ -1396,7 +1396,7 @@ class Submission < ActiveRecord::Base
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
-    if self.workflow_state_changed? && self.graded?
+    if (self.workflow_state_changed? && self.graded?) || self.late_policy_status_changed?
       self.graded_at = Time.now
     end
     self.media_comment_id = nil if self.media_comment_id && self.media_comment_id.strip.empty?

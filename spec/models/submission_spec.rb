@@ -1668,6 +1668,17 @@ describe Submission do
         submission_spec_model(submit_homework: true)
       end
 
+      it "updates 'graded_at' on the submission when the late_policy_status is changed" do
+        now = Time.zone.now
+        Timecop.freeze(1.hour.ago(now)) do
+          @submission.update!(late_policy_status: "late")
+        end
+        Timecop.freeze(now) do
+          @submission.update!(late_policy_status: "missing")
+        end
+        expect(@submission.graded_at).to eq now
+      end
+
       it "should create a message when the assignment has been graded and published" do
         communication_channel(@user, {username: 'somewhere@test.com'})
         @submission.reload
