@@ -874,7 +874,25 @@ describe "Users API", type: :request do
       account_admin_user_with_role_changes(:role_changes => {:read_roster => false, :manage_user_logins => false})
       api_call(:get, "/api/v1/users/#{@other_user.id}",
                {:controller => 'users', :action => 'api_show', :id => @other_user.id.to_param, :format => 'json'},
-               {}, {}, {:expected_status => 401})
+               {}, {}, {:expected_status => 404})
+    end
+
+    it "404s on a deleted user" do
+      @other_user.destroy
+      account_admin_user
+      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                      { :controller => 'users', :action => 'api_show', :id => @other_user.id.to_param, :format => 'json' },
+                      {}, expected_status: 404)
+      expect(json.keys).to eq ["errors"]
+    end
+
+    it "404s but still returns the user on a deleted user for a site admin" do
+      @other_user.destroy
+      account_admin_user(account: Account.site_admin)
+      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                      { :controller => 'users', :action => 'api_show', :id => @other_user.id.to_param, :format => 'json' },
+                      {}, expected_status: 404)
+      expect(json.keys).not_to be_include("errors")
     end
   end
 

@@ -1198,43 +1198,52 @@ class UsersController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
-      get_context
+      get_context(include_deleted: true)
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
-      if authorized_action(@user, @current_user, :read_full_profile)
-        add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
+      @user = if @context.is_a?(User)
+        @context
+      else
+        api_find(@context.all_users, params[:id])
+      end
+      allowed = @user.grants_right?(@current_user, session, :read_full_profile)
+      
+      raise ActiveRecord::RecordNotFound unless allowed
 
-        @group_memberships = @user.cached_current_group_memberships_by_date
+      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
-        # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
-        # maybe should just look at the first enrollment and check if it's cached to decide if we should include
-        # them here
-        @enrollments = @user.enrollments.
-          shard(@user).
-          where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
-          eager_load(:course).
-          preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
+      @group_memberships = @user.cached_current_group_memberships_by_date
 
-        # restrict view for other users
-        if @user != @current_user
-          @enrollments = @enrollments.select{|e| e.grants_right?(@current_user, session, :read)}
+      # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
+      # maybe should just look at the first enrollment and check if it's cached to decide if we should include
+      # them here
+      @enrollments = @user.enrollments
+        .shard(@user)
+        .where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'")
+        .eager_load(:course)
+        .preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
+
+      # restrict view for other users
+      if @user != @current_user
+        @enrollments = @enrollments.select{|e| e.grants_right?(@current_user, session, :read)}
+      end
+
+      @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
+      # pre-populate the reverse association
+      @enrollments.each { |e| e.user = @user }
+
+      status = @user.deleted? ? 404 : 200
+      respond_to do |format|
+        format.html do
+          @google_analytics_page_title = "User"
+          @body_classes << 'full-width'
+          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+                  USER_ID: @user.id)
+          render status: status
         end
-
-        @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-        # pre-populate the reverse association
-        @enrollments.each { |e| e.user = @user }
-
-        respond_to do |format|
-          format.html do
-            @google_analytics_page_title = "User"
-            @body_classes << 'full-width'
-            js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
-                   USER_ID: @user.id)
-          end
-          format.json do
-            render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
-                                      @current_user.pseudonym.account)
-          end
+        format.json do
+          render json: user_json(@user, @current_user, session, %w{locale avatar_url},
+                                 @current_user.pseudonym.account),
+                                 status: status
         end
       end
     end
@@ -1276,9 +1285,10 @@ class UsersController < ApplicationController
         @user.last_login = User.with_last_login.find(@user.id).read_attribute(:last_login)
       end
 
-      render :json => user_json(@user, @current_user, session, includes, @domain_root_account)
+      render json: user_json(@user, @current_user, session, includes, @domain_root_account),
+             status: @user.deleted? ? 404 : 200
     else
-      render_unauthorized_action
+      raise ActiveRecord::RecordNotFound
     end
   end
 

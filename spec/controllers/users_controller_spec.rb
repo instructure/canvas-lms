@@ -2095,6 +2095,30 @@ describe UsersController do
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
     end
 
+    it "404s on a deleted user" do
+      course_with_teacher(:active_all => 1)
+
+      account_admin_user
+      user_session(@admin)
+      @teacher.destroy
+
+      get 'show', params: { id: @teacher.id }
+      expect(response.status).to eq 404
+      expect(response).not_to render_template('users/show')
+    end
+
+    it "404s, but still shows, on a deleted user for site admins" do
+      course_with_teacher(:active_all => 1)
+
+      account_admin_user(account: Account.site_admin)
+      user_session(@admin)
+      @teacher.destroy
+
+      get 'show', params: { id: @teacher.id }
+      expect(response.status).to eq 404
+      expect(response).to render_template('users/show')
+    end
+
     it "should respond to JSON request" do
       account = Account.create!
       course_with_student(:active_all => true, :account => account)
