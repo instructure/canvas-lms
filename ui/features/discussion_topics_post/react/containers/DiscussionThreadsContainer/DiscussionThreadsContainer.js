@@ -57,7 +57,6 @@ export const DiscussionThreadsContainer = props => {
   return (
     <div
       style={{
-        maxWidth: '55.625rem',
         marginTop: '1.5rem'
       }}
     >

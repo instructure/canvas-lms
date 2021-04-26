@@ -199,7 +199,7 @@ export const DiscussionTopicContainer = props => {
               padding="medium small small"
               alignItems="start"
             >
-              <Flex.Item>
+              <Flex.Item shouldShrink shouldGrow>
                 <PostMessage
                   authorName={discussionTopicData.authorName}
                   avatarUrl={discussionTopicData.avatarUrl}
