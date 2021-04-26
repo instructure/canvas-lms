@@ -801,6 +801,8 @@ class RCEWrapper extends React.Component {
       } else {
         bridge.hideTrays()
       }
+    } else if (event.key.match(/\w/)) {
+      event.stopPropagation()
     }
   }
 
