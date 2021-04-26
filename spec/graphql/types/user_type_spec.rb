@@ -326,25 +326,31 @@ describe Types::UserType do
     end
 
     it 'has createdAt field for conversationMessagesConnection' do
-      c = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      expect(
-        Date.parse(type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0])
-      ).to eq Date.parse(c.conversation.conversation_messages.first.created_at.iso8601)
+      Timecop.freeze do
+        c = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        expect(
+          type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
+        ).to eq c.conversation.conversation_messages.first.created_at.iso8601
+      end
     end
 
     it 'has updatedAt field for conversations and conversationParticipants' do
-      convo = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
-      expect(Date.parse(res_node)).to eq Date.parse(convo.conversation.conversation_participants.first.updated_at.iso8601)
+      Timecop.freeze do
+        convo = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
+        expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+      end
     end
 
     it 'has updatedAt field for conversationParticipantsConnection' do
-      convo = conversation(@student, @teacher)
-      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
-      res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
-      expect(Date.parse(res_node)).to eq Date.parse(convo.conversation.conversation_participants.first.updated_at.iso8601)
+      Timecop.freeze do
+        convo = conversation(@student, @teacher)
+        type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+        res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
+        expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+      end
     end
 
     it 'does not return conversations for other users' do
