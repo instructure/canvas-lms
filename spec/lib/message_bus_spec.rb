@@ -35,11 +35,25 @@ describe MessageBus do
     producer.close()
     consumer = MessageBus.consumer_for(TEST_MB_NAMESPACE, topic_name, subscription_name)
     msg = consumer.receive(1000)
-    puts("GOT DATA: #{msg.data}")
     consumer.acknowledge(msg)
     consumer.close()
     # normally you would process the message before acknowledging it
     # but we're trying to keep the external state as clean as possible in the tests.
     expect(JSON.parse(msg.data)['test_key']).to eq("test_val")
   end
+
+  it "only parses the YAML one time as long as it doesn't change" do
+    # make sure we aren't parsing every time
+    expect(YAML).to receive(:safe_load).at_most(:twice).and_call_original
+    original_config = nil
+    5.times { original_config = MessageBus.config }
+    # force the config to change, so we get a second yaml parse
+    yaml = "NOT_THE_ORIGINAL: config"
+    allow(DynamicSettings).to receive(:find).and_return({'pulsar.yml' => yaml})
+    other_config = nil
+    5.times { other_config = MessageBus.config }
+    # make sure that the contents change when the dynamic settings change
+    expect(other_config).to_not eq(original_config)
+  end
+
 end

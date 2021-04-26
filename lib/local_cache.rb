@@ -23,6 +23,7 @@ class LocalCache
   # are a good example.
   class << self
     delegate :clear, :delete, :delete_matched, :fetch, :fetch_without_expiration, :read, :write, :write_set, to: :cache
+    delegate :lock, :unlock, to: :cache
 
     def cache
       unless defined?(@local_cache)
