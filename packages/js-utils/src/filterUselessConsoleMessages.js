@@ -23,7 +23,8 @@ const consoleMessagesToIgnore = {
     'Warning: [Focusable] Exactly one tabbable child is required (0 found).',
 
     // This is from @instructure/ui-menu, nothing we can do about it ourselves
-    /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/
+    /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
+    /Warning: \[themeable\] A theme registry has already been initialized.*/
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up
@@ -44,7 +45,9 @@ const consoleMessagesToIgnore = {
 
     // React 16.9+ generates these deprecation warnings but it doesn't do any good to hear about the ones for instUI. We can't do anything about them in this repo
     // Put any others we can't control here.
-    /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|TabList|TabPanel|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/
+    /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|TabList|TabPanel|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/,
+    // output of Pagination component substitutes the component name for the placeholder %s
+    /Please update the following components: %s,Pagination/
 
     // /is deprecated and will be removed/, // uncomment to remove instui deprecation messages
     // /Translation for/ // uncomment to remove missing translation messages
@@ -54,7 +57,7 @@ const consoleMessagesToIgnore = {
 export function filterUselessConsoleMessages(originalConsole = console) {
   Object.keys(consoleMessagesToIgnore).forEach(key => {
     const original = originalConsole[key]
-    originalConsole[key] = function() {
+    originalConsole[key] = function () {
       const combinedMsg = Array.prototype.join.call(arguments)
       const shouldIgnore = pattern =>
         combinedMsg[typeof pattern === 'string' ? 'includes' : 'match'](pattern)
