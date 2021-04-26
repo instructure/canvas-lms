@@ -260,15 +260,17 @@ module MicrosoftSync
             )
           end
 
-          it 'sends an RetriesExhaustedError to Canvas::Errors' do
+          it 'sends an RetriesExhaustedError to Canvas::Errors and saves last_error_report_id' do
             expect(Canvas::Errors).to receive(:capture) do |error, options, level|
               expect(error).to be_a(described_class::RetriesExhaustedError)
               expect(error.cause).to be_a(MicrosoftSync::Errors::PublicError)
               expect(options).to \
                 eq(tags: {type: 'microsoft_sync_smj'})
               expect(level).to eq(:error)
+              {error_report: 456}
             end
             expect { subject.send(:run, :step_first) }.to raise_error(Errors::PublicError)
+            expect(state_record.last_error_report_id).to eq(456)
           end
         end
 
@@ -404,11 +406,12 @@ module MicrosoftSync
             expect(steps_object.steps_run.last).to eq([:after_failure])
           end
 
-          it 'sends the error to Canvas::Errors.capture' do
+          it 'sends the error to Canvas::Errors.capture and saves the error report' do
             expect(Canvas::Errors).to receive(:capture).with(
               error, {tags: {type: 'microsoft_sync_smj'}}, :error
-            )
+            ).and_return({error_report: 123})
             expect { subject.send(:run, :step_first) }.to raise_error(error)
+            expect(state_record.last_error_report_id).to eq(123)
           end
 
           it 'increments the "failure" statsd metric' do

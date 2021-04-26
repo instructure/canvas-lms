@@ -53,6 +53,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
   ).freeze
 
   belongs_to :course
+  belongs_to :last_error_report, class_name: 'ErrorReport'
   validates_presence_of :course
   validates_uniqueness_of :course_id
 

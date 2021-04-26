@@ -218,13 +218,13 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          update_state_record_to_errored_and_cleanup(e)
           if e.is_a?(GracefulCancelErrorMixin)
             statsd_increment(:cancel, current_step, e)
+            update_state_record_to_errored_and_cleanup(e)
             return
           else
             statsd_increment(:failure, current_step, e)
-            capture_exception(e)
+            update_state_record_to_errored_and_cleanup(e, capture: e)
             raise
           end
         end
@@ -276,10 +276,12 @@ module MicrosoftSync
       self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now).run(step)
     end
 
-    def update_state_record_to_errored_and_cleanup(error)
+    def update_state_record_to_errored_and_cleanup(error, capture: nil)
+      error_report_id = capture && capture_exception(capture)[:error_report]
       error_msg = MicrosoftSync::Errors.user_facing_message(error)
       job_state_record&.update_unless_deleted(
-        workflow_state: :errored, last_error: error_msg, job_state: nil
+        workflow_state: :errored, job_state: nil,
+        last_error: error_msg, last_error_report_id: error_report_id
       )
       steps_object.after_failure
     end
@@ -321,9 +323,10 @@ module MicrosoftSync
 
 
       if retries >= steps_object.max_retries
-        update_state_record_to_errored_and_cleanup(retry_object.error)
+        update_state_record_to_errored_and_cleanup(
+          retry_object.error, capture: RetriesExhaustedError.new(retry_object.error)
+        )
         statsd_increment(:final_retry, current_step, retry_object.error)
-        capture_exception(RetriesExhaustedError.new(retry_object.error))
         raise retry_object.error
       end
 

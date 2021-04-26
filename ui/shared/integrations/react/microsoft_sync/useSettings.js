@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import {useState, useCallback} from 'react'
+import React, {useState, useCallback} from 'react'
 import I18n from 'i18n!course_settings'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 
@@ -46,11 +46,13 @@ function useSettings(courseId) {
       setEnabled(!!response.workflow_state)
 
       if (response.workflow_state === 'errored') {
-        setError({
-          message: I18n.t('An error occurred during the sync process: %{error}', {
-            error: response.last_error
-          })
+        let message = I18n.t('An error occurred during the sync process: %{error}', {
+          error: response.last_error
         })
+        if (response.last_error_report_id) {
+          message = <a href={`/error_reports/${response.last_error_report_id}`}>{message}</a>
+        }
+        setError({message})
       }
     }, []),
     error: useCallback(e => {

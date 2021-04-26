@@ -48,6 +48,20 @@ describe('useSettings', () => {
     })
   })
 
+  describe('when last_error and last_error_report_id are set on the group', () => {
+    it('sets the error with a link to the error report', () => {
+      useFetchApi.mockImplementationOnce(({success}) => {
+        success({workflow_state: 'errored', last_error: 'foo', last_error_report_id: 456})
+      })
+
+      const result = subject().result
+      const message = result.current[3].message
+      expect(message.type).toBe('a')
+      expect(message.props.href).toBe('/error_reports/456')
+      expect(message.props.children).toBe('An error occurred during the sync process: foo')
+    })
+  })
+
   describe('toggleEnabled', () => {
     it('enables the integration when it is disabled', () => {
       const {result} = subject()
