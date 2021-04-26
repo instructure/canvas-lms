@@ -25,9 +25,9 @@ function check_ready {
 CHECK_COUNT=0
 until check_ready; do
   echo "Waiting for pulsar to be ready ... $CHECK_COUNT ... "
-  sleep 5
+  sleep 4
   CHECK_COUNT=$((CHECK_COUNT+1))
-  if [ "$CHECK_COUNT" -gt "20" ]; then
+  if [ "$CHECK_COUNT" -gt "8" ]; then
     echo ":cry: I don't think pulsar is ever going to be ready..."
     exit 1
   fi
