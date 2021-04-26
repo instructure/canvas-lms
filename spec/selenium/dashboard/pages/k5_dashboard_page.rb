@@ -281,6 +281,10 @@ module K5PageObject
     ".PlannerItem-styles__title a"
   end
 
+  def missing_item_href_selector(course_id, assignment_id)
+    "//*[contains(@href, '/courses/#{course_id}/assignments/#{assignment_id}')]"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -562,6 +566,10 @@ module K5PageObject
 
   def schedule_item
     f(schedule_item_selector)
+  end
+
+  def assignment_link(missing_assignment_element, course_id, assignment_id)
+    find_from_element_fxpath(missing_assignment_element, missing_item_href_selector(course_id, assignment_id))
   end
 
   #----------------------- Actions & Methods -------------------------

@@ -150,7 +150,7 @@ describe "student k5 dashboard schedule" do
 
       expect(assignments_list.count).to eq(2)
       expect(assignments_list.first.text).to include('missing assignment1')
-      expect(assignment_link_exists?(@course.id, assignment1.id)).to be_truthy
+      expect(assignment_link(missing_assignments[0], @subject_course.id, assignment1.id)).to be_displayed
     end
 
     it 'clicking list twice hides missing assignments' do
