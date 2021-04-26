@@ -23,7 +23,7 @@ services:
       # parallel_tests
       CI_NODE_TOTAL:
       CI_NODE_INDEX:
-      DOCKER_PROCESSES:
+      RSPEC_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
       # rspec-parallel-log build

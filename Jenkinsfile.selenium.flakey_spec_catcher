@@ -92,7 +92,7 @@ def computeTestCount() {
   }
 
   sh """
-    docker-compose --project-name canvas-lms0 run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
+    docker-compose run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
       canvas \
       bash -c "bundle exec rspec --dry-run ${changed_tests_arr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
   """
@@ -204,7 +204,6 @@ pipeline {
     // repeats each test FSC_REPEAT_FACTOR times.
     // Assumption: non-selenium tests take 500ms / test
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
-    DOCKER_PROCESSES = 1
     FSC_REPEAT_FACTOR = 10
     MAX_NODES = configuration.getString('fsc-max-nodes', '10')
     RSPEC_PROCESSES = 3

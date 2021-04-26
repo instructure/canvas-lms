@@ -37,7 +37,6 @@ def runSeleniumSuite(total, index) {
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
-      '1',
       '3',
       config.force_failure,
       config.patchsetTag
@@ -65,7 +64,6 @@ def runRSpecSuite(total, index) {
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/(selenium|contracts)',
-      '1',
       '4',
       config.force_failure,
       config.patchsetTag
@@ -81,7 +79,6 @@ def _runRspecTestSuite(
     rerunsRetry,
     testFilePattern,
     excludeRegex,
-    dockerProcesses,
     rspecProcesses,
     forceFailure,
     patchsetTag
@@ -94,7 +91,6 @@ def _runRspecTestSuite(
       "TEST_PATTERN=$testFilePattern",
       "EXCLUDE_TESTS=$excludeRegex",
       "CI_NODE_TOTAL=$total",
-      "DOCKER_PROCESSES=$dockerProcesses",
       "RSPEC_PROCESSES=$rspecProcesses",
       "FORCE_FAILURE=$forceFailure",
       'POSTGRES_PASSWORD=sekret',
@@ -109,7 +105,7 @@ def _runRspecTestSuite(
           sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
         }
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
-        sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
+        sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
       }
     } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {

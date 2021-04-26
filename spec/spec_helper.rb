@@ -354,8 +354,8 @@ RSpec.configure do |config|
   config.include PGCollkeyHelper
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
-  # DOCKER_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV['DOCKER_PROCESSES']
+  # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
+  if ENV['RSPEC_PROCESSES']
     file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
     config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
