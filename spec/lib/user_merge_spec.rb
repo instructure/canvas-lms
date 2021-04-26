@@ -55,6 +55,11 @@ describe UserMerge do
       expect(mergeme.merge_data.items.where(item_type: 'merge_error').take.item.first).to eq 'boom'
     end
 
+    it 'records where the user was merged to' do
+      UserMerge.from(user2).into(user1)
+      expect(user2.reload.merged_into_user).to eq user1
+    end
+
     it "should move pseudonyms to the new user" do
       pseudonym = user2.pseudonyms.create!(unique_id: 'sam@yahoo.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@yahoo.com')
