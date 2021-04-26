@@ -280,10 +280,13 @@ module AuthenticationMethods
         @real_current_pseudonym = @current_pseudonym
         @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
         logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
-      elsif api_request?
-        # fail silently for UI, but not for API
+      elsif api_request? # fail silently for UI, but not for API
+        result = { errors: "Invalid as_user_id" }
+        if user&.deleted? && user.merged_into_user_id && user.grants_right?(@current_user, :read)
+          result[:merged_into_user_id] = user.merged_into_user_id
+        end
         # this should maybe be 404, not 401, but we can't change it now
-        render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
+        render json: result, status: :unauthorized
         return false
       end
     end

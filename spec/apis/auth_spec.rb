@@ -948,5 +948,18 @@ describe "API Authentication", type: :request do
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
     end
+
+    it "includes the merged_into_user_id for a merged user" do
+      from_user = user_with_pseudonym(active_all: true)
+      to_user = user_with_pseudonym(active_all: true)
+      UserMerge.from(from_user).into(to_user)
+
+      account_admin_user(account: Account.site_admin)
+
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{from_user.id}",
+                   :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => from_user.id.to_s)
+      assert_status(401)
+      expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id', 'merged_into_user_id' => to_user.id })
+    end
   end
 end
