@@ -141,3 +141,17 @@ function check_dependencies {
 function is_running_on_jenkins() {
   [[ -n "${JENKINS:-}" ]]
 }
+
+function rebuild_docker_images {
+  if [ -n "$(git diff --name-only "${before_rebase_sha:-origin/master}" | grep -E 'Dockerfile$|Dockerfile.githook$|docker-compose/postgres/Dockerfile$')" ]; then
+    message "There have been some updates made to Dockerfile, you should rebuild your docker images."
+    prompt "Rebuild docker images? [y/n]" rebuild_image
+    if [ "${rebuild_image:n}" == 'y' ]; then
+      start_spinner "Rebuilding Docker images"
+      _canvas_lms_track_with_log docker-compose build
+      stop_spinner
+    else
+      echo "Your docker image is now outdated and needs to be rebuilt! You should run \"docker-compose build\"."
+    fi
+  fi
+}

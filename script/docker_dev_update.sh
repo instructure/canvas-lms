@@ -34,10 +34,12 @@ while :; do
       ;;
     --update-code)
       UPDATE_CODE=true
+      before_rebase_sha="$(git rev-parse HEAD)"
       params=()
       while :; do
         case $2 in
           skip-canvas)
+            unset before_rebase_sha
             params+=(--skip-canvas)
             ;;
           skip-plugins)
@@ -91,6 +93,7 @@ create_log_file
 message "Bringing Canvas up to date ..."
 init_log_file "Docker Dev Update"
 [[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
+rebuild_docker_images
 docker_compose_up
 bundle_install_with_check
 install_node_packages
