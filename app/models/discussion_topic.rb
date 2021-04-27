@@ -139,6 +139,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def sections_for(user)
+    return unless is_section_specific?
+    CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: self.id)
+      .where("EXISTS (?)", Enrollment.active_or_pending.where(user_id: user)
+        .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
+      .select("discussion_topic_section_visibilities.course_section_id"))
+  end
+
+  def address_book_context_for(user)
+    if self.is_section_specific?
+      sections_for(user)
+    else
+      context
+    end
+  end
+
   def threaded=(v)
     self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
   end
