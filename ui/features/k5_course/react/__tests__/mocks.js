@@ -58,6 +58,8 @@ export const MOCK_ASSIGNMENT_GROUPS = [
   {
     id: '51',
     name: 'Reports',
+    rules: {},
+    group_weight: 0.0,
     assignments: [
       {
         id: '1',
@@ -76,5 +78,17 @@ export const MOCK_ASSIGNMENT_GROUPS = [
         }
       }
     ]
+  }
+]
+
+export const MOCK_ENROLLMENTS = [
+  {
+    user_id: 'fake'
+  },
+  {
+    user_id: '1',
+    grades: {
+      current_score: 89.39
+    }
   }
 ]

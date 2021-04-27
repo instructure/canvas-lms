@@ -38,6 +38,7 @@ ready(() => {
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
         userIsInstructor={ENV.COURSE.is_instructor}
+        hideFinalGrades={ENV.COURSE.hide_final_grades}
       />,
       courseContainer
     )

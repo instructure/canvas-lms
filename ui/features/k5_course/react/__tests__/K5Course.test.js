@@ -21,7 +21,7 @@ import moxios from 'moxios'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
-import {MOCK_COURSE_APPS, MOCK_COURSE_TABS, MOCK_ASSIGNMENT_GROUPS} from './mocks'
+import {MOCK_COURSE_APPS, MOCK_COURSE_TABS, MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
@@ -49,6 +49,7 @@ const defaultProps = {
   timeZone: defaultEnv.TIMEZONE,
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
+  hideFinalGrades: false,
   userIsInstructor: false
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
@@ -56,6 +57,8 @@ const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission'
 )
+const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
+
 let modulesContainer
 
 beforeAll(() => {
@@ -63,6 +66,7 @@ beforeAll(() => {
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
   fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
+  fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
   if (!modulesContainer) {
     modulesContainer = document.createElement('div')
     modulesContainer.id = 'k5-modules-container'
@@ -208,6 +212,11 @@ describe('K-5 Subject Course', () => {
         expect(getByText(t)).toBeInTheDocument()
       })
       expect(getByText('Submitted', {exact: false})).toBeInTheDocument()
+    })
+
+    it('shows course total', async () => {
+      const {findByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
+      expect(await findByText('Total: 89.39%')).toBeInTheDocument()
     })
   })
 

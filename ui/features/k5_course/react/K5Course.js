@@ -150,6 +150,8 @@ export function K5Course({
   canManage = false,
   defaultTab = TAB_IDS.HOME,
   plannerEnabled = false,
+  hideFinalGrades,
+  currentUser,
   userIsInstructor
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
@@ -237,7 +239,13 @@ export function K5Course({
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         {currentTab === TAB_IDS.GRADES && (
-          <GradesPage courseId={id} courseName={name} userIsInstructor={userIsInstructor} />
+          <GradesPage
+            courseId={id}
+            courseName={name}
+            hideFinalGrades={hideFinalGrades}
+            currentUser={currentUser}
+            userIsInstructor={userIsInstructor}
+          />
         )}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
       </View>
@@ -259,6 +267,8 @@ K5Course.propTypes = {
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   courseOverview: PropTypes.string.isRequired,
+  hideFinalGrades: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object.isRequired,
   userIsInstructor: PropTypes.bool.isRequired
 }
 

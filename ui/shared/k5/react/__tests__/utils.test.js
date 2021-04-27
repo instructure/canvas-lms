@@ -27,7 +27,9 @@ import {
   fetchCourseApps,
   sendMessage,
   createNewCourse,
-  enrollAsTeacher
+  enrollAsTeacher,
+  getAssignmentGroupTotals,
+  getAssignmentGrades
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -269,5 +271,104 @@ describe('enrollAsTeacher', () => {
     fetchMock.post(encodeURI(ENROLL_AS_TEACHER_URL), 200)
     const result = await enrollAsTeacher('test')
     expect(result.response.ok).toBeTruthy()
+  })
+})
+
+describe('getAssignmentGroupTotals', () => {
+  it('returns an array of objects that have id, name, and score', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              late: false,
+              excused: false,
+              missing: false
+            }
+          },
+          {
+            id: 150,
+            name: '2',
+            points_possible: 5.0,
+            grading_type: 'points',
+            submission: {
+              score: 5.0,
+              grade: '5.0',
+              late: false,
+              excused: false,
+              missing: false
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data)
+    expect(totals.length).toBe(1)
+    expect(totals[0].id).toBe('49')
+    expect(totals[0].name).toBe('Assignments')
+    expect(totals[0].score).toBe('80.00%')
+  })
+
+  it('returns n/a for assignment groups with no assignments', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: []
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data)
+    expect(totals[0].score).toBe('n/a')
+  })
+})
+
+describe('getAssignmentGrades', () => {
+  it('includes assignments from different groups in returned array', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            html_url: 'http://localhost/1',
+            due_at: null,
+            points_possible: 10.0,
+            grading_type: 'points'
+          }
+        ]
+      },
+      {
+        id: '50',
+        name: 'Essays',
+        assignments: [
+          {
+            id: 150,
+            name: '2',
+            html_url: 'http://localhost/2',
+            due_at: '2020-04-18T05:59:59Z',
+            points_possible: 10.0,
+            grading_type: 'points'
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals.length).toBe(2)
+    expect(totals[0].assignmentName).toBe('2')
+    expect(totals[1].assignmentName).toBe('1')
   })
 })

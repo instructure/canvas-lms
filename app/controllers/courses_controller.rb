@@ -2082,7 +2082,8 @@ class CoursesController < ApplicationController
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
                    is_instructor: @context.user_is_instructor?(@current_user),
-                   course_overview: @context&.wiki&.front_page&.body
+                   course_overview: @context&.wiki&.front_page&.body,
+                   hide_final_grades: @context.hide_final_grades?
                  }
                })
 

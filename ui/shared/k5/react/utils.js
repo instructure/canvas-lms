@@ -19,6 +19,8 @@
 import I18n from 'i18n!k5_dashboard'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
+import moment from 'moment-timezone'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -148,6 +150,62 @@ export const enrollAsTeacher = courseId =>
       'enrollment[enrollment_state]': 'active'
     }
   })
+
+/* Takes raw response from assignment_groups API and returns an array of objects with each
+   assignment group's id, name, and total score. */
+export const getAssignmentGroupTotals = data =>
+  data.map(group => {
+    const groupScores = AssignmentGroupGradeCalculator.calculate(
+      group.assignments.map(a => ({
+        points_possible: a.points_possible,
+        assignment_id: a.id,
+        assignment_group_id: a.assignment_group_id,
+        ...a.submission
+      })),
+      group,
+      false
+    )
+    return {
+      id: group.id,
+      name: group.name,
+      score:
+        groupScores.current.possible === 0
+          ? I18n.t('n/a')
+          : I18n.n((groupScores.current.score / groupScores.current.possible) * 100, {
+              percentage: true,
+              precision: 2
+            })
+    }
+  })
+
+/* Takes raw response from assignment_groups API and returns an array of assignments with
+   grade information, sorted by due date. */
+export const getAssignmentGrades = data =>
+  data
+    .map(group =>
+      group.assignments.map(a => ({
+        id: a.id,
+        assignmentName: a.name,
+        url: a.html_url,
+        dueDate: a.due_at,
+        assignmentGroupName: group.name,
+        assignmentGroupId: group.id,
+        pointsPossible: a.points_possible,
+        gradingType: a.grading_type,
+        score: a.submission?.score,
+        grade: a.submission?.grade,
+        submissionDate: a.submission?.submitted_at,
+        late: a.submission?.late,
+        excused: a.submission?.excused,
+        missing: a.submission?.missing
+      }))
+    )
+    .flat(1)
+    .sort((a, b) => {
+      if (a.dueDate == null) return 1
+      if (b.dueDate == null) return -1
+      return moment(a.dueDate).diff(moment(b.dueDate))
+    })
 
 export const TAB_IDS = {
   HOME: 'tab-home',

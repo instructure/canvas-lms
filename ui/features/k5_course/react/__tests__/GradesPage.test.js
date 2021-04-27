@@ -17,22 +17,32 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import tz from '@canvas/timezone'
 import {GradesPage} from '../GradesPage'
-import {MOCK_ASSIGNMENT_GROUPS} from './mocks'
+import {MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
 
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission'
 )
+const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments'
 
 describe('GradesPage', () => {
   const getProps = (overrides = {}) => ({
     courseId: '12',
     courseName: 'History',
     userIsInstructor: false,
+    hideFinalGrades: false,
+    currentUser: {
+      id: '1'
+    },
     ...overrides
+  })
+
+  beforeEach(() => {
+    fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
+    fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
   })
 
   afterEach(() => {
@@ -40,7 +50,6 @@ describe('GradesPage', () => {
   })
 
   it('renders loading skeletons while fetching content', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
     const {getAllByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() => {
       const skeletons = getAllByText('Loading grades for History')
@@ -50,7 +59,7 @@ describe('GradesPage', () => {
   })
 
   it('renders a flashAlert if an error happens on fetch', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, 400)
+    fetchMock.get(ASSIGNMENT_GROUPS_URL, 400, {overwriteRoutes: true})
     const {getAllByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() =>
       expect(getAllByText('Failed to load grades for History')[0]).toBeInTheDocument()
@@ -58,7 +67,6 @@ describe('GradesPage', () => {
   })
 
   it('renders a table with 4 headers', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
     const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
     ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
@@ -67,7 +75,7 @@ describe('GradesPage', () => {
   })
 
   it('shows a panda and text for students with no grades', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, [])
+    fetchMock.get(ASSIGNMENT_GROUPS_URL, [], {overwriteRoutes: true})
     const {getByTestId, getByText, queryByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
     expect(getByText("You don't have any grades yet.")).toBeInTheDocument()
@@ -78,7 +86,6 @@ describe('GradesPage', () => {
   })
 
   it('renders the returned assignment details', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
     const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
     const formattedDueDate = tz.format('2020-04-18T05:59:59Z', 'date.formats.full_with_weekday')
@@ -88,7 +95,6 @@ describe('GradesPage', () => {
   })
 
   it('shows a panda and link to gradebook for teachers', async () => {
-    fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
     const {getByText, getByTestId, getByRole, queryByText} = render(
       <GradesPage {...getProps({userIsInstructor: true})} />
     )
@@ -98,5 +104,47 @@ describe('GradesPage', () => {
     expect(gradebookButton).toBeInTheDocument()
     expect(gradebookButton.href).toContain('/courses/12/gradebook')
     expect(queryByText('Assignment')).not.toBeInTheDocument()
+  })
+
+  describe('totals', () => {
+    it('displays fetched course total grade', async () => {
+      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
+      await waitFor(() =>
+        expect(queryByText('Loading total grade for History')).not.toBeInTheDocument()
+      )
+      expect(getByText('Total: 89.39%')).toBeInTheDocument()
+    })
+
+    it('displays assignment group totals when expanded', async () => {
+      const {getByText, findByText, queryByText} = render(<GradesPage {...getProps()} />)
+      const totalsButton = await findByText('View Assignment Group Totals')
+      expect(queryByText('Reports: 95.00%')).not.toBeInTheDocument()
+      act(() => totalsButton.click())
+      expect(getByText('Reports: 95.00%')).toBeInTheDocument()
+    })
+
+    it("doesn't show any totals if hideFinalGrades is set", async () => {
+      const {queryByText} = render(<GradesPage {...getProps({hideFinalGrades: true})} />)
+      await waitFor(() => {
+        expect(queryByText('Loading grades for History')).not.toBeInTheDocument()
+        expect(queryByText('Loading total grade for History')).not.toBeInTheDocument()
+      })
+      expect(queryByText('Total: 89.39%')).not.toBeInTheDocument()
+      expect(queryByText('Reports: 95.00%')).not.toBeInTheDocument()
+    })
+
+    it('total shows n/a if the fetched score is null', async () => {
+      const enrollmentsData = [
+        {
+          user_id: '1',
+          grades: {
+            current_score: null
+          }
+        }
+      ]
+      fetchMock.get(ENROLLMENTS_URL, enrollmentsData, {overwriteRoutes: true})
+      const {findByText} = render(<GradesPage {...getProps()} />)
+      expect(await findByText('Total: n/a')).toBeInTheDocument()
+    })
   })
 })
