@@ -37,6 +37,23 @@ export const Attachment = {
     mimeClass: string,
     url: string,
     thumbnailUrl: string
+  }),
+
+  mock: ({
+    _id = '304',
+    displayName = 'file1.jpg',
+    id = 'RmlsZS0zMDQ=',
+    mimeClass = 'image',
+    url = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    thumbnailUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+  } = {}) => ({
+    _id,
+    displayName,
+    id,
+    mimeClass,
+    url,
+    thumbnailUrl,
+    __typename: 'File'
   })
 }
 

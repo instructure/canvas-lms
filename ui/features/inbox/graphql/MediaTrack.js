@@ -33,6 +33,19 @@ export const MediaTrack = {
     content: string,
     locale: string,
     kind: string
+  }),
+
+  mock: ({
+    _id = '101',
+    content = '1\r\n00:00:00,000 --> 00:00:02,000\r\nMy first video\r\n',
+    locale = 'en',
+    kind = 'subtitles'
+  } = {}) => ({
+    _id,
+    content,
+    locale,
+    kind,
+    __typename: 'MediaTrack'
   })
 }
 

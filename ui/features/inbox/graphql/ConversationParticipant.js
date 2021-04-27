@@ -39,6 +39,21 @@ export const ConversationParticipant = {
     label: string,
     user: User.shape,
     workflowState: string
+  }),
+
+  mock: ({
+    _id = '251',
+    id = 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUx',
+    label = null,
+    user = User.mock(),
+    workflowState = 'read'
+  } = {}) => ({
+    _id,
+    id,
+    label,
+    user,
+    workflowState,
+    __typename: 'ConversationParticipant'
   })
 }
 

@@ -27,10 +27,18 @@ export const Course = {
       assetString
     }
   `,
+
   shape: shape({
     _id: string,
     contextName: string,
     assetString: string
+  }),
+
+  mock: ({_id = '195', contextName = 'XavierSchool', assetString = 'course_195'} = {}) => ({
+    _id,
+    contextName,
+    assetString,
+    __typename: 'Course'
   })
 }
 

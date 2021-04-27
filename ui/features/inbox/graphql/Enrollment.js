@@ -30,9 +30,16 @@ export const Enrollment = {
     }
     ${Course.fragment}
   `,
+
   shape: shape({
     type: string,
     course: Course.shape
+  }),
+
+  mock: ({type = 'StudentEnrollment', course = Course.mock()} = {}) => ({
+    type,
+    course,
+    __typename: 'Enrollment'
   })
 }
 

@@ -27,10 +27,18 @@ export const Group = {
       assetString
     }
   `,
+
   shape: shape({
     _id: string,
     contextName: string,
     assetString: string
+  }),
+
+  mock: ({_id = '1', contextName = 'Study Group 1', assetString = 'group_1'} = {}) => ({
+    _id,
+    contextName,
+    assetString,
+    __typename: 'Group'
   })
 }
 
