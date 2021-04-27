@@ -3469,4 +3469,56 @@ describe Enrollment do
       })
     end
   end
+
+  describe '#sync_microsoft_group' do
+    let(:course) { course_factory }
+
+    before :each do
+      MicrosoftSync::Group.create!(course: course)
+    end
+
+    # enroll user without running callbacks like update_user_account_associations,
+    # so that the only jobs getting enqueued are the MSFT sync group type
+    def enroll_user
+      course.enroll_user(user_factory, 'StudentViewEnrollment', skip_touch_user: true)
+    end
+
+    context 'when feature flag is off' do
+      before :each do
+        course.root_account.disable_feature!(:microsoft_group_enrollments_syncing)
+      end
+
+      it 'does not enqueue a job' do
+        expect { enroll_user }.not_to change { Delayed::Job.count }
+      end
+    end
+
+    context 'when feature flag is on' do
+      before :each do
+        course.root_account.enable_feature!(:microsoft_group_enrollments_syncing)
+      end
+
+      context 'when account has turned sync off' do
+        before :each do
+          course.root_account.settings[:microsoft_sync_enabled] = false
+          course.root_account.save!
+        end
+
+        it 'does not enqueue a job' do
+          expect { enroll_user }.not_to change { Delayed::Job.count }
+        end
+      end
+
+      context 'when account has turned sync on' do
+        before :each do
+          course.root_account.settings[:microsoft_sync_enabled] = true
+          course.root_account.save!
+        end
+
+        it 'should enqueue a job' do
+          expect { enroll_user }.to change { Delayed::Job.count }.by 1
+        end
+      end
+    end
+  end
 end

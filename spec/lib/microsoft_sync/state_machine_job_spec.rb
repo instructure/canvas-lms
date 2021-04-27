@@ -117,6 +117,9 @@ module MicrosoftSync
         mock_delay_object.define_singleton_method(:run) do |*run_args|
           so.steps_run << [:delay_run, args, run_args]
         end
+        mock_delay_object.define_singleton_method(:run_later) do |*run_later_args|
+          so.steps_run << [:delay_run_later, args, run_later_args]
+        end
       end
     end
   end
@@ -150,6 +153,16 @@ module MicrosoftSync
         subject.send(:run_later)
         expect(steps_object.steps_run).to eq([
           [:delay_run, [{strand: strand, run_at: nil}], [nil]],
+        ])
+      end
+    end
+
+    describe '#enqueue_future_sync' do
+      it 'enqueues a job calling run_later with no args' do
+        time = 10.minutes.from_now
+        subject.enqueue_future_sync(run_at: time)
+        expect(steps_object.steps_run).to eq([
+          [:delay_run_later, [{singleton: "#{strand}:enqueue_future_sync", run_at: time, on_conflict: :overwrite}], []],
         ])
       end
     end

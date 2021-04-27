@@ -113,9 +113,9 @@ describe MicrosoftSync::GroupsController, type: :controller do
       subject
     end
 
-    it 'updates the group state to "scheduled"' do
+    it 'updates the group state to "manually_scheduled"' do
       subject
-      expect(group.reload.workflow_state).to eq 'scheduled'
+      expect(group.reload.workflow_state).to eq 'manually_scheduled'
     end
 
     context 'when the group is in a "running" state' do

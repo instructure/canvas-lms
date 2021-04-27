@@ -61,6 +61,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
   workflow do
     state :pending # Initial state, before first sync
+    state :manually_scheduled
     state :scheduled
     state :running
     state :retrying
@@ -118,5 +119,13 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
   def syncer_job
     MicrosoftSync::StateMachineJob.new(self, MicrosoftSync::SyncerSteps.new(self))
+  end
+
+  def enqueue_future_sync
+    return unless update_unless_deleted(workflow_state: :scheduled)
+
+    syncer_job.enqueue_future_sync(
+      run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', '10').to_i.minutes.from_now
+    )
   end
 end
