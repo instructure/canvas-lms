@@ -7,7 +7,7 @@ services:
     depends_on:
       - pulsar
   pulsar:
-    image: apachepulsar/pulsar:latest
+    image: starlord.inscloudgate.net/jenkins/pulsar:latest
     command: bin/pulsar standalone
     ports:
       - "6650"
@@ -15,7 +15,7 @@ services:
     volumes:
       - pulsar-data:/pulsar/data
   pulsar-admin:
-    image: apachepulsar/pulsar:latest
+    image: starlord.inscloudgate.net/jenkins/pulsar:latest
     volumes:
       - ./docker-compose/pulsar:/pulsar/scripts
     depends_on:

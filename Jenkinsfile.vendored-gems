@@ -98,7 +98,7 @@ pipeline {
                 ]) {
                   try {
                     sh """
-                      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull apachepulsar/pulsar:latest
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest
                       docker-compose run pulsar-admin ./scripts/bootstrap.sh
                       docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
                     """

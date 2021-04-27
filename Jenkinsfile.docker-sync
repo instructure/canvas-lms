@@ -35,6 +35,10 @@ def SYNC_IMAGES = [
     job: null,
     target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.7-bionic',
   ],
+  'apachepulsar/pulsar:latest': [
+    job: null,
+    target: 'starlord.inscloudgate.net/jenkins/pulsar:latest',
+  ],
 ]
 
 pipeline {
