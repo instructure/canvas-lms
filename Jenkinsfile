@@ -100,11 +100,11 @@ def postFn(status) {
       }
     }
   } finally {
-    if(status == 'FAILURE') {
+    if(status == 'SUCCESS') {
+      maybeSlackSendSuccess()
+    } else {
       maybeSlackSendFailure()
       maybeRetrigger()
-    } else if(status == 'SUCCESS') {
-      maybeSlackSendSuccess()
     }
   }
 }
