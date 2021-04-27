@@ -720,6 +720,8 @@ class AssignmentsController < ApplicationController
         end
       end
 
+      hash[:USAGE_RIGHTS_REQUIRED] = @context.try(:usage_rights_required?)
+
       js_env(hash)
       conditional_release_js_env(@assignment)
       set_master_course_js_env_data(@assignment, @context)
