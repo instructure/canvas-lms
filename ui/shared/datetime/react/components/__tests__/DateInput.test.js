@@ -170,6 +170,13 @@ describe('dirty input state', () => {
     expect(getInput().value).toBe(newDate.toISOString())
   })
 
+  it('calls onSelectedDateChange with parsed date when Enter is pressed on the input', () => {
+    const {props, getInput} = renderAndDirtyInput('May 20')
+    const newDate = new Date('2020-05-20')
+    fireEvent.keyDown(getInput(), {key: 'Enter'})
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate)
+  })
+
   it('calls onSelectedDateChange with on blur and garbage input, and clears the input', () => {
     const {props, getInput} = renderAndDirtyInput('asdf')
     fireEvent.blur(getInput())

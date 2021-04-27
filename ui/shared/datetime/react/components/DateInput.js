@@ -238,6 +238,16 @@ export default function CanvasDateInput({
     if (!newDate) syncInput(priorSelectedMoment.current)
   }
 
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      handleBlur(e)
+    } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+      modifySelectedMoment(1, 'day')
+    } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
+      modifySelectedMoment(-1, 'day')
+    }
+  }
+
   function handleHideCalendar() {
     setIsShowingCalendar(false)
   }
@@ -311,6 +321,7 @@ export default function CanvasDateInput({
       assistiveText={I18n.t('Type a date or use arrow keys to navigate date picker.')}
       value={inputValue}
       onChange={handleChange}
+      onKeyDown={handleKeyDown}
       isInline
       placement={placement}
       messages={messages.concat(internalMessages)}
