@@ -160,17 +160,24 @@ module MicrosoftSync
       end
 
       result = response.parsed_response
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.success", tags: {msft_endpoint: statsd_tag})
+      InstStatsd::Statsd.increment(statsd_name, tags: {msft_endpoint: statsd_tag})
       result
-    rescue MicrosoftSync::Errors::HTTPNotFound
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.notfound", tags: {msft_endpoint: statsd_tag})
-      raise
-    rescue
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.error", tags: {msft_endpoint: statsd_tag})
+    rescue => error
+      InstStatsd::Statsd.increment(statsd_name(error), tags: {msft_endpoint: statsd_tag})
       raise
     end
 
     private
+
+    def statsd_name(error=nil)
+      name = case error
+             when nil then 'success'
+             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+             else 'error'
+             end
+      "#{STATSD_PREFIX}.#{name}"
+    end
 
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'

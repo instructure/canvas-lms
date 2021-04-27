@@ -82,6 +82,21 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    context 'with a 429 status code' do
+      let(:response) { json_response(429, error: {message: 'uh-oh!'}) }
+
+      it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with(
+          'microsoft_sync.graph_service.throttled',
+          tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+        )
+        expect { subject }.to raise_error(
+          MicrosoftSync::Errors::HTTPTooManyRequests,
+          /Graph service returned 429 for tenant mytenant.*uh-oh!/
+        )
+      end
+    end
+
     it 'increments a success statsd metric on success' do
       expect(InstStatsd::Statsd).to receive(:increment).with(
         'microsoft_sync.graph_service.success',
