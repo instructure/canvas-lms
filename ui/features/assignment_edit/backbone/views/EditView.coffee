@@ -430,7 +430,7 @@ export default class EditView extends ValidatedFormView
     @setAnnotatedDocument(null)
 
   shouldRenderUsageRights: =>
-    ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS
+    ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS and ENV.USAGE_RIGHTS_REQUIRED
 
   setAnnotatedDocumentUsageRights:(usageRights) =>
     @annotatedDocumentUsageRights = usageRights
