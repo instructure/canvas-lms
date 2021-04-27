@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ConversationMessage} from './graphql/ConversationMessage'
-import {ConversationParticipant} from './graphql/ConversationParticipant'
-import {ConversationParticipantWithConversation} from './graphql/ConversationParticipantWithConversation'
-import {Error} from '../../shared/graphql/Error'
+import {ConversationMessage} from './ConversationMessage'
+import {ConversationParticipant} from './ConversationParticipant'
+import {ConversationParticipantWithConversation} from './ConversationParticipantWithConversation'
+import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
 
 export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
