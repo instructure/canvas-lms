@@ -331,6 +331,7 @@ module SeleniumDriverSetup
         if CONFIG[:window_size].present?
           caps['goog:chromeOptions'][:args].append("window-size=#{CONFIG[:window_size]}")
         end
+        caps['unexpectedAlertBehaviour'] = 'ignore'
       when :edge
         # TODO: options for edge driver
       when :safari
