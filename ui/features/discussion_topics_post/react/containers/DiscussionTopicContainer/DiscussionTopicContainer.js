@@ -36,6 +36,7 @@ import {
 } from '../../../graphql/Mutations'
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
+import {isGraded, getSpeedGraderUrl} from '../../utils'
 
 export const DiscussionTopicContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -58,15 +59,15 @@ export const DiscussionTopicContainer = props => {
     assignment: props.discussionTopic?.assignment
   }
 
-  const isGraded =
-    discussionTopicData.assignment !== null &&
-    (discussionTopicData.assignment.dueAt || discussionTopicData.assignment.pointsPossible)
+  // TODO: Change this to the new canGrade permission.
+  const canGrade =
+    (isGraded(discussionTopicData.assignment) && discussionTopicData?.permissions?.update) || false
   const canDelete = discussionTopicData?.permissions?.delete || false
   const canReadAsAdmin = !!discussionTopicData?.permissions?.readAsAdmin || false
   const canUpdate = discussionTopicData?.permissions?.update || false
   const canUnpublish = props.discussionTopic.canUnpublish || false
 
-  if (isGraded) {
+  if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
       props.discussionTopic.assignment.dueAt
     )
@@ -178,7 +179,7 @@ export const DiscussionTopicContainer = props => {
         </Flex.Item>
         <Flex.Item>
           <div style={{border: '1px solid #c7cdd1', borderRadius: '5px'}}>
-            {isGraded && (
+            {isGraded(discussionTopicData.assignment) && (
               <div style={{padding: '0 1.5rem 0'}}>
                 <Alert
                   contextDisplayText="Section 2"
@@ -255,6 +256,16 @@ export const DiscussionTopicContainer = props => {
                       onEdit={canReadAsAdmin ? () => {} : null}
                       onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
                       onToggleSubscription={onSubscribe}
+                      onOpenSpeedgrader={
+                        canGrade
+                          ? () => {
+                              window.location.href = getSpeedGraderUrl(
+                                ENV.course_id,
+                                discussionTopicData.assignment._id
+                              )
+                            }
+                          : null
+                      }
                       isPublished={discussionTopicData.published}
                       canUnpublish={canUnpublish}
                       isSubscribed={discussionTopicData.subscribed}

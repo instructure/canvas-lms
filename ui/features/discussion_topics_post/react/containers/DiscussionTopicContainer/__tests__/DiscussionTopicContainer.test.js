@@ -161,6 +161,25 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('delete')).toBeNull()
   })
 
+  it('Should be able to open SpeedGrader', async () => {
+    const {getByTestId, findByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('speedGrader'))
+
+    await waitFor(() => {
+      expect(findByText('This student does not have a submission for this assignment')).toBeTruthy()
+    })
+  })
+
+  it('Should not be able to open SpeedGrader if is not an assignment', () => {
+    const {getByTestId, queryByTestId} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, assignment: null}
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(queryByTestId('speedGrader')).toBeNull()
+  })
+
   it('renders a modal to send content', async () => {
     const container = setup(discussionTopicMock)
     const kebob = await container.findByTestId('discussion-post-menu-trigger')

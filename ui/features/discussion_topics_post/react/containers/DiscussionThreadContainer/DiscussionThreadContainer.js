@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {Assignment} from '../../../graphql/Assignment'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
@@ -38,6 +39,7 @@ import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {isGraded, getSpeedGraderUrl} from '../../utils'
 
 export const mockThreads = {
   id: '432',
@@ -186,6 +188,9 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
+  // TODO: Change this to the new canGrade permission.
+  const canGrade = (isGraded(props.assignment) && props.permissions?.update) || false
+
   return (
     <>
       <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}}>
@@ -204,6 +209,17 @@ export const DiscussionThreadContainer = props => {
                 onEdit={() => {
                   setIsEditing(true)
                 }}
+                onOpenInSpeedGrader={
+                  canGrade
+                    ? () => {
+                        window.location.href = getSpeedGraderUrl(
+                          ENV.course_id,
+                          props.assignment._id,
+                          props.author._id
+                        )
+                      }
+                    : null
+                }
               />
             </Flex.Item>
           )}
@@ -249,11 +265,13 @@ export const DiscussionThreadContainer = props => {
 
 DiscussionThreadContainer.propTypes = {
   ...DiscussionEntry.shape,
-  depth: PropTypes.number
+  depth: PropTypes.number,
+  assignment: Assignment.shape
 }
 
 DiscussionThreadContainer.defaultProps = {
-  depth: 0
+  depth: 0,
+  assignment: {}
 }
 
 export default DiscussionThreadContainer
@@ -277,10 +295,13 @@ const DiscussionSubentries = props => {
     return <LoadingIndicator />
   }
 
-  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
+  const discussionTopic = subentries.data.legacyNode
+
+  return discussionTopic.discussionSubentriesConnection.nodes.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
+      assignment={discussionTopic?.assignment}
       {...entry}
     />
   ))

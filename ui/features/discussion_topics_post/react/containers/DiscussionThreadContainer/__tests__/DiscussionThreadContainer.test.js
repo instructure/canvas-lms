@@ -218,4 +218,37 @@ describe('DiscussionThreadContainer', () => {
       })
     })
   })
+
+  describe('SpeedGrader', () => {
+    it('Should be able to open SpeedGrader', async () => {
+      const {getByTestId, findByText} = setup(
+        defaultProps({
+          assignment: {
+            dueAt: '2021-04-05T13:40:50Z',
+            pointsPossible: 5
+          }
+        })
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByTestId('inSpeedGrader'))
+
+      await waitFor(() => {
+        expect(
+          findByText('This student does not have a submission for this assignment')
+        ).toBeTruthy()
+      })
+    })
+
+    it('Should not be able to open SpeedGrader if is not an assignment', () => {
+      const {getByTestId, queryByTestId} = setup(
+        defaultProps({
+          assignment: null
+        })
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(queryByTestId('inSpeedGrader')).toBeNull()
+    })
+  })
 })

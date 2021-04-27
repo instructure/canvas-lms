@@ -33,7 +33,7 @@ const createProps = overrides => {
     goToTopic: jest.fn(),
     onEdit: jest.fn(),
     onDelete: jest.fn(),
-    openInSpeedGrader: jest.fn(),
+    onOpenInSpeedGrader: jest.fn(),
     ...overrides
   }
 }
@@ -177,9 +177,9 @@ describe('ThreadActions', () => {
         const {getByTestId, getByText} = render(<ThreadActions {...props} />)
 
         fireEvent.click(getByTestId('thread-actions-menu'))
-        expect(props.openInSpeedGrader.mock.calls.length).toBe(0)
+        expect(props.onOpenInSpeedGrader.mock.calls.length).toBe(0)
         fireEvent.click(getByText('Open in SpeedGrader'))
-        expect(props.openInSpeedGrader.mock.calls.length).toBe(1)
+        expect(props.onOpenInSpeedGrader.mock.calls.length).toBe(1)
       })
     })
 

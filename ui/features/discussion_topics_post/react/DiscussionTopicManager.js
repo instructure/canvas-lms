@@ -55,6 +55,7 @@ const DiscussionTopicManager = props => {
     <>
       <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionThreadsContainer
+        discussionTopic={discussionTopicQuery.data.legacyNode}
         discussionTopicId={props.discussionTopicId}
         threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
         pageInfo={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.pageInfo}

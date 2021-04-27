@@ -17,6 +17,7 @@
  */
 
 import {DISCUSSION_QUERY} from '../../../graphql/Queries'
+import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -61,7 +62,13 @@ export const DiscussionThreadsContainer = props => {
       }}
     >
       {threads?.map(r => {
-        return <DiscussionThreadContainer key={`discussion-thread-${r.id}`} {...r} />
+        return (
+          <DiscussionThreadContainer
+            key={`discussion-thread-${r.id}`}
+            assignment={props.discussionTopic?.assignment}
+            {...r}
+          />
+        )
       })}
       {props.totalPages > 1 && (
         <ThreadPagination
@@ -75,6 +82,7 @@ export const DiscussionThreadsContainer = props => {
 }
 
 DiscussionThreadsContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionTopicId: PropTypes.string.isRequired,
   threads: PropTypes.arrayOf(PropTypes.shape(DiscussionEntry.shape)).isRequired,
   pageInfo: PageInfo.shape.isRequired,

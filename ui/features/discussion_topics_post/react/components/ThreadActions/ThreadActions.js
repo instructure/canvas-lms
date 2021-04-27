@@ -119,12 +119,12 @@ const getMenuConfigs = props => {
       selectionCallback: props.onDelete
     })
   }
-  if (props.openInSpeedGrader) {
+  if (props.onOpenInSpeedGrader) {
     options.push({
       key: 'inSpeedGrader',
       icon: <IconSpeedGraderLine />,
       label: I18n.t('Open in SpeedGrader'),
-      selectionCallback: props.openInSpeedGrader
+      selectionCallback: props.onOpenInSpeedGrader
     })
   }
   return options
@@ -156,7 +156,7 @@ ThreadActions.propTypes = {
   goToParent: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  openInSpeedGrader: PropTypes.func
+  onOpenInSpeedGrader: PropTypes.func
 }
 
 ThreadActions.defaultProps = {
