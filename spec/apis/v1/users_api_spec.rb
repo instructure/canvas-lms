@@ -894,6 +894,17 @@ describe "Users API", type: :request do
                       {}, expected_status: 404)
       expect(json.keys).not_to be_include("errors")
     end
+
+    it "404s but still returns the user on a deleted user, including merge info, for a site admin" do
+      u3 = User.create!
+      UserMerge.from(@other_user).into(u3)
+      account_admin_user(account: Account.site_admin)
+      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                      { :controller => 'users', :action => 'api_show', :id => @other_user.id.to_param, :format => 'json' },
+                      {}, expected_status: 404)
+      expect(json.keys).not_to be_include("errors")
+      expect(json['merged_into_user_id']).to eq u3.id
+    end
   end
 
   describe "user account listing" do
