@@ -3713,11 +3713,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_from_course_template
-    # because of some specs that mock out all feature flags, and how often
-    # courses are created, we check that the feature actually exists here
-    # before checking if it's enabled
-    if Feature.definitions['course_templates'] &&
-      root_account.feature_enabled?(:course_templates) &&
+    if root_account.feature_enabled?(:course_templates) &&
       (template = account.effective_course_template)
       content_migration = content_migrations.new(
         source_course: template,

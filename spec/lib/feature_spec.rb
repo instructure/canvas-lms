@@ -18,9 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../spec_helper.rb'
+require_relative '../feature_flag_helper.rb'
 
 describe Feature do
+  include FeatureFlagHelper
+
   let(:t_site_admin) { Account.site_admin }
   let(:t_root_account) { account_model }
   let(:t_sub_account) { account_model parent_account: t_root_account }
@@ -28,6 +31,7 @@ describe Feature do
   let(:t_user) { user_with_pseudonym account: t_root_account }
 
   before do
+    silence_undefined_feature_flag_errors
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
         'SA' => Feature.new(feature: 'SA', applies_to: 'SiteAdmin', state: 'off'),
