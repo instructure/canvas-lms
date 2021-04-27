@@ -188,8 +188,7 @@ describe "help dialog" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       form = f('#account_settings')
-      form.submit
-      wait_for_ajaximations
+      expect_new_page_load { form.submit }
       f('#global_nav_help_link').click
       wait_for_ajaximations
       expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
@@ -205,14 +204,13 @@ describe "help dialog" do
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
       form = f('#account_settings')
-      form.submit
-      wait_for_ajaximations
+      expect_new_page_load { form.submit }
       f('#global_nav_help_link').click
       wait_for_ajaximations
       expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
     end
   end
-  
+
   context 'welcome tour' do
     before :each do
       course_with_student_logged_in(active_all: true)
@@ -226,7 +224,7 @@ describe "help dialog" do
       get "/"
       driver.local_storage.clear
       wait_for_ajaximations
-      
+
       get "/courses/#{@course.id}"
       wait_for_ajaximations
       wait_for(method: nil, timeout: 1) { f('#___reactour').displayed? }
@@ -254,7 +252,7 @@ describe "help dialog" do
       get "/"
       driver.local_storage.clear
       wait_for_ajaximations
-      
+
       # Reload so the local storage clearing take effect
       get "/"
       wait_for_ajaximations
