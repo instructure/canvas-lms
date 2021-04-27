@@ -33,13 +33,14 @@ export const MediaSource = {
   `,
 
   shape: shape({
-    _id: string,
     contentType: string,
+    url: string,
     bitrate: string,
     fileExt: string,
     height: string,
-    width: string,
-    size: string
+    isOriginal: string,
+    size: string,
+    width: string
   })
 }
 

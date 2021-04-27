@@ -16,28 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Course} from './Course'
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
 
-export const FavoriteGroupsConnection = {
+export const Enrollment = {
   fragment: gql`
-    fragment FavoriteGroupsConnection on Group {
-      _id
-      contextName: name
-      assetString
+    fragment Enrollment on Enrollment {
+      type
+      course {
+        ...Course
+      }
     }
+    ${Course.fragment}
   `,
   shape: shape({
-    id: string,
-    contextName: string,
-    assetString: string
+    type: string,
+    course: Course.shape
   })
 }
 
 export const DefaultMocks = {
-  Group: () => ({
-    id: 'someId',
-    contextName: 'someContextName',
-    assetString: 'someContextId'
+  Enrollment: () => ({
+    course: {
+      _id: '1',
+      contextName: 'contextName',
+      assetString: 'contextId'
+    }
   })
 }

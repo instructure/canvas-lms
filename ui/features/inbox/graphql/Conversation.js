@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
-import {number, shape, string} from 'prop-types'
+import {arrayOf, number, shape, string} from 'prop-types'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
+import gql from 'graphql-tag'
 
 export const Conversation = {
   fragment: gql`
@@ -50,9 +50,13 @@ export const Conversation = {
     contextType: string,
     contextName: string,
     subject: string,
-    conversationMessagesConnection: ConversationMessage.shape,
-    conversationParticipantsConnection: ConversationParticipant.shape,
-  }),
+    conversationMessagesConnection: shape({
+      nodes: arrayOf(ConversationMessage.shape)
+    }),
+    conversationParticipantsConnection: shape({
+      nodes: arrayOf(ConversationParticipant.shape)
+    })
+  })
 }
 
 export const DefaultMocks = {
@@ -61,9 +65,6 @@ export const DefaultMocks = {
     contextType: 'context',
     contextId: 2,
     contextName: 'Context Name',
-    subject: 'Mock Subject',
-    updatedAt: 'November 5, 2020 at 2:25pm',
-    conversationMessagesConnection: {edges: [{}]},
-    conversationParticipantsConnection: {edges: [{}]},
-  }),
+    subject: 'Mock Subject'
+  })
 }

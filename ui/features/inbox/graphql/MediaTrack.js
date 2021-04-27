@@ -38,10 +38,8 @@ export const MediaTrack = {
 
 export const DefaultMocks = {
   MediaTrack: () => ({
-    kind: 'kindString',
-    local: 'en-us',
     content: 'mockContent',
-    mediaObject: {},
-    webvttContent: 'webvttContent'
+    local: 'en-us',
+    kind: 'kindString'
   })
 }

@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {arrayOf, bool, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {shape, string, bool} from 'prop-types'
 import {MediaSource} from './MediaSource'
 import {MediaTrack} from './MediaTrack'
 
@@ -43,8 +44,8 @@ export const MediaComment = {
     id: string,
     title: string,
     canAddCaptions: bool,
-    mediaSources: MediaSource.shape,
-    mediaTracks: MediaTrack.shape
+    mediaSources: arrayOf(MediaSource.shape),
+    mediaTracks: arrayOf(MediaTrack.shape)
   })
 }
 

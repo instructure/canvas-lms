@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
-import {ConversationParticipantWithConversation} from './ConversationParticipantWithConversation'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
 
@@ -89,7 +89,10 @@ export const CREATE_CONVERSATION = gql`
       }
     ) {
       conversations {
-        ...ConversationParticipantWithConversation
+        ...ConversationParticipant
+        conversation {
+          ...Conversation
+        }
       }
       errors {
         ...Error
@@ -97,7 +100,8 @@ export const CREATE_CONVERSATION = gql`
     }
   }
   ${Error.fragment}
-  ${ConversationParticipantWithConversation.fragment}
+  ${ConversationParticipant.fragment}
+  ${Conversation.fragment}
 `
 
 export const ADD_CONVERSATION_MESSAGE = gql`

@@ -19,30 +19,25 @@
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
 
-export const Enrollments = {
+export const Group = {
   fragment: gql`
-    fragment Enrollments on Enrollment {
-      type
-      course {
-        _id
-        contextName: name
-        assetString
-      }
+    fragment Group on Group {
+      _id
+      contextName: name
+      assetString
     }
   `,
   shape: shape({
-    id: string,
+    _id: string,
     contextName: string,
     assetString: string
   })
 }
 
 export const DefaultMocks = {
-  Enrollment: () => ({
-    course: {
-      _id: '1',
-      contextName: 'contextName',
-      assetString: 'contextId'
-    }
+  Group: () => ({
+    _id: 'someId',
+    contextName: 'someContextName',
+    assetString: 'someContextId'
   })
 }
