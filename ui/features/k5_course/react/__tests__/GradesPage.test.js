@@ -31,6 +31,7 @@ describe('GradesPage', () => {
   const getProps = (overrides = {}) => ({
     courseId: '12',
     courseName: 'History',
+    userIsInstructor: false,
     ...overrides
   })
 
@@ -65,10 +66,12 @@ describe('GradesPage', () => {
     })
   })
 
-  it('does not render anything if no results are returned', async () => {
+  it('shows a panda and text for students with no grades', async () => {
     fetchMock.get(ASSIGNMENT_GROUPS_URL, [])
-    const {queryByText} = render(<GradesPage {...getProps()} />)
+    const {getByTestId, getByText, queryByText} = render(<GradesPage {...getProps()} />)
     await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
+    expect(getByText("You don't have any grades yet.")).toBeInTheDocument()
+    expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
     ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
       expect(queryByText(header)).not.toBeInTheDocument()
     })
@@ -82,5 +85,18 @@ describe('GradesPage', () => {
     ;['WWII Report', formattedDueDate, 'Reports', '9.5 pts', 'Out of 10 pts'].forEach(header => {
       expect(getByText(header)).toBeInTheDocument()
     })
+  })
+
+  it('shows a panda and link to gradebook for teachers', async () => {
+    fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
+    const {getByText, getByTestId, getByRole, queryByText} = render(
+      <GradesPage {...getProps({userIsInstructor: true})} />
+    )
+    await waitFor(() => expect(getByText('Students see their grades here.')).toBeInTheDocument())
+    expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
+    const gradebookButton = getByRole('link', {name: 'View Gradebook'})
+    expect(gradebookButton).toBeInTheDocument()
+    expect(gradebookButton.href).toContain('/courses/12/gradebook')
+    expect(queryByText('Assignment')).not.toBeInTheDocument()
   })
 })

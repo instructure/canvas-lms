@@ -22,15 +22,20 @@ import PropTypes from 'prop-types'
 import moment from 'moment-timezone'
 
 import {Table} from '@instructure/ui-table'
+import {Flex} from '@instructure/ui-flex'
+import {Img} from '@instructure/ui-img'
+import {Text} from '@instructure/ui-text'
+import {Button} from '@instructure/ui-buttons'
 
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {GradeRow} from './GradeRow'
+import EmptyGradesUrl from '../images/empty-grades.svg'
 
 const NUM_LOADING_SKELETONS = 10
 
-export const GradesPage = ({courseId, courseName}) => {
+export const GradesPage = ({courseId, courseName, userIsInstructor}) => {
   const [loading, setLoading] = useState(true)
   const [grades, setGrades] = useState([])
   const [error, setError] = useState(null)
@@ -96,7 +101,21 @@ export const GradesPage = ({courseId, courseName}) => {
     )
   }
 
-  return loading || grades?.length > 0 ? (
+  return userIsInstructor || (!loading && grades?.length === 0) ? (
+    <Flex direction="column" alignItems="center" margin="x-large large">
+      <Img src={EmptyGradesUrl} margin="0 0 medium 0" data-testid="empty-grades-panda" />
+      {userIsInstructor ? (
+        <>
+          <Text size="large">{I18n.t('Students see their grades here.')}</Text>
+          <Button href={`/courses/${courseId}/gradebook`} margin="small 0 0 0">
+            {I18n.t('View Gradebook')}
+          </Button>
+        </>
+      ) : (
+        <Text size="large">{I18n.t("You don't have any grades yet.")}</Text>
+      )}
+    </Flex>
+  ) : (
     <Table caption={I18n.t('Grades for %{courseName}', {courseName})} margin="medium 0">
       <Table.Head>
         <Table.Row>
@@ -112,12 +131,13 @@ export const GradesPage = ({courseId, courseName}) => {
           : grades.map(assignment => <GradeRow key={assignment.id} {...assignment} />)}
       </Table.Body>
     </Table>
-  ) : null
+  )
 }
 
 GradesPage.propTypes = {
   courseId: PropTypes.string.isRequired,
-  courseName: PropTypes.string.isRequired
+  courseName: PropTypes.string.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired
 }
 
 export default GradesPage

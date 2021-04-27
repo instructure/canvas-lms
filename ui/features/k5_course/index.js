@@ -37,6 +37,7 @@ ready(() => {
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
+        userIsInstructor={ENV.COURSE.is_instructor}
       />,
       courseContainer
     )

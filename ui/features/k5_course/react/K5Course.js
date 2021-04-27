@@ -149,7 +149,8 @@ export function K5Course({
   timeZone,
   canManage = false,
   defaultTab = TAB_IDS.HOME,
-  plannerEnabled = false
+  plannerEnabled = false,
+  userIsInstructor
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [courseNavLinks, setCourseNavLinks] = useState([])
@@ -235,7 +236,9 @@ export function K5Course({
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
-        {currentTab === TAB_IDS.GRADES && <GradesPage courseId={id} courseName={name} />}
+        {currentTab === TAB_IDS.GRADES && (
+          <GradesPage courseId={id} courseName={name} userIsInstructor={userIsInstructor} />
+        )}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
       </View>
     </K5DashboardContext.Provider>
@@ -255,7 +258,8 @@ K5Course.propTypes = {
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  courseOverview: PropTypes.string.isRequired
+  courseOverview: PropTypes.string.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

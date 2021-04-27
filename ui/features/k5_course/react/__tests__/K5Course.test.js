@@ -48,7 +48,8 @@ const defaultProps = {
   id: '30',
   timeZone: defaultEnv.TIMEZONE,
   canManage: false,
-  courseOverview: '<h2>Time to learn!</h2>'
+  courseOverview: '<h2>Time to learn!</h2>',
+  userIsInstructor: false
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
