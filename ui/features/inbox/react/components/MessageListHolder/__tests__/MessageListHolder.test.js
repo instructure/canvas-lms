@@ -187,6 +187,15 @@ describe('MessageListHolder', () => {
     expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
   })
 
+  it('Sets the selected conversation as the conversation not the conversation participant', () => {
+    const onSelect = jest.fn()
+    const {getAllByText} = render(<MessageListHolder {...props} onSelect={onSelect} />)
+    const conversation = getAllByText('This is a different subject line')
+    fireEvent.mouseDown(conversation[0])
+    const expectedConversation = props.conversations[1].conversation
+    expect(onSelect).toHaveBeenCalledWith([expectedConversation])
+  })
+
   it('should be able to open messages', () => {
     const onOpenMock = jest.fn()
     const {getAllByText} = render(<MessageListHolder onOpen={onOpenMock} {...props} />)
