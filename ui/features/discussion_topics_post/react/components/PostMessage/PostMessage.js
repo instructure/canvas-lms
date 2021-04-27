@@ -37,6 +37,12 @@ export function PostMessage({...props}) {
           <Text weight="bold">{props.authorName}</Text>
           <View padding="0 small">
             <Text color="secondary">{props.timingDisplay}</Text>
+            <Text color="secondary">
+              {!!props.lastReplyAtDisplayText &&
+                I18n.t(', last reply %{lastReplyAtDisplayText}', {
+                  lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                })}
+            </Text>
           </View>
           {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
         </>
@@ -93,6 +99,10 @@ PostMessage.propTypes = {
    * Children to be directly rendered below the PostMessage
    */
   children: PropTypes.node,
+  /**
+   * Last Reply Date if there are discussion replies
+   */
+  lastReplyAtDisplayText: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a

@@ -19,6 +19,7 @@
 import {Alert} from '../../components/Alert/Alert'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
+import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
@@ -36,16 +37,6 @@ import {
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
 
-const dateOptions = {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric'
-}
-
-const getDate = date =>
-  date ? Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(new Date(date)) : ''
-
 export const DiscussionTopicContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
@@ -58,7 +49,7 @@ export const DiscussionTopicContainer = props => {
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
     message: props.discussionTopic?.message || '',
     permissions: props.discussionTopic?.permissions || {},
-    postedAt: getDate(props.discussionTopic?.postedAt),
+    postedAt: DateHelper.formatDatetimeForDiscussions(props.discussionTopic?.postedAt),
     published: props.discussionTopic?.published || false,
     subscribed: props.discussionTopic?.subscribed || false,
     title: props.discussionTopic?.title || '',
@@ -76,7 +67,9 @@ export const DiscussionTopicContainer = props => {
   const canUnpublish = props.discussionTopic.canUnpublish || false
 
   if (isGraded) {
-    discussionTopicData.dueAt = getDate(props.discussionTopic.assignment.dueAt)
+    discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
+      props.discussionTopic.assignment.dueAt
+    )
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
 

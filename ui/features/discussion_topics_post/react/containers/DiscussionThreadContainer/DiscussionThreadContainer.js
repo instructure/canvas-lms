@@ -18,6 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
+import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT
@@ -128,7 +129,7 @@ export const DiscussionThreadContainer = props => {
     )
   }
 
-  const createdAt = Date.parse(props.createdAt)
+  const createdAt = DateHelper.formatDatetimeForDiscussions(props.createdAt)
 
   if (props.depth === 0 && props.lastReply) {
     threadActions.push(
@@ -159,7 +160,7 @@ export const DiscussionThreadContainer = props => {
     if (props.deleted) {
       const name = props.editor ? props.editor.name : props.author.name
       return (
-        <DeletedPostMessage deleterName={name} timingDisplay={createdAt.toDateString()}>
+        <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </DeletedPostMessage>
       )
@@ -168,7 +169,10 @@ export const DiscussionThreadContainer = props => {
         <PostMessage
           authorName={props.author.name}
           avatarUrl={props.author.avatarUrl}
-          timingDisplay={createdAt.toDateString()}
+          lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+            props.lastReply?.createdAt
+          )}
+          timingDisplay={createdAt}
           message={props.message}
           isUnread={!props.read}
           isEditing={isEditing}

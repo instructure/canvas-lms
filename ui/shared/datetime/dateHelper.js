@@ -34,6 +34,10 @@ const DateHelper = {
     return $.datetimeString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
+  formatDatetimeForDiscussions(datetime, format = '') {
+    return $.discussionsDatetimeString(datetime, {format, timezone: ENV.CONTEXT_TIMEZONE})
+  },
+
   formatDateForDisplay(date) {
     return $.dateString(date, {format: 'medium', timezone: ENV.CONTEXT_TIMEZONE})
   },

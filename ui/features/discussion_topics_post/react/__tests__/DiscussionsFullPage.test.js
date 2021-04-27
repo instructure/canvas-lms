@@ -177,5 +177,13 @@ describe('DiscussionFullPage', () => {
       const container = setup()
       await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
     })
+
+    it('renders the dates properly', async () => {
+      const container = setup()
+      await waitFor(() => expect(container.findByText('Nov 23, 2020 6:40pm')).toBeTruthy())
+      await waitFor(() =>
+        expect(container.findByText('Apr 5 7:41pm, last reply Apr 5 7:41pm')).toBeTruthy()
+      )
+    })
   })
 })

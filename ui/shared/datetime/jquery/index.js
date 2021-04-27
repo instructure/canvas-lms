@@ -30,7 +30,7 @@ import 'jqueryui/datepicker'
 // difference between the user's configured timezone in their profile, and the timezone
 // of the browser. We want to display times in the timezone of their profile. Use
 // unfudgeDateForProfileTimezone to remove the correction before sending dates back to the server.
-$.fudgeDateForProfileTimezone = function(date) {
+$.fudgeDateForProfileTimezone = function (date) {
   date = tz.parse(date)
   if (!date) return null
   let year = tz.format(date, '%Y')
@@ -54,7 +54,7 @@ $.fudgeDateForProfileTimezone = function(date) {
   return fudgedDate
 }
 
-$.unfudgeDateForProfileTimezone = function(date) {
+$.unfudgeDateForProfileTimezone = function (date) {
   date = tz.parse(date)
   if (!date) return null
   // format fudged date into browser timezone without tz-info, then parse in
@@ -66,13 +66,13 @@ $.unfudgeDateForProfileTimezone = function(date) {
 // this batch of methods assumes *real* dates passed in (or, really, anything
 // tz.parse() can recognize. so timestamps are cool, too. but not fudged dates).
 // use accordingly
-$.sameYear = function(d1, d2) {
+$.sameYear = function (d1, d2) {
   return tz.format(d1, '%Y') == tz.format(d2, '%Y')
 }
-$.sameDate = function(d1, d2) {
+$.sameDate = function (d1, d2) {
   return tz.format(d1, '%F') == tz.format(d2, '%F')
 }
-$.dateString = function(date, options) {
+$.dateString = function (date, options) {
   if (date == null) return ''
   const timezone = options && options.timezone
   let format = options && options.format
@@ -92,7 +92,7 @@ $.dateString = function(date, options) {
   }
 }
 
-$.timeString = function(date, options) {
+$.timeString = function (date, options) {
   if (date == null) return ''
   const timezone = options && options.timezone
 
@@ -115,7 +115,7 @@ $.timeString = function(date, options) {
   return tz.format(date, format) || ''
 }
 
-$.datetimeString = function(datetime, options) {
+$.datetimeString = function (datetime, options) {
   datetime = tz.parse(datetime)
   if (datetime == null) return ''
   const dateValue = $.dateString(datetime, options)
@@ -124,7 +124,15 @@ $.datetimeString = function(datetime, options) {
 }
 // end batch
 
-$.friendlyDatetime = function(datetime, perspective) {
+$.discussionsDatetimeString = function (datetime, options) {
+  datetime = tz.parse(datetime)
+  if (datetime == null) return ''
+  const dateValue = $.dateString(datetime, options)
+  const timeValue = $.timeString(datetime, options)
+  return I18n.t('#timeValue.event', '%{dateValue} %{timeValue}', {dateValue, timeValue})
+}
+
+$.friendlyDatetime = function (datetime, perspective) {
   const today = Date.today()
   if (Date.equals(datetime.clone().clearTime(), today)) {
     return I18n.l('#time.formats.tiny', datetime)
@@ -132,7 +140,7 @@ $.friendlyDatetime = function(datetime, perspective) {
     return $.friendlyDate(datetime, perspective)
   }
 }
-$.friendlyDate = function(datetime, perspective) {
+$.friendlyDate = function (datetime, perspective) {
   if (perspective == null) {
     perspective = 'past'
   }
@@ -153,7 +161,7 @@ $.friendlyDate = function(datetime, perspective) {
 }
 
 $.datepicker.oldParseDate = $.datepicker.parseDate
-$.datepicker.parseDate = function(format, value, settings) {
+$.datepicker.parseDate = function (format, value, settings) {
   // try parsing with tz.parse first. if it can, its return is an unfudged
   // value, but the datepicker expects a fudged one, so fudge it. if it can't
   // parse it, fallback to the datepicker's original parseDate (which returns
@@ -166,7 +174,7 @@ $.datepicker.parseDate = function(format, value, settings) {
   }
 }
 $.datepicker._generateDatepickerHTML = $.datepicker._generateHTML
-$.datepicker._generateHTML = function(inst) {
+$.datepicker._generateHTML = function (inst) {
   let html = $.datepicker._generateDatepickerHTML(inst)
   if (inst.settings.timePicker) {
     html += renderDatepickerTime(inst.input)
@@ -175,7 +183,7 @@ $.datepicker._generateHTML = function(inst) {
 }
 $.fn.realDatepicker = $.fn.datepicker
 const _originalSelectDay = $.datepicker._selectDay
-$.datepicker._selectDay = function(id, month, year, td) {
+$.datepicker._selectDay = function (id, month, year, td) {
   const target = $(id)
   if ($(td).hasClass(this._unselectableClass) || this._isDisabledDatepicker(target[0])) {
     return
@@ -192,10 +200,10 @@ $.datepicker._selectDay = function(id, month, year, td) {
     _originalSelectDay.call(this, id, month, year, td)
   }
 }
-$.fn.datepicker = function(options) {
+$.fn.datepicker = function (options) {
   options = $.extend({}, options)
   options.prevOnSelect = options.onSelect
-  options.onSelect = function(text, picker) {
+  options.onSelect = function (text, picker) {
     if (options.prevOnSelect) {
       options.prevOnSelect.call(this, text, picker)
     }
@@ -228,7 +236,7 @@ $.fn.datepicker = function(options) {
       }
     })
     $(document)
-      .delegate('.ui-datepicker-time-hour', 'change keypress focus blur', function(event) {
+      .delegate('.ui-datepicker-time-hour', 'change keypress focus blur', function (event) {
         const cur = $.datepicker._curInst
         if (cur) {
           const $this = $(this)
@@ -249,14 +257,14 @@ $.fn.datepicker = function(options) {
           cur.input.data('time-hour', val)
         }
       })
-      .delegate('.ui-datepicker-time-minute', 'change keypress focus blur', function(event) {
+      .delegate('.ui-datepicker-time-minute', 'change keypress focus blur', function (event) {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
           cur.input.data('time-minute', val)
         }
       })
-      .delegate('.ui-datepicker-time-ampm', 'change keypress focus blur', function(event) {
+      .delegate('.ui-datepicker-time-ampm', 'change keypress focus blur', function (event) {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
@@ -266,7 +274,7 @@ $.fn.datepicker = function(options) {
     $(document).delegate(
       '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       'mousedown',
-      function(event) {
+      function (event) {
         $(this).focus()
       }
     )
@@ -299,13 +307,13 @@ $.fn.datepicker = function(options) {
   $(document).data('last_datepicker', this)
   return this
 }
-$.fn.date_field = function(options) {
+$.fn.date_field = function (options) {
   options = $.extend({}, options)
   options.dateOnly = true
   this.datetime_field(options)
   return this
 }
-$.fn.time_field = function(options) {
+$.fn.time_field = function (options) {
   options = $.extend({}, options)
   options.timeOnly = true
   this.datetime_field(options)
@@ -315,9 +323,9 @@ $.fn.time_field = function(options) {
 // add bootstrap's .btn class to the button that opens a datepicker
 $.datepicker._triggerClass = $.datepicker._triggerClass + ' btn'
 
-$.fn.datetime_field = function(options) {
+$.fn.datetime_field = function (options) {
   options = $.extend({}, options)
-  this.each(function() {
+  this.each(function () {
     const $field = $(this)
     if (!$field.hasClass('datetime_field_enabled')) {
       $field.addClass('datetime_field_enabled')
@@ -335,14 +343,14 @@ $.fn.datetime_field = function(options) {
     http://haineault.com
 
     MIT License (http://www.opensource.org/licenses/mit-license.php */
-$.fn.timepicker = function() {
+$.fn.timepicker = function () {
   let $picker = $('#time_picker')
   if ($picker.length === 0) {
     $picker = $._initializeTimepicker()
   }
-  this.each(function() {
+  this.each(function () {
     $(this)
-      .focus(function() {
+      .focus(function () {
         const offset = $(this).offset()
         const height = $(this).outerHeight()
         const width = $(this).outerWidth()
@@ -380,11 +388,9 @@ $.fn.timepicker = function() {
             left: offset.left + width - pickerWidth
           })
         }
-        $('#time_picker')
-          .hide()
-          .slideDown()
+        $('#time_picker').hide().slideDown()
       })
-      .blur(function() {
+      .blur(function () {
         if ($('#time_picker').data('attached_to') == $(this)[0]) {
           $('#time_picker').data('attached_to', null)
           $('#time_picker')
@@ -393,10 +399,10 @@ $.fn.timepicker = function() {
             .removeClass('ui-state-highlight')
         }
       })
-      .keycodes('esc return', function(event) {
+      .keycodes('esc return', function (event) {
         $(this).triggerHandler('blur')
       })
-      .keycodes('ctrl+up ctrl+right ctrl+left ctrl+down', function(event) {
+      .keycodes('ctrl+up ctrl+right ctrl+left ctrl+down', function (event) {
         if ($('#time_picker').data('attached_to') != $(this)[0]) {
           return
         }
@@ -417,9 +423,7 @@ $.fn.timepicker = function() {
           if (isNaN(idx)) {
             idx = 0
           }
-          $('#time_picker .time_slot')
-            .eq(idx)
-            .triggerHandler('mouseover')
+          $('#time_picker .time_slot').eq(idx).triggerHandler('mouseover')
           return
         }
         if (event.keyString == 'ctrl+up') {
@@ -430,11 +434,7 @@ $.fn.timepicker = function() {
           } else if ($parent.hasClass('minute_group')) {
             idx = parseInt(hr, 10) - 1
           }
-          $parent
-            .prev('.widget_group')
-            .find('.time_slot')
-            .eq(idx)
-            .triggerHandler('mouseover')
+          $parent.prev('.widget_group').find('.time_slot').eq(idx).triggerHandler('mouseover')
         } else if (event.keyString == 'ctrl+right') {
           $current.next('.time_slot').triggerHandler('mouseover')
         } else if (event.keyString == 'ctrl+left') {
@@ -455,7 +455,7 @@ $.fn.timepicker = function() {
   })
   return this
 }
-$._initializeTimepicker = function() {
+$._initializeTimepicker = function () {
   const $picker = $(document.createElement('div'))
   $picker.attr('id', 'time_picker').css({
     position: 'absolute',
@@ -498,7 +498,7 @@ $._initializeTimepicker = function() {
   $('body').append($picker)
   $picker
     .find('.time_slot')
-    .mouseover(function() {
+    .mouseover(function () {
       $picker.find('.time_slot.ui-state-highlight').removeClass('ui-state-highlight')
       $(this).addClass('ui-state-highlight')
       const $field = $($picker.data('attached_to') || 'none')
@@ -521,29 +521,24 @@ $._initializeTimepicker = function() {
       }
       $field.val(hr + ':' + min + ampm)
     })
-    .mouseout(function() {
+    .mouseout(function () {
       $(this).removeClass('ui-state-highlight')
     })
-    .mousedown(function(event) {
+    .mousedown(function (event) {
       event.preventDefault()
       $(this).triggerHandler('mouseover')
-      $(this)
-        .removeClass('ui-state-highlight')
-        .addClass('ui-state-active')
+      $(this).removeClass('ui-state-highlight').addClass('ui-state-active')
     })
-    .mouseup(function() {
+    .mouseup(function () {
       $(this).removeClass('ui-state-active')
     })
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       $(this).triggerHandler('mouseover')
       if ($picker.data('attached_to')) {
         $($picker.data('attached_to')).focus()
       }
-      $picker
-        .stop()
-        .hide()
-        .data('attached_to', null)
+      $picker.stop().hide().data('attached_to', null)
     })
   return $picker
 }
