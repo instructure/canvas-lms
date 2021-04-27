@@ -28,7 +28,8 @@ import {InlineList} from '@instructure/ui-list'
 
 const stateMap = {
   pending: I18n.t('Ready for sync'),
-  scheduled: I18n.t('Sync scheduled'),
+  scheduled: I18n.t('Sync auto-scheduled by enrollment changes'),
+  manually_scheduled: I18n.t('Sync manually scheduled'),
   running: I18n.t('Sync currently running'),
   retrying: I18n.t('Sync currently running'),
   errored: I18n.t('The sync encountered an error and did not complete'),

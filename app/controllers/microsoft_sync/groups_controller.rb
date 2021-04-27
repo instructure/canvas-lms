@@ -138,7 +138,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   # before another manual sync is allowed.
   def sync
     group.syncer_job.run_later
-    group.update_unless_deleted(workflow_state: :scheduled, last_manually_synced_at: Time.zone.now)
+    group.update_unless_deleted(workflow_state: :manually_scheduled, last_manually_synced_at: Time.zone.now)
     render json: group_json
   end
 

@@ -164,6 +164,10 @@ module MicrosoftSync
       run_with_delay
     end
 
+    def enqueue_future_sync(run_at:)
+      self.delay(singleton: "#{strand}:enqueue_future_sync", run_at: run_at, on_conflict: :overwrite).run_later
+    end
+
     private
 
     def run(step, synchronous=false)
