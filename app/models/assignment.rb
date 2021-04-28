@@ -1648,8 +1648,7 @@ class Assignment < ActiveRecord::Base
       'online_quiz',
       'discussion_topic',
       'wiki_page',
-      'attendance',
-      'external_tool'
+      'attendance'
     ].include?(self.submission_types)
   end
 
