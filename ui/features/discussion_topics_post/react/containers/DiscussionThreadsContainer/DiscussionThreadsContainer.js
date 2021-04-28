@@ -27,6 +27,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {useLazyQuery} from 'react-apollo'
+import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
   let threads = props.threads
@@ -56,11 +57,7 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <div
-      style={{
-        marginTop: '1.5rem'
-      }}
-    >
+    <View as="div" margin="medium none none none">
       {threads?.map(thread => {
         return (
           <DiscussionThreadContainer
@@ -77,7 +74,7 @@ export const DiscussionThreadsContainer = props => {
           totalPages={props.totalPages}
         />
       )}
-    </div>
+    </View>
   )
 }
 

@@ -40,6 +40,7 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {isGraded, getSpeedGraderUrl} from '../../utils'
+import theme from '@instructure/canvas-theme'
 
 export const mockThreads = {
   discussionEntry: {
@@ -108,8 +109,8 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const marginDepth = `calc(4rem * ${props.depth})`
-  const replyMarginDepth = `calc(3.75rem * (${props.depth + 1}))`
+  const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
+  const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
 
   const threadActions = []
   if (!props.discussionEntry.deleted) {
@@ -199,7 +200,7 @@ export const DiscussionThreadContainer = props => {
 
   return (
     <>
-      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}}>
+      <div style={{marginLeft: marginDepth, paddingLeft: theme.variables.spacing.small}}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}
@@ -253,8 +254,9 @@ export const DiscussionThreadContainer = props => {
         />
       )}
       {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
-        <div
-          style={{marginLeft: '4rem'}}
+        <View
+          as="div"
+          margin="none none none xx-large"
           width="100%"
           key={`discussion-thread-collapse-${props.discussionEntry.id}`}
         >
@@ -268,7 +270,7 @@ export const DiscussionThreadContainer = props => {
           >
             <CollapseReplies onClick={() => setExpandReplies(false)} />
           </View>
-        </div>
+        </View>
       )}
     </>
   )

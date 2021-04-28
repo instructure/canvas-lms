@@ -37,6 +37,7 @@ import {
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
 import {isGraded, getSpeedGraderUrl, getEditUrl} from '../../utils'
+import {View} from '@instructure/ui-view'
 
 export const DiscussionTopicContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -178,22 +179,28 @@ export const DiscussionTopicContainer = props => {
           />
         </Flex.Item>
         <Flex.Item>
-          <div style={{border: '1px solid #c7cdd1', borderRadius: '5px'}}>
+          <View
+            as="div"
+            borderWidth="small"
+            borderRadius="medium"
+            borderStyle="solid"
+            borderColor="primary"
+          >
             {isGraded(discussionTopicData.assignment) && (
-              <div style={{padding: '0 1.5rem 0'}}>
+              <View as="div" padding="none medium none">
                 <Alert
                   contextDisplayText="Section 2"
                   dueAtDisplayText={discussionTopicData.dueAt}
                   pointsPossible={discussionTopicData.pointsPossible}
                 />
-              </div>
+              </View>
             )}
             <Flex direction="column">
               <Flex.Item>
                 <Flex
                   direction="row"
                   justifyItems="space-between"
-                  padding="medium small small"
+                  padding="medium small none"
                   alignItems="start"
                 >
                   <Flex.Item shouldShrink shouldGrow>
@@ -284,7 +291,9 @@ export const DiscussionTopicContainer = props => {
               <Flex.Item
                 shouldShrink
                 shouldGrow
-                padding="none medium medium xx-large"
+                padding={
+                  expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
+                }
                 overflowX="hidden"
                 overflowY="hidden"
               >
@@ -297,7 +306,7 @@ export const DiscussionTopicContainer = props => {
                 />
               </Flex.Item>
             </Flex>
-          </div>
+          </View>
         </Flex.Item>
       </Flex>
       <DirectShareUserModal {...directShareUserModalProps} />

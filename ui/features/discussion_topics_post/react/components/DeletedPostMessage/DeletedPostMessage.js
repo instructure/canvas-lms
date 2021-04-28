@@ -44,7 +44,7 @@ export function DeletedPostMessage({...props}) {
         </View>
       }
     >
-      <div style={{marginLeft: '3rem'}} />
+      <View as="div" margin="none none none x-large" />
     </Byline>
   )
 }
