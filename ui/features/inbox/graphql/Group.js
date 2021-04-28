@@ -41,11 +41,3 @@ export const Group = {
     __typename: 'Group'
   })
 }
-
-export const DefaultMocks = {
-  Group: () => ({
-    _id: 'someId',
-    contextName: 'someContextName',
-    assetString: 'someContextId'
-  })
-}

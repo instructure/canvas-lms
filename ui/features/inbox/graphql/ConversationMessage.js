@@ -86,11 +86,3 @@ export const ConversationMessage = {
     __typename: 'ConversationMessage'
   })
 }
-
-export const DefaultMocks = {
-  ConversationMessage: () => ({
-    _id: '1a',
-    body: 'This is the body of a mocked message',
-    createdAt: 'November 5, 2020 at 2:25pm'
-  })
-}

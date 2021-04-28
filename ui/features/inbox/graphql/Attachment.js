@@ -56,10 +56,3 @@ export const Attachment = {
     __typename: 'File'
   })
 }
-
-export const DefaultMocks = {
-  File: () => ({
-    displayName: 'testing.csv',
-    mimeClass: 'file'
-  })
-}

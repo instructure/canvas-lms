@@ -56,11 +56,3 @@ export const ConversationParticipant = {
     __typename: 'ConversationParticipant'
   })
 }
-
-export const DefaultMocks = {
-  ConversationParticipant: () => ({
-    _id: '1a',
-    workflowState: 'unread',
-    label: 'starred'
-  })
-}

@@ -42,13 +42,3 @@ export const Enrollment = {
     __typename: 'Enrollment'
   })
 }
-
-export const DefaultMocks = {
-  Enrollment: () => ({
-    course: {
-      _id: '1',
-      contextName: 'contextName',
-      assetString: 'contextId'
-    }
-  })
-}
