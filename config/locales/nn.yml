@@ -10672,11 +10672,14 @@ nn:
   hours_late_989e9081: "Timar for seint"
   hover_over_me_496521b9: "Flytt peikaren over meg"
   how_do_i_add_a_rubric_in_a_course_a4c7a40: "Korleis legg eg ein rubrikk til i eit emne?"
+  how_do_i_add_an_announcement_in_a_course_63396bb7: "Korleis legg eg til ei kunngjering i eit emne?"
   how_do_i_add_users_to_a_course_4a88efaf: "Korleis legg eg til brukarar i eit emne?"
+  how_do_i_change_the_course_home_page_326cee50: "Korleis kan eg endre forsida i emnet mitt? "
   how_do_i_create_a_conference_in_a_course_69affbf4: "Korleis kan eg opprette ein konferanse i eit emne?"
   how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Korleis kan eg som faglærar sette opp ein diskusjon? "
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Korleis opprettar eg ei quiz til vurdering i New Quizzes? "
   how_do_i_create_an_assignment_35532b59: "Korleis kan eg opprette ei oppgåve?"
+  how_do_i_edit_an_announcement_in_a_course_815c3c60: "Korleis redigerer eg ei kunngjering i eit emne?"
   how_do_i_find_my_courses_b826e4ce: "Korleis finn eg emna mine?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Korleis importerer eg ein pakke som er eksportert frå eit Canvas-emne?"
   how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "Korleis kan eg invitere andre til møtet?"
@@ -10691,6 +10694,8 @@ nn:
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Korleis lastar eg opp ei fil i eit emne? "
   how_do_i_use_course_settings_1e8467e6: "Kva kan eg gjere med emne-innstillingar?"
   how_do_i_use_speedgrader_e18e4ca2: "Korleis brukar eg SpeedGrader?"
+  how_do_i_use_the_announcements_index_page_94a14011: "Korleis brukar eg kunngjeringsoversikta?"
+  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Korleis kan eg som faglærar lage til ei forside i emnet mitt? "
   how_do_i_use_the_pages_index_page_dafb986c: "Korleis brukar eg sideoversikta?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Korleis brukar eg personsida i eit emne som ein faglærar?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Korleis brukar eg quizoversikta?"
@@ -11265,6 +11270,7 @@ nn:
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hugs at denne innleveringa gjeld for alle i %{groupType}-gruppa."
+  keep_students_informed_3f41a7e6: "Hald studentane dine informerte"
   keep_submissions_anonymous_5cbaf419: "La innleveringane vere anonyme"
   kenya_254_2945663a: "Kenya (+254)"
   key_api_key_68bf80ae: "Nøkkel: *%{api_key}*"
@@ -18375,6 +18381,7 @@ nn:
   sections_94731e51: Seksjonar
   security_7a7e8808: Tryggleik
   security_tab_failed_to_load_2d2242a: "Tryggleiksknapp lastar ikkje"
+  see_more_in_canvas_guides_fc90a457: "Sjå meir i Canvas Guides"
   see_other_users_primary_email_address_59c8473f: "Sjå andre brukarar sine primære e-postadressar"
   see_rubric_results_62a6447d: "Sjå vurderingsskjema-resultat"
   see_scoring_details_f7fd1f3b: "Sjå resultatdetaljar"
@@ -18627,9 +18634,9 @@ nn:
   share_important_information_about_your_course_with_dceacbf9: |-
       Del viktig informasjon med alle brukarar i emnet ditt.
       Bruk kunngjeringar til å minne studentar på frister og gjeremål,
-      peike til interne og eksterne ressurser og hjelp dei med å nå
+      peike til interne og eksterne ressurser, hjelpe dei med å nå
       læringsmåla, feire suksess og markere særskilde hendingar.
-      Kunngjeringar kan inkludere tekst, multimedia og filer.
+      Kunngjeringar kan innehalde tekst, multimedia og filer.
   share_important_information_with_all_users_in_your_bc49ee7f: |-
       Del viktig informasjon med alle brukarar i emnet ditt.
       Vel om du vil ha kopi av eigne kunngjeringar frå Varselmenyen.
@@ -20307,6 +20314,11 @@ nn:
       opp til %{max_domains} kvitelista domener. Jokernotasjon er tilrådd
       (f.eks. *.instructure.com). Canvas- og Instructure-domener er automatisk inkludert
       og tel ikkje i maksimumstalet på 50 domener.
+  the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
+      Forsida til emnet er den første sida studentane ser når dei går
+      til emnet ditt. På forsida kan du vise deltaking og aktivitetstraumen
+      til emnet, moduloversikta, oppgåvelista, emneoversikta
+      eller ei side du sjølv lagar til som forside.
   the_course_link_validator_searches_course_content__563fa215: "Lenkesjekkeren søker gjennom alt emneinnhald etter ugyldige eller utilgjengelege lenker og bilder. "
   the_course_link_validator_searches_through_course__76f0bc63: "Emnekoplingsvalidatoren søker i emneinnhaldet og returnerer alle lenker som er ugyldige eller ikkje responderer. Merk at nokre av koblingane som merkast som ikkje responsive kun er utilgjengeleg frå våre serverar og vil fortsatt vere gyldig for studentar."
   the_course_state_manage_permission_allows_users_to_67e16652: "Løyvet 'Emnestatus - administrer' tillet brukarar å publisere emne som ikkje inneheld modular. For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på."
@@ -22130,6 +22142,7 @@ nn:
   welcome_to_the_canvas_theme_editor_73091d1: "Velkomen til temaredigeringsprogram for Canvas"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkomen til dine emne. Om du vil tilpasse emnelista, klikkar du på lenka \"Alle emne\", og stjernemarkerer emna du vil vise."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Velkomen til dine emne. Om du vil tilpasse emnelista, klikkar du på lenka \"Alle emne\", og stjernemarkerer emna du vil vise."
+  welcome_your_students_e1d96088: "Ynskje studentane velkomen"
   well_below_mastery_37664bdc: "Godt under meistringsnivå"
   welsh_42ab94b1: Walisisk
   what_are_announcements_52175539: "Kva er kunngjeringar?"
@@ -22138,6 +22151,7 @@ nn:
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_happened_322d8259: "Kva hendte?"
   what_it_does_d4debc07: "Kva den gjer"
+  what_layout_options_are_available_in_the_course_ho_5d364ce3: "Kva alternativ har eg som faglærar når eg skal velje ei utsjånad for emneforsida?"
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
   when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
