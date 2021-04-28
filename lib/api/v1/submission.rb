@@ -122,6 +122,12 @@ module Api::V1::Submission
       hash['grading_status'] = submission.grading_status
     end
 
+    if includes.include?('read_state')
+      # Save the current read state to the hash, then mark as read
+      hash['read_state'] = submission.read_state(current_user)
+      submission.mark_read(current_user)
+    end
+
     if context.account_membership_allows(current_user)
       hash['anonymous_id'] = submission.anonymous_id
     end

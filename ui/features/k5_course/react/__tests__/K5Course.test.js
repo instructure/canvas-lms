@@ -55,7 +55,7 @@ const defaultProps = {
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission'
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
 

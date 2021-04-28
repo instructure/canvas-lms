@@ -74,7 +74,8 @@ export const MOCK_ASSIGNMENT_GROUPS = [
           submitted_at: '2020-04-15T05:59:59Z',
           late: false,
           excused: false,
-          missing: false
+          missing: false,
+          read_state: 'read'
         }
       }
     ]

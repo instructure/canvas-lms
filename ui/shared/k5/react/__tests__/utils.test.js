@@ -371,4 +371,26 @@ describe('getAssignmentGrades', () => {
     expect(totals[0].assignmentName).toBe('2')
     expect(totals[1].assignmentName).toBe('1')
   })
+
+  it('saves unread as true if read_state is unread', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              read_state: 'unread'
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals[0].unread).toBeTruthy()
+  })
 })

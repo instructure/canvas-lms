@@ -34,17 +34,31 @@ describe('GradeRow', () => {
     score: 5,
     grade: '5',
     submissionDate: '2020-03-18T05:59:59Z',
+    unread: false,
     late: false,
     excused: false,
     missing: false,
     ...overrides
   })
 
-  it('renders assignment title as a link', async () => {
+  it('renders assignment title as a link', () => {
     const {getByText} = render(<GradeRow {...getProps()} />)
     const title = getByText('Essay #2')
     expect(title).toBeInTheDocument()
     expect(title.href).toBe('http://localhost/essay2')
+  })
+
+  describe('unread badge', () => {
+    it('is rendered when unread is true', () => {
+      const {getByText} = render(<GradeRow {...getProps({unread: true})} />)
+      expect(getByText('New grade for Essay #2')).toBeInTheDocument()
+    })
+
+    it('is not present when unread is false', () => {
+      const {getByText, queryByText} = render(<GradeRow {...getProps()} />)
+      expect(getByText('Essay #2')).toBeInTheDocument()
+      expect(queryByText('New grade for Essay #2')).not.toBeInTheDocument()
+    })
   })
 
   describe('score column', () => {

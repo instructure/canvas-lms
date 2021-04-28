@@ -195,6 +195,7 @@ export const getAssignmentGrades = data =>
         score: a.submission?.score,
         grade: a.submission?.grade,
         submissionDate: a.submission?.submitted_at,
+        unread: a.submission?.read_state === 'unread',
         late: a.submission?.late,
         excused: a.submission?.excused,
         missing: a.submission?.missing

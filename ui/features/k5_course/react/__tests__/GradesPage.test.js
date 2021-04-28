@@ -24,7 +24,7 @@ import {GradesPage} from '../GradesPage'
 import {MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
 
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission'
+  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments'
 

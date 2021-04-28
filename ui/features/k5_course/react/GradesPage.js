@@ -61,7 +61,7 @@ export const GradesPage = ({
     error: setError,
     fetchAllPages: true,
     params: {
-      include: ['assignments', 'submission']
+      include: ['assignments', 'submission', 'read_state']
     }
   })
 
