@@ -42,9 +42,11 @@ describe MessageBus::CaCert do
     end
     fake_connection = fake_conn_cls.new
     allow(CanvasHttp).to receive(:connection_for_uri).and_return(fake_connection)
+    LocalCache.cache.clear
   end
 
   after(:each) do
+    LocalCache.cache.clear
     File.delete(cert_location) if File.exist?(cert_location)
   end
 
@@ -55,7 +57,6 @@ describe MessageBus::CaCert do
 
   it "won't fight with itself on cert writing" do
     expect(MessageBus::CaCert).to receive(:write_cert).once.and_call_original
-    LocalCache.cache.clear
     t1 = Thread.new do
       sleep(0.003)
       MessageBus::CaCert.ensure_presence!(conf_hash)
