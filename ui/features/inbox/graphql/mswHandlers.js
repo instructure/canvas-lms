@@ -19,7 +19,10 @@
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
+import {Course} from './Course'
+import {Enrollment} from './Enrollment'
 import {graphql} from 'msw'
+import {Group} from './Group'
 import {User} from './User'
 
 export const handlers = [
@@ -119,6 +122,49 @@ export const handlers = [
       ]
     }
 
+    return res(ctx.data(data))
+  }),
+
+  graphql.query('GetUserCourses', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        id: 'VXNlci05',
+        email: 'hmccoy@xavierschool.com',
+        favoriteGroupsConnection: {
+          nodes: [Group.mock()],
+          __typename: 'GroupConnection'
+        },
+        favoriteCoursesConnection: {
+          nodes: [Course.mock()],
+          __typename: 'CourseConnection'
+        },
+        enrollments: [
+          Enrollment.mock(),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '196',
+              contextName: 'Fighting Magneto 101',
+              assetString: 'course_196'
+            })
+          }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '197',
+              contextName: 'Fighting Magneto 202',
+              assetString: 'course_197'
+            })
+          }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '198',
+              contextName: 'Flying The Blackbird',
+              assetString: 'course_198'
+            })
+          })
+        ],
+        __typename: 'User'
+      }
+    }
     return res(ctx.data(data))
   })
 ]

@@ -17,90 +17,66 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ApolloProvider} from 'react-apollo'
+import {handlers} from '../../../graphql/mswHandlers'
 import MessageListActionContainer from '../MessageListActionContainer'
-import {createCache} from '@canvas/apollo'
-import {COURSES_QUERY} from '../../../graphql/Queries'
-import {MockedProvider} from '@apollo/react-testing'
+import {mswClient} from '../../../../../shared/msw/mswClient'
+import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {mockQuery} from '../../../mocks'
-import waitForApolloLoading from '../../../util/waitForApolloLoading'
-
-const createGraphqlMocks = () => {
-  const mocks = [
-    {
-      request: {
-        query: COURSES_QUERY,
-        variables: {
-          userID: '1'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          }
-        }
-      }
-    }
-  ]
-
-  const mockResults = Promise.all(
-    mocks.map(async m => {
-      const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
-      return {
-        request: {query: m.request.query, variables: m.request.variables},
-        result
-      }
-    })
-  )
-  return mockResults
-}
-
-const setup = async overrideProps => {
-  const mocks = await createGraphqlMocks()
-  return render(
-    <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <MessageListActionContainer {...overrideProps} />
-      </MockedProvider>
-    </AlertManagerContext.Provider>
-  )
-}
 
 describe('MessageListActionContainer', () => {
+  const server = mswServer(handlers)
+  beforeAll(() => {
+    // eslint-disable-next-line no-undef
+    fetchMock.dontMock()
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+    // eslint-disable-next-line no-undef
+    fetchMock.enableMocks()
+  })
+
   beforeEach(() => {
     window.ENV = {
       current_user_id: 1
     }
   })
 
+  const setup = overrideProps => {
+    return render(
+      <ApolloProvider client={mswClient}>
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MessageListActionContainer {...overrideProps} />
+        </AlertManagerContext.Provider>
+      </ApolloProvider>
+    )
+  }
+
   describe('rendering', () => {
-    it('should render', async () => {
-      const component = await setup()
-
-      await waitForApolloLoading()
-
+    it('should render', () => {
+      const component = setup()
       expect(component.container).toBeTruthy()
     })
 
-    it('should call onCourseFilterSelect when course selected ', async () => {
+    it('should call onCourseFilterSelect when course selected', async () => {
       const mock = jest.fn()
 
-      const component = await setup({
+      const component = setup({
         onCourseFilterSelect: mock
       })
 
-      await waitForApolloLoading()
-
-      const courseDropdown = await component.getByTestId('course-select')
-
+      const courseDropdown = await component.findByTestId('course-select')
       fireEvent.click(courseDropdown)
-      await waitForApolloLoading()
 
-      const options = await component.queryAllByText('Hello World')
-
-      expect(options.length).toBe(6)
-
-      fireEvent.click(options[1])
+      const option = await component.findByText('Fighting Magneto 101')
+      fireEvent.click(option)
 
       expect(mock.mock.calls.length).toBe(1)
     })
@@ -108,22 +84,15 @@ describe('MessageListActionContainer', () => {
     it('should callback to update mailbox when event fires', async () => {
       const mock = jest.fn()
 
-      const component = await setup({
+      const component = setup({
         onSelectMailbox: mock
       })
 
-      await waitForApolloLoading()
-
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
-
       fireEvent.click(mailboxDropdown)
 
-      await waitForApolloLoading()
-
       const option = await component.findByText('Sent')
-
       expect(option).toBeTruthy()
-
       fireEvent.click(option)
 
       expect(mock.mock.calls.length).toBe(1)
@@ -132,95 +101,82 @@ describe('MessageListActionContainer', () => {
     it('should call onSelectMailbox when mailbox changed', async () => {
       const mock = jest.fn()
 
-      const component = await setup({
+      const component = setup({
         onSelectMailbox: mock
       })
 
-      await waitForApolloLoading()
-
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
-
       fireEvent.click(mailboxDropdown)
-      await waitForApolloLoading()
 
       const option = await component.findByText('Sent')
-
       expect(option).toBeTruthy()
-
       fireEvent.click(option)
 
       expect(mock.mock.calls.length).toBe(1)
     })
 
     it('should load with selected mailbox set via props', async () => {
-      const component = await setup({
+      const component = setup({
         activeMailbox: 'sent'
       })
 
-      await waitForApolloLoading()
-
       const mailboxDropdown = await component.findByDisplayValue('Sent')
-
       expect(mailboxDropdown).toBeTruthy()
     })
   })
 
   it('should have buttons disabled when their disabled states are true', async () => {
-    const component = await setup({
+    const component = setup({
       deleteDisabled: true,
       archiveDisabled: true
     })
 
-    await waitForApolloLoading()
-
-    const delBtn = await component.getByTestId('delete')
-    const archBtn = await component.getByTestId('archive')
+    const delBtn = await component.findByTestId('delete')
+    const archBtn = await component.findByTestId('archive')
     expect(delBtn).toBeDisabled()
     expect(archBtn).toBeDisabled()
   })
 
   it('should have buttons enabled when their disabled states are false', async () => {
-    const component = await setup({
+    const component = setup({
       deleteDisabled: false,
       archiveDisabled: false
     })
 
-    await waitForApolloLoading()
-
-    const delBtn = await component.getByTestId('delete')
-    const archBtn = await component.getByTestId('archive')
+    const delBtn = await component.findByTestId('delete')
+    const archBtn = await component.findByTestId('archive')
     expect(delBtn).not.toBeDisabled()
     expect(archBtn).not.toBeDisabled()
   })
 
   it('should have archive disabled when activeMailbox is sent', async () => {
-    const component = await setup({
+    const component = setup({
       archiveDisabled: false,
       activeMailbox: 'sent'
     })
-    await waitForApolloLoading()
-    const archBtn = await component.getByTestId('archive')
+
+    const archBtn = await component.findByTestId('archive')
     expect(archBtn).toBeDisabled()
   })
 
   it('should show unarchive button when displayUnarchiveButton is true', async () => {
-    const component = await setup({
+    const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true
     })
-    await waitForApolloLoading()
-    const unarchBtn = await component.getByTestId('unarchive')
+
+    const unarchBtn = await component.findByTestId('unarchive')
     expect(unarchBtn).toBeTruthy()
   })
 
   it('should trigger confirm when unarchiving', async () => {
     window.confirm = jest.fn(() => true)
-    const component = await setup({
+    const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true,
       selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
     })
-    await waitForApolloLoading()
+
     const unarchBtn = await component.findByTestId('unarchive')
     fireEvent.click(unarchBtn)
     expect(window.confirm).toHaveBeenCalled()
@@ -228,11 +184,11 @@ describe('MessageListActionContainer', () => {
 
   it('should trigger confirm when deleting', async () => {
     window.confirm = jest.fn(() => true)
-    const component = await setup({
+    const component = setup({
       deleteDisabled: false,
       selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
     })
-    await waitForApolloLoading()
+
     const deleteBtn = await component.findByTestId('delete')
     fireEvent.click(deleteBtn)
     expect(window.confirm).toHaveBeenCalled()
