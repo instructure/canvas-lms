@@ -15,154 +15,84 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {ApolloProvider} from 'react-apollo'
 import MessageListContainer from '../MessageListContainer'
-import {createCache} from '@canvas/apollo'
-import {CONVERSATIONS_QUERY} from '../../../graphql/Queries'
-import {MockedProvider} from '@apollo/react-testing'
+import {handlers} from '../../../graphql/mswHandlers'
+import {mswClient} from '../../../../../shared/msw/mswClient'
+import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
-import {mockQuery} from '../../../mocks'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 
-const createGraphqlMocks = () => {
-  const mocks = [
-    {
-      request: {
-        query: CONVERSATIONS_QUERY,
-        variables: {
-          userID: '1',
-          scope: 'inbox'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: CONVERSATIONS_QUERY,
-        variables: {
-          userID: '1',
-          scope: 'inbox',
-          course: 'course_123'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          },
-          Conversation: () => ({
-            _id: '1a',
-            contextType: 'context',
-            contextId: 2,
-            contextName: 'Context Name',
-            subject: 'Second Subject',
-            updateAt: new Date(),
-            conversationMessageConnections: [{}],
-            conversationParticipantsConnection: [{}]
-          })
-        }
-      }
-    },
-    {
-      request: {
-        query: CONVERSATIONS_QUERY,
-        variables: {
-          userID: '1',
-          scope: 'sent'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          },
-          Conversation: () => ({
-            _id: '1a',
-            contextType: 'context',
-            contextId: 2,
-            contextName: 'Context Name',
-            subject: 'Second Subject',
-            updateAt: new Date(),
-            conversationMessageConnections: [{}],
-            conversationParticipantsConnection: [{}]
-          })
-        }
-      }
-    }
-  ]
-
-  const mockResults = Promise.all(
-    mocks.map(async m => {
-      const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
-      return {
-        request: {query: m.request.query, variables: m.request.variables},
-        result
-      }
-    })
-  )
-  return mockResults
-}
-
-const setup = async messageListContainerProps => {
-  const mocks = await createGraphqlMocks()
-  return render(
-    <MockedProvider mocks={mocks} cache={createCache()}>
-      <MessageListContainer {...messageListContainerProps} />
-    </MockedProvider>
-  )
-}
-
 describe('MessageListContainer', () => {
+  const server = mswServer(handlers)
+  beforeAll(() => {
+    // eslint-disable-next-line no-undef
+    fetchMock.dontMock()
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+    // eslint-disable-next-line no-undef
+    fetchMock.enableMocks()
+  })
+
   beforeEach(() => {
     window.ENV = {
       current_user_id: 1
     }
   })
 
+  const setup = messageListContainerProps => {
+    return render(
+      <ApolloProvider client={mswClient}>
+        <MessageListContainer {...messageListContainerProps} />
+      </ApolloProvider>
+    )
+  }
+
   describe('converation_query', () => {
     it('should render query when successful', async () => {
-      const component = await setup()
-      expect(component).toBeTruthy()
+      const component = setup()
+      expect(component.container).toBeTruthy()
     })
 
     it('should change list of messages when scope changes', async () => {
-      const component = await setup()
+      const component = setup()
 
-      await waitForApolloLoading()
-
-      let messages = await component.queryAllByText('Mock Subject')
-      expect(messages.length).toBe(2)
+      expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
 
       component.rerender(
-        <MockedProvider mocks={await createGraphqlMocks()}>
+        <ApolloProvider client={mswClient}>
           <MessageListContainer scope="sent" />
-        </MockedProvider>
+        </ApolloProvider>
       )
 
-      await waitForApolloLoading()
-
-      messages = await component.queryByText('Mock Subject')
-      expect(messages).toBeNull()
+      await waitFor(() =>
+        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument()
+      )
     })
 
-    it('should change list of messaes when course and scope changes', async () => {
-      const component = await setup()
+    it('should change list of messages when course and scope changes', async () => {
+      const component = setup()
 
-      await waitForApolloLoading()
-
-      let messages = await component.queryAllByText('Mock Subject')
-      expect(messages.length).toBe(2)
+      expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
 
       component.rerender(
-        <MockedProvider mocks={await createGraphqlMocks()}>
+        <ApolloProvider client={mswClient}>
           <MessageListContainer course="course_123" />
-        </MockedProvider>
+        </ApolloProvider>
       )
 
-      await waitForApolloLoading()
-
-      messages = await component.queryByText('Mock Subject')
-      expect(messages).toBeNull()
+      await waitFor(() =>
+        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument()
+      )
     })
   })
 

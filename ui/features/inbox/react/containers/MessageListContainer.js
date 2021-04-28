@@ -46,7 +46,7 @@ const MessageListContainer = ({course, scope, onSelectMessage}) => {
   }
 
   if (error) {
-    setOnFailure(I18n.t('Unable to load messages. '))
+    setOnFailure(I18n.t('Unable to load messages.'))
   }
 
   return (

@@ -76,11 +76,24 @@ export const handlers = [
           workflowState: 'unread'
         })
       ]
+    } else if (req.variables.course) {
+      data.legacyNode.conversationParticipantsConnection.nodes = [
+        {
+          ...ConversationParticipant.mock({_id: '123', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMTA='}),
+          conversation: Conversation.mock({
+            _id: '10',
+            subject: 'This is a course scoped conversation'
+          })
+        }
+      ]
+      data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes = [
+        ConversationMessage.mock({body: 'Course scoped conversation message'})
+      ]
     } else {
       data.legacyNode.conversationsConnection.nodes = [
         {
           ...ConversationParticipant.mock({_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2'}),
-          conversation: Conversation.mock({_id: '197', subject: 'this is a message for the inbox'})
+          conversation: Conversation.mock({_id: '197', subject: 'This is an inbox conversation'})
         }
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes = [
