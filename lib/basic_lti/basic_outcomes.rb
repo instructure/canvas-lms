@@ -347,7 +347,9 @@ to because the assignment has no points possible.
       # rubocop:disable Metrics/ParameterLists
       def fetch_attachment(url, attachment)
         attachment.clone_url(url, 'rename', true)
-        raise 'retry attachment clone' if attachment.file_state == 'errored'
+        if attachment.file_state == 'errored'
+          raise Delayed::RetriableError, 'Attachment clone failed' 
+        end
       end
       # rubocop:enable Metrics/ParameterLists
 
