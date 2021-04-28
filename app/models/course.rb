@@ -2833,8 +2833,10 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
+  TAB_SCHEDULE = 19
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
+  COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES].freeze
 
   def self.default_tabs
     [{
@@ -2938,6 +2940,18 @@ class Course < ActiveRecord::Base
     homeroom_tabs.compact
   end
 
+  def self.course_subject_tabs
+    course_tabs = Course.default_tabs.select { |tab| COURSE_SUBJECT_TAB_IDS.include?(tab[:id]) }
+    # Add the unique TAB_SCHEDULE
+    course_tabs << {
+      :id => TAB_SCHEDULE,
+      :label => t('#tabs.schedule', "Schedule"),
+      :css_class => 'schedule',
+      :href => :course_path
+    }
+    course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
+  end
+
   def tab_hidden?(id)
     tab = self.tab_configuration.find{|t| t[:id] == id}
     return tab && tab[:hidden]
@@ -2981,7 +2995,16 @@ class Course < ActiveRecord::Base
 
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
-    default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
+    # The request params are nested within the session variable. Here we attempt to dig deep and find the params we
+    # care about to display elementary course subject tabs
+    course_subject_tabs = elementary_subject_course? && opts&.dig(:session)&.instance_variable_get(:@req)&.params&.dig(:include)&.include?('course_subject_tabs')
+    default_tabs = if elementary_homeroom_course?
+                     Course.default_homeroom_tabs
+                   elsif course_subject_tabs
+                     Course.course_subject_tabs
+                   else
+                     Course.default_tabs
+                   end
     # can't manage people in template courses
     default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
     opts[:include_external] = false if elementary_homeroom_course?
@@ -3017,7 +3040,7 @@ class Course < ActiveRecord::Base
 
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
-      tabs << settings_tab
+      tabs << settings_tab unless course_subject_tabs
 
       if opts[:only_check]
         tabs = tabs.select { |t| opts[:only_check].include?(t[:id]) }
@@ -3126,6 +3149,7 @@ class Course < ActiveRecord::Base
           (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
       end
+
       tabs
     end
   end
