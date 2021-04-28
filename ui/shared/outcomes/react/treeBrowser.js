@@ -87,7 +87,8 @@ const getCounts = rootGroups => {
 const useTreeBrowser = () => {
   const {contextType} = useCanvasContext()
   const client = useApolloClient()
-  const [collections, setCollections] = useState({[ROOT_ID]: defaultStruct(ROOT_ID)})
+  const [collections, setCollections] = useState({})
+  const [rootId, setRootId] = useState(ROOT_ID)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
@@ -152,7 +153,9 @@ const useTreeBrowser = () => {
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    setRootId,
+    rootId
   }
 }
 
@@ -168,7 +171,9 @@ export const useManageOutcomes = () => {
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    setRootId,
+    rootId
   } = useTreeBrowser()
 
   const queryCollections = ({id}) => {
@@ -187,19 +192,18 @@ export const useManageOutcomes = () => {
         }
       })
       .then(({data}) => {
+        const rootGroup = data?.context?.rootOutcomeGroup
+        const initialCollection = {[rootGroup._id]: structFromGroup(rootGroup, ROOT_ID)}
         setCollections(
-          mergeCollections(
-            data?.context?.rootOutcomeGroup?.childGroups?.nodes,
-            collections,
-            ROOT_ID
-          )
+          mergeCollections(rootGroup?.childGroups?.nodes, initialCollection, rootGroup._id)
         )
-      })
-      .finally(() => {
-        setIsLoading(false)
+        setRootId(rootGroup._id)
       })
       .catch(err => {
         setError(err)
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -209,7 +213,7 @@ export const useManageOutcomes = () => {
     isLoading,
     collections,
     queryCollections,
-    rootId: ROOT_ID,
+    rootId,
     selectedGroupId,
     selectedParentGroupId
   }
@@ -228,7 +232,9 @@ export const useFindOutcomeModal = open => {
     setIsLoading,
     selectedGroupId,
     setSelectedGroupId,
-    updateSelectedGroupId
+    updateSelectedGroupId,
+    setRootId,
+    rootId
   } = useTreeBrowser()
   const [searchString, updateSearch, clearSearch] = useSearch()
 
@@ -257,7 +263,7 @@ export const useFindOutcomeModal = open => {
       })
       .then(({data}) => {
         const {context, globalRootGroup} = data
-        let newCollections = {...collections}
+        let newCollections = {[ROOT_ID]: defaultStruct(ROOT_ID)}
         let accounts = []
         if (contextType === 'Course') {
           accounts = [...context.account.parentAccountsConnection?.nodes, context.account]
@@ -297,12 +303,13 @@ export const useFindOutcomeModal = open => {
           )
         }
         setCollections(newCollections)
-      })
-      .finally(() => {
-        setIsLoading(false)
+        setRootId(ROOT_ID)
       })
       .catch(err => {
         setError(err)
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -314,7 +321,7 @@ export const useFindOutcomeModal = open => {
     queryCollections,
     selectedGroupId,
     toggleGroupId,
-    rootId: ROOT_ID,
+    rootId,
     searchString,
     updateSearch,
     clearSearch
@@ -332,7 +339,9 @@ export const useGroupMoveModal = groupId => {
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    rootId,
+    setRootId
   } = useTreeBrowser()
 
   const queryCollections = ({id}) => {
@@ -353,19 +362,18 @@ export const useGroupMoveModal = groupId => {
           }
         })
         .then(({data}) => {
+          const rootGroup = data?.context?.rootOutcomeGroup
+          const initialCollection = {[rootGroup?._id]: structFromGroup(rootGroup, ROOT_ID)}
           setCollections(
-            mergeCollections(
-              data?.context?.rootOutcomeGroup?.childGroups?.nodes,
-              collections,
-              ROOT_ID
-            )
+            mergeCollections(rootGroup?.childGroups?.nodes, initialCollection, rootGroup._id)
           )
-        })
-        .finally(() => {
-          setIsLoading(false)
+          setRootId(rootGroup._id)
         })
         .catch(err => {
           setError(err)
+        })
+        .finally(() => {
+          setIsLoading(false)
         })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -377,6 +385,6 @@ export const useGroupMoveModal = groupId => {
     isLoading,
     collections,
     queryCollections,
-    rootId: ROOT_ID
+    rootId
   }
 }

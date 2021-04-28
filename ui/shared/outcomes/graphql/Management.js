@@ -23,19 +23,23 @@ import {gql} from '@canvas/apollo'
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
     _id
+    title
+    description
     outcomesCount
     childGroupsCount
+    canEdit
+  }
+`
+
+const childGroupsFragment = gql`
+  fragment ChildGroupsFragment on LearningOutcomeGroup {
     childGroups {
       nodes {
-        _id
-        title
-        description
-        outcomesCount
-        childGroupsCount
-        canEdit
+        ...GroupFragment
       }
     }
   }
+  ${groupFragment}
 `
 
 export const CHILD_GROUPS_QUERY = gql`
@@ -45,20 +49,26 @@ export const CHILD_GROUPS_QUERY = gql`
         _id
         rootOutcomeGroup {
           ...GroupFragment
+          ...ChildGroupsFragment
         }
       }
       ... on Course {
         _id
         rootOutcomeGroup {
           ...GroupFragment
+          ...ChildGroupsFragment
         }
       }
       ... on LearningOutcomeGroup {
-        ...GroupFragment
+        _id
+        outcomesCount
+        childGroupsCount
+        ...ChildGroupsFragment
       }
     }
   }
   ${groupFragment}
+  ${childGroupsFragment}
 `
 
 export const GROUP_DETAIL_QUERY = gql`

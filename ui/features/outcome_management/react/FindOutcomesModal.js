@@ -43,7 +43,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     toggleGroupId,
     searchString,
     updateSearch,
-    clearSearch
+    clearSearch,
+    error
   } = useFindOutcomeModal(open)
   const {group, loading, loadMore} = useGroupDetail(selectedGroupId, true)
 
@@ -80,6 +81,14 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                   <div style={{textAlign: 'center', paddingTop: '2rem'}}>
                     <Spinner renderTitle={I18n.t('Loading')} size="large" />
                   </div>
+                ) : error ? (
+                  <Text color="danger">
+                    {contextType === 'Course'
+                      ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
+                      : I18n.t('An error occurred while loading account outcomes: %{error}', {
+                          error
+                        })}
+                  </Text>
                 ) : (
                   <TreeBrowser
                     onCollectionToggle={toggleGroupId}

@@ -204,6 +204,8 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(within(getByRole('menu')).getByText('Move'))
       await act(async () => jest.runAllTimers())
       // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runAllTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
       await act(async () => jest.runAllTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
@@ -235,6 +237,8 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(within(getByRole('menu')).getByText('Move'))
       await act(async () => jest.runAllTimers())
       // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runAllTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
       await act(async () => jest.runAllTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))

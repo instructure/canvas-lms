@@ -193,6 +193,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
                   onCollectionToggle={queryCollections}
                   collections={collections}
                   rootId={rootId}
+                  showRootCollection
                 />
               )}
             </View>

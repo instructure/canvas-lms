@@ -84,6 +84,8 @@ describe('CreateOutcomeModal', () => {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.click(getByText('Create'))
@@ -149,6 +151,8 @@ describe('CreateOutcomeModal', () => {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Group 100 folder 0')).toBeInTheDocument()
@@ -163,6 +167,8 @@ describe('CreateOutcomeModal', () => {
     )
     await act(async () => jest.runAllTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(within(getByRole('dialog')).getByText('Create').closest('button')).not.toHaveAttribute(
       'disabled'
@@ -203,7 +209,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())
     await waitFor(() => {
@@ -223,7 +229,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())
     await waitFor(() => {
@@ -243,7 +249,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())
     await waitFor(() => {
@@ -272,6 +278,8 @@ describe('CreateOutcomeModal', () => {
     fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
       target: {value: 'Alternate description'}
     })
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())
@@ -301,6 +309,8 @@ describe('CreateOutcomeModal', () => {
     fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
       target: {value: 'Alternate description'}
     })
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())
@@ -329,6 +339,8 @@ describe('CreateOutcomeModal', () => {
     fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
       target: {value: 'Alternate description'}
     })
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runAllTimers())

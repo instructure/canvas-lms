@@ -44,6 +44,9 @@ export const accountMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
+            description: `Root account group`,
+            title: `Root account folder`,
+            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: 1,
             childGroups: {
@@ -87,6 +90,9 @@ export const courseMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
+            description: `Root course group`,
+            title: `Root course folder`,
+            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: 2,
             childGroups: {
