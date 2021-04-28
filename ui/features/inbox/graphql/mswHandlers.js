@@ -166,5 +166,49 @@ export const handlers = [
       }
     }
     return res(ctx.data(data))
+  }),
+
+  graphql.query('ReplyConversationQuery', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        ...Conversation.mock()
+      }
+    }
+    // Remove uneeded fields from response that are
+    // automatically included through mocks
+    delete data.legacyNode.contextId
+    delete data.legacyNode.contextType
+    delete data.legacyNode.conversationParticipantsConnection
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.mutation('CreateConversation', (req, res, ctx) => {
+    const data = {
+      createConversation: {
+        conversations: [
+          {
+            ...ConversationParticipant.mock(),
+            conversation: Conversation.mock({subject: req.variables.subject})
+          }
+        ],
+        errors: null,
+        __typename: 'CreateConversationPayload'
+      }
+    }
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.mutation('AddConversationMessage', (req, res, ctx) => {
+    const data = {
+      addConversationMessage: {
+        conversationMessage: ConversationMessage.mock({body: req.variables.body}),
+        errors: null,
+        __typename: 'AddConversationMessagePayload'
+      }
+    }
+
+    return res(ctx.data(data))
   })
 ]

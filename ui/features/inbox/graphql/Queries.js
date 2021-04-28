@@ -18,6 +18,7 @@
 import gql from 'graphql-tag'
 
 import {Conversation} from './Conversation'
+import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import {Enrollment} from './Enrollment'
 import {Course} from './Course'
@@ -78,20 +79,15 @@ export const REPLY_CONVERSATION_QUERY = gql`
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
         _id
-        id
         contextName
         subject
         conversationMessagesConnection(participants: $participants) {
           nodes {
-            _id
-            body
-            createdAt
-            author {
-              name
-            }
+            ...ConversationMessage
           }
         }
       }
     }
   }
+  ${ConversationMessage.fragment}
 `
