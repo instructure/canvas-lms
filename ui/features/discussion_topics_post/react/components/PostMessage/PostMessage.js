@@ -129,11 +129,11 @@ PostMessage.propTypes = {
   /**
    * Callback for when Editor Save button is pressed
    */
-  onSave: PropTypes.func.isRequired,
+  onSave: PropTypes.func,
   /**
    * Callback for when Editor Cancel button is pressed
    */
-  onCancel: PropTypes.func.isRequired
+  onCancel: PropTypes.func
 }
 
 export default PostMessage

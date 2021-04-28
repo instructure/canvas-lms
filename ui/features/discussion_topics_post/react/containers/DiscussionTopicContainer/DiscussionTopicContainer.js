@@ -36,7 +36,7 @@ import {
 } from '../../../graphql/Mutations'
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
-import {isGraded, getSpeedGraderUrl} from '../../utils'
+import {isGraded, getSpeedGraderUrl, getEditUrl} from '../../utils'
 
 export const DiscussionTopicContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -253,7 +253,16 @@ export const DiscussionTopicContainer = props => {
                             }
                           : null
                       }
-                      onEdit={canReadAsAdmin ? () => {} : null}
+                      onEdit={
+                        canReadAsAdmin
+                          ? () => {
+                              window.location.href = getEditUrl(
+                                ENV.course_id,
+                                discussionTopicData._id
+                              )
+                            }
+                          : null
+                      }
                       onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
                       onToggleSubscription={onSubscribe}
                       onOpenSpeedgrader={

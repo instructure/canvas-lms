@@ -24,7 +24,9 @@ const consoleMessagesToIgnore = {
 
     // This is from @instructure/ui-menu, nothing we can do about it ourselves
     /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
-    /Warning: \[themeable\] A theme registry has already been initialized.*/
+    /Warning: \[themeable\] A theme registry has already been initialized.*/,
+    // from an old discussions edit page
+    /Error: Not implemented: navigation \(except hash changes\)/
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up

@@ -142,6 +142,16 @@ describe('DiscussionTopicContainer', () => {
     expect(await findByText('Copy To...')).toBeTruthy()
   })
 
+  it('should be able to send to edit page when canreadAsAdmin', async () => {
+    const {getByTestId, findByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('edit'))
+    await waitFor(() => {
+      // this text appears on the edit page
+      expect(findByText('Allow threaded replies')).toBeTruthy()
+    })
+  })
+
   it('Should be able to delete topic', async () => {
     window.confirm = jest.fn(() => true)
     const {getByTestId, findByText} = setup(discussionTopicMock)

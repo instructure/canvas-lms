@@ -29,3 +29,7 @@ export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {
 
   return speedGraderUrl
 }
+
+export const getEditUrl = (courseId, discussionTopicId) => {
+  return `/courses/${courseId}/discussion_topics/${discussionTopicId}/edit`
+}
