@@ -3408,7 +3408,7 @@ sv:
     edit_view: 
       assignment_name: "Uppgiftens namn"
       buttons: 
-        build: Version
+        build: Bygg
         save: Spara
         save_and_publish: "Spara och publicera"
       description: Beskrivning
