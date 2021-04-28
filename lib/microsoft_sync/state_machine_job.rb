@@ -150,10 +150,10 @@ module MicrosoftSync
       end
     end
 
+    # SEE ALSO Errors::GracefulCancelErrorMixin
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
-    module GracefulCancelErrorMixin; end
 
     # Mostly used for debugging. May use sleep!
     def run_synchronously(step=nil)
@@ -222,7 +222,7 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          if e.is_a?(GracefulCancelErrorMixin)
+          if e.is_a?(Errors::GracefulCancelErrorMixin)
             statsd_increment(:cancel, current_step, e)
             update_state_record_to_errored_and_cleanup(e)
             return

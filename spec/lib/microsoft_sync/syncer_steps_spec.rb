@@ -137,7 +137,7 @@ describe MicrosoftSync::SyncerSteps do
     it 'raises a graceful exit error informing the user' do
       expect { subject }.to raise_error do |error|
         expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_members || 25000} members in a team."
       end
     end
@@ -147,7 +147,7 @@ describe MicrosoftSync::SyncerSteps do
     it 'raises a graceful exit error informing the user' do
       expect { subject }.to raise_error do |error|
         expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
       end
     end
@@ -240,7 +240,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
           expect { subject }.to raise_error do |e|
             expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-            expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+            expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
           end
         end
       end
@@ -520,7 +520,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(error.public_message).to match(
             /no users corresponding to the instructors of the Canvas course could be found/
           )
-          expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+          expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
       end
     end

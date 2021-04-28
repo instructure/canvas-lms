@@ -55,7 +55,10 @@ describe MicrosoftSync::GraphService do
         it 'raises an HTTPNotFound error' do
           expect(InstStatsd::Statsd).to receive(:increment).with(
             'microsoft_sync.graph_service.notfound',
-            tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+            tags: {
+              msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+              status_code: '404'
+            }
           )
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPNotFound,
@@ -72,7 +75,10 @@ describe MicrosoftSync::GraphService do
         it 'raises an HTTPInvalidStatus with the code and message' do
           expect(InstStatsd::Statsd).to receive(:increment).with(
             'microsoft_sync.graph_service.error',
-            tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+            tags: {
+              msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+              status_code: code.to_s
+            }
           )
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPInvalidStatus,
@@ -88,7 +94,10 @@ describe MicrosoftSync::GraphService do
       it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
         expect(InstStatsd::Statsd).to receive(:increment).with(
           'microsoft_sync.graph_service.throttled',
-          tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+          tags: {
+            msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+            status_code: '429'
+          }
         )
         expect { subject }.to raise_error(
           MicrosoftSync::Errors::HTTPTooManyRequests,
@@ -97,11 +106,34 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    context 'with a SocketError' do
+      it 'increments an "error" counter and bubbles up the error' do
+        error = SocketError.new
+        expect(HTTParty).to receive(http_method.to_sym).and_raise error
+        expect(InstStatsd::Statsd).to receive(:increment).with(
+          'microsoft_sync.graph_service.error',
+          tags: {
+            msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+            status_code: 'unknown'
+          }
+        )
+        expect { subject }.to raise_error(error)
+      end
+    end
+
     it 'increments a success statsd metric on success' do
       expect(InstStatsd::Statsd).to receive(:increment).with(
         'microsoft_sync.graph_service.success',
         tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
       )
+      subject
+    end
+
+    it 'records time with a statsd time metric' do
+      expect(InstStatsd::Statsd).to receive(:time).with(
+        'microsoft_sync.graph_service.time',
+        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+      ).and_call_original
       subject
     end
   end
