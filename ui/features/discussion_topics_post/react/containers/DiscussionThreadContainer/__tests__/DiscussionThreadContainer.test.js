@@ -294,4 +294,18 @@ describe('DiscussionThreadContainer', () => {
       expect(queryByTestId('inSpeedGrader')).toBeNull()
     })
   })
+
+  describe('Go to Buttons', () => {
+    it('Should call scrollTo when go to topic is pressed', async () => {
+      window.scrollTo = jest.fn()
+      const {getByTestId} = setup(defaultProps())
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByTestId('toTopic'))
+
+      await waitFor(() => {
+        expect(window.scrollTo.mock.calls.length).toBe(1)
+      })
+    })
+  })
 })

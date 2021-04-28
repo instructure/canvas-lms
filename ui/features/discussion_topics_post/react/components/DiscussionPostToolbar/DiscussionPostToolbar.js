@@ -130,7 +130,9 @@ export const DiscussionPostToolbar = props => {
             layout="columns"
           >
             <Button
-              onClick={props.onTopClick}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
               renderIcon={<IconCircleArrowUpLine />}
               data-testid="topButton"
             >
@@ -148,11 +150,9 @@ export default DiscussionPostToolbar
 DiscussionPostToolbar.propTypes = {
   selectedView: PropTypes.string,
   sortDirection: PropTypes.string,
-  isCollapsedReplies: PropTypes.bool,
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
-  onSortClick: PropTypes.func,
-  onTopClick: PropTypes.func
+  onSortClick: PropTypes.func
 }
 
 DiscussionPostToolbar.defaultProps = {
