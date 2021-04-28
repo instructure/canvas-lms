@@ -229,6 +229,7 @@ class RCEWrapper extends React.Component {
     this._elementRef = React.createRef()
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
+    this._switchedFromWysiwygToPrettyHtml = false
 
     injectTinySkin()
 
@@ -280,7 +281,11 @@ class RCEWrapper extends React.Component {
   }
 
   setCode(newContent) {
-    this.mceInstance()?.setContent(newContent)
+    if (this.state.editorView === PRETTY_HTML_EDITOR_VIEW) {
+      return this.mceInstance()?.setContent(newContent, {format: 'raw'})
+    } else {
+      return this.mceInstance()?.setContent(newContent)
+    }
   }
 
   // This function is called imperatively by the page that renders the RCE.
@@ -569,6 +574,8 @@ class RCEWrapper extends React.Component {
       case RAW_HTML_EDITOR_VIEW:
         newState = {editorView: newView || WYSIWYG_VIEW}
     }
+    this._switchedFromWysiwygToPrettyHtml =
+      this.state.editorView === WYSIWYG_VIEW && newView === PRETTY_HTML_EDITOR_VIEW
     this.setState(newState, () => {
       if (wasFullscreen) {
         window.setTimeout(() => {
@@ -1389,7 +1396,6 @@ class RCEWrapper extends React.Component {
       case PRETTY_HTML_EDITOR_VIEW:
         this.getTextarea().setAttribute('aria-hidden', true)
         this.getTextarea().labels?.[0]?.setAttribute('aria-hidden', true)
-        this.mceInstance().undoManager.add() // all changes in html vidw are 1 undo
         this.mceInstance().hide()
         this._elementRef.current.querySelector('.CodeMirror')?.CodeMirror.setCursor(0, 0)
         break
@@ -1430,6 +1436,15 @@ class RCEWrapper extends React.Component {
   renderHtmlEditor() {
     if (!this.props.use_rce_pretty_html_editor) return null
 
+    let code = ''
+    if (this._switchedFromWysiwygToPrettyHtml) {
+      // When changing from WYSIWYG to Pretty HTML we need to get the HTML styled content
+      code = this.mceInstance().getContent({format: 'html'})
+    } else {
+      // Reproducing the raw HTML editor behavior
+      this.mceInstance().getContent({format: 'raw'})
+    }
+
     // the div keeps the editor from collapsing while the code editor is downloaded
     return (
       <Suspense
@@ -1450,9 +1465,15 @@ class RCEWrapper extends React.Component {
           <RceHtmlEditor
             ref={this._prettyHtmlEditorRef}
             height={document[FS_ELEMENT] ? `${window.screen.height}px` : this.state.height}
-            code={this.mceInstance().getContent({format: 'html'})}
+            code={code}
             onChange={value => {
               this.getTextarea().value = value
+              this.handleTextareaChange()
+              // Enters only once, changes the way how the user can edit the content
+              // like the raw HTML editor
+              if (this._switchedFromWysiwygToPrettyHtml) {
+                this._switchedFromWysiwygToPrettyHtml = false
+              }
             }}
             onFocus={this.handleFocusHtmlEditor}
           />

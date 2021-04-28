@@ -109,6 +109,16 @@ module QuizzesCommon
     wait_for_ajaximations
   end
 
+  def create_essay_question
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Essay Question')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    submit_form(question)
+    wait_for_ajaximations
+  end
+
   def create_file_upload_question
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'File Upload Question')
