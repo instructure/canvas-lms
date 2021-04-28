@@ -24,6 +24,10 @@
 #
 module MicrosoftSync
   module LoginService
+    class TenantDoesNotExist < StandardError
+      include Errors::GracefulCancelErrorMixin
+    end
+
     BASE_URL = 'https://login.microsoftonline.com'
     TOKEN_SUBPATH = 'oauth2/v2.0/token'
 
@@ -33,6 +37,8 @@ module MicrosoftSync
     # Give us a little breathing room from when they say the token will expire.
     CACHE_EXPIRY_BUFFER = 8.seconds
     CACHE_RACE_CONDITION_TTL = 5.seconds
+
+    STATSD_NAME = 'microsoft_sync.login_service'
 
     class << self
       def login_url(tenant)
@@ -62,6 +68,15 @@ module MicrosoftSync
         end
 
         response.parsed_response
+      rescue Errors::HTTPBadRequest
+        if response.body =~ /Tenant .* not found/ || response.body =~ /is neither a valid DNS name/
+          raise TenantDoesNotExist
+        end
+
+        raise
+      ensure
+        statsd_tags = {status_code: response&.code&.to_s || 'error'}
+        InstStatsd::Statsd.increment(STATSD_NAME, tags: statsd_tags)
       end
 
       # Returns a string token. Cached per-tenant for the time given in the login response.

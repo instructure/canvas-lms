@@ -41,7 +41,7 @@ module MicrosoftSync
     # SyncCanceled errors are semi-expected errors -- so we raise them they will
     # cleanup_after_failure but not produce a failed job.
     class SyncCanceled < Errors::PublicError
-      include StateMachineJob::GracefulCancelErrorMixin
+      include Errors::GracefulCancelErrorMixin
     end
 
     class MissingOwners < SyncCanceled; end
