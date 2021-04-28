@@ -6,7 +6,7 @@ source script/common/canvas/build_helpers.sh
 trap 'trap_result' ERR EXIT
 trap "printf '\nTerminated\n' && exit 130" SIGINT
 LOG="$(pwd)/log/docker_dev_setup.log"
-SCRIPT_NAME=$0
+SCRIPT_NAME="$0 $@"
 OS="$(uname)"
 DOCKER='true'
 
