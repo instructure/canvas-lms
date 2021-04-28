@@ -2370,10 +2370,12 @@ describe CalendarEventsApiController, type: :request do
       before :once do
         @c0 = @course
         @a0 = @c0.assignments.create(workflow_state: 'published', due_at: 1.day.from_now)
+        @e0 = @c0.calendar_events.create!(start_at: 1.day.from_now, end_at: 1.day.from_now + 1.hour)
         @shard1.activate do
           @shard1_account = Account.create!
           @c1 = course_with_teacher(user: @me, account: @shard1_account, enrollment_state: 'active').course
           @a1 = @c1.assignments.create(workflow_state: 'published', due_at: 2.days.from_now)
+          @e1 = @c1.calendar_events.create!(start_at: 2.days.from_now, end_at: 2.days.from_now + 1.hour)
         end
       end
 
@@ -2393,6 +2395,27 @@ describe CalendarEventsApiController, type: :request do
                         all_events: 1, per_page: 1, page: next_link['page'])
         expect(json.size).to eq 1
         expect(json[0]['id']).to eq @a1.asset_string
+
+        links = Api.parse_pagination_links(response.headers['Link'])
+        expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
+      end
+
+      it "paginates events from multiple shards correctly" do
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1&include[]=web_conference",
+                        controller: 'calendar_events_api', action: 'index', format: 'json', include: ['web_conference'],
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, per_page: 1)
+        expect(json.size).to eq 1
+        expect(json[0]['id']).to eq @e0.id
+
+        links = Api.parse_pagination_links(response.headers['Link'])
+        next_link = links.detect { |link| link[:rel] == 'next' }
+        expect(next_link).not_to be_nil
+
+        json = api_call(:get, next_link[:uri].to_s, controller: 'calendar_events_api', action: 'index',
+                        format: 'json', context_codes: [@c0.asset_string, @c1.global_asset_string],
+                        include: ['web_conference'], all_events: 1, per_page: 1, page: next_link['page'])
+        expect(json.size).to eq 1
+        expect(json[0]['id']).to eq @e1.id
 
         links = Api.parse_pagination_links(response.headers['Link'])
         expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
