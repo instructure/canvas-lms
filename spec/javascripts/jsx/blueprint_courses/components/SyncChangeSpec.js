@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import SyncChange from 'jsx/blueprint_courses/components/SyncChange'
+import SyncChange from '@canvas/blueprint-courses/react/components/SyncChange'
 import {Pill} from '@instructure/ui-pill'
 import getSampleData from '../getSampleData'
 import ReactDOM from 'react-dom'

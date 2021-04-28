@@ -44,13 +44,12 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
-      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
       type_in_tiny("#submission_body", 'text')
-      f('button[type="submit"]').click
+      wait_for_new_page_load { f('button[type="submit"]').click }
 
       expect(f("#sidebar_content")).to include_text("Submitted!")
       expect(f("#content")).not_to contain_css(".error_text")
@@ -60,9 +59,9 @@ describe "submissions" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f(".submit_assignment_link").click
-      f("[aria-label='Rich Content Editor'] #submission_body_ifr")
-      f('#submit_assignment_tabs button[type="submit"]').click
+      wait_for_new_page_load { f(".submit_assignment_link").click }
+      f('button[type="submit"]').click
+
       expect(f(".error_text")).to be
     end
 

@@ -229,6 +229,8 @@ class Course < ActiveRecord::Base
 
   has_one :microsoft_sync_group, class_name: "MicrosoftSync::Group", dependent: :destroy, inverse_of: :course
 
+  has_many :comment_bank_items, inverse_of: :course
+
   prepend Profile::Association
 
   before_save :assign_uuid
@@ -244,6 +246,7 @@ class Course < ActiveRecord::Base
   after_commit :update_cached_due_dates
 
   after_create :set_default_post_policy
+  after_create :copy_from_course_template
 
   after_update :clear_cached_short_name, :if => :saved_change_to_course_code?
 
@@ -307,7 +310,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.ensure_dummy_course
-    Account.ensure_dummy_account
+    Account.ensure_dummy_root_account
     Course.find_or_create_by!(id: 0) { |c| c.account_id = c.root_account_id = 0 }
   end
 
@@ -813,6 +816,8 @@ class Course < ActiveRecord::Base
 
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => {:workflow_state => 'deleted'}) }
   scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") }
+
+  scope :templates, -> { where(template: true) }
 
   def potential_collaborators
     current_users
@@ -2353,6 +2358,14 @@ class Course < ActiveRecord::Base
     }
   end
 
+  def student_annotation_documents_folder
+    Folder.unique_folder(
+      self,
+      Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE,
+      lambda { t "Student Annotation Documents" }
+    )
+  end
+
   def copy_attachments_from_course(course, options={})
     root_folder = Folder.root_folders(self).first
     root_folder_name = root_folder.name + '/'
@@ -3196,7 +3209,10 @@ class Course < ActiveRecord::Base
 
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
-      self.save!
+      Course.suspend_callbacks(:copy_from_course_template) do
+        self.save!
+      end
+
       unless profile.new_record?
         profile.update_attribute(:context, new_course)
       end
@@ -3667,5 +3683,29 @@ class Course < ActiveRecord::Base
   def canvas_k6_tab_configuration
     visible, hidden = Course.default_tabs.partition {|tab| CANVAS_K6_TAB_IDS.include?(tab[:id])}
     [*visible, *hidden.tap {|tabs| tabs.each{|t| t[:hidden]=true }}]
+  end
+
+  def copy_from_course_template
+    # because of some specs that mock out all feature flags, and how often
+    # courses are created, we check that the feature actually exists here
+    # before checking if it's enabled
+    if Feature.definitions['course_templates'] &&
+      root_account.feature_enabled?(:course_templates) &&
+      (template = account.effective_course_template)
+      content_migration = content_migrations.new(
+        source_course: template,
+        migration_type: 'course_copy_importer',
+        initiated_source: :course_template
+      )
+      content_migration.migration_settings[:source_course_id] = template.id
+      content_migration.migration_settings[:import_quizzes_next] = true
+
+      content_migration.migration_settings[:import_immediately] = true
+      content_migration.copy_options = { everything: true }
+      content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
+      content_migration.workflow_state = 'importing'
+      content_migration.save!
+      content_migration.queue_migration
+    end
   end
 end

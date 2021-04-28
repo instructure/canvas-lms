@@ -809,6 +809,26 @@ describe "security" do
         expect(response.body).to match /People/
       end
 
+      it "Display groups and persons for students" do
+        student_in_course
+        user_session(@user)
+
+        get "/courses/#{@course.id}/users"
+        expect(response).to be_successful
+
+        get "/courses/#{@course.id}/groups"
+        expect(response).to be_successful
+
+        @course.tab_configuration = [ { :id => Course::TAB_PEOPLE, :hidden => true } ]
+        @course.save!
+
+        get "/courses/#{@course.id}/users"
+        expect(response).to be_redirect
+
+        get "/courses/#{@course.id}/groups"
+        expect(response).to be_redirect
+      end
+
       it 'view_all_grades' do
         get "/courses/#{@course.id}/grades"
         assert_status(401)

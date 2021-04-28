@@ -155,7 +155,7 @@ module CanvasRails
     # havoc on the app (e.g. stylesheets/base -> ::Base)
     config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
                                   #{Rails.root}/app/stylesheets
-                                  #{Rails.root}/app/jsx)
+                                  #{Rails.root}/ui)
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: -> (*) {

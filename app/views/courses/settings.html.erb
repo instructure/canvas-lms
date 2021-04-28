@@ -59,27 +59,32 @@
     <% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
       <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature Options}) %></a></li>
     <% end %>
+    <% if @context.grants_right?(@current_user, session, :manage_students) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
+      <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
+    <% end %>
   </ul>
   <div id="tab-details">
     <h2>
       <%= t('headings.details', %{Course Details}) %>
-      <% if @context.created? || @context.claimed? %>
-        <span id='course-status' class='published-status unpublished pull-right'>
-          <%= t('labels.course_status_unpublished', %{Course is Unpublished}) %>
-          <i class="icon-unpublished"></i>
-        </span>
-      <% else %>
-        <% if @context.unpublishable? %>
-          <span data-tooltip title="" id='course-status' class='published-status published pull-right'>
-            <%= t('labels.course_status_published', %{Course is Published}) %>
-            <i class="icon-publish icon-Solid"></i>
+      <% unless @context.elementary_subject_course? %>
+        <% if @context.created? || @context.claimed? %>
+          <span id='course-status' class='published-status unpublished pull-right'>
+            <%= t('labels.course_status_unpublished', %{Course is Unpublished}) %>
+            <i class="icon-unpublished"></i>
           </span>
         <% else %>
-          <% unpublish_tooltip = t('tooltips.cannot_unpublish_course', %{You cannot unpublish this course if there are graded student submissions}) %>
-          <span data-tooltip title="<%= unpublish_tooltip %>" id='course-status' class='published-status published pull-right'>
-            <%= t('labels.course_status_published', %{Course is Published}) %>
-            <i class="icon-publish icon-Solid"></i>
-          </span>
+          <% if @context.unpublishable? %>
+            <span data-tooltip title="" id='course-status' class='published-status published pull-right'>
+              <%= t('labels.course_status_published', %{Course is Published}) %>
+              <i class="icon-publish icon-Solid"></i>
+            </span>
+          <% else %>
+            <% unpublish_tooltip = t('tooltips.cannot_unpublish_course', %{You cannot unpublish this course if there are graded student submissions}) %>
+            <span data-tooltip title="<%= unpublish_tooltip %>" id='course-status' class='published-status published pull-right'>
+              <%= t('labels.course_status_published', %{Course is Published}) %>
+              <i class="icon-publish icon-Solid"></i>
+            </span>
+          <% end %>
         <% end %>
       <% end %>
     </h2>
@@ -156,13 +161,7 @@
                    @context.can_become_template? && @context.grants_right?(@current_user, session, :add_course_template)
                  end
             %>
-            <div class="checkbox-flex-container">
-              <%= f.check_box :template, disabled: !editable %>
-              <%= f.label :template, :en => "Enable course as a Course Template" %>
-            </div>
-            <% if @context.template? %>
-              <div><%= t({ one: "One associated account", other: "%{count} associated accounts" }, count: @context.templated_accounts.count) %></div>
-            <% end %>
+            <div id="course_template_details" data-is-editable=<%= editable %> %>></div>
           </div>
         </div>
       <% end %>
@@ -831,6 +830,10 @@
 
   <% if can_do(@context, @current_user, :view_feature_flags) && !@context.elementary_homeroom_course? %>
     <div id="tab-features"></div>
+  <% end %>
+
+  <% if @context.grants_right?(@current_user, session, :manage_students) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
+    <div id="tab-integrations"></div>
   <% end %>
 </div><!-- end course details tab -->
 

@@ -288,20 +288,13 @@ describe MediaObject do
       expect(att).to be_empty
     end
 
-    it "creates the corresponding attachment if the feature is enabled" do
-      @course.root_account.enable_feature!(:autocreate_attachment_from_media_object)
+    it "creates the corresponding attachment" do
       mo = @media_object
       mo.process_retrieved_details(@mock_entry, @media_type, @assets)
       att = Attachment.find(mo[:attachment_id])
       expect(att).to be_hidden
       expect(att.folder.name).to eq "Uploaded Media"
       expect(att[:media_entry_id]).to eql mo[:media_id]
-    end
-
-    it "doesn't create the corresponding attachment if the feature is not enabled" do
-      mo = @media_object
-      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-      expect(mo.attachment_id).to be_nil
     end
   end
 

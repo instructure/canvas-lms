@@ -27,6 +27,8 @@ class ContextController < ApplicationController
   before_action :reject_student_view_student, :only => [:inbox]
   protect_from_forgery :except => [:object_snippet], with: :exception
 
+  include K5Mode
+
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])
     if authorized_action(@context, @current_user, :read)
@@ -310,7 +312,7 @@ class ContextController < ApplicationController
 
       js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
 
-      js_bundle :user_name, "legacy/context_roster_user"
+      js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
       @google_analytics_page_title = "#{@context.name} People"
 

@@ -129,6 +129,10 @@ module K5PageObject
     "h2 div"
   end
 
+  def teacher_preview_selector
+    "h2:contains('Teacher Schedule Preview')"
+  end
+
   def previous_week_button_selector
     "//button[.//span[. = 'View previous week']]"
   end
@@ -139,6 +143,58 @@ module K5PageObject
 
   def today_button_selector
     "//button[.//span[. = 'Today']]"
+  end
+
+  def missing_dropdown_selector
+    "[data-testid = 'missing-item-info']"
+  end
+
+  def missing_data_selector
+    "[data-testid = 'missing-data']"
+  end
+
+  def missing_assignments_selector
+    ".MissingAssignments-styles__root .PlannerItem-styles__title"
+  end
+
+  def assignment_url_selector(course_id, assignment_id)
+    "a[href = '/courses/#{course_id}/assignments/#{assignment_id}']"
+  end
+
+  def message_button_selector
+    "//button[.//*[contains(text(),'Send a message to')]]"
+  end
+
+  def subject_input_selector
+    "input[placeholder = 'No subject']"
+  end
+
+  def message_input_selector
+    "textarea[placeholder = 'Message']"
+  end
+
+  def send_button_selector
+    "//button[.//*[. = 'Send']]"
+  end
+
+  def cancel_button_selector
+    "//button[.//*[. = 'Cancel']]"
+  end
+
+  def message_modal_selector(user_name)
+    "[aria-label='Message #{user_name}']"
+  end
+
+  def k5_app_button_selector
+    "[data-testid='k5-app-button']"
+  end
+
+  def course_selection_modal_selector
+    "[aria-label='Choose a Course']"
+  end
+
+  def course_list_selector
+    "//*[@aria-label = 'Choose a Course']//a"
   end
 
   #------------------------- Elements --------------------------
@@ -251,6 +307,10 @@ module K5PageObject
     f(grading_period_dropdown_selector)
   end
 
+  def teacher_preview
+    fj(teacher_preview_selector)
+  end
+
   def beginning_of_week_date
     date_block = ff(week_date_selector)
     date_block[0].text == 'Today' ? date_block[1].text : date_block[0].text
@@ -270,6 +330,66 @@ module K5PageObject
 
   def today_button
     fxpath(today_button_selector)
+  end
+
+  def items_missing
+    f(missing_dropdown_selector)
+  end
+
+  def items_missing_exists?
+    element_exists?(missing_dropdown_selector)
+  end
+
+  def missing_data
+    f(missing_data_selector)
+  end
+
+  def missing_data_exists?
+    element_exists?(missing_data_selector)
+  end
+
+  def missing_assignments
+    ff(missing_assignments_selector)
+  end
+
+  def assignment_url(assignment_title)
+    fj(assignment_url_selector(assignment_title))
+  end
+
+  def message_button
+    fxpath(message_button_selector)
+  end
+
+  def subject_input
+    f(subject_input_selector)
+  end
+
+  def message_input
+    f(message_input_selector)
+  end
+
+  def send_button
+    fxpath(send_button_selector)
+  end
+
+  def cancel_button
+    fxpath(cancel_button_selector)
+  end
+
+  def message_modal(user_name)
+    f(message_modal_selector(user_name))
+  end
+
+  def k5_app_buttons
+    ff(k5_app_button_selector)
+  end
+
+  def course_selection_modal
+    f(course_selection_modal_selector)
+  end
+
+  def course_list
+    ffxpath(course_list_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
@@ -340,5 +460,92 @@ module K5PageObject
 
   def ending_weekday_calculation(current_date)
     (current_date.end_of_week(:sunday)).strftime("%B %-d")
+  end
+
+  def click_missing_items
+    items_missing.click
+  end
+
+  def assignment_link_exists?(course_id, assignment_id)
+    element_exists?(assignment_url_selector(course_id, assignment_id))
+  end
+
+  def missing_assignments_exist?
+    element_exists?(missing_assignments_selector)
+  end
+
+  def create_dated_assignment(assignment_title, assignment_due_at)
+    @course.assignments.create!(
+      title: assignment_title,
+      grading_type: 'points',
+      points_possible: 100,
+      due_at: assignment_due_at,
+      submission_types: 'online_text_entry'
+    )
+  end
+
+  def click_message_button
+    message_button.click
+  end
+
+  def click_send_button
+    send_button.click
+  end
+
+  def click_cancel_button
+    cancel_button.click
+  end
+
+  def is_send_available?
+    element_value_for_attr(send_button, 'cursor') == 'pointer'
+  end
+
+  def is_cancel_available?
+    element_value_for_attr(cancel_button, 'cursor') == 'pointer'
+  end
+
+  def is_modal_gone?(user_name)
+    wait_for_no_such_element { message_modal(user_name) }
+  end
+
+  def message_modal_displayed?(user_name)
+    element_exists?(message_modal_selector(user_name))
+  end
+
+  def click_k5_button(button_item)
+    k5_app_buttons[button_item].click
+  end
+
+  def k5_resource_button_names_list
+    k5_app_buttons.map(&:text)
+  end
+
+  def create_lti_resource(resource_name)
+    @rendered_icon='https://lor.instructure.com/img/icon_commons.png'
+    @lti_resource_url='http://www.example.com'
+    @tool =
+      Account.default.context_external_tools.new(
+        {
+          name: resource_name,
+          domain: 'canvaslms.com',
+          consumer_key: '12345',
+          shared_secret: 'secret',
+          is_rce_favorite: 'true'
+        }
+      )
+    @tool.set_extension_setting(
+      :editor_button,
+      {
+        message_type: 'ContentItemSelectionRequest',
+        url: @lti_resource_url,
+        icon_url: @rendered_icon,
+        text: "#{resource_name} Favorites",
+        enabled: 'true',
+        use_tray: 'true',
+        favorite: 'true'
+      }
+    )
+    @tool.course_navigation = {enabled: true}
+    @tool.save!
   end
 end

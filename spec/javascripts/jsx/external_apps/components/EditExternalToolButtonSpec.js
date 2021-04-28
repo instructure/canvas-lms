@@ -18,8 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import EditExternalToolButton from 'jsx/external_apps/components/EditExternalToolButton'
-import Store from 'jsx/external_apps/lib/ExternalAppsStore.js'
+import EditExternalToolButton from 'ui/features/external_apps/react/components/EditExternalToolButton.js'
+import Store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
 
 const wrapper = document.getElementById('fixtures')
 const prevEnvironment = ENV

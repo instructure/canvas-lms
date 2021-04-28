@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import history from 'jsx/gradebook-history/reducers/HistoryReducer'
-import searchForm from 'jsx/gradebook-history/reducers/SearchFormReducer'
-import {allReducers} from 'jsx/gradebook-history/reducers/Reducer'
+import history from 'ui/features/gradebook_history/react/reducers/HistoryReducer.js'
+import searchForm from 'ui/features/gradebook_history/react/reducers/SearchFormReducer.js'
+import {allReducers} from 'ui/features/gradebook_history/react/reducers/Reducer.js'
 
 QUnit.module('Reducer')
 

@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
-import 'jquery.instructure_date_and_time'
+import '@canvas/datetime'
 
 QUnit.module('fudgeDateForProfileTimezone', {
   setup() {

@@ -401,27 +401,27 @@ describe SubmissionsController do
       expect(assigns[:submission]).to be_nil
     end
 
-    context 'when the submission_type is annotated_document' do
+    context 'when the submission_type is student_annotation' do
       before(:once) do
         @course = course_model(workflow_state: "available")
         @attachment = attachment_model(context: @course)
         @assignment = @course.assignments.create!(
           annotatable_attachment: @attachment,
-          submission_types: 'annotated_document'
+          submission_types: 'student_annotation'
         )
       end
 
-      it 'redirects with an error if annotated_document_id is not present in params' do
+      it 'redirects with an error if annotatable_attachment_id is not present in params' do
         course_with_student_logged_in(active_all: true, course: @course)
         post :create, params: {
           assignment_id: @assignment.id,
           course_id: @course.id,
-          submission: { submission_type: 'annotated_document' }
+          submission: { submission_type: 'student_annotation' }
         }
 
         aggregate_failures do
           expect(response).to be_redirect
-          expect(flash[:error]).to eq "Annotated Document submissions require an annotated_document_id to submit"
+          expect(flash[:error]).to eq "Student Annotation submissions require an annotatable_attachment_id to submit"
         end
       end
 
@@ -433,7 +433,7 @@ describe SubmissionsController do
         post :create, params: {
           assignment_id: @assignment.id,
           course_id: @course.id,
-          submission: { annotated_document_id: @attachment.id, submission_type: 'annotated_document' }
+          submission: { annotatable_attachment_id: @attachment.id, submission_type: 'student_annotation' }
         }
 
         aggregate_failures do

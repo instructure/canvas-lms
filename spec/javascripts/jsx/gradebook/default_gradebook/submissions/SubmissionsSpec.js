@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook > Submissions', suiteHooks => {
   let $container

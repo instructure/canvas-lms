@@ -17,7 +17,6 @@
  */
 
 import {handleActions} from 'redux-actions'
-import parseLinkHeader from 'parse-link-header'
 import {mergeDays, purgeDuplicateDays} from '../utilities/daysUtils'
 import {findNextLink} from '../utilities/apiUtils'
 
@@ -110,10 +109,10 @@ export default handleActions(
     GOT_PARTIAL_PAST_DAYS: gotPartialPastDays,
     GOT_PARTIAL_FUTURE_DAYS: gotPartialFutureDays,
     GOT_PARTIAL_WEEK_DAYS: gotPartialWeekDays,
-    START_LOADING_OPPORTUNITIES: (state, action) => {
+    START_LOADING_OPPORTUNITIES: (state, _action) => {
       return {...state, loadingOpportunities: true}
     },
-    START_LOADING_ITEMS: (state, action) => {
+    START_LOADING_ITEMS: (state, _action) => {
       return loadingState(state, {isLoading: true})
     },
     GETTING_PAST_ITEMS: (state, action) => {
@@ -130,39 +129,39 @@ export default handleActions(
         isLoading: state.isLoading
       })
     },
-    GETTING_FUTURE_ITEMS: (state, action) => {
+    GETTING_FUTURE_ITEMS: (state, _action) => {
       return loadingState(state, {
         loadingError: state.loadingError, // don't reset error until we're successful
         loadingFuture: true
       })
     },
-    DELETED_PLANNER_ITEM: (state, action) => {
+    DELETED_PLANNER_ITEM: (state, _action) => {
       return loadingState(state, {hasSomeItems: false}) // because we can no longer be sure
     },
-    SAVED_PLANNER_ITEM: (state, action) => {
+    SAVED_PLANNER_ITEM: (state, _action) => {
       return loadingState(state, {hasSomeItems: true}) // even if days[] is empty, we know we have an item
     },
-    ALL_FUTURE_ITEMS_LOADED: (state, action) => {
+    ALL_FUTURE_ITEMS_LOADED: (state, _action) => {
       return loadingState(state, {allFutureItemsLoaded: true})
     },
-    ALL_WEEK_ITEMS_LOADED: (state, action) => {
+    ALL_WEEK_ITEMS_LOADED: (state, _action) => {
       return loadingState(state, {allWeekItemsLoaded: true})
     },
-    ALL_OPPORTUNITIES_LOADED: (state, action) => {
+    ALL_OPPORTUNITIES_LOADED: (state, _action) => {
       return {...state, loadingOpportunities: false, allOpportunitiesLoaded: true}
     },
-    ALL_PAST_ITEMS_LOADED: (state, action) => {
+    ALL_PAST_ITEMS_LOADED: (state, _action) => {
       return loadingState(state, {allPastItemsLoaded: true})
     },
-    ADD_OPPORTUNITIES: (state, action) => {
+    ADD_OPPORTUNITIES: (state, _action) => {
       return {...state, loadingOpportunities: false}
     },
-    START_LOADING_GRADES_SAGA: (state, action) => ({
+    START_LOADING_GRADES_SAGA: (state, _action) => ({
       ...state,
       loadingGrades: true,
       gradesLoadingError: null
     }),
-    GOT_GRADES_SUCCESS: (state, action) => ({
+    GOT_GRADES_SUCCESS: (state, _action) => ({
       ...state,
       loadingGrades: false,
       gradesLoaded: true,
@@ -174,14 +173,22 @@ export default handleActions(
       gradesLoaded: false,
       gradesLoadingError: action.payload.message
     }),
-    GETTING_WEEK_ITEMS: (state, action) => {
+    GETTING_INIT_WEEK_ITEMS: (state, _action) => {
+      return loadingState(state, {
+        loadingError: state.loadingError, // don't reset error until we're successful
+        isLoading: true,
+        loadingWeek: true,
+        allWeekItemsLoaded: false // because it only refers to the week about to get loaded
+      })
+    },
+    GETTING_WEEK_ITEMS: (state, _action) => {
       return loadingState(state, {
         loadingError: state.loadingError, // don't reset error until we're successful
         loadingWeek: true,
         allWeekItemsLoaded: false // because it only refers to the week about to get loaded
       })
     },
-    WEEK_LOADED: (state, action) => {
+    WEEK_LOADED: (state, _action) => {
       return loadingState(state, {
         loadingError: null,
         isLoading: false,
@@ -189,7 +196,10 @@ export default handleActions(
         loadingWeek: false
       })
     },
-    JUMP_TO_WEEK: (state, action) => {
+    JUMP_TO_WEEK: (state, _action) => {
+      return loadingState(state, {loadingWeek: false})
+    },
+    JUMP_TO_THIS_WEEK: (state, _action) => {
       return loadingState(state, {loadingWeek: false})
     }
   },

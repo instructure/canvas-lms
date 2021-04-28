@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import ContentMigration from 'compiled/models/ContentMigration'
-import CopyCourseView from 'compiled/views/content_migrations/CopyCourseView'
-import DateShiftView from 'compiled/views/content_migrations/subviews/DateShiftView'
+import Backbone from '@canvas/backbone'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
+import CopyCourseView from 'ui/features/content_migrations/backbone/views/CopyCourseView.coffee'
+import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CopyCourseView: Initializer', {

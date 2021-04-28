@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "pattern": "**/*.{coffee,js}",
+      "processor": "js"
+    },
+    {
+      "pattern": "**/*.{handlebars,hbs}",
+      "processor": "hbs"
+    }
+  ]
+}

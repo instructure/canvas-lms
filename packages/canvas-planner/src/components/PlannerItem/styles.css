@@ -116,6 +116,12 @@
       text-transform: none;
     }
   }
+  .missingItem & {
+    flex-basis: 16rem;
+    &.with_end_time {
+      flex-basis: 20rem;
+    }
+  }
 }
 
 .due,

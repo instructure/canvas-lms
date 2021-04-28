@@ -21,9 +21,9 @@ import _ from 'lodash'
 import $ from 'jquery'
 import I18n from 'i18n!gradingGradeSummary'
 import fakeENV from 'helpers/fakeENV'
-import numberHelper from 'jsx/shared/helpers/numberHelper'
-import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
-import GradeSummary from 'jsx/grading/GradeSummary'
+import numberHelper from '@canvas/i18n/numberHelper'
+import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
+import GradeSummary from 'ui/features/grade_summary/jquery/index.js'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
 
 const $fixtures = $('#fixtures')

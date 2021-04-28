@@ -20,11 +20,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import _ from 'underscore'
-import GradingPeriod from 'jsx/grading/gradingPeriod'
+import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriod.js'
 import fakeENV from 'helpers/fakeENV'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
-import 'jquery.instructure_misc_plugins'
-import 'compiled/jquery.rails_flash_notifications'
+import DateHelper from '@canvas/datetime/dateHelper'
+import '@canvas/jquery/jquery.instructure_misc_plugins'
+import '@canvas/rails-flash-notifications'
 
 const wrapper = document.getElementById('fixtures')
 

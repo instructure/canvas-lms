@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
-import {underscore} from 'convert_case'
+import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi.js'
+import {underscore} from 'convert-case'
 
 QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
   let server

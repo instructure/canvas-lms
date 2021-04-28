@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UniqueDropdownCollection from 'compiled/util/UniqueDropdownCollection'
-import Backbone from 'Backbone'
+import UniqueDropdownCollection from 'ui/features/assignment_index/backbone/collections/UniqueDropdownCollection.coffee'
+import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 
 QUnit.module('UniqueDropdownCollection', {

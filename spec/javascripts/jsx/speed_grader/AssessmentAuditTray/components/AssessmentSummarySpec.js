@@ -18,11 +18,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import timezone from 'timezone'
+import timezone from '@canvas/timezone'
 import newYork from 'timezone/America/New_York'
 
-import AssessmentSummary from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentSummary'
-import {overallAnonymityStates} from 'jsx/speed_grader/AssessmentAuditTray/AuditTrailHelpers'
+import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary.js'
+import {overallAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers.js'
 
 const {FULL, NA, PARTIAL} = overallAnonymityStates
 

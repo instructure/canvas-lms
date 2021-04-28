@@ -21,7 +21,7 @@ import {
   showFlashAlert,
   showFlashError,
   showFlashSuccess
-} from 'jsx/shared/FlashAlert'
+} from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('FlashAlert', hooks => {
   let clock

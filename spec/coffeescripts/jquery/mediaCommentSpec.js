@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import MediaUtils from 'compiled/jquery/mediaComment'
+import MediaUtils from '@canvas/media-comments/jquery/mediaComment'
 import 'jqueryui/dialog'
-import 'jquery.disableWhileLoading'
+import '@canvas/jquery/jquery.disableWhileLoading'
 
 QUnit.module('mediaComment', {
   setup() {

@@ -111,6 +111,22 @@ if (!('IntersectionObserver' in window)) {
   })
 }
 
+if (!('ResizeObserver' in window)) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      observe() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    }
+  })
+}
+
 if (!('matchMedia' in window)) {
   window.matchMedia = () => ({
     matches: false,

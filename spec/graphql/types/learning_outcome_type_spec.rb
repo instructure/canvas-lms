@@ -85,4 +85,20 @@ describe Types::LearningOutcomeType do
       expect(outcome_type.resolve("assessed")).to eq false
     end
   end
+
+  context "imported" do
+    let(:course) { Course.create! }
+    let(:root_group) { course.root_outcome_group }
+
+    it "returns false when not imported" do
+      expect(outcome_type.resolve("isImported(targetContextType: \"Course\", targetContextId: #{course.id})"))
+        .to eq false
+    end
+
+    it "returns true when imported" do
+      root_group.add_outcome(@outcome)
+      expect(outcome_type.resolve("isImported(targetContextType: \"Course\", targetContextId: #{course.id})"))
+        .to eq true
+    end
+  end
 end

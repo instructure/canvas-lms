@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import 'jqueryui/menu'
-import LongTextEditor from 'slickgrid.long_text_editor'
+import LongTextEditor from 'ui/features/gradebook/jquery/slickgrid.long_text_editor.js'
 
 function editorArgs() {
   return {

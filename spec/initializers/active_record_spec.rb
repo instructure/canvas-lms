@@ -478,3 +478,28 @@ module ActiveRecord
     end
   end
 end
+
+describe ActiveRecord::Migration::CommandRecorder do
+  it "reverses if_exists/if_not_exists" do
+    recorder = ActiveRecord::Migration::CommandRecorder.new
+    r = recorder
+    recorder.revert do
+      r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
+      r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+
+      r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
+      r.remove_foreign_key :enrollments, :users, if_exists: true
+      r.remove_index :accounts, :id, if_exists: true
+    end
+    expect(recorder.commands).to eq([
+      [:add_index, [:accounts, :id, { if_not_exists: true }]],
+      [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
+      [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
+
+      [:remove_index, [:accounts, { column: :course_template_id, algorithm: :concurrently, if_exists: true }]],
+      [:remove_foreign_key, [:accounts, :courses, { column: :course_template_id, if_exists: true }], nil],
+      [:remove_column, [:accounts, :course_template_id, :integer, { limit: 8, if_exists: true }], nil],
+    ])
+  end
+end

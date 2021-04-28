@@ -97,5 +97,5 @@ use_cloudfront_for_docviewer:
 annotated_document_submissions:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Annotated document submissions
-  description: Ability to submit annotatable document assignments.
+  display_name: Student Annotation submissions
+  description: Ability to submit student annotation assignments.

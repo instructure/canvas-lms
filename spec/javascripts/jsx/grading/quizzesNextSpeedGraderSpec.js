@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
+import quizzesNextSpeedGrading from 'ui/features/speed_grader/quizzesNextSpeedGrading.js'
 
 const postMessageStub = sinon.stub()
 const fakeIframeHolder = {

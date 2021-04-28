@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import InsertUpdateImageView from 'coffeescripts/views/tinymce/InsertUpdateImageView'
-import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
+import InsertUpdateImageView from '@canvas/rce/backbone/views/InsertUpdateImageView'
+import * as RceCommandShim from '@canvas/rce/RceCommandShim'
 
 let fakeEditor
 let moveToBookmarkSpy

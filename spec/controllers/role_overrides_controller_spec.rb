@@ -319,7 +319,7 @@ describe RoleOverridesController do
         get 'index', params: {:account_id => @account.id}
         expect(response).to be_successful
         expect(assigns[:js_bundles].length).to eq 1
-        expect(assigns[:js_bundles].first).to include :permissions_index
+        expect(assigns[:js_bundles].first).to include :permissions
       end
 
       it 'does not load the manage_developer_keys role on sub account' do

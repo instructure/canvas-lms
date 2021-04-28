@@ -56,13 +56,14 @@ describe('saveMediaRecording', () => {
     done()
   })
 
-  it('returns error if k5.filreError is dispatched', () => {
+  it('returns error if k5.fileError is dispatched', () => {
     moxios.stubRequest('/api/v1/services/kaltura_session?include_upload_config=1', {
       status: 200,
       response: mediaServerSession()
     })
     const doneFunction = jest.fn()
-    return saveMediaRecording({}, '1', 'course', doneFunction).then(uploader => {
+    const progressFunction = jest.fn()
+    return saveMediaRecording({}, '1', 'course', doneFunction, progressFunction).then(uploader => {
       uploader.dispatchEvent('K5.fileError', {error: 'womp womp'}, uploader)
       expect(doneFunction).toHaveBeenCalledTimes(1)
       expect(doneFunction.mock.calls[0][0].error).toBe('womp womp')
@@ -75,13 +76,33 @@ describe('saveMediaRecording', () => {
       response: mediaServerSession()
     })
     const doneFunction = jest.fn()
+    const progressFunction = jest.fn()
     const uploadFileFunc = jest.fn()
-    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction).then(uploader => {
-      uploader.uploadFile = uploadFileFunc
-      uploader.dispatchEvent('K5.ready', uploader)
-      expect(uploadFileFunc).toHaveBeenCalledTimes(1)
-      expect(uploadFileFunc.mock.calls[0][0].file).toBe('thing')
+    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction, progressFunction).then(
+      uploader => {
+        uploader.uploadFile = uploadFileFunc
+        uploader.dispatchEvent('K5.ready', uploader)
+        expect(uploadFileFunc).toHaveBeenCalledTimes(1)
+        expect(uploadFileFunc.mock.calls[0][0].file).toBe('thing')
+      }
+    )
+  })
+
+  it('k5.progress calls progress function when dispatched', () => {
+    moxios.stubRequest('/api/v1/services/kaltura_session?include_upload_config=1', {
+      status: 200,
+      response: mediaServerSession()
     })
+    const doneFunction = jest.fn()
+    const progressFunction = jest.fn()
+    const uploadFileFunc = jest.fn()
+    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction, progressFunction).then(
+      uploader => {
+        uploader.uploadFile = uploadFileFunc
+        uploader.dispatchEvent('K5.progress', uploader)
+        expect(progressFunction).toHaveBeenCalled()
+      }
+    )
   })
 
   it('k5.complete calls done with canvasMediaObject data if succeeds', () => {
@@ -94,7 +115,8 @@ describe('saveMediaRecording', () => {
       response: {data: 'media object data'}
     })
     const doneFunction2 = jest.fn()
-    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction2).then(
+    const progressFunction = jest.fn()
+    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
         await new Promise(setTimeout)
@@ -118,7 +140,8 @@ describe('saveMediaRecording', () => {
       response: {error: 'womp womp'}
     })
     const doneFunction2 = jest.fn()
-    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction2).then(
+    const progressFunction = jest.fn()
+    return saveMediaRecording({file: 'thing'}, '1', 'course', doneFunction2, progressFunction).then(
       async uploader => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
         await new Promise(setTimeout)

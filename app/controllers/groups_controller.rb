@@ -260,6 +260,9 @@ class GroupsController < ApplicationController
                              order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by).
                              eager_load(:group_category).preload(:root_account)
 
+    # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
+    return unless tab_enabled?(Course::TAB_PEOPLE)
+
     unless api_request?
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")

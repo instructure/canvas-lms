@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageView from 'compiled/views/wiki/WikiPageView'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView.js'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'helpers/jquery.simulate'
-import 'compiled/jquery/ModuleSequenceFooter'
+import '@canvas/module-sequence-footer'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('WikiPageView', hooks => {

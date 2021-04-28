@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import EditorToggle from 'compiled/editor/EditorToggle'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import EditorToggle from '@canvas/editor-toggle'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 const fixtures = $('#fixtures')
 let containerDiv = null

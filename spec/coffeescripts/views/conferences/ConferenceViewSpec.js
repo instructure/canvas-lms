@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Conference from 'compiled/models/Conference'
-import ConferenceView from 'compiled/views/conferences/ConferenceView'
+import Backbone from '@canvas/backbone'
+import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView.coffee'
 import $ from 'jquery'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'

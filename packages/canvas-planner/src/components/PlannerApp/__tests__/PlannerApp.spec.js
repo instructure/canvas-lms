@@ -33,6 +33,7 @@ const getDefaultValues = overrides => {
     days: days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     timeZone: TZ,
     changeDashboardView() {},
+    scrollToToday() {},
     isCompletelyEmpty: false,
     ...overrides
   }

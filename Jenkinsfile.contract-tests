@@ -29,7 +29,6 @@ def cleanupFn(status) {
     }
   } finally {
     sh 'rm -vrf tmp/spec_results'
-    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -67,11 +66,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
-            stage ('Pre-Cleanup') {
-              cleanAndSetup()
-            }
-
+          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
               timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
@@ -85,7 +80,13 @@ pipeline {
               }
             }
 
-            stage('Provider Verification for API and Live Event Consumers') {
+            def postBuildHandler = [
+              onStageEnded: { _, stageConfig ->
+                cleanupFn(stageConfig.status())
+              }
+            ]
+
+            extendedStage('Provider Verification for API and Live Event Consumers').hooks(postBuildHandler).obeysAllowStages(false).execute {
               def stages = [:]
 
               stages['Android'] = {

@@ -24,7 +24,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
   setupAnonymizableAuthorId
-} from 'speed_grader_helpers'
+} from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
 import $ from 'jquery'
 
 QUnit.module('SpeedGrader', hooks => {

@@ -1,0 +1,7 @@
+{
+  "name": "validated-apollo",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./src/index.js"
+}

@@ -261,7 +261,7 @@ module Types
       "returns permission information for the current user in this course",
       null: true
     def permissions
-      Loaders::CoursePermissionsLoader.for(
+      Loaders::PermissionsLoader.for(
         course,
         current_user: current_user, session: session
       )

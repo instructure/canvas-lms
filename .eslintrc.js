@@ -220,7 +220,7 @@ module.exports = {
       },
     },
     {
-      files: ['app/**/*', 'spec/**/*', 'public/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
@@ -236,7 +236,12 @@ module.exports = {
       },
     },
     {
-      files: ['app/jsx/canvas_quizzes/**/*'],
+      files: [
+        'ui/features/quiz_log_auditing/**/*',
+        'ui/features/quiz_statistics/**/*',
+        'ui/shared/quiz-legacy-client-apps/**/*',
+        'ui/shared/quiz-log-auditing/**/*',
+      ],
       rules: {
         'react/prop-types': 'off',
         'prefer-const': 'warn',

@@ -55,9 +55,30 @@ it('sets loadingFuture to true on GETTING_FUTURE_ITEMS', () => {
   expect(newState).toMatchObject({loadingFuture: true})
 })
 
-it('sets loadingWeek to true on GETTING_WEEK_ITEMS', () => {
+it('sets loading states on GETTING_WEEK_ITEMS', () => {
   const newState = loadingReducer(initialState(), Actions.gettingWeekItems())
-  expect(newState).toMatchObject({loadingWeek: true})
+  expect(newState).toMatchObject({loadingWeek: true, isLoading: false, allWeekItemsLoaded: false})
+})
+
+it('leaves loadingError in place on GETTING_WEEK_ITEMS', () => {
+  const newState = loadingReducer(
+    initialState({loadingError: 'whoops!'}),
+    Actions.gettingWeekItems()
+  )
+  expect(newState).toMatchObject({loadingError: 'whoops!'})
+})
+
+it('sets loading states on GETTING_INIT_WEEK_ITEMS', () => {
+  const newState = loadingReducer(initialState(), Actions.gettingInitWeekItems())
+  expect(newState).toMatchObject({loadingWeek: true, isLoading: true, allWeekItemsLoaded: false})
+})
+
+it('leaves loadingError in place on GETTING_INIT_WEEK_ITEMS', () => {
+  const newState = loadingReducer(
+    initialState({loadingError: 'whoops!'}),
+    Actions.gettingInitWeekItems()
+  )
+  expect(newState).toMatchObject({loadingError: 'whoops!'})
 })
 
 it('sets loadingWeek to false on JUMP_TO_WEEK', () => {

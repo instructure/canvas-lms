@@ -35,6 +35,8 @@ class Quizzes::QuizzesController < ApplicationController
   before_action :require_context
   before_action :rce_js_env, only: [:show, :new, :edit]
 
+  include K5Mode
+
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
   before_action :require_quiz, :only => [
@@ -367,7 +369,7 @@ class Quizzes::QuizzesController < ApplicationController
       conditional_release_js_env(@quiz.assignment)
       set_master_course_js_env_data(@quiz, @context)
 
-      js_bundle :quizzes_bundle
+      js_bundle :quizzes
       css_bundle :quizzes, :tinymce, :conditional_release_editor
       render :new, stream: can_stream_template?
     end

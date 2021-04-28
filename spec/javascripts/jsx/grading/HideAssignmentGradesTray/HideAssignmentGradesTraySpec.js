@@ -20,9 +20,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 
-import HideAssignmentGradesTray from 'jsx/grading/HideAssignmentGradesTray'
-import * as Api from 'jsx/grading/HideAssignmentGradesTray/Api'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
+import * as Api from '@canvas/hide-assignment-grades-tray/react/Api'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('HideAssignmentGradesTray', suiteHooks => {
   let $container

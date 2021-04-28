@@ -1660,6 +1660,10 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:high_contrast)
   end
 
+  def auto_show_cc?
+    !!feature_enabled?(:auto_show_cc)
+  end
+
   def prefers_no_toast_timeout?
     !!feature_enabled?(:disable_alert_timeouts)
   end

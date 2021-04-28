@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import {get} from 'lodash'
-import WikiPageRevisionsCollection from 'compiled/collections/WikiPageRevisionsCollection'
-import WikiPageRevisionsView from 'compiled/views/wiki/WikiPageRevisionsView'
+import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
+import WikiPageRevisionsView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionsView.js'
 
 QUnit.module('WikiPageRevisionsView', {
   setup() {},

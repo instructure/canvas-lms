@@ -71,8 +71,8 @@ class StudentAssignmentPageV2
       fj('button:contains("Send Comment")')
     end
 
-    def comments_tab
-      fj('[role="tab"]:contains("Comments")')
+    def view_feedback_button
+      fj('button:contains("View Feedback")')
     end
 
     def comment_text_area

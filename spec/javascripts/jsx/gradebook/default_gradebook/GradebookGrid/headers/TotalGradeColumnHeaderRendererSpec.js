@@ -20,8 +20,8 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import TotalGradeColumnHeaderRenderer from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import TotalGradeColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer.js'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {

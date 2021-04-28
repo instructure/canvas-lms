@@ -89,6 +89,17 @@ export function getFriendlyDate(date) {
   }
 }
 
+export function getDynamicFullDate(date, timeZone) {
+  const today = moment().tz(timeZone)
+  const momentizedDate = moment(date)
+  return new Intl.DateTimeFormat(moment.locale(), {
+    year: date.isSame(today, 'year') ? undefined : 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone
+  }).format(momentizedDate.toDate())
+}
+
 export function getFullDate(date) {
   return moment(date).format('MMMM D, YYYY')
 }
@@ -97,9 +108,24 @@ export function getShortDate(date) {
   return moment(date).format('MMMM D')
 }
 
+export function getDynamicFullDateAndTime(date, timeZone) {
+  const today = moment().tz(timeZone)
+  const momentizedDate = moment(date)
+  const dateFormatter = new Intl.DateTimeFormat(moment.locale(), {
+    year: date.isSame(today, 'year') ? undefined : 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone
+  })
+  return formatMessage('{date} at {time}', {
+    date: dateFormatter.format(momentizedDate.toDate()),
+    time: momentizedDate.format('LT')
+  })
+}
+
 export function getFullDateAndTime(date) {
   const {today, yesterday, tomorrow} = getTodaysDetails()
-  const momentizedDate = new moment(date)
+  const momentizedDate = moment(date)
 
   if (isToday(date, today)) {
     return formatMessage('Today at {date}', {date: momentizedDate.format('LT')})

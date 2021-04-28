@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import openModerateStudentDialog from 'jsx/quizzes/moderate/openModerateStudentDialog'
+import openModerateStudentDialog from 'ui/features/moderate_quiz/jquery/openModerateStudentDialog.js'
 import $ from 'jquery'
 
 let $fixture = null

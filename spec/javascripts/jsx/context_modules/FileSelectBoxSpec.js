@@ -17,7 +17,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import FileSelectBox from 'jsx/context_modules/FileSelectBox'
+import FileSelectBox from '@canvas/select-content-dialog/react/components/FileSelectBox'
 
 let wrapper
 

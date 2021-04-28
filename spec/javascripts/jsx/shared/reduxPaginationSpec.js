@@ -21,7 +21,7 @@ import {
   createPaginationActions,
   selectPaginationState,
   LoadStates
-} from 'jsx/shared/reduxPagination'
+} from '@canvas/pagination/redux/actions'
 
 const createMockStore = state => ({
   subs: [],

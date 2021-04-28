@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import GradebookSelector from 'jsx/gradebook/individual-gradebook/components/GradebookSelector'
+import GradebookSelector from 'ui/features/screenreader_gradebook/react/GradebookSelector.js'
 
 QUnit.module('Gradebook > Individual Gradebook > Components > GradebookSelector', suiteHooks => {
   let $container

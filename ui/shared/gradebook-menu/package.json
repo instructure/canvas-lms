@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/gradebook-menu",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./react/index.js"
+}

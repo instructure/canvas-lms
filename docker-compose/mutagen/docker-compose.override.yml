@@ -81,8 +81,6 @@ x-mutagen:
           - "/packages/canvas-rce/canvas"
           - "!/public/dist/"
           - "/public/dist/*"
-          - "!/public/javascripts/compiled/"
-          - "/public/javascripts/compiled/*"
           - "!/config/locales/generated/"
           - "/config/locales/generated/*"
           - "!/log/"

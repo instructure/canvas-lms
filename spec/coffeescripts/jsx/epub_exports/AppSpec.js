@@ -20,8 +20,8 @@ import {isEmpty} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import App from 'jsx/epub_exports/App'
-import CourseEpubExportStore from 'jsx/epub_exports/CourseStore'
+import App from 'ui/features/epub_exports/react/App.js'
+import CourseEpubExportStore from 'ui/features/epub_exports/react/CourseStore.js'
 
 QUnit.module('AppSpec', {
   setup() {

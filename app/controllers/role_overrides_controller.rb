@@ -170,7 +170,7 @@ class RoleOverridesController < ApplicationController
         :ACCOUNT_ID => @context.id
       })
 
-      js_bundle :permissions_index
+      js_bundle :permissions
       css_bundle :permissions
       set_active_tab 'permissions'
     end

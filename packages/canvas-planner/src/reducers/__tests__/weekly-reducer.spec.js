@@ -65,7 +65,8 @@ it('adds new week data to state', () => {
   const initState = initialState({
     weeks: {
       [thisWeekStart.format()]: ['first week data']
-    }
+    },
+    weekStart: thisWeekStart
   })
   // start loading next week
   const nextWeek = {
@@ -75,7 +76,7 @@ it('adds new week data to state', () => {
   const newState = weeklyReducer(initState, Actions.gettingWeekItems(nextWeek))
 
   // next week is loaded
-  const newerState = weeklyReducer(newState, Actions.weekLoaded(['next week data']))
+  const newerState = weeklyReducer(newState, Actions.weekLoaded({weekDays: ['next week data']}))
 
   expect(newerState.weeks).toMatchObject({
     ...initState.weeks,

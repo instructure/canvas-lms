@@ -31,7 +31,8 @@ module Types
     field :rating, Boolean, null: true
     def rating
       Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
-        deps.find_by(user: current_user)&.rating.present?
+        r = deps.find_by(user: current_user)&.rating
+        !r.nil? && r == 1
       end
     end
 
@@ -52,7 +53,7 @@ module Types
       load_association(:user)
     end
 
-    field :deleted, Boolean, null:true
+    field :deleted, Boolean, null: true
     def deleted
       object.deleted?
     end
@@ -62,7 +63,12 @@ module Types
       load_association(:editor)
     end
 
-    field :discussion_topic, Types::DiscussionType, null:false
+    field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
+    def root_entry_participant_counts
+      Loaders::RootEntryParticipantCountsLoader.for(current_user: current_user).load(object)
+    end
+
+    field :discussion_topic, Types::DiscussionType, null: false
     def discussion_topic
       load_association(:discussion_topic)
     end
@@ -70,6 +76,31 @@ module Types
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true
     def discussion_subentries_connection
       load_association(:discussion_subentries)
+    end
+
+    field :parent, Types::DiscussionEntryType, null: true
+    def parent
+      Loaders::IDLoader.for(DiscussionEntry).load(object.parent_id)
+    end
+
+    field :attachment, Types::FileType, null: true
+    def attachment
+      load_association(:attachment)
+    end
+
+    field :last_reply, Types::DiscussionEntryType, null: true
+    def last_reply
+      load_association(:last_discussion_subentry)
+    end
+
+    field :subentries_count, Integer, null: true
+    def subentries_count
+      Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
+    end
+
+    field :permissions, Types::DiscussionEntryPermissionsType, null: true
+    def permissions
+      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
     end
   end
 end

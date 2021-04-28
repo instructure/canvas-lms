@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import collaborations from 'collaborations'
+import collaborations from 'ui/features/collaborations/jquery/index.js'
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 let oldAjaxJSON = null
 

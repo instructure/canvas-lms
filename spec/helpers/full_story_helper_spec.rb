@@ -20,75 +20,55 @@
 
 require 'spec_helper'
 
-  describe "fullstory" do
-    include FullStoryHelper
+describe "fullstory" do
+  include FullStoryHelper
 
-    before :each do
-      @site_admin_account = Account.site_admin
-      @session = {}
-    end
+  before :each do
+    @site_admin_account = Account.site_admin
+    @session = {}
+  end
 
-    context "with feature enabled" do
-      before :each do
-        @site_admin_account.enable_feature!(:enable_fullstory)
-      end
-
-      it 'is enabled if login is sampled' do
-        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
-          fullstory_init(@site_admin_account, @session)
-          expect(fullstory_app_key).to eql('12345')
-          expect(@session[:fullstory_enabled]).to be_truthy
-          expect(fullstory_enabled_for_session?(@session)).to be_truthy
-        end
-      end
-
-      it 'is disabled if login is not sampled' do
-        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 0, app_key: '12345'} } }) do
-          fullstory_init(@site_admin_account, @session)
-          expect(fullstory_app_key).to eql('12345')
-          expect(@session[:fullstory_enabled]).to be_falsey
-          expect(fullstory_enabled_for_session?(@session)).to be_falsey
-        end
-      end
-
-      it 'is disabled if account setting is disabled' do
-        account = double('Account')
-
-        allow(account).to receive(:settings).and_return({ enable_fullstory: false })
-        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-
-        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
-          fullstory_init(account, @session)
-          expect(@session[:fullstory_enabled]).to be_falsey
-        end
-      end
-
-      it "doesn't explode if the dynamic settings are missing" do
-        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-        override_dynamic_settings(config: {canvas: { fullstory: nil } }) do
-          fullstory_init(@site_admin_account, @session)
-          expect(fullstory_app_key).to be_nil
-          expect(@session[:fullstory_enabled]).to be_falsey
-          expect(fullstory_enabled_for_session?(@session)).to be_falsey
-        end
+  context "with feature enabled" do
+    it 'is enabled if login is sampled' do
+      allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+        fullstory_init(@site_admin_account, @session)
+        expect(fullstory_app_key).to eql('12345')
+        expect(@session[:fullstory_enabled]).to be_truthy
+        expect(fullstory_enabled_for_session?(@session)).to be_truthy
       end
     end
 
-    context "with feature disabled" do
-      before :each do
-        @site_admin_account.disable_feature!(:enable_fullstory)
+    it 'is disabled if login is not sampled' do
+      allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 0, app_key: '12345'} } }) do
+        fullstory_init(@site_admin_account, @session)
+        expect(fullstory_app_key).to eql('12345')
+        expect(@session[:fullstory_enabled]).to be_falsey
+        expect(fullstory_enabled_for_session?(@session)).to be_falsey
       end
+    end
 
-      it 'is disabled' do
-        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
-          fullstory_init(@site_admin_account, @session)
-          expect(fullstory_app_key).to eql('12345')
-          expect(@session[:fullstory_enabled]).to be_falsey
-          expect(fullstory_enabled_for_session?(@session)).to be_falsey
-        end
+    it 'is disabled if account setting is disabled' do
+      account = double('Account')
+
+      allow(account).to receive(:settings).and_return({ enable_fullstory: false })
+      allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+
+      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+        fullstory_init(account, @session)
+        expect(@session[:fullstory_enabled]).to be_falsey
+      end
+    end
+
+    it "doesn't explode if the dynamic settings are missing" do
+      allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+      override_dynamic_settings(config: {canvas: { fullstory: nil } }) do
+        fullstory_init(@site_admin_account, @session)
+        expect(fullstory_app_key).to be_nil
+        expect(@session[:fullstory_enabled]).to be_falsey
+        expect(fullstory_enabled_for_session?(@session)).to be_falsey
       end
     end
   end
+end

@@ -53,6 +53,7 @@ module Api::V1::Account
       hash['sis_import_id'] = account.sis_batch_id if !account.root_account? && account.root_account.grants_right?(user, session, :manage_sis)
       hash['integration_id'] = account.integration_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash['lti_guid'] = account.lti_guid if includes.include?('lti_guid')
+      hash['course_template_id'] = account.course_template_id if account.root_account.feature_enabled?(:course_templates)
       if includes.include?('registration_settings')
         hash['registration_settings'] = {
           :login_handle_name => account.login_handle_name_with_inference,

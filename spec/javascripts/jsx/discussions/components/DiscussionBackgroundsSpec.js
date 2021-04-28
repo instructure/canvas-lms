@@ -21,7 +21,7 @@ import {
   pinnedDiscussionBackground,
   unpinnedDiscussionsBackground,
   closedDiscussionBackground
-} from 'jsx/discussions/components/DiscussionBackgrounds'
+} from 'ui/features/discussion_topics_index/react/components/DiscussionBackgrounds.js'
 
 const defaultProps = () => ({
   permissions: {

@@ -31,6 +31,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: 'DiscussionEntry', foreign_key: 'root_entry_id'
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
@@ -357,6 +358,8 @@ class DiscussionEntry < ActiveRecord::Base
   end
   protected :context_module_action_later
 
+  # If this discussion topic is part of an assignment this method is what
+  # submits the assignment or updates the submission for the user
   def context_module_action
     if self.discussion_topic && self.user
       action = self.deleted? ? :deleted : :contributed
@@ -442,7 +445,7 @@ class DiscussionEntry < ActiveRecord::Base
   # opts         - Additional named arguments (default: {})
   #                :forced - Also set the forced_read_state to this value.
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # Returns nil if current_user is nil, the DiscussionEntryParticipant if the
   # read_state was changed, or true if the read_state was not changed. If the
   # read_state is not changed, a participant record will not be created.
   def change_read_state(new_state, current_user = nil, opts = {})

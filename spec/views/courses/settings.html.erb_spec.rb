@@ -218,7 +218,7 @@ describe "courses/settings.html.erb" do
     it "is not visible if the feature isn't enabled" do
       render
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("input#course_template")).to be_nil
+      expect(doc.at_css("div#course_template_details")).to be_nil
     end
 
     context "with the feature enabled" do
@@ -227,8 +227,7 @@ describe "courses/settings.html.erb" do
       it "is visible" do
         render
         doc = Nokogiri::HTML5(response.body)
-        expect((checkbox = doc.at_css("input#course_template"))).not_to be_nil
-        expect(checkbox['disabled']).to eq 'disabled'
+        expect(doc.at_css("div#course_template_details")).not_to be_nil
       end
 
       it "is editable if you have permission" do
@@ -239,8 +238,8 @@ describe "courses/settings.html.erb" do
 
         render
         doc = Nokogiri::HTML5(response.body)
-        checkbox = doc.at_css("input#course_template")
-        expect(checkbox['disabled']).to be_nil
+        placeholder_div = doc.at_css("div#course_template_details")
+        expect(placeholder_div['data-is-editable']).to eq "true"
       end
 
       it "is not editable even if you have permission, but it's not possible" do
@@ -249,8 +248,8 @@ describe "courses/settings.html.erb" do
 
         render
         doc = Nokogiri::HTML5(response.body)
-        checkbox = doc.at_css("input#course_template")
-        expect(checkbox['disabled']).to eq 'disabled'
+        placeholder_div = doc.at_css("div#course_template_details")
+        expect(placeholder_div['data-is-editable']).to eq "false"
       end
     end
   end

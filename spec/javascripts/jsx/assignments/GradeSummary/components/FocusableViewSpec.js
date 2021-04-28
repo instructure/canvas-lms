@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import FocusableView from 'jsx/assignments/GradeSummary/components/FocusableView'
+import FocusableView from 'ui/features/assignment_grade_summary/react/components/FocusableView.js'
 
 // This rule does not apply for these specs.
 /* eslint-disable react/prop-types */

@@ -103,7 +103,6 @@ def _runRspecTestSuite(
       "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
     try {
-      cleanAndSetup()
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 15) {
         credentials.withStarlordCredentials { ->
@@ -112,6 +111,18 @@ def _runRspecTestSuite(
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
+    } catch(org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+      if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+        sh '''#!/bin/bash
+          ids=( $(docker ps -aq --filter "name=canvas_") )
+          for i in "${ids[@]}"
+          do
+            docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+          done
+        '''
+      }
+
+      throw e
     } finally {
       // copy spec failures to local
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
@@ -163,7 +174,6 @@ def _runRspecTestSuite(
       }
 
       sh 'rm -rf ./tmp'
-      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

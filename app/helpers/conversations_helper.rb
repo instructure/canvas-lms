@@ -155,7 +155,7 @@ module ConversationsHelper
 
   def infer_media_comment(media_id, media_type)
     if media_id.present? && media_type.present?
-      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
+      media_comment = MediaObject.by_media_id(media_id).first
       unless media_comment
         media_comment ||= MediaObject.new
         media_comment.media_type = media_type

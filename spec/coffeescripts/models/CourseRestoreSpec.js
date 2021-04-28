@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CourseRestoreModel from 'compiled/models/CourseRestore'
+import Backbone from '@canvas/backbone'
+import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
 import $ from 'jquery'
 
 const progressCompletedJSON = {

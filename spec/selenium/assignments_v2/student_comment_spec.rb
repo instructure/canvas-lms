@@ -41,7 +41,7 @@ describe 'assignments' do
     end
 
     it 'should allow you to submit a comment when there is no submission' do
-      StudentAssignmentPageV2.comments_tab.click
+      StudentAssignmentPageV2.view_feedback_button.click
       StudentAssignmentPageV2.leave_a_comment('test comment')
       expect(StudentAssignmentPageV2.comment_container).to include_text('test comment')
     end

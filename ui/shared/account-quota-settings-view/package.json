@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/account-quota-settings-view",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./backbone/views/QuotasView.coffee"
+}

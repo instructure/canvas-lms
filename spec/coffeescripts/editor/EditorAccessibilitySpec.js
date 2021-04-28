@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import EditorAccessibility from 'compiled/editor/editorAccessibility'
+import EditorAccessibility from '@canvas/rce/jquery/editorAccessibility'
 
 const fixtures = $('#fixtures')
 let label = null

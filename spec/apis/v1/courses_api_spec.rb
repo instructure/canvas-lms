@@ -1087,6 +1087,29 @@ describe CoursesController, type: :request do
           expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
         end
       end
+
+      it "applies a course template" do
+        template = @account.courses.create!(name: 'Template', template: true)
+        template.assignments.create!(title: 'my assignment')
+
+        @account.root_account.enable_feature!(:course_templates)
+        @account.update!(course_template: template)
+
+        post_params = {
+          'account_id' => @account.id,
+          'offer'      => true,
+          'course'     => {
+            'name' => 'Test Course',
+          }
+        }
+        expect(Auditors::Course).to receive(:record_created).once
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        run_jobs
+        new_course = Course.find(json['id'])
+        expect(new_course.name).to eq 'Test Course'
+        expect(new_course.assignments.length).to eq 1
+        expect(new_course.assignments.first.title).to eq 'my assignment'
+      end
     end
 
     context "a user without permissions" do

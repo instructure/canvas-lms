@@ -17,9 +17,9 @@
  */
 
 import _ from 'underscore'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import OutcomeDialogView from 'compiled/views/grade_summary/OutcomeDialogView'
-import OutcomeLineGraphView from 'compiled/views/grade_summary/OutcomeLineGraphView'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView.coffee'
+import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView.coffee'
 
 QUnit.module('OutcomeDialogViewSpec', {
   setup() {

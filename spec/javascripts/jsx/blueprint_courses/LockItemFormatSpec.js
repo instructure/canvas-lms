@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {formatLockObject, formatLockArray} from 'jsx/blueprint_courses/LockItemFormat'
+import {formatLockObject, formatLockArray} from '@canvas/blueprint-courses/react/LockItemFormat'
 
 QUnit.module('LockItemFormat functions')
 

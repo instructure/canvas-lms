@@ -30,6 +30,17 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  it 'allows querying for entry counts' do
+
+    3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
+
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 0
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+  end
+
   it "queries the attribute" do
     expect(discussion_type.resolve("title")).to eq discussion.title
     expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
@@ -41,13 +52,13 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("isSectionSpecific")).to eq discussion.is_section_specific
 
     expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id
-    
+
     expect(discussion_type.resolve("assignment { _id }")).to eq discussion.assignment_id.to_s
     expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
   end
 
-  it 'allows querying root discussion entries' do
+  it "allows querying root discussion entries" do
     de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
     discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
 
@@ -62,5 +73,73 @@ describe Types::DiscussionType do
     discussion.context_module_tags.create!(context_module: module1, context: discussion.course, tag_type: 'context_module')
     discussion.context_module_tags.create!(context_module: module2, context: discussion.course, tag_type: 'context_module')
     expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+  end
+
+  context 'graded discussion' do
+    it 'allows querying the assignment type on a discussion' do
+      Assignment::ALLOWED_GRADING_TYPES.each do |grading_type|
+        discussion.assignment.update!(grading_type: grading_type)
+        expect(discussion_type.resolve('assignment { gradingType }')).to eq grading_type
+      end
+    end
+  end
+
+  context "allows filtering discussion entries by workflow_state" do
+    before do
+      @de = discussion.discussion_entries.create!(message: 'find me', user: @teacher)
+      student_in_course(active_all: true)
+      @de2 = discussion.discussion_entries.create!(message: 'not me', user: @student)
+    end
+
+    it "at message body" do
+      result = discussion_type.resolve('discussionEntriesConnection(searchTerm:"find") { nodes { message } }')
+      expect(result.count).to be 1
+      expect(result[0]).to eq @de.message
+    end
+
+    it "at author name" do
+      @student.update(name: 'Student')
+
+      result = discussion_type.resolve('discussionEntriesConnection(searchTerm:"student") { nodes { message } }')
+      expect(result.count).to be 1
+      expect(result[0]).to eq @de2.message
+    end
+  end
+
+  context "allows filtering discussion entries" do
+    before do
+      @de = discussion.discussion_entries.create!(message: 'peekaboo', user: @teacher)
+      @de2 = discussion.discussion_entries.create!(message: 'find me', user: @teacher)
+      @de2.change_read_state('unread', @teacher)
+    end
+
+    it "by any workflow state" do
+      result = discussion_type.resolve('discussionEntriesConnection(filter:All) { nodes { message } }')
+      expect(result.count).to be 2
+    end
+
+    it "by unread workflow state" do
+      result = discussion_type.resolve('discussionEntriesConnection(filter:Unread) { nodes { message } }')
+      expect(result.count).to be 1
+      expect(result[0]).to eq @de2.message
+    end
+
+    it "by deleted workflow state" do
+      @de2.destroy
+      result = discussion_type.resolve('discussionEntriesConnection(filter:Deleted) { nodes { deleted } }')
+
+      expect(result.count).to be 1
+      expect(result[0]).to eq true
+    end
+  end
+
+  it 'returns the current user permissions' do
+    expect(discussion_type.resolve('permissions { delete }')).to eq true
+    expect(discussion.grants_right?(@teacher, nil, :delete)).to eq true
+
+    student_in_course(active_all: true)
+    type = GraphQLTypeTester.new(discussion, current_user: @student)
+    expect(type.resolve('permissions { delete }')).to eq false
+    expect(discussion.grants_right?(@student, nil, :delete)).to eq false
   end
 end

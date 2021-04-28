@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import ColumnHeaderRenderer from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/ColumnHeaderRenderer'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import ColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/ColumnHeaderRenderer.js'
 
 QUnit.module('GradebookGrid ColumnHeaderRenderer', suiteHooks => {
   let $container

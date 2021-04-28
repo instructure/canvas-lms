@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import DataRow from 'jsx/grading/dataRow'
+import DataRow from '@canvas/grading-standard-collection/react/dataRow'
 
 QUnit.module('DataRow not being edited, without a sibling', {
   setup() {

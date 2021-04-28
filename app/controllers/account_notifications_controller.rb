@@ -110,7 +110,7 @@ class AccountNotificationsController < ApplicationController
     @show_left_side = true
     @context = @current_user.profile
     set_active_tab('past_global_announcements')
-    js_bundle :past_global_notifications
+    js_bundle :past_global_announcements
     render html: '', layout: true
   end
 

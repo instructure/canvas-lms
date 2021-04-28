@@ -31,12 +31,26 @@ require_dependency 'microsoft_sync'
 # course settings) the option to sync enrollments to Microsoft Teams. It is
 # then used to keep track of the syncing.
 #
+# See usages in StateMachineJob (workflow_state, job_state, last_error) and
+# SyncerSteps (ms_group_id)
+#
 # Notable fields:
 # * ms_group_id -- Microsoft's ID used in the their Graph API for the group
 #
 class MicrosoftSync::Group < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
+
+  # States at which a manual sync is allowed
+  COOLDOWN_NOT_REQUIRED_STATES = %i(
+    pending
+    errored
+  ).freeze
+
+  RUNNING_STATES = %i(
+    running
+    retrying
+  ).freeze
 
   belongs_to :course
   validates_presence_of :course
@@ -46,13 +60,21 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
   workflow do
     state :pending # Initial state, before first sync
+    state :scheduled
     state :running
+    state :retrying
     state :errored
     state :completed
     state :deleted
   end
 
+  serialize :job_state
+
   resolves_root_account through: :course
+
+  def self.manual_sync_cooldown
+    Setting.get('msft_sync.manual_sync_cooldown', 90.minutes.to_s).to_i
+  end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
@@ -79,22 +101,21 @@ class MicrosoftSync::Group < ActiveRecord::Base
   # Whatever the result, this also updates workflow_state on the model passed
   # in to reflect the actual DB state.
   # Returns true if the record was updated (i.e. record exists and is not deleted).
-  def update_workflow_state_unless_deleted(new_state, extra={})
-    records_updated = self.class.where(id: id).where.not(workflow_state: 'deleted').
-      update_all(extra.merge(workflow_state: new_state))
+  def update_unless_deleted(attrs={})
+    records_updated = self.class
+      .where(id: id).where.not(workflow_state: 'deleted').update_all(attrs)
     if records_updated == 0
       # It could actually be that the record was hard-deleted and not
       # workflow_state=deleted, but whatever
       self.workflow_state = 'deleted'
       false
     else
-      self.workflow_state = new_state
-      assign_attributes(extra)
+      assign_attributes(attrs)
       true
     end
   end
 
-  def sync!
-    MicrosoftSync::Syncer.new(self).sync!
+  def syncer_job
+    MicrosoftSync::StateMachineJob.new(self, MicrosoftSync::SyncerSteps.new(self))
   end
 end

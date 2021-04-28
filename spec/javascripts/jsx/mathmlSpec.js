@@ -224,7 +224,7 @@ test('getImageEquationText returns undefined if there is no src', () => {
   equal(mathImageHelper.getImageEquationText(img), undefined)
 })
 
-test('getImageEquationText returns undefined if it not an equation image', () => {
+test('getImageEquationText returns undefined if it is not an equation image', () => {
   const img = document.createElement('img')
   const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
   img.setAttribute('src', `http://host/not_equation_images/${txt}`)

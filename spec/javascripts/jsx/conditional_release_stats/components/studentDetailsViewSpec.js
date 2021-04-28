@@ -19,7 +19,7 @@
 import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
-import StudentDetailsComponent from 'jsx/conditional_release_stats/components/student-details-view'
+import StudentDetailsComponent from '@canvas/conditional-release-stats/react/components/student-details-view'
 
 QUnit.module('Student Details View Component')
 

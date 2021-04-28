@@ -21,7 +21,7 @@ import {
   isHideable,
   extractSimilarityInfo,
   similarityIcon
-} from 'jsx/grading/helpers/SubmissionHelper'
+} from '@canvas/grading/SubmissionHelper'
 
 QUnit.module('SubmissionHelper', suiteHooks => {
   let submission

@@ -25,8 +25,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Spinner} from '@instructure/ui-spinner'
 
-import {DEFAULT_LATE_POLICY_DATA} from 'jsx/gradebook/default_gradebook/apis/GradebookSettingsModalApi'
-import LatePoliciesTabPanel from 'jsx/gradebook/default_gradebook/components/LatePoliciesTabPanel'
+import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
+import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel.js'
 
 const MIN = '0'
 const MAX = '100'

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Quiz from 'compiled/models/Quiz'
-import QuizCollection from 'compiled/collections/QuizCollection'
-import QuizItemGroupView from 'compiled/views/quizzes/QuizItemGroupView'
+import Backbone from '@canvas/backbone'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection.js'
+import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItemGroupView.js'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

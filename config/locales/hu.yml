@@ -1034,7 +1034,7 @@ hu:
                 check_box: "Beiratkozások CSV"
               group_categories: 
                 login: 
-                  check_box: "Csoport kategóriák CSV"
+                  check_box: "Csoporthalmazok CSV"
               group_membership: 
                 login: 
                   check_box: "Csoport tagság CSV"
@@ -1067,7 +1067,7 @@ hu:
             check_box: "Beiratkozások CSV"
           group_categories: 
             login: 
-              check_box: "Csoportkategóriák CSV"
+              check_box: "Csoporthalmazok CSV"
           group_membership: 
             login: 
               check_box: "Csoporttagság CSV"
@@ -2048,8 +2048,8 @@ hu:
   appointment_group_sub_context: 
     errors: 
       invalid_course_section: "Érvénytelen kurzusszekció"
-      invalid_group_category: "Érvénytelen kategóriacsoport"
-      missing_group_category: "A megbeszélés-csoportoknak kategóriával kell rendelkezniük"
+      invalid_group_category: "Érvénytelen csoporthalmaz"
+      missing_group_category: "A megbeszélés-csoportoknak csoporthalmazzal kell rendelkezniük"
   appointment_groups_bd225e60: "Megbeszélés csoportok"
   appointments_dcb41d23: Megbeszélés
   approved_c3b285d4: Jóváhagyott
@@ -3251,7 +3251,7 @@ hu:
       calendar: Naptár
       date: Dátum
       details: "Részletek:"
-      group_category: Csoportkategória
+      group_category: Csoporthalmaz
       group_signup: "A hallgatók regisztrálása csoportokba."
       location: Helyszín
       name: Név
@@ -3676,6 +3676,7 @@ hu:
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Az oszlopra kattintva az sorokat fejléc szerint fogja rendezni."
   client_id_cb2502af: Kliensazonosító
   clone_group_set_c2a40e15: "Csoporthalmaz klónozása"
+  clone_groupcategoryname_ef85ddb8: "(Klónozás) %{groupCategoryName}"
   close_17f50799: bezárás
   close_and_return_to_canvas_80544344: "Bezárás és a munka folytatása"
   close_d634289d: Bezárás
@@ -6046,7 +6047,7 @@ hu:
   discussion_entry: 
     atom_no_author: "Nincs szerző"
     default_user_name: Felhasználónév
-  discussion_group_category_locked: "A csoportkategóriák nem állíthatóak be direkt módon a fórumjellegű feladatokhoz, helyette magában a fórumban kell ezt beállítani."
+  discussion_group_category_locked: "A csoporthalmazok nem állíthatóak be direkt módon a fórumjellegű feladatkiírásban, helyette magában a fórumban kell ezt beállítani."
   discussion_submission_781d5d33: Fórumbeadás
   discussion_topic: 
     atom_no_author: "Nincs szerző"
@@ -7841,10 +7842,10 @@ hu:
       create_category_success: "A kategória sikeresen létre lett hozva."
       delete_category_success: "A kategória sikeresen törölve lett"
       update_category_success: "A kategória sikeresen frissítve lett."
-  group_categories_7a569a4d: Csoportkategóriák
-  group_categories_csv_21eb0566: "Csoport kategóriák CSV"
+  group_categories_7a569a4d: Csoporthalmazok
+  group_categories_csv_21eb0566: "Csoporthalmazok CSV"
   group_category: 
-    cant_restrict_self_signup: "Nem tiltható le az önálló jelentkezés, amíg van egy kevert szekciójú csoport ebben a kategóriában"
+    cant_restrict_self_signup: "Nem tiltható le az önálló jelentkezés, amíg van egy vegyes szekciójú csoport ebben a halmazban"
     empty_course_or_account_id: "Rendelkeznie kell fiókkal vagy kurzusazonosítóval"
     greater_than_1: "1-nél nagyobbnak kell lennie"
     group_categories: 
@@ -7891,7 +7892,7 @@ hu:
   group_name_group_home_21f8a655: "%{group_name} - Csoportkezdőoldal"
   group_name_group_pages_def16554: "%{group_name} - Csoportoldalak"
   group_name_group_people_e9d548c1: "%{group_name} - Csoporttagok"
-  group_name_in_group_category_name_group_category_29bf3254: "%{group_name} a/az %{group_category_name} csoportkategóriában"
+  group_name_in_group_category_name_group_category_29bf3254: "%{group_name} a/az %{group_category_name} csoporthalmazban"
   group_name_is_required_5547bc0b: "A csoportnév megadása kötelező"
   group_pages_656556f3: Csoportoldalak
   group_set_name_2aed2347: "Csoporthalmaz neve"
@@ -11166,7 +11167,7 @@ hu:
   new_gradebook_297f7e2d: "Új osztálynapló"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Az Új osztálynapló lehetővé teszi az új osztálynapló fejlesztéseinek korai kiadását."
   new_gradebook_plagiarism_indicator_8dd22971: "Új osztálynapló plágiumjelző"
-  new_group_category_66be9cbd: "Új csoprotkategória"
+  new_group_category_66be9cbd: "Új csoporthalmaz"
   new_group_set_7241a581: "Új csoporthalmaz "
   new_module_4e9287e4: "Új modul"
   new_outcome_7fba8c7d: "Új tanulási eredmény"
@@ -14889,6 +14890,7 @@ hu:
   select_1e849959: "[Kiválaszt]"
   select_a_grading_period_5ea50f1: "Osztályzási időszak választása..."
   select_a_grading_period_aab25483: "Osztályzási időszak választása"
+  select_a_group_category_295f7a34: "Csoporthalmaz választása"
   select_a_predefined_color_c77ab2f5: "Válasszon egy előre definiált színt!"
   select_all_students_7c2c34b3: "Minden hallgató kiválasztása"
   select_audio_file_7d905cce: "Audiófájl kiválasztása"
@@ -15671,6 +15673,7 @@ hu:
       courses: "Kurzusok: %{course_count}"
       crosslists: "Keresztlisták: %{crosslist_count}"
       enrollments: "Beiratkozások: %{enrollment_count}"
+      group_categories: "Csoporthalmazok: %{group_categories_count}"
       group_enrollments: "Csoportbeiratkozások: %{group_enrollments_count}"
       groups: "Csoportok: %{group_count}"
       sections: "Szekciók: %{section_count}"

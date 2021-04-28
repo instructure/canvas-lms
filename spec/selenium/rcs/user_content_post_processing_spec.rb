@@ -31,7 +31,7 @@ describe 'user_content post processing' do
         uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain')
       )
     @file.save!
-    @file_url = "http://#{HostUrl.default_host}/users/#{@teacher.id}/files/#{@file.id}"
+    @file_url = "/users/#{@teacher.id}/files/#{@file.id}"
   end
 
   def create_wiki_page_with_content(page_title, page_content)
@@ -119,30 +119,21 @@ describe 'user_content post processing' do
       expect(download_btn).to have_attribute('download')
     end
 
-    it 'omits download button if an external link' do
+    it 'omits download button if not a file link' do
       create_wiki_page_with_content(
         'page',
-        "<a id='link1' class='instructure_file_link'
-          href='http://instructure.com'>external link</a>"
+        "<a id='page' class='instructure_file_link'
+          href='/courses/#{@course.id}/pages/other-page'>internal link</a>
+          <a id='external' class='instructure_file_link'
+          href='http://instructure.com'>external link</a>
+          <a id='mailto' class='instructure_file_link'
+          href='mailto:example@example.com'>example@example.com</a>"
       )
       get "/courses/#{@course.id}/pages/page"
 
-      # the link has an external-link button
-      expect(f('.ui-icon-extlink')).to be_displayed
-      expect(f('#link1')).not_to contain_css('.file_download_btn')
-    end
-
-    it 'omits download button if internal link' do
-      create_wiki_page_with_content(
-        'page',
-        "<a id='link1' class='instructure_file_link'
-          href='/courses/#{@course.id}/pages/other-page'>internal link</a>"
-      )
-      get "/courses/#{@course.id}/pages/page"
-
-      # look up the link by the data-api-returntype
-      # because this is how we determine to hide the download button for internal links
-      expect(f("a[data-api-returntype='Page']")).to be_displayed
+      expect(f('a#page')).to be_displayed
+      expect(f('a#external')).to be_displayed
+      expect(f('a#mailto')).to be_displayed
       expect(f('body')).not_to contain_css('a.file_download_btn')
     end
   end

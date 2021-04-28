@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 
-import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
-import SetDefaultGradeDialogManager from 'jsx/gradebook/shared/SetDefaultGradeDialogManager'
-import AsyncComponents from '../../../../../app/jsx/gradebook/default_gradebook/AsyncComponents'
+import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
+import SetDefaultGradeDialogManager from 'ui/features/gradebook/react/shared/SetDefaultGradeDialogManager.js'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
 
 function createAssignmentProp() {
   return {

@@ -24,6 +24,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Tabs} from '@instructure/ui-tabs'
 import {px} from '@instructure/ui-utils'
+import {ProgressBar} from '@instructure/ui-progress'
+import {Text} from '@instructure/ui-text'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
@@ -74,6 +76,8 @@ export default class UploadMedia extends React.Component {
 
     this.state = {
       hasUploadedFile: false,
+      uploading: false,
+      progress: 0,
       selectedPanel: defaultSelectedPanel,
       computerFile: props.computerFile || null,
       subtitles: [],
@@ -109,8 +113,19 @@ export default class UploadMedia extends React.Component {
   }
 
   uploadFile(file) {
+    this.setState({uploading: true})
     this.props.onStartUpload && this.props.onStartUpload(file)
-    saveMediaRecording(file, this.props.contextId, this.props.contextType, this.saveMediaCallback)
+    saveMediaRecording(
+      file,
+      this.props.contextId,
+      this.props.contextType,
+      this.saveMediaCallback,
+      this.onSaveMediaProgress
+    )
+  }
+
+  onSaveMediaProgress = progress => {
+    this.setState({progress})
   }
 
   saveMediaCallback = async (err, data) => {
@@ -139,8 +154,10 @@ export default class UploadMedia extends React.Component {
         modalBodySize.width !== prevState.modalBodySize.width ||
         modalBodySize.height !== prevState.modalBodySize.height
       ) {
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({modalBodySize})
+        if (modalBodySize.width > 0 && modalBodySize.height > 0) {
+          // eslint-disable-next-line react/no-did-update-set-state
+          this.setState({modalBodySize})
+        }
       }
     }
   }
@@ -221,9 +238,24 @@ export default class UploadMedia extends React.Component {
       return null
     }
 
-    const {CLOSE_TEXT, SUBMIT_TEXT} = this.props.uploadMediaTranslations.UploadMediaStrings
+    const {
+      CLOSE_TEXT,
+      SUBMIT_TEXT,
+      PROGRESS_LABEL
+    } = this.props.uploadMediaTranslations.UploadMediaStrings
     return (
       <Modal.Footer>
+        {this.state.uploading && (
+          <ProgressBar
+            screenReaderLabel={PROGRESS_LABEL}
+            valueNow={this.state.progress}
+            valueMax={100}
+            renderValue={({valueNow}) => {
+              return <Text>{valueNow}%</Text>
+            }}
+          />
+        )}
+        &nbsp;
         <Button onClick={this.onModalClose}> {CLOSE_TEXT} </Button>
         &nbsp;
         <Button

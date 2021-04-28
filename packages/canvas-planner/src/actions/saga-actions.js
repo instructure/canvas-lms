@@ -72,13 +72,14 @@ export const mergeWeekItems = (newWeekItems, response) => (dispatch, getState) =
     state.loading.allWeekItemsLoaded,
     'asc'
   )
+  const initialWeeklyLoad = state.loading.isLoading // only true on initial page load
   if (
     state.loading.allWeekItemsLoaded ||
     didWeFindWeekEnd(completeDays, state.weeklyDashboard.weekEnd)
   ) {
     const r = mergeCompleteDays(completeDays, dispatch, state.loading.allWeekItemsLoaded, response)
     if (r) {
-      dispatch(LA.weekLoaded(completeDays))
+      dispatch(LA.weekLoaded({weekDays: completeDays, initialWeeklyLoad}))
     }
     return r
   }

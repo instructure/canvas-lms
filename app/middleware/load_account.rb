@@ -23,12 +23,13 @@ class LoadAccount
   end
 
   def call(env)
-    clear_caches
     domain_root_account = ::LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
     env['canvas.domain_root_account'] = domain_root_account
     @app.call(env)
+  ensure
+    clear_caches
   end
 
   def self.default_domain_root_account; Account.default; end

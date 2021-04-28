@@ -159,7 +159,7 @@ function print_results {
 
 ensure_in_canvas_root_directory
 create_log_file
-intro_message "Rebase Canvas and Plugins"
+init_log_file "Rebase Canvas and Plugins"
 check_for_changes
 [[ -n "$SKIP_CANVAS" ]] || rebase_canvas
 [[ -n "$SKIP_PLUGINS" ]] || rebase_plugins

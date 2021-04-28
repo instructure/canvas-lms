@@ -40,10 +40,31 @@ module Quizzes::QuizQuestion::AnswerSerializers
         end
       end
 
+      # Cast a localized string number to a BigDecimal
+      #
+      # @return [BigDecimal]
+      def i18n_to_decimal(value)
+        separator = I18n.t('number.format.separator')
+        delimiter = I18n.t('number.format.delimiter')
+
+        to_decimal(value.gsub(delimiter, '').gsub(separator, '.'))
+      end
+
+      # Cast a BigDecimal to a localized string
+      #
+      # @return [String]
+      def decimal_to_i18n(value)
+        separator = I18n.t('number.format.separator')
+        delimiter = I18n.t('number.format.delimiter')
+
+        value.to_s.gsub(delimiter, '').gsub(separator, '.')
+      end
+
       # Convert a value to a BigDecimal.
       #
       # @return [BigDecimal]
       def to_decimal(value)
+
         BigDecimal(value.to_s)
       rescue ArgumentError
         BigDecimal('0.0')

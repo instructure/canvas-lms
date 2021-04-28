@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
-import AssignmentColumnHeader from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/AssignmentColumnHeader'
-import MessageStudentsWhoDialog from 'jsx/gradebook/shared/MessageStudentsWhoDialog'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
+import AssignmentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentColumnHeader.js'
+import MessageStudentsWhoDialog from 'ui/features/gradebook/react/shared/MessageStudentsWhoDialog.js'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */

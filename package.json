@@ -11,6 +11,7 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/plugins/*",
+      "ui/shared/*",
       "packages/*"
     ],
     "nohoist": [
@@ -55,7 +56,7 @@
     "@instructure/ui-layout": "6",
     "@instructure/ui-link": "6",
     "@instructure/ui-list": "6",
-    "@instructure/ui-media-player": "^7",
+    "@instructure/ui-media-player": "^7.2",
     "@instructure/ui-menu": "6",
     "@instructure/ui-metric": "6",
     "@instructure/ui-modal": "6",
@@ -328,8 +329,8 @@
     "build:packages": "yarn workspace-run build:canvas",
     "lint:browser-code": "es-check es8 ./public/dist/**/*.js",
     "lint:staged": "lint-staged",
-    "lint:js:coffeescripts": "eslint ./app/coffeescripts/**/*.js",
-    "lint:js:jsx": "eslint ./app/jsx/**/*.js",
+    "lint:js:coffeescripts": "echo 'STOP CALLING ME IM NO LONGER NEEDED'",
+    "lint:js:jsx": "eslint './ui/**/*.js'",
     "lint:js:packages": "eslint ./packages/**/*.js",
     "lint:style": "stylelint  './app/**/*.{css,scss}' './packages/**/*.{css,scss}'",
     "lint:xss": "node ./script/xsslint.js",
@@ -338,7 +339,7 @@
     "webpack": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --progress --color --watch",
     "webpack-development": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
     "webpack-production": "NODE_ENV=production gulp rev && NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
-    "workspace-run": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report -c $@; exit $?; } && r",
+    "workspace-run": "r() { wsrun --fast-exit --exclude-missing --report -c $@; exit $?; } && r",
     "workspace-run-serial": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report --serial -c $@; exit $?; } && r",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",

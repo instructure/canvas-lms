@@ -674,7 +674,7 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
   end
 
-  # see public/javascripts/vendor/jquery.scrollTo.js
+  # see packages/jquery-scroll-to-visible
   # target can be:
   #  - A number position (will be applied to all axes).
   #  - A string position ('44', '100px', '+=90', etc ) will be applied to all axes

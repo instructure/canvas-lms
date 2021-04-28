@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
+import OverrideStudentStore from '@canvas/due-dates/react/OverrideStudentStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('OverrideStudentStore', {

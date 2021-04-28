@@ -33,13 +33,22 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
   end
 
   def i18n_decimal(val)
-    separator = I18n.t('number.format.separator')
-    delimiter = I18n.t('number.format.delimiter')
+    value = if val.is_a? String
+      separator = I18n.t('number.format.separator')
+      delimiter = I18n.t('number.format.delimiter')
+
+      val.gsub(delimiter, '').gsub(separator, '.')
+    else
+      # If val is already a number, when we stringify it
+      # we won't gsub the string as it will already be
+      # formatted correctly 
+      val.to_s
+    end
 
     # we use BigDecimal here to avoid rounding errors at the edge of the tolerance
     # e.g. in floating point, -11.7 with margin of 0.02 isn't inclusive of the answer -11.72
     begin
-      BigDecimal(val.gsub(delimiter, '').gsub(separator, '.'))
+      BigDecimal(value)
     rescue ArgumentError
       BigDecimal('0.0')
     end
@@ -54,7 +63,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     return nil if answer_text.nil?
     return false if answer_text.blank?
 
-    answer_number = i18n_decimal(answer_text.to_s)
+    answer_number = i18n_decimal(answer_text)
 
     match = answers.find do |answer|
       if answer[:numerical_answer_type] == "exact_answer"

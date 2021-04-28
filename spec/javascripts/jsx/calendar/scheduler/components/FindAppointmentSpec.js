@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import FindAppointmentApp from 'jsx/calendar/scheduler/components/FindAppointment'
+import FindAppointmentApp from 'ui/features/calendar/react/scheduler/components/FindAppointment.js'
 
 QUnit.module('FindAppointmentApp')
 

@@ -17,12 +17,13 @@
  */
 
 const glob = require('glob')
+const path = require('path')
 const fs = require('fs')
 const momentLocaleBundles = require('./momentBundles')
 
 const entries = {}
 
-const bundlesPattern = `${__dirname}/../app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}`
+const bundlesPattern = path.resolve(__dirname, '../ui/features/*/index.js')
 const pluginBundlesPattern = `${__dirname}/../gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}`
 const bundleNameRegexp = /\/(coffeescripts|jsx)\/bundles\/(.*).(coffee|js)/
 const fileNameRegexp = /\/([^/]+)\.(coffee|js)/
@@ -32,12 +33,8 @@ const appBundles = glob.sync(bundlesPattern, [])
 const pluginBundles = glob.sync(pluginBundlesPattern, [])
 
 appBundles.forEach(entryFilepath => {
-  const entryBundlePath = entryFilepath.replace(
-    /^.*app\/(coffeescripts|jsx)\/bundles/,
-    (_, dir) => `../app/${dir}/bundles`
-  )
-  const entryName = bundleNameRegexp.exec(entryBundlePath)[2]
-  entries[entryName] = entryBundlePath
+  const entryName = path.basename(path.dirname(entryFilepath))
+  entries[entryName] = entryFilepath
 })
 
 pluginBundles.forEach(entryFilepath => {

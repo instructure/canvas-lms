@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Helper from 'context_modules_helper'
+import Helper from '@canvas/context-modules/jquery/context_modules_helper'
 
 QUnit.module('ContextModulesHelper', {
   setup() {

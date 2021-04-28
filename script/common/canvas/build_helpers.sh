@@ -20,12 +20,13 @@ function compile_assets {
 }
 
 function build_images {
-  message 'Building docker images...'
+  start_spinner  'Building docker images...'
   if [[ "$(uname)" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-    _canvas_lms_track docker-compose build --pull --build-arg USER_ID=$(id -u)
+    _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
   else
-    _canvas_lms_track docker-compose build --pull
+    _canvas_lms_track_with_log docker-compose build --pull
   fi
+  stop_spinner
 }
 
 function check_gemfile {
@@ -38,7 +39,7 @@ errors.'
   fi
 
   # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
-  if ! docker-compose run --no-deps --rm web touch Gemfile.lock; then
+  if ! _canvas_lms_track_with_log docker-compose run --no-deps --rm web touch Gemfile.lock; then
     message \
 "The 'docker' user is not allowed to write to Gemfile.lock. We need write
 permissions so we can install gems."
@@ -49,17 +50,23 @@ permissions so we can install gems."
 
 function build_assets {
   message "Building assets..."
-  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c bundle
-  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c yarn
-  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c compile
+  start_spinner "> Bundle install..."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c bundle
+  stop_spinner
+  start_spinner "> Yarn install...."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c yarn
+  stop_spinner
+  start_spinner "> Compile assets...."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c compile
+  stop_spinner
 }
 
 function database_exists {
-  docker-compose run --rm web bundle exec rails runner 'ActiveRecord::Base.connection' &> /dev/null
+  run_command bundle exec rails runner 'ActiveRecord::Base.connection' &> /dev/null
 }
 
 function create_db {
-  if ! docker-compose run --no-deps --rm web touch db/structure.sql; then
+  if ! _canvas_lms_track_with_log run_command touch db/structure.sql; then
     message \
 "The 'docker' user is not allowed to write to db/structure.sql. We need write
 permissions so we can run migrations."
@@ -67,7 +74,9 @@ permissions so we can run migrations."
     confirm_command 'chmod a+rw db/structure.sql' || true
   fi
 
+  start_spinner "Checking for existing db..."
   if database_exists; then
+    stop_spinner
     message \
 'An existing database was found.
 
@@ -76,24 +85,28 @@ This script will destroy ALL EXISTING DATA if it continues
 If you want to migrate the existing database, use docker_dev_update
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     message 'About to run "bundle exec rake db:drop"'
-    if [[ -z "${JENKINS}" ]]; then
+    if ! is_running_on_jenkins; then
       prompt "type NUKE in all caps: " nuked
       [[ ${nuked:-n} == 'NUKE' ]] || exit 1
     fi
-    _canvas_lms_track docker-compose run --rm web bundle exec rake db:drop
+    start_spinner "Deleting db....."
+    _canvas_lms_track_with_log run_command bundle exec rake db:drop
+    stop_spinner
   fi
+  stop_spinner
 
-  message "Creating new database"
-  _canvas_lms_track docker-compose run --rm web \
-    bundle exec rake db:create
+  start_spinner "Creating new database...."
+  _canvas_lms_track_with_log run_command bundle exec rake db:create
+  stop_spinner
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
-  _canvas_lms_track docker-compose run --rm web \
-    bundle exec rake db:migrate RAILS_ENV=development
-  _canvas_lms_track docker-compose run --rm web \
-    bundle exec rake db:migrate RAILS_ENV=test
-  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN --rm web \
-    bundle exec rake db:initial_setup
+  start_spinner "Migrating (Development env)...."
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=development
+  stop_spinner
+  start_spinner "Migrating (Test env)...."
+  _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
+  stop_spinner
+  _canvas_lms_track run_command bundle exec rake db:initial_setup
 }
 
 function sync_bundler_version {
@@ -101,7 +114,8 @@ function sync_bundler_version {
   actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
   if [ "$actual_version" != "$expected_version" ]; then
     echo_console_and_log "  Wrong version of bundler installed, installing correct version..."
-    run_command bash -c "gem uninstall --all --ignore-dependencies --force bundler && gem install bundler --no-document -v $expected_version" >>"$LOG" 2>&1
+    _canvas_lms_track_with_log run_command bash -c "gem uninstall --all --ignore-dependencies --force --executables bundler"
+    _canvas_lms_track_with_log run_command bash -c "gem install bundler --no-document -v $expected_version"
   fi
 }
 

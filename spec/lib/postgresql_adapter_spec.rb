@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'irb'
+
 require_relative '../spec_helper'
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
@@ -53,5 +55,28 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
       expect(User.connection.schema_search_path).not_to match(/bogus/)
       expect(User.connection.select_value("SHOW search_path")).not_to match(/bogus/)
     end
+  end
+
+  it 'aborts a query when interrupted' do
+    aborted = false
+    thread = Thread.new do
+      User.connection.transaction(requires_new: true) do
+        User.connection.execute("SELECT pg_sleep(30)")
+      rescue IRB::Abort
+        aborted = true
+        raise ActiveRecord::Rollback
+      end
+      # make sure we can immediately execute our next query
+      User.connection.execute("SELECT 1")
+    end
+
+    start = Time.now.utc
+    # make sure it starts the query
+    sleep 0.5
+    thread.raise(IRB::Abort)
+    thread.join
+
+    expect(Time.now.utc - start).to be < 1.0
+    expect(aborted).to eq true
   end
 end

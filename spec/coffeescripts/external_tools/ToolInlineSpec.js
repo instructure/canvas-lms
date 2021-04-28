@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ToolLaunchResizer from 'lti/tool_launch_resizer'
+import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
 
 QUnit.module('ToolLaunchResizer', {
   setup() {

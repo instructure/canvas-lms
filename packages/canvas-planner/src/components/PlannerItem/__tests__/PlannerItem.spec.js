@@ -61,7 +61,7 @@ function noteProps(option) {
   }
 }
 
-function groupProps(option) {
+function groupProps() {
   return {
     color: '#F06291',
     completed: false,
@@ -687,5 +687,11 @@ describe('with isMissingItem', () => {
     expect(courseNameText.exists()).toBeTruthy()
     expect(courseNameText.prop('children')).toBe('A Course about being Diffrient')
     expect(courseNameText.prop('theme')).toMatchObject({primaryColor: '#d71f85'})
+  })
+
+  it('renders dates with both date and time', () => {
+    const wrapper = shallow(<PlannerItem {...props} />)
+    const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
+    expect(dateText.childAt(0).text()).toBe('Due: Dec 17, 2011 at 3:30 AM')
   })
 })

@@ -37,7 +37,8 @@ function create_dinghy_vm {
   prompt "How big should the VM's disk be (in GB)? [$DINGHY_DISK]" disk
 
   message "OK let's do this."
-  _canvas_lms_track dinghy create \
+  message "Creating dinghy machine..."
+  _canvas_lms_track_with_log dinghy create \
     --provider=virtualbox \
     --memory "${memory:-$DINGHY_MEMORY}" \
     --cpus "${cpus:-$DINGHY_CPUS}" \
@@ -46,7 +47,8 @@ function create_dinghy_vm {
 
 function start_dinghy_vm {
   if dinghy status | grep -q 'stopped'; then
-    _canvas_lms_track dinghy up
+    message "Starting dinghy VM..."
+    _canvas_lms_track_with_log dinghy up
   else
     message 'Looks like the dinghy VM is already running. Moving on...'
   fi

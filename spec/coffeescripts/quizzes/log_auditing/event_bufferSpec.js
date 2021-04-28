@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QuizEvent from 'compiled/quizzes/log_auditing/event'
-import EventBuffer from 'compiled/quizzes/log_auditing/event_buffer'
-import K from 'compiled/quizzes/log_auditing/constants'
+import QuizEvent from '@canvas/quiz-log-auditing/jquery/event'
+import EventBuffer from '@canvas/quiz-log-auditing/jquery/event_buffer'
+import K from '@canvas/quiz-log-auditing/jquery/constants'
 
 const useLocalStorage = () => EventBuffer.setStorageAdapter(K.EVT_STORAGE_LOCAL_STORAGE)
 const useMemoryStorage = () => EventBuffer.setStorageAdapter(K.EVT_STORAGE_MEMORY)

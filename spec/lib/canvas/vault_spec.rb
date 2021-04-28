@@ -125,7 +125,7 @@ module Canvas
       end
 
       it "reads from disk config if configured to do so" do
-        cred_path = "sts/testaccount/sts/canvas-shards-lookuper-test"
+        cred_path = "sts/testaccount/sts/canvas-shards-lookupper-test"
         creds_hash = {
           cred_path => {
             "access_key"=>"fake-access-key",
@@ -133,8 +133,8 @@ module Canvas
             "security_token"=>"fake-security-token"
           }
         }
-        allow(ConfigFile).to receive(:load).with("vault_contents").and_return(creds_hash)
         allow(described_class).to receive(:config).and_return(local_config)
+        allow(ConfigFile).to receive(:load).and_return(creds_hash)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
       end
@@ -159,6 +159,7 @@ module Canvas
             redis_port: 6379,
             redis_db: 6 # intentionally one probably not used elsewhere
           })
+          allow(ConfigFile).to receive(:load).and_call_original
           @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}").
             to_return(status: 200, body: {
             data: credential_data,

@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import RCELoader from 'jsx/shared/rce/serviceRCELoader'
-import * as jwt from 'jsx/shared/jwt'
+import RCELoader from '@canvas/rce/serviceRCELoader'
+import * as jwt from '@canvas/rce/jwt'
 import editorUtils from 'helpers/editorUtils'
 import fakeENV from 'helpers/fakeENV'
 import fixtures from 'helpers/fixtures'

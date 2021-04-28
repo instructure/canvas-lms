@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import NavigationForTree from 'compiled/views/content_migrations/NavigationForTree'
+import NavigationForTree from 'ui/features/content_migrations/backbone/views/NavigationForTree.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 

@@ -303,8 +303,6 @@ class MediaObject < ActiveRecord::Base
   def ensure_attachment
     return if self.attachment_id
     return unless %w{Account Course Group User}.include?(self.context_type)
-    root_account = context.is_a?(User) ? context.account : context.root_account
-    return unless root_account.feature_enabled?(:autocreate_attachment_from_media_object)
 
     sources = self.media_sources
     return unless sources.present?

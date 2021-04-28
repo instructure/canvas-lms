@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradebookGrid from 'jsx/gradebook/default_gradebook/GradebookGrid'
+import GradebookGrid from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/index.js'
 
 QUnit.module('GradebookGrid Columns', suiteHooks => {
   let gradebookGridOptions

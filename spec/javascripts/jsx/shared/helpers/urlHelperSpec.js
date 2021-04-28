@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import urlHelper from 'jsx/shared/helpers/urlHelper'
+import urlHelper from 'url-encoding'
 
 QUnit.module('Url Helper')
 

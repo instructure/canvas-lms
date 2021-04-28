@@ -26,6 +26,8 @@ class AnnouncementsController < ApplicationController
   before_action :require_context, :except => :public_feed
   before_action { |c| c.active_tab = "announcements" }
 
+  include K5Mode
+
   module AnnouncementsIndexHelper
     def announcements_locked?
       return false unless @context.is_a?(Course)
@@ -60,7 +62,7 @@ class AnnouncementsController < ApplicationController
         add_crumb(t(:announcements_crumb, "Announcements"))
         load_announcements
 
-        js_bundle :announcements_index_v2
+        js_bundle :announcements
         css_bundle :announcements_index
 
         set_tutorial_js_env

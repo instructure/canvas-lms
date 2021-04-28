@@ -586,7 +586,7 @@ RSpec.configure do |config|
     allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
     allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-    MultiCache.reset
+    allow(MultiCache).to receive(:cache).and_return(new_cache)
   end
 
   def specs_require_cache(new_cache=:memory_store)
@@ -598,6 +598,7 @@ RSpec.configure do |config|
   def enable_cache(new_cache=:memory_store)
     previous_cache = Rails.cache
     previous_perform_caching = ActionController::Base.perform_caching
+    previous_multicache = MultiCache.cache
     set_cache(new_cache)
     if block_given?
       begin
@@ -608,6 +609,7 @@ RSpec.configure do |config|
         allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
         allow(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
+        allow(MultiCache).to receive(:cache).and_return(previous_multicache)
       end
     end
   end

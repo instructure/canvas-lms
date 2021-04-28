@@ -1,7 +1,21 @@
-version: "2"
+# to use this add docker-compose/pulsar.yml
+# to your COMPOSE_FILE var in .env
+version: "2.3"
+
 services:
   postgres:
     environment:
       REPLICATION_USER: impulse
       REPLICATION_PASSWORD: impulse
       REPLICATION_DB: canvas
+  pulsar:
+    image: apachepulsar/pulsar:latest
+    command: bin/pulsar standalone
+    ports:
+      - "6650"
+      - "8080"
+    volumes:
+      - pulsar-data:/pulsar/data
+
+volumes:
+  pulsar-data: {}

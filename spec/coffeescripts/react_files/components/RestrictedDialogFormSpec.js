@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
-import RestrictedDialogForm from 'jsx/files/RestrictedDialogForm'
-import Folder from 'compiled/models/Folder'
+import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
+import Folder from '@canvas/files/backbone/models/Folder'
 
 QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   setup() {

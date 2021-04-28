@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UploadQueue from 'compiled/react_files/modules/UploadQueue'
+import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import sinon from 'sinon'
 
 const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({

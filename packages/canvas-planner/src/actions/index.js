@@ -49,7 +49,8 @@ export const {
   openEditingPlannerItem,
   setNaiAboveScreen,
   scrollToNewActivity,
-  scrollToToday
+  scrollToToday,
+  toggleMissingItems
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -67,7 +68,8 @@ export const {
   'OPEN_EDITING_PLANNER_ITEM',
   'SET_NAI_ABOVE_SCREEN',
   'SCROLL_TO_NEW_ACTIVITY',
-  'SCROLL_TO_TODAY'
+  'SCROLL_TO_TODAY',
+  'TOGGLE_MISSING_ITEMS'
 )
 
 export * from './loading-actions'

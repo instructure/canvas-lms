@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import tz from 'timezone'
-import i18nObj from 'i18nObj'
+import tz from '@canvas/timezone'
+import i18nObj from '@canvas/i18n'
 import detroit from 'timezone/America/Detroit'
 import french from 'timezone/fr_FR'
 import portuguese from 'timezone/pt_PT'

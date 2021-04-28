@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import UnreadBadge from 'jsx/shared/components/UnreadBadge'
+import UnreadBadge from '@canvas/unread-badge'
 
 QUnit.module('UnreadBadge component')
 

@@ -21,7 +21,8 @@ import {
   isToday,
   isInFuture,
   getFriendlyDate,
-  getFullDate,
+  getDynamicFullDate,
+  getDynamicFullDateAndTime,
   getFirstLoadedMoment,
   getLastLoadedMoment,
   getFullDateAndTime,
@@ -73,10 +74,43 @@ describe('getFriendlyDate', () => {
   })
 })
 
-describe('getFullDate', () => {
-  it('returns the format month day year', () => {
-    const date = moment().add(3, 'days')
-    expect(getFullDate(date)).toEqual(date.format('MMMM D, YYYY'))
+describe('getDynamicFullDate', () => {
+  it('returns the format month day if in the current year', () => {
+    const date = moment().tz(TZ)
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D'))
+  })
+
+  it('returns the format month day year if in a past year', () => {
+    const date = moment().tz(TZ).subtract(1, 'years')
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D, YYYY'))
+  })
+
+  it('returns the format month day year if in a future year', () => {
+    const date = moment().tz(TZ).add(1, 'years')
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D, YYYY'))
+  })
+})
+
+describe('getDynamicFullDateAndTime', () => {
+  it('returns the format month day time if in the current year', () => {
+    const date = moment().tz(TZ)
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D')} at ${date.format('LT')}`
+    )
+  })
+
+  it('returns the format month day year time if in a past year', () => {
+    const date = moment().tz(TZ).subtract(1, 'years')
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+    )
+  })
+
+  it('returns the format month day year time if in a future year', () => {
+    const date = moment().tz(TZ).add(1, 'years')
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+    )
   })
 })
 

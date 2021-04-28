@@ -137,7 +137,7 @@ describe ExternalToolsController do
 
           it 'uses the public user ID as the ISS' do
             subject
-            expect(cached_launch['sub']).to eq User.public_lti_id
+            expect(cached_launch['sub']).to be_nil
           end
         end
       end

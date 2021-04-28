@@ -30,6 +30,8 @@ class WikiPagesController < ApplicationController
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: [:edit, :index]
 
+  include K5Mode
+
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
     current_user = c.instance_variable_get('@current_user')

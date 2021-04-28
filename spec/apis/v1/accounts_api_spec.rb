@@ -634,6 +634,75 @@ describe "Accounts API", type: :request do
         }
       end
     end
+
+    context 'with course_template_id' do
+      before do
+        @a2.root_account.enable_feature!(:course_templates)
+        @user.account_users.where(account: @a2).delete_all
+      end
+
+      let(:template) { @a2.courses.create!(template: true) }
+
+      it "updates" do
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }})
+        @a2.reload
+        expect(@a2.course_template).to eq template                
+      end
+
+      it "returns unauthorized when you don't have permission to change it" do
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :add_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }},
+                 {},
+                 expected_status: 401)
+      end
+
+      it "returns bad request when you give a course that can't be a template" do
+        template.update!(template: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }},
+                 {},
+                 expected_status: 404)
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (template set)" do
+        @a2.update!(course_template: template)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :add_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: template.id }})
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (inherit)" do
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :delete_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: nil }})
+      end
+
+      it "doesn't error when you pass a template of no change, even if you don't have permissions (no template)" do
+        Course.ensure_dummy_course
+        @a2.update!(course_template_id: 0)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :delete_course_template, enabled: false)
+        @a1.role_overrides.create!(role: @user.account_users.first.role, permission: :edit_course_template, enabled: false)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a2.id}",
+                 { controller: 'accounts', action: 'update', id: @a2.to_param, format: 'json' },
+                 { account: { course_template_id: 0 }})
+      end
+    end
   end
 
   it "should find accounts by sis in only this root account" do

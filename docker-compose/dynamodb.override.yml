@@ -1,7 +1,8 @@
-# to use this for global lookups add docker-compose/dynamodb.override.yml
+# to use this for global lookups or release notes add docker-compose/dynamodb.override.yml
 # to your COMPOSE_FILE var in .env
 # Then run:
 # $ docker-compose run --rm web bin/rails runner GlobalLookups::DevUtils.initialize_ddb_for_development!
+# $ docker-compose run --rm web bin/rails runner ReleaseNotes::DevUtils.initialize_ddb_for_development!
 version: '2.3'
 services:
   web:

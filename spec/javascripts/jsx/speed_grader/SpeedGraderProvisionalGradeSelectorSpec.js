@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import SpeedGraderProvisionalGradeSelector from 'ui/features/speed_grader/react/SpeedGraderProvisionalGradeSelector.js'
 
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   let $container

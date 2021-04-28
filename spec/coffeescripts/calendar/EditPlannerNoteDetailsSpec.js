@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import EditPlannerNoteDetails from 'compiled/calendar/EditPlannerNoteDetails'
-import tz from 'timezone'
+import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails.js'
+import tz from '@canvas/timezone'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
-import commonEventFactory from 'compiled/calendar/commonEventFactory'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 const fixtures = $('#fixtures')
 const note = {

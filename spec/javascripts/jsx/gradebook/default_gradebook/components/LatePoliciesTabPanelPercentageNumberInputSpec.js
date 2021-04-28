@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {fireEvent} from '@testing-library/react'
 
-import {DEFAULT_LATE_POLICY_DATA} from 'jsx/gradebook/default_gradebook/apis/GradebookSettingsModalApi'
-import LatePoliciesTabPanel from 'jsx/gradebook/default_gradebook/components/LatePoliciesTabPanel'
+import {DEFAULT_LATE_POLICY_DATA} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
+import LatePoliciesTabPanel from 'ui/features/gradebook/react/default_gradebook/components/LatePoliciesTabPanel.js'
 
 const MAX = '100'
 const MIN = '0'

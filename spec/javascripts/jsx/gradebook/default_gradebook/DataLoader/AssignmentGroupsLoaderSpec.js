@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import AssignmentGroupsLoader from 'jsx/gradebook/default_gradebook/DataLoader/AssignmentGroupsLoader'
-import PerformanceControls from 'jsx/gradebook/default_gradebook/PerformanceControls'
-import {NetworkFake, setPaginationLinkHeader} from 'jsx/shared/network/NetworkFake'
-import {RequestDispatch} from 'jsx/shared/network'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import AssignmentGroupsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/AssignmentGroupsLoader.js'
+import PerformanceControls from 'ui/features/gradebook/react/default_gradebook/PerformanceControls.js'
+import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
+import {RequestDispatch} from '@canvas/network'
 
 /* eslint-disable no-async-promise-executor */
 QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {

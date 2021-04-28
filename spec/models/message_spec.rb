@@ -113,6 +113,15 @@ describe Message do
       expect(msg.subject.length).to be > 255
     end
 
+    it "should truncate the body if it exceeds the maximum text length" do
+      allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
+      assignment_model(title: 'this is a message')
+      msg = generate_message(:assignment_created, :email, @assignment)
+      msg.save!
+      expect(msg.body).to eq 'message preview unavailable'
+      expect(msg.html_body).to eq 'message preview unavailable'
+    end
+
     it "should default to the account time zone if the user has no time zone" do
       original_time_zone = Time.zone
       Time.zone = 'UTC'

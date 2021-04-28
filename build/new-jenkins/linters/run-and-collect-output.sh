@@ -8,10 +8,16 @@ CMD=$1
 # Buffer the output into a variable and print it all once the command
 # has completed. This improves readability of the command output.
 echo "=== RUN $CMD"
-R=$(bash -c "$CMD" 2>&1); EXIT_CODE=$?
+
+LOG_FILE=./log/cmd_output/interrupt-output-pid$$.log
+mkdir -p "`dirname \"$LOG_FILE\"`"
+echo "Writing to Log File: $(readlink -f $LOG_FILE)"
+echo "=== START OUTPUT $CMD" > "$LOG_FILE"
+eval "$CMD" >> "$LOG_FILE" 2>&1; EXIT_CODE=$?
+echo "=== END OUTPUT $CMD" >> "$LOG_FILE"
+
 [ $EXIT_CODE -ne 0 ] && echo "=== FAILED $CMD"
-echo "=== START OUTPUT $CMD"
-echo "$R"
-echo "=== END OUTPUT $CMD"
+cat "$LOG_FILE"
+rm "$LOG_FILE"
 
 exit $EXIT_CODE

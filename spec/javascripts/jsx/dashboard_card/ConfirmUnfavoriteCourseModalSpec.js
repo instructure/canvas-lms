@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 
-import ConfirmUnfavoriteCourseModal from 'jsx/dashboard_card/ConfirmUnfavoriteCourseModal'
+import ConfirmUnfavoriteCourseModal from '@canvas/dashboard-card/react/ConfirmUnfavoriteCourseModal'
 
 QUnit.module('ConfirmUnfavoriteCourseModal', suiteHooks => {
   let $container

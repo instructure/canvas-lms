@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery/fixDialogButtons'
-import 'jquery.disableWhileLoading'
+import '@canvas/util/jquery/fixDialogButtons'
+import '@canvas/jquery/jquery.disableWhileLoading'
 import 'helpers/jquery.simulate'
 
 QUnit.module('fixDialogButtons', {

@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import DueDateRemoveRowLink from 'jsx/due_dates/DueDateRemoveRowLink'
+import DueDateRemoveRowLink from '@canvas/due-dates/react/DueDateRemoveRowLink'
 
 QUnit.module('DueDateRemoveRowLink', {
   setup() {

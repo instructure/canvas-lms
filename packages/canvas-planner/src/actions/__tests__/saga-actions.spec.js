@@ -39,6 +39,7 @@ import {itemsToDays} from '../../utilities/daysUtils'
 function getStateFn(opts = {loading: {}}) {
   return () => ({
     loading: {
+      isLoading: false,
       allFutureItemsLoaded: false,
       partialFutureDays: [],
 
@@ -326,9 +327,9 @@ describe('mergeWeekItems', () => {
   })
 
   beforeEach(() => {
-    getStateMock = jest.fn(() => {
+    getStateMock = jest.fn(opts => {
       return {
-        ...getStateFn(),
+        ...getStateFn(opts)(),
         weeklyDashboard: {
           weekStart: moment.tz('UTC').startOf('week'),
           weekEnd: moment.tz('UTC').endOf('week'),
@@ -348,13 +349,16 @@ describe('mergeWeekItems', () => {
     const mockDays = itemsToDays(mockItems)
     const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
       return {
-        ...getStateMock(),
-        loading: {partialWeekDays: mockDays, allWeekItemsLoaded: true}
+        ...getStateMock({
+          loading: {partialWeekDays: mockDays, allWeekItemsLoaded: true}
+        })
       }
     })
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays(mockDays, 'mock response'))
-    expect(mockDispatch).toHaveBeenCalledWith(weekLoaded(itemsToDays(mockItems), 'mock response'))
+    expect(mockDispatch).toHaveBeenCalledWith(
+      weekLoaded({weekDays: itemsToDays(mockItems), initialWeeklyLoad: false}, 'mock response')
+    )
   })
 
   it('does not dispatch weekLoaded we do not get the full week up front', () => {
@@ -383,13 +387,16 @@ describe('mergeWeekItems', () => {
     const mockItems = []
     const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
       return {
-        ...getStateMock(),
-        loading: {partialWeekDays: [], allWeekItemsLoaded: true}
+        ...getStateMock({
+          loading: {partialWeekDays: [], allWeekItemsLoaded: true}
+        })
       }
     })
     expect(result).toBe(true)
     // still want to pretend something was loaded so all the loading states get updated.
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays([], 'mock response'))
-    expect(mockDispatch).toHaveBeenCalledWith(weekLoaded([], 'mock response'))
+    expect(mockDispatch).toHaveBeenCalledWith(
+      weekLoaded({weekDays: [], initialWeeklyLoad: false}, 'mock response')
+    )
   })
 })

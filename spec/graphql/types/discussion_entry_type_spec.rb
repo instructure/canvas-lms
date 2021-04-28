@@ -49,8 +49,46 @@ describe Types::DiscussionEntryType do
     expect(result[0]).to eq de.message
   end
 
+  it 'allows querying for the last subentry' do
+    de = discussion_entry
+    4.times do |i|
+      de = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: de.id)
+    end
+
+    result = discussion_entry_type.resolve('lastReply { message }')
+    expect(result).to eq de.message
+  end
+
+  it 'allows querying for participant counts' do
+    3.times { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id) }
+
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { unreadCount }')).to eq 0
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
+    DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { unreadCount }')).to eq 3
+    expect(discussion_entry_type.resolve('rootEntryParticipantCounts { repliesCount }')).to eq 3
+  end
+
   it 'returns a null message when entry is marked as deleted' do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
+  end
+
+  it 'returns subentries count' do
+    4.times do |i|
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: discussion_entry.id)
+    end
+
+    expect(discussion_entry_type.resolve('subentriesCount')).to eq 4
+  end
+
+  it 'returns the current user permissions' do
+    expect(discussion_entry_type.resolve('permissions { delete }')).to eq true
+    expect(discussion_entry.grants_right?(@teacher, nil, :delete)).to eq true
+
+    student_in_course(active_all: true)
+    type = GraphQLTypeTester.new(discussion_entry, current_user: @student)
+    expect(type.resolve('permissions { delete }')).to eq false
+    expect(discussion_entry.grants_right?(@student, nil, :delete)).to eq false
   end
 end

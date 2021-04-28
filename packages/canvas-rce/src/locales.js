@@ -17,9 +17,7 @@
  */
 
 import ar from '@instructure/translations/lib/canvas-rce/ar.json'
-import bg from '@instructure/translations/lib/canvas-rce/bg.json'
 import ca from '@instructure/translations/lib/canvas-rce/ca.json'
-import cs from '@instructure/translations/lib/canvas-rce/cs.json'
 import cy from '@instructure/translations/lib/canvas-rce/cy.json'
 import da from '@instructure/translations/lib/canvas-rce/da.json'
 import da_K12 from '@instructure/translations/lib/canvas-rce/da-x-k12.json'
@@ -29,9 +27,7 @@ import en_AU from '@instructure/translations/lib/canvas-rce/en_AU.json'
 import en_AU_Unimelb from '@instructure/translations/lib/canvas-rce/en-AU-x-unimelb.json'
 import en_CY from '@instructure/translations/lib/canvas-rce/en_CY.json'
 import en_GB from '@instructure/translations/lib/canvas-rce/en_GB.json'
-import en_IE from '@instructure/translations/lib/canvas-rce/en_IE'
 import es from '@instructure/translations/lib/canvas-rce/es.json'
-import fa from '@instructure/translations/lib/canvas-rce/fa.json'
 import fa_IR from '@instructure/translations/lib/canvas-rce/fa_IR.json'
 import fr from '@instructure/translations/lib/canvas-rce/fr.json'
 import fr_CA from '@instructure/translations/lib/canvas-rce/fr_CA.json'
@@ -51,23 +47,17 @@ import nn from '@instructure/translations/lib/canvas-rce/nn.json'
 import pl from '@instructure/translations/lib/canvas-rce/pl.json'
 import pt from '@instructure/translations/lib/canvas-rce/pt.json'
 import pt_BR from '@instructure/translations/lib/canvas-rce/pt_BR.json'
-import ro from '@instructure/translations/lib/canvas-rce/ro.json'
 import ru from '@instructure/translations/lib/canvas-rce/ru.json'
-import sq from '@instructure/translations/lib/canvas-rce/sq.json'
-import sr from '@instructure/translations/lib/canvas-rce/sr.json'
 import sv from '@instructure/translations/lib/canvas-rce/sv.json'
 import sv_K12 from '@instructure/translations/lib/canvas-rce/sv-x-k12.json'
 import tr from '@instructure/translations/lib/canvas-rce/tr.json'
 import uk from '@instructure/translations/lib/canvas-rce/uk_UA.json'
-import vi from '@instructure/translations/lib/canvas-rce/vi.json'
 import zh from '@instructure/translations/lib/canvas-rce/zh.json'
 import zh_HK from '@instructure/translations/lib/canvas-rce/zh_HK.json'
 
 export default {
   ar,
-  bg,
   ca,
-  cs,
   cy,
   da,
   'da-x-k12': da_K12,
@@ -75,11 +65,9 @@ export default {
   'en-AU': en_AU,
   'en-AU-x-unimelb': en_AU_Unimelb,
   'en-GB': en_GB,
-  'en-GB-x-lbs': en_IE,
   'en-GB-x-ukhe': en_CY,
   el,
   es,
-  fa,
   'fa-IR': fa_IR,
   fr,
   'fr-CA': fr_CA,
@@ -99,15 +87,11 @@ export default {
   pl,
   'pt-BR': pt_BR,
   pt,
-  ro,
   ru,
-  sq,
-  sr,
   'sv-x-k12': sv_K12,
   sv,
   tr,
   uk,
-  vi,
   'zh-Hans': zh,
   'zh-Hant': zh_HK
 }

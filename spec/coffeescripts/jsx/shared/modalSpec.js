@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import Modal from 'jsx/shared/modal'
+import Modal from '@canvas/modal'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ModalContent from 'jsx/shared/modal-content'
-import ModalButtons from 'jsx/shared/modal-buttons'
+import ModalContent from '@canvas/modal/react/content'
+import ModalButtons from '@canvas/modal/react/buttons'
 
 QUnit.module('Modal', {
   setup() {

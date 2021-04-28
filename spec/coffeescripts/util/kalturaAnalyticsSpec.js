@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import kalturaAnalytics from 'compiled/util/kalturaAnalytics'
-import mejs from 'vendor/mediaelement-and-player'
+import kalturaAnalytics from '@canvas/media-comments/jquery/kalturaAnalytics'
+import mejs from '@canvas/mediaelement'
 import 'jquery.cookie'
 
 QUnit.module('kaltura analytics helper', {

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SyllabusBehaviors from 'compiled/behaviors/SyllabusBehaviors'
-import Sidebar from 'jsx/shared/rce/Sidebar'
+import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
+import Sidebar from '@canvas/rce/Sidebar'
 import editorUtils from 'helpers/editorUtils'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
   setup() {

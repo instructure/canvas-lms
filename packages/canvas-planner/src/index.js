@@ -29,7 +29,9 @@ import {
   getWeeklyPlannerItems,
   scrollIntoPast,
   loadFutureItems,
-  startLoadingAllOpportunities
+  loadThisWeekItems,
+  startLoadingAllOpportunities,
+  toggleMissingItems
 } from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
@@ -46,7 +48,7 @@ const WeeklyPlannerHeader = React.lazy(() => import('./components/WeeklyPlannerH
 
 export * from './components'
 
-export {startLoadingAllOpportunities}
+export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 
@@ -106,6 +108,7 @@ const defaultEnv = {}
 
 const plannerHeaderId = 'dashboard_header_container'
 const plannerNewActivityButtonId = 'new_activity_button'
+const weeklyPlannerHeaderId = 'weekly_planner_header'
 
 function mergeDefaultOptions(options) {
   const newOpts = {...defaultOptions, ...options}
@@ -195,7 +198,11 @@ export function initializePlanner(options) {
     initializeDateTimeFormatters(options.dateTimeFormatters)
 
     options.plannerNewActivityButtonId = plannerNewActivityButtonId
-    dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+    if (options.env.K5_MODE) {
+      dynamicUiManager.setOffsetElementIds(weeklyPlannerHeaderId, null)
+    } else {
+      dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+    }
 
     if (options.externalFallbackFocusable) {
       dynamicUiManager.registerAnimatable(

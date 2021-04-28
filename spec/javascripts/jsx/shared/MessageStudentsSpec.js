@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import moxios from 'moxios'
-import MessageStudents from 'jsx/shared/MessageStudents'
+import MessageStudents from '@canvas/message-students-modal'
 
 let $domNode, subject, fixtures
 

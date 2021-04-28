@@ -154,6 +154,7 @@ class FilesController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Avatar
   include AttachmentHelper
+  include K5Mode
 
   before_action { |c| c.active_tab = "files" }
 
@@ -425,7 +426,7 @@ class FilesController < ApplicationController
 
       @page_title = t('files_page_title', 'Files')
       @body_classes << 'full-width padless-content'
-      js_bundle :react_files
+      js_bundle :files
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,

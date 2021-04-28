@@ -2273,4 +2273,60 @@ describe Account do
       expect(account.enable_as_k5_account[:locked]).to be_truthy
     end
   end
+
+  describe "#effective_course_template" do
+    let(:root_account) { Account.create! }
+    let(:sub_account) { root_account.sub_accounts.create! }
+    let(:template) { root_account.courses.create!(template: true) }
+
+    it "returns an explicit template" do
+      sub_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template            
+    end
+
+    it "inherits a template" do
+      root_account.update!(course_template: template)
+      expect(sub_account.effective_course_template).to eq template
+    end
+
+    it "doesn't use an explicit non-template" do
+      root_account.update!(course_template: template)
+      Course.ensure_dummy_course
+      sub_account.update!(course_template_id: 0)
+      expect(sub_account.effective_course_template).to be_nil
+    end
+  end
+
+  describe "#course_template_id" do
+    it "resets id of 0 to nil on root accounts" do
+      a = Account.new
+      a.course_template_id = 0
+      expect(a).to be_valid
+      expect(a.course_template_id).to be_nil
+    end
+
+    it "requires the course template to be in the same root account" do
+      a = Account.create!
+      a2 = Account.create!
+      c = a2.courses.create!(template: true)
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "requires the course template to actually be a template" do
+      a = Account.create!
+      c = a.courses.create!
+      a.course_template = c
+      expect(a).not_to be_valid
+      expect(a.errors.to_h.keys).to eq [:course_template_id]
+    end
+
+    it "allows a valid course template" do
+      a = Account.create!
+      c = a.courses.create!(template: true)
+      a.course_template = c
+      expect(a).to be_valid
+    end
+  end
 end

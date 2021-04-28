@@ -20,8 +20,8 @@ import {
   subscribeFlashNotifications,
   notificationActions,
   reduceNotifications
-} from 'jsx/shared/reduxNotifications'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
+} from '@canvas/notifications/redux/actions'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const createMockStore = state => ({
   subs: [],

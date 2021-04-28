@@ -57,6 +57,19 @@ describe "course settings" do
 
   end
 
+  describe('Integrations tab') do
+    let(:course) { @course }
+
+    context 'with the MSFT sync flag on' do
+      before { course.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+
+      it 'displays the course settings tab' do
+        get "/courses/#{course.id}/settings"
+        expect(f('#integrations_tab')).to be_displayed
+      end
+    end
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
@@ -339,6 +352,16 @@ describe "course settings" do
       expect(fj('.summary tr:nth(1)').text).to match /weirdo \(inactive\):\s*1/
       expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
+    end
+
+    it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
+      @account.root_account.enable_feature!(:canvas_for_elementary)
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      course_with_teacher_logged_in(:active_all => true)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#course_status_form")).to be_present
+      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
     end
   end
 

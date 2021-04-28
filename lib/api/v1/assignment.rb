@@ -574,7 +574,7 @@ module Api::V1::Assignment
     "media_recording",
     "not_graded",
     "wiki_page",
-    "annotated_document",
+    "student_annotation",
     ""
   ].freeze
 
@@ -791,9 +791,10 @@ module Api::V1::Assignment
       end
     end
 
-    if update_params[:submission_types]&.include?('annotated_document')
-      if assignment_params.key?(:annotated_document_id)
-        assignment.annotatable_attachment_id = assignment_params.delete(:annotated_document_id)
+    if update_params[:submission_types]&.include?('student_annotation')
+      if assignment_params.key?(:annotatable_attachment_id)
+        attachment = Attachment.find(assignment_params.delete(:annotatable_attachment_id))
+        assignment.annotatable_attachment = attachment.copy_to_student_annotation_documents_folder(assignment.course)
       end
     else
       assignment.annotatable_attachment_id = nil
@@ -986,10 +987,10 @@ module Api::V1::Assignment
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
 
-    if assignment_params[:submission_types]&.include?("annotated_document")
-      return false unless assignment_params.key?(:annotated_document_id)
+    if assignment_params[:submission_types]&.include?("student_annotation")
+      return false unless assignment_params.key?(:annotatable_attachment_id)
 
-      attachment = Attachment.find_by(id: assignment_params[:annotated_document_id])
+      attachment = Attachment.find_by(id: assignment_params[:annotatable_attachment_id])
       return false unless attachment&.grants_right?(user, :read)
     end
 

@@ -23,7 +23,7 @@ import {shallow} from 'enzyme'
 import moxios from 'moxios'
 import sinon from 'sinon'
 import $ from 'jquery'
-import {DashboardHeader} from 'jsx/dashboard/DashboardHeader'
+import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader.js'
 import {resetPlanner} from '@instructure/canvas-planner'
 
 const container = document.getElementById('fixtures')
@@ -121,7 +121,7 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
     status: 200,
     responseText: {}
   })
-  const promiseToGetNewCourseForm = import('compiled/util/newCourseForm')
+  const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm.js')
 
   ReactDOM.render(
     <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,

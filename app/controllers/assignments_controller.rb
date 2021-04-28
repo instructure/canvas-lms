@@ -33,6 +33,7 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include SyllabusHelper
   before_action :require_context
+  include K5Mode
   add_crumb(
     proc { t '#crumbs.assignments', "Assignments" },
     except: [:destroy, :syllabus, :index, :new, :edit]
@@ -148,7 +149,7 @@ class AssignmentsController < ApplicationController
       SUBMISSION_ID: graphql_submisison_id
     })
     css_bundle :assignments_2_student
-    js_bundle :assignments_2_show_student
+    js_bundle :assignments_show_student
     render html: '', layout: true
   end
 
@@ -269,7 +270,7 @@ class AssignmentsController < ApplicationController
         if @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
-            js_bundle :assignments_2_show_teacher
+            js_bundle :assignments_show_teacher
             render html: '', layout: true
             return
           end
@@ -641,6 +642,7 @@ class AssignmentsController < ApplicationController
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       hash = {
+        ROOT_FOLDER_ID: Folder.root_folders(@context).first&.id,
         ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
         ASSIGNMENT_GROUPS: json_for_assignment_groups,
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
@@ -711,6 +713,8 @@ class AssignmentsController < ApplicationController
         if Account.site_admin.feature_enabled?(:annotated_document_submissions)
           hash[:ANNOTATED_DOCUMENT] = {
             display_name: @assignment.annotatable_attachment.display_name,
+            context_type: @assignment.annotatable_attachment.context_type,
+            context_id: @assignment.annotatable_attachment.context_id,
             id: @assignment.annotatable_attachment.id
           }
         end

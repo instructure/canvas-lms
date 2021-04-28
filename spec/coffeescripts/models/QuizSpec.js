@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import Quiz from 'compiled/models/Quiz'
-import Assignment from 'compiled/models/Assignment'
-import DateGroup from 'compiled/models/DateGroup'
-import AssignmentOverrideCollection from 'compiled/collections/AssignmentOverrideCollection'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
+import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
 import fakeENV from 'helpers/fakeENV'
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('Quiz', {
   setup() {

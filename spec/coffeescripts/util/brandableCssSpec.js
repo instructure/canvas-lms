@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import brandableCss from 'compiled/util/brandableCss'
+import brandableCss from '@canvas/brandable-css'
 
 const testBundleId = 'bundles/foo'
 const testFingerprint = 'asdf1234'

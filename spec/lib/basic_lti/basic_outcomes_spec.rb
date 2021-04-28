@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 require 'nokogiri'
 
@@ -527,6 +527,31 @@ describe BasicLTI::BasicOutcomes do
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
+      end
+    end
+
+    context 'attachments' do
+      it 'retries attachments if they fail to upload' do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          }
+        )
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+        Timecop.freeze do
+          run_jobs
+          expect(submission.reload.versions.count).to eq 2
+          expect(submission.attachments.count).to eq 1
+          expect(submission.attachments.first.file_state).to eq 'errored'
+          expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
+          expect(Delayed::Job.find_by(strand: 'file_download/example.com').run_at).to be > Time.zone.now + 5.seconds
+        end
       end
     end
   end

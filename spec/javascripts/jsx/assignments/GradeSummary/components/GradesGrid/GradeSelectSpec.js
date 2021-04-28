@@ -19,8 +19,8 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import GradeSelect from 'jsx/assignments/GradeSummary/components/GradesGrid/GradeSelect'
-import {FAILURE, STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
+import GradeSelect from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GradeSelect.js'
+import {FAILURE, STARTED, SUCCESS} from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
 
 import {waitFor} from '../../../../support/Waiters'
 

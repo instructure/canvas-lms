@@ -18,19 +18,19 @@
 
 import $ from 'jquery'
 import React from 'react'
-import RCELoader from 'jsx/shared/rce/serviceRCELoader'
-import SectionCollection from 'compiled/collections/SectionCollection'
-import Assignment from 'compiled/models/Assignment'
-import DueDateList from 'compiled/models/DueDateList'
-import Section from 'compiled/models/Section'
-import AssignmentGroupSelector from 'compiled/views/assignments/AssignmentGroupSelector'
-import DueDateOverrideView from 'compiled/views/assignments/DueDateOverride'
-import EditView from 'compiled/views/assignments/EditView'
-import GradingTypeSelector from 'compiled/views/assignments/GradingTypeSelector'
-import GroupCategorySelector from 'compiled/views/assignments/GroupCategorySelector'
-import PeerReviewsSelector from 'compiled/views/assignments/PeerReviewsSelector'
+import RCELoader from '@canvas/rce/serviceRCELoader'
+import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
+import Section from '@canvas/sections/backbone/models/Section.coffee'
+import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector.coffee'
+import DueDateOverrideView from '@canvas/due-dates'
+import EditView from 'ui/features/assignment_edit/backbone/views/EditView.coffee'
+import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector.coffee'
+import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector.coffee'
+import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector.coffee'
 import fakeENV from 'helpers/fakeENV'
-import userSettings from 'compiled/userSettings'
+import userSettings from '@canvas/user-settings'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
 
@@ -110,7 +110,11 @@ function disableCheckbox(id) {
 
 QUnit.module('EditView', {
   setup() {
-    fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
+    fixtures.innerHTML = `
+        <span data-component="ModeratedGradingFormFieldGroup"></span>
+        <input id="annotatable_attachment_id" type="hidden" />
+        <div id="annotated_document_usage_rights_container"></div>
+    `
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
@@ -120,7 +124,8 @@ QUnit.module('EditView', {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
-      COURSE_ID: 1
+      COURSE_ID: 1,
+      ANNOTATED_DOCUMENT_SUBMISSIONS: true
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -186,10 +191,52 @@ test('validates grader count', function () {
 
 test('validates presence of attachment when assignment has type annotatable_attachment', function () {
   const view = this.editView()
-  const data = {submission_types: ['annotated_document']}
+  const data = {submission_types: ['student_annotation']}
   const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentError = errors['online_submission_types[annotated_document]'][0]
+  const annotatedDocumentError = errors['online_submission_types[student_annotation]'][0]
   strictEqual(annotatedDocumentError.message, 'You must attach a file')
+})
+
+test('validates presence of attachment use justification when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#usageRightSelector').val('choose')
+  const data = {submission_types: ['student_annotation']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
+  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
+})
+
+test('validates presence of attachment legal copyright when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#copyrightHolder').val('')
+  const data = {submission_types: ['student_annotation']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
+  strictEqual(
+    annotatedDocumentLegalCopyrightError.message,
+    'You must set document copyright holder'
+  )
+})
+
+test('validates presence of attachment use justification and legal copyright when assignment has type annotatable_attachment', function () {
+  const view = this.editView()
+  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+  view.renderAnnotatedDocumentUsageRightsSelectBox()
+  view.$('#usageRightSelector').val('choose')
+  view.$('#copyrightHolder').val('')
+  const data = {submission_types: ['student_annotation']}
+  const errors = view.validateBeforeSave(data, {})
+  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
+  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
+  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
+  strictEqual(
+    annotatedDocumentLegalCopyrightError.message,
+    'You must set document copyright holder'
+  )
 })
 
 test('does not allow group assignment for large rosters', function () {
@@ -1391,6 +1438,7 @@ test('shows the build button', function () {
 })
 
 test('save routes to cancelLocation', function () {
+  this.view.preventBuildNavigation = true
   equal(this.view.locationAfterSave({}), currentOrigin + '/cancel')
 })
 
@@ -1953,7 +2001,7 @@ QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', hooks => {
   })
 })
 
-QUnit.module('EditView annotatable document submission', hooks => {
+QUnit.module('EditView student annotation submission', hooks => {
   let server
   let view
 
@@ -1961,7 +2009,8 @@ QUnit.module('EditView annotatable document submission', hooks => {
     fixtures.innerHTML = `
       <span data-component="ModeratedGradingFormFieldGroup"></span>
       <div id="annotated_document_chooser_container"></div>
-      <input id="annotated_document_id" type="checkbox"></input>
+      <input id="annotatable_attachment_id" type="checkbox"></input>
+      <div id="annotated_document_usage_rights_container"></div>
     `
 
     fakeENV.setup({
@@ -2002,36 +2051,170 @@ QUnit.module('EditView annotatable document submission', hooks => {
     ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
     view = editView()
     const label = view.$('#assignment_annotated_document').parent()
-    ok(label.text().includes('Annotated Document'))
+    ok(label.text().includes('Student Annotation'))
   })
 
-  QUnit.module('when Annotated Document is selected', function (contextHooks) {
+  test('disables annotatable document option for group assignments', () => {
+    ENV.GROUP_CATEGORIES = [{id: '1', name: 'Group Category #1'}]
+    view = editView({group_category_id: '1'})
+    view.$el.appendTo($('#fixtures'))
+    view.afterRender() // call this because it's called before everything is rendered in the specs
+    const annotatedDocumentCheckbox = view.$el.find('input#assignment_annotated_document')
+
+    strictEqual(annotatedDocumentCheckbox.prop('disabled'), true)
+  })
+
+  QUnit.module('when Student Annotation is selected', function (contextHooks) {
     const filename = 'test.pdf'
+    const serverResponse200 = data => [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(data)
+    ]
     let assignmentOpts
 
     contextHooks.beforeEach(function () {
       ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
-      ENV.ANNOTATED_DOCUMENT = {id: 1, display_name: filename}
-      assignmentOpts = {submissionTypes: ['annotated_document']}
+      ENV.ANNOTATED_DOCUMENT = {
+        id: '1',
+        display_name: filename,
+        context_type: 'Course',
+        context_id: '1'
+      }
+      ENV.context_asset_string = 'course_1'
+      assignmentOpts = {submissionTypes: ['student_annotation']}
+      server = sinon.fakeServer.create()
+    })
+
+    contextHooks.afterEach(() => {
+      server.restore()
+    })
+
+    test('renders a file browser when creating new assignment and defaults to Student Annotation', function () {
+      delete ENV.ANNOTATED_DOCUMENT
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
+      const fileBrowserContainer = document.getElementById('annotated_document_chooser_container')
+      ok(fileBrowserContainer.textContent.includes('Loading'))
     })
 
     test('renders the filename if attachment is present', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       const file = document.querySelector('div#annotated_document_chooser_container span')
       strictEqual(file.textContent, filename)
     })
 
+    test('hide a11y notice when annotated document type is initially unchecked', function () {
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.$el.find('#assignment_annotated_document').prop('checked', false)
+      view.afterRender()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'none')
+    })
+
+    test('show a11y notice if annotated document type is initially checked', function () {
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'block')
+    })
+
+    test('show a11y notice when annotated document type is clicked', function () {
+      assignmentOpts = {submissionTypes: ['online_text_entry']}
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.afterRender()
+      view.$el.find('#assignment_annotated_document').click()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'block')
+    })
+
+    test('hide a11y notice when annotated document type is deselected', function () {
+      assignmentOpts = {submissionTypes: ['online_text_entry']}
+      view = editView(assignmentOpts)
+      view.$el.appendTo($('#fixtures'))
+      view.afterRender()
+      view.$el.find('#assignment_annotated_document').click()
+      view.$el.find('#assignment_annotated_document').click()
+      const info = document.getElementById('assignment_annotated_document_info')
+      strictEqual(getComputedStyle(info).getPropertyValue('display'), 'none')
+    })
+
     test('renders a remove button if attachment is present', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       const button = document.querySelector('div#annotated_document_chooser_container button')
       strictEqual(button.textContent, 'Remove selected attachment')
     })
 
     test('clicking the remove button de-selects the file', function () {
-      editView(assignmentOpts)
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
       document.querySelector('div#annotated_document_chooser_container button').click()
       const container = document.querySelector('div#annotated_document_chooser_container')
       notOk(container.textContent.includes(filename))
+    })
+
+    test('renders the usage rights container properly', function () {
+      const defaultCourseUrl = '/api/v1/files/1?include%5B%5D=usage_rights'
+      const contentLicensesUrl = '/api/v1/courses/1/content_licenses'
+      const fileData = {
+        usage_rights: {
+          use_justification: 'creative_commons',
+          license: 'cc_by',
+          legal_copyright: 'Test copyright'
+        }
+      }
+      const licensesData = [
+        {
+          id: 'public_domain',
+          name: 'Public Domain',
+          url: 'http://en.wikipedia.org/wiki/Public_domain'
+        },
+        {
+          id: 'cc_by',
+          name: 'CC Attribution',
+          url: 'http://creativecommons.org/licenses/by/4.0'
+        },
+        {
+          id: 'cc_by_sa',
+          name: 'CC Attribution Share Alike',
+          url: 'http://creativecommons.org/licenses/by-sa/4.0'
+        }
+      ]
+      server.respondWith('GET', defaultCourseUrl, serverResponse200(fileData))
+      server.respondWith('GET', contentLicensesUrl, serverResponse200(licensesData))
+      editView(assignmentOpts)
+      server.respond()
+      const usageRightSelector = document.querySelector('#usageRightSelector')
+      const creativeCommonsSelection = document.querySelector('#creativeCommonsSelection')
+      const copyrightHolder = document.querySelector('#copyrightHolder')
+      strictEqual(
+        usageRightSelector.options[usageRightSelector.selectedIndex].text,
+        'The material is licensed under Creative Commons'
+      )
+      strictEqual(
+        creativeCommonsSelection.options[creativeCommonsSelection.selectedIndex].text,
+        'CC Attribution'
+      )
+      strictEqual(copyrightHolder.value, 'Test copyright')
+    })
+
+    test('clicking the remove button unmount usage rights container properly', function () {
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.afterRender()
+      document.querySelector('div#annotated_document_chooser_container button').click()
+      const container = document.querySelector('#annotated_document_usage_rights_container')
+      strictEqual(container.innerHTML, '')
     })
   })
 })

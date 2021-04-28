@@ -33,12 +33,18 @@ module Canvas
     end
 
     def config
-      @config ||= @parent.config.to_h.merge(vault_secrets.deep_symbolize_keys)
+      @config ||= @parent.config.to_h.merge(unencrypted_secrets.deep_symbolize_keys).merge(vault_secrets.deep_symbolize_keys)
     end
 
     private
     def options
       @options ||= ActiveSupport::InheritableOptions.new(config)
+    end
+
+    def unencrypted_secrets
+      return {} unless Rails.env.test?
+
+      ConfigFile.load("credentials.#{Rails.env}", nil)
     end
 
     # Don't cache in redis since we are memoizing it in process memory too

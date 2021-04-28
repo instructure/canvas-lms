@@ -66,16 +66,35 @@ describe "/submissions/show_preview" do
       view_context
     end
 
+    it "renders a DocViewer url that includes the submission id when assignment takes file uploads" do
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+      submission = assignment.submit_homework(@user, attachments: [@attachment])
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
+    end
+
+    it "renders multiple DocViewer urls that do not have null attributes because of hash attribute deletions in code" do
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+      another_attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework2.png")
+      submission = assignment.submit_homework(@user, attachments: [@attachment, another_attachment])
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
+      expect(response.body.include?("%22enable_annotations%22:null")).to be false
+    end
+
     it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do
       assignment = @course.assignments.create!(
         annotatable_attachment: @attachment,
-        submission_types: "annotated_document",
+        submission_types: "student_annotation",
         title: "some assignment"
       )
       submission = assignment.submit_homework(
         @user,
-        annotated_document_id: @attachment.id,
-        submission_type: "annotated_document"
+        annotatable_attachment_id: @attachment.id,
+        submission_type: "student_annotation"
       )
       assign(:assignment, assignment)
       assign(:submission, submission)

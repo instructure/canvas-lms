@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Handlebars from 'compiled/handlebars_helpers'
+import Handlebars from '@canvas/handlebars-helpers'
 import $ from 'jquery'
 import _ from 'underscore'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'
-import numberFormat from 'jsx/shared/helpers/numberFormat'
-import tz from 'timezone'
+import numberFormat from '@canvas/i18n/numberFormat'
+import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import chicago from 'timezone/America/Chicago'
 import newYork from 'timezone/America/New_York'

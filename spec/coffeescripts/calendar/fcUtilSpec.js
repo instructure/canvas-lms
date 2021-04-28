@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fcUtil from 'compiled/util/fcUtil'
-import tz from 'timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 
 QUnit.module('Calendar', {

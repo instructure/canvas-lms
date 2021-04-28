@@ -16,10 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Course from 'compiled/models/Course'
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import ToggleShowByView from 'compiled/views/assignments/ToggleShowByView'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView.js'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

@@ -24,6 +24,8 @@
 
 module MicrosoftSync
   class MembershipDiff
+    attr_reader :local_owners
+
     def initialize(remote_members, remote_owners)
       @remote_members = Set.new(remote_members)
       @remote_owners = Set.new(remote_owners)

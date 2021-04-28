@@ -118,11 +118,13 @@ module MicrosoftSync
       }
       request(:post, 'teams', body: body)
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      if e.response_body =~ /must have one or more owners in order to create a Team/
-        raise MicrosoftSync::Errors::GroupHasNoOwners
-      end
+      raise unless e.response_body =~ /must have one or more owners in order to create a Team/i
 
-      raise
+      raise MicrosoftSync::Errors::GroupHasNoOwners
+    rescue MicrosoftSync::Errors::HTTPConflict => e
+      raise unless e.response_body =~ /group is already provisioned/i
+
+      raise MicrosoftSync::Errors::TeamAlreadyExists
     end
 
     # === Users ===
@@ -142,9 +144,9 @@ module MicrosoftSync
       end
 
       url = path.start_with?('https:') ? path : BASE_URL + path
-      Rails.logger.debug("MicrosoftSync::GraphClient: #{method} #{url}")
+      Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{url}")
 
-      response = Canvas.timeout_protection("microsoft_sync_graph") do
+      response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         HTTParty.send(method, url, options)
       end
 

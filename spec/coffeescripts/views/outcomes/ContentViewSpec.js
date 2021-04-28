@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
-import ContentView from 'compiled/views/outcomes/ContentView'
+import Backbone from '@canvas/backbone'
+import ContentView from '@canvas/outcome-content-view'
 import fakeENV from 'helpers/fakeENV'
-import instructionsTemplate from 'jst/outcomes/mainInstructions'
+import instructionsTemplate from 'ui/features/learning_outcomes/jst/mainInstructions.handlebars'
 import assertions from 'helpers/assertions'
-import {publish} from 'vendor/jquery.ba-tinypubsub'
+import {publish} from 'jquery-tinypubsub'
 
 QUnit.module('CollectionView', {
   setup() {
