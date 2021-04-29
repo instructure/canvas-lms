@@ -531,7 +531,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     context 'attachments' do
-      it 'retries attachments if they fail to upload' do
+      it 'does not retry attachments if they fail to upload' do
         submission = assignment.submit_homework(
           @user,
           {
@@ -549,8 +549,7 @@ describe BasicLTI::BasicOutcomes do
           expect(submission.reload.versions.count).to eq 2
           expect(submission.attachments.count).to eq 1
           expect(submission.attachments.first.file_state).to eq 'errored'
-          expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
-          expect(Delayed::Job.find_by(strand: 'file_download/example.com').run_at).to be > Time.zone.now + 5.seconds
+          expect(Delayed::Job.strand_size('file_download/example.com')).to be 0
         end
       end
     end
