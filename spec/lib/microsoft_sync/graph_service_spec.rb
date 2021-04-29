@@ -29,16 +29,19 @@ describe MicrosoftSync::GraphService do
   before do
     WebMock.disable_net_connect!
     allow(MicrosoftSync::LoginService).to receive(:token).with('mytenant').and_return('mytoken')
-    if with_params.empty?
-      WebMock.stub_request(http_method, url).and_return(response)
-    else
-      WebMock.stub_request(http_method, url).with(with_params).and_return(response)
+    if url
+      if with_params.empty?
+        WebMock.stub_request(http_method, url).and_return(response)
+      else
+        WebMock.stub_request(http_method, url).with(with_params).and_return(response)
+      end
     end
   end
 
   after { WebMock.enable_net_connect! }
 
   let(:service) { described_class.new('mytenant') }
+  let(:url) { nil }
 
   let(:response) { json_response(200, response_body) }
   let(:with_params) { {} }
@@ -285,11 +288,15 @@ describe MicrosoftSync::GraphService do
     it_behaves_like 'a graph service endpoint'
   end
 
-  describe '#add_users_to_group' do
-    subject { service.add_users_to_group('msgroupid', members: members, owners: owners) }
+  describe '#add_users_to_group_ignore_duplicates' do
+    subject do
+      service.add_users_to_group_ignore_duplicates(
+        'msgroupid', members: members, owners: owners
+      )
+    end
 
-    let(:members) { %w[m1 m2] }
-    let(:owners) { %w[o1 o2] }
+    let(:members) { Set.new %w[m1 m2] }
+    let(:owners) { Set.new %w[o1 o2] }
 
     let(:http_method) { :patch }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
@@ -308,10 +315,12 @@ describe MicrosoftSync::GraphService do
     end
     let(:response) { {status: 204, body: ''} }
 
+    it_behaves_like 'a graph service endpoint'
+
     it { is_expected.to eq(nil) }
 
     context 'when members is not given' do
-      subject { service.add_users_to_group('msgroupid', owners: owners) }
+      subject { service.add_users_to_group_ignore_duplicates('msgroupid', owners: owners) }
 
       let(:req_body) { super().slice('owners@odata.bind') }
 
@@ -319,7 +328,7 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when owners is not given' do
-      subject { service.add_users_to_group('msgroupid', members: members) }
+      subject { service.add_users_to_group_ignore_duplicates('msgroupid', members: members) }
 
       let(:req_body) { super().slice('members@odata.bind') }
 
@@ -328,13 +337,13 @@ describe MicrosoftSync::GraphService do
 
     context 'when members and owners are not given' do
       it 'raises an ArgumentError' do
-        expect { service.add_users_to_group('msgroupid') }.to \
-          raise_error(ArgumentError, 'Missing users to add to group')
+        expect { service.add_users_to_group_ignore_duplicates('msgroupid') }.to \
+          raise_error(ArgumentError, 'Missing members/owners')
       end
     end
 
     context 'when 20 users are given' do
-      subject { service.add_users_to_group('msgroupid', members: (1..20).map(&:to_s)) }
+      subject { service.add_users_to_group_ignore_duplicates('msgroupid', members: (1..20).map(&:to_s)) }
 
       let(:req_body) do
         {
@@ -349,14 +358,115 @@ describe MicrosoftSync::GraphService do
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
-          service.add_users_to_group('msgroupid', members: ['x'] * 10, owners: ['y'] * 11)
+          service.add_users_to_group_ignore_duplicates(
+            'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
+          )
         }.to raise_error(
-          ArgumentError, "Only 20 users can be added at once. Got 21."
+          ArgumentError, "Only 20 users can be batched at once. Got 21."
         )
       end
     end
 
-    it_behaves_like 'a graph service endpoint'
+    context 'when using JSON batching because some users already exist' do
+      let(:response) { {status: 400, body: 'One or more added object references already exist'} }
+      let(:batch_url) { 'https://graph.microsoft.com/v1.0/$batch' }
+      let(:batch_method) { :post }
+      let(:batch_body) do
+        {
+          requests: [
+            {
+              id: "members_m1", url: "/groups/msgroupid/members/$ref", method: "POST",
+              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m1" },
+              headers: { "Content-Type": "application/json" }
+            },
+            {
+              id: "members_m2", url: "/groups/msgroupid/members/$ref", method: "POST",
+              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m2" },
+              headers: { "Content-Type": "application/json" }
+            },
+            {
+              id: "owners_o1", url: "/groups/msgroupid/owners/$ref", method: "POST",
+              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o1" },
+              headers: { "Content-Type": "application/json" }
+            },
+            {
+              id: "owners_o2", url: "/groups/msgroupid/owners/$ref", method: "POST",
+              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o2" },
+              headers: { "Content-Type": "application/json" }
+            }
+          ]
+        }
+      end
+
+      def succ(id)
+        {id: id, status: 204, body: nil}
+      end
+
+      def err(id)
+        {id: id, status: 400, body: "bad"}
+      end
+
+      def dupe(id)
+        err_msg = "One or more added object references already exist for the following modified properties: 'members'."
+        {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: err_msg}}}
+      end
+
+      before do
+        stub_request(batch_method, batch_url).with(body: batch_body)
+          .to_return(json_response(200, responses: batch_responses.shuffle))
+      end
+
+      context 'when all are successfully added' do
+        let(:batch_responses) do
+          [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
+        end
+
+        it { is_expected.to eq(nil) }
+      end
+
+      context 'when some owners were already in the group' do
+        let(:batch_responses) do
+          [succ('members_m1'), succ('members_m2'), succ('owners_o1'), dupe('owners_o2')]
+        end
+
+        it 'returns a hash with an array with those users' do
+          expect(subject.transform_values(&:sort)).to eq(owners: %w[o2])
+        end
+      end
+
+      context 'when some members were already in the group' do
+        let(:batch_responses) do
+          [dupe('members_m1'), dupe('members_m2'), succ('owners_o1'), succ('owners_o2')]
+        end
+
+        it 'returns a hash with an array with those users' do
+          expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
+        end
+      end
+
+      context 'when some members and owners were already in the group' do
+        let(:batch_responses) do
+          [dupe('members_m1'), succ('members_m2'), dupe('owners_o1'), dupe('owners_o2')]
+        end
+
+        it 'returns a hash with arrays with those users' do
+          expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
+        end
+      end
+
+      context 'when some users failed for some other reason' do
+        let(:batch_responses) do
+          [dupe('members_m1'), err('members_m2'), err('owners_o1'), dupe('owners_o2')]
+        end
+
+        it 'raises a BatchRequestFailed error' do
+          expect { subject }.to raise_error(
+            described_class::BatchRequestFailed,
+            'Batch of 2: codes [400, 400], bodies ["bad", "bad"]'
+          )
+        end
+      end
+    end
   end
 
   describe '#get_group' do
@@ -395,28 +505,117 @@ describe MicrosoftSync::GraphService do
     it_behaves_like 'a paginated list endpoint'
   end
 
-  describe '#remove_group_member' do
-    subject { service.remove_group_member('mygroup', 'myuser') }
+  describe '#remove_group_users_ignore_missing' do
+    subject do
+      service.remove_group_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
+    end
 
-    let(:http_method) { :delete }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/members/myuser/$ref' }
-    let(:response) { {status: 204, body: ''} }
+    let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
+    let(:http_method) { :post }
+    let(:with_params) do
+      {
+        body: {
+          requests: [
+            { id: "members_m1", url: "/groups/msgroupid/members/m1/$ref", method: "DELETE" },
+            { id: "members_m2", url: "/groups/msgroupid/members/m2/$ref", method: "DELETE" },
+            { id: "owners_o1", url: "/groups/msgroupid/owners/o1/$ref", method: "DELETE" },
+            { id: "owners_o2", url: "/groups/msgroupid/owners/o2/$ref", method: "DELETE" }
+          ]
+        }
+      }
+    end
+    let(:response_body) { {responses: subresponses.shuffle} }
+    let(:subresponses) { [] }
 
-    it { is_expected.to eq(nil) }
+    def succ(id)
+      {id: id, status: 204, body: nil}
+    end
 
-    it_behaves_like 'a graph service endpoint'
-  end
+    def err(id)
+      {id: id, status: 400, body: "bad"}
+    end
 
-  describe '#remove_group_owner' do
-    subject { service.remove_group_owner('mygroup', 'myuser') }
+    def missing(id)
+      err_msg = "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of " \
+        "its queried reference-property objects are not present."
+      {id: id, status: 404, body: {error: {code: "Request_ResourceNotFound", msg: err_msg}}}
+    end
 
-    let(:http_method) { :delete }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners/myuser/$ref' }
-    let(:response) { {status: 204, body: ''} }
+    # This style seems to happen if we remove with the API after (right after?) removing from the UI
+    def missing2(id)
+      msg = "One or more removed object references do not exist for the following " \
+            "modified properties: 'members'."
+      {id: id, status: 400, body: {error: {code:"Request_BadRequest", message: msg}}}
+    end
 
-    it { is_expected.to eq(nil) }
+    context 'when all are successfully removed' do
+      let(:subresponses) { [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')] }
 
-    it_behaves_like 'a graph service endpoint'
+      it { is_expected.to eq(nil) }
+    end
+
+    context 'when some owners were not in the group' do
+      let(:subresponses) do
+        [succ('members_m1'), succ('members_m2'), succ('owners_o1'), missing('owners_o2')]
+      end
+
+      it 'returns a hash with an array with those users' do
+        expect(subject.transform_values(&:sort)).to eq(owners: %w[o2])
+      end
+    end
+
+    context 'when some members were not in the group' do
+      let(:subresponses) do
+        [missing('members_m1'), missing('members_m2'), succ('owners_o1'), succ('owners_o2')]
+      end
+
+      it 'returns a hash with an array with those users' do
+        expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
+      end
+    end
+
+    context 'when some members were not in the group' do
+      let(:subresponses) do
+        [missing2('members_m1'), missing2('members_m2'), succ('owners_o1'), succ('owners_o2')]
+      end
+
+      it 'returns a hash with an array with those users' do
+        expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
+      end
+    end
+
+    context 'when some members and owners were not in the group' do
+      let(:subresponses) do
+        [missing('members_m1'), succ('members_m2'), missing('owners_o1'), missing('owners_o2')]
+      end
+
+      it 'returns a hash with arrays with those users' do
+        expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
+      end
+    end
+
+    context 'when some users failed for some other reason' do
+      let(:subresponses) do
+        [missing('members_m1'), err('members_m2'), err('owners_o1'), missing('owners_o2')]
+      end
+
+      it 'raises a BatchRequestFailed error' do
+        expect { subject }.to raise_error(
+          described_class::BatchRequestFailed,
+          'Batch of 2: codes [400, 400], bodies ["bad", "bad"]'
+        )
+      end
+    end
+
+    context 'when more than 20 users are given' do
+      it 'raises an ArgumentError' do
+        expect {
+          service.remove_group_users_ignore_missing(
+            'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
+          )
+        }.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
+      end
+    end
   end
 
   describe '#get_team' do

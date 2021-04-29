@@ -38,6 +38,9 @@ module MicrosoftSync
     MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
     MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
 
+    STATSD_NAME_SKIPPED_BATCHES = "microsoft_sync.syncer_steps.skipped_batches"
+    STATSD_NAME_SKIPPED_TOTAL = "microsoft_sync.syncer_steps.skipped_total"
+
     # SyncCanceled errors are semi-expected errors -- so we raise them they will
     # cleanup_after_failure but not produce a failed job.
     class SyncCanceled < Errors::PublicError
@@ -172,6 +175,16 @@ module MicrosoftSync
       StateMachineJob::Retry.new(error: e, **STANDARD_RETRY_DELAY)
     end
 
+    def log_batch_skipped(type, users)
+      return unless users # GraphService batch functions return nil if all succesful
+
+      n_total = users.values.map(&:length).sum
+      Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
+                        "Skipping #{type} for #{n_total}: #{users.to_json}")
+      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}")
+      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total)
+    end
+
     # Run the API calls to add/remove users.
     def step_execute_diff(diff, _job_state_data)
       # TODO: If there are no instructor enrollments, we actually want to
@@ -185,20 +198,22 @@ module MicrosoftSync
       raise_max_enrollment_members_reached if diff.max_enrollment_members_reached?
       raise_max_enrollment_owners_reached if diff.max_enrollment_owners_reached?
 
-      batch_size = GraphService::GROUP_USERS_ADD_BATCH_SIZE
+      batch_size = GraphService::GROUP_USERS_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
-        graph_service.add_users_to_group(group.ms_group_id, members_and_owners)
+        log_batch_skipped(
+          :add,
+          graph_service.add_users_to_group_ignore_duplicates(group.ms_group_id, members_and_owners)
+        )
       end
 
       # Microsoft will not let you remove the last owner in a group, so it's
-      # slightly safer to remove owners last in case we need to completely
+      # slightly safer to remove users last in case we need to completely
       # change owners.
-      diff.members_to_remove.each do |aad|
-        graph_service.remove_group_member(group.ms_group_id, aad)
-      end
-
-      diff.owners_to_remove.each do |aad|
-        graph_service.remove_group_owner(group.ms_group_id, aad)
+      diff.removals_in_slices_of(batch_size) do |members_and_owners|
+        log_batch_skipped(
+          :remove,
+          graph_service.remove_group_users_ignore_missing(group.ms_group_id, members_and_owners)
+        )
       end
 
       StateMachineJob::NextStep.new(:step_check_team_exists)

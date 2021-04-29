@@ -477,34 +477,80 @@ describe MicrosoftSync::SyncerSteps do
     before do
       group.update!(ms_group_id: 'mygroup')
 
-      allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
-      allow(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
       allow(diff).to receive(:max_enrollment_members_reached?).and_return(false)
       allow(diff).to receive(:max_enrollment_owners_reached?).and_return(false)
       allow(diff).to \
-        receive(:additions_in_slices_of).
-        with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
-        and_yield(owners: %w[o3], members: %w[o1 o2]).
-        and_yield(members: %w[o3])
+        receive(:additions_in_slices_of)
+        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
+        .and_yield(owners: %w[o3], members: %w[o1 o2])
+        .and_yield(members: %w[o3])
+      allow(diff).to \
+        receive(:removals_in_slices_of)
+        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
+        .and_yield(owners: %w[o1], members: %w[m1 m2])
+        .and_yield(members: %w[m3])
+      allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
 
       allow(diff).to receive(:local_owners).and_return Set.new(%w[o3])
     end
 
     it 'adds/removes users based on the diff' do
-      expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm1')
-      expect(graph_service).to receive(:remove_group_member).once.with('mygroup', 'm2')
-      expect(graph_service).to receive(:remove_group_owner).once.with('mygroup', 'o1')
-      expect(graph_service).to \
-        receive(:add_users_to_group).with('mygroup', owners: %w[o3], members: %w[o1 o2])
-      expect(graph_service).to \
-        receive(:add_users_to_group).with('mygroup', members: %w[o3])
+      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        .with('mygroup', owners: %w[o3], members: %w[o1 o2])
+      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        .with('mygroup', members: %w[o3])
+      expect(graph_service).to receive(:remove_group_users_ignore_missing)
+        .with('mygroup', members: %w[m1 m2], owners: %w[o1])
+      expect(graph_service).to receive(:remove_group_users_ignore_missing)
+        .with('mygroup', members: %w[m3])
 
       expect_next_step(subject, :step_check_team_exists)
     end
 
+    context 'when some users to be added already exist in the group' do
+      it 'logs and increments statsd metrics' do
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+          .twice.and_return(members: %w[o3], owners: %w[o1 o2])
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+
+        allow(Rails.logger).to receive(:warn)
+        allow(InstStatsd::Statsd).to receive(:increment)
+
+        expect_next_step(subject, :step_check_team_exists)
+
+        expect(Rails.logger).to have_received(:warn).twice
+          .with(/Skipping add for 3: .*(o3.*o2|o2.*o3)/)
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+          .with("microsoft_sync.syncer_steps.skipped_batches.add")
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+          .with("microsoft_sync.syncer_steps.skipped_total.add", 3)
+      end
+    end
+
+    context "when some users to be removed don't exist in the group" do
+      it 'logs and increments statsd metrics' do
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        expect(graph_service).to receive(:remove_group_users_ignore_missing)
+          .twice.and_return(owners: %w[m2 m3])
+
+        allow(Rails.logger).to receive(:warn)
+        allow(InstStatsd::Statsd).to receive(:increment)
+
+        expect_next_step(subject, :step_check_team_exists)
+
+        expect(Rails.logger).to have_received(:warn).twice
+          .with(/Skipping remove for 2: .*(m2.*m3|m3.*m2)/)
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+          .with("microsoft_sync.syncer_steps.skipped_batches.remove")
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+          .with("microsoft_sync.syncer_steps.skipped_total.remove", 2)
+      end
+    end
+
     context 'on 404' do
       it 'goes back to step_generate_diff with a delay' do
-        expect(graph_service).to receive(:add_users_to_group).and_raise(new_http_error(404))
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+          .and_raise(new_http_error(404))
         expect_retry(
           subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
           delay_amount: [5, 20, 100], step: :step_generate_diff
