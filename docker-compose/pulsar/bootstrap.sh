@@ -47,3 +47,9 @@ bin/pulsar-admin --admin-url $ADMIN_URL tenants create canvas
 # the application.
 bin/pulsar-admin --admin-url $ADMIN_URL namespaces create canvas/test-only
 bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m canvas/test-only
+# namespaces for specific use cases within canvas that will be tested
+# via integration with the message bus (both manually and in specs)
+# should be added here so that they exist when you need them, kind of
+# like database migrations.
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces create canvas/asset_user_access_log
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m canvas/asset_user_access_log
