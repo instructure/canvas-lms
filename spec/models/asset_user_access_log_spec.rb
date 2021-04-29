@@ -37,6 +37,54 @@ describe AssetUserAccessLog do
       AssetUserAccessLog.put_view(@asset, timestamp: dt)
       expect(AssetUserAccessLog::AuaLog5.count).to eq(1)
     end
+
+    describe "via message bus" do
+
+      before(:each) do
+        skip("pulsar config required to test") unless MessageBus.enabled?
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return({
+          "pulsar_writes_enabled" => true,
+          "pulsar_reads_enabled" => false
+        })
+      end
+
+      after(:each) do
+        MessageBus.reset!
+      end
+
+      it "sends any log writes to the database AND to the message bus" do
+        dt = DateTime.civil(2021, 4, 29, 12, 0, 0) # a thursday, index 4
+        AssetUserAccessLog::AuaLog4.delete_all
+        subscription_name = "test"
+        # clear mb topic
+        pre_consumer = MessageBus.consumer_for(
+          AssetUserAccessLog::PULSAR_NAMESPACE,
+          AssetUserAccessLog.message_bus_topic_name(Shard.current),
+          subscription_name
+        )
+        begin
+          while (message = pre_consumer.receive(200)) do
+            pre_consumer.acknowledge(message)
+          end
+        rescue Pulsar::Error::Timeout
+          # subscription is caught up
+          MessageBus.reset!
+        end
+        AssetUserAccessLog.put_view(@asset, timestamp: dt)
+        expect(AssetUserAccessLog::AuaLog4.count).to eq(1)
+        record = AssetUserAccessLog::AuaLog4.last
+        consumer = MessageBus.consumer_for(
+          AssetUserAccessLog::PULSAR_NAMESPACE,
+          AssetUserAccessLog.message_bus_topic_name(Shard.current),
+          subscription_name
+        )
+        message = consumer.receive(1000)
+        data = JSON.parse(message.data)
+        expect(data["asset_user_access_id"]).to eq(record.asset_user_access_id)
+        expect(data["log_entry_id"]).to eq(record.id)
+        expect(data["partition_index"]).to eq(4)
+      end
+    end
   end
 
   describe ".compact" do
@@ -215,4 +263,5 @@ describe AssetUserAccessLog do
       expect(Delayed::Job.where(strand: AssetUserAccessLog.strand_name).count).to eq(1)
     end
   end
+
 end
