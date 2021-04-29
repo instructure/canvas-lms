@@ -149,6 +149,7 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onDelete = () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
@@ -212,10 +213,8 @@ export const DiscussionThreadContainer = props => {
                 onOpenInSpeedGrader={
                   canGrade
                     ? () => {
-                        window.location.href = getSpeedGraderUrl(
-                          ENV.course_id,
-                          props.assignment._id,
-                          props.author._id
+                        window.location.assign(
+                          getSpeedGraderUrl(ENV.course_id, props.assignment._id, props.author._id)
                         )
                       }
                     : null

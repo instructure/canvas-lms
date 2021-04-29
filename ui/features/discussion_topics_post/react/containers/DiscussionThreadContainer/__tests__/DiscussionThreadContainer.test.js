@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
 import {fireEvent, render} from '@testing-library/react'
+import {getSpeedGraderUrl} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -31,7 +32,14 @@ describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
+  const assignMock = jest.fn()
   beforeAll(() => {
+    delete window.location
+    window.location = {assign: assignMock}
+    window.ENV = {
+      course_id: '1'
+    }
+
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
@@ -41,6 +49,7 @@ describe('DiscussionThreadContainer', () => {
     server.resetHandlers()
     onFailureStub.mockClear()
     onSuccessStub.mockClear()
+    assignMock.mockClear()
   })
 
   afterAll(() => {
@@ -221,9 +230,10 @@ describe('DiscussionThreadContainer', () => {
 
   describe('SpeedGrader', () => {
     it('Should be able to open SpeedGrader', async () => {
-      const {getByTestId, findByText} = setup(
+      const {getByTestId} = setup(
         defaultProps({
           assignment: {
+            _id: '1337',
             dueAt: '2021-04-05T13:40:50Z',
             pointsPossible: 5
           }
@@ -234,9 +244,7 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(
-          findByText('This student does not have a submission for this assignment')
-        ).toBeTruthy()
+        expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337', '1'))
       })
     })
 
