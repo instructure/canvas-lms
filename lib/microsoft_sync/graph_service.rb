@@ -34,6 +34,10 @@ module MicrosoftSync
     GROUP_USERS_ADD_BATCH_SIZE = 20
     STATSD_PREFIX = 'microsoft_sync.graph_service'
 
+    class ApplicationNotAuthorizedForTenant < StandardError
+      include Errors::GracefulCancelErrorMixin
+    end
+
     attr_reader :tenant
 
     def initialize(tenant)
@@ -60,7 +64,8 @@ module MicrosoftSync
     def add_users_to_group(group_id, members: [], owners: [])
       raise ArgumentError, 'Missing users to add to group' if members.empty? && owners.empty?
       if (n_total_additions = members.length + owners.length) > GROUP_USERS_ADD_BATCH_SIZE
-        raise ArgumentError, "Only 20 users can be added at once. Got #{n_total_additions}."
+        raise ArgumentError, "Only #{GROUP_USERS_ADD_BATCH_SIZE} users can be added at " \
+          "once. Got #{n_total_additions}."
       end
 
       body = {}
@@ -158,7 +163,9 @@ module MicrosoftSync
         end
       end
 
-      unless (200..299).cover?(response.code)
+      if application_not_authorized_response?(response)
+        raise ApplicationNotAuthorizedForTenant
+      elsif !(200..299).cover?(response.code)
         raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
           service: 'graph', tenant: tenant, response: response
         )
@@ -174,6 +181,16 @@ module MicrosoftSync
     end
 
     private
+
+    def application_not_authorized_response?(response)
+      (
+        response.code == 401 &&
+        response.body.include?('The identity of the calling application could not be established.')
+      ) || (
+        response.code == 403 &&
+        response.body.include?('Required roles claim values are not provided')
+      )
+    end
 
     def statsd_name(error=nil)
       name = case error
