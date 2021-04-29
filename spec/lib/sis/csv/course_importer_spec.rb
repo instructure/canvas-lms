@@ -867,6 +867,48 @@ describe SIS::CSV::CourseImporter do
       expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
     end
 
+    describe "homeroom_course setting" do
+      it "creates course with homeroom_course setting" do
+        process_csv_data_cleanly(
+          "course_id,short_name,long_name,account_id,term_id,status,homeroom_course",
+          "test_1,TC 101,Test Course 101,,,active,true",
+          "test_2,TC 102,Test Course 102,,,active,0",
+          "test_3,TC 103,Test Course 103,,,active,"
+        )
+        expect(Course.where(sis_source_id: 'test_1').take).to be_homeroom_course
+        expect(Course.where(sis_source_id: 'test_2').take).not_to be_homeroom_course
+        expect(Course.where(sis_source_id: 'test_3').take).not_to be_homeroom_course
+      end
+
+      it "updates homeroom course setting" do
+        course1 = @account.courses.create!(sis_source_id: "test_1")
+        course1.homeroom_course = true
+        course1.save!
+        course2 = @account.courses.create!(sis_source_id: "test_2")
+        process_csv_data_cleanly(
+          "course_id,short_name,long_name,account_id,term_id,status,homeroom_course",
+          "test_1,TC 101,Test Course 101,,,active,false",
+          "test_2,TC 101,Test Course 101,,,active,1",
+        )
+        expect(course1.reload).not_to be_homeroom_course
+        expect(course2.reload).to be_homeroom_course
+      end
+
+      it "leaves the setting unchanged if not provided in csv" do
+        course1 = @account.courses.create!(sis_source_id: "test_1")
+        course1.homeroom_course = true
+        course1.save!
+        course2 = @account.courses.create!(sis_source_id: "test_2")
+        process_csv_data_cleanly(
+          "course_id,short_name,long_name,account_id,term_id,status",
+          "test_1,TC 101,Test Course 101,,,active",
+          "test_2,TC 101,Test Course 101,,,active",
+        )
+        expect(course1.reload).to be_homeroom_course
+        expect(course2.reload).not_to be_homeroom_course
+      end
+    end
+
     it "applies an account's course template" do
       @account.root_account.enable_feature!(:course_templates)
       template = @account.courses.create!(name: 'Template Course', template: true)

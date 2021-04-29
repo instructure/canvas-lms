@@ -547,6 +547,20 @@ Requires Blueprint Courses feature.
 To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
 </td>
 </tr>
+<tr>
+<td>grade_passback_setting</td>
+<td>text</td>
+<td></td>
+<td>✓</td>
+<td>nightly_sync, not_set</td>
+</tr>
+<tr>
+<td>homeroom_course</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>Whether the course is a homeroom course. Requires the "Canvas for Elementary" feature to be enabled.</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will
