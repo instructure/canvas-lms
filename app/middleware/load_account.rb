@@ -41,7 +41,7 @@ class LoadAccount
   end
 
   def call(env)
-    check_schema_cache
+    self.class.check_schema_cache
     domain_root_account = ::LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
