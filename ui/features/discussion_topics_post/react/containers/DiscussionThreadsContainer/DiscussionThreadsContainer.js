@@ -61,12 +61,12 @@ export const DiscussionThreadsContainer = props => {
         marginTop: '1.5rem'
       }}
     >
-      {threads?.map(r => {
+      {threads?.map(thread => {
         return (
           <DiscussionThreadContainer
-            key={`discussion-thread-${r.id}`}
+            key={`discussion-thread-${thread.id}`}
             assignment={props.discussionTopic?.assignment}
-            {...r}
+            discussionEntry={thread}
           />
         )
       })}

@@ -58,43 +58,46 @@ describe('DiscussionThreadContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const defaultProps = overrides => {
+  const defaultProps = ({discussionEntryOverrides = {}, assignment = undefined} = {}) => {
     return {
-      _id: '49',
-      id: '49',
-      createdAt: '2021-04-05T13:40:50-06:00',
-      updatedAt: '2021-04-05T13:40:50-06:00',
-      deleted: false,
-      message: '<p>This is the parent reply</p>',
-      ratingCount: null,
-      ratingSum: null,
-      rating: false,
-      read: true,
-      subentriesCount: 1,
-      rootEntryParticipantCounts: {
-        unreadCount: 1,
-        repliesCount: 1
-      },
-      author: {
-        _id: '1',
-        id: 'VXNlci0x',
-        avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-        name: 'Matthew Lemon'
-      },
-      editor: null,
-      lastReply: {
-        createdAt: '2021-04-05T13:41:42-06:00'
-      },
-      permissions: {
-        attach: true,
-        create: true,
-        delete: true,
-        rate: true,
+      discussionEntry: {
+        _id: '49',
+        id: '49',
+        createdAt: '2021-04-05T13:40:50-06:00',
+        updatedAt: '2021-04-05T13:40:50-06:00',
+        deleted: false,
+        message: '<p>This is the parent reply</p>',
+        ratingCount: null,
+        ratingSum: null,
+        rating: false,
         read: true,
-        reply: true,
-        update: true
+        subentriesCount: 1,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1
+        },
+        author: {
+          _id: '1',
+          id: 'VXNlci0x',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+          name: 'Matthew Lemon'
+        },
+        editor: null,
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00'
+        },
+        permissions: {
+          attach: true,
+          create: true,
+          delete: true,
+          rate: true,
+          read: true,
+          reply: true,
+          update: true
+        },
+        ...discussionEntryOverrides
       },
-      ...overrides
+      assignment
     }
   }
 

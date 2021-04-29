@@ -42,21 +42,23 @@ import {View} from '@instructure/ui-view'
 import {isGraded, getSpeedGraderUrl} from '../../utils'
 
 export const mockThreads = {
-  id: '432',
-  author: {
-    name: 'Jeffrey Johnson',
-    avatarUrl: 'someURL'
-  },
-  createdAt: '2021-02-08T13:36:05-07:00',
-  message:
-    '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
-  read: true,
-  lastReply: null,
-  rootEntryParticipantCounts: {
-    unreadCount: 0,
-    repliesCount: 0
-  },
-  subentriesCount: 0
+  discussionEntry: {
+    id: '432',
+    author: {
+      name: 'Jeffrey Johnson',
+      avatarUrl: 'someURL'
+    },
+    createdAt: '2021-02-08T13:36:05-07:00',
+    message:
+      '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
+    read: true,
+    lastReply: null,
+    rootEntryParticipantCounts: {
+      unreadCount: 0,
+      repliesCount: 0
+    },
+    subentriesCount: 0
+  }
 }
 
 export const DiscussionThreadContainer = props => {
@@ -91,8 +93,8 @@ export const DiscussionThreadContainer = props => {
   const toggleRating = () => {
     updateDiscussionEntryParticipant({
       variables: {
-        discussionEntryId: props._id,
-        rating: props.rating ? 'not_liked' : 'liked'
+        discussionEntryId: props.discussionEntry._id,
+        rating: props.discussionEntry.rating ? 'not_liked' : 'liked'
       }
     })
   }
@@ -100,8 +102,8 @@ export const DiscussionThreadContainer = props => {
   const toggleUnread = () => {
     updateDiscussionEntryParticipant({
       variables: {
-        discussionEntryId: props._id,
-        read: !props.read
+        discussionEntryId: props.discussionEntry._id,
+        read: !props.discussionEntry.read
       }
     })
   }
@@ -110,11 +112,11 @@ export const DiscussionThreadContainer = props => {
   const replyMarginDepth = `calc(3.75rem * (${props.depth + 1}))`
 
   const threadActions = []
-  if (!props.deleted) {
+  if (!props.discussionEntry.deleted) {
     threadActions.push(
       <ThreadingToolbar.Reply
-        key={`reply-${props.id}`}
-        delimiterKey={`reply-delimiter-${props.id}`}
+        key={`reply-${props.discussionEntry.id}`}
+        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
           setEditorExpanded(!editorExpanded)
         }}
@@ -122,25 +124,25 @@ export const DiscussionThreadContainer = props => {
     )
     threadActions.push(
       <ThreadingToolbar.Like
-        key={`like-${props.id}`}
-        delimiterKey={`like-delimiter-${props.id}`}
+        key={`like-${props.discussionEntry.id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={toggleRating}
-        isLiked={props.rating}
-        likeCount={props.ratingSum || 0}
+        isLiked={props.discussionEntry.rating}
+        likeCount={props.discussionEntry.ratingSum || 0}
       />
     )
   }
 
-  const createdAt = DateHelper.formatDatetimeForDiscussions(props.createdAt)
+  const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
 
-  if (props.depth === 0 && props.lastReply) {
+  if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
-        key={`expand-${props.id}`}
-        delimiterKey={`expand-delimiter-${props.id}`}
+        key={`expand-${props.discussionEntry.id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
         expandText={I18n.t('%{replies} replies, %{unread} unread', {
-          replies: props.rootEntryParticipantCounts?.repliesCount,
-          unread: props.rootEntryParticipantCounts?.unreadCount
+          replies: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+          unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
         })}
         onClick={() => setExpandReplies(!expandReplies)}
         isExpanded={expandReplies}
@@ -153,15 +155,17 @@ export const DiscussionThreadContainer = props => {
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
-          id: props._id
+          id: props.discussionEntry._id
         }
       })
     }
   }
 
   const renderPostMessage = () => {
-    if (props.deleted) {
-      const name = props.editor ? props.editor.name : props.author.name
+    if (props.discussionEntry.deleted) {
+      const name = props.discussionEntry.editor
+        ? props.discussionEntry.editor.name
+        : props.discussionEntry.author.name
       return (
         <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
@@ -170,14 +174,14 @@ export const DiscussionThreadContainer = props => {
     } else {
       return (
         <PostMessage
-          authorName={props.author.name}
-          avatarUrl={props.author.avatarUrl}
+          authorName={props.discussionEntry.author.name}
+          avatarUrl={props.discussionEntry.author.avatarUrl}
           lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-            props.lastReply?.createdAt
+            props.discussionEntry.lastReply?.createdAt
           )}
           timingDisplay={createdAt}
-          message={props.message}
-          isUnread={!props.read}
+          message={props.discussionEntry.message}
+          isUnread={!props.discussionEntry.read}
           isEditing={isEditing}
           onCancel={() => {
             setIsEditing(false)
@@ -190,7 +194,8 @@ export const DiscussionThreadContainer = props => {
   }
 
   // TODO: Change this to the new canGrade permission.
-  const canGrade = (isGraded(props.assignment) && props.permissions?.update) || false
+  const canGrade =
+    (isGraded(props.assignment) && props.discussionEntry.permissions?.update) || false
 
   return (
     <>
@@ -199,14 +204,14 @@ export const DiscussionThreadContainer = props => {
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}
           </Flex.Item>
-          {!props.deleted && (
+          {!props.discussionEntry.deleted && (
             <Flex.Item align="stretch">
               <ThreadActions
-                id={props.id}
-                isUnread={!props.read}
+                id={props.discussionEntry.id}
+                isUnread={!props.discussionEntry.read}
                 onToggleUnread={toggleUnread}
                 onMarkAllAsUnread={() => {}}
-                onDelete={props.permissions?.delete ? onDelete : null}
+                onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
                 onEdit={() => {
                   setIsEditing(true)
                 }}
@@ -214,7 +219,11 @@ export const DiscussionThreadContainer = props => {
                   canGrade
                     ? () => {
                         window.location.assign(
-                          getSpeedGraderUrl(ENV.course_id, props.assignment._id, props.author._id)
+                          getSpeedGraderUrl(
+                            ENV.course_id,
+                            props.assignment._id,
+                            props.discussionEntry.author._id
+                          )
                         )
                       }
                     : null
@@ -237,14 +246,17 @@ export const DiscussionThreadContainer = props => {
           </View>
         )}
       </div>
-      {(expandReplies || props.depth > 0) && props.subentriesCount > 0 && (
-        <DiscussionSubentries discussionEntryId={props._id} depth={props.depth + 1} />
+      {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
+        <DiscussionSubentries
+          discussionEntryId={props.discussionEntry._id}
+          depth={props.depth + 1}
+        />
       )}
-      {expandReplies && props.depth === 0 && props.lastReply && (
+      {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
         <div
           style={{marginLeft: '4rem'}}
           width="100%"
-          key={`discussion-thread-collapse-${props.id}`}
+          key={`discussion-thread-collapse-${props.discussionEntry.id}`}
         >
           <View
             background="primary"
@@ -263,7 +275,7 @@ export const DiscussionThreadContainer = props => {
 }
 
 DiscussionThreadContainer.propTypes = {
-  ...DiscussionEntry.shape,
+  discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
   assignment: Assignment.shape
 }
@@ -301,7 +313,7 @@ const DiscussionSubentries = props => {
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
       assignment={discussionTopic?.assignment}
-      {...entry}
+      discussionEntry={entry}
     />
   ))
 }

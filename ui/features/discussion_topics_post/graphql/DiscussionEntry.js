@@ -56,7 +56,7 @@ export const DiscussionEntry = {
     ${DiscussionEntryPermissions.fragment}
   `,
 
-  shape: {
+  shape: shape({
     id: string,
     _id: string,
     createdAt: string,
@@ -78,7 +78,7 @@ export const DiscussionEntry = {
       createdAt: string
     }),
     permissions: DiscussionEntryPermissions.shape
-  }
+  })
 }
 
 export const DefaultMocks = {
