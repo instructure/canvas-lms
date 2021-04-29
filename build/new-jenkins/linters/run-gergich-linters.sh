@@ -10,7 +10,7 @@ cat <<EOF | docker run \
   local/gergich /bin/bash -
 set -ex
 # when parent is not in \$GERRIT_BRANCH (i.e. master)
-if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
+if ! git merge-base --is-ancestor HEAD~1 origin/\$GERRIT_BRANCH; then
   message="This commit is built upon commits not currently merged in \$GERRIT_BRANCH. Ensure that your dependent patchsets are merged first!\\n"
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"warn\",\"message\":\"\$message\"}"
 fi
