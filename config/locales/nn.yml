@@ -1890,7 +1890,7 @@ nn:
   admin_tools_notifications_tab_120d6cdf: "Administrasjonsverktøy (varselfane)"
   admin_tools_restore_courses_tab_b07bbfa7: "Administrasjonsverktøy (fane for gjenoppretting av kurs)"
   admin_tools_undelete_courses_d9bd8631: "Administrasjonsverktøy (gjer om sletting av emne)"
-  admin_tour_36d89fbb: Admin-vegvisar
+  admin_tour_36d89fbb: Adminvegvisar
   admin_tray_3b680e7b: Administrasjonsmeny
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: Administrasjonsvising
@@ -3455,6 +3455,13 @@ nn:
     invalid_submission_types: "Ugyldige innleveringstypar"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i utrekninga."
+  assignments_include_quizzes_graded_discussions_and_182e5899: |-
+      Oppgåver kan inneholde quizar, vurderte diskusjonar og mange typar
+      innleveringar (filer, bilder, text URL-ar og medieinnspelingar). Du kan tilordne
+      oppgåver til alle i eit emne eller gi ulike fristar til
+      enkeltstudentar eller grupper av studentar. Organiser oppgåvelista ved å gruppere innleveringar
+      og vekt oppgåvegrupper prosentvis. Aktiver kverandrevurdering sånn at studentane kan
+      vurdere kverandre sine arbeider.
   assignments_list_fe3e54be: Oppgåveliste
   assignments_report_faea72b9: Oppgåverapport
   assignments_settings_30613d0c: Oppgåveinnstillingar
@@ -7814,6 +7821,12 @@ nn:
     unsubscribed: "Stoppa abonnement"
     unsubscribed_hint: "Du abonnerer ikkje på dette emnet. Klikk her for å abonnere."
   discussions_a5f96392: Diskusjonar
+  discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
+      Diskusjonar legg til rette for dialog mellom studentar og faglærarar innanfor
+      ulike tema kva tid som helst. Du kan definere ein diskusjon som eit arbeidskrav eller
+      la diskusjonane vere opne for idéutveksling og problemløysing studentar imellom. Diskusjonstrådar
+      er perfekte til å organisere lange og langvarige diskusjonar,
+      medan fokuserte diskusjoner egner seg betre for kortare ordvekslingar.
   discussions_create_94dff604: "DIskusjonar - opprett"
   discussions_moderate_d1e69c7e: "Diskusjonar - moderer"
   discussions_post_62f64091: "Diskusjonar - lag innlegg"
@@ -8209,6 +8222,7 @@ nn:
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
   encourage_class_participation_4e069479: "Oppmod til deltaking"
+  encourage_student_discourse_7836b9f7: "Legg til rette for studentdialog"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Krypterte sourcedId-er for basislæringsmål"
   end_course_set_up_tutorial_dialog_5b812ec6: "Avslutt dialog med sett-opp-emne-rettleiing"
   end_course_set_up_tutorial_f358b85d: "Avslutt sett-opp-emne-rettleiing"
@@ -8285,6 +8299,7 @@ nn:
   enter_a_what_if_score_668c91a3: "Oppgi eit kva-skjer-dersom-resultat."
   enter_a_workflow_state_to_narrow_results_162903af: "Legg inn ein arbeidsflyt for å snevre inn søkeresultatet"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Skriv inn \"{{ACCOUNT_DOMAIN}}\" som erstatning for brukaren sitt rotdomene"
+  enter_and_distribute_grades_c1216df: "Hald oversikt over oppgåver og vurderingar"
   enter_at_least_count_characters_1c7a0b36: "Må vere minst %{count} teikn"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Skriv inn \"{{CANVAS_USER_ID}}\" som erstatning for brukaren sin unike Canvas-ID"
   enter_grades_as_e113e606: "Legg inn vurderingar som"
@@ -10492,6 +10507,7 @@ nn:
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
   hebrew_88fbf778: Hebraisk
+  hello_name_cabdd4ce: "Hei %{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
       
@@ -10673,12 +10689,16 @@ nn:
   hover_over_me_496521b9: "Flytt peikaren over meg"
   how_do_i_add_a_rubric_in_a_course_a4c7a40: "Korleis legg eg ein rubrikk til i eit emne?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Korleis legg eg til ei kunngjering i eit emne?"
+  how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Korleis kan eg legge til noko eller redigere i ei oppgåve? "
   how_do_i_add_users_to_a_course_4a88efaf: "Korleis legg eg til brukarar i eit emne?"
   how_do_i_change_the_course_home_page_326cee50: "Korleis kan eg endre forsida i emnet mitt? "
+  how_do_i_contact_my_instructor_184e35ed: "Korleis tar eg kontakt med faglærar?"
   how_do_i_create_a_conference_in_a_course_69affbf4: "Korleis kan eg opprette ein konferanse i eit emne?"
   how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Korleis kan eg som faglærar sette opp ein diskusjon? "
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Korleis opprettar eg ei quiz til vurdering i New Quizzes? "
-  how_do_i_create_an_assignment_35532b59: "Korleis kan eg opprette ei oppgåve?"
+  how_do_i_create_an_assignment_35532b59: "Korleis kan eg setje opp ei oppgåve?"
+  how_do_i_download_the_student_app_4a4b8a63: "Korleis lastar eg ned studentappen?"
+  how_do_i_download_the_student_app_and_get_addition_3604c207: "Korleis lastar eg ned studentappen for få meir hjelp? "
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Korleis redigerer eg ei kunngjering i eit emne?"
   how_do_i_find_my_courses_b826e4ce: "Korleis finn eg emna mine?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Korleis importerer eg ein pakke som er eksportert frå eit Canvas-emne?"
@@ -10687,8 +10707,12 @@ nn:
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Korleis kan eg som faglærar rydde og organisere filene mine?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Korleis flyttar eg eller omorganiser ein modul? "
   how_do_i_mute_and_unmute_all_participants_a7a2115b: "Korleis slår eg av og på mikrofonen til deltakarane?"
-  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Korleis publiserer eller avpubliserer eg som faglærar ei side? "
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Korleis kan eg som faglærar publisere og avpublisere ein diskusjon? "
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Korleis kan eg som faglærar publisere og avpublisere modular? "
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Korleis kan eg som faglærar publisere eller avpublisere ei side? "
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Korleis kan eg som faglærar publisere og avpublisere ein oppgåve? "
   how_do_i_record_a_meeting_ae3a0d4e: "Korleis tar eg opp eit møte?"
+  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Korleis kan eg som faglærar delta i ein diskusjon? "
   how_do_i_share_my_screen_c280e585: "Korleis deler eg skjerm?"
   how_do_i_start_a_meeting_e8a9e67b: "Korleis startar eg eit møte?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Korleis lastar eg opp ei fil i eit emne? "
@@ -10700,6 +10724,7 @@ nn:
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Korleis brukar eg personsida i eit emne som ein faglærar?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Korleis brukar eg quizoversikta?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Korleis ser eg analysedata for ein student?"
+  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Korleis kan eg som faglærar sjå og sortere diskusjonsinnlegg? "
   how_is_the_grade_determined_bb75bf53: "Korleis er vurderinga gjort?"
   how_is_this_affecting_you_b3b6a639: "Korleis verkar dette på deg?"
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
@@ -15752,7 +15777,7 @@ nn:
   proceed_f3d33864: Fortsett
   processing_2fcc9739: Handsamar
   product_name: Canvas
-  product_tours_1e19eb95: Produkt-vegvisar
+  product_tours_1e19eb95: Produktvegvisar
   proficiency_rating_6346119f: Ferdigheitsnivå
   proficiency_rating_deleted_77827473: "Ferdigheitsnivå sletta"
   proficiency_ratings_2bbabdcd: Ferdigheitsnivå
@@ -17656,6 +17681,7 @@ nn:
     welcome_to_canvas: "Velkomen til Canvas!"
   registration_url_60e0eaaa: Registrerings-URL
   regular_style_checkbox_ee3d71c1: "Vanleg avmerkingsboks"
+  reinforce_student_understanding_304d18a6: "Styrk studentane sin forståing og læring"
   release_grades_c68fbcc: "Send ut vurderingsresultat"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Kunngjort frå meistringssti: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Kunngjort frå meistringssti: %{path}"
@@ -19762,7 +19788,7 @@ nn:
   student_sis_id_abe6b292: student-SIS-ID
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
   student_submissions_910da1b3: Studentinnleveringar
-  student_tour_38b735c8: Student-vegvisar
+  student_tour_38b735c8: Studentvegvisar
   student_view_ac9b672f: Studentvising
   student_viewed_document_9065adb8: "Student opna dokumentet"
   studentcount_student_scores_updated_232ad7b7: 
@@ -20190,7 +20216,7 @@ nn:
   teacher_count_teachers_a92f7199: "%{teacher_count} faglærarar"
   teacher_engagement_report_ec03613d: Faglæraraktivitetsrapport
   teacher_s_fdefb2c: Faglærar(ar)
-  teacher_tour_26282921: Faglærar-vegvisar
+  teacher_tour_26282921: Faglærarvegvisar
   teacher_view_b2047bc6: "Sjå som Faglærar"
   teachers_52e2423f: Faglærarar
   teachers_over_time_1905603b: "faglærarar over tid"
@@ -22148,6 +22174,7 @@ nn:
   what_are_announcements_52175539: "Kva er kunngjeringar?"
   what_are_collaborations_27c20a98: "Kva er samarbeid?"
   what_are_self_sign_up_groups_af1f002a: "Kva er sjølvregistreringsgrupper?"
+  what_assignment_types_can_i_create_in_a_course_1ed4eed4: "Kva oppgåvetyper kan eg setje opp i eit emne? "
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_happened_322d8259: "Kva hendte?"
   what_it_does_d4debc07: "Kva den gjer"
