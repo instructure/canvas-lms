@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,12 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import k5Theme from '@canvas/k5/react/k5-theme'
 
- @import "base/environment";
-
-.ic-app-header__main-navigation,
-.ic-app-crumbs,
-.ic-app-course-menu,
-.enhanced {
-  font-family: "Balsamiq Sans", $ic-font-family;
-}
+k5Theme.use({fontOnly: true})

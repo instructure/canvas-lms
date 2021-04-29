@@ -358,7 +358,7 @@ class CoursesController < ApplicationController
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
-  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export, :user_progress]
+  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :confirm_action, :copy, :effective_due_dates, :offline_web_exports, :link_validator, :settings, :start_offline_web_export, :statistics, :user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -1350,7 +1350,6 @@ class CoursesController < ApplicationController
   end
 
   def statistics
-    get_context
     if authorized_action(@context, @current_user, :read_reports)
       @student_ids = @context.student_ids
 
@@ -1401,7 +1400,6 @@ class CoursesController < ApplicationController
   end
 
   def settings
-    get_context
     if authorized_action(@context, @current_user, :read_as_admin)
       load_all_contexts(:context => @context)
 
@@ -2229,7 +2227,6 @@ class CoursesController < ApplicationController
   end
 
   def confirm_action
-    get_context
     params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? 'delete' : 'conclude'
     return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
   end
@@ -2411,7 +2408,6 @@ class CoursesController < ApplicationController
   end
 
   def copy
-    get_context
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     account = @context.account
@@ -3369,7 +3365,6 @@ class CoursesController < ApplicationController
   end
 
   def link_validator
-    get_context
     return unless authorized_action(@context, @current_user, :manage_content)
     # render view
   end

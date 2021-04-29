@@ -148,6 +148,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
   include Context
+  include K5Mode
 
   SETTABLE_GROUP_ATTRIBUTES = %w(
     name description join_level is_public group_category avatar_attachment
