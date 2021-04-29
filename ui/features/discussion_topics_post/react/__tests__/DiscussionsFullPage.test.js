@@ -180,10 +180,8 @@ describe('DiscussionFullPage', () => {
 
     it('renders the dates properly', async () => {
       const container = setup()
-      await waitFor(() => expect(container.findByText('Nov 23, 2020 6:40pm')).toBeTruthy())
-      await waitFor(() =>
-        expect(container.findByText('Apr 5 7:41pm, last reply Apr 5 7:41pm')).toBeTruthy()
-      )
+      expect(await container.findByText('Nov 23, 2020 6:40pm')).toBeInTheDocument()
+      expect(await container.findByText(', last reply Apr 5 7:41pm')).toBeInTheDocument()
     })
   })
 })
