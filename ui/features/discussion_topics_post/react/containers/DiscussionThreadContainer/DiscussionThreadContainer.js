@@ -22,7 +22,8 @@ import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
   DELETE_DISCUSSION_ENTRY,
-  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
+  UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
@@ -80,6 +81,21 @@ export const DiscussionThreadContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
     }
   })
+
+  const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.updateDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The reply was successfully updated.'))
+        setIsEditing(false)
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+    }
+  })
+
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
@@ -91,6 +107,7 @@ export const DiscussionThreadContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
     }
   })
+
   const toggleRating = () => {
     updateDiscussionEntryParticipant({
       variables: {
@@ -162,6 +179,15 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
+  const onUpdate = newMesssage => {
+    updateDiscussionEntry({
+      variables: {
+        discussionEntryId: props.discussionEntry._id,
+        message: newMesssage
+      }
+    })
+  }
+
   const renderPostMessage = () => {
     if (props.discussionEntry.deleted) {
       const name = props.discussionEntry.editor
@@ -187,6 +213,7 @@ export const DiscussionThreadContainer = props => {
           onCancel={() => {
             setIsEditing(false)
           }}
+          onSave={onUpdate}
         >
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </PostMessage>
@@ -213,9 +240,13 @@ export const DiscussionThreadContainer = props => {
                 onToggleUnread={toggleUnread}
                 onMarkAllAsUnread={() => {}}
                 onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                onEdit={() => {
-                  setIsEditing(true)
-                }}
+                onEdit={
+                  props.discussionEntry.permissions?.update
+                    ? () => {
+                        setIsEditing(true)
+                      }
+                    : null
+                }
                 onOpenInSpeedGrader={
                   canGrade
                     ? () => {

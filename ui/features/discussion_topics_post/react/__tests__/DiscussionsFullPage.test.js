@@ -115,6 +115,23 @@ describe('DiscussionFullPage', () => {
       fireEvent.click(likeButton)
       await waitFor(() => expect(container.queryByText('Like count: 1')).toBeNull())
     })
+
+    it('updates discussion entry', async () => {
+      const {getByTestId, queryByText, findByTestId, queryAllByTestId, getAllByTestId} = setup()
+      await waitFor(() => expect(queryByText('This is the parent reply')).toBeInTheDocument())
+
+      const actionsButton = await findByTestId('thread-actions-menu')
+      fireEvent.click(actionsButton)
+      fireEvent.click(getByTestId('edit'))
+
+      const bodyInput = queryAllByTestId('message-body')[1]
+      fireEvent.change(bodyInput, {target: {value: ''}})
+
+      const submitButton = getAllByTestId('DiscussionEdit-submit')[1]
+      fireEvent.click(submitButton)
+
+      await waitFor(() => expect(queryByText('This is the parent reply')).not.toBeInTheDocument())
+    })
   })
 
   describe('discussion topic', () => {

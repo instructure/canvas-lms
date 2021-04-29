@@ -50,7 +50,11 @@ export function PostMessage({...props}) {
       description={
         props.isEditing ? (
           <View display="inline-block" margin="small none none none" width="100%">
-            <DiscussionEdit onCancel={props.onCancel} value={props.message} />
+            <DiscussionEdit
+              onCancel={props.onCancel}
+              value={props.message}
+              onSubmit={props.onSave}
+            />
           </View>
         ) : (
           <>

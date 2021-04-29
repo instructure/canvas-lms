@@ -86,3 +86,18 @@ export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
   }
   ${Discussion.fragment}
 `
+
+export const UPDATE_DISCUSSION_ENTRY = gql`
+  mutation UpdateDiscussionEntry($discussionEntryId: ID!, $message: String) {
+    updateDiscussionEntry(input: {discussionEntryId: $discussionEntryId, message: $message}) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+  ${Error.fragment}
+`
