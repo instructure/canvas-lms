@@ -614,13 +614,15 @@ $(function () {
           return
         }
         event.preventDefault()
+        const url = new URL(event.target.href)
+        const verifier = url?.searchParams.get('verifier')
         const file_id = matches[1]
         import('../react/showFilePreview')
           .then(module => {
-            module.showFilePreview(file_id)
+            module.showFilePreview(file_id, verifier)
           })
           .catch(_err => {
-            $.flashError(I18n.t('Someting went wrong loading the file previewer.'))
+            $.flashError(I18n.t('Something went wrong loading the file previewer.'))
           })
       }
     })

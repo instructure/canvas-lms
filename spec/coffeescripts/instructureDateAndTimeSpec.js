@@ -20,6 +20,7 @@ import $ from 'jquery'
 import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
+import kolkata from 'timezone/Asia/Kolkata'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
 import '@canvas/datetime'
@@ -34,7 +35,7 @@ QUnit.module('fudgeDateForProfileTimezone', {
   }
 })
 
-test('should produce a date that formats via toString same as the original formats via tz', function() {
+test('should produce a date that formats via toString same as the original formats via tz', function () {
   const fudged = $.fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
@@ -47,7 +48,7 @@ test('should parse dates before the year 1000', () => {
   equal(oldFudgeDate.toString('yyyy-MM-dd HH:mm:ss'), '0900-02-01 00:00:00')
 })
 
-test('should work on non-date date-like values', function() {
+test('should work on non-date date-like values', function () {
   let fudged = $.fudgeDateForProfileTimezone(+this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
   fudged = $.fudgeDateForProfileTimezone(this.original.toISOString())
@@ -63,7 +64,7 @@ test('should return null for invalid values', () => {
 test('should not return treat 0 as invalid', () =>
   equal(+$.fudgeDateForProfileTimezone(0), +$.fudgeDateForProfileTimezone(new Date(0))))
 
-test('should be sensitive to profile time zone', function() {
+test('should be sensitive to profile time zone', function () {
   tz.changeZone(detroit, 'America/Detroit')
   let fudged = $.fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
@@ -82,12 +83,12 @@ QUnit.module('unfudgeDateForProfileTimezone', {
   }
 })
 
-test('should produce a date that formats via tz same as the original formats via toString()', function() {
+test('should produce a date that formats via tz same as the original formats via toString()', function () {
   const unfudged = $.unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
-test('should work on non-date date-like values', function() {
+test('should work on non-date date-like values', function () {
   let unfudged = $.unfudgeDateForProfileTimezone(+this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
   unfudged = $.unfudgeDateForProfileTimezone(this.original.toISOString())
@@ -103,7 +104,7 @@ test('should return null for invalid values', () => {
 test('should not return treat 0 as invalid', () =>
   equal(+$.unfudgeDateForProfileTimezone(0), +$.unfudgeDateForProfileTimezone(new Date(0))))
 
-test('should be sensitive to profile time zone', function() {
+test('should be sensitive to profile time zone', function () {
   tz.changeZone(detroit, 'America/Detroit')
   let unfudged = $.unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
@@ -210,6 +211,14 @@ test('should use the tiny_on_the_hour format on the hour', () => {
   equal($.timeString(new Date(0)), '7pm')
 })
 
+test('should use the tiny format on the hour, when timezone difference is not in whole hours', () => {
+  I18nStubber.stub('en', {'time.formats.tiny': '%l:%M%P'})
+  I18nStubber.stub('en', {'time.formats.tiny_on_the_hour': '%l%P'})
+  // kolkata: +05:30
+  tz.changeZone(kolkata, 'Asia/Kolkata')
+  equal($.timeString(new Date(30 * 60 * 1000), {timezone: 'America/Detroit'}), '7:30pm')
+})
+
 QUnit.module('datetimeString', {
   setup() {
     this.snapshot = tz.snapshot()
@@ -286,22 +295,22 @@ QUnit.module('$.datepicker time picker', {
   }
 })
 
-test('sets ampm select to am if empty and hour is changed to 0', function() {
+test('sets ampm select to am if empty and hour is changed to 0', function () {
   this.$hour.val('0').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to am if empty and hour is changed to 00', function() {
+test('sets ampm select to am if empty and hour is changed to 00', function () {
   this.$hour.val('00').trigger('change')
   equal(this.$ampm.val(), 'am')
 })
 
-test('sets ampm select to pm if empty and hour is changed to > 0', function() {
+test('sets ampm select to pm if empty and hour is changed to > 0', function () {
   this.$hour.val('1').trigger('change')
   equal(this.$ampm.val(), 'pm')
 })
 
-test('sets hour to 12 if ampm exists and hour is changed to 0', function() {
+test('sets hour to 12 if ampm exists and hour is changed to 0', function () {
   this.$hour.val('0').trigger('change')
   equal(this.$hour.val(), '12')
 })

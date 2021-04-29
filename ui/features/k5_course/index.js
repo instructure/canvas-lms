@@ -32,10 +32,13 @@ ready(() => {
         currentUser={ENV.current_user}
         id={ENV.COURSE.id}
         imageUrl={ENV.COURSE.image_url}
+        color={ENV.COURSE.color}
         name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
+        userIsInstructor={ENV.COURSE.is_instructor}
+        hideFinalGrades={ENV.COURSE.hide_final_grades}
       />,
       courseContainer
     )

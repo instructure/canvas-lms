@@ -27,6 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 
 export function PostMessage({...props}) {
   return (
@@ -36,17 +37,29 @@ export function PostMessage({...props}) {
           <Text weight="bold">{props.authorName}</Text>
           <View padding="0 small">
             <Text color="secondary">{props.timingDisplay}</Text>
+            <Text color="secondary">
+              {!!props.lastReplyAtDisplayText &&
+                I18n.t(', last reply %{lastReplyAtDisplayText}', {
+                  lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                })}
+            </Text>
           </View>
           {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
         </>
       }
       description={
-        <>
-          <div dangerouslySetInnerHTML={{__html: props.message}} />
-          <View display="block" margin="small none none none">
-            {props.children}
+        props.isEditing ? (
+          <View display="inline-block" margin="small none none none" width="100%">
+            <DiscussionEdit onCancel={props.onCancel} value={props.message} />
           </View>
-        </>
+        ) : (
+          <>
+            <div dangerouslySetInnerHTML={{__html: props.message}} />
+            <View display="block" margin="small none none none">
+              {props.children}
+            </View>
+          </>
+        )
       }
       alignContent="top"
       margin="0 0 medium 0"
@@ -87,6 +100,10 @@ PostMessage.propTypes = {
    */
   children: PropTypes.node,
   /**
+   * Last Reply Date if there are discussion replies
+   */
+  lastReplyAtDisplayText: PropTypes.string,
+  /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
    * timestamp to be formatted.
@@ -104,7 +121,19 @@ PostMessage.propTypes = {
   /**
    * Determines if the unread badge should be displayed
    */
-  isUnread: PropTypes.bool
+  isUnread: PropTypes.bool,
+  /**
+   * Determines if the editor should be displayed
+   */
+  isEditing: PropTypes.bool,
+  /**
+   * Callback for when Editor Save button is pressed
+   */
+  onSave: PropTypes.func,
+  /**
+   * Callback for when Editor Cancel button is pressed
+   */
+  onCancel: PropTypes.func
 }
 
 export default PostMessage

@@ -33,10 +33,6 @@
   background-image: linear-gradient(to top, rgba(255, 255, 255, 0), #fafafa);
 }
 
-.WeeklyPlannerFooter {
-  opacity: 0;
-}
-
 .errorbox {
   background: var(--backgroundPrimary);
   z-index: 2;

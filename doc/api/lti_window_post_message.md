@@ -60,6 +60,17 @@ window.parent.postMessage(
 )
 ```
 
+## toggleCourseNavigationMenu
+
+Opens and closes the course navigation sidebar, giving more space for the tool to display.
+
+**Required properties:**
+- messageType: "toggleCourseNavigationMenu"
+
+```js
+window.parent.postMessage({ messageType: "toggleCourseNavigationMenu" }, "*")
+```
+
 ## lti.resourceImported
 
 Notifies the Canvas page holding the tool that a resource has finished importing.

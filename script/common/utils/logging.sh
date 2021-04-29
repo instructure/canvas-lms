@@ -80,7 +80,7 @@ function display_next_steps {
   message "You're good to go! Next steps:"
 
   # shellcheck disable=SC2016
-  [[ $OS == 'Darwin' ]] && echo '
+  [[ $OS == 'Darwin' ]] && (! is_mutagen) && echo '
   First, run:
 
     eval "$(dinghy env)"
@@ -98,12 +98,12 @@ function display_next_steps {
   echo "
   Running Canvas:
 
-    docker-compose up -d
+    ${DOCKER_COMMAND} up -d
     open http://canvas.docker
 
   Running the tests:
 
-    docker-compose run --rm web bundle exec rspec
+    ${DOCKER_COMMAND} run --rm web bundle exec rspec
 
    Running Selenium tests:
 
@@ -111,10 +111,10 @@ function display_next_steps {
       echo ':docker-compose/selenium.override.yml' >> .env
 
     build the selenium container
-      docker-compose build selenium-chrome
+      ${DOCKER_COMMAND} build selenium-chrome
 
     run selenium
-      docker-compose run --rm web bundle exec rspec spec/selenium
+      ${DOCKER_COMMAND} run --rm web bundle exec rspec spec/selenium
 
     Virtual network remote desktop sharing to selenium container
       for Firefox:

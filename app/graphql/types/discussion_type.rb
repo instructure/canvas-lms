@@ -43,6 +43,7 @@ module Types
 
     global_id_field :id
     field :title, String, null: true
+    field :message, String, null: true
     field :delayed_post_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false
@@ -77,13 +78,8 @@ module Types
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
     end
-    def discussion_entries_connection(search_term: nil, filter: nil, sort_order: :asc)
-      Loaders::DiscussionEntryLoader.for(
-        current_user: current_user,
-        search_term: search_term,
-        filter: filter,
-        sort_order: sort_order
-      ).load(object)
+    def discussion_entries_connection(**args)
+      get_entries(args)
     end
 
     field :root_discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
@@ -91,19 +87,14 @@ module Types
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
     end
-    def root_discussion_entries_connection(search_term: nil, filter: nil, sort_order: :asc)
-      Loaders::DiscussionEntryLoader.for(
-        current_user: current_user,
-        search_term: search_term,
-        filter: filter,
-        sort_order: sort_order,
-        root_entries: true
-      ).load(object)
+    def root_discussion_entries_connection(**args)
+      args[:root_entries] = true
+      get_entries(args)
     end
 
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
-      Loaders::DiscussionTopicEntryCountsLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
     field :subscribed, Boolean, null: false
@@ -113,7 +104,7 @@ module Types
       end
     end
 
-    field :author, Types::UserType, null: false
+    field :author, Types::UserType, null: true
     def author
       load_association(:user)
     end
@@ -125,7 +116,57 @@ module Types
 
     field :permissions, Types::DiscussionPermissionsType, null: true
     def permissions
-      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+      load_association(:context).then do
+        Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+      end
+    end
+
+    field :course_sections, [Types::SectionType], null: false
+    def course_sections
+      load_association(:course_sections)
+    end
+
+    field :can_unpublish, Boolean, null: false
+    def can_unpublish
+      object.can_unpublish?
+    end
+
+    field :entries_total_pages, Integer, null: true do
+      argument :per_page, Integer, required: true
+      argument :search_term, String, required: false
+      argument :filter, DiscussionFilterType, required: false
+      argument :sort_order, DiscussionSortOrderType, required: false
+    end
+    def entries_total_pages(**args)
+      get_entry_page_count(args)
+    end
+
+    field :root_entries_total_pages, Integer, null: true do
+      argument :per_page, Integer, required: true
+      argument :search_term, String, required: false
+      argument :filter, DiscussionFilterType, required: false
+      argument :sort_order, DiscussionSortOrderType, required: false
+    end
+    def root_entries_total_pages(**args)
+      args[:root_entries] = true
+      get_entry_page_count(args)
+    end
+
+    def get_entry_page_count(**args)
+      per_page = args.delete(:per_page)
+      get_entries(args).then do |entries|
+        (entries.count.to_f / per_page).ceil
+      end
+    end
+
+    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
+      Loaders::DiscussionEntryLoader.for(
+        current_user: current_user,
+        search_term: search_term,
+        filter: filter,
+        sort_order: sort_order,
+        root_entries: root_entries
+      ).load(object)
     end
   end
 end

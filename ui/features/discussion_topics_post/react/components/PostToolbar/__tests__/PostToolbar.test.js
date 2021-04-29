@@ -27,8 +27,8 @@ const setup = props => {
 describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
-      const {queryByText} = setup({infoText: 'info text'})
-      expect(queryByText('info text')).toBeTruthy()
+      const {queryByText} = setup({repliesCount: 1})
+      expect(queryByText('1 replies')).toBeTruthy()
     })
   })
 
@@ -42,11 +42,22 @@ describe('PostToolbar', () => {
       const onTogglePublishMock = jest.fn()
       const {getByText} = setup({
         onTogglePublish: onTogglePublishMock,
-        isPublished: true
+        isPublished: true,
+        canUnpublish: true
       })
       expect(onTogglePublishMock.mock.calls.length).toBe(0)
       fireEvent.click(getByText('Published'))
       expect(onTogglePublishMock.mock.calls.length).toBe(1)
+    })
+
+    it('displays as readonly if canUnpublish is false', () => {
+      const onTogglePublishMock = jest.fn()
+      const {getByText} = setup({
+        onTogglePublish: onTogglePublishMock,
+        isPublished: true,
+        canUnpublish: false
+      })
+      expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
   })
 

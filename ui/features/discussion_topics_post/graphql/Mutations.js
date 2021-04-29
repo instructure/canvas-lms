@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
 import {DiscussionEntry} from './DiscussionEntry'
+import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
+import gql from 'graphql-tag'
 
 export const DELETE_DISCUSSION_TOPIC = gql`
   mutation DeleteDiscussionTopic($id: ID!) {
@@ -48,4 +49,40 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     }
   }
   ${DiscussionEntry.fragment}
+`
+export const DELETE_DISCUSSION_ENTRY = gql`
+  mutation DeleteDiscussionEntry($id: ID!) {
+    deleteDiscussionEntry(input: {id: $id}) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+  ${Error.fragment}
+`
+export const PUBLISH_DISCUSSION_TOPIC = gql`
+  mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean) {
+    updateDiscussionTopic(input: {discussionTopicId: $discussionTopicId, published: $published}) {
+      discussionTopic {
+        ...Discussion
+      }
+    }
+  }
+  ${Discussion.fragment}
+`
+export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
+  mutation subscribeToDiscussionTopic($discussionTopicId: ID!, $subscribed: Boolean!) {
+    subscribeToDiscussionTopic(
+      input: {discussionTopicId: $discussionTopicId, subscribed: $subscribed}
+    ) {
+      discussionTopic {
+        ...Discussion
+      }
+    }
+  }
+  ${Discussion.fragment}
 `

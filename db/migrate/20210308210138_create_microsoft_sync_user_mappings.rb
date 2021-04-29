@@ -32,10 +32,7 @@ class CreateMicrosoftSyncUserMappings < ActiveRecord::Migration[6.0]
       t.index [:root_account_id, :id], unique: true, name: 'index_microsoft_sync_user_mappings_replica_identity'
     end
 
-    execute(%[
-      ALTER TABLE #{MicrosoftSync::UserMapping.quoted_table_name}
-      REPLICA IDENTITY USING INDEX index_microsoft_sync_user_mappings_replica_identity
-    ])
+    set_replica_identity(:microsoft_sync_user_mappings, :index_microsoft_sync_user_mappings_replica_identity)
   end
 
   def down

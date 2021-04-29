@@ -1217,14 +1217,14 @@ class CalendarEventsApiController < ApplicationController
         relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
+        if includes.include?('web_conference')
+          relation = relation.preload(:web_conference)
+        end
         relation
       end
     else
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
-    end
-    if includes.include?('web_conference')
-      scope = scope.preload(:web_conference)
     end
     scope
   end

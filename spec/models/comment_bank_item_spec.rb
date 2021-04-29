@@ -56,4 +56,25 @@ describe CommentBankItem, type: :model do
       expect(subject.root_account_id).to eq(@course.root_account_id)
     end
   end
+
+  describe 'permissions' do
+    subject { CommentBankItem.create!(comment: 'A', course: course, user: user) }
+
+    describe 'read/update/delete' do
+      it 'is allowed for the creator' do
+        aggregate_failures do
+          [:read, :update, :delete].each do |permission|
+            expect(subject.grants_right?(user, permission)).to be(true)
+          end
+        end
+      end
+
+      it 'is not allowed for other users' do
+        user2 = user_model
+        [:read, :update, :delete].each do |permission|
+          expect(subject.grants_right?(user2, permission)).to be(false)
+        end
+      end
+    end
+  end
 end

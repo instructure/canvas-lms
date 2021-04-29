@@ -23,21 +23,25 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {PER_PAGE} from './utils/constants'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {useQuery} from 'react-apollo'
-
-export const PER_PAGE = 20
 
 const DiscussionTopicManager = props => {
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables: {
       discussionID: props.discussionTopicId,
-      perPage: PER_PAGE
+      perPage: PER_PAGE,
+      page: btoa(0)
     }
   })
 
-  if (discussionTopicQuery.error) {
+  if (discussionTopicQuery.loading) {
+    return <LoadingIndicator />
+  }
+
+  if (discussionTopicQuery.error || !discussionTopicQuery?.data?.legacyNode) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -47,15 +51,15 @@ const DiscussionTopicManager = props => {
     )
   }
 
-  if (discussionTopicQuery.loading) {
-    return <LoadingIndicator />
-  }
-
   return (
     <>
       <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionThreadsContainer
+        discussionTopic={discussionTopicQuery.data.legacyNode}
+        discussionTopicId={props.discussionTopicId}
         threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
+        pageInfo={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.pageInfo}
+        totalPages={discussionTopicQuery.data.legacyNode.rootEntriesTotalPages}
       />
     </>
   )

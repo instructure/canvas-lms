@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const whitelist = ['requestFullWindowLaunch', 'lti.resourceImported']
+export const whitelist = [
+  'requestFullWindowLaunch',
+  'lti.resourceImported',
+  'toggleCourseNavigationMenu'
+]
 
 // These are handled elsewhere so ignore them
 export const ignorelist = ['LtiDeepLinkingResponse']

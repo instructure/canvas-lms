@@ -115,6 +115,7 @@ gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
 gem 'rotp', '6.2.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
+gem 'ruby2_keywords', '0.0.3'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
@@ -124,7 +125,7 @@ gem 'sanitize', '5.2.3', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '2.0.8'
+gem 'switchman', '2.0.9'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '3.1.2'
 gem 'twilio-ruby', '5.36.0', require: false

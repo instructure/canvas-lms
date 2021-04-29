@@ -253,6 +253,7 @@ class Course < ActiveRecord::Base
   before_update :handle_syllabus_changes_for_master_migration
 
   before_save :touch_root_folder_if_necessary
+  before_save :hide_external_tool_tabs_if_necessary
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -750,15 +751,15 @@ class Course < ActiveRecord::Base
     enrollment_completed_sql = ""
 
     if args[1].blank?
-      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS c ON c.id = caa.course_id
-        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = c.enrollment_term_id
-        WHERE (c.workflow_state<>'completed' AND
-          (c.conclude_at IS NULL OR c.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS courses ON courses.id = caa.course_id
+        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
       enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
-        WHERE (courses.workflow_state<>'completed' AND
-          (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
     end
 
     distinct.joins("INNER JOIN (
@@ -2842,10 +2843,32 @@ class Course < ActiveRecord::Base
   end
 
   def external_tool_tabs(opts, user)
-    tools = self.context_external_tools.active.having_setting('course_navigation')
-    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
-    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
+    tools = external_tools_for_tabs.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
+  end
+
+  def external_tools_for_tabs
+    self.context_external_tools.active.having_setting('course_navigation') +
+      ContextExternalTool.active.having_setting('course_navigation').where(
+        context_type: 'Account', context_id: account_chain_ids
+      ).to_a
+  end
+
+  def hide_external_tool_tabs_if_necessary
+    return true unless tab_configuration_changed?
+
+    tabs_by_id = tab_configuration.each_with_object({}) { |tab,memo| memo[tab['id']] = tab}
+    external_tools_for_tabs.each do |tool|
+      next unless tabs_by_id[tool.asset_string]
+
+      if tabs_by_id[tool.asset_string]['hidden']
+        tool.override_visibility('admins', :course_navigation)
+      else
+        tool.clear_visibility_override(:course_navigation)
+      end
+      tool.save!
+    end
+    true
   end
 
   def tabs_available(user=nil, opts={})
@@ -3666,6 +3689,10 @@ class Course < ActiveRecord::Base
 
   def can_stop_being_template?
     !templated_accounts.exists?
+  end
+
+  def comment_bank_items_visible_to(user)
+    comment_bank_items.active.where(user: user)
   end
 
   private

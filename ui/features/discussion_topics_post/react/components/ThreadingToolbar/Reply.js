@@ -43,5 +43,9 @@ Reply.propTypes = {
    * Specifies if the Button should render with a solid background.
    * When false, the background is transparent.
    */
-  withBackground: PropTypes.bool
+  withBackground: PropTypes.bool,
+  /**
+   * Key consumed by ThreadingToolbar's InlineList
+   */
+  delimiterKey: PropTypes.string.isRequired
 }

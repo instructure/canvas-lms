@@ -41,7 +41,8 @@ export const Default = Template.bind({})
 Default.args = {
   isPublished: true,
   isSubscribed: true,
-  infoText: '24 replies, 4 unread'
+  repliesCount: 24,
+  unreadCount: 4
 }
 
 export const StudentView = Template.bind({})

@@ -860,22 +860,6 @@ module ApplicationHelper
     Digest::MD5.hexdigest(keys.join('/'))
   end
 
-  def translated_due_date(assignment)
-    if assignment.multiple_due_dates_apply_to?(@current_user)
-      t('Due: Multiple Due Dates')
-    else
-      assignment = assignment.overridden_for(@current_user)
-
-      if assignment.due_at
-        t('Due: %{assignment_due_date_time}',
-          assignment_due_date_time: datetime_string(force_zone(assignment.due_at))
-        )
-      else
-        t('Due: No Due Date')
-      end
-    end
-  end
-
   def add_uri_scheme_name(uri)
     noSchemeName = !uri.match(/^(.+):\/\/(.+)/)
     uri = 'http://' + uri if noSchemeName

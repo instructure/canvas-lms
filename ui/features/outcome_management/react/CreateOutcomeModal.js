@@ -32,10 +32,7 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import useRCE from './hooks/useRCE'
-import {
-  titleValidator,
-  displayNameValidator
-} from '../validators/outcomeValidators'
+import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {createOutcome} from '@canvas/outcomes/graphql/Management'
 import TreeBrowser from './Management/TreeBrowser'
@@ -155,7 +152,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
                   <Spinner renderTitle={I18n.t('Loading')} size="medium" />
                 </View>
               ) : error ? (
-                <Text color="danger">
+                <Text color="danger" data-testid="loading-error">
                   {contextType === 'Course'
                     ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
                     : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}

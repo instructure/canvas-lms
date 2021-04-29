@@ -102,6 +102,24 @@ describe "BookmarkedCollection::Collection" do
     end
   end
 
+  describe "round-tripping dates" do
+    it "converts to UTC" do
+      timestamp = DateTime.parse('2020-12-31T22:00:00-09:00').in_time_zone('Alaska')
+      page = @collection.bookmark_to_page([1, timestamp])
+      expect(page).to match(/^bookmark:/)
+      bookmark = @collection.page_to_bookmark(page)
+      expect(bookmark).to eq([1, "2021-01-01T07:00:00.000000Z"])
+    end
+
+    it "preserves fractional times" do
+      timestamp = DateTime.parse('2020-02-22T22:22:22.22Z')
+      page = @collection.bookmark_to_page([1, [2, timestamp]])
+      expect(page).to match(/^bookmark:/)
+      bookmark = @collection.page_to_bookmark(page)
+      expect(bookmark).to eq([1, [2, "2020-02-22T22:22:22.220000Z"]])
+    end
+  end
+
   describe "#current_page=" do
     it "should set current_bookmark to nil if nil" do
       @collection.current_bookmark = "some value"

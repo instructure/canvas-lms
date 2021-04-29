@@ -1,17 +1,83 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html dir="ltr">
   <head>
-    <title>canvas-rce documentation</title>
+    <title>Canvas RCE Demo</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 1920 1920' version='1.1' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1108.6752,239.0016 L271.0752,1077.3696 C257.6352,1090.8096 248.5152,1107.8976 244.7712,1126.4256 L244.7712,1126.4256 L144.9312,1625.6256 C138.6912,1657.1136 148.4832,1689.6576 171.1392,1712.4096 C189.3792,1730.5536 213.8592,1740.5376 239.1072,1740.5376 C245.3472,1740.5376 251.5872,1739.8656 257.9232,1738.6176 L257.9232,1738.6176 L757.1232,1638.7776 C775.6512,1635.0336 792.7392,1625.9136 806.1792,1612.5696 L806.1792,1612.5696 L1631.9712,787.3536 L1631.9712,1871.0016 L-0.0288,1871.0016 L-0.0288,239.0016 L1108.6752,239.0016 Z M1442.8992,40.3296 C1497.5232,-13.4304 1592.6592,-13.4304 1646.4192,40.3296 L1646.4192,40.3296 L1843.2192,237.1296 C1870.0992,264.0096 1885.3632,300.4896 1885.3632,338.8896 C1885.3632,377.2896 1870.0992,413.7696 1843.2192,440.6496 L1843.2192,440.6496 L1643.5392,639.3696 L738.1632,1544.6496 L239.0592,1644.4896 L338.8992,1145.2896 L1244.1792,240.0096 Z M465.5232,1153.9296 L427.2192,1192.3296 L360.9792,1522.5696 L691.2192,1456.3296 L729.5232,1417.9296 L465.5232,1153.9296 Z M1305.5232,509.7696 L712.3392,1103.0496 L780.4992,1171.2096 L1373.7792,577.9296 L1305.5232,509.7696 Z M1544.6592,94.0896 C1532.1792,94.0896 1519.6992,99.8496 1511.0592,108.4896 L1511.0592,108.4896 L1379.5392,240.0096 L1643.5392,504.0096 L1775.0592,372.4896 C1783.6992,363.8496 1789.3632,351.3696 1789.3632,338.8896 C1789.3632,325.4496 1783.6992,313.9296 1775.0592,304.3296 L1775.0592,304.3296 L1579.2192,108.4896 C1569.5232,99.8496 1558.0992,94.0896 1544.6592,94.0896 Z' stroke='none' stroke-width='1' fill-rule='evenodd'/%3E%3C/svg%3E"
+    />
     <style>
-    body {max-width: 1100px; margin: 2em auto; background-color: #eee;} 
-    h1 {border-bottom: 1px;}
-    code {background-color: #ddd; color: #c32; padding: 1px 3px; boarder-radius: 2px;}
+      @import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
+      html {
+        font-family: 'Lato Extended', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      }
+      body {
+        width: 1100px;
+        margin: 1rem auto;
+        background-color: #eee;
+      }
+      h1 small {
+        font-size: 0.5rem;
+        font-weight: normal;
+        color: #888;
+      }
+      #demo {
+        display: flex;
+      }
+      .main {
+        flex: 3;
+        padding: 0 2rem;
+      }
+      .sidebar {
+        flex: 1;
+      }
+      #options {
+        margin-top: 1rem;
+      }
+      #options label {
+        margin-top: 1rem;
+      }
+      h1 {
+        border-bottom: 1px;
+      }
+      code {
+        background-color: #ddd;
+        color: #c32;
+        padding: 1px 3px;
+        border-radius: 2px;
+      }
+      .screenreader-only {
+        border: 0;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+        transform: translatez(0);
+      }
     </style>
   </head>
   <body>
-    <h1>CanvasRCE Documentation</h1>
-    <p>Documentation coming soon.</p>
-    <h2>Demo</h2>
-    <p><a href="demo.html">CanvasRCE Demo</a></p>
+    <div
+      id="flash_screenreader_holder"
+      role="alert"
+      aria-live="assertive"
+      aria-relevant="additions text"
+      class="screenreader-only"
+      aria-atomic="false"
+    ></div>
+    <h1>Canvas RCE Demo</h1>
+    <div id="demo">
+      <div class="main" id="content"></div>
+      <div class="sidebar">
+        <div id="options"></div>
+      </div>
+    </div>
+    <script src="./demo.js"></script>
   </body>
 </html>

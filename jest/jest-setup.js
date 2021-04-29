@@ -135,3 +135,7 @@ if (!('matchMedia' in window)) {
   })
   window.matchMedia._mocked = true
 }
+
+if (!('scrollIntoView' in window.HTMLElement.prototype)) {
+  window.HTMLElement.prototype.scrollIntoView = () => {}
+}

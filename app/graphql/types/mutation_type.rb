@@ -67,6 +67,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
+  field :delete_submission_draft, mutation: Mutations::DeleteSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
   field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
@@ -82,6 +83,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
   field :import_outcomes, mutation: Mutations::ImportOutcomes
+  field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

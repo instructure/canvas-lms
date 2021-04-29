@@ -76,7 +76,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("submission_comments")
-      published_comments = submission.comments_for(@current_user).published
+      published_comments = submission.comments_excluding_drafts_for(@current_user)
       hash['submission_comments'] = submission_comments_json(published_comments, current_user)
     end
 

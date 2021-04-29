@@ -30,6 +30,7 @@ const defaultContext = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
+  cardsSettled: true,
   isStudent: true,
   switchToMissingItems: jest.fn(),
   switchToToday: jest.fn()
@@ -102,7 +103,11 @@ describe('K-5 Dashboard Card', () => {
       ]),
       {overwriteRoutes: true}
     )
-    const {findByText} = render(<K5DashboardCard {...defaultProps} />)
+    const {findByText} = render(
+      <K5DashboardContext.Provider value={defaultContext}>
+        <K5DashboardCard {...defaultProps} />
+      </K5DashboardContext.Provider>
+    )
     const linkText = await findByText('How do you do, fellow kids?')
     const link = linkText.closest('a')
     expect(link.href).toBe('http://localhost/courses/test/discussion_topics/55')
@@ -110,7 +115,7 @@ describe('K-5 Dashboard Card', () => {
 
   it('displays "Nothing due today" if no assignments are due today', async () => {
     const {findByText} = render(
-      <K5DashboardContext.Provider value={{...defaultContext}}>
+      <K5DashboardContext.Provider value={defaultContext}>
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
@@ -160,6 +165,13 @@ describe('K-5 Dashboard Card', () => {
       </K5DashboardContext.Provider>
     )
     expect(queryByText('Nothing due today')).not.toBeInTheDocument()
+  })
+
+  it('defaults color if no course color or image are provided', () => {
+    const {getByTestId} = render(<K5DashboardCard {...defaultProps} />)
+    expect(getByTestId('k5-dashboard-card-hero').style.getPropertyValue('background-color')).toBe(
+      'rgb(57, 75, 88)'
+    )
   })
 })
 

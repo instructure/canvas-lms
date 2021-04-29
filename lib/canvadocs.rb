@@ -255,7 +255,7 @@ module Canvadocs
         )
       ]
 
-      if assignment.peer_reviews? && submission.user == current_user
+      if assignment.peer_reviews?
         session_params[:user_filter] = session_params[:user_filter] | peer_review_user_filter(submission, current_user, enrollments)
       end
     end
@@ -301,8 +301,15 @@ module Canvadocs
 
     def peer_review_user_filter(submission, current_user, enrollments)
       assessors = User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+      users_for_filter = assessors.push(current_user)
 
-      assessors.push(current_user).map do |assessor|
+      # When the submission is for a Student Annotation assignment, the
+      # annotations are the submission, so show the annotations to reviewers.
+      if assessors.include?(current_user) && submission.submission_type == "student_annotation"
+        users_for_filter.push(submission.user)
+      end
+
+      users_for_filter.map do |assessor|
         user_filter_entry(
           assessor,
           submission,

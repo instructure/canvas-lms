@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
+
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent, within} from '@testing-library/react'
 import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import MoveModal from '../MoveModal'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
@@ -36,6 +36,7 @@ jest.mock('@canvas/outcomes/graphql/Management', () => ({
 describe('MoveModal', () => {
   let onCloseHandlerMock
   let cache
+  let showFlashAlertSpy
 
   const defaultProps = (props = {}) => ({
     isOpen: true,
@@ -51,6 +52,7 @@ describe('MoveModal', () => {
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
     cache = createCache()
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -160,25 +162,27 @@ describe('MoveModal', () => {
   })
 
   it('displays an error on failed request for account outcome groups', async () => {
-    const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+    render(<MoveModal {...defaultProps()} />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
-    expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
-    expect(getByText(/account/)).toBeInTheDocument()
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading account outcomes.',
+      type: 'error'
+    })
   })
 
   it('displays an error on failed request for course outcome groups', async () => {
-    const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+    render(<MoveModal {...defaultProps()} />, {
       contextId: '2',
       contextType: 'Course',
       mocks: []
     })
     await act(async () => jest.runAllTimers())
-    expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
-    expect(getByText(/course/)).toBeInTheDocument()
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading course outcomes.',
+      type: 'error'
+    })
   })
 
   it('renders a create new group link', async () => {
@@ -199,7 +203,7 @@ describe('MoveModal', () => {
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlert).toHaveBeenCalledWith({
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
         message: '"new group name" has been created.'
       })
@@ -217,7 +221,7 @@ describe('MoveModal', () => {
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlert).toHaveBeenCalledWith({
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
         message: 'An error occurred adding group "new group name": Server is busy'
       })

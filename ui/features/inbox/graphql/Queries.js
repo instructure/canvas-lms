@@ -17,10 +17,11 @@
  */
 import gql from 'graphql-tag'
 
-import {ConversationParticipantWithConversation} from './ConversationParticipantWithConversation'
-import {Enrollments} from './Enrollments'
-import {FavoriteCoursesConnection} from './FavoriteCoursesConnection'
-import {FavoriteGroupsConnection} from './FavoriteGroupsConnection'
+import {Conversation} from './Conversation'
+import {ConversationParticipant} from './ConversationParticipant'
+import {Enrollment} from './Enrollment'
+import {Course} from './Course'
+import {Group} from './Group'
 
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery($userID: ID!, $course: String, $scope: String = "") {
@@ -33,13 +34,17 @@ export const CONVERSATIONS_QUERY = gql`
           filter: $course # e.g. course_1
         ) {
           nodes {
-            ...ConversationParticipantWithConversation
+            ...ConversationParticipant
+            conversation {
+              ...Conversation
+            }
           }
         }
       }
     }
   }
-  ${ConversationParticipantWithConversation.fragment}
+  ${ConversationParticipant.fragment}
+  ${Conversation.fragment}
 `
 export const COURSES_QUERY = gql`
   query GetUserCourses($userID: ID!) {
@@ -49,23 +54,23 @@ export const COURSES_QUERY = gql`
         email
         favoriteGroupsConnection {
           nodes {
-            ...FavoriteGroupsConnection
+            ...Group
           }
         }
         favoriteCoursesConnection {
           nodes {
-            ...FavoriteCoursesConnection
+            ...Course
           }
         }
         enrollments {
-          ...Enrollments
+          ...Enrollment
         }
       }
     }
   }
-  ${Enrollments.fragment}
-  ${FavoriteCoursesConnection.fragment}
-  ${FavoriteGroupsConnection.fragment}
+  ${Enrollment.fragment}
+  ${Course.fragment}
+  ${Group.fragment}
 `
 
 export const REPLY_CONVERSATION_QUERY = gql`

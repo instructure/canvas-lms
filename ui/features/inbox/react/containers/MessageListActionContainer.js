@@ -18,7 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {COURSES_QUERY, CONVERSATIONS_QUERY} from '../../graphql/Queries'
-import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../Mutations'
+import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {CourseSelect} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!conversations_2'

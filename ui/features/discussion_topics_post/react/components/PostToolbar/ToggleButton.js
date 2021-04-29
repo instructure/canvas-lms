@@ -35,6 +35,7 @@ export function ToggleButton({...props}) {
         withBackground={false}
         withBorder={false}
         {...getButtonProps(props)}
+        interaction={props.interaction}
       />
     </Tooltip>
   )
@@ -55,6 +56,7 @@ const getButtonProps = props => {
 }
 
 ToggleButton.propTypes = {
+  interaction: PropTypes.string,
   isEnabled: PropTypes.bool.isRequired,
   enabledIcon: PropTypes.node.isRequired,
   disabledIcon: PropTypes.node.isRequired,

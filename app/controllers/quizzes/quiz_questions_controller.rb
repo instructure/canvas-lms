@@ -286,6 +286,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
+      process_answer_html_content(question_data)
 
       guard_against_big_fields do
         @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
@@ -357,6 +358,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
       question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
+      process_answer_html_content(question_data)
 
       if question_data[:quiz_group_id]
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
@@ -463,5 +465,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
       quiz_data,
       shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
     )
+  end
+
+  def process_answer_html_content(question_data)
+    if Account.site_admin.feature_enabled?(:strip_origin_from_quiz_answer_file_references)
+      question_data[:answers]&.each do |_index, answer|
+        %i[answer_html answer_comment_html].each do |key|
+          answer[key] = process_incoming_html_content(answer[key]) if answer[key].present?
+        end
+      end
+    end
   end
 end

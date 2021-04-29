@@ -27,4 +27,9 @@ class CommentBankItem < ActiveRecord::Base
   resolves_root_account through: :course
 
   validates :comment, length: { maximum: maximum_text_length, allow_blank: false }
+
+  set_policy do
+    given { |user| self.user == user }
+    can :delete and can :read and can :update
+  end
 end

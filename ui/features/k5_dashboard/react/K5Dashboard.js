@@ -45,7 +45,7 @@ import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from './ResourcesPage'
-import {TAB_IDS} from '@canvas/k5/react/utils'
+import {FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
@@ -85,11 +85,12 @@ export const K5Dashboard = ({
   toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  canCreateCourses = false
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
-  const [focusMissingItems, setFocusMissingItems] = useState(false)
+  const [cardsSettled, setCardsSettled] = useState(false)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -100,20 +101,21 @@ export const K5Dashboard = ({
 
   useEffect(() => {
     if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
-      loadCardDashboard(setCards)
+      loadCardDashboard((dc, cardsFinishedLoading) => {
+        setCards(dc)
+        setCardsSettled(cardsFinishedLoading)
+      })
     }
   }, [cards, currentTab])
 
   const handleSwitchToToday = () => {
-    setFocusMissingItems(false)
-    handleTabChange(TAB_IDS.SCHEDULE)
+    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.TODAY)
     switchToToday()
   }
 
   const handleSwitchToMissingItems = () => {
     toggleMissing({forceExpanded: true})
-    setFocusMissingItems(true)
-    handleTabChange(TAB_IDS.SCHEDULE)
+    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.MISSING_ITEMS)
     switchToToday()
   }
 
@@ -124,6 +126,7 @@ export const K5Dashboard = ({
           assignmentsDueToday,
           assignmentsMissing,
           assignmentsCompletedForToday,
+          cardsSettled,
           loadingOpportunities,
           isStudent: plannerEnabled,
           responsiveSize,
@@ -134,32 +137,28 @@ export const K5Dashboard = ({
         <K5Tabs
           currentTab={currentTab}
           name={display_name}
-          onTabChange={id => {
-            if (id === TAB_IDS.SCHEDULE) {
-              setFocusMissingItems(false)
-            }
-            handleTabChange(id)
-          }}
+          onTabChange={handleTabChange}
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
-        {cards && (
-          <HomeroomPage
-            cards={cards}
-            isStudent={plannerEnabled}
-            responsiveSize={responsiveSize}
-            visible={currentTab === TAB_IDS.HOMEROOM}
-          />
-        )}
-        {plannerInitialized && (
-          <SchedulePage
-            visible={currentTab === TAB_IDS.SCHEDULE}
-            focusMissingItems={focusMissingItems}
-          />
-        )}
+        <HomeroomPage
+          cards={cards}
+          cardsSettled={cardsSettled}
+          isStudent={plannerEnabled}
+          responsiveSize={responsiveSize}
+          visible={currentTab === TAB_IDS.HOMEROOM}
+          canCreateCourses={canCreateCourses}
+        />
+        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
-        {cards && <ResourcesPage cards={cards} visible={currentTab === TAB_IDS.RESOURCES} />}
+        {cards && (
+          <ResourcesPage
+            cards={cards}
+            cardsSettled={cardsSettled}
+            visible={currentTab === TAB_IDS.RESOURCES}
+          />
+        )}
       </K5DashboardContext.Provider>
     </View>
   )
@@ -180,7 +179,8 @@ K5Dashboard.propTypes = {
   toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string
+  responsiveSize: PropTypes.string,
+  canCreateCourses: PropTypes.bool
 }
 
 const mapDispatchToProps = {

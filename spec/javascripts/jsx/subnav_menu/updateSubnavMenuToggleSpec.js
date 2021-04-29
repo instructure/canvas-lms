@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import updateSubnavMenuToggle from '../../../../ui/boot/initializers/updateSubnavMenuToggle.js'
+import updateSubnavMenuToggle from '../../../../ui/shared/courses/jquery/updateSubnavMenuToggle'
 
 const container = $('#fixtures')
 

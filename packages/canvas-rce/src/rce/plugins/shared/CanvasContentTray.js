@@ -458,7 +458,8 @@ const trayPropsMap = {
   contextType: string.isRequired, // initial value indicating the user's context, not the tray's
   containingContext: shape({
     contextType: string.isRequired,
-    contextId: string.isRequired
+    contextId: string.isRequired,
+    userId: string.isRequired
   }),
   filesTabDisabled: bool,
   host: requiredWithoutSource,
@@ -470,7 +471,7 @@ const trayPropsMap = {
   themeUrl: string
 }
 
-export const trayProps = shape(trayPropsMap)
+export const trayPropTypes = shape(trayPropsMap)
 
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,

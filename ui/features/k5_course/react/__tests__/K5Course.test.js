@@ -21,7 +21,7 @@ import moxios from 'moxios'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
-import {MOCK_COURSE_APPS, MOCK_COURSE_TABS} from './mocks'
+import {MOCK_COURSE_APPS, MOCK_COURSE_TABS, MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
@@ -48,20 +48,40 @@ const defaultProps = {
   id: '30',
   timeZone: defaultEnv.TIMEZONE,
   canManage: false,
-  courseOverview: '<h2>Time to learn!</h2>'
+  courseOverview: '<h2>Time to learn!</h2>',
+  hideFinalGrades: false,
+  userIsInstructor: false
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
+const ASSIGNMENT_GROUPS_URL = encodeURI(
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission'
+)
+const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
+
+let modulesContainer
 
 beforeAll(() => {
   moxios.install()
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
   fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
+  fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
+  fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
+  if (!modulesContainer) {
+    modulesContainer = document.createElement('div')
+    modulesContainer.id = 'k5-modules-container'
+    modulesContainer.style.display = 'none'
+    modulesContainer.innerHTML = 'Course modules content'
+    document.body.appendChild(modulesContainer)
+  }
 })
 
 afterAll(() => {
   moxios.uninstall()
   fetchMock.restore()
+  if (modulesContainer) {
+    modulesContainer.remove()
+  }
 })
 
 beforeEach(() => {
@@ -83,11 +103,18 @@ describe('K-5 Subject Course', () => {
       expect(hero.style.getPropertyValue('background-image')).toBe(`url(${imageUrl})`)
     })
 
-    it('displays a gray background on the hero header if no image is set', () => {
+    it('displays the course color if one is set but no course image is set', () => {
+      const {getByTestId} = render(<K5Course {...defaultProps} color="#bb8" />)
+      const hero = getByTestId('k5-course-header-hero')
+
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(187, 187, 136)')
+    })
+
+    it('displays a gray background on the hero header if no course color or image is set', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} />)
       const hero = getByTestId('k5-course-header-hero')
 
-      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(199, 205, 209)')
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(57, 75, 88)')
     })
 
     it('displays the course name', () => {
@@ -158,7 +185,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('overview tab', () => {
+  describe('home tab', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Time to learn!')).toBeInTheDocument()
@@ -166,39 +193,57 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('modules tab', () => {
-    it('only shows modules container on modules tab', () => {
-      const modulesContainer = document.createElement('div')
-      modulesContainer.setAttribute('id', 'k5-modules-container')
-      modulesContainer.style.display = 'none'
-      const {getByRole} = render(<K5Course {...defaultProps} />)
-      expect(modulesContainer.style.display).toBe('none')
-      getByRole('tab', {name: 'Modules'}).click()
-      waitFor(() => expect(modulesContainer.style.display).toBe('block'))
+    it('shows modules content if modules tab is selected', async () => {
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />)
+      expect(getByText('Course modules content')).toBeVisible()
+    })
+
+    it('hides modules content if modules tab is not selected', async () => {
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
+      expect(getByText('Course modules content')).not.toBeVisible()
+    })
+  })
+
+  describe('grades tab', () => {
+    it('fetches and displays grade information', async () => {
+      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
+      await waitFor(() => expect(getByText('WWII Report')).toBeInTheDocument())
+      ;['Reports', '9.5 pts', 'Out of 10 pts'].forEach(t => {
+        expect(getByText(t)).toBeInTheDocument()
+      })
+      expect(getByText('Submitted', {exact: false})).toBeInTheDocument()
+    })
+
+    it('shows course total', async () => {
+      const {findByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
+      expect(await findByText('Total: 89.39%')).toBeInTheDocument()
     })
   })
 
   describe('resources tab', () => {
-    it("displays user's apps", () => {
+    it("displays user's apps", async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-      waitFor(() => {
+      await waitFor(() => {
         expect(getByText('Studio')).toBeInTheDocument()
         expect(getByText('Student Applications')).toBeInTheDocument()
       })
     })
 
-    it('shows a loading spinner while apps are loading', () => {
+    it('shows a loading spinner while apps are loading', async () => {
       const {getByText, queryByText} = render(
         <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
       )
-      waitFor(() => expect(getByText('Loading apps...')).toBeInTheDocument())
-      expect(queryByText('Studio')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText('Loading apps...')).toBeInTheDocument()
+        expect(queryByText('Studio')).not.toBeInTheDocument()
+      })
     })
 
-    it('shows an error if apps fail to load', () => {
+    it('shows an error if apps fail to load', async () => {
       fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
-      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-      waitFor(() =>
-        expect(getByText('Failed to load apps for Arts and Crafts.')).toBeInTheDocument()
+      const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+      await waitFor(() =>
+        expect(getAllByText('Failed to load apps for Arts and Crafts.')[0]).toBeInTheDocument()
       )
     })
   })

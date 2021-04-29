@@ -39,6 +39,31 @@ import './boot/initializers/ajax_errors.js'
 import './boot/initializers/activateKeyClicks.js'
 import './boot/initializers/activateTooltips.js'
 
+window.canvasReadyState = 'loading'
+window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
+
+const readinessTargets = [
+  ['asyncInitializers',false],
+  ['deferredBundles',false],
+]
+const advanceReadiness = target => {
+  const entry = readinessTargets.find(x => x[0] === target)
+
+  if (!entry) {
+    throw new Error(`Invalid readiness target -- "${target}"`)
+  }
+  else if (entry[1]) {
+    throw new Error(`Target already marked ready -- "${target}"`)
+  }
+
+  entry[1] = true
+
+  if (readinessTargets.every(x => x[1])) {
+    window.canvasReadyState = 'complete'
+    window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
+  }
+}
+
 // This is because most pages use this and by having it all in it's own chunk it makes webpack
 // split out a ton of stuff (like @instructure/ui-view) into multiple chunks because its chunking
 // algorithm decides that because that chunk would either be too small or it would cause more than
@@ -90,11 +115,15 @@ if (
 }
 
 ;(window.requestIdleCallback || window.setTimeout)(() => {
-  import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse.js')
+  import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse.js').then(() =>
+    advanceReadiness('asyncInitializers')
+  )
 })
 
 ready(() => {
-  ;(window.deferredBundles || []).forEach(loadBundle)
+  Promise.all(
+    (window.deferredBundles || []).map(loadBundle)
+  ).then(() => advanceReadiness('deferredBundles'))
 
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't

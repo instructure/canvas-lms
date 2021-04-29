@@ -72,6 +72,7 @@ describe MicrosoftSync::SyncerSteps do
     ra = course.root_account
     ra.settings[:microsoft_sync_enabled] = sync_enabled
     ra.settings[:microsoft_sync_tenant] = tenant
+    ra.settings[:microsoft_sync_login_attribute] = 'email'
     ra.save!
 
     allow(MicrosoftSync::GraphServiceHelpers).to \

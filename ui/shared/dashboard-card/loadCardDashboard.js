@@ -73,8 +73,11 @@ export default function loadCardDashboard(renderFn = renderIntoDOM) {
     Promise.race([promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage]).then(
       dashboardCards => {
         clearTimeout(sessionStorageTimeout)
-        renderFn(dashboardCards)
-        if (!xhrHasReturned) promiseToGetDashboardCards.then(renderFn)
+        // calling the renderFn with `false` indicates to consumers that we're still waiting
+        // on the follow-up xhr request to complete.
+        renderFn(dashboardCards, xhrHasReturned)
+        // calling it with `true` indicates that all outstanding card promises have settled.
+        if (!xhrHasReturned) promiseToGetDashboardCards.then(cards => renderFn(cards, true))
       }
     )
 
@@ -84,6 +87,10 @@ export default function loadCardDashboard(renderFn = renderIntoDOM) {
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )
   } else {
-    promiseToGetDashboardCards.then(renderFn)
+    promiseToGetDashboardCards.then(cards => renderFn(cards, true))
   }
+}
+
+export function resetDashboardCards() {
+  promiseToGetDashboardCards = undefined
 }

@@ -17,7 +17,7 @@
  */
 
 import * as uploadFileModule from '@canvas/upload-file'
-import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../Mutations'
+import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {COURSES_QUERY, REPLY_CONVERSATION_QUERY} from '../../../graphql/Queries'

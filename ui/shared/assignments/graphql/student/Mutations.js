@@ -26,6 +26,7 @@ export const DefaultMocks = {
   CreateSubmissionCommentPayload: () => ({errors: null}),
   CreateSubmissionDraftPayload: () => ({errors: null}),
   CreateSubmissionPayload: () => ({errors: null}),
+  DeleteSubmissionDraftPayload: () => ({errors: null}),
   MarkSubmissionCommentsReadPayload: () => ({errors: null})
 }
 
@@ -145,6 +146,18 @@ export const SET_MODULE_ITEM_COMPLETION = gql`
       moduleItem {
         _id
       }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`
+
+export const DELETE_SUBMISSION_DRAFT = gql`
+  mutation DeleteSubmissionDraft($submissionId: ID!) {
+    deleteSubmissionDraft(input: {submissionId: $submissionId}) {
+      submissionDraftIds
       errors {
         ...Error
       }

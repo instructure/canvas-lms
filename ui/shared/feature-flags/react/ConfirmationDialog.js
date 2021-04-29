@@ -28,6 +28,7 @@ export default function ConfirmationDialog({
   open,
   label,
   children,
+  confirmColor,
   confirmText,
   onConfirm,
   onReject
@@ -41,7 +42,7 @@ export default function ConfirmationDialog({
       footer={
         <>
           <Button onClick={onReject}>{I18n.t('Cancel')}</Button>
-          <Button margin="0 0 0 small" variant="primary" onClick={onConfirm}>
+          <Button margin="0 0 0 small" variant={confirmColor || 'primary'} onClick={onConfirm}>
             {confirmText || I18n.t('Confirm')}
           </Button>
         </>
@@ -52,7 +53,7 @@ export default function ConfirmationDialog({
   )
 }
 
-export async function showConfirmationDialog({label, body, confirmText}) {
+export async function showConfirmationDialog({label, body, confirmText, confirmColor}) {
   let resolver
   const returnedPromise = new Promise(resolve => {
     resolver = resolve
@@ -83,6 +84,7 @@ export async function showConfirmationDialog({label, body, confirmText}) {
       <ConfirmationDialog
         open
         label={label}
+        confirmColor={confirmColor}
         confirmText={confirmText}
         onConfirm={confirmationFunction}
         onReject={rejectFunction}

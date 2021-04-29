@@ -190,6 +190,21 @@ describe('CourseAvailabilityOptions', () => {
     expect(getByLabelText('End').value).toContain('Oct 16, 2020')
   })
 
+  it('clears course dates when participation setting is changed to Term', () => {
+    const {getByText, getByLabelText} = renderComponent(wrapper, {
+      course_conclude_at: moment('2020-10-16').toISOString(),
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const select = getByLabelText('Limit course participation to term or custom course dates?')
+    expect(select.value).toBe('Course')
+    fireEvent.click(select)
+    const termOption = getByText('Term')
+    fireEvent.click(termOption)
+
+    expect(document.getElementById('course_start_at').value).toBe('')
+    expect(document.getElementById('course_conclude_at').value).toBe('')
+  })
+
   it('sets the restriction checkboxes to currently set values on render', () => {
     const {getByLabelText} = renderComponent(wrapper, {
       course_restrict_student_future_view: 'false',

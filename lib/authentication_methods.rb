@@ -263,6 +263,7 @@ module AuthenticationMethods
       begin
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
+        nil
       end
       if user && @real_current_user
         if @current_user != user
@@ -273,7 +274,7 @@ module AuthenticationMethods
         # else: they do match, everything is already set
         end
         logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url} via masquerade token"
-      elsif user && user.can_masquerade?(@current_user, @domain_root_account)
+      elsif user&.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
         @real_current_pseudonym = @current_pseudonym
@@ -281,6 +282,7 @@ module AuthenticationMethods
         logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API
+        # this should maybe be 404, not 401, but we can't change it now
         render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
         return false
       end

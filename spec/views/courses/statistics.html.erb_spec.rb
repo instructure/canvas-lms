@@ -23,10 +23,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "courses/statistics.html.erb" do
   before do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     assign(:range_start, Date.parse("Jan 1 2000"))
     assign(:range_end, 3.days.from_now)
   end
+
+  let(:doc) { Nokogiri::HTML5(response.body) }
 
   it "only lists active quiz objects, questions, and submissions" do
     quiz_with_submission
@@ -36,9 +38,38 @@ describe "courses/statistics.html.erb" do
     view_context(@course, @user)
     render
 
-    doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('.quiz_count').text).to eq "1"
-    expect(doc.at_css('.quiz_question_count').text).to eq "1"
-    expect(doc.at_css('.quiz_submission_count').text).to eq "1"
+    expect(doc.at_css(".quiz_count").text).to eq "1"
+    expect(doc.at_css(".quiz_question_count").text).to eq "1"
+    expect(doc.at_css(".quiz_submission_count").text).to eq "1"
+  end
+
+  context "student annotation assignments" do
+    before(:each) do
+      @attachment = attachment_model(context: @course)
+      @assignment = @course.assignments.create!(
+        name: "annotated",
+        submission_types: "student_annotation",
+        annotatable_attachment: @attachment
+      )
+    end
+
+    it "includes counts for student annotation assignments" do
+      view_context(@course, @user)
+      render
+      expect(doc.at_css('#student-annotation-assignment-count').text).to eq "1"
+    end
+
+    it "includes counts for student annotation submissions" do
+      student = student_in_course(course: @course, active_all: true).user
+      @assignment.submit_homework(
+        student,
+        submission_type: "student_annotation",
+        annotatable_attachment_id: @attachment.id
+      )
+
+      view_context(@course, @user)
+      render
+      expect(doc.at_css('#student-annotation-submission-count').text).to eq "1"
+    end
   end
 end

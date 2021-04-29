@@ -5,7 +5,7 @@ source script/common/utils/common.sh
 source script/common/canvas/build_helpers.sh
 
 LOG="$(pwd)/log/docker_dev_update.log"
-DOCKER='y'
+DOCKER='true'
 SCRIPT_NAME=$0
 
 trap trap_result EXIT
@@ -25,6 +25,11 @@ die () {
 }
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
+if is_mutagen; then
+  DOCKER_COMMAND="mutagen compose"
+  CANVAS_SKIP_DOCKER_USERMOD='true'
+  print_mutagen_intro
+fi
 
 while :; do
   case $1 in
@@ -34,10 +39,12 @@ while :; do
       ;;
     --update-code)
       UPDATE_CODE=true
+      before_rebase_sha="$(git rev-parse HEAD)"
       params=()
       while :; do
         case $2 in
           skip-canvas)
+            unset before_rebase_sha
             params+=(--skip-canvas)
             ;;
           skip-plugins)
@@ -64,10 +71,8 @@ while :; do
   shift
 done
 
-if ! docker info &> /dev/null; then
-  echo "Docker is not running! Start docker daemon and try again."
-  exit 1
-fi
+# check for docker daemon running before anything else
+docker_running || exit 1
 
 if [ -f "docker-compose.override.yml" ]; then
   echo "docker-compose.override.yml exists, skipping copy of default configuration"
@@ -91,6 +96,7 @@ create_log_file
 message "Bringing Canvas up to date ..."
 init_log_file "Docker Dev Update"
 [[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
+rebuild_docker_images
 docker_compose_up
 bundle_install_with_check
 install_node_packages

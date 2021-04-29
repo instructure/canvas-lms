@@ -24,6 +24,9 @@ import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
+import {waitFor} from '@testing-library/dom'
+
+jest.mock('@canvas/rce/RichContentEditor')
 
 const discussionTopicMock = {
   discussionTopic: {
@@ -37,6 +40,8 @@ const discussionTopicMock = {
     message: '<p> This is the Discussion Topic. </p>',
     postedAt: '2021-04-05T13:40:50Z',
     subscribed: true,
+    published: true,
+    canUnpublish: true,
     entryCounts: {
       repliesCount: 24,
       unreadCount: 4
@@ -44,25 +49,11 @@ const discussionTopicMock = {
     assignment: {
       dueAt: '2021-04-05T13:40:50Z',
       pointsPossible: 5
-    }
-  }
-}
-
-const discussionTopicMockOptional = {
-  discussionTopic: {
-    _id: '1',
-    id: 'VXNlci0x',
-    title: 'Discussion Topic One',
-    author: {
-      name: 'Chawn Neal',
-      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
-    message: '<p> This is the Discussion Topic. </p>',
-    postedAt: '2021-04-05T13:40:50Z',
-    subscribed: true,
-    entryCounts: {
-      repliesCount: 24,
-      unreadCount: 4
+    permissions: {
+      readAsAdmin: true,
+      update: true,
+      delete: true
     }
   }
 }
@@ -70,6 +61,7 @@ const discussionTopicMockOptional = {
 describe('DiscussionTopicContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
+    window.ENV = {context_asset_string: 'course_1'}
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
@@ -94,29 +86,125 @@ describe('DiscussionTopicContainer', () => {
       </ApolloProvider>
     )
   }
+  it('publish button is readonly if canUnpublish is false', async () => {
+    const {getByText} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, canUnpublish: false}
+    })
 
-  it('renders without optional props', async () => {
-    const container = setup(discussionTopicMockOptional)
-    expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
-    expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
-    expect(await container.queryByTestId('discussion-topic-reply')).toBeNull()
+    expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
 
-  it('renders Graded info when isGraded', async () => {
+  it('renders without optional props', async () => {
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, assignment: {}}
+    })
+    expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
+
+    expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
+  })
+
+  it('renders infoText only when there are replies', async () => {
+    const container = setup(discussionTopicMock)
+    const infoText = await container.findByTestId('replies-counter')
+    expect(infoText).toHaveTextContent('24 replies, 4 unread')
+  })
+
+  it('does not render unread when there are none', async () => {
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, unreadCount: 0}
+    })
+    const infoText = await container.findByTestId('replies-counter')
+    expect(infoText).toHaveTextContent('24 replies')
+  })
+
+  it('renders Graded info when assignment info exists', async () => {
     const container = setup(discussionTopicMock)
     const gradedDiscussionInfo = await container.findByTestId('graded-discussion-info')
     expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
   })
 
-  it('renders teacher components when hasTeacherPermissions', async () => {
-    discussionTopicMock.hasTeacherPermissions = true
-    const container = setup(discussionTopicMock)
-    const manageButton = await container.getByText('Manage Discussion').closest('button')
+  it('renders Graded info when isGraded', async () => {
+    const {findByTestId} = setup(discussionTopicMock)
+    const gradedDiscussionInfo = await findByTestId('graded-discussion-info')
+    expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
+  })
+
+  it('renders teacher components when can readAsAdmin', async () => {
+    const {getByText, findByText} = setup(discussionTopicMock)
+
+    const manageButton = getByText('Manage Discussion').closest('button')
     fireEvent.click(manageButton)
-    expect(await container.getByText('Edit')).toBeTruthy()
-    expect(await container.getByText('Delete')).toBeTruthy()
-    expect(await container.getByText('Close for Comments')).toBeTruthy()
-    expect(await container.getByText('Send To...')).toBeTruthy()
-    expect(await container.getByText('Copy To...')).toBeTruthy()
+
+    expect(await findByText('Edit')).toBeTruthy()
+    expect(await findByText('Delete')).toBeTruthy()
+    expect(await findByText('Close for Comments')).toBeTruthy()
+    expect(await findByText('Send To...')).toBeTruthy()
+    expect(await findByText('Copy To...')).toBeTruthy()
+  })
+
+  it('should be able to send to edit page when canreadAsAdmin', async () => {
+    const {getByTestId, findByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('edit'))
+    await waitFor(() => {
+      // this text appears on the edit page
+      expect(findByText('Allow threaded replies')).toBeTruthy()
+    })
+  })
+
+  it('Should be able to delete topic', async () => {
+    window.confirm = jest.fn(() => true)
+    const {getByTestId, findByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('delete'))
+
+    await waitFor(() => {
+      expect(findByText('Pinned Discussions')).toBeTruthy()
+    })
+  })
+
+  it('Should not be able to delete the topic if does not have permission', async () => {
+    const {getByTestId, queryByTestId} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {delete: false}}
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(queryByTestId('delete')).toBeNull()
+  })
+
+  it('Should be able to open SpeedGrader', async () => {
+    const {getByTestId, findByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('speedGrader'))
+
+    await waitFor(() => {
+      expect(findByText('This student does not have a submission for this assignment')).toBeTruthy()
+    })
+  })
+
+  it('Should not be able to open SpeedGrader if is not an assignment', () => {
+    const {getByTestId, queryByTestId} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, assignment: null}
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(queryByTestId('speedGrader')).toBeNull()
+  })
+
+  it('renders a modal to send content', async () => {
+    const container = setup(discussionTopicMock)
+    const kebob = await container.findByTestId('discussion-post-menu-trigger')
+    fireEvent.click(kebob)
+    const sendToButton = await container.findByText('Send To...')
+    fireEvent.click(sendToButton)
+    expect(await container.findByText('Send to:')).toBeTruthy()
+  })
+
+  it.skip('renders a modal to copy content', async () => {
+    const container = setup(discussionTopicMock)
+    const kebob = await container.findByTestId('discussion-post-menu-trigger')
+    fireEvent.click(kebob)
+    const copyToButton = await container.findByText('Copy To...')
+    fireEvent.click(copyToButton)
+    expect(await container.findByText('Select a Course')).toBeTruthy()
   })
 })

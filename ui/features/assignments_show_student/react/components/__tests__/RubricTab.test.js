@@ -100,38 +100,57 @@ async function makeProps(opts = {}) {
 
 describe('RubricTab', () => {
   describe('ungraded rubric', () => {
-    it('contains the rubric criteria heading', async () => {
+    it('is collapsed by default', async () => {
       const props = await makeProps({graded: false})
-      const {findAllByText} = render(<RubricTab {...props} />)
-      expect((await findAllByText('Criteria'))[1]).toBeInTheDocument()
-    })
-
-    it('contains the rubric ratings heading', async () => {
-      const props = await makeProps({graded: false})
-      const {findAllByText} = render(<RubricTab {...props} />)
-      expect((await findAllByText('Ratings'))[1]).toBeInTheDocument()
-    })
-
-    it('contains the rubric points heading', async () => {
-      const props = await makeProps({graded: false})
-      const {findAllByText} = render(<RubricTab {...props} />)
-      expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
-    })
-
-    it('shows possible points if the association does not hide points', async () => {
-      const props = await makeProps({graded: false})
-      props.rubricAssociation = {}
-
-      const {findByText} = render(<RubricTab {...props} />)
-      expect(await findByText(/\/ 6 pts/)).toBeInTheDocument()
-    })
-
-    it('does not show possible points for criteria if the association hides points', async () => {
-      const props = await makeProps({graded: false})
-      props.rubricAssociation = {hide_points: true}
-
       const {queryByText} = render(<RubricTab {...props} />)
-      expect(queryByText(/\/ 6 pts/)).not.toBeInTheDocument()
+
+      expect(queryByText('Criteria')).not.toBeInTheDocument()
+    })
+
+    describe('when expanded', () => {
+      it('contains the rubric criteria heading', async () => {
+        const props = await makeProps({graded: false})
+        const {findAllByText, getByRole} = render(<RubricTab {...props} />)
+        fireEvent.click(getByRole('button', {name: /View Rubric/}))
+
+        expect((await findAllByText('Criteria'))[1]).toBeInTheDocument()
+      })
+
+      it('contains the rubric ratings heading', async () => {
+        const props = await makeProps({graded: false})
+        const {findAllByText, getByRole} = render(<RubricTab {...props} />)
+        fireEvent.click(getByRole('button', {name: /View Rubric/}))
+
+        expect((await findAllByText('Ratings'))[1]).toBeInTheDocument()
+      })
+
+      it('contains the rubric points heading', async () => {
+        const props = await makeProps({graded: false})
+        const {findAllByText, getByRole} = render(<RubricTab {...props} />)
+        fireEvent.click(getByRole('button', {name: /View Rubric/}))
+
+        expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
+      })
+
+      it('shows possible points if the association does not hide points', async () => {
+        const props = await makeProps({graded: false})
+        props.rubricAssociation = {}
+
+        const {findByText, getByRole} = render(<RubricTab {...props} />)
+        fireEvent.click(getByRole('button', {name: /View Rubric/}))
+
+        expect(await findByText(/\/ 6 pts/)).toBeInTheDocument()
+      })
+
+      it('does not show possible points for criteria if the association hides points', async () => {
+        const props = await makeProps({graded: false})
+        props.rubricAssociation = {hide_points: true}
+
+        const {queryByText, getByRole} = render(<RubricTab {...props} />)
+        fireEvent.click(getByRole('button', {name: /View Rubric/}))
+
+        expect(queryByText(/\/ 6 pts/)).not.toBeInTheDocument()
+      })
     })
   })
 

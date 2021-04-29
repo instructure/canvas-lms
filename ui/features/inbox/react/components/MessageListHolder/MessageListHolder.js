@@ -27,7 +27,9 @@ export const MessageListHolder = ({...props}) => {
   const [rangeClickStart, setRangeClickStart] = useState()
 
   const provideConversationsForOnSelect = conversationIds => {
-    const matchedConversations = props.conversations.filter(c => conversationIds.includes(c._id))
+    const matchedConversations = props.conversations
+      .filter(c => conversationIds.includes(c._id))
+      .map(c => c.conversation)
     props.onSelect(matchedConversations)
   }
 

@@ -33,12 +33,12 @@ describe('ThreadPagination', () => {
     const {getByText} = render(<ThreadPagination {...props} />)
 
     fireEvent.click(getByText('2'))
-    expect(props.setPage).toHaveBeenCalledWith(2)
+    expect(props.setPage).toHaveBeenCalledWith(1)
 
     fireEvent.click(getByText('3'))
-    expect(props.setPage).toHaveBeenCalledWith(3)
+    expect(props.setPage).toHaveBeenCalledWith(2)
 
     fireEvent.click(getByText('10'))
-    expect(props.setPage).toHaveBeenCalledWith(10)
+    expect(props.setPage).toHaveBeenCalledWith(9)
   })
 })

@@ -16,11 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../Mutations'
+import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import ComposeModalContainer from './ComposeModalContainer'
 import {Conversation} from '../../../graphql/Conversation'
-import {CONVERSATIONS_QUERY, COURSES_QUERY, REPLY_CONVERSATION_QUERY} from '../../../graphql/Queries'
+import {
+  CONVERSATIONS_QUERY,
+  COURSES_QUERY,
+  REPLY_CONVERSATION_QUERY
+} from '../../../graphql/Queries'
 import I18n from 'i18n!conversations_2'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'

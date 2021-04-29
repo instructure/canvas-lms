@@ -298,7 +298,7 @@ const mathImageHelper = {
         changed = true
       }
       const v = e.style.verticalAlign
-      if (Math.abs(parseInt(v, 10)) > 10000) {
+      if (Math.abs(parseFloat(v)) > 10000) {
         // 10000 is a ridiculously large number
         s = s.replace(/vertical-align[^;]+;/, '')
         changed = true

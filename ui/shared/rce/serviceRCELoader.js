@@ -51,8 +51,7 @@ function getTrayProps() {
     host: ENV.RICH_CONTENT_APP_HOST,
     jwt: ENV.JWT,
     refreshToken: refreshToken(ENV.JWT),
-    themeUrl: ENV.active_brand_config_json_url,
-    liveRegion: () => document.getElementById('flash_screenreader_holder')
+    themeUrl: ENV.active_brand_config_json_url
   }
 }
 
@@ -140,9 +139,7 @@ const RCELoader = {
   getTargetTextarea(initialTarget) {
     return $(initialTarget).get(0).type === 'textarea'
       ? $(initialTarget).get(0)
-      : $(initialTarget)
-          .find('textarea')
-          .get(0)
+      : $(initialTarget).find('textarea').get(0)
   },
 
   /**
@@ -157,9 +154,7 @@ const RCELoader = {
     let renderingTarget
 
     if (typeof getTargetFn === 'undefined') {
-      renderingTarget = $(textarea)
-        .parent()
-        .get(0)
+      renderingTarget = $(textarea).parent().get(0)
     } else {
       renderingTarget = getTargetFn(textarea)
     }
@@ -244,6 +239,7 @@ const RCELoader = {
       textareaId: textarea.id,
       trayProps: getTrayProps(),
       languages,
+      liveRegion: () => document.getElementById('flash_screenreader_holder'),
       autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor

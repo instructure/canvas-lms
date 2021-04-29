@@ -122,6 +122,7 @@ module CustomValidators
       driver.switch_to.alert.accept rescue Selenium::WebDriver::Error::NoSuchAlertError
       driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
     end or return false
+    wait_for_initializers
     wait_for_dom_ready
     wait_for_ajaximations
     true

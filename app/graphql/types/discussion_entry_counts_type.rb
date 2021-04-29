@@ -24,5 +24,6 @@ module Types
 
     field :unread_count, Integer, null: false
     field :replies_count, Integer, null: false
+    field :deleted_count, Integer, null: false
   end
 end

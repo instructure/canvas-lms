@@ -167,7 +167,7 @@ describe CourseLinkValidator do
       expect(link_validator.whitelisted?('http://baz.com/baz')).to eq false
     end
   end
-  
+
   describe "insecure hosts" do
     def test_url(url)
       course_factory
@@ -182,11 +182,13 @@ describe CourseLinkValidator do
     end
 
     it "should not try to access local ips" do
+      skip('for flakiness and fix with MAT-61')
       test_url("http://localhost:3000/haxxed")
       test_url("http://127.0.0.1/haxxedagain")
     end
 
     it "should be able to set the ip filter" do
+      skip('for flakiness and fix with MAT-61')
       Setting.set('http_blocked_ip_ranges', '42.42.42.42/8,24.24.24.24')
       test_url("http://42.42.0.1/haxxedtheplanet")
       test_url("http://24.24.24.24/haxxedforever")

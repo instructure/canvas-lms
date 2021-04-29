@@ -17,20 +17,29 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {Assignment} from '../../../graphql/Assignment'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
+import DateHelper from '../../../../../shared/datetime/dateHelper'
+import {
+  DELETE_DISCUSSION_ENTRY,
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
+} from '../../../graphql/Mutations'
+import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
+import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {UPDATE_DISCUSSION_ENTRY_PARTICIPANT} from '../../../graphql/Mutations'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {isGraded, getSpeedGraderUrl} from '../../utils'
 
 export const mockThreads = {
   id: '432',
@@ -53,86 +62,181 @@ export const mockThreads = {
 export const DiscussionThreadContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
-  const [isRead, setRead] = useState(props.read)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editorExpanded, setEditorExpanded] = useState(false)
 
-  const [toggleUnread] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+  const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.deleteDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The entry was successfully deleted'))
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while deleting the entry'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while deleting the entry'))
+    }
+  })
+  const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     onCompleted: data => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
       }
-
-      // Optimistic change mostly done because of testing. The change will
-      //   get reverted if the mutation fails.
-      setRead(!isRead)
-
-      if (!isRead) {
-        setOnSuccess(I18n.t('The entry was successfully marked as unread.'))
-      } else {
-        setOnSuccess(I18n.t('The entry was successfully marked as read.'))
-      }
+      setOnSuccess(I18n.t('The entry was successfully updated.'))
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the entry.'))
     }
   })
+  const toggleRating = () => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: props._id,
+        rating: props.rating ? 'not_liked' : 'liked'
+      }
+    })
+  }
 
-  const marginDepth = 4 * props.depth
+  const toggleUnread = () => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: props._id,
+        read: !props.read
+      }
+    })
+  }
 
-  const threadActions = [
-    <ThreadingToolbar.Reply key={`reply-${props.id}`} onReply={() => {}} />,
-    <ThreadingToolbar.Like
-      key={`like-${props.id}`}
-      onClick={() => {}}
-      isLiked={props.rating}
-      likeCount={props.ratingCount}
-    />
-  ]
+  const marginDepth = `calc(4rem * ${props.depth})`
+  const replyMarginDepth = `calc(3.75rem * (${props.depth + 1}))`
+
+  const threadActions = []
+  if (!props.deleted) {
+    threadActions.push(
+      <ThreadingToolbar.Reply
+        key={`reply-${props.id}`}
+        delimiterKey={`reply-delimiter-${props.id}`}
+        onClick={() => {
+          setEditorExpanded(!editorExpanded)
+        }}
+      />
+    )
+    threadActions.push(
+      <ThreadingToolbar.Like
+        key={`like-${props.id}`}
+        delimiterKey={`like-delimiter-${props.id}`}
+        onClick={toggleRating}
+        isLiked={props.rating}
+        likeCount={props.ratingSum || 0}
+      />
+    )
+  }
+
+  const createdAt = DateHelper.formatDatetimeForDiscussions(props.createdAt)
 
   if (props.depth === 0 && props.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
         key={`expand-${props.id}`}
+        delimiterKey={`expand-delimiter-${props.id}`}
         expandText={I18n.t('%{replies} replies, %{unread} unread', {
           replies: props.rootEntryParticipantCounts?.repliesCount,
           unread: props.rootEntryParticipantCounts?.unreadCount
         })}
         onClick={() => setExpandReplies(!expandReplies)}
+        isExpanded={expandReplies}
       />
     )
   }
 
-  const createdAt = Date.parse(props.createdAt)
+  const onDelete = () => {
+    if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
+      deleteDiscussionEntry({
+        variables: {
+          id: props._id
+        }
+      })
+    }
+  }
+
+  const renderPostMessage = () => {
+    if (props.deleted) {
+      const name = props.editor ? props.editor.name : props.author.name
+      return (
+        <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
+          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
+        </DeletedPostMessage>
+      )
+    } else {
+      return (
+        <PostMessage
+          authorName={props.author.name}
+          avatarUrl={props.author.avatarUrl}
+          lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+            props.lastReply?.createdAt
+          )}
+          timingDisplay={createdAt}
+          message={props.message}
+          isUnread={!props.read}
+          isEditing={isEditing}
+          onCancel={() => {
+            setIsEditing(false)
+          }}
+        >
+          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
+        </PostMessage>
+      )
+    }
+  }
+
+  // TODO: Change this to the new canGrade permission.
+  const canGrade = (isGraded(props.assignment) && props.permissions?.update) || false
 
   return (
     <>
-      <div style={{marginLeft: marginDepth + 'rem'}}>
+      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
-            <PostMessage
-              authorName={props.author.name}
-              avatarUrl={props.author.avatarUrl}
-              timingDisplay={createdAt.toDateString()}
-              message={props.message}
-              isUnread={!isRead}
-            >
-              <ThreadingToolbar>{threadActions}</ThreadingToolbar>
-            </PostMessage>
+            {renderPostMessage()}
           </Flex.Item>
-          <Flex.Item align="stretch">
-            <ThreadActions
-              id={props.id}
-              isUnread={!isRead}
-              onToggleUnread={() => {
-                toggleUnread({
-                  variables: {
-                    discussionEntryId: props._id,
-                    read: !isRead
-                  }
-                })
-              }}
-            />
-          </Flex.Item>
+          {!props.deleted && (
+            <Flex.Item align="stretch">
+              <ThreadActions
+                id={props.id}
+                isUnread={!props.read}
+                onToggleUnread={toggleUnread}
+                onMarkAllAsUnread={() => {}}
+                onDelete={props.permissions?.delete ? onDelete : null}
+                onEdit={() => {
+                  setIsEditing(true)
+                }}
+                onOpenInSpeedGrader={
+                  canGrade
+                    ? () => {
+                        window.location.href = getSpeedGraderUrl(
+                          ENV.course_id,
+                          props.assignment._id,
+                          props.author._id
+                        )
+                      }
+                    : null
+                }
+              />
+            </Flex.Item>
+          )}
         </Flex>
+      </div>
+      <div style={{marginLeft: replyMarginDepth}}>
+        {editorExpanded && (
+          <View
+            display="block"
+            background="primary"
+            borderWidth="none none small none"
+            padding="none none small none"
+            margin="none none xSmall none"
+          >
+            <DiscussionEdit onCancel={() => setEditorExpanded(false)} />
+          </View>
+        )}
       </div>
       {(expandReplies || props.depth > 0) && props.subentriesCount > 0 && (
         <DiscussionSubentries discussionEntryId={props._id} depth={props.depth + 1} />
@@ -161,19 +265,19 @@ export const DiscussionThreadContainer = props => {
 
 DiscussionThreadContainer.propTypes = {
   ...DiscussionEntry.shape,
-  depth: PropTypes.number
+  depth: PropTypes.number,
+  assignment: Assignment.shape
 }
 
 DiscussionThreadContainer.defaultProps = {
-  depth: 0
+  depth: 0,
+  assignment: {}
 }
 
 export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
-
-  const PER_PAGE = 25
 
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
@@ -191,10 +295,13 @@ const DiscussionSubentries = props => {
     return <LoadingIndicator />
   }
 
-  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
+  const discussionTopic = subentries.data.legacyNode
+
+  return discussionTopic.discussionSubentriesConnection.nodes.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
+      assignment={discussionTopic?.assignment}
       {...entry}
     />
   ))

@@ -28,36 +28,38 @@ export default {
 
 export const Default = () => (
   <ThreadingToolbar>
-    <ThreadingToolbar.Reply onReply={Function.prototype} />
-    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked />
+    <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
+    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked delimiterKey="like" />
     <ThreadingToolbar.Expansion
       onExpand={Function.prototype}
       expandText="4 replies, 2 unread"
       isExpanded
+      delimiterKey="expansion"
     />
   </ThreadingToolbar>
 )
 
 export const WithoutLiking = () => (
   <ThreadingToolbar>
-    <ThreadingToolbar.Reply onReply={Function.prototype} />
+    <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
     <ThreadingToolbar.Expansion
       onExpand={Function.prototype}
       expandText="4 replies, 2 unread"
       isExpanded
+      delimiterKey="expansion"
     />
   </ThreadingToolbar>
 )
 
 export const WithoutExpansion = () => (
   <ThreadingToolbar>
-    <ThreadingToolbar.Reply onReply={Function.prototype} />
-    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked />
+    <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
+    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked delimiterKey="like" />
   </ThreadingToolbar>
 )
 
 export const OnlyReply = () => (
   <ThreadingToolbar>
-    <ThreadingToolbar.Reply onReply={Function.prototype} />
+    <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
   </ThreadingToolbar>
 )

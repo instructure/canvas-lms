@@ -33,6 +33,19 @@ export const User = {
     avatarUrl: string,
     pronouns: string,
     name: string
+  }),
+
+  mock: ({
+    avatarUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    name = 'Hank Mccoy',
+    pronouns = null,
+    _id = '9'
+  } = {}) => ({
+    avatarUrl,
+    name,
+    pronouns,
+    __typename: 'User',
+    _id
   })
 }
 

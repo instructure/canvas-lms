@@ -38,7 +38,6 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       end
       scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'Unread'
       scope = scope.where(workflow_state: 'deleted') if @filter == 'Deleted'
-      ActiveRecord::Associations::Preloader.new.preload(scope, :user)
       fulfill(discussion_topic, scope)
     end
   end

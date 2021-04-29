@@ -56,7 +56,7 @@ export const DiscussionEntry = {
     ${DiscussionEntryPermissions.fragment}
   `,
 
-  shape: shape({
+  shape: {
     id: string,
     _id: string,
     createdAt: string,
@@ -70,15 +70,15 @@ export const DiscussionEntry = {
     subentriesCount: number,
     author: User.shape,
     editor: User.shape,
-    rootEntryParticipantCounts: {
+    rootEntryParticipantCounts: shape({
       unreadCount: number,
       repliesCount: number
-    },
+    }),
     lastReply: shape({
       createdAt: string
     }),
     permissions: DiscussionEntryPermissions.shape
-  })
+  }
 }
 
 export const DefaultMocks = {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!k5_dashboard'
 
@@ -31,9 +31,10 @@ import {View} from '@instructure/ui-view'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
+import useImmediate from '@canvas/use-immediate-hook'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
+import {fetchLatestAnnouncement, DEFAULT_COURSE_COLOR, FOCUS_TARGETS} from '@canvas/k5/react/utils'
 
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 
@@ -134,7 +135,7 @@ export const AssignmentLinks = ({
       {numDueToday > 0 ? (
         <Flex.Item>
           <Link
-            href="/#schedule"
+            href={`/?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
             onClick={e => {
               e.preventDefault()
               switchToToday()
@@ -168,7 +169,7 @@ export const AssignmentLinks = ({
           </Flex.Item>
           <Flex.Item>
             <Link
-              href="/#schedule"
+              href={`/?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
               onClick={e => {
                 e.preventDefault()
                 switchToMissingItems()
@@ -232,7 +233,7 @@ const K5DashboardCard = ({
   href,
   id,
   originalName,
-  backgroundColor = '#394B58',
+  courseColor,
   connectDragSource = c => c,
   connectDropTarget = c => c,
   headingLevel = 'h3',
@@ -241,15 +242,7 @@ const K5DashboardCard = ({
 }) => {
   const [latestAnnouncement, setLatestAnnouncement] = useState(null)
   const [loadingAnnouncement, setLoadingAnnouncement] = useState(false)
-  useEffect(() => {
-    setLoadingAnnouncement(true)
-    fetchLatestAnnouncement(id)
-      .then(setLatestAnnouncement)
-      .catch(
-        showFlashError(I18n.t('Failed to load announcement for %{originalName}.', {originalName}))
-      )
-      .finally(() => setLoadingAnnouncement(false))
-  }, [id, originalName])
+  const backgroundColor = courseColor || DEFAULT_COURSE_COLOR
 
   const k5Context = useContext(K5DashboardContext)
   const assignmentsDueToday =
@@ -258,10 +251,23 @@ const K5DashboardCard = ({
     (k5Context?.assignmentsMissing && k5Context.assignmentsMissing[id]) || 0
   const assignmentsCompletedForToday =
     (k5Context?.assignmentsCompletedForToday && k5Context.assignmentsCompletedForToday[id]) || 0
+  const cardsSettled = k5Context.cardsSettled || false
   const loadingOpportunities = k5Context?.loadingOpportunities || false
   const isStudent = k5Context?.isStudent || false
   const switchToMissingItems = k5Context?.switchToMissingItems
   const switchToToday = k5Context?.switchToToday
+
+  useImmediate(() => {
+    if (cardsSettled) {
+      setLoadingAnnouncement(true)
+      fetchLatestAnnouncement(id)
+        .then(setLatestAnnouncement)
+        .catch(
+          showFlashError(I18n.t('Failed to load announcement for %{originalName}.', {originalName}))
+        )
+        .finally(() => setLoadingAnnouncement(false))
+    }
+  }, [cardsSettled, id, originalName])
 
   const handleHeaderClick = e => {
     if (e) {
@@ -354,6 +360,7 @@ K5DashboardCard.propTypes = {
   id: PropTypes.string.isRequired,
   originalName: PropTypes.string.isRequired,
   backgroundColor: PropTypes.string,
+  courseColor: PropTypes.string,
   connectDragSource: PropTypes.func,
   connectDropTarget: PropTypes.func,
   headingLevel: PropTypes.string,

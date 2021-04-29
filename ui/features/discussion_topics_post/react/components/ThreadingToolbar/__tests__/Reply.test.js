@@ -21,7 +21,7 @@ import React from 'react'
 import {Reply} from '../Reply'
 
 const setup = props => {
-  return render(<Reply onClick={Function.prototype} {...props} />)
+  return render(<Reply onClick={Function.prototype} delimiterKey="reply" {...props} />)
 }
 
 describe('Reply', () => {

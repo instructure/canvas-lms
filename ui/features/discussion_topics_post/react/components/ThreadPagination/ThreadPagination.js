@@ -28,11 +28,12 @@ export const ThreadPagination = props => (
     variant="compact"
     labelNext={I18n.t('Next Page')}
     labelPrev={I18n.t('Previous Page')}
+    data-testid="pagination"
   >
     {Array.from(Array(props.totalPages)).map((v, i) => (
       <Pagination.Page
         key={btoa(i)}
-        onClick={() => props.setPage(i + 1)}
+        onClick={() => props.setPage(i)}
         current={props.selectedPage === i + 1}
       >
         {i + 1}

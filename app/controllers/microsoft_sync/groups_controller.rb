@@ -49,7 +49,7 @@
 #           ]
 #         },
 #         "job_state": {
-#           "description": "The last step of syncing that was successfully completed",
+#           "description": "Internal data about the last step run for a job in the 'retrying' state. Only returned for site admins",
 #           "type": "string"
 #         },
 #         "last_synced_at": {
@@ -61,9 +61,13 @@
 #            "description": "The last error encountered during an attempted sync",
 #            "type": "string",
 #         },
+#         "last_error_report_id": {
+#            "description": "The ErrorReport ID for the last_error. Only returned for site admins",
+#            "type": "integer",
+#         },
 #         "root_account_id": {
 #            "description": "The root account the MicrosoftSync::Group belongs to",
-#            "integer": "datetime",
+#            "type": "integer",
 #            "example": "1"
 #         },
 #         "created_at": {
@@ -104,7 +108,7 @@ class MicrosoftSync::GroupsController < ApplicationController
     new_group = (existing_group&.restore! && existing_group) ||
       MicrosoftSync::Group.create!(course: course)
 
-    render json: new_group.as_json(include_root: false), status: :created
+    render json: group_json(new_group), status: :created
   end
 
   # Get a single MicrosoftSync::Group
@@ -113,7 +117,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   #
   # @returns MicrosoftSync::Group
   def show
-    render json: group.as_json(include_root: false)
+    render json: group_json
   end
 
   # Destroy the MicrosoftSync::Group associated
@@ -135,7 +139,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   def sync
     group.syncer_job.run_later
     group.update_unless_deleted(workflow_state: :scheduled, last_manually_synced_at: Time.zone.now)
-    render json: group.as_json(include_root: false)
+    render json: group_json
   end
 
   private
@@ -195,5 +199,13 @@ class MicrosoftSync::GroupsController < ApplicationController
   def group
     @group ||= MicrosoftSync::Group.not_deleted.find_by(course: course) ||
       (raise ActiveRecord::RecordNotFound)
+  end
+
+  def group_json(grp=nil)
+    excludes = [:job_state]
+    unless Account.site_admin.grants_right?(@current_user, :view_error_reports)
+      excludes << :last_error_report_id
+    end
+    (grp || group).as_json(include_root: false, except: excludes)
   end
 end

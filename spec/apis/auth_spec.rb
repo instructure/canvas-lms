@@ -935,5 +935,18 @@ describe "API Authentication", type: :request do
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
     end
+
+    it "401s for a deleted user" do
+      account_admin_user(account: Account.site_admin)
+      deleted = user_with_pseudonym(active_all: true)
+      deleted.destroy
+      admin = @user
+      user_with_pseudonym(user: admin)
+
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
+                   :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => deleted.id.to_s)
+      assert_status(401)
+      expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
+    end
   end
 end

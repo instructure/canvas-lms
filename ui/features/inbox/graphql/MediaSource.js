@@ -33,13 +33,35 @@ export const MediaSource = {
   `,
 
   shape: shape({
-    _id: string,
     contentType: string,
+    url: string,
     bitrate: string,
     fileExt: string,
     height: string,
-    width: string,
-    size: string
+    isOriginal: string,
+    size: string,
+    width: string
+  }),
+
+  mock: ({
+    contentType = 'video/mp4',
+    url = 'https://nv.instructuremedia.com/fetch/QkFoYkIxc0hhUVRndjZZU01Hd3JCOUd4WEdBPS0tNTU1MTlhMTMyOGI0MTFkMjVjNzkwNmEwZDYzOWJkYzVjM2U0OTBlZQ.mp4',
+    bitrate = '1515981',
+    fileExt = 'mp4',
+    height = '720',
+    isOriginal = '0',
+    size = '360',
+    width = '1280'
+  } = {}) => ({
+    contentType,
+    url,
+    bitrate,
+    fileExt,
+    height,
+    isOriginal,
+    size,
+    width,
+    __typename: 'MediaSource'
   })
 }
 

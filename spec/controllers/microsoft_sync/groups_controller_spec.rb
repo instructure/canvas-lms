@@ -78,6 +78,22 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
+  shared_examples_for 'endpoints that return an existing group' do
+    before { group.reload.update!(job_state: {step: 'abc'}, last_error_report_id: 123) }
+
+    specify { expect(subject.parsed_body).to_not include('job_state') }
+    specify { expect(subject.parsed_body).to_not include('last_error_report_id') }
+
+    context 'when the user is a site admin' do
+      before { user_session(site_admin) }
+
+      let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
+
+      specify { expect(subject.parsed_body).to_not include('job_state') }
+      specify { expect(subject.parsed_body['last_error_report_id']).to eq(123) }
+    end
+  end
+
   describe '#sync' do
     subject { post :sync, params: params }
 
@@ -86,6 +102,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require a user'
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
+    it_behaves_like 'endpoints that return an existing group'
 
     it { is_expected.to be_successful }
 
@@ -217,7 +234,8 @@ describe MicrosoftSync::GroupsController, type: :controller do
         expect(subject).to match(
           JSON.parse(
             MicrosoftSync::Group.find(subject['id']).to_json(
-              include_root: false
+              include_root: false,
+              except: %i[job_state last_error_report_id]
             )
           )
         )
@@ -252,12 +270,15 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require a user'
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
+    it_behaves_like 'endpoints that return an existing group'
 
     it { is_expected.to be_successful }
 
     it 'responds with the expected group' do
       subject
-      expect(json_parse).to eq JSON.parse(group.to_json(include_root: false))
+      expect(json_parse).to eq(
+        JSON.parse(group.to_json(include_root: false, except: %i[job_state last_error_report_id]))
+      )
     end
   end
 end

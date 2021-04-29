@@ -170,6 +170,7 @@ class UserMerge
 
     from_user.reload
     target_user.clear_caches
+    from_user.update!(merged_into_user: target_user)
     from_user.destroy
     @merge_data.workflow_state = 'active'
     @merge_data.save!

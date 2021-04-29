@@ -17,6 +17,7 @@
  */
 
 import {useEffect, useRef, useState} from 'react'
+import qs from 'qs'
 import {TAB_IDS} from '../utils'
 
 export const getInitialTab = defaultTab => {
@@ -58,14 +59,16 @@ export default function useTabState(defaultTab) {
     activeTab.current = currentTab
   }, [currentTab])
 
-  const handleTabChange = id => {
+  const handleTabChange = (id, focusTarget = '') => {
     setCurrentTab(id)
+    const {protocol, host, pathname, search} = window.location
     if (window.history.replaceState) {
-      let newUrl = window.location.href
-      if (window.location.hash) {
-        newUrl = newUrl.replace(window.location.hash, '')
-      }
-      window.history.replaceState({id}, null, `${newUrl}#${id.replace('tab-', '')}`)
+      const queryParams = qs.parse(search.substring(1))
+      queryParams.focusTarget = focusTarget || undefined
+      let query = qs.stringify(queryParams)
+      query = query ? `?${query}` : ''
+      const newUrl = `${protocol}//${host}${pathname}${query}#${id.replace('tab-', '')}`
+      window.history.replaceState({id}, null, newUrl)
     }
   }
 

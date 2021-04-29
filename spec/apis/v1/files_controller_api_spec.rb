@@ -247,7 +247,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
-        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -286,7 +286,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
-        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -1015,6 +1015,24 @@ describe "Files API", type: :request do
       user_session(@user)
       opts = @file_path_options.merge(:course_id => @course.id.to_param)
       api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {}, {}, :expected_status => 404)
+    end
+
+    it 'should work with a valid verifier' do
+      @att.context = @teacher
+      @att.save!
+      course_with_student(course: @course)
+      user_session(@student)
+      opts = @file_path_options.merge(user_id: @teacher.id.to_param, verifier: @att.uuid.to_param)
+      api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 200)
+    end
+
+    it 'should 401 with invalid verifier' do
+      @att.context = @teacher
+      @att.save!
+      course_with_student(course: @course)
+      user_session(@student)
+      opts = @file_path_options.merge(user_id: @teacher.id.to_param, verifier: 'nope')
+      api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 401)
     end
 
     it "should omit verifiers when using session auth" do

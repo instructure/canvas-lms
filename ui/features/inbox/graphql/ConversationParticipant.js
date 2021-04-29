@@ -25,7 +25,6 @@ export const ConversationParticipant = {
       _id
       id
       label
-      userId
       user {
         ...User
       }
@@ -38,17 +37,30 @@ export const ConversationParticipant = {
     _id: string,
     id: string,
     label: string,
-    user: User.shape
+    user: User.shape,
+    workflowState: string
+  }),
+
+  mock: ({
+    _id = '251',
+    id = 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUx',
+    label = null,
+    user = User.mock(),
+    workflowState = 'read'
+  } = {}) => ({
+    _id,
+    id,
+    label,
+    user,
+    workflowState,
+    __typename: 'ConversationParticipant'
   })
 }
 
 export const DefaultMocks = {
   ConversationParticipant: () => ({
     _id: '1a',
-    user_id: 'mockUserId',
     workflowState: 'unread',
-    label: 'starred',
-    subscribed: false,
-    updatedAt: 'November 5, 2020 at 2:25pm'
+    label: 'starred'
   })
 }

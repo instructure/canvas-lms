@@ -99,7 +99,7 @@ describe('GradesSummary', () => {
   it('shows the default background medium color if no course color or image are given', () => {
     const {getByTestId} = render(<GradesSummary courses={[defaultCourse]} />)
     const image = getByTestId('k5-grades-course-image')
-    expect(image.style.getPropertyValue('background-color')).toBe('rgb(199, 205, 209)')
+    expect(image.style.getPropertyValue('background-color')).toBe('rgb(57, 75, 88)')
   })
 
   it('renders a link to the gradebook if the user is enrolled as a teacher', () => {

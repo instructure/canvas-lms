@@ -21,6 +21,7 @@ import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
+import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
@@ -104,19 +105,19 @@ const gradeCourses = [
 ]
 const opportunities = [
   {
-    id: 1,
+    id: '1',
     course_id: '1',
     name: 'Assignment 1',
-    point_possible: 23,
+    points_possible: 23,
     html_url: '/courses/1/assignments/1',
     due_at: '2021-01-10T05:59:00Z',
     submission_types: ['online_quiz']
   },
   {
-    id: 2,
+    id: '2',
     course_id: '1',
     name: 'Assignment 2',
-    point_possible: 10,
+    points_possible: 10,
     html_url: '/courses/1/assignments/2',
     due_at: '2021-01-15T05:59:00Z',
     submission_types: ['online_url']
@@ -157,6 +158,7 @@ const apps = [
 ]
 const defaultEnv = {
   current_user: currentUser,
+  current_user_id: '1',
   K5_MODE: true,
   FEATURES: {
     canvas_for_elementary: true,
@@ -175,7 +177,7 @@ const defaultProps = {
   timeZone: defaultEnv.TIMEZONE
 }
 
-beforeAll(() => {
+beforeEach(() => {
   moxios.install()
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
     status: 200,
@@ -278,20 +280,16 @@ beforeAll(() => {
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
   fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
-})
-
-afterAll(() => {
-  moxios.uninstall()
-  fetchMock.restore()
-})
-
-beforeEach(() => {
   global.ENV = defaultEnv
 })
 
 afterEach(() => {
+  moxios.uninstall()
+  fetchMock.restore()
   global.ENV = {}
+  resetDashboardCards()
   resetPlanner()
+  sessionStorage.clear()
   window.location.hash = ''
 })
 
@@ -400,6 +398,37 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Assignment 1')).toBeInTheDocument()
       expect(getByText('Assignment 2')).toBeInTheDocument()
     })
+
+    it('shows loading skeletons for course cards while they load', () => {
+      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+    })
+
+    it('only fetches announcements and LTIs based on cards once per page load', done => {
+      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
+      moxios.withMock(() => {
+        render(<K5Dashboard {...defaultProps} />)
+
+        // Don't respond immediately, let the cards from sessionStorage return first
+        moxios.wait(() =>
+          moxios.requests
+            .mostRecent()
+            .respondWith({
+              status: 200,
+              response: dashboardCards
+            })
+            .then(() => {
+              // Expect one announcement request for each card
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(2)
+              // Expect one LTI request for each non-homeroom card
+              expect(
+                fetchMock.calls('/api/v1/courses/1/external_tools/visible_course_nav_tools').length
+              ).toBe(1)
+              done()
+            })
+        )
+      })
+    })
   })
 
   describe('Schedule Section', () => {
@@ -437,9 +466,22 @@ describe('K-5 Dashboard', () => {
 
       const header = await findByTestId('WeeklyPlannerHeader')
       expect(header).toBeInTheDocument()
+    })
 
-      const footer = await findByTestId('WeeklyPlannerFooter')
-      expect(footer).toBeInTheDocument()
+    it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
+      const {findByRole} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const jumpToNavButton = await findByRole('button', {name: 'Jump to navigation toolbar'})
+      expect(jumpToNavButton).not.toBeVisible()
+
+      act(() => jumpToNavButton.focus())
+      expect(jumpToNavButton).toBeVisible()
+
+      act(() => jumpToNavButton.click())
+      expect(document.activeElement.id).toBe('weekly-header-active-button')
+      expect(jumpToNavButton).not.toBeVisible()
     })
 
     it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
@@ -456,7 +498,7 @@ describe('K-5 Dashboard', () => {
 
     it('displays a teacher preview if the user has no student enrollments', async () => {
       const {findByTestId, getByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={false} />
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()

@@ -32,6 +32,7 @@ module MicrosoftSync
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
     GROUP_USERS_ADD_BATCH_SIZE = 20
+    STATSD_PREFIX = 'microsoft_sync.graph_service'
 
     attr_reader :tenant
 
@@ -136,6 +137,8 @@ module MicrosoftSync
     # ===== Helpers =====
 
     def request(method, path, options={})
+      statsd_tag = InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+
       options[:headers] ||= {}
       options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
       if options[:body]
@@ -156,10 +159,25 @@ module MicrosoftSync
         )
       end
 
-      response.parsed_response
+      result = response.parsed_response
+      InstStatsd::Statsd.increment(statsd_name, tags: {msft_endpoint: statsd_tag})
+      result
+    rescue => error
+      InstStatsd::Statsd.increment(statsd_name(error), tags: {msft_endpoint: statsd_tag})
+      raise
     end
 
     private
+
+    def statsd_name(error=nil)
+      name = case error
+             when nil then 'success'
+             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+             else 'error'
+             end
+      "#{STATSD_PREFIX}.#{name}"
+    end
 
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'

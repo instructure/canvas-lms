@@ -180,6 +180,35 @@ describe 'user_content post processing' do
       expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
     end
 
+    it 'previews other user files in the FilePreview overlay' do
+      # create a file in the teacher's user files
+      file =
+        @teacher.attachments.create!(
+          display_name: 'file',
+          context: @teacher,
+          uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain')
+        )
+      file.save!
+      file_url = "/users/#{@teacher.id}/files/#{file.id}"
+
+      # link to the teacher's file in the page
+      create_wiki_page_with_content(
+        'page',
+        "<a id='thelink' class='instructure_file_link instructure_scribd_file inline_disabled'
+          href='#{file_url}?wrap=1&verifier=#{file.uuid}'>file</a>"
+      )
+
+      # log in as a student to make sure the student can preview the teacher's file
+      course_with_student_logged_in(course: @course)
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a#thelink')
+      expect(file_link.attribute('class')).to include('preview_in_overlay')
+
+      file_link.click
+      expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
+    end
+
     it 'inline-able file link does not show the file preview icon' do
       create_wiki_page_with_content(
         'page',

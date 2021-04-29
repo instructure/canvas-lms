@@ -26,7 +26,9 @@ export default {
   argTypes: {}
 }
 
-const Template = args => <ThreadingToolbar.Expansion isExpanded expandText="" {...args} />
+const Template = args => (
+  <ThreadingToolbar.Expansion isExpanded expandText="" delimiterKey="expansion" {...args} />
+)
 
 export const Default = Template.bind({})
 Default.args = {

@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {Assignment} from './Assignment'
-import {bool, number, shape, string} from 'prop-types'
+import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
@@ -28,6 +29,7 @@ export const Discussion = {
       id
       _id
       title
+      message
       createdAt
       updatedAt
       postedAt
@@ -39,6 +41,7 @@ export const Discussion = {
       delayedPostAt
       subscribed
       published
+      canUnpublish
       entryCounts {
         unreadCount
         repliesCount
@@ -55,16 +58,21 @@ export const Discussion = {
       permissions {
         ...DiscussionPermissions
       }
+      courseSections {
+        ...Section
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
+    ${Section.fragment}
   `,
 
   shape: shape({
     id: string,
     _id: string,
     title: string,
+    message: string,
     createdAt: string,
     updatedAt: string,
     postedAt: string,
@@ -76,15 +84,17 @@ export const Discussion = {
     delayedPostAt: string,
     subscribed: bool,
     published: bool,
-    entryCounts: {
+    canUnpublish: bool,
+    entryCounts: shape({
       unreadCount: number,
       repliesCount: number
-    },
-    repliesCount: string,
+    }),
     author: User.shape,
     editor: User.shape,
     assignment: Assignment.shape,
-    permissions: DiscussionPermissions.shape
+    permissions: DiscussionPermissions.shape,
+    courseSections: arrayOf(Section.shape),
+    rootEntriesTotalPages: number
   })
 }
 

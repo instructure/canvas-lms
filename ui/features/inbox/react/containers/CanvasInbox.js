@@ -58,7 +58,7 @@ const CanvasInbox = () => {
     } else {
       setDisplayUnarchiveButton(
         selectedConversations[0].conversationParticipantsConnection?.nodes?.some(cp => {
-          return cp.userId === userID && cp.workflowState === 'archived'
+          return cp.user._id === userID && cp.workflowState === 'archived'
         })
       )
     }

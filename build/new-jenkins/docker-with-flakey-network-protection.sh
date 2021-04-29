@@ -12,7 +12,7 @@ if [[ $PULL_RESULT =~ (TLS handshake timeout|unknown blob|i/o timeout|Internal S
   PULL_RESULT=$(docker $1 $2 2>&1) || EXIT_CODE=$?
 elif [[ $PULL_RESULT =~ (no basic auth credentials) ]]; then
   if [ -z "$STARLORD_USERNAME" ]; then
-    echo "unable to automatically recover from an expired or invalid starlord token, wrap the caller in credentials.withStarlordCredentials to fix"
+    echo "unable to automatically recover from an expired or invalid starlord token, wrap the caller in credentials.withStarlordDockerLogin to fix"
 
     exit $EXIT_CODE
   fi

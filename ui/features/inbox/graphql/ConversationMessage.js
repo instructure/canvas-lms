@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
+import {arrayOf, shape, string} from 'prop-types'
 import {Attachment} from './Attachment'
-import {User} from './User'
+import gql from 'graphql-tag'
 import {MediaComment} from './MediaComment'
+import {User} from './User'
 
 export const ConversationMessage = {
   fragment: gql`
@@ -51,23 +51,46 @@ export const ConversationMessage = {
 
   shape: shape({
     _id: string,
+    id: string,
     createdAt: string,
     body: string,
-    attachmentsConnection: Attachment.shape,
+    attachmentsConnection: shape({
+      nodes: arrayOf(Attachment.shape)
+    }),
     author: User.shape,
     mediaComment: MediaComment.shape,
-    recipients: User.shape,
+    recipients: arrayOf(User.shape)
   }),
+
+  mock: ({
+    _id = '2696',
+    id = 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjk2',
+    createdAt = '2021-02-01T12:28:57-07:00',
+    body = 'this is the first reply message',
+    attachmentsConnection = {
+      nodes: [Attachment.mock()],
+      __typename: 'FileConnection'
+    },
+    author = User.mock(),
+    mediaComment = MediaComment.mock(),
+    recipients = [User.mock({_id: '8', pronouns: 'They/Them', name: 'Scotty Summers'})]
+  } = {}) => ({
+    _id,
+    id,
+    createdAt,
+    body,
+    attachmentsConnection,
+    author,
+    mediaComment,
+    recipients,
+    __typename: 'ConversationMessage'
+  })
 }
 
 export const DefaultMocks = {
   ConversationMessage: () => ({
     _id: '1a',
-    conversationId: 'mockConversation',
     body: 'This is the body of a mocked message',
-    createdAt: 'November 5, 2020 at 2:25pm',
-    author: {},
-    mediaComment: {},
-    attachmentConnection: [{}],
-  }),
+    createdAt: 'November 5, 2020 at 2:25pm'
+  })
 }

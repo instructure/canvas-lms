@@ -84,13 +84,11 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
         )
   }
 
-  const resetTmpChanges = () => {
-    const oldCourseStartDate = window.ENV.COURSE_DATES.start_at
-    const oldCourseEndDate = window.ENV.COURSE_DATES.end_at
-    setFormValue(FORM_IDS.START_DATE, oldCourseStartDate)
-    setStartDate(oldCourseStartDate)
-    setFormValue(FORM_IDS.END_DATE, oldCourseEndDate)
-    setEndDate(oldCourseEndDate)
+  const clearCourseDates = () => {
+    setFormValue(FORM_IDS.START_DATE, null)
+    setStartDate(null)
+    setFormValue(FORM_IDS.END_DATE, null)
+    setEndDate(null)
   }
 
   return (
@@ -115,9 +113,9 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           value={selectedApplicabilityValue}
           onChange={(e, {value}) => {
             if (value !== 'course') {
-              // Discard unsubmitted course dates, if they are removed from the Date inputs when Participation is different to course,
+              // Discard course dates, if they are removed from the Date inputs when Participation is different to course,
               // in order to avoid saving these changes if they are not on the screen at the moment of submitting the form
-              resetTmpChanges()
+              clearCourseDates()
             }
             setFormValue(FORM_IDS.RESTRICT_ENROLLMENTS, value === 'course')
             setSelectedApplicabilityValue(value)

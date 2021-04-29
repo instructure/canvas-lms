@@ -24,6 +24,7 @@ require 'lti2_course_spec_helper'
 require 'csv'
 require 'socket'
 
+
 describe Course do
   include_examples "outcome import context examples"
 
@@ -1569,9 +1570,9 @@ describe Course do
       expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
     end
 
-    it "returns none for a nobody" do
-      worthless_loser = User.create(:name => "Worthless Loser")
-      expect(@course.course_section_visibility(worthless_loser)).to eq []
+    it "returns none for a user with no visibility" do
+      user_with_no_visibility = User.create(:name => "Sans Connexion")
+      expect(@course.course_section_visibility(user_with_no_visibility)).to eq []
     end
   end
 
@@ -1685,6 +1686,25 @@ describe Course do
         expect(course.outcome_calculation_method).to eq nil
         expect(course.resolved_outcome_calculation_method).to eq nil
       end
+    end
+  end
+
+  describe "comment_bank_items_visible_to" do
+    before do
+      @course = course_factory(active_all: true)
+      @user1 = user_model
+      @user2 = user_model
+      @item = comment_bank_item_model(course: @course, user: @user1)
+    end
+
+    it "should return items visible to the provided user" do
+      expect(@course.comment_bank_items_visible_to(@user2)).to eq []
+      expect(@course.comment_bank_items_visible_to(@user1)).to eq [@item]
+    end
+
+    it "should only return active records" do
+      @item.destroy
+      expect(@course.comment_bank_items_visible_to(@user1)).to eq []
     end
   end
 end
@@ -4271,6 +4291,72 @@ describe Course, 'tabs_available' do
     @course.enable_feature!(:analytics_2)
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
+  end
+end
+
+describe Course, 'hide_external_tool_tabs_if_necessary' do
+  before :once do
+    course_model
+  end
+
+  def hide_tool(tool)
+    @course.tab_configuration = [{id: tool.asset_string, hidden: true}]
+    @course.save!
+  end
+
+  def unhide_tool(tool)
+    @course.tab_configuration = [{id: tool.asset_string}]
+    @course.save!
+  end
+
+  context 'when tool does not have visibility defined' do
+    def new_tool
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.course_navigation = {url: "http://www.example.com", default: "active" }
+      tool.save!
+      tool
+    end
+
+    it 'restricts tool visibility to teachers when tool tab is hidden from navigation' do
+      tool = new_tool
+      hide_tool(tool)
+      expect(tool.reload.settings.dig(:course_navigation, :visibility_override)).to eq('admins')
+    end
+
+    it 'removes restrictions on tool visibility when tool tab is unhidden' do
+      tool = new_tool
+      hide_tool(tool)
+      unhide_tool(tool)
+      expect(tool.reload.settings.dig(:course_navigation, :visibility_override)).to be_nil
+    end
+  end
+
+  context 'when tool has visibility defined' do
+    def new_tool
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.course_navigation = {url: "http://www.example.com", visibility: 'members', default: "active" }
+      tool.save!
+      tool
+    end
+
+    it 'keeps originally-defined visibility for later reuse' do
+      tool = new_tool
+      hide_tool(tool)
+      settings = tool.reload.settings
+
+      expect(settings.dig(:course_navigation, :visibility_override)).to eq('admins')
+      expect(settings.dig(:course_navigation, :visibility)).to eq('members')
+    end
+
+    it 'restores originally-defined visibility when tool is un-hidden' do
+      tool = new_tool
+      hide_tool(tool)
+      unhide_tool(tool)
+      settings = tool.reload.settings
+
+      expect(settings.dig(:course_navigation, :visibility_override)).to be_nil
+      expect(settings.dig(:course_navigation, :visibility)).to eq('members')
+    end
   end
 end
 

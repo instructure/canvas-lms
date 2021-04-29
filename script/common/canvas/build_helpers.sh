@@ -15,16 +15,19 @@ function is_canvas_root {
 }
 
 function compile_assets {
-  echo_console_and_log "  Compiling assets (css and js only, no docs or styleguide) ..."
+  start_spinner "Compiling assets (css and js only, no docs or styleguide)..."
   _canvas_lms_track_with_log run_command bundle exec rake canvas:compile_assets_dev
+  stop_spinner
 }
 
 function build_images {
-  start_spinner  'Building docker images...'
-  if [[ "$(uname)" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
+  start_spinner 'Building docker images...'
+  if [[ -n "$JENKINS" ]]; then
+    _canvas_lms_track_with_log docker-compose build --build-arg USER_ID=$(id -u)
+  elif [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
     _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
   else
-    _canvas_lms_track_with_log docker-compose build --pull
+    _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
   fi
   stop_spinner
 }
@@ -39,7 +42,7 @@ errors.'
   fi
 
   # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
-  if ! _canvas_lms_track_with_log docker-compose run --no-deps --rm web touch Gemfile.lock; then
+  if ! _canvas_lms_track_with_log $DOCKER_COMMAND run --no-deps --rm web touch Gemfile.lock; then
     message \
 "The 'docker' user is not allowed to write to Gemfile.lock. We need write
 permissions so we can install gems."
@@ -110,41 +113,51 @@ If you want to migrate the existing database, use docker_dev_update
 }
 
 function sync_bundler_version {
+  start_spinner "Checking bundler version..."
   expected_version=$(run_command bash -c "echo \$BUNDLER_VERSION" |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
   actual_version=$(eval run_command bundler --version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
   if [ "$actual_version" != "$expected_version" ]; then
-    echo_console_and_log "  Wrong version of bundler installed, installing correct version..."
+    stop_spinner
+    start_spinner "  Wrong version of bundler installed, installing correct version..."
     _canvas_lms_track_with_log run_command bash -c "gem uninstall --all --ignore-dependencies --force --executables bundler"
     _canvas_lms_track_with_log run_command bash -c "gem install bundler --no-document -v $expected_version"
+    stop_spinner
   fi
+  stop_spinner
 }
 
 function bundle_install {
-  echo_console_and_log "  Installing gems (bundle install) ..."
+  start_spinner "  Installing gems (bundle install) ..."
   run_command bash -c 'rm -f Gemfile.lock* >/dev/null 2>&1'
   _canvas_lms_track_with_log run_command bundle install
+  stop_spinner
 }
 
 function bundle_install_with_check {
-  echo_console_and_log "  Checking your gems (bundle check) ..."
   sync_bundler_version
+  start_spinner "Checking your gems (bundle check)..."
   if _canvas_lms_track_with_log run_command bundle check ; then
+    stop_spinner
     echo_console_and_log "  Gems are up to date, no need to bundle install ..."
   else
+    stop_spinner
     bundle_install
   fi
 }
 
 function rake_db_migrate_dev_and_test {
-  echo_console_and_log "  Migrating development DB ..."
+  start_spinner "Migrating development DB..."
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=development
-  echo_console_and_log "  Migrating test DB ..."
+  stop_spinner
+  start_spinner "Migrating test DB..."
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
+  stop_spinner
 }
 
 function install_node_packages {
-  echo_console_and_log "  Installing Node packages ..."
+  start_spinner "Installing Node packages..."
   _canvas_lms_track_with_log run_command bundle exec rake js:yarn_install
+  stop_spinner
 }
 
 function copy_docker_config {
@@ -154,7 +167,10 @@ function copy_docker_config {
 
 function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
-    if [ -f "docker-compose.override.yml" ]; then
+  if is_mutagen; then
+    message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
+    cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
+  elif [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
   else
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"

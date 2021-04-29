@@ -1603,6 +1603,15 @@ describe CoursesController do
         expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
       end
 
+      it "sets COURSE.color appropriately in js_env" do
+        @course.course_color = "#BB8"
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:color]).to eq('#BB8')
+      end
+
       it "loads announcements on home page when course is a k5 homeroom course" do
         @course.homeroom_course = true
         @course.save!
@@ -2233,13 +2242,25 @@ describe CoursesController do
         put 'update', params: {:id => @course.id, :course => { :course_color => "1" }}
         put 'update', params: {:id => @course.id, :course => { :course_color => "#1a2b3c4e5f6" }}
         @course.reload
-        expect(@course.settings[:course_color]).to be_nil
+        expect(@course.settings[:course_color]).to eq ""
       end
 
       it "should normalize hexcodes without a leading #" do
         put 'update', params: {:id => @course.id, :course => { :course_color => "123456" }}
         @course.reload
         expect(@course.settings[:course_color]).to eq '#123456'
+      end
+
+      it "should set blank inputs to nil" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "   " }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq ""
+      end
+
+      it "should set single character (e.g. just a pound sign) inputs to nil" do
+        put 'update', params: {:id => @course.id, :course => { :course_color => "#" }}
+        @course.reload
+        expect(@course.settings[:course_color]).to eq ""
       end
     end
 
