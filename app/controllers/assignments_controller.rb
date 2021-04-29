@@ -297,6 +297,7 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
+          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
         }
 
         @similarity_pledge = pledge_text
@@ -644,6 +645,7 @@ class AssignmentsController < ApplicationController
       end
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+
       hash = {
         ROOT_FOLDER_ID: Folder.root_folders(@context).first&.id,
         ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
@@ -660,6 +662,9 @@ class AssignmentsController < ApplicationController
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
+        PERMISSIONS: {
+          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+        },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
           Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2

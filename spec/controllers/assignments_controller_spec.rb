@@ -1298,6 +1298,11 @@ describe AssignmentsController do
           end
         end
       end
+
+      it "sets can_manage_groups permissions in the ENV" do
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PERMISSIONS]).to include can_manage_groups: true
+      end
     end
   end
 
@@ -1660,6 +1665,12 @@ describe AssignmentsController do
       root_folder = Folder.root_folders(@course).first
       get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_FOLDER_ID]).to eq root_folder.id
+    end
+
+    it "sets can_manage_groups permissions in the ENV" do
+      user_session(@teacher)
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:PERMISSIONS]).to eq can_manage_groups: true
     end
 
     it "should require authorization" do
