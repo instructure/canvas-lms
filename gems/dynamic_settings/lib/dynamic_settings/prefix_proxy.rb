@@ -103,13 +103,13 @@ module DynamicSettings
       # we could have one ttl again
       subtree_ttl = ttl * 2
       cache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
-        values = kv_fetch(tree_key, recurse: true, stale: true, convert_to_hash: true)
+        values = kv_fetch(tree_key, recurse: true, stale: true)
         if values.nil?
           # no sense trying to populate the subkeys
           # when there's no tree
           nil
         else
-          populate_cache(tree_key, values, subtree_ttl)
+          populate_cache(values, subtree_ttl)
           values
         end
       end
@@ -233,20 +233,8 @@ module DynamicSettings
       key_array.concat([prefix, key]).compact.join("/")
     end
 
-    def populate_cache(prefix, subtree, ttl)
-      pop_set = construct_population_set(prefix, subtree)
-      cache.write_set(pop_set, ttl: ttl)
-    end
-
-    def construct_population_set(prefix, subtree, accumulator={})
-      if subtree.is_a?(Hash)
-        subtree.each do |(k, v)|
-          accumulator = construct_population_set("#{prefix}/#{k}", v, accumulator)
-        end
-      else
-        accumulator[CACHE_KEY_PREFIX + prefix] = subtree
-      end
-      accumulator
+    def populate_cache(subtree, ttl)
+      cache.write_set(subtree.map { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }.to_h, ttl: ttl)
     end
   end
 end
