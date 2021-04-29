@@ -321,10 +321,14 @@ export const handlers = [
     )
   }),
   graphql.mutation('DeleteDiscussionTopic', (req, res, ctx) => {
-    ctx.data({
-      deleteDiscussionTopic: {
-        discussionTopicId: req.body.variables.id
-      }
-    })
+    return res(
+      ctx.data({
+        deleteDiscussionTopic: {
+          discussionTopicId: req.variables.id,
+          errors: null,
+          __typename: 'DeleteDiscussionTopicPayload'
+        }
+      })
+    )
   })
 ]

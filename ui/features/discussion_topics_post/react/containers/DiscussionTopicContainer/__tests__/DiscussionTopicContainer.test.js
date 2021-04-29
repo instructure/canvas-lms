@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
+import {getEditUrl, getSpeedGraderUrl} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -47,6 +48,7 @@ const discussionTopicMock = {
       unreadCount: 4
     },
     assignment: {
+      _id: '1337',
       dueAt: '2021-04-05T13:40:50Z',
       pointsPossible: 5
     },
@@ -60,18 +62,43 @@ const discussionTopicMock = {
 
 describe('DiscussionTopicContainer', () => {
   const server = mswServer(handlers)
+  const setOnFailure = jest.fn()
+  const setOnSuccess = jest.fn()
+  const assignMock = jest.fn()
+  let liveRegion = null
+
   beforeAll(() => {
-    window.ENV = {context_asset_string: 'course_1'}
+    delete window.location
+    window.location = {assign: assignMock}
+    window.ENV = {
+      context_asset_string: 'course_1',
+      course_id: '1'
+    }
+
+    if (!document.getElementById('flash_screenreader_holder')) {
+      liveRegion = document.createElement('div')
+      liveRegion.id = 'flash_screenreader_holder'
+      liveRegion.setAttribute('role', 'alert')
+      document.body.appendChild(liveRegion)
+    }
+
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
   })
 
   afterEach(() => {
+    setOnFailure.mockClear()
+    setOnSuccess.mockClear()
+    assignMock.mockClear()
     server.resetHandlers()
   })
 
   afterAll(() => {
+    if (liveRegion) {
+      liveRegion.remove()
+    }
+
     server.close()
     // eslint-disable-next-line no-undef
     fetchMock.enableMocks()
@@ -80,7 +107,7 @@ describe('DiscussionTopicContainer', () => {
   const setup = props => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicContainer {...props} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
@@ -142,24 +169,26 @@ describe('DiscussionTopicContainer', () => {
     expect(await findByText('Copy To...')).toBeTruthy()
   })
 
-  it('should be able to send to edit page when canreadAsAdmin', async () => {
-    const {getByTestId, findByText} = setup(discussionTopicMock)
+  it('should be able to send to edit page when canReadAsAdmin', async () => {
+    const {getByTestId} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByTestId('edit'))
     await waitFor(() => {
-      // this text appears on the edit page
-      expect(findByText('Allow threaded replies')).toBeTruthy()
+      expect(assignMock).toHaveBeenCalledWith(getEditUrl('1', '1'))
     })
   })
 
   it('Should be able to delete topic', async () => {
     window.confirm = jest.fn(() => true)
-    const {getByTestId, findByText} = setup(discussionTopicMock)
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    const {getByTestId, findByTestId} = setup(discussionTopicMock)
+    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByTestId('delete'))
 
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The topic was successfully deleted.')
+    )
     await waitFor(() => {
-      expect(findByText('Pinned Discussions')).toBeTruthy()
+      expect(assignMock).toHaveBeenCalledWith('/courses/1/discussion_topics')
     })
   })
 
@@ -172,12 +201,12 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to open SpeedGrader', async () => {
-    const {getByTestId, findByText} = setup(discussionTopicMock)
+    const {getByTestId} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByTestId('speedGrader'))
 
     await waitFor(() => {
-      expect(findByText('This student does not have a submission for this assignment')).toBeTruthy()
+      expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'))
     })
   })
 

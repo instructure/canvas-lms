@@ -77,7 +77,7 @@ export const DiscussionTopicContainer = props => {
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
       setOnSuccess(I18n.t('The topic was successfully deleted.'))
-      window.location.href = `/courses/${ENV.course_id}/discussion_topics`
+      window.location.assign(`/courses/${ENV.course_id}/discussion_topics`)
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error deleting the topic.'))
@@ -256,9 +256,8 @@ export const DiscussionTopicContainer = props => {
                       onEdit={
                         canReadAsAdmin
                           ? () => {
-                              window.location.href = getEditUrl(
-                                ENV.course_id,
-                                discussionTopicData._id
+                              window.location.assign(
+                                getEditUrl(ENV.course_id, discussionTopicData._id)
                               )
                             }
                           : null
@@ -268,9 +267,8 @@ export const DiscussionTopicContainer = props => {
                       onOpenSpeedgrader={
                         canGrade
                           ? () => {
-                              window.location.href = getSpeedGraderUrl(
-                                ENV.course_id,
-                                discussionTopicData.assignment._id
+                              window.location.assign(
+                                getSpeedGraderUrl(ENV.course_id, discussionTopicData.assignment._id)
                               )
                             }
                           : null
@@ -295,6 +293,7 @@ export const DiscussionTopicContainer = props => {
                   onCancel={() => {
                     setExpandedReply(false)
                   }}
+                  onSubmit={() => {}}
                 />
               </Flex.Item>
             </Flex>
