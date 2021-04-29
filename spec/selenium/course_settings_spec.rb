@@ -470,6 +470,8 @@ describe "course settings" do
     end
 
     it "should be able to filter links to unpublished content" do
+      skip "need to detect the job finished better"
+
       course_with_teacher_logged_in
 
       active = @course.assignments.create!(:title => "blah")
