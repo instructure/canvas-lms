@@ -36,7 +36,10 @@ module BasicLTI
     end
 
     # gives instfs about 7 hours to have an outage and eventually take the file
-    MAX_ATTEMPTS=10
+    # MAX_ATTEMPTS=10
+    # but creates lots of problems when google/office presigned S3 urls expire,
+    # since all 10 attempts will fail, and will gum up job queues, so for now:
+    MAX_ATTEMPTS=1
 
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
