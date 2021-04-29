@@ -14,6 +14,8 @@ rm -rf lib/*
 rm -rf es/*
 rm -rf canvas/*
 
+yarn genTranslationGetters
+
 JEST_WORKER_ID=true ./node_modules/.bin/babel --out-dir lib src --ignore '**/__tests__'
 ./node_modules/.bin/babel --out-dir es src --ignore '**/__tests__'
 cp -r lib locales README.md package.json canvas

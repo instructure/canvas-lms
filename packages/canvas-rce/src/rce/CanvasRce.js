@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, useEffect} from 'react'
+import React, {createRef, useState} from 'react'
 import {number, string} from 'prop-types'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
+import editorLanguage from './editorLanguage'
+import normalizeLocale from './normalizeLocale'
 import tinyRCE from './tinyRCE'
+import getTinymceTranslations from '../getTinymceTranslations'
+import getRceTranslations from '../getRceTranslations'
 import '@instructure/canvas-theme'
 
 if (!process?.env?.BUILD_LOCALE) {
@@ -139,29 +143,60 @@ function addCanvasConnection(propsOut, propsIn) {
   }
 }
 export default function CanvasRce(props) {
-  const {defaultContent, textareaId, height, trayProps, ...rest} = props
+  const {defaultContent, textareaId, height, language, trayProps, ...rest} = props
   const rceRef = createRef(null)
-
-  useEffect(() => {
-    formatMessage.setup({locale: props.language})
-  }, [props.language])
+  useState(() => formatMessage.setup({locale: normalizeLocale(props.language)}))
+  const [tinyTranslations, setTinyTranslations] = useState(() => {
+    const locale = editorLanguage(props.language)
+    const p = getTinymceTranslations(locale)
+      .then(() => {
+        setTinyTranslations(true)
+      })
+      .catch(err => {
+        console.log('>>>', err)
+        setTinyTranslations(false)
+      })
+    return p
+  })
+  const [rceTranslations, setRceTranslations] = useState(() => {
+    const locale = normalizeLocale(props.language)
+    const p = getRceTranslations(locale)
+      .then(() => {
+        setRceTranslations(true)
+      })
+      .catch(err => {
+        console.log('>>>', err)
+        setRceTranslations(false)
+      })
+    return p
+  })
 
   // useEffect(() => {
   //   rceRef.current?.setCode(props.content)
   // }, [props.content, rceRef])
 
+  // merge CanvasRce props into the base properties
+  // Note: languages is a bit of a mess. Tinymce and Canvas
+  // have 2 different sets of language names. normalizeLocale
+  // takes the lanbuage prop and returns the locale Canvas knows.
+  // editorLanguage takes the language prop and returns the
+  // corresponding name for tinymce.
   const rceProps = {...baseProps}
-  rceProps.language = props.language || 'en'
+  rceProps.language = normalizeLocale(props.language || 'en')
   rceProps.defaultContent = defaultContent
   rceProps.textareaId = textareaId
   rceProps.editorOptions.selector = `#${textareaId}`
   rceProps.editorOptions.height = height
-  rceProps.editorOptions.language = props.language || 'en'
+  rceProps.editorOptions.language = editorLanguage(props.language || 'en')
   rceProps.trayProps = trayProps
 
   addCanvasConnection(rceProps, props)
 
-  return <RCEWrapper ref={rceRef} tinymce={tinyRCE} {...rceProps} {...rest} />
+  if (typeof tinyTranslations !== 'boolean' || typeof rceTranslations !== 'boolean') {
+    return formatMessage('Loading...')
+  } else {
+    return <RCEWrapper ref={rceRef} tinymce={tinyRCE} {...rceProps} {...rest} />
+  }
 }
 
 CanvasRce.propTypes = {

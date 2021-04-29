@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import CanvasRce from '../CanvasRce'
 import bridge from '../../bridge'
 // even though CanvasRce imports tinymce, it doesn't get
@@ -41,8 +41,8 @@ describe('CanvasRce', () => {
     bridge.focusEditor(null)
   })
 
-  it('bridges newly rendered editors', () => {
+  it('bridges newly rendered editors', async () => {
     render(<CanvasRce textareaId="textarea3" tinymce={new FakeEditor()} />, target)
-    expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper')
+    await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
   })
 })

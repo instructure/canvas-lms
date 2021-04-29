@@ -68,6 +68,9 @@ const mapping = {
 // still expose it as a method for consistent usage and in case we ever have to
 // add special casing or null interpretation in the future
 function editorLanguage(locale) {
+  if (!locale) {
+    return mapping.en
+  }
   // tinymce won't know about custom locales, use the base one for mapping
   if (locale.match('-x-')) {
     locale = locale.split('-x-')[0]
