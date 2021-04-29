@@ -268,7 +268,7 @@ module InstFS
     private
     def setting(key)
       unsafe_setting(key)
-    rescue Imperium::TimeoutError => e
+    rescue Diplomat::KeyNotFound => e
       # capture this to make sure that we have SOME
       # signal that the problem is continuing, even if our
       # retries are all successful.
@@ -283,7 +283,7 @@ module InstFS
         begin
           return_value = unsafe_setting(key)
           break
-        rescue Imperium::TimeoutError => e
+        rescue Diplomat::KeyNotFound => e
           retry_count += 1
           # if we're not currently in a job, one retry is all you get,
           # fail for the user and move on.

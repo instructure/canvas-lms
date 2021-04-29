@@ -19,8 +19,7 @@ require 'spec_helper'
 
 module DynamicSettings
   RSpec.describe PrefixProxy do
-    let(:client) { instance_double(Imperium::KV) }
-    let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes, kv_client: client) }
+    let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes) }
 
     after(:each) do
       DynamicSettings.cache.clear(force: true)
@@ -36,51 +35,35 @@ module DynamicSettings
       end
 
       it 'must return nil when no value was found' do
-        allow(client).to receive(:get).
-          and_return(Imperium::Testing.kv_not_found_response(options: [:stale]))
+        allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
         expect(proxy.fetch('baz')).to be_nil
       end
 
       it 'must return the value for the specified key' do
-        allow(client).to receive(:get).
+        allow(Diplomat::Kv).to receive(:get).
           and_return(
-            Imperium::Testing.kv_get_response(
-              body: [
-                { Key: "foo/bar/baz", Value: 'qux'},
-              ],
-              options: [:stale],
-            )
+            'qux'
           )
         expect(proxy.fetch('baz')).to eq 'qux'
       end
 
       it 'must fetch the value from consul using the prefix and supplied key' do
-        expect(client).to receive(:get).with('', :recurse, :stale).ordered.and_return(double(status: 200, values: {}))
-        expect(client).to receive(:get).with('foo/bar/baz', :stale).ordered.and_return(double(status: 200, values: nil))
-        expect(client).to receive(:get).with('global/foo/bar/baz', :stale).ordered.and_return(double(status: 200, values: nil))
+        expect(Diplomat::Kv).to receive(:get).with('', { convert_to_hash: true, recurse: true, stale: true }).ordered.and_return({})
+        expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return(nil)
+        expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).ordered.and_return(nil)
         proxy.fetch('baz')
       end
 
       it "logs the query when enabled" do
         proxy.query_logging = true
-        allow(client).to receive(:get).and_return(
-          Imperium::Testing.kv_get_response(
-            body: [
-              { Key: "foo/bar/bang", Value: 'qux'},
-            ],
-            options: [:stale],
-          )
+        allow(Diplomat::Kv).to receive(:get).and_return(
+          'qux'
         )
         expect(DynamicSettings.logger).to receive(:debug) do |log_message|
           expect(log_message).to match("CONSUL")
-          expect(log_message).to match("status:200")
+          expect(log_message).to match("status:OK")
         end.twice
         expect(proxy.fetch('bang')).to eq 'qux'
-      end
-
-      it "raises an error on bad statuses" do
-        allow(client).to receive(:get).and_return(double(status: 500, values: nil))
-        expect { proxy.fetch('bang') }.to raise_error(UnexpectedConsulResponse)
       end
 
       it 'must use the dynamic settings cache for previously fetched values' do
@@ -93,7 +76,7 @@ module DynamicSettings
 
       it "must fall back to expired cached values when consul can't be contacted" do
         DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz', 'qux', expires_in: -3.minutes)
-        expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
+        expect(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
         val = proxy.fetch('baz')
         expect(val).to eq 'qux'
       end
@@ -103,24 +86,22 @@ module DynamicSettings
         invoked = false
         DynamicSettings.fallback_recovery_lambda = lambda do |e|
           invoked = true
-          expect(e.class).to eq(Imperium::TimeoutError)
+          expect(e.class).to eq(Diplomat::KeyNotFound)
         end
-        allow(client).to receive(:get).and_raise(Imperium::TimeoutError)
+        allow(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
         proxy.fetch('baz')
         expect(invoked).to be_truthy
       end
 
       it "must raise an exception when consul can't be reached and no previous value is found" do
-        expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
-        expect { proxy.fetch('baz') }.to raise_error(Imperium::TimeoutError)
+        expect(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
+        expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
       end
 
       it "falls back to global settings" do
-        empty_mock = double(status: 404, values: nil)
-        mock = double(status: 200, values: 42)
-        expect(client).to receive(:get).with('', :recurse, :stale).and_return(empty_mock).ordered
-        expect(client).to receive(:get).with('foo/bar/baz', :stale).and_return(empty_mock).ordered
-        expect(client).to receive(:get).with('global/foo/bar/baz', :stale).and_return(mock).ordered
+        expect(Diplomat::Kv).to receive(:get).with('', { convert_to_hash: true, recurse: true, stale: true }).and_return(nil).ordered
+        expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return(nil).ordered
+        expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).and_return(42).ordered
         expect(proxy.fetch('baz')).to eq 42
       end
     end
@@ -145,33 +126,62 @@ module DynamicSettings
           with(an_instance_of(String), a_hash_including(default_ttl: 5.minutes))
         proxy.for_prefix('baz', default_ttl: 5.minutes)
       end
-
-      it 'must pass on the kv client from the receiving proxy' do
-        proxy
-        expect(PrefixProxy).to receive(:new).
-          with(an_instance_of(String), a_hash_including(kv_client: client))
-        proxy.for_prefix('baz')
-      end
     end
 
     describe '#set_keys' do
       let(:kvs) { {foo1: 'bar1', foo2: 'bar2', foo3: 'bar3'} }
 
       it 'sets multiple key value pairs' do
-        transaction_double = double(:transaction)
-        expect(transaction_double).to receive(:set).with('foo/bar/foo1', 'bar1')
-        expect(transaction_double).to receive(:set).with('foo/bar/foo2', 'bar2')
-        expect(transaction_double).to receive(:set).with('foo/bar/foo3', 'bar3')
-        allow(client).to receive(:transaction).and_yield(transaction_double)
+        expect(Diplomat::Kv).to receive(:txn).with([
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'foo/bar/foo1',
+              Value: Base64.strict_encode64('bar1')
+            }
+          },
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'foo/bar/foo2',
+              Value: Base64.strict_encode64('bar2')
+            }
+          },
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'foo/bar/foo3',
+              Value: Base64.strict_encode64('bar3')
+            }
+          }
+        ])
         proxy.set_keys(kvs)
       end
 
       it 'sets multiple global key value pairs' do
-        transaction_double = double(:transaction)
-        expect(transaction_double).to receive(:set).with('global/foo/bar/foo1', 'bar1')
-        expect(transaction_double).to receive(:set).with('global/foo/bar/foo2', 'bar2')
-        expect(transaction_double).to receive(:set).with('global/foo/bar/foo3', 'bar3')
-        allow(client).to receive(:transaction).and_yield(transaction_double)
+        expect(Diplomat::Kv).to receive(:txn).with([
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'global/foo/bar/foo1',
+              Value: Base64.strict_encode64('bar1')
+            }
+          },
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'global/foo/bar/foo2',
+              Value: Base64.strict_encode64('bar2')
+            }
+          },
+          {
+            KV: {
+              Verb: 'set',
+              Key: 'global/foo/bar/foo3',
+              Value: Base64.strict_encode64('bar3')
+            }
+          }
+        ])
         proxy.set_keys(kvs, global: true)
       end
     end

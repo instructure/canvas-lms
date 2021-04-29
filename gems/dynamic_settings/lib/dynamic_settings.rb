@@ -21,7 +21,7 @@ require 'logger'
 require 'active_support'
 require 'active_support/core_ext'
 require 'config_file'
-require 'imperium'
+require 'diplomat'
 require 'dynamic_settings/memory_cache'
 require 'dynamic_settings/fallback_proxy'
 require 'dynamic_settings/prefix_proxy'
@@ -37,25 +37,26 @@ module DynamicSettings
 
   class << self
     attr_accessor :environment
-    attr_reader :fallback_data, :kv_client, :config
+    attr_reader :fallback_data, :use_consul, :config
     attr_writer :fallback_recovery_lambda, :cache, :logger
 
     def config=(conf_hash)
       @config = conf_hash
       if conf_hash.present?
-        Imperium.configure do |config|
-          config.ssl = conf_hash.fetch('ssl', true)
-          config.host = conf_hash.fetch('host')
-          config.port = conf_hash.fetch('port')
-          config.token = conf_hash.fetch('acl_token', nil)
+        Diplomat.configure do |config|
+          need_ssl = conf_hash.fetch('ssl', true)
+          config.url = "#{need_ssl ? 'https://' : 'http://'}#{conf_hash.fetch('host')}:#{conf_hash.fetch('port')}"
+          config.acl_token = conf_hash.fetch('acl_token', nil)
 
-          config.connect_timeout = conf_hash['connect_timeout'] if conf_hash['connect_timeout']
-          config.send_timeout = conf_hash['send_timeout'] if conf_hash['send_timeout']
-          config.receive_timeout = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
+          options = { request: {} }
+          options[:request][:open_timeout] = conf_hash['connect_timeout'] if conf_hash['connect_timeout']
+          options[:request][:write_timeout] = conf_hash['send_timeout'] if conf_hash['send_timeout']
+          options[:request][:read_timeout] = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
+          config.options = options
         end
 
         @environment = conf_hash['environment']
-        @kv_client = Imperium::KV.default_client
+        @use_consul = true
         @data_center = conf_hash.fetch('global_dc', nil)
         @default_service = conf_hash.fetch('service', :canvas)
         @cache = conf_hash.fetch('cache', ::DynamicSettings::MemoryCache.new)
@@ -63,7 +64,7 @@ module DynamicSettings
         @logger = conf_hash.fetch('logger', nil)
       else
         @environment = nil
-        @kv_client = nil
+        @use_consul = false
         @default_service = :canvas
         @cache = ::DynamicSettings::MemoryCache.new
       end
@@ -86,12 +87,6 @@ module DynamicSettings
     def on_reload!
       @root_fallback_proxy = nil
       reset_cache!
-    end
-
-    # if we don't clear out the kv_client we can end up
-    # with a shared file descriptor between processes
-    def on_fork!
-      @kv_client = Imperium::KV.default_client unless @kv_client.nil?
     end
 
     # Set the fallback data to use in leiu of Consul
@@ -131,7 +126,7 @@ module DynamicSettings
              default_ttl: PrefixProxy::DEFAULT_TTL,
              data_center: nil)
       service ||= @default_service || :canvas
-      if kv_client
+      if use_consul
         PrefixProxy.new(
           prefix,
           tree: tree,
@@ -139,7 +134,6 @@ module DynamicSettings
           environment: @environment,
           cluster: cluster,
           default_ttl: default_ttl,
-          kv_client: kv_client,
           data_center: data_center || @data_center,
           query_logging: @config.fetch('query_logging', true)
         )
