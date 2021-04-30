@@ -130,7 +130,6 @@ function docker_compose_up {
   if is_mutagen; then
     start_spinner "Starting mutagen containers..."
     _canvas_lms_track_with_log mutagen compose up --no-start web
-    _canvas_lms_track_with_log mutagen compose run -u root --rm web chown docker:docker /usr/src/app
     stop_spinner
   fi
   start_spinner "Starting docker containers..."
@@ -166,24 +165,6 @@ function is_running_on_jenkins() {
   [[ -n "${JENKINS:-}" ]]
 }
 
-function rebuild_docker_images {
-  if [ -n "$(git diff --name-only "${before_rebase_sha:-origin/master}" | grep -E 'Dockerfile$|Dockerfile.githook$|docker-compose/postgres/Dockerfile$')" ]; then
-    message "There have been some updates made to Dockerfile, you should rebuild your docker images."
-    prompt "Rebuild docker images? [y/n]" rebuild_image
-    if [ "${rebuild_image:n}" == 'y' ]; then
-      start_spinner "Rebuilding docker images..."
-      if [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-        _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
-      else
-        _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
-      fi
-      stop_spinner
-    else
-      echo "Your docker image is now outdated and needs to be rebuilt! You should run \"${DOCKER_COMMAND} build\"."
-    fi
-  fi
-}
-
 function is_mutagen {
   [ -f ".mutagen" ]
 }
@@ -197,6 +178,19 @@ function docker_running {
   echo "Docker is not running! Start docker daemon and try again."
   return 1
 fi
+}
+
+function containers_running {
+  if [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
+  echo "You should probably stop docker containers before rebasing code"
+  prompt "Would you like to attempt to stop containers with docker-compose stop? [y/n]" stop
+  if [[ ${stop:-n} == 'y' ]]; then
+    docker-compose stop
+  else
+    echo "Continuing with docker containers running, this may cause errors."
+  fi
+fi
+echo ""
 }
 
 function os_setup {

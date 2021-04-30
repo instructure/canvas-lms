@@ -48,6 +48,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        autoconf \
        automake \
+       gosu \
        git \
        build-essential \
   && ([ $(lsb_release -rs) = "18.04" ] || apt-get install -qqy --no-install-recommends \
@@ -77,6 +78,7 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v $BUNDLER_VERSION \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
+
 RUN npm install -g npm@latest && npm cache clean --force
 
 USER docker

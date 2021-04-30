@@ -9,7 +9,7 @@ LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
 ENV APP_HOME /usr/src/app/
-ENV RAILS_ENV production
+ENV RAILS_ENV development
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
@@ -27,6 +27,7 @@ ENV BUNDLE_APP_CONFIG /home/docker/.bundle
 WORKDIR $APP_HOME
 
 USER root
+COPY --chown=docker:docker . ${APP_HOME}
 
 ARG USER_ID
 # This step allows docker to write files to a host-mounted volume with the correct user permissions.
@@ -55,6 +56,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        autoconf \
        automake \
+       gosu \
        git \
        build-essential \
   && ([ $(lsb_release -rs) = "18.04" ] || apt-get install -qqy --no-install-recommends \
@@ -84,41 +86,21 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v $BUNDLER_VERSION \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
+
 RUN npm install -g npm@latest && npm cache clean --force
 
 USER docker
 
 RUN set -eux; \
-  mkdir -p \
-    .yardoc \
-    app/stylesheets/brandable_css_brands \
-    app/views/info \
-    config/locales/generated \
-    gems/canvas_i18nliner/node_modules \
-    log \
-    node_modules \
-    packages/canvas-media/es \
-    packages/canvas-media/lib \
-    packages/canvas-media/node_modules \
-    packages/canvas-planner/lib \
-    packages/canvas-planner/node_modules \
-    packages/canvas-rce/canvas \
-    packages/canvas-rce/lib \
-    packages/canvas-rce/node_modules \
-    packages/jest-moxios-utils/node_modules \
-    packages/js-utils/es \
-    packages/js-utils/lib \
-    packages/js-utils/node_modules \
-    packages/k5uploader/es \
-    packages/k5uploader/lib \
-    packages/k5uploader/node_modules \
-    packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
-    pacts \
-    public/dist \
-    public/doc/api \
-    public/javascripts/translations \
-    reports \
-    tmp \
-    /home/docker/.bundler/ \
-    /home/docker/.cache/yarn \
-    /home/docker/.gem/
+  \
+  # set up bundle config options \
+  bundle config --global build.nokogiri --use-system-libraries \
+  && bundle config --global build.ffi --enable-system-libffi \
+  && mkdir -p /home/docker/.bundle \
+  && bundle install --jobs $(nproc)
+
+RUN (yarn install --ignore-optional --pure-lockfile || yarn install --ignore-optional --pure-lockfile --network-concurrency 1)
+RUN bundle exec rake canvas:compile_assets
+
+USER root
+COPY docker-entrypoint.sh /root/entrypoint.sh

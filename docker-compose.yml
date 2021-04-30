@@ -9,6 +9,14 @@ services:
       - redis
     environment:
       POSTGRES_PASSWORD: sekret
+    cap_add:
+      - SYS_ADMIN
+    # for linux the default profile restricts mount usage, set to have no restrictions
+    security_opt:
+      - apparmor:unconfined
+    entrypoint: /root/entrypoint.sh
+    command: [ "/tini", "--", "/usr/src/entrypoint" ]
+
 
   jobs:
     <<: *WEB
