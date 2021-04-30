@@ -200,9 +200,10 @@ module DynamicSettings
     def kv_fetch(full_key, **options)
       result = nil
       error = nil
+      method = options[:recurse] ? :get_all : :get
       ms = 1000 * Benchmark.realtime do
         begin
-          result = Diplomat::Kv.get(full_key, options)
+          result = Diplomat::Kv.send(method, full_key, options)
         rescue => e
           error = e
         end
