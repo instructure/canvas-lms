@@ -35,12 +35,6 @@ module BasicLTI
       end
     end
 
-    # gives instfs about 7 hours to have an outage and eventually take the file
-    # MAX_ATTEMPTS=10
-    # but creates lots of problems when google/office presigned S3 urls expire,
-    # since all 10 attempts will fail, and will gum up job queues, so for now:
-    MAX_ATTEMPTS=1
-
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
@@ -279,15 +273,25 @@ to because the assignment has no points possible.
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
         else
-          create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
           if attachment
             job_options = {
               :priority => Delayed::HIGH_PRIORITY,
-              :max_attempts => MAX_ATTEMPTS,
+              :max_attempts => 1,
               :n_strand => Attachment.clone_url_strand(url)
             }
 
-            delay(**job_options).fetch_attachment(url, attachment)
+            delay(**job_options).fetch_attachment_and_save_submission(
+              url,
+              attachment,
+              tool,
+              submission_hash,
+              assignment,
+              user,
+              new_score,
+              raw_score
+            )
+          else
+            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
           end
         end
 
@@ -348,11 +352,9 @@ to because the assignment has no points possible.
       end
 
       # rubocop:disable Metrics/ParameterLists
-      def fetch_attachment(url, attachment)
+      def fetch_attachment_and_save_submission(url, attachment, tool, submission_hash, assignment, user, new_score, raw_score)
         attachment.clone_url(url, 'rename', true)
-        if attachment.file_state == 'errored'
-          raise Delayed::RetriableError, 'Attachment clone failed' 
-        end
+        create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score
       end
       # rubocop:enable Metrics/ParameterLists
 
