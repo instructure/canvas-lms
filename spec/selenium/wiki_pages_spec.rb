@@ -119,7 +119,7 @@ describe "Wiki Pages" do
     end
 
     it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
-      skip "need to detect the job finished better"
+      skip 'DE-661 (04/29/21)'
 
       @course.wiki_pages.create!(title: 'Page1', body: 'http://www.instructure.com/')
       get "/courses/#{@course.id}/link_validator"

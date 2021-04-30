@@ -411,6 +411,7 @@ describe "course settings" do
 
   context "link validator" do
     it "should validate all the links" do
+      skip 'DE-661 (04/30/21)'
       allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
       course_with_teacher_logged_in
@@ -470,7 +471,7 @@ describe "course settings" do
     end
 
     it "should be able to filter links to unpublished content" do
-      skip "need to detect the job finished better"
+      skip 'DE-661 (04/29/21)'
 
       course_with_teacher_logged_in
 
