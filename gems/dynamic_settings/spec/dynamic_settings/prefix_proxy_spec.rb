@@ -35,18 +35,19 @@ module DynamicSettings
       end
 
       it 'must return nil when no value was found' do
+        allow(Diplomat::Kv).to receive(:get_all) { |key| raise Diplomat::KeyNotFound, key }
         allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
         expect(proxy.fetch('baz')).to be_nil
       end
 
       it 'must return the value for the specified key' do
-        allow(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
         allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return('qux')
         expect(proxy.fetch('baz')).to eq 'qux'
       end
 
       it 'must fetch the value from consul using the prefix and supplied key' do
-        expect(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
+        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return(nil)
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).ordered.and_return(nil)
         proxy.fetch('baz')
@@ -54,7 +55,7 @@ module DynamicSettings
 
       it "logs the query when enabled" do
         proxy.query_logging = true
-        allow(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
+        allow(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).ordered.and_return([])
         allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).ordered.and_return('qux')
         expect(DynamicSettings.logger).to receive(:debug) do |log_message|
           expect(log_message).to match("CONSUL")
@@ -73,7 +74,7 @@ module DynamicSettings
 
       it "must fall back to expired cached values when consul can't be contacted" do
         DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz', 'qux', expires_in: -3.minutes)
-        expect(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
+        expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
         val = proxy.fetch('baz')
         expect(val).to eq 'qux'
       end
@@ -85,18 +86,18 @@ module DynamicSettings
           invoked = true
           expect(e.class).to eq(Diplomat::KeyNotFound)
         end
-        allow(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
+        allow(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
         proxy.fetch('baz')
         expect(invoked).to be_truthy
       end
 
       it "must raise an exception when consul can't be reached and no previous value is found" do
-        expect(Diplomat::Kv).to receive(:get).and_raise(Diplomat::KeyNotFound)
+        expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
         expect { proxy.fetch('baz') }.to raise_error(Diplomat::KeyNotFound)
       end
 
       it "falls back to global settings" do
-        expect(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).and_return(nil).ordered
+        expect(Diplomat::Kv).to receive(:get_all).with('', { recurse: true, stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).and_return(42).ordered
         expect(proxy.fetch('baz')).to eq 42

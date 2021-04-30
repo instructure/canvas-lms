@@ -53,7 +53,7 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   end
 
   it "caches tree values from client" do
-    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
       {
         :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
         :value => 'http://test-host'
@@ -74,7 +74,7 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   it "can handle a cache clear" do
     skip('10/5/2020 FOO-1030')
     
-    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
       {
         :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
         :value => 'http://test-host'
