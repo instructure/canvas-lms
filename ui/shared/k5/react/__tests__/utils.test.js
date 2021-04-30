@@ -332,6 +332,52 @@ describe('getAssignmentGroupTotals', () => {
     const totals = getAssignmentGroupTotals(data)
     expect(totals[0].score).toBe('n/a')
   })
+
+  it('excludes assignment groups without assignments in provided gradingPeriodId', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              grading_period_id: 1
+            }
+          }
+        ]
+      },
+      {
+        id: '55',
+        name: 'Papers',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 178,
+            name: '2',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              grading_period_id: 2
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data, 1)
+    expect(totals.length).toBe(1)
+    expect(totals[0].name).toBe('Assignments')
+  })
 })
 
 describe('getAssignmentGrades', () => {

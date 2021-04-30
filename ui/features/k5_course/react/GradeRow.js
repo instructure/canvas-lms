@@ -32,19 +32,12 @@ import {Badge} from '@instructure/ui-badge'
 import k5Theme from '@canvas/k5/react/k5-theme'
 
 export const GradeRow = ({
-  // these unused vars should be used in future grades tickets
-  // eslint-disable-next-line no-unused-vars
-  id,
   assignmentName,
   url,
   dueDate,
   assignmentGroupName,
-  // eslint-disable-next-line no-unused-vars
-  assignmentGroupId,
   pointsPossible,
   gradingType,
-  // eslint-disable-next-line no-unused-vars
-  score,
   grade,
   submissionDate,
   unread,
@@ -191,12 +184,10 @@ export const GradeRow = ({
 }
 
 GradeRow.propTypes = {
-  id: PropTypes.string.isRequired,
   assignmentName: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   dueDate: PropTypes.string,
   assignmentGroupName: PropTypes.string.isRequired,
-  assignmentGroupId: PropTypes.string.isRequired,
   pointsPossible: PropTypes.number,
   gradingType: PropTypes.oneOf([
     'pass_fail',
@@ -206,7 +197,6 @@ GradeRow.propTypes = {
     'points',
     'not_graded'
   ]).isRequired,
-  score: PropTypes.number,
   grade: PropTypes.string,
   submissionDate: PropTypes.string,
   unread: PropTypes.bool.isRequired,

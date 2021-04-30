@@ -21,6 +21,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 import moment from 'moment-timezone'
+import PropTypes from 'prop-types'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -152,9 +153,15 @@ export const enrollAsTeacher = courseId =>
   })
 
 /* Takes raw response from assignment_groups API and returns an array of objects with each
-   assignment group's id, name, and total score. */
-export const getAssignmentGroupTotals = data =>
-  data.map(group => {
+   assignment group's id, name, and total score. If gradingPeriodId is passed, only return
+   totals for assignment groups which have assignments in the provided grading period. */
+export const getAssignmentGroupTotals = (data, gradingPeriodId) => {
+  if (gradingPeriodId) {
+    data = data.filter(group =>
+      group.assignments?.some(a => a.submission?.grading_period_id === gradingPeriodId)
+    )
+  }
+  return data.map(group => {
     const groupScores = AssignmentGroupGradeCalculator.calculate(
       group.assignments.map(a => ({
         points_possible: a.points_possible,
@@ -177,6 +184,7 @@ export const getAssignmentGroupTotals = data =>
             })
     }
   })
+}
 
 /* Takes raw response from assignment_groups API and returns an array of assignments with
    grade information, sorted by due date. */
@@ -223,3 +231,11 @@ export const FOCUS_TARGETS = {
 }
 
 export const DEFAULT_COURSE_COLOR = '#394B58'
+
+export const GradingPeriodShape = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  end_date: PropTypes.string,
+  start_date: PropTypes.string,
+  workflow_state: PropTypes.string
+}

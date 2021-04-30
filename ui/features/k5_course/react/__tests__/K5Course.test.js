@@ -21,7 +21,13 @@ import moxios from 'moxios'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
-import {MOCK_COURSE_APPS, MOCK_COURSE_TABS, MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
+import {
+  MOCK_COURSE_APPS,
+  MOCK_COURSE_TABS,
+  MOCK_GRADING_PERIODS_EMPTY,
+  MOCK_ASSIGNMENT_GROUPS,
+  MOCK_ENROLLMENTS
+} from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
@@ -54,6 +60,9 @@ const defaultProps = {
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
+const GRADING_PERIODS_URL = encodeURI(
+  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
+)
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
 )
@@ -65,6 +74,7 @@ beforeAll(() => {
   moxios.install()
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
   fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
+  fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
   if (!modulesContainer) {

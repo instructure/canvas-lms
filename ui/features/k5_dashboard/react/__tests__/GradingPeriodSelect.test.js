@@ -20,31 +20,10 @@
 import React from 'react'
 import {act, render} from '@testing-library/react'
 import GradingPeriodSelect from '../GradingPeriodSelect'
+import {GRADING_PERIODS} from '@canvas/k5/react/__tests__/fixtures'
 
 const defaultProps = {
-  gradingPeriods: [
-    {
-      id: '1',
-      title: 'Spring 2020',
-      start_date: '2020-01-01T07:00:00Z',
-      end_date: '2020-07-01T06:59:59Z',
-      workflow_state: 'active'
-    },
-    {
-      id: '2',
-      title: 'Fall 2020',
-      start_date: '2020-07-01T07:00:00Z',
-      end_date: '2021-01-01T06:59:59Z',
-      workflow_state: 'active'
-    },
-    {
-      id: '3',
-      title: 'Fall 2019',
-      start_date: '2019-07-01T07:00:00Z',
-      end_date: '2020-01-01T06:59:59Z',
-      workflow_state: 'deleted'
-    }
-  ],
+  gradingPeriods: GRADING_PERIODS,
   handleSelectGradingPeriod: () => {},
   selectedGradingPeriodId: ''
 }
