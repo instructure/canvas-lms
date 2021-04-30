@@ -1822,6 +1822,17 @@ describe 'Submissions API', type: :request do
         submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
         expect(submission_json.fetch("has_postable_comments")).to be false
       end
+
+      it "is false when unposted and only draft comments exist" do
+        student1_sub.add_comment(
+          author: @teacher,
+          comment: "maybe bad job but not sure, let me think about it",
+          hidden: true,
+          draft_comment: true
+        )
+        submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
+        expect(submission_json.fetch("has_postable_comments")).to be false
+      end
     end
 
     context 'OriginalityReport' do
