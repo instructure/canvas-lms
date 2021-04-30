@@ -40,15 +40,13 @@ module DynamicSettings
       end
 
       it 'must return the value for the specified key' do
-        allow(Diplomat::Kv).to receive(:get).
-          and_return(
-            'qux'
-          )
+        allow(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return('qux')
         expect(proxy.fetch('baz')).to eq 'qux'
       end
 
       it 'must fetch the value from consul using the prefix and supplied key' do
-        expect(Diplomat::Kv).to receive(:get).with('', { convert_to_hash: true, recurse: true, stale: true }).ordered.and_return({})
+        expect(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).ordered.and_return(nil)
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).ordered.and_return(nil)
         proxy.fetch('baz')
@@ -56,9 +54,8 @@ module DynamicSettings
 
       it "logs the query when enabled" do
         proxy.query_logging = true
-        allow(Diplomat::Kv).to receive(:get).and_return(
-          'qux'
-        )
+        allow(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).ordered.and_return([])
+        allow(Diplomat::Kv).to receive(:get).with('foo/bar/bang', { stale: true }).ordered.and_return('qux')
         expect(DynamicSettings.logger).to receive(:debug) do |log_message|
           expect(log_message).to match("CONSUL")
           expect(log_message).to match("status:OK")
@@ -99,7 +96,7 @@ module DynamicSettings
       end
 
       it "falls back to global settings" do
-        expect(Diplomat::Kv).to receive(:get).with('', { convert_to_hash: true, recurse: true, stale: true }).and_return(nil).ordered
+        expect(Diplomat::Kv).to receive(:get).with('', { recurse: true, stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('foo/bar/baz', { stale: true }).and_return(nil).ordered
         expect(Diplomat::Kv).to receive(:get).with('global/foo/bar/baz', { stale: true }).and_return(42).ordered
         expect(proxy.fetch('baz')).to eq 42

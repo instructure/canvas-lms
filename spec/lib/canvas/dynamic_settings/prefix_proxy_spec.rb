@@ -53,16 +53,16 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   end
 
   it "caches tree values from client" do
-    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true, convert_to_hash: true }).and_return({
-      'test' => {
-        'prefix' => {
-          'svc_config' => {
-            'app-host' => 'http://test-host',
-            'app-secret' => 'sekret'
-          }
-        }
+    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
+        :value => 'http://test-host'
+      },
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
+        :value => 'sekret'
       }
-    }).ordered
+    ]).ordered
     # shouldn't need to get a specific key because it's already populated in the cache
     expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
     expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret')
@@ -74,16 +74,16 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   it "can handle a cache clear" do
     skip('10/5/2020 FOO-1030')
     
-    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true, convert_to_hash: true }).and_return({
-      'test' => {
-        'prefix' => {
-          'svc_config' => {
-            'app-host' => 'http://test-host',
-            'app-secret' => 'sekret'
-          }
-        }
+    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
+        :value => 'http://test-host'
+      },
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
+        :value => 'sekret'
       }
-    }).ordered
+    ]).ordered
     expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
     expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret', { stale: true }).and_return('sekret').ordered
     output = proxy['svc_config/app-host']
