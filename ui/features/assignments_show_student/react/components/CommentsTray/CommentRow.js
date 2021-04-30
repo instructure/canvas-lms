@@ -72,7 +72,7 @@ export default function CommentRow(props) {
             dateTime={props.comment.updatedAt}
           />
         </Text>
-        <Text color={props.comment._id === 'pending' ? 'secondary' : null}>
+        <Text color={props.comment._id === 'pending' ? 'secondary' : null} wrap="break-word">
           {props.comment.comment}
         </Text>
         {props.comment.attachments.map(attachment => (
