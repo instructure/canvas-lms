@@ -34,17 +34,23 @@ import useInput from '@canvas/outcomes/react/hooks/useInput'
 import useRCE from './hooks/useRCE'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {createOutcome} from '@canvas/outcomes/graphql/Management'
+import {
+  createOutcome,
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
+} from '@canvas/outcomes/graphql/Management'
 import TreeBrowser from './Management/TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import {useMutation} from 'react-apollo'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const {contextType, contextId} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
+  const [altDescription, altDescriptionChangeHandler] = useInput()
   const [setRCERef, getRCECode, setRCECode] = useRCE()
   const [showTitleError, setShowTitleError] = useState(false)
+  const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const {
     error,
     isLoading,
@@ -73,11 +79,24 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const onCreateOutcomeHandler = () => {
     ;(async () => {
       try {
-        await createOutcome(contextType, contextId, selectedGroupId, {
+        const result = await createOutcome(contextType, contextId, selectedGroupId, {
           title,
           description: getRCECode(),
           display_name: displayName
         })
+        if (result.status === 200 && altDescription) {
+          const altDescriptionResult = await setOutcomeFriendlyDescription({
+            variables: {
+              input: {
+                outcomeId: result.data.outcome.id,
+                description: altDescription,
+                contextId,
+                contextType
+              }
+            }
+          })
+          if (altDescriptionResult.data?.setFriendlyDescription?.errors) throw new Error()
+        }
         showFlashAlert({
           message: I18n.t('Outcome "%{title}" was successfully created', {title}),
           type: 'success'
@@ -135,6 +154,17 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
           </Flex>
           <View as="div" padding="small 0 0">
             <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
+          </View>
+          <View as="div" padding="small 0">
+            <TextArea
+              size="medium"
+              height="8rem"
+              maxHeight="10rem"
+              value={altDescription}
+              placeholder={I18n.t('Enter your alternate description here')}
+              label={I18n.t('Alternate description (for parent/student display)')}
+              onChange={altDescriptionChangeHandler}
+            />
           </View>
           <View as="div" padding="x-small 0 0">
             <Text size="medium" weight="bold">
