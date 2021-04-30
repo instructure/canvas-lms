@@ -77,11 +77,11 @@ export const DiscussionTopicContainer = props => {
 
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
-      setOnSuccess(I18n.t('The topic was successfully deleted.'))
+      setOnSuccess(I18n.t('The discussion topic was successfully deleted.'))
       window.location.assign(`/courses/${ENV.course_id}/discussion_topics`)
     },
     onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error deleting the topic.'))
+      setOnFailure(I18n.t('There was an unexpected error deleting the discussion topic.'))
     }
   })
 

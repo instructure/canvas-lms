@@ -71,13 +71,13 @@ export const DiscussionThreadContainer = props => {
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
       if (!data.deleteDiscussionEntry.errors) {
-        setOnSuccess(I18n.t('The entry was successfully deleted'))
+        setOnSuccess(I18n.t('The reply was successfully deleted.'))
       } else {
-        setOnFailure(I18n.t('There was an unexpected error while deleting the entry'))
+        setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
       }
     },
     onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error while deleting the entry'))
+      setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
     }
   })
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
@@ -85,10 +85,10 @@ export const DiscussionThreadContainer = props => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
       }
-      setOnSuccess(I18n.t('The entry was successfully updated.'))
+      setOnSuccess(I18n.t('The reply was successfully updated.'))
     },
     onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error updating the entry.'))
+      setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
     }
   })
   const toggleRating = () => {
@@ -300,7 +300,7 @@ const DiscussionSubentries = props => {
   })
 
   if (subentries.error) {
-    setOnFailure(I18n.t('Error loading replies'))
+    setOnFailure(I18n.t('There was an unexpected error loading the replies.'))
     return null
   }
 

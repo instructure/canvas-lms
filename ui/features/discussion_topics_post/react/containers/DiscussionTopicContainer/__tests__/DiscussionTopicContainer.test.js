@@ -185,7 +185,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByTestId('delete'))
 
     await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The topic was successfully deleted.')
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.')
     )
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith('/courses/1/discussion_topics')
