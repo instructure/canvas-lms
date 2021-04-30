@@ -17519,7 +17519,7 @@ it:
         buttons: 
           update: Aggiorna
         default_group_name: Gruppo
-        edit_questions_and_points: "Scegli *%{num_questions}* domande, n. %{num_points} n. punti per domanda"
+        edit_questions_and_points: "Scegli *%{num_questions}* domande, #%{num_points}# punti per domanda"
         labels: 
           group_name: "Nome del gruppo"
           number_of_questions: "Numero di domande"
@@ -17527,7 +17527,7 @@ it:
           question_bank: "Le domande verranno estratte dalla banca"
         links: 
           link_to_a_question_bank: "Collega a una banca di domande"
-        show_questions_and_points: "Scegli *%{num_questions}* domande, n. %{num_points} n. punti per domanda"
+        show_questions_and_points: "Scegli *%{num_questions}* domande, #%{num_points}# punti per domanda"
         titles: 
           add_question_to_group: "Aggiungi domanda a questo gruppo"
           collapse_group: "Comprimi gruppo"
