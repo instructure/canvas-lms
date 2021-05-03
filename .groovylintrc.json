@@ -2,10 +2,10 @@
   "extends": "recommended",
   "rules": {
     "formatting.ClassStartsWithBlankLine": {
-      "enabled": false
+      "blankLineRequired": false
     },
     "formatting.ClassEndsWithBlankLine": {
-      "enabled": false
+      "blankLineRequired": false
     },
     "formatting.Indentation": {
       "spacesPerIndentLevel": 2
