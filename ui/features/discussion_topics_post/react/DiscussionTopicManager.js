@@ -23,25 +23,31 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PER_PAGE} from './utils/constants'
+import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
+import {PER_PAGE, SearchContext} from './utils/constants'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const DiscussionTopicManager = props => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const value = {searchTerm, setSearchTerm}
+
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const variables = {
     discussionID: props.discussionTopicId,
     perPage: PER_PAGE,
-    page: btoa(0)
+    page: btoa(0),
+    searchTerm,
+    rootEntries: !searchTerm
   }
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
 
   const updateCache = (cache, result) => {
     try {
-      const lastPage = discussionTopicQuery.data.legacyNode.rootEntriesTotalPages - 1
+      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
       const options = {
         query: DISCUSSION_QUERY,
         variables: {...variables, page: btoa(lastPage * PER_PAGE)}
@@ -50,7 +56,7 @@ const DiscussionTopicManager = props => {
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
 
       if (currentDiscussion && newDiscussionEntry) {
-        currentDiscussion.legacyNode.rootDiscussionEntriesConnection.nodes.push(newDiscussionEntry)
+        currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
 
         // TODO: Handle sorting.
         cache.writeQuery({...options, data: currentDiscussion})
@@ -69,7 +75,7 @@ const DiscussionTopicManager = props => {
     }
   })
 
-  if (discussionTopicQuery.loading) {
+  if (discussionTopicQuery.loading && !searchTerm) {
     return <LoadingIndicator />
   }
 
@@ -85,24 +91,30 @@ const DiscussionTopicManager = props => {
 
   return (
     <>
-      <DiscussionTopicContainer
-        discussionTopic={discussionTopicQuery.data.legacyNode}
-        createDiscussionEntry={text => {
-          createDiscussionEntry({
-            variables: {
-              discussionTopicId: ENV.discussion_topic_id,
-              message: text
-            }
-          })
-        }}
-      />
-      <DiscussionThreadsContainer
-        discussionTopic={discussionTopicQuery.data.legacyNode}
-        discussionTopicId={props.discussionTopicId}
-        threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
-        pageInfo={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.pageInfo}
-        totalPages={discussionTopicQuery.data.legacyNode.rootEntriesTotalPages}
-      />
+      <SearchContext.Provider value={value}>
+        <DiscussionTopicContainer
+          discussionTopic={discussionTopicQuery.data.legacyNode}
+          createDiscussionEntry={text => {
+            createDiscussionEntry({
+              variables: {
+                discussionTopicId: ENV.discussion_topic_id,
+                message: text
+              }
+            })
+          }}
+        />
+        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 ? (
+          <NoResultsFound />
+        ) : (
+          <DiscussionThreadsContainer
+            discussionTopic={discussionTopicQuery.data.legacyNode}
+            discussionTopicId={props.discussionTopicId}
+            threads={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes}
+            pageInfo={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.pageInfo}
+            totalPages={discussionTopicQuery.data.legacyNode.entriesTotalPages}
+          />
+        )}
+      </SearchContext.Provider>
     </>
   )
 }

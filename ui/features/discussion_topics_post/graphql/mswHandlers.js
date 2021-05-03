@@ -228,6 +228,60 @@ const defaultTopic = {
     __typename: 'DiscussionEntryConnection'
   },
   rootEntriesTotalPages: 1,
+  discussionEntriesConnection: {
+    nodes: [
+      {
+        author: {
+          avatarUrl: imageUrl,
+          id: 'VXNlci0x',
+          name: 'Matthew Lemon',
+          _id: '1',
+          __typename: 'User'
+        },
+        createdAt: '2021-04-05T13:40:50-06:00',
+        deleted: false,
+        editor: null,
+        id: '49',
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00',
+          __typename: 'DiscussionEntry'
+        },
+        message: '<p>This is the parent reply</p>',
+        permissions: {
+          attach: true,
+          create: true,
+          delete: true,
+          rate: true,
+          read: true,
+          reply: true,
+          update: true,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        rating: false,
+        ratingCount: null,
+        ratingSum: null,
+        read: true,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1,
+          __typename: 'RootEntryParticipantCount'
+        },
+        subentriesCount: 1,
+        updatedAt: '2021-04-05T13:40:50-06:00',
+        _id: '49',
+        __typename: 'DiscussionEntry'
+      }
+    ],
+    pageInfo: {
+      endCursor: 'MTg',
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: 'MQ',
+      __typename: 'PageInfo'
+    },
+    __typename: 'DiscussionEntryConnection'
+  },
+  entriesTotalPages: 1,
   subscribed: true,
   title: 'Cookie Cat',
   message: 'This is a Discussion Topic Message',

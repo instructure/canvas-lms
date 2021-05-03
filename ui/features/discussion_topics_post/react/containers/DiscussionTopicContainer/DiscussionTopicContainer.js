@@ -36,6 +36,7 @@ import {
 } from '../../../graphql/Mutations'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
+import {SearchContext} from '../../utils/constants'
 import {useMutation} from 'react-apollo'
 import {isGraded, getSpeedGraderUrl, getEditUrl} from '../../utils'
 import {View} from '@instructure/ui-view'
@@ -45,6 +46,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
+
+  const {setSearchTerm} = useContext(SearchContext)
 
   const discussionTopicData = {
     _id: props.discussionTopic._id,
@@ -164,6 +167,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     })
   }
 
+  const onSearchChange = value => {
+    setSearchTerm(value)
+  }
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
@@ -172,7 +179,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
             selectedView="all"
             sortDirection="asc"
             isCollapsedReplies
-            onSearchChange={() => {}}
+            onSearchChange={onSearchChange}
             onViewFilter={() => {}}
             onSortClick={() => {}}
             onCollapseRepliesToggle={() => {}}

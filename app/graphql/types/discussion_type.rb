@@ -77,6 +77,7 @@ module Types
       argument :search_term, String, required: false
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :root_entries, Boolean, required: false
     end
     def discussion_entries_connection(**args)
       get_entries(args)
@@ -136,6 +137,7 @@ module Types
       argument :search_term, String, required: false
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :root_entries, Boolean, required: false
     end
     def entries_total_pages(**args)
       get_entry_page_count(args)

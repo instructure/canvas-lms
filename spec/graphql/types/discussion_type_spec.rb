@@ -59,6 +59,15 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
   end
 
+  it "allows querying root discussion entries (via rootEntries param)" do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
+
+    result = discussion_type.resolve('discussionEntriesConnection(rootEntries:true) { nodes { message } }')
+    expect(result.count).to be 1
+    expect(result[0]).to eq de.message
+  end
+
   it "allows querying root discussion entries" do
     de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
     discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
@@ -199,6 +208,12 @@ describe Types::DiscussionType do
     it 'returns total number of root entry pages' do
       (1..@total_root_entries).each do |i|
         expect(discussion_type.resolve("rootEntriesTotalPages(perPage: #{i})")).to eq((@total_root_entries.to_f / i).ceil)
+      end
+    end
+
+    it 'returns total number of root entry pages (via rootEntries param)' do
+      (1..@total_root_entries).each do |i|
+        expect(discussion_type.resolve("entriesTotalPages(perPage: #{i}, rootEntries: true)")).to eq((@total_root_entries.to_f / i).ceil)
       end
     end
 
