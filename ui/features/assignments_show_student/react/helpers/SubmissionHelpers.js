@@ -53,3 +53,9 @@ export function multipleTypesDrafted(submission) {
 
   return matchingCriteria.length > 1
 }
+
+export function totalAllowedAttempts({assignment, submission}) {
+  return assignment.allowedAttempts != null
+    ? assignment.allowedAttempts + (submission?.extraAttempts || 0)
+    : null
+}

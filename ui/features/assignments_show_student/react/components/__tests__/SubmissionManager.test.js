@@ -522,6 +522,15 @@ describe('SubmissionManager', () => {
       const {queryByRole} = render(<SubmissionManager {...props} />)
       expect(queryByRole('button', 'Try Again')).not.toBeInTheDocument()
     })
+
+    it('accounts for any extra attempts awarded to the student', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 1},
+        Submission: {...SubmissionMocks.submitted, extraAttempts: 2}
+      })
+      const {queryByRole} = render(<SubmissionManager {...props} />)
+      expect(queryByRole('button', 'Try Again')).toBeInTheDocument()
+    })
   })
 
   describe('"Back to Attempt" button', () => {

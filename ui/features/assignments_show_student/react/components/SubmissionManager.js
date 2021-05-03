@@ -27,7 +27,11 @@ import {
   DELETE_SUBMISSION_DRAFT
 } from '@canvas/assignments/graphql/student/Mutations'
 import {Flex} from '@instructure/ui-flex'
-import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
+import {
+  friendlyTypeName,
+  multipleTypesDrafted,
+  totalAllowedAttempts
+} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -494,6 +498,7 @@ export default class SubmissionManager extends Component {
         key: 'new-attempt',
         shouldRender: context => {
           const {assignment, submission} = this.props
+          const allowedAttempts = totalAllowedAttempts({assignment, submission})
 
           return (
             context.allowChangesToSubmission &&
@@ -501,7 +506,7 @@ export default class SubmissionManager extends Component {
             (submission.state === 'graded' || submission.state === 'submitted') &&
             submission.gradingStatus !== 'excused' &&
             context.latestSubmission.state !== 'unsubmitted' &&
-            (assignment.allowedAttempts == null || submission.attempt < assignment.allowedAttempts)
+            (allowedAttempts == null || submission.attempt < allowedAttempts)
           )
         },
         render: context => {

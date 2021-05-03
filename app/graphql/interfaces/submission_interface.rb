@@ -312,4 +312,6 @@ module Interfaces::SubmissionInterface
   end
 
   field :url, Types::UrlType, null: true
+
+  field :extra_attempts, Integer, null: true
 end
