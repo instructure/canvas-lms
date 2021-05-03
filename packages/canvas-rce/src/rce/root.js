@@ -19,7 +19,6 @@
 import React, {createRef} from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
 import RCEWrapper from './RCEWrapper'
-import tinyRCE from './tinyRCE'
 import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
 
@@ -32,24 +31,28 @@ if (!process?.env?.BUILD_LOCALE) {
 }
 
 export function renderIntoDiv(target, props, renderCallback) {
-  // normalize props
-  props = normalizeProps(props, tinyRCE)
+  import('./tinyRCE').then(module => {
+    const tinyRCE = module.default
 
-  formatMessage.setup({locale: props.language})
-  // render the editor to the target element
-  const renderedComponent = createRef()
-  render(
-    <RCEWrapper
-      ref={renderedComponent}
-      {...props}
-      handleUnmount={() => unmountComponentAtNode(target)}
-    />,
-    target,
-    () => {
-      // pass it back
-      renderCallback && renderCallback(renderedComponent.current)
-    }
-  )
+    // normalize props
+    props = normalizeProps(props, tinyRCE)
+
+    formatMessage.setup({locale: props.language})
+    // render the editor to the target element
+    const renderedComponent = createRef()
+    render(
+      <RCEWrapper
+        ref={renderedComponent}
+        {...props}
+        handleUnmount={() => unmountComponentAtNode(target)}
+      />,
+      target,
+      () => {
+        // pass it back
+        renderCallback && renderCallback(renderedComponent.current)
+      }
+    )
+  })
 }
 
 // Adding this event listener fixes LA-212. I have no idea why. In Safari it

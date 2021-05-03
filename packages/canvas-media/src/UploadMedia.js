@@ -49,8 +49,12 @@ export default class UploadMedia extends React.Component {
       })
     ),
     liveRegion: func,
-    contextId: string,
-    contextType: string,
+    rcsConfig: shape({
+      contextId: string,
+      contextType: string,
+      origin: string.isRequired,
+      headers: shape({Authentication: string.isRequired})
+    }),
     onStartUpload: func,
     onUploadComplete: func,
     onDismiss: func,
@@ -115,13 +119,7 @@ export default class UploadMedia extends React.Component {
   uploadFile(file) {
     this.setState({uploading: true})
     this.props.onStartUpload && this.props.onStartUpload(file)
-    saveMediaRecording(
-      file,
-      this.props.contextId,
-      this.props.contextType,
-      this.saveMediaCallback,
-      this.onSaveMediaProgress
-    )
+    saveMediaRecording(file, this.props.rcsConfig, this.saveMediaCallback, this.onSaveMediaProgress)
   }
 
   onSaveMediaProgress = progress => {
@@ -134,7 +132,11 @@ export default class UploadMedia extends React.Component {
     } else {
       try {
         if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
-          await saveClosedCaptions(data.mediaObject.media_object.media_id, this.state.subtitles)
+          await saveClosedCaptions(
+            data.mediaObject.media_object.media_id,
+            this.state.subtitles,
+            this.props.rcsConfig
+          )
         }
         this.props.onUploadComplete && this.props.onUploadComplete(null, data)
       } catch (ex) {

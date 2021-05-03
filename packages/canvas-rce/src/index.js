@@ -19,6 +19,7 @@
 import normalizeLocale from './rce/normalizeLocale'
 import {renderIntoDiv as render} from './rce/root'
 import getRceTranslations from './getRceTranslations'
+import {headerFor, originFromHost} from './sidebar/sources/api'
 import 'tinymce'
 
 if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
@@ -54,4 +55,12 @@ export function renderIntoDiv(editorEl, props, cb) {
         render(editorEl, props, cb)
       })
   }
+}
+
+export function getRCSAuthenticationHeaders(jwt) {
+  return headerFor(jwt)
+}
+
+export function getRCSOriginFromHost(host) {
+  return originFromHost(host)
 }
