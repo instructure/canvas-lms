@@ -113,6 +113,10 @@ describe DiscussionEntry do
       @non_posting_student = @student
       student_in_course(:active_all => true)
 
+      @notification_mention = "New Discussion Mention"
+      n = Notification.create(:name => @notification_mention, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+
       @notification_name = "New Discussion Entry"
       n = Notification.create(:name => @notification_name, :category => "TestImmediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
@@ -206,6 +210,17 @@ describe DiscussionEntry do
       entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
       expect(entry.messages_sent[@notification_name]).to be_blank
       expect(entry.messages_sent["Announcement Reply"]).not_to be_blank
+    end
+
+    it "should send one notification to mentioned users" do
+      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.new(:user => @teacher, :message => "Oh, and another thing...")
+      entry.mentions.new(user: @student, root_account_id: @course.root_account_id)
+      entry.save! # also saves the mention.
+      expect(entry.messages_sent[@notification_name]).to be_blank
+      expect(entry.messages_sent[@notification_mention]).not_to be_blank
+      expect(entry.messages_sent["Announcement Reply"]).to be_blank
     end
 
   end

@@ -78,13 +78,25 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def mentioned_users
+    users = User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+    discussion_topic.filter_message_users(users)
+  end
+
   def course_broadcast_data
     discussion_topic.context&.broadcast_data
   end
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { discussion_topic.subscribers - [user] }
+    p.to { discussion_topic.subscribers - [user] - mentioned_users }
+    p.whenever { |record|
+      record.just_created && record.active?
+    }
+    p.data { course_broadcast_data }
+
+    p.dispatch :new_discussion_mention
+    p.to { mentioned_users - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }

@@ -1376,6 +1376,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids).to_a
 
+    subscribed_users = filter_message_users(subscribed_users)
+
+    subscribed_users
+  end
+
+  def filter_message_users(users)
     if self.for_assignment?
       students_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
@@ -1383,14 +1389,13 @@ class DiscussionTopic < ActiveRecord::Base
       observer_ids = course.participating_observers.pluck(:id)
       observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(course, observer_ids)
 
-      subscribed_users.select!{ |user|
+      users.select! do |user|
         students_with_visibility.include?(user.id) || admin_ids.include?(user.id) ||
-        # an observer with no students or one with students who have visibility
-        (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
-      }
+          # an observer with no students or one with students who have visibility
+          (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
+      end
     end
-
-    subscribed_users
+    users
   end
 
   def posters
