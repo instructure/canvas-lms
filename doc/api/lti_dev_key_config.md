@@ -125,12 +125,12 @@ also found in the placements sub-menu in the left-navigation of this documentati
          "domain":"thebesttool.com",
          "tool_id":"the-best-tool",
          "platform":"canvas.instructure.com",
+         "privacy_level":"public",
          "settings":{  
             "text":"Launch The Best Tool",
             "icon_url":"https://some.icon.url/tool-level.png",
             "selection_height": 800,
             "selection_width": 800,
-            "privacy_level":"public",
             "placements":[  
                {  
                   "text":"User Navigation Placement",
@@ -371,6 +371,31 @@ object for placement-specific target_link_uri's</p>
       </td>
     </tr>
 
+<!-- privacy_level -->  
+    <tr class="request-param ">
+      <td>privacy_level</td>
+      <td>
+
+        Required
+
+      </td>
+      <td>string</td>
+
+
+
+      <td class="param-desc">
+
+<p>What level of user information to send to the external tool.</p>
+
+
+        <p class="param-values">
+          <span class="allowed">Allowed values:</span> <code class="enum">anonymous</code>, <code class="enum">public</code>
+        </p>
+
+      </td>
+    </tr>
+
+
 <!-- settings -->      
     <tr class="request-param ">
       <td>settings</td>
@@ -429,30 +454,6 @@ object for placement-specific target_link_uri's</p>
       <td class="param-desc">
 
 <p>The display width of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-
-<!-- privacy_level -->  
-    <tr class="request-param ">
-      <td>privacy_level</td>
-      <td>
-
-        Required
-
-      </td>
-      <td>string</td>
-
-
-
-      <td class="param-desc">
-
-<p>What level of user information to send to the external tool.</p>
-
-
-        <p class="param-values">
-          <span class="allowed">Allowed values:</span> <code class="enum">anonymous</code>, <code class="enum">public</code>
-        </p>
-
-      </td>
-    </tr>
 
 <!-- text -->          
       </td>
