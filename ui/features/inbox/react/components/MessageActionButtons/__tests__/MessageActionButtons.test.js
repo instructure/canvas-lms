@@ -27,12 +27,15 @@ const createProps = overrides => {
     archiveDisabled: false,
     deleteDisabled: false,
     settingsDisabled: false,
+    shouldRenderMarkAsRead: true,
+    shouldRenderMarkAsUnread: true,
     compose: jest.fn(),
     reply: jest.fn(),
     replyAll: jest.fn(),
     archive: jest.fn(),
     delete: jest.fn(),
     markAsUnread: jest.fn(),
+    markAsRead: jest.fn(),
     forward: jest.fn(),
     star: jest.fn(),
     ...overrides
@@ -70,6 +73,14 @@ describe('MessageActionButtons', () => {
 
     fireEvent.click(getByTestId('delete'))
     expect(props.delete).toHaveBeenCalled()
+
+    fireEvent.click(getByTestId('settings'))
+    fireEvent.click(getByText('Mark as unread'))
+    expect(props.markAsUnread).toHaveBeenCalled()
+
+    fireEvent.click(getByTestId('settings'))
+    fireEvent.click(getByText('Mark as read'))
+    expect(props.markAsRead).toHaveBeenCalled()
 
     fireEvent.click(getByTestId('settings'))
     fireEvent.click(getByText('Mark as unread'))

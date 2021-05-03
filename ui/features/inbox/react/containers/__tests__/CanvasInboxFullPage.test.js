@@ -32,6 +32,11 @@ describe('CanvasInbox Full Page', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
+    window.ENV = {
+      current_user: {
+        id: '9'
+      }
+    }
   })
 
   afterEach(() => {
@@ -87,5 +92,17 @@ describe('CanvasInbox Full Page', () => {
     expect(
       await container.findByText('Wolverine is not so bad when you get to know him')
     ).toBeInTheDocument()
+  })
+
+  it('should change the read state of a message', async () => {
+    const container = setup()
+    const conversation = await container.findByTestId('messageListItem-Checkbox')
+    fireEvent.click(conversation)
+    await container.findByText('Watch out for that Magneto guy')
+    const settings = await container.findByTestId('settings')
+    fireEvent.click(settings)
+    const markAsReadButton = await container.findByText('Mark as read')
+    fireEvent.click(markAsReadButton)
+    expect(container.queryByTestId('unread-badge')).toBeFalsy()
   })
 })

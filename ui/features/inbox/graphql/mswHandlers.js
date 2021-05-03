@@ -21,7 +21,7 @@ import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import {Course} from './Course'
 import {Enrollment} from './Enrollment'
-import {graphql} from 'msw'
+import {graphql, mswAssign} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
 
@@ -95,7 +95,10 @@ export const handlers = [
     } else {
       data.legacyNode.conversationsConnection.nodes = [
         {
-          ...ConversationParticipant.mock({_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2'}),
+          ...ConversationParticipant.mock(
+            {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
+            {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+          ),
           conversation: Conversation.mock({_id: '197', subject: 'This is an inbox conversation'})
         }
       ]
@@ -129,11 +132,19 @@ export const handlers = [
         ConversationParticipant.mock({
           _id: '255',
           id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU1',
-          user: User.mock({_id: '1', name: 'Charles Xavier'})
+          user: User.mock({_id: '1', name: 'Charles Xavier'}),
+          workflowState: 'unread'
         }),
         ConversationParticipant.mock({
           _id: '256',
-          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2'
+          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2',
+          workflowState: 'unread'
+        }),
+        ConversationParticipant.mock({
+          _id: '257',
+          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4',
+          user: User.mock({_id: '1', name: 'Charles Xavier'}),
+          workflowState: 'unread'
         })
       ]
     }
@@ -226,5 +237,22 @@ export const handlers = [
     }
 
     return res(ctx.data(data))
+  }),
+
+  graphql.mutation('UpdateConversationParticipants', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        UpdateConversationParticipants: {
+          conversationParticipants: mswAssign(
+            {...ConversationParticipant.mock()},
+            {
+              id: req.body.variables.conversationId,
+              read: req.body.variables.read
+            }
+          ),
+          __typename: 'UpdateConversationParticipantsPayload'
+        }
+      })
+    )
   })
 ]

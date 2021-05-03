@@ -50,9 +50,22 @@ const Settings = props => (
     }
     disabled={props.settingsDisabled}
   >
-    <Menu.Item value="MarkAsUnread" onSelect={() => props.markAsUnread()}>
-      {I18n.t('Mark as unread')}
-    </Menu.Item>
+    {props.shouldRenderMarkAsRead && (
+      <Menu.Item value="MarkAsRead" onSelect={() => props.markAsRead()} data-testid="mark-as-read">
+        {props.hasMultipleSelectedMessages ? I18n.t('Mark all as read') : I18n.t('Mark as read')}
+      </Menu.Item>
+    )}
+    {props.shouldRenderMarkAsUnread && (
+      <Menu.Item
+        value="MarkAsUnread"
+        onSelect={() => props.markAsUnread()}
+        data-testid="mark-as-unread"
+      >
+        {props.hasMultipleSelectedMessages
+          ? I18n.t('Mark all as unread')
+          : I18n.t('Mark as unread')}
+      </Menu.Item>
+    )}
     <Menu.Item value="Forward" onSelect={() => props.forward()}>
       {I18n.t('Forward')}
     </Menu.Item>
@@ -140,7 +153,11 @@ MessageActionButtons.propTypes = {
   archive: PropTypes.func,
   unarchive: PropTypes.func,
   delete: PropTypes.func.isRequired,
-  markAsUnread: PropTypes.func.isRequired,
+  markAsUnread: PropTypes.func,
+  markAsRead: PropTypes.func,
   forward: PropTypes.func.isRequired,
-  star: PropTypes.func.isRequired
+  star: PropTypes.func.isRequired,
+  shouldRenderMarkAsRead: PropTypes.bool,
+  shouldRenderMarkAsUnread: PropTypes.bool,
+  hasMultipleSelectedMessages: PropTypes.bool
 }
