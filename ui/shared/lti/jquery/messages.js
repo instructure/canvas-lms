@@ -28,7 +28,7 @@ let beforeUnloadHandler
 function setUnloadMessage(msg) {
   removeUnloadMessage()
 
-  beforeUnloadHandler = function(e) {
+  beforeUnloadHandler = function (e) {
     return (e.returnValue = msg || '')
   }
   window.addEventListener('beforeunload', beforeUnloadHandler)
@@ -136,7 +136,7 @@ export function ltiMessageHandler(e) {
 
       case 'lti.screenReaderAlert':
         $.screenReaderFlashMessageExclusive(
-          typeof(message.body) === 'string' ? message.body : JSON.stringify(message.body)
+          typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
         )
         break
 
