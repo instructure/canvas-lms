@@ -1,10 +1,31 @@
 {
   "extends": "recommended",
   "rules": {
-    "formatting.ClassStartsWithBlankLine": {
-      "blankLineRequired": false
+    "DuplicateNumberLiteral": {
+      "enabled": false
+    },
+    "DuplicateStringLiteral": {
+      "enabled": false
+    },
+    "MethodParameterTypeRequired": {
+      "enabled": false
+    },
+    "MethodReturnTypeRequired": {
+      "enabled": false
+    },
+    "NestedBlockDepth": {
+      "enabled": false
+    },
+    "NoDef": {
+      "enabled": false
+    },
+    "VariableTypeRequired": {
+      "enabled": false
     },
     "formatting.ClassEndsWithBlankLine": {
+      "blankLineRequired": false
+    },
+    "formatting.ClassStartsWithBlankLine": {
       "blankLineRequired": false
     },
     "formatting.Indentation": {
