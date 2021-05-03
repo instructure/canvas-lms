@@ -36,5 +36,20 @@ export const Section = {
     id: string,
     name: string,
     updatedAt: string
+  }),
+
+  mock: ({
+    _id = 'U2VjdGlvbi0y',
+    createdAt = '2020-11-13T11:27:58-07:00',
+    id = '2',
+    name = 'X-Men A-Team',
+    updatedAt = '2020-11-13T11:27:58-07:00'
+  } = {}) => ({
+    _id,
+    createdAt,
+    id,
+    name,
+    updatedAt,
+    __typename: 'Section'
   })
 }

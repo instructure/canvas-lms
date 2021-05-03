@@ -78,6 +78,50 @@ export const DiscussionEntry = {
       createdAt: string
     }),
     permissions: DiscussionEntryPermissions.shape
+  }),
+
+  mock: ({
+    id = '3',
+    _id = '3',
+    createdAt = '2021-02-08T13:35:56-07:00',
+    updatedAt = '2021-04-13T10:00:20-06:00',
+    deleted = false,
+    message = 'Who has the best power?',
+    ratingCount = 1,
+    ratingSum = 1,
+    rating = true,
+    read = true,
+    subentriesCount = 1,
+    author = User.mock(),
+    editor = User.mock(),
+    rootEntryParticipantCounts = {
+      unreadCount: 0,
+      repliesCount: 1,
+      __typename: 'DiscussionEntryCounts'
+    },
+    lastReply = {
+      createdAt: '2021-02-08T13:36:14-07:00',
+      __typename: 'DiscussionEntry'
+    },
+    permissions = DiscussionEntryPermissions.mock()
+  } = {}) => ({
+    id,
+    _id,
+    createdAt,
+    updatedAt,
+    deleted,
+    message,
+    ratingCount,
+    ratingSum,
+    rating,
+    read,
+    subentriesCount,
+    author,
+    editor,
+    rootEntryParticipantCounts,
+    lastReply,
+    permissions,
+    __typename: 'DiscussionEntry'
   })
 }
 

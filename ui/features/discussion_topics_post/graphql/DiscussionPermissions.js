@@ -46,5 +46,30 @@ export const DiscussionPermissions = {
     readReplies: bool,
     reply: bool,
     update: bool
+  }),
+
+  mock: ({
+    attach = true,
+    create = true,
+    canDelete = true, // Special case because `delete` is a special word
+    duplicate = true,
+    rate = true,
+    read = true,
+    readAsAdmin = true,
+    readReplies = true,
+    reply = true,
+    update = true
+  } = {}) => ({
+    attach,
+    create,
+    delete: canDelete,
+    duplicate,
+    rate,
+    read,
+    readAsAdmin,
+    readReplies,
+    reply,
+    update,
+    __typename: 'DiscussionPermissions'
   })
 }

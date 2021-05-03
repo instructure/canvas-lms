@@ -38,6 +38,23 @@ export const Assignment = {
     lockAt: string,
     unlockAt: string,
     pointsPossible: number
+  }),
+
+  mock: ({
+    id = 'QXNzaWdubWVudC0x',
+    _id = '1',
+    dueAt = '2021-03-30T23:59:59-06:00',
+    lockAt = '2021-04-03T23:59:59-06:00',
+    unlockAt = '2021-03-24T00:00:00-06:00',
+    pointsPossible = 10
+  } = {}) => ({
+    id,
+    _id,
+    dueAt,
+    lockAt,
+    unlockAt,
+    pointsPossible,
+    __typename: 'Assignment'
   })
 }
 
