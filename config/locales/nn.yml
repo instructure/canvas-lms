@@ -2680,6 +2680,7 @@ nn:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Når du skriv i dette feltet, blir resultatlistene automatisk oppdaterte."
   ask_your_instructor_a_question_a61ca5e9: "Spør faglærar eit spørsmål"
   assess_and_survey_your_students_ce8172a9: "Vurder og kartlegg studentane dine"
+  assess_student_understanding_1e0b8d7f: "Vurder studentane si forståing"
   assessment_audit_d4a76709: Vurderingslogg
   assessment_audit_events_for_creatorname_56e84e8: "Vurderingslogghendingar for %{creatorName}"
   assessment_audit_tray_5dd11721: "Meny for vurderingslogg"
@@ -4841,6 +4842,7 @@ nn:
   common_cartridge_name: "Common Cartridge-import"
   common_timezones_2b00baba: "Vanlege tidssoner"
   commons_ed0252fb: Commons
+  communicate_course_objectives_f457158c: "Vis eit samandrag av emnet"
   communicate_to_your_students_exactly_what_will_be__7312d45d: "Informer studentane om arbeidskrava i emnet i kronologisk rekkefølgje. Generer ein emneoversikt basert på oppgåver og hendingar som du har satt opp."
   communication_5255723c: Kommunikasjon
   communication_channel: 
@@ -6845,6 +6847,7 @@ nn:
   create_discussion_topics_8330d52b: "Opprett diskusjonsemne"
   create_educational_resources_8219326e: "Opprett utdanningsressursar"
   create_failed_15d07ad4: "Oppretting mislukkast"
+  create_interactive_course_content_76665336: "Lag interaktivt emneinnhald"
   create_new_attempt_19c96c03: "Opprett nytt forsøk"
   create_new_course_e3ef9cd0: "Opprett nytt emne"
   create_new_discussions_6ab69da2: "Opprett nye diskusjonar"
@@ -10687,24 +10690,38 @@ nn:
   hour_s_b6e8d238: Time(ar)
   hours_late_989e9081: "Timar for seint"
   hover_over_me_496521b9: "Flytt peikaren over meg"
+  how_do_i_add_a_module_65f5bf13: "Korleis legg eg til ein modul?"
   how_do_i_add_a_rubric_in_a_course_a4c7a40: "Korleis legg eg ein rubrikk til i eit emne?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Korleis legg eg til ei kunngjering i eit emne?"
+  how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Korleis legg eg til eit bilde på emnekortet på dashbordet?"
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Korleis legg eg til oppgåvetyper, sider og filer som modulelement? "
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Korleis kan eg legge til noko eller redigere i ei oppgåve? "
   how_do_i_add_users_to_a_course_4a88efaf: "Korleis legg eg til personar i eit emne?"
+  how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Korleis lastar eg opp fleire filer på ein gong i eit emne?"
+  how_do_i_change_a_course_name_and_course_code_23b41292: "Korleis kan eg endre emnenamn og -kode?"
   how_do_i_change_the_course_home_page_326cee50: "Korleis kan eg endre forsida i emnet mitt? "
   how_do_i_contact_my_instructor_184e35ed: "Korleis tar eg kontakt med faglærar?"
   how_do_i_create_a_conference_in_a_course_69affbf4: "Korleis kan eg opprette ein konferanse i eit emne?"
   how_do_i_create_a_discussion_as_an_instructor_fa6c26d6: "Korleis kan eg som faglærar sette opp ein diskusjon? "
+  how_do_i_create_a_google_drive_collaboration_as_an_28274cf7: "Korleis kan eg som faglærar setje opp eit Google Drive-samarbeid?"
+  how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "Korleis kan eg som faglærar setje opp eit Microsoft Office 365-samarbeid?"
+  how_do_i_create_a_new_page_in_a_course_37a87285: "Korleis kan eg lage ei ny side i eit emne?"
+  how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Korleis kan eg lage ein quiz med individuelle spørsmål?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Korleis opprettar eg ei quiz til vurdering i New Quizzes? "
   how_do_i_create_an_assignment_35532b59: "Korleis kan eg setje opp ei oppgåve?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Korleis kan eg lage eit nytt læringsmål i eit emne? "
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "Korleis lager eg læringsmålgrupper i eit emne? "
   how_do_i_download_the_student_app_4a4b8a63: "Korleis lastar eg ned studentappen?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Korleis lastar eg ned studentappen for få meir hjelp? "
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Korleis redigerer eg ei kunngjering i eit emne?"
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Korleis redigerer eg teksten i emneoversikta?"
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Korleis legg eg inn nye eller redigerer vurderingar i vurderingsoversikta?"
   how_do_i_find_my_courses_b826e4ce: "Korleis finn eg emna mine?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Korleis importerer eg ein pakke som er eksportert frå eit Canvas-emne?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "Korleis importerer eg læringsmål til eit emne?"
   how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "Korleis kan eg invitere andre til møtet?"
   how_do_i_manage_and_share_the_recording_52fc2993: "Korleis administrerer eg og deler opptaket?"
+  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Korleis brukar eg vurderingsinnstillingane i New Quizzes?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Korleis kan eg som faglærar rydde og organisere filene mine?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Korleis flyttar eg eller omorganiser ein modul? "
   how_do_i_mute_and_unmute_all_participants_a7a2115b: "Korleis slår eg av og på mikrofonen til deltakarane?"
@@ -10715,22 +10732,28 @@ nn:
   how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Korleis kan eg som faglærar publisere og avpublisere ein oppgåve? "
   how_do_i_record_a_meeting_ae3a0d4e: "Korleis tar eg opp eit møte?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Korleis kan eg som faglærar delta i ein diskusjon? "
+  how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Korleis kan eg lage til ei forside i eit emne? "
+  how_do_i_set_details_for_a_course_52cfbeff: "Korleis endrar eg emnedetaljar?"
   how_do_i_share_my_screen_c280e585: "Korleis deler eg skjerm?"
   how_do_i_start_a_meeting_e8a9e67b: "Korleis startar eg eit møte?"
   how_do_i_upload_a_file_to_a_course_e8332cfe: "Korleis lastar eg opp ei fil i eit emne? "
   how_do_i_use_course_settings_1e8467e6: "Kva kan eg gjere med emne-innstillingar?"
+  how_do_i_use_files_as_an_instructor_70a996b: "Korleis kan eg som faglærar bruke filer? "
   how_do_i_use_speedgrader_e18e4ca2: "Korleis brukar eg SpeedGrader?"
   how_do_i_use_the_announcements_index_page_94a14011: "Korleis brukar eg kunngjeringsoversikta?"
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Korleis kan eg som faglærar lage til ei forside i emnet mitt? "
   how_do_i_use_the_gradebook_622395dc: "Korleis brukar eg vurderingsoversikta?"
-  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Korleis kan eg sjå kva læringsmål som er nådd i den vanlege vurderingsoversikta frå vurderingsoversikta for meistringslæring? "
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Korleis kan eg sjå kva læringsmål som er nådd gjennom meistringslæring i vurderingsoversikta? "
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Korleis brukar eg læringsmål i eit emne? "
   how_do_i_use_the_pages_index_page_dafb986c: "Korleis brukar eg sideoversikta?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Korleis kan eg som faglærar bruka personsida i eit emne?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Korleis brukar eg quizoversikta?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Korleis kan eg som faglærar bruke emneoversikta?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Korleis ser eg analysedata for ein student?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Korleis kan eg som faglærar sjå og sortere diskusjonsinnlegg? "
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Korleis kan eg sjå alle innleveringar eller individuelle studentinnleveringar i vurderingsoversikta? "
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Korleis kan eg sjå detaljane i ei studentinnlevering i SpeedGrader?"
+  how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "Korleis kan eg sjå brukardetaljane til eit medlem i eit emne?"
   how_is_the_grade_determined_bb75bf53: "Korleis er vurderinga gjort?"
   how_is_this_affecting_you_b3b6a639: "Korleis verkar dette på deg?"
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
@@ -11859,6 +11882,10 @@ nn:
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Gjer nye innstillingar for SIS-integrasjonar synlege og aktive"
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Gjer emnesamandrag (liste med innleveringar og hendingar) valfritt i emneoversikt"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Gjer dette kurset offentleg og synleg for alle (studentdata er framleis privat)"
+  make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
+      Gjer emnet ditt! Last opp eit bilde som er representativt
+      for emnet, gi studentar løyve til å administrere deler av emneinnhaldet og skjul
+      vurderingsdetaljar frå studentane. Du kan òg justere emnenamn og -kode.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Gjer at eit Microsoft Immersive Reader-lenkeval viser på innhaldssider/wikisider."
   makes_the_student_grades_page_responsive_c13e00eb: "Gjer vurderingssidene for studentar responsive."
   making_a_copy_of_originalassignmentname_b7268992: "Oppretta kopi av \"%{originalAssignmentName}\""
@@ -14641,7 +14668,7 @@ nn:
       remember_auth: "Hugs autorisasjonen"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: Objekttype
-  observe_student_mastery_a1f01a: "Observer meistring hos student"
+  observe_student_mastery_a1f01a: "Sjå meistring hos studentane"
   observees: 
     being_observed: "Studentar er observerte"
     new_observee_pairing_code: "Paringskode for student"
@@ -14782,6 +14809,7 @@ nn:
       Organiser og del emnet inn i tema, eining, kapittel
       eller veke. Sekvensier valde modular ved å definere kriterium og
       føresetnader.
+  organize_course_content_11de8958: "Organiser emneinnhaldet"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser EPUB etter innhaldstype (standard er etter modul)."
   organize_your_course_content_c3c7ed03: "Organiser emneinnhaldet"
   originality_report_5d461681: Originalitetsrapport
@@ -15049,6 +15077,12 @@ nn:
   pages_e5414c2c: Sider
   pages_front_page_9ce5188: "Sider forside"
   pages_index_menu_f391bf04: Sideoversiktmeny
+  pages_let_you_create_interactive_content_directly__9933eb32: |-
+      Sider lar deg lage interaktiv innhald direkte i Canvas,
+      anten det er vekevise statusar, ein emnewiki som fleire arbeider på saman eller ei
+      liste over læringsressursar. Sider kan innehalde tekst, multimedia
+      og lenker til filer og anna emneinnhald eller andre sider. Du kan òg
+      la studentar medvirke til utarbeiding av særskilde sider i emnet.
   pages_settings_968392a3: Sideinnstillingar
   pages_tutorial_tray_169464a9: "Sider opplæringsmeny"
   paginated_collection: 
@@ -20450,6 +20484,11 @@ nn:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Denne brukaren er ikkje student på dette emnet"
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
+  the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
+      Emneoversikta lar deg ynskje studentane velkomne til
+      emnet. Bruk oversikta til å spesifisere måla til emnet, vise til kontaktinformasjon og andre detaljar, eller du kan laste opp ei PDF med eit eksisterande
+      emnesamandrag. Emneoversikta kan òg vise alle oppgåvefristar og kalenderhendingar
+      i emnet.
   the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
   the_term_to_report_on_5f586e7c: "Semesteret som rapporten gjeld for"
@@ -21472,6 +21511,11 @@ nn:
   updating_discussion_failed_aadb2d35: "Oppdatering av diskusjon mislukkast"
   upload_8b403d05: "Last opp"
   upload_a_picture_9f5f6e3c: "Last opp eit bilde"
+  upload_and_store_course_files_or_any_other_files_y_b00cb954: |-
+      Last opp og lagre emnefiler eller andre filer du ynskjer å ha
+      tilgjengeleg. Når du lagrar ressursar i fillageret kan dei enkelt hentast inn i
+      modular, oppgåver, diskusjonar eller sider. Distribuer filer til studentar
+      frå fillageret i emnet eller lås filer til du er klar til å gjere dei tilgjengelege for bruk av studentane.
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
       Last opp emnefiler, pensum, litteraturlister eller andre dokument.
       Lås mapper så dei er skjult for studentane. Legg til filer i modular,
@@ -21520,9 +21564,21 @@ nn:
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Bruk HTML5 opptakar i Innhaldseditoren i staden for Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Bruke MathMan til å konvertere LaTeX til MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Bruke MathMan til å konvertere LaTeX til SVG?"
+  use_modules_to_organize_your_content_and_create_a__1da4149: |-
+      Bruk modular til å organisere emneinnhaldet og lag ei linær arbeidsflyt
+      for det studentane skal gjere i emnet. I modular kan innhald organiserast
+      etter veke, tema, kapittel eller etter ein annan struktur som passar.
+      Legg til filer, diskusjonar, oppgåver, quizer og andre læringsressursar.
+      Definer føresetnader for å få starte på neste modul eller
+      modulelement eller gi ein modul eit opningstidspunkt.
   use_new_folder_tree_in_files_bc0ea09f: "Bruk nytt mappetre i filene"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Bruk ny rikt innhald-editor med forbetra sidemeny alle stader "
   use_parent_account_setting_f25a721f: "Bruk innstillingar frå kontonivået over"
+  use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
+      Bruk quizar til å utfordre og teste studentane si forståing
+      av emneinnhaldet. Med New Quizzes-motoren kan du setje opp inntil
+      13 ulike typar av spørsmål og innhald. Dersom ikkje New Quizzes er aktivert hos din institusjon,
+      kan du fortsatt bruke den opprinnelege Quiz-motoren.
   use_remote_service_for_notifications_9fe667c6: "Bruk ekstern teneste for varslingar"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Bruk eksternt redigeringsprogram for rikt innhald"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Bruk eksternt redigeringsprogram for rikt innhald OG sidestolpe"
@@ -22186,12 +22242,14 @@ nn:
   what_happened_322d8259: "Kva hendte?"
   what_it_does_d4debc07: "Kva den gjer"
   what_layout_options_are_available_in_the_course_ho_5d364ce3: "Kva alternativ har eg som faglærar når eg skal velje ei utsjånad for emneforsida?"
+  what_options_can_i_set_in_a_quiz_53522d76: "Kva alternativ har eg når eg skal setje opp ein Quiz?"
   what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
       Kva er eit emne utan folka i det? Personsida
       viser ei liste over alle personane som er tilknytt emnet ditt. På bakgrunn av rolla di kan du leggje til studentar, faglærarar, undervisingsassistenter
       med fleire. Du kan òg opprette grupper der du kan setje opp gruppeinnleveringar,
       diskusjonar og lagre filer.
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
+  what_storage_options_do_i_have_in_zoom_b79c738e: "Kva lagringsalternativ har eg i Zoom?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
   when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når vurderingsresultat vert skjult for anonyme oppgåver, vil resultata bli skjult for alle i emnet. Anonymitet innførast på nytt."
