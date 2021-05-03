@@ -822,6 +822,8 @@ class Course < ActiveRecord::Base
 
   scope :templates, -> { where(template: true) }
 
+  scope :sync_homeroom_enrollments_enabled, -> { where('settings LIKE ?', '%sync_enrollments_from_homeroom: true%') }
+
   def potential_collaborators
     current_users
   end
@@ -2557,7 +2559,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course, :course_color
+      :homeroom_course, :course_color, :sync_enrollments_from_homeroom, :homeroom_course_id
     ]
   end
 
@@ -3275,6 +3277,8 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :homeroom_course, :boolean => true, :default => false
+  add_setting :sync_enrollments_from_homeroom, :boolean => true, :default => false
+  add_setting :homeroom_course_id
   add_setting :course_color
 
   def elementary_enabled?
@@ -3291,6 +3295,25 @@ class Course < ActiveRecord::Base
 
   def lock_all_announcements?
     !!lock_all_announcements || elementary_homeroom_course?
+  end
+
+  def self.sync_homeroom_enrollments
+    sync_homeroom_enrollments_enabled.find_each(&:sync_homeroom_enrollments)
+  end
+
+  def sync_homeroom_enrollments(progress=nil)
+    return false unless elementary_subject_course? && sync_enrollments_from_homeroom && homeroom_course_id.present?
+
+    homeroom_course = account.courses.find_by(id: homeroom_course_id)
+    return false if homeroom_course.nil?
+
+    progress&.calculate_completion!(0, homeroom_course.enrollments.size)
+    homeroom_course.all_enrollments.find_each do |enrollment|
+      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id)
+      course_enrollment.workflow_state = enrollment.workflow_state
+      course_enrollment.save!
+      progress.increment_completion!(1) if progress&.total
+    end
   end
 
   def user_can_manage_own_discussion_posts?(user)

@@ -1410,6 +1410,12 @@ class CoursesController < ApplicationController
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
         can_do(@context, @current_user, :manage_grades)
 
+      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+        @context.account.courses.active.select(&:homeroom_course)
+      else
+        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).select(&:homeroom_course)
+      end
+
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
@@ -1600,6 +1606,8 @@ class CoursesController < ApplicationController
       :syllabus_course_summary,
       :home_page_announcement_limit,
       :homeroom_course,
+      :sync_enrollments_from_homeroom,
+      :homeroom_course_id,
       :course_color
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
@@ -2674,6 +2682,14 @@ class CoursesController < ApplicationController
   #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
   #   is enabled and the course is associated with a K-5-enabled account.
   #
+  # @argument course[sync_enrollments_from_homeroom] [String]
+  #   Syncs enrollments from the homeroom that is set in homeroom_course_id. The setting only takes effect when
+  #   Canvas for Elementary feature is enabled and sync_enrollments_from_homeroom is enabled.
+  #
+  # @argument course[homeroom_course_id] [String]
+  #   Sets the Homeroom Course id to be used with sync_enrollments_from_homeroom. The setting only takes effect when
+  #   Canvas for Elementary feature is enabled and sync_enrollments_from_homeroom is enabled.
+  #
   # @argument course[template] [Boolean]
   #   Enable or disable the course as a template that can be selected by an account
   #
@@ -2958,6 +2974,13 @@ class CoursesController < ApplicationController
         @current_user.touch
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
+        end
+        # Sync homeroom enrollments if enabled
+        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+          progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
+          progress.user = @current_user
+          progress.reset!
+          progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
         end
         render_update_success
       else
@@ -3608,7 +3631,7 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom
     )
   end
 end

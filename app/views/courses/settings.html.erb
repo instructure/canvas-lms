@@ -229,7 +229,35 @@
             </span>
           <% end %>
         </div>
-      </div><div class="form-row">
+      </div>
+      <% if @context.elementary_subject_course? %>
+        <div class="form-row">
+          <div class="form-label nobr"><%= f.blabel :enrollments_from_homeroom, :en => "Enrollments" %></div>
+          <div class="tall-row">
+            <div class="nobr">
+              <%= f.check_box :sync_enrollments_from_homeroom, class: 'sync_enrollments_from_homeroom_checkbox', :disabled => !can_manage || @context.homeroom_course %>
+              <%= f.label :sync_enrollments_from_homeroom, :en => "Sync enrollments from homeroom" %><br/>
+            </div>
+            <div class="sync_enrollments_from_homeroom_select">
+              <% format_options = options_from_collection_for_select(@homeroom_courses, 'id', 'name', @context.homeroom_course_id) %>
+              <% if can_manage %>
+                <%= f.select :homeroom_course_id, format_options %>
+              <% else %>
+                <%= (format_options.detect{|text, key| key == @context.homeroom_course_id} || format_options.first).first %>
+              <% end %>
+              <div class="aside palign">
+                <% latest_progress = @context.progresses.where(tag: 'sync_homeroom_enrollments').last %>
+                <% if latest_progress&.completed? %>
+                  <%= t("Last synced: %{datetime}", datetime: latest_progress.updated_at.strftime('%B %e, %Y at %l:%M %p')) %>
+                <% elsif latest_progress&.pending? %>
+                  <span class="sync_enrollments_from_homeroom_progress" data-url="<%= api_v1_progress_url(latest_progress) %>"><%= image_tag "ajax-loader-small.gif", :class => "status_loader", :alt => t('Loading') %> <%= t('Sync in progress') %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <div class="form-row">
         <div class="form-label"><%= f.blabel :enrollment_term_id, :en => "Term" %></div>
         <div>
           <% if can_manage && can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin) %>
@@ -312,10 +340,10 @@
           <label for="course_grading_scheme"><%= before_label('grading_scheme', %{Grading Scheme}) %></label>
         </div>
         <div id="course_grading_scheme">
-        <div class="checkbox-flex-container">
-          <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
-          <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
-        </div>
+          <div class="checkbox-flex-container">
+            <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
+            <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
+          </div>
           <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
             <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
           </div>

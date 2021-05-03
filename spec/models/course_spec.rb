@@ -4940,6 +4940,80 @@ describe Course, "enrollments" do
   end
 end
 
+describe Course, "#sync_homeroom_enrollments" do
+  before :once do
+    @homeroom_course = course_factory(active_course: true)
+    @homeroom_course.root_account.enable_feature!(:canvas_for_elementary)
+    @homeroom_course.account.settings[:enable_as_k5_account] = {value: true}
+    @homeroom_course.homeroom_course = true
+    @homeroom_course.save!
+
+    @teacher = User.create
+    @homeroom_course.enroll_teacher(@teacher).accept
+
+    @ta = User.create
+    @homeroom_course.enroll_user(@ta, "TaEnrollment").accept
+
+    @student = User.create
+    @homeroom_course.enroll_user(@student, "StudentEnrollment").accept
+
+    @observer = User.create
+    @homeroom_course.enroll_user(@observer, "ObserverEnrollment").accept
+
+    @course = course_factory(active_course: true, account: @homeroom_course.account)
+    @course.sync_enrollments_from_homeroom = true
+    @course.homeroom_course_id = @homeroom_course.id
+    @course.save!
+  end
+
+  it "copies enrollments the homeroom course" do
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+    expect(@course.user_is_instructor?(@ta)).to eq(false)
+    expect(@course.user_is_student?(@student)).to eq(false)
+    expect(@course.user_has_been_observer?(@observer)).to eq(false)
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+    expect(@course.user_is_instructor?(@ta)).to eq(true)
+    expect(@course.user_is_student?(@student)).to eq(true)
+    expect(@course.user_has_been_observer?(@observer)).to eq(true)
+  end
+
+  it "readds enrollments deleted on subject courses" do
+    @course.sync_homeroom_enrollments
+    @course.enrollments.find_by(user: @teacher).destroy
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+  end
+
+  it "removes enrollments on subject courses when removed on the homeroom" do
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+    @homeroom_course.enrollments.find_by(user: @teacher).destroy
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+  end
+
+  it "returns false unless course is an elementary subject and sync setting is on and homeroom_course_id is set" do
+    @course.sync_enrollments_from_homeroom = false
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).to eq(false)
+    @course.sync_enrollments_from_homeroom = true
+    @course.homeroom_course_id = nil
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).to eq(false)
+    @course.homeroom_course_id = @homeroom_course.id
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).not_to eq(false)
+  end
+
+  it "returns false unless the homeroom_course_id is accessible within the account" do
+    @course.homeroom_course_id = 0
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).to eq(false)
+  end
+end
+
 describe Course, "user_is_instructor?" do
   before :once do
     @course = Course.create
