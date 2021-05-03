@@ -33,7 +33,6 @@ import DiscussionTopicToolbarView from './backbone/views/DiscussionTopicToolbarV
 import TopicView from './backbone/views/TopicView'
 import EntriesView from './backbone/views/EntriesView'
 import SectionsTooltip from '@canvas/sections-tooltip'
-import 'jquery-sticky'
 import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboardShortcutModal'
 import ready from '@instructure/ready'
 
