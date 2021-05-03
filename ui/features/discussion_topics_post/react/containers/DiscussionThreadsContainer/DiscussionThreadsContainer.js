@@ -81,7 +81,7 @@ export const DiscussionThreadsContainer = props => {
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionTopicId: PropTypes.string.isRequired,
-  threads: PropTypes.arrayOf(PropTypes.shape(DiscussionEntry.shape)).isRequired,
+  threads: PropTypes.arrayOf(DiscussionEntry.shape),
   pageInfo: PageInfo.shape.isRequired,
   totalPages: PropTypes.number
 }
