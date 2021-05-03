@@ -2707,7 +2707,7 @@ class CoursesController < ApplicationController
       event = params[:course][:event].to_s
       # check permissions on processable events
       # allow invalid and non_events to pass through
-      if %w[offer claim complete delete undelete].include?(event)
+      if %w[offer claim conclude delete undelete].include?(event)
         return unless authorized_action(@course, @current_user, permission_for_event(event))
       end
       # authorized, invalid, and non_events are processed
@@ -2840,7 +2840,7 @@ class CoursesController < ApplicationController
         event = params[:course][:event].to_s
         # check permissions on processable events
         # allow invalid and non_events to pass through
-        if %w[offer claim complete delete undelete].include?(event)
+        if %w[offer claim conclude delete undelete].include?(event)
           return unless authorized_action(@course, @current_user, permission_for_event(event))
         end
         # authorized, invalid, and non_events are processed
@@ -3287,7 +3287,7 @@ class CoursesController < ApplicationController
   def permission_for_event(event)
     @context ||= @course
     case event
-    when 'claim', 'offer'
+    when 'offer', 'claim'
       if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
         :manage_courses_publish
       else
