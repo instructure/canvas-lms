@@ -145,6 +145,7 @@ export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) =
             <Flex.Item>
               <Tooltip renderTip={I18n.t('Start a new course')}>
                 <IconButton
+                  data-testid="new-course-button"
                   screenReaderLabel={I18n.t('Open new course modal')}
                   withBackground={false}
                   withBorder={false}

@@ -285,6 +285,34 @@ module K5PageObject
     "//*[contains(@href, '/courses/#{course_id}/assignments/#{assignment_id}')]"
   end
 
+  def new_course_button_selector
+    "[data-testid='new-course-button']"
+  end
+
+  def new_course_modal_selector
+    "[aria-label='Create Course']"
+  end
+
+  def new_course_modal_close_button_selector
+    "[data-testid='instui-modal-close']"
+  end
+
+  def account_name_selector
+    "[placeholder='Begin typing to search']"
+  end
+
+  def course_name_input_selector
+    "[placeholder='Name...']"
+  end
+
+  def new_course_modal_create_selector
+    "//button[.//*[. = 'Create']]"
+  end
+
+  def new_course_modal_cancel_selector
+    "//button[.//*[. = 'Cancel']]"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -572,6 +600,33 @@ module K5PageObject
     find_from_element_fxpath(missing_assignment_element, missing_item_href_selector(course_id, assignment_id))
   end
 
+  def new_course_button
+    f(new_course_button_selector)
+  end
+
+  def new_course_modal
+    f(new_course_modal_selector)
+  end
+
+  def new_course_modal_close_button
+    f(new_course_modal_close_button_selector)
+  end
+
+  def account_name_element
+    f(account_name_selector)
+  end
+
+  def course_name_input
+    f(course_name_input_selector)
+  end
+
+  def new_course_modal_create
+    fxpath(new_course_modal_create_selector)
+  end
+
+  def new_course_modal_cancel
+    fxpath(new_course_modal_cancel_selector)
+  end
   #----------------------- Actions & Methods -------------------------
 
 
@@ -683,6 +738,26 @@ module K5PageObject
     add_module_item_button.click
   end
 
+  def click_new_course_button
+    new_course_button.click
+  end
+
+  def click_new_course_close_button
+    new_course_modal_close_button.click
+  end
+
+  def select_account_from_list(account_name)
+    click_option(account_name_selector, account_name)
+  end
+
+  def click_new_course_create
+    new_course_modal_create.click
+  end
+
+  def click_new_course_cancel
+    new_course_modal_cancel.click
+  end
+
   #------------------------------Retrieve Text----------------------#
 
   def retrieve_welcome_text
@@ -745,6 +820,26 @@ module K5PageObject
 
   def schedule_item_exists?
     element_exists?(schedule_item_selector)
+  end
+
+  def new_course_modal_exists?
+    element_exists?(new_course_modal_selector)
+  end
+
+  def enter_account_search_data(search_term)
+    replace_content(account_name_element, search_term)
+    driver.action.send_keys(:enter).perform
+  end
+
+  def enter_course_name(course_name)
+    replace_content(course_name_input, course_name)
+    driver.action.send_keys(:enter).perform
+  end
+
+  def fill_out_course_modal(course_name)
+    enter_account_search_data(@account.name[0...3])
+    select_account_from_list(@account.name)
+    enter_course_name(course_name)
   end
 
   #----------------------------Create Content---------------------#
@@ -850,6 +945,12 @@ module K5PageObject
       course_name: @subject_course_title
     )
     @subject_course = @course
+  end
+
+  def admin_setup
+    feature_setup
+    teacher_setup
+    account_admin_user(:account => @account)
   end
 
   def create_and_submit_assignment(course)
