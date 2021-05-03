@@ -23,8 +23,12 @@ export default class ToolLaunchResizer {
     this.minToolHeight = minToolHeight || 450
   }
 
+  sanitizedWrapperId(wrapperId) {
+    return wrapperId?.toString()?.replace(/[^a-zA-Z0-9_-]/g, '')
+  }
+
   tool_content_wrapper(wrapperId) {
-    let container = $(`div[data-tool-wrapper-id*='${wrapperId}']`)
+    let container = $(`div[data-tool-wrapper-id*='${this.sanitizedWrapperId(wrapperId)}']`)
     if (container.length <= 0 && $('.tool_content_wrapper').length === 1) {
       container = $('.tool_content_wrapper')
     }
