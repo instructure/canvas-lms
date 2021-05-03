@@ -7,6 +7,9 @@
     "DuplicateStringLiteral": {
       "enabled": false
     },
+    "JUnitStyleAssertions": {
+      "enabled": false
+    },
     "MethodParameterTypeRequired": {
       "enabled": false
     },
