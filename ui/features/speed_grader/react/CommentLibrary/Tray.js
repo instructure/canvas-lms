@@ -98,7 +98,7 @@ const Tray = ({isOpen, setIsOpen, onItemClick, comments}) => {
               />
             ))}
           </Flex.Item>
-          <Flex.Item padding="medium small small small" as="footer">
+          <Flex.Item padding="medium small small small">
             <TrayTextArea />
           </Flex.Item>
         </Flex>

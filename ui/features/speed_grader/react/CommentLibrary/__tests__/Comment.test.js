@@ -43,7 +43,7 @@ describe('Comment', () => {
     const props = defaultProps()
     const {getByText} = render(<Comment {...props} />)
     expect(getByText(props.comment)).toBeInTheDocument()
-    expect(getByText('Delete comment')).toBeInTheDocument()
+    expect(getByText('Delete comment: My assignment comment')).toBeInTheDocument()
   })
 
   it('calls the onClick prop when the comment is clicked', () => {

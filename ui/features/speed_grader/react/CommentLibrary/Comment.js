@@ -18,7 +18,8 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {IconButton} from '@instructure/ui-buttons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -39,46 +40,55 @@ const Comment = ({comment, onClick}) => {
     <View as="div" position="relative" borderWidth="none none small none">
       <Flex>
         <Flex.Item as="div" shouldGrow size="80%" shouldShrink>
-          <View
-            as="div"
-            padding="small"
-            cursor="pointer"
-            isWithinText={false}
-            onClick={() => onClick(comment)}
-            background={isHovering ? 'brand' : 'transparent'}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-          >
-            {!isExpanded ? (
-              <TruncateText onUpdate={handleUpdate} maxLines={4}>
-                {comment}
-              </TruncateText>
-            ) : (
-              comment
-            )}
-          </View>
+          <PresentationContent>
+            <View
+              as="div"
+              padding="small"
+              cursor="pointer"
+              isWithinText={false}
+              onClick={() => onClick(comment)}
+              background={isHovering ? 'brand' : 'transparent'}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              {!isExpanded ? (
+                <TruncateText onUpdate={handleUpdate} maxLines={4}>
+                  {comment}
+                </TruncateText>
+              ) : (
+                comment
+              )}
+            </View>
+          </PresentationContent>
+          <ScreenReaderContent>
+            <Button onClick={() => onClick(comment)}>
+              {I18n.t('Use comment %{comment}', {comment})}
+            </Button>
+          </ScreenReaderContent>
         </Flex.Item>
         <Flex.Item size="20%" shouldGrow align="start" textAlign="end">
           <View as="div" padding="x-small small 0 0">
             <IconButton
-              screenReaderLabel={I18n.t('Delete comment')}
+              screenReaderLabel={I18n.t('Delete comment: %{comment}', {comment})}
               renderIcon={IconTrashLine}
               withBackground={false}
               withBorder={false}
               size="small"
             />
           </View>
-          {isTruncated && (
-            <View as="div" insetBlockEnd="12px" insetInlineEnd="20px" position="absolute">
-              <Link isWithinText={false} onClick={() => setIsExpanded(!isExpanded)}>
-                {isExpanded ? (
-                  <Text size="x-small">{I18n.t('show less')}</Text>
-                ) : (
-                  <Text size="x-small">{I18n.t('show more')}</Text>
-                )}
-              </Link>
-            </View>
-          )}
+          <PresentationContent>
+            {isTruncated && (
+              <View as="div" insetBlockEnd="12px" insetInlineEnd="20px" position="absolute">
+                <Link isWithinText={false} onClick={() => setIsExpanded(!isExpanded)}>
+                  {isExpanded ? (
+                    <Text size="x-small">{I18n.t('show less')}</Text>
+                  ) : (
+                    <Text size="x-small">{I18n.t('show more')}</Text>
+                  )}
+                </Link>
+              </View>
+            )}
+          </PresentationContent>
         </Flex.Item>
       </Flex>
     </View>
