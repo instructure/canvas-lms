@@ -21,7 +21,7 @@ def seleniumConfig() {
     node_total: configuration.getInteger('selenium-ci-node-total'),
     max_fail: configuration.getInteger('selenium-max-fail'),
     reruns_retry: configuration.getInteger('selenium-rerun-retry'),
-    force_failure: configuration.isForceFailureSelenium() ? "1" : '',
+    force_failure: configuration.isForceFailureSelenium() ? '1' : '',
     patchsetTag: env.PATCHSET_TAG,
   ]
 }
@@ -49,7 +49,7 @@ def rspecConfig() {
     node_total: configuration.getInteger('rspec-ci-node-total'),
     max_fail: configuration.getInteger('rspec-max-fail'),
     reruns_retry: configuration.getInteger('rspec-rerun-retry'),
-    force_failure: configuration.isForceFailureRSpec() ? "1" : '',
+    force_failure: configuration.isForceFailureRSpec() ? '1' : '',
     patchsetTag: env.PATCHSET_TAG,
   ]
 }
@@ -97,8 +97,8 @@ def _runRspecTestSuite(
       "DOCKER_PROCESSES=$docker_processes",
       "RSPEC_PROCESSES=$rspec_processes",
       "FORCE_FAILURE=$force_failure",
-      "POSTGRES_PASSWORD=sekret",
-      "SELENIUM_VERSION=3.141.59-20201119",
+      'POSTGRES_PASSWORD=sekret',
+      'SELENIUM_VERSION=3.141.59-20201119',
       "PATCHSET_TAG=$patchsetTag",
       "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
@@ -111,7 +111,7 @@ def _runRspecTestSuite(
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
-    } catch(org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
         sh '''#!/bin/bash
           ids=( $(docker ps -aq --filter "name=canvas_") )
@@ -128,7 +128,7 @@ def _runRspecTestSuite(
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
 
-      if(configuration.getBoolean('upload-docker-logs', 'false')) {
+      if (configuration.getBoolean('upload-docker-logs', 'false')) {
         sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${index}.log"
         archiveArtifacts(artifacts: "tmp/docker-${prefix}-${index}.log")
       }
@@ -138,7 +138,7 @@ def _runRspecTestSuite(
         // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
         // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
 
-        def pathCategory = file.getPath().split("/")[5]
+        def pathCategory = file.getPath().split('/')[5]
         def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
         def splitPath = file.getPath().split('/').toList()
         def specTitle = splitPath.subList(6, splitPath.size() - 1).join('/')
@@ -146,7 +146,7 @@ def _runRspecTestSuite(
 
         buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
 
-        if(pathCategory == finalCategory) {
+        if (pathCategory == finalCategory) {
           buildSummaryReport.setFailureCategory(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_NEVER_PASSED)
         } else {
           buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
@@ -156,12 +156,11 @@ def _runRspecTestSuite(
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
       def preStatus = currentBuild.rawBuild.@result
 
-      junit allowEmptyResults: true, testResults: "tmp/rspec_results/**/*.xml"
+      junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml'
 
-      if(currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
+      if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
         currentBuild.rawBuild.@result = preStatus
       }
-
 
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
@@ -192,7 +191,7 @@ def _uploadCoverage(prefix, coverage_name) {
 
 def uploadParallelLog() {
   reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
-  archiveArtifacts(artifacts: "parallel_logs/**")
+  archiveArtifacts(artifacts: 'parallel_logs/**')
 }
 
 return this

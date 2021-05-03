@@ -17,10 +17,10 @@
  */
 
 def call() {
-  def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-  checkoutRepo("canvas-lms", refspecToCheckout, 100)
+  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+  checkoutRepo('canvas-lms', refspecToCheckout, 100)
 
-  if(env.GERRIT_PROJECT != "canvas-lms") {
+  if (env.GERRIT_PROJECT != 'canvas-lms') {
     dir(env.LOCAL_WORKDIR) {
       checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
     }
@@ -39,17 +39,16 @@ def call() {
     }
   }
 
-  pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: "vendor/qti_migration_tool"])
+  pluginsToPull.add([name: 'qti_migration_tool', version: _getPluginVersion('qti_migration_tool'), target: 'vendor/qti_migration_tool'])
 
   pullRepos(pluginsToPull)
 
   libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
-
 }
 
 def _getPluginVersion(plugin) {
-  if(env.GERRIT_BRANCH.contains('stable/')) {
+  if (env.GERRIT_BRANCH.contains('stable/')) {
     return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
   }
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", 'master')
 }

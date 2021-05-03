@@ -1,0 +1,14 @@
+{
+  "extends": "recommended",
+  "rules": {
+    "formatting.ClassStartsWithBlankLine": {
+      "enabled": false
+    },
+    "formatting.ClassEndsWithBlankLine": {
+      "enabled": false
+    },
+    "formatting.Indentation": {
+      "spacesPerIndentLevel": 2
+    }
+  }
+}

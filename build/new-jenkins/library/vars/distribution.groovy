@@ -33,10 +33,10 @@ def appendStagesAsBuildNodes(nodes,
                              stage_name_prefix,
                              test_label,
                              stage_block) {
-  for(int i = 0; i < stage_count; i++) {
+  for (int i = 0; i < stage_count; i++) {
     // make this a local variable so when the closure resolves
     // it gets the correct number
-    def index = i;
+    def index = i
     // we cant use String.format, so... yea
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
@@ -44,12 +44,12 @@ def appendStagesAsBuildNodes(nodes,
       echo "Running on node ${env.NODE_NAME}"
       def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
       // make sure to unstash
-      unstash name: "build-dir"
-      unstash name: "build-docker-compose"
+      unstash name: 'build-dir'
+      unstash name: 'build-docker-compose'
       stage_block(index)
     }
   }
-}
+                             }
 
 /**
  * use this in combination with appendStagesAsBuildNodes. this will
@@ -57,8 +57,8 @@ def appendStagesAsBuildNodes(nodes,
  * the build scripts
  */
 def stashBuildScripts() {
-  stash name: "build-dir", includes: 'build/**/*'
-  stash name: "build-docker-compose", includes: 'docker-compose.*.yml'
+  stash name: 'build-dir', includes: 'build/**/*'
+  stash name: 'build-docker-compose', includes: 'docker-compose.*.yml'
 }
 
 /**

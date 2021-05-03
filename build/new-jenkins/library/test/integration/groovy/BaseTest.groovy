@@ -22,7 +22,6 @@ import org.junit.runner.Description
 import org.junit.Rule
 import com.lesfurets.jenkins.unit.*
 
-
 class BaseTest extends BasePipelineTest {
 
   // Implement a rule to intercept test failures and print the callStack

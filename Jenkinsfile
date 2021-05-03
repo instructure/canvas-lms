@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-def FILES_CHANGED_STAGE = "Detect Files Changed"
-def JS_BUILD_IMAGE_STAGE = "Javascript (Build Image)"
-def RUN_MIGRATIONS_STAGE = "Run Migrations"
+def FILES_CHANGED_STAGE = 'Detect Files Changed'
+def JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
+def RUN_MIGRATIONS_STAGE = 'Run Migrations'
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -51,11 +51,11 @@ def getSummaryUrl() {
 }
 
 def getDockerWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def getLocalWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 // return false if the current patchset tag doesn't match the
@@ -65,7 +65,7 @@ def isPatchsetPublishable() {
 }
 
 def isPatchsetRetriggered() {
-  if(env.IS_AUTOMATIC_RETRIGGER == '1') {
+  if (env.IS_AUTOMATIC_RETRIGGER == '1') {
     return true
   }
 
@@ -88,11 +88,11 @@ def postFn(status) {
 
       buildSummaryReport.publishReport('Build Summary Report', status)
 
-      if(isPatchsetPublishable()) {
+      if (isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.EXTERNAL_TAG)
       }
 
-      if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
+      if (status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
         dockerUtils.tagRemote(env.CASSANDRA_IMAGE_TAG, env.CASSANDRA_MERGE_IMAGE)
         dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
@@ -100,7 +100,7 @@ def postFn(status) {
       }
     }
   } finally {
-    if(status == 'SUCCESS') {
+    if (status == 'SUCCESS') {
       maybeSlackSendSuccess()
     } else {
       maybeSlackSendFailure()
@@ -119,21 +119,21 @@ def shouldPatchsetRetrigger() {
 }
 
 def maybeRetrigger() {
-  if(shouldPatchsetRetrigger() && !isPatchsetRetriggered()) {
+  if (shouldPatchsetRetrigger() && !isPatchsetRetriggered()) {
     def retriggerParams = currentBuild.rawBuild.getAction(ParametersAction).getParameters()
 
     retriggerParams = retriggerParams.findAll { record ->
       record.name != 'IS_AUTOMATIC_RETRIGGER'
     }
 
-    retriggerParams << new StringParameterValue('IS_AUTOMATIC_RETRIGGER', "1")
+    retriggerParams << new StringParameterValue('IS_AUTOMATIC_RETRIGGER', '1')
 
     build(job: env.JOB_NAME, parameters: retriggerParams, propagate: false, wait: false)
   }
 }
 
 def maybeSlackSendFailure() {
-  if(configuration.isChangeMerged()) {
+  if (configuration.isChangeMerged()) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
@@ -155,7 +155,7 @@ def maybeSlackSendFailure() {
 }
 
 def maybeSlackSendSuccess() {
-  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
+  if (configuration.isChangeMerged() && isPatchsetRetriggered()) {
     slackSend(
       channel: getSlackChannel(),
       color: 'good',
@@ -171,7 +171,7 @@ def maybeSlackSendSuccess() {
 }
 
 def maybeSlackSendRetrigger() {
-  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
+  if (configuration.isChangeMerged() && isPatchsetRetriggered()) {
     slackSend(
       channel: getSlackChannel(),
       color: 'warning',
@@ -194,7 +194,7 @@ def getSlackChannel() {
 def getCanvasBuildsRefspec() {
   def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
 
-  if(env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
+  if (env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
     return env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
   }
 
@@ -204,9 +204,9 @@ def getCanvasBuildsRefspec() {
 @groovy.transform.Field def CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
   // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
-  if(env.GERRIT_BRANCH.contains('stable/')) {
+  if (env.GERRIT_BRANCH.contains('stable/')) {
     def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
-    if((commitMessage =~ CANVAS_LMS_REFSPEC_REGEX).find()) {
+    if ((commitMessage =~ CANVAS_LMS_REFSPEC_REGEX).find()) {
       return configuration.canvasLmsRefspec()
     }
     return "+refs/heads/$GERRIT_BRANCH:refs/remotes/origin/$GERRIT_BRANCH"
@@ -216,7 +216,7 @@ def getCanvasLmsRefspec() {
 // =========
 
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
-loadLocalLibrary("local-lib", "build/new-jenkins/library")
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
@@ -241,7 +241,6 @@ pipeline {
     // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
 
-
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = imageTag.patchset()
 
@@ -259,17 +258,17 @@ pipeline {
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
     RSPEC_PROCESSES = 4
 
-    LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath("linter-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
+    LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath('linter-debug')}:${imageTagVersion()}-$TAG_SUFFIX"
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
-    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath("karma-builder")
-    KARMA_RUNNER_PREFIX = configuration.buildRegistryPath("karma-runner")
+    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath('karma-builder')
+    KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
-    RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
-    YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
-    WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath("webpack-builder")
-    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath("webpack-cache")
+    RUBY_RUNNER_PREFIX = configuration.buildRegistryPath('ruby-runner')
+    YARN_RUNNER_PREFIX = configuration.buildRegistryPath('yarn-runner')
+    WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath('webpack-builder')
+    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath('webpack-cache')
 
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
@@ -300,19 +299,19 @@ pipeline {
           node('master') {
             if (configuration.skipCi()) {
               currentBuild.result = 'NOT_BUILT'
-              gerrit.submitLintReview("-2", "Build not executed due to [skip-ci] flag")
-              error "[skip-ci] flag enabled: skipping the build"
+              gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')
+              error '[skip-ci] flag enabled: skipping the build'
               return
-            } else if(extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
-              gerrit.submitLintReview("-2", "One or more build flags causes a subset of the build to be run")
+            } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
+              gerrit.submitLintReview('-2', 'One or more build flags causes a subset of the build to be run')
             } else {
-              gerrit.submitLintReview("0")
+              gerrit.submitLintReview('0')
             }
           }
 
           // Ensure that all build flags are compatible.
-          if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
-            error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
+          if (configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
+            error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
             return
           }
 
@@ -320,7 +319,7 @@ pipeline {
 
           def buildSummaryReportHooks = [
             onStageEnded: { stageName, _, buildResult ->
-              if(buildResult) {
+              if (buildResult) {
                 buildSummaryReport.addFailureRun(stageName, buildResult)
                 buildSummaryReport.addRunTestActions(stageName, buildResult)
                 buildSummaryReport.setStageIgnored(stageName)
@@ -342,18 +341,18 @@ pipeline {
             buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
             buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
             buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-            buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
+            buildParameters += string(name: 'CANVAS_RAILS6_0', value: '1')
 
             // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
             // the gerrit rather than master. Stable branches also need to check out the JENKINSFILE_REFSPEC to prevent
             // the job default from pulling master.
-            if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
+            if (env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('Jenkinsfile')) {
               buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
-            } else if(env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('stable')) {
+            } else if (env.GERRIT_PROJECT == 'canvas-lms' && env.JOB_NAME.endsWith('stable')) {
               buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
             }
 
-            if (env.GERRIT_PROJECT != "canvas-lms") {
+            if (env.GERRIT_PROJECT != 'canvas-lms') {
               // the plugin builds require the canvas lms refspec to be different. so only
               // set this refspec if the main build is requesting it to be set.
               // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
@@ -382,7 +381,7 @@ pipeline {
 
                   // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
                   // https://issues.jenkins.io/browse/JENKINS-52750
-                  if(env.GERRIT_PROJECT != "canvas-lms") {
+                  if (env.GERRIT_PROJECT != 'canvas-lms') {
                     sh "rm -vrf $LOCAL_WORKDIR@tmp"
                   }
 
@@ -428,7 +427,7 @@ pipeline {
                     extendedStage('Linters - Run Tests - Code').queue(nestedStages, lintersStage.&codeStage)
                     extendedStage('Linters - Run Tests - Webpack').queue(nestedStages, lintersStage.&webpackStage)
                     extendedStage('Linters - Run Tests - Yarn')
-                      .required(env.GERRIT_PROJECT == "canvas-lms" && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+                      .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                       .queue(nestedStages, lintersStage.&yarnStage)
 
                     parallel(nestedStages)
@@ -468,28 +467,28 @@ pipeline {
               parallel(nestedStages)
             }
 
-            extendedStage("Javascript (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
+            extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
               def nestedStages = [:]
 
               extendedStage('Javascript (Jest)')
                 .hooks(buildSummaryReportHooks)
                 .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                   string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: "jest"),
+                  string(name: 'TEST_SUITE', value: 'jest'),
                 ])
 
               extendedStage('Javascript (Coffeescript)')
                 .hooks(buildSummaryReportHooks)
                 .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                   string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: "coffee"),
+                  string(name: 'TEST_SUITE', value: 'coffee'),
                 ])
 
               extendedStage('Javascript (Karma)')
                 .hooks(buildSummaryReportHooks)
                 .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                   string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: "karma"),
+                  string(name: 'TEST_SUITE', value: 'karma'),
                 ])
 
               parallel(nestedStages)
