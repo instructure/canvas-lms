@@ -27,9 +27,9 @@ import {
   fetchCourseApps,
   sendMessage,
   createNewCourse,
-  enrollAsTeacher,
   getAssignmentGroupTotals,
-  getAssignmentGrades
+  getAssignmentGrades,
+  getAccountsFromEnrollments
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -40,9 +40,7 @@ const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
 const CONVERSATIONS_URL = '/api/v1/conversations'
-const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science'
-const ENROLL_AS_TEACHER_URL =
-  '/api/v1/courses/test/enrollments?enrollment[type]=TeacherEnrollment&enrollment[user_id]=self&enrollment[enrollment_state]=active'
+const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science&enroll_me=true'
 
 afterEach(() => {
   fetchMock.restore()
@@ -266,14 +264,6 @@ describe('createNewCourse', () => {
   })
 })
 
-describe('enrollAsTeacher', () => {
-  it('posts to the enrollments endpoint', async () => {
-    fetchMock.post(encodeURI(ENROLL_AS_TEACHER_URL), 200)
-    const result = await enrollAsTeacher('test')
-    expect(result.response.ok).toBeTruthy()
-  })
-})
-
 describe('getAssignmentGroupTotals', () => {
   it('returns an array of objects that have id, name, and score', () => {
     const data = [
@@ -438,5 +428,44 @@ describe('getAssignmentGrades', () => {
     ]
     const totals = getAssignmentGrades(data)
     expect(totals[0].unread).toBeTruthy()
+  })
+})
+
+describe('getAccountsFromEnrollments', () => {
+  it('returns array of objects containing id and name', () => {
+    const enrollments = [
+      {
+        name: 'Algebra',
+        account: {
+          id: 6,
+          name: 'Elementary',
+          workflow_state: 'active'
+        }
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
+    expect(accounts[0].id).toBe(6)
+    expect(accounts[0].name).toBe('Elementary')
+    expect(accounts[0].workflow_state).toBeUndefined()
+  })
+
+  it('removes duplicate accounts from list', () => {
+    const enrollments = [
+      {
+        account: {
+          id: 12,
+          name: 'FFES'
+        }
+      },
+      {
+        account: {
+          id: 12,
+          name: 'FFES'
+        }
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
   })
 })

@@ -2620,21 +2620,33 @@ describe UsersController do
     end
 
     context "ENV.PERMISSIONS" do
-      before :once do
-        course_with_student
-      end
-
-      it "sets :create_courses to true if user is admin" do
+      it "sets :create_courses_as_admin to true if user is admin" do
         account_admin_user
         user_session @user
         get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses]).to be_truthy
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
       end
 
-      it "sets :create_courses to false if user is not admin" do
-        user_session @student
+      it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
+        Account.default.settings[:teachers_can_create_courses] = true
+        course_with_teacher_logged_in
         get 'user_dashboard'
-        expect(assigns[:js_env][:PERMISSIONS][:create_courses]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
+      end
+
+      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
+        course_with_teacher_logged_in
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+      end
+
+      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
+        course_with_student_logged_in
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
       end
     end
   end

@@ -31,9 +31,9 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {createNewCourse, enrollAsTeacher} from '@canvas/k5/react/utils'
+import {createNewCourse, getAccountsFromEnrollments} from '@canvas/k5/react/utils'
 
-export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
+export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
   const [loading, setLoading] = useState(true)
   const [allAccounts, setAllAccounts] = useState([])
   const [selectedAccount, setSelectedAccount] = useState(null)
@@ -50,35 +50,46 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
   const createCourse = () => {
     setLoading(true)
     createNewCourse(selectedAccount.id, courseName)
-      .then(course => {
-        enrollAsTeacher(course.id)
-          .then(() => (window.location.href = `/courses/${course.id}/settings`))
-          .catch(err => {
-            setLoading(false)
-            showFlashError(
-              I18n.t('The course was created, but something went wrong adding you as a teacher')
-            )(err)
-          })
-      })
+      .then(course => (window.location.href = `/courses/${course.id}/settings`))
       .catch(err => {
         setLoading(false)
-        showFlashError(I18n.t('Error creating course'))(err)
+        showFlashError(I18n.t('Error creating new course'))(err)
       })
   }
 
-  useFetchApi({
+  const teacherFetchOpts = {
+    path: '/api/v1/users/self/courses',
+    success: useCallback(enrollments => {
+      const accounts = getAccountsFromEnrollments(enrollments)
+      setAllAccounts(accounts)
+      if (accounts.length === 1) {
+        setSelectedAccount(accounts[0])
+        setAccountSearchTerm(accounts[0].name)
+      }
+    }, []),
+    params: {
+      per_page: 100,
+      include: ['account']
+    }
+  }
+
+  const adminFetchOpts = {
     path: '/api/v1/manageable_accounts',
-    loading: setLoading,
     success: useCallback(accounts => {
       setAllAccounts(
         accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
       )
     }, []),
-    error: useCallback(err => showFlashError(I18n.t('Unable to get accounts')(err)), []),
-    fetchAllPages: true,
     params: {
       per_page: 100
     }
+  }
+
+  useFetchApi({
+    loading: setLoading,
+    error: useCallback(err => showFlashError(I18n.t('Unable to get accounts'))(err), []),
+    fetchAllPages: true,
+    ...(permissions === 'teacher' ? teacherFetchOpts : adminFetchOpts)
   })
 
   const handleAccountSelected = id => {
@@ -100,6 +111,9 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
       ))
   }
 
+  // Don't show the account select for teachers with only one account to show
+  const hideAccountSelect = permissions === 'teacher' && allAccounts?.length === 1
+
   return (
     <Modal label={I18n.t('Create Course')} open={isModalOpen} size="small" onDismiss={clearModal}>
       <Modal.Body>
@@ -119,16 +133,18 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
             layout="stacked"
             rowSpacing="medium"
           >
-            <CanvasAsyncSelect
-              inputValue={accountSearchTerm}
-              renderLabel={I18n.t('Which account will this course be associated with?')}
-              placeholder={I18n.t('Begin typing to search')}
-              noOptionsLabel={I18n.t('No Results')}
-              onInputChange={e => setAccountSearchTerm(e.target.value)}
-              onOptionSelected={(_e, id) => handleAccountSelected(id)}
-            >
-              {accountOptions}
-            </CanvasAsyncSelect>
+            {!hideAccountSelect && (
+              <CanvasAsyncSelect
+                inputValue={accountSearchTerm}
+                renderLabel={I18n.t('Which account will this course be associated with?')}
+                placeholder={I18n.t('Begin typing to search')}
+                noOptionsLabel={I18n.t('No Results')}
+                onInputChange={e => setAccountSearchTerm(e.target.value)}
+                onOptionSelected={(_e, id) => handleAccountSelected(id)}
+              >
+                {accountOptions}
+              </CanvasAsyncSelect>
+            )}
             <TextInput
               renderLabel={I18n.t('Course Name')}
               placeholder={I18n.t('Name...')}
@@ -151,7 +167,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
           color="primary"
           onClick={createCourse}
           interaction={
-            selectedAccount?.name === accountSearchTerm && courseName && !loading
+            courseName && !loading && selectedAccount?.name === accountSearchTerm
               ? 'enabled'
               : 'disabled'
           }
@@ -165,5 +181,6 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen}) => {
 
 CreateCourseModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
-  setModalOpen: PropTypes.func.isRequired
+  setModalOpen: PropTypes.func.isRequired,
+  permissions: PropTypes.oneOf(['admin', 'teacher']).isRequired
 }

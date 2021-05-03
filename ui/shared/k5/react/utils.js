@@ -132,25 +132,16 @@ export const sendMessage = (recipientId, message, subject) =>
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
 
-/* Creates a new course with name in provided account */
+/* Creates a new course with name in provided account, and enrolls the user as a teacher */
 export const createNewCourse = (accountId, courseName) =>
   doFetchApi({
     path: `/api/v1/accounts/${accountId}/courses`,
     method: 'POST',
-    params: {'course[name]': courseName}
-  }).then(data => data.json)
-
-/* Enrolls the current user as a teacher in the provided course */
-export const enrollAsTeacher = courseId =>
-  doFetchApi({
-    path: `/api/v1/courses/${courseId}/enrollments`,
-    method: 'POST',
     params: {
-      'enrollment[type]': 'TeacherEnrollment',
-      'enrollment[user_id]': 'self',
-      'enrollment[enrollment_state]': 'active'
+      'course[name]': courseName,
+      enroll_me: true
     }
-  })
+  }).then(data => data.json)
 
 /* Takes raw response from assignment_groups API and returns an array of objects with each
    assignment group's id, name, and total score. If gradingPeriodId is passed, only return
@@ -215,6 +206,21 @@ export const getAssignmentGrades = data =>
       if (b.dueDate == null) return -1
       return moment(a.dueDate).diff(moment(b.dueDate))
     })
+
+/* Return array of objects containing id and name of accounts associated with each
+   enrollment. */
+export const getAccountsFromEnrollments = enrollments =>
+  enrollments
+    .reduce((acc, e) => {
+      if (!acc.find(({id}) => id === e.account.id)) {
+        acc.push({
+          id: e.account.id,
+          name: e.account.name
+        })
+      }
+      return acc
+    }, [])
+    .sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
 
 export const TAB_IDS = {
   HOME: 'tab-home',

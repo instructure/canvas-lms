@@ -496,7 +496,8 @@ class UsersController < ApplicationController
       :STUDENT_PLANNER_GROUPS => planner_enabled? && map_groups_for_planner(@current_user.current_groups),
       :INITIAL_NUM_K5_CARDS => Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
       :PERMISSIONS => {
-        :create_courses => @current_user.roles(@domain_root_account).include?('admin')
+        :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
+        :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
       }
     })
 
@@ -1206,7 +1207,7 @@ class UsersController < ApplicationController
         api_find(@context.all_users, params[:id])
       end
       allowed = @user.grants_right?(@current_user, session, :read_full_profile)
-      
+
       raise ActiveRecord::RecordNotFound unless allowed
 
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )

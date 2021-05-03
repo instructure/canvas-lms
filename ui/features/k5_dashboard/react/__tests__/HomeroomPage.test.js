@@ -23,7 +23,7 @@ import {HomeroomPage} from '../HomeroomPage'
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
     visible: true,
-    canCreateCourses: true,
+    createPermissions: 'admin',
     ...overrides
   })
 
@@ -77,12 +77,17 @@ describe('HomeroomPage', () => {
   })
 
   describe('start a new course button', () => {
-    it('is not present if canCreateCourses is false', () => {
-      const {queryByText} = render(<HomeroomPage {...getProps({canCreateCourses: false})} />)
+    it('is not present if createPermissions is set to none', () => {
+      const {queryByText} = render(<HomeroomPage {...getProps({createPermissions: 'none'})} />)
       expect(queryByText('Open new course modal')).not.toBeInTheDocument()
     })
 
-    describe('with canCreateCourses set to true', () => {
+    it('is present if createPermissions is set to teacher', () => {
+      const {getByText} = render(<HomeroomPage {...getProps({createPermissions: 'teacher'})} />)
+      expect(getByText('Open new course modal')).toBeInTheDocument()
+    })
+
+    describe('with createPermissions set to admin', () => {
       it('is visible', () => {
         const {getByText} = render(<HomeroomPage {...getProps()} />)
         expect(getByText('Open new course modal')).toBeInTheDocument()
