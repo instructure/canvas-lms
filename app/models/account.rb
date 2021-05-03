@@ -1277,6 +1277,18 @@ class Account < ActiveRecord::Base
     end
     can :create_courses
 
+    # grants right to manually created courses account for show user create course button
+    given do |user|
+      user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        !root_account.site_admin? && self == manually_created_courses_account &&
+        root_account
+          .enrollments
+          .active
+          .where(user_id: user)
+          .any? { |e| e.has_permission_to?(:manage_courses_add) }
+    end
+    can :create_courses
+
     # any logged in user with an active enrollment granting :manage_courses_add
     # scope is checked against user's associated courses on the account's residing shard
     given do |user|
