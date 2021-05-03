@@ -7,7 +7,16 @@
     "DuplicateStringLiteral": {
       "enabled": false
     },
+    "FieldTypeRequired": {
+      "enabled": false
+    },
     "JUnitStyleAssertions": {
+      "enabled": false
+    },
+    "LineLength": {
+      "enabled": false
+    },
+    "MethodName": {
       "enabled": false
     },
     "MethodParameterTypeRequired": {
@@ -20,6 +29,9 @@
       "enabled": false
     },
     "NoDef": {
+      "enabled": false
+    },
+    "UnnecessaryGetter": {
       "enabled": false
     },
     "VariableTypeRequired": {
