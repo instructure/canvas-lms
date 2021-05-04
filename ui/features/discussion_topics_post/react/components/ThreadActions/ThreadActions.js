@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {Menu} from '@instructure/ui-menu'
 import {
@@ -27,8 +27,6 @@ import {
   IconDiscussionLine,
   IconEditLine,
   IconTrashLine,
-  IconMarkAsReadLine,
-  IconMarkAsReadSolid,
   IconSpeedGraderLine
 } from '@instructure/ui-icons'
 
@@ -38,11 +36,13 @@ import {Flex} from '@instructure/ui-flex'
 
 // Reason: <Menu> in v6 of InstUI requires a ref to bind too or errors
 // are produced by the menu causing the page to scroll all over the place
-// eslint-disable-next-line react/prefer-stateless-function
-export class ThreadActions extends React.Component {
-  render() {
-    const {...props} = this.props
-    return (
+export const ThreadActions = props => {
+  const menuItems = useMemo(() => {
+    return getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))
+  }, [props])
+
+  return (
+    <>
       <Menu
         placement="bottom"
         key={`threadActionMenu-${props.id}`}
@@ -57,33 +57,42 @@ export class ThreadActions extends React.Component {
           />
         }
       >
-        {getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))}
+        {menuItems}
       </Menu>
-    )
-  }
+    </>
+  )
 }
 
 const getMenuConfigs = props => {
-  const options = [
-    {
+  const options = []
+  if (props.onMarkAllAsRead) {
+    options.push({
       key: 'markAllAsRead',
       icon: <IconNextUnreadLine />,
-      label: I18n.t('Mark All as Read'),
+      label: I18n.t('Mark Thread as Read'),
       selectionCallback: props.onMarkAllAsUnread
-    }
-  ]
+    })
+  }
+  if (props.onMarkAllAsUnread) {
+    options.push({
+      key: 'markAllAsUnRead',
+      icon: <IconNextUnreadLine />,
+      label: I18n.t('Mark Thread as Unread'),
+      selectionCallback: props.onMarkAllAsUnread
+    })
+  }
   if (props.isUnread) {
     options.push({
       key: 'markAsRead',
-      icon: <IconMarkAsReadLine />,
-      label: I18n.t('Mark as Read'),
+      icon: <IconNextUnreadLine />,
+      label: I18n.t('Mark Post as Read'),
       selectionCallback: props.onToggleUnread
     })
   } else {
     options.push({
       key: 'markAsUnread',
-      icon: <IconMarkAsReadSolid />,
-      label: I18n.t('Mark as Unread'),
+      icon: <IconNextUnreadLine />,
+      label: I18n.t('Mark Post as Unread'),
       selectionCallback: props.onToggleUnread
     })
   }
@@ -149,7 +158,8 @@ const renderMenuItem = ({selectionCallback, icon, label, key}, id) => (
 
 ThreadActions.propTypes = {
   id: PropTypes.string.isRequired,
-  onMarkAllAsUnread: PropTypes.func.isRequired,
+  onMarkAllAsUnread: PropTypes.func,
+  onMarkAllAsRead: PropTypes.func,
   onToggleUnread: PropTypes.func.isRequired,
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,

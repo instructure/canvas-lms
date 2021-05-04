@@ -35,7 +35,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
@@ -64,10 +64,13 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
+  const AUTO_MARK_AS_READ_DELAY = 3000
+
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
+  const threadRef = useRef()
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -125,6 +128,18 @@ export const DiscussionThreadContainer = props => {
       }
     })
   }
+
+  const markAsRead = useCallback(() => {
+    setTimeout(
+      updateDiscussionEntryParticipant({
+        variables: {
+          discussionEntryId: props.discussionEntry._id,
+          read: true
+        }
+      }),
+      AUTO_MARK_AS_READ_DELAY
+    )
+  }, [updateDiscussionEntryParticipant, props.discussionEntry._id])
 
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
@@ -225,9 +240,27 @@ export const DiscussionThreadContainer = props => {
   const canGrade =
     (isGraded(props.assignment) && props.discussionEntry.permissions?.update) || false
 
+  // Scrolling auto listener to mark messages as read
+  useEffect(() => {
+    const observer = new IntersectionObserver(markAsRead, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    })
+
+    if (threadRef.current) observer.observe(threadRef.current)
+
+    return () => {
+      if (threadRef.current) observer.unobserve(threadRef.current)
+    }
+  }, [threadRef, markAsRead])
+
   return (
     <>
-      <div style={{marginLeft: marginDepth, paddingLeft: theme.variables.spacing.small}}>
+      <div
+        style={{marginLeft: marginDepth, paddingLeft: theme.variables.spacing.small}}
+        ref={threadRef}
+      >
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}
@@ -238,7 +271,6 @@ export const DiscussionThreadContainer = props => {
                 id={props.discussionEntry.id}
                 isUnread={!props.discussionEntry.read}
                 onToggleUnread={toggleUnread}
-                onMarkAllAsUnread={() => {}}
                 onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
                 onEdit={
                   props.discussionEntry.permissions?.update

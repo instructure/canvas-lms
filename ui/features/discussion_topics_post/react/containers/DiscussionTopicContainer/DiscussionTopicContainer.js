@@ -224,7 +224,6 @@ export const DiscussionTopicContainer = props => {
                   </Flex.Item>
                   <Flex.Item>
                     <PostToolbar
-                      onReadAll={() => {}}
                       onToggleComments={canReadAsAdmin ? () => {} : null}
                       onDelete={
                         canDelete

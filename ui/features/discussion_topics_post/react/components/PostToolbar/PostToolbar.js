@@ -118,14 +118,15 @@ const renderMenu = props => {
 }
 
 const getMenuConfigs = props => {
-  const options = [
-    {
+  const options = []
+  if (props.onReadAll) {
+    options.push({
       key: 'read-all',
       icon: <IconMarkAsReadLine />,
       label: I18n.t('Mark All as Read'),
       selectionCallback: props.onReadAll
-    }
-  ]
+    })
+  }
   if (props.onEdit) {
     options.push({
       key: 'edit',
@@ -221,7 +222,7 @@ PostToolbar.propTypes = {
   /**
    * Behavior for marking the thread as read
    */
-  onReadAll: PropTypes.func.isRequired,
+  onReadAll: PropTypes.func,
   /**
    * Behavior for deleting the discussion post.
    * Providing this function will result in the menu option being rendered.
