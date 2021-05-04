@@ -6,9 +6,9 @@ cache:
   yarn: true
 script:
   - npm run test:coverage
-  - npm run cypress:ci
+  # - npm run cypress:ci
   - npm run fmt-check
-  - npm run build:demo
+  # - npm run build:demo
 deploy:
   provider: pages
   skip-cleanup: true

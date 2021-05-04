@@ -11,7 +11,10 @@ export default [
       {
         label: "Select Field",
         dataKey: "select",
-        options: [["a", "A"], ["b", "B"]]
+        options: [
+          ["a", "A"],
+          ["b", "B"]
+        ]
       },
       {
         label: "Select Field",

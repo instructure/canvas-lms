@@ -1,8 +1,8 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import contrast from "wcag-element-contrast"
-import TextInput from "@instructure/ui-forms/lib/components/TextInput"
-import View from "@instructure/ui-layout/lib/components/View"
+import { TextInput } from "@instructure/ui-forms"
+import { View } from "@instructure/ui-layout"
 import ColorPicker from "./color-picker"
 
 export default class ColorField extends React.Component {

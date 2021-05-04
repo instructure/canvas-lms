@@ -1,5 +1,5 @@
 import { renderIntoDiv } from "canvas-rce"
-import canvasTheme from "@instructure/ui-themes/lib/canvas"
+import canvasTheme from "@instructure/canvas-theme"
 
 import { getInstance, setLocale } from "./plugin"
 import "tinymce/plugins/image"
