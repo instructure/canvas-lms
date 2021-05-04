@@ -125,7 +125,7 @@ const GradeDetails = ({
               screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
             />
           ) : (
-            <Heading level="h2" margin="medium 0 small">
+            <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
               {totalGrade && I18n.t('Total: %{grade}', {grade: totalGrade})}
             </Heading>
           )}
@@ -136,7 +136,10 @@ const GradeDetails = ({
               screenReaderLabel={I18n.t('Loading assignment group totals')}
             />
           ) : (
-            <ToggleDetails summary={I18n.t('View Assignment Group Totals')}>
+            <ToggleDetails
+              data-testid="assignment-group-toggle"
+              summary={I18n.t('View Assignment Group Totals')}
+            >
               {assignmentGroupTotals.map(group => (
                 <Text as="div" margin="small 0" key={group.id}>
                   {I18n.t('%{groupName}: %{score}', {groupName: group.name, score: group.score})}

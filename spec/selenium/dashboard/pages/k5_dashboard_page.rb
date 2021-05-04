@@ -313,6 +313,25 @@ module K5PageObject
     "//button[.//*[. = 'Cancel']]"
   end
 
+  def empty_grades_image_selector
+    "[data-testid='empty-grades-panda']"
+  end
+
+  def assignment_group_toggle_selector
+    "[data-testid='assignment-group-toggle']"
+  end
+
+  def grades_total_selector
+    "[data-testid='grades-total']"
+  end
+
+  def grades_table_row_selector
+    "[data-testid='grades-table-row']"
+  end
+
+  def grades_assignment_anchor_selector
+    "a"
+  end
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -627,6 +646,23 @@ module K5PageObject
   def new_course_modal_cancel
     fxpath(new_course_modal_cancel_selector)
   end
+
+  def empty_grades_image
+    f(empty_grades_image_selector)
+  end
+
+  def grades_total
+    f(grades_total_selector)
+  end
+
+  def grades_assignments_list
+    ff(grades_table_row_selector)
+  end
+
+  def grades_assignment_href(grade_row_element)
+    element_value_for_attr(grade_row_element.find_element(:css, grades_assignment_anchor_selector), "href")
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -772,6 +808,10 @@ module K5PageObject
     k5_app_buttons.map(&:text)
   end
 
+  def grades_total_text
+    grades_total.text
+  end
+
   #----------------------------Element Management---------------------#
 
   def announcement_button_exists?
@@ -878,11 +918,11 @@ module K5PageObject
     tool
   end
 
-  def create_dated_assignment(course, assignment_title, assignment_due_at)
+  def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
     course.assignments.create!(
       title: assignment_title,
       grading_type: 'points',
-      points_possible: 100,
+      points_possible: points_possible,
       due_at: assignment_due_at,
       submission_types: 'online_text_entry'
     )
@@ -953,14 +993,18 @@ module K5PageObject
     account_admin_user(:account => @account)
   end
 
-  def create_and_submit_assignment(course)
-    assignment = course.assignments.create!(
-      title: "Math Assignment 5",
-      description: "General Assignment",
-      points_possible: 100,
+  def create_assignment(course, assignment_title, description, points_possible)
+    course.assignments.create!(
+      title: assignment_title,
+      description: description,
+      points_possible: points_possible,
       submission_types: 'online_text_entry',
       workflow_state: 'published'
     )
+  end
+
+  def create_and_submit_assignment(course, assignment_title, description, points_possible)
+    assignment = create_assignment(course, assignment_title, description, points_possible)
     assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
     assignment
   end
@@ -971,5 +1015,17 @@ module K5PageObject
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
     @course_module.add_item(:id => assignment.id, :type => 'assignment')
+  end
+
+  def create_grading_standard(course)
+    course.grading_standards.create!(
+      title: "Fun Grading Standard",
+      standard_data: {
+        "scheme_0" => { name: "Awesome", value: "90" },
+        "scheme_1" => { name: "Fabulous", value: "80" },
+        "scheme_2" => { name: "You got this", value: "70" },
+        "scheme_3" => { name: "See me", value: "0" }
+      }
+    )
   end
 end

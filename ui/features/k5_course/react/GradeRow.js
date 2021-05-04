@@ -144,7 +144,7 @@ export const GradeRow = ({
   )
 
   return (
-    <Table.Row>
+    <Table.Row data-testid="grades-table-row">
       <Table.Cell>
         {unread ? (
           <Badge
