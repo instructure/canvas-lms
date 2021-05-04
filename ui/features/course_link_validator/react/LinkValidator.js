@@ -21,6 +21,7 @@ import '@canvas/rails-flash-notifications'
 import React from 'react'
 import I18n from 'i18n!link_validator'
 import ValidatorResults from './ValidatorResults'
+import {number} from 'prop-types'
 import {Confetti} from '@canvas/confetti'
 
 class LinkValidator extends React.Component {
@@ -45,7 +46,7 @@ class LinkValidator extends React.Component {
         if (data.workflow_state === 'queued' || data.workflow_state === 'running') {
           setTimeout(() => {
             this.getResults()
-          }, 10000)
+          }, this.props.pollTimeout)
         } else if (data.workflow_state === 'completed' && data.results.version == 2) {
           this.setState({
             buttonMessage: I18n.t('Restart Link Validation'),
@@ -104,7 +105,7 @@ class LinkValidator extends React.Component {
         const getResults = this.getResults
         setTimeout(() => {
           getResults()
-        }, 2000)
+        }, this.props.pollTimeoutInitial)
       },
       error: () => {
         this.setState({
@@ -144,6 +145,11 @@ class LinkValidator extends React.Component {
       </div>
     )
   }
+}
+
+LinkValidator.propTypes = {
+  pollTimeout: number.isRequired,
+  pollTimeoutInitial: number.isRequired
 }
 
 export default LinkValidator
