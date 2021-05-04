@@ -31,13 +31,36 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import startMoveOutcome from '@canvas/outcomes/react/helpers/startMoveOutcome'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('@canvas/outcomes/react/helpers/startMoveOutcome')
 jest.useFakeTimers()
 
 describe('OutcomeManagementPanel', () => {
   let cache
   let showFlashAlertSpy
+  const outcome = {
+    __typename: 'LearningOutcome',
+    _id: '1',
+    canEdit: true,
+    contextId: '2',
+    contextType: 'Course',
+    description: '',
+    displayName: '',
+    friendlyDescription: null,
+    title: 'Outcome 1 - Group 200'
+  }
+  const newParentGroup = {
+    canEdit: true,
+    collections: [200, 201],
+    descriptor: '2 Groups | 2 Outcomes',
+    id: 2,
+    loadInfo: 'loaded',
+    name: 'Root course folder',
+    outcomesCount: 2,
+    parentGroupId: 0
+  }
 
   beforeEach(() => {
     cache = createCache()
@@ -292,6 +315,19 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Edit Outcome')).toBeInTheDocument()
   })
 
+  it('shows move outcome modal if move option from individual outcome menu is selected', async () => {
+    const {getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Move'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Where would you like to move this outcome?')).toBeInTheDocument()
+  })
+
   it('clears selected outcome when edit outcome modal is closed', async () => {
     const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -320,6 +356,20 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
   })
 
+  it('clears selected outcome when move outcome modal is closed', async () => {
+    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Move'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Cancel'))
+    expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
+  })
+
   it('hides the Outcome Menu if the user doesnt have permission to edit the outcome', async () => {
     const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
@@ -334,5 +384,26 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
+  })
+
+  it('calls startMoveOutcome with correct args and closes move outcome modal when user clicks on Move button', async () => {
+    const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runAllTimers())
+    // OutcomeManagementPanel Group Tree Browser
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    // OutcomeManagementPanel First Outcome Kebab Menu
+    fireEvent.click(getAllByText('Outcome Menu')[0])
+    fireEvent.click(within(getByRole('menu')).getByText('Move'))
+    await act(async () => jest.runAllTimers())
+    // Move Modal
+    fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+    await act(async () => jest.runAllTimers())
+    expect(startMoveOutcome).toHaveBeenCalledWith('Course', '2', outcome, 200, newParentGroup)
+    expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
   })
 })

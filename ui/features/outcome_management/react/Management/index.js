@@ -40,6 +40,7 @@ import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import startMoveOutcome from '@canvas/outcomes/react/helpers/startMoveOutcome'
 
 const NoOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()
@@ -99,6 +100,7 @@ const OutcomeManagementPanel = () => {
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
@@ -106,6 +108,10 @@ const OutcomeManagementPanel = () => {
   }
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
+    setSelectedOutcome(null)
+  }
+  const onCloseOutcomeMoveModal = () => {
+    closeOutcomeMoveModal()
     setSelectedOutcome(null)
   }
   const onCloseEditGroupModal = () => {
@@ -126,6 +132,8 @@ const OutcomeManagementPanel = () => {
       openOutcomeRemoveModal()
     } else if (action === 'edit') {
       openOutcomeEditModal()
+    } else if (action === 'move') {
+      openOutcomeMoveModal()
     }
   }
 
@@ -156,6 +164,11 @@ const OutcomeManagementPanel = () => {
         type: 'error'
       })
     }
+  }
+
+  const onMoveOutcomeHandler = newParentGroup => {
+    startMoveOutcome(contextType, contextId, selectedOutcome, selectedGroupId, newParentGroup)
+    onCloseOutcomeMoveModal()
   }
 
   if (isLoading) {
@@ -284,6 +297,15 @@ const OutcomeManagementPanel = () => {
                 outcome={selectedOutcome}
                 isOpen={isOutcomeEditModalOpen}
                 onCloseHandler={onCloseOutcomeEditModal}
+              />
+              <MoveModal
+                title={selectedOutcome.title}
+                groupId={selectedGroupId}
+                parentGroupId={selectedGroupId}
+                type="outcome"
+                isOpen={isOutcomeMoveModalOpen}
+                onCloseHandler={onCloseOutcomeMoveModal}
+                onMoveHandler={onMoveOutcomeHandler}
               />
             </>
           )}

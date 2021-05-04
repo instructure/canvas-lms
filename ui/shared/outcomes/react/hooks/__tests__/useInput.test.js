@@ -31,8 +31,13 @@ describe('useInput', () => {
     expect(result.current[0]).toBe('1')
   })
 
-  test('should create custom hook with initial state equal to empty string if no initial state provided', () => {
+  test('should create custom hook with initial state equal to empty string if no initial value provided', () => {
     const {result} = renderHook(() => useInput())
+    expect(result.current[0]).toBe('')
+  })
+
+  test('should create custom hook with initial state equal to empty string if initial value is null', () => {
+    const {result} = renderHook(() => useInput(null))
     expect(result.current[0]).toBe('')
   })
 

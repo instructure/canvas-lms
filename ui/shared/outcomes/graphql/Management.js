@@ -225,3 +225,17 @@ export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) =>
     {title}
   )
 }
+
+export const moveOutcome = (
+  contextType,
+  contextId,
+  outcomeId,
+  oldParentGroupId,
+  newParentGroupId
+) =>
+  axios.put(
+    `/api/v1/${pluralize(
+      contextType
+    ).toLowerCase()}/${contextId}/outcome_groups/${newParentGroupId}/outcomes/${outcomeId}`,
+    {move_from: oldParentGroupId}
+  )

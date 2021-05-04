@@ -18,8 +18,9 @@
 
 import {useState} from 'react'
 
-const useInput = (initialValue = '') => {
-  const [value, setValue] = useState(initialValue)
+const useInput = initialValue => {
+  const initialState = initialValue || ''
+  const [value, setValue] = useState(initialState)
   const changeValue = arg => {
     if (typeof arg === 'object' && arg.target?.value !== undefined) {
       setValue(arg.target.value)
@@ -27,7 +28,7 @@ const useInput = (initialValue = '') => {
       setValue(arg)
     }
   }
-  const valueChanged = value.length !== initialValue.length || value !== initialValue
+  const valueChanged = (value || '').length !== initialState.length || value !== initialState
 
   return [value, changeValue, valueChanged]
 }
