@@ -354,7 +354,10 @@ QUnit.module('SpeedGrader', rootHooks => {
         submission_state: 'not_graded',
         submission: {score: 7, grade: 70, submission_history: []}
       }
-      setupFixtures('<div id="submission_details">Submission Details</div>')
+      setupFixtures(`
+        <div id="submission_details">Submission Details</div>
+        <div id="reassign_assignment"></div>
+      `)
       sinon.stub($, 'getJSON')
       sinon.stub($, 'ajaxJSON')
       sinon.stub(SpeedGrader.EG, 'domReady')
@@ -399,6 +402,60 @@ QUnit.module('SpeedGrader', rootHooks => {
       }
       SpeedGrader.EG.showSubmissionDetails()
       strictEqual($('#submission_details').is(':visible'), true)
+    })
+
+    test('shows the Reassign Assignment button for media recording submissions', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'media_recording'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), true)
+    })
+
+    test('shows the Reassign Assignment button for "online"-type submissions that are not quizzes', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), true)
+    })
+
+    test('does not show the Reassign Assignment button for online quizzes', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_quiz'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), false)
+    })
+
+    test('does not show the Reassign Assignment button for submissions without a due date', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), false)
+    })
+
+    test('does not show the Reassign Assignment button for unsubmitted submissions', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'unsubmitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), false)
     })
   })
 

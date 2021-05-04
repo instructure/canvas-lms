@@ -2302,8 +2302,9 @@ EG = {
       if (
         !!currentSubmission.cached_due_date &&
         currentSubmission.submission_type &&
-        currentSubmission.submission_type.startsWith('online_') &&
-        currentSubmission.submission_type !== 'online_quiz'
+        (currentSubmission.submission_type === 'media_recording' ||
+          (currentSubmission.submission_type.startsWith('online_') &&
+            currentSubmission.submission_type !== 'online_quiz'))
       ) {
         $reassign_assignment.show()
       } else {
