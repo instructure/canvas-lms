@@ -5,9 +5,9 @@ docker run tinymce-a11y-checker npm run test:coverage
 unit_status=$?
 ((unit_status)) && echo "[!] Failed unit tests."
 
-docker run tinymce-a11y-checker npm run cypress:run
-cypress_status=$?
-((cypress_status)) && echo "[!] Failed Cypress E2E tests."
+# docker run tinymce-a11y-checker npm run cypress:run
+# cypress_status=$?
+# ((cypress_status)) && echo "[!] Failed Cypress E2E tests."
 
 docker run tinymce-a11y-checker npm run fmt-check
 fmt_status=$?

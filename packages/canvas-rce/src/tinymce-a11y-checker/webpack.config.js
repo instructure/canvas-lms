@@ -5,7 +5,10 @@ module.exports = {
     demo: "./src/demo.js"
   },
   module: {
-    rules: [{ test: /\.js$/, exclude: /node_modules/, use: "babel-loader" }]
+    rules: [{ test: /\.js$/, exclude: /node_modules/, use: "babel-loader" }],
+    noParse: [
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+    ],
   },
   devtool: "inline-source-map",
   devServer: {

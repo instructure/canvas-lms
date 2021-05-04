@@ -2,3 +2,6 @@ node_modules
 lib
 src/translations.json
 coverage
+cypress/videos
+cypress/screenshots
+demo/*.bundle.js

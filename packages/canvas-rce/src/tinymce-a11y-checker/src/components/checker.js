@@ -2,28 +2,14 @@ import React from "react"
 
 import preventDefault from "prevent-default"
 import { LiveAnnouncer, LiveMessage } from "react-aria-live"
-import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent"
-import CloseButton from "@instructure/ui-buttons/lib/components/CloseButton"
-import Tray from "@instructure/ui-overlays/lib/components/Tray"
-import View from "@instructure/ui-layout/lib/components/View"
-import Heading from "@instructure/ui-elements/lib/components/Heading"
-import Button from "@instructure/ui-buttons/lib/components/Button"
-import Link from "@instructure/ui-elements/lib/components/Link"
-import Checkbox from "@instructure/ui-forms/lib/components/Checkbox"
-import TextInput from "@instructure/ui-forms/lib/components/TextInput"
-import TextArea from "@instructure/ui-forms/lib/components/TextArea"
-import Select from "@instructure/ui-core/lib/components/Select"
-import Grid from "@instructure/ui-layout/lib/components/Grid"
-import GridRow from "@instructure/ui-layout/lib/components/Grid/GridRow"
-import GridCol from "@instructure/ui-layout/lib/components/Grid/GridCol"
-import Spinner from "@instructure/ui-elements/lib/components/Spinner"
-import Popover, {
-  PopoverTrigger,
-  PopoverContent
-} from "@instructure/ui-overlays/lib/components/Popover"
-import Text from "@instructure/ui-elements/lib/components/Text"
-import IconQuestionLine from "@instructure/ui-icons/lib/Line/IconQuestion"
-import ApplyTheme from "@instructure/ui-themeable/lib/components/ApplyTheme"
+import { ScreenReaderContent } from "@instructure/ui-a11y"
+import { Button, CloseButton } from "@instructure/ui-buttons"
+import { Tray, Popover } from "@instructure/ui-overlays"
+import { View, Grid, GridRow, GridCol } from "@instructure/ui-layout"
+import { Heading, Link, Spinner, Text } from "@instructure/ui-elements"
+import { Checkbox, TextInput, TextArea, Select } from "@instructure/ui-forms"
+import { IconQuestionLine } from "@instructure/ui-icons"
+import { ApplyTheme } from "@instructure/ui-themeable"
 import ColorField from "./color-field"
 import PlaceholderSVG from "./placeholder-svg"
 
@@ -347,7 +333,7 @@ export default class Checker extends React.Component {
                           shouldContainFocus
                           shouldReturnFocus
                         >
-                          <PopoverTrigger>
+                          <Popover.Trigger>
                             <Button
                               variant="icon"
                               icon={IconQuestionLine}
@@ -362,8 +348,8 @@ export default class Checker extends React.Component {
                                 {formatMessage("Why")}
                               </ScreenReaderContent>
                             </Button>
-                          </PopoverTrigger>
-                          <PopoverContent>
+                          </Popover.Trigger>
+                          <Popover.Content>
                             <View
                               padding="medium"
                               display="block"
@@ -398,7 +384,7 @@ export default class Checker extends React.Component {
                                 </p>
                               </Text>
                             </View>
-                          </PopoverContent>
+                          </Popover.Content>
                         </Popover>
                       </GridCol>
                     </GridRow>
@@ -480,9 +466,19 @@ export default class Checker extends React.Component {
         return (
           <Select
             label={f.label}
-            name={f.dataKey}
-            value={this.state.formState[f.dataKey]}
-            onChange={this.updateFormState}
+            selectedOption={
+              this.state.formState[f.dataKey] && {
+                value: this.state.formState[f.dataKey]
+              }
+            }
+            onChange={(e, option) => {
+              this.updateFormState({
+                target: {
+                  name: f.dataKey,
+                  value: option.value
+                }
+              })
+            }}
             disabled={disabled}
           >
             {f.options.map(o => (
