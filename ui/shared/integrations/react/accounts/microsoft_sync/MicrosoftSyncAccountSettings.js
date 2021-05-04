@@ -26,6 +26,7 @@ import LoginAttributeSelector from './components/LoginAttributeSelector'
 import MicrosoftSyncTitle from './components/MicrosoftSyncTitle'
 import TenantInput from './components/TenantInput'
 import UpdateSettingsButton from './components/UpdateSettingsButton'
+import AdminConsentLink from './components/AdminConsentLink'
 import {reducerActions} from './lib/settingsReducer'
 import useSettings from './lib/useSettings'
 
@@ -98,6 +99,17 @@ export default function MicrosoftSyncAccountSettings() {
           handleClick={() => {
             dispatch({type: reducerActions.updateSettings, dispatch})
           }}
+        />
+        <AdminConsentLink
+          enabled={
+            state.microsoft_sync_enabled &&
+            !!state.microsoft_sync_tenant &&
+            state.tenantErrorMessages.length < 1
+          }
+          baseUrl={ENV.MICROSOFT_SYNC.BASE_URL}
+          clientId={ENV.MICROSOFT_SYNC.CLIENT_ID}
+          redirectUri={ENV.MICROSOFT_SYNC.REDIRECT_URI}
+          tenant={state.microsoft_sync_tenant}
         />
       </View>
     )

@@ -1174,6 +1174,11 @@ class AccountsController < ApplicationController
           :enabled => @account.csp_enabled?,
           :inherited => @account.csp_inherited?,
           :settings_locked => @account.csp_locked?,
+        },
+        MICROSOFT_SYNC: {
+          CLIENT_ID: MicrosoftSync::LoginService.client_id,
+          REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
+          BASE_URL: MicrosoftSync::LoginService::BASE_URL
         }
       })
       js_env(edit_help_links_env, true)

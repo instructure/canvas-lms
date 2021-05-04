@@ -894,6 +894,16 @@ describe AccountsController do
         get 'settings', params: {account_id: account.id}
         expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end
+
+      it 'sets microsoft sync values' do
+        allow(MicrosoftSync::LoginService).to receive(:client_id).and_return('1234')
+        get 'settings', params: {account_id: account.id}
+        expect(assigns.dig(:js_env, :MICROSOFT_SYNC)).to include(
+          CLIENT_ID: '1234',
+          REDIRECT_URI: 'https://www.instructure.com/',
+          BASE_URL: 'https://login.microsoftonline.com'
+        )
+      end
     end
 
     it "should load account report details" do

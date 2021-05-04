@@ -30,6 +30,7 @@ module MicrosoftSync
 
     BASE_URL = 'https://login.microsoftonline.com'
     TOKEN_SUBPATH = 'oauth2/v2.0/token'
+    REDIRECT_URI = 'https://www.instructure.com/'
 
     # Tokens are normally 3599 or 3600 seconds. Assume it will be and adjust
     # the expiry if it isn't.
@@ -108,15 +109,15 @@ module MicrosoftSync
         result
       end
 
+      def client_id
+        settings['client-id']
+      end
+
       private
 
       def settings
         DynamicSettings.find('microsoft-sync') or
           raise ArgumentError, 'MicrosoftSync not configured'
-      end
-
-      def client_id
-        settings['client-id']
       end
 
       def client_secret

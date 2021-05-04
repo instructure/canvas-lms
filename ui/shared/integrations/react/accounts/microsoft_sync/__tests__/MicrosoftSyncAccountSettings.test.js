@@ -45,6 +45,17 @@ describe('MicrosoftSyncAccountSettings', () => {
   beforeEach(() => {
     doFetchApi.mockClear()
     useFetchApi.mockClear()
+    window.ENV = {
+      MICROSOFT_SYNC: {
+        CLIENT_ID: '12345',
+        REDIRECT_URI: 'https://www.instructure.com',
+        BASE_URL: 'https://login.microsoftonline.com'
+      }
+    }
+  })
+
+  afterEach(() => {
+    window.ENV = {}
   })
 
   describe('basic rendering tests', () => {
@@ -186,6 +197,38 @@ describe('MicrosoftSyncAccountSettings', () => {
       expect(errMsg).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledTimes(0)
     })
+
+    it('does not show a Microsoft admin consent link if disabled', () => {
+      const container = setup(
+        ({loading, success}) => {
+          loading(false)
+          success({
+            microsoft_sync_tenant: 'testtenant.com',
+            microsoft_sync_login_attribute: 'sis_user_id',
+            microsoft_sync_enabled: false
+          })
+        },
+        () => {}
+      )
+
+      expect(container.queryByText(/Grant tenant access/)).not.toBeInTheDocument()
+    })
+
+    it('does not show a Microsoft admin consent link if tenant empty', () => {
+      const container = setup(
+        ({loading, success}) => {
+          loading(false)
+          success({
+            microsoft_sync_tenant: '',
+            microsoft_sync_login_attribute: 'sis_user_id',
+            microsoft_sync_enabled: true
+          })
+        },
+        () => {}
+      )
+
+      expect(container.queryByText(/Grant tenant access/)).not.toBeInTheDocument()
+    })
   })
 
   describe('typical user interaction', () => {
@@ -234,6 +277,25 @@ describe('MicrosoftSyncAccountSettings', () => {
           attr
         )
       })
+    })
+
+    it('shows a Microsoft admin consent link', () => {
+      const container = setup(
+        ({loading, success}) => {
+          loading(false)
+          success({
+            microsoft_sync_tenant: 'testtenant.com',
+            microsoft_sync_login_attribute: 'sis_user_id',
+            microsoft_sync_enabled: true
+          })
+        },
+        () => {}
+      )
+
+      const anchorTag = container.getByText(/Grant tenant access/)
+      expect(anchorTag.href).toEqual(
+        'https://login.microsoftonline.com/testtenant.com/adminconsent?client_id=12345&redirect_uri=https%3A%2F%2Fwww.instructure.com'
+      )
     })
   })
 })
