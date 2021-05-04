@@ -247,7 +247,7 @@
       </div>
       <% if @context.root_account.feature_enabled?(:new_course_availability_ui) %>
         <div class="form-row course-participation-row">
-          <div class="form-label"><label for="availability_options_container"><%= before_label('Participation') %></label></div>
+          <div class="form-label"><label for="availability_options_container"><%= f.blabel :participation_id, :en => "Participation" %></label></div>
           <div class="nobr">
             <div id="availability_options_container"></div>
             <%= f.hidden_field :start_at, :value => @context.start_at&.iso8601 %>
