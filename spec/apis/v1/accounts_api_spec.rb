@@ -533,7 +533,7 @@ describe "Accounts API", type: :request do
       let(:update_path) { "/api/v1/accounts/#{@a1.id}" }
       let(:sync_enabled) { true }
       let(:tenant_name) { "canvastest2.onmicrosoft.com" }
-      let(:attribute) { "sub" }
+      let(:attribute) { "email" }
 
       before(:each) do
         user_session(@user)
@@ -667,7 +667,7 @@ describe "Accounts API", type: :request do
           end
 
           it "should allow setting the login attribute to any of the allowed attributes" do
-            %w(sub email oid preferred_username).each do |attribute|
+            %w(email sis_user_id preferred_username).each do |attribute|
               update_sync_settings_params[:account][:settings][:microsoft_sync_login_attribute] = attribute
               api_call(:put, update_path, header_options_hash,
                        update_sync_settings_params, { expected_result: 200 })

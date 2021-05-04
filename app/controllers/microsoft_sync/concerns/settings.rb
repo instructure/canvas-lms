@@ -20,7 +20,7 @@ module MicrosoftSync::Concerns
   module Settings
     extend ActiveSupport::Concern
 
-    VALID_SYNC_LOGIN_ATTRIBUTES = %w(sub email oid preferred_username).freeze
+    VALID_SYNC_LOGIN_ATTRIBUTES = %w(email preferred_username sis_user_id).freeze
 
     def set_microsoft_sync_settings(enabled, tenant, login_attribute)
       return if enabled.nil? && tenant.blank? && login_attribute.blank?
