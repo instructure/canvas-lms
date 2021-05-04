@@ -98,7 +98,7 @@ class AssignmentsController < ApplicationController
   def render_a2_student_view?
     @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      !@context_enrollment&.observer?
+      !@context_enrollment&.observer? && !@assignment.submission_types.include?('student_annotation')
   end
 
   def render_a2_student_view
