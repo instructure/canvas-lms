@@ -1,13 +1,31 @@
 {
   "extends": "recommended",
   "rules": {
+    "BuilderMethodWithSideEffects": {
+      "enabled": false
+    },
+    "ClassJavadoc": {
+      "enabled": false
+    },
+    "CompileStatic": {
+      "enabled": false
+    },
     "DuplicateNumberLiteral": {
       "enabled": false
     },
     "DuplicateStringLiteral": {
       "enabled": false
     },
+    "EmptyCatchBlock": {
+      "enabled": false
+    },
+    "FactoryMethodName": {
+      "enabled": false
+    },
     "FieldTypeRequired": {
+      "enabled": false
+    },
+    "Instanceof": {
       "enabled": false
     },
     "JUnitStyleAssertions": {
@@ -31,7 +49,13 @@
     "NoDef": {
       "enabled": false
     },
+    "PropertyName": {
+      "enabled": false
+    },
     "UnnecessaryGetter": {
+      "enabled": false
+    },
+    "UnnecessarySetter": {
       "enabled": false
     },
     "VariableTypeRequired": {
