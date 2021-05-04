@@ -726,21 +726,31 @@
     <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
-      <p style="margin-bottom: 4px; padding-top: 10px">
-        <%= t('help.edit_navigation', %{Drag and drop items to reorder them in the course navigation.}) %>
-      </p>
+      <div style="width: 400px; padding-top: 10px">
+        <p style="margin: 0">
+          <%= @context.elementary_subject_course? ?
+                  t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.") :
+                  t("help.edit_navigation", "Drag and drop items to reorder them in the course navigation.") %>
+        </p>
+        <% if @context.elementary_subject_course? %>
+          <p style="font-size: 0.8em; margin: 6px 0 0">
+            <%= t("help.edit_navigation_info_k5", "If enabled, LTI tools will always appear last under the Resources tab in the order you choose.") %>
+          </p>
+        <% end %>
+      </div>
       <% tabs.each do |tab|
         tab[:disabled_message] = [Course::TAB_GRADES, Course::TAB_DISCUSSIONS].include?(tab[:id]) ? t('tab_cant_disable', "This page can't be disabled, only hidden") : t('tab_disabled', "Page disabled, will redirect to course home page")
         tab[:disabled_message] = t("tab_hidden_if_disabled", "Page disabled, won't appear in navigation") if tab[:external]
+        tab[:disabled_message] = t("tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation") if @context.elementary_subject_course?
       end %>
       <h3 class="screenreader-only"><%= t('Enabled Links') %></h3>
       <ul id="nav_enabled_list" class="nav_list connectedSortable">
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %>"
+          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
               id="nav_edit_tab_id_<%= tab[:id] %>"
           >
             <%= tab[:label] %>
-            <% if tab[:id] != Course::TAB_HOME %>
+            <% if @context.tab_enabled?(tab) %>
               <div class="admin-links">
                 <a class="al-trigger al-trigger-gray" role="button" href="#">
                   <i class="icon-more" aria-hidden="true"></i>
@@ -768,7 +778,9 @@
         <li class="disabled">
           <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
           <div style="font-size: 0.8em;">
-            <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
+            <% unless @context.elementary_subject_course? %>
+              <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
+            <% end %>
           </div>
         </li>
         <% tabs.select {|t| t[:hidden] }.each do |tab|  %>

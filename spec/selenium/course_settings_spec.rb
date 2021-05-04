@@ -246,7 +246,7 @@ describe "course settings" do
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click
       wait_for_ajaximations
-      f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
+      f('#nav_form button.btn.btn-primary').click
       wait_for_ajaximations
       enter_student_view
       wait_for_ajaximations
