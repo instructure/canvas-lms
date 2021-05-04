@@ -183,7 +183,6 @@ describe "course settings" do
       # Show announcements and limit setting elements
       show_announcements_on_home_page = f('#course_show_announcements_on_home_page')
       home_page_announcement_limit = f('#course_home_page_announcement_limit')
-
       expect(is_checked(show_announcements_on_home_page)).not_to be_truthy
       expect(home_page_announcement_limit).to be_disabled
 
@@ -197,6 +196,24 @@ describe "course settings" do
       expect(element_exists?('.course-participation-row')).to be_truthy
       expect(element_exists?('#availability_options_container')).to be_truthy
     end
+
+    it "should check if it is a k5 course should not show the fields" do
+      @account.enable_feature!(:canvas_for_elementary)
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      get "/courses/#{@course.id}/settings"
+
+      more_options_link = f('.course_form_more_options_link')
+      more_options_link.click
+      wait_for_ajaximations
+
+      expect(element_exists?('#course_show_announcements_on_home_page')).to be_falsey
+      expect(element_exists?('#course_allow_student_discussion_topics')).to be_falsey
+      expect(element_exists?('#course_allow_student_organized_groups')).to be_falsey
+      expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
+      expect(element_exists?('#course_lock_all_announcements')).to be_falsey
+    end
+
   end
 
   describe "course items" do

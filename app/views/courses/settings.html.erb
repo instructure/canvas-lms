@@ -472,46 +472,56 @@
                 <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
                 </div>
               <% end %>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
-              <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
-              </div>
-              <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
-              <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
+              <% unless @context.elementary_subject_course? %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
+                <% f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
+                </div>
+                <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
+                <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
+              <% end %>
               <div class="checkbox-flex-container">
               <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
               <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
               </div>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
-              <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
-              </div>
+              <% unless @context.elementary_subject_course? %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
+                <%= f.label :allow_student_discussion_topics, :en => "Let students create discussion topics" %><br/>
+                </div>
+              <% end %>
               <div class="checkbox-flex-container">
               <%= f.check_box :allow_student_discussion_editing, :disabled => !can_manage %>
               <%= f.label :allow_student_discussion_editing, :en => "Let students edit or delete their own discussion posts" %><br/>
               </div>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
-              <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
-              </div>
+              <% unless @context.elementary_subject_course? %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
+                <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
+                </div>
+              <% end %>
               <div class="checkbox-flex-container">
               <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
               <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
               </div>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
-              <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-              </div>
+              <% unless @context.elementary_subject_course? %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
+                <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
+                </div>
+              <% end %>
               <% if has_multiple_sections %>
                 <div class="checkbox-flex-container">
                   <%= f.check_box :hide_sections_on_course_users_page, :disabled => !can_manage %>
                   <%= f.label :hide_sections_on_course_users_page, :en => "Hide sections on the People page from students" %><br/>
                 </div>
               <% end %>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
-              <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
-              </div>
+              <% unless @context.elementary_subject_course? %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
+                <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+                </div>
+              <% end %>
               <%= f.select :default_wiki_editing_roles, [
                 [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
                 [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
