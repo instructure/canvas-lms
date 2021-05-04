@@ -25,6 +25,7 @@ import com.lesfurets.jenkins.unit.*
 class BaseTest extends BasePipelineTest {
   // Implement a rule to intercept test failures and print the callStack
   @Rule
+  /* groovylint-disable-next-line UnnecessaryPublicModifier */
   public final TestRule testRule = new TestWatcher() {
     @Override
     protected void failed(Throwable e, Description description) {
