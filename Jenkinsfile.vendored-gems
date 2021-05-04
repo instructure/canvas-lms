@@ -119,6 +119,10 @@ pipeline {
                       """
                       still_running = false;
                     } catch(Exception ex) {
+                      // want to be able to debug in build output what
+                      // made the pulsar container fail.
+                      sh "docker-compose logs pulsar"
+
                       // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
                       // which means we don't think we can retry, so just let it die.
                       sh "docker-compose logs pulsar | grep \"zoo keeper disconnected\""
