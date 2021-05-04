@@ -312,7 +312,7 @@ module Lti::Ims
       end
 
       # change submission time without making it a "new" submission
-      if submitted_at.present?
+      if submitted_at.present? && submission.submitted_at != submitted_at
         submission.submitted_at = submitted_at
         submission.attempt -= 1 if submission.attempt.try(:'>', 0)
       end

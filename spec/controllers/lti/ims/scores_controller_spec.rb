@@ -213,6 +213,25 @@ module Lti::Ims
             end
 
             it_behaves_like 'updates existing submission'
+
+            context 'when submitted_at is the same across submissions' do
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => {
+                    new_submission: false, submitted_at: '2021-05-04T18:54:34.736+00:00'
+                  }
+                )
+              end
+
+              it 'does not decrement attempt' do
+                # starting at attempt 0 doesn't work since it always goes back to 1 on save
+                result.submission.update!(attempt: 4)
+                send_request
+                attempt = result.submission.reload.attempt
+                send_request
+                expect(result.submission.reload.attempt).to eq attempt
+              end
+            end
           end
 
           context 'when "new_submission" extension is present and true' do
