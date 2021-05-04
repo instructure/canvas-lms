@@ -37,6 +37,42 @@ module CustomWaitMethods
     raise "left page before domready" if result != 0
   end
 
+  # If we're looking for the loading image, we can't just do a normal assertion, because the image
+  # could end up getting loaded too quickly.
+  def wait_for_loading_image
+    driver.execute_script(<<-JS)
+      window.__WAIT_FOR_LOADING_IMAGE = false
+      window.__WAIT_FOR_LOADING_IMAGE_CALLBACK = null
+      var callback = function(mutationsList, observer) {
+        for(var record of mutationsList) {
+          for(var newNode of record.addedNodes) {
+            if(newNode.classList.contains('loading_image_holder')) {
+              observer.disconnect()
+
+              window.__WAIT_FOR_LOADING_IMAGE = true
+              window.__WAIT_FOR_LOADING_IMAGE_CALLBACK && window.__WAIT_FOR_LOADING_IMAGE_CALLBACK()
+            }
+          }
+        }
+      }
+      var observer = new MutationObserver(callback)
+      observer.observe(document.body, { subtree: true, childList: true })
+    JS
+
+    yield
+
+    result = driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1]
+      if (window.__WAIT_FOR_LOADING_IMAGE) {
+        callback(0)
+      }
+      window.__WAIT_FOR_LOADING_IMAGE_CALLBACK = function() {
+        callback(0)
+      }
+    JS
+    raise "loading image did not appear" if result != 0
+  end
+
   def wait_for_ajax_requests
     result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
