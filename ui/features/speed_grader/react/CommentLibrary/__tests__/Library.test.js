@@ -38,6 +38,9 @@ describe('Library', () => {
         }
       ],
       setComment: setCommentMock,
+      onAddComment: () => {},
+      onDeleteComment: () => {},
+      isAddingComment: false,
       ...props
     }
   }

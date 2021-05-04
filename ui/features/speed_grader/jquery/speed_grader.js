@@ -661,7 +661,7 @@ function renderCommentTextArea() {
   }
 
   ReactDOM.render(
-    <CommentArea getTextAreaRef={getTextAreaRef} />,
+    <CommentArea getTextAreaRef={getTextAreaRef} courseId={ENV.course_id} />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )
 }

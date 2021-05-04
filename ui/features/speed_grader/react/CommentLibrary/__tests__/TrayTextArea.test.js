@@ -17,17 +17,59 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import TrayTextArea from '../TrayTextArea'
 
 describe('TrayTextArea', () => {
+  let onAddMock
+  const defaultProps = (props = {}) => {
+    return {
+      isAdding: false,
+      onAdd: onAddMock,
+      ...props
+    }
+  }
+
+  beforeEach(() => {
+    onAddMock = jest.fn()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders the text area with a placeholder', () => {
-    const {getByPlaceholderText} = render(<TrayTextArea />)
+    const {getByPlaceholderText} = render(<TrayTextArea {...defaultProps()} />)
     expect(getByPlaceholderText('Write something...')).toBeInTheDocument()
   })
 
   it('renders a submit button that is initially disabled', () => {
-    const {getByText} = render(<TrayTextArea />)
-    expect(getByText('Add to Library').closest('button')).toHaveAttribute('disabled')
+    const {getByText} = render(<TrayTextArea {...defaultProps()} />)
+    expect(getByText('Add to Library').closest('button')).toBeDisabled()
+  })
+
+  it('enables the button when text is entered', () => {
+    const {getByText, getByLabelText} = render(<TrayTextArea {...defaultProps()} />)
+    const input = getByLabelText('Add comment to library')
+    fireEvent.change(input, {target: {value: 'test comment'}})
+    expect(getByText('Add to Library').closest('button')).not.toBeDisabled()
+  })
+
+  it('calls onAdd when the button is clicked', () => {
+    const {getByText, getByLabelText} = render(<TrayTextArea {...defaultProps()} />)
+    const input = getByLabelText('Add comment to library')
+    fireEvent.change(input, {target: {value: 'test comment'}})
+    fireEvent.click(getByText('Add to Library'))
+    expect(onAddMock).toHaveBeenCalledWith('test comment')
+  })
+
+  describe('when isAdding is true', () => {
+    it('updates the button text and disables it', () => {
+      const {getByText, getByLabelText, rerender} = render(<TrayTextArea {...defaultProps()} />)
+      const input = getByLabelText('Add comment to library')
+      fireEvent.change(input, {target: {value: 'test comment'}})
+      rerender(<TrayTextArea {...defaultProps({isAdding: true})} />)
+      expect(getByText('Adding to Library').closest('button')).toBeDisabled()
+    })
   })
 })

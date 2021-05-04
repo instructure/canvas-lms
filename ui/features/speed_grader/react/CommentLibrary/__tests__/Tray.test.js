@@ -28,6 +28,9 @@ describe('Tray', () => {
       setIsOpen: setIsOpenMock,
       onItemClick: () => {},
       comments: [{_id: '1', comment: 'assignment comment'}],
+      onDeleteComment: () => {},
+      onAddComment: () => {},
+      isAddingComment: false,
       ...props
     }
   }
@@ -52,7 +55,7 @@ describe('Tray', () => {
 
   it('renders a checkbox', () => {
     const {getByLabelText} = render(<Tray {...defaultProps()} />)
-    expect(getByLabelText('Show suggestions when typing').checked).toBe(true)
+    expect(getByLabelText('Show suggestions when typing')).toBeChecked()
   })
 
   it('renders comments', () => {

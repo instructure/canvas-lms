@@ -30,7 +30,15 @@ import I18n from 'i18n!CommentLibrary'
 import Comment from './Comment'
 import TrayTextArea from './TrayTextArea'
 
-const Tray = ({isOpen, setIsOpen, onItemClick, comments}) => {
+const Tray = ({
+  isOpen,
+  setIsOpen,
+  onItemClick,
+  comments,
+  onDeleteComment,
+  onAddComment,
+  isAddingComment
+}) => {
   return (
     <InstuiTray
       size="regular"
@@ -94,12 +102,13 @@ const Tray = ({isOpen, setIsOpen, onItemClick, comments}) => {
                 key={commentItem._id}
                 onClick={onItemClick}
                 id={commentItem._id}
+                onDelete={() => onDeleteComment(commentItem._id)}
                 comment={commentItem.comment}
               />
             ))}
           </Flex.Item>
           <Flex.Item padding="medium small small small">
-            <TrayTextArea />
+            <TrayTextArea onAdd={onAddComment} isAdding={isAddingComment} />
           </Flex.Item>
         </Flex>
       </View>
@@ -116,7 +125,10 @@ Tray.propTypes = {
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onItemClick: PropTypes.func.isRequired,
-  setIsOpen: PropTypes.func.isRequired
+  setIsOpen: PropTypes.func.isRequired,
+  onAddComment: PropTypes.func.isRequired,
+  onDeleteComment: PropTypes.func.isRequired,
+  isAddingComment: PropTypes.bool.isRequired
 }
 
 export default Tray

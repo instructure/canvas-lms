@@ -28,7 +28,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!CommentLibrary'
 
-const Comment = ({comment, onClick}) => {
+const Comment = ({comment, onClick, onDelete}) => {
   const [isTruncated, setIsTruncated] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -71,6 +71,7 @@ const Comment = ({comment, onClick}) => {
             <IconButton
               screenReaderLabel={I18n.t('Delete comment: %{comment}', {comment})}
               renderIcon={IconTrashLine}
+              onClick={onDelete}
               withBackground={false}
               withBorder={false}
               size="small"
@@ -97,7 +98,8 @@ const Comment = ({comment, onClick}) => {
 
 Comment.propTypes = {
   comment: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired
 }
 
 export default Comment

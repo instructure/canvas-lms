@@ -25,7 +25,8 @@ describe('CommentArea', () => {
 
   const defaultProps = () => {
     return {
-      getTextAreaRef: getTextAreaRefMock
+      getTextAreaRef: getTextAreaRefMock,
+      courseId: '1'
     }
   }
 
@@ -46,8 +47,7 @@ describe('CommentArea', () => {
   describe('with the comment library flag enabled', () => {
     beforeEach(() => {
       window.ENV = {
-        assignment_comment_library_feature_enabled: true,
-        context_asset_string: 'course_1'
+        assignment_comment_library_feature_enabled: true
       }
     })
 

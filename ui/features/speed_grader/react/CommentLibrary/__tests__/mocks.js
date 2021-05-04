@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import mockGraphqlQuery from '@canvas/graphql-query-mock'
+import {DELETE_COMMENT_MUTATION, CREATE_COMMENT_MUTATION} from '../graphql/Mutations'
 import {COMMENTS_QUERY} from '../graphql/Queries'
 
 export const commentBankItemMocks = ({courseId = '1', numberOfComments = '10'} = {}) => [
@@ -43,3 +45,31 @@ export const commentBankItemMocks = ({courseId = '1', numberOfComments = '10'} =
     }
   }
 ]
+
+export async function makeCreateMutationMock({overrides = {}, variables = {}} = {}) {
+  const result = await mockGraphqlQuery(CREATE_COMMENT_MUTATION, overrides, variables)
+
+  return [
+    {
+      request: {
+        query: CREATE_COMMENT_MUTATION,
+        variables
+      },
+      result
+    }
+  ]
+}
+
+export async function makeDeleteCommentMutation({overrides = {}, variables = {}} = {}) {
+  const result = await mockGraphqlQuery(DELETE_COMMENT_MUTATION, overrides, variables)
+
+  return [
+    {
+      request: {
+        query: DELETE_COMMENT_MUTATION,
+        variables
+      },
+      result
+    }
+  ]
+}

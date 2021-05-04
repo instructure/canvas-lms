@@ -18,17 +18,16 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useQuery} from 'react-apollo'
+import {useQuery, useMutation} from 'react-apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {DELETE_COMMENT_MUTATION, CREATE_COMMENT_MUTATION} from './graphql/Mutations'
 import {COMMENTS_QUERY} from './graphql/Queries'
 import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
 
-const LibraryManager = ({setComment}) => {
-  const courseId = ENV.context_asset_string.split('_')[1]
-
+const LibraryManager = ({setComment, courseId}) => {
   const {loading, error, data} = useQuery(COMMENTS_QUERY, {
     variables: {courseId}
   })
@@ -42,6 +41,84 @@ const LibraryManager = ({setComment}) => {
       type: 'error'
     })
   }, [error])
+
+  const getCachedComments = cache => {
+    return JSON.parse(
+      JSON.stringify(
+        cache.readQuery({
+          query: COMMENTS_QUERY,
+          variables: {courseId}
+        })
+      )
+    )
+  }
+
+  const writeComments = (cache, comments) => {
+    cache.writeQuery({
+      query: COMMENTS_QUERY,
+      variables: {courseId},
+      data: comments
+    })
+  }
+
+  const removeDeletedCommentFromCache = (cache, result) => {
+    const commentsFromCache = getCachedComments(cache)
+    const resultId = result.data.deleteCommentBankItem.commentBankItemId
+    const updatedComments = commentsFromCache.course.commentBankItemsConnection.nodes.filter(
+      comment => comment._id !== resultId
+    )
+
+    commentsFromCache.course.commentBankItemsConnection.nodes = updatedComments
+    writeComments(cache, commentsFromCache)
+  }
+
+  const addCommentToCache = (cache, result) => {
+    const commentsFromCache = getCachedComments(cache)
+    const newComment = result.data.createCommentBankItem.commentBankItem
+    const updatedComments = [
+      ...commentsFromCache.course.commentBankItemsConnection.nodes,
+      newComment
+    ]
+
+    commentsFromCache.course.commentBankItemsConnection.nodes = updatedComments
+    writeComments(cache, commentsFromCache)
+  }
+
+  const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
+    update: removeDeletedCommentFromCache,
+    onCompleted(_data) {
+      showFlashAlert({
+        message: I18n.t('Comment destroyed'),
+        type: 'success'
+      })
+    },
+    onError(_error) {
+      showFlashAlert({
+        message: I18n.t('Error deleting comment'),
+        type: 'error'
+      })
+    }
+  })
+
+  const [addComment, {loading: isAddingComment}] = useMutation(CREATE_COMMENT_MUTATION, {
+    update: addCommentToCache,
+    onCompleted(_data) {
+      showFlashAlert({
+        message: I18n.t('Comment added'),
+        type: 'success'
+      })
+    },
+    onError(_error) {
+      showFlashAlert({
+        message: I18n.t('Error creating comment'),
+        type: 'error'
+      })
+    }
+  })
+
+  const handleAddComment = comment => {
+    addComment({variables: {comment, courseId}})
+  }
 
   if (loading) {
     return (
@@ -59,12 +136,17 @@ const LibraryManager = ({setComment}) => {
     <Library
       comments={data?.course?.commentBankItemsConnection?.nodes || []}
       setComment={setComment}
+      onAddComment={handleAddComment}
+      onDeleteComment={id => deleteComment({variables: {id}})}
+      isAddingComment={isAddingComment}
+      courseId={courseId}
     />
   )
 }
 
 LibraryManager.propTypes = {
-  setComment: PropTypes.func.isRequired
+  setComment: PropTypes.func.isRequired,
+  courseId: PropTypes.string.isRequired
 }
 
 export default LibraryManager

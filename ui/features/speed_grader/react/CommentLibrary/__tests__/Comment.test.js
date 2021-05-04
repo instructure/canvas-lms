@@ -21,17 +21,19 @@ import {fireEvent, render} from '@testing-library/react'
 import Comment from '../Comment'
 
 describe('Comment', () => {
-  let onClickMock
+  let onClickMock, onDeleteMock
 
   const defaultProps = (props = {}) => {
     return {
       comment: 'My assignment comment',
       onClick: onClickMock,
+      onDelete: onDeleteMock,
       ...props
     }
   }
 
   beforeEach(() => {
+    onDeleteMock = jest.fn()
     onClickMock = jest.fn()
   })
 
@@ -50,5 +52,11 @@ describe('Comment', () => {
     const {getByText} = render(<Comment {...defaultProps()} />)
     fireEvent.click(getByText('My assignment comment'))
     expect(onClickMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls the onDelete prop when the trash icon is clicked', () => {
+    const {getByText} = render(<Comment {...defaultProps()} />)
+    fireEvent.click(getByText('Delete comment: My assignment comment').closest('button'))
+    expect(onDeleteMock).toHaveBeenCalledTimes(1)
   })
 })

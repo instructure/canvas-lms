@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,22 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import {ApolloProvider, createClient} from '@canvas/apollo'
-import LibraryManager from './LibraryManager'
+import {gql} from '@canvas/apollo'
 
-const client = createClient()
+export const CREATE_COMMENT_MUTATION = gql`
+  mutation CreateCommentBankItem($courseId: ID!, $comment: String!) {
+    createCommentBankItem(input: {courseId: $courseId, comment: $comment}) {
+      commentBankItem {
+        _id
+        comment
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
 
-export default function CommentLibrary({setComment, courseId}) {
-  return (
-    <ApolloProvider client={client}>
-      <LibraryManager setComment={setComment} courseId={courseId} />
-    </ApolloProvider>
-  )
-}
-
-CommentLibrary.PropTypes = {
-  setComment: PropTypes.func.isRequired,
-  courseId: PropTypes.string.isRequired
-}
+export const DELETE_COMMENT_MUTATION = gql`
+  mutation DeleteCommentBankItem($id: ID!) {
+    deleteCommentBankItem(input: {id: $id}) {
+      commentBankItemId
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`

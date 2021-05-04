@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CommentLibrary from './CommentLibrary'
@@ -30,12 +31,12 @@ const textAreaProps = {
   resize: 'vertical'
 }
 
-export default function CommentArea({getTextAreaRef}) {
+export default function CommentArea({getTextAreaRef, courseId}) {
   const [comment, setComment] = useState('')
   const showCommentLibrary = ENV.assignment_comment_library_feature_enabled
   return (
     <>
-      {showCommentLibrary && <CommentLibrary setComment={setComment} />}
+      {showCommentLibrary && <CommentLibrary setComment={setComment} courseId={courseId} />}
       <TextArea
         value={comment}
         onChange={e => setComment(e.target.value)}
@@ -44,4 +45,9 @@ export default function CommentArea({getTextAreaRef}) {
       />
     </>
   )
+}
+
+CommentArea.propTypes = {
+  getTextAreaRef: PropTypes.func.isRequired,
+  courseId: PropTypes.string.isRequired
 }
