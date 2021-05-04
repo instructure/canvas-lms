@@ -467,7 +467,7 @@ class StreamItem < ActiveRecord::Base
   public
 
   def destroy_stream_item_instances
-    stream_item_instances.shard(self).activate do |scope|
+    stream_item_instances.preload(:context).shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !invalidate_immediately && user_ids.count > 100
         StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY)
