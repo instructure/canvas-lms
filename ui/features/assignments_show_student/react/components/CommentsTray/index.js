@@ -66,7 +66,6 @@ export default function CommentsTray(props) {
       onDismiss={props.closeTray}
       size="regular"
       placement="end"
-      shouldCloseOnDocumentClick
     >
       <div style={{position: 'absolute', top: 0, bottom: 0, width: '100%'}}>
         <Flex direction="column" height="100%">

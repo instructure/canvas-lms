@@ -22,7 +22,11 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CommentContent from '../CommentsTray/CommentContent'
 import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
-import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '@canvas/assignments/graphql/studentMocks'
+import {
+  mockAssignmentAndSubmission,
+  mockQuery,
+  mockSubmission
+} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
@@ -53,7 +57,8 @@ async function mockCreateSubmissionComment() {
     id: '1',
     comment: 'lion',
     fileIds: [],
-    mediaObjectId: null
+    mediaObjectId: null,
+    mediaObjectType: null
   }
   const overrides = {
     DateTime: '2010-11-16T23:59:59-06:00',
@@ -77,6 +82,7 @@ async function mockComments(overrides = {}) {
 
 let mockedSetOnFailure = null
 let mockedSetOnSuccess = null
+const originalENV = window.ENV
 
 function mockContext(children) {
   return (
@@ -97,8 +103,13 @@ describe('CommentsTrayBody', () => {
   })
 
   beforeEach(() => {
+    window.ENV = {...originalENV, RICH_CONTENT_APP_HOST: '', JWT: '123'}
     mockedSetOnFailure = jest.fn().mockResolvedValue({})
     mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+  })
+
+  afterEach(() => {
+    window.ENV = originalENV
   })
 
   describe('hidden submissions', () => {

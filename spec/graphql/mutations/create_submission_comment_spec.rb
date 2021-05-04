@@ -40,7 +40,7 @@ describe Mutations::CreateSubmissionComment do
     stringify ? "\"#{value}\"" : value
   end
 
-  def mutation_str(submission_id: nil, attempt: nil, comment: 'hello', file_ids: [], media_object_id: nil)
+  def mutation_str(submission_id: nil, attempt: nil, comment: 'hello', file_ids: [], media_object_id: nil, media_object_type: nil)
     <<~GQL
       mutation {
         createSubmissionComment(input: {
@@ -48,6 +48,7 @@ describe Mutations::CreateSubmissionComment do
           comment: #{value_or_null(comment)}
           fileIds: #{file_ids}
           mediaObjectId: #{value_or_null(media_object_id)}
+          mediaObjectType: #{value_or_null(media_object_type)}
           submissionId: #{value_or_null(submission_id || @submission.id)}
         }) {
           submissionComment {
@@ -179,7 +180,7 @@ describe Mutations::CreateSubmissionComment do
     end
   end
 
-  describe 'media_object_id argument' do
+  describe 'media objects' do
     before(:once) do
       @media_object = media_object
     end
@@ -189,6 +190,12 @@ describe Mutations::CreateSubmissionComment do
       expect(
         result.dig(:data, :createSubmissionComment, :submissionComment, :mediaObject, :_id)
       ).to eq @media_object.media_id
+    end
+
+    it 'saves the media comment type on the created submission comment object' do
+      run_mutation(media_object_id: @media_object.media_id, media_object_type: 'video')
+      comment = SubmissionComment.find_by(media_comment_id: @media_object.media_id)
+      expect(comment.media_comment_type).to eq 'video'
     end
 
     it 'gracefully handles the media object not being found' do

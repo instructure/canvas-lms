@@ -36,6 +36,7 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../helpers/UploadMediaTranslations'
+import {getRCSAuthenticationHeaders, getRCSOriginFromHost} from '@instructure/canvas-rce'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
   return {id: key, label: closedCaptionLanguages[key]}
@@ -95,9 +96,10 @@ export default class CommentTextArea extends Component {
     }
 
     const {submissionComments} = JSON.parse(JSON.stringify(cache.readQuery(this.queryVariables())))
-    submissionComments.commentsConnection.nodes = submissionComments.commentsConnection.nodes.concat(
-      [result.data.createSubmissionComment.submissionComment]
-    )
+    submissionComments.commentsConnection.nodes =
+      submissionComments.commentsConnection.nodes.concat([
+        result.data.createSubmissionComment.submissionComment
+      ])
     cache.writeQuery({
       ...this.queryVariables(),
       data: {submissionComments}
@@ -138,9 +140,9 @@ export default class CommentTextArea extends Component {
 
   onSendComment = createSubmissionComment => {
     this.setState({hasError: false, uploadingComments: true}, async () => {
-      const mediaObjectId = this.state.mediaObject
-        ? this.state.mediaObject.media_object.media_id
-        : null
+      const mediaObject = this.state.mediaObject || {
+        media_object: {media_id: null, media_type: null}
+      }
       let attachmentIds = []
       const filesWithoutMediaObject = this.state.currentFiles.filter(
         file => file !== this.state.mediaObject
@@ -167,7 +169,8 @@ export default class CommentTextArea extends Component {
           submissionAttempt: this.props.submission.attempt,
           comment: this.state.commentText,
           fileIds: attachmentIds,
-          mediaObjectId
+          mediaObjectId: mediaObject.media_object.media_id,
+          mediaObjectType: mediaObject.media_object.media_type
         }
       })
 
@@ -214,6 +217,21 @@ export default class CommentTextArea extends Component {
         }
       }
     )
+  }
+
+  handleMediaUpload = (error, uploadData, createSubmissionComment) => {
+    if (error) {
+      const errorMessage =
+        error.file?.size > error.maxFileSize * 1024 * 1024
+          ? I18n.t('File size exceeds the maximum of %{max} MB', {max: error.maxFileSize})
+          : UploadMediaStrings.UPLOADING_ERROR
+
+      this.context.setOnFailure(errorMessage)
+    } else {
+      this.setState({mediaObject: uploadData.mediaObject}, () => {
+        this.onSendComment(createSubmissionComment)
+      })
+    }
   }
 
   render() {
@@ -292,14 +310,24 @@ export default class CommentTextArea extends Component {
                   <ScreenReaderContent>{I18n.t('Record Audio/Video')}</ScreenReaderContent>
                 </Button>
                 <UploadMedia
-                  onDismiss={this.onMediaModalDismiss}
                   contextId={this.props.assignment.env.courseId}
                   contextType="course"
+                  languages={languages}
+                  liveRegion={() => document.getElementById('flash_screenreader_holder')}
+                  onDismiss={this.onMediaModalDismiss}
+                  onUploadComplete={(error, data) => {
+                    this.handleMediaUpload(error, data, createSubmissionComment)
+                  }}
                   open={this.state.mediaModalOpen}
+                  rcsConfig={{
+                    contextId: this.props.assignment.env.courseId,
+                    contextType: 'course',
+                    origin: getRCSOriginFromHost(ENV.RICH_CONTENT_APP_HOST),
+                    headers: getRCSAuthenticationHeaders(ENV.JWT)
+                  }}
                   tabs={{embed: false, record: true, upload: true}}
                   uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
-                  liveRegion={() => document.getElementById('flash_screenreader_holder')}
-                  languages={languages}
+                  disableSubmitWhileUploading
                 />
                 <Button
                   disabled={

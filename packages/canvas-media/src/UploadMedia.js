@@ -42,6 +42,7 @@ export const PANELS = {
 
 export default class UploadMedia extends React.Component {
   static propTypes = {
+    disableSubmitWhileUploading: bool,
     languages: arrayOf(
       shape({
         id: string,
@@ -53,7 +54,7 @@ export default class UploadMedia extends React.Component {
       contextId: string,
       contextType: string,
       origin: string.isRequired,
-      headers: shape({Authentication: string.isRequired})
+      headers: shape({Authorization: string.isRequired})
     }),
     onStartUpload: func,
     onUploadComplete: func,
@@ -66,6 +67,10 @@ export default class UploadMedia extends React.Component {
     uploadMediaTranslations: translationShape,
     // for testing
     computerFile: instanceOf(File)
+  }
+
+  static defaultProps = {
+    disableSubmitWhileUploading: false
   }
 
   constructor(props) {
@@ -93,6 +98,10 @@ export default class UploadMedia extends React.Component {
   }
 
   isReady = () => {
+    if (this.props.disableSubmitWhileUploading && this.state.uploading) {
+      return false
+    }
+
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER:
         return !!this.state.computerFile
@@ -117,9 +126,15 @@ export default class UploadMedia extends React.Component {
   }
 
   uploadFile(file) {
-    this.setState({uploading: true})
-    this.props.onStartUpload && this.props.onStartUpload(file)
-    saveMediaRecording(file, this.props.rcsConfig, this.saveMediaCallback, this.onSaveMediaProgress)
+    this.setState({uploading: true}, () => {
+      this.props.onStartUpload && this.props.onStartUpload(file)
+      saveMediaRecording(
+        file,
+        this.props.rcsConfig,
+        this.saveMediaCallback,
+        this.onSaveMediaProgress
+      )
+    })
   }
 
   onSaveMediaProgress = progress => {
@@ -240,11 +255,8 @@ export default class UploadMedia extends React.Component {
       return null
     }
 
-    const {
-      CLOSE_TEXT,
-      SUBMIT_TEXT,
-      PROGRESS_LABEL
-    } = this.props.uploadMediaTranslations.UploadMediaStrings
+    const {CLOSE_TEXT, SUBMIT_TEXT, PROGRESS_LABEL} =
+      this.props.uploadMediaTranslations.UploadMediaStrings
     return (
       <Modal.Footer>
         {this.state.uploading && (
