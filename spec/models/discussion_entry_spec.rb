@@ -89,6 +89,23 @@ describe DiscussionEntry do
     expect(entry.grants_right?(@student, :read)).to be(false)
   end
 
+  context "mentions" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @mentioned_student = @student
+      student_in_course(:active_all => true)
+      @topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+    end
+
+    it 'should create on entry save' do
+      entry = @topic.discussion_entries.new(user: @student)
+      allow(entry).to receive(:message).and_return("<p>hello</p><span data-mention=#{@mentioned_student.id} </span> what's up dude")
+      expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
+      expect(entry.mentions.take.user_id).to eq @mentioned_student.id
+    end
+  end
+
   context "entry notifications" do
     before :once do
       course_with_teacher(:active_all => true)

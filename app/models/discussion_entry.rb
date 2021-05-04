@@ -59,12 +59,23 @@ class DiscussionEntry < ActiveRecord::Base
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
+  # parse_and_create_mentions has to run before has_a_broadcast_policy and the
+  # after_save hook it adds.
+  after_save :parse_and_create_mentions
   has_a_broadcast_policy
   attr_accessor :new_record_header
 
   workflow do
     state :active
     state :deleted
+  end
+
+  def parse_and_create_mentions
+    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]').map(&:values)
+    user_ids = mention_data.map(&:first)
+    User.where(id: user_ids).each do |u|
+      mentions.create!(user: u, root_account_id: root_account_id)
+    end
   end
 
   def course_broadcast_data
