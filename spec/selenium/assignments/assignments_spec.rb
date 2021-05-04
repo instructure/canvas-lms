@@ -417,6 +417,8 @@ describe "assignments" do
     context "student annotation" do
       before do
         Account.site_admin.enable_feature!(:annotated_document_submissions)
+        @course.account.settings[:usage_rights_required] = true
+        @course.account.save!
         attachment = attachment_model(content_type: "application/pdf", context: @course)
         @assignment = @course.assignments.create(name: "Student Annotation", submission_types: 'student_annotation,online_text_entry', annotatable_attachment_id: attachment.id)
       end
