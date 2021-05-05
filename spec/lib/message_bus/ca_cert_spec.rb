@@ -22,26 +22,20 @@ require 'spec_helper'
 describe MessageBus::CaCert do
 
   let(:cert_location){ "/tmp/fake_pulsar_cert_#{SecureRandom.hex(3)}.pem" }
-  let(:fake_uri){ 'http://test.host.fake/mb_cert.pem' }
+  let(:fake_vault_path){ 'fake/vault/path' }
   let(:conf_hash) do
-    { 'PULSAR_CERT_URI' => fake_uri, 'PULSAR_CERT_PATH' => cert_location }
+    {
+      'PULSAR_CERT_VAULT_PATH' => fake_vault_path,
+      'PULSAR_CERT_PATH' => cert_location
+    }
   end
 
   before(:each) do
     skip("pulsar config required to test") unless MessageBus.enabled?
     File.delete(cert_location) if File.exist?(cert_location)
-    fake_conn_cls = Class.new do
-      def start(); end
-
-      def finish(); end
-
-      def get(_path)
-        cert_response = "this-is-the-pulsar-cert-[NOT]"
-        yield cert_response
-      end
-    end
-    fake_connection = fake_conn_cls.new
-    allow(CanvasHttp).to receive(:connection_for_uri).and_return(fake_connection)
+    allow(Canvas::Vault).to receive(:read).with(fake_vault_path).and_return({
+      certificate: "this-is-the-pulsar-cert-[NOT]"
+    })
     LocalCache.cache.clear
   end
 
@@ -52,11 +46,12 @@ describe MessageBus::CaCert do
 
   it "gets any configured cert url to disk" do
     MessageBus::CaCert.ensure_presence!(conf_hash)
-    expect(File.exist?(cert_location)).to be_truthy
+    expect(File.read(cert_location)).to eq("this-is-the-pulsar-cert-[NOT]")
   end
 
   it "won't fight with itself on cert writing" do
-    expect(MessageBus::CaCert).to receive(:write_cert).once.and_call_original
+    File.delete(cert_location) if File.exist?(cert_location)
+    expect(File.exist?(cert_location)).to be_falsey
     t1 = Thread.new do
       sleep(0.003)
       MessageBus::CaCert.ensure_presence!(conf_hash)
@@ -72,5 +67,6 @@ describe MessageBus::CaCert do
       MessageBus::CaCert.ensure_presence!(conf_hash)
     end
     [t1, t2, t3].map(&:join)
+    expect(File.read(cert_location)).to eq("this-is-the-pulsar-cert-[NOT]")
   end
 end

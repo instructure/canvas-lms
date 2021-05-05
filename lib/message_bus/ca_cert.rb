@@ -42,41 +42,24 @@ module MessageBus
       end
       return true if File.exist?(cert_path_on_disk)
 
-      cert_uri = config_hash.fetch("PULSAR_CERT_URI")
-      lock_key = "message_bus_cert_file"
-      nonce = LocalCache.lock(lock_key, {})
-      if nonce
-        if File.exist?(cert_path_on_disk)
-          # it got written by another process after checking but before obtaining the lock
-          LocalCache.unlock(lock_key, nonce)
-          return true
-        end
-        self.write_cert(cert_uri, cert_path_on_disk)
-        LocalCache.unlock(lock_key, nonce)
-        return true
-      else
-        # some other process on the box is currently writing the cert, give it a minute
-        wait_count = 0
-        return true if File.exist?(cert_path_on_disk)
-
-        while wait_count <= 5 do
-          sleep(0.2)
-          return true if File.exist?(cert_path_on_disk)
-          wait_count += 1
-        end
-        raise ::MessageBus::CertSyncError, "Failure to synchronize politely on #{cert_path_on_disk} while fetching message bus hash"
-      end
+      cert_vault_path = config_hash.fetch("PULSAR_CERT_VAULT_PATH")
+      process_file_version = cert_path_on_disk.gsub(".pem", "-#{Process.pid}-#{Thread.current.object_id}.pem")
+      self.write_cert(cert_vault_path, process_file_version)
+      # it's possible another process has already
+      # moved this file into place, in which case do nothing.
+      return true if File.exist?(cert_path_on_disk)
+      # renaming is atomic, and overwrites silently.
+      # if two processes are racing and each write
+      # their own version of the file and rename them into place, the last write wins,
+      # which is fine because the content is the same
+      File.rename(process_file_version, cert_path_on_disk)
+      true
     end
 
-    def self.write_cert(uri, path)
-      cert_uri = URI.parse(uri)
-      conn = CanvasHttp.connection_for_uri(cert_uri)
-      conn.start()
-      conn.get(cert_uri.path) do |response|
-        File.open(path, "wb") { |f| f.write(response) }
-      end
-    ensure
-      conn.finish()
+    def self.write_cert(cert_vault_path, process_file_version)
+      vault_contents = Canvas::Vault.read(cert_vault_path)
+      cert_string = vault_contents.fetch(:certificate)
+      File.open(process_file_version, "wb") { |f| f.write(cert_string) }
     end
   end
 end
