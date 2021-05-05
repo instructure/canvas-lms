@@ -20,9 +20,9 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
-  gem 'rails', '6.0.3.6'
+  gem 'rails', '6.0.3.7'
 else
-  gem 'rails', '6.1.3'
+  gem 'rails', '6.1.3.2'
 end
   gem 'irb', '1.3.5'
 

@@ -51,7 +51,7 @@ class GradebooksController < ApplicationController
     # teacher in the course and they are not trying to view another
     # user's grades, redirect them to the gradebook
     if @presenter.user_needs_redirection?
-      return redirect_to polymorphic_url([@context, 'gradebook'])
+      return redirect_to polymorphic_url([@context, :gradebook])
     end
 
     if !@presenter.student || !student_enrollment
@@ -238,7 +238,7 @@ class GradebooksController < ApplicationController
       log_asset_access(['grades', @context], 'grades')
       if requested_gradebook_view.present?
         update_preferred_gradebook_view!(requested_gradebook_view) if requested_gradebook_view != preferred_gradebook_view
-        redirect_to polymorphic_url([@context, 'gradebook'])
+        redirect_to polymorphic_url([@context, :gradebook])
         return
       end
 
@@ -1126,7 +1126,7 @@ class GradebooksController < ApplicationController
   def change_gradebook_version
     @current_user.migrate_preferences_if_needed
     @current_user.set_preference(:gradebook_version, params[:version])
-    redirect_to polymorphic_url([@context, 'gradebook'])
+    redirect_to polymorphic_url([@context, :gradebook])
   end
 
   def visible_modules?
