@@ -287,7 +287,7 @@ describe "groups" do
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
         # Verifies group member can access the teacher's group discussion & that it's the correct discussion
-        expect_new_page_load { f('.discussion-title').click }
+        expect_new_page_load{f("[data-testid='discussion-link-#{dt.id}']").click}
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
@@ -307,34 +307,34 @@ describe "groups" do
       end
 
       it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626, ignore_js_errors: true do
-        DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
         get discussions_page
-        expect(ff('.discussion-title').size).to eq 1
+        expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
         f('.discussions-index-manage-menu').click
         wait_for_animations
         f('#delete-discussion-menu-option').click
         f('#confirm_delete_discussions').click
         wait_for_ajaximations
-        expect(f(".discussions-container__wrapper")).not_to contain_css('.discussion-title')
+        expect(f(".discussions-container__wrapper")).not_to contain_css("[data-testid='discussion-link-#{dt.id}']")
       end
 
       it "should not be able to delete a discussion by a different creator", priority: "1", test_id: 420009 do
-        DiscussionTopic.create!(context: @testgroup.first,
+        dt = DiscussionTopic.create!(context: @testgroup.first,
                                 user: @students.first,
                                 title: 'Back to the Future day',
                                 message: 'There are no hover boards!')
         get discussions_page
-        expect(ff('.discussion-title').size).to eq 1
+        expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
         expect(f(".discussions-container__wrapper")).not_to contain_css('#discussions-index-manage-menu')
       end
 
       it "should allow group members to edit their discussions", priority: "1", test_id: 312866 do
-        DiscussionTopic.create!(context: @testgroup.first,
+        dt = DiscussionTopic.create!(context: @testgroup.first,
                                 user: @user,
                                 title: 'White Snow',
                                 message: 'Where are my skis?')
         get discussions_page
-        f('.discussion-title').click
+        f("[data-testid='discussion-link-#{dt.id}']").click
         f('.edit-btn').click
         expect(driver.title).to eq 'Edit Discussion Topic'
         type_in_tiny('textarea[name=message]','The slopes are ready,')
@@ -344,12 +344,12 @@ describe "groups" do
       end
 
       it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
-        DiscussionTopic.create!(context: @testgroup.first,
+        dt = DiscussionTopic.create!(context: @testgroup.first,
                                 user: @students.first,
                                 title: 'White Snow',
                                 message: 'Where are my skis?')
         get discussions_page
-        f('.discussion-title').click
+        f("[data-testid='discussion-link-#{dt.id}']").click
         expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
