@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!k5_dashboard'
 
+import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
@@ -68,30 +69,34 @@ export const fetchHomeroomAnnouncements = cards =>
       )
   ).then(announcements => announcements.filter(a => a))
 
-export const HomeroomPage = props => {
-  const {cards, visible} = props
+export const HomeroomPage = ({cards, cardsSettled, visible}) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
 
-  useEffect(() => {
-    setDashboardCards(
-      createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
-        headingLevel: 'h3'
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cards])
+  useImmediate(
+    () => {
+      if (cards) {
+        setDashboardCards(
+          createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
+            headingLevel: 'h3'
+          })
+        )
+      }
 
-  useEffect(() => {
-    if (cards) {
-      setAnnouncementsLoading(true)
-      fetchHomeroomAnnouncements(cards)
-        .then(setHomeroomAnnouncements)
-        .catch(showFlashError(I18n.t('Failed to load announcements.')))
-        .finally(() => setAnnouncementsLoading(false))
-    }
-  }, [cards])
+      if (cardsSettled) {
+        setAnnouncementsLoading(true)
+        fetchHomeroomAnnouncements(cards)
+          .then(setHomeroomAnnouncements)
+          .catch(showFlashError(I18n.t('Failed to load announcements.')))
+          .finally(() => setAnnouncementsLoading(false))
+      }
+    },
+    [cards, cardsSettled],
+    // Need to do deep comparison on cards to only re-trigger if they actually changed
+    // (they shouldn't after they're set the first time)
+    {deep: true}
+  )
 
   const NUM_CARD_SKELETONS = ENV?.INITIAL_NUM_K5_CARDS || 5
   const skeletonCards = []
@@ -141,7 +146,8 @@ export const HomeroomPage = props => {
 }
 
 HomeroomPage.propTypes = {
-  cards: PropTypes.array.isRequired,
+  cards: PropTypes.array,
+  cardsSettled: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired
 }
 
