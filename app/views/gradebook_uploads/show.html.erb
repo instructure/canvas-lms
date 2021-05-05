@@ -86,7 +86,7 @@
 <div id="no_changes_detected" style="display:none;">
   <h2><%= t('headers.no_changes', "There were no changes detected in the gradebook you uploaded.") %></h2>
   <p>
-  <%= link_to(t('links.back', "Go back to Gradebook"), polymorphic_url([@context, 'gradebook'])) %>
+  <%= link_to(t('links.back', "Go back to Gradebook"), polymorphic_url([@context, :gradebook])) %>
   </p>
 
 </div>

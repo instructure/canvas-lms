@@ -41,7 +41,7 @@
   <div id="gradebook_header" class="subheadContent" style="display:none;">
     <div class="subheadContent subheadContent--flex-start">
       <div id="speedgrader-icons" class="gradebookActions">
-        <a href="<%= polymorphic_url([@context, 'gradebook']) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
+        <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
