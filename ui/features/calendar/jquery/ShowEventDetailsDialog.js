@@ -323,6 +323,11 @@ export default class ShowEventDetailsDialog {
           } else {
             $('#reservations').remove()
           }
+
+          // If we've modified content of the popover, that means the contents / size of the popover has
+          // probably changed. If this is the case, instead of waiting for the next update tick in 200ms,
+          // force the positioning calculation now.
+          this.popover.position()
         })
         .catch(() => $('#reservations').remove())
     }
