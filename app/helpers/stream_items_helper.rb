@@ -95,12 +95,12 @@ module StreamItemsHelper
   def extract_path(category, item, user)
     case category
     when "Announcement", "DiscussionTopic"
-      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id"\
+      polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
                        => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
-      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id"\
+      polymorphic_path([item.context_type.underscore.to_sym, category.underscore.to_sym], :"#{item.context_type.underscore}_id"\
                        => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.context_id))
     when "AssessmentRequest"
       submission = item.data.asset
@@ -120,7 +120,7 @@ module StreamItemsHelper
       context.type = item.context_type
       context.id = item.context_id
       context.name = asset.context_short_name
-      context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], :"#{context.type.underscore}_id" => Shard.short_id_for(context.id))
+      context.linked_to = polymorphic_path([context.type.underscore.to_sym, category.underscore.pluralize.to_sym], :"#{context.type.underscore}_id" => Shard.short_id_for(context.id))
     when "Conversation"
       context.type = "User"
       last_author = item.participant.last_message.author
