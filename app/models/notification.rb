@@ -63,6 +63,7 @@ class Notification < ActiveRecord::Base
     "calendar",
     "conversation_message",
     "course_content",
+    "discussion_mention",
     "due_date",
     "grading",
     "invitation",
@@ -86,6 +87,7 @@ class Notification < ActiveRecord::Base
     "Assignment Unmuted",
     "Collaboration Invitation",
     "Conversation Message",
+    "Discussion Mention",
     "Event Date Changed",
     "New Announcement",
     "New Event Created",
@@ -119,6 +121,7 @@ class Notification < ActiveRecord::Base
     # Discussions
     'Discussion',
     'DiscussionEntry',
+    'DiscussionMention',
 
     # Scheduling
     'Student Appointment Signups',
@@ -343,6 +346,8 @@ class Notification < ActiveRecord::Base
       FREQ_NEVER
     when 'DiscussionEntry'
       FREQ_DAILY
+    when 'DiscussionMention'
+      FREQ_IMMEDIATELY
     when 'Announcement Reply'
       FREQ_NEVER
     when 'Due Date'
@@ -415,6 +420,7 @@ class Notification < ActiveRecord::Base
     t 'names.confirm_sms_communication_channel', 'Confirm Sms Communication Channel'
     t 'names.content_export_failed', 'Content Export Failed'
     t 'names.content_export_finished', 'Content Export Finished'
+    t 'Discussion Mention'
     t 'names.enrollment_accepted', 'Enrollment Accepted'
     t 'names.enrollment_invitation', 'Enrollment Invitation'
     t 'names.enrollment_notification', 'Enrollment Notification'
@@ -488,6 +494,7 @@ class Notification < ActiveRecord::Base
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
+    t 'DiscussionMention'
     t 'categories.due_date', 'Due Date'
     t 'categories.files', 'Files'
     t 'categories.grading', 'Grading'
@@ -523,6 +530,8 @@ class Notification < ActiveRecord::Base
       t(:discussion_display, 'Discussion')
     when 'DiscussionEntry'
       t(:discussion_post_display, 'Discussion Post')
+    when 'DiscussionMention'
+      t('Discussion Mention')
     when 'Due Date'
       t(:due_date_display, 'Due Date')
     when 'Grading'
@@ -595,6 +604,8 @@ EOS
       t(:discussion_description, 'New discussion topic in your course')
     when 'DiscussionEntry'
       t(:discussion_post_description, "New discussion post in a topic you're subscribed to")
+    when 'DiscussionMention'
+      t("New mention in a discussion post.")
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'
