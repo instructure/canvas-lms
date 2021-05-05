@@ -29,7 +29,8 @@ import {
   createNewCourse,
   getAssignmentGroupTotals,
   getAssignmentGrades,
-  getAccountsFromEnrollments
+  getAccountsFromEnrollments,
+  getTotalGradeStringFromEnrollments
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -467,5 +468,70 @@ describe('getAccountsFromEnrollments', () => {
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)
+  })
+})
+
+describe('getTotalGradeStringFromEnrollments', () => {
+  it("returns n/a if there's no score or grade", () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: null,
+          current_grade: null
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('n/a')
+  })
+
+  it("returns just the percent with 2 decimals if there's no grade", () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 84,
+          current_grade: null
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('84.00%')
+  })
+
+  it('returns formatted score and grade if both exist', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 87.34,
+          current_grade: 'B+'
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('87.34% (B+)')
+  })
+
+  it('finds the correct enrollment if multiple are returned', () => {
+    const enrollments = [
+      {
+        user_id: '1',
+        grades: {
+          current_score: 1
+        }
+      },
+      {
+        user_id: '2',
+        grades: {
+          current_score: 2
+        }
+      },
+      {
+        user_id: '3',
+        grades: {
+          current_score: 3
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('2.00%')
   })
 })

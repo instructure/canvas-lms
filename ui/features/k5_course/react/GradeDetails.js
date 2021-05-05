@@ -27,7 +27,11 @@ import {Table} from '@instructure/ui-table'
 
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {getAssignmentGrades, getAssignmentGroupTotals} from '@canvas/k5/react/utils'
+import {
+  getAssignmentGrades,
+  getAssignmentGroupTotals,
+  getTotalGradeStringFromEnrollments
+} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'
@@ -77,10 +81,7 @@ const GradeDetails = ({
     loading: setLoadingTotalGrade,
     success: useCallback(
       data => {
-        const score = data.find(({user_id}) => user_id === currentUser.id)?.grades?.current_score
-        setTotalGrade(
-          score == null ? I18n.t('n/a') : I18n.n(score, {percentage: true, precision: 2})
-        )
+        setTotalGrade(getTotalGradeStringFromEnrollments(data, currentUser.id))
       },
       [currentUser]
     ),

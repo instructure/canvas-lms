@@ -222,6 +222,19 @@ export const getAccountsFromEnrollments = enrollments =>
     }, [])
     .sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
 
+/* Formats course total score and grade (if applicable) into string from enrollments API
+   response */
+export const getTotalGradeStringFromEnrollments = (enrollments, userId) => {
+  const grades = enrollments.find(({user_id}) => user_id === userId)?.grades
+  if (grades?.current_score == null) {
+    return I18n.t('n/a')
+  }
+  const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
+  return grades.current_grade == null
+    ? score
+    : I18n.t('%{score} (%{grade})', {score, grade: grades.current_grade})
+}
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

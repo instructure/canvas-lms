@@ -156,6 +156,21 @@ describe('GradesPage', () => {
         const {findByText} = render(<GradesPage {...getProps()} />)
         expect(await findByText('Total: n/a')).toBeInTheDocument()
       })
+
+      it('shows the grading scheme grade next to percent if course has grading scheme', async () => {
+        const enrollmentsData = [
+          {
+            user_id: '1',
+            grades: {
+              current_score: 84.6,
+              current_grade: 'B'
+            }
+          }
+        ]
+        fetchMock.get(ENROLLMENTS_URL, enrollmentsData, {overwriteRoutes: true})
+        const {findByText} = render(<GradesPage {...getProps()} />)
+        expect(await findByText('Total: 84.60% (B)')).toBeInTheDocument()
+      })
     })
   })
 
