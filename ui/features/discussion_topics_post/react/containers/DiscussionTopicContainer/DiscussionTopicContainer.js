@@ -165,8 +165,8 @@ export const DiscussionTopicContainer = props => {
 
   return (
     <>
-      <Flex as="div" direction="column">
-        <Flex.Item margin="0 0 large" overflowY="hidden" overflowX="hidden">
+      <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
+        <View as="div" padding="medium 0" background="primary">
           <DiscussionPostToolbar
             selectedView="all"
             sortDirection="asc"
@@ -177,7 +177,9 @@ export const DiscussionTopicContainer = props => {
             onCollapseRepliesToggle={() => {}}
             onTopClick={() => {}}
           />
-        </Flex.Item>
+        </View>
+      </div>
+      <Flex as="div" direction="column">
         <Flex.Item>
           <View
             as="div"
