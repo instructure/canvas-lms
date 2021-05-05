@@ -18756,7 +18756,7 @@ nb-x-k12:
         go_to_dashboard: "Gå til oversikten din"
     authenticate: 
       buttons: 
-        enroll_in_course: "Registrere deg på fag"
+        enroll_in_course: "Registrerer deg på fag"
         next: Neste
       getting_started: "Du registrerer deg i **%{course}**."
       labels: 
@@ -18775,7 +18775,7 @@ nb-x-k12:
       buttons: 
         enroll_in_course: "Registrere deg på fag"
         next: Neste
-      getting_started: "Du registrere deg på **%{course}**"
+      getting_started: "Du registrerer deg på **%{course}**"
     course_full: 
       class_full: "Faget **%{course}** er fulltegnet. Vi beklager dette."
     enrollment_closed: 
