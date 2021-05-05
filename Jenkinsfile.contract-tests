@@ -52,11 +52,12 @@ pipeline {
   environment {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
-    DOCKER_PROCESSES = '7'
+    DOCKER_PROCESSES = '1'
     POSTGRES_PASSWORD = 'sekret'
     PACT_BROKER = credentials('PACT_BROKER')
     PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
     PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
+    RSPEC_PROCESSES = '7'
   }
 
   stages {
