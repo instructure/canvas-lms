@@ -33,9 +33,9 @@ def call() {
   gems = configuration.plugins()
   echo "Plugin list: ${gems}"
   def pluginsToPull = []
-  gems.each {
-    if (env.GERRIT_PROJECT != it) {
-      pluginsToPull.add([name: it, version: _getPluginVersion(it), target: "gems/plugins/$it"])
+  gems.each { gem ->
+    if (env.GERRIT_PROJECT != gem) {
+      pluginsToPull.add([name: gem, version: _getPluginVersion(gem), target: "gems/plugins/$gem"])
     }
   }
 
