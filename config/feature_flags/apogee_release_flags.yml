@@ -9,18 +9,6 @@ datadog_rum_js:
   applies_to: SiteAdmin
   display_name: Datadog RUM JS Agent
   description: Include the Datadog RUM JS Agent in the document HEAD.
-gradebook_dataloader_improvements:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Gradebook Data Loading Performance Improvements
-  description: Performance improvements for loading data into Gradebook.
-  environments:
-    ci:
-      state: on
-    development:
-      state: on
-    test:
-      state: on
 missing_policy_applicator_emits_live_events:
   state: hidden
   applies_to: RootAccount

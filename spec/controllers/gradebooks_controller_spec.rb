@@ -741,38 +741,6 @@ describe GradebooksController do
         scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
         expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
       end
-
-      context "when 'gradebook_dataloader_improvements' is disabled" do
-        # TODO: remove this entire block with TALLY-831
-
-        before :each do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
-        end
-
-        it "does not prefetch user ids" do
-          get :show, params: { course_id: @course.id }
-
-          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
-          expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
-        end
-
-        it "does not prefetch grading period assignments" do
-          group_helper = Factories::GradingPeriodGroupHelper.new
-          period_helper = Factories::GradingPeriodHelper.new
-
-          grading_period_group = group_helper.create_for_account(@course.root_account)
-          term = @course.enrollment_term
-          term.grading_period_group = grading_period_group
-          term.save!
-          period_helper.create_presets_for_group(grading_period_group, :past, :current, :future)
-
-          get :show, params: { course_id: @course.id }
-
-          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
-          expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
-        end
-      end
     end
 
     describe 'js_env' do
@@ -858,22 +826,6 @@ describe GradebooksController do
         end
       end
 
-      describe "dataloader_improvements" do
-        # TODO: remove this entire block with TALLY-831
-
-        it "is true when 'gradebook_dataloader_improvements' is enabled" do
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:dataloader_improvements)).to be true
-        end
-
-        it "is false when 'gradebook_dataloader_improvements' is disabled" do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:dataloader_improvements)).to be false
-        end
-      end
-
       describe "default_grading_standard" do
         it "uses the course's grading standard" do
           grading_standard = grading_standard_for(@course)
@@ -917,13 +869,6 @@ describe GradebooksController do
       it "sets show_similarity_score to false when the New Gradebook Plagiarism Indicator feature flag is not enabled" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options[:show_similarity_score]).to be(false)
-      end
-
-      it "includes api_max_per_page" do
-        Setting.set("api_max_per_page", 50)
-        get :show, params: {course_id: @course.id}
-        api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
-        expect(api_max_per_page).to eq(50)
       end
 
       describe "performance_controls" do
@@ -1221,12 +1166,6 @@ describe GradebooksController do
         get "show", params: {:course_id => @course.id}
         expect(response).to render_template("gradebooks/individual")
       end
-
-      it "requests groups without wiki_page assignments" do
-        get "show", params: {:course_id => @course.id}
-        url = controller.js_env[:GRADEBOOK_OPTIONS][:assignment_groups_url]
-        expect(URI.unescape(url)).to include 'exclude_assignment_submission_types[]=wiki_page'
-      end
     end
 
     it "renders the unauthorized page without gradebook authorization" do
@@ -1253,10 +1192,6 @@ describe GradebooksController do
         expected_value = new_course_gradebook_upload_path(@course)
 
         expect(actual_value).to eq(expected_value)
-      end
-
-      it "includes the context_modules_url in the ENV" do
-        expect(@gradebook_env[:context_modules_url]).to eq(api_v1_course_context_modules_url(@course))
       end
     end
 

@@ -23,9 +23,7 @@ import('@canvas/context-cards/react/StudentContextCardTrigger')
 const gradebook = new Gradebook({
   ...ENV.GRADEBOOK_OPTIONS,
   currentUserId: ENV.current_user_id,
-  locale: ENV.LOCALE,
-  // TODO: remove `performanceControls` with TALLY-831
-  performanceControls: ENV.performance_controls
+  locale: ENV.LOCALE
 })
 
 gradebook.initialize()

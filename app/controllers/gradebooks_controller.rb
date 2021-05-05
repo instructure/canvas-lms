@@ -257,11 +257,9 @@ class GradebooksController < ApplicationController
     set_tutorial_js_env
 
     # Optimize initial data loading
-    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
-      prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
-    end
+    prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
 
-    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements) && grading_periods?
+    if grading_periods?
       prefetch_xhr(grading_period_assignments_course_gradebook_url(@context), id: 'grading_period_assignments')
     end
 
@@ -394,28 +392,13 @@ class GradebooksController < ApplicationController
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
-      # TODO: remove `api_max_per_page` with TALLY-831
-      api_max_per_page: per_page,
-
-      # TODO: remove `assignment_groups_url` with TALLY-831
-      assignment_groups_url: api_v1_course_assignment_groups_url(
-        @context,
-        include: %w[assignments assignment_visibility grades_published],
-        override_assignment_dates: "false",
-        exclude_assignment_submission_types: ['wiki_page']
-      ),
-
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
-      # TODO: remove `chunk_size` with TALLY-831
-      chunk_size: Setting.get('gradebook2.submissions_chunk_size', '10').to_i,
       colors: gradebook_settings(:colors),
       context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
       context_code: @context.asset_string,
       context_id: @context.id.to_s,
-      # TODO: remove `context_modules_url` with TALLY-831
-      context_modules_url: api_v1_course_context_modules_url(@context),
       context_sis_id: @context.sis_source_id,
       context_url: named_context_url(@context, :context_url),
       course_is_concluded: @context.completed?,
@@ -428,13 +411,7 @@ class GradebooksController < ApplicationController
 
       course_url: api_v1_course_url(@context),
       current_grading_period_id: @current_grading_period_id,
-      # TODO: remove `custom_column_data_url` with TALLY-831
-      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
-      # TODO: remove `custom_columns_url` with TALLY-831
-      custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
-      # TODO: remove `dataloader_improvements` with TALLY-831
-      dataloader_improvements:  Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
       enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
@@ -483,10 +460,6 @@ class GradebooksController < ApplicationController
       sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
-      # TODO: remove `students_stateless_url` with TALLY-831
-      students_stateless_url: custom_course_users_api_url(exclude_states: true, per_page: per_page),
-      # TODO: remove `submissions_url` with TALLY-831
-      submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
@@ -494,10 +467,6 @@ class GradebooksController < ApplicationController
 
     js_env({
       GRADEBOOK_OPTIONS: gradebook_options,
-      # TODO: remove `performance_controls` with TALLY-831
-      performance_controls: {
-        active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,
-      }
     })
   end
 
