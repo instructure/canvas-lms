@@ -331,6 +331,23 @@ export const handlers = [
       })
     )
   }),
+  graphql.mutation('CreateDiscussionEntry', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        createDiscussionEntry: {
+          discussionEntry: mswAssign(
+            {...defaultEntry},
+            {
+              id: req.body.variables.discussionTopicId,
+              message: req.body.variables.message
+            }
+          ),
+          errors: null,
+          __typename: 'CreateDiscussionEntryPayload'
+        }
+      })
+    )
+  }),
   graphql.mutation('UpdateDiscussionEntry', (req, res, ctx) => {
     ctx.data({
       updateDiscussionEntry: {

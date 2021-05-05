@@ -30,16 +30,17 @@ import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
+  DELETE_DISCUSSION_TOPIC,
   PUBLISH_DISCUSSION_TOPIC,
-  SUBSCRIBE_TO_DISCUSSION_TOPIC,
-  DELETE_DISCUSSION_TOPIC
+  SUBSCRIBE_TO_DISCUSSION_TOPIC
 } from '../../../graphql/Mutations'
+import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {useMutation} from 'react-apollo'
 import {isGraded, getSpeedGraderUrl, getEditUrl} from '../../utils'
 import {View} from '@instructure/ui-view'
 
-export const DiscussionTopicContainer = props => {
+export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendToOpen, setSendToOpen] = useState(false)
   const [copyToOpen, setCopyToOpen] = useState(false)
@@ -216,7 +217,7 @@ export const DiscussionTopicContainer = props => {
                       <Button
                         color="primary"
                         onClick={() => {
-                          setExpandedReply(true)
+                          setExpandedReply(!expandedReply)
                         }}
                         data-testid="discussion-topic-reply"
                       >
@@ -300,10 +301,15 @@ export const DiscussionTopicContainer = props => {
               >
                 <DiscussionEdit
                   show={expandedReply}
+                  onSubmit={text => {
+                    if (createDiscussionEntry) {
+                      createDiscussionEntry(text)
+                      setExpandedReply(false)
+                    }
+                  }}
                   onCancel={() => {
                     setExpandedReply(false)
                   }}
-                  onSubmit={() => {}}
                 />
               </Flex.Item>
             </Flex>
@@ -322,7 +328,12 @@ DiscussionTopicContainer.propTypes = {
    * Providing this property will result in the graded info
    * to be rendered
    */
-  discussionTopic: Discussion.shape.isRequired
+  discussionTopic: Discussion.shape.isRequired,
+
+  /**
+   * Function to be executed to create a Discussion Entry.
+   */
+  createDiscussionEntry: PropTypes.func
 }
 
 export default DiscussionTopicContainer

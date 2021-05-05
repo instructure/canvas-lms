@@ -87,6 +87,33 @@ export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
   ${Discussion.fragment}
 `
 
+export const CREATE_DISCUSSION_ENTRY = gql`
+  mutation CreateDiscussionEntry(
+    $discussionTopicId: ID!
+    $message: String!
+    $parentEntryId: ID
+    $fileId: ID
+  ) {
+    createDiscussionEntry(
+      input: {
+        discussionTopicId: $discussionTopicId
+        message: $message
+        parentEntryId: $parentEntryId
+        fileId: $fileId
+      }
+    ) {
+      discussionEntry {
+        ...DiscussionEntry
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+  ${Error.fragment}
+`
+
 export const UPDATE_DISCUSSION_ENTRY = gql`
   mutation UpdateDiscussionEntry($discussionEntryId: ID!, $message: String) {
     updateDiscussionEntry(input: {discussionEntryId: $discussionEntryId, message: $message}) {
