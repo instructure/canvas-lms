@@ -17,7 +17,7 @@
 //  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import FeatureFlags from '../FeatureFlags'
@@ -47,5 +47,37 @@ describe('feature_flags::FeatureFlags', () => {
     expect(getAllByText('Course')[0]).toBeInTheDocument()
     expect(getAllByText('User')[0]).toBeInTheDocument()
     expect(queryByText('Site Admin')).not.toBeInTheDocument()
+  })
+
+  describe('search', () => {
+    it('renders an empty search bar on load', async () => {
+      const {findByPlaceholderText} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search')
+      expect(searchField).toBeInTheDocument()
+      expect(searchField.value).toBe('')
+    })
+
+    it('filters rows to show only those matching query', async () => {
+      const {findByPlaceholderText, getByText, queryByText} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search')
+      const query = 'Feature 3'
+      fireEvent.change(searchField, {target: {value: query}})
+      expect(await getByText(query)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(queryByText('Feature 1')).not.toBeInTheDocument()
+        expect(queryByText('Feature 2')).not.toBeInTheDocument()
+      })
+    })
+
+    it('hides section titles if no row exists in section after search', async () => {
+      const {findByPlaceholderText, getAllByText, queryByText} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search')
+      fireEvent.change(searchField, {target: {value: 'Feature 4'}})
+      expect(await getAllByText('User')[0]).toBeInTheDocument()
+      await waitFor(() => {
+        expect(queryByText('Account')).not.toBeInTheDocument()
+        expect(queryByText('Course')).not.toBeInTheDocument()
+      })
+    })
   })
 })
