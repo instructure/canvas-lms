@@ -56,7 +56,9 @@ const defaultProps = {
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
-  userIsInstructor: false
+  userIsInstructor: false,
+  showStudentView: false,
+  studentViewPath: '/courses/30/student_view/1'
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -192,6 +194,24 @@ describe('K-5 Subject Course', () => {
     it('Does not show a manage button when the user does not have manage permissions', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} />)
       expect(queryByRole('button', {name: 'Manage'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Student View Button functionality', () => {
+    it('Shows the Student View button when the user has student view mode access', () => {
+      const {queryByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
+    })
+
+    it('Does not show the Student View button when the user does not have student view mode access', () => {
+      const {queryByRole} = render(<K5Course {...defaultProps} />)
+      expect(queryByRole('link', {name: 'Student View'})).not.toBeInTheDocument()
+    })
+
+    it('Should open student view path when clicked', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      const studentViewBtn = getByRole('link', {name: 'Student View'})
+      expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
     })
   })
 

@@ -32,7 +32,8 @@ import {
   IconEditSolid,
   IconHomeLine,
   IconModuleLine,
-  IconStarLightLine
+  IconStarLightLine,
+  IconStudentViewLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
@@ -40,6 +41,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Mask} from '@instructure/ui-overlays'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs from '@canvas/k5/react/K5Tabs'
@@ -126,6 +128,38 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
   )
 }
 
+export function CourseHeaderOptions({handleOpenTray, showStudentView, studentViewPath, canManage}) {
+  return (
+    <View as="section" borderWidth="0 0 small 0" padding="0 0 medium 0" margin="0 0 medium 0">
+      <Flex direction="row">
+        {canManage && (
+          <Flex.Item shouldGrow shouldShrink>
+            <Button
+              data-testid="manage-button"
+              onClick={handleOpenTray}
+              renderIcon={<IconEditSolid />}
+            >
+              {I18n.t('Manage')}
+            </Button>
+          </Flex.Item>
+        )}
+        {showStudentView && (
+          <Flex.Item shouldGrow shouldShrink textAlign="end">
+            <Button
+              id="student-view-btn"
+              href={studentViewPath}
+              data-method="post"
+              renderIcon={<IconStudentViewLine />}
+            >
+              {I18n.t('Student View')}
+            </Button>
+          </Flex.Item>
+        )}
+      </Flex>
+    </View>
+  )
+}
+
 const fetchApps = (courseId, courseName) =>
   fetchCourseApps(courseId).then(apps =>
     apps.map(app => ({
@@ -152,7 +186,9 @@ export function K5Course({
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
-  userIsInstructor
+  userIsInstructor,
+  showStudentView,
+  studentViewPath
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [courseNavLinks, setCourseNavLinks] = useState([])
@@ -213,21 +249,13 @@ export function K5Course({
           tabs={COURSE_TABS}
           tabsRef={setTabsRef}
         >
-          {canManage && (
-            <View
-              as="section"
-              borderWidth="0 0 small 0"
-              padding="0 0 medium 0"
-              margin="0 0 medium 0"
-            >
-              <Button
-                data-testid="manage-button"
-                onClick={handleOpenTray}
-                renderIcon={<IconEditSolid />}
-              >
-                {I18n.t('Manage')}
-              </Button>
-            </View>
+          {(canManage || showStudentView) && (
+            <CourseHeaderOptions
+              canManage={canManage}
+              handleOpenTray={handleOpenTray}
+              showStudentView={showStudentView}
+              studentViewPath={studentViewPath}
+            />
           )}
           <CourseHeaderHero
             name={name}
@@ -269,7 +297,9 @@ K5Course.propTypes = {
   courseOverview: PropTypes.string.isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
-  userIsInstructor: PropTypes.bool.isRequired
+  userIsInstructor: PropTypes.bool.isRequired,
+  showStudentView: PropTypes.bool.isRequired,
+  studentViewPath: PropTypes.string.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

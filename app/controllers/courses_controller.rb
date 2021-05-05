@@ -2080,7 +2080,9 @@ class CoursesController < ApplicationController
                    is_student: @context.user_is_student?(@current_user),
                    is_instructor: @context.user_is_instructor?(@current_user),
                    course_overview: @context&.wiki&.front_page&.body,
-                   hide_final_grades: @context.hide_final_grades?
+                   hide_final_grades: @context.hide_final_grades?,
+                   show_student_view: can_do(@context, @current_user, :use_student_view),
+                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1)
                  }
                })
 
