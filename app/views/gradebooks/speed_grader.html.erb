@@ -196,9 +196,6 @@
         <div class="content_box">
           <% if @assignment.active_rubric_association? %>
           <div id="rubric_full" style="display: none;">
-            <div id="rubric_full_resizer">
-              <div id="rubric_full_resizer_handle"></div>
-            </div>
               <h2><%= t("Grading") %></h2>
               <div id="rubric_holder">
                 <%= render :partial => "shared/rubric",

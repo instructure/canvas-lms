@@ -168,7 +168,6 @@ let $assignment_submission_originality_report_url
 let $assignment_submission_vericite_report_url
 let $assignment_submission_resubmit_to_vericite_url
 let $rubric_holder
-let $rubric_full_resizer_handle
 let $no_annotation_warning
 let $comment_submitted
 let $comment_submitted_message
@@ -909,30 +908,6 @@ function initRubricStuff() {
 
   selectors.get('#rubric_assessments_select').change(() => {
     handleSelectedRubricAssessmentChanged()
-  })
-
-  $rubric_full_resizer_handle.draggable({
-    axis: 'x',
-    cursor: 'crosshair',
-    scroll: false,
-    containment: '#left_side',
-    snap: '#full_width_container',
-    appendTo: '#full_width_container',
-    start() {
-      $rubric_full_resizer_handle.draggable('option', 'minWidth', $right_side.width())
-    },
-    helper() {
-      return $rubric_full_resizer_handle.clone().addClass('clone')
-    },
-    drag(event, ui) {
-      const offset = ui.offset,
-        windowWidth = $window.width()
-      selectors.get('#rubric_full').width(windowWidth - offset.left)
-      $rubric_full_resizer_handle.css('left', '0')
-    },
-    stop(event, ui) {
-      event.stopImmediatePropagation()
-    }
   })
 
   $('.save_rubric_button').click(function () {
@@ -3769,7 +3744,6 @@ function setupSelectors() {
   $resize_overlay = $('#resize_overlay')
   $right_side = $('#right_side')
   $rightside_inner = $('#rightside_inner')
-  $rubric_full_resizer_handle = $('#rubric_full_resizer_handle')
   $rubric_holder = $('#rubric_holder')
   $score = $grade_container.find('.score')
   $selectmenu = null
