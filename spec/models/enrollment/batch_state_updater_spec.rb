@@ -125,6 +125,65 @@ describe "Enrollment::BatchStateUpdater" do
     end
   end
 
+  describe '.sync_microsoft_group' do
+    def update_batch
+      Enrollment::BatchStateUpdater.sync_microsoft_group([@course], @course.root_account)
+    end
+
+    before :each do
+      MicrosoftSync::Group.create!(course: @course)
+    end
+
+    context 'when feature flag is off' do
+      before :each do
+        @course.root_account.disable_feature!(:microsoft_group_enrollments_syncing)
+      end
+
+      it 'does not enqueue a job' do
+        expect { update_batch }.not_to change { Delayed::Job.count }
+      end
+    end
+
+    context 'when feature flag is on' do
+      before :each do
+        @course.root_account.enable_feature!(:microsoft_group_enrollments_syncing)
+      end
+
+      context 'when account has turned sync off' do
+        before :each do
+          @course.root_account.settings[:microsoft_sync_enabled] = false
+          @course.root_account.save!
+        end
+
+        it 'does not enqueue a job' do
+          expect { update_batch }.not_to change { Delayed::Job.count }
+        end
+      end
+
+      context 'when account has turned sync on' do
+        before :each do
+          @course.root_account.settings[:microsoft_sync_enabled] = true
+          @course.root_account.save!
+        end
+
+        it 'should enqueue a job' do
+          expect { update_batch }.to change { Delayed::Job.count }.by 1
+        end
+
+        it 'should enqueue one job for each course' do
+          course2 = course_factory
+          course3 = course_factory
+          MicrosoftSync::Group.create!(course: course2)
+          MicrosoftSync::Group.create!(course: course3)
+
+          expect {
+            Enrollment::BatchStateUpdater.sync_microsoft_group([course2, course3], @course.root_account)
+          }.to change { Delayed::Job.count }.by 2
+        end
+      end
+    end
+  end
+
   it 'should account for all enrollment callbacks in Enrollment::BatchStateUpdater.destroy_batch' do
     accounted_for_callbacks = %i(
       add_to_favorites_later
@@ -152,6 +211,7 @@ describe "Enrollment::BatchStateUpdater" do
       restore_submissions_and_scores
       set_sis_stickiness
       set_update_cached_due_dates
+      sync_microsoft_group
       touch_graders_if_needed
       update_assignment_overrides_if_needed
       update_linked_enrollments

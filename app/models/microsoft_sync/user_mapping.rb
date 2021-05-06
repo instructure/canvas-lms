@@ -39,20 +39,24 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   validates_presence_of :root_account
   validates_presence_of :user_id
   validates_uniqueness_of :user_id, scope: :root_account
+  MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
   def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
-    GuardRail.activate(:secondary) do
+    user_ids = GuardRail.activate(:secondary) do
       Enrollment.active.where(course_id: course.id).joins(%{
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
-        }).
-        where('mappings.id IS NULL').select(:user_id).
-        find_in_batches(batch_size: batch_size) do |enrollments|
-          blk.call(enrollments.map(&:user_id))
-        end
+        })
+        .where('mappings.id IS NULL')
+        .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
+        .pluck(:user_id)
+    end
+
+    user_ids.in_groups_of(batch_size) do |batch|
+      blk.call(batch.compact)
     end
   end
 
@@ -74,7 +78,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
     # TODO: either check UPN type in Account settings transactionally when adding, or
     # check after adding and delete what we just added.
-    GuardRail.activate(:primary) { insert_all(records) }
+    insert_all(records)
   end
 
   # Find the enrollments for course which have a UserMapping for the user.

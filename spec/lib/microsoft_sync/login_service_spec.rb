@@ -45,47 +45,114 @@ describe MicrosoftSync::LoginService do
     context 'when configured' do
       subject { described_class.new_token('mytenant') }
 
-      before do
-        allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(Canvas::DynamicSettings).to receive(:find).with('microsoft-sync').and_return({
-          'client-id' => 'theclientid',
-          'client-secret' => 'thesecret'
-        })
+      context 'when Microsoft returns a response' do
+        before do
+          allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+          allow(Canvas::DynamicSettings).to receive(:find).with('microsoft-sync').and_return({
+            'client-id' => 'theclientid',
+            'client-secret' => 'thesecret'
+          })
 
-        WebMock.stub_request(
-          :post, 'https://login.microsoftonline.com/mytenant/oauth2/v2.0/token'
-        ).with(
-          body: {
-            scope: 'https://graph.microsoft.com/.default',
-            grant_type: 'client_credentials',
-            client_id: 'theclientid',
-            client_secret: 'thesecret'
-          }
-        ).and_return(
-          status: response_status,
-          body: response_body.to_json,
-          headers: {'Content-type' => 'application/json'},
-        )
-      end
-
-      context 'when Microsoft returns a 200' do
-        let(:response_status) { 200 }
-        let(:response_body) do
-          { 'token_type' => 'Bearer', 'expires_in' => 3599, 'access_token' => 'themagicaltoken' }
+          WebMock.stub_request(
+            :post, 'https://login.microsoftonline.com/mytenant/oauth2/v2.0/token'
+          ).with(
+            body: {
+              scope: 'https://graph.microsoft.com/.default',
+              grant_type: 'client_credentials',
+              client_id: 'theclientid',
+              client_secret: 'thesecret'
+            }
+          ).and_return(
+            status: response_status,
+            body: response_body.to_json,
+            headers: {'Content-type' => 'application/json'},
+          )
         end
 
-        it { is_expected.to eq(response_body) }
+        context '(200 status code)' do
+          let(:response_status) { 200 }
+          let(:response_body) do
+            { 'token_type' => 'Bearer', 'expires_in' => 3599, 'access_token' => 'themagicaltoken' }
+          end
+
+          it { is_expected.to eq(response_body) }
+
+          it 'increments a statsd metric' do
+            expect(InstStatsd::Statsd).to \
+              receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '200'})
+            subject
+          end
+        end
+
+        context '(401 status code)' do
+          let(:response_status) { 401 }
+          let(:response_body) { {} }
+
+          it 'increments a statsd metric and raises an HTTPInvalidStatus' do
+            expect(InstStatsd::Statsd).to \
+              receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '401'})
+            expect { subject }.to raise_error(
+              MicrosoftSync::Errors::HTTPInvalidStatus,
+              /Login service returned 401 for tenant mytenant/
+            )
+          end
+        end
+
+        context '(400 status code, Tenant not found)' do
+          let(:response_status) { 400 }
+          let(:response_body) do
+            {
+              "error"=>"invalid_request",
+               "error_description"=>
+                 "AADSTS90002: Tenant 'a.b.c' not found. This may happen if there are no active subscriptions for the tenant. Check to make sure you have the correct tenant ID. Check with your subscription administrator.\r\nTrace ID: etc.",
+               "error_codes"=>[90002],
+               "timestamp"=>"2021-04-28 23:20:12Z",
+               "error_uri"=>"https://login.microsoftonline.com/error?code=90002"
+            }
+          end
+
+          it 'raises a TenantDoesNotExist (graceful cancel error)' do
+            expect { subject }.to raise_error do |e|
+              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
+              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+            end
+          end
+        end
+
+        context '(400 status code, Tenant not valid domain)' do
+          let(:response_status) { 400 }
+          let(:response_body) do
+            {"error_description"=>"AADSTS900023: Specified tenant identifier '---' is neither a valid DNS name, nor a valid external domain.\r\nTrace ID: etc", "error_codes"=>[900023], "timestamp"=>"2021-04-28 23:20:23Z", "error_uri"=>"https://login.microsoftonline.com/error?code=900023"}
+          end
+
+          it 'raises a TenantDoesNotExist (graceful cancel error)' do
+            expect { subject }.to raise_error do |e|
+              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
+              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+            end
+          end
+        end
+
+        context '(400 status code, other error message)' do
+          let(:response_status) { 400 }
+          let(:response_body) { {"error_description" => "foo"} }
+
+          it 'raises an HTTPInvalidStatus' do
+            expect { subject }.to raise_error(
+              MicrosoftSync::Errors::HTTPBadRequest,
+              /Login service returned 400 for tenant mytenant/
+            )
+          end
+        end
       end
 
-      context 'when Microsoft returns a non-200 response' do
-        let(:response_status) { 401 }
-        let(:response_body) { {} }
-
-        it 'raises an HTTPInvalidStatus' do
-          expect { subject }.to raise_error(
-            MicrosoftSync::Errors::HTTPInvalidStatus,
-            /Login service returned 401 for tenant mytenant/
-          )
+      context 'when an error occurs' do
+        it 'increments a statsd metric and bubbles up the error' do
+          error = SocketError.new
+          expect(HTTParty).to receive(:post).and_raise error
+          expect(InstStatsd::Statsd).to \
+            receive(:increment).with('microsoft_sync.login_service', tags: {status_code: 'error'})
+          expect { subject }.to raise_error(error)
         end
       end
     end

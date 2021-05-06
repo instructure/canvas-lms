@@ -34,6 +34,10 @@ module MicrosoftSync
     GROUP_USERS_ADD_BATCH_SIZE = 20
     STATSD_PREFIX = 'microsoft_sync.graph_service'
 
+    class ApplicationNotAuthorizedForTenant < StandardError
+      include Errors::GracefulCancelErrorMixin
+    end
+
     attr_reader :tenant
 
     def initialize(tenant)
@@ -60,7 +64,8 @@ module MicrosoftSync
     def add_users_to_group(group_id, members: [], owners: [])
       raise ArgumentError, 'Missing users to add to group' if members.empty? && owners.empty?
       if (n_total_additions = members.length + owners.length) > GROUP_USERS_ADD_BATCH_SIZE
-        raise ArgumentError, "Only 20 users can be added at once. Got #{n_total_additions}."
+        raise ArgumentError, "Only #{GROUP_USERS_ADD_BATCH_SIZE} users can be added at " \
+          "once. Got #{n_total_additions}."
       end
 
       body = {}
@@ -137,7 +142,10 @@ module MicrosoftSync
     # ===== Helpers =====
 
     def request(method, path, options={})
-      statsd_tag = InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+      statsd_tags = {
+        msft_endpoint:
+          InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+      }
 
       options[:headers] ||= {}
       options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
@@ -150,24 +158,39 @@ module MicrosoftSync
       Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{url}")
 
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
-        HTTParty.send(method, url, options)
+        InstStatsd::Statsd.time("#{STATSD_PREFIX}.time", tags: statsd_tags) do
+          HTTParty.send(method, url, options)
+        end
       end
 
-      unless (200..299).cover?(response.code)
+      if application_not_authorized_response?(response)
+        raise ApplicationNotAuthorizedForTenant
+      elsif !(200..299).cover?(response.code)
         raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
           service: 'graph', tenant: tenant, response: response
         )
       end
 
       result = response.parsed_response
-      InstStatsd::Statsd.increment(statsd_name, tags: {msft_endpoint: statsd_tag})
+      InstStatsd::Statsd.increment(statsd_name, tags: statsd_tags)
       result
     rescue => error
-      InstStatsd::Statsd.increment(statsd_name(error), tags: {msft_endpoint: statsd_tag})
+      statsd_tags[:status_code] = response&.code&.to_s || 'unknown'
+      InstStatsd::Statsd.increment(statsd_name(error), tags: statsd_tags)
       raise
     end
 
     private
+
+    def application_not_authorized_response?(response)
+      (
+        response.code == 401 &&
+        response.body.include?('The identity of the calling application could not be established.')
+      ) || (
+        response.code == 403 &&
+        response.body.include?('Required roles claim values are not provided')
+      )
+    end
 
     def statsd_name(error=nil)
       name = case error

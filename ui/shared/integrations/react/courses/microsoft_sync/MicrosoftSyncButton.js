@@ -23,8 +23,8 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-const readyStates = ['pending', 'errored', 'completed']
-const coolDownRequiredStates = ['completed', 'scheduled']
+const readyStates = ['pending', 'errored', 'completed', 'scheduled']
+const coolDownRequiredStates = ['completed', 'manually_scheduled', 'scheduled']
 
 const syncReducer = (state, action) => {
   switch (action.type) {

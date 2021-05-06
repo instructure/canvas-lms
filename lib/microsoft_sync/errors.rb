@@ -43,6 +43,10 @@ module MicrosoftSync
       end
     end
 
+    # Signals to StateMachineJob that an error is not entirely unexpected. It should
+    # quit the job and report the error to the user, but not report to Canvas::Errors
+    module GracefulCancelErrorMixin; end
+
     class InvalidRemoteState < PublicError; end
     class GroupHasNoOwners < PublicError; end
     class TeamAlreadyExists < PublicError; end

@@ -26,7 +26,7 @@ module MicrosoftSync
   # When `login_attribute` is not set or is one that we don't know how find the
   # Canvas user id information, we'll raise and exception and stop the job
   class InvalidOrMissingLoginAttributeConfig < StandardError
-    include StateMachineJob::GracefulCancelErrorMixin
+    include Errors::GracefulCancelErrorMixin
   end
 
   class UsersUpnsFinder

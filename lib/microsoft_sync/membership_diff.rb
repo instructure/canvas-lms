@@ -34,6 +34,8 @@ module MicrosoftSync
     end
 
     OWNER_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
+    MAX_ENROLLMENT_MEMBERS = 25_000
+    MAX_ENROLLMENT_OWNERS = 100
 
     def set_local_member(member, enrollment_type)
       if OWNER_ENROLLMENT_TYPES.include?(enrollment_type)
@@ -66,6 +68,13 @@ module MicrosoftSync
     def owners_to_remove
       @remote_owners - @local_owners
     end
+
+    def max_enrollment_members_reached?
+      (@local_members + @local_owners).size > MAX_ENROLLMENT_MEMBERS
+    end
+
+    def max_enrollment_owners_reached?
+      @local_owners.size > MAX_ENROLLMENT_OWNERS
+    end
   end
 end
-

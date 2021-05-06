@@ -175,4 +175,36 @@ describe MicrosoftSync::MembershipDiff do
       expect(subject.local_owners).to eq(Set.new(%w[teacher2 teacher4 teacher5 teacher6]))
     end
   end
+
+  describe 'max_enrollment_members_reached?' do
+    let(:half) { max/2 }
+    let(:max) { MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS }
+    let(:min) { 1 }
+
+    it 'when the members size is less than or equal to the max enrollment members' do
+      set_local_members 'student', (min..half), member_enrollment_type
+      set_local_members 'teacher', (half...max), owner_enrollment_type
+      expect(subject.max_enrollment_members_reached?).to eq false
+    end
+
+    it 'when the members size is greater than to the max enrollment members' do
+      set_local_members 'student', (min..half), member_enrollment_type
+      set_local_members 'teacher', (half..max), owner_enrollment_type
+      expect(subject.max_enrollment_members_reached?).to eq true
+    end
+  end
+
+  describe 'max_enrollment_owners_reached?' do
+    let(:max) { MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS }
+
+    it 'when the owners size is less than or equal to the max enrollment owners' do
+      set_local_members 'teacher', (1...max), owner_enrollment_type
+      expect(subject.max_enrollment_owners_reached?).to eq false
+    end
+
+    it 'when the owners size is greater than to the max enrollment owners' do
+      set_local_members 'teacher', (0..max), owner_enrollment_type
+      expect(subject.max_enrollment_owners_reached?).to eq true
+    end
+  end
 end
