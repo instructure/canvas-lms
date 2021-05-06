@@ -24,57 +24,59 @@ module Types
 
     field :read, Boolean, null: true
     def read
-      object.load(:read)
+      object[:loader].load(:read)
     end
 
     field :read_replies, Boolean, null: true
     def read_replies
-      object.load(:read_replies)
+      object[:loader].load(:read_replies)
     end
 
     field :reply, Boolean, null: true
     def reply
-      object.load(:reply)
+      object[:loader].load(:reply)
     end
 
     field :update, Boolean, null: true
     def update
-      object.load(:update)
+      object[:loader].load(:update)
     end
 
     field :delete, Boolean, null: true
     def delete
-      object.load(:delete)
+      object[:loader].load(:delete).then do |permission|
+        permission && !object[:discussion_topic].editing_restricted?(:any)
+      end
     end
 
     field :create, Boolean, null: true
     def create
-      object.load(:create)
+      object[:loader].load(:create)
     end
 
     field :duplicate, Boolean, null: true
     def duplicate
-      object.load(:duplicate)
+      object[:loader].load(:duplicate)
     end
 
     field :attach, Boolean, null: true
     def attach
-      object.load(:attach)
+      object[:loader].load(:attach)
     end
 
     field :read_as_admin, Boolean, null: true
     def read_as_admin
-      object.load(:read_as_admin)
+      object[:loader].load(:read_as_admin)
     end
 
     field :rate, Boolean, null: true
     def rate
-      object.load(:rate)
+      object[:loader].load(:rate)
     end
 
     field :moderate_forum, Boolean, null: true
     def moderate_forum
-      object.load(:moderate_forum)
+      object[:loader].load(:moderate_forum)
     end
   end
 end

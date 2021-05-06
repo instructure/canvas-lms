@@ -26,6 +26,55 @@ describe Types::DiscussionType do
 
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
+  let(:permissions) {
+    [
+      {
+        value: 'attach',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :attach)}
+      },
+      {
+        value: 'create',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :create)}
+      },
+      {
+        value: 'delete',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any)}
+      },
+      {
+        value: 'duplicate',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :duplicate)}
+      },
+      {
+        value: 'moderateForum',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :moderate_forum)}
+      },
+      {
+        value: 'rate',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :rate)}
+      },
+      {
+        value: 'read',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read)}
+      },
+      {
+        value: 'readAsAdmin',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read_as_admin)}
+      },
+      {
+        value: 'readReplies',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read_replies)}
+      },
+      {
+        value: 'reply',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :reply)}
+      },
+      {
+        value: 'update',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :update)}
+      }
+    ]
+  }
+
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
@@ -144,29 +193,13 @@ describe Types::DiscussionType do
   end
 
   it 'returns the current user permissions' do
-    permissions = {
-      attach: 'attach',
-      create: 'create',
-      delete: 'delete',
-      duplicate: 'duplicate',
-      moderate_forum: 'moderateForum',
-      rate: 'rate',
-      read: 'read',
-      read_as_admin: 'readAsAdmin',
-      read_replies: 'readReplies',
-      reply: 'reply',
-      update: 'update'
-    }
-
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
-    permissions.keys.each do |key|
-      permission = discussion.grants_right?(@teacher, nil, key)
-      expect(discussion_type.resolve("permissions { #{permissions[key]} }")).to eq permission
+    permissions.each do |permission|
+      expect(discussion_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
 
-      permission = discussion.grants_right?(@student, nil, key)
-      expect(type_with_student.resolve("permissions { #{permissions[key]} }")).to eq permission
+      expect(type_with_student.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
     end
   end
 
