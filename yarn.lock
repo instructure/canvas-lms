@@ -5583,7 +5583,7 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-5.0.0.tgz#89405a0cf4dc6f9bc04e12b4aadbd51febd9e39a"
   integrity sha512-sH1oXU7Q4qam35iehvB/SMtuXJh5Ff29pWd7Z2c3Jt39K8kDE344xM/jlI/Qh4CJ6/UguPfKdFSGubLsNeWEgg==
 
-"@tinymce/tinymce-react@^3.8.4":
+"@tinymce/tinymce-react@~3.8.4":
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/@tinymce/tinymce-react/-/tinymce-react-3.8.4.tgz#c652f23735bf63812ce2077a06682fe335b24fee"
   integrity sha512-wk9UTyuopeSs2UPxfMY2t4ZK4094aH7bfbHz+kAoHQ/lAQB01qojM9Khsg9dGwlMg8ZmUcvQdoiAOwYNUztKww==

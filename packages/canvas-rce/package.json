@@ -104,7 +104,7 @@
     "@instructure/ui-view": "7",
     "@instructure/uid": "7",
     "@sheerun/mutationobserver-shim": "^0.3.2",
-    "@tinymce/tinymce-react": "^3.8.4",
+    "@tinymce/tinymce-react": "~3.8.4",
     "aphrodite": "^2",
     "axios": "^0.19.0 || ^0.18.0",
     "bloody-offset": "0.0.0",
