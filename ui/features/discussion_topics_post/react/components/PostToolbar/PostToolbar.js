@@ -33,6 +33,7 @@ import {
   IconMarkAsReadLine,
   IconMoreLine,
   IconNoSolid,
+  IconPeerReviewLine,
   IconRubricSolid,
   IconSpeedGraderSolid,
   IconTrashLine,
@@ -198,6 +199,14 @@ const getMenuConfigs = props => {
       selectionCallback: props.onShareToCommons
     })
   }
+  if (props.onPeerReviews) {
+    options.push({
+      key: 'peerReviews',
+      icon: <IconPeerReviewLine />,
+      label: I18n.t('Peer Reviews'),
+      selectionCallback: props.onPeerReviews
+    })
+  }
   return options
 }
 
@@ -285,16 +294,18 @@ PostToolbar.propTypes = {
    * Callback to be fired when Share to Commons action is fired.
    */
   onShareToCommons: PropTypes.func,
-
   /**
    * Indicate the replies count associated with the Post.
    */
   repliesCount: PropTypes.number,
-
   /**
    * Indicate the unread count associated with the Post.
    */
-  unreadCount: PropTypes.number
+  unreadCount: PropTypes.number,
+  /**
+   * Callback to be fired when Peer Review action is fired
+   */
+  onPeerReviews: PropTypes.func
 }
 
 PostToolbar.defaultProps = {

@@ -102,5 +102,18 @@ module Types
         end
       end
     end
+
+    field :peer_review, Boolean, null: true
+    def peer_review
+      return false if object[:discussion_topic].assignment_id.nil?
+
+      Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
+        Loaders::PermissionsLoader.for(object[:discussion_topic].assignment, current_user: current_user, session: session).load(:grade).then do |can_grade|
+          object[:discussion_topic].assignment.published? &&
+          object[:discussion_topic].assignment.has_peer_reviews? &&
+          can_grade
+        end
+      end
+    end
   end
 end

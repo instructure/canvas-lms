@@ -82,6 +82,15 @@ describe Types::DiscussionType do
             return permission && discussion.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
         }
+      },
+      {
+        value: 'peerReview',
+        allowed: -> (user) {
+          discussion.assignment_id &&
+          discussion.assignment.published? &&
+          discussion.assignment.has_peer_reviews? &&
+          discussion.assignment.grants_right?(user, :grade)
+        }
       }
     ]
   }
