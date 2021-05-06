@@ -87,6 +87,7 @@ class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_user
   before_action :validate_user_permissions
   before_action :require_feature
+  before_action :require_integration_available
   before_action :require_cooldown, only: :sync
   before_action :require_currently_not_syncing, only: :sync
 
@@ -180,6 +181,12 @@ class MicrosoftSync::GroupsController < ApplicationController
     return if course.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
 
     not_found
+  end
+
+  def require_integration_available
+    return if course.root_account.settings[:microsoft_sync_enabled]
+
+    render json: { errors: ['Integration not available'] }, status: :bad_request
   end
 
   def validate_user_permissions

@@ -30,7 +30,8 @@ describe('Integrations', () => {
 
   beforeEach(() => {
     window.ENV = {
-      COURSE_ID: 2
+      COURSE_ID: 2,
+      MSFT_SYNC_ENABLED: true
     }
   })
 
@@ -43,6 +44,16 @@ describe('Integrations', () => {
   it('renders the Microsoft Sync integration', () => {
     const subject = render(<Integrations />)
     expect(subject.getAllByText('Microsoft Sync')).toBeTruthy()
+  })
+
+  describe('when no integrations are enabled', () => {
+    beforeEach(() => {
+      window.ENV.MSFT_SYNC_ENABLED = false
+    })
+
+    it('informs the user no integrations are available', () => {
+      expect(render(<Integrations />).getByText('No integrations available')).toBeInTheDocument()
+    })
   })
 
   describe('Microsoft Sync', () => {

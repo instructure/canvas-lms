@@ -730,6 +730,11 @@ describe CoursesController do
       )
     end
 
+    it 'sets MSFT enabled in the JS ENV' do
+      subject
+      expect(controller.js_env[:MSFT_SYNC_ENABLED]).to eq false
+    end
+
     it 'sets the external tools create url' do
       user_session(@teacher)
       get 'settings', params: {:course_id => @course.id}

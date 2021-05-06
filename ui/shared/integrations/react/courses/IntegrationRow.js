@@ -30,6 +30,7 @@ import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
 const IntegrationRow = ({
+  available,
   children,
   enabled,
   error,
@@ -80,7 +81,7 @@ const IntegrationRow = ({
   const toggleLabel = () =>
     expanded ? I18n.t('Hide %{name} details', {name}) : I18n.t('Show %{name} details', {name})
 
-  return (
+  return available ? (
     <ToggleGroup
       toggleLabel={toggleLabel()}
       summary={summary()}
@@ -113,6 +114,8 @@ const IntegrationRow = ({
         {children}
       </View>
     </ToggleGroup>
+  ) : (
+    <></>
   )
 }
 
