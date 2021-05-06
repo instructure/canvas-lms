@@ -103,7 +103,8 @@ const DiscussionTopicManager = props => {
             })
           }}
         />
-        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 ? (
+        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
+        searchTerm ? (
           <NoResultsFound />
         ) : (
           <DiscussionThreadsContainer
