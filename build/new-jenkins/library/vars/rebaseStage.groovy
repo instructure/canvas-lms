@@ -18,9 +18,9 @@
 
 import groovy.transform.Field
 
-@Field static COMMIT_HISTORY = 100
+@Field final static COMMIT_HISTORY = 100
 
-@Field static CHANGED_FILES = [
+@Field final static CHANGED_FILES = [
   'Jenkinsfile*',
   '^docker-compose.new-jenkins*.yml',
   'build/new-jenkins/*'

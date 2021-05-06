@@ -58,6 +58,9 @@
     "UnnecessarySetter": {
       "enabled": false
     },
+    "VariableName": {
+      "finalRegex": "[A-Z][A-Z0-9_]*"
+    },
     "VariableTypeRequired": {
       "enabled": false
     },

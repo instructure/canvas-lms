@@ -38,9 +38,9 @@ def appendStagesAsBuildNodes(nodes,
     // it gets the correct number
     def index = i
     // we cant use String.format, so... yea
-    def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
+    def stageName = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
-    extendedStage(stage_name).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').queue(nodes) {
+    extendedStage(stageName).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').queue(nodes) {
       echo "Running on node ${env.NODE_NAME}"
       def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
       // make sure to unstash
@@ -65,10 +65,10 @@ def stashBuildScripts() {
  * common helper for adding rspec tests to be ran
  */
 def addRSpecSuites(stages) {
-  def rspec_node_total = rspec.rspecConfig().node_total
+  def rspecNodeTotal = rspec.rspecConfig().node_total
   echo 'adding RSpec Test Sets'
-  appendStagesAsBuildNodes(stages, rspec_node_total, 'RSpec Test Set', 'rspec') { index ->
-    rspec.runRSpecSuite(rspec_node_total, index)
+  appendStagesAsBuildNodes(stages, rspecNodeTotal, 'RSpec Test Set', 'rspec') { index ->
+    rspec.runRSpecSuite(rspecNodeTotal, index)
   }
 }
 
@@ -76,10 +76,10 @@ def addRSpecSuites(stages) {
  * common helper for adding selenium tests to be ran
  */
 def addSeleniumSuites(stages) {
-  def selenium_node_total = rspec.seleniumConfig().node_total
+  def seleniumNodeTotal = rspec.seleniumConfig().node_total
   echo 'adding Selenium Test Sets'
-  appendStagesAsBuildNodes(stages, selenium_node_total, 'Selenium Test Set', 'selenium') { index ->
-    rspec.runSeleniumSuite(selenium_node_total, index)
+  appendStagesAsBuildNodes(stages, seleniumNodeTotal, 'Selenium Test Set', 'selenium') { index ->
+    rspec.runSeleniumSuite(seleniumNodeTotal, index)
   }
 }
 

@@ -50,23 +50,23 @@ def slackSendCacheBuild(block) {
   // into parts.
   def i = 0
   def partitions = []
-  def cur_partition = []
-  def max_entries = 5
+  def curPartition = []
+  def maxEntries = 5
 
   while (i < buildLogPartsLength) {
-    cur_partition.add(buildLogParts[i])
+    curPartition.add(buildLogParts[i])
 
-    if (cur_partition.size() >= max_entries) {
-      partitions.add(cur_partition)
+    if (curPartition.size() >= maxEntries) {
+      partitions.add(curPartition)
 
-      cur_partition = []
+      curPartition = []
     }
 
     i++
   }
 
-  if (cur_partition.size() > 0) {
-    partitions.add(cur_partition)
+  if (curPartition.size() > 0) {
+    partitions.add(curPartition)
   }
 
   for (i = 0; i < partitions.size(); i++) {
@@ -172,7 +172,7 @@ def patchsetImage() {
     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
     if (configuration.isChangeMerged()) {
-      def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+      final GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
       sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
       sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
