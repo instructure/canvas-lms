@@ -818,7 +818,8 @@ class RCEWrapper extends React.Component {
       } else {
         bridge.hideTrays()
       }
-    } else if (event.key.match(/\w/)) {
+    } else if (['n', 'N', 'd', 'D'].indexOf(event.key) !== -1) {
+      // Prevent key events from bubbling up on touch screen device
       event.stopPropagation()
     }
   }
