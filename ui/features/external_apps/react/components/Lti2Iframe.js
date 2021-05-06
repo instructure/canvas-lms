@@ -80,6 +80,10 @@ export default class Lti2Iframe extends React.Component {
 
   handleMessage = event => {
     try {
+      if (event.origin !== ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN) {
+        return
+      }
+
       let message = event.data
       if (typeof message !== 'object') {
         message = JSON.parse(event.data)
