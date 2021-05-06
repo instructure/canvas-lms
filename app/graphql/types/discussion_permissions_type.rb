@@ -78,5 +78,29 @@ module Types
     def moderate_forum
       object[:loader].load(:moderate_forum)
     end
+
+    field :speed_grader, Boolean, null: true
+    def speed_grader
+      return false if object[:discussion_topic].assignment_id.nil?
+
+      Promise.all([
+        Loaders::AssociationLoader.for(Course, :enrollment_term).load(object[:discussion_topic].context),
+        Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic])
+      ]).then do
+        permission = !object[:discussion_topic].context.large_roster? && object[:discussion_topic].assignment.published?
+        course_permission_loader = Loaders::PermissionsLoader.for(object[:discussion_topic].context, current_user: current_user, session: session)
+        if object[:discussion_topic].context.concluded?
+          course_permission_loader.load(:read_as_admin).then do |read_as_admin|
+            permission && read_as_admin
+          end
+        else
+          course_permission_loader.load(:manage_grades).then do |manage_grades|
+            course_permission_loader.load(:view_all_grades).then do |view_all_grades|
+              permission && (manage_grades || view_all_grades)
+            end
+          end
+        end
+      end
+    end
   end
 end

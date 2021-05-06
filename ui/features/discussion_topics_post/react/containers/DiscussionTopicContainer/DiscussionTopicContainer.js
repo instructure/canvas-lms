@@ -65,8 +65,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   }
 
   // TODO: Change this to the new canGrade permission.
-  const canGrade =
-    (isGraded(discussionTopicData.assignment) && discussionTopicData?.permissions?.update) || false
+  const canGrade = discussionTopicData?.permissions?.speedGrader || false
   const canDelete = discussionTopicData?.permissions?.delete || false
   const canReadAsAdmin = !!discussionTopicData?.permissions?.readAsAdmin || false
   const canUpdate = discussionTopicData?.permissions?.update || false

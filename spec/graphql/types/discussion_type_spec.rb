@@ -71,6 +71,17 @@ describe Types::DiscussionType do
       {
         value: 'update',
         allowed: -> (user) {discussion.grants_right?(user, nil, :update)}
+      },
+      {
+        value: 'speedGrader',
+        allowed: -> (user) {
+          permission = !discussion.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
+          if discussion.context.concluded?
+            return permission && discussion.context.grants_right?(user, :read_as_admin)
+          else
+            return permission && discussion.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+          end
+        }
       }
     ]
   }

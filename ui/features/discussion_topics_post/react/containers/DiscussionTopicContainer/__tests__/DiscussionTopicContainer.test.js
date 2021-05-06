@@ -55,7 +55,8 @@ const discussionTopicMock = {
     permissions: {
       readAsAdmin: true,
       update: true,
-      delete: true
+      delete: true,
+      speedGrader: true
     }
   }
 }
@@ -210,9 +211,9 @@ describe('DiscussionTopicContainer', () => {
     })
   })
 
-  it('Should not be able to open SpeedGrader if is not an assignment', () => {
+  it('Should not be able to open SpeedGrader if the user does not have permission', () => {
     const {getByTestId, queryByTestId} = setup({
-      discussionTopic: {...discussionTopicMock.discussionTopic, assignment: null}
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
     })
 
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))

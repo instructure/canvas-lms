@@ -32,6 +32,7 @@ export const DiscussionPermissions = {
       readReplies
       reply
       update
+      speedGrader
     }
   `,
 
@@ -45,7 +46,8 @@ export const DiscussionPermissions = {
     readAsAdmin: bool,
     readReplies: bool,
     reply: bool,
-    update: bool
+    update: bool,
+    speedGrader: bool
   }),
 
   mock: ({
@@ -58,7 +60,8 @@ export const DiscussionPermissions = {
     readAsAdmin = true,
     readReplies = true,
     reply = true,
-    update = true
+    update = true,
+    speedGrader = true
   } = {}) => ({
     attach,
     create,
@@ -70,6 +73,7 @@ export const DiscussionPermissions = {
     readReplies,
     reply,
     update,
+    speedGrader,
     __typename: 'DiscussionPermissions'
   })
 }
