@@ -595,6 +595,7 @@ module CustomSeleniumActions
     dy = target_location.y - source_location.y
 
     drag_with_js source_selector, dx, dy
+    wait_for_ajaximations
   end
 
   ##

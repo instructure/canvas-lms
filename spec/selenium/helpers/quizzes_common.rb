@@ -657,7 +657,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##
@@ -682,7 +681,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##
@@ -694,7 +692,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##
