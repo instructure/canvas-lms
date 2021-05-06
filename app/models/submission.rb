@@ -119,7 +119,7 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
-  has_many :canvadocs_annotation_contexts, inverse_of: :submission
+  has_many :canvadocs_annotation_contexts, inverse_of: :submission, dependent: :destroy
   has_many :canvadocs_submissions
 
   has_many :auditor_grade_change_records,
