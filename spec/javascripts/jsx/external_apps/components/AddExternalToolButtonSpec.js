@@ -27,12 +27,12 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     server = sinon.fakeServer.create()
-    sinon.spy($, 'flashError')
+    sinon.spy($, 'flashErrorSafe')
   })
 
   suiteHooks.afterEach(() => {
     wrapper.setState({modalIsOpen: false}) // close the modal, if open
-    $.flashError.restore()
+    $.flashErrorSafe.restore()
     server.restore()
     wrapper.unmount()
   })
@@ -50,11 +50,11 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
     test('displays a flash message from the tool when there is an error', () => {
       mountComponent()
       const toolData = {
-        message: 'Something bad happened',
+        message: {html: 'Something bad happened'},
         status: 'failure'
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
-      strictEqual($.flashError.callCount, 1)
+      strictEqual($.flashErrorSafe.callCount, 1)
     })
 
     test('displays the message included with the error', () => {
@@ -64,7 +64,7 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
         status: 'failure'
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
-      const [message] = $.flashError.lastCall.args
+      const [message] = $.flashErrorSafe.lastCall.args
       equal(message, 'Something bad happened')
     })
 
@@ -74,7 +74,7 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
         status: 'failure'
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
-      const [message] = $.flashError.lastCall.args
+      const [message] = $.flashErrorSafe.lastCall.args
       equal(message, 'There was an unknown error registering the tool')
     })
   })
