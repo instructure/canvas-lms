@@ -53,6 +53,20 @@ describe('FlashNotifications', () => {
     ).toHaveTextContent('test')
   })
 
+  test('flashErrorSafe with text is the same as flashError', () => {
+    $.flashErrorSafe('here is a thing')
+    expect(document.querySelector('#flash_message_holder .ic-flash-error')).toHaveTextContent(
+      'here is a thing'
+    )
+  })
+
+  test('flashErrorSafe with "html" escapes HTML', () => {
+    $.flashErrorSafe({html: '<script>evil()</script>'})
+    expect(document.querySelector('#flash_message_holder .ic-flash-error')).toContainHTML(
+      '&lt;script&gt;'
+    )
+  })
+
   test('screenreader message', () => {
     $.screenReaderFlashMessage('<script>evil()</script>')
     expect(document.querySelector('#flash_screenreader_holder span')).toContainHTML(

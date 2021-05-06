@@ -38,6 +38,15 @@ $.flashError = function(content, timeout) {
   createScreenreaderNodeWithDelay(content)
 }
 
+// Like flashError but does escapes html even if 'html' field given To be used
+// when the input comes from an external source (e.g. an LTI tool)
+$.flashErrorSafe = function(contentString, timeout) {
+  if (typeof contentString === 'object' && contentString.html) {
+    contentString = contentString.html
+  }
+  $.flashError(contentString.toString(), timeout)
+}
+
 // Pops up a small warning box at the top of the screen.
 $.flashWarning = function(content, timeout = 3000) {
   helper.createNode('warning', content, timeout)
