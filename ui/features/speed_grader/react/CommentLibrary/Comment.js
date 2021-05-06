@@ -31,7 +31,7 @@ import I18n from 'i18n!CommentLibrary'
 const Comment = ({comment, onClick, onDelete}) => {
   const [isTruncated, setIsTruncated] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isHovering, setIsHovering] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const handleUpdate = truncated => {
     setIsTruncated(truncated)
   }
@@ -40,17 +40,19 @@ const Comment = ({comment, onClick, onDelete}) => {
     <View as="div" position="relative" borderWidth="none none small none">
       <Flex>
         <Flex.Item as="div" shouldGrow size="80%" shouldShrink>
-          <PresentationContent>
-            <View
-              as="div"
-              padding="small"
-              cursor="pointer"
-              isWithinText={false}
-              onClick={() => onClick(comment)}
-              background={isHovering ? 'brand' : 'transparent'}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
+          <View
+            as="div"
+            padding="small"
+            cursor="pointer"
+            isWithinText={false}
+            onClick={() => onClick(comment)}
+            background={isFocused ? 'brand' : 'transparent'}
+            onMouseEnter={() => setIsFocused(true)}
+            onMouseLeave={() => setIsFocused(false)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          >
+            <PresentationContent>
               {!isExpanded ? (
                 <TruncateText onUpdate={handleUpdate} maxLines={4}>
                   {comment}
@@ -58,13 +60,13 @@ const Comment = ({comment, onClick, onDelete}) => {
               ) : (
                 comment
               )}
-            </View>
-          </PresentationContent>
-          <ScreenReaderContent>
-            <Button onClick={() => onClick(comment)}>
-              {I18n.t('Use comment %{comment}', {comment})}
-            </Button>
-          </ScreenReaderContent>
+            </PresentationContent>
+            <ScreenReaderContent>
+              <Button onClick={() => onClick(comment)}>
+                {I18n.t('Use comment %{comment}', {comment})}
+              </Button>
+            </ScreenReaderContent>
+          </View>
         </Flex.Item>
         <Flex.Item size="20%" shouldGrow align="start" textAlign="end">
           <View as="div" padding="x-small small 0 0">
