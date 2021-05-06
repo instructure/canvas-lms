@@ -38,9 +38,11 @@ export default {
     if (data.decorative) {
       elem.setAttribute("alt", "")
       elem.setAttribute("data-decorative", "true")
+      elem.setAttribute("role", "presentation")
     } else {
       elem.setAttribute("alt", data.alt)
       elem.removeAttribute("data-decorative")
+      elem.removeAttribute("role")
     }
     return elem
   },
