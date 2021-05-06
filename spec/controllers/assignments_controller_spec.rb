@@ -836,6 +836,15 @@ describe AssignmentsController do
 
         expect(assigns[:js_env][:PREREQS][:items].first[:prev][:title]).to eq(@assignment.title)
       end
+
+      it "sets belongs to unpublished module when assignment is part of a unpublished module" do
+        @mod = @course.context_modules.create!(name: 'Unpublished module')
+        @mod.unpublish
+        @mod.add_item(type: 'assignment', id: @assignment.id)
+
+        get 'show', params: {course_id: @course.id, id: @assignment.id}
+        expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
+      end
     end
 
     it "should not show locked external tool assignments" do

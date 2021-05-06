@@ -120,6 +120,10 @@ class AssignmentsController < ApplicationController
        {}
      end
 
+    js_env({
+      belongs_to_unpublished_module: @locked && !@locked[:can_view] && @locked.dig(:context_module, "workflow_state") == "unpublished"
+    })
+
     mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
     if mark_done_presenter.has_requirement?
       js_env({

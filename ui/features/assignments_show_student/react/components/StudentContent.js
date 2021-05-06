@@ -35,6 +35,7 @@ import StudentFooter from './StudentFooter'
 import {Text} from '@instructure/ui-elements'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-layout'
+import UnpublishedModule from '../UnpublishedModule'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
@@ -104,6 +105,8 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
   } else if (assignment.nonDigitalSubmission) {
     return renderSubmissionlessAssignment({assignment}, alertContext)
+  } else if (ENV.belongs_to_unpublished_module) {
+    return <UnpublishedModule />
   } else if (submission == null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
