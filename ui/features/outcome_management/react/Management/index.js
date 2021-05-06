@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useReducer, useState} from 'react'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
@@ -80,14 +80,13 @@ const OutcomeManagementPanel = () => {
     onChangeHandler: onSearchChangeHandler,
     onClearHandler: onSearchClearHandler
   } = useSearch()
-  const [selectedOutcomes, setSelectedOutcomes] = useState({})
+  const [selectedOutcomes, toggleSelectedOutcomes] = useReducer((prevState, id) => {
+    const updatedState = {...prevState}
+    prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
+    return updatedState
+  }, {})
+
   const selected = Object.keys(selectedOutcomes).length
-  const onSelectOutcomesHandler = id =>
-    setSelectedOutcomes(prevState => {
-      const updatedState = {...prevState}
-      prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
-      return updatedState
-    })
   const noop = () => {}
   const {
     error,
@@ -132,16 +131,20 @@ const OutcomeManagementPanel = () => {
       openEditGroupModal()
     }
   }
-  const outcomeMenuHandler = (id, action) => {
-    setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id)?.node)
-    if (action === 'remove') {
-      openOutcomeRemoveModal()
-    } else if (action === 'edit') {
-      openOutcomeEditModal()
-    } else if (action === 'move') {
-      openOutcomeMoveModal()
-    }
-  }
+  const outcomeMenuHandler = useCallback(
+    (id, action) => {
+      setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id)?.node)
+      if (action === 'remove') {
+        openOutcomeRemoveModal()
+      } else if (action === 'edit') {
+        openOutcomeEditModal()
+      } else if (action === 'move') {
+        openOutcomeMoveModal()
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [group]
+  )
 
   const onMoveHandler = async newParentGroup => {
     closeMoveGroupModal()
@@ -254,7 +257,7 @@ const OutcomeManagementPanel = () => {
                     loading={loading}
                     selectedOutcomes={selectedOutcomes}
                     searchString={searchString}
-                    onSelectOutcomesHandler={onSelectOutcomesHandler}
+                    onSelectOutcomesHandler={toggleSelectedOutcomes}
                     onOutcomeGroupMenuHandler={groupMenuHandler}
                     onOutcomeMenuHandler={outcomeMenuHandler}
                     onSearchChangeHandler={onSearchChangeHandler}
