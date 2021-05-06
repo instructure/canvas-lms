@@ -91,6 +91,10 @@ describe Types::DiscussionType do
           discussion.assignment.has_peer_reviews? &&
           discussion.assignment.grants_right?(user, :grade)
         }
+      },
+      {
+        value: 'showRubric',
+        allowed: -> (user) {!discussion.assignment_id.nil? && !discussion.assignment.rubric.nil?}
       }
     ]
   }

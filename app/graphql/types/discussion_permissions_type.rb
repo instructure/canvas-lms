@@ -115,5 +115,16 @@ module Types
         end
       end
     end
+
+    field :show_rubric, Boolean, null: true
+    def show_rubric
+      return false if object[:discussion_topic].assignment_id.nil?
+
+      Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do |assignment|
+        Loaders::AssociationLoader.for(Assignment, :rubric).load(assignment).then do |rubric|
+          !rubric.nil?
+        end
+      end
+    end
   end
 end

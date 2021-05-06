@@ -171,6 +171,7 @@ const defaultTopic = {
     update: true,
     speedGrader: true,
     peerReview: true,
+    showRubric: true,
     __typename: 'DiscussionPermissions'
   },
   postedAt: '2020-11-23T11:40:44-07:00',

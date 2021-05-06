@@ -34,6 +34,7 @@ export const DiscussionPermissions = {
       update
       speedGrader
       peerReview
+      showRubric
     }
   `,
 
@@ -49,7 +50,8 @@ export const DiscussionPermissions = {
     reply: bool,
     update: bool,
     speedGrader: bool,
-    peerReview: bool
+    peerReview: bool,
+    showRubric: bool
   }),
 
   mock: ({
@@ -64,7 +66,8 @@ export const DiscussionPermissions = {
     reply = true,
     update = true,
     speedGrader = true,
-    peerReview = true
+    peerReview = true,
+    showRubric = true
   } = {}) => ({
     attach,
     create,
@@ -78,6 +81,7 @@ export const DiscussionPermissions = {
     update,
     speedGrader,
     peerReview,
+    showRubric,
     __typename: 'DiscussionPermissions'
   })
 }
