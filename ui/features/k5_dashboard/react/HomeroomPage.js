@@ -66,6 +66,7 @@ export const fetchHomeroomAnnouncements = cards =>
             courseName: course.shortName,
             courseUrl: course.href,
             canEdit: announcement.permissions.update,
+            published: course.published,
             announcement: {
               title: announcement.title,
               message: announcement.message,

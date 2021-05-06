@@ -19,9 +19,11 @@
 import React from 'react'
 import I18n from 'i18n!dashboard_layout_HomeroomAnnouncementsLayout'
 import {array, bool} from 'prop-types'
+
+import {View} from '@instructure/ui-view'
+
 import HomeroomAnnouncement from './HomeroomAnnouncement'
 import EmptyHomeroomAnnouncement from './EmptyHomeroomAnnouncement'
-import {View} from '@instructure/ui-view'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
 export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, loading}) {
@@ -31,7 +33,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
         <>
           <LoadingSkeleton
             screenReaderLabel={I18n.t('Loading Homeroom Course Name')}
-            margin="small 0"
+            margin="medium 0 small"
             width="20em"
             height="1.5em"
           />
@@ -63,6 +65,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
                       message={homeroom.announcement.message}
                       url={homeroom.announcement.url}
                       attachment={homeroom.announcement.attachment}
+                      published={homeroom.published}
                     />
                   </View>
                 )

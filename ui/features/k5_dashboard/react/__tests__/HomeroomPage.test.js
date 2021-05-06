@@ -60,7 +60,8 @@ describe('HomeroomPage', () => {
           originalName: 'Computer Science 101',
           courseCode: 'CS-001',
           isHomeroom: false,
-          canManage: false
+          canManage: false,
+          published: true
         }
       ],
       cardsLoading: false

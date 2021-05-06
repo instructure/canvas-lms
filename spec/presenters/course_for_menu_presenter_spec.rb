@@ -89,6 +89,11 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
+    it 'sets the published value' do
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      expect(cs_presenter.to_h.key?(:published)).to eq true
+    end
+
     context 'with `homeroom_course` setting enabled' do
       before do
         course.update! settings: course.settings.merge(homeroom_course: true)
