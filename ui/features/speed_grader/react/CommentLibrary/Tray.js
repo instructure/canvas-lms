@@ -51,7 +51,7 @@ const Tray = ({
         <Flex direction="column" as="div">
           <Flex.Item textAlign="center" as="header">
             <View as="div" padding="small 0 medium xx-small">
-              <div style={{float: 'left'}}>
+              <div style={{float: 'left', margin: '6px'}}>
                 <IconButton
                   size="small"
                   screenReaderLabel={I18n.t('Close comment library')}
@@ -62,7 +62,7 @@ const Tray = ({
                 />
               </div>
               <View display="inline-block" margin="0 auto">
-                <Text weight="bold" size="medium">
+                <Text weight="bold" size="medium" as="h2">
                   {I18n.t('Manage Comment Library')}
                 </Text>
               </View>
