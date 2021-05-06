@@ -18,8 +18,8 @@
 
 import normalizeLocale from './rce/normalizeLocale'
 import {renderIntoDiv as render} from './rce/root'
-import getRceTranslations from './getRceTranslations'
 import {headerFor, originFromHost} from './sidebar/sources/api'
+import getTranslations from './getTranslations'
 import 'tinymce'
 
 if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
@@ -46,7 +46,7 @@ export function renderIntoDiv(editorEl, props, cb) {
     // unlike the pretranslated builds, in the default, non-pretranslated build,
     // this will cause a new network round trip to get all the locale info we
     // and tinymce need.
-    getRceTranslations(language)
+    getTranslations(language)
       .then(() => render(editorEl, props, cb))
       .catch(() => {
         console.error(
