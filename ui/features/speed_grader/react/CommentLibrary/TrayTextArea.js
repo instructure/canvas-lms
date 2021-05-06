@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {TextArea} from '@instructure/ui-text-area'
@@ -26,16 +26,21 @@ import I18n from 'i18n!CommentLibrary'
 
 const TrayTextArea = ({onAdd, isAdding}) => {
   const [text, setText] = useState('')
+  const textInputRef = useRef()
   useEffect(() => {
     if (isAdding) {
       return
     }
-    setText('')
+    if (text !== '') {
+      setText('')
+      textInputRef.current.focus()
+    }
   }, [isAdding])
 
   return (
     <>
       <TextArea
+        textareaRef={el => (textInputRef.current = el)}
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder={I18n.t('Write something...')}
