@@ -215,12 +215,12 @@ export function enhanceUserContent() {
       // only proceed if this is a canvas file link
       return
     }
-    let $download_btn, $preview_link, $preview_container
+    let $download_btn, $preview_link
     if ($.trim($link.text())) {
-      const $span = $("<span class='instructure_file_holder link_holder'/>")
-      // the preview's container
-      const preview_id = previewId()
-      $preview_container = $('<div role="region" />').attr('id', preview_id).css('display', 'none')
+      // instructure_file_link_holder is used to find file_preview_link
+      const $span = $(
+        "<span class='instructure_file_holder link_holder instructure_file_link_holder'/>"
+      )
       if (ENV.FEATURES?.rce_better_file_downloading) {
         const qs = href.searchParams
         qs.delete('wrap')
@@ -248,8 +248,6 @@ export function enhanceUserContent() {
           } else {
             // link opens inline preview
             $link.addClass('file_preview_link')
-            $link.attr('aria-expanded', 'false')
-            $link.attr('aria-controls', preview_id)
           }
         } else if (!$link.hasClass('inline_disabled')) {
           $preview_link = $(
@@ -267,16 +265,31 @@ export function enhanceUserContent() {
       $link.removeClass('instructure_scribd_file').before($span).appendTo($span)
       $span.append($preview_link)
       $span.append($download_btn)
-      $span.append($preview_container)
-      if ($link.hasClass('auto_open')) {
-        if ($preview_link) {
-          $preview_link.click()
-        } else if (ENV.FEATURES?.rce_better_file_previewing) {
-          $link.click()
-        }
-      }
     }
   })
+
+  // Some schools have been using 'file_preview_link' for inline previews
+  // outside of the RCE so find them all after we've gone through and
+  // added our own (above)
+  $('.instructure_file_link_holder')
+    .find('a.file_preview_link, a.scribd_file_preview_link')
+    .each(function () {
+      const $link = $(this)
+      if ($link.siblings('.preview_container').length) {
+        return
+      }
+
+      const preview_id = previewId()
+      $link.attr('aria-expanded', 'false')
+      $link.attr('aria-controls', preview_id)
+      const $preview_container = $('<div role="region" class="preview_container" />')
+        .attr('id', preview_id)
+        .css('display', 'none')
+      $link.parent().append($preview_container)
+      if ($link.hasClass('auto_open')) {
+        $link.click()
+      }
+    })
 
   $('.user_content.unenhanced a,.user_content.unenhanced+div.answers a')
     .find('img.media_comment_thumbnail')
@@ -523,7 +536,7 @@ $(function () {
     })
   })
   if ($.filePreviewsEnabled()) {
-    $('a.file_preview_link').live('click', function (event) {
+    $('a.file_preview_link, a.scribd_file_preview_link').live('click', function (event) {
       if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
         // if any modifier keys are pressed, do the browser default thing
         return

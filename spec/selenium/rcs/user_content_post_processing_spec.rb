@@ -245,6 +245,40 @@ describe 'user_content post processing' do
       expect(f('iframe', preview_container)).to be_displayed
     end
 
+    it 'shows inline preview for instructure_file_link_holder file_preview_link' do
+      create_wiki_page_with_content(
+        'page',
+        "<span class='instructure_file_link_holder'>
+          <a id='thelink' class='file_preview_link'
+          href='#{@file_url}/preview'>file</a></span>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a#thelink')
+
+      wait_for_loading_image { file_link.click }
+      preview_container = f('#preview_1[role="region"]')
+      expect(f('.hide_file_preview_link', preview_container)).to be_displayed
+      expect(f('iframe', preview_container)).to be_displayed
+    end
+
+    it 'shows inline preview for instructure_file_link_holder scribd_file_preview_link' do
+      create_wiki_page_with_content(
+        'page',
+        "<span class='instructure_file_link_holder'>
+          <a id='thelink' class='scribd_file_preview_link'
+          href='#{@file_url}/preview'>file</a></span>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a#thelink')
+
+      wait_for_loading_image { file_link.click }
+      preview_container = f('#preview_1[role="region"]')
+      expect(f('.hide_file_preview_link', preview_container)).to be_displayed
+      expect(f('iframe', preview_container)).to be_displayed
+    end
+
     it 'performs the browser default action if inline preview link is clicked with a modifier key pressed' do
       create_wiki_page_with_content(
         'page',
