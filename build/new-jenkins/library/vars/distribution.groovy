@@ -23,22 +23,22 @@ import groovy.time.*
  * the closure.
  *
  * @nodes: the hash of nodes to be ran later
- * @stage_count: the amount of nodes to add to the hash
- * @stage_name_prefix: the name to prefix the stages with
- * @test_label: specific test label used to mark the success and identify node pool. null/false if no marking.
- * @stage_block: the closure thats exectued after unstashing build scripts
+ * @stageCount: the amount of nodes to add to the hash
+ * @stageNamePrefix: the name to prefix the stages with
+ * @testLabel: specific test label used to mark the success and identify node pool. null/false if no marking.
+ * @stageBlock: the closure thats exectued after unstashing build scripts
  */
 def appendStagesAsBuildNodes(nodes,
-                             stage_count,
-                             stage_name_prefix,
-                             test_label,
-                             stage_block) {
-  for (int i = 0; i < stage_count; i++) {
+                             stageCount,
+                             stageNamePrefix,
+                             testLabel,
+                             stageBlock) {
+  for (int i = 0; i < stageCount; i++) {
     // make this a local variable so when the closure resolves
     // it gets the correct number
     def index = i
     // we cant use String.format, so... yea
-    def stageName = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
+    def stageName = "$stageNamePrefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
     extendedStage(stageName).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').queue(nodes) {
       echo "Running on node ${env.NODE_NAME}"
@@ -46,7 +46,7 @@ def appendStagesAsBuildNodes(nodes,
       // make sure to unstash
       unstash name: 'build-dir'
       unstash name: 'build-docker-compose'
-      stage_block(index)
+      stageBlock(index)
     }
   }
                              }

@@ -77,26 +77,26 @@ def _runRspecTestSuite(
     index,
     compose,
     prefix,
-    max_fail,
-    reruns_retry,
-    test_file_pattern,
-    exclude_regex,
-    docker_processes,
-    rspec_processes,
-    force_failure,
+    maxFail,
+    rerunsRetry,
+    testFilePattern,
+    excludeRegex,
+    dockerProcesses,
+    rspecProcesses,
+    forceFailure,
     patchsetTag
 ) {
   withEnv([
       "CI_NODE_INDEX=$index",
       "COMPOSE_FILE=$compose",
-      "RERUNS_RETRY=$reruns_retry",
-      "MAX_FAIL=$max_fail",
-      "TEST_PATTERN=$test_file_pattern",
-      "EXCLUDE_TESTS=$exclude_regex",
+      "RERUNS_RETRY=$rerunsRetry",
+      "MAX_FAIL=$maxFail",
+      "TEST_PATTERN=$testFilePattern",
+      "EXCLUDE_TESTS=$excludeRegex",
       "CI_NODE_TOTAL=$total",
-      "DOCKER_PROCESSES=$docker_processes",
-      "RSPEC_PROCESSES=$rspec_processes",
-      "FORCE_FAILURE=$force_failure",
+      "DOCKER_PROCESSES=$dockerProcesses",
+      "RSPEC_PROCESSES=$rspecProcesses",
+      "FORCE_FAILURE=$forceFailure",
       'POSTGRES_PASSWORD=sekret',
       'SELENIUM_VERSION=3.141.59-20201119',
       "PATCHSET_TAG=$patchsetTag",
@@ -185,8 +185,8 @@ def uploadRSpecCoverage() {
   _uploadCoverage('rspec', 'canvas-lms-rspec')
 }
 
-def _uploadCoverage(prefix, coverage_name) {
-  reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverage_name/coverage")
+def _uploadCoverage(prefix, coverageName) {
+  reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverageName/coverage")
 }
 
 def uploadParallelLog() {
