@@ -39,6 +39,10 @@ ready(() => {
         courseOverview={ENV.COURSE.course_overview}
         userIsInstructor={ENV.COURSE.is_instructor}
         hideFinalGrades={ENV.COURSE.hide_final_grades}
+        showLearningMasteryGradebook={
+          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student
+        }
+        outcomeProficiency={ENV.COURSE.outcome_proficiency}
         showStudentView={ENV.COURSE.show_student_view}
         studentViewPath={ENV.COURSE.student_view_path}
       />,

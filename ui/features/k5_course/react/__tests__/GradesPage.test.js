@@ -45,6 +45,7 @@ describe('GradesPage', () => {
     currentUser: {
       id: '1'
     },
+    showLearningMasteryGradebook: false,
     ...overrides
   })
 
@@ -230,6 +231,34 @@ describe('GradesPage', () => {
       await waitFor(() => expect(getByText('WWII Report')).toBeInTheDocument())
       expect(queryByText('Total: 89.39%')).not.toBeInTheDocument()
       expect(queryByText('View Assignment Group Totals')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('learning mastery gradebook', () => {
+    it('shows no tabs if LMGB is disabled', () => {
+      const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
+      expect(getByText('Assignment')).toBeInTheDocument()
+      expect(queryByText('Assignments')).not.toBeInTheDocument()
+      expect(queryByText('Learning Mastery')).not.toBeInTheDocument()
+    })
+
+    it('shows tabs for both gradebooks if LMGB is enabled', () => {
+      const {getByRole} = render(<GradesPage {...getProps({showLearningMasteryGradebook: true})} />)
+      expect(getByRole('tab', {name: 'Assignments', selected: true})).toBeInTheDocument()
+      expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
+    })
+
+    it('shows LMGB and hides assignments when clicking on the tab', async () => {
+      const {getByRole, getByText, queryByText} = render(
+        <GradesPage {...getProps({showLearningMasteryGradebook: true})} />
+      )
+      act(() => getByRole('tab', {name: 'Learning Mastery'}).click())
+      ;['Assignment', 'Due Date', 'Assignment Group', 'Score'].forEach(header => {
+        expect(queryByText(header)).not.toBeInTheDocument()
+      })
+      expect(getByText('Learning outcome gradebook for History')).toBeInTheDocument()
+      await waitFor(() => expect(queryByText('Loading outcome results')).not.toBeInTheDocument())
+      expect(getByText('An error occurred loading outcomes data.')).toBeInTheDocument()
     })
   })
 })

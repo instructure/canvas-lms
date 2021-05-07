@@ -111,3 +111,9 @@
 a#student-view-btn {
     text-decoration: none;
 }
+
+// Increases the spacing between learning mastery gradebook outcome groups to
+// account for k5's larger font size.
+.outcomeGroup {
+  margin-top: 1em;
+}

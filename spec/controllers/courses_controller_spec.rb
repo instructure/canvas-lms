@@ -1628,6 +1628,14 @@ describe CoursesController do
         expect(bundle.size).to eq 1
       end
     end
+
+    it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
+      @course.enable_feature!(:student_outcome_gradebook)
+      user_session(@student)
+
+      get 'show', params: {:id => @course.id}
+      expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+    end
   end
 
   describe "POST 'unenroll_user'" do

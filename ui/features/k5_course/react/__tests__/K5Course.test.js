@@ -58,7 +58,8 @@ const defaultProps = {
   hideFinalGrades: false,
   userIsInstructor: false,
   showStudentView: false,
-  studentViewPath: '/courses/30/student_view/1'
+  studentViewPath: '/courses/30/student_view/1',
+  showLearningMasteryGradebook: false
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -247,6 +248,13 @@ describe('K-5 Subject Course', () => {
     it('shows course total', async () => {
       const {findByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
       expect(await findByText('Total: 89.39%')).toBeInTheDocument()
+    })
+
+    it('shows tab for LMGB if enabled', () => {
+      const {getByRole} = render(
+        <K5Course {...defaultProps} showLearningMasteryGradebook defaultTab={TAB_IDS.GRADES} />
+      )
+      expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
     })
   })
 

@@ -61,6 +61,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import ManageCourseTray from './ManageCourseTray'
 import {GradesPage} from './GradesPage'
+import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 
 const HERO_HEIGHT_PX = 400
 
@@ -188,7 +189,9 @@ export function K5Course({
   currentUser,
   userIsInstructor,
   showStudentView,
-  studentViewPath
+  studentViewPath,
+  showLearningMasteryGradebook,
+  outcomeProficiency
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [courseNavLinks, setCourseNavLinks] = useState([])
@@ -273,6 +276,8 @@ export function K5Course({
             hideFinalGrades={hideFinalGrades}
             currentUser={currentUser}
             userIsInstructor={userIsInstructor}
+            showLearningMasteryGradebook={showLearningMasteryGradebook}
+            outcomeProficiency={outcomeProficiency}
           />
         )}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
@@ -299,7 +304,9 @@ K5Course.propTypes = {
   currentUser: PropTypes.object.isRequired,
   userIsInstructor: PropTypes.bool.isRequired,
   showStudentView: PropTypes.bool.isRequired,
-  studentViewPath: PropTypes.string.isRequired
+  studentViewPath: PropTypes.string.isRequired,
+  showLearningMasteryGradebook: PropTypes.bool.isRequired,
+  outcomeProficiency: outcomeProficiencyShape
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

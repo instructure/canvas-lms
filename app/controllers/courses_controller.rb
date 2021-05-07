@@ -2081,6 +2081,8 @@ class CoursesController < ApplicationController
                    is_instructor: @context.user_is_instructor?(@current_user),
                    course_overview: @context&.wiki&.front_page&.body,
                    hide_final_grades: @context.hide_final_grades?,
+                   student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+                   outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
                    show_student_view: can_do(@context, @current_user, :use_student_view),
                    student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1)
                  }
@@ -2184,7 +2186,7 @@ class CoursesController < ApplicationController
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 
           js_bundle :k5_course, :context_modules
-          css_bundle :k5_dashboard, :content_next, :context_modules2
+          css_bundle :k5_dashboard, :content_next, :context_modules2, :grade_summary
         when 'announcements'
           js_bundle :announcements
           css_bundle :announcements_index

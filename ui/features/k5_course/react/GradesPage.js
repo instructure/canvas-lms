@@ -20,18 +20,26 @@ import React, {useState, useCallback, useEffect} from 'react'
 import I18n from 'i18n!k5_course_GradesPage'
 import PropTypes from 'prop-types'
 
+import {Tabs} from '@instructure/ui-tabs'
+import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import GradingPeriodSelect from './GradingPeriodSelect'
 import GradesEmptyPage from './GradesEmptyPage'
 import GradeDetails from './GradeDetails'
+import IndividualStudentMastery from '@canvas/grade-summary'
+import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 
 export const GradesPage = ({
   courseId,
   courseName,
   hideFinalGrades,
   currentUser,
-  userIsInstructor
+  userIsInstructor,
+  showLearningMasteryGradebook,
+  outcomeProficiency
 }) => {
   const [loadingGradingPeriods, setLoadingGradingPeriods] = useState(true)
   const [error, setError] = useState(null)
@@ -39,6 +47,7 @@ export const GradesPage = ({
   const [currentGradingPeriodId, setCurrentGradingPeriodId] = useState(null)
   const [allowTotalsForAllPeriods, setAllowTotalsForAllPeriods] = useState(true)
   const [selectedGradingPeriodId, setSelectedGradingPeriodId] = useState(null)
+  const [selectedTab, setSelectedTab] = useState('assignments')
 
   useFetchApi({
     path: `/api/v1/courses/${courseId}`,
@@ -66,9 +75,7 @@ export const GradesPage = ({
   const allGradingPeriodsSelected = gradingPeriods?.length > 0 && selectedGradingPeriodId === null
   const showTotals = !hideFinalGrades && !(allGradingPeriodsSelected && !allowTotalsForAllPeriods)
 
-  return userIsInstructor ? (
-    <GradesEmptyPage userIsInstructor courseId={courseId} />
-  ) : (
+  const renderAssignments = () => (
     <>
       {(gradingPeriods?.length > 0 || loadingGradingPeriods) && (
         <GradingPeriodSelect
@@ -89,6 +96,52 @@ export const GradesPage = ({
       />
     </>
   )
+
+  const renderOutcomes = () => (
+    <>
+      <ScreenReaderContent>
+        {I18n.t('Learning outcome gradebook for %{courseName}', {courseName})}
+      </ScreenReaderContent>
+      <div id="outcomes">
+        <IndividualStudentMastery
+          courseId={courseId}
+          studentId={currentUser.id}
+          outcomeProficiency={outcomeProficiency}
+        />
+      </div>
+    </>
+  )
+
+  if (userIsInstructor) {
+    return <GradesEmptyPage userIsInstructor courseId={courseId} />
+  } else if (showLearningMasteryGradebook) {
+    return (
+      <Tabs
+        variant="secondary"
+        onRequestTabChange={(_e, {id}) => setSelectedTab(id)}
+        margin="medium 0 0"
+      >
+        <Tabs.Panel
+          renderTitle={<Text size="small">{I18n.t('Assignments')}</Text>}
+          id="k5-assignments"
+          selected={selectedTab === 'k5-assignments'}
+          padding="small 0"
+        >
+          {renderAssignments()}
+        </Tabs.Panel>
+        <Tabs.Panel
+          renderTitle={<Text size="small">{I18n.t('Learning Mastery')}</Text>}
+          id="k5-outcomes"
+          selected={selectedTab === 'k5-outcomes'}
+          padding="small 0"
+        >
+          {renderOutcomes()}
+        </Tabs.Panel>
+      </Tabs>
+    )
+  } else {
+    return renderAssignments()
+  }
 }
 
 GradesPage.propTypes = {
@@ -96,7 +149,9 @@ GradesPage.propTypes = {
   courseName: PropTypes.string.isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
-  userIsInstructor: PropTypes.bool.isRequired
+  userIsInstructor: PropTypes.bool.isRequired,
+  showLearningMasteryGradebook: PropTypes.bool.isRequired,
+  outcomeProficiency: outcomeProficiencyShape
 }
 
 export default GradesPage
