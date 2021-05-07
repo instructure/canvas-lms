@@ -109,7 +109,10 @@ if (ENV.use_high_contrast) {
   window.fetch = function() {
     window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
     const promise = fetch.apply(this, arguments)
-    promise.finally(() => window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--)
+    promise.finally(() => {
+      window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
+      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
+    })
     return promise
   }
 }

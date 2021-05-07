@@ -104,6 +104,7 @@ module CustomWaitMethods
         window.addEventListener('canvasXHRComplete', onXHRCompleted)
       }
     JS
+    raise "ajax requests not completed" if result == -2
     result
   end
 
