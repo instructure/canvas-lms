@@ -137,6 +137,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'shows the list of missing assignments in dropdown' do
+      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
       assignment1 = create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
       create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
 
@@ -154,6 +155,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'clicking list twice hides missing assignments' do
+      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
       create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
 
       get "/#schedule"
