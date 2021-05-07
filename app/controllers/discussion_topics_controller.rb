@@ -633,20 +633,12 @@ class DiscussionTopicsController < ApplicationController
 
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
-
-    # Render updated UI if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_announcement_discussion_edit)
-      js_bundle :discussion_topic_edit_v2
-      render html: '', layout: true
-      return
-    end
-
     render :edit
   end
 
   def show
     # Render updated Post UI if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_discussions_post)
+    if @context.feature_enabled?(:react_discussions_post)
       js_env({
                course_id: params[:course_id],
                discussion_topic_id: params[:id]

@@ -15,21 +15,17 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
-react_announcement_discussion_edit:
-  state: hidden
-  display_name: Update announcement/discussion edit page to use react/instui
-  description: |-
-    This refactor will make this page more maintainable and easily
-    allow us to make the page more accessible
-  applies_to: RootAccount
-
 react_discussions_post:
   state: hidden
-  display_name: Update Discussions to use React & InstUI
+  beta: true
+  display_name: New Discussions
   description: |-
-    This refactor will make our Discussions Posts more maintainable and
-    allow for easier changes in the future
-  applies_to: RootAccount
+    This feature enhances the Canvas experience within
+    Discussions. When this flag is enabled, ongoing improvements
+    will be displayed automatically with every release. For full
+    details about New Discussions, please see the New Discussions
+    beta user group in the Canvas Community.
+  applies_to: Course
 
 react_inbox:
   state: hidden

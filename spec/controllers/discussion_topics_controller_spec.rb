@@ -331,6 +331,14 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:disable_keyboard_shortcuts]).to be_truthy
     end
 
+    it "js_bundles includes discussion_topics_post when ff is on" do
+      @course.enable_feature!(:react_discussions_post)
+      user_session(@teacher)
+      @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello')
+      get 'show', params: {:course_id => @course.id, :id => @discussion.id}
+      expect(assigns[:js_bundles].first).to include(:discussion_topics_post)
+    end
+
     it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
@@ -884,13 +892,6 @@ describe DiscussionTopicsController do
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
-    end
-
-    it "js_bundles includes discussion_topic_edit_v2 when ff is on" do
-      user_session(@teacher)
-      @course.account.enable_feature!(:react_announcement_discussion_edit)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
   end
 
