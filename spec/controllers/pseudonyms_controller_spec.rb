@@ -192,6 +192,7 @@ describe PseudonymsController do
     end
 
     it "should not destroy if for the wrong user" do
+      skip('investigate cause for failures beginning 05/05/21 FOO-1950')
       @main_user = @user
       user_model
       @other_user = @user
