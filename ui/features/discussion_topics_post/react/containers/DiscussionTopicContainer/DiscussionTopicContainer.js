@@ -72,6 +72,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canUnpublish = props.discussionTopic.canUnpublish || false
   const canPeerReview = discussionTopicData?.permissions?.peerReview
   const canShowRubric = discussionTopicData?.permissions?.showRubric
+  const canAddRubric = discussionTopicData?.permissions?.addRubric
 
   if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
@@ -292,6 +293,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       }
                       onPeerReviews={canPeerReview ? () => {} : null}
                       onShowRubric={canShowRubric ? () => {} : null}
+                      onAddRubric={canAddRubric ? () => {} : null}
                       isPublished={discussionTopicData.published}
                       canUnpublish={canUnpublish}
                       isSubscribed={discussionTopicData.subscribed}

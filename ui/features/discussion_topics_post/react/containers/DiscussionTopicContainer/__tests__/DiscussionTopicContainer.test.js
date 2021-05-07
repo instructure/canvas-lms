@@ -220,6 +220,24 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('speedGrader')).toBeNull()
   })
 
+  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {addRubric: true}}
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Add Rubric')).toBeInTheDocument()
+  })
+
+  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {showRubric: true}}
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Show Rubric')).toBeInTheDocument()
+  })
+
   it('renders a modal to send content', async () => {
     const container = setup(discussionTopicMock)
     const kebob = await container.findByTestId('discussion-post-menu-trigger')

@@ -183,12 +183,20 @@ const getMenuConfigs = props => {
       selectionCallback: props.onOpenSpeedgrader
     })
   }
-  if (props.onShowRubric) {
+  if (props.onShowRubric && !props.onAddRubric) {
     options.push({
       key: 'rubric',
       icon: <IconRubricSolid />,
       label: I18n.t('Show Rubric'),
       selectionCallback: props.onShowRubric
+    })
+  }
+  if (props.onAddRubric) {
+    options.push({
+      key: 'rubric',
+      icon: <IconRubricSolid />,
+      label: I18n.t('Add Rubric'),
+      selectionCallback: props.onAddRubric
     })
   }
   if (props.onShareToCommons) {
@@ -290,6 +298,10 @@ PostToolbar.propTypes = {
    * Callback to be fired when Show Rubric action is fired.
    */
   onShowRubric: PropTypes.func,
+  /**
+   * Callback to be fired when Add Rubric action is fired
+   */
+  onAddRubric: PropTypes.func,
   /**
    * Callback to be fired when Share to Commons action is fired.
    */

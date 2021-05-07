@@ -95,6 +95,14 @@ describe Types::DiscussionType do
       {
         value: 'showRubric',
         allowed: -> (user) {!discussion.assignment_id.nil? && !discussion.assignment.rubric.nil?}
+      },
+      {
+        value: 'addRubric',
+        allowed: -> (user) {
+          !discussion.assignment_id.nil? &&
+          discussion.assignment.rubric.nil? &&
+          discussion.assignment.grants_right?(user, :update)
+        }
       }
     ]
   }

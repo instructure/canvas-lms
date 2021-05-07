@@ -126,5 +126,18 @@ module Types
         end
       end
     end
+
+    field :add_rubric, Boolean, null: true
+    def add_rubric
+      return false if object[:discussion_topic].assignment_id.nil?
+
+      Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do |assignment|
+        Loaders::AssociationLoader.for(Assignment, :rubric).load(assignment).then do |rubric|
+          Loaders::PermissionsLoader.for(assignment, current_user: current_user, session: session).load(:update).then do |can_add_rubric|
+            rubric.nil? && can_add_rubric
+          end
+        end
+      end
+    end
   end
 end
