@@ -77,4 +77,21 @@ describe('LatePolicyStatusDisplay', () => {
       getByText('Attempt 2: 8/32Late Penalty: minus 3 PointsGrade: 5/32')
     )
   })
+
+  it('defaults to 0 if no value is given for pointsDeducted', () => {
+    const {getByTestId, getByText} = render(
+      <LatePolicyStatusDisplay
+        attempt={2}
+        grade="8"
+        originalGrade="8"
+        gradingType="points"
+        pointsPossible={32}
+      />
+    )
+
+    const tooltipContent = getByTestId('late-policy-accessible-tip-content')
+    expect(tooltipContent).toContainElement(
+      getByText('Attempt 2: 8/32Late Penalty: minus 0 PointsGrade: 8/32')
+    )
+  })
 })

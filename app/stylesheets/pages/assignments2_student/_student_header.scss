@@ -16,31 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.assignment-pizza-header-outer {
-  width: 100%;
-  position: relative;
-  height: 120px;
-}
-
-.assignment-student-header-sticky .assignment-pizza-header-outer {
-  height: 30px;
-}
-
-.assignment-pizza-header-inner {
-  width: 100%;
-  position: absolute;
-  #{direction(right)}: 0;
-}
-
 .assignment-student-submission-tracker {
   line-height: normal;
 }
 
-.assignment-student-header-normal {
-  position: static;
-}
-
-.assignment-student-header-sticky {
+.assignment-student-header {
   position: sticky;
   padding: 12px;
   top: 0px;
@@ -56,4 +36,9 @@
 
 .a2-toggle-details-container {
   margin-bottom: 1.75rem;
+}
+
+.points-text {
+  // This matches the value InstUI uses for weight="light"
+  font-weight: 300;
 }

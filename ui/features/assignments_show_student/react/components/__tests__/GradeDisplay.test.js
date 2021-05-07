@@ -22,107 +22,143 @@ import {render} from '@testing-library/react'
 import GradeDisplay from '../GradeDisplay'
 
 describe('GradeDisplay', () => {
-  it('renders points correctly when no receivedGrade are set', () => {
-    const {getByTestId, getByText} = render(
-      <GradeDisplay gradingType="points" pointsPossible={32} />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getByText('–/32 Points'))
+  describe('when gradingStatus is set to Excused', () => {
+    it('renders the text "Excused"', () => {
+      const {getByTestId} = render(
+        <GradeDisplay gradingType="points" pointsPossible={10} gradingStatus="excused" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('Excused')
+    })
   })
 
-  it('renders points correctly when receivedGrade is set', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay gradingType="points" receivedGrade={4} pointsPossible={5} />
-    )
+  describe('for a points-based assignment', () => {
+    describe('when no grade has been awarded', () => {
+      it('renders the number of possible points', () => {
+        const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="points" />)
+        expect(getByTestId('grade-display')).toHaveTextContent('5 Possible Points')
+      })
 
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('4/5 Points')[1])
+      it('renders a screenreader string including "Ungraded" and the number of points', () => {
+        const {getByText} = render(<GradeDisplay pointsPossible={10} gradingType="points" />)
+        expect(getByText('Ungraded, 10 Possible Points')).toBeInTheDocument()
+      })
+
+      it('renders "1 Possible Point" when possiblePoints is 1', () => {
+        const {getByTestId} = render(<GradeDisplay pointsPossible={1} gradingType="points" />)
+        expect(getByTestId('grade-display')).toHaveTextContent('1 Possible Point')
+      })
+
+      it('renders a screenreader string including "Ungraded" when possiblePoints is 1', () => {
+        const {getByText} = render(<GradeDisplay pointsPossible={1} gradingType="points" />)
+        expect(getByText('Ungraded, 1 Possible Point')).toBeInTheDocument()
+      })
+
+      it('does not indicate possible points if possiblePoints is null', () => {
+        const {getByTestId, queryByText} = render(
+          <GradeDisplay pointsPossible={null} gradingType="points" />
+        )
+        expect(getByTestId('grade-display')).toBeEmptyDOMElement()
+        expect(queryByText(/Possible Point/)).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when a grade has been awarded', () => {
+      it('renders the awarded score and the possible points', () => {
+        const {getByTestId} = render(
+          <GradeDisplay receivedGrade={2} pointsPossible={5} gradingType="points" />
+        )
+        expect(getByTestId('grade-display')).toHaveTextContent('2/5 Points')
+      })
+
+      it('renders the awarded score and the possible points when possiblePoints is 1', () => {
+        const {getByTestId} = render(
+          <GradeDisplay receivedGrade={1} pointsPossible={1} gradingType="points" />
+        )
+        expect(getByTestId('grade-display')).toHaveTextContent('1/1 Point')
+      })
+    })
   })
 
-  it('renders correctly when receivedGrade is 0', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade={0} pointsPossible={5} />
-    )
+  describe('for a pass-fail assignment', () => {
+    it('renders "Complete" when a "complete" grade has been awarded', () => {
+      const {getByTestId} = render(
+        <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('complete')
+    })
 
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('0/5 Points')[1])
+    it('renders "Incomplete" when an "incomplete" grade has been awarded', () => {
+      const {getByTestId} = render(
+        <GradeDisplay receivedGrade="incomplete" pointsPossible={5} gradingType="pass_fail" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('incomplete')
+    })
+
+    it('renders no text when no grade has been awarded', () => {
+      const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="pass_fail" />)
+      expect(getByTestId('grade-display')).toBeEmptyDOMElement()
+    })
+
+    it('renders "ungraded" as screen-reader content', () => {
+      const {getByText} = render(<GradeDisplay pointsPossible={5} gradingType="pass_fail" />)
+      expect(getByText('ungraded')).toBeInTheDocument()
+    })
   })
 
-  it('defaults to using points if gradingType is not explictly set', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade={4} pointsPossible={5} />
-    )
+  describe('for a percent-based assignment', () => {
+    it('renders the grade as a percent when one has been awarded', () => {
+      const {getByTestId} = render(
+        <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('15%')
+    })
 
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('4/5 Points')[1])
+    it('renders no text if no grade has been awarded', () => {
+      const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="percent" />)
+      expect(getByTestId('grade-display')).toBeEmptyDOMElement()
+    })
+
+    it('renders "ungraded" as screen-reader content', () => {
+      const {getByText} = render(<GradeDisplay pointsPossible={5} gradingType="percent" />)
+      expect(getByText('ungraded')).toBeInTheDocument()
+    })
   })
 
-  it('renders correctly when displayType is percent', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />
-    )
+  describe('for an assignment graded using a GPA scale', () => {
+    it('renders the grade when one has been awarded', () => {
+      const {getByTestId} = render(
+        <GradeDisplay receivedGrade="just great" pointsPossible={5} gradingType="gpa_scale" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('just great')
+    })
 
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('15%')[1])
+    it('renders no text if no grade has been awarded', () => {
+      const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="gpa_scale" />)
+      expect(getByTestId('grade-display')).toBeEmptyDOMElement()
+    })
+
+    it('renders "ungraded" as screen-reader content', () => {
+      const {getByText} = render(<GradeDisplay pointsPossible={5} gradingType="gpa_scale" />)
+      expect(getByText('ungraded')).toBeInTheDocument()
+    })
   })
 
-  it('renders percent correctly when no grade is set', () => {
-    const {getByTestId, getByText} = render(
-      <GradeDisplay pointsPossible={5} gradingType="percent" />
-    )
+  describe('for an assignment graded using a letter grade', () => {
+    it('renders the grade when one has been awarded', () => {
+      const {getByTestId} = render(
+        <GradeDisplay receivedGrade="A-" pointsPossible={5} gradingType="letter_grade" />
+      )
+      expect(getByTestId('grade-display')).toHaveTextContent('A-')
+    })
 
-    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
-  })
+    it('renders no displayed text if no grade has been awarded', () => {
+      const {getByTestId} = render(<GradeDisplay pointsPossible={5} gradingType="letter_grade" />)
+      expect(getByTestId('grade-display')).toBeEmptyDOMElement()
+    })
 
-  it('renders grading scheme correcty with grade', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade="Absolutely Amazing" pointsPossible={5} gradingType="gpa_scale" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('Absolutely Amazing')[1])
-  })
-
-  it('renders grading scheme correcty with no grade', () => {
-    const {getByTestId, getByText} = render(
-      <GradeDisplay pointsPossible={5} gradingType="gpa_scale" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
-  })
-
-  it('renders pass fail correcty with grade', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('complete')[1])
-  })
-
-  it('renders pass fail correcty with incomplete grade', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade="incomplete" pointsPossible={100} gradingType="pass_fail" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('incomplete')[1])
-  })
-
-  it('renders pass fail correcty with no grade', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay pointsPossible={5} gradingType="pass_fail" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('ungraded')[1])
-  })
-
-  it('renders letter grade correctly with grade', () => {
-    const {getByTestId, getAllByText} = render(
-      <GradeDisplay receivedGrade="A" pointsPossible={5} gradingType="letter_grade" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getAllByText('A')[1])
-  })
-
-  it('renders letter grade correctly with no grade', () => {
-    const {getByTestId, getByText} = render(
-      <GradeDisplay pointsPossible={5} gradingType="letter_grade" />
-    )
-
-    expect(getByTestId('grade-display')).toContainElement(getByText('–'))
+    it('renders "ungraded" as screen-reader content', () => {
+      const {getByText} = render(<GradeDisplay pointsPossible={5} gradingType="letter_grade" />)
+      expect(getByText('ungraded')).toBeInTheDocument()
+    })
   })
 })
