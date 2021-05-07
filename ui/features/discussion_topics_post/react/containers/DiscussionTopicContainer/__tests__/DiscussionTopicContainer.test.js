@@ -249,8 +249,26 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Close for Comments')).toBeInTheDocument()
   })
 
+  it('Renders Copy To and Send To in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {copyAndSendTo: true}
+      }
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Copy To...')).toBeInTheDocument()
+    expect(getByText('Send To...')).toBeInTheDocument()
+  })
+
   it('renders a modal to send content', async () => {
-    const container = setup(discussionTopicMock)
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {copyAndSendTo: true}
+      }
+    })
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
     const sendToButton = await container.findByText('Send To...')
@@ -259,7 +277,12 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it.skip('renders a modal to copy content', async () => {
-    const container = setup(discussionTopicMock)
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {copyAndSendTo: true}
+      }
+    })
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
     const copyToButton = await container.findByText('Copy To...')

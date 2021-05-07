@@ -157,5 +157,10 @@ module Types
         can_moderate && !object[:discussion_topic].locked
       end
     end
+
+    field :copy_and_send_to, Boolean, null: true
+    def copy_and_send_to
+      Loaders::PermissionsLoader.for(object[:discussion_topic].context, current_user: current_user, session: session).load(:read_as_admin)
+    end
   end
 end

@@ -119,6 +119,10 @@ describe Types::DiscussionType do
           !discussion.locked &&
           discussion.grants_right?(user, :moderate_forum)
         }
+      },
+      {
+        value: 'copyAndSendTo',
+        allowed: -> (user) {discussion.context.grants_right?(user, :read_as_admin)}
       }
     ]
   }

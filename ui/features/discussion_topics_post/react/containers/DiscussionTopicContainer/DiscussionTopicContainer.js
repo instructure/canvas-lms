@@ -75,6 +75,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canAddRubric = discussionTopicData?.permissions?.addRubric
   const canOpenForComments = discussionTopicData?.permissions?.openForComments
   const canCloseForComments = discussionTopicData?.permissions?.closeForComments
+  const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
 
   if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
@@ -259,14 +260,14 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       repliesCount={discussionTopicData.replies}
                       unreadCount={discussionTopicData.unread}
                       onSend={
-                        canReadAsAdmin
+                        canCopyAndSendTo
                           ? () => {
                               setSendToOpen(true)
                             }
                           : null
                       }
                       onCopy={
-                        canReadAsAdmin
+                        canCopyAndSendTo
                           ? () => {
                               setCopyToOpen(true)
                             }

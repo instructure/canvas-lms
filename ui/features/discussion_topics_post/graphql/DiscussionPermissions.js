@@ -38,6 +38,7 @@ export const DiscussionPermissions = {
       addRubric
       openForComments
       closeForComments
+      copyAndSendTo
     }
   `,
 
@@ -57,7 +58,8 @@ export const DiscussionPermissions = {
     showRubric: bool,
     addRubric: bool,
     openForComments: bool,
-    closeForComment: bool
+    closeForComment: bool,
+    copyAndSendTo: bool
   }),
 
   mock: ({
@@ -76,7 +78,8 @@ export const DiscussionPermissions = {
     showRubric = true,
     addRubric = true,
     openForComments = true,
-    closeForComment = false
+    closeForComment = false,
+    copyAndSendTo = true
   } = {}) => ({
     attach,
     create,
@@ -94,6 +97,7 @@ export const DiscussionPermissions = {
     addRubric,
     openForComments,
     closeForComment,
+    copyAndSendTo,
     __typename: 'DiscussionPermissions'
   })
 }
