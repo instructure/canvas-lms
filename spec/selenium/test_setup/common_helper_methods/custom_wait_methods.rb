@@ -73,8 +73,10 @@ module CustomWaitMethods
     raise "loading image did not appear" if result != 0
   end
 
-  def wait_for_ajax_requests
-    result = driver.execute_async_script(<<-JS)
+  def wait_for_ajax_requests(bridge = nil)
+    bridge = driver if bridge.nil?
+
+    result = bridge.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       // see code in ui/boot/index.js for where
       // __CANVAS_IN_FLIGHT_XHR_REQUESTS__ and 'canvasXHRComplete' come from
@@ -108,8 +110,10 @@ module CustomWaitMethods
     result
   end
 
-  def wait_for_animations
-    driver.execute_async_script(<<-JS)
+  def wait_for_animations(bridge = nil)
+    bridge = driver if bridge.nil?
+
+    bridge.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       if (typeof($) == 'undefined') {
         callback(-1);
@@ -126,16 +130,21 @@ module CustomWaitMethods
     JS
   end
 
-  def wait_for_ajaximations
-    wait_for_ajax_requests
-    wait_for_animations
+  def wait_for_ajaximations(bridge = nil)
+    bridge = driver if bridge.nil?
+
+    wait_for_ajax_requests(bridge)
+    wait_for_animations(bridge)
   end
 
-  def wait_for_initializers
-    driver.execute_async_script <<~JS
+  def wait_for_initializers(bridge = nil)
+    bridge = driver if bridge.nil?
+
+    bridge.execute_async_script <<~JS
       var callback = arguments[arguments.length - 1];
 
-      if (window.canvasReadyState === 'complete') {
+      // If canvasReadyState isn't defined, we're likely in an IFrame (such as the RCE)
+      if (!window.canvasReadyState || window.canvasReadyState === 'complete') {
         callback()
       }
       else {
