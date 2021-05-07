@@ -103,6 +103,22 @@ describe Types::DiscussionType do
           discussion.assignment.rubric.nil? &&
           discussion.assignment.grants_right?(user, :update)
         }
+      },
+      {
+        value: 'openForComments',
+        allowed: -> (user) {
+          !discussion.comments_disabled? &&
+          discussion.locked &&
+          discussion.grants_right?(user, :moderate_forum)
+        }
+      },
+      {
+        value: 'closeForComments',
+        allowed: -> (user) {
+          !discussion.comments_disabled? &&
+          !discussion.locked &&
+          discussion.grants_right?(user, :moderate_forum)
+        }
       }
     ]
   }

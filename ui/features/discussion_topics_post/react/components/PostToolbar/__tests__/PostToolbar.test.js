@@ -136,10 +136,8 @@ describe('PostToolbar', () => {
 
       describe('comments are currently enabled', () => {
         it('renders correct display text', () => {
-          const onToggleCommentsMock = jest.fn()
           const {queryByText, getByTestId} = setup({
-            onToggleComments: onToggleCommentsMock,
-            commentsEnabled: true
+            onCloseForComments: jest.fn()
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Close for Comments')).toBeTruthy()
@@ -149,8 +147,7 @@ describe('PostToolbar', () => {
         it('calls provided callback when clicked', () => {
           const onToggleCommentsMock = jest.fn()
           const {getByTestId, getByText} = setup({
-            onToggleComments: onToggleCommentsMock,
-            commentsEnabled: true
+            onCloseForComments: onToggleCommentsMock
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(onToggleCommentsMock.mock.calls.length).toBe(0)
@@ -161,10 +158,8 @@ describe('PostToolbar', () => {
 
       describe('comments are currently disabled', () => {
         it('renders correct display text', () => {
-          const onToggleCommentsMock = jest.fn()
           const {queryByText, getByTestId} = setup({
-            onToggleComments: onToggleCommentsMock,
-            commentsEnabled: false
+            onOpenForComments: jest.fn()
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Open for Comments')).toBeTruthy()
@@ -174,8 +169,7 @@ describe('PostToolbar', () => {
         it('calls provided callback when clicked', () => {
           const onToggleCommentsMock = jest.fn()
           const {getByTestId, getByText} = setup({
-            onToggleComments: onToggleCommentsMock,
-            commentsEnabled: false
+            onOpenForComments: onToggleCommentsMock
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(onToggleCommentsMock.mock.calls.length).toBe(0)

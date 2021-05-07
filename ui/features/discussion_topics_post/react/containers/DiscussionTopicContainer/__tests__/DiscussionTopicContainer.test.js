@@ -157,19 +157,6 @@ describe('DiscussionTopicContainer', () => {
     expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
   })
 
-  it('renders teacher components when can readAsAdmin', async () => {
-    const {getByText, findByText} = setup(discussionTopicMock)
-
-    const manageButton = getByText('Manage Discussion').closest('button')
-    fireEvent.click(manageButton)
-
-    expect(await findByText('Edit')).toBeTruthy()
-    expect(await findByText('Delete')).toBeTruthy()
-    expect(await findByText('Close for Comments')).toBeTruthy()
-    expect(await findByText('Send To...')).toBeTruthy()
-    expect(await findByText('Copy To...')).toBeTruthy()
-  })
-
   it('should be able to send to edit page when canReadAsAdmin', async () => {
     const {getByTestId} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -236,6 +223,30 @@ describe('DiscussionTopicContainer', () => {
 
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Show Rubric')).toBeInTheDocument()
+  })
+
+  it('Renders Open for Comments in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {openForComments: true}
+      }
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Open for Comments')).toBeInTheDocument()
+  })
+
+  it('Renders Close for Comments in the kabob menu if the user has permission', () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {closeForComments: true}
+      }
+    })
+
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Close for Comments')).toBeInTheDocument()
   })
 
   it('renders a modal to send content', async () => {

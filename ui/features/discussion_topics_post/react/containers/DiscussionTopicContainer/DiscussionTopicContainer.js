@@ -73,6 +73,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canPeerReview = discussionTopicData?.permissions?.peerReview
   const canShowRubric = discussionTopicData?.permissions?.showRubric
   const canAddRubric = discussionTopicData?.permissions?.addRubric
+  const canOpenForComments = discussionTopicData?.permissions?.openForComments
+  const canCloseForComments = discussionTopicData?.permissions?.closeForComments
 
   if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
@@ -236,7 +238,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                   </Flex.Item>
                   <Flex.Item>
                     <PostToolbar
-                      onToggleComments={canReadAsAdmin ? () => {} : null}
                       onDelete={
                         canDelete
                           ? () => {
@@ -297,7 +298,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       isPublished={discussionTopicData.published}
                       canUnpublish={canUnpublish}
                       isSubscribed={discussionTopicData.subscribed}
-                      commentsEnabled
+                      onOpenForComments={canOpenForComments ? () => {} : null}
+                      onCloseForComments={canCloseForComments ? () => {} : null}
                     />
                   </Flex.Item>
                 </Flex>

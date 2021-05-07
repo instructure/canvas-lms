@@ -144,19 +144,20 @@ const getMenuConfigs = props => {
       selectionCallback: props.onDelete
     })
   }
-  if (props.onToggleComments && props.commentsEnabled) {
+  if (props.onCloseForComments) {
     options.push({
       key: 'toggle-comments',
       icon: <IconLockLine />,
       label: I18n.t('Close for Comments'),
-      selectionCallback: props.onToggleComments
+      selectionCallback: props.onCloseForComments
     })
-  } else if (props.onToggleComments && !props.commentsEnabled) {
+  }
+  if (props.onOpenForComments) {
     options.push({
       key: 'toggle-comments',
       icon: <IconUnlockLine />,
       label: I18n.t('Open for Comments'),
-      selectionCallback: props.onToggleComments
+      selectionCallback: props.onOpenForComments
     })
   }
   if (props.onSend) {
@@ -246,16 +247,6 @@ PostToolbar.propTypes = {
    */
   onDelete: PropTypes.func,
   /**
-   * Behavior for toggling the ability to comment on the post.
-   * Providing this function will result in the menu option being rendered.
-   */
-  onToggleComments: PropTypes.func,
-  /**
-   * Indicates whether comments have been enabled or not.
-   * Which toggling menu option is rendered is dependent on this prop.
-   */
-  commentsEnabled: PropTypes.bool,
-  /**
    * Behavior for sending to a recipient.
    * Providing this function will result in the menu option being rendered.
    */
@@ -317,7 +308,15 @@ PostToolbar.propTypes = {
   /**
    * Callback to be fired when Peer Review action is fired
    */
-  onPeerReviews: PropTypes.func
+  onPeerReviews: PropTypes.func,
+  /**
+   * Callback to be fired when Open for Comments action is fired
+   */
+  onOpenForComments: PropTypes.func,
+  /**
+   * Callback to be fired when Close for Comments action is fired
+   */
+  onCloseForComments: PropTypes.func
 }
 
 PostToolbar.defaultProps = {

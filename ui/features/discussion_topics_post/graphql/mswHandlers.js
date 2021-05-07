@@ -173,6 +173,8 @@ const defaultTopic = {
     peerReview: true,
     showRubric: true,
     addRubric: true,
+    openForComments: true,
+    closeForComments: false,
     __typename: 'DiscussionPermissions'
   },
   postedAt: '2020-11-23T11:40:44-07:00',
