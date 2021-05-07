@@ -28,6 +28,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
 import mathml from 'mathml'
+import htmlEscape from 'html-escape'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -195,7 +196,7 @@ function bindToMiniCalendar() {
     if (!$lastBefore) $lastBefore = $('tr.date:first')
 
     selectDate(todayString)
-    selectRow($(`tr.date.events_${$lastBefore}`))
+    selectRow($(htmlEscape(`tr.date.events_${$lastBefore}`)))
   })
 }
 
