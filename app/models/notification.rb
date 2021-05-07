@@ -103,6 +103,8 @@ class Notification < ActiveRecord::Base
     "Web Conference Invitation"
   ].freeze
 
+  NON_CONFIGURABLE_TYPES = %w(Migration Registration Summaries Alert).freeze
+
   COURSE_TYPES = [
     # Course Activities
     'Due Date',
@@ -165,6 +167,21 @@ class Notification < ActiveRecord::Base
     @all ||= self.all.to_a.each(&:readonly!)
   end
 
+  def self.valid_configurable_types
+    # this is ugly, but reading from file instead of defined notifications in db
+    # because this is used to define valid types in our graphql which needs to
+    # exists for specs to be able to use any graphql mutation in this space.
+    #
+    # the file is loaded by category, category_name so first, then last grabs all the types.
+    #  we have a deprecated type that we consider invalid
+    # graphql types cannot have spaces we have used underscores
+    # and we don't allow editing system notification types
+    @configurable_types ||= YAML.load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
+      .map(&:first).map(&:last)
+      .select { |type| !type.include?('DEPRECATED') }
+      .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
+  end
+
   def self.find(id, options = {})
     (@all_by_id ||= all_cached.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
@@ -215,10 +232,6 @@ class Notification < ActiveRecord::Base
         asset.assignment.context.preload_user_roles!
       end
     end
-  end
-
-  def category_spaceless
-    (self.category || "None").gsub(/\s/, "_")
   end
 
   def sort_order
@@ -283,7 +296,7 @@ class Notification < ActiveRecord::Base
   end
 
   def dashboard?
-    ["Migration", "Registration", "Summaries", "Alert"].exclude?(self.category)
+    NON_CONFIGURABLE_TYPES.exclude?(self.category)
   end
 
   def category_slug

@@ -37,33 +37,9 @@ end
 class NotificationCategoryType < Types::BaseEnum
   graphql_name 'NotificationCategoryType'
   description 'The categories that a notification can belong to'
-  value 'Account_Notification'
-  value 'Added_To_Conversation'
-  value 'All_Submissions'
-  value 'Announcement'
-  value 'Announcement_Created_By_You'
-  value 'Appointment_Availability'
-  value 'Appointment_Cancelations'
-  value 'Appointment_Signups'
-  value 'Blueprint'
-  value 'Calendar'
-  value 'Content_Link_Error'
-  value 'Conversation_Created'
-  value 'Conversation_Message'
-  value 'Course_Content'
-  value 'Discussion'
-  value 'DiscussionEntry'
-  value 'Due_Date'
-  value 'Files'
-  value 'Grading'
-  value 'Grading_Policies'
-  value 'Invitation'
-  value 'Late_Grading'
-  value 'Membership_Update'
-  value 'Other'
-  value 'Recording_Ready'
-  value 'Student_Appointment_Signups'
-  value 'Submission_Comment'
+  Notification.valid_configurable_types.each do |type|
+    value type
+  end
 end
 
 class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
@@ -139,7 +115,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     if input[:context_type] == 'Course' && !input[:course_id]
       raise err_klass, I18n.t('Course level notification preferences require a course_id to update')
     elsif input[:context_type] == 'Account' && !input[:account_id]
-      raise err_klass, I18n.t('Account level notification preferences require an account_id to update') 
+      raise err_klass, I18n.t('Account level notification preferences require an account_id to update')
     end
 
     validate_policy_update_input(input)
