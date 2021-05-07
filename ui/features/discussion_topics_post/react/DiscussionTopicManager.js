@@ -56,7 +56,7 @@ const DiscussionTopicManager = props => {
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
 
       if (currentDiscussion && newDiscussionEntry) {
-        currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+        currentDiscussion.legacyNode.rootDiscussionEntriesConnection.nodes.push(newDiscussionEntry)
 
         // TODO: Handle sorting.
         cache.writeQuery({...options, data: currentDiscussion})

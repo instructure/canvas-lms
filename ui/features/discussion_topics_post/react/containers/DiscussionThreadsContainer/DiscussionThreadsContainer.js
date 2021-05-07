@@ -16,45 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CREATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../../../graphql/Queries'
 import {Discussion} from '../../../graphql/Discussion'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
+import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PageInfo} from '../../../graphql/PageInfo'
 import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
-import {useLazyQuery} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
-  let threads = props.threads
-  let selectedPage = Math.ceil(atob(props.pageInfo.startCursor) / PER_PAGE)
+  const [currentPage, setCurrentPage] = useState(0)
+  const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
 
-  const [discussionTopicQuery, {called, loading, data}] = useLazyQuery(DISCUSSION_QUERY)
+  const variables = {
+    discussionID: props.discussionTopicId,
+    perPage: PER_PAGE,
+    page: btoa(currentPage * PER_PAGE)
+  }
 
-  if (called && loading) {
+  const {loading, data} = useQuery(DISCUSSION_QUERY, {
+    variables
+  })
+
+  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+    }
+  })
+
+  if (loading) {
     return <LoadingIndicator />
   }
 
-  if (called && data) {
-    selectedPage = Math.ceil(
-      atob(data.legacyNode.rootDiscussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
-    )
-    threads = data.legacyNode.rootDiscussionEntriesConnection.nodes
-  }
-
-  const setPage = pageNumber => {
-    discussionTopicQuery({
-      variables: {
-        discussionID: props.discussionTopicId,
-        perPage: PER_PAGE,
-        page: btoa(pageNumber * PER_PAGE)
-      }
-    })
-  }
+  const threads = data.legacyNode.rootDiscussionEntriesConnection.nodes
+  const totalPages = data.legacyNode.rootEntriesTotalPages
 
   return (
     <View as="div" margin="medium none none none">
@@ -64,14 +68,23 @@ export const DiscussionThreadsContainer = props => {
             key={`discussion-thread-${thread.id}`}
             assignment={props.discussionTopic?.assignment}
             discussionEntry={thread}
+            createDiscussionEntry={text => {
+              createDiscussionEntry({
+                variables: {
+                  discussionTopicId: ENV.discussion_topic_id,
+                  parentEntryId: thread._id,
+                  message: text
+                }
+              })
+            }}
           />
         )
       })}
       {props.totalPages > 1 && (
         <ThreadPagination
-          setPage={setPage}
-          selectedPage={selectedPage}
-          totalPages={props.totalPages}
+          setPage={setCurrentPage}
+          selectedPage={currentPage + 1}
+          totalPages={totalPages}
         />
       )}
     </View>
@@ -81,8 +94,6 @@ export const DiscussionThreadsContainer = props => {
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionTopicId: PropTypes.string.isRequired,
-  threads: PropTypes.arrayOf(DiscussionEntry.shape),
-  pageInfo: PageInfo.shape.isRequired,
   totalPages: PropTypes.number
 }
 

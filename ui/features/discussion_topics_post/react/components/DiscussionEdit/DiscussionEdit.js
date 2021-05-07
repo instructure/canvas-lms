@@ -56,7 +56,9 @@ export const DiscussionEdit = props => {
           </Button>
           <Button
             onClick={() => {
-              props.onSubmit(getRCEText())
+              if (props.onSubmit) {
+                props.onSubmit(getRCEText())
+              }
             }}
             display="inline-block"
             color="primary"

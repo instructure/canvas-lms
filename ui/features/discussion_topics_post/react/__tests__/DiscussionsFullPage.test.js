@@ -37,6 +37,10 @@ describe('DiscussionFullPage', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
+
+    window.ENV = {
+      discussion_topic_id: '1'
+    }
   })
 
   beforeEach(() => {
@@ -208,11 +212,7 @@ describe('DiscussionFullPage', () => {
   })
 
   it('should be able to post a reply to the topic', async () => {
-    window.ENV = {
-      discussion_topic_id: '1'
-    }
-
-    const {getByTestId, findByTestId, queryAllByTestId, findByText} = setup()
+    const {getByTestId, findByTestId, queryAllByTestId} = setup()
 
     const replyButton = await findByTestId('discussion-topic-reply')
     fireEvent.click(replyButton)
@@ -229,6 +229,25 @@ describe('DiscussionFullPage', () => {
     fireEvent.click(doReplyButton)
 
     expect((await findByTestId('DiscussionEdit-container')).style.display).toBe('none')
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+    )
+  })
+
+  it('should be able to post a reply to an entry', async () => {
+    const {findByTestId, findAllByTestId, getAllByTestId} = setup()
+
+    const replyButton = await findByTestId('threading-toolbar-reply')
+    fireEvent.click(replyButton)
+
+    const rce = await findAllByTestId('DiscussionEdit-container')
+    expect(rce[1].style.display).toBe('')
+
+    const doReplyButton = getAllByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton[1])
+
+    expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')

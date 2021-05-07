@@ -63,7 +63,7 @@ export const mockThreads = {
   }
 }
 
-export const DiscussionThreadContainer = props => {
+export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => {
   const AUTO_MARK_AS_READ_DELAY = 3000
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -304,9 +304,17 @@ export const DiscussionThreadContainer = props => {
             background="primary"
             borderWidth="none none small none"
             padding="none none small none"
-            margin="none none xSmall none"
+            margin="none none x-small none"
           >
-            <DiscussionEdit onCancel={() => setEditorExpanded(false)} />
+            <DiscussionEdit
+              onSubmit={text => {
+                if (createDiscussionEntry) {
+                  createDiscussionEntry(text)
+                  setEditorExpanded(false)
+                }
+              }}
+              onCancel={() => setEditorExpanded(false)}
+            />
           </View>
         )}
       </div>
@@ -342,7 +350,8 @@ export const DiscussionThreadContainer = props => {
 DiscussionThreadContainer.propTypes = {
   discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
-  assignment: Assignment.shape
+  assignment: Assignment.shape,
+  createDiscussionEntry: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
