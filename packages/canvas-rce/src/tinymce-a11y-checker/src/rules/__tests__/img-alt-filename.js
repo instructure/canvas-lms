@@ -1,4 +1,3 @@
-import moxios from "moxios"
 import rule from "../img-alt-filename"
 
 let el
