@@ -18,8 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../../helpers/color_common'
 
 module K5PageObject
+  include ColorCommon
+
   #------------------------- Selectors --------------------------
   def enable_homeroom_checkbox_selector
     '#course_homeroom_course'
@@ -213,6 +216,10 @@ module K5PageObject
     "[data-testid='k5-dashboard-card-hero']"
   end
 
+  def dashboard_header_selector
+    "[data-testid='k5-course-header-hero']"
+  end
+
   def front_page_info_selector
     "#course_home_content .user_content"
   end
@@ -332,6 +339,23 @@ module K5PageObject
   def grades_assignment_anchor_selector
     "a"
   end
+
+  def pink_color_button_selector
+    "//button[contains(@id,'DF6B91')]"
+  end
+
+  def selected_color_input_selector
+    "[name='course[course_color]']"
+  end
+
+  def course_color_preview_selector
+    "[data-testid='course-color-preview']"
+  end
+
+  def planner_assignment_header_selector
+    ".Grouping-styles__overlay"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -663,6 +687,26 @@ module K5PageObject
     element_value_for_attr(grade_row_element.find_element(:css, grades_assignment_anchor_selector), "href")
   end
 
+  def pink_color_button
+    fxpath(pink_color_button_selector)
+  end
+
+  def selected_color_input
+    f(selected_color_input_selector)
+  end
+
+  def course_color_preview
+    f(course_color_preview_selector)
+  end
+
+  def dashboard_header
+    f(dashboard_header_selector)
+  end
+
+  def planner_assignment_header
+    f(planner_assignment_header_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -794,6 +838,10 @@ module K5PageObject
     new_course_modal_cancel.click
   end
 
+  def click_pink_color_button
+    pink_color_button.click
+  end
+
   #------------------------------Retrieve Text----------------------#
 
   def retrieve_welcome_text
@@ -880,6 +928,10 @@ module K5PageObject
     enter_account_search_data(@account.name[0...3])
     select_account_from_list(@account.name)
     enter_course_name(course_name)
+  end
+
+  def input_color_hex_value(hex_value)
+    selected_color_input.send_keys(hex_value)
   end
 
   #----------------------------Create Content---------------------#
@@ -1027,5 +1079,9 @@ module K5PageObject
         "scheme_3" => { name: "See me", value: "0" }
       }
     )
+  end
+
+  def hex_value_for_color(element)
+    '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
   end
 end
