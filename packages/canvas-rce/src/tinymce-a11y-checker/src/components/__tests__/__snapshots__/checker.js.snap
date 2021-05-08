@@ -43,23 +43,21 @@ exports[`render matches snapshot with errors 1`] = `
     </CloseButton>
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="x-large large"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Heading
         as="h2"
         border="none"
         color="inherit"
-        ellipsis={false}
         level="h3"
         margin="medium 0"
       >
@@ -67,16 +65,15 @@ exports[`render matches snapshot with errors 1`] = `
       </Heading>
       <View
         as="div"
-        borderColor="default"
-        debug={false}
+        borderColor="primary"
         display="auto"
         focusColor="info"
         focusPosition="offset"
-        focused={false}
         overflowX="visible"
         overflowY="visible"
         position="static"
         shouldAnimateFocus={true}
+        withVisualDebug={false}
       >
         <LiveMessage
           aria-live="polite"
@@ -88,17 +85,16 @@ exports[`render matches snapshot with errors 1`] = `
         />
         <View
           as="div"
-          borderColor="default"
-          debug={false}
+          borderColor="primary"
           display="auto"
           focusColor="info"
           focusPosition="offset"
-          focused={false}
           margin="large 0 medium 0"
           overflowX="visible"
           overflowY="visible"
           position="static"
           shouldAnimateFocus={true}
+          withVisualDebug={false}
         >
           <Grid
             colSpacing="none"
@@ -133,41 +129,38 @@ exports[`render matches snapshot with errors 1`] = `
                 width="auto"
               >
                 <Popover
-                  alignArrow={false}
+                  color="primary"
                   constrain="window"
                   contentRef={[Function]}
-                  defaultFocusElement={null}
-                  defaultShow={false}
+                  defaultIsShowingContent={false}
                   insertAt="bottom"
-                  label={null}
-                  liveRegion={null}
-                  mountNode={null}
                   offsetX={0}
                   offsetY={0}
                   on="click"
                   onBlur={[Function]}
                   onClick={[Function]}
-                  onDismiss={[Function]}
                   onFocus={[Function]}
+                  onHideContent={[Function]}
+                  onKeyDown={[Function]}
+                  onKeyUp={[Function]}
                   onMouseOut={[Function]}
                   onMouseOver={[Function]}
                   onPositionChanged={[Function]}
                   onPositioned={[Function]}
-                  onShow={[Function]}
-                  onToggle={[Function]}
+                  onShowContent={[Function]}
                   placement="bottom center"
-                  positionTarget={null}
+                  renderTrigger={null}
                   shadow="resting"
+                  shouldAlignArrow={false}
                   shouldCloseOnDocumentClick={true}
                   shouldCloseOnEscape={true}
                   shouldContainFocus={true}
                   shouldFocusContentOnTriggerBlur={false}
                   shouldRenderOffscreen={false}
                   shouldReturnFocus={true}
+                  shouldTrackPosition={true}
                   show={false}
                   stacking="topmost"
-                  trackPosition={true}
-                  variant="default"
                   withArrow={true}
                 >
                   <PopoverTrigger>
@@ -195,18 +188,17 @@ exports[`render matches snapshot with errors 1`] = `
                   </PopoverTrigger>
                   <PopoverContent>
                     <View
-                      borderColor="default"
-                      debug={false}
+                      borderColor="primary"
                       display="block"
                       focusColor="info"
                       focusPosition="offset"
-                      focused={false}
                       overflowX="visible"
                       overflowY="visible"
                       padding="medium"
                       position="static"
                       shouldAnimateFocus={true}
                       width="16rem"
+                      withVisualDebug={false}
                     >
                       <CloseButton
                         as="button"
@@ -235,20 +227,18 @@ exports[`render matches snapshot with errors 1`] = `
                             immutable={false}
                             theme={
                               Object {
-                                Symbol(Link__cLDjO): Object {
+                                Symbol(Link__fbyHH): Object {
                                   "textDecoration": "underline",
                                 },
                               }
                             }
                           >
                             <Link
-                              disabled={false}
+                              color="link"
                               href="http://some-url"
                               iconPlacement="start"
                               isWithinText={true}
-                              linkRef={[Function]}
                               target="_blank"
-                              variant="default"
                             >
                               Link for learning more
                             </Link>
@@ -275,72 +265,71 @@ exports[`render matches snapshot with errors 1`] = `
           </Text>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             key="select"
             margin="medium 0 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
-            <Select
-              allowCustom={false}
-              allowEmpty={true}
-              closeOnSelect={true}
+            <SimpleSelect
               constrain="window"
               disabled={false}
-              editable={false}
-              emptyOption="---"
-              filter={[Function]}
-              formatSelectedOption={[Function]}
               inputRef={[Function]}
-              label="Select Field"
-              loadingText={null}
-              multiple={false}
+              isInline={false}
+              isRequired={false}
+              listRef={[Function]}
+              onBlur={[Function]}
               onChange={[Function]}
-              optionsMaxWidth={null}
-              readOnly={false}
-              selectedOption={
-                Object {
-                  "value": "a",
-                }
-              }
+              onFocus={[Function]}
+              onHideOptions={[Function]}
+              onShowOptions={[Function]}
+              placeholder={null}
+              placement="bottom stretch"
+              renderAfterInput={null}
+              renderBeforeInput={null}
+              renderEmptyOption="---"
+              renderLabel={[Function]}
               size="medium"
+              value="a"
               visibleOptionsCount={8}
             >
-              <option
+              <Option
+                id="a"
+                isDisabled={false}
                 key="a"
                 value="a"
               >
                 A
-              </option>
-              <option
+              </Option>
+              <Option
+                id="b"
+                isDisabled={false}
                 key="b"
                 value="b"
               >
                 B
-              </option>
-            </Select>
+              </Option>
+            </SimpleSelect>
           </View>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             key="checkbox"
             margin="medium 0 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
             <Checkbox
               checked={true}
@@ -358,18 +347,17 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             key="color"
             margin="medium 0 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
             <ColorField
               label="Select Field"
@@ -380,30 +368,31 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             key="text"
             margin="medium 0 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
             <TextInput
               disabled={true}
-              inline={false}
+              display="block"
+              inputContainerRef={[Function]}
               inputRef={[Function]}
+              isRequired={false}
               label="Text Field"
-              layout="stacked"
               messages={Array []}
               name="text"
+              onBlur={[Function]}
               onChange={[Function]}
-              readOnly={false}
-              required={false}
+              onFocus={[Function]}
+              shouldNotWrap={false}
               size="medium"
               textAlign="start"
               type="text"
@@ -412,18 +401,17 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             key="textarea"
             margin="medium 0 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
             <TextArea
               autoGrow={true}
@@ -443,17 +431,16 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
-            borderColor="default"
-            debug={false}
+            borderColor="primary"
             display="auto"
             focusColor="info"
             focusPosition="offset"
-            focused={false}
             margin="medium 0"
             overflowX="visible"
             overflowY="visible"
             position="static"
             shouldAnimateFocus={true}
+            withVisualDebug={false}
           >
             <Grid
               colSpacing="none"
@@ -576,39 +563,36 @@ exports[`render matches snapshot without errors 1`] = `
     </CloseButton>
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="x-large large"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Heading
         as="h2"
         border="none"
         color="inherit"
-        ellipsis={false}
         level="h3"
         margin="medium 0"
       >
          Accessibility Checker
       </Heading>
       <View
-        borderColor="default"
-        debug={false}
+        borderColor="primary"
         display="auto"
         focusColor="info"
         focusPosition="offset"
-        focused={false}
         overflowX="visible"
         overflowY="visible"
         position="static"
         shouldAnimateFocus={true}
+        withVisualDebug={false}
       >
         <Text
           as="span"

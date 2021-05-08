@@ -2,12 +2,20 @@ import React from "react"
 
 import preventDefault from "prevent-default"
 import { LiveAnnouncer, LiveMessage } from "react-aria-live"
-import { ScreenReaderContent } from "@instructure/ui-a11y"
+import { ScreenReaderContent } from "@instructure/ui-a11y-content"
 import { Button, CloseButton } from "@instructure/ui-buttons"
-import { Tray, Popover } from "@instructure/ui-overlays"
-import { View, Grid, GridRow, GridCol } from "@instructure/ui-layout"
-import { Heading, Link, Spinner, Text } from "@instructure/ui-elements"
-import { Checkbox, TextInput, TextArea, Select } from "@instructure/ui-forms"
+import { Tray } from "@instructure/ui-tray"
+import { Popover } from "@instructure/ui-popover"
+import { View } from "@instructure/ui-view"
+import { Grid, GridRow, GridCol } from "@instructure/ui-grid"
+import { Heading } from "@instructure/ui-heading"
+import { Link } from "@instructure/ui-link"
+import { Spinner } from "@instructure/ui-spinner"
+import { Text } from "@instructure/ui-text"
+import { Checkbox } from "@instructure/ui-checkbox"
+import { TextInput } from "@instructure/ui-text-input"
+import { TextArea } from "@instructure/ui-text-area"
+import { SimpleSelect } from "@instructure/ui-simple-select"
 import { IconQuestionLine } from "@instructure/ui-icons"
 import { ApplyTheme } from "@instructure/ui-themeable"
 import ColorField from "./color-field"
@@ -464,13 +472,8 @@ export default class Checker extends React.Component {
     switch (true) {
       case !!f.options:
         return (
-          <Select
-            label={f.label}
-            selectedOption={
-              this.state.formState[f.dataKey] && {
-                value: this.state.formState[f.dataKey]
-              }
-            }
+          <SimpleSelect
+            disabled={disabled}
             onChange={(e, option) => {
               this.updateFormState({
                 target: {
@@ -479,14 +482,15 @@ export default class Checker extends React.Component {
                 }
               })
             }}
-            disabled={disabled}
+            value={this.state.formState[f.dataKey]}
+            renderLabel={() => f.label}
           >
             {f.options.map(o => (
-              <option key={o[0]} value={o[0]}>
+              <SimpleSelect.Option key={o[0]} id={o[0]} value={o[0]}>
                 {o[1]}
-              </option>
+              </SimpleSelect.Option>
             ))}
-          </Select>
+          </SimpleSelect>
         )
       case f.checkbox:
         return (
