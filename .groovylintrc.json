@@ -52,6 +52,9 @@
     "PropertyName": {
       "enabled": false
     },
+    "ThrowException": {
+      "enabled": false
+    },
     "UnnecessaryGetter": {
       "enabled": false
     },
