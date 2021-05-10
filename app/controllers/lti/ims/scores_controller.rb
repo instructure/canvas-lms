@@ -347,7 +347,7 @@ module Lti::Ims
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment: true,
+          submit_assignment: false, # AGS is already submitting the assignment
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,

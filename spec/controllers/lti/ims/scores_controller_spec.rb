@@ -401,6 +401,15 @@ module Lti::Ims
               expect(result.submission.reload.submission_type).to eq 'online_upload'
             end
 
+            it 'only submits assignment once' do
+              send_request
+              attempt = result.submission.reload.attempt + 1
+              send_request
+              expect(result.submission.reload.attempt).to eq attempt
+              run_jobs # process the file upload
+              expect(result.submission.reload.attempt).to eq attempt
+            end
+
             shared_examples_for 'a file submission' do
               it 'creates an attachment' do
                 send_request
