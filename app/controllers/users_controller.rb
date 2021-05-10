@@ -1530,7 +1530,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays).freeze
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled).freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1538,6 +1538,9 @@ class UsersController < ApplicationController
   # @argument manual_mark_as_read [Boolean]
   #   If true, require user to manually mark discussion posts as read (don't
   #   auto-mark as read).
+  #
+  # @argument release_notes_badge_disabled [Boolean]
+  #   If true, hide the badge for new release notes.
   #
   # @argument collapse_global_nav [Boolean]
   #   If true, the user's page loads with the global navigation collapsed

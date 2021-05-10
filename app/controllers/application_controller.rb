@@ -158,32 +158,33 @@ class ApplicationController < ActionController::Base
           active_brand_config_json_url: active_brand_config_url('json'),
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
-          current_user_id: @current_user.try(:id),
-          current_user_roles: @current_user.try(:roles, @domain_root_account),
+          current_user_id: @current_user&.id,
+          current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_types: @current_user.try{|u| u.account_users.map{|t| t.readable_type }},
-          current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
+          current_user_disabled_inbox: @current_user&.disabled_inbox?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-          DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
+          DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
-          use_high_contrast: @current_user.try(:prefers_high_contrast?),
-          auto_show_cc: @current_user.try(:auto_show_cc?),
-          disable_celebrations: @current_user.try(:prefers_no_celebrations?),
-          disable_keyboard_shortcuts: @current_user.try(:prefers_no_keyboard_shortcuts?),
+          use_high_contrast: @current_user&.prefers_high_contrast?,
+          auto_show_cc: @current_user&.auto_show_cc?,
+          disable_celebrations: @current_user&.prefers_no_celebrations?,
+          disable_keyboard_shortcuts: @current_user&.prefers_no_keyboard_shortcuts?,
           LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
           DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
           DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
           SETTINGS: {
-            open_registration: @domain_root_account.try(:open_registration?),
-            collapse_global_nav: @current_user.try(:collapse_global_nav?),
+            open_registration: @domain_root_account&.open_registration?,
+            collapse_global_nav: @current_user&.collapse_global_nav?,
+            release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
         }
 
-        @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user.try(:prefers_no_toast_timeout?)
+        @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user&.prefers_no_toast_timeout?
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
         cached_features = cached_js_env_account_features

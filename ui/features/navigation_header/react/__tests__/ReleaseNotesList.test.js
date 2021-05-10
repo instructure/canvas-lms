@@ -20,8 +20,11 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ReleaseNotesList, {dateFormatter} from '../ReleaseNotesList'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/use-fetch-api-hook')
+jest.mock('@canvas/do-fetch-api-effect')
 
 describe('ReleaseNotesList', () => {
   const notes = [
@@ -68,5 +71,43 @@ describe('ReleaseNotesList', () => {
       expect(queryByText(note.description)).toBeInTheDocument()
       expect(queryByText(dateFormatter.format(new Date(note.date)))).toBeInTheDocument()
     })
+  })
+
+  it('shows a toggle for "notifications', () => {
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(notes)
+    })
+
+    const {queryByText} = render(<ReleaseNotesList />)
+
+    const checkbox = queryByText('Show badges for new release notes')
+    expect(checkbox).toBeInTheDocument()
+  })
+
+  it('clicking the toggle for "notifications" calls the right things', () => {
+    const setBadgeDisabled = jest.fn()
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(notes)
+    })
+
+    const {queryByText} = render(
+      <ReleaseNotesList badgeDisabled setBadgeDisabled={setBadgeDisabled} />
+    )
+
+    const checkbox = queryByText('Show badges for new release notes')
+    userEvent.click(checkbox)
+
+    expect(doFetchApi).toHaveBeenCalledTimes(1)
+    expect(setBadgeDisabled).toHaveBeenCalledTimes(1)
+    expect(doFetchApi).toHaveBeenCalledWith({
+      method: 'PUT',
+      path: '/api/v1/users/self/settings',
+      body: {
+        release_notes_badge_disabled: false
+      }
+    })
+    expect(setBadgeDisabled).toHaveBeenCalledWith(false)
   })
 })

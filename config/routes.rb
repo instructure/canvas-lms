@@ -2204,6 +2204,7 @@ CanvasRails::Application.routes.draw do
       get 'release_notes', action: :index, as: :release_notes
       post 'release_notes', action: :create
       get 'release_notes/latest', action: :latest
+      get 'release_notes/unread_count', action: :unread_count
       put 'release_notes/:id', action: :update
       delete 'release_notes/:id', action: :destroy
       put 'release_notes/:id/published', action: :publish

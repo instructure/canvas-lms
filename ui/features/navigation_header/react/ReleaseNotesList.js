@@ -19,6 +19,8 @@
 import React, {useState} from 'react'
 import I18n from 'i18n!Navigation'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
@@ -32,7 +34,15 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 // Export so that tests can look for the right strings
 export const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {month: 'short', day: 'numeric'})
 
-export default function ReleaseNotesList() {
+function persistBadgeDisabled(state) {
+  doFetchApi({
+    path: '/api/v1/users/self/settings',
+    method: 'PUT',
+    body: {release_notes_badge_disabled: state}
+  })
+}
+
+export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [releaseNotes, setReleaseNotes] = useState([])
@@ -58,33 +68,39 @@ export default function ReleaseNotesList() {
     return null
   }
 
+  function updateBadgeDisabled(state) {
+    persistBadgeDisabled(state)
+    setBadgeDisabled(state)
+  }
+
   return (
     <View>
       <View display="block" margin="medium 0 0">
-        <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
-          {I18n.t('Release Notes')}
-        </Text>
+        <Flex justifyItems="space-between" alignItems="start">
+          <Text weight="bold" transform="uppercase" size="small" lineHeight="double">
+            {I18n.t('Release Notes')}
+          </Text>
+        </Flex>
         <hr role="presentation" style={{marginTop: '0'}} />
       </View>
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {releaseNotes.map(note => {
-          // TODO add new tag support
-          const has_new_tag = false
+          const has_new_tag = note.new
           return (
             <List.Item key={note.id}>
-              <Flex justifyItems="space-between" alignItems="center">
+              <Flex justifyItems="space-between" alignItems="start">
+                <Link isWithinText={false} href={note.url} target="_blank" rel="noopener">
+                  {note.title}
+                </Link>
+                <Text color="secondary">
+                  <span style={{whiteSpace: 'nowrap'}}>
+                    {dateFormatter.format(new Date(note.date))}
+                  </span>
+                </Text>
+              </Flex>
+              {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
+              <Flex justifyItems="space-between" alignItems="start">
                 <Flex.Item size={has_new_tag ? '80%' : '100%'}>
-                  <Flex justifyItems="space-between" alignItems="start">
-                    <Link isWithinText={false} href={note.url} target="_blank" rel="noopener">
-                      {note.title}
-                    </Link>
-                    <Text color="secondary">
-                      <span style={{whiteSpace: 'nowrap'}}>
-                        {dateFormatter.format(new Date(note.date))}
-                      </span>
-                    </Text>
-                  </Flex>
-                  {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
                   {note.description && (
                     <Text as="div" size="small">
                       {note.description}
@@ -103,6 +119,14 @@ export default function ReleaseNotesList() {
           )
         })}
       </List>
+
+      <Checkbox
+        label={I18n.t('Show badges for new release notes')}
+        checked={!badgeDisabled}
+        onChange={() => updateBadgeDisabled(!badgeDisabled)}
+        variant="toggle"
+        size="small"
+      />
     </View>
   )
 }
