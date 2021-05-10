@@ -429,6 +429,9 @@ pipeline {
                     def nestedStages = [:]
 
                     extendedStage('Linters - Run Tests - Code').queue(nestedStages, lintersStage.&codeStage)
+                    extendedStage('Linters - Run Tests - Master Bouncer')
+                      .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())
+                      .queue(nestedStages, lintersStage.&masterBouncerStage)
                     extendedStage('Linters - Run Tests - Webpack').queue(nestedStages, lintersStage.&webpackStage)
                     extendedStage('Linters - Run Tests - Yarn')
                       .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
@@ -436,14 +439,6 @@ pipeline {
 
                     parallel(nestedStages)
                   })
-
-                extendedStage('Master Bouncer')
-                  .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())
-                  .queue(stages) {
-                    credentials.withMasterBouncerCredentials {
-                      sh 'build/new-jenkins/linters/run-master-bouncer.sh'
-                    }
-                  }
 
                 extendedStage('Consumer Smoke Test').queue(stages) {
                   sh 'build/new-jenkins/consumer-smoke-test.sh'

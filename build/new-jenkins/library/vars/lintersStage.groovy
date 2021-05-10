@@ -77,6 +77,12 @@ def codeStage() {
   }
 }
 
+def masterBouncerStage() {
+  credentials.withMasterBouncerCredentials {
+    sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+  }
+}
+
 def webpackStage() {
   withEnv([
     "DOCKER_INPUTS=${_getDockerInputs()}",
