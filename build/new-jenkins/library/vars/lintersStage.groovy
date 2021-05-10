@@ -48,6 +48,7 @@ def _getDockerInputs() {
 def setupNode() {
   distribution.unstashBuildScripts()
 
+  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $LINTERS_RUNNER_IMAGE'
   sh "docker volume create $dockerVolumeName"
 }
 
