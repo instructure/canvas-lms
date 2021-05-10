@@ -190,6 +190,13 @@ describe "course settings" do
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+
+    it "should show participation by default" do
+      get "/courses/#{@course.id}/settings"
+
+      expect(element_exists?('.course-participation-row')).to be_truthy
+      expect(element_exists?('#availability_options_container')).to be_truthy
+    end
   end
 
   describe "course items" do
@@ -365,16 +372,14 @@ describe "course settings" do
     end
   end
 
-  it "should disable inherited settings if locked by the account" do
+  it "should restrict student access inputs be hidden" do
     @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
     @account.save!
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view')).not_to be_disabled
-    expect(f('#course_restrict_student_future_view')).to be_disabled
-
-    expect(is_checked('#course_restrict_student_future_view')).to be_truthy
+    expect(f('#course_restrict_student_past_view')).to_not be_displayed
+    expect(f('#course_restrict_student_future_view')).to_not be_displayed
   end
 
   it "should disable editing settings if :manage rights are not granted" do

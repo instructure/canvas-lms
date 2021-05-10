@@ -411,11 +411,6 @@ timer_without_autosubmission:
   description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
   applies_to: RootAccount
   state: hidden
-new_course_availability_ui:
-  state: hidden
-  applies_to: RootAccount
-  display_name: New Course Availability UI
-  description: Refreshes the section of the UI on the course settings page controlling course availability options.
 strip_origin_from_quiz_answer_file_references:
   state: hidden
   applies_to: SiteAdmin

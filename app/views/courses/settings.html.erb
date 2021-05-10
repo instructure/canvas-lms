@@ -245,89 +245,17 @@
           <% end %>
         </div>
       </div>
-      <% if @context.root_account.feature_enabled?(:new_course_availability_ui) %>
-        <div class="form-row course-participation-row">
-          <div class="form-label"><label for="availability_options_container"><%= f.blabel :participation_id, :en => "Participation" %></label></div>
-          <div class="nobr">
-            <div id="availability_options_container"></div>
-            <%= f.hidden_field :start_at, :value => @context.start_at&.iso8601 %>
-            <%= f.hidden_field :conclude_at, :value => @context.conclude_at&.iso8601 %>
-            <%= f.hidden_field :restrict_enrollments_to_course_dates %>
-            <%= f.hidden_field :restrict_student_past_view %>
-            <%= f.hidden_field :restrict_student_future_view %>
-          </div>
+      <div class="form-row course-participation-row">
+        <div class="form-label"><label for="availability_options_container"><%= f.blabel :participation_id, :en => "Participation" %></label></div>
+        <div class="nobr">
+          <div id="availability_options_container"></div>
+          <%= f.hidden_field :start_at, :value => @context.start_at&.iso8601 %>
+          <%= f.hidden_field :conclude_at, :value => @context.conclude_at&.iso8601 %>
+          <%= f.hidden_field :restrict_enrollments_to_course_dates %>
+          <%= f.hidden_field :restrict_student_past_view %>
+          <%= f.hidden_field :restrict_student_future_view %>
         </div>
-      <% else %>
-        <% if can_change_course_availability %>
-          <div class="form-row">
-            <div></div>
-            <div class="tall-row">
-              <div class="aside top-hint">
-                <%= t "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates." %>
-              </div>
-            </div>
-          </div>
-        <% end %>
-        <div class="form-row">
-          <div class="form-label"><%= f.blabel :start_at, :en => "Starts" %></div>
-          <div class="nobr">
-            <% if can_change_course_availability %>
-              <%= f.text_field :start_at, :class => "date_entry", :value => datetime_string(@context.start_at, :verbose) %>
-            <% else %>
-              <%= datetime_string(@context.start_at, :verbose) %>
-            <% end %>
-          </div>
-        </div><div class="form-row course-conclude-at-row">
-          <div class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></div>
-          <div class="nobr tall-row">
-            <% if can_change_course_availability %>
-            <div>
-              <% warning_message = t(:course_conclude_at_warning_message, "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active.") %>
-              <%= f.text_field :conclude_at, :class => "date_entry", :value => datetime_string(@context.conclude_at, :verbose) %>
-              <i id="course_conclude_at_warning" style="<%= hidden %>" class="date-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
-                 data-html-tooltip-title="<div class='popover-title'><%= t(:course_conclude_at_warning_title, "Course Ending at Midnight") %></div><div class='popover-content'><p>
-                <%= warning_message %></p></div>">
-                <span class="screenreader-only"><%= warning_message %></span>
-              </i>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :restrict_enrollments_to_course_dates, "aria-describedby" => 'users-can-only-participate-description' %>
-              <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
-              </div>
-            </div>
-            <div class="aside bottom-hint" id="users-can-only-participate-description">
-              <%= t "When selected, the course is in a read-only state outside these dates." %>
-            </div>
-            <% else %>
-              <%= datetime_string(@context.conclude_at, :verbose) %>
-            <% end %>
-          </div>
-        <% unless can_manage %>
-          </div><div class="form-row">
-          <div class="form-label"></div>
-          <div class="nobr checkbox-flex-container">
-            <%= f.check_box :restrict_enrollments_to_course_dates, :disabled => true %>
-            <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
-          </div>
-        <% end %>
-        </div><div class="form-row">
-          <div></div>
-          <div class="tall-row">
-            <div class="nobr" role="group" aria-describedby="restrict-view-description">
-              <div class="checkbox-flex-container">
-                <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] || !can_change_course_availability %>
-                <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing this course after end date" %>
-              </div>
-              <div class="checkbox-flex-container">
-                <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] || !can_change_course_availability %>
-                <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing this course before start date" %>
-              </div>
-            </div>
-            <div class="aside bottom-hint" id="restrict-view-description">
-              <%= t "When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates." %>
-            </div>
-          </div>
-        </div>
-      <% end %>
+      </div>
       <% if available_locales.size > 1 %>
       <div class="form-row language-row">
         <div class="form-label"><%= f.blabel :locale, :language, :en => "Language" %></div>
