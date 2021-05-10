@@ -359,6 +359,11 @@ rubric_criterion_range:
     rating.
   applies_to: RootAccount
   root_opt_in: true
+self_service_user_merge:
+  state: allowed_on
+  applies_to: RootAccount
+  display_name: Self Service User Merge
+  description: Allows users to merge multiple accounts together (given proper credentials).
 slack_notifications:
   state: hidden
   display_name: Slack Notifications

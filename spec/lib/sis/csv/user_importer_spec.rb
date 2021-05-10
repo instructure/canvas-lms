@@ -810,6 +810,25 @@ describe SIS::CSV::UserImporter do
     expect(Message.where(:communication_channel_id => user2.email_channel, :notification_id => notification).first).not_to be_nil
   end
 
+  it "does not send a merge notification email when self service merge is disabled" do
+    @account.disable_feature!(:self_service_user_merge)
+    user1 = User.create!(:name => 'User Uno')
+    user1.pseudonyms.create!(:unique_id => 'user1', :account => @account)
+    communication_channel(user1, {username: 'user@example.com', active_cc: true})
+
+    expect_any_instance_of(CommunicationChannel).not_to receive(:send_merge_notification!)
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,active"
+    )
+    user2 = Pseudonym.by_unique_id('user2').first.user
+    expect(user1).not_to eq user2
+    expect(user2.last_name).to eq "Dos"
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
+  end
+
   it "should not notify about a merge opportunity to an SIS user in the same account" do
     notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
     process_csv_data_cleanly(
