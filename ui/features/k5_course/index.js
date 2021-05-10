@@ -45,6 +45,7 @@ ready(() => {
         outcomeProficiency={ENV.COURSE.outcome_proficiency}
         showStudentView={ENV.COURSE.show_student_view}
         studentViewPath={ENV.COURSE.student_view_path}
+        tabs={ENV.TABS}
       />,
       courseContainer
     )

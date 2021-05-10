@@ -46,7 +46,6 @@ describe "teacher k5 course dashboard" do
       expect(schedule_tab).to be_displayed
       expect(modules_tab).to be_displayed
       expect(grades_tab).to be_displayed
-      expect(resources_tab).to be_displayed
     end
 
     it 'saves tab information for refresh' do
@@ -110,14 +109,6 @@ describe "teacher k5 course dashboard" do
       get "/courses/#{@subject_course.id}#modules"
 
       expect(module_item(@module_title)).to be_displayed
-    end
-
-    it 'provides a no modules defined message when there are no modules' do
-      course_with_teacher(active_all: true, user: @homeroom_teacher)
-
-      get "/courses/#{@course.id}#modules"
-
-      expect(module_empty_state_button).to be_displayed
     end
 
     it 'navigates to module task in edit mode when clicked' do

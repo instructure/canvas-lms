@@ -1161,12 +1161,13 @@ class ExternalToolsController < ApplicationController
   def visible_course_nav_tools
     if authorized_action(@context, @current_user, :read)
       if @context.is_a?(Course)
-        tabs = @context.tabs_available(@current_user)
+        tabs = @context.tabs_available(@current_user, course_subject_tabs: true)
         tool_ids = []
         tabs.select{ |t| t[:external] }.each do |t|
           tool_ids << t[:args][1] if t[:args] && t[:args][1]
         end
         @tools = ContextExternalTool.where(:id => tool_ids)
+        @tools = tool_ids.map{ |id| @tools.find{ |t| t[:id] == id }}.compact
         render :json => external_tools_json(@tools, @context, @current_user, session)
       end
     end

@@ -894,6 +894,10 @@ module K5PageObject
     element_exists?(course_navigation_tray_selector)
   end
 
+  def modules_tab_exists?
+    element_exists?(modules_tab_selector)
+  end
+
   def module_assignment_exists?(assignment_title)
     element_exists?(module_assignment_selector(assignment_title))
   end
@@ -1061,9 +1065,9 @@ module K5PageObject
     assignment
   end
 
-  def create_course_module
+  def create_course_module(workflow_state = 'active')
     @module_title = "Course Module"
-    @course_module = @subject_course.context_modules.create!(:name => @module_title)
+    @course_module = @subject_course.context_modules.create!(:name => @module_title, :workflow_state => workflow_state)
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
     @course_module.add_item(:id => assignment.id, :type => 'assignment')

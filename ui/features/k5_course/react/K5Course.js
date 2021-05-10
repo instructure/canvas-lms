@@ -93,6 +93,26 @@ const COURSE_TABS = [
   }
 ]
 
+// Translates server-side tab IDs to their associated frontend IDs
+const translateTabId = id => {
+  if (id === '19') return TAB_IDS.SCHEDULE
+  if (id === '10') return TAB_IDS.MODULES
+  if (id === '5') return TAB_IDS.GRADES
+  if (String(id).startsWith('context_external_tool_')) return TAB_IDS.RESOURCES
+  return TAB_IDS.HOME
+}
+
+const toRenderTabs = tabs =>
+  tabs.reduce((acc, {id, hidden}) => {
+    if (hidden) return acc
+    const renderId = translateTabId(id)
+    const renderTab = COURSE_TABS.find(tab => tab.id === renderId)
+    if (renderTab && !acc.some(tab => tab.id === renderId)) {
+      acc.push(renderTab)
+    }
+    return acc
+  }, [])
+
 export function CourseHeaderHero({name, image, backgroundColor}) {
   return (
     <div
@@ -177,13 +197,13 @@ export function K5Course({
   assignmentsCompletedForToday,
   color,
   courseOverview,
+  defaultTab,
   id,
   imageUrl,
   loadAllOpportunities,
   name,
   timeZone,
   canManage = false,
-  defaultTab = TAB_IDS.HOME,
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
@@ -191,9 +211,11 @@ export function K5Course({
   showStudentView,
   studentViewPath,
   showLearningMasteryGradebook,
-  outcomeProficiency
+  outcomeProficiency,
+  tabs
 }) {
-  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
+  const renderTabs = toRenderTabs(tabs)
+  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [courseNavLinks, setCourseNavLinks] = useState([])
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
@@ -249,7 +271,7 @@ export function K5Course({
         <K5Tabs
           currentTab={currentTab}
           onTabChange={handleTabChange}
-          tabs={COURSE_TABS}
+          tabs={renderTabs}
           tabsRef={setTabsRef}
         >
           {(canManage || showStudentView) && (
@@ -306,7 +328,8 @@ K5Course.propTypes = {
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
-  outcomeProficiency: outcomeProficiencyShape
+  outcomeProficiency: outcomeProficiencyShape,
+  tabs: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

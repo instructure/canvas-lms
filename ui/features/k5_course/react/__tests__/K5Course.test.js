@@ -47,6 +47,7 @@ const defaultEnv = {
   MOMENT_LOCALE: 'en',
   TIMEZONE: 'America/Denver'
 }
+const defaultTabs = [{id: '0'}, {id: '19'}, {id: '10'}, {id: '5'}, {id: 'context_external_tool_1'}]
 const defaultProps = {
   currentUser,
   loadAllOpportunities: () => {},
@@ -59,7 +60,8 @@ const defaultProps = {
   userIsInstructor: false,
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
-  showLearningMasteryGradebook: false
+  showLearningMasteryGradebook: false,
+  tabs: defaultTabs
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -135,16 +137,37 @@ describe('K-5 Subject Course', () => {
       expect(getByText(defaultProps.name)).toBeInTheDocument()
     })
 
-    it('shows Home, Schedule, Modules, Grades, and Resources options', () => {
+    it('shows Home, Schedule, Modules, Grades, and Resources options if configured', () => {
       const {getByText} = render(<K5Course {...defaultProps} />)
       ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
         expect(getByText(label)).toBeInTheDocument()
       )
     })
 
-    it('defaults to the Home tab', () => {
+    it('defaults to the first tab', () => {
       const {getByRole} = render(<K5Course {...defaultProps} />)
       expect(getByRole('tab', {name: 'Home', selected: true})).toBeInTheDocument()
+    })
+
+    it('only renders non-hidden tabs, in the order they are provided', () => {
+      const tabs = [
+        {id: '10'},
+        {id: '5', hidden: true},
+        {id: '19'},
+        {id: 'context_external_tool_3', hidden: true}
+      ]
+      const {getAllByRole} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      const renderedTabs = getAllByRole('tab')
+      expect(renderedTabs.map(({id}) => id.replace('tab-', ''))).toEqual([
+        TAB_IDS.MODULES,
+        TAB_IDS.SCHEDULE
+      ])
+    })
+
+    it('does not render any tabs if none are provided', () => {
+      const {getByText, queryByRole} = render(<K5Course {...defaultProps} tabs={[]} />)
+      expect(getByText(defaultProps.name)).toBeInTheDocument()
+      expect(queryByRole('tab')).not.toBeInTheDocument()
     })
   })
 
