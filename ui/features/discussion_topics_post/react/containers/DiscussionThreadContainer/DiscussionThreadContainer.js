@@ -155,6 +155,8 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
         }}
       />
     )
+  }
+  if (props.discussionEntry.permissions.viewRating) {
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.discussionEntry.id}`}

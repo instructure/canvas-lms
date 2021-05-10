@@ -22,8 +22,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::DiscussionEntryType do
-  let(:discussion_entry) { create_valid_discussion_entry }
+  let_once(:discussion_entry) { create_valid_discussion_entry }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
+  let(:permissions) {
+    [
+      {
+        value: 'delete',
+        allowed: proc {|user| discussion_entry.grants_right?(user, :delete)}
+      },
+      {
+        value: 'viewRating',
+        allowed: proc {discussion_entry.discussion_topic.allow_rating && !discussion_entry.deleted?}
+      }
+    ]
+  }
 
   it 'works' do
     expect(discussion_entry_type.resolve("_id")).to eq discussion_entry.id.to_s
@@ -89,12 +101,13 @@ describe Types::DiscussionEntryType do
   end
 
   it 'returns the current user permissions' do
-    expect(discussion_entry_type.resolve('permissions { delete }')).to eq true
-    expect(discussion_entry.grants_right?(@teacher, nil, :delete)).to eq true
-
     student_in_course(active_all: true)
     type = GraphQLTypeTester.new(discussion_entry, current_user: @student)
-    expect(type.resolve('permissions { delete }')).to eq false
-    expect(discussion_entry.grants_right?(@student, nil, :delete)).to eq false
+
+    permissions.each do |permission|
+      expect(type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
+
+      expect(discussion_entry_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
+    end
   end
 end

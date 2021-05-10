@@ -93,7 +93,8 @@ describe('DiscussionThreadContainer', () => {
           rate: true,
           read: true,
           reply: true,
-          update: true
+          update: true,
+          viewRating: true
         },
         ...discussionEntryOverrides
       },

@@ -100,7 +100,12 @@ module Types
 
     field :permissions, Types::DiscussionEntryPermissionsType, null: true
     def permissions
-      Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+      load_association(:discussion_topic).then do
+        {
+          loader: Loaders::PermissionsLoader.for(object, current_user: current_user, session: session),
+          discussion_entry: object
+        }
+      end
     end
   end
 end

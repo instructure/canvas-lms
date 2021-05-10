@@ -92,6 +92,7 @@ const defaultEntry = {
           read: true,
           reply: true,
           update: true,
+          viewRating: true,
           __typename: 'DiscussionEntryPermissions'
         },
         __typename: 'DiscussionEntry'
@@ -114,6 +115,7 @@ const defaultEntry = {
     read: true,
     reply: true,
     update: true,
+    viewRating: true,
     __typename: 'DiscussionEntryPermissions'
   },
   __typename: 'DiscussionEntry'
@@ -208,6 +210,7 @@ const defaultTopic = {
           read: true,
           reply: true,
           update: true,
+          viewRating: true,
           __typename: 'DiscussionEntryPermissions'
         },
         rating: false,
@@ -262,6 +265,7 @@ const defaultTopic = {
           read: true,
           reply: true,
           update: true,
+          viewRating: true,
           __typename: 'DiscussionEntryPermissions'
         },
         rating: false,
