@@ -23,18 +23,22 @@ describe MicrosoftSync::GroupsController, type: :controller do
   let!(:group) { MicrosoftSync::Group.create!(course: course, workflow_state: workflow_state) }
 
   let(:course_id) { course.id }
-  let(:feature_context) { course.root_account }
   let(:feature) { :microsoft_group_enrollments_syncing }
   let(:params) { { course_id: course_id } }
   let(:student) { course.student_enrollments.first.user }
   let(:teacher) { course.teacher_enrollments.first.user }
   let(:workflow_state) { :completed }
+  let(:root_account) { course.root_account }
   let(:course) do
     course_with_student(active_all: true)
     @course
   end
 
-  before { feature_context.enable_feature! feature }
+  before do
+    root_account.enable_feature! feature
+    root_account.settings[:microsoft_sync_enabled] = true
+    root_account.save!
+  end
 
   shared_examples_for 'endpoints that respond with 404 when records do not exist' do
     context 'when the course does not exist' do
@@ -72,7 +76,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
   shared_examples_for 'endpoints that require a release flag to be on' do
     context 'when the release flag is off' do
-      before { feature_context.disable_feature! feature }
+      before { root_account.disable_feature! feature }
 
       it { is_expected.to be_not_found }
     end
@@ -94,6 +98,15 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
+  shared_examples_for 'endpoints that require the integration to be available' do
+    before do
+      root_account.settings[:microsoft_sync_enabled] = false
+      root_account.save!
+    end
+
+    it { is_expected.to be_bad_request }
+  end
+
   describe '#sync' do
     subject { post :sync, params: params }
 
@@ -103,6 +116,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
     it_behaves_like 'endpoints that return an existing group'
+    it_behaves_like 'endpoints that require the integration to be available'
 
     it { is_expected.to be_successful }
 
@@ -167,6 +181,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require a user'
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
+    it_behaves_like 'endpoints that require the integration to be available'
 
     context 'when the course does not exist' do
       before { course.destroy! }
@@ -252,6 +267,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require a user'
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
+    it_behaves_like 'endpoints that require the integration to be available'
 
     it { is_expected.to be_no_content }
 
@@ -271,6 +287,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it_behaves_like 'endpoints that require permissions'
     it_behaves_like 'endpoints that require a release flag to be on'
     it_behaves_like 'endpoints that return an existing group'
+    it_behaves_like 'endpoints that require the integration to be available'
 
     it { is_expected.to be_successful }
 

@@ -26,6 +26,7 @@ describe('IntegrationRow', () => {
     name: 'Microsoft Sync',
     enabled: true,
     loading: false,
+    available: true,
     onChange,
     ...overrides
   })
@@ -90,5 +91,13 @@ describe('IntegrationRow', () => {
     const propOverrides = {info: {message: 'Hello there', variant: 'success'}, expanded: true}
 
     expect(subject(propOverrides).getByText('Hello there')).toBeInTheDocument()
+  })
+
+  describe('when "available" is falsey', () => {
+    const propOverrides = {available: false}
+
+    it('does not render the integration', () => {
+      expect(subject(propOverrides).queryByText('Microsoft Sync')).not.toBeInTheDocument()
+    })
   })
 })
