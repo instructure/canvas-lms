@@ -19,7 +19,7 @@
 
 class ReleaseNotesController < ApplicationController
   before_action :get_context, only: %w[manage]
-  before_action :require_manage_release_notes
+  before_action :require_manage_release_notes, except: %[latest]
 
   def require_manage_release_notes
     require_site_admin_with_permission(:manage_release_notes)
@@ -69,6 +69,21 @@ class ReleaseNotesController < ApplicationController
     note.save
   end
 
+  def latest
+    json = release_notes_for_user.map do |note|
+      localized_text = note[release_note_lang] || note['en']
+      {
+        id: note.id,
+        title: localized_text[:title],
+        description: localized_text[:description],
+        url: localized_text[:url],
+        date: note.show_ats[Canvas.environment]
+      }
+    end
+
+    render json: json
+  end
+
   def manage
     raise ActiveRecord::RecordNotFound unless @context.site_admin?
 
@@ -80,6 +95,38 @@ class ReleaseNotesController < ApplicationController
       release_notes_envs: allowed_envs,
     })
     render :html => "".html_safe, :layout => true
+  end
+
+  private
+  
+  def release_notes_for_user
+    return [] unless ReleaseNote.enabled?
+
+    # Treat anonymous users as regular "user"
+    roles = @current_user&.roles(@domain_root_account) || ['user']
+
+    all_notes = roles.flat_map do |role|
+      # Caches are partitioned by environment anyways so don't include in the key
+      # Since the time to show new notes could roll over at any time, just refresh the latest
+      # notes per role every 5 minutes
+      MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
+        notes = ReleaseNote.latest(env: Canvas.environment, role: role, limit: latest_limit)
+        # Ensure we have loaded the locales *before* caching
+        notes.each { |note| note[release_note_lang] || note['en']}
+        notes
+      end
+    end
+
+    notes = all_notes.sort_by { |note| note.show_ats[Canvas.environment] }.reverse!.first(latest_limit)
+  end
+
+  def last_seen_release_note
+    # for an anonymous user, they have always seen everything
+    @last_seen_release_note ||= @current_user&.last_seen_release_note || Time.now
+  end
+
+  def release_note_lang
+    @release_note_lang ||= I18n.fallbacks[I18n.locale].detect { |locale| allowed_langs.include?(locale.to_s) }
   end
 
   def upsert_params
@@ -94,7 +141,18 @@ class ReleaseNotesController < ApplicationController
     Setting.get('release_notes_envs', Rails.env.production? ? 'beta,production' : Rails.env).split(',')
   end
 
+  def latest_limit
+    Setting.get('release_notes_latest_limit', '10').to_i
+  end
+
   def include_langs?
     !!params[:includes]&.include?('langs')
+  end
+
+  # For specs only
+  def clear_ivars
+    self.instance_variables.each do |ivar|
+      self.instance_variable_set(ivar, nil)      
+    end
   end
 end

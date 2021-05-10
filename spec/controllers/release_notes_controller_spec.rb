@@ -44,6 +44,11 @@ describe ReleaseNotesController do
       description: 'A boring description',
       url: 'https://example.com/note0'
     }
+    note['es'] = {
+      title: 'A boring title en español',
+      description: 'A boring description en español',
+      url: 'https://es.example.com/note0'
+    }
     note.save
     note
   end
@@ -169,6 +174,108 @@ describe ReleaseNotesController do
       delete 'unpublish', params: { id: the_note.id }
       the_note = ReleaseNote.find(note.id)
       expect(the_note.published).to eq(false)
+    end
+  end
+
+  describe 'latest' do
+    before do
+      @student_enrollment = student_in_course(active_all: true)
+      user_session(@student_enrollment.user)
+
+      the_note = ReleaseNote.find(note.id)
+      the_note.published = true
+      the_note.save
+    end
+
+    it 'should return english notes by default' do
+      I18n.locale = :ar
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(1)
+
+      json_note = res[0]
+      expect(json_note['id']).to eq(note.id)
+      expect(json_note['title']).to eq(note['en'][:title])
+      expect(json_note['description']).to eq(note['en'][:description])
+      expect(json_note['url']).to eq(note['en'][:url])
+      expect(Time.zone.parse(json_note['date'])).to eq(note.show_ats['test'])
+    end
+
+    it 'should return localized notes when available' do
+      @user.update_attribute :locale, 'es'
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(1)
+
+      json_note = res[0]
+      expect(json_note['id']).to eq(note.id)
+      expect(json_note['title']).to eq(note['es'][:title])
+      expect(json_note['description']).to eq(note['es'][:description])
+      expect(json_note['url']).to eq(note['es'][:url])
+      expect(Time.zone.parse(json_note['date'])).to eq(note.show_ats['test'])
+    end
+
+    it 'should return only published notes' do
+      the_note = ReleaseNote.find(note.id)
+      the_note.published = false
+      the_note.save
+
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(0)
+
+      the_note.published = true
+      the_note.save
+
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(1)
+    end
+
+    it 'should return only notes past their show_at' do
+      the_note = ReleaseNote.find(note.id)
+      the_note.set_show_at('test', Time.now.utc.change(usec: 0) + 1.hour)
+      the_note.save
+
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(0)
+
+      the_note.set_show_at('test', Time.now.utc.change(usec: 0) - 1.hour)
+      the_note.save
+
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(1)
+    end
+
+    it "should not return notes that do not apply to the current user's roles" do
+      user_session(account_admin_user)
+      get 'latest'
+      expect(response.status).to eq(200)
+      res = JSON.parse(response.body)
+      expect(res.length).to eq(0)
+    end
+
+    it "should cache the dynamodb queries by language" do
+      enable_cache do
+        @user.update_attribute :locale, 'es'
+        # 2x the number of roles because we are testing two languages.
+        # The second spanish request shouldn't call the method at all though
+        expect(ReleaseNote).to receive(:latest).exactly(@user.roles(@student_enrollment.root_account).length * 2).times.and_call_original
+        get 'latest'
+        subject.send(:clear_ivars)
+        get 'latest'
+        @user.update_attribute :locale, 'en'
+        subject.send(:clear_ivars)
+        get 'latest'
+      end
     end
   end
 end
