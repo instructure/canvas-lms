@@ -2820,29 +2820,34 @@ class User < ActiveRecord::Base
       return :required if mfa_settings == :required ||
           mfa_settings == :required_for_admins && !pseudonym_hint.account.cached_all_account_users_for(self).empty?
     end
+    return :required if pseudonym_hint&.authentication_provider&.mfa_required?
 
-    result = self.pseudonyms.shard(self).preload(:account).map(&:account).uniq.map do |account|
+    pseudonyms = self.pseudonyms.shard(self).preload(:account, authentication_provider: :account)
+    return :required if pseudonyms.any? { |p| p.authentication_provider&.mfa_required? }
+
+    result = pseudonyms.map(&:account).uniq.map do |account|
       case account.mfa_settings
-        when :disabled
-          0
-        when :optional
+      when :disabled
+        0
+      when :optional
+        1
+      when :required_for_admins
+        # if pseudonym_hint is given, and we got to here, we don't need
+        # to redo the expensive all_account_users_for check
+        if (pseudonym_hint && pseudonym_hint.account == account) ||
+            account.cached_all_account_users_for(self).empty?
           1
-        when :required_for_admins
-          # if pseudonym_hint is given, and we got to here, we don't need
-          # to redo the expensive all_account_users_for check
-          if (pseudonym_hint && pseudonym_hint.account == account) ||
-              account.cached_all_account_users_for(self).empty?
-            1
-          else
-            # short circuit the entire method
-            return :required
-          end
-        when :required
+        else
           # short circuit the entire method
           return :required
+        end
+      when :required
+        # short circuit the entire method
+        return :required
       end
     end.max
     return :disabled if result.nil?
+
     [ :disabled, :optional ][result]
   end
 

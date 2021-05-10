@@ -24,7 +24,7 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::Oauth
   plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec
 
   def self.recognized_params
-    [ :login_attribute, :jit_provisioning ].freeze
+    super + [ :login_attribute, :jit_provisioning ].freeze
   end
 
   def self.login_attributes

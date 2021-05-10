@@ -2299,7 +2299,19 @@ describe User do
       p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
       account.account_users.create!(user: user)
 
-      expect(user).to receive(:pseudonyms).never
+      expect(user).not_to receive(:pseudonyms)
+      expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
+    end
+
+    it "is required for an auth provider that has it required" do
+      account = Account.create(settings: { mfa_settings: :optional })
+      ap = account.canvas_authentication_provider
+      ap.update!(mfa_required: true)
+      p = user.pseudonyms.create!(account: account, unique_id: 'user', authentication_provider: ap)
+
+      expect(user.mfa_settings).to eq :required
+
+      expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
   end

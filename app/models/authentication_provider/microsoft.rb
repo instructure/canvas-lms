@@ -50,7 +50,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_params
-    [:tenant, :login_attribute, :jit_provisioning].freeze
+    super + [:tenant, :login_attribute, :jit_provisioning].freeze
   end
 
   def self.login_attributes

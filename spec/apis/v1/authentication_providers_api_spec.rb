@@ -93,6 +93,22 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.position).to eq 1
     end
 
+    it "can create an initially mfa-required provider" do
+      @account.settings[:mfa_settings] = :optional
+      @account.save!
+      @saml_hash[:mfa_required] = true
+      call_create(@saml_hash)
+      ap = @account.authentication_providers.first
+      expect(ap).to be_mfa_required
+    end
+
+    it "ignores mfa_required if the account doesn't have it enabled" do
+      @saml_hash[:mfa_required] = true
+      call_create(@saml_hash)
+      ap = @account.authentication_providers.first
+      expect(ap).not_to be_mfa_required
+    end
+
     it "should work with rails form style params" do
       call_create({:authentication_provider => @saml_hash})
       aac = @account.authentication_providers.first
@@ -259,6 +275,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['metadata_uri'] = nil
       @saml_hash['sig_alg'] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
       @saml_hash['strip_domain_from_login_attribute'] = false
+      @saml_hash['mfa_required'] = false
       expect(json).to eq @saml_hash
     end
 
@@ -273,6 +290,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash['auth_over_tls'] = 'start_tls'
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['position'] = 1
+      @ldap_hash['mfa_required'] = false
       expect(json).to eq @ldap_hash
     end
 
@@ -285,6 +303,7 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash['position'] = 1
       @cas_hash['unknown_user_url'] = nil
       @cas_hash['federated_attributes'] = {}
+      @cas_hash['mfa_required'] = false
       expect(json).to eq @cas_hash
     end
 
@@ -391,6 +410,19 @@ describe "AuthenticationProviders API", type: :request do
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       call_update(0, {}, 401)
+    end
+
+    it "can disable MFA" do
+      @account.settings[:mfa_settings] = :optional
+      @account.save!
+      aac = @account.authentication_providers.new(@cas_hash)
+      aac.mfa_required = true
+      aac.save!
+      @cas_hash['mfa_required'] = '0'
+      call_update(aac.id, @cas_hash)
+
+      aac.reload
+      expect(aac).not_to be_mfa_required
     end
   end
 
