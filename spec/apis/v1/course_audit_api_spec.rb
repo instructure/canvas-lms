@@ -55,9 +55,9 @@ describe "CourseAudit API", type: :request do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
     end
 
-    def fetch_for_context(context, options={})
+    def fetch_for_context(context, id: nil, **options)
       type = context.class.to_s.downcase unless type = options.delete(:type)
-      id = context.id.to_s
+      id ||= context.id.to_s
 
       arguments = { controller: 'course_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
       query_string = []
@@ -87,17 +87,17 @@ describe "CourseAudit API", type: :request do
       api_call_as_user(@viewing_user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
-    def expect_event_for_context(context, event, options={})
+    def expect_event_for_context(context, event, **options)
       json = options.delete(:json)
-      json ||= fetch_for_context(context, options)
+      json ||= fetch_for_context(context, **options)
       expect(json['events'].map{ |e| [e['id'], e['event_type']] })
                     .to include([event.id, event.event_type])
       json
     end
 
-    def forbid_event_for_context(context, event, options={})
+    def forbid_event_for_context(context, event, **options)
       json = options.delete(:json)
-      json ||= fetch_for_context(context, options)
+      json ||= fetch_for_context(context, **options)
       expect(json['events'].map{ |e| [e['id'], e['event_type']] })
                     .not_to include([event.id, event.event_type])
       json
@@ -138,6 +138,11 @@ describe "CourseAudit API", type: :request do
       it "should recognize :end_time" do
         json = forbid_event_for_context(@course, @event, end_time: 12.hours.ago)
         expect_event_for_context(@course, @event2, end_time: 12.hours.ago, json: json)
+      end
+
+      it "supports using sis_id" do
+        @course.update!(sis_source_id: 'my_sis_id')
+        expect_event_for_context(@course, @event, id: 'sis_course_id:my_sis_id')
       end
     end
 
