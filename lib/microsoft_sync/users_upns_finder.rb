@@ -54,7 +54,7 @@ module MicrosoftSync
 
     def find_by_email
       users_upns = CommunicationChannel
-        .where(user_id: user_ids, path_type: 'email')
+        .where(user_id: user_ids, path_type: 'email', workflow_state: 'active')
         .order(position: :asc)
         .pluck(:user_id, :path)
 

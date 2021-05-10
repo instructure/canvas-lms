@@ -342,10 +342,10 @@ describe MicrosoftSync::SyncerSteps do
       stub_const('MicrosoftSync::GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE', batch_size)
 
       students.each_with_index do |student, i|
-        communication_channel(student, path_type: 'email', username: "student#{i}@example.com")
+        communication_channel(student, path_type: 'email', username: "student#{i}@example.com", active_cc: true)
       end
       teachers.each_with_index do |teacher, i|
-        communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com")
+        communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com", active_cc: true)
       end
 
     end
