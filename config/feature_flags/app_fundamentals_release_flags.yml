@@ -29,3 +29,8 @@ course_templates:
   applies_to: RootAccount
   display_name: Course Templates
   description: Enables the Course Templates feature globally
+persist_inferred_authentication_providers:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Require Authenticion Provider on Logins
+  description: Persists the used authentication provider when logging in, and defaults new logins to the default provider

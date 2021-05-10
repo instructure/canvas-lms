@@ -19,8 +19,11 @@
 
 require 'apis/api_spec_helper'
 require 'sharding_spec_helper'
+require 'feature_flag_helper'
 
 describe "Feature Flags API", type: :request do
+  include FeatureFlagHelper
+
   let_once(:t_site_admin) { Account.site_admin }
   let_once(:t_root_account) { account_model }
   let_once(:t_teacher) { user_with_pseudonym account: t_root_account }
@@ -49,6 +52,7 @@ describe "Feature Flags API", type: :request do
       'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
       'compact_live_event_payloads' => live_event_feature
     })
+    silence_undefined_feature_flag_errors
   end
 
   describe "index" do

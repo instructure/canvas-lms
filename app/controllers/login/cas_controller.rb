@@ -79,6 +79,7 @@ class Login::CasController < ApplicationController
         session[:cas_session] = params[:ticket]
         session[:login_aac] = aac.id
 
+        pseudonym.infer_auth_provider(aac)
         successful_login(pseudonym.user, pseudonym)
       else
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
