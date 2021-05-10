@@ -42,23 +42,21 @@ def appendStagesAsBuildNodes(nodes,
     def timeStart = new Date()
     extendedStage(stageName).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').queue(nodes) {
       echo "Running on node ${env.NODE_NAME}"
-      def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
-      // make sure to unstash
-      unstash name: 'build-dir'
-      unstash name: 'build-docker-compose'
+
+      unstashBuildScripts()
       stageBlock(index)
     }
   }
-                             }
+}
 
-/**
- * use this in combination with appendStagesAsBuildNodes. this will
- * stash the required files for running biulds that only require
- * the build scripts
- */
 def stashBuildScripts() {
   stash name: 'build-dir', includes: 'build/**/*'
   stash name: 'build-docker-compose', includes: 'docker-compose.*.yml'
+}
+
+def unstashBuildScripts() {
+  unstash name: 'build-dir'
+  unstash name: 'build-docker-compose'
 }
 
 /**

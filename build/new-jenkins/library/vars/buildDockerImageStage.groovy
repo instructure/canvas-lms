@@ -109,6 +109,13 @@ def jsImage() {
   }
 }
 
+def lintersImage() {
+  credentials.withStarlordDockerLogin {
+    sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
+    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $LINTERS_RUNNER_PREFIX'
+  }
+}
+
 def premergeCacheImage() {
   credentials.withStarlordDockerLogin {
     withEnv([

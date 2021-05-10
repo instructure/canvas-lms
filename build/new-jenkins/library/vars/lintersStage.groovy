@@ -46,12 +46,9 @@ def _getDockerInputs() {
 }
 
 def setupNode() {
-  credentials.withStarlordDockerLogin {
-    sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
-    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $LINTERS_RUNNER_PREFIX'
+  distribution.unstashBuildScripts()
 
-    sh "docker volume create $dockerVolumeName"
-  }
+  sh "docker volume create $dockerVolumeName"
 }
 
 def tearDownNode() {
