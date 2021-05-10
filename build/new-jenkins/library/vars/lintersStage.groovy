@@ -22,7 +22,6 @@ import groovy.transform.Field
 
 def _getDockerInputs() {
   def inputVars = [
-    "--volume $WORKSPACE/.git:/usr/src/app/.git",
     '--env GERGICH_DB_PATH=/home/docker/gergich',
     "--env GERGICH_PUBLISH=$GERGICH_PUBLISH",
     "--env GERGICH_KEY=$GERGICH_KEY",
@@ -39,7 +38,6 @@ def _getDockerInputs() {
 
   if (env.GERRIT_PROJECT != 'canvas-lms') {
     inputVars.addAll([
-      "--volume $WORKSPACE/gems/plugins/$GERRIT_PROJECT/.git:/usr/src/app/gems/plugins/$GERRIT_PROJECT/.git",
       "--env GERGICH_GIT_PATH=/usr/src/app/gems/plugins/$GERRIT_PROJECT",
     ])
   }
