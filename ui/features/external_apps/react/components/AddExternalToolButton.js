@@ -83,7 +83,9 @@ export default class AddExternalToolButton extends React.Component {
   handleLti2ToolInstalled = toolData => {
     if (toolData.status === 'failure') {
       this.setState({modalIsOpen: false}, () => {
-        $.flashError(toolData.message || I18n.t('There was an unknown error registering the tool'))
+        $.flashErrorSafe(
+          toolData.message || I18n.t('There was an unknown error registering the tool')
+        )
       })
     } else {
       this.setState({tool: toolData})
