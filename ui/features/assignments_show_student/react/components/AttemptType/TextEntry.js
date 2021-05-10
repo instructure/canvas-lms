@@ -70,7 +70,6 @@ export default class TextEntry extends React.Component {
 
   componentDidMount() {
     this._isMounted = true
-    window.addEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.getDraftBody() != null && !this.state.editorLoaded) {
       this.loadRCE()
@@ -100,17 +99,9 @@ export default class TextEntry extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
-    window.removeEventListener('beforeunload', this.beforeunload.bind(this))
 
     if (this.state.editorLoaded) {
       this.unloadRCE()
-    }
-  }
-
-  beforeunload(e) {
-    if (this.state.editorLoaded && this.getDraftBody() !== this.getRCEText()) {
-      e.preventDefault()
-      e.returnValue = true
     }
   }
 
