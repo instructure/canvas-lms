@@ -288,6 +288,19 @@ module Types
         end
       end
     end
+
+    field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
+      argument :query, String, <<~DOC, required: false
+        Only include comments that match the query string.
+      DOC
+    end
+    def comment_bank_items_connection(query: nil)
+      return unless object == current_user
+
+      comments = current_user.comment_bank_items
+      comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
+      comments
+    end
   end
 end
 

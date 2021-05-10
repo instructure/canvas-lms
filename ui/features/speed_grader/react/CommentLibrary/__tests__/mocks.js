@@ -20,18 +20,18 @@ import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import {DELETE_COMMENT_MUTATION, CREATE_COMMENT_MUTATION} from '../graphql/Mutations'
 import {COMMENTS_QUERY} from '../graphql/Queries'
 
-export const commentBankItemMocks = ({courseId = '1', numberOfComments = 10} = {}) => [
+export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {}) => [
   {
     request: {
       query: COMMENTS_QUERY,
       variables: {
-        courseId
+        userId
       }
     },
     result: {
       data: {
-        course: {
-          __typename: 'Course',
+        legacyNode: {
+          __typename: 'User',
           commentBankItemsConnection: {
             __typename: 'CommentBankItemsConnection',
             nodes: new Array(numberOfComments).fill(0).map((_v, i) => ({

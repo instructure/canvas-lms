@@ -26,7 +26,8 @@ describe('CommentArea', () => {
   const defaultProps = () => {
     return {
       getTextAreaRef: getTextAreaRefMock,
-      courseId: '1'
+      courseId: '1',
+      userId: '1'
     }
   }
 

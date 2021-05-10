@@ -3461,4 +3461,17 @@ describe User do
       expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
     end
   end
+
+  describe "comment_bank_items" do
+    before(:once) do
+      course_with_teacher
+      @c1 = comment_bank_item_model({user: @teacher})
+      @c2 = comment_bank_item_model({user: @teacher})
+    end
+
+    it "only returns active records" do
+      @c2.destroy
+      expect(@teacher.comment_bank_items).to eq [@c1]
+    end
+  end
 end
