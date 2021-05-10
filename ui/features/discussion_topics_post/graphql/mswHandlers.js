@@ -128,7 +128,7 @@ const defaultEntry = {
   __typename: 'DiscussionEntry'
 }
 
-const defaultTopic = {
+export const defaultTopic = {
   allowRating: true,
   assignment: null,
   author: {

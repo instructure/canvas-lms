@@ -67,6 +67,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   // TODO: Change this to the new canGrade permission.
   const canGrade = discussionTopicData?.permissions?.speedGrader || false
   const canDelete = discussionTopicData?.permissions?.delete || false
+  const canReply = discussionTopicData?.permissions?.reply
   const canUpdate = discussionTopicData?.permissions?.update || false
   const canPeerReview = discussionTopicData?.permissions?.peerReview
   const canShowRubric = discussionTopicData?.permissions?.showRubric
@@ -226,15 +227,17 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       timingDisplay={discussionTopicData.postedAt}
                       message={discussionTopicData.message}
                     >
-                      <Button
-                        color="primary"
-                        onClick={() => {
-                          setExpandedReply(!expandedReply)
-                        }}
-                        data-testid="discussion-topic-reply"
-                      >
-                        {I18n.t('Reply')}
-                      </Button>
+                      {canReply && (
+                        <Button
+                          color="primary"
+                          onClick={() => {
+                            setExpandedReply(!expandedReply)
+                          }}
+                          data-testid="discussion-topic-reply"
+                        >
+                          {I18n.t('Reply')}
+                        </Button>
+                      )}
                     </PostMessage>
                   </Flex.Item>
                   <Flex.Item>

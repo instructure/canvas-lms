@@ -21,7 +21,8 @@ import {ApolloProvider} from 'react-apollo'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {getEditUrl, getSpeedGraderUrl} from '../../../utils'
-import {handlers} from '../../../../graphql/mswHandlers'
+import {graphql} from 'msw'
+import {handlers, defaultTopic} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
@@ -276,6 +277,7 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Send to:')).toBeTruthy()
   })
 
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders a modal to copy content', async () => {
     const container = setup({
       discussionTopic: {
@@ -288,5 +290,33 @@ describe('DiscussionTopicContainer', () => {
     const copyToButton = await container.findByText('Copy To...')
     fireEvent.click(copyToButton)
     expect(await container.findByText('Select a Course')).toBeTruthy()
+  })
+
+  it('renders a reply button if user has reply permission true', async () => {
+    const container = setup({discussionTopic: {...defaultTopic}})
+    await waitFor(() =>
+      expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+    )
+    expect(await container.findByTestId('discussion-topic-reply')).toBeInTheDocument()
+  })
+
+  it('does not render a reply button if user has reply permission false', async () => {
+    defaultTopic.permissions.reply = false
+    server.use(
+      graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: {...defaultTopic}
+          })
+        )
+      })
+    )
+    const container = setup({discussionTopic: {...defaultTopic}})
+    await waitFor(() =>
+      expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+    )
+
+    await waitFor(() => expect(container.queryByTestId('discussion-topic-reply')).toBeNull())
+    defaultTopic.permissions.reply = true
   })
 })
