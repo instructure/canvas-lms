@@ -123,6 +123,19 @@ describe('GlobalNavigation::UnreadCounts', () => {
       jest.advanceTimersByTime(allowedAge - age + 50) // just past the allowed age
       expect(fetchMock).toHaveBeenCalled()
     })
+
+    it('skips fetching if refreshing is disabled and the allowed age has no expired', () => {
+      const age = allowedAge / 2 // within the allowed age
+      const last = {
+        updatedAt: +new Date() - age,
+        unreadCount: 12
+      }
+      window.sessionStorage.setItem(storageKey, JSON.stringify(last))
+      render(<UnreadCounts {...props} pollIntervalMs={0} targetEl={target} />)
+      expect(fetchMock).not.toHaveBeenCalled()
+      jest.advanceTimersByTime(allowedAge - age + 50) // just past the allowed age
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('API sad path', () => {

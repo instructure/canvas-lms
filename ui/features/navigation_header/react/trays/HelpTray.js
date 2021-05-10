@@ -24,7 +24,14 @@ import {Heading} from '@instructure/ui-heading'
 import HelpDialog from '../HelpDialog/index'
 import ReleaseNotesList from '../ReleaseNotesList'
 
-export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
+export default function HelpTray({
+  trayTitle,
+  closeTray,
+  links,
+  hasLoaded,
+  badgeDisabled,
+  setBadgeDisabled
+}) {
   return (
     <View as="div" padding="medium" id="help_tray">
       <Heading level="h3" as="h2">
@@ -32,7 +39,7 @@ export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
       </Heading>
       <hr role="presentation" />
       <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray} />
-      <ReleaseNotesList />
+      <ReleaseNotesList badgeDisabled={badgeDisabled} setBadgeDisabled={setBadgeDisabled} />
     </View>
   )
 }
@@ -41,7 +48,9 @@ HelpTray.propTypes = {
   trayTitle: string,
   closeTray: func.isRequired,
   links: array,
-  hasLoaded: bool
+  hasLoaded: bool,
+  badgeDisabled: bool,
+  setBadgeDisabled: func
 }
 
 HelpTray.defaultProps = {

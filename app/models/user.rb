@@ -1706,6 +1706,18 @@ class User < ActiveRecord::Base
     !!preferences[:default_notifications_disabled]
   end
 
+  def last_seen_release_note=(val)
+    preferences[:last_seen_release_note] = val
+  end
+
+  def last_seen_release_note
+    preferences[:last_seen_release_note] || Time.at(0)
+  end
+
+  def release_notes_badge_disabled?
+    !!preferences[:release_notes_badge_disabled]
+  end
+
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 

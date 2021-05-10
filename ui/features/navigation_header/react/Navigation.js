@@ -103,7 +103,8 @@ export default class Navigation extends React.Component {
     profileAreLoading: false,
     profileAreLoaded: false,
     historyLoading: false,
-    historyAreLoaded: false
+    historyAreLoaded: false,
+    releaseNotesBadgeDisabled: ENV.SETTINGS.release_notes_badge_disabled
   }
 
   componentDidMount() {
@@ -316,6 +317,8 @@ export default class Navigation extends React.Component {
             links={this.state.help}
             hasLoaded={this.state.helpAreLoaded}
             closeTray={this.closeTray}
+            badgeDisabled={this.state.releaseNotesBadgeDisabled}
+            setBadgeDisabled={val => this.setState({releaseNotesBadgeDisabled: val})}
           />
         )
       default:
@@ -370,6 +373,16 @@ export default class Navigation extends React.Component {
       {
         one: 'One unread share.',
         other: '%{count} unread shares.'
+      },
+      {count}
+    )
+  }
+
+  releaseNotesBadgeText(count) {
+    return I18n.t(
+      {
+        one: 'One unread release note.',
+        other: '%{count} release notes.'
       },
       {count}
     )
@@ -443,6 +456,22 @@ export default class Navigation extends React.Component {
             onUpdate={unreadCount => this.onInboxUnreadUpdate(unreadCount)}
             srText={this.inboxUnreadSRText}
             useSessionStorage={false}
+          />
+        )}
+        {!this.state.releaseNotesBadgeDisabled && (
+          <UnreadComponent
+            targetEl={
+              this.unreadReleaseNotesCountElement ||
+              (this.unreadReleaseNotesCountElement = document.querySelector(
+                '#global_nav_help_link .menu-item__badge'
+              ))
+            }
+            dataUrl="/api/v1/release_notes/unread_count"
+            srText={this.releaseNotesBadgeText}
+            // Don't bother re-fetching unless it's at least 5 minutes old
+            allowedAge={5 * 60 * 1000}
+            // Don't poll-this changes rarely enough and new features usually require a page refresh anyways
+            pollIntervalMs={0}
           />
         )}
       </>
