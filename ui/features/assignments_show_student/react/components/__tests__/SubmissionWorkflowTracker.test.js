@@ -21,13 +21,26 @@ import {render} from '@testing-library/react'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionWorkflowTracker from '../SubmissionWorkflowTracker'
+import tz from '@canvas/timezone'
 
 describe('when a submission is graded', () => {
-  it('renders as "Review Feedback" when the grade is visible', async () => {
-    const submission = await mockSubmission({Submission: SubmissionMocks.graded})
+  describe('when the grade is visible', () => {
+    it('renders as "Review Feedback"', async () => {
+      const submission = await mockSubmission({Submission: SubmissionMocks.graded})
 
-    const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
-    expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Review Feedback')
+      const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+      expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Review Feedback')
+    })
+
+    it('renders the time submitted in the subtitle', async () => {
+      const submission = await mockSubmission({Submission: SubmissionMocks.graded})
+      submission.submittedAt = tz.parse('2021-06-01T19:27:54Z')
+
+      const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+      expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveTextContent(
+        'Submitted on Jun 1, 2021 7:27pm'
+      )
+    })
   })
 
   it('renders as "Submitted" when the grade is not visible', async () => {
@@ -36,7 +49,7 @@ describe('when a submission is graded', () => {
     })
 
     const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
-    expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Submitted')
+    expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent(/Submitted/i)
   })
 })
 
@@ -44,7 +57,15 @@ it('renders as "Submitted" when the student has submitted', async () => {
   const submission = await mockSubmission({Submission: {...SubmissionMocks.submitted}})
 
   const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
-  expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Submitted')
+  expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent(/Submitted/i)
+})
+
+it('renders the time submitted when the student has submitted', async () => {
+  const submission = await mockSubmission({Submission: {...SubmissionMocks.submitted}})
+  submission.submittedAt = tz.parse('2021-06-01T19:27:54Z')
+
+  const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+  expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Jun 1, 2021 7:27pm')
 })
 
 it('renders as "In Progress" when the student has not yet submitted', async () => {
