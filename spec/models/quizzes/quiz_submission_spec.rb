@@ -466,24 +466,6 @@ describe Quizzes::QuizSubmission do
       end
     end
 
-    it "should know if it is overdue" do
-      now = Time.now
-      q = @quiz.quiz_submissions.new
-      q.end_at = now
-      q.save!
-
-      expect(q.overdue?).to eql(false)
-      q.end_at = now - (3 * 60)
-      q.save!
-      expect(q.overdue?).to eql(false)
-
-      expect(q.overdue?(true)).to eql(true)
-      q.end_at = now - (6 * 60)
-      q.save!
-      expect(q.overdue?).to eql(true)
-      expect(q.overdue?(true)).to eql(true)
-    end
-
     it "should know if it is extendable" do
       @quiz.update_attribute(:time_limit, 10)
       now = Time.now.utc
@@ -1726,6 +1708,117 @@ describe Quizzes::QuizSubmission do
     it "should return the correct time left in seconds" do
       subject.end_at = 1.hour.from_now
       expect(subject.time_left).to eql(60 * 60)
+    end
+
+    context "when Quiz autosubmit is disabled" do
+      before :each do
+        course_factory
+        subject.quiz = @course.quizzes.create!
+        subject.end_at = 1.hour.from_now
+        allow(subject).to receive(:end_at_without_time_limit).and_return(2.hours.from_now)
+      end
+
+      it "should return the correct soft (when the Attempt will timeout) time left" do
+        expect(subject.quiz).to_not receive(:timer_autosubmit_disabled?)
+        expect(subject.time_left).to eql(60 * 60)
+      end
+
+      it "should return the correct hard (when the Quiz is due) time left" do
+        expect(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
+        expect(subject.time_left(hard: true)).to eql(120 * 60)
+      end
+    end
+  end
+
+  describe "#overdue_and_needs_submission?" do
+    before :each do
+      course_factory
+      subject.quiz = @course.quizzes.create!
+      subject.end_at = 3.days.ago
+      allow(subject).to receive(:untaken?).and_return(true)
+    end
+
+    it "should return true if strictly overdue?" do
+      expect(subject).to receive(:overdue?).with(true).and_return(true)
+      expect(subject.overdue_and_needs_submission?(true)).to be(true)
+    end
+
+    it "should return false if untaken" do
+      expect(subject).to receive(:untaken?).and_return(false)
+      expect(subject.overdue_and_needs_submission?).to be(false)
+    end
+
+    it "should return true if untaken and end_at is past" do
+      expect(subject.overdue_and_needs_submission?).to be(true)
+    end
+
+    context "when Quiz autosubmit is disabled" do
+      before :each do
+        allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
+      end
+
+      it "should return false when date is future" do
+        allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.from_now)
+        expect(subject.overdue_and_needs_submission?).to be(false)
+      end
+
+      it "should return true when date is past" do
+        allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.ago)
+        expect(subject.overdue_and_needs_submission?).to be(true)
+      end
+    end
+  end
+
+  describe "#overdue?" do
+    before :each do
+      course_factory
+      subject.quiz = @course.quizzes.create!
+    end
+
+    it "should allow a 1 minute grace if strict" do
+      subject.end_at = 50.seconds.ago
+      expect(subject.overdue?(true)).to be(false)
+
+      subject.end_at = 3.minutes.ago
+      expect(subject.overdue?(true)).to be(true)
+
+      subject.end_at = 6.minutes.ago
+      expect(subject.overdue?(true)).to be(true)
+    end
+
+    it "should allow a 5 minute grace if not strict" do
+      subject.end_at = 3.minutes.ago
+      expect(subject.overdue?).to be(false)
+
+      subject.end_at = 6.minutes.ago
+      expect(subject.overdue?).to be(true)
+    end
+
+    it "should use end_at by default" do
+      expect(subject).to_not receive(:end_at_without_time_limit)
+
+      subject.end_at = 3.minutes.ago
+      expect(subject.overdue?).to be(false)
+
+      subject.end_at = 6.minutes.ago
+      expect(subject.overdue?).to be(true)
+    end
+
+    context "when Quiz autosubmit is disabled" do
+      before :each do
+        subject.end_at = 6.minutes.ago
+        allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
+      end
+
+      it "should return false when date is future" do
+        allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.from_now)
+        expect(subject.overdue?).to be(false)
+      end
+
+      it "should return true when date is past" do
+        allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.ago)
+        expect(subject.overdue?).to be(true)
+      end
     end
   end
 
