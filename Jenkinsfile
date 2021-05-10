@@ -428,10 +428,6 @@ pipeline {
                 extendedStage(LINTERS_BUILD_IMAGE_STAGE)
                   .queue(stages, buildDockerImageStage.&lintersImage)
 
-                extendedStage('Dependency Check')
-                  .required(configuration.isChangeMerged())
-                  .queue(stages, { dependencyCheckStage() })
-
                 parallel(stages)
               }
             }
@@ -483,17 +479,27 @@ pipeline {
               extendedStage('Linters')
                 .hooks(linterHooks)
                 .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
-                .required(!configuration.isChangeMerged())
                 .execute {
                   def nestedStages = [:]
 
-                  extendedStage('Linters - Run Tests - Code').queue(nestedStages, lintersStage.&codeStage)
+                  extendedStage('Linters - Run Tests - Code')
+                    .required(!configuration.isChangeMerged())
+                    .queue(nestedStages, lintersStage.&codeStage)
+
+                  extendedStage('Linters - Run Tests - Dependency Check')
+                    .required(configuration.isChangeMerged())
+                    .queue(nestedStages, lintersStage.&dependencyCheckStage)
+
                   extendedStage('Linters - Run Tests - Master Bouncer')
                     .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())
                     .queue(nestedStages, lintersStage.&masterBouncerStage)
-                  extendedStage('Linters - Run Tests - Webpack').queue(nestedStages, lintersStage.&webpackStage)
+
+                  extendedStage('Linters - Run Tests - Webpack')
+                    .required(!configuration.isChangeMerged())
+                    .queue(nestedStages, lintersStage.&webpackStage)
+
                   extendedStage('Linters - Run Tests - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+                    .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                     .queue(nestedStages, lintersStage.&yarnStage)
 
                   parallel(nestedStages)

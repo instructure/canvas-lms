@@ -75,6 +75,21 @@ def codeStage() {
   }
 }
 
+def dependencyCheckStage() {
+  catchError (buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+    try {
+      snyk('canvas-lms:ruby', 'Gemfile.lock', "$LINTERS_RUNNER_IMAGE")
+    }
+    catch (err) {
+      if (err.toString().contains('Gemfile.lock does not exist')) {
+        snyk('canvas-lms:ruby', 'Gemfile.lock.next', "$LINTERS_RUNNER_IMAGE")
+      } else {
+        throw err
+      }
+    }
+  }
+}
+
 def masterBouncerStage() {
   credentials.withMasterBouncerCredentials {
     sh 'build/new-jenkins/linters/run-master-bouncer.sh'
