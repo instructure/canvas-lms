@@ -736,7 +736,7 @@ class CoursesController < ApplicationController
   #   course. This parameter is required when using the API, as this option is
   #   not displayed in the Course Settings page.
   #
-  # @argument course[term_id] [Integer]
+  # @argument course[term_id] [String]
   #   The unique ID of the term to create to course in.
   #
   # @argument course[sis_course_id] [String]
