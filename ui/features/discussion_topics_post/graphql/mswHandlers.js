@@ -185,6 +185,7 @@ const defaultTopic = {
     openForComments: true,
     closeForComments: false,
     copyAndSendTo: true,
+    moderateForum: true,
     __typename: 'DiscussionPermissions'
   },
   postedAt: '2020-11-23T11:40:44-07:00',

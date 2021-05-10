@@ -68,14 +68,14 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canGrade = discussionTopicData?.permissions?.speedGrader || false
   const canDelete = discussionTopicData?.permissions?.delete || false
   const canReadAsAdmin = !!discussionTopicData?.permissions?.readAsAdmin || false
-  const canUpdate = discussionTopicData?.permissions?.update || false
-  const canUnpublish = props.discussionTopic.canUnpublish || false
   const canPeerReview = discussionTopicData?.permissions?.peerReview
   const canShowRubric = discussionTopicData?.permissions?.showRubric
   const canAddRubric = discussionTopicData?.permissions?.addRubric
   const canOpenForComments = discussionTopicData?.permissions?.openForComments
   const canCloseForComments = discussionTopicData?.permissions?.closeForComments
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
+  const canModerate = discussionTopicData?.permissions?.moderateForum
+  const canUnpublish = props.discussionTopic.canUnpublish
 
   if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
@@ -282,7 +282,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             }
                           : null
                       }
-                      onTogglePublish={canReadAsAdmin && canUpdate ? onPublish : null}
+                      onTogglePublish={canModerate ? onPublish : null}
                       onToggleSubscription={onSubscribe}
                       onOpenSpeedgrader={
                         canGrade

@@ -56,7 +56,8 @@ const discussionTopicMock = {
       readAsAdmin: true,
       update: true,
       delete: true,
-      speedGrader: true
+      speedGrader: true,
+      moderateForum: true
     }
   }
 }
