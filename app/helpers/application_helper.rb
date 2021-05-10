@@ -631,14 +631,10 @@ module ApplicationHelper
     support_url || '#'
   end
 
-  def show_help_link?
-    show_feedback_link? || support_url.present?
-  end
-
   def help_link_classes(additional_classes = [])
     css_classes = []
     css_classes << "support_url" if support_url
-    css_classes << "help_dialog_trigger" if show_feedback_link?
+    css_classes << "help_dialog_trigger"
     css_classes.concat(additional_classes) if additional_classes
     css_classes.join(" ")
   end
@@ -663,12 +659,10 @@ module ApplicationHelper
   end
 
   def help_link
-    if show_help_link?
-      link_content = help_link_name
-      link_to link_content.html_safe, help_link_url,
-        :class => help_link_classes,
-        :data => help_link_data
-    end
+    link_content = help_link_name
+    link_to link_content.html_safe, help_link_url,
+      :class => help_link_classes,
+      :data => help_link_data
   end
 
   def active_brand_config_cache

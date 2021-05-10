@@ -395,6 +395,7 @@ describe AccountsController do
     end
 
     it "doesn't break I18n by setting customized text for default help links unnecessarily" do
+      Setting.set('show_feedback_link', 'true')
       account_with_admin_logged_in
       post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
         { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
@@ -1100,6 +1101,7 @@ describe AccountsController do
     end
 
     it "should return default help links" do
+      Setting.set('show_feedback_link', 'true')
       get 'help_links', params: {account_id: @account.id}
 
       expect(response).to be_successful

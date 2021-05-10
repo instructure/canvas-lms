@@ -483,12 +483,7 @@ describe ApplicationHelper do
   end
 
   describe "help link" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     it "should configure the help link to display the dialog by default" do
-      expect(helper.show_help_link?).to eq true
       expect(helper.help_link_url).to eq '#'
       expect(helper.help_link_classes).to eq 'help_dialog_trigger'
     end
@@ -497,13 +492,11 @@ describe ApplicationHelper do
       support_url = 'http://instructure.com'
       Account.default.update_attribute(:settings, { :support_url => support_url })
       helper.instance_variable_set(:@domain_root_account, Account.default)
-      Setting.set('show_feedback_link', 'false')
 
       expect(helper.support_url).to eq support_url
-      expect(helper.show_help_link?).to eq true
       expect(helper.help_link_url).to eq support_url
       expect(helper.help_link_icon).to eq 'help'
-      expect(helper.help_link_classes).to eq 'support_url'
+      expect(helper.help_link_classes).to eq 'support_url help_dialog_trigger'
     end
 
     it "should return the configured icon" do

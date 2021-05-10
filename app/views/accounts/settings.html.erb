@@ -644,7 +644,7 @@
             <% end %>
         <% end %>
 
-        <% if @account.root_account? && !@account.site_admin? && show_feedback_link? %>
+        <% if @account.root_account? && !@account.site_admin? %>
           <div id="custom_help_link_settings"></div>
         <% end %>
 

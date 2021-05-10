@@ -35,7 +35,6 @@ describe "site-wide" do
   let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
 
   it "should render 404 when user isn't logged in" do
-    Setting.set 'show_feedback_link', 'true'
     get "/dashbo"
     assert_status(404)
   end

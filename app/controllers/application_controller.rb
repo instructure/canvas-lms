@@ -180,7 +180,6 @@ class ApplicationController < ActionController::Base
           SETTINGS: {
             open_registration: @domain_root_account.try(:open_registration?),
             collapse_global_nav: @current_user.try(:collapse_global_nav?),
-            show_feedback_link: show_feedback_link?
           },
         }
 

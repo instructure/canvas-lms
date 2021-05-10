@@ -375,10 +375,6 @@ describe "admin settings tab" do
   end
 
   context "custom help links" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     def set_checkbox(checkbox, checked)
       selector = "##{checkbox['id']}"
       checkbox.click if is_checked(selector) != checked
@@ -509,6 +505,8 @@ describe "admin settings tab" do
     end
 
     it "edits a default link" do
+      Setting.set('show_feedback_link', 'true')
+
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
