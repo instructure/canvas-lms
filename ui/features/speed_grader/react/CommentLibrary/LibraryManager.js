@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes, {shape, instanceOf} from 'prop-types'
 import {useQuery, useMutation} from 'react-apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -28,18 +28,18 @@ import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
 
 const LibraryManager = ({setComment, courseId, textAreaRef}) => {
+  const [removedItemIndex, setRemovedItemIndex] = useState(null)
   const {loading, error, data} = useQuery(COMMENTS_QUERY, {
     variables: {courseId}
   })
 
   useEffect(() => {
-    if (!error) {
-      return
+    if (error) {
+      showFlashAlert({
+        message: I18n.t('Error loading comment library'),
+        type: 'error'
+      })
     }
-    showFlashAlert({
-      message: I18n.t('Error loading comment library'),
-      type: 'error'
-    })
   }, [error])
 
   const getCachedComments = cache => {
@@ -64,12 +64,16 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
   const removeDeletedCommentFromCache = (cache, result) => {
     const commentsFromCache = getCachedComments(cache)
     const resultId = result.data.deleteCommentBankItem.commentBankItemId
+    const removedIndex = commentsFromCache.course.commentBankItemsConnection.nodes.findIndex(
+      comment => comment._id === resultId
+    )
     const updatedComments = commentsFromCache.course.commentBankItemsConnection.nodes.filter(
-      comment => comment._id !== resultId
+      (_comment, index) => index !== removedIndex
     )
 
     commentsFromCache.course.commentBankItemsConnection.nodes = updatedComments
     writeComments(cache, commentsFromCache)
+    setRemovedItemIndex(removedIndex)
   }
 
   const addCommentToCache = (cache, result) => {
@@ -145,6 +149,7 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
       onDeleteComment={id => deleteComment({variables: {id}})}
       isAddingComment={isAddingComment}
       courseId={courseId}
+      removedItemIndex={removedItemIndex}
     />
   )
 }

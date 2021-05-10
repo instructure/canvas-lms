@@ -28,6 +28,7 @@ describe('Comment', () => {
       comment: 'My assignment comment',
       onClick: onClickMock,
       onDelete: onDeleteMock,
+      shouldFocus: false,
       ...props
     }
   }
@@ -70,5 +71,11 @@ describe('Comment', () => {
     const {getByText} = render(<Comment {...defaultProps()} />)
     fireEvent.click(getByText('Delete comment: My assignment comment').closest('button'))
     expect(onDeleteMock).not.toHaveBeenCalled()
+  })
+
+  it('focuses on the trash icon if shouldFocus changes to true', () => {
+    const {getByText, rerender} = render(<Comment {...defaultProps()} />)
+    rerender(<Comment {...defaultProps({shouldFocus: true})} />)
+    expect(getByText('Delete comment: My assignment comment').closest('button')).toHaveFocus()
   })
 })

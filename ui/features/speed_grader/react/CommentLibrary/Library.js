@@ -26,7 +26,14 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import Tray from './Tray'
 import I18n from 'i18n!CommentLibrary'
 
-const Library = ({comments, setComment, onAddComment, onDeleteComment, isAddingComment}) => {
+const Library = ({
+  comments,
+  setComment,
+  onAddComment,
+  onDeleteComment,
+  isAddingComment,
+  removedItemIndex
+}) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
 
   const handleCommentClick = comment => {
@@ -61,6 +68,7 @@ const Library = ({comments, setComment, onAddComment, onDeleteComment, isAddingC
         onItemClick={handleCommentClick}
         onDeleteComment={onDeleteComment}
         setIsOpen={setIsTrayOpen}
+        removedItemIndex={removedItemIndex}
       />
     </>
   )
@@ -76,7 +84,8 @@ Library.propTypes = {
   setComment: PropTypes.func.isRequired,
   isAddingComment: PropTypes.bool.isRequired,
   onAddComment: PropTypes.func.isRequired,
-  onDeleteComment: PropTypes.func.isRequired
+  onDeleteComment: PropTypes.func.isRequired,
+  removedItemIndex: PropTypes.number
 }
 
 export default Library

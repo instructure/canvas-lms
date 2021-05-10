@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton, Button} from '@instructure/ui-buttons'
@@ -28,7 +28,8 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!CommentLibrary'
 
-const Comment = ({comment, onClick, onDelete}) => {
+const Comment = ({comment, onClick, onDelete, shouldFocus}) => {
+  const deleteButtonRef = useRef(null)
   const [isTruncated, setIsTruncated] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
@@ -41,11 +42,17 @@ const Comment = ({comment, onClick, onDelete}) => {
     // behavior caused by using a Tray with a
     // Modal.
     // eslint-disable-next-line no-alert
-    const confirmed = window.confirm('Are you sure you want to delete this comment?')
+    const confirmed = window.confirm(I18n.t('Are you sure you want to delete this comment?'))
     if (confirmed) {
       onDelete()
     }
   }
+
+  useEffect(() => {
+    if (shouldFocus) {
+      deleteButtonRef.current.focus()
+    }
+  }, [shouldFocus])
 
   return (
     <View as="div" position="relative" borderWidth="none none small none">
@@ -87,6 +94,7 @@ const Comment = ({comment, onClick, onDelete}) => {
               onClick={handleDelete}
               withBackground={false}
               withBorder={false}
+              elementRef={el => (deleteButtonRef.current = el)}
               size="small"
             />
           </View>
@@ -112,7 +120,8 @@ const Comment = ({comment, onClick, onDelete}) => {
 Comment.propTypes = {
   comment: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
+  onDelete: PropTypes.func.isRequired,
+  shouldFocus: PropTypes.bool.isRequired
 }
 
 export default Comment

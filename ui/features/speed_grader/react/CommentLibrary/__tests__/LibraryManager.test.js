@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {act, fireEvent, render as rtlRender} from '@testing-library/react'
+import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {commentBankItemMocks, makeDeleteCommentMutation, makeCreateMutationMock} from './mocks'
@@ -142,7 +142,6 @@ describe('LibraryManager', () => {
 
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
       expect(queryByText('Comment item 0')).not.toBeInTheDocument()
     })
 
@@ -174,6 +173,36 @@ describe('LibraryManager', () => {
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await act(async () => jest.runAllTimers())
       expect(getByText('Delete comment: Comment item 0')).toBeInTheDocument()
+    })
+
+    it("focuses on the previous comment's trash icon after deleting", async () => {
+      const mutationMock = await makeDeleteCommentMutation({
+        overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '1'}},
+        variables: {id: '1'}
+      })
+      const mocks = [...commentBankItemMocks(), ...mutationMock]
+      const {getByText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Tray'))
+
+      fireEvent.click(getByText('Delete comment: Comment item 1'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Delete comment: Comment item 0').closest('button')).toHaveFocus()
+    })
+
+    it('focuses on the close tray button if the last comment was deleted', async () => {
+      const mutationMock = await makeDeleteCommentMutation({
+        overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
+        variables: {id: '0'}
+      })
+      const mocks = [...commentBankItemMocks({numberOfComments: 1}), ...mutationMock]
+      const {getByText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Delete comment: Comment item 0'))
+      await waitFor(() => {
+        expect(getByText('Close comment library').closest('button')).toHaveFocus()
+      })
     })
   })
 })

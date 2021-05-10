@@ -53,11 +53,6 @@ describe('Tray', () => {
     expect(queryByText('Manage Comment Library')).not.toBeInTheDocument()
   })
 
-  it('renders a checkbox', () => {
-    const {getByLabelText} = render(<Tray {...defaultProps()} />)
-    expect(getByLabelText('Show suggestions when typing')).toBeChecked()
-  })
-
   it('renders comments', () => {
     const {getByText} = render(<Tray {...defaultProps()} />)
     expect(getByText('assignment comment')).toBeInTheDocument()
@@ -77,5 +72,11 @@ describe('Tray', () => {
     const {getByText} = render(<Tray {...defaultProps()} />)
     fireEvent.click(getByText('Close comment library'))
     expect(setIsOpenMock).toHaveBeenCalledWith(false)
+  })
+
+  it('focuses on the close button when deletedIndex is 0 and there are no more comments', () => {
+    const {rerender, getByText} = render(<Tray {...defaultProps()} />)
+    rerender(<Tray {...defaultProps({removedItemIndex: 0, comments: []})} />)
+    expect(getByText('Close comment library').closest('button')).toHaveFocus()
   })
 })

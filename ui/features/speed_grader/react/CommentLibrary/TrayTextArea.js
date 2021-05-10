@@ -28,14 +28,13 @@ const TrayTextArea = ({onAdd, isAdding}) => {
   const [text, setText] = useState('')
   const textInputRef = useRef()
   useEffect(() => {
-    if (isAdding) {
-      return
+    if (!isAdding) {
+      if (text !== '') {
+        setText('')
+        textInputRef.current.focus()
+      }
     }
-    if (text !== '') {
-      setText('')
-      textInputRef.current.focus()
-    }
-  }, [isAdding])
+  }, [isAdding]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

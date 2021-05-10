@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-elements'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Tray as InstuiTray} from '@instructure/ui-tray'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!CommentLibrary'
 import Comment from './Comment'
 import TrayTextArea from './TrayTextArea'
@@ -37,8 +35,16 @@ const Tray = ({
   comments,
   onDeleteComment,
   onAddComment,
-  isAddingComment
+  isAddingComment,
+  removedItemIndex
 }) => {
+  const closeButtonRef = useRef(null)
+  useEffect(() => {
+    if (removedItemIndex === 0 && comments.length === 0) {
+      closeButtonRef.current.focus()
+    }
+  }, [comments]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <InstuiTray
       size="regular"
@@ -50,7 +56,7 @@ const Tray = ({
       <View as="div" padding="small">
         <Flex direction="column" as="div">
           <Flex.Item textAlign="center" as="header">
-            <View as="div" padding="small 0 medium xx-small">
+            <View as="div" padding="small 0 medium xx-small" borderWidth="none none medium none">
               <div style={{float: 'left', margin: '6px'}}>
                 <IconButton
                   size="small"
@@ -58,6 +64,7 @@ const Tray = ({
                   renderIcon={IconArrowOpenStartLine}
                   withBorder={false}
                   withBackground={false}
+                  elementRef={el => (closeButtonRef.current = el)}
                   onClick={() => setIsOpen(false)}
                 />
               </div>
@@ -67,45 +74,22 @@ const Tray = ({
                 </Text>
               </View>
             </View>
-            <View
-              textAlign="start"
-              as="div"
-              padding="0 0 medium small"
-              borderWidth="none none medium none"
-            >
-              <AccessibleContent>
-                <View as="div" display="inline-block">
-                  <Text size="small" weight="bold">
-                    {I18n.t('Show suggestions when typing')}
-                  </Text>
-                </View>
-              </AccessibleContent>
-              <div style={{display: 'inline-block', float: 'right'}}>
-                <Checkbox
-                  label={
-                    <ScreenReaderContent>
-                      {I18n.t('Show suggestions when typing')}
-                    </ScreenReaderContent>
-                  }
-                  value="small"
-                  variant="toggle"
-                  size="small"
-                  inline
-                  defaultChecked
-                />
-              </div>
-            </View>
           </Flex.Item>
           <Flex.Item size="65vh" shouldGrow>
-            {comments.map(commentItem => (
-              <Comment
-                key={commentItem._id}
-                onClick={onItemClick}
-                id={commentItem._id}
-                onDelete={() => onDeleteComment(commentItem._id)}
-                comment={commentItem.comment}
-              />
-            ))}
+            {comments.map((commentItem, index) => {
+              const shouldFocus =
+                removedItemIndex !== null && index === Math.max(removedItemIndex - 1, 0)
+              return (
+                <Comment
+                  key={commentItem._id}
+                  onClick={onItemClick}
+                  id={commentItem._id}
+                  onDelete={() => onDeleteComment(commentItem._id)}
+                  comment={commentItem.comment}
+                  shouldFocus={shouldFocus}
+                />
+              )
+            })}
           </Flex.Item>
           <Flex.Item padding="medium small small small">
             <TrayTextArea onAdd={onAddComment} isAdding={isAddingComment} />
@@ -128,7 +112,12 @@ Tray.propTypes = {
   setIsOpen: PropTypes.func.isRequired,
   onAddComment: PropTypes.func.isRequired,
   onDeleteComment: PropTypes.func.isRequired,
-  isAddingComment: PropTypes.bool.isRequired
+  isAddingComment: PropTypes.bool.isRequired,
+  removedItemIndex: PropTypes.number
+}
+
+Tray.defaultProps = {
+  removedItemIndex: null
 }
 
 export default Tray
