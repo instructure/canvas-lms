@@ -545,6 +545,19 @@ describe User do
       expect(@fake_student.reload.user_account_associations).to be_empty
     end
 
+    it "removes account associations after an enrollment concludes" do
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = Account.default.sub_accounts.create!
+      course1 = course_with_student(active_all: true, account: subaccount1).course
+      course2 = course_with_student(active_all: true, account: subaccount2, user: @student).course
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+
+      course2.complete
+      @student.update_account_associations
+      expect(@student.enrollments.where(course_id: course2).take.enrollment_state.state).to eq 'completed' # sanity check
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1].map(&:id))
+    end
+
     context "sharding" do
       specs_require_sharding
 
