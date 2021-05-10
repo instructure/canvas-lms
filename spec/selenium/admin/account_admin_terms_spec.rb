@@ -76,8 +76,8 @@ describe "account admin terms" do
 
       expect do
         f('.add_term_link').click
-        replace_content(f('#enrollment_term_name'), new_term_name)
-        replace_content(f('#enrollment_term_sis_source_id'), '(sis id goes here)')
+        replace_content(f('#enrollment_term_name_new'), new_term_name)
+        replace_content(f('#enrollment_term_sis_source_id_new'), '(sis id goes here)')
         f('.submit_button').click
         wait_for_ajax_requests
       end.to change(EnrollmentTerm, :count).by(1)
@@ -105,7 +105,7 @@ describe "account admin terms" do
 
       expect {
         f('.add_term_link').click
-        replace_content(f('#enrollment_term_name'), 'false add')
+        replace_content(f('#enrollment_term_name_new'), 'false add')
         f('.cancel_button').click
       }.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
