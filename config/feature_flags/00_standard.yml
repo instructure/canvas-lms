@@ -1,32 +1,70 @@
 ---
-google_docs_domain_restriction:
+allow_opt_out_of_inbox:
   state: hidden
   display_name:
-    features.google_docs_domain_restriction: Google Docs Domain Restriction
+    features.allow_opt_out_of_inbox: Allow Users to Opt-out of the Inbox
   description:
-    google_docs_domain_restriction_description: |-
-      Google Docs Domain Restriction allows Google Docs submissions and collaborations
-      to be restricted to a single domain. Students attempting to submit assignments or
-      join collaborations on an unapproved domain will receive an error message notifying them
-      that they will need to update their Google Docs integration.
+    allow_opt_out_of_inbox: Allow users to opt out of the Conversation's Inbox. This
+      will cause all conversation messages and notifications to be sent as ASAP notifications
+      to the user's primary email, hide the Conversation's Inbox unread messages badge
+      on the Inbox, and hide the Conversation's notification preferences.
   applies_to: RootAccount
   root_opt_in: true
-epub_export:
+analytics_2:
+  state: hidden
+  applies_to: Course
+  display_name: New Course and User Analytics
+  description: Show new analytics for course and user data. Data may take 24 hours
+    to appear in New Analytics after setting this feature flag to ON.
+  after_state_change_proc: analytics_2_after_state_change_hook
+anonymous_instructor_annotations:
   state: allowed
-  display_name: ePub Exporting
-  description: This enables users to generate and download course ePub.
+  display_name: Anonymous Instructor Annotations
+  description: Anonymize all instructor comments and annotations within DocViewer
+  applies_to: Course
+  root_opt_in: false
+autodetect_field_separators_for_gradebook_exports:
+  state: allowed
+  display_name: Autodetect field separators in compatible spreadsheet exports
+  description: Attempt to detect an appropriate field separator in compatible spreadsheet
+    exports based on the number format for your language.
+  applies_to: User
+  custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook
+common_cartridge_page_conversion:
+  state: hidden
+  display_name: Common Cartridge HTML File to Page Conversion
+  description: If enabled, Common Cartridge importers will convert HTML files into
+    Pages
+  applies_to: Course
+  beta: true
+commons_favorites:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Import Commons Favorites
+  description: If Commons is installed, allows importing favorited content items from
+    within Canvas.
+compact_live_event_payloads:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Remove null values from live event payloads
+  description: Canvas will remove keys with null values from live event payloads if
+    this feature is enabled.
+conditional_release:
+  state: allowed
+  display_name: Mastery Paths
+  description: Configure individual learning paths for students based on assessment
+    results.
   applies_to: Course
   root_opt_in: true
-high_contrast:
+  custom_transition_proc: conditional_release_transition_hook
+  after_state_change_proc: conditional_release_after_change_hook
+course_card_images:
   state: allowed
-  display_name:
-    features.high_contrast: High Contrast UI
-  description:
-    high_contrast_description: |-
-      High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
-      distinct and easier to identify. Note: Institution branding will be disabled.
-  applies_to: User
-  autoexpand: true
+  display_name: Enable Dashboard Images for Courses
+  description: Allow course images to be assigned to a course and used on the dashboard
+    cards.
+  applies_to: Course
+  root_opt_in: true
 disable_alert_timeouts:
   state: allowed
   display_name:
@@ -42,74 +80,60 @@ disable_celebrations:
   display_name:
     features.hide_celebrations: Disable Celebration Animations
   description:
-    disable_celebrations_description: |-
-      Enabling this feature hides all celebration animations.
+    disable_celebrations_description: Enabling this feature hides all celebration
+      animations.
   applies_to: User
-underline_all_links:
-  state: allowed
-  display_name: Underline Links
-  description:
-    wrapper: <span class="feature-detail-underline">\1</span>
-    underline_all_links_description: |-
-      Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
-      *underlined text*. This feature option does not apply to user-generated content links in the
-      Rich Content Editor, which always underlines links for all users.
-  applies_to: User
-new_user_tutorial_on_off:
-  state: allowed
-  display_name: Course Set-up Tutorial
-  description: Course set-up tutorial provides tips on how to leverage the feature
-    opportunities on each page in Canvas. It is especially useful when you are new
-    to Canvas or are setting up a new course for the first time in a long time.
-  applies_to: User
-outcome_gradebook:
-  state: allowed
-  display_name:
-    features.learning_mastery_gradebook: Learning Mastery Gradebook
-  description:
-    learning_mastery_gradebook_description: |-
-      Learning Mastery Gradebook provides a way for teachers to quickly view student and course
-      progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-      format and student progress is displayed both as a numerical score and as mastered/near
-      mastery/remedial.
-  applies_to: Course
-  root_opt_in: false
-student_outcome_gradebook:
-  state: allowed
-  display_name:
-    features.student_outcome_gradebook: Student Learning Mastery Gradebook
-  description:
-    student_outcome_gradebook_description: |-
-      Student Learning Mastery Gradebook provides a way for students to quickly view progress
-      on course learning outcomes. Outcomes are presented in a Gradebook-like
-      format and progress is displayed both as a numerical score and as mastered/near
-      mastery/remedial.
-  applies_to: Course
-  root_opt_in: false
-outcome_extra_credit:
-  state: allowed
-  display_name: Allow Outcome Extra Credit
-  description: If enabled, allows more than the maximum possible score on an Outcome
-    to be given on a rubric.
-  applies_to: Course
-  root_opt_in: true
-post_grades:
+disable_keyboard_shortcuts:
   state: hidden
-  display_name:
-    features.post_grades: Post Grades to SIS
-  description:
-    post_grades_description: |-
-      Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
-      Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
-      GradingAssignment, GradingAssignmentScore.
+  display_name: Disable Keyboard Shortcuts
+  description: |-
+    Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
+    will have an improved experience with these shortcuts turned off.
+  applies_to: User
+  autoexpand: true
+disable_lti_post_only:
+  state: hidden
+  display_name: Don't Move LTI Query Params to POST Body
+  description: If enabled, query parameters will not be copied to the POST body during
+    an LTI launch.
+  applies_to: RootAccount
+  root_opt_in: true
+  beta: true
+duplicate_modules:
+  state: allowed
+  display_name: Duplicate Modules
+  description: Allows the duplicating of modules in Canvas
+  applies_to: Account
+  root_opt_in: true
+encrypted_sourcedids:
+  state: allowed
+  display_name: Encrypted Sourcedids for Basic Outcomes
+  description: If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.
+  applies_to: RootAccount
+  root_opt_in: true
+epub_export:
+  state: allowed
+  display_name: ePub Exporting
+  description: This enables users to generate and download course ePub.
   applies_to: Course
   root_opt_in: true
-anonymous_instructor_annotations:
+featured_help_links:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Featured Help Links
+  description: Allows Help Links to be tagged as Featured or New and prominently displays
+    the Featured Help Link in the Help Menu.
+filter_speed_grader_by_student_group:
   state: allowed
-  display_name: Anonymous Instructor Annotations
-  description: Anonymize all instructor comments and annotations within DocViewer
-  applies_to: Course
-  root_opt_in: false
+  applies_to: RootAccount
+  display_name: Filter SpeedGrader by Student Group
+  description: Allows users to enable the "Launch SpeedGrader Filtered by Student
+    Group" option for courses on the course settings page. When active and a student
+    group has been selected in New Gradebook, SpeedGrader will only load students
+    in the selected group.
+  environments:
+    production:
+      state: hidden
 final_grades_override:
   state: allowed
   display_name: Final Grade Override
@@ -118,44 +142,64 @@ final_grades_override:
   applies_to: Course
   root_opt_in: true
   custom_transition_proc: final_grades_override_custom_transition_hook
+google_docs_domain_restriction:
+  state: hidden
+  display_name:
+    features.google_docs_domain_restriction: Google Docs Domain Restriction
+  description:
+    google_docs_domain_restriction_description: |-
+      Google Docs Domain Restriction allows Google Docs submissions and collaborations
+      to be restricted to a single domain. Students attempting to submit assignments or
+      join collaborations on an unapproved domain will receive an error message notifying them
+      that they will need to update their Google Docs integration.
+  applies_to: RootAccount
+  root_opt_in: true
+high_contrast:
+  state: allowed
+  display_name:
+    features.high_contrast: High Contrast UI
+  description:
+    high_contrast_description: |-
+      High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
+      distinct and easier to identify. Note: Institution branding will be disabled.
+  applies_to: User
+  autoexpand: true
+include_byte_order_mark_in_gradebook_exports:
+  state: allowed
+  display_name: Include Byte-Order Mark in compatible spreadsheet exports
+  description: Optionally include a byte-order mark in compatible spreadsheet exports
+    so they can be imported into Excel for users in some locales.
+  applies_to: User
+international_sms:
+  state: hidden
+  display_name: International SMS
+  description: Allows users with international phone numbers to receive text messages
+    from Canvas.
+  applies_to: RootAccount
+  root_opt_in: true
+javascript_csp:
+  state: allowed
+  display_name: Content Security Policy
+  description: Enable the Security tab on the settings page to adjust CSP settings
+  applies_to: RootAccount
+  root_opt_in: true
+  beta: true
+  environments:
+    production:
+      state: hidden
 k12:
   state: hidden
   display_name:
     features.k12: K-12 Specific Features
   description:
-    k12_description: |-
-      Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment.
-  applies_to: RootAccount
-  root_opt_in: true
-duplicate_modules:
-  state: allowed
-  display_name: Duplicate Modules
-  description: Allows the duplicating of modules in Canvas
-  applies_to: Account
-  root_opt_in: true
-allow_opt_out_of_inbox:
-  state: hidden
-  display_name:
-    features.allow_opt_out_of_inbox: Allow Users to Opt-out of the Inbox
-  description:
-    allow_opt_out_of_inbox: Allow users to opt out of the Conversation's Inbox. This
-      will cause all conversation messages and notifications to be sent as ASAP notifications
-      to the user's primary email, hide the Conversation's Inbox unread messages badge
-      on the Inbox, and hide the Conversation's notification preferences.
+    k12_description: Update the icons in the Global Navigation Menu that make more
+      sense specifically in a K-12 environment.
   applies_to: RootAccount
   root_opt_in: true
 lti2_rereg:
   state: hidden
   display_name: LTI 2 Reregistration
   description: Enable reregistration for LTI 2
-  applies_to: RootAccount
-  root_opt_in: true
-  beta: true
-disable_lti_post_only:
-  state: hidden
-  display_name: Don't Move LTI Query Params to POST Body
-  description: If enabled, query parameters will not be copied to the POST body during
-    an LTI launch.
   applies_to: RootAccount
   root_opt_in: true
   beta: true
@@ -166,6 +210,27 @@ membership_service_for_lti_tools:
     Membership Service API
   applies_to: RootAccount
   root_opt_in: true
+new_collaborations:
+  state: hidden
+  display_name: External Collaborations Tool
+  description: Use the new Collaborations external tool enabling more options for
+    tools to use to collaborate
+  applies_to: Course
+  root_opt_in: true
+  touch_context: true
+new_features_ui:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: New Feature Flags
+  description: This feature creates a SiteAdmin Release Flag tab to be able to release
+    features to users through the UI. It also reworks the UI for the old Feature Options
+    tabs.
+new_gradebook_plagiarism_indicator:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Gradebook Plagiarism Indicator
+  description: Enables display of plagiarism reports and similarity scores in the
+    New Gradebook submission tray.
 new_sis_integrations:
   state: hidden
   display_name: Enable new SIS integration settings
@@ -181,111 +246,66 @@ new_sis_integrations:
   applies_to: Account
   root_opt_in: true
   beta: true
-notification_service:
-  state: hidden
-  display_name: Use remote service for notifications
-  description: Allow the ability to send notifications through our dispatch queue
-  applies_to: RootAccount
-  root_opt_in: true
-course_card_images:
-  state: allowed
-  display_name: Enable Dashboard Images for Courses
-  description: Allow course images to be assigned to a course and used on the dashboard
-    cards.
-  applies_to: Course
-  root_opt_in: true
-responsive_layout:
-  state: hidden
-  display_name: Responsive Layout
-  description: This is a feature to allow the development of a responsive layout
-  applies_to: RootAccount
-  root_opt_in: true
-  environments:
-    development:
-      state: 'on'
-disable_keyboard_shortcuts:
-  state: hidden
-  display_name: Disable Keyboard Shortcuts
-  description: |-
-    Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
-    will have an improved experience with these shortcuts turned off.
-  applies_to: User
-  autoexpand: true
-include_byte_order_mark_in_gradebook_exports:
-  state: allowed
-  display_name: Include Byte-Order Mark in compatible spreadsheet exports
-  description: Optionally include a byte-order mark in compatible spreadsheet exports so they can
-    be imported into Excel for users in some locales.
-  applies_to: User
-use_semi_colon_field_separators_in_gradebook_exports:
-  state: allowed
-  display_name: Use semicolons to separate fields in compatible spreadsheet exports
-  description: Use semicolons instead of commas to separate fields in compatible spreadsheet exports
-    so they can be imported into Excel for users in some locales.
-  applies_to: User
-  custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
-autodetect_field_separators_for_gradebook_exports:
-  state: allowed
-  display_name: Autodetect field separators in compatible spreadsheet exports
-  description: Attempt to detect an appropriate field separator in compatible spreadsheet exports
-    based on the number format for your language.
-  applies_to: User
-  custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook
-international_sms:
-  state: hidden
-  display_name: International SMS
-  description: Allows users with international phone numbers to receive text messages
-    from Canvas.
-  applies_to: RootAccount
-  root_opt_in: true
-conditional_release:
-  state: allowed
-  display_name: Mastery Paths
-  description: Configure individual learning paths for students based on assessment
-    results.
-  applies_to: Course
-  root_opt_in: true
-  custom_transition_proc: conditional_release_transition_hook
-  after_state_change_proc: conditional_release_after_change_hook
-wrap_calendar_event_titles:
-  state: allowed
-  display_name: Wrap event titles in Calendar month view
-  description: Show calendar events in the month view on multiple lines if the title
-    doesn't fit on a single line
-  applies_to: RootAccount
-  root_opt_in: true
-new_collaborations:
-  state: hidden
-  display_name: External Collaborations Tool
-  description: Use the new Collaborations external tool enabling more options for
-    tools to use to collaborate
-  applies_to: Course
-  root_opt_in: true
-  touch_context: true
-student_context_cards:
-  state: allowed
-  display_name: Student Context Card
-  description: Enable student context card links
-  applies_to: RootAccount
-  root_opt_in: true
 new_user_tutorial:
   state: allowed
   display_name: New User Tutorial
   description: Provide tutorial information for new users in a flyout tray.
   applies_to: RootAccount
   root_opt_in: true
-rubric_criterion_range:
+new_user_tutorial_on_off:
   state: allowed
-  display_name: Rubric Criterion Range
-  description: Specify max and min points to clarify boundaries of a rubric criterion
-    rating.
+  display_name: Course Set-up Tutorial
+  description: Course set-up tutorial provides tips on how to leverage the feature
+    opportunities on each page in Canvas. It is especially useful when you are new
+    to Canvas or are setting up a new course for the first time in a long time.
+  applies_to: User
+newquizzes_on_quiz_page:
+  state: hidden
+  display_name: New Quizzes on the Quizzes page
+  description: Show New Quizzes on the Quizzes page
+  applies_to: Account
+  root_opt_in: true
+non_scoring_rubrics:
+  state: 'on'
+  display_name: Non-scoring Rubrics
+  description: If enabled, the option will be presented to have non-scoring rubrics.
   applies_to: RootAccount
   root_opt_in: true
-encrypted_sourcedids:
-  state: allowed
-  display_name: Encrypted Sourcedids for Basic Outcomes
-  description: If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted.
+notification_service:
+  state: hidden
+  display_name: Use remote service for notifications
+  description: Allow the ability to send notifications through our dispatch queue
   applies_to: RootAccount
+  root_opt_in: true
+outcome_extra_credit:
+  state: allowed
+  display_name: Allow Outcome Extra Credit
+  description: If enabled, allows more than the maximum possible score on an Outcome
+    to be given on a rubric.
+  applies_to: Course
+  root_opt_in: true
+outcome_gradebook:
+  state: allowed
+  display_name:
+    features.learning_mastery_gradebook: Learning Mastery Gradebook
+  description:
+    learning_mastery_gradebook_description: |-
+      Learning Mastery Gradebook provides a way for teachers to quickly view student and course
+      progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+      format and student progress is displayed both as a numerical score and as mastered/near
+      mastery/remedial.
+  applies_to: Course
+  root_opt_in: false
+post_grades:
+  state: hidden
+  display_name:
+    features.post_grades: Post Grades to SIS
+  description:
+    post_grades_description: |-
+      Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+      Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
+      GradingAssignment, GradingAssignmentScore.
+  applies_to: Course
   root_opt_in: true
 quizzes_next:
   state: allowed
@@ -301,49 +321,6 @@ quizzes_next_submission_history:
     separately.
   applies_to: RootAccount
   root_opt_in: true
-newquizzes_on_quiz_page:
-  state: hidden
-  display_name: New Quizzes on the Quizzes page
-  description: Show New Quizzes on the Quizzes page
-  applies_to: Account
-  root_opt_in: true
-common_cartridge_page_conversion:
-  state: hidden
-  display_name: Common Cartridge HTML File to Page Conversion
-  description: If enabled, Common Cartridge importers will convert HTML files into
-    Pages
-  applies_to: Course
-  beta: true
-non_scoring_rubrics:
-  state: 'on'
-  display_name: Non-scoring Rubrics
-  description: If enabled, the option will be presented to have non-scoring rubrics.
-  applies_to: RootAccount
-  root_opt_in: true
-slack_notifications:
-  state: hidden
-  display_name: Slack Notifications
-  description: The ability for users to receive notifications from slack
-  applies_to: RootAccount
-javascript_csp:
-  state: allowed
-  display_name: Content Security Policy
-  description: Enable the Security tab on the settings page to adjust CSP settings
-  applies_to: RootAccount
-  root_opt_in: true
-  beta: true
-  environments:
-    production:
-      state: hidden
-restrict_students_from_annotating:
-  state: allowed
-  display_name: Restrict Students from Annotating
-  description: Prevents students from leaving annotations in assignments. Does not
-    apply to peer-reviewed assignments.
-  applies_to: Course
-  environments:
-    production:
-      state: disabled
 rce_enhancements:
   state: allowed
   display_name: RCE Enhancements
@@ -354,63 +331,39 @@ rce_enhancements:
     production:
       state: hidden
     development:
-      state: on
+      state: true
     ci:
-      state: on
-new_features_ui:
+      state: true
+responsive_layout:
   state: hidden
-  applies_to: SiteAdmin
-  display_name: New Feature Flags
-  description: This feature creates a SiteAdmin Release Flag tab to be able
-    to release features to users through the UI. It also reworks the UI for
-    the old Feature Options tabs.
-filter_speed_grader_by_student_group:
-  state: allowed
+  display_name: Responsive Layout
+  description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
-  display_name: Filter SpeedGrader by Student Group
-  description: Allows users to enable the "Launch SpeedGrader Filtered by Student Group"
-    option for courses on the course settings page. When active and a student group has
-    been selected in New Gradebook, SpeedGrader will only load students in the selected
-    group.
+  root_opt_in: true
+  environments:
+    development:
+      state: 'on'
+restrict_students_from_annotating:
+  state: allowed
+  display_name: Restrict Students from Annotating
+  description: Prevents students from leaving annotations in assignments. Does not
+    apply to peer-reviewed assignments.
+  applies_to: Course
   environments:
     production:
-      state: hidden
-compact_live_event_payloads:
+      state: disabled
+rubric_criterion_range:
   state: allowed
+  display_name: Rubric Criterion Range
+  description: Specify max and min points to clarify boundaries of a rubric criterion
+    rating.
   applies_to: RootAccount
-  display_name: Remove null values from live event payloads
-  description: Canvas will remove keys with null values from
-    live event payloads if this feature is enabled.
-analytics_2:
+  root_opt_in: true
+slack_notifications:
   state: hidden
-  applies_to: Course
-  display_name: New Course and User Analytics
-  description: Show new analytics for course and user data. Data may take 24
-    hours to appear in New Analytics after setting this feature flag to ON.
-  after_state_change_proc: analytics_2_after_state_change_hook
-new_gradebook_plagiarism_indicator:
-  state: hidden
+  display_name: Slack Notifications
+  description: The ability for users to receive notifications from slack
   applies_to: RootAccount
-  display_name: New Gradebook Plagiarism Indicator
-  description: Enables display of plagiarism reports and similarity scores in
-    the New Gradebook submission tray.
-commons_favorites:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Import Commons Favorites
-  description: If Commons is installed, allows importing favorited content
-    items from within Canvas.
-featured_help_links:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Featured Help Links
-  description: Allows Help Links to be tagged as Featured or New and
-    prominently displays the Featured Help Link in the Help Menu.
-timer_without_autosubmission:
-  display_name: Classic Quizzes Option for Timed Quizzes without Submission
-  description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
-  applies_to: RootAccount
-  state: hidden
 strip_origin_from_quiz_answer_file_references:
   state: hidden
   applies_to: SiteAdmin
@@ -419,3 +372,51 @@ strip_origin_from_quiz_answer_file_references:
     This was already happening for images in the question, but not answers
     causing CORS failures when a quiz is created in one domain and
     taken in another (like a vanity domain).
+student_context_cards:
+  state: allowed
+  display_name: Student Context Card
+  description: Enable student context card links
+  applies_to: RootAccount
+  root_opt_in: true
+student_outcome_gradebook:
+  state: allowed
+  display_name:
+    features.student_outcome_gradebook: Student Learning Mastery Gradebook
+  description:
+    student_outcome_gradebook_description: |-
+      Student Learning Mastery Gradebook provides a way for students to quickly view progress
+      on course learning outcomes. Outcomes are presented in a Gradebook-like
+      format and progress is displayed both as a numerical score and as mastered/near
+      mastery/remedial.
+  applies_to: Course
+  root_opt_in: false
+timer_without_autosubmission:
+  display_name: Classic Quizzes Option for Timed Quizzes without Submission
+  description: Presents the quiz setting to avoid automatic submission of a timed
+    quiz when the available time has ended.
+  applies_to: RootAccount
+  state: hidden
+underline_all_links:
+  state: allowed
+  display_name: Underline Links
+  description:
+    wrapper: <span class="feature-detail-underline">\1</span>
+    underline_all_links_description: |-
+      Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
+      *underlined text*. This feature option does not apply to user-generated content links in the
+      Rich Content Editor, which always underlines links for all users.
+  applies_to: User
+use_semi_colon_field_separators_in_gradebook_exports:
+  state: allowed
+  display_name: Use semicolons to separate fields in compatible spreadsheet exports
+  description: Use semicolons instead of commas to separate fields in compatible spreadsheet
+    exports so they can be imported into Excel for users in some locales.
+  applies_to: User
+  custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
+wrap_calendar_event_titles:
+  state: allowed
+  display_name: Wrap event titles in Calendar month view
+  description: Show calendar events in the month view on multiple lines if the title
+    doesn't fit on a single line
+  applies_to: RootAccount
+  root_opt_in: true
