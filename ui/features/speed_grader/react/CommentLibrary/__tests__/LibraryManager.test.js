@@ -33,6 +33,7 @@ describe('LibraryManager', () => {
       setComment: () => {},
       courseId: '1',
       textAreaRef: {current: inputRef},
+      userId: '1',
       ...props
     }
   }

@@ -204,6 +204,8 @@ class User < ActiveRecord::Base
     dependent: :destroy,
     inverse_of: :grader
 
+  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
+
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   belongs_to :merged_into_user, class_name: 'User'

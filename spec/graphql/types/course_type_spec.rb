@@ -532,30 +532,6 @@ describe Types::CourseType do
     end
   end
 
-  describe "CommentBankItemsConnection" do
-    before do
-      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course, comment: 'great comment!')
-    end
-
-    it "returns comment bank items" do
-      expect(
-        course_type.resolve("commentBankItemsConnection { nodes { _id } }", current_user: @teacher)
-      ).to eq [@comment_bank_item.id.to_s]
-    end
-
-    describe "with a search query" do
-      before do
-        @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: 'new comment!')
-      end
-
-      it "returns results that match the query" do
-        expect(
-          course_type.resolve("commentBankItemsConnection(query: \"new\") { nodes { _id } }", current_user: @teacher).length
-        ).to eq 1
-      end
-    end
-  end
-
   describe 'Account' do
     it 'works' do
       expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s

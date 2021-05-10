@@ -23,10 +23,15 @@ import LibraryManager from './LibraryManager'
 
 const client = createClient()
 
-export default function CommentLibrary({setComment, courseId, textAreaRef}) {
+export default function CommentLibrary({setComment, courseId, textAreaRef, userId}) {
   return (
     <ApolloProvider client={client}>
-      <LibraryManager setComment={setComment} courseId={courseId} textAreaRef={textAreaRef} />
+      <LibraryManager
+        setComment={setComment}
+        courseId={courseId}
+        textAreaRef={textAreaRef}
+        userId={userId}
+      />
     </ApolloProvider>
   )
 }
@@ -36,5 +41,6 @@ CommentLibrary.propTypes = {
   courseId: PropTypes.string.isRequired,
   textAreaRef: shape({
     current: instanceOf(Element)
-  }).isRequired
+  }).isRequired,
+  userId: PropTypes.string.isRequired
 }
