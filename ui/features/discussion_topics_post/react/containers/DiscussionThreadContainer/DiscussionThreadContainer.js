@@ -156,7 +156,10 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
       />
     )
   }
-  if (props.discussionEntry.permissions.viewRating) {
+  if (
+    props.discussionEntry.permissions.viewRating &&
+    (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
+  ) {
     threadActions.push(
       <ThreadingToolbar.Like
         key={`like-${props.discussionEntry.id}`}
@@ -164,6 +167,7 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
         onClick={toggleRating}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
+        interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
     )
   }

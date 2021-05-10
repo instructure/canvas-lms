@@ -31,6 +31,10 @@ describe Types::DiscussionEntryType do
         allowed: proc {|user| discussion_entry.grants_right?(user, :delete)}
       },
       {
+        value: 'rate',
+        allowed: proc {|user| discussion_entry.grants_right?(user, :rate)}
+      },
+      {
         value: 'viewRating',
         allowed: proc {discussion_entry.discussion_topic.allow_rating && !discussion_entry.deleted?}
       }

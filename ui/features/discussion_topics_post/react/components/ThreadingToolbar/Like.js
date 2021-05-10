@@ -37,6 +37,7 @@ export function Like({...props}) {
       withBackground={false}
       color="primary"
       data-testid="like-button"
+      interaction={props.interaction}
     >
       <ScreenReaderContent>
         {props.isLiked ? I18n.t('Unlike post') : I18n.t('Like post')}
@@ -71,5 +72,9 @@ Like.propTypes = {
   /**
    * Key consumed by ThreadingToolbar's InlineList
    */
-  delimiterKey: PropTypes.string.isRequired
+  delimiterKey: PropTypes.string.isRequired,
+  /**
+   * Specifies if the interaction with Like is enabled, disabled, or readonly
+   */
+  interaction: PropTypes.string
 }
