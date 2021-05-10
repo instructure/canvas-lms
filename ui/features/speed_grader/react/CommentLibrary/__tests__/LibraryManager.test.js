@@ -119,17 +119,28 @@ describe('LibraryManager', () => {
   })
 
   describe('delete', () => {
+    const oldWindowConfirm = window.confirm
+
+    beforeEach(() => {
+      window.confirm = jest.fn()
+      window.confirm.mockImplementation(() => true)
+    })
+
+    afterEach(() => {
+      window.confirm = oldWindowConfirm
+    })
+
     it('deletes the comment and removes the comment from the tray when the trash button is clicked', async () => {
       const mutationMock = await makeDeleteCommentMutation({
         overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
         variables: {id: '0'}
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
-      const {getByText, queryAllByText, queryByText} = render({mocks})
+      const {getByText, queryByText} = render({mocks})
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Open Comment Tray'))
 
-      fireEvent.click(queryAllByText('Delete comment: Comment item 0')[0])
+      fireEvent.click(getByText('Delete comment: Comment item 0'))
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Open Comment Tray'))
       expect(queryByText('Comment item 0')).not.toBeInTheDocument()
@@ -137,16 +148,32 @@ describe('LibraryManager', () => {
 
     it('displays an error if the delete mutation failed', async () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-      const {getByText, queryAllByText} = render()
+      const {getByText} = render()
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Open Comment Tray'))
-      fireEvent.click(queryAllByText('Delete comment: Comment item 0')[0])
+      fireEvent.click(getByText('Delete comment: Comment item 0'))
 
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error deleting comment',
         type: 'error'
       })
+    })
+
+    it('does not delete if the user rejects the confirmation prompt', async () => {
+      window.confirm.mockImplementation(() => false)
+      const mutationMock = await makeDeleteCommentMutation({
+        overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
+        variables: {id: '0'}
+      })
+      const mocks = [...commentBankItemMocks(), ...mutationMock]
+      const {getByText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Tray'))
+
+      fireEvent.click(getByText('Delete comment: Comment item 0'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Delete comment: Comment item 0')).toBeInTheDocument()
     })
   })
 })

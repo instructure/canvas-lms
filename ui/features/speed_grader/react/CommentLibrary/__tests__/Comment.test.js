@@ -32,12 +32,17 @@ describe('Comment', () => {
     }
   }
 
+  const oldWindowConfirm = window.confirm
+
   beforeEach(() => {
     onDeleteMock = jest.fn()
     onClickMock = jest.fn()
+    window.confirm = jest.fn()
+    window.confirm.mockImplementation(() => true)
   })
 
   afterEach(() => {
+    window.confirm = oldWindowConfirm
     jest.clearAllMocks()
   })
 
@@ -58,5 +63,12 @@ describe('Comment', () => {
     const {getByText} = render(<Comment {...defaultProps()} />)
     fireEvent.click(getByText('Delete comment: My assignment comment').closest('button'))
     expect(onDeleteMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call the onDelete prop if window.confirm returns false', () => {
+    window.confirm.mockImplementation(() => false)
+    const {getByText} = render(<Comment {...defaultProps()} />)
+    fireEvent.click(getByText('Delete comment: My assignment comment').closest('button'))
+    expect(onDeleteMock).not.toHaveBeenCalled()
   })
 })

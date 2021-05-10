@@ -36,6 +36,17 @@ const Comment = ({comment, onClick, onDelete}) => {
     setIsTruncated(truncated)
   }
 
+  const handleDelete = () => {
+    // This uses window.confirm due to poor focus
+    // behavior caused by using a Tray with a
+    // Modal.
+    // eslint-disable-next-line no-alert
+    const confirmed = window.confirm('Are you sure you want to delete this comment?')
+    if (confirmed) {
+      onDelete()
+    }
+  }
+
   return (
     <View as="div" position="relative" borderWidth="none none small none">
       <Flex>
@@ -58,7 +69,7 @@ const Comment = ({comment, onClick, onDelete}) => {
                   {comment}
                 </TruncateText>
               ) : (
-                comment
+                <Text wrap="break-word">{comment}</Text>
               )}
             </PresentationContent>
             <ScreenReaderContent>
@@ -73,7 +84,7 @@ const Comment = ({comment, onClick, onDelete}) => {
             <IconButton
               screenReaderLabel={I18n.t('Delete comment: %{comment}', {comment})}
               renderIcon={IconTrashLine}
-              onClick={onDelete}
+              onClick={handleDelete}
               withBackground={false}
               withBorder={false}
               size="small"
