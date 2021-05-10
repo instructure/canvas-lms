@@ -315,6 +315,10 @@ pipeline {
             return
           }
 
+          reportToSplunk('is_kubernetes', [
+            'value': configuration.isKubernetesEnabled(),
+          ])
+
           maybeSlackSendRetrigger()
 
           def buildSummaryReportHooks = [
