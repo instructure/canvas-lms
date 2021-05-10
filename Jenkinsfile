@@ -258,12 +258,11 @@ pipeline {
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
     RSPEC_PROCESSES = 4
 
-    LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath('linter-debug')}:${imageTagVersion()}-$TAG_SUFFIX"
-
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     KARMA_BUILDER_PREFIX = configuration.buildRegistryPath('karma-builder')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
+    LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath('ruby-runner')
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath('yarn-runner')
@@ -282,6 +281,7 @@ pipeline {
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    LINTERS_RUNNER_IMAGE = "$LINTERS_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
 
     // This is primarily for the plugin build

@@ -47,14 +47,8 @@ def _getDockerInputs() {
 
 def setupNode() {
   credentials.withStarlordDockerLogin {
-    sh './build/new-jenkins/linters/docker-build.sh local/gergich'
-
-    if (configuration.getBoolean('upload-linter-debug-image', 'false')) {
-      sh """
-      docker tag local/gergich $LINTER_DEBUG_IMAGE
-      docker push $LINTER_DEBUG_IMAGE
-      """
-    }
+    sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
+    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $LINTERS_RUNNER_PREFIX'
 
     sh "docker volume create $dockerVolumeName"
   }

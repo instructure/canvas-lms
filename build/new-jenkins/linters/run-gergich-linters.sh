@@ -7,7 +7,7 @@ cat <<EOF | docker run \
   --env SKIP_ESLINT \
   --interactive \
   --volume $GERGICH_VOLUME:/home/docker/gergich \
-  local/gergich /bin/bash -
+  $LINTERS_RUNNER_IMAGE /bin/bash -
 set -ex
 # when parent is not in \$GERRIT_BRANCH (i.e. master)
 if ! git merge-base --is-ancestor HEAD~1 origin/\$GERRIT_BRANCH; then
