@@ -27,10 +27,12 @@ import LibraryManager from '../LibraryManager'
 jest.useFakeTimers()
 
 describe('LibraryManager', () => {
+  const inputRef = document.createElement('input')
   const defaultProps = (props = {}) => {
     return {
       setComment: () => {},
       courseId: '1',
+      textAreaRef: {current: inputRef},
       ...props
     }
   }
@@ -59,6 +61,14 @@ describe('LibraryManager', () => {
         message: 'Error loading comment library',
         type: 'error'
       })
+    })
+
+    it('calls focus on textAreaRef.current when a comment within the tray is clicked', async () => {
+      const {getByText} = render()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Comment item 0'))
+      expect(document.activeElement).toBe(inputRef)
     })
   })
 

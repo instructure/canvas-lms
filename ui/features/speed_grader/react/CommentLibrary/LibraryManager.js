@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, {shape, instanceOf} from 'prop-types'
 import {useQuery, useMutation} from 'react-apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,7 @@ import {COMMENTS_QUERY} from './graphql/Queries'
 import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
 
-const LibraryManager = ({setComment, courseId}) => {
+const LibraryManager = ({setComment, courseId, textAreaRef}) => {
   const {loading, error, data} = useQuery(COMMENTS_QUERY, {
     variables: {courseId}
   })
@@ -132,10 +132,15 @@ const LibraryManager = ({setComment, courseId}) => {
     return null
   }
 
+  const handleSetComment = comment => {
+    setComment(comment)
+    textAreaRef.current.focus()
+  }
+
   return (
     <Library
       comments={data?.course?.commentBankItemsConnection?.nodes || []}
-      setComment={setComment}
+      setComment={handleSetComment}
       onAddComment={handleAddComment}
       onDeleteComment={id => deleteComment({variables: {id}})}
       isAddingComment={isAddingComment}
@@ -146,7 +151,10 @@ const LibraryManager = ({setComment, courseId}) => {
 
 LibraryManager.propTypes = {
   setComment: PropTypes.func.isRequired,
-  courseId: PropTypes.string.isRequired
+  courseId: PropTypes.string.isRequired,
+  textAreaRef: shape({
+    current: instanceOf(Element)
+  }).isRequired
 }
 
 export default LibraryManager
