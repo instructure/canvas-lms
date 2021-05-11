@@ -1492,6 +1492,25 @@ describe "Files API", type: :request do
       api_call(:put, @file_path, @file_path_options, {:parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
     end
 
+    it "truncates names over 255 characters" do
+      overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi"
+
+      truncated_overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi..."
+
+      api_call(:put, @file_path, @file_path_options, name: overly_long_name)
+      updated_name = @att.reload.display_name
+
+      aggregate_failures do
+        expect(overly_long_name.length).to be > 255
+        expect(updated_name.length).to be 255
+        expect(updated_name).to eq truncated_overly_long_name
+      end
+    end
+
     context "with usage_rights_required" do
       before do
         @course.usage_rights_required = true

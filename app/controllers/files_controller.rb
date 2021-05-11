@@ -1102,7 +1102,7 @@ class FilesController < ApplicationController
   # Update some settings on the specified file
   #
   # @argument name [String]
-  #   The new display name of the file
+  #   The new display name of the file, with a limit of 255 characters.
   #
   # @argument parent_folder_id [String]
   #   The id of the folder to move this file into.
@@ -1150,7 +1150,7 @@ class FilesController < ApplicationController
         end
       end
 
-      @attachment.display_name = params[:name] if params.key?(:name)
+      @attachment.display_name = params[:name].truncate(255) if params.key?(:name)
       @attachment.lock_at = params[:lock_at] if params.key?(:lock_at)
       @attachment.unlock_at = params[:unlock_at] if params.key?(:unlock_at)
       @attachment.locked = value_to_boolean(params[:locked]) if params.key?(:locked)
