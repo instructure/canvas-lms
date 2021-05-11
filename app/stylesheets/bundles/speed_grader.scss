@@ -923,3 +923,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     color: $ic-color-dark;
   }
 }
+
+#library-suggestions {
+  float: direction(right);
+}

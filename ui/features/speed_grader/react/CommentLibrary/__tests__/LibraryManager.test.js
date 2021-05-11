@@ -21,28 +21,43 @@ import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import {commentBankItemMocks, makeDeleteCommentMutation, makeCreateMutationMock} from './mocks'
+import {
+  commentBankItemMocks,
+  makeDeleteCommentMutation,
+  makeCreateMutationMock,
+  searchMocks
+} from './mocks'
 import LibraryManager from '../LibraryManager'
 
 jest.useFakeTimers()
 
 describe('LibraryManager', () => {
-  const inputRef = document.createElement('input')
+  let setFocusToTextAreaMock
   const defaultProps = (props = {}) => {
     return {
       setComment: () => {},
       courseId: '1',
-      textAreaRef: {current: inputRef},
+      setFocusToTextArea: setFocusToTextAreaMock,
       userId: '1',
+      commentAreaText: '',
       ...props
     }
   }
 
+  beforeEach(() => {
+    setFocusToTextAreaMock = jest.fn()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   const render = ({
     props = defaultProps(),
-    mocks = commentBankItemMocks({numberOfComments: 10})
+    mocks = commentBankItemMocks({numberOfComments: 10}),
+    func = rtlRender
   } = {}) =>
-    rtlRender(
+    func(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <LibraryManager {...props} />
       </MockedProvider>
@@ -64,12 +79,19 @@ describe('LibraryManager', () => {
       })
     })
 
-    it('calls focus on textAreaRef.current when a comment within the tray is clicked', async () => {
+    it('calls focus when a comment within the tray is clicked', async () => {
       const {getByText} = render()
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Comment item 0'))
-      expect(document.activeElement).toBe(inputRef)
+      expect(setFocusToTextAreaMock).toHaveBeenCalled()
+    })
+
+    it('initially renders suggestions as disabled', async () => {
+      const {getByText, getByLabelText} = render({mocks: commentBankItemMocks()})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
     })
   })
 
@@ -82,12 +104,12 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       expect(getByText('test comment')).toBeInTheDocument()
     })
 
@@ -96,7 +118,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
@@ -107,7 +129,7 @@ describe('LibraryManager', () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       const {getByText, getByLabelText} = render()
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
@@ -139,7 +161,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, queryByText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await act(async () => jest.runAllTimers())
@@ -150,7 +172,7 @@ describe('LibraryManager', () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       const {getByText} = render()
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Delete comment: Comment item 0'))
 
       await act(async () => jest.runAllTimers())
@@ -169,7 +191,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await act(async () => jest.runAllTimers())
@@ -184,7 +206,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 1'))
       await act(async () => jest.runAllTimers())
@@ -199,11 +221,96 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks({numberOfComments: 1}), ...mutationMock]
       const {getByText} = render({mocks})
       await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Tray'))
+      fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await waitFor(() => {
         expect(getByText('Close comment library').closest('button')).toHaveFocus()
       })
+    })
+  })
+
+  describe('search', () => {
+    it('loads search results when commentAreaText is provided', async () => {
+      const mocks = [...commentBankItemMocks(), ...searchMocks()]
+      const {getByText, getByLabelText, rerender} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      fireEvent.click(getByText('Close comment library'))
+
+      render({
+        props: defaultProps({commentAreaText: 'search'}),
+        mocks,
+        func: rerender
+      })
+
+      await act(async () => jest.runAllTimers())
+      expect(getByText('search result 0')).toBeInTheDocument()
+    })
+
+    it('only loads results when the entered comment is 3 or more characters', async () => {
+      const mocks = [...commentBankItemMocks(), ...searchMocks({query: 'se'})]
+      const {getByText, getByLabelText, queryByText, rerender} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      fireEvent.click(getByText('Close comment library'))
+
+      render({
+        props: defaultProps({commentAreaText: 'se'}),
+        mocks,
+        func: rerender
+      })
+      await act(async () => jest.runAllTimers())
+      expect(queryByText('search result 0')).not.toBeInTheDocument()
+    })
+
+    it('debounces the commentAreaText when displaying results', async () => {
+      const mocks = [...commentBankItemMocks(), ...searchMocks()]
+      const {getByText, getByLabelText, rerender, queryByText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      fireEvent.click(getByText('Close comment library'))
+
+      render({
+        props: defaultProps({commentAreaText: 'search'}),
+        mocks,
+        func: rerender
+      })
+
+      await act(async () => jest.advanceTimersByTime(50))
+      expect(queryByText('search result 0')).not.toBeInTheDocument()
+      await act(async () => jest.advanceTimersByTime(1000))
+      expect(getByText('search result 0')).toBeInTheDocument()
+    })
+
+    it('doesnt rerender the suggestions after clicking on a suggested comment', async () => {
+      const mocks = [
+        ...commentBankItemMocks(),
+        ...searchMocks({query: 'search'}),
+        ...searchMocks({query: 'search results 0', maxResults: 1})
+      ]
+
+      const {getByText, getByLabelText, rerender, queryByText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      fireEvent.click(getByText('Close comment library'))
+
+      const props = defaultProps({commentAreaText: 'search'})
+      render({props, mocks, func: rerender})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('search result 0'))
+      await act(async () => jest.runAllTimers())
+
+      render({
+        props: defaultProps({commentAreaText: 'search result 0'}),
+        mocks,
+        func: rerender
+      })
+      await act(async () => jest.runAllTimers())
+      expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
   })
 })

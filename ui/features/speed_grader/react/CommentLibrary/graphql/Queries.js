@@ -19,10 +19,10 @@
 import {gql} from '@canvas/apollo'
 
 export const COMMENTS_QUERY = gql`
-  query CommentBankItemQuery($userId: ID!) {
+  query CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
-        commentBankItemsConnection {
+        commentBankItemsConnection(query: $query, limit: $maxResults) {
           nodes {
             comment
             _id

@@ -73,3 +73,31 @@ export async function makeDeleteCommentMutation({overrides = {}, variables = {}}
     }
   ]
 }
+
+export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {}) => [
+  {
+    request: {
+      query: COMMENTS_QUERY,
+      variables: {
+        userId,
+        query,
+        maxResults
+      }
+    },
+    result: {
+      data: {
+        legacyNode: {
+          __typename: 'User',
+          commentBankItemsConnection: {
+            __typename: 'CommentBankItemsConnection',
+            nodes: new Array(maxResults).fill(0).map((_v, i) => ({
+              __typename: 'CommentBankItem',
+              _id: i.toString(),
+              comment: `search result ${i}`
+            }))
+          }
+        }
+      }
+    }
+  }
+]
