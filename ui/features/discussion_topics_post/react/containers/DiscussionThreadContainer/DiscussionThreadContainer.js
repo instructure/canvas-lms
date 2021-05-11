@@ -60,7 +60,17 @@ export const mockThreads = {
       unreadCount: 0,
       repliesCount: 0
     },
-    subentriesCount: 0
+    subentriesCount: 0,
+    permissions: {
+      attach: true,
+      create: true,
+      delete: true,
+      rate: true,
+      read: true,
+      reply: true,
+      update: true,
+      viewRating: true
+    }
   }
 }
 
