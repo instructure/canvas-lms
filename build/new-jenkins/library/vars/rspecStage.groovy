@@ -86,6 +86,10 @@ def tearDownNode(prefix) {
     archiveArtifacts(artifacts: "tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log")
   }
 
+  if (env.ENABLE_AXE_SELENIUM == '1') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/rspec_results/**/*"
+  }
+
   archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
   findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
     // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
