@@ -61,8 +61,9 @@ const DiscussionTopicManager = props => {
         // TODO: Handle sorting.
         cache.writeQuery({...options, data: currentDiscussion})
       }
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      discussionTopicQuery.refetch(variables)
+    }
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
