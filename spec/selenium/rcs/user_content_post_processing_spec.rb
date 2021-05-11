@@ -39,6 +39,10 @@ describe 'user_content post processing' do
     @course.wiki_pages.create!(title: page_title, body: page_content)
   end
 
+  def wait_for_loading_image
+    wait_for_transient_element('.loading_image_holder') { yield }
+  end
+
   describe 'with rce_better_file_downloading flag on' do
     before(:each) { Account.site_admin.enable_feature!(:rce_better_file_downloading) }
 
