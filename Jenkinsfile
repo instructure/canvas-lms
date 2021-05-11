@@ -428,10 +428,6 @@ pipeline {
                 extendedStage(LINTERS_BUILD_IMAGE_STAGE)
                   .queue(stages, buildDockerImageStage.&lintersImage)
 
-                extendedStage('Dependency Check')
-                  .required(configuration.isChangeMerged())
-                  .queue(stages, { dependencyCheckStage() })
-
                 parallel(stages)
               }
             }
@@ -475,24 +471,30 @@ pipeline {
             }
 
             extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
-              def linterHooks = [
-                onNodeAcquired: lintersStage.&setupNode,
-                onNodeReleasing: lintersStage.&tearDownNode,
-              ]
+              extendedStage('Linters - Dependency Check')
+                .hooks([onNodeAcquired: lintersStage.&setupNode])
+                .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+                .required(configuration.isChangeMerged())
+                .execute(lintersStage.&dependencyCheckStage)
 
               extendedStage('Linters')
-                .hooks(linterHooks)
+                .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])
                 .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
                 .required(!configuration.isChangeMerged())
                 .execute {
                   def nestedStages = [:]
 
-                  extendedStage('Linters - Run Tests - Code').queue(nestedStages, lintersStage.&codeStage)
-                  extendedStage('Linters - Run Tests - Master Bouncer')
-                    .required(env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged())
+                  extendedStage('Linters - Code')
+                    .queue(nestedStages, lintersStage.&codeStage)
+
+                  extendedStage('Linters - Master Bouncer')
+                    .required(env.MASTER_BOUNCER_RUN == '1')
                     .queue(nestedStages, lintersStage.&masterBouncerStage)
-                  extendedStage('Linters - Run Tests - Webpack').queue(nestedStages, lintersStage.&webpackStage)
-                  extendedStage('Linters - Run Tests - Yarn')
+
+                  extendedStage('Linters - Webpack')
+                    .queue(nestedStages, lintersStage.&webpackStage)
+
+                  extendedStage('Linters - Yarn')
                     .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                     .queue(nestedStages, lintersStage.&yarnStage)
 
