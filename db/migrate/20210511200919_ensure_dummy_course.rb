@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,11 +15,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module CdcFixtures
-  def self.create_profile
-    Course.find_or_create_by!(id: 1)
-    Profile.new(context_id: 1, context_type: 'Course', root_account_id: 1)
+class EnsureDummyCourse < ActiveRecord::Migration[6.0]
+  tag :predeploy
+
+  def up
+    Course.ensure_dummy_course
   end
 end
