@@ -290,14 +290,11 @@ class SubmissionComment < ActiveRecord::Base
       raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
-        SubmissionComment.create!({
-          :comment => message,
-          :submission_id => self.submission_id,
-          :author => user,
-          :context_id => self.context_id,
-          :context_type => self.context_type,
-          :provisional_grade_id => self.provisional_grade_id
-        })
+        self.submission.add_comment(
+          author: user,
+          comment: message,
+          provisional: self.provisional_grade_id.present?
+        )
       end
     end
   end

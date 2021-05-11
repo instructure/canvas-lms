@@ -353,6 +353,18 @@ This text has a http://www.google.com link in it...
       expect(reply.provisional_grade).to eq(comment.provisional_grade)
       expect(reply.provisional_grade.scorer).to eq @teacher
     end
+
+    it "posts submissions for auto-posted assignments" do
+      assignment = @course.assignments.create!
+      submission = assignment.submission_for_student(@student)
+      comment = submission.add_comment(user: @student, comment: "student")
+      expect {
+        comment.reply_from(user: @teacher, text: "teacher")
+      }.to change {
+        submission.reload.posted?
+      }.from(false).to(true)
+    end
+
   end
 
   describe "read/unread state" do
