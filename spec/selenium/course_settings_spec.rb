@@ -33,6 +33,20 @@ describe "course settings" do
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
+  context "k5 courses" do
+    before(:each) do
+      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+    end
+
+    it "should show a Back to Subject button that sends the user to the course home path" do
+      get "/courses/#{@course.id}/settings"
+      expect(f('#back_to_subject')).to be_displayed
+      expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
+    end
+  end
+
   context "considering homeroom courses" do
     before(:each) do
       @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')

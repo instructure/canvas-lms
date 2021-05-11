@@ -18,7 +18,7 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
 import {
@@ -61,7 +61,8 @@ const defaultProps = {
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
   showLearningMasteryGradebook: false,
-  tabs: defaultTabs
+  tabs: defaultTabs,
+  settingsPath: '/courses/30/settings'
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -183,50 +184,18 @@ describe('K-5 Subject Course', () => {
   describe('Manage course functionality', () => {
     it('Shows a manage button when the user has manage permissions', () => {
       const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      expect(getByRole('button', {name: 'Manage'})).toBeInTheDocument()
+      expect(getByRole('link', {name: 'Manage Subject'})).toBeInTheDocument()
     })
 
-    it('The manage button opens a slide-out tray with the course navigation tabs when clicked', async () => {
+    it('Should redirect to course settings path when clicked', async () => {
       const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      const manageButton = getByRole('button', {name: 'Manage'})
-
-      act(() => manageButton.click())
-
-      const validateLink = (name, href) => {
-        const link = getByRole('link', {name})
-        expect(link).toBeInTheDocument()
-        expect(link.href).toBe(href)
-      }
-
-      await waitFor(() => {
-        validateLink('Home', 'http://localhost/courses/30')
-        validateLink('Modules', 'http://localhost/courses/30/modules')
-        validateLink('Assignments', 'http://localhost/courses/30/assignments')
-        validateLink('Settings', 'http://localhost/courses/30/settings')
-      })
-    })
-
-    it('Displays an icon indicating that a nav link is hidden from students', async () => {
-      const {findAllByTestId, getByRole, getByText} = render(
-        <K5Course {...defaultProps} canManage />
-      )
-      const manageButton = getByRole('button', {name: 'Manage'})
-
-      act(() => manageButton.click())
-
-      const hiddenIcons = await findAllByTestId('k5-course-nav-hidden-icon')
-      // Doesn't show the icon for settings, though
-      expect(hiddenIcons.length).toBe(1)
-
-      fireEvent.mouseOver(hiddenIcons[0])
-      await waitFor(() =>
-        expect(getByText('Disabled. Not visible to students')).toBeInTheDocument()
-      )
+      const manageSubjectBtn = getByRole('link', {name: 'Manage Subject'})
+      expect(manageSubjectBtn.href).toBe('http://localhost/courses/30/settings')
     })
 
     it('Does not show a manage button when the user does not have manage permissions', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} />)
-      expect(queryByRole('button', {name: 'Manage'})).not.toBeInTheDocument()
+      expect(queryByRole('link', {name: 'Manage Subject'})).not.toBeInTheDocument()
     })
   })
 

@@ -2084,7 +2084,8 @@ class CoursesController < ApplicationController
                    student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                    outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
                    show_student_view: can_do(@context, @current_user, :use_student_view),
-                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1)
+                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
+                   settings_path: course_settings_path(@context.id)
                  }
                })
 

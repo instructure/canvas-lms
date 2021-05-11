@@ -70,33 +70,18 @@ describe "teacher k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
-    it 'has manage button' do
+    it 'has manage subject button' do
       get "/courses/#{@subject_course.id}#home"
 
       expect(manage_button).to be_displayed
     end
 
-    it 'slides out manage tray when manage button is clicked and closes with X' do
+    it 'opens the course setting path when manage subject button is clicked' do
       get "/courses/#{@subject_course.id}#home"
 
       click_manage_button
 
-      expect(course_navigation_tray_exists?).to be_truthy
-
-      click_nav_tray_close
-
-      expect(course_navigation_tray_exists?).to be_falsey
-    end
-
-    it 'navigates to the assignment index page when clicked from nav tray' do
-      get "/courses/#{@subject_course.id}#home"
-
-      click_manage_button
-
-      click_assignments_link
-      wait_for_ajaximations
-
-      expect(driver.current_url).to include("/courses/#{@subject_course.id}/assignments")
+      expect(driver.current_url).to match(course_settings_path(@subject_course.id))
     end
   end
 

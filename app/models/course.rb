@@ -2954,6 +2954,10 @@ class Course < ActiveRecord::Base
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
   end
 
+  def self.elementary_course_nav_tabs
+    Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+  end
+
   def tab_enabled?(tab)
     elementary_subject_course? || tab[:id] != TAB_HOME
   end
@@ -2986,6 +2990,8 @@ class Course < ActiveRecord::Base
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
+                   elsif elementary_subject_course?
+                     Course.elementary_course_nav_tabs
                    else
                      Course.default_tabs
                    end

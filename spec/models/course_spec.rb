@@ -2795,10 +2795,11 @@ describe Course, "tabs_available" do
           @course.save!
         end
 
-        it "returns default course tabs without course_subject_tabs option" do
-          length = Course.default_tabs.length
+        it "returns default course tabs without home if course_subject_tabs option is not passed" do
+          course_elementary_nav_tabs = Course.default_tabs.reject{|tab| tab[:id] == Course::TAB_HOME}
+          length = course_elementary_nav_tabs.length
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
+          expect(tab_ids).to eql(course_elementary_nav_tabs.map{|t| t[:id] })
           expect(tab_ids.length).to eql(length)
         end
 
