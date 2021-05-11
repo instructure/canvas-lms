@@ -106,7 +106,7 @@
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "@tinymce/tinymce-react": "~3.8.4",
     "aphrodite": "^2",
-    "axios": "^0.19.0 || ^0.18.0",
+    "axios": "^0.21.1",
     "bloody-offset": "0.0.0",
     "classnames": "^2.2.5",
     "format-message": "^6",

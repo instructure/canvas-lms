@@ -57,7 +57,7 @@
     "@instructure/ui-toggle-details": "^7",
     "@instructure/uid": "6",
     "@sheerun/mutationobserver-shim": "^0.3.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "format-message": "^6",
     "lodash": "^4",
     "prop-types": "^15",

@@ -87,7 +87,7 @@ export default class GenericErrorPage extends React.Component {
     try {
       // Returns json of {logged: boolean, id: string}
       const request = await axios.post('/error_reports', postData, {
-        headers: [{'content-type': 'application/json'}]
+        headers: {'content-type': 'application/json'}
       })
       const logObject = request.data
       if (logObject.logged) {

@@ -86,7 +86,7 @@ describe('GenericErrorPage component', () => {
     fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
-      const moxItem = await moxios.requests.mostRecent()
+      const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
       expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
       expect(getByText('Comment submitted!')).toBeInTheDocument()
@@ -108,7 +108,7 @@ describe('GenericErrorPage component', () => {
     fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
-      const moxItem = await moxios.requests.mostRecent()
+      const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
       expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
       expect(getByText('Comment failed to post! Please try again later.')).toBeInTheDocument()

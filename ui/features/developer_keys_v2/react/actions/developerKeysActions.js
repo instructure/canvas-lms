@@ -262,8 +262,7 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
   return axios({
     method,
     url,
-    data: formData,
-    config: {headers: {'Content-Type': 'multipart/form-data'}}
+    data: formData
   })
     .then(response => {
       if (method === 'post') {
