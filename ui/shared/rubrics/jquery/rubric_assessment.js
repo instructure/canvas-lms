@@ -255,6 +255,15 @@ window.rubricAssessment = {
     }
   },
 
+  // Ideally, we should investigate why criteriaAssessment id ends up being "null" string
+  // Due to the complexity of the code, this method is used to handle the situation and to
+  // test the change properly.
+  //
+  // For reference, see bug EVAL-1621
+  getCriteriaAssessmentId(criteriaAssessmentId) {
+    return ['null', null].includes(criteriaAssessmentId) ? undefined : criteriaAssessmentId
+  },
+
   assessmentData($rubric) {
     $rubric = rubricAssessment.findRubric($rubric)
     const data = {}
@@ -273,7 +282,9 @@ window.rubricAssessment = {
         const pre = `rubric_assessment[criterion_${criteriaAssessment.criterion_id}]`
         const section = key => `${pre}${key}`
         const points = criteriaAssessment.points.value
-        data[section('[rating_id]')] = criteriaAssessment.id
+        data[section('[rating_id]')] = rubricAssessment.getCriteriaAssessmentId(
+          criteriaAssessment.id
+        )
         data[section('[points]')] = !Number.isNaN(points) ? points : undefined
         data[section('[description]')] = criteriaAssessment.description
         data[section('[comments]')] = criteriaAssessment.comments || ''
