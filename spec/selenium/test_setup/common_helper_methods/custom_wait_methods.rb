@@ -46,7 +46,7 @@ module CustomWaitMethods
 
       var _checkAddedNodes = function(addedNodes) {
         for(var newNode of addedNodes) {
-          if(newNode.matches('#{selector}')) {
+          if(newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
             window.__WAIT_FOR_LOADING_IMAGE = 1
           }
         }
@@ -58,7 +58,7 @@ module CustomWaitMethods
         }
 
         for(var newNode of removedNodes) {
-          if(newNode.matches('#{selector}')) {
+          if(newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
             observer.disconnect()
 
             window.__WAIT_FOR_LOADING_IMAGE = 2
