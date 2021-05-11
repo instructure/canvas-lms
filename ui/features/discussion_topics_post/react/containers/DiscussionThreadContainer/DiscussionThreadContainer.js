@@ -21,6 +21,7 @@ import {Assignment} from '../../../graphql/Assignment'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
+  CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
@@ -63,7 +64,7 @@ export const mockThreads = {
   }
 }
 
-export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => {
+export const DiscussionThreadContainer = props => {
   const AUTO_MARK_AS_READ_DELAY = 3000
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -71,6 +72,15 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
   const threadRef = useRef()
+
+  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+    }
+  })
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -314,10 +324,14 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
           >
             <DiscussionEdit
               onSubmit={text => {
-                if (createDiscussionEntry) {
-                  createDiscussionEntry(text)
-                  setEditorExpanded(false)
-                }
+                createDiscussionEntry({
+                  variables: {
+                    discussionTopicId: ENV.discussion_topic_id,
+                    parentEntryId: props.discussionEntry._id,
+                    message: text
+                  }
+                })
+                setEditorExpanded(false)
               }}
               onCancel={() => setEditorExpanded(false)}
             />
@@ -356,8 +370,7 @@ export const DiscussionThreadContainer = ({createDiscussionEntry, ...props}) => 
 DiscussionThreadContainer.propTypes = {
   discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
-  assignment: Assignment.shape,
-  createDiscussionEntry: PropTypes.func
+  assignment: Assignment.shape
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -369,12 +382,12 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
-
+  const variables = {
+    discussionEntryID: props.discussionEntryId,
+    perPage: PER_PAGE
+  }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    variables: {
-      discussionEntryID: props.discussionEntryId,
-      perPage: PER_PAGE
-    }
+    variables
   })
 
   if (subentries.error) {

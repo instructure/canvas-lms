@@ -73,8 +73,12 @@ const defaultEntry = {
         ratingSum: 0,
         rating: false,
         read: true,
-        subentriesCount: 0,
-        rootEntryParticipantCounts: null,
+        subentriesCount: 1,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1,
+          __typename: 'RootEntryParticipantCount'
+        },
         author: {
           _id: '1',
           id: 'VXNlci0x',
@@ -83,7 +87,10 @@ const defaultEntry = {
           __typename: 'User'
         },
         editor: null,
-        lastReply: null,
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00',
+          __typename: 'DiscussionEntry'
+        },
         permissions: {
           attach: true,
           create: true,

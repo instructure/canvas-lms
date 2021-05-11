@@ -16,23 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CREATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../../../graphql/Queries'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
-import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
-import {useMutation, useQuery} from 'react-apollo'
+import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
   const [currentPage, setCurrentPage] = useState(0)
-  const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
 
   const variables = {
     discussionID: props.discussionTopicId,
@@ -42,15 +38,6 @@ export const DiscussionThreadsContainer = props => {
 
   const {loading, data} = useQuery(DISCUSSION_QUERY, {
     variables
-  })
-
-  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
-    onCompleted: () => {
-      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
-    },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
-    }
   })
 
   if (loading) {
@@ -68,15 +55,6 @@ export const DiscussionThreadsContainer = props => {
             key={`discussion-thread-${thread.id}`}
             assignment={props.discussionTopic?.assignment}
             discussionEntry={thread}
-            createDiscussionEntry={text => {
-              createDiscussionEntry({
-                variables: {
-                  discussionTopicId: ENV.discussion_topic_id,
-                  parentEntryId: thread._id,
-                  message: text
-                }
-              })
-            }}
           />
         )
       })}
