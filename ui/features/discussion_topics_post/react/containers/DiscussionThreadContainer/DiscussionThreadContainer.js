@@ -258,18 +258,20 @@ export const DiscussionThreadContainer = props => {
 
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
-    const observer = new IntersectionObserver(markAsRead, {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    })
+    if (!props.discussionEntry.read) {
+      const observer = new IntersectionObserver(markAsRead, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      })
 
-    if (threadRef.current) observer.observe(threadRef.current)
+      if (threadRef.current) observer.observe(threadRef.current)
 
-    return () => {
-      if (threadRef.current) observer.unobserve(threadRef.current)
+      return () => {
+        if (threadRef.current) observer.unobserve(threadRef.current)
+      }
     }
-  }, [threadRef, markAsRead])
+  }, [threadRef, markAsRead, props.discussionEntry.read])
 
   return (
     <>
