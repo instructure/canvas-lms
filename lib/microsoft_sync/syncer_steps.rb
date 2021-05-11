@@ -146,6 +146,8 @@ module MicrosoftSync
         users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
         users_and_upns = users_upns_finder.call
 
+        # If some users in different slices have the same UPNs, this could end up
+        # looking up the same UPN multiple times; but this should be very rare
         users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
           upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
           user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
