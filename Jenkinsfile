@@ -364,7 +364,7 @@ pipeline {
               buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
             }
 
-            extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timings(false).queue(rootStages) {
+            extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).timings(false).queue(rootStages) {
               // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
               // wait for the current steps to complete (even wait to spin up a node), causing
               // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
