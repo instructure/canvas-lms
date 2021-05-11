@@ -558,6 +558,19 @@ describe User do
       expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1].map(&:id))
     end
 
+    it "removes account associations for inactive/rejected enrollments" do
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = Account.default.sub_accounts.create!
+      enrollment1 = course_with_student(active_all: true, account: subaccount1)
+      enrollment2 = course_with_student(active_all: true, account: subaccount2, user: @student)
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+
+      enrollment1.reject
+      enrollment2.update workflow_state: 'inactive'
+      @student.update_account_associations
+      expect(@student.user_account_associations.pluck(:account_id)).to be_empty
+    end
+
     context "sharding" do
       specs_require_sharding
 

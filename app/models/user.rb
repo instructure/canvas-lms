@@ -600,7 +600,7 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.where("workflow_state NOT IN ('deleted','completed') AND type<>'StudentViewEnrollment'").
+            Enrollment.where("workflow_state NOT IN ('deleted','completed','inactive','rejected') AND type<>'StudentViewEnrollment'").
                 where(:user_id => shard_user_ids).
                 select([:user_id, :course_id, :course_section_id]).
                 joins(:enrollment_state).
