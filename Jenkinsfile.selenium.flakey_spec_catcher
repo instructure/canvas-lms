@@ -55,7 +55,7 @@ def setupNode() {
   credentials.withStarlordDockerLogin { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
-  sh 'build/new-jenkins/docker-compose-build-up.sh'
+  sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }
 
 def computeTestCount() {
@@ -143,7 +143,7 @@ def computeTestCount() {
 def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -vrf tmp'
   try {
-    sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
+    sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       echo "Failing the build due to timeouts"
@@ -200,13 +200,14 @@ pipeline {
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20201119"
 
-    // Targeting 10 minutes / node, each node runs DOCKER_PROCESSES threads and
+    // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
     // repeats each test FSC_REPEAT_FACTOR times.
     // Assumption: non-selenium tests take 500ms / test
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
-    DOCKER_PROCESSES = 3
+    DOCKER_PROCESSES = 1
     FSC_REPEAT_FACTOR = 10
     MAX_NODES = configuration.getString('fsc-max-nodes', '10')
+    RSPEC_PROCESSES = 3
     SELENIUM_RATIO = 20
     TESTS_PER_NODE = 200
   }
