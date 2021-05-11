@@ -36,6 +36,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionStatusPill from '@canvas/assignments/react/SubmissionStatusPill'
 import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
 
 class Header extends React.Component {
@@ -105,13 +106,19 @@ class Header extends React.Component {
       submission.grade != null ? {weight: 'bold', transform: 'capitalize'} : {color: 'secondary'}
 
     return (
-      <Flex as="div">
-        <Flex.Item>{I18n.t('Attempt %{attempt} Score:', {attempt: submission.attempt})}</Flex.Item>
+      <View className="selected-submission-grade">
+        <Flex as="div" direction="column" alignItems="end">
+          <Flex.Item>
+            <Text size="small">
+              {I18n.t('Attempt %{attempt} Score:', {attempt: submission.attempt})}
+            </Text>
+          </Flex.Item>
 
-        <Flex.Item margin="0 0 0 xx-small">
-          <Text {...textProps}>{formattedGrade}</Text>
-        </Flex.Item>
-      </Flex>
+          <Flex.Item>
+            <Text {...textProps}>{formattedGrade}</Text>
+          </Flex.Item>
+        </Flex>
+      </View>
     )
   }
 
