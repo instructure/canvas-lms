@@ -17,10 +17,11 @@
  */
 import {
   CHILD_GROUPS_QUERY,
+  CREATE_LEARNING_OUTCOME,
   FIND_GROUP_OUTCOMES,
   SEARCH_GROUP_OUTCOMES,
-  UPDATE_LEARNING_OUTCOME,
-  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+  UPDATE_LEARNING_OUTCOME
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -767,6 +768,80 @@ export const setFriendlyDescriptionOutcomeMock = ({
           contextId: '1',
           contextType: 'Account',
           outcomeId: '1'
+        }
+      }
+    },
+    result
+  }
+}
+
+export const createLearningOutcomeMock = ({
+  title = 'Outcome title',
+  description = 'description',
+  displayName = 'display name',
+  groupId = 1,
+  failResponse = false,
+  failMutation = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      createLearningOutcome: {
+        learningOutcome: {
+          _id: '1',
+          title,
+          description,
+          displayName,
+          __typename: 'LearningOutcome'
+        },
+        __typename: 'CreateLearningOutcomePayload',
+        errors: null
+      }
+    },
+    errors: null
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        message: 'mutation failed',
+        __typename: 'Error'
+      }
+    ]
+  }
+  const failedMutation = {
+    data: {
+      createLearningOutcome: {
+        __typename: 'CreateLearningOutcomePayload',
+        learningOutcome: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: 'mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  }
+
+  return {
+    request: {
+      query: CREATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          description,
+          title,
+          groupId,
+          displayName
         }
       }
     },

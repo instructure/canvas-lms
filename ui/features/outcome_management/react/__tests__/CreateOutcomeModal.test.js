@@ -26,12 +26,11 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   accountMocks,
   smallOutcomeTree,
-  setFriendlyDescriptionOutcomeMock
+  setFriendlyDescriptionOutcomeMock,
+  createLearningOutcomeMock
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios')
 jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers()
 
@@ -89,6 +88,7 @@ describe('CreateOutcomeModal', () => {
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.click(getByText('Create'))
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
@@ -197,18 +197,25 @@ describe('CreateOutcomeModal', () => {
 
   it('displays flash confirmation with proper message if create request succeeds', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [
         ...smallOutcomeTree('Account'),
         setFriendlyDescriptionOutcomeMock({
-          inputDescription: 'Alternate description'
+          inputDescription: 'Friendly Description value'
+        }),
+        createLearningOutcomeMock({
+          title: 'Outcome 123',
+          displayName: 'Display name',
+          description: ''
         })
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
+    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
+      target: {value: 'Friendly Description value'}
+    })
     fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -222,9 +229,16 @@ describe('CreateOutcomeModal', () => {
 
   it('displays flash error if create request fails', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockRejectedValueOnce(new Error('Network error'))
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [
+        ...smallOutcomeTree('Account'),
+        createLearningOutcomeMock({
+          title: 'Outcome 123',
+          displayName: 'Display name',
+          description: '',
+          failResponse: true
+        })
+      ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -234,17 +248,24 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome: Network error.',
+        message: 'An error occurred while creating this outcome: GraphQL error: mutation failed.',
         type: 'error'
       })
     })
   })
 
-  it('displays flash error with generic error message if create request fails and err.message not provided', async () => {
+  it('displays flash error if create mutation fails', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockRejectedValueOnce(new Error())
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [
+        ...smallOutcomeTree('Account'),
+        createLearningOutcomeMock({
+          title: 'Outcome 123',
+          displayName: 'Display name',
+          description: '',
+          failMutation: true
+        })
+      ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -254,7 +275,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome.',
+        message: 'An error occurred while creating this outcome: mutation failed.',
         type: 'error'
       })
     })
@@ -262,10 +283,15 @@ describe('CreateOutcomeModal', () => {
 
   it('handles create outcome failure due to alternate description', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [
         ...smallOutcomeTree('Account'),
+        createLearningOutcomeMock({
+          title: 'Outcome 123',
+          displayName: 'Display name',
+          description: '',
+          groupId: 100
+        }),
         setFriendlyDescriptionOutcomeMock({
           inputDescription: 'Alternate description',
           failResponse: true
@@ -293,10 +319,15 @@ describe('CreateOutcomeModal', () => {
 
   it('does not throw error if alternate description mutation succeeds', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [
         ...smallOutcomeTree('Account'),
+        createLearningOutcomeMock({
+          title: 'Outcome 123',
+          displayName: 'Display name',
+          description: '',
+          groupId: 100
+        }),
         setFriendlyDescriptionOutcomeMock({
           inputDescription: 'Alternate description'
         })

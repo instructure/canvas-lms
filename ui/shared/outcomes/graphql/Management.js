@@ -174,6 +174,23 @@ export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
   }
 `
 
+export const CREATE_LEARNING_OUTCOME = gql`
+  mutation CreateLearningOutcome($input: CreateLearningOutcomeInput!) {
+    createLearningOutcome(input: $input) {
+      learningOutcome {
+        _id
+        title
+        displayName
+        description
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const UPDATE_LEARNING_OUTCOME = gql`
   mutation UpdateLearningOutcome($input: UpdateLearningOutcomeInput!) {
     updateLearningOutcome(input: $input) {
@@ -213,14 +230,6 @@ export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroup
   axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
     {parent_outcome_group_id: newParentGroupId}
-  )
-
-export const createOutcome = (contextType, contextId, groupId, outcome) =>
-  axios.post(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes`,
-    outcome
   )
 
 export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {
