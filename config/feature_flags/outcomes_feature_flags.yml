@@ -48,4 +48,4 @@ assignment_comment_library:
   state: hidden
   applies_to: RootAccount
   display_name: Comment Library
-  description: Adds comment library for assignment comments within speedgrader
+  description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
