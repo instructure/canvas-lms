@@ -28,6 +28,9 @@
     "Instanceof": {
       "enabled": false
     },
+    "InvertedIfElse": {
+      "enabled": false
+    },
     "JUnitStyleAssertions": {
       "enabled": false
     },
