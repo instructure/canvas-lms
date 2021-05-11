@@ -178,14 +178,14 @@ def _runRspecTestSuite(
 }
 
 def uploadSeleniumCoverage() {
-  _uploadCoverage('selenium', 'canvas-lms-selenium')
+  _uploadCoverage('canvas-lms-selenium')
 }
 
 def uploadRSpecCoverage() {
-  _uploadCoverage('rspec', 'canvas-lms-rspec')
+  _uploadCoverage('canvas-lms-rspec')
 }
 
-def _uploadCoverage(prefix, coverageName) {
+def _uploadCoverage(coverageName) {
   reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverageName/coverage")
 }
 

@@ -31,7 +31,6 @@ import groovy.time.*
 def appendStagesAsBuildNodes(nodes,
                              stageCount,
                              stageNamePrefix,
-                             testLabel,
                              stageBlock) {
   for (int i = 0; i < stageCount; i++) {
     // make this a local variable so when the closure resolves
@@ -65,7 +64,7 @@ def unstashBuildScripts() {
 def addRSpecSuites(stages) {
   def rspecNodeTotal = rspec.rspecConfig().node_total
   echo 'adding RSpec Test Sets'
-  appendStagesAsBuildNodes(stages, rspecNodeTotal, 'RSpec Test Set', 'rspec') { index ->
+  appendStagesAsBuildNodes(stages, rspecNodeTotal, 'RSpec Test Set') { index ->
     rspec.runRSpecSuite(rspecNodeTotal, index)
   }
 }
@@ -76,7 +75,7 @@ def addRSpecSuites(stages) {
 def addSeleniumSuites(stages) {
   def seleniumNodeTotal = rspec.seleniumConfig().node_total
   echo 'adding Selenium Test Sets'
-  appendStagesAsBuildNodes(stages, seleniumNodeTotal, 'Selenium Test Set', 'selenium') { index ->
+  appendStagesAsBuildNodes(stages, seleniumNodeTotal, 'Selenium Test Set') { index ->
     rspec.runSeleniumSuite(seleniumNodeTotal, index)
   }
 }
