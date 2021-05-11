@@ -1605,7 +1605,7 @@ class AccountsController < ApplicationController
       @account.course_template_id = nil
     elsif param.to_s == '0'
       return if @account.course_template_id == 0
-      return :unauthorized unless @account.grants_right?(@current_user, :delete_course_template, :edit_course_template)
+      return :unauthorized unless @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
 
       @account.course_template_id = 0
     else
