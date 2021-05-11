@@ -373,6 +373,12 @@ pipeline {
                 .timeout(2)
                 .execute({ setupStage() })
 
+              extendedStage('Rebase')
+                .obeysAllowStages(false)
+                .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
+                .timeout(2)
+                .execute({ rebaseStage() })
+
               extendedStage(FILES_CHANGED_STAGE)
                 .obeysAllowStages(false)
                 .timeout(2)
@@ -392,12 +398,6 @@ pipeline {
 
                   distribution.stashBuildScripts()
                 }
-
-              extendedStage('Rebase')
-                .obeysAllowStages(false)
-                .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
-                .timeout(2)
-                .execute({ rebaseStage() })
 
               extendedStage('Build Docker Image (Pre-Merge)')
                 .obeysAllowStages(false)
