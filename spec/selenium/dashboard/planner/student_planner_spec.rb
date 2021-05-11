@@ -498,7 +498,6 @@ describe "student planner" do
       expect(scroll_height).to eq 0
 
       new_activity_button.click
-      wait_for_spinner
       expect(items_displayed.count).to eq 5
 
       next_item_y = item_top_position(1)
@@ -513,11 +512,9 @@ describe "student planner" do
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
       skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
-      wait_for_spinner
 
       expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
       new_activity_button.click
-      wait_for_spinner
       scroll_page_to_top
       expect(planner_header_container).not_to contain_jqcss(new_activity_button_selector)
       scroll_page_to_bottom
@@ -526,7 +523,6 @@ describe "student planner" do
 
     it "collapses an item when marked as complete", priority: "1", test_id: 3263155 do
       go_to_list_view
-      wait_for_spinner
 
       planner_item_status_checkbox('Discussion', @future_discussion.title).click
       refresh_page

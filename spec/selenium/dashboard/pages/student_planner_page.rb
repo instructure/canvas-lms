@@ -429,26 +429,6 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
-  def wait_for_todo_load
-    begin
-      f("[id*=Spinner]", todo_sidebar_container)
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-    rescue SpecTimeLimit::Error
-    end
-    expect(todo_sidebar_container).not_to contain_jqcss("title:contains('To Do Items Loading')")
-  end
-
-  def wait_for_spinner
-    begin
-      f("[id*=Spinner]", planner_app_div) # the loading spinner appears
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      # ignore - sometimes spinner is too quick
-    rescue SpecTimeLimit::Error
-      # ignore - sometimes spinner doesn't appear in Chrome
-    end
-    expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
-  end
-
   def first_item_on_page
     items_displayed[0]
   end
