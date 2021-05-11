@@ -639,9 +639,13 @@ class DiscussionTopicsController < ApplicationController
   def show
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post)
+      @topic = @context.all_discussion_topics.find(params[:id])
+      add_discussion_or_announcement_crumb
+      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       js_env({
                course_id: params[:course_id],
-               discussion_topic_id: params[:id]
+               discussion_topic_id: params[:id],
+               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
              })
       js_bundle :discussion_topics_post
       render html: '', layout: true

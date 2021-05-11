@@ -332,11 +332,21 @@ describe DiscussionTopicsController do
     end
 
     it "js_bundles includes discussion_topics_post when ff is on" do
+      commons_hash = {
+        base_url: '/testing-url',
+        canvas_icon_class: 'icon-commons',
+        icon_url: 'http://example.com/icon.png',
+        id: '1',
+        title: 'Share to Commons'
+      }
+      allow(controller).to receive(:external_tools_display_hashes).and_return([commons_hash])
       @course.enable_feature!(:react_discussions_post)
       user_session(@teacher)
-      @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello')
+      @discussion = @course.discussion_topics.create!(:user => @teacher, title: 'Greetings' ,message: 'Hello, and good morning!')
       get 'show', params: {:course_id => @course.id, :id => @discussion.id}
       expect(assigns[:js_bundles].first).to include(:discussion_topics_post)
+      expect(assigns[:_crumbs]).to include(['Discussions', "/courses/#{@course.id}/discussion_topics", {}])
+      expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
     end
 
     it "should not work for announcements in a public course" do
