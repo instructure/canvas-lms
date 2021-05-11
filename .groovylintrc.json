@@ -58,6 +58,9 @@
     "UnnecessaryGetter": {
       "enabled": false
     },
+    "UnnecessaryObjectReferences": {
+      "enabled": false
+    },
     "UnnecessarySetter": {
       "enabled": false
     },
