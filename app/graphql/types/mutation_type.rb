@@ -81,6 +81,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
   field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
   field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
+  field :update_discussion_entries_read_state, mutation: Mutations::UpdateDiscussionEntriesReadState
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
