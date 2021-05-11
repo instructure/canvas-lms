@@ -16,9 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% provide :page_title do %><%= t :page_title, "Syllabus for %{course}", :course => @context.name %><% end %>
-<% provide :right_side do %>
-  <%= render :partial => 'assignments/syllabus_right_side' %>
+<% provide :page_title do %>
+  <%= @context.elementary_homeroom_course? ? t("Important Info for %{course}", :course => @context.name): t(:page_title, "Syllabus for %{course}", :course => @context.name) %>
+<% end %>
+
+<% unless @context.elementary_homeroom_course? %>
+  <% provide :right_side do %>
+    <%= render :partial => 'assignments/syllabus_right_side' %>
+  <% end %>
 <% end %>
 
 <%

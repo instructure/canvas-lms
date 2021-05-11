@@ -23,7 +23,16 @@ import ResourcesPage from '../ResourcesPage'
 jest.mock('@canvas/k5/react/utils')
 const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
 
-const defaultResponse = [
+const defaultImportantInfoResponse = [
+  {
+    courseId: '2',
+    courseName: 'Homeroom A',
+    canEdit: true,
+    content: '<p>Bring your calculators today</p>'
+  }
+]
+
+const defaultAppsResponse = [
   {
     id: '3',
     course_navigation: {
@@ -59,9 +68,26 @@ describe('ResourcesPage', () => {
     ...overrides
   })
 
+  beforeEach(() => {
+    utils.fetchImportantInfos.mockReturnValue(Promise.resolve(defaultImportantInfoResponse))
+    utils.fetchCourseApps.mockReturnValue(Promise.resolve(defaultAppsResponse))
+  })
+
+  describe('Important Info section', () => {
+    it('renders homeroom syllabus content', async () => {
+      const {findByText} = render(<ResourcesPage {...getProps()} />)
+      expect(await findByText('Bring your calculators today')).toBeInTheDocument()
+    })
+
+    it('shows an error if the infos fail to load', async () => {
+      utils.fetchImportantInfos.mockReturnValue(Promise.reject(new Error('Fail!')))
+      const {findAllByText} = render(<ResourcesPage {...getProps()} />)
+      expect((await findAllByText('Failed to load important info.'))[0]).toBeInTheDocument()
+    })
+  })
+
   describe('Apps section', () => {
     it('renders apps section', async () => {
-      utils.fetchCourseApps.mockReturnValue(Promise.resolve(defaultResponse))
       const {getByText} = render(<ResourcesPage {...getProps()} />)
       await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())
       expect(getByText('Google Apps')).toBeInTheDocument()
@@ -78,7 +104,6 @@ describe('ResourcesPage', () => {
     })
 
     it('only fetches apps for non-homeroom courses', async () => {
-      utils.fetchCourseApps.mockReturnValue(Promise.resolve(defaultResponse))
       const {getByText, queryByText} = render(<ResourcesPage {...getProps()} />)
       await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())
       const assign = window.location.assign

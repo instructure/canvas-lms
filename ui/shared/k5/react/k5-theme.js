@@ -28,6 +28,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Table} from '@instructure/ui-table'
+import {IconButton} from '@instructure/ui-buttons'
 
 import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
 
@@ -88,6 +89,9 @@ export const theme = {
   },
   [Table.Cell.theme]: {
     padding: '1rem 0.75rem'
+  },
+  [IconButton.theme]: {
+    iconSizeMedium: '1.5rem'
   }
 }
 

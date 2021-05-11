@@ -268,12 +268,12 @@ describe('K-5 Subject Course', () => {
       })
     })
 
-    it('shows a loading spinner while apps are loading', async () => {
-      const {getByText, queryByText} = render(
+    it('shows some loading skeletons while apps are loading', async () => {
+      const {getAllByText, queryByText} = render(
         <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
       )
       await waitFor(() => {
-        expect(getByText('Loading apps...')).toBeInTheDocument()
+        expect(getAllByText('Loading apps...')[0]).toBeInTheDocument()
         expect(queryByText('Studio')).not.toBeInTheDocument()
       })
     })

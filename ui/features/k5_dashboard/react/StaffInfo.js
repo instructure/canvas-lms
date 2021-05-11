@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {IconEmailLine} from '@instructure/ui-icons'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {readableRoleName, sendMessage} from '@canvas/k5/react/utils'
 import {Avatar} from '@instructure/ui-avatar'
@@ -67,7 +67,7 @@ export default function StaffInfo({
 
   return (
     <View>
-      <Flex>
+      <Flex margin="small 0">
         <Flex.Item align="start">
           <Avatar name={name} src={avatarUrl} alt={I18n.t('Avatar for %{name}', {name})} />
         </Flex.Item>
@@ -86,7 +86,6 @@ export default function StaffInfo({
           <Flex.Item>
             <IconButton
               screenReaderLabel={I18n.t('Send a message to %{name}', {name})}
-              size="small"
               withBackground={false}
               withBorder={false}
               onClick={() => setModalOpen(true)}
@@ -96,9 +95,6 @@ export default function StaffInfo({
           </Flex.Item>
         )}
       </Flex>
-      <PresentationContent>
-        <hr style={{margin: '0.8em 0'}} />
-      </PresentationContent>
 
       {allowMessaging() && (
         <Modal

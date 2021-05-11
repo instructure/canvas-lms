@@ -2939,6 +2939,9 @@ class Course < ActiveRecord::Base
   def self.default_homeroom_tabs
     default_tabs = Course.default_tabs
     homeroom_tabs = [default_tabs.find {|tab| tab[:id] == TAB_ANNOUNCEMENTS}]
+    syllabus_tab = default_tabs.find {|tab| tab[:id] == TAB_SYLLABUS}
+    syllabus_tab[:label] = t("Important Info")
+    homeroom_tabs << syllabus_tab
     homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_PEOPLE}
     homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_SETTINGS}
     homeroom_tabs.compact

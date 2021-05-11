@@ -69,9 +69,10 @@ describe('StaffContactInfoLayout', () => {
     expect(container.firstChild).toBeEmpty()
   })
 
-  it('renders a loading indicator if isLoading set', () => {
-    const {getByText} = render(<StaffContactInfoLayout {...getProps({isLoading: true})} />)
-    expect(getByText('Loading staff...')).toBeInTheDocument()
+  it('renders 2 loading skeletons if isLoading set', () => {
+    const {getAllByText} = render(<StaffContactInfoLayout {...getProps({isLoading: true})} />)
+    const skeletons = getAllByText('Loading staff...')
+    expect(skeletons.length).toBe(2)
   })
 
   it('renders no loading indicator if isLoading not set', () => {

@@ -18,6 +18,24 @@
 
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
+<%
+  show_summary = @context.syllabus_course_summary? && !@context.elementary_homeroom_course?
+  if @context.elementary_homeroom_course?
+    title_text = t("Important Info")
+    submit_btn_text = t("Update Important Info")
+    help_text = t("You can add important information here that you want to display under the Resources tab in your homeroom.")
+  else
+    title_text = t("titles.course_syllabus", "Course Syllabus")
+    submit_btn_text = t("buttons.update_syllabus", "Update Syllabus")
+    help_text = mt "instructions.syllabus", <<-DOC
+The syllabus page shows a table-oriented view of the course schedule, and the basics of
+course grading.  You can add any other comments, notes, or thoughts you have about the course
+structure, course policies or anything else.
+
+To add some comments, click the "Edit" link at the top.
+    DOC
+  end
+%>
 <% set_active_tab "syllabus" %>
 <% course_home ||= false %>
 <div class="ic-Action-header">
@@ -25,11 +43,11 @@
   <% if course_home %>
     <h2 class="ic-Action-header__Heading"><%= @context.nickname_for(@current_user) %></h2>
   <% else %>
-    <h1 class="ic-Action-header__Heading"><%= t 'titles.course_syllabus', "Course Syllabus" %></h1>
+    <h1 class="ic-Action-header__Heading"><%= title_text %></h1>
   <% end %>
   </div>
   <div class="ic-Action-header__Secondary">
-  <% if @context.syllabus_course_summary? %>
+  <% if show_summary %>
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
   <% end %>
   <% if can_do(@context, @current_user, :manage_content) %>
@@ -42,14 +60,7 @@
   <%= user_content(@syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
-  <%= mt 'instructions.syllabus', <<-DOC
-The syllabus page shows a table-oriented view of the course schedule, and the basics of
-course grading.  You can add any other comments, notes, or thoughts you have about the course
-structure, course policies or anything else.
-
-To add some comments, click the "Edit" link at the top.
-DOC
-      %>
+  <%= help_text %>
 </div>
 <%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
   <% unless @context.feature_enabled?(:rce_enhancements) %>
@@ -58,22 +69,28 @@ DOC
       <a href="#" class="toggle_views_link toggle_rich_editor_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
     </div>
   <% end %>
-  <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
+  <% if @context.elementary_homeroom_course? %>
+    <%= f.blabel :syllabus_body, :important_info_description, :en => "Important Info Description" %>
+  <% else %>
+    <%= f.blabel :syllabus_body, :syllabus_description, :en => "Syllabus Description" %>
+  <% end %>
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
 
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <%= f.check_box :syllabus_course_summary, :checked => @context.syllabus_course_summary? %>
-    <%= f.label :syllabus_course_summary, :class => 'ic-Label', :en => "Show Course Summary" %>
-  </div>
+  <% if !@context.elementary_homeroom_course? %>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <%= f.check_box :syllabus_course_summary, :checked => @context.syllabus_course_summary? %>
+      <%= f.label :syllabus_course_summary, :class => 'ic-Label', :en => "Show Course Summary" %>
+    </div>
+  <% end %>
 
   <div class='form-actions'>
     <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-    <button type="submit" class='btn btn-primary'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
+    <button type="submit" class='btn btn-primary'><%= submit_btn_text %></button>
   </div>
 <% end %>
 
-<% if @context.syllabus_course_summary? %>
+<% if show_summary %>
 
 <h2><%= before_label :assignments_summary, "Course Summary" %></h2>
 

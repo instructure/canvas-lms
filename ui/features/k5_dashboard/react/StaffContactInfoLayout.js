@@ -19,33 +19,35 @@
 import I18n from 'i18n!k5_dashboard'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {View} from '@instructure/ui-view'
-import StaffInfo, {StaffShape} from './StaffInfo'
-import {Heading} from '@instructure/ui-heading'
-import {PresentationContent} from '@instructure/ui-a11y-content'
-import {Spinner} from '@instructure/ui-spinner'
 
-export default function StaffContactInfoLayout({isLoading, staff}) {
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+
+import StaffInfo, {StaffShape} from './StaffInfo'
+import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+
+const StaffContactInfoLayout = ({isLoading, staff}) => {
+  const skeletons = []
+  for (let i = 0; i < 2; i++) {
+    skeletons.push(
+      <LoadingSkeleton
+        key={`skeleton-${i}`}
+        width="100%"
+        height="4em"
+        margin="small 0"
+        screenReaderLabel={I18n.t('Loading staff...')}
+      />
+    )
+  }
+
   return (
     <View>
-      {isLoading && (
-        <View as="div" textAlign="center" margin="large 0">
-          <Spinner renderTitle={I18n.t('Loading staff...')} size="large" />
-        </View>
+      {(isLoading || staff.length > 0) && (
+        <Heading level="h2" margin="large 0 0">
+          {I18n.t('Staff Contact Info')}
+        </Heading>
       )}
-      {staff.length > 0 && (
-        <View>
-          <Heading level="h3" as="h2" margin="medium 0 0">
-            {I18n.t('Staff Contact Info')}
-          </Heading>
-          <PresentationContent>
-            <hr style={{margin: '0.8em 0'}} />
-          </PresentationContent>
-          {staff.map(s => (
-            <StaffInfo key={s.id} {...s} />
-          ))}
-        </View>
-      )}
+      {isLoading ? skeletons : staff.map(s => <StaffInfo key={s.id} {...s} />)}
     </View>
   )
 }
@@ -54,3 +56,5 @@ StaffContactInfoLayout.propTypes = {
   isLoading: PropTypes.bool,
   staff: PropTypes.arrayOf(PropTypes.shape(StaffShape)).isRequired
 }
+
+export default StaffContactInfoLayout

@@ -2748,7 +2748,12 @@ describe Course, "tabs_available" do
 
         it 'hides most tabs for homeroom courses' do
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
+        end
+
+        it 'renames the syllabus tab to important info' do
+          syllabus_tab = @course.tabs_available(@user).find{|t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq('Important Info')
         end
 
         it 'hides external tools in nav' do
@@ -2765,7 +2770,7 @@ describe Course, "tabs_available" do
           )
           @course.tab_configuration = [{:id => Course::TAB_ANNOUNCEMENTS}, {:id => 'context_external_tool_8'}]
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
         end
       end
 

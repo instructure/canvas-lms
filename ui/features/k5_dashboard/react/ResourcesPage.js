@@ -19,11 +19,17 @@
 import I18n from 'i18n!dashboard_pages_ResourcesPage'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Heading} from '@instructure/ui-heading'
+import {View} from '@instructure/ui-view'
+
 import StaffContactInfoLayout from './StaffContactInfoLayout'
 import useImmediate from '@canvas/use-immediate-hook'
-import {fetchCourseInstructors, fetchCourseApps} from '@canvas/k5/react/utils'
+import {fetchCourseInstructors, fetchCourseApps, fetchImportantInfos} from '@canvas/k5/react/utils'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import ImportantInfoLayout from './ImportantInfoLayout'
 
 const fetchStaff = cards =>
   Promise.all(cards.filter(c => c.isHomeroom).map(course => fetchCourseInstructors(course.id)))
@@ -72,35 +78,31 @@ const fetchApps = cards =>
     )
 
 export default function ResourcesPage({cards, cardsSettled, visible}) {
+  const [infos, setInfos] = useState([])
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
+  const [isInfoLoading, setInfoLoading] = useState(false)
   const [isAppsLoading, setAppsLoading] = useState(false)
   const [isStaffLoading, setStaffLoading] = useState(false)
 
   useImmediate(
     () => {
       if (cards && cardsSettled) {
+        setInfoLoading(true)
+        fetchImportantInfos(cards.filter(c => c.isHomeroom))
+          .then(setInfos)
+          .catch(showFlashError(I18n.t('Failed to load important info.')))
+          .finally(() => setInfoLoading(false))
         setAppsLoading(true)
         fetchApps(cards)
-          .then(data => {
-            setApps(data)
-            setAppsLoading(false)
-          })
-          .catch(err => {
-            setAppsLoading(false)
-            showFlashError(I18n.t('Failed to load apps.'))(err)
-          })
-
+          .then(setApps)
+          .catch(showFlashError(I18n.t('Failed to load apps.')))
+          .finally(() => setAppsLoading(false))
         setStaffLoading(true)
         fetchStaff(cards)
-          .then(data => {
-            setStaff(data)
-            setStaffLoading(false)
-          })
-          .catch(err => {
-            setStaffLoading(false)
-            showFlashError(I18n.t('Failed to load staff.'))(err)
-          })
+          .then(setStaff)
+          .catch(showFlashError(I18n.t('Failed to load staff.')))
+          .finally(() => setStaffLoading(false))
       }
     },
     [cards, cardsSettled],
@@ -109,8 +111,20 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
 
   return (
     <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
-      <AppsList isLoading={isAppsLoading} apps={apps} />
-      <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
+      <ApplyTheme
+        theme={{
+          [Heading.theme]: {
+            h2FontSize: '1.375rem',
+            h3FontSize: '1.125rem'
+          }
+        }}
+      >
+        <View>
+          <ImportantInfoLayout isLoading={isInfoLoading} importantInfos={infos} />
+          <AppsList isLoading={isAppsLoading} apps={apps} />
+          <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
+        </View>
+      </ApplyTheme>
     </section>
   )
 }
