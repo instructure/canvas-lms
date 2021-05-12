@@ -1163,12 +1163,18 @@ class User < ActiveRecord::Base
   end
 
   def check_courses_right?(user, sought_right, enrollments_to_check=nil)
-    enrollments_to_check ||= enrollments.current_and_concluded
+    return false unless user && sought_right
+
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
     # the right then look at the concluded courses.
-    user && sought_right &&
-      self.courses_for_enrollments(enrollments_to_check).any?{ |c| c.grants_right?(user, sought_right) }
+    enrollments_to_check ||= enrollments.current_and_concluded
+
+    shards = associated_shards & user.associated_shards
+    # search the current shard first
+    shards.delete(Shard.current) && shards.unshift(Shard.current) if shards.include?(Shard.current)
+
+    courses_for_enrollments(enrollments_to_check.shard(shards)).any?{ |c| c.grants_right?(user, sought_right) }
   end
 
   def check_accounts_right?(user, sought_right)

@@ -1060,6 +1060,19 @@ describe User do
     it "allows for narrowing courses by enrollments" do
       expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works cross-shard" do
+        @shard1.activate do
+          account = Account.create!
+          course_with_teacher(account: account, active_all: true)
+          course_with_student(course: @course, user: @student1, active_all: true)
+          expect(@student1.check_courses_right?(@teacher, :read_forum)).to eq true
+        end
+      end
+    end
   end
 
   context "search_messageable_users" do
