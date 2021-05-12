@@ -116,8 +116,8 @@ describe('student view integration tests', () => {
     // components re-rendering
     it('displays the new file after it has been uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
-      uploadFileModule.uploadFiles = jest.fn()
-      uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
+      uploadFileModule.uploadFile = jest.fn()
+      uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 
       const mocks = await createGraphqlMocks({
@@ -126,7 +126,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {findByTestId, findByText, findAllByText} = render(
+      const {findByRole, findByTestId, findAllByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -134,14 +134,14 @@ describe('student view integration tests', () => {
         </AlertManagerContext.Provider>
       )
 
-      const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
+      const files = [new File(['foo'], 'test.jpg', {type: 'image/jpg'})]
       const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
-      await findByText('Loading')
+      await findByRole('progressbar', {name: /Upload progress/})
       expect((await findAllByText('test.jpg'))[0]).toBeInTheDocument()
     })
 
-    it('displays a loading indicator for each new file being uploaded', async () => {
+    it('displays a progress bar for each new file being uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFiles = jest.fn()
       uploadFileModule.uploadFiles.mockReturnValueOnce([
@@ -156,7 +156,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {findByTestId, findAllByText} = render(
+      const {findByTestId, findAllByRole} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -170,7 +170,7 @@ describe('student view integration tests', () => {
       ]
       const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
-      const elements = await findAllByText('Loading')
+      const elements = await findAllByRole('progressbar', {name: /Upload progress/})
       expect(elements).toHaveLength(2)
     })
   })

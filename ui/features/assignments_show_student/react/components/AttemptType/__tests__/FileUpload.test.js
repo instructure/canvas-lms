@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DEFAULT_ICON} from '@canvas/mime/react/mimeClassIconHelper'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, waitFor} from '@testing-library/react'
@@ -78,7 +77,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
-  uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+  uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
 })
 
 describe('FileUpload', () => {
@@ -90,20 +89,17 @@ describe('FileUpload', () => {
     })
   }
 
-  it('renders the upload tab by default', async () => {
+  it('renders the upload file drop', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
-    const {container, getByTestId, getByText} = render(
+    const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
 
-    expect(emptyRender).toContainElement(getByText('Upload File'))
-    expect(emptyRender).toContainElement(
-      container.querySelector(`svg[name=${DEFAULT_ICON.type.displayName.replace('Line', '')}]`)
-    )
+    expect(emptyRender).toHaveTextContent('Drag a file here')
   })
 
   it('renders the submission draft files if there are any', async () => {
@@ -159,10 +155,9 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const setOnSuccess = jest.fn()
     const props = await makeProps()
-    uploadFileModule.uploadFiles.mockResolvedValue([
-      {id: '1', name: 'file1.jpg'},
-      {id: '2', name: 'file2.jpg'}
-    ])
+    uploadFileModule.uploadFile
+      .mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
+      .mockResolvedValueOnce({id: '2', name: 'file2.jpg'})
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -194,9 +189,7 @@ describe('FileUpload', () => {
     const setOnFailure = jest.fn()
     const setOnSuccess = jest.fn()
     const props = await makeProps()
-    uploadFileModule.uploadFiles.mock.results = () => {
-      throw new Error('no')
-    }
+    uploadFileModule.uploadFile.mockRejectedValue(new Error('no'))
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -209,7 +202,9 @@ describe('FileUpload', () => {
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
 
     uploadFiles(fileInput, [file])
-    expect(setOnFailure).toHaveBeenCalledWith('Error updating submission draft')
+    await waitFor(() => {
+      expect(setOnFailure).toHaveBeenCalledWith('Error updating submission draft')
+    })
   })
 
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
@@ -218,7 +213,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Submission: {attempt: 0}
     })
-    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'LemonRules.jpg'})
 
     render(
       <MockedProvider mocks={mocks}>
@@ -262,7 +257,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Submission: {attempt: 0}
     })
-    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'LemonRules.jpg'})
 
     render(
       <MockedProvider mocks={mocks}>
@@ -289,10 +284,13 @@ describe('FileUpload', () => {
     )
 
     await waitFor(() => {
-      expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
-        [{url: 'http://lemon.com', title: 'LemonRules.txt', mediaType: ''}],
-        expect.anything()
-      )
+      const [, fileArgs] = uploadFileModule.uploadFile.mock.calls[0]
+      expect(fileArgs).toEqual({
+        content_type: '',
+        name: 'LemonRules.txt',
+        submit_assignment: false,
+        url: 'http://lemon.com'
+      })
     })
   })
 
@@ -388,7 +386,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Submission: {attempt: 2}
     })
-    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -419,7 +417,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Submission: {attempt: 0}
     })
-    uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -599,17 +597,75 @@ describe('FileUpload', () => {
     expect(queryByText('Invalid file type')).toBeNull()
   })
 
-  it('renders a loading indicator when a file is being uploaded', async () => {
+  it('shows a checkmark icon for uploaded files', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
+    const attachmentOverrides = [{_id: '1', displayName: 'just a file'}]
+    const props = await makeProps({
+      Submission: {
+        submissionDraft: {attachments: attachmentOverrides}
+      }
+    })
+
+    const {container, getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+    const uploadRender = getByTestId('upload-pane')
+    expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
+  })
+
+  it('renders a loading indicator for each file being uploaded', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
-    props.uploadingFiles = true
-    const {getByTestId, getAllByText} = render(
+
+    const progressHandlers = []
+
+    uploadFileModule.uploadFile
+      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '1', name: 'file1.pdf'})
+      })
+      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '2', name: 'file2.pdf'})
+      })
+
+    const {getAllByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
     )
+    const fileInput = document.getElementById('inputFileDrop')
 
-    const uploadingFilesRender = getByTestId('upload-pane')
-    expect(uploadingFilesRender).toContainElement(getAllByText('Loading')[0])
+    uploadFiles(fileInput, [
+      new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
+      new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
+    ])
+
+    progressHandlers[0]({loaded: 10, total: 100})
+    progressHandlers[1]({loaded: 50, total: 250})
+
+    const progressBars = getAllByRole('progressbar')
+    expect(progressBars).toHaveLength(2)
+
+    expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
+    expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+    expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+    expect(progressBars[0]).toHaveAttribute(
+      'aria-label',
+      'Upload progress for file1.pdf 10 percent'
+    )
+
+    expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
+    expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
+    expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
+    expect(progressBars[1]).toHaveAttribute(
+      'aria-label',
+      'Upload progress for file2.pdf 20 percent'
+    )
   })
 })
