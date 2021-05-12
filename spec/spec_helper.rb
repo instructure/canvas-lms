@@ -335,7 +335,8 @@ RSpec::Expectations.configuration.on_potential_false_positives = :raise
 require 'rspec_junit_formatter'
 
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = Rails.root.join('tmp', 'rspec')
+  config.example_status_persistence_file_path = Rails.root.join('tmp', "rspec#{ENV.fetch('PARALLEL_INDEX', '0').to_i}")
+  config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root.join('spec', 'fixtures')
@@ -916,4 +917,3 @@ end
 def enable_default_developer_key!
   enable_developer_key_account_binding!(DeveloperKey.default)
 end
-
