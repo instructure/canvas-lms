@@ -80,7 +80,7 @@ export const DiscussionPermissions = {
     showRubric = true,
     addRubric = true,
     openForComments = true,
-    closeForComment = false,
+    closeForComments = false,
     copyAndSendTo = true,
     moderateForum = true
   } = {}) => ({
@@ -99,7 +99,7 @@ export const DiscussionPermissions = {
     showRubric,
     addRubric,
     openForComments,
-    closeForComment,
+    closeForComments,
     copyAndSendTo,
     moderateForum,
     __typename: 'DiscussionPermissions'

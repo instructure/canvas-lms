@@ -96,7 +96,7 @@ describe('DiscussionFullPage', () => {
       const deleteButton = container.getByText('Delete')
       fireEvent.click(deleteButton)
 
-      expect(await container.findByText('Deleted by Matthew Lemon')).toBeInTheDocument()
+      expect(await container.findByText('Deleted by Hank Mccoy')).toBeInTheDocument()
     })
 
     it('toggles an entries read state when the Mark as Read/Unread is clicked', async () => {
@@ -147,7 +147,7 @@ describe('DiscussionFullPage', () => {
     it('should render', async () => {
       const container = setup()
 
-      await waitFor(() => expect(container.getAllByText('Matthew Lemon')).toBeTruthy())
+      await waitFor(() => expect(container.getAllByText('Hank Mccoy')).toBeTruthy())
       expect(await container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     })
 

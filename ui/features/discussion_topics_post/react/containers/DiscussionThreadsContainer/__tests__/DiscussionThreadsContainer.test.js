@@ -85,13 +85,13 @@ describe('DiscussionThreadContainer', () => {
 
   it('renders discussion entries', async () => {
     const {queryByText, getByTestId, findByText} = setup(defaultProps())
-    expect(await findByText('Who has the best power?')).toBeTruthy()
+    expect(await findByText('This is the parent reply')).toBeTruthy()
     expect(queryByText('This is the child reply')).toBe(null)
 
     const expandButton = getByTestId('expand-button')
     fireEvent.click(expandButton)
 
-    expect(await findByText('This is the child reply')).toBeTruthy()
+    expect(await findByText('This is the child reply', {}, {timeout: 4000})).toBeTruthy()
   })
 
   it('renders the pagination component if there are more than 1 pages', () => {

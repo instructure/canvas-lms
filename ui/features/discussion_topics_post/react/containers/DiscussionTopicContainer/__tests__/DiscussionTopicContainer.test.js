@@ -22,13 +22,16 @@ import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {getEditUrl, getSpeedGraderUrl} from '../../../utils'
 import {graphql} from 'msw'
-import {handlers, defaultTopic} from '../../../../graphql/mswHandlers'
+import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
+import {Discussion} from '../../../../graphql/Discussion'
 
 jest.mock('@canvas/rce/RichContentEditor')
+
+const defaultTopic = Discussion.mock()
 
 const discussionTopicMock = {
   discussionTopic: {

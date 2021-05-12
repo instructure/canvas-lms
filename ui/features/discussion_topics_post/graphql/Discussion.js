@@ -22,6 +22,8 @@ import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
+import {DiscussionEntry} from './DiscussionEntry'
+import {PageInfo} from './PageInfo'
 
 export const Discussion = {
   fragment: gql`
@@ -102,7 +104,7 @@ export const Discussion = {
     id = 'RGlzY3Vzc2lvbi0x',
     _id = '1',
     title = 'X-Men Powers Discussion',
-    message = 'Lets talk about our powers and their applications',
+    message = 'This is a Discussion Topic Message',
     createdAt = '2020-11-23T11:40:44-07:00',
     updatedAt = '2021-04-22T12:41:56-06:00',
     postedAt = '2020-11-23T11:40:44-07:00',
@@ -114,7 +116,7 @@ export const Discussion = {
     delayedPostAt = null,
     subscribed = true,
     published = true,
-    canUnpublish = true,
+    canUnpublish = false,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -126,7 +128,17 @@ export const Discussion = {
     permissions = DiscussionPermissions.mock(),
     courseSections = [Section.mock()],
     rootEntriesTotalPages = 2,
-    entriesTotalPages = 2
+    rootDiscussionEntriesConnection = {
+      nodes: [DiscussionEntry.mock()],
+      pageInfo: PageInfo.mock(),
+      __typename: 'RootDiscussionEntriesConnection'
+    },
+    entriesTotalPages = 2,
+    discussionEntriesConnection = {
+      nodes: [DiscussionEntry.mock()],
+      pageInfo: PageInfo.mock(),
+      __typename: 'DiscussionEntriesConnection'
+    }
   } = {}) => ({
     id,
     _id,
@@ -151,7 +163,9 @@ export const Discussion = {
     permissions,
     courseSections,
     rootEntriesTotalPages,
+    rootDiscussionEntriesConnection,
     entriesTotalPages,
+    discussionEntriesConnection,
     __typename: 'Discussion'
   })
 }

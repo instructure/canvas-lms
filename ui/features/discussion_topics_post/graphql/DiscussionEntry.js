@@ -19,6 +19,7 @@
 import {bool, number, shape, string} from 'prop-types'
 import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
 import gql from 'graphql-tag'
+import {PageInfo} from './PageInfo'
 import {User} from './User'
 
 export const DiscussionEntry = {
@@ -86,24 +87,29 @@ export const DiscussionEntry = {
     createdAt = '2021-02-08T13:35:56-07:00',
     updatedAt = '2021-04-13T10:00:20-06:00',
     deleted = false,
-    message = 'Who has the best power?',
-    ratingCount = 1,
-    ratingSum = 1,
-    rating = true,
+    message = '<p>This is the parent reply</p>',
+    ratingCount = null,
+    ratingSum = null,
+    rating = false,
     read = true,
     subentriesCount = 1,
     author = User.mock(),
     editor = User.mock(),
     rootEntryParticipantCounts = {
-      unreadCount: 0,
+      unreadCount: 1,
       repliesCount: 1,
       __typename: 'DiscussionEntryCounts'
     },
     lastReply = {
-      createdAt: '2021-02-08T13:36:14-07:00',
+      createdAt: '2021-04-05T13:41:42-06:00',
       __typename: 'DiscussionEntry'
     },
-    permissions = DiscussionEntryPermissions.mock()
+    permissions = DiscussionEntryPermissions.mock(),
+    discussionSubentriesConnection = {
+      nodes: [],
+      pageInfo: PageInfo.mock(),
+      __typename: 'DiscussionSubentriesConnection'
+    }
   } = {}) => ({
     id,
     _id,
@@ -121,6 +127,7 @@ export const DiscussionEntry = {
     rootEntryParticipantCounts,
     lastReply,
     permissions,
+    discussionSubentriesConnection,
     __typename: 'DiscussionEntry'
   })
 }
