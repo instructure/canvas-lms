@@ -57,6 +57,7 @@ import {
 } from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import AppsList from '@canvas/k5/react/AppsList'
+import EmptyCourse from './EmptyCourse'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import ManageCourseTray from './ManageCourseTray'
@@ -254,6 +255,38 @@ export function K5Course({
   const handleOpenTray = () => setTrayOpen(true)
   const handleCloseTray = () => setTrayOpen(false)
 
+  const courseHeader = (
+    <>
+      {(canManage || showStudentView) && (
+        <CourseHeaderOptions
+          canManage={canManage}
+          handleOpenTray={handleOpenTray}
+          showStudentView={showStudentView}
+          studentViewPath={studentViewPath}
+        />
+      )}
+      <CourseHeaderHero
+        name={name}
+        image={imageUrl}
+        backgroundColor={color || DEFAULT_COURSE_COLOR}
+      />
+    </>
+  )
+
+  // Only render the K5Tabs component if we actually have any visible tabs
+  const courseTabs = renderTabs?.length ? (
+    <K5Tabs
+      currentTab={currentTab}
+      onTabChange={handleTabChange}
+      tabs={renderTabs}
+      tabsRef={setTabsRef}
+    >
+      {courseHeader}
+    </K5Tabs>
+  ) : (
+    courseHeader
+  )
+
   return (
     <K5DashboardContext.Provider
       value={{
@@ -268,26 +301,8 @@ export function K5Course({
         {canManage && (
           <ManageCourseTray navLinks={courseNavLinks} open={trayOpen} onClose={handleCloseTray} />
         )}
-        <K5Tabs
-          currentTab={currentTab}
-          onTabChange={handleTabChange}
-          tabs={renderTabs}
-          tabsRef={setTabsRef}
-        >
-          {(canManage || showStudentView) && (
-            <CourseHeaderOptions
-              canManage={canManage}
-              handleOpenTray={handleOpenTray}
-              showStudentView={showStudentView}
-              studentViewPath={studentViewPath}
-            />
-          )}
-          <CourseHeaderHero
-            name={name}
-            image={imageUrl}
-            backgroundColor={color || DEFAULT_COURSE_COLOR}
-          />
-        </K5Tabs>
+        {courseTabs}
+        {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}

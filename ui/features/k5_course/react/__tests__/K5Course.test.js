@@ -164,10 +164,19 @@ describe('K-5 Subject Course', () => {
       ])
     })
 
-    it('does not render any tabs if none are provided', () => {
-      const {getByText, queryByRole} = render(<K5Course {...defaultProps} tabs={[]} />)
+    it('renders an empty state instead of any tabs if none are provided', () => {
+      const {getByTestId, getByText, queryByRole} = render(<K5Course {...defaultProps} tabs={[]} />)
       expect(getByText(defaultProps.name)).toBeInTheDocument()
       expect(queryByRole('tab')).not.toBeInTheDocument()
+      expect(getByTestId('space-panda')).toBeInTheDocument()
+      expect(getByText('Welcome to the cold, dark void of Arts and Crafts.')).toBeInTheDocument()
+    })
+
+    it('renders a link to update tab settings if no tabs are provided and the user has manage permissions', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} canManage tabs={[]} />)
+      const link = getByRole('link', {name: 'Reestablish your world'})
+      expect(link).toBeInTheDocument()
+      expect(link.href).toBe('http://localhost/courses/30/settings#tab-navigation')
     })
   })
 
