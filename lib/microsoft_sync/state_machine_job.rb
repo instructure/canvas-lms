@@ -234,7 +234,7 @@ module MicrosoftSync
           end
         end
 
-        log { "step #{current_step} finished with #{result.class.name}" }
+        log { "step #{current_step} finished with #{result.class.name.split('::').last}" }
         case result
         when Complete
           job_state_record&.update_unless_deleted(

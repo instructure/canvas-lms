@@ -406,6 +406,10 @@ describe MicrosoftSync::GraphService do
         {id: id, status: 400, body: "bad"}
       end
 
+      def throttled(id)
+        {id: id, status: 429, body: "bad2"}
+      end
+
       def dupe(id)
         err_msg = "One or more added object references already exist for the following modified properties: 'members'."
         {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: err_msg}}}
@@ -413,7 +417,7 @@ describe MicrosoftSync::GraphService do
 
       before do
         stub_request(batch_method, batch_url).with(body: batch_body)
-          .to_return(json_response(200, responses: batch_responses.shuffle))
+          .to_return(json_response(200, responses: batch_responses))
       end
 
       context 'when all are successfully added' do
@@ -456,13 +460,35 @@ describe MicrosoftSync::GraphService do
 
       context 'when some users failed for some other reason' do
         let(:batch_responses) do
-          [dupe('members_m1'), err('members_m2'), err('owners_o1'), dupe('owners_o2')]
+          [dupe('members_m1'), err('members_m2'), throttled('owners_o1'), succ('owners_o2')]
         end
 
         it 'raises a BatchRequestFailed error' do
           expect { subject }.to raise_error(
             described_class::BatchRequestFailed,
-            'Batch of 2: codes [400, 400], bodies ["bad", "bad"]'
+            'Batch of 2: codes [400, 429], bodies ["bad", "bad2"]'
+          )
+        end
+
+        it 'increments statsd counters based on the responses' do
+          allow(InstStatsd::Statsd).to receive(:increment)
+          expect { subject }.to raise_error(described_class::BatchRequestFailed)
+
+          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+            'microsoft_sync.graph_service.batch.error', 1,
+            tags: {msft_endpoint: 'group_add_users', status: 400}
+          )
+          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+            'microsoft_sync.graph_service.batch.throttled', 1,
+            tags: {msft_endpoint: 'group_add_users', status: 429}
+          )
+          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+            'microsoft_sync.graph_service.batch.ignored', 1,
+            tags: {msft_endpoint: 'group_add_users', status: 400}
+          )
+          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+            'microsoft_sync.graph_service.batch.success', 1,
+            tags: {msft_endpoint: 'group_add_users', status: 204}
           )
         end
       end
@@ -524,7 +550,7 @@ describe MicrosoftSync::GraphService do
         }
       }
     end
-    let(:response_body) { {responses: subresponses.shuffle} }
+    let(:response_body) { {responses: subresponses} }
     let(:subresponses) { [] }
 
     def succ(id)
@@ -596,13 +622,31 @@ describe MicrosoftSync::GraphService do
 
     context 'when some users failed for some other reason' do
       let(:subresponses) do
-        [missing('members_m1'), err('members_m2'), err('owners_o1'), missing('owners_o2')]
+        [missing('members_m1'), err('members_m2'), err('owners_o1'), succ('owners_o2')]
       end
 
       it 'raises a BatchRequestFailed error' do
         expect { subject }.to raise_error(
           described_class::BatchRequestFailed,
           'Batch of 2: codes [400, 400], bodies ["bad", "bad"]'
+        )
+      end
+
+      it 'increments statsd counters based on the responses' do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        expect { subject }.to raise_error(described_class::BatchRequestFailed)
+
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+          'microsoft_sync.graph_service.batch.error', 2,
+          tags: {msft_endpoint: 'group_remove_users', status: 400}
+        )
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+          'microsoft_sync.graph_service.batch.ignored', 1,
+          tags: {msft_endpoint: 'group_remove_users', status: 404}
+        )
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+          'microsoft_sync.graph_service.batch.success', 1,
+          tags: {msft_endpoint: 'group_remove_users', status: 204}
         )
       end
     end

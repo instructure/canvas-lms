@@ -202,20 +202,20 @@ module MicrosoftSync
 
       batch_size = GraphService::GROUP_USERS_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
-        log_batch_skipped(
-          :add,
-          graph_service.add_users_to_group_ignore_duplicates(group.ms_group_id, members_and_owners)
+        skipped = graph_service.add_users_to_group_ignore_duplicates(
+          group.ms_group_id, **members_and_owners
         )
+        log_batch_skipped(:add, skipped)
       end
 
       # Microsoft will not let you remove the last owner in a group, so it's
       # slightly safer to remove users last in case we need to completely
       # change owners.
       diff.removals_in_slices_of(batch_size) do |members_and_owners|
-        log_batch_skipped(
-          :remove,
-          graph_service.remove_group_users_ignore_missing(group.ms_group_id, members_and_owners)
+        skipped = graph_service.remove_group_users_ignore_missing(
+          group.ms_group_id, **members_and_owners
         )
+        log_batch_skipped(:remove, skipped)
       end
 
       StateMachineJob::NextStep.new(:step_check_team_exists)

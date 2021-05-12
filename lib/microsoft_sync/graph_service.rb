@@ -24,8 +24,8 @@
 # a new client with `GraphService.new(tenant_name)`
 #
 # This class is a lower-level interface, akin to what a Microsoft API gem which
-# provide, which has no knowledge of Canvas models, so should be mainly used
-# via CanvasGraphService, which does.
+# provide, which has no knowledge of Canvas models. So many operations will be
+# used via GraphServiceHelpers, which does have knowledge of Canvas models.
 #
 module MicrosoftSync
   class GraphService
@@ -105,7 +105,7 @@ module MicrosoftSync
       reqs =
         group_remove_user_requests(group_id, members, 'members') +
         group_remove_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch(reqs) do |resp|
+      failed_req_ids = run_batch('group_remove_users', reqs) do |resp|
         (
           resp['status'] == 404 && resp['body'].to_s =~
             /does not exist or one of its queried reference-property objects are not present/i
@@ -124,7 +124,7 @@ module MicrosoftSync
       reqs =
         group_add_user_requests(group_id, members, 'members') +
         group_add_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch(reqs) do |r|
+      failed_req_ids = run_batch('group_add_users', reqs) do |r|
         r['status'] == 400 && r['body'].to_s =~ /One or more added object references already exist/i
       end
       split_request_ids_to_hash(failed_req_ids)
@@ -297,17 +297,31 @@ module MicrosoftSync
     # HTTP request. Expected failures can be ignored by passing in a block which checks
     # the response. Other non-2xx responses cause a BatchRequestFailed error.
     # Returns a list of ids of the requests that were ignored.
-    def run_batch(requests, &response_should_be_ignored)
+    def run_batch(endpoint_name, requests, &response_should_be_ignored)
       ignored_request_ids = []
       failed = []
 
+      Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
+
       response = request(:post, '$batch', body: { requests: requests })
+
+      statsd_names_and_codes = []
       response['responses'].each do |subresponse|
+        code = subresponse['status']
         if response_should_be_ignored[subresponse]
           ignored_request_ids << subresponse['id']
-        elsif subresponse['status'] < 200 || subresponse['status'] >= 300
+          statsd_names_and_codes << [:ignored, code]
+        elsif code < 200 || code >= 300
           failed << subresponse
+          statsd_names_and_codes << [code == 429 ? :throttled : :error, code]
+        else
+          statsd_names_and_codes << [:success, code]
         end
+      end
+
+      statsd_names_and_codes.group_by{|c| c}.transform_values(&:count).each do |(name, code), count|
+        tags = {msft_endpoint: endpoint_name, status: code}
+        InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{name}", count, tags: tags)
       end
 
       if failed.any?
