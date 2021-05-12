@@ -150,6 +150,25 @@ describe('DiscussionThreadContainer', () => {
     expect(queryByTestId('collapse-replies')).toBeNull()
   })
 
+  describe('delete permission', () => {
+    it('removed when false', async () => {
+      const new_prop = defaultProps()
+      new_prop.discussionEntry.permissions.delete = false
+      const {getByTestId, queryAllByText} = setup(new_prop)
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryAllByText('Delete').length).toBe(0)
+    })
+
+    it('present when true', async () => {
+      const {getByTestId, queryAllByText} = setup(defaultProps())
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      const deletes = queryAllByText('Delete')
+      expect(deletes.length).toBe(1)
+    })
+  })
+
   describe('read state', () => {
     it('indicates the update to the user', async () => {
       const {getByTestId} = setup(defaultProps())
