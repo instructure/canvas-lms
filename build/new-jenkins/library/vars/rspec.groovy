@@ -22,7 +22,6 @@ def seleniumConfig() {
     max_fail: configuration.getInteger('selenium-max-fail'),
     reruns_retry: configuration.getInteger('selenium-rerun-retry'),
     force_failure: configuration.isForceFailureSelenium() ? '1' : '',
-    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
@@ -38,8 +37,7 @@ def runSeleniumSuite(total, index) {
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
       '3',
-      config.force_failure,
-      config.patchsetTag
+      config.force_failure
   )
 }
 
@@ -49,7 +47,6 @@ def rspecConfig() {
     max_fail: configuration.getInteger('rspec-max-fail'),
     reruns_retry: configuration.getInteger('rspec-rerun-retry'),
     force_failure: configuration.isForceFailureRSpec() ? '1' : '',
-    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
@@ -65,8 +62,7 @@ def runRSpecSuite(total, index) {
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/(selenium|contracts)',
       '4',
-      config.force_failure,
-      config.patchsetTag
+      config.force_failure
   )
 }
 
@@ -80,8 +76,7 @@ def _runRspecTestSuite(
     testFilePattern,
     excludeRegex,
     rspecProcesses,
-    forceFailure,
-    patchsetTag
+    forceFailure
 ) {
   withEnv([
       "CI_NODE_INDEX=$index",
@@ -95,7 +90,6 @@ def _runRspecTestSuite(
       "FORCE_FAILURE=$forceFailure",
       'POSTGRES_PASSWORD=sekret',
       'SELENIUM_VERSION=3.141.59-20201119',
-      "PATCHSET_TAG=$patchsetTag",
       "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
   ]) {
     try {
