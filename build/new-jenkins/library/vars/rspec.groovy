@@ -158,11 +158,6 @@ def _runRspecTestSuite(
         currentBuild.rawBuild.@result = preStatus
       }
 
-      if (env.COVERAGE == '1') {
-        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
-        archiveArtifacts(artifacts: 'tmp/spec_coverage/**/*')
-      }
-
       if (env.RSPEC_LOG == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
         archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
@@ -171,18 +166,6 @@ def _runRspecTestSuite(
       sh 'rm -rf ./tmp'
     }
   }
-}
-
-def uploadSeleniumCoverage() {
-  _uploadCoverage('canvas-lms-selenium')
-}
-
-def uploadRSpecCoverage() {
-  _uploadCoverage('canvas-lms-rspec')
-}
-
-def _uploadCoverage(coverageName) {
-  reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverageName/coverage")
 }
 
 def uploadParallelLog() {
