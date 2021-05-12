@@ -45,7 +45,7 @@ describe "reply attachment" do
   it "should allow reply after cancel" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     f('.discussion-reply-box').click
-    wait_for_ajaximations
+    wait_for_tiny(f("#root_reply_message_for_#{@topic.id}"))
     f('.cancel_button').click
     force_click('.discussion-reply-box')
     wait_for_ajaximations

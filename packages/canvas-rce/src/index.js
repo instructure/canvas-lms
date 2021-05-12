@@ -20,7 +20,6 @@ import normalizeLocale from './rce/normalizeLocale'
 import {renderIntoDiv as render} from './rce/root'
 import {headerFor, originFromHost} from './sidebar/sources/api'
 import getTranslations from './getTranslations'
-import 'tinymce'
 
 if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
   try {
@@ -30,7 +29,7 @@ if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
     // performance and smaller bundle size since it won't have to include all the chunk info
     // for all the possible locales in the webpack runtime and will be less network roundtrips.
 
-    require(`./rce/languages/${process.env.BUILD_LOCALE}`)
+    require(`./rce/translations/locales/${process.env.BUILD_LOCALE}`)
   } catch (e) {
     // gracefully proceed if we do not have a language file for this locale
     // eslint-disable-next-line no-console
@@ -44,13 +43,16 @@ export function renderIntoDiv(editorEl, props, cb) {
     render(editorEl, props, cb)
   } else {
     // unlike the pretranslated builds, in the default, non-pretranslated build,
-    // this will cause a new network round trip to get all the locale info we
+    // this will cause a new network round trip to get all the locale info the rce
     // and tinymce need.
     getTranslations(language)
       .then(() => render(editorEl, props, cb))
-      .catch(() => {
+      .catch(err => {
         console.error(
-          `Failed to find a language file for "${language}". RCE is falling back to English.`
+          'Failed loading the language file for',
+          language,
+          'RCE is falling back to English.\n Cause:',
+          err
         )
         render(editorEl, props, cb)
       })

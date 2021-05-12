@@ -17,5 +17,3 @@
  */
 
 export * from '@instructure/canvas-rce'
-// eslint-disable-next-line import/first
-import './initA11yChecker'

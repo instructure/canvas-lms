@@ -81,6 +81,7 @@ function renderDemos(state) {
       textareaId="textarea3"
       defaultContent="hello RCE"
       height={350}
+      highContrastCSS={[]}
       trayProps={trayProps}
     />,
     document.getElementById('content')

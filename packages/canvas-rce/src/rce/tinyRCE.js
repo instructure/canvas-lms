@@ -17,7 +17,7 @@
  */
 
 import * as browser from '../common/browser'
-import tinymce from 'tinymce/tinymce'
+import tinymce from 'tinymce'
 
 // load theme
 import 'tinymce/themes/silver/theme'
@@ -51,10 +51,12 @@ import './plugins/instructure_documents/plugin'
 import './plugins/instructure_html_view/plugin'
 import './plugins/instructure_media_embed/plugin'
 
+import 'tinymce-a11y-checker'
+
 // prevent tinymce from loading language scripts with explicit
 // language_url of 'none'
 const originalScriptAdd = tinymce.ScriptLoader.add
-tinymce.ScriptLoader.add = function(url) {
+tinymce.ScriptLoader.add = function (url) {
   if (url !== 'none') {
     originalScriptAdd.apply(tinymce.ScriptLoader, arguments)
   }

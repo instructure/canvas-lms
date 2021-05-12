@@ -25,6 +25,21 @@ import bridge from '../../bridge'
 // enough juice for that to happen.
 import FakeEditor from '../plugins/shared/__tests__/FakeEditor'
 
+const fakeTinyMCE = {
+  init: () => {},
+  triggerSave: () => 'called',
+  execCommand: () => 'command executed',
+  // plugins
+  create: () => {},
+  PluginManager: {
+    add: () => {}
+  },
+  plugins: {
+    AccessibilityChecker: {}
+  },
+  editors: [new FakeEditor()]
+}
+
 describe('CanvasRce', () => {
   let target
 
@@ -35,6 +50,7 @@ describe('CanvasRce', () => {
     document.body.appendChild(div)
 
     target = document.getElementById('target')
+    global.tinymce = fakeTinyMCE
   })
   afterEach(() => {
     document.body.removeChild(document.getElementById('fixture'))
@@ -42,7 +58,7 @@ describe('CanvasRce', () => {
   })
 
   it('bridges newly rendered editors', async () => {
-    render(<CanvasRce textareaId="textarea3" tinymce={new FakeEditor()} />, target)
+    render(<CanvasRce textareaId="textarea3" tinymce={fakeTinyMCE.editors[0]} />, target)
     await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
   })
 })
