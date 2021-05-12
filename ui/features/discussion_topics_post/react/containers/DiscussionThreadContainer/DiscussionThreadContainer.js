@@ -41,7 +41,13 @@ import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {isGraded, getSpeedGraderUrl} from '../../utils'
+import {
+  isGraded,
+  getSpeedGraderUrl,
+  addReplyToDiscussionEntry,
+  addReplyToSubentries,
+  addReplyToDiscussion
+} from '../../utils'
 import theme from '@instructure/canvas-theme'
 
 export const mockThreads = {
@@ -83,7 +89,16 @@ export const DiscussionThreadContainer = props => {
   const [editorExpanded, setEditorExpanded] = useState(false)
   const threadRef = useRef()
 
+  const updateCache = (cache, result) => {
+    const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+
+    addReplyToDiscussion(cache, props.discussionTopicGraphQLId, newDiscussionEntry)
+    addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
+    addReplyToSubentries(cache, props.discussionEntry._id, newDiscussionEntry)
+  }
+
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
+    update: updateCache,
     onCompleted: () => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
     },
@@ -352,6 +367,7 @@ export const DiscussionThreadContainer = props => {
       </div>
       {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
         <DiscussionSubentries
+          discussionTopicGraphQLId={props.discussionTopicGraphQLId}
           discussionEntryId={props.discussionEntry._id}
           depth={props.depth + 1}
         />
@@ -380,6 +396,7 @@ export const DiscussionThreadContainer = props => {
 }
 
 DiscussionThreadContainer.propTypes = {
+  discussionTopicGraphQLId: PropTypes.string,
   discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
   assignment: Assignment.shape
@@ -419,11 +436,13 @@ const DiscussionSubentries = props => {
       depth={props.depth}
       assignment={discussionTopic?.assignment}
       discussionEntry={entry}
+      discussionTopicGraphQLId={props.discussionTopicGraphQLId}
     />
   ))
 }
 
 DiscussionSubentries.propTypes = {
+  discussionTopicGraphQLId: PropTypes.string,
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number
 }

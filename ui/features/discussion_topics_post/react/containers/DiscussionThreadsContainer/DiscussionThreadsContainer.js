@@ -18,34 +18,43 @@
 
 import {DISCUSSION_QUERY} from '../../../graphql/Queries'
 import {Discussion} from '../../../graphql/Discussion'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {PageInfo} from '../../../graphql/PageInfo'
 import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
-import {useQuery} from 'react-apollo'
+import {useLazyQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
-  const [currentPage, setCurrentPage] = useState(0)
+  let threads = props.threads
+  let selectedPage = Math.ceil(atob(props.pageInfo.startCursor) / PER_PAGE)
 
-  const variables = {
-    discussionID: props.discussionTopicId,
-    perPage: PER_PAGE,
-    page: btoa(currentPage * PER_PAGE)
-  }
+  const [discussionTopicQuery, {called, loading, data}] = useLazyQuery(DISCUSSION_QUERY)
 
-  const {loading, data} = useQuery(DISCUSSION_QUERY, {
-    variables
-  })
-
-  if (loading) {
+  if (called && loading) {
     return <LoadingIndicator />
   }
 
-  const threads = data.legacyNode.rootDiscussionEntriesConnection.nodes
-  const totalPages = data.legacyNode.rootEntriesTotalPages
+  if (called && data) {
+    selectedPage = Math.ceil(
+      atob(data.legacyNode.rootDiscussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
+    )
+    threads = data.legacyNode.rootDiscussionEntriesConnection.nodes
+  }
+
+  const setPage = pageNumber => {
+    discussionTopicQuery({
+      variables: {
+        discussionID: props.discussionTopicId,
+        perPage: PER_PAGE,
+        page: btoa(pageNumber * PER_PAGE)
+      }
+    })
+  }
 
   return (
     <View as="div" margin="medium none none none">
@@ -55,14 +64,15 @@ export const DiscussionThreadsContainer = props => {
             key={`discussion-thread-${thread.id}`}
             assignment={props.discussionTopic?.assignment}
             discussionEntry={thread}
+            discussionTopicGraphQLId={props.discussionTopic.id}
           />
         )
       })}
       {props.totalPages > 1 && (
         <ThreadPagination
-          setPage={setCurrentPage}
-          selectedPage={currentPage + 1}
-          totalPages={totalPages}
+          setPage={setPage}
+          selectedPage={selectedPage}
+          totalPages={props.totalPages}
         />
       )}
     </View>
@@ -72,6 +82,8 @@ export const DiscussionThreadsContainer = props => {
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionTopicId: PropTypes.string.isRequired,
+  threads: PropTypes.arrayOf(DiscussionEntry.shape),
+  pageInfo: PageInfo.shape.isRequired,
   totalPages: PropTypes.number
 }
 
