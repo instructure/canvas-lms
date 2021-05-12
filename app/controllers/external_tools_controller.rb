@@ -153,12 +153,6 @@ class ExternalToolsController < ApplicationController
       raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
     placement = placement_from_params
-
-    unless @tool.visible?(placement, @current_user, @context, session)
-      render_unauthorized_action
-      return
-    end
-
     add_crumb(@context.name, named_context_url(@context, :context_url))
     @lti_launch = lti_launch(
       tool: @tool,
@@ -379,21 +373,11 @@ class ExternalToolsController < ApplicationController
   #      }
   def show
     if api_request?
-      unless ContextExternalTool.visible?('admins', @current_user, @context, session)
-        render_unauthorized_action
-        return
-      end
-
-      tool = ContextExternalTool.find_for(params[:external_tool_id], @context, nil)
+      tool = @context.context_external_tools.active.find(params[:external_tool_id])
       render :json => external_tool_json(tool, @context, @current_user, session)
     else
       placement = placement_from_params
       return unless find_tool(params[:id], placement)
-
-      unless @tool.visible?(placement, @current_user, @context, session)
-        render_unauthorized_action
-        return
-      end
 
       add_crumb(@context.name, named_context_url(@context, :context_url))
 
