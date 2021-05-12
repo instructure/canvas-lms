@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import HomeroomAnnouncement from '../HomeroomAnnouncement'
+import K5Announcement from '../K5Announcement'
 
-describe('HomeroomAnnouncement', () => {
+describe('K5Announcement', () => {
   const getProps = (overrides = {}) => ({
     courseId: 123,
     courseName: "Mrs. Jensen's Homeroom",
@@ -35,30 +35,31 @@ describe('HomeroomAnnouncement', () => {
       filename: '1608134586_366__exam1.pdf'
     },
     published: true,
+    showCourseDetails: true,
     ...overrides
   })
 
   it('shows homeroom course title with underlying link for teachers', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<K5Announcement {...getProps()} />)
     const courseName = getByText("Mrs. Jensen's Homeroom")
     expect(courseName).toBeInTheDocument()
     expect(courseName.href).toBe('http://google.com/courseurl')
   })
 
   it('shows homeroom course title with no link for students', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps({canEdit: false})} />)
+    const {getByText} = render(<K5Announcement {...getProps({canEdit: false})} />)
     const courseName = getByText("Mrs. Jensen's Homeroom")
     expect(courseName).toBeInTheDocument()
     expect(courseName.href).toBeUndefined()
   })
 
   it('shows announcement title', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<K5Announcement {...getProps()} />)
     expect(getByText('20 minutes of weekly reading')).toBeInTheDocument()
   })
 
   it('shows announcement body with rich content', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<K5Announcement {...getProps()} />)
     const announcementBody = getByText('You have this assignment', {exact: false})
     expect(announcementBody).toBeInTheDocument()
     expect(announcementBody.innerHTML).toBe(
@@ -67,17 +68,17 @@ describe('HomeroomAnnouncement', () => {
   })
 
   it('shows an edit button if teacher', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<K5Announcement {...getProps()} />)
     expect(getByText('Edit announcement 20 minutes of weekly reading')).toBeInTheDocument()
   })
 
   it('does not show an edit button if student', () => {
-    const {queryByText} = render(<HomeroomAnnouncement {...getProps({canEdit: false})} />)
+    const {queryByText} = render(<K5Announcement {...getProps({canEdit: false})} />)
     expect(queryByText('Edit announcement 20 minutes of weekly reading')).not.toBeInTheDocument()
   })
 
   it('shows the announcement attachment link if present', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {getByText} = render(<K5Announcement {...getProps()} />)
     const courseName = getByText('exam1.pdf')
     expect(courseName).toBeInTheDocument()
     expect(courseName.href).toBe('http://google.com/download')
@@ -85,12 +86,29 @@ describe('HomeroomAnnouncement', () => {
   })
 
   it('shows indicator if course is unpublished', () => {
-    const {getByText} = render(<HomeroomAnnouncement {...getProps({published: false})} />)
+    const {getByText} = render(<K5Announcement {...getProps({published: false})} />)
     expect(getByText('Your homeroom is currently unpublished.')).toBeInTheDocument()
   })
 
   it('does not show indicator if course is published', () => {
-    const {queryByText} = render(<HomeroomAnnouncement {...getProps()} />)
+    const {queryByText} = render(<K5Announcement {...getProps()} />)
+    expect(queryByText('Your homeroom is currently unpublished.')).not.toBeInTheDocument()
+  })
+
+  it('hides the course name but keeps the edit button if showCourseDetails is false', () => {
+    const {getByRole, queryByText} = render(
+      <K5Announcement {...getProps({showCourseDetails: false})} />
+    )
+    expect(queryByText("Mrs. Jensen's Homeroom")).not.toBeInTheDocument()
+    expect(
+      getByRole('link', {name: 'Edit announcement 20 minutes of weekly reading'})
+    ).toBeInTheDocument()
+  })
+
+  it("doesn't show the unpublished indicator if showCourseDetails is false", () => {
+    const {queryByText} = render(
+      <K5Announcement {...getProps({published: false, showCourseDetails: false})} />
+    )
     expect(queryByText('Your homeroom is currently unpublished.')).not.toBeInTheDocument()
   })
 })

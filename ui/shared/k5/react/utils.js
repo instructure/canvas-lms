@@ -253,6 +253,39 @@ export const fetchImportantInfos = courses =>
     )
   ).then(infos => infos.filter(info => info.content))
 
+/* Turns raw announcement data from API into usable object */
+export const parseAnnouncementDetails = (announcement, course) => {
+  if (!announcement) {
+    return {
+      courseId: course.id,
+      courseName: course.shortName,
+      courseUrl: course.href,
+      canEdit: course.canManage
+    }
+  }
+  let attachment
+  if (announcement.attachments[0]) {
+    attachment = {
+      display_name: announcement.attachments[0].display_name,
+      url: announcement.attachments[0].url,
+      filename: announcement.attachments[0].filename
+    }
+  }
+  return {
+    courseId: course.id,
+    courseName: course.shortName,
+    courseUrl: course.href,
+    canEdit: announcement.permissions.update,
+    published: course.published,
+    announcement: {
+      title: announcement.title,
+      message: announcement.message,
+      url: announcement.html_url,
+      attachment
+    }
+  }
+}
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

@@ -37,6 +37,11 @@ class Announcement < DiscussionTopic
 
   acts_as_list scope: { context: self, type: 'Announcement' }
 
+  scope :ordered_between, lambda { |start_date, end_date|
+    where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', start_date, end_date)
+      .order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
+  }
+
   def validate_draft_state_change
     old_draft_state, new_draft_state = self.changes['workflow_state']
     self.errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'

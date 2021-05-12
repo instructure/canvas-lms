@@ -62,7 +62,23 @@ const defaultProps = {
   studentViewPath: '/courses/30/student_view/1',
   showLearningMasteryGradebook: false,
   tabs: defaultTabs,
-  settingsPath: '/courses/30/settings'
+  settingsPath: '/courses/30/settings',
+  latestAnnouncement: {
+    id: '12',
+    title: 'Important announcement',
+    message: '<p>Read this closely.</p>',
+    html_url: '/courses/30/discussion_topics/12',
+    attachments: [
+      {
+        filename: 'hw.pdf',
+        display_name: 'hw.pdf',
+        url: 'http://address/to/hw.pdf'
+      }
+    ],
+    permissions: {
+      update: true
+    }
+  }
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
@@ -214,6 +230,35 @@ describe('K-5 Subject Course', () => {
       const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
       const studentViewBtn = getByRole('link', {name: 'Student View'})
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
+    })
+  })
+
+  describe('subject announcements', () => {
+    it('shows the latest announcement, attachment and edit button on the subject home', () => {
+      const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
+      expect(getByText('Important announcement')).toBeInTheDocument()
+      expect(getByText('Read this closely.')).toBeInTheDocument()
+      const button = getByRole('link', {name: 'Edit announcement Important announcement'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toContain('/courses/30/discussion_topics/12')
+      const attachment = getByRole('link', {name: 'hw.pdf'})
+      expect(attachment).toBeInTheDocument()
+      expect(attachment.href).toBe('http://address/to/hw.pdf')
+    })
+
+    it('hides the edit button if student', () => {
+      const props = defaultProps
+      props.latestAnnouncement.permissions.update = false
+      const {queryByRole} = render(<K5Course {...props} />)
+      expect(
+        queryByRole('link', {name: 'Edit announcement Important announcement'})
+      ).not.toBeInTheDocument()
+    })
+
+    it('puts the announcement on whichever tab is set as main tab', () => {
+      const tabs = [{id: '10'}, {id: '0'}]
+      const {getByText} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      expect(getByText('Important announcement')).toBeInTheDocument()
     })
   })
 

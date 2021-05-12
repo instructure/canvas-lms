@@ -2076,6 +2076,11 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @k5_mode
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
+        start_date = 14.days.ago.beginning_of_day
+        end_date = start_date + 28.days
+        latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+          .ordered_between(start_date, end_date).limit(1).first
+
         js_env({
                  COURSE: {
                    id: @context.id.to_s,
@@ -2093,7 +2098,8 @@ class CoursesController < ApplicationController
                    outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
                    show_student_view: can_do(@context, @current_user, :use_student_view),
                    student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
-                   settings_path: course_settings_path(@context.id)
+                   settings_path: course_settings_path(@context.id),
+                   latest_announcement: latest_announcement ? discussion_topic_api_json(latest_announcement, @context, @current_user, session) : nil
                  }
                })
 

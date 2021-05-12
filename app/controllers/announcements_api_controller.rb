@@ -97,8 +97,7 @@ class AnnouncementsApiController < ApplicationController
 
     @start_date ||= 14.days.ago.beginning_of_day
     @end_date ||= @start_date + 28.days
-    scope = scope.where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', @start_date, @end_date)
-    scope = scope.order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
+    scope = scope.ordered_between(@start_date, @end_date)
 
     # only filter by section visibility if user has no course manage rights
     skip_section_filtering = courses.all? do |course|

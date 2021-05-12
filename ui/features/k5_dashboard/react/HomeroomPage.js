@@ -32,7 +32,7 @@ import {Img} from '@instructure/ui-img'
 
 import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
-import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
+import {fetchLatestAnnouncement, parseAnnouncementDetails} from '@canvas/k5/react/utils'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
@@ -44,37 +44,9 @@ export const fetchHomeroomAnnouncements = cards =>
     cards
       .filter(c => c.isHomeroom)
       .map(course =>
-        fetchLatestAnnouncement(course.id).then(announcement => {
-          if (!announcement) {
-            return {
-              courseId: course.id,
-              courseName: course.shortName,
-              courseUrl: course.href,
-              canEdit: course.canManage
-            }
-          }
-          let attachment
-          if (announcement.attachments[0]) {
-            attachment = {
-              display_name: announcement.attachments[0].display_name,
-              url: announcement.attachments[0].url,
-              filename: announcement.attachments[0].filename
-            }
-          }
-          return {
-            courseId: course.id,
-            courseName: course.shortName,
-            courseUrl: course.href,
-            canEdit: announcement.permissions.update,
-            published: course.published,
-            announcement: {
-              title: announcement.title,
-              message: announcement.message,
-              url: announcement.html_url,
-              attachment
-            }
-          }
-        })
+        fetchLatestAnnouncement(course.id).then(announcement =>
+          parseAnnouncementDetails(announcement, course)
+        )
       )
   ).then(announcements => announcements.filter(a => a))
 

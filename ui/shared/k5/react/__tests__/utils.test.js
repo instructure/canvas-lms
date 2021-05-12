@@ -31,7 +31,8 @@ import {
   getAssignmentGrades,
   getAccountsFromEnrollments,
   getTotalGradeStringFromEnrollments,
-  fetchImportantInfos
+  fetchImportantInfos,
+  parseAnnouncementDetails
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -576,5 +577,58 @@ describe('fetchImportantInfos', () => {
       }
     ])
     expect(response.length).toBe(0)
+  })
+})
+
+describe('parseAnnouncementDetails', () => {
+  const announcement = {
+    title: 'Hello class',
+    message: '<p>Some details</p>',
+    html_url: 'http://localhost:3000/courses/78/discussion_topics/72',
+    id: '72',
+    permissions: {
+      update: true
+    },
+    attachments: [
+      {
+        id: '409',
+        display_name: 'File.pdf',
+        filename: 'file12.pdf',
+        url: 'http://localhost:3000/files/longpath'
+      }
+    ]
+  }
+
+  const course = {
+    id: '78',
+    shortName: 'Reading',
+    href: 'http://localhost:3000/courses/78',
+    canManage: false,
+    published: true
+  }
+
+  it('filters and renames attributes in received object', () => {
+    const announcementDetails = parseAnnouncementDetails(announcement, course)
+
+    expect(announcementDetails.courseId).toBe('78')
+    expect(announcementDetails.courseName).toBe('Reading')
+    expect(announcementDetails.courseUrl).toBe('http://localhost:3000/courses/78')
+    expect(announcementDetails.canEdit).toBe(true)
+    expect(announcementDetails.published).toBe(true)
+    expect(announcementDetails.announcement.title).toBe('Hello class')
+    expect(announcementDetails.announcement.message).toBe('<p>Some details</p>')
+    expect(announcementDetails.announcement.url).toBe(
+      'http://localhost:3000/courses/78/discussion_topics/72'
+    )
+    expect(announcementDetails.announcement.attachment.display_name).toBe('File.pdf')
+    expect(announcementDetails.announcement.attachment.url).toBe(
+      'http://localhost:3000/files/longpath'
+    )
+    expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
+  })
+
+  it('handles a missing attachment', () => {
+    const announcementDetails = parseAnnouncementDetails({...announcement, attachments: []}, course)
+    expect(announcementDetails.announcement.attachment).toBeUndefined()
   })
 })

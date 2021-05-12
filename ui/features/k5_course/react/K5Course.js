@@ -50,6 +50,7 @@ import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import {
   fetchCourseApps,
+  parseAnnouncementDetails,
   DEFAULT_COURSE_COLOR,
   TAB_IDS
 } from '@canvas/k5/react/utils'
@@ -60,6 +61,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import {GradesPage} from './GradesPage'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
+import K5Announcement from '@canvas/k5/react/K5Announcement'
 
 const HERO_HEIGHT_PX = 400
 
@@ -149,7 +151,13 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
 
 export function CourseHeaderOptions({settingsPath, showStudentView, studentViewPath, canManage}) {
   return (
-    <View id="k5-course-header-options" as="section" borderWidth="0 0 small 0" padding="0 0 medium 0" margin="0 0 medium 0">
+    <View
+      id="k5-course-header-options"
+      as="section"
+      borderWidth="0 0 small 0"
+      padding="0 0 medium 0"
+      margin="0 0 medium 0"
+    >
       <Flex direction="row">
         {canManage && (
           <Flex.Item shouldGrow shouldShrink>
@@ -212,7 +220,8 @@ export function K5Course({
   showLearningMasteryGradebook,
   outcomeProficiency,
   tabs,
-  settingsPath
+  settingsPath,
+  latestAnnouncement
 }) {
   const renderTabs = toRenderTabs(tabs)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
@@ -278,6 +287,13 @@ export function K5Course({
     courseHeader
   )
 
+  const announcementDetails = parseAnnouncementDetails(latestAnnouncement, {
+    id,
+    shortName: name,
+    href: `/courses/${id}`,
+    canManage
+  })
+
   return (
     <K5DashboardContext.Provider
       value={{
@@ -290,6 +306,13 @@ export function K5Course({
       <View as="section">
         {courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
+        {currentTab === renderTabs?.[0]?.id && latestAnnouncement && (
+          <K5Announcement
+            showCourseDetails={false}
+            {...announcementDetails.announcement}
+            {...announcementDetails}
+          />
+        )}
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
@@ -332,7 +355,8 @@ K5Course.propTypes = {
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape,
   tabs: PropTypes.arrayOf(PropTypes.object).isRequired,
-  settingsPath: PropTypes.string.isRequired
+  settingsPath: PropTypes.string.isRequired,
+  latestAnnouncement: PropTypes.object
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

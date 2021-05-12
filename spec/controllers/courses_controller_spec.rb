@@ -1636,6 +1636,46 @@ describe CoursesController do
       get 'show', params: {:id => @course.id}
       expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
     end
+
+    context 'COURSE.latest_announcement' do
+      it 'is set with most recent visible announcement' do
+        Announcement.create!(
+          :title => "Hello students",
+          :message => "Welcome to the grind",
+          :user => @teacher,
+          :context => @course,
+          :workflow_state => "published",
+          :posted_at => 1.hour.ago
+        )
+        Announcement.create!(
+          :title => "Hidden",
+          :message => "You shouldn't see me",
+          :user => @teacher,
+          :context => @course,
+          :workflow_state => "post_delayed"
+        )
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
+        expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
+      end
+
+      it 'is set to nil if there are no recent (within 2 weeks) announcements' do
+        Announcement.create!(
+          :title => "Hello students",
+          :message => "Welcome to the grind",
+          :user => @teacher,
+          :context => @course,
+          :workflow_state => "published",
+          :posted_at => 3.weeks.ago
+        )
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:latest_announcement]).to be_nil
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
