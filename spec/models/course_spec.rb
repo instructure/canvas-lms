@@ -2737,6 +2737,24 @@ describe Course, "tabs_available" do
       expect(available_tabs.select{|t| t[:hidden]}).to be_empty
     end
 
+    it "should include item banks tab for active external tools" do
+      @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool 1",
+        :course_navigation => {
+          :text => "Item Banks",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+
+      tabs = @course.tabs_available(@user,include_external: true).map { |tab| tab[:label] }
+
+      expect(tabs).to be_include("Item Banks")
+    end
+
     describe "with canvas_for_elementary account setting on" do
       context "homeroom course" do
         before :once do
@@ -2908,6 +2926,24 @@ describe Course, "tabs_available" do
 
       expect(tabs).to be_include(t1.asset_string)
       expect(tabs).not_to be_include(t2.asset_string)
+    end
+
+    it "should not include item banks tab for active external tools" do
+      @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool 1",
+        :course_navigation => {
+          :text => "Item Banks",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+
+      tabs = @course.tabs_available(@user,include_external: true).map { |tab| tab[:label] }
+
+      expect(tabs).not_to be_include("Item Banks")
     end
 
     it 'sets the target value on the tab if the external tool has a windowTarget' do

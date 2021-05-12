@@ -3016,6 +3016,8 @@ class Course < ActiveRecord::Base
                       else
                         []
                       end
+      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tabs)
+
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab
@@ -3124,6 +3126,8 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
+
+        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, :manage_assignments)
 
         if self.root_account.feature_enabled?(:granular_permissions_course_files)
           delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
