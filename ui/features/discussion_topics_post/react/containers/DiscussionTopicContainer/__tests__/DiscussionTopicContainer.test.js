@@ -53,7 +53,6 @@ const discussionTopicMock = {
       pointsPossible: 5
     },
     permissions: {
-      readAsAdmin: true,
       update: true,
       delete: true,
       speedGrader: true,
@@ -158,7 +157,7 @@ describe('DiscussionTopicContainer', () => {
     expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
   })
 
-  it('should be able to send to edit page when canReadAsAdmin', async () => {
+  it('should be able to send to edit page when canUpdate', async () => {
     const {getByTestId} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     fireEvent.click(getByTestId('edit'))
