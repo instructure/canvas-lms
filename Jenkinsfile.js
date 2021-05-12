@@ -38,9 +38,7 @@ def makeKarmaStage(group, ciNode, ciTotal) {
       "JSPEC_GROUP=${group}"
     ]) {
       try {
-        credentials.withSentryCredentials {
-          sh 'build/new-jenkins/js/tests-karma.sh'
-        }
+        sh 'build/new-jenkins/js/tests-karma.sh'
       } finally {
         copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
       }
@@ -77,9 +75,6 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC=1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
-    SENTRY_URL="https://sentry.insops.net"
-    SENTRY_ORG="instructure"
-    SENTRY_PROJECT="master-javascript-build"
   }
 
   stages {
@@ -115,9 +110,7 @@ pipeline {
                     tests['Jest'] = {
                       withEnv(['CONTAINER_NAME=tests-jest']) {
                         try {
-                          credentials.withSentryCredentials {
-                            sh 'build/new-jenkins/js/tests-jest.sh'
-                          }
+                          sh 'build/new-jenkins/js/tests-jest.sh'
                         } finally {
                           copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
                         }
@@ -131,9 +124,7 @@ pipeline {
                     tests['Packages'] = {
                       withEnv(['CONTAINER_NAME=tests-packages']) {
                         try {
-                          credentials.withSentryCredentials {
-                            sh 'build/new-jenkins/js/tests-packages.sh'
-                          }
+                          sh 'build/new-jenkins/js/tests-packages.sh'
                         } finally {
                           copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
                         }
