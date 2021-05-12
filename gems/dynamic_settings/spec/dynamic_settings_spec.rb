@@ -30,7 +30,7 @@ describe DynamicSettings do
   after do
     begin
       DynamicSettings.config = @cached_config
-    rescue Imperium::UnableToConnectError, Imperium::TimeoutError
+    rescue Diplomat::KeyNotFound
       # don't fail the test if there is no consul running
       DynamicSettings.logger.debug("failed config reset because no consul")
     end
@@ -39,7 +39,6 @@ describe DynamicSettings do
   end
 
   let(:parent_key){ 'rich-content-service' }
-  let(:imperium_read_options){ [:recurse, :stale] }
   let(:kv_client) { DynamicSettings.kv_client }
   let(:valid_config) do
     {
@@ -52,9 +51,9 @@ describe DynamicSettings do
   end
 
   describe ".config=" do
-    it "configures imperium when config is set" do
+    it "configures diplomat when config is set" do
       DynamicSettings.config = valid_config
-      expect(Imperium.configuration.url.to_s).to eq("https://consul:8500")
+      expect(Diplomat.configuration.url.to_s).to eq("https://consul:8500")
     end
 
     it 'must pass through timeout settings to the underlying library' do
@@ -64,10 +63,10 @@ describe DynamicSettings do
         'receive_timeout' => 3,
       })
 
-      client_config = kv_client.config
-      expect(client_config.connect_timeout).to eq 1
-      expect(client_config.send_timeout).to eq 2
-      expect(client_config.receive_timeout).to eq 3
+      options = Diplomat.configuration.options
+      expect(options[:request][:open_timeout]).to eq 1
+      expect(options[:request][:write_timeout]).to eq 2
+      expect(options[:request][:read_timeout]).to eq 3
     end
 
     it 'must capture the environment name when supplied' do
@@ -76,18 +75,6 @@ describe DynamicSettings do
       })
 
       expect(DynamicSettings.environment).to eq 'foobar'
-    end
-  end
-
-  describe ".on_fork!" do
-    it "clears any held imperium client" do
-      DynamicSettings.config = valid_config
-      cur_client = Imperium::KV.default_client
-      expect(DynamicSettings.kv_client.object_id).to eq(cur_client.object_id)
-      Imperium::KV.reset_default_client
-      DynamicSettings.on_fork!
-      expect(DynamicSettings.kv_client).to_not be_nil
-      expect(DynamicSettings.kv_client.object_id).to_not eq(cur_client.object_id)
     end
   end
 

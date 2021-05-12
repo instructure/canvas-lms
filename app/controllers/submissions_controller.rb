@@ -136,7 +136,8 @@ class SubmissionsController < SubmissionsBaseController
     "online_url" => ["url"].freeze,
     "online_upload" => ["file_ids"].freeze,
     "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
-    "basic_lti_launch" => ["url"].freeze
+    "basic_lti_launch" => ["url"].freeze,
+    "student_annotation" => ["annotatable_attachment_id"].freeze
   }.freeze
 
   # @API Submit an assignment

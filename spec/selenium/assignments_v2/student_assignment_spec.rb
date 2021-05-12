@@ -56,10 +56,6 @@ describe 'as a student' do
         expect(StudentAssignmentPageV2.details_toggle).to be_displayed
       end
 
-      it 'should show assignment group link' do
-        expect(StudentAssignmentPageV2.assignment_group_link).to be_displayed
-      end
-
       it 'should show assignment due date' do
         expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
       end
@@ -90,6 +86,7 @@ describe 'as a student' do
       end
 
       it 'should be able to be submitted', custom_timeout: 30 do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.submit_assignment
@@ -98,6 +95,7 @@ describe 'as a student' do
       end
 
       it 'should be able to be saved as a draft' do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.edit_text_entry_button.click

@@ -29,6 +29,7 @@ import PaginatedGroupList from './PaginatedGroupList'
 import Filter from './Filter'
 import NewGroupDialog from './NewGroupDialog'
 import ManageGroupDialog from './ManageGroupDialog'
+import 'jqueryui/dialog'
 
 const StudentView = createReactClass({
   displayName: 'StudentView',

@@ -38,10 +38,7 @@ class CreateMicrosoftSyncGroups < ActiveRecord::Migration[6.0]
       t.index [:root_account_id, :id], unique: true,
         name: 'index_microsoft_sync_groups_replica_identity'
     end
-    execute(%[
-      ALTER TABLE #{MicrosoftSync::Group.quoted_table_name}
-      REPLICA IDENTITY USING INDEX index_microsoft_sync_groups_replica_identity
-    ])
+    set_replica_identity(:microsoft_sync_groups, :index_microsoft_sync_groups_replica_identity)
   end
 
   def down

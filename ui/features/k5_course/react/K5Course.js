@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React, {useEffect, useRef, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
@@ -46,14 +47,19 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {fetchCourseApps, fetchCourseTabs, TAB_IDS} from '@canvas/k5/react/utils'
-import k5Theme, {theme} from '@canvas/k5/react/k5-theme'
+import {
+  fetchCourseApps,
+  fetchCourseTabs,
+  DEFAULT_COURSE_COLOR,
+  TAB_IDS
+} from '@canvas/k5/react/utils'
+import {theme} from '@canvas/k5/react/k5-theme'
 import AppsList from '@canvas/k5/react/AppsList'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import ManageCourseTray from './ManageCourseTray'
+import {GradesPage} from './GradesPage'
 
-const DEFAULT_COLOR = k5Theme.variables.colors.backgroundMedium
 const HERO_HEIGHT_PX = 400
 
 const COURSE_TABS = [
@@ -134,6 +140,7 @@ export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
+  color,
   courseOverview,
   id,
   imageUrl,
@@ -142,7 +149,10 @@ export function K5Course({
   timeZone,
   canManage = false,
   defaultTab = TAB_IDS.HOME,
-  plannerEnabled = false
+  plannerEnabled = false,
+  hideFinalGrades,
+  currentUser,
+  userIsInstructor
 }) {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [courseNavLinks, setCourseNavLinks] = useState([])
@@ -210,16 +220,33 @@ export function K5Course({
               padding="0 0 medium 0"
               margin="0 0 medium 0"
             >
-              <Button onClick={handleOpenTray} renderIcon={<IconEditSolid />}>
+              <Button
+                data-testid="manage-button"
+                onClick={handleOpenTray}
+                renderIcon={<IconEditSolid />}
+              >
                 {I18n.t('Manage')}
               </Button>
             </View>
           )}
-          <CourseHeaderHero name={name} image={imageUrl} backgroundColor={DEFAULT_COLOR} />
+          <CourseHeaderHero
+            name={name}
+            image={imageUrl}
+            backgroundColor={color || DEFAULT_COURSE_COLOR}
+          />
         </K5Tabs>
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        {currentTab === TAB_IDS.GRADES && (
+          <GradesPage
+            courseId={id}
+            courseName={name}
+            hideFinalGrades={hideFinalGrades}
+            currentUser={currentUser}
+            userIsInstructor={userIsInstructor}
+          />
+        )}
         {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
       </View>
     </K5DashboardContext.Provider>
@@ -235,10 +262,14 @@ K5Course.propTypes = {
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
+  color: PropTypes.string,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  courseOverview: PropTypes.string.isRequired
+  courseOverview: PropTypes.string.isRequired,
+  hideFinalGrades: PropTypes.bool.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

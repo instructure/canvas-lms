@@ -192,7 +192,7 @@ describe "student planner" do
       go_to_list_view
       mark_peer_review_as_complete(@course.name)
 
-      expect(peer_review_item(@course.name)).to contain_jqcss("span:contains('Peer Review #{@assignment.name} is marked as done.')")
+      expect(peer_review_item(@course.name)).to contain_css("[aria-label='Peer Review #{@assignment.name} is marked as done.']")
     end
   end
 

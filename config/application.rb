@@ -293,24 +293,6 @@ module CanvasRails
       PhusionPassenger.on_event(:after_installing_signal_handlers) do
         Canvas::Reloader.trap_signal
       end
-      PhusionPassenger.on_event(:starting_worker_process) do |forked|
-        if forked
-          # We're in smart spawning mode.
-          # Reset imperium because it's possible to accidentally share an open http
-          # socket between processes shortly after fork.
-          Imperium::Agent.reset_default_client
-          Imperium::Catalog.reset_default_client
-          Imperium::Client.reset_default_client
-          Imperium::Events.reset_default_client
-          Imperium::KV.reset_default_client
-          # it's really important to reset the default clients
-          # BEFORE letting dynamic setting pull a new one.
-          # do not change this order.
-          Canvas::DynamicSettings.on_fork!
-        else
-          # We're in direct spawning mode. We don't need to do anything.
-        end
-      end
     else
       config.to_prepare do
         Canvas::Reloader.trap_signal
@@ -372,6 +354,10 @@ module CanvasRails
         require_dependency 'canvas/dynamic_settings'
         Canvas::DynamicSettingsInitializer.bootstrap!
       end
+    end
+
+    initializer "canvas.cache_config", before: "canvas.extend_shard" do
+      CanvasCacheInit.apply!
     end
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do

@@ -715,6 +715,35 @@ describe Quizzes::Quiz do
     expect(possible).to eq 9.9
   end
 
+  describe "learning outcome results" do
+    before :once do
+      build_course_quiz_questions_and_a_bank
+      @quiz.generate_quiz_data(persist: true)
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      answer_a_question(@q1, @sub)
+      answer_a_question(@q2, @sub, correct: false)
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
+      @quiz.reload
+    end
+
+    it "should destroy results if the quiz_type becomes practice_quiz" do
+      @quiz.quiz_type = "practice_quiz"
+      expect {
+        @quiz.save!
+      }.to change { LearningOutcomeResult.active.count }.by(-1)
+    end
+
+    it "should restore results if the quiz_type changes from practice_quiz" do
+      @quiz.quiz_type = "practice_quiz"
+      @quiz.save!
+      @quiz.quiz_type = "assignment"
+      expect {
+        @quiz.save!
+      }.to change { LearningOutcomeResult.active.count }.by(1)
+    end
+  end
+
   describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")

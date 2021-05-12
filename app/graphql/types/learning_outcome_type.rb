@@ -84,6 +84,18 @@ module Types
       ImportedLoader.for(args[:target_context_id], args[:target_context_type]).load(outcome)
     end
 
+    field :friendly_description, Types::OutcomeFriendlyDescriptionType, null: true do
+      argument :context_id, ID, required: true
+      argument :context_type, String, required: true
+    end
+    def friendly_description(context_id:, context_type:)
+      Loaders::OutcomeFriendlyDescriptionLoader.for(
+        context_id, context_type
+      ).load(
+        object.id
+      )
+    end
+
     private
 
     def outcome_context_promise

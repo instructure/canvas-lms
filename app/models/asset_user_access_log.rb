@@ -75,7 +75,8 @@ class AssetUserAccessLog
   MODEL_BY_DAY_OF_WEEK_INDEX = [
     AuaLog0, AuaLog1, AuaLog2, AuaLog3, AuaLog4, AuaLog5, AuaLog6
   ].freeze
-  METADATUM_KEY = "aua_logs_compaction_state".freeze
+  METADATUM_KEY = "aua_logs_compaction_state"
+  PULSAR_NAMESPACE="asset_user_access_log"
 
   def self.put_view(asset_user_access, timestamp: nil)
     # the "timestamp:" argument is useful for testing or backfill/replay
@@ -86,7 +87,40 @@ class AssetUserAccessLog
     # below when inferring which table to talk to.
     ts = timestamp || Time.now.utc
     log_values = { asset_user_access_id: asset_user_access.id, created_at: ts }
-    log_model(ts).new(log_values).save_without_transaction(touch: false)
+    log_entry = log_model(ts).new(log_values)
+    log_entry.save_without_transaction(touch: false)
+
+    # make sure that any message bus config is relative to the shard
+    # the actual AUA record lives on.  The topic name
+    # and channel config need to be read relative
+    # to the same shard throughput.
+    asset_user_access.shard.activate do
+      shard = ::Switchman::Shard.current
+      if write_to_message_bus?(shard)
+        log_values[:created_at] = log_values[:created_at].to_i
+        # TODO: these 2 values are used to keep the metadata
+        # about which records have been processed already in sync
+        # between the postgres and pulsar versions.  Even if we switch
+        # back and forth between consuming from postgres and pulsar,
+        # we won't compact the same record twice.  When we no longer
+        # use the postgres path, we can rely on the internal sequence IDs from
+        # the message bus to track what we have and have not processed
+        # and the daily partitions won't be relevant anymore; at that point
+        # we will no longer need to add these 2 values to the log entry.
+        log_values[:log_entry_id] = log_entry.id
+        log_values[:partition_index] = ts.wday
+        publish_message_to_bus(log_values, shard)
+      end
+    end
+  end
+
+  def self.publish_message_to_bus(log_values, shard)
+    producer = MessageBus.producer_for(PULSAR_NAMESPACE, message_bus_topic_name(shard))
+    producer.send(log_values.to_json)
+  end
+
+  def self.message_bus_topic_name(shard)
+    "view-increments-#{shard.id}"
   end
 
   # mostly useful for verifying writes by using the same
@@ -106,6 +140,22 @@ class AssetUserAccessLog
 
   def self.plugin_setting
     PluginSetting.find_by_name(:asset_user_access_logs)
+  end
+
+  def self.write_to_message_bus?(shard)
+    self.channel_config(shard).fetch("pulsar_writes_enabled", false)
+  end
+
+  # This config map is intended to be used during the transition
+  # between writing these log updates through postgres directly
+  # to writing them through an external message bus to save on
+  # write throughput.
+  #
+  # TODO: Once we are stably writing logs through the message bus
+  # we can drop this config information entirely.
+  def self.channel_config(shard)
+    settings = DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
+    YAML.safe_load(settings['aua.yml'] || '{}')
   end
 
   def self.metadatum_payload

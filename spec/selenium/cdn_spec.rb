@@ -29,8 +29,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
 
-EXAMPLE_CDN_HOST = 'https://somecdn.example.com'
-
 describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   include_context "in-process server selenium tests"
 
@@ -75,7 +73,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
     variant = 'new_styles_normal_contrast'
     fingerprint = BrandableCSS.cache_for(bundle_name, variant)[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
-    url = "#{EXAMPLE_CDN_HOST}/dist/brandable_css/#{variant}/#{bundle_name}-#{fingerprint}.css"
+    url = "#{app_url}/dist/brandable_css/#{variant}/#{bundle_name}-#{fingerprint}.css"
     assert_tag('link', 'href', url)
   end
 
@@ -85,12 +83,12 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
       expect(asset_path).to be_present
     end
     attribute = (tag == 'link') ? 'href' : 'src'
-    url = "#{EXAMPLE_CDN_HOST}#{asset_path}"
+    url = "#{app_url}#{asset_path}"
     assert_tag(tag, attribute, url)
   end
 
   it 'has the right urls for script tag and stylesheets on the login page' do
-    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(EXAMPLE_CDN_HOST)
+    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(app_url)
     get '/login/canvas'
 
     ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }

@@ -25,6 +25,9 @@ import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
 import RubricComponent from '@canvas/rubrics/react/Rubric'
+import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-layout'
 
 const ENROLLMENT_STRINGS = {
   StudentEnrollment: I18n.t('Student'),
@@ -82,28 +85,40 @@ export default function RubricTab(props) {
 
   return (
     <div data-testid="rubric-tab">
-      {!!assessments?.length && (
-        <div style={{marginBottom: '22px', width: '325px'}}>
-          <CanvasSelect
-            label={I18n.t('Select Grader')}
-            value={displayedAssessment._id}
-            onChange={(e, optionValue) => setDisplayedAssessmentId(optionValue)}
-          >
-            {assessments.map(assessment => (
-              <CanvasSelect.Option key={assessment._id} value={assessment._id} id={assessment._id}>
-                {formatAssessor(assessment.assessor)}
-              </CanvasSelect.Option>
-            ))}
-          </CanvasSelect>
-        </div>
-      )}
+      <View as="div" margin="none none medium">
+        <ToggleDetails
+          defaultExpanded={displayedAssessment != null}
+          fluidWidth
+          summary={<Text weight="bold">{I18n.t('View Rubric')}</Text>}
+        >
+          {!!assessments?.length && (
+            <div style={{marginBottom: '22px', width: '325px'}}>
+              <CanvasSelect
+                label={I18n.t('Select Grader')}
+                value={displayedAssessment._id}
+                onChange={(e, optionValue) => setDisplayedAssessmentId(optionValue)}
+              >
+                {assessments.map(assessment => (
+                  <CanvasSelect.Option
+                    key={assessment._id}
+                    value={assessment._id}
+                    id={assessment._id}
+                  >
+                    {formatAssessor(assessment.assessor)}
+                  </CanvasSelect.Option>
+                ))}
+              </CanvasSelect>
+            </div>
+          )}
 
-      <RubricComponent
-        customRatings={props.proficiencyRatings}
-        rubric={rubric}
-        rubricAssessment={fillAssessment(rubric, displayedAssessment || {})}
-        rubricAssociation={props.rubricAssociation}
-      />
+          <RubricComponent
+            customRatings={props.proficiencyRatings}
+            rubric={rubric}
+            rubricAssessment={fillAssessment(rubric, displayedAssessment || {})}
+            rubricAssociation={props.rubricAssociation}
+          />
+        </ToggleDetails>
+      </View>
     </div>
   )
 }

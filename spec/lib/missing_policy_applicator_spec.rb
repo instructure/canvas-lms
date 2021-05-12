@@ -267,6 +267,34 @@ describe MissingPolicyApplicator do
       expect { applicator.apply_missing_deductions }.not_to(change { submission.reload.score })
     end
 
+    it 'does not change the grade on missing submissions for concluded enrollments in other courses' do
+      c1 = course_with_student(active_all: true).course
+      c2 = course_with_student(user: @student, active_all: true).course
+      c1.assignments.create!(
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+      )
+      c2.assignments.create!(
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+      )
+      c2.student_enrollments.find_by(user_id: @student).conclude
+      LatePolicy.create!(
+        course_id: c1.id,
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction: 75
+      )
+      LatePolicy.create!(
+        course_id: c2.id,
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction: 75
+      )
+      s1 = c1.submissions.find_by(user_id: @student)
+      s1.update_columns(score: nil, grade: nil)
+
+      s2 = c2.submissions.find_by(user_id: @student)
+      s2.update_columns(score: nil, grade: nil)
+      expect { applicator.apply_missing_deductions }.not_to change { s2.reload.grade }
+    end
+
     it 'does not change the grade on missing submissions for concluded students' do
       create_recent_assignment
       @course.student_enrollments.find_by(user_id: @student).conclude

@@ -106,6 +106,11 @@ module Types
       course.resolved_outcome_proficiency
     end
 
+    field :comment_bank_items_connection, CommentBankItemType.connection_type, null: true
+    def comment_bank_items_connection
+      course.comment_bank_items_visible_to(current_user)
+    end
+
     # field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
     # def proficiency_ratings_connection
     #   # This does a recursive lookup of parent accounts, not sure how we could

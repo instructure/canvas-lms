@@ -19,10 +19,12 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
+import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
 import MarkAsDoneButton from './MarkAsDoneButton'
+import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
 import React, {Suspense, lazy, useContext} from 'react'
@@ -34,6 +36,8 @@ import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+
+const RubricsQuery = lazy(() => import('./RubricsQuery'))
 
 function EnrollmentConcludedNotice() {
   return (
@@ -75,6 +79,22 @@ function renderSubmissionlessAssignment({assignment}, alertContext) {
   )
 }
 
+function renderAttemptsAndAvailability({assignment}) {
+  return (
+    <View as="div" margin="medium 0">
+      <Text as="div" weight="bold">
+        {I18n.t(
+          {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+          {count: assignment.allowedAttempts || 0}
+        )}
+      </Text>
+      <Text as="div">
+        <AvailabilityDates assignment={assignment} formatStyle="long" />
+      </Text>
+    </View>
+  )
+}
+
 function renderContentBaseOnAvailability({assignment, submission}, alertContext) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
@@ -83,10 +103,11 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
   } else if (assignment.nonDigitalSubmission) {
     return renderSubmissionlessAssignment({assignment}, alertContext)
-  } else if (submission === null) {
+  } else if (submission == null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
+        {renderAttemptsAndAvailability({assignment})}
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
@@ -98,7 +119,13 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
   } else {
     return (
       <>
+        {renderAttemptsAndAvailability({assignment})}
         <AssignmentToggleDetails description={assignment.description} />
+        {assignment.rubric && (
+          <Suspense fallback={<LoadingIndicator />}>
+            <RubricsQuery assignment={assignment} submission={submission} />
+          </Suspense>
+        )}
         <ContentTabs assignment={assignment} submission={submission} />
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>

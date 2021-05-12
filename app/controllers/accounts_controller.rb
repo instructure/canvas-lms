@@ -302,6 +302,7 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
+  include MicrosoftSync::Concerns::Settings
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -337,6 +338,25 @@ class AccountsController < ApplicationController
         render :json => @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
       end
     end
+  end
+
+  # @API Get accounts that admins can manage
+  # A paginated list of accounts where the current user has permission to create
+  # or manage courses. List will be empty for students and teachers as only admins
+  # can view which accounts they are in.
+  #
+  # @returns [Account]
+  def manageable_accounts
+    @accounts = @current_user ? @current_user.adminable_accounts : []
+    @all_accounts = Set.new
+    @accounts.each do |a|
+      if a.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+        @all_accounts << a
+        @all_accounts.merge Account.active.sub_accounts_recursive(a.id)
+      end
+    end
+    @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
+    render :json => @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
   end
 
   # @API List accounts for course admins
@@ -376,6 +396,22 @@ class AccountsController < ApplicationController
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
                                                  !@account.grants_right?(@current_user, session, :manage)) }
     end
+  end
+
+  # @API Settings
+  # Returns all of the settings for the specified account as a JSON object. The caller must be an Account
+  # admin with the manage_account_settings permission.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/settings \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {"usage_rights_required": true, "lock_all_announcements": true, "restrict_student_past_view": true}
+  def show_settings
+    return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
+
+    render :json => @account.settings
   end
 
   # @API Permissions
@@ -771,6 +807,13 @@ class AccountsController < ApplicationController
         end
       end
 
+      # All the Microsoft Teams Sync things!
+      sync_enabled = params.dig(:account, :settings)&.delete(:microsoft_sync_enabled)
+      tenant = params.dig(:account, :settings)&.delete(:microsoft_sync_tenant)
+      login_attribute = params.dig(:account, :settings)&.delete(:microsoft_sync_login_attribute)
+      set_microsoft_sync_settings(sync_enabled, tenant, login_attribute)
+
+
       # quotas (:manage_account_quotas)
       quota_settings = account_params.slice(:default_storage_quota_mb, :default_user_storage_quota_mb,
                                                       :default_group_storage_quota_mb)
@@ -850,6 +893,21 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][restrict_student_future_view][value] [Boolean]
   #   Restrict students from viewing courses before start date
+  #
+  # @argument account[settings][microsoft_sync_enabled] [Boolean]
+  #   Determines whether this account has Microsoft Teams Sync enabled or not.
+  #
+  #   Note that if you are altering Microsoft Teams sync settings you must enable
+  #   the Microsoft Group enrollment syncing feature flag. In addition, if you are enabling
+  #   Microsoft Teams sync, you must also specify a tenant and login attribute.
+  #
+  # @argument account[settings][microsoft_sync_tenant]
+  #   The tenant this account should use when using Microsoft Teams Sync.
+  #   This should be an Azure Active Directory domain name.
+  #
+  # @argument account[settings][microsoft_sync_login_attribute]
+  #   The attribute this account should use to lookup users when using Microsoft Teams Sync.
+  #   Must be one of sub, email, oid, or preferred_username.
   #
   # @argument account[settings][restrict_student_future_view][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
@@ -1116,6 +1174,11 @@ class AccountsController < ApplicationController
           :enabled => @account.csp_enabled?,
           :inherited => @account.csp_inherited?,
           :settings_locked => @account.csp_locked?,
+        },
+        MICROSOFT_SYNC: {
+          CLIENT_ID: MicrosoftSync::LoginService.client_id,
+          REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
+          BASE_URL: MicrosoftSync::LoginService::BASE_URL
         }
       })
       js_env(edit_help_links_env, true)
@@ -1542,7 +1605,7 @@ class AccountsController < ApplicationController
       @account.course_template_id = nil
     elsif param.to_s == '0'
       return if @account.course_template_id == 0
-      return :unauthorized unless @account.grants_right?(@current_user, :delete_course_template, :edit_course_template)
+      return :unauthorized unless @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
 
       @account.course_template_id = 0
     else
@@ -1605,10 +1668,11 @@ class AccountsController < ApplicationController
                                    :include_students_in_global_survey, :license_type,
                                    {:lock_all_announcements => [:value, :locked]}.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
-                                   :mobile_qr_login_is_enabled, :open_registration,
-                                   :outgoing_email_default_name, :prevent_course_renaming_by_teachers,
-                                   :prevent_course_availability_editing_by_teachers, :restrict_quiz_questions,
-                                   {:restrict_student_future_listing => [:value, :locked].freeze}.freeze,
+                                   :mobile_qr_login_is_enabled,
+                                   :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
+                                   :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
+                                   :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
+                                   {:restrict_student_future_listing => [:value, :locked]}.freeze,
                                    {:restrict_student_future_view => [:value, :locked]}.freeze,
                                    {:restrict_student_past_view => [:value, :locked]}.freeze,
                                    :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,

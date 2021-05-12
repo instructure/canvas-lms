@@ -294,17 +294,20 @@ module Api
     relation
   end
 
-  def self.max_per_page
-    Setting.get('api_max_per_page', '50').to_i
+  def self.max_per_page(action = nil)
+    result = Setting.get("api_max_per_page_#{action}", nil)&.to_i if action
+    result || Setting.get('api_max_per_page', '50').to_i
   end
 
-  def self.per_page
-    Setting.get('api_per_page', '10').to_i
+  def self.per_page(action = nil)
+    result = Setting.get("api_per_page_#{action}", nil)&.to_i if action
+    result || Setting.get('api_per_page', '10').to_i
   end
 
   def self.per_page_for(controller, options={})
-    per_page_requested = controller.params[:per_page] || options[:default] || per_page
-    max = options[:max] || max_per_page
+    action = "#{controller.params[:controller]}##{controller.params[:action]}"
+    per_page_requested = controller.params[:per_page] || options[:default] || per_page(action)
+    max = options[:max] || max_per_page(action)
     [[per_page_requested.to_i, 1].max, max.to_i].min
   end
 

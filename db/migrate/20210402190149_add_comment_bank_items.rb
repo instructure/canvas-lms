@@ -33,10 +33,7 @@ class AddCommentBankItems < ActiveRecord::Migration[6.0]
         name: 'index_comment_bank_items_replica_identity'
     end
 
-    execute(%[
-      ALTER TABLE #{CommentBankItem.quoted_table_name}
-      REPLICA IDENTITY USING INDEX index_comment_bank_items_replica_identity
-    ])
+    set_replica_identity(:comment_bank_items, :index_comment_bank_items_replica_identity)
 
     add_index :comment_bank_items,
               [:course_id, :user_id],

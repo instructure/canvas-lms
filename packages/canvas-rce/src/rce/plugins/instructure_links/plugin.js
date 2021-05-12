@@ -74,13 +74,10 @@ const COURSE_PLUGIN_KEY = 'course_links'
 const GROUP_PLUGIN_KEY = 'group_links'
 
 function selectedAnchorCount(ed) {
-  return ed.selection
-    .getRng()
-    .cloneContents()
-    .querySelectorAll('a').length
+  return ed.selection.getRng().cloneContents().querySelectorAll('a').length
 }
 function getMenuItems(ed) {
-  const contextType = ed.settings.canvas_rce_containing_context.type
+  const contextType = ed.settings.canvas_rce_containing_context?.type
   const sel_anchors = ed.selection.isCollapsed() ? 0 : selectedAnchorCount(ed)
   let items
   if (getAnchorElement(ed, ed.selection.getNode())) {

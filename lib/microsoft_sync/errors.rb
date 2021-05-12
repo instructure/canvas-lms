@@ -43,6 +43,10 @@ module MicrosoftSync
       end
     end
 
+    # Signals to StateMachineJob that an error is not entirely unexpected. It should
+    # quit the job and report the error to the user, but not report to Canvas::Errors
+    module GracefulCancelErrorMixin; end
+
     class InvalidRemoteState < PublicError; end
     class GroupHasNoOwners < PublicError; end
     class TeamAlreadyExists < PublicError; end
@@ -61,6 +65,7 @@ module MicrosoftSync
           400 => HTTPBadRequest,
           404 => HTTPNotFound,
           409 => HTTPConflict,
+          429 => HTTPTooManyRequests,
           500 => HTTPInternalServerError,
           502 => HTTPBadGateway,
           503 => HTTPServiceUnavailable,
@@ -84,6 +89,7 @@ module MicrosoftSync
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
     class HTTPConflict < HTTPInvalidStatus; end
+    class HTTPTooManyRequests < HTTPInvalidStatus; end
     class HTTPInternalServerError < HTTPInvalidStatus; end
     class HTTPBadGateway < HTTPInvalidStatus; end
     class HTTPServiceUnavailable < HTTPInvalidStatus; end

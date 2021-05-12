@@ -510,7 +510,7 @@ class FilesController < ApplicationController
       return
     end
     params[:include] = Array(params[:include])
-    if authorized_action(@attachment,@current_user,:read)
+    if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
 
       json.merge!(doc_preview_json(@attachment, @current_user))

@@ -894,6 +894,16 @@ describe AccountsController do
         get 'settings', params: {account_id: account.id}
         expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end
+
+      it 'sets microsoft sync values' do
+        allow(MicrosoftSync::LoginService).to receive(:client_id).and_return('1234')
+        get 'settings', params: {account_id: account.id}
+        expect(assigns.dig(:js_env, :MICROSOFT_SYNC)).to include(
+          CLIENT_ID: '1234',
+          REDIRECT_URI: 'https://www.instructure.com/',
+          BASE_URL: 'https://login.microsoftonline.com'
+        )
+      end
     end
 
     it "should load account report details" do
@@ -1643,6 +1653,46 @@ describe AccountsController do
         get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
         expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
       end
+    end
+  end
+
+  describe("manageable_accounts") do
+    before :once do
+      @account1 = Account.create!(:name => "Account 1", :root_account => Account.default)
+      account_with_admin(:account => @account1)
+      @admin1 = @admin
+      @account2 = Account.create!(:name => "Account 2", :root_account => Account.default)
+      account_admin_user(:account => @account2, :user => @admin1)
+      @subaccount1 = @account1.sub_accounts.create!(:name => "Subaccount 1")
+    end
+
+    it "includes all top-level and subaccounts" do
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts[0]["name"]).to eq "Account 1"
+      expect(accounts[1]["name"]).to eq "Subaccount 1"
+      expect(accounts[2]["name"]).to eq "Account 2"
+    end
+
+    it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
+      account3 = Account.create!(:name => "Account 3", :root_account => Account.default)
+      account_admin_user_with_role_changes(:account => account3, :user => @admin1, :role_changes => {:manage_courses => false, :create_courses => false})
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts.length).to be 3
+      accounts.each do |a|
+        expect(a["name"]).not_to eq "Account 3"
+      end
+    end
+
+    it "returns an empty list for students" do
+      student_in_course(:active_all => true, :account => @account1)
+      user_session @student
+      get "manageable_accounts"
+      expect(response).to be_successful
+      expect(json_parse(response.body).length).to be 0
     end
   end
 end

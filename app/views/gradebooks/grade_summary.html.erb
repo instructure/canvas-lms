@@ -522,6 +522,9 @@
                       <td>
                       <% if comment.media_comment_id && comment.media_comment_type %>
                         <div class="comment_media">
+                          <% unless comment.comment.nil? %>
+                            <span style="white-space: pre-wrap;"><%= comment.comment %></span><br/>
+                          <% end %>
                           <%= t(:media_comment, "This is a media comment,") %><br/>
                           <a href="#" class="play_comment_link <%= comment.media_comment_type %>_comment"><%= t('links.click_to_view', "click here to view") %></a>
                           <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>

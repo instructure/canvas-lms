@@ -23,5 +23,9 @@ module.exports = {
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
   modulePathIgnorePatterns: ['<rootDir>/lib', '<rootDir>/canvas'],
-  testEnvironment: 'jest-environment-jsdom-fourteen'
+  testEnvironment: 'jest-environment-jsdom-fourteen',
+  moduleNameMapper: {
+    // jest can't import the icons
+    '@instructure/ui-icons/es/svg': '<rootDir>/src/rce/__tests__/_mockIcons.js'
+  }
 }

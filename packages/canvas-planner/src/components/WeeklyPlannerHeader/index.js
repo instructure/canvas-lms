@@ -18,8 +18,11 @@
 
 import React, {Component, createRef} from 'react'
 import PropTypes from 'prop-types'
+import {momentObj} from 'react-moment-proptypes'
 import {connect} from 'react-redux'
 import keycode from 'keycode'
+import qs from 'qs'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {themeable} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
@@ -27,10 +30,12 @@ import {View} from '@instructure/ui-view'
 import {loadNextWeekItems, loadPastWeekItems, loadThisWeekItems, scrollToToday} from '../../actions'
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
-import {isThisWeek} from '../../utilities/dateUtils'
+import {isInMomentRange} from '../../utilities/dateUtils'
 
 import theme from './theme'
 import styles from './styles.css'
+
+export const WEEKLY_PLANNER_ACTIVE_BTN_ID = 'weekly-header-active-button'
 
 // Breaking our encapsulation by reaching outside our dom sub-tree
 // I suppose we could wire up the event handlers in K5Dashboard.js
@@ -38,8 +43,19 @@ import styles from './styles.css'
 // worth the complexity when another page needs the info.
 function findStickyOffset() {
   const dashboardTabs = document.querySelector('.ic-Dashboard-tabs')
-  const so = dashboardTabs?.getBoundingClientRect().bottom || 122
-  return so
+  return dashboardTabs?.getBoundingClientRect().bottom || 122
+}
+
+export const processFocusTarget = () => {
+  const {protocol, host, pathname, search, hash} = window.location
+  const queryParams = qs.parse(search.substring(1))
+  const focusTarget = queryParams.focusTarget
+  queryParams.focusTarget = undefined
+  let query = qs.stringify(queryParams)
+  query = query ? `?${query}` : ''
+  const newUrl = `${protocol}//${host}${pathname}${query}${hash}`
+  window.history.replaceState({}, null, newUrl)
+  return focusTarget
 }
 
 // Theming a functional component blew up because there was no super.prototpye
@@ -55,11 +71,9 @@ export class WeeklyPlannerHeader extends Component {
       loadingError: PropTypes.string
     }).isRequired,
     visible: PropTypes.bool,
-    isFooter: PropTypes.bool,
-    today: PropTypes.string,
-    focusMissingItems: PropTypes.bool,
-    weekStartDate: PropTypes.string,
-    weekEndDate: PropTypes.string,
+    todayMoment: momentObj,
+    weekStartMoment: momentObj,
+    weekEndMoment: momentObj,
     wayPastItemDate: PropTypes.string,
     wayFutureItemDate: PropTypes.string
   }
@@ -75,9 +89,7 @@ export class WeeklyPlannerHeader extends Component {
     prevEnabled: true,
     nextEnabled: true,
     focusedButtonIndex: 1, // start with the today button
-    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef],
-    focused: false,
-    activeButton: 0 // -1 for prev, 0 for today, 1 for next
+    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef]
   }
 
   handleStickyOffset = () => {
@@ -87,14 +99,14 @@ export class WeeklyPlannerHeader extends Component {
   handlePrev = () => {
     this.prevButtonRef.current.focus()
     this.props.loadPastWeekItems()
-    this.setState({focusedButtonIndex: 0, activeButton: -1})
+    this.setState({focusedButtonIndex: 0})
   }
 
   handleToday = () => {
     this.todayButtonRef.current.focus()
     this.props.loadThisWeekItems()
     this.setState((state, _props) => {
-      return {focusedButtonIndex: state.prevEnabled ? 1 : 0, activeButton: 0}
+      return {focusedButtonIndex: state.prevEnabled ? 1 : 0}
     })
   }
 
@@ -102,7 +114,7 @@ export class WeeklyPlannerHeader extends Component {
     this.nextButtonRef.current.focus()
     this.props.loadNextWeekItems({loadMoreButtonClicked: true})
     this.setState((state, _props) => {
-      return {focusedButtonIndex: state.prevEnabled ? 2 : 1, activeButton: 1}
+      return {focusedButtonIndex: state.prevEnabled ? 2 : 1}
     })
   }
 
@@ -120,22 +132,16 @@ export class WeeklyPlannerHeader extends Component {
     this.setState({focusedButtonIndex: newFocusedIndex})
   }
 
-  handleFocus = () => {
-    this.setState({focused: true})
-  }
-
-  handleBlur = () => {
-    this.setState({focused: false})
-  }
-
   updateButtons() {
     const buttons = []
 
     this.setState((state, props) => {
       const prevEnabled =
-        props.wayPastItemDate < props.weekStartDate || props.weekStartDate > props.today
+        props.wayPastItemDate < props.weekStartMoment.format() ||
+        props.weekStartMoment.isAfter(props.todayMoment)
       const nextEnabled =
-        props.wayFutureItemDate > props.weekEndDate || props.weekEndDate < props.today
+        props.wayFutureItemDate > props.weekEndMoment.format() ||
+        props.weekEndMoment.isBefore(props.todayMoment)
       let focusedButtonIndex = state.focusedButtonIndex
       if (prevEnabled) buttons.push(this.prevButtonRef)
       buttons.push(this.todayButtonRef)
@@ -172,14 +178,20 @@ export class WeeklyPlannerHeader extends Component {
     // 2. the window becomes narrow enough for the tabs to wrap.
     // We need to relocate the WeeklyPlannerHeader so it sticks
     // to the bottom of the tabs panel.
-    if (!this.props.isFooter && this.props.visible !== prevProps.visible) {
+    if (this.props.visible !== prevProps.visible) {
       if (this.props.visible) {
+        const focusTarget = processFocusTarget()
         this.handleStickyOffset()
         document.addEventListener('scroll', this.handleStickyOffset)
         window.addEventListener('resize', this.handleStickyOffset)
-        if (isThisWeek(this.props.weekStartDate)) {
-          const focusMissingItems = this.props.focusMissingItems || false
-          window.setTimeout(() => this.props.scrollToToday({focusMissingItems, isWeekly: true}), 0) // need to wait until the k5Dashboard tab is active
+        if (
+          isInMomentRange(
+            this.props.todayMoment,
+            this.props.weekStartMoment,
+            this.props.weekEndMoment
+          )
+        ) {
+          window.setTimeout(() => this.props.scrollToToday({focusTarget, isWeekly: true}), 0) // need to wait until the k5Dashboard tab is active
         }
       } else {
         document.removeEventListener('scroll', this.handleStickyOffset)
@@ -188,13 +200,13 @@ export class WeeklyPlannerHeader extends Component {
     }
     if (
       this.props.wayPastItemDate !== prevProps.wayPastItemDate ||
-      this.props.weekStartDate !== prevProps.weekStartDate ||
+      !this.props.weekStartMoment.isSame(prevProps.weekStartMoment) ||
       this.props.wayFutureItemDate !== prevProps.wayFutureItemDate ||
-      this.props.weekEndDate !== prevProps.weekEndDate
+      !this.props.weekEndMoment.isSame(prevProps.weekEndMoment)
     ) {
       const buttons = this.updateButtons()
 
-      if (!this.props.isFooter && prevState.buttons.length === 3 && buttons.length === 2) {
+      if (prevState.buttons.length === 3 && buttons.length === 2) {
         // when prev or next buttons go away, move focus to Today
         this.todayButtonRef.current.focus()
       }
@@ -216,29 +228,21 @@ export class WeeklyPlannerHeader extends Component {
     }
   }
 
+  getButtonId(which) {
+    return this.getButtonTabIndex(which) === 0 ? WEEKLY_PLANNER_ACTIVE_BTN_ID : undefined
+  }
+
   render() {
-    let prevButtonId, todayButtonId, nextButtonId
-    if (!this.props.isFooter) {
-      prevButtonId = this.state.activeButton === -1 ? 'weekly-header-active-button' : undefined
-      todayButtonId = this.state.activeButton === 0 ? 'weekly-header-active-button' : undefined
-      nextButtonId = this.state.activeButton === 1 ? 'weekly-header-active-button' : undefined
-    }
     return (
       <div
-        id={this.props.isFooter ? 'weekly_planner_footer' : 'weekly_planner_header'}
-        data-testid={this.props.isFooter ? 'WeeklyPlannerFooter' : 'WeeklyPlannerHeader'}
-        className={`${styles.root} ${
-          this.props.isFooter ? 'WeeklyPlannerFooter' : 'WeeklyPlannerHeader'
-        }`}
-        style={{
-          top: `${this.state.stickyOffset}px`,
-          opacity: `${this.props.isFooter && !this.state.focused ? 0 : 1}`
-        }}
+        id="weekly_planner_header"
+        data-testid="WeeklyPlannerHeader"
+        className={`${styles.root} WeeklyPlannerHeader`}
+        style={{top: `${this.state.stickyOffset}px`}}
         role="toolbar"
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
+        aria-label={formatMessage('Weekly schedule navigation')}
       >
-        {this.props.loading.loadingError && !this.props.isFooter && (
+        {this.props.loading.loadingError && (
           <div className={styles.errorbox}>
             <ErrorAlert error={this.props.loading.loadingError} margin="xx-small">
               {formatMessage('Error loading items')}
@@ -253,7 +257,7 @@ export class WeeklyPlannerHeader extends Component {
           onKeyDown={this.handleKey}
         >
           <IconButton
-            id={prevButtonId}
+            id={this.getButtonId('prev')}
             onClick={this.handlePrev}
             screenReaderLabel={formatMessage('View previous week')}
             interaction={this.state.prevEnabled ? 'enabled' : 'disabled'}
@@ -263,16 +267,18 @@ export class WeeklyPlannerHeader extends Component {
             <IconArrowOpenStartLine />
           </IconButton>
           <Button
-            id={todayButtonId}
+            id={this.getButtonId('today')}
             margin="0 xx-small"
             onClick={this.handleToday}
             ref={this.todayButtonRef}
             tabIndex={this.getButtonTabIndex('today')}
           >
-            {formatMessage('Today')}
+            <AccessibleContent alt={formatMessage('Jump to Today')}>
+              {formatMessage('Today')}
+            </AccessibleContent>
           </Button>
           <IconButton
-            id={nextButtonId}
+            id={this.getButtonId('next')}
             onClick={this.handleNext}
             screenReaderLabel={formatMessage('View next week')}
             interaction={this.state.nextEnabled ? 'enabled' : 'disabled'}
@@ -292,9 +298,9 @@ export const ThemedWeeklyPlannerHeader = themeable(theme, styles)(WeeklyPlannerH
 const mapStateToProps = state => {
   return {
     loading: state.loading,
-    today: state.today.format(),
-    weekStartDate: state.weeklyDashboard.weekStart.format(),
-    weekEndDate: state.weeklyDashboard.weekEnd.format(),
+    todayMoment: state.today,
+    weekStartMoment: state.weeklyDashboard.weekStart,
+    weekEndMoment: state.weeklyDashboard.weekEnd,
     wayPastItemDate: state.weeklyDashboard.wayPastItemDate,
     wayFutureItemDate: state.weeklyDashboard.wayFutureItemDate
   }

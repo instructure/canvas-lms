@@ -16,15 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {createRef} from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
 import RCEWrapper from './RCEWrapper'
 import tinyRCE from './tinyRCE'
 import normalizeProps from './normalizeProps'
 import formatMessage from '../format-message'
-import Bridge from '../bridge'
 
-if (!process.env.BUILD_LOCALE) {
+if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),
@@ -38,16 +37,19 @@ export function renderIntoDiv(target, props, renderCallback) {
 
   formatMessage.setup({locale: props.language})
   // render the editor to the target element
-  const renderedComponent = render(
-    <RCEWrapper {...props} handleUnmount={() => unmountComponentAtNode(target)} />,
-    target
+  const renderedComponent = createRef()
+  render(
+    <RCEWrapper
+      ref={renderedComponent}
+      {...props}
+      handleUnmount={() => unmountComponentAtNode(target)}
+    />,
+    target,
+    () => {
+      // pass it back
+      renderCallback && renderCallback(renderedComponent.current)
+    }
   )
-
-  // connect the editor to the event bridge if no editor is currently active
-  Bridge.renderEditor(renderedComponent)
-
-  // pass it back
-  renderCallback && renderCallback(renderedComponent)
 }
 
 // Adding this event listener fixes LA-212. I have no idea why. In Safari it

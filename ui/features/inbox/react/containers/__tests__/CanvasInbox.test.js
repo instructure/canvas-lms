@@ -17,70 +17,52 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ApolloProvider} from 'react-apollo'
 import CanvasInbox from '../CanvasInbox'
-import {createCache} from '@canvas/apollo'
-import {CONVERSATIONS_QUERY} from '../../../graphql/Queries'
-import {MockedProvider} from '@apollo/react-testing'
+import {handlers} from '../../../graphql/mswHandlers'
+import {mswClient} from '../../../../../shared/msw/mswClient'
+import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render} from '@testing-library/react'
-import {mockQuery} from '../../../mocks'
-import waitForApolloLoading from '../../../util/waitForApolloLoading'
-
-const createGraphqlMocks = () => {
-  const mocks = [
-    {
-      request: {
-        query: CONVERSATIONS_QUERY,
-        variables: {
-          userID: '1',
-          scope: 'inbox'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          }
-        }
-      }
-    }
-  ]
-
-  const mockResults = Promise.all(
-    mocks.map(async m => {
-      const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
-      return {
-        request: {query: m.request.query, variables: m.request.variables},
-        result
-      }
-    })
-  )
-  return mockResults
-}
-
-const setup = async () => {
-  const mocks = await createGraphqlMocks()
-  return render(
-    <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-      <MockedProvider mocks={mocks} cache={createCache()}>
-        <CanvasInbox />
-      </MockedProvider>
-    </AlertManagerContext.Provider>
-  )
-}
 
 describe('CanvasInbox App Container', () => {
+  const server = mswServer(handlers)
+  beforeAll(() => {
+    // eslint-disable-next-line no-undef
+    fetchMock.dontMock()
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+    // eslint-disable-next-line no-undef
+    fetchMock.enableMocks()
+  })
+
   beforeEach(() => {
     window.ENV = {
       current_user_id: 1
     }
   })
 
+  const setup = () => {
+    return render(
+      <ApolloProvider client={mswClient}>
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <CanvasInbox />
+        </AlertManagerContext.Provider>
+      </ApolloProvider>
+    )
+  }
+
   describe('rendering', () => {
-    it('should render <CanvasInbox />', async () => {
-      const component = await setup()
-
-      await waitForApolloLoading()
-
-      expect(await component).toBeTruthy()
+    it('should render <CanvasInbox />', () => {
+      const container = setup()
+      expect(container).toBeTruthy()
     })
   })
 })

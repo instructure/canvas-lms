@@ -94,6 +94,23 @@ module CustomWaitMethods
     wait_for_animations
   end
 
+  def wait_for_initializers
+    driver.execute_async_script <<~JS
+      var callback = arguments[arguments.length - 1];
+
+      if (window.canvasReadyState === 'complete') {
+        callback()
+      }
+      else {
+        window.addEventListener('canvasReadyStateChange', function() {
+          if (window.canvasReadyState === 'complete') {
+            callback()
+          }
+        })
+      }
+    JS
+  end
+
   def wait_for_children(selector)
     has_children = false
     while has_children == false

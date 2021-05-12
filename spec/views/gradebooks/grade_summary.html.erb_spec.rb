@@ -73,6 +73,22 @@ describe "/gradebooks/grade_summary" do
     expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
   end
 
+  it "shows media comments with text included" do
+    stub_kaltura
+    course_with_teacher
+    student_in_course(active_all: true)
+    view_context
+    a = @course.assignments.create!(title: 'some assignment', submission_types: ['online_text_entry'])
+    sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
+    sub.add_comment(author: @teacher, media_comment_id: '0_ijklmnop', media_comment_type: 'video',
+                    comment: "hello")
+    assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+    render("gradebooks/grade_summary")
+    doc = Nokogiri::HTML5.fragment response.body
+    expect(doc.at_css('.comment_media > span:first-child').text).to eql 'hello'
+    expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
+  end
+
   it "should show a disabled message for grade stats for the test student" do
     course_with_teacher(:active_all => true)
     @student = @course.student_view_student

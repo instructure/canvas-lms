@@ -41,7 +41,11 @@ class Enrollment::BatchStateUpdater
   # after_commit :update_cached_due_dates - handled in update_cached_due_dates
   # after_save :update_assignment_overrides_if_needed - handled in update_assignment_overrides
   # after_save :needs_grading_count_updated -handled in needs_grading_count_updated
-  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
+  # after_commit :sync_microsoft_group - handled in sync_microsoft_group
+  #
+  # ignore_due_date_caching_for: optional hash of (course_id => user_ids_array) of users to _not_
+  # re-cache their scores for (presumably the caller already queued one of their own)
+  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false, ignore_due_date_caching_for: {})
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1000
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
@@ -65,9 +69,10 @@ class Enrollment::BatchStateUpdater
     clear_email_caches(@invited_user_ids) unless @invited_user_ids.empty?
     needs_grading_count_updated(@courses)
     recache_all_course_grade_distribution(@courses)
-    update_cached_due_dates(@students, @root_account)
+    update_cached_due_dates(@students, ignore_due_date_caching_for)
     reset_notifications_cache(@user_course_tuples)
     touch_all_graders_if_needed(@students)
+    sync_microsoft_group(@courses, @root_account)
     sis_batch ? @data : batch.count
   end
 
@@ -177,16 +182,24 @@ class Enrollment::BatchStateUpdater
     end
   end
 
-  def self.update_cached_due_dates(students, root_account, updating_user: nil)
+  def self.update_cached_due_dates(students, ignore_due_date_caching_for = {})
     students.group_by(&:course_id).each do |course, studs|
+      user_ids = studs.map(&:user_id)
+      user_ids -= ignore_due_date_caching_for[course] || []
+      next if user_ids.empty?
+
       DueDateCacher.recompute_users_for_course(
         studs.map(&:user_id),
-        course,
-        nil,
-        singleton: ('EnrollmentBatchStateUpdater_' + root_account.global_id.to_s),
-        executing_user: updating_user
+        course
       )
     end
+  end
+
+  def self.sync_microsoft_group(courses, root_account)
+    return unless root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
+    return unless root_account.settings[:microsoft_sync_enabled]
+
+    MicrosoftSync::Group.not_deleted.where(course: courses).each(&:enqueue_future_sync)
   end
 
   # this is to be used for enrollments that just changed workflow_states but are
@@ -209,7 +222,8 @@ class Enrollment::BatchStateUpdater
     update_linked_enrollments(students, restore: true)
     needs_grading_count_updated(courses)
     recache_all_course_grade_distribution(courses)
-    update_cached_due_dates(students, root_account)
+    update_cached_due_dates(students)
     touch_all_graders_if_needed(students)
+    sync_microsoft_group(courses, root_account)
   end
 end

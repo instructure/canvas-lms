@@ -2425,8 +2425,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def comments_for(user)
-    user_can_read_grade?(user) ? submission_comments : visible_submission_comments
+  # Note that this will return an Array (not an ActiveRecord::Relation) if comments are preloaded
+  def comments_excluding_drafts_for(user)
+    comments = user_can_read_grade?(user) ? submission_comments : visible_submission_comments
+    comments.loaded? ? comments.reject(&:draft?) : comments.published
   end
 
   def filter_attributes_for_user(hash, user, session)

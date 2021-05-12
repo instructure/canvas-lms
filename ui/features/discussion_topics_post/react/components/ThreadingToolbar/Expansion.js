@@ -52,5 +52,9 @@ Expansion.propTypes = {
   /**
    * Text to display for the button
    */
-  expandText: PropTypes.string.isRequired
+  expandText: PropTypes.string.isRequired,
+  /**
+   * Key consumed by ThreadingToolbar's InlineList
+   */
+  delimiterKey: PropTypes.string.isRequired
 }

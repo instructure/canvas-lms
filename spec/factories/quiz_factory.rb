@@ -200,7 +200,7 @@ module Factories
           "id"=>2159
         }
       ],
-      "question_text"=>"<p>there's no such thing as a _____ question</p>", 
+      "question_text"=>"<p>there's no such thing as a _____ question</p>",
       "id" => 1
     }.with_indifferent_access
   end
@@ -471,5 +471,40 @@ module Factories
     @quiz.workflow_state = "available" if active
     @quiz.save!
     @quiz
+  end
+
+  def question_data(reset=false, data={})
+    @qdc = reset || !@qdc ? 1 : @qdc + 1
+    {
+      :name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
+      [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
+    }.merge(data)
+  end
+
+  def find_the_answer_from_a_question(question)
+    question.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+  end
+
+  def answer_a_question(question, submission, correct: true)
+    return if question.question_data['answers'] == []
+
+    q_id = question.data[:id]
+    answer = if correct
+              find_the_answer_from_a_question(question)
+             else
+              find_the_answer_from_a_question(question) + 1
+    end
+    submission.submission_data["question_#{q_id}"] = answer
+  end
+
+  def build_course_quiz_questions_and_a_bank(data={}, opts={})
+    scoring_policy = opts[:scoring_policy] || "keep_highest"
+    course_with_student(:active_all => true)
+    @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
+    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
+    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
+    @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+    @bank = @q1.assessment_question.assessment_question_bank
+    @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
   end
 end

@@ -20,7 +20,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-require 'imperium/testing'
 
 describe "API Authentication", type: :request do
 
@@ -615,7 +614,7 @@ describe "API Authentication", type: :request do
     end
 
     it "recovers gracefully if consul is missing encryption data" do
-      allow(Imperium::KV).to receive(:get).and_return(Imperium::Testing.kv_not_found_response(options: %i{recurse}))
+      allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       assert_status(200)
     end
@@ -932,6 +931,19 @@ describe "API Authentication", type: :request do
       @user = @student
       raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
+      assert_status(401)
+      expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
+    end
+
+    it "401s for a deleted user" do
+      account_admin_user(account: Account.site_admin)
+      deleted = user_with_pseudonym(active_all: true)
+      deleted.destroy
+      admin = @user
+      user_with_pseudonym(user: admin)
+
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
+                   :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => deleted.id.to_s)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
     end

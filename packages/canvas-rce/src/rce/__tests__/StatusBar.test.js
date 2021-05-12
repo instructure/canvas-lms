@@ -18,7 +18,8 @@
 
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import {queryHelpers} from '@testing-library/dom'
 import keycode from 'keycode'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
 
@@ -35,6 +36,13 @@ function renderStatusBar(overrideProps) {
       {...overrideProps}
     />
   )
+}
+
+async function findDescribedByText(container) {
+  const editBtn = queryHelpers.queryByAttribute('data-btn-id', container, 'rce-edit-btn')
+  await waitFor(() => expect(editBtn.getAttribute('aria-describedby')).not.toBeNull())
+  const descById = editBtn.getAttribute('aria-describedby')
+  return document.getElementById(descById).textContent
 }
 
 describe('RCE StatusBar', () => {
@@ -79,6 +87,41 @@ describe('RCE StatusBar', () => {
         )
       }
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
+
+    it('defaults to pretty html editor', async () => {
+      const onChangeView = jest.fn()
+      const {container, getByText} = renderStatusBar({
+        use_rce_pretty_html_editor: true,
+        onChangeView
+      })
+
+      expect(await findDescribedByText(container)).toEqual(
+        'The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor.'
+      )
+      expect(getByText('Switch to the html editor')).toBeInTheDocument()
+
+      const editbtn = queryHelpers.queryByAttribute('data-btn-id', container, 'rce-edit-btn')
+      fireEvent.click(editbtn)
+      expect(onChangeView).toHaveBeenCalledWith(PRETTY_HTML_EDITOR_VIEW)
+    })
+
+    it('prefers raw html editor if specified', async () => {
+      const onChangeView = jest.fn()
+      const {container, getByText} = renderStatusBar({
+        use_rce_pretty_html_editor: true,
+        preferredHtmlEditor: RAW_HTML_EDITOR_VIEW,
+        onChangeView
+      })
+
+      expect(await findDescribedByText(container)).toEqual(
+        'Shift-O to open the pretty html editor.'
+      )
+      expect(getByText('Switch to the html editor')).toBeInTheDocument()
+
+      const editbtn = queryHelpers.queryByAttribute('data-btn-id', container, 'rce-edit-btn')
+      fireEvent.click(editbtn)
+      expect(onChangeView).toHaveBeenCalledWith(RAW_HTML_EDITOR_VIEW)
     })
   })
 

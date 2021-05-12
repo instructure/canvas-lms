@@ -487,15 +487,9 @@ class SubmissionsApiController < ApplicationController
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
 
-      submission_preloads = [:originality_reports, {:quiz_submission => :versions}]
+      submission_preloads = [:originality_reports, {:quiz_submission => :versions}, :submission_comments]
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
-
-      ActiveRecord::Associations::Preloader.new.preload(
-        submissions,
-        :submission_comments,
-        SubmissionComment.select(:hidden, :submission_id)
-      )
 
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -560,6 +554,9 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, {:quiz_submission => :versions})
       submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
+      if includes.include?("has_postable_comments") || includes.include?("submission_comments")
+        submissions = submissions.preload(:submission_comments)
+      end
 
       # this will speed up pagination for large collections when order_direction is asc
       if order_by == 'graded_at' && order_direction == 'asc'

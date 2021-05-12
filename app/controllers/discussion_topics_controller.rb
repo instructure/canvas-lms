@@ -647,7 +647,10 @@ class DiscussionTopicsController < ApplicationController
   def show
     # Render updated Post UI if feature flag is enabled
     if @domain_root_account.feature_enabled?(:react_discussions_post)
-      js_env(discussion_topic_id: params[:id])
+      js_env({
+               course_id: params[:course_id],
+               discussion_topic_id: params[:id]
+             })
       js_bundle :discussion_topics_post
       render html: '', layout: true
       return
@@ -847,7 +850,6 @@ class DiscussionTopicsController < ApplicationController
                 content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
               end
             end
-
 
 
             render stream: can_stream_template?

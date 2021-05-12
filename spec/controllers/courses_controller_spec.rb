@@ -730,6 +730,11 @@ describe CoursesController do
       )
     end
 
+    it 'sets MSFT enabled in the JS ENV' do
+      subject
+      expect(controller.js_env[:MSFT_SYNC_ENABLED]).to eq false
+    end
+
     it 'sets the external tools create url' do
       user_session(@teacher)
       get 'settings', params: {:course_id => @course.id}
@@ -1601,6 +1606,15 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:PERMISSIONS]).to eq({manage: true})
+      end
+
+      it "sets COURSE.color appropriately in js_env" do
+        @course.course_color = "#BB8"
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:color]).to eq('#BB8')
       end
 
       it "loads announcements on home page when course is a k5 homeroom course" do

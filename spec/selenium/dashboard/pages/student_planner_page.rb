@@ -220,7 +220,7 @@ module PlannerPageObject
   end
 
   def planner_item_status_checkbox(object_type, object_name)
-    fj("div label:contains('#{object_type} #{object_name} is not marked as done.')")
+    fj("input[aria-label='#{object_type} #{object_name} is not marked as done.'] + label")
   end
 
   def course_page_recent_activity

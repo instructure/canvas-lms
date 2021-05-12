@@ -17,7 +17,6 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-
 import {mockAssignment} from '@canvas/assignments/graphql/studentMocks'
 import AssignmentDetails from '../AssignmentDetails'
 import {render} from '@testing-library/react'
@@ -35,92 +34,28 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('renders title correctly', async () => {
+it('renders the title', async () => {
   const assignment = await mockAssignment({
     Assignment: {name: 'Egypt Economy Research'}
   })
-  const {getAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
+  const {getByText} = render(<AssignmentDetails assignment={assignment} />)
+  expect(getByText('Egypt Economy Research')).toBeInTheDocument()
 })
 
-it('renders title correctly when sticky', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {name: 'Egypt Economy Research'}
-  })
-  const {getAllByText} = render(<AssignmentDetails assignment={assignment} isSticky />)
-  expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
-})
-
-it('does not render AvailabilityDates when sticky', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {
-      unlockAt: '2016-07-11T18:00:00-01:00',
-      lockAt: '2016-11-11T18:00:00-01:00'
-    }
-  })
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky />)
-  expect(queryAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(0)
-})
-
-it('renders AvailabilityDates when not sticky', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {
-      unlockAt: '2016-07-11T18:00:00-01:00',
-      lockAt: '2016-11-11T18:00:00-01:00'
-    }
-  })
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  // Reason why this is showing up twice is once for screenreader content and again for regular content
-  expect(queryAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
-})
-
-it('renders date correctly', async () => {
+it('renders the due date if dueAt is set', async () => {
   const assignment = await mockAssignment({
     Assignment: {dueAt: '2016-07-11T18:00:00-01:00'}
   })
 
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
+  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} />)
   // Reason why this is showing up twice is once for screenreader content and again for regular content
   // Also, notice that it handles timezone differences here, with the `-01:00` offset
   expect(queryAllByText('Due: Mon Jul 11, 2016 7:00pm')).toHaveLength(2)
   expect(queryAllByText('7/11/2016')).toHaveLength(1)
 })
 
-it('does not render a date if there is no dueAt set', async () => {
+it('does not render a due date if there is no dueAt set', async () => {
   const assignment = await mockAssignment()
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
+  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} />)
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
-})
-
-it('renders the number of attempts with one attempt', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {allowedAttempts: 1}
-  })
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  expect(queryAllByText('1 Attempt')).toHaveLength(1)
-})
-
-it('renders the number of attempts with unlimited attempts', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {allowedAttempts: null}
-  })
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  expect(queryAllByText('Unlimited Attempts')).toHaveLength(1)
-})
-
-it('renders the number of attempts with multiple attempt', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {allowedAttempts: 3}
-  })
-  const {queryAllByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  expect(queryAllByText('3 Attempts')).toHaveLength(1)
-})
-
-it('does not render the number of attempts if the assignment does not invovle digital submissions', async () => {
-  const assignment = await mockAssignment({
-    Assignment: {allowedAttempts: 3, nonDigitalSubmission: true}
-  })
-
-  const {queryByText} = render(<AssignmentDetails assignment={assignment} isSticky={false} />)
-  expect(queryByText('3 Attempts')).not.toBeInTheDocument()
 })

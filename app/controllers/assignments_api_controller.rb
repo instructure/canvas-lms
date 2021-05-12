@@ -637,7 +637,7 @@
 #           "$ref": "ScoreStatistic"
 #         },
 #         "can_submit": {
-#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter.",
+#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter. Not available when observed_users are included.",
 #           "example": true,
 #           "type": "boolean"
 #         }
@@ -1159,6 +1159,8 @@ class AssignmentsApiController < ApplicationController
   #   assignment lists.
   #
   # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"|"student_annotation"]
+  #   Only applies if the assignment doesn't have student submissions.
+  #
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.

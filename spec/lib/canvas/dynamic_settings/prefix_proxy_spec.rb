@@ -17,7 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require 'spec_helper'
 require 'dynamic_settings'
-require 'imperium/testing' # Not loaded by default
 
 # This looks like a test for a class that is in another
 # package, and it IS, but the reason it exists is that
@@ -34,14 +33,12 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
     }
   end
 
-  let(:client) { instance_double(Imperium::KV) }
   let(:proxy) do
     DynamicSettings::PrefixProxy.new('test/prefix',
                                      service: 'test_svc',
                                      tree: 'test_tree',
                                      environment: 'test_env',
-                                     default_ttl: 3.minutes,
-                                     kv_client: client)
+                                     default_ttl: 3.minutes)
   end
 
   before(:each) do
@@ -56,20 +53,19 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
   end
 
   it "caches tree values from client" do
-    mock = double(status: 200, values: {
-      'test' => {
-        'prefix' => {
-          'svc_config' => {
-            'app-host' => 'http://test-host',
-            'app-secret' => 'sekret'
-          }
-        }
+    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
+        :value => 'http://test-host'
+      },
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
+        :value => 'sekret'
       }
-    })
-    expect(client).to receive(:get).with('test_tree/test_svc/test_env', :recurse, :stale).and_return(mock).ordered
+    ]).ordered
     # shouldn't need to get a specific key because it's already populated in the cache
-    expect(client).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', :stale)
-    expect(client).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret', :stale)
+    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
+    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret')
     output = proxy['svc_config/app-host']
     expect(output).to eq('http://test-host')
     expect(proxy['svc_config/app-secret']).to eq('sekret')
@@ -77,20 +73,19 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
 
   it "can handle a cache clear" do
     skip('10/5/2020 FOO-1030')
-    mock = double(status: 200, values: {
-      'test' => {
-        'prefix' => {
-          'svc_config' => {
-            'app-host' => 'http://test-host',
-            'app-secret' => 'sekret'
-          }
-        }
+    
+    expect(Diplomat::Kv).to receive(:get_all).with('test_tree/test_svc/test_env', { recurse: true, stale: true }).and_return([
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-host',
+        :value => 'http://test-host'
+      },
+      {
+        :key => 'test_tree/test_svc/test_env/test/prefix/svc_config/app-secret',
+        :value => 'sekret'
       }
-    })
-    sub_mock = double(status: 200, values: 'sekret')
-    expect(client).to receive(:get).with('test_tree/test_svc/test_env', :recurse, :stale).and_return(mock).ordered
-    expect(client).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', :stale)
-    expect(client).to receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret', :stale).and_return(sub_mock).ordered
+    ]).ordered
+    expect(Diplomat::Kv).to_not receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-host', { stale: true })
+    expect(Diplomat::Kv).to receive(:get).with('test_tree/test_svc/test_env/test/prefix/svc_config/app-secret', { stale: true }).and_return('sekret').ordered
     output = proxy['svc_config/app-host']
     expect(output).to eq('http://test-host')
     # CACHE CLEAR, but force race condition

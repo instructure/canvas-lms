@@ -45,12 +45,23 @@ describe MicrosoftSync::GraphService do
 
   # http_method, url, with_params, and reponse_body will be defined with let()s below
 
+  let(:url_path_prefix_for_statsd) { URI.parse(url).path.split('/')[2] }
+
   shared_examples_for 'a graph service endpoint' do |opts={}|
+    let(:statsd_tags) do
+      {
+        msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+        status_code: response[:status].to_s
+      }
+    end
+
     unless opts[:ignore_404]
       context 'with a 404 status code' do
         let(:response) { json_response(404, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPNotFound error' do
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with('microsoft_sync.graph_service.notfound', tags: statsd_tags)
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPNotFound,
             /Graph service returned 404 for tenant mytenant.*uh-oh!/
@@ -64,12 +75,91 @@ describe MicrosoftSync::GraphService do
         let(:response) { json_response(code, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPInvalidStatus with the code and message' do
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with('microsoft_sync.graph_service.error', tags: statsd_tags)
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPInvalidStatus,
             /Graph service returned #{code} for tenant mytenant.*uh-oh!/
           )
         end
       end
+    end
+
+    context 'with a 429 status code' do
+      let(:response) { json_response(429, error: {message: 'uh-oh!'}) }
+
+      it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
+        expect(InstStatsd::Statsd).to receive(:increment)
+          .with('microsoft_sync.graph_service.throttled', tags: statsd_tags)
+        expect { subject }.to raise_error(
+          MicrosoftSync::Errors::HTTPTooManyRequests,
+          /Graph service returned 429 for tenant mytenant.*uh-oh!/
+        )
+      end
+    end
+
+    context 'with a SocketError' do
+      it 'increments an "error" counter and bubbles up the error' do
+        error = SocketError.new
+        expect(HTTParty).to receive(http_method.to_sym).and_raise error
+        expect(InstStatsd::Statsd).to receive(:increment).with(
+          'microsoft_sync.graph_service.error',
+          tags: statsd_tags.merge(status_code: 'unknown')
+        )
+        expect { subject }.to raise_error(error)
+      end
+    end
+
+    context 'with a 401 tenant unauthorized error' do
+      let(:response) do
+        json_response(401, error: {
+          code: "Authorization_IdentityNotFound",
+          message: "The identity of the calling application could not be established."
+        })
+      end
+
+      it 'raises an ApplicationNotAuthorizedForTenant error' do
+        expect(InstStatsd::Statsd).to receive(:increment)
+          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
+        expect { subject }.to raise_error do |e|
+          expect(e).to be_a(described_class::ApplicationNotAuthorizedForTenant)
+          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+        end
+      end
+    end
+
+    context 'with a 403 tenant unauthorized error' do
+      let(:response) do
+        json_response(403, error: {
+          code: "AccessDenied",
+          message: "Required roles claim values are not provided."
+        })
+      end
+
+      it 'raises an ApplicationNotAuthorizedForTenant error' do
+        expect(InstStatsd::Statsd).to receive(:increment)
+          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
+        expect { subject }.to raise_error do |e|
+          expect(e).to be_a(described_class::ApplicationNotAuthorizedForTenant)
+          expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+        end
+      end
+    end
+
+    it 'increments a success statsd metric on success' do
+      expect(InstStatsd::Statsd).to receive(:increment).with(
+        'microsoft_sync.graph_service.success',
+        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+      )
+      subject
+    end
+
+    it 'records time with a statsd time metric' do
+      expect(InstStatsd::Statsd).to receive(:time).with(
+        'microsoft_sync.graph_service.time',
+        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+      ).and_call_original
+      subject
     end
   end
 
@@ -346,21 +436,18 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+    let(:response_body) { {'foo' => 'bar'} }
+
+    it_behaves_like 'a graph service endpoint', ignore_404: true
 
     context 'when the team exists' do
-      let(:response_body) { {'foo' => 'bar'} }
-
       it { is_expected.to eq(true) }
-
-      it_behaves_like 'a graph service endpoint', ignore_404: true
     end
 
     context "when the team doesn't exist" do
       let(:response) { json_response(404, error: {code: 'NotFound', message: 'Does not exist'}) }
 
       it { is_expected.to eq(false) }
-
-      it_behaves_like 'a graph service endpoint', ignore_404: true
     end
   end
 

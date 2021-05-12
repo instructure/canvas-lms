@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/rails-flash-notifications'
-import I18n from 'i18n!OutcomeManagement'
-import $ from 'jquery'
 import {useState, useEffect} from 'react'
 import {useApolloClient} from 'react-apollo'
 import {
@@ -27,6 +24,8 @@ import {
 } from '../../graphql/Management'
 import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
+import I18n from 'i18n!OutcomeManagement'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const useGroupDetail = (id, loadOutcomesIsImported = false) => {
   const {contextType, contextId} = useCanvasContext()
@@ -84,7 +83,10 @@ const useGroupDetail = (id, loadOutcomesIsImported = false) => {
 
   useEffect(() => {
     if (error) {
-      $.flashError(I18n.t('An error occurred while loading selected group.'))
+      showFlashAlert({
+        message: I18n.t('An error occurred while loading selected group.'),
+        type: 'error'
+      })
     }
   }, [error])
 

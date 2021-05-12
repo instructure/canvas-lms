@@ -47,10 +47,6 @@ module DynamicSettings
       end
     end
 
-    describe '#fetch_object(key, ttl: nil)' do
-      it 'must return a thing that squawks like an Imperium::KVGETResponse'
-    end
-
     describe '#for_prefix(key, default_ttl: nil)' do
       it 'must return a new instance populated with the sub hash found at the specified key' do
         new_proxy = proxy.for_prefix('baz')

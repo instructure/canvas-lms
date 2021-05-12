@@ -105,19 +105,19 @@ const gradeCourses = [
 ]
 const opportunities = [
   {
-    id: 1,
+    id: '1',
     course_id: '1',
     name: 'Assignment 1',
-    point_possible: 23,
+    points_possible: 23,
     html_url: '/courses/1/assignments/1',
     due_at: '2021-01-10T05:59:00Z',
     submission_types: ['online_quiz']
   },
   {
-    id: 2,
+    id: '2',
     course_id: '1',
     name: 'Assignment 2',
-    point_possible: 10,
+    points_possible: 10,
     html_url: '/courses/1/assignments/2',
     due_at: '2021-01-15T05:59:00Z',
     submission_types: ['online_url']
@@ -399,6 +399,11 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Assignment 2')).toBeInTheDocument()
     })
 
+    it('shows loading skeletons for course cards while they load', () => {
+      const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+    })
+
     it('only fetches announcements and LTIs based on cards once per page load', done => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
       moxios.withMock(() => {
@@ -461,26 +466,39 @@ describe('K-5 Dashboard', () => {
 
       const header = await findByTestId('WeeklyPlannerHeader')
       expect(header).toBeInTheDocument()
+    })
 
-      const footer = await findByTestId('WeeklyPlannerFooter')
-      expect(footer).toBeInTheDocument()
+    it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
+      const {findByRole} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      )
+
+      const jumpToNavButton = await findByRole('button', {name: 'Jump to navigation toolbar'})
+      expect(jumpToNavButton).not.toBeVisible()
+
+      act(() => jumpToNavButton.focus())
+      expect(jumpToNavButton).toBeVisible()
+
+      act(() => jumpToNavButton.click())
+      expect(document.activeElement.id).toBe('weekly-header-active-button')
+      expect(jumpToNavButton).not.toBeVisible()
     })
 
     it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
-      const {findAllByRole, getAllByRole} = render(
+      const {findByRole, getByRole} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
-      const todayButton = (await findAllByRole('button', {name: 'Today'}))[0]
+      const todayButton = await findByRole('button', {name: 'Jump to Today'})
       expect(todayButton).toBeEnabled()
-      const previousButton = getAllByRole('button', {name: 'View previous week'})[0]
+      const previousButton = getByRole('button', {name: 'View previous week'})
       await waitFor(() => expect(previousButton).toBeEnabled())
-      const nextButton = getAllByRole('button', {name: 'View next week'})[0]
+      const nextButton = getByRole('button', {name: 'View next week'})
       expect(nextButton).toBeEnabled()
     })
 
     it('displays a teacher preview if the user has no student enrollments', async () => {
       const {findByTestId, getByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnable={false} />
+        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={false} />
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()

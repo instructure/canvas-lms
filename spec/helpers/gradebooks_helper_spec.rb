@@ -23,6 +23,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
+  include TextHelper
+
   before do
     FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
       def anonymous_grading?
@@ -252,6 +254,72 @@ describe GradebooksHelper do
       expect(
         helper.history_submission_class(submission)
       ).to eq 'assignment_assignment_id_user_user_id_current_grade'
+    end
+  end
+
+  describe "translated_due_date_for_speedgrader" do
+    before :each do
+      @current_user = user_factory
+      @course = Account.default.courses.create!(name: 'My Course')
+      @course.enroll_teacher(@current_user, enrollment_state: 'active')
+      @student1 = student_in_course(course: @course, active_all: true).user
+      @student2 = student_in_course(course: @course, active_all: true).user
+    end
+
+    it "produces a translated due date if multiple dates" do
+      assignment = @course.assignments.create!(
+        title: 'My Multiple Due Date Assignment',
+        due_at: '2021-04-15T22:00:24Z'
+      )
+      section1 = CourseSection.create!(name: 'Section 1', course: @course)
+      section2 = CourseSection.create!(name: 'Section 2', course: @course)
+      student_in_section(section1, user: @student1)
+      student_in_section(section2, user: @student2)
+      assignment.assignment_overrides.create!(
+        due_at: '2021-04-15T22:00:24Z',
+        due_at_overridden: true,
+        set: section1
+      )
+      assignment.assignment_overrides.create!(
+        due_at: '2021-04-22T22:00:24Z',
+        due_at_overridden: true,
+        set: section2
+      )
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Multiple Due Dates"
+    end
+
+    it "produces a translated due date based on due date" do
+      assignment = @course.assignments.create!(
+        title: 'My Due Date Assignment',
+        due_at: '2021-04-15T22:00:24Z'
+      )
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15 at 10pm"
+    end
+
+    it "produces No due date message if no due date" do
+      assignment = @course.assignments.create!(
+        title: 'My Assignment with no due date',
+        due_at: nil
+      )
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: No Due Date"
+    end
+
+    it "produces a translated due date based on single section overriden due date" do
+      assignment = @course.assignments.create!(
+        title: 'My Single Section Overridden Due Date Assignment',
+        only_visible_to_overrides: true,
+        workflow_state: 'published'
+      )
+      single_section = CourseSection.create!(name: 'Single Section', course: @course)
+      student_in_section(single_section, user: @student1)
+      assignment.assignment_overrides.create!(
+        due_at: '2021-04-15T22:00:24Z',
+        due_at_overridden: true,
+        set: single_section,
+        workflow_state: 'active'
+      )
+      assignment.reload
+      expect(translated_due_date_for_speedgrader(assignment)).to eq "Due: Apr 15 at 10pm"
     end
   end
 end

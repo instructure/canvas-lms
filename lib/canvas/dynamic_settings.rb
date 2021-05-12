@@ -33,7 +33,7 @@ module Canvas
       if settings.present?
         begin
           ::DynamicSettings.config = settings
-        rescue Imperium::UnableToConnectError
+        rescue Diplomat::KeyNotFound
           Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
         end
       end

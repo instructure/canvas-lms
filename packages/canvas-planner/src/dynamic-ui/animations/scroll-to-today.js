@@ -27,15 +27,15 @@ import {handleNothingToday} from '../util'
 export class ScrollToToday extends Animation {
   uiDidUpdate() {
     const action = this.acceptedAction('SCROLL_TO_TODAY')
-    const focusMissingItems = !!action.payload?.focusMissingItems
+    const focusTarget = action.payload?.focusTarget
     const isWeekly = !!action.payload?.isWeekly
     const todayElem = this.document().querySelector('.planner-today h2')
-    if (isWeekly && focusMissingItems) {
+    if (isWeekly && focusTarget === 'missing-items') {
       // Skip the items completely and focus the fallback instead, which will
       // be the missing items element for the weekly planner
-      handleNothingToday(this.manager(), todayElem, false)
+      handleNothingToday(this.manager(), todayElem, focusTarget)
     } else {
-      scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly)
+      scrollAndFocusTodayItem(this.manager(), todayElem, isWeekly, focusTarget)
     }
   }
 }
@@ -48,7 +48,7 @@ export class JumpScrollToToday extends Animation {
   }
 }
 
-export function scrollAndFocusTodayItem(manager, todayElem, isWeekly) {
+export function scrollAndFocusTodayItem(manager, todayElem, isWeekly, focusTarget) {
   if (todayElem) {
     const {component, when} = findTodayOrNearest(
       manager.getRegistry(),
@@ -68,7 +68,7 @@ export function scrollAndFocusTodayItem(manager, todayElem, isWeekly) {
                 alert(formatMessage('Nothing planned today. Selecting most recent item.'))
               }
               // finally, focus the item
-              if (component.getFocusable()) {
+              if (component.getFocusable() && (!isWeekly || focusTarget === 'today')) {
                 manager.getAnimator().focusElement(component.getFocusable())
               }
             })

@@ -20,11 +20,12 @@ import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import range from 'lodash/range'
 import React from 'react'
-import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_HISTORIES_QUERY
+} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import ViewManager from '../ViewManager'
-
-jest.mock('../AttemptSelect')
 
 async function mockStudentViewResult(overrides = {}) {
   const variables = {assignmentLid: '1', submissionID: '1'}
@@ -103,14 +104,14 @@ describe('ViewManager', () => {
     describe('behaves correctly', () => {
       it('by creating a new dummy submission when clicked', async () => {
         const props = await makeProps({currentAttempt: 1})
-        const {getAllByText, getByText} = render(
+        const {getByDisplayValue, getByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
           </MockedProvider>
         )
         const newAttemptButton = getByText('Try Again')
         fireEvent.click(newAttemptButton)
-        expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
+        expect(getByDisplayValue('Attempt 2')).toBeInTheDocument()
       })
 
       it('by not displaying the new attempt button on a dummy submission', async () => {
@@ -210,12 +211,12 @@ describe('ViewManager', () => {
   describe('Submission Drafts', () => {
     it('are initially displayed if they exist', async () => {
       const props = await makeProps({currentAttempt: 1, withDraft: true})
-      const {getAllByText} = render(
+      const {getByDisplayValue} = render(
         <MockedProvider>
           <ViewManager {...props} />
         </MockedProvider>
       )
-      expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
+      expect(getByDisplayValue('Attempt 2')).toBeInTheDocument()
     })
   })
 })

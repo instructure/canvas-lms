@@ -17,7 +17,7 @@
  */
 
 def call() {
-  credentials.withStarlordCredentials {
+  credentials.withStarlordDockerLogin {
     def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
     def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
 

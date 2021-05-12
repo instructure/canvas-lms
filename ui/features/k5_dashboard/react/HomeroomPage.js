@@ -23,6 +23,12 @@ import I18n from 'i18n!k5_dashboard'
 import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconAddSolid} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Text} from '@instructure/ui-text'
+import {Img} from '@instructure/ui-img'
 
 import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
@@ -30,6 +36,8 @@ import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import {CreateCourseModal} from './CreateCourseModal'
+import EmptyDashPandaUrl from '../images/empty-dashboard.svg'
 
 export const fetchHomeroomAnnouncements = cards =>
   Promise.all(
@@ -69,27 +77,28 @@ export const fetchHomeroomAnnouncements = cards =>
       )
   ).then(announcements => announcements.filter(a => a))
 
-export const HomeroomPage = ({cards, cardsSettled, visible}) => {
+export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
   const [announcementsLoading, setAnnouncementsLoading] = useState(true)
+  const [courseModalOpen, setCourseModalOpen] = useState(false)
 
   useImmediate(
     () => {
       if (cards) {
         setDashboardCards(
-          createDashboardCards(cards?.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
+          createDashboardCards(cards.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
             headingLevel: 'h3'
           })
         )
-      }
 
-      if (cardsSettled) {
-        setAnnouncementsLoading(true)
-        fetchHomeroomAnnouncements(cards)
-          .then(setHomeroomAnnouncements)
-          .catch(showFlashError(I18n.t('Failed to load announcements.')))
-          .finally(() => setAnnouncementsLoading(false))
+        if (cardsSettled) {
+          setAnnouncementsLoading(true)
+          fetchHomeroomAnnouncements(cards)
+            .then(setHomeroomAnnouncements)
+            .catch(showFlashError(I18n.t('Failed to load announcements.')))
+            .finally(() => setAnnouncementsLoading(false))
+        }
       }
     },
     [cards, cardsSettled],
@@ -127,19 +136,41 @@ export const HomeroomPage = ({cards, cardsSettled, visible}) => {
           loading={announcementsLoading}
         />
       </View>
-      {(!cards || cards.length > 0) && (
-        <View as="section">
-          <Heading level="h2" margin="medium 0 0 0">
-            {I18n.t('My Subjects')}
-          </Heading>
-          {!cards ? (
-            <div className="ic-DashboardCard__box">
-              <div className="ic-DashboardCard__box__container">{skeletonCards}</div>
-            </div>
-          ) : (
-            dashboardCards
+      <View as="section">
+        <Flex alignItems="center" justifyItems="space-between" margin="small 0 0 0">
+          <Flex.Item>
+            <Heading level="h2">{I18n.t('My Subjects')}</Heading>
+          </Flex.Item>
+          {canCreateCourses && (
+            <Flex.Item>
+              <Tooltip renderTip={I18n.t('Start a new course')}>
+                <IconButton
+                  screenReaderLabel={I18n.t('Open new course modal')}
+                  withBackground={false}
+                  withBorder={false}
+                  onClick={() => setCourseModalOpen(true)}
+                >
+                  <IconAddSolid />
+                </IconButton>
+              </Tooltip>
+            </Flex.Item>
           )}
-        </View>
+        </Flex>
+        {!cards ? (
+          <div className="ic-DashboardCard__box">
+            <div className="ic-DashboardCard__box__container">{skeletonCards}</div>
+          </div>
+        ) : cards.length > 0 ? (
+          dashboardCards
+        ) : (
+          <Flex direction="column" alignItems="center" margin="x-large large">
+            <Img src={EmptyDashPandaUrl} margin="0 0 medium 0" data-testid="empty-dash-panda" />
+            <Text>{I18n.t("You don't have any active courses yet.")}</Text>
+          </Flex>
+        )}
+      </View>
+      {courseModalOpen && (
+        <CreateCourseModal isModalOpen={courseModalOpen} setModalOpen={setCourseModalOpen} />
       )}
     </section>
   )
@@ -148,7 +179,8 @@ export const HomeroomPage = ({cards, cardsSettled, visible}) => {
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
   cardsSettled: PropTypes.bool.isRequired,
-  visible: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired,
+  canCreateCourses: PropTypes.bool.isRequired
 }
 
 export default HomeroomPage

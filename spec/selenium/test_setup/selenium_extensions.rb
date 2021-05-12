@@ -19,10 +19,36 @@
 
 require_relative "../../support/call_stack_utils"
 require_relative 'selenium_driver_setup'
+require_relative "common_helper_methods/custom_wait_methods"
 
 module SeleniumExtensions
   class Error < ::RuntimeError; end
   class NestedWaitError < Error; end
+
+  module UnexpectedPageReloadProtection
+    include CustomWaitMethods
+
+    def click(*args)
+      reload_expected = driver.execute_script("return !!(window.INST && INST.still_on_old_page)")
+      super
+
+      begin
+        if !reload_expected && driver.execute_script("return window.canvasReadyState && window.canvasReadyState !== 'complete'")
+          msg = "[UnexpectedPageReloadProtection] The page was not fully loaded after executing this action. Usually it means the caller should be wrapped in a wait_for_new_page_load / expect_new_page_load block."
+          $stderr.puts msg
+          Rails.logger.warn msg
+          Rails.logger.info caller
+
+          wait_for_initializers
+          wait_for_ajaximations
+        end
+      rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError
+        # If there is an alert open, the calling code needs to accept it, so we won't be reloading
+        # as part of this event.
+        return
+      end
+    end
+  end
 
   module ElementNotInteractableProtection
     include SeleniumDriverSetup
@@ -197,5 +223,6 @@ end
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::ElementNotInteractableProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::StaleElementProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::FinderWaiting)
+Selenium::WebDriver::Element.prepend(SeleniumExtensions::UnexpectedPageReloadProtection)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::PreventEarlyInteraction)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::FinderWaiting)

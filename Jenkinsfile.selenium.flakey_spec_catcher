@@ -52,7 +52,7 @@ def setupNode() {
     }
   }
 
-  credentials.withStarlordCredentials { ->
+  credentials.withStarlordDockerLogin { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
   sh 'build/new-jenkins/docker-compose-build-up.sh'
@@ -172,12 +172,8 @@ def sendSlack(success) {
 }
 
 def cleanupFn(status) {
-  try {
-    if(fsc_status != 'aborted') {
-      sendSlack(status == 'SUCCESS')
-    }
-  } finally {
-    sh 'rm -vrf ./tmp/'
+  if(fsc_status != 'aborted') {
+    sendSlack(status == 'SUCCESS')
   }
 }
 
@@ -219,7 +215,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements('canvas-docker').obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             def postBuildHandler = [
               onStageEnded: { _, stageConfig ->
                 cleanupFn(stageConfig.status())
@@ -267,13 +263,8 @@ pipeline {
                         "FSC_TESTS=${partitions[index].join(',')}",
                         "NODE_NUMBER=$node_number"
                       ]) {
-                        try {
-                          setupNode()
-                          executeFlakeySpecCatcher("node$node_number")
-                        }
-                        finally {
-                          sh 'rm -vrf ./tmp'
-                        }
+                        setupNode()
+                        executeFlakeySpecCatcher("node$node_number")
                       }
                     }
                   }

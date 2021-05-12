@@ -224,7 +224,8 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing, :expand_cc_languages
+    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing, 
+    :expand_cc_languages, :strip_origin_from_quiz_answer_file_references
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
@@ -2107,12 +2108,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def require_account_management(on_root_account = false)
+  def require_account_management(on_root_account = false, permissions: [:manage_account_settings])
     if (!@context.root_account? && on_root_account) || !@context.is_a?(Account)
       redirect_to named_context_url(@context, :context_url)
       return false
     else
-      return false unless authorized_action(@context, @current_user, :manage_account_settings)
+      return false unless authorized_action(@context, @current_user, permissions)
     end
     true
   end

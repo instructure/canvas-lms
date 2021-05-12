@@ -257,7 +257,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
-  validate :validate_template, if: :template_changed?
+  validate :validate_template
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -486,6 +486,9 @@ class Course < ActiveRecord::Base
   end
 
   def validate_template
+    return unless self.class.columns_hash.key?('template')
+    return unless template_changed?
+
     if template? && !can_become_template?
       errors.add(:template, t("Courses with enrollments can't become templates"))
     elsif !template? && !can_stop_being_template?
@@ -750,15 +753,15 @@ class Course < ActiveRecord::Base
     enrollment_completed_sql = ""
 
     if args[1].blank?
-      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS c ON c.id = caa.course_id
-        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = c.enrollment_term_id
-        WHERE (c.workflow_state<>'completed' AND
-          (c.conclude_at IS NULL OR c.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS courses ON courses.id = caa.course_id
+        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
       enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
-        WHERE (courses.workflow_state<>'completed' AND
-          (courses.conclude_at IS NULL OR courses.conclude_at >= ?) AND
-          (et.end_at IS NULL OR et.end_at >= ?))", Time.now.utc, Time.now.utc])
+        WHERE courses.workflow_state<>'completed' AND
+          ((et.end_at IS NULL OR et.end_at >= :end) OR
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
     end
 
     distinct.joins("INNER JOIN (
@@ -3668,6 +3671,10 @@ class Course < ActiveRecord::Base
     !templated_accounts.exists?
   end
 
+  def comment_bank_items_visible_to(user)
+    comment_bank_items.active.where(user: user)
+  end
+
   private
 
   def effective_due_dates
@@ -3686,11 +3693,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_from_course_template
-    # because of some specs that mock out all feature flags, and how often
-    # courses are created, we check that the feature actually exists here
-    # before checking if it's enabled
-    if Feature.definitions['course_templates'] &&
-      root_account.feature_enabled?(:course_templates) &&
+    if root_account.feature_enabled?(:course_templates) &&
       (template = account.effective_course_template)
       content_migration = content_migrations.new(
         source_course: template,

@@ -26,41 +26,48 @@ import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 export default function PointsDisplay(props) {
-  // We need to have a different ungraded values for screenreaders and visual users
-  // because voiceover does not read the '–' character in a string like '-/10'
-  let ungradedScreenreaderString = null
-  let ungradedVisualString = null
-  switch (props.gradingType) {
-    case 'points':
-      ungradedScreenreaderString = I18n.t('ungraded/%{pointsPossible}', {
-        pointsPossible: props.pointsPossible
-      })
-      ungradedVisualString = `–/${props.pointsPossible}`
-      break
-    case 'pass_fail':
-      ungradedScreenreaderString = I18n.t('ungraded')
-      ungradedVisualString = I18n.t('ungraded')
-      break
-    default:
-      ungradedScreenreaderString = I18n.t('ungraded')
-      ungradedVisualString = '–'
-      break
+  const ungradedVisualString = () => {
+    if (props.gradingType === 'points' && props.pointsPossible != null) {
+      return I18n.t(
+        {one: '*1* Possible Point', other: '*%{count}* Possible Points'},
+        {
+          count: props.pointsPossible,
+          wrappers: ['<span class="points-value">$1</span>']
+        }
+      ).string
+    }
+
+    return ''
   }
 
-  const formatGrade = ({forScreenReader}) => {
-    if (props.gradingStatus === 'excused' && !props.showGradeForExcused) {
-      return I18n.t('Excused!')
+  const ungradedScreenreaderString = () => {
+    if (props.gradingType === 'points' && props.pointsPossible != null) {
+      return I18n.t(
+        {one: 'Ungraded, 1 Possible Point', other: 'Ungraded, %{count} Possible Points'},
+        {count: props.pointsPossible}
+      )
+    }
+
+    return I18n.t('ungraded')
+  }
+
+  const formatGrade = ({forScreenReader = false} = {}) => {
+    if (props.gradingStatus === 'excused') {
+      return I18n.t('Excused')
     }
 
     const formattedGrade = GradeFormatHelper.formatGrade(props.receivedGrade, {
       gradingType: props.gradingType,
       pointsPossible: props.pointsPossible,
-      defaultValue: forScreenReader ? ungradedScreenreaderString : ungradedVisualString,
+      defaultValue: forScreenReader ? ungradedScreenreaderString() : ungradedVisualString(),
       formatType: 'points_out_of_fraction'
     })
 
-    if (props.gradingType === 'points') {
-      return I18n.t('%{formattedGrade} Points', {formattedGrade})
+    if (props.gradingType === 'points' && props.receivedGrade != null) {
+      return I18n.t('%{formattedGrade} *Points*', {
+        formattedGrade,
+        wrappers: [forScreenReader ? '$1' : '<span class="points-text">$1</span>']
+      }).string
     } else {
       return formattedGrade
     }
@@ -71,9 +78,12 @@ export default function PointsDisplay(props) {
       <ScreenReaderContent>{formatGrade({forScreenReader: true})}</ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
         <Flex.Item>
-          <Text transform="capitalize" size={props.displaySize} data-testid="grade-display">
-            {formatGrade({forScreenReader: false})}
-          </Text>
+          <Text
+            dangerouslySetInnerHTML={{__html: formatGrade()}}
+            data-testid="grade-display"
+            size="xx-large"
+            transform="capitalize"
+          />
         </Flex.Item>
       </Flex>
     </div>
@@ -81,17 +91,13 @@ export default function PointsDisplay(props) {
 }
 
 PointsDisplay.propTypes = {
-  displaySize: PropTypes.string,
   gradingStatus: PropTypes.oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
   gradingType: PropTypes.string.isRequired,
-  pointsPossible: PropTypes.number.isRequired,
-  receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  showGradeForExcused: PropTypes.bool
+  pointsPossible: PropTypes.number,
+  receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }
 
 PointsDisplay.defaultProps = {
-  displaySize: 'x-large',
   gradingStatus: null,
-  gradingType: 'points',
-  showGradeForExcused: false
+  gradingType: 'points'
 }

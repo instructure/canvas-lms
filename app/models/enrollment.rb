@@ -83,6 +83,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
   after_update :needs_grading_count_updated, if: :active_student_changed?
+  after_commit :sync_microsoft_group
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -1559,5 +1560,12 @@ class Enrollment < ActiveRecord::Base
 
   def being_deleted?
     workflow_state == 'deleted' && workflow_state_before_last_save != 'deleted'
+  end
+
+  def sync_microsoft_group
+    return unless self.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
+    return unless self.root_account.settings[:microsoft_sync_enabled]
+
+    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_sync
   end
 end

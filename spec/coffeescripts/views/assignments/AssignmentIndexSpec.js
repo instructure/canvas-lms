@@ -146,7 +146,7 @@ test('should enable search on assignmentGroup reset', () => {
   ok(!view.$('#search_term').is(':disabled'))
 })
 
-test('enable search handler should only fire on the first reset', function() {
+test('enable search handler should only fire on the first reset', function () {
   const view = assignmentIndex()
   assignmentGroups.reset()
   ok(this.enable_spy.calledOnce)
@@ -195,7 +195,12 @@ test("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => 
   ENV.PERMISSIONS.manage_assignments = true
   ENV.QUIZ_LTI_ENABLED = false
   const view = assignmentIndex()
-  equal($('.new_quiz_lti').length, 0)
+  equal(view.$('.new_quiz_lti').length, 0)
+})
+
+test('should contain a drag and drop warning for screen readers', () => {
+  const view = assignmentIndex()
+  equal(view.$('.drag_and_drop_warning').length, 1)
 })
 
 QUnit.module('student index view', {
@@ -213,6 +218,11 @@ QUnit.module('student index view', {
     assignmentGroups = null
     fixtures.empty()
   }
+})
+
+test('should not contain a drag and drop warning for screen readers', () => {
+  const view = assignmentIndex()
+  equal(view.$('.drag_and_drop_warning').length, 0)
 })
 
 test('should clear search on toggle', () => {

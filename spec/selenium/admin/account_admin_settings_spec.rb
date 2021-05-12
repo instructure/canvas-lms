@@ -61,6 +61,58 @@ describe "root account basic settings" do
     end
   end
 
+  context 'Integrations' do
+    context 'Microsoft Teams Sync' do
+      context('microsoft_group_enrollments FF enabled') do
+
+        let(:tenant) { 'canvastest2.onmicrosoft.com' }
+        let(:login_attribute) { 'email' }
+
+        before :once do
+          account.enable_feature!(:microsoft_group_enrollments_syncing)
+        end
+
+        before :each do
+          account_admin_user(account: account)
+          user_session(@admin)
+        end
+
+        it "lets a user update what tenant and login attribute they want to use" do
+          get account_settings_url
+
+          f("#tab-integrations-link").click
+          tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
+          set_value(tenant_input_area, tenant)
+          f("#microsoft_teams_sync_attribute_selector").click
+          f("#email").click
+          fxpath("//*[@id=\"tab-integrations\"]/span/button").click
+          wait_for_ajaximations
+
+          account.reload
+          expect(account.settings[:microsoft_sync_tenant]).to eq tenant
+          expect(account.settings[:microsoft_sync_login_attribute]).to eq login_attribute
+        end
+
+        it "lets a user toggle Microsoft Teams sync" do
+          account.settings[:microsoft_sync_enabled] = false
+          account.settings[:microsoft_sync_tenant] = tenant
+          account.settings[:microsoft_sync_login_attribute] = login_attribute
+          account.save!
+
+          get account_settings_url
+
+          f("#tab-integrations-link").click
+          f("#microsoft_sync_toggle_button").click
+          wait_for_ajaximations
+          account.reload
+          expect(account.settings[:microsoft_sync_enabled]).to be true
+          expect(account.settings[:microsoft_sync_tenant]).to eq tenant
+          expect(account.settings[:microsoft_sync_login_attribute]).to eq login_attribute
+        end
+      end
+    end
+  end
+
 
   it "downloads reports" do
     course_with_admin_logged_in

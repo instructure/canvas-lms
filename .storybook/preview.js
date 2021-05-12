@@ -8,10 +8,13 @@ import '@instructure/canvas-theme'
 
 window.ENV ||= {
   FEATURES: {
-    use_rce_enhancements: true,
     rce_pretty_html_editor: true,
     rce_auto_save: true
-  }
+  },
+  use_rce_enhancements: true,
+  // the RCE won't load w/o these yet
+  context_asset_string: 'course_1',
+  current_user_id: 2
 }
 
 window.INST ||= {

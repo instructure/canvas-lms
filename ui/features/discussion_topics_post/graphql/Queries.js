@@ -19,9 +19,10 @@
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import gql from 'graphql-tag'
+import {PageInfo} from './PageInfo'
 
 export const DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery($discussionID: ID!, $page: String, $perPage: Int) {
+  query GetDiscussionQuery($discussionID: ID!, $page: String, $perPage: Int!) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
@@ -30,17 +31,16 @@ export const DISCUSSION_QUERY = gql`
             ...DiscussionEntry
           }
           pageInfo {
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            startCursor
+            ...PageInfo
           }
         }
+        rootEntriesTotalPages(perPage: $perPage)
       }
     }
   }
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
+  ${PageInfo.fragment}
 `
 
 export const DISCUSSION_SUBENTRIES_QUERY = gql`
@@ -53,14 +53,12 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
             ...DiscussionEntry
           }
           pageInfo {
-            endCursor
-            hasNextPage
-            hasPreviousPage
-            startCursor
+            ...PageInfo
           }
         }
       }
     }
   }
   ${DiscussionEntry.fragment}
+  ${PageInfo.fragment}
 `

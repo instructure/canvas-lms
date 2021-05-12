@@ -89,9 +89,7 @@ describe('scrollToToday', () => {
       manager.getDocument().querySelector = function () {
         return today_elem
       }
-      const mockRegistryEntries = [
-        mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ).add(12, 'hours'))
-      ]
+      const mockRegistryEntries = [mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ))]
       mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem)
       registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries)
       store.getState.mockReturnValue({
@@ -278,14 +276,12 @@ describe('scrollToToday', () => {
 
   describe('in weekly planner mode', () => {
     describe('when there are no items today', () => {
-      it('focuses on missing items', () => {
+      it('leaves focus on the weekly header navigation', () => {
         const today_elem = {}
         const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday)
-        manager.getDocument().querySelector = function () {
-          return today_elem
-        }
-        manager.getDocument().getElementById = function () {
-          return 'missing items'
+        manager.getDocument().querySelector = () => today_elem
+        manager.getDocument().getElementById = id => {
+          return id === 'MissingAssignments' ? 'missing items' : 'weekly header'
         }
         registry.getAllItemsSorted.mockReturnValue([])
         store.getState.mockReturnValue({
@@ -296,7 +292,8 @@ describe('scrollToToday', () => {
         expect(srAlert).toHaveBeenCalledWith(nothingTodayMessage)
         expect(animator.forceScrollTo).toHaveBeenCalledTimes(1)
         expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
-        expect(animator.focusElement).toHaveBeenCalledWith('missing items')
+        expect(animator.focusElement).not.toHaveBeenCalledWith('missing items')
+        expect(animator.focusElement).toHaveBeenCalledWith('weekly header')
       })
     })
 
@@ -318,7 +315,7 @@ describe('scrollToToday', () => {
         })
         animation.acceptAction({
           type: 'SCROLL_TO_TODAY',
-          payload: {focusMissingItems: true, isWeekly: true}
+          payload: {focusTarget: 'missing-items', isWeekly: true}
         })
         animation.uiDidUpdate()
         expect(srAlert).not.toHaveBeenCalledWith(nothingTodayMessage)
@@ -326,6 +323,32 @@ describe('scrollToToday', () => {
         expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
         expect(animator.focusElement).toHaveBeenCalledWith('missing items')
       })
+    })
+  })
+
+  describe('when there are items today, and the action specifies focusing on today', () => {
+    it('focuses on the first item due today', () => {
+      const today_elem = {}
+      const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday)
+      manager.getDocument().querySelector = function () {
+        return today_elem
+      }
+      const mockRegistryEntries = [mockRegistryEntry('some-item', 'i1', moment.tz(today, TZ))]
+      mockRegistryEntries[0].component.getScrollable.mockReturnValue(today_elem)
+      registry.getAllItemsSorted.mockReturnValue(mockRegistryEntries)
+      store.getState.mockReturnValue({
+        timeZone: TZ
+      })
+      animation.acceptAction({
+        type: 'SCROLL_TO_TODAY',
+        payload: {focusTarget: 'today', isWeekly: true}
+      })
+
+      animation.uiDidUpdate()
+      expect(animator.forceScrollTo).toHaveBeenCalledTimes(1)
+      expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
+      expect(animator.scrollTo).toHaveBeenCalledTimes(1)
+      expect(animator.focusElement).toHaveBeenCalledWith('i1-focusable')
     })
   })
 

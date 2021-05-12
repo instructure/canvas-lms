@@ -24,6 +24,7 @@ require 'lti2_course_spec_helper'
 require 'csv'
 require 'socket'
 
+
 describe Course do
   include_examples "outcome import context examples"
 
@@ -1569,9 +1570,9 @@ describe Course do
       expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
     end
 
-    it "returns none for a nobody" do
-      worthless_loser = User.create(:name => "Worthless Loser")
-      expect(@course.course_section_visibility(worthless_loser)).to eq []
+    it "returns none for a user with no visibility" do
+      user_with_no_visibility = User.create(:name => "Sans Connexion")
+      expect(@course.course_section_visibility(user_with_no_visibility)).to eq []
     end
   end
 
@@ -1685,6 +1686,25 @@ describe Course do
         expect(course.outcome_calculation_method).to eq nil
         expect(course.resolved_outcome_calculation_method).to eq nil
       end
+    end
+  end
+
+  describe "comment_bank_items_visible_to" do
+    before do
+      @course = course_factory(active_all: true)
+      @user1 = user_model
+      @user2 = user_model
+      @item = comment_bank_item_model(course: @course, user: @user1)
+    end
+
+    it "should return items visible to the provided user" do
+      expect(@course.comment_bank_items_visible_to(@user2)).to eq []
+      expect(@course.comment_bank_items_visible_to(@user1)).to eq [@item]
+    end
+
+    it "should only return active records" do
+      @item.destroy
+      expect(@course.comment_bank_items_visible_to(@user1)).to eq []
     end
   end
 end

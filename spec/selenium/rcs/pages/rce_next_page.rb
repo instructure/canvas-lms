@@ -616,7 +616,7 @@ module RCENextPage
   end
 
   def editor_view_button
-    f('[data-btn-id="rce-edit-btn"]')
+    f('button[data-btn-id="rce-edit-btn"]')
   end
 
   def fullscreen_element
@@ -965,7 +965,7 @@ module RCENextPage
   end
 
   def click_editor_view_button
-    editor_view_button.click
+    force_click('button[data-btn-id="rce-edit-btn"]')
   end
 
   def switch_to_html_view
@@ -1055,7 +1055,7 @@ module RCENextPage
   end
 
   def add_squareroot_value
-    editor_sqrt_textarea.send_keys("81")
+    editor_sqrt_textarea.send_keys('81')
   end
 
   def select_math_equation_from_toolbar
@@ -1079,15 +1079,15 @@ module RCENextPage
   end
   def select_text_of_element_by_id(id)
     script = <<-JS
-        const id = arguments[0]
-        const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-        const rng = win.document.createRange()
-        rng.setStart(win.document.getElementById(id).firstChild, 0)
-        rng.setEnd(win.document.getElementById(id).firstChild, 9)
-        const sel = win.getSelection()
-        sel.removeAllRanges()
-        sel.addRange(rng)
-      JS
+    const id = arguments[0]
+    const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+    const rng = win.document.createRange()
+    rng.setStart(win.document.getElementById(id).firstChild, 0)
+    rng.setEnd(win.document.getElementById(id).firstChild, 9)
+    const sel = win.getSelection()
+    sel.removeAllRanges()
+    sel.addRange(rng)
+    JS
 
     driver.execute_script script, id
   end
@@ -1126,8 +1126,8 @@ module RCENextPage
   def create_course_text_file(title)
     @root_folder = Folder.root_folders(@course).first
     @text_file =
-      @root_folder.attachments.create!(filename: title, context: @course) do |a|
-        a.content_type = 'text/plain'
-      end
+      @root_folder
+        .attachments
+        .create!(filename: title, context: @course) { |a| a.content_type = 'text/plain' }
   end
 end

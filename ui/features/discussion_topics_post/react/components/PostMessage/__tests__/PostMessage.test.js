@@ -57,10 +57,12 @@ describe('PostMessage', () => {
     it('renders the correct post info', () => {
       const {queryByText, queryByTestId} = setup({
         authorName: 'Author Name',
-        timingDisplay: 'Timing Display'
+        timingDisplay: 'Timing Display',
+        lastReplyAtDisplayText: 'Apr 12 2:35pm'
       })
       expect(queryByText('Author Name')).toBeTruthy()
       expect(queryByText('Timing Display')).toBeTruthy()
+      expect(queryByText(', last reply Apr 12 2:35pm')).toBeTruthy()
       expect(queryByTestId('post-pill')).toBeFalsy()
     })
 

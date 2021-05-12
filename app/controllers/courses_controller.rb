@@ -1461,7 +1461,8 @@ class CoursesController < ApplicationController
         RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
         RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
         PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers],
-        MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown
+        MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown,
+        MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled]
       })
 
       set_tutorial_js_env
@@ -2076,12 +2077,14 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    name: @context.name,
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
+                   color: @k5_mode ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
                    is_instructor: @context.user_is_instructor?(@current_user),
-                   course_overview: @context&.wiki&.front_page&.body
+                   course_overview: @context&.wiki&.front_page&.body,
+                   hide_final_grades: @context.hide_final_grades?
                  }
                })
 

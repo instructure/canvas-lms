@@ -5643,6 +5643,7 @@ hu:
   custom_gradebook_columns_81944594: "Egyedi Osztálynapló Oszlopok"
   custom_link_details_35fd38fc: "Egyéni hivatkozás részletei"
   custom_reports_experimental_features_40bbfe7c: "Egyéni jelentések: Kísérleti funkciók"
+  customize_learning_mastery_ratings_4ace142a: "Jártassági szintek minősítéseinek testreszabása"
   customize_this_menu_efa72a9: "Menü testreszabása"
   cutoff_score_74254c89: "vágási pont"
   cyan_c1d5f68a: Cián
@@ -6337,6 +6338,7 @@ hu:
   domain_is_required_1d4c8b25: "A tartomány megadása kötelező"
   dominican_republic_1_3cef4021: "Dominikai Köztársaság (+1)"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ne mozgassa az LTI lekérdezési paramétereket a POST törzsébe"
+  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ne vigye át a Tanulási eredmények pontszámait a Jártassági szint naplóba."
   done_54e3d4b6: Kész
   done_8af51c9b: Kész.
   done_editing_9f7379d9: "Szerkesztés kész"
@@ -8253,6 +8255,7 @@ hu:
   hour_34d02553: Óra
   hour_s_b6e8d238: Órá(k)
   hover_over_me_496521b9: "Vigye az egeret fölém"
+  how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Hogyan használhatom a Jártassági szint naplót, hogy láthassam a tanulási eredményeket egy kurzusban?"
   how_is_this_affecting_you_b3b6a639: "Hogy érinti ez Önt ?"
   how_many_minutes_ecca5ee7: "Hány perc?"
   html_editor_fb2ab713: "HTML szerkesztő"
@@ -8750,9 +8753,10 @@ hu:
   lbs_report_notes: Jegyzetek
   learn_more_about_collaborations_2978f66d: "Bővebben az együttműködésről"
   learning_mastery_5fc34276: "Tanulási jártassági szint"
+  learning_mastery_6ed4fd63: "Jártassági szint..."
   learning_mastery_gradebook_description: |-
       A jártassági szint napló lehetőséget biztosít az oktatók számára, hogy
-      gyors áttekintést kapjanak a hallgatók  előrehaladásában
+      gyors áttekintést kapjanak a hallgatók  előrehaladásáról
       a tanulási eredmények tükrében. Az eredmények
       naplószerűen
       jelennek meg és a tanulók haladása numerikus eredményként és a
@@ -11549,6 +11553,7 @@ hu:
   notifications_cbfa7704: Értesítések
   notifications_search_results_80a0b06f: "Értesítési keresés eredmények"
   notifications_view_f9a60770: "Értesítések - áttekintés"
+  notify_students_in_time_of_assignments_that_requir_332ef10e: "A hallgatók értesítése a feladatokról, amikre figyelmet kell fordítaniuk."
   notify_users_this_quiz_has_changed_c5b05995: "A felhasználók értesítése arról, hogy a kvíz megváltozott"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "A kurzus fel lett töltve és elérhetővé vált, így lehet, hogy erre az ellenőrzőlistára nincs többé szüksége. Ennek ellenére a lehetőség továbbra is megmarad arra, hogy új elemekkel bővítse a kurzust, vagy segítséget kapjon a kurzus módosítására vonatkozóan."
   number: 
@@ -14319,7 +14324,7 @@ hu:
   remove_name_as_an_admin_c296cf49: "%{name}mint admin eltávolítása"
   remove_null_values_from_live_event_payloads_3c826f: "Nullértékek eltávolítása az élő eseménytartalmakból"
   remove_placement_90862c13: "%{placement} eltávolítása"
-  remove_points_from_rubric_dcd4b585: "Pontok eltávolítása rovatból"
+  remove_points_from_rubric_dcd4b585: "Pontok eltávolítása az értékelőtáblából"
   remove_recipient_name_a6b83cef: "%{name} nevű címzett eltávolítása"
   remove_row_c198da5a: "Sor törlése"
   remove_row_row_167c424a: "Sor törlése: %{row}"
@@ -15417,8 +15422,8 @@ hu:
         assign_rubric: "Értékelőtábla hozzárendelése"
     select_content_dialog: 
       assignment_item: Feladat
-      assignment_item_select_label: "Válassza ki a feladatot, amelyhez kapcsolódni szeretne, vagy adjon hozzá \"Új feladat\"-ot."
-      assignment_notice: "Válassza ki a feladatot, amelyhez kapcsolódni szeretne ezzel a *modul*-lal, vagy adjon hozzá \"Új feladat\"-ot."
+      assignment_item_select_label: "Válassza ki a feladatot, amelyet fel szeretne venni a modulba, vagy adjon hozzá “Új feladat”-ot!"
+      assignment_notice: "Válassza ki a feladatot, amelyet fel szeretne venni a modulba, vagy adjon hozzá “Új feladat”-ot!"
       content_page_item: Oldal
       discussion_item: Fórum
       discussion_topic_select_label: "Válassza ki a témát, amelyhez kapcsolódni szeretne, vagy adjon hozzá \"Új témá\"-t."

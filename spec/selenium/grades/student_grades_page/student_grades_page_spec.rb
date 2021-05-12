@@ -104,8 +104,8 @@ describe "gradebook - logged in as a student" do
   describe 'grade-only assignment' do
     before :once do
       skip('Unskip in GRADE-1359')
-      course_with_teacher(name: "Teacher Boss", active_course: true, active_user: true)
-      course_with_student(course: @course, name: "Student Slave", active_all: true)
+      course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
+      course_with_student(course: @course, name: "Hardworking Student", active_all: true)
       @assignment = @course.assignments.create!(
         title: 'Grade Only Assignment',
         grading_type: 'grade_only',

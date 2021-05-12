@@ -25,6 +25,8 @@ export const Assignment = {
       id
       _id
       dueAt
+      lockAt
+      unlockAt
       pointsPossible
     }
   `,
@@ -33,6 +35,8 @@ export const Assignment = {
     id: string,
     _id: string,
     dueAt: string,
+    lockAt: string,
+    unlockAt: string,
     pointsPossible: number
   })
 }
@@ -41,6 +45,8 @@ export const DefaultMocks = {
   Assignment: () => ({
     _id: '1',
     dueAt: '2021-03-25T13:22:24-06:00',
+    lockAt: '2021-03-27T13:22:24-06:00',
+    unlockAt: '2021-03-21T13:22:24-06:00',
     pointsPossible: 10
   })
 }

@@ -28,7 +28,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 // showFilePreview repurposes the file preview overlay from the Files
 // pages to show a single file in an arbitrary context. First use
 // is for canvas files users linked to using the RCE.
-export function showFilePreview(file_id) {
+export function showFilePreview(file_id, verifier = '') {
   let container = document.getElementById('file_preview_container')
   if (!container) {
     container = document.createElement('div')
@@ -36,7 +36,12 @@ export function showFilePreview(file_id) {
     document.body.appendChild(container)
   }
 
-  asJson(fetch(`/api/v1/files/${file_id}?include[]=enhanced_preview_url`, defaultFetchOptions))
+  asJson(
+    fetch(
+      `/api/v1/files/${file_id}?include[]=enhanced_preview_url&verifier=${verifier}&use_verifiers=1`,
+      defaultFetchOptions
+    )
+  )
     .then(file => {
       const backboneFile = new File(file)
       ReactDOM.render(<StandaloneFilePreview preview_file={backboneFile} />, container)

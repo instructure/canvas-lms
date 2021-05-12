@@ -72,6 +72,7 @@ describe MicrosoftSync::SyncerSteps do
     ra = course.root_account
     ra.settings[:microsoft_sync_enabled] = sync_enabled
     ra.settings[:microsoft_sync_tenant] = tenant
+    ra.settings[:microsoft_sync_login_attribute] = 'email'
     ra.save!
 
     allow(MicrosoftSync::GraphServiceHelpers).to \
@@ -81,7 +82,8 @@ describe MicrosoftSync::SyncerSteps do
   describe '#initial_step' do
     subject { syncer_steps.initial_step }
 
-    it { is_expected.to eq(:step_ensure_class_group_exists) }
+    it { is_expected.to eq(:step_ensure_max_enrollments_in_a_course) }
+
     it 'references an existing method' do
       expect { syncer_steps.method(subject.to_sym) }.to_not raise_error
     end
@@ -128,6 +130,58 @@ describe MicrosoftSync::SyncerSteps do
         expect_retry(subject,
                      error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
       end
+    end
+  end
+
+  shared_examples_for 'max of members enrollment reached' do |max_members|
+    it 'raises a graceful exit error informing the user' do
+      expect { subject }.to raise_error do |error|
+        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
+        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_members || 25000} members in a team."
+      end
+    end
+  end
+
+  shared_examples_for 'max of owners enrollment reached' do |max_owners|
+    it 'raises a graceful exit error informing the user' do
+      expect { subject }.to raise_error do |error|
+        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
+        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+      end
+    end
+  end
+
+  describe '#step_ensure_max_enrollments_in_a_course' do
+    subject { syncer_steps.step_ensure_max_enrollments_in_a_course(nil, nil) }
+
+    before do
+      n_students_in_course(2, course: course)
+      teacher_in_course(course: course)
+      teacher_in_course(course: course)
+    end
+
+    context 'when the max enrollments in a course was not reached' do
+      it 'schedule the next step `step_ensure_class_group_exists`' do
+        expect_next_step(subject, :step_ensure_class_group_exists)
+      end
+    end
+
+    context 'when max members enrollments was reached in a course' do
+      before do
+        stub_const('MicrosoftSync::SyncerSteps::MAX_ENROLLMENT_MEMBERS', 3)
+      end
+
+      it_should_behave_like 'max of members enrollment reached', 3
+    end
+
+    context 'when max owners enrollments was reached in a course' do
+      before do
+        stub_const('MicrosoftSync::SyncerSteps::MAX_ENROLLMENT_OWNERS', 1)
+      end
+
+      it_behaves_like 'max of owners enrollment reached', 1
     end
   end
 
@@ -186,7 +240,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
           expect { subject }.to raise_error do |e|
             expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-            expect(e).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+            expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
           end
         end
       end
@@ -425,6 +479,8 @@ describe MicrosoftSync::SyncerSteps do
 
       allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
       allow(diff).to receive(:members_to_remove).and_return(Set.new(%w[m1 m2]))
+      allow(diff).to receive(:max_enrollment_members_reached?).and_return(false)
+      allow(diff).to receive(:max_enrollment_owners_reached?).and_return(false)
       allow(diff).to \
         receive(:additions_in_slices_of).
         with(MicrosoftSync::GraphService::GROUP_USERS_ADD_BATCH_SIZE).
@@ -464,9 +520,25 @@ describe MicrosoftSync::SyncerSteps do
           expect(error.public_message).to match(
             /no users corresponding to the instructors of the Canvas course could be found/
           )
-          expect(error).to be_a(MicrosoftSync::StateMachineJob::GracefulCancelErrorMixin)
+          expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
       end
+    end
+
+    context 'when there are more than `MAX_ENROLLMENT_MEMBERS` enrollments in a course' do
+      before do
+        allow(diff).to receive(:max_enrollment_members_reached?).and_return true
+      end
+
+      it_behaves_like 'max of members enrollment reached'
+    end
+
+    context 'when there are more than `MAX_ENROLLMENT_OWNERS` enrollments in a course' do
+      before do
+        allow(diff).to receive(:max_enrollment_owners_reached?).and_return true
+      end
+
+      it_behaves_like 'max of owners enrollment reached'
     end
   end
 

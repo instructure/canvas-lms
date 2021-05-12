@@ -21,7 +21,15 @@ import React from 'react'
 import {Expansion} from '../Expansion'
 
 const setup = props => {
-  return render(<Expansion isExpanded onClick={Function.prototype} expandText="" {...props} />)
+  return render(
+    <Expansion
+      isExpanded
+      onClick={Function.prototype}
+      delimiterKey="expansion"
+      expandText=""
+      {...props}
+    />
+  )
 }
 
 describe('Expansion', () => {
@@ -41,7 +49,9 @@ describe('Expansion', () => {
     expect(queryByText('Expand discussion thread')).toBeTruthy()
     expect(queryByText('Collapse discussion thread')).toBeFalsy()
 
-    rerender(<Expansion onClick={Function.prototype} isExpanded expandText="" />)
+    rerender(
+      <Expansion onClick={Function.prototype} isExpanded delimiterKey="expansion" expandText="" />
+    )
 
     expect(queryByText('Expand discussion thread')).toBeFalsy()
     expect(queryByText('Collapse discussion thread')).toBeTruthy()

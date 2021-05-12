@@ -24,21 +24,31 @@ module OutcomesService
       def url(context)
         settings = settings(context)
         protocol = ENV.fetch('OUTCOMES_SERVICE_PROTOCOL', Rails.env.production? ? 'https' : 'http')
-        domain = settings[:domain]
+        domain = settings[domain_key]
         "#{protocol}://#{domain}" if domain.present?
+      end
+
+      def domain_key
+        # test_cluster? and test_cluster_name are true and not nil for nonprod environments,
+        # like beta or test
+        if ApplicationController.test_cluster?
+          "#{ApplicationController.test_cluster_name}_domain".to_sym
+        else
+          :domain
+        end
       end
 
       def enabled_in_context?(context)
         settings = settings(context)
-        settings[:consumer_key].present? && settings[:jwt_secret].present? && settings[:domain].present?
+        settings[:consumer_key].present? && settings[:jwt_secret].present? && settings[domain_key].present?
       end
 
       def jwt(context, scope, expiration = 1.day.from_now.to_i, overrides: {})
-        settings = settings(context)
-        if settings.key?(:consumer_key) && settings.key?(:jwt_secret) && settings.key?(:domain)
+        if enabled_in_context?(context)
+          settings = settings(context)
           consumer_key = settings[:consumer_key]
           jwt_secret = settings[:jwt_secret]
-          domain = settings[:domain]
+          domain = settings[domain_key]
           payload = {
             host: domain,
             consumer_key: consumer_key,

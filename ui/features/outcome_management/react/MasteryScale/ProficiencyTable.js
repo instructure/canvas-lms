@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
@@ -28,6 +28,7 @@ import uuid from 'uuid/v1'
 import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '@canvas/i18n/numberHelper'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
@@ -135,7 +136,11 @@ class ProficiencyTable extends React.Component {
       },
       () => {
         this.notifyPendingChanges()
-        $.screenReaderFlashMessage(I18n.t('Added mastery level'))
+        showFlashAlert({
+          message: I18n.t('Added mastery level'),
+          type: 'success',
+          srOnly: true
+        })
       }
     )
   }
@@ -162,13 +167,19 @@ class ProficiencyTable extends React.Component {
         this.notifyPendingChanges()
         this.props
           .update(this.stateToConfig())
-          .then(() => $.flashMessage(I18n.t(`Mastery scale saved`)))
+          .then(() =>
+            showFlashAlert({
+              message: I18n.t('Mastery scale saved'),
+              type: 'success'
+            })
+          )
           .catch(e => {
-            $.flashError(
-              I18n.t('An error occurred while saving the mastery scale: %{message}', {
+            showFlashAlert({
+              message: I18n.t('An error occurred while saving the mastery scale: %{message}', {
                 message: e.message
-              })
-            )
+              }),
+              type: 'error'
+            })
             this.setState({savedRows: oldRows}, this.notifyPendingChanges)
           })
       }
@@ -240,7 +251,11 @@ class ProficiencyTable extends React.Component {
         this.notifyPendingChanges
       )
     }
-    $.screenReaderFlashMessage(I18n.t('Mastery level deleted'))
+    showFlashAlert({
+      message: I18n.t('Mastery level deleted'),
+      type: 'success',
+      srOnly: true
+    })
   })
 
   isStateValid = () =>
@@ -347,7 +362,7 @@ class ProficiencyTable extends React.Component {
     const isMobileView = breakpoints.mobileOnly
     return (
       <>
-        <Flex width="100%" padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}>
+        <Flex width="100%" padding={isMobileView ? '0 0 small 0' : '0 small small small'}>
           <Flex.Item size={isMobileView ? '25%' : '15%'} padding="0 medium 0 0">
             <div aria-hidden="true" className="header">
               {I18n.t('Mastery')}
@@ -397,7 +412,6 @@ class ProficiencyTable extends React.Component {
             {this.renderBorder()}
           </React.Fragment>
         ))}
-
         {canManage && (
           <>
             <View

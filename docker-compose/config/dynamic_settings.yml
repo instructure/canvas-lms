@@ -30,7 +30,7 @@ development:
         client-id: some_client_id
         client-secret: some_client_secret
       rich-content-service:
-        app-host: "rce.docker"
+        app-host: "http://rce.canvas.docker:3000"
     # another service
     inst-fs:
       app-host: "http://api.instfs.docker"

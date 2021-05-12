@@ -29,6 +29,10 @@ module K5PageObject
     'h1'
   end
 
+  def course_dashboard_title_selector
+    'h1'
+  end
+
   def homeroom_tab_selector
     '#tab-tab-homeroom'
   end
@@ -43,6 +47,14 @@ module K5PageObject
 
   def resources_tab_selector
     '#tab-tab-resources'
+  end
+
+  def home_tab_selector
+    '#tab-tab-home'
+  end
+
+  def modules_tab_selector
+    '#tab-tab-modules'
   end
 
   def course_card_selector(course_title)
@@ -197,6 +209,82 @@ module K5PageObject
     "//*[@aria-label = 'Choose a Course']//a"
   end
 
+  def dashboard_card_selector
+    "[data-testid='k5-dashboard-card-hero']"
+  end
+
+  def front_page_info_selector
+    "#course_home_content .user_content"
+  end
+
+  def manage_button_selector
+    "[data-testid = 'manage-button']"
+  end
+
+  def course_navigation_tray_selector
+    "[aria-label='Course Navigation Tray']"
+  end
+
+  def course_nav_tray_close_selector
+    "//button[.//*[. = 'Close']]"
+  end
+
+  def no_module_content_selector
+    "#no_context_modules_message"
+  end
+
+  def module_item_selector(module_title)
+    "[title='#{module_title}']"
+  end
+
+  def expand_collapse_module_selector
+    "#expand_collapse_all"
+  end
+
+  def module_assignment_selector(module_assignment_title)
+    "[title='#{module_assignment_title}']"
+  end
+
+  def assignment_page_title_selector
+    "h1"
+  end
+
+  def module_empty_state_button_selector
+    ".ic-EmptyStateButton"
+  end
+
+  def assignment_edit_button_selector
+    ".edit_assignment_link"
+  end
+
+  def add_module_button_selector
+    ".add_module_link"
+  end
+
+  def add_module_modal_selector
+    "#add_context_module_form"
+  end
+
+  def add_module_item_button_selector
+    ".add_module_item_link"
+  end
+
+  def add_module_item_modal_selector
+    "#select_context_content_dialog"
+  end
+
+  def drag_handle_selector
+    "[title='Drag to reorder or move item to another module']"
+  end
+
+  def schedule_item_selector
+    ".PlannerItem-styles__title a"
+  end
+
+  def missing_item_href_selector(course_id, assignment_id)
+    "//*[contains(@href, '/courses/#{course_id}/assignments/#{assignment_id}')]"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -205,6 +293,10 @@ module K5PageObject
 
   def welcome_title
     f(welcome_title_selector)
+  end
+
+  def course_dashboard_title
+    f(course_dashboard_title_selector)
   end
 
   def homeroom_tab
@@ -221,6 +313,14 @@ module K5PageObject
 
   def resources_tab
     f(resources_tab_selector)
+  end
+
+  def home_tab
+    f(home_tab_selector)
+  end
+
+  def modules_tab
+    f(modules_tab_selector)
   end
 
   def course_card(course_title)
@@ -392,7 +492,90 @@ module K5PageObject
     ffxpath(course_list_selector)
   end
 
+  def dashboard_card
+    f(dashboard_card_selector)
+  end
+
+  def front_page_info
+    f(front_page_info_selector)
+  end
+
+  def manage_button
+    f(manage_button_selector)
+  end
+
+  def course_navigation_tray
+    f(course_navigation_tray_selector)
+  end
+
+  def course_nav_tray_close
+    fxpath(course_nav_tray_close_selector)
+  end
+
+  def assignments_link
+    fln('Assignments')
+  end
+
+  def no_module_content
+    f(no_module_content_selector)
+  end
+
+  def module_item(module_title)
+    f(module_item_selector(module_title))
+  end
+
+  def expand_collapse_module
+    f(expand_collapse_module_selector)
+  end
+
+  def module_assignment(assignment_title)
+    f(module_assignment_selector(assignment_title))
+  end
+
+  def assignment_page_title
+    f(assignment_page_title_selector)
+  end
+
+  def module_empty_state_button
+    f(module_empty_state_button_selector)
+  end
+
+  def assignment_edit_button
+    f(assignment_edit_button_selector)
+  end
+
+  def add_module_button
+    f(add_module_button_selector)
+  end
+
+  def add_module_modal
+    f(add_module_modal_selector)
+  end
+
+  def add_module_item_button
+    f(add_module_item_button_selector)
+  end
+
+  def add_module_item_modal
+    f(add_module_item_modal_selector)
+  end
+
+  def drag_handle
+    f(drag_handle_selector)
+  end
+
+  def schedule_item
+    f(schedule_item_selector)
+  end
+
+  def assignment_link(missing_assignment_element, course_id, assignment_id)
+    find_from_element_fxpath(missing_assignment_element, missing_item_href_selector(course_id, assignment_id))
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+
+  #----------------------- Click Items -------------------------------
 
   def check_enable_homeroom_checkbox
     enable_homeroom_checkbox.click
@@ -400,6 +583,10 @@ module K5PageObject
 
   def select_homeroom_tab
     homeroom_tab.click
+  end
+
+  def select_home_tab
+    home_tab.click
   end
 
   def select_schedule_tab
@@ -414,14 +601,6 @@ module K5PageObject
     resources_tab.click
   end
 
-  def retrieve_welcome_text
-    welcome_title.text
-  end
-
-  def new_announcement(course, title, message)
-    course.announcements.create!(title: title, message: message)
-  end
-
   def navigate_to_subject(subject_title)
     subject_title_link(subject_title).click
   end
@@ -432,10 +611,6 @@ module K5PageObject
 
   def click_announcement_button
     announcement_button.click
-  end
-
-  def announcement_button_exists?
-    element_exists?(announcement_button_selector, true)
   end
 
   def click_announcement_edit_pencil
@@ -454,34 +629,8 @@ module K5PageObject
     today_button.click
   end
 
-  def beginning_weekday_calculation(current_date)
-    (current_date.beginning_of_week(:sunday)).strftime("%B %-d")
-  end
-
-  def ending_weekday_calculation(current_date)
-    (current_date.end_of_week(:sunday)).strftime("%B %-d")
-  end
-
   def click_missing_items
     items_missing.click
-  end
-
-  def assignment_link_exists?(course_id, assignment_id)
-    element_exists?(assignment_url_selector(course_id, assignment_id))
-  end
-
-  def missing_assignments_exist?
-    element_exists?(missing_assignments_selector)
-  end
-
-  def create_dated_assignment(assignment_title, assignment_due_at)
-    @course.assignments.create!(
-      title: assignment_title,
-      grading_type: 'points',
-      points_possible: 100,
-      due_at: assignment_due_at,
-      submission_types: 'online_text_entry'
-    )
   end
 
   def click_message_button
@@ -494,6 +643,72 @@ module K5PageObject
 
   def click_cancel_button
     cancel_button.click
+  end
+
+  def click_k5_button(button_item)
+    k5_app_buttons[button_item].click
+  end
+
+  def click_dashboard_card
+    dashboard_card.click
+  end
+
+  def click_manage_button
+    manage_button.click
+    wait_for(method: nil, timeout: 2) { course_navigation_tray }
+  end
+
+  def click_nav_tray_close
+    course_nav_tray_close.click
+    wait_for_ajaximations
+  end
+
+  def click_assignments_link
+    assignments_link.click
+  end
+
+  def click_expand_collapse
+    expand_collapse_module.click
+  end
+
+  def click_module_assignment(assignment_title)
+    module_assignment(assignment_title).click
+  end
+
+  def click_add_module_button
+    add_module_button.click
+  end
+
+  def click_add_module_item_button
+    add_module_item_button.click
+  end
+
+  #------------------------------Retrieve Text----------------------#
+
+  def retrieve_welcome_text
+    welcome_title.text
+  end
+
+  def retrieve_title_text
+    course_dashboard_title.text
+  end
+
+  def k5_resource_button_names_list
+    k5_app_buttons.map(&:text)
+  end
+
+  #----------------------------Element Management---------------------#
+
+  def announcement_button_exists?
+    element_exists?(announcement_button_selector, true)
+  end
+
+  def assignment_link_exists?(course_id, assignment_id)
+    element_exists?(assignment_url_selector(course_id, assignment_id))
+  end
+
+  def missing_assignments_exist?
+    element_exists?(missing_assignments_selector)
   end
 
   def is_send_available?
@@ -512,18 +727,36 @@ module K5PageObject
     element_exists?(message_modal_selector(user_name))
   end
 
-  def click_k5_button(button_item)
-    k5_app_buttons[button_item].click
+  def course_navigation_tray_exists?
+    element_exists?(course_navigation_tray_selector)
   end
 
-  def k5_resource_button_names_list
-    k5_app_buttons.map(&:text)
+  def module_assignment_exists?(assignment_title)
+    element_exists?(module_assignment_selector(assignment_title))
+  end
+
+  def beginning_weekday_calculation(current_date)
+    (current_date.beginning_of_week(:sunday)).strftime("%B %-d")
+  end
+
+  def ending_weekday_calculation(current_date)
+    (current_date.end_of_week(:sunday)).strftime("%B %-d")
+  end
+
+  def schedule_item_exists?
+    element_exists?(schedule_item_selector)
+  end
+
+  #----------------------------Create Content---------------------#
+
+  def new_announcement(course, title, message)
+    course.announcements.create!(title: title, message: message)
   end
 
   def create_lti_resource(resource_name)
-    @rendered_icon='https://lor.instructure.com/img/icon_commons.png'
-    @lti_resource_url='http://www.example.com'
-    @tool =
+    rendered_icon='https://lor.instructure.com/img/icon_commons.png'
+    lti_resource_url='http://www.example.com'
+    tool =
       Account.default.context_external_tools.new(
         {
           name: resource_name,
@@ -533,19 +766,109 @@ module K5PageObject
           is_rce_favorite: 'true'
         }
       )
-    @tool.set_extension_setting(
+    tool.set_extension_setting(
       :editor_button,
       {
         message_type: 'ContentItemSelectionRequest',
-        url: @lti_resource_url,
-        icon_url: @rendered_icon,
+        url: lti_resource_url,
+        icon_url: rendered_icon,
         text: "#{resource_name} Favorites",
         enabled: 'true',
         use_tray: 'true',
         favorite: 'true'
       }
     )
-    @tool.course_navigation = {enabled: true}
-    @tool.save!
+    tool.course_navigation = {enabled: true}
+    tool.save!
+    tool
+  end
+
+  def create_dated_assignment(course, assignment_title, assignment_due_at)
+    course.assignments.create!(
+      title: assignment_title,
+      grading_type: 'points',
+      points_possible: 100,
+      due_at: assignment_due_at,
+      submission_types: 'online_text_entry'
+    )
+  end
+
+  def feature_setup
+    @account = Account.default
+    @account.enable_feature!(:canvas_for_elementary)
+    toggle_k5_setting(@account)
+  end
+
+  def student_setup
+    feature_setup
+    @course_name = "K5 Course"
+    @teacher_name = 'K5Teacher'
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      course_name: @course_name,
+      name: @teacher_name,
+      email: 'teacher_person@example.com'
+    )
+    @homeroom_teacher = @teacher
+    course_with_student(
+      active_all: true,
+      new_user: true,
+      user_name: 'KTStudent',
+      course: @course
+    )
+    @course.update!(homeroom_course: true)
+    @homeroom_course = @course
+
+    @subject_course_title = "Science"
+    course_with_student(
+      active_all: true,
+      user: @student,
+      course_name: @subject_course_title
+    )
+    @subject_course = @course
+  end
+
+  def teacher_setup
+    feature_setup
+    @course_name = "K5 Course"
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      course_name: @course_name,
+      name: 'K5Teacher'
+    )
+    @homeroom_teacher = @teacher
+    @course.update!(homeroom_course: true)
+    @homeroom_course = @course
+
+    @subject_course_title = "Math"
+    course_with_teacher(
+      active_course: 1,
+      active_enrollment: 1,
+      user: @homeroom_teacher,
+      course_name: @subject_course_title
+    )
+    @subject_course = @course
+  end
+
+  def create_and_submit_assignment(course)
+    assignment = course.assignments.create!(
+      title: "Math Assignment 5",
+      description: "General Assignment",
+      points_possible: 100,
+      submission_types: 'online_text_entry',
+      workflow_state: 'published'
+    )
+    assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    assignment
+  end
+
+  def create_course_module
+    @module_title = "Course Module"
+    @course_module = @subject_course.context_modules.create!(:name => @module_title)
+    @module_assignment_title = "General Assignment"
+    assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
+    @course_module.add_item(:id => assignment.id, :type => 'assignment')
   end
 end

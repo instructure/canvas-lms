@@ -219,6 +219,24 @@ class ViewManager extends React.Component {
     )
   }
 
+  onCancelDraft = () => {
+    // If we cancelled a draft consisting only of a dummy submission, we need
+    // to note its deletion. If the draft had actual content, the mutation
+    // handles updating the list of submissions.
+    this.setState((oldState, _props) => {
+      const {submissions} = oldState
+
+      if (oldState.dummyNextSubmission == null) {
+        return
+      }
+
+      return {
+        displayedAttempt: submissions[submissions.length - 1].attempt,
+        dummyNextSubmission: null
+      }
+    })
+  }
+
   render() {
     const assignment = this.getAssignment()
     const submission = this.getDisplayedSubmission()
@@ -227,6 +245,7 @@ class ViewManager extends React.Component {
       <StudentViewContext.Provider
         value={{
           allowChangesToSubmission: ENV.enrollment_state === 'active',
+          cancelDraftAction: this.onCancelDraft,
           isLatestAttempt: !this.hasNextSubmission(),
           latestSubmission: this.getLatestSubmission(),
           lastSubmittedSubmission: getInitialSubmission(this.props.initialQueryData),

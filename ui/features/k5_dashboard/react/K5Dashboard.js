@@ -45,7 +45,7 @@ import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from './ResourcesPage'
-import {TAB_IDS} from '@canvas/k5/react/utils'
+import {FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
@@ -85,11 +85,11 @@ export const K5Dashboard = ({
   toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  canCreateCourses = false
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
   const [cards, setCards] = useState(null)
-  const [focusMissingItems, setFocusMissingItems] = useState(false)
   const [cardsSettled, setCardsSettled] = useState(false)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
@@ -109,15 +109,13 @@ export const K5Dashboard = ({
   }, [cards, currentTab])
 
   const handleSwitchToToday = () => {
-    setFocusMissingItems(false)
-    handleTabChange(TAB_IDS.SCHEDULE)
+    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.TODAY)
     switchToToday()
   }
 
   const handleSwitchToMissingItems = () => {
     toggleMissing({forceExpanded: true})
-    setFocusMissingItems(true)
-    handleTabChange(TAB_IDS.SCHEDULE)
+    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.MISSING_ITEMS)
     switchToToday()
   }
 
@@ -139,12 +137,7 @@ export const K5Dashboard = ({
         <K5Tabs
           currentTab={currentTab}
           name={display_name}
-          onTabChange={id => {
-            if (id === TAB_IDS.SCHEDULE) {
-              setFocusMissingItems(false)
-            }
-            handleTabChange(id)
-          }}
+          onTabChange={handleTabChange}
           tabs={DASHBOARD_TABS}
           tabsRef={setTabsRef}
         />
@@ -154,13 +147,9 @@ export const K5Dashboard = ({
           isStudent={plannerEnabled}
           responsiveSize={responsiveSize}
           visible={currentTab === TAB_IDS.HOMEROOM}
+          canCreateCourses={canCreateCourses}
         />
-        {plannerInitialized && (
-          <SchedulePage
-            visible={currentTab === TAB_IDS.SCHEDULE}
-            focusMissingItems={focusMissingItems}
-          />
-        )}
+        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         {cards && (
@@ -190,7 +179,8 @@ K5Dashboard.propTypes = {
   toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string
+  responsiveSize: PropTypes.string,
+  canCreateCourses: PropTypes.bool
 }
 
 const mapDispatchToProps = {

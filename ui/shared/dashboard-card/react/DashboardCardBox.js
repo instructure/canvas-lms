@@ -148,6 +148,7 @@ export default class DashboardCardBox extends React.Component {
         term={card.term}
         assetString={card.assetString}
         backgroundColor={this.colorForCard(card.assetString)}
+        courseColor={card.color}
         handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
         image={card.image}
         hideColorOverlays={this.props.hideColorOverlays}

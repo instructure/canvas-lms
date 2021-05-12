@@ -125,7 +125,8 @@ QUnit.module('EditView', {
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
       COURSE_ID: 1,
-      ANNOTATED_DOCUMENT_SUBMISSIONS: true
+      ANNOTATED_DOCUMENT_SUBMISSIONS: true,
+      USAGE_RIGHTS_REQUIRED: true
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2163,7 +2164,18 @@ QUnit.module('EditView student annotation submission', hooks => {
       notOk(container.textContent.includes(filename))
     })
 
+    test('does not render usage rights when they are not required', function () {
+      ENV.USAGE_RIGHTS_REQUIRED = false
+      view = editView(assignmentOpts)
+      view.$el.find('#assignment_annotated_document').prop('checked', true)
+      view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
+      view.afterRender()
+      const container = document.querySelector('#annotated_document_usage_rights_container')
+      strictEqual(container.innerHTML, '')
+    })
+
     test('renders the usage rights container properly', function () {
+      ENV.USAGE_RIGHTS_REQUIRED = true
       const defaultCourseUrl = '/api/v1/files/1?include%5B%5D=usage_rights'
       const contentLicensesUrl = '/api/v1/courses/1/content_licenses'
       const fileData = {

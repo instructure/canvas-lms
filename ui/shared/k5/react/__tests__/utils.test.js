@@ -25,21 +25,24 @@ import {
   fetchLatestAnnouncement,
   readableRoleName,
   fetchCourseApps,
-  sendMessage
+  sendMessage,
+  createNewCourse,
+  enrollAsTeacher,
+  getAssignmentGroupTotals,
+  getAssignmentGrades
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
-
 const GRADES_URL = /\/api\/v1\/users\/self\/courses\?.*/
 const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
-
 const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
-
 const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
-
 const CONVERSATIONS_URL = '/api/v1/conversations'
+const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science'
+const ENROLL_AS_TEACHER_URL =
+  '/api/v1/courses/test/enrollments?enrollment[type]=TeacherEnrollment&enrollment[user_id]=self&enrollment[enrollment_state]=active'
 
 afterEach(() => {
   fetchMock.restore()
@@ -116,6 +119,7 @@ describe('fetchGrades', () => {
     id: '1',
     name: 'Intro to Everything',
     image_download_url: 'https://course.img',
+    course_color: '#ace',
     has_grading_periods: true,
     homeroom_course: false,
     enrollments: [
@@ -148,6 +152,7 @@ describe('fetchGrades', () => {
         courseId: '1',
         courseName: 'Intro to Everything',
         courseImage: 'https://course.img',
+        courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
         gradingPeriods: [
@@ -176,6 +181,7 @@ describe('fetchGrades', () => {
         courseId: '1',
         courseName: 'Intro to Everything',
         courseImage: 'https://course.img',
+        courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
         gradingPeriods: [],
@@ -249,5 +255,120 @@ describe('sendMessage', () => {
     fetchMock.post(CONVERSATIONS_URL, 200)
     const result = await sendMessage(1, 'Hello user #1!', null)
     expect(result.response.ok).toBeTruthy()
+  })
+})
+
+describe('createNewCourse', () => {
+  it('posts to the new course endpoint and returns the new id', async () => {
+    fetchMock.post(encodeURI(NEW_COURSE_URL), {id: '56'})
+    const result = await createNewCourse(15, 'Science')
+    expect(result.id).toBe('56')
+  })
+})
+
+describe('enrollAsTeacher', () => {
+  it('posts to the enrollments endpoint', async () => {
+    fetchMock.post(encodeURI(ENROLL_AS_TEACHER_URL), 200)
+    const result = await enrollAsTeacher('test')
+    expect(result.response.ok).toBeTruthy()
+  })
+})
+
+describe('getAssignmentGroupTotals', () => {
+  it('returns an array of objects that have id, name, and score', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              late: false,
+              excused: false,
+              missing: false
+            }
+          },
+          {
+            id: 150,
+            name: '2',
+            points_possible: 5.0,
+            grading_type: 'points',
+            submission: {
+              score: 5.0,
+              grade: '5.0',
+              late: false,
+              excused: false,
+              missing: false
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data)
+    expect(totals.length).toBe(1)
+    expect(totals[0].id).toBe('49')
+    expect(totals[0].name).toBe('Assignments')
+    expect(totals[0].score).toBe('80.00%')
+  })
+
+  it('returns n/a for assignment groups with no assignments', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: []
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data)
+    expect(totals[0].score).toBe('n/a')
+  })
+})
+
+describe('getAssignmentGrades', () => {
+  it('includes assignments from different groups in returned array', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            html_url: 'http://localhost/1',
+            due_at: null,
+            points_possible: 10.0,
+            grading_type: 'points'
+          }
+        ]
+      },
+      {
+        id: '50',
+        name: 'Essays',
+        assignments: [
+          {
+            id: 150,
+            name: '2',
+            html_url: 'http://localhost/2',
+            due_at: '2020-04-18T05:59:59Z',
+            points_possible: 10.0,
+            grading_type: 'points'
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals.length).toBe(2)
+    expect(totals[0].assignmentName).toBe('2')
+    expect(totals[1].assignmentName).toBe('1')
   })
 })

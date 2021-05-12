@@ -28,7 +28,7 @@ jest.mock('../AttemptSelect')
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()
   const {getByTestId} = render(<Header {...props} />)
-  expect(getByTestId('assignment-student-header-normal')).toBeInTheDocument()
+  expect(getByTestId('assignment-student-header')).toBeInTheDocument()
 })
 
 it('renders a "View Feedback" button', async () => {
@@ -72,7 +72,7 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async 
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
 })
 
-it('will render the latest grade instead of the displayed submissions grade', async () => {
+it('shows the most recently received grade as the "canonical" score', async () => {
   const lastSubmittedSubmission = await mockSubmission({
     Submission: {
       ...SubmissionMocks.graded,
@@ -90,14 +90,67 @@ it('will render the latest grade instead of the displayed submissions grade', as
     }
   })
 
-  const {queryByText, queryAllByText} = render(
+  const {getByText} = render(
     <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
       <Header {...props} />
     </StudentViewContext.Provider>
   )
 
-  expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
-  expect(queryByText('131/150 Points')).not.toBeInTheDocument()
+  expect(getByText('147/150 Points')).toBeInTheDocument()
+})
+
+it('renders the grade for the currently selected attempt', async () => {
+  const lastSubmittedSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '147',
+      enteredGrade: '147'
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 7,
+      grade: '131',
+      enteredGrade: '131'
+    }
+  })
+
+  const {container} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+
+  expect(container).toHaveTextContent(/Attempt 7 Score:\s*131\/150/)
+})
+
+it('renders "N/A" for the currently selected attempt if it has no grade', async () => {
+  const lastSubmittedSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '147',
+      enteredGrade: '147'
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.submitted,
+      attempt: 7
+    }
+  })
+
+  const {container} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+
+  expect(container).toHaveTextContent(/Attempt 7 Score:\s*N\/A/)
 })
 
 it('will not render the grade if the last submitted submission is excused', async () => {
@@ -124,7 +177,7 @@ it('will not render the grade if the last submitted submission is excused', asyn
     </StudentViewContext.Provider>
   )
 
-  expect(getByTestId('grade-display').textContent).toEqual('Excused!')
+  expect(getByTestId('grade-display').textContent).toEqual('Excused')
 })
 
 describe('submission workflow tracker', () => {

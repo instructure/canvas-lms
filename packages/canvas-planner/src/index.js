@@ -121,11 +121,19 @@ function mergeDefaultOptions(options) {
   return newOpts
 }
 
+function getCourseColor({assetString, color}, {K5_MODE, PREFERENCES: {custom_colors = {}}}) {
+  if (K5_MODE) {
+    return color || '#394B58'
+  } else {
+    return custom_colors[assetString]
+  }
+}
+
 function initializeCourseAndGroupColors(options) {
   if (!options.env.PREFERENCES) return
   options.env.STUDENT_PLANNER_COURSES = options.env.STUDENT_PLANNER_COURSES.map(dc => ({
     ...dc,
-    color: options.env.PREFERENCES.custom_colors[dc.assetString]
+    color: getCourseColor(dc, options.env)
   }))
   options.env.STUDENT_PLANNER_GROUPS = options.env.STUDENT_PLANNER_GROUPS.map(dg => ({
     ...dg,

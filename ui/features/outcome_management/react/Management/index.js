@@ -194,6 +194,8 @@ const OutcomeManagementPanel = () => {
               position="relative"
               height="60vh"
               as="div"
+              overflowY="auto"
+              overflowX="hidden"
             >
               <View as="div" padding="small none none x-small">
                 <Text size="large" weight="light" fontStyle="normal">

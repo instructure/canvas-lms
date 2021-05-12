@@ -31,14 +31,15 @@ describe Types::DiscussionType do
   end
 
   it 'allows querying for entry counts' do
-
     3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
-
+    discussion.discussion_entries.take.destroy
+    expect(discussion_type.resolve('entryCounts { deletedCount }')).to eq 1
     expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 0
-    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 2
     DiscussionEntryParticipant.where(user_id: @teacher).update_all(workflow_state: 'unread')
-    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 3
-    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 3
+    expect(discussion_type.resolve('entryCounts { deletedCount }')).to eq 1
+    expect(discussion_type.resolve('entryCounts { unreadCount }')).to eq 2
+    expect(discussion_type.resolve('entryCounts { repliesCount }')).to eq 2
   end
 
   it "queries the attribute" do
@@ -134,12 +135,77 @@ describe Types::DiscussionType do
   end
 
   it 'returns the current user permissions' do
-    expect(discussion_type.resolve('permissions { delete }')).to eq true
-    expect(discussion.grants_right?(@teacher, nil, :delete)).to eq true
+    permissions = {
+      attach: 'attach',
+      create: 'create',
+      delete: 'delete',
+      duplicate: 'duplicate',
+      moderate_forum: 'moderateForum',
+      rate: 'rate',
+      read: 'read',
+      read_as_admin: 'readAsAdmin',
+      read_replies: 'readReplies',
+      reply: 'reply',
+      update: 'update'
+    }
 
     student_in_course(active_all: true)
-    type = GraphQLTypeTester.new(discussion, current_user: @student)
-    expect(type.resolve('permissions { delete }')).to eq false
-    expect(discussion.grants_right?(@student, nil, :delete)).to eq false
+    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
+
+    permissions.keys.each do |key|
+      permission = discussion.grants_right?(@teacher, nil, key)
+      expect(discussion_type.resolve("permissions { #{permissions[key]} }")).to eq permission
+
+      permission = discussion.grants_right?(@student, nil, key)
+      expect(type_with_student.resolve("permissions { #{permissions[key]} }")).to eq permission
+    end
+  end
+
+  it 'returns the course sections' do
+    section = add_section('Dope Section')
+    topic = discussion_topic_model(context: @course, is_section_specific: true, course_section_ids: [section.id])
+    type = GraphQLTypeTester.new(topic, current_user: @teacher)
+
+    expect(type.resolve('courseSections { _id }')[0]).to eq section.id.to_s
+    expect(type.resolve('courseSections { name }')[0]).to eq section.name
+  end
+
+  it 'returns if the discussion is able to be unpublished' do
+    result = discussion_type.resolve('canUnpublish')
+    expect(result).to eq discussion.can_unpublish?
+  end
+
+  context 'pagination' do
+    before(:once) do
+      # Add 10 root entries
+      @total_root_entries = 10
+      @total_root_entries.times do |i|
+        discussion.discussion_entries.create!(message: "Message #{i}", user: @teacher)
+      end
+      # Add 10 subentries
+      @total_subentries = 10
+      subentry = discussion.discussion_entries.first
+      @total_subentries.times do |i|
+        subentry.discussion_subentries.create!(
+          message: "Subentry #{i}",
+          user: @teacher,
+          discussion_topic_id: discussion.id
+        )
+      end
+
+      @total_entries = @total_root_entries + @total_subentries
+    end
+
+    it 'returns total number of root entry pages' do
+      (1..@total_root_entries).each do |i|
+        expect(discussion_type.resolve("rootEntriesTotalPages(perPage: #{i})")).to eq((@total_root_entries.to_f / i).ceil)
+      end
+    end
+
+    it 'returns total number of entry pages' do
+      (1..@total_entries).each do |i|
+        expect(discussion_type.resolve("entriesTotalPages(perPage: #{i})")).to eq((@total_entries.to_f / i).ceil)
+      end
+    end
   end
 end

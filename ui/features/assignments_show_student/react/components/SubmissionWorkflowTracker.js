@@ -17,6 +17,7 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import I18n from 'i18n!assignments_2_student_header'
 import {ProgressCircle} from '@instructure/ui-progress'
 import React from 'react'
@@ -26,14 +27,45 @@ import {Text} from '@instructure/ui-elements'
 const possibleStates = {
   inProgress: {
     value: 1,
-    title: I18n.t('In Progress'),
+    title: <Text transform="uppercase">{I18n.t('In Progress')}</Text>,
     subtitle: I18n.t('Next Up: Submit Assignment')
   },
-  submitted: {value: 2, title: I18n.t('Submitted'), subtitle: I18n.t('Next Up: Review Feedback')},
+  submitted: {
+    value: 2,
+    title: submission => {
+      // Hard-coding the upper-casing into the prefix is not what we'd prefer,
+      // but it doesn't seem possible to transform the string using I18n
+      // wrappers *and* have it play nice with the rendering in
+      // FriendlyDatetime.
+      return (
+        <FriendlyDatetime
+          dateTime={submission.submittedAt}
+          format={I18n.t('#date.formats.full')}
+          prefix={I18n.t('SUBMITTED on')}
+          showTime
+        />
+      )
+    },
+    subtitle: I18n.t('Next Up: Review Feedback')
+  },
   completed: {
     value: 3,
-    title: I18n.t('Review Feedback'),
-    subtitle: I18n.t('This assignment is complete!')
+    title: <Text transform="uppercase">{I18n.t('Review Feedback')}</Text>,
+    subtitle: submission => {
+      const {submittedAt} = submission
+      if (submittedAt == null) {
+        return I18n.t('This assignment is complete!')
+      }
+
+      return (
+        <FriendlyDatetime
+          dateTime={submittedAt}
+          format={I18n.t('#date.formats.full')}
+          prefix={I18n.t('Submitted on')}
+          showTime
+        />
+      )
+    }
   }
 }
 
@@ -51,6 +83,9 @@ function currentWorkflowState({submission}) {
   const valueMax = Math.max(...Object.values(possibleStates).map(state => state.value))
   return {state: currentState, valueMax}
 }
+
+const renderStateText = (submission, stateText) =>
+  typeof stateText === 'function' ? stateText(submission) : stateText
 
 export default function SubmissionWorkflowTracker({submission}) {
   if (!submission) {
@@ -74,18 +109,17 @@ export default function SubmissionWorkflowTracker({submission}) {
           />
         </Flex.Item>
         <Flex.Item shouldGrow>
-          {state.title && (
-            <Text
-              as="div"
-              color="success"
-              data-testid="submission-workflow-tracker-title"
-              transform="uppercase"
-              weight="bold"
-            >
-              {state.title}
-            </Text>
-          )}
-          {state.subtitle && <Text as="div">{state.subtitle}</Text>}
+          <Text
+            as="div"
+            color="success"
+            data-testid="submission-workflow-tracker-title"
+            weight="bold"
+          >
+            {renderStateText(submission, state.title)}
+          </Text>
+          <Text as="div" data-testid="submission-workflow-tracker-subtitle">
+            {renderStateText(submission, state.subtitle)}
+          </Text>
         </Flex.Item>
       </Flex>
     </div>

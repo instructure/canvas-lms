@@ -27,6 +27,7 @@ import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
+import {Table} from '@instructure/ui-table'
 
 import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
 
@@ -79,6 +80,9 @@ export const theme = {
   [PlannerItem.theme]: {
     iconColor: colors.licorice,
     secondaryColor: colors.licorice
+  },
+  [Table.Cell.theme]: {
+    padding: '1rem 0.75rem'
   }
 }
 

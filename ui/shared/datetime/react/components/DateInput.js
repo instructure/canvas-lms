@@ -21,7 +21,6 @@ import React, {useRef, useState} from 'react'
 import {arrayOf, bool, element, func, oneOfType, shape, string} from 'prop-types'
 import moment from 'moment-timezone'
 import tz from '@canvas/timezone'
-import {DateTime} from '@instructure/ui-i18n'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'
@@ -97,6 +96,7 @@ CanvasDateInput.propTypes = {
   formatDate: func.isRequired,
   onSelectedDateChange: func.isRequired,
   interaction: string,
+  locale: string,
   placement: string,
   withRunningValue: bool,
   invalidDateMessage: oneOfType([string, func]),
@@ -106,7 +106,7 @@ CanvasDateInput.propTypes = {
 
 CanvasDateInput.defaultProps = {
   selectedDate: null,
-  timezone: ENV?.TIMEZONE || DateTime.browserTimeZone(),
+  timezone: ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone,
   renderLabel: I18n.t('Choose a date'),
   messages: [],
   interaction: 'enabled',
@@ -124,6 +124,7 @@ export default function CanvasDateInput({
   formatDate,
   onSelectedDateChange,
   interaction,
+  locale: specifiedLocale,
   placement,
   withRunningValue,
   invalidDateMessage,
@@ -170,17 +171,32 @@ export default function CanvasDateInput({
   function renderDays() {
     // This is expensive, so only do it if the calendar is open
     if (!isShowingCalendar) return null
+
+    const locale = specifiedLocale || ENV?.LOCALE || navigator.language
+
+    const labelFormatter = new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: timezone
+    })
+
+    const dayFormat = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      timeZone: timezone
+    })
+
     const days = generateMonthMoments().map(dayMoment => (
       <DateInput.Day
         key={dayMoment.toISOString()}
         date={dayMoment.toISOString(true)}
-        label={tz.format(dayMoment.toDate(), 'date.formats.medium')}
+        label={labelFormatter.format(dayMoment.toDate())}
         isSelected={dayMoment.isSame(selectedMoment, 'day')}
         isToday={dayMoment.isSame(todayMoment, 'day')}
         isOutsideMonth={!dayMoment.isSame(renderedMoment, 'month')}
         onClick={handleDayClick}
       >
-        {dayMoment.format('D')}
+        {dayFormat.format(dayMoment.toDate())}
       </DateInput.Day>
     ))
     return days

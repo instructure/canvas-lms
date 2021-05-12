@@ -25,9 +25,12 @@ import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
+import {graphql} from 'msw'
 
 describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
+  const onFailureStub = jest.fn()
+  const onSuccessStub = jest.fn()
   beforeAll(() => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -36,6 +39,8 @@ describe('DiscussionThreadContainer', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    onFailureStub.mockClear()
+    onSuccessStub.mockClear()
   })
 
   afterAll(() => {
@@ -44,7 +49,7 @@ describe('DiscussionThreadContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const defaultProps = () => {
+  const defaultProps = overrides => {
     return {
       _id: '49',
       id: '49',
@@ -70,14 +75,26 @@ describe('DiscussionThreadContainer', () => {
       editor: null,
       lastReply: {
         createdAt: '2021-04-05T13:41:42-06:00'
-      }
+      },
+      permissions: {
+        attach: true,
+        create: true,
+        delete: true,
+        rate: true,
+        read: true,
+        reply: true,
+        update: true
+      },
+      ...overrides
     }
   }
 
   const setup = props => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider
+          value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+        >
           <DiscussionThreadContainer {...props} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
@@ -120,24 +137,118 @@ describe('DiscussionThreadContainer', () => {
     expect(queryByTestId('collapse-replies')).toBeNull()
   })
 
-  it('should unread entry when Mark As Unread is clicked', async () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
+  describe('read state', () => {
+    it('indicates the update to the user', async () => {
+      const {getByTestId} = setup(defaultProps())
 
-    fireEvent.click(getByTestId('thread-actions-menu'))
-    fireEvent.click(getByTestId('markAsUnread'))
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByTestId('markAsUnread'))
 
-    await waitFor(() => {
-      expect(queryByTestId('is-unread')).toBeTruthy()
+      await waitFor(() => {
+        expect(onSuccessStub.mock.calls.length).toBe(1)
+        expect(onFailureStub.mock.calls.length).toBe(0)
+      })
+    })
+
+    describe('error handling', () => {
+      beforeEach(() => {
+        server.use(
+          graphql.mutation('UpdateDiscussionEntryParticipant', (req, res, ctx) => {
+            return res.once(
+              ctx.errors([
+                {
+                  message: 'foobar'
+                }
+              ])
+            )
+          })
+        )
+      })
+
+      it('indicates the failure to the user', async () => {
+        const {getByTestId} = setup(defaultProps())
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        fireEvent.click(getByTestId('markAsUnread'))
+
+        await waitFor(() => {
+          expect(onSuccessStub.mock.calls.length).toBe(0)
+          expect(onFailureStub.mock.calls.length).toBe(1)
+        })
+      })
     })
   })
 
-  it('should read entry when Mark As Read is clicked', async () => {
-    const {getByTestId, queryByTestId} = setup({...defaultProps(), read: false})
-    fireEvent.click(getByTestId('thread-actions-menu'))
-    fireEvent.click(getByTestId('markAsRead'))
+  describe('ratings', () => {
+    it('indicates the update to the user', async () => {
+      const {getByTestId} = setup(defaultProps())
 
-    await waitFor(() => {
-      expect(queryByTestId('is-unread')).toBeNull()
+      fireEvent.click(getByTestId('like-button'))
+
+      await waitFor(() => {
+        expect(onSuccessStub.mock.calls.length).toBe(1)
+        expect(onFailureStub.mock.calls.length).toBe(0)
+      })
+    })
+
+    describe('error handling', () => {
+      beforeEach(() => {
+        server.use(
+          graphql.mutation('UpdateDiscussionEntryParticipant', (req, res, ctx) => {
+            return res.once(
+              ctx.errors([
+                {
+                  message: 'foobar'
+                }
+              ])
+            )
+          })
+        )
+      })
+
+      it('indicates the failure to the user', async () => {
+        const {getByTestId} = setup(defaultProps())
+
+        fireEvent.click(getByTestId('like-button'))
+
+        await waitFor(() => {
+          expect(onSuccessStub.mock.calls.length).toBe(0)
+          expect(onFailureStub.mock.calls.length).toBe(1)
+        })
+      })
+    })
+  })
+
+  describe('SpeedGrader', () => {
+    it('Should be able to open SpeedGrader', async () => {
+      const {getByTestId, findByText} = setup(
+        defaultProps({
+          assignment: {
+            dueAt: '2021-04-05T13:40:50Z',
+            pointsPossible: 5
+          }
+        })
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByTestId('inSpeedGrader'))
+
+      await waitFor(() => {
+        expect(
+          findByText('This student does not have a submission for this assignment')
+        ).toBeTruthy()
+      })
+    })
+
+    it('Should not be able to open SpeedGrader if is not an assignment', () => {
+      const {getByTestId, queryByTestId} = setup(
+        defaultProps({
+          assignment: null
+        })
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(queryByTestId('inSpeedGrader')).toBeNull()
     })
   })
 })

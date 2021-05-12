@@ -136,11 +136,11 @@ describe InstFS do
         end
       end
 
-      it "retries if imperium is timing out" do
+      it "retries if consul is erroring out" do
         times_called = 0
         allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs", default_ttl: 5.minutes) do
           times_called += 1
-          raise Imperium::SendTimeout if times_called < 2
+          raise Diplomat::KeyNotFound if times_called < 2
           settings_hash
         end
         expect(InstFS.authenticated_url(@attachment, {}))
@@ -149,9 +149,9 @@ describe InstFS do
 
       it "actually fails with a config error if can't find config" do
         allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs", default_ttl: 5.minutes) do
-          raise Imperium::SendTimeout
+          raise Diplomat::KeyNotFound
         end
-        expect{ InstFS.authenticated_url(@attachment, {}) }.to raise_error(Imperium::TimeoutError)
+        expect{ InstFS.authenticated_url(@attachment, {}) }.to raise_error(Diplomat::KeyNotFound)
       end
 
       describe "jwt claims" do

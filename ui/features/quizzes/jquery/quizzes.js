@@ -2860,7 +2860,7 @@ $(document).ready(function() {
     quiz.updateDisplayComments()
   })
 
-  $(document).delegate('a.comment_focus', 'click', function(event) {
+  $(document).delegate('div.answer_comments, a.comment_focus', 'click', function (event) {
     event.preventDefault()
     const $link = $(this)
     const $comment = $link.closest('.question_comment, .answer_comments')
@@ -2878,7 +2878,7 @@ $(document).ready(function() {
         editorBoxLabel: $link.title
       })
 
-      toggler.editButton = $link
+      toggler.editButton = $comment // focus on the comment box after closing the RCE
       toggler.on('display', () => {
         $comment.removeClass('editing')
 
@@ -2896,6 +2896,13 @@ $(document).ready(function() {
       $comment.addClass('editing')
       toggler.edit()
     }
+  })
+
+  // while focusing on an answer comment box, trigger its click event when the
+  // Space or Enter key is pressed
+  $(document).delegate('.answer_comments', 'keyup', function (event) {
+    const keycode = event.keyCode || event.which
+    if ([13, 32].indexOf(keycode) > -1) $(this).click()
   })
 
   $(document)

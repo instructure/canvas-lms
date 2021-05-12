@@ -166,20 +166,22 @@ describe('CreateOutcomeModal', () => {
   })
 
   it('displays an error on failed request for account outcome groups', async () => {
-    const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+    const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
+    const {getByText} = within(getByTestId('loading-error'))
     expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
   })
 
   it('displays an error on failed request for course outcome groups', async () => {
-    const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+    const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
       contextType: 'Course',
       contextId: '2',
       mocks: []
     })
     await act(async () => jest.runAllTimers())
+    const {getByText} = within(getByTestId('loading-error'))
     expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
   })
 

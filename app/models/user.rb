@@ -204,6 +204,8 @@ class User < ActiveRecord::Base
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
+  belongs_to :merged_into_user, class_name: 'User'
+
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name, :pronouns
 
