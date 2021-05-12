@@ -192,12 +192,6 @@ describe ExternalToolsController do
           get :show, params: {:course_id => @course.id, id: tool.id}
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/roles"]).to include("http://purl.imsglobal.org/vocab/lti/system/person#TestUser")
         end
-
-        it 'API request returns unauthorized' do
-          allow(controller).to receive(:api_request?).and_return(true)
-          get :show, params: {:course_id => @course.id, id: tool.id}
-          expect(response).to be_unauthorized
-        end
       end
     end
 
@@ -869,16 +863,6 @@ describe ExternalToolsController do
       user_model
       user_session(@user)
       get 'retrieve', params: {:course_id => @course.id}
-      assert_unauthorized
-    end
-
-    it 'should restrict students from launching tools with limited visibility' do
-      user_session(@student)
-      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob")
-      tool.url = "http://www.example.com/basic_lti"
-      tool.course_navigation = { visibility: 'admins'}
-      tool.save!
-      get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/basic_lti", placement: 'course_navigation'}
       assert_unauthorized
     end
 
