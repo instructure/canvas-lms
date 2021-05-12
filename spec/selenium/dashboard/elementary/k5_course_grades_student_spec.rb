@@ -135,4 +135,17 @@ describe "student k5 course grades tab" do
       expect(grades_assignments_list[0].text).to include("#{student_score}%")
     end
   end
+
+  context 'new grade indicator' do
+    before :each do
+      assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)
+      assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+    end
+
+    it 'shows new grade indicator the first time the grades tab is accessed after grading' do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(new_grade_badge).to be_displayed
+    end
+  end
 end

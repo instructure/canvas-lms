@@ -356,6 +356,10 @@ module K5PageObject
     ".Grouping-styles__overlay"
   end
 
+  def new_grade_badge_selector
+    "[data-testid='new-grade-indicator']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -705,6 +709,10 @@ module K5PageObject
 
   def planner_assignment_header
     f(planner_assignment_header_selector)
+  end
+
+  def new_grade_badge
+    f(new_grade_badge_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
