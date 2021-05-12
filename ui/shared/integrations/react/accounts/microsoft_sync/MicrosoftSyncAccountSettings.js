@@ -20,12 +20,13 @@ import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
+import {IconUploadLine} from '@instructure/ui-icons'
 import I18n from 'i18n!account_settings_jsx_bundle'
 import React from 'react'
 import LoginAttributeSelector from './components/LoginAttributeSelector'
 import MicrosoftSyncTitle from './components/MicrosoftSyncTitle'
 import TenantInput from './components/TenantInput'
-import UpdateSettingsButton from './components/UpdateSettingsButton'
 import AdminConsentLink from './components/AdminConsentLink'
 import {reducerActions} from './lib/settingsReducer'
 import useSettings from './lib/useSettings'
@@ -52,9 +53,10 @@ export default function MicrosoftSyncAccountSettings() {
           {state.errorMessage && (
             <Alert
               variant="error"
-              renderCloseButtonLabel="Close"
+              renderCloseButtonLabel={I18n.t('Close')}
               margin="small"
               onDismiss={() => dispatch({type: reducerActions.removeAlerts})}
+              timeout={5000}
             >
               {state.errorMessage}
             </Alert>
@@ -62,9 +64,10 @@ export default function MicrosoftSyncAccountSettings() {
           {state.successMessage && (
             <Alert
               variant="success"
-              renderCloseButtonLabel="Close"
+              renderCloseButtonLabel={I18n.t('Close')}
               margin="small"
               onDismiss={() => dispatch({type: reducerActions.removeAlerts})}
+              timeout={5000}
             >
               {state.successMessage}
             </Alert>
@@ -74,7 +77,8 @@ export default function MicrosoftSyncAccountSettings() {
           handleClick={() => {
             dispatch({type: reducerActions.toggleSync, dispatch})
           }}
-          isEnabled={state.microsoft_sync_enabled}
+          syncEnabled={state.microsoft_sync_enabled}
+          interactionDisabled={!state.uiEnabled}
         />
         <TenantInput
           tenantInputHandler={event =>
@@ -95,11 +99,15 @@ export default function MicrosoftSyncAccountSettings() {
           }
           selectedLoginAttribute={state.selectedAttribute}
         />
-        <UpdateSettingsButton
-          handleClick={() => {
-            dispatch({type: reducerActions.updateSettings, dispatch})
-          }}
-        />
+        <Button
+          renderIcon={IconUploadLine}
+          interaction={state.uiEnabled ? 'enabled' : 'disabled'}
+          color="primary"
+          onClick={() => dispatch({type: reducerActions.updateSettings, dispatch})}
+          margin="small 0 small 0"
+        >
+          {I18n.t('Update Settings')}
+        </Button>
         <AdminConsentLink
           enabled={
             state.microsoft_sync_enabled &&

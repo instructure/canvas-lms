@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {doUpdateSettings, validateTenant} from './settingsHelper'
+import {doUpdateSettings, validateTenant, clearMessages} from './settingsHelper'
 import I18n from 'i18n!account_settings_jsx_bundle'
 
 /**
@@ -61,6 +61,8 @@ export const reducerActions = {
  * Any tenant input validation error messages
  * @property {boolean} loading
  * Whether settings are still being loaded or not
+ * @property {boolean} uiEnabled
+ * Whether the user can interact with the UI.
  * @property {boolean} microsoft_sync_enabled
  * Whether Teams sync is enabled or not
  * @property {string} microsoft_sync_tenant
@@ -82,6 +84,7 @@ export const defaultState = {
   errorMessage: '',
   tenantErrorMessages: [],
   loading: true,
+  uiEnabled: true,
   microsoft_sync_enabled: false,
   microsoft_sync_tenant: '',
   microsoft_sync_login_attribute: 'email',
@@ -101,11 +104,7 @@ export const defaultState = {
 export function settingsReducer(state, {type, payload, dispatch}) {
   switch (type) {
     case reducerActions.removeAlerts: {
-      return {
-        ...state,
-        errorMessage: '',
-        successMessage: ''
-      }
+      return clearMessages({...state})
     }
     case reducerActions.updateAttribute: {
       // Gotta keep track of both the actual login attribute and the selected one
@@ -123,7 +122,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       }
     }
     case reducerActions.updateSettings: {
-      const stateAfterUpdate = validateTenant({...state})
+      const stateAfterUpdate = validateTenant(clearMessages({...state}))
       if (stateAfterUpdate.tenantErrorMessages.length > 0) {
         return stateAfterUpdate
       } else {
@@ -135,11 +134,12 @@ export function settingsReducer(state, {type, payload, dispatch}) {
           .then(() => dispatch({type: reducerActions.updateSuccess}))
           .catch(() => dispatch({type: reducerActions.updateError}))
 
+        stateAfterUpdate.uiEnabled = false
         return stateAfterUpdate
       }
     }
     case reducerActions.toggleSync: {
-      const stateAfterToggle = validateTenant({...state})
+      const stateAfterToggle = validateTenant(clearMessages({...state}))
 
       if (stateAfterToggle.tenantErrorMessages.length > 0) {
         return stateAfterToggle
@@ -153,6 +153,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
           .then(() => dispatch({type: reducerActions.updateSuccess}))
           .catch(() => dispatch({type: reducerActions.toggleError}))
 
+        stateAfterToggle.uiEnabled = false
         return stateAfterToggle
       }
     }
@@ -187,7 +188,8 @@ export function settingsReducer(state, {type, payload, dispatch}) {
     case reducerActions.updateSuccess: {
       return {
         ...state,
-        successMessage: I18n.t('Microsoft Teams Sync settings updated!')
+        successMessage: I18n.t('Microsoft Teams Sync settings updated!'),
+        uiEnabled: true
       }
     }
     case reducerActions.updateError: {
@@ -195,7 +197,8 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         errorMessage: I18n.t(
           'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
-        )
+        ),
+        uiEnabled: true
       }
     }
     case reducerActions.toggleError: {
@@ -204,7 +207,8 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         errorMessage: I18n.t(
           'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
         ),
-        microsoft_sync_enabled: !state.microsoft_sync_enabled
+        microsoft_sync_enabled: !state.microsoft_sync_enabled,
+        uiEnabled: true
       }
     }
   }

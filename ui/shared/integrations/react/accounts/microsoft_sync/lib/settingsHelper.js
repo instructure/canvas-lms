@@ -71,3 +71,14 @@ export function validateTenant(state) {
   }
   return state
 }
+
+/**
+ * Removes all error and success messages from the state.
+ * @param {import('./settingsReducer').State} state
+ * @returns The state with all error and success messages cleared.
+ */
+export function clearMessages(state) {
+  state.errorMessage = ''
+  state.successMessage = ''
+  return state
+}
