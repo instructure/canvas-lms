@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-media",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A component that will handle upload/record and displaying of media",
   "author": "Instructure, Inc.",
   "main": "lib/index.js",
@@ -10,11 +10,13 @@
     "test": "jest --color --runInBand",
     "jest": "jest --runInBand",
     "test:debug": "node --inspect-brk ../../node_modules/.bin/jest --runInBand",
+    "build": "yarn build:canvas",
     "build:es": "babel src --out-dir es --ignore '**/__tests__'",
     "build:cjs": "JEST_WORKER_ID=true babel src --out-dir lib --ignore '**/__tests__'",
     "build:canvas": "yarn run build:es && yarn run build:cjs",
     "build:watch": "yarn run build:es --watch",
-    "clean": "rm -rf lib && rm -rf es && rm -rf coverage"
+    "clean": "rm -rf lib && rm -rf es && rm -rf coverage",
+    "prepublishOnly": "yarn build && yarn test"
   },
   "repository": {
     "type": "git",
