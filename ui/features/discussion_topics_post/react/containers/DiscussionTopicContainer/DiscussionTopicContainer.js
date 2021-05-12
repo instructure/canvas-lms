@@ -225,6 +225,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       avatarUrl={discussionTopicData.avatarUrl}
                       pillText={I18n.t('Author')}
                       timingDisplay={discussionTopicData.postedAt}
+                      title={discussionTopicData.title}
                       message={discussionTopicData.message}
                     >
                       {canReply && (

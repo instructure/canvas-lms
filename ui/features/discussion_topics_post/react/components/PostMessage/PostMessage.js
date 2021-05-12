@@ -48,22 +48,29 @@ export function PostMessage({...props}) {
         </>
       }
       description={
-        props.isEditing ? (
-          <View display="inline-block" margin="small none none none" width="100%">
-            <DiscussionEdit
-              onCancel={props.onCancel}
-              value={props.message}
-              onSubmit={props.onSave}
-            />
-          </View>
-        ) : (
-          <>
-            <div dangerouslySetInnerHTML={{__html: props.message}} />
-            <View display="block" margin="small none none none">
-              {props.children}
+        <>
+          {props.title && (
+            <View as="div" margin="medium none">
+              <Text size="x-large">{props.title}</Text>
             </View>
-          </>
-        )
+          )}
+          {props.isEditing ? (
+            <View display="inline-block" margin="small none none none" width="100%">
+              <DiscussionEdit
+                onCancel={props.onCancel}
+                value={props.message}
+                onSubmit={props.onSave}
+              />
+            </View>
+          ) : (
+            <>
+              <div dangerouslySetInnerHTML={{__html: props.message}} />
+              <View display="block" margin="small none none none">
+                {props.children}
+              </View>
+            </>
+          )}
+        </>
       }
       alignContent="top"
       margin="0 0 medium 0"
@@ -113,6 +120,10 @@ PostMessage.propTypes = {
    * timestamp to be formatted.
    */
   timingDisplay: PropTypes.string.isRequired,
+  /**
+   * Display text for the post's title. Only pass this in if it's a DiscussionTopic
+   */
+  title: PropTypes.string,
   /**
    * Display text for the post's message
    */
