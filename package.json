@@ -162,7 +162,7 @@
     "tablesorter": "^2.28.5",
     "timezone": "https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz",
     "tinycolor2": "1.4.1",
-    "tinymce-a11y-checker": "3.0.0-rc2",
+    "tinymce-a11y-checker": "^3.0.0",
     "use-debounce": "^3",
     "use-media-set": "^1.1",
     "uuid": "^3.2.1"
