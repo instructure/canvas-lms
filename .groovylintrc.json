@@ -64,6 +64,9 @@
     "UnnecessaryObjectReferences": {
       "enabled": false
     },
+    "UnnecessaryPackageReference": {
+      "enabled": false
+    },
     "UnnecessarySetter": {
       "enabled": false
     },
