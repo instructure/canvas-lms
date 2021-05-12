@@ -71,7 +71,7 @@ const LongDescriptionDialog = ({open, close, longDescription}) => {
         <Heading>{modalHeader}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <Text lineHeight="double">
+        <Text lineHeight="double" wrap="break-word">
           <div dangerouslySetInnerHTML={{__html: longDescription}} />
         </Text>
       </Modal.Body>
