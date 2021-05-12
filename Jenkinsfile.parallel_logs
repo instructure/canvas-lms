@@ -88,9 +88,7 @@ pipeline {
           def stages = [:]
 
           distribution.stashBuildScripts()
-
-          distribution.addRSpecSuites(stages)
-          distribution.addSeleniumSuites(stages)
+          rspecStage.createDistribution(stages)
 
           parallel(stages)
         }

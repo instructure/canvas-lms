@@ -537,8 +537,8 @@ pipeline {
                   string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                 ])
 
-              distribution.addRSpecSuites(nestedStages)
-              distribution.addSeleniumSuites(nestedStages)
+
+              rspecStage.createDistribution(nestedStages)
 
               parallel(nestedStages)
             }
