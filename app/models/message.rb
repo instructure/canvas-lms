@@ -261,14 +261,20 @@ class Message < ActiveRecord::Base
 
   def author
     @_author ||= begin
-      if context.has_attribute?(:user_id)
+      if author_context.has_attribute?(:user_id)
         User.find(context.user_id)
-      elsif context.has_attribute?(:author_id)
+      elsif author_context.has_attribute?(:author_id)
         User.find(context.author_id)
       else
         nil
       end
     end
+  end
+
+  def author_context
+    # the user_id on a mention is the user that was mentioned instead of the
+    # author of the message.
+    context.is_a?(Mention) ? context.discussion_entry : context
   end
 
   def avatar_enabled?
