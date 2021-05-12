@@ -27,6 +27,17 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+disable_dashboard_account_notification_header:
+  state: allowed
+  display_name:
+    features.disable_dashboard_account_notification_header: Hide Global Announcements on the Dashboard
+  description:
+    disable_dashboard_account_notification_header: |-
+      This stops global announcements from appearing on the top of the dashboard, which can sometimes 
+      clutter the screen on certain devices. Global announcements can still be accessed under Account
+      > Global Announcements.
+  applies_to: User
+  autoexpand: true
 disable_alert_timeouts:
   state: allowed
   display_name:
