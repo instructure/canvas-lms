@@ -2515,6 +2515,26 @@ describe DiscussionTopic do
     end
   end
 
+  describe 'reply_from' do
+    before(:once) do
+      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
+    end
+
+    it 'returns entry for valid arguments' do
+      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
+      expect(val).to be_a_kind_of DiscussionEntry
+    end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
+    end
+
+    it 'raises BlankMessage for empty message' do
+      expect { @topic.reply_from(user: @teacher, text: '') }.to raise_error IncomingMail::Errors::BlankMessage
+    end
+  end
+
   describe 'to_podcast' do
     it "includes media extension in enclosure url even though it is a redirect (for itunes)" do
       @topic = @course.discussion_topics.create!(

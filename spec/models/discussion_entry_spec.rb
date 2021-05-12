@@ -640,6 +640,15 @@ describe DiscussionEntry do
       student_in_course(:course => @course)
       expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
+    end
+
+    it 'raises BlankMessage for blank message' do
+      expect { @topic.reply_from(user: @teacher, text: '') }.to raise_error IncomingMail::Errors::BlankMessage
+    end
   end
 
   context 'stream items' do

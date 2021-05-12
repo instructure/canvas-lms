@@ -170,9 +170,9 @@ class DiscussionEntry < ActiveRecord::Base
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
-      raise "Only context participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,
