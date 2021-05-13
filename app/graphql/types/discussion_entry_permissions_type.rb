@@ -29,7 +29,9 @@ module Types
 
     field :reply, Boolean, null: true
     def reply
-      object[:loader].load(:reply)
+      object[:loader].load(:reply).then do |can_reply|
+        can_reply && !object[:discussion_entry].deleted? && object[:discussion_entry].depth < 3
+      end
     end
 
     field :update, Boolean, null: true

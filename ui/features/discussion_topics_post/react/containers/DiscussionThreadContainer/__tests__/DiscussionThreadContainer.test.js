@@ -19,6 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
+import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
@@ -117,6 +118,18 @@ describe('DiscussionThreadContainer', () => {
   it('should render', () => {
     const {container} = setup(defaultProps())
     expect(container).toBeTruthy()
+  })
+
+  it('should not render reply button if reply permission is false', () => {
+    const {queryByTestId} = setup({
+      discussionEntry: DiscussionEntry.mock({permissions: {reply: false}})
+    })
+    expect(queryByTestId('threading-toolbar-reply')).toBeFalsy()
+  })
+
+  it('should render reply button if reply permission is true', () => {
+    const {queryByTestId} = setup(defaultProps())
+    expect(queryByTestId('threading-toolbar-reply')).toBeTruthy()
   })
 
   it('should render expand when nested replies are present', () => {

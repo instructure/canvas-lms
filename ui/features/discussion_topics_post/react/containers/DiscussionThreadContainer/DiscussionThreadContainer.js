@@ -180,7 +180,7 @@ export const DiscussionThreadContainer = props => {
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
 
   const threadActions = []
-  if (!props.discussionEntry.deleted) {
+  if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
