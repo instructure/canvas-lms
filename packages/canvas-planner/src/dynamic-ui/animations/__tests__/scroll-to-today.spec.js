@@ -276,7 +276,7 @@ describe('scrollToToday', () => {
 
   describe('in weekly planner mode', () => {
     describe('when there are no items today', () => {
-      it('leaves focus on the weekly header navigation', () => {
+      it('leaves focus where it is', () => {
         const today_elem = {}
         const {animation, animator, store, registry, manager} = createAnimation(ScrollToToday)
         manager.getDocument().querySelector = () => today_elem
@@ -293,7 +293,7 @@ describe('scrollToToday', () => {
         expect(animator.forceScrollTo).toHaveBeenCalledTimes(1)
         expect(animator.forceScrollTo.mock.calls[0][0]).toEqual(today_elem)
         expect(animator.focusElement).not.toHaveBeenCalledWith('missing items')
-        expect(animator.focusElement).toHaveBeenCalledWith('weekly header')
+        expect(animator.focusElement).not.toHaveBeenCalledWith('weekly header')
       })
     })
 
