@@ -72,7 +72,7 @@ const ManageOutcomesView = ({
         />
         <View as="div" padding="medium 0 xx-small" margin="x-small 0 0">
           <OutcomeSearchBar
-            enabled={numOutcomes > 0}
+            enabled={numOutcomes > 0 || searchString.length > 0}
             placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
             searchString={searchString}
             onChangeHandler={onSearchChangeHandler}

@@ -51,7 +51,7 @@ describe('useSearch', () => {
 
   test('should update state with event.target.value using default debounce', async () => {
     const {result} = renderHook(() => useSearch())
-    result.current.onChangeHandler(event)
+    act(() => result.current.onChangeHandler(event))
     expect(result.current.search).toBe('123')
     expect(result.current.debouncedSearch).toBe('')
     await act(async () => jest.advanceTimersByTime(100))

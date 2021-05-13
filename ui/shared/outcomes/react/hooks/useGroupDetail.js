@@ -22,10 +22,10 @@ import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {GROUP_DETAIL_QUERY} from '@canvas/outcomes/graphql/Management'
+import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 const useGroupDetail = ({
-  query = GROUP_DETAIL_QUERY,
+  query = SEARCH_GROUP_OUTCOMES,
   loadOutcomesIsImported = false,
   searchString = '',
   id

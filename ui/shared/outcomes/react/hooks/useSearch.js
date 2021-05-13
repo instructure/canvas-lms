@@ -23,15 +23,14 @@ const useSearch = (debounceTime = 500) => {
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  const [debouncedCallback, callPending] = useDebouncedCallback(value => {
+  const [debouncedCallback] = useDebouncedCallback(value => {
     setDebouncedSearch(value)
   }, debounceTime)
 
   const onChangeHandler = useCallback(event => setSearch(event.target.value), [])
   const onClearHandler = useCallback(() => {
     setSearch('')
-    callPending()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setDebouncedSearch('')
   }, [])
 
   useEffect(() => {

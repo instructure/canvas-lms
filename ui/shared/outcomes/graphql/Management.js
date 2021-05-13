@@ -71,52 +71,6 @@ export const CHILD_GROUPS_QUERY = gql`
   ${childGroupsFragment}
 `
 
-export const GROUP_DETAIL_QUERY = gql`
-  query GroupDetailQuery(
-    $id: ID!
-    $outcomesCursor: String
-    $outcomesContextId: ID!
-    $outcomesContextType: String!
-  ) {
-    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
-      ... on LearningOutcomeGroup {
-        _id
-        description
-        title
-        outcomesCount
-        canEdit
-        outcomes(first: 10, after: $outcomesCursor) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          edges {
-            canUnlink
-            node {
-              ... on LearningOutcome {
-                _id
-                description
-                title
-                displayName
-                canEdit
-                contextType
-                contextId
-                friendlyDescription(
-                  contextId: $outcomesContextId
-                  contextType: $outcomesContextType
-                ) {
-                  _id
-                  description
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
 export const FIND_GROUP_OUTCOMES = gql`
   query GroupDetailWithSearchQuery(
     $id: ID!
@@ -149,6 +103,53 @@ export const FIND_GROUP_OUTCOMES = gql`
                   targetContextType: $outcomesContextType
                   targetContextId: $outcomesContextId
                 ) @include(if: $outcomeIsImported)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const SEARCH_GROUP_OUTCOMES = gql`
+  query SearchGroupDetailQuery(
+    $id: ID!
+    $outcomesCursor: String
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+    $searchQuery: String
+  ) {
+    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
+      ... on LearningOutcomeGroup {
+        _id
+        description
+        title
+        outcomesCount(searchQuery: $searchQuery)
+        canEdit
+        outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            canUnlink
+            node {
+              ... on LearningOutcome {
+                _id
+                description
+                title
+                displayName
+                canEdit
+                contextType
+                contextId
+                friendlyDescription(
+                  contextId: $outcomesContextId
+                  contextType: $outcomesContextType
+                ) {
+                  _id
+                  description
+                }
               }
             }
           }

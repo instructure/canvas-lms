@@ -406,4 +406,48 @@ describe('OutcomeManagementPanel', () => {
     expect(startMoveOutcome).toHaveBeenCalledWith('Course', '2', outcome, 200, newParentGroup)
     expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
   })
+
+  it('should not disable search input and clear search button (X) if there are no results', async () => {
+    const {getByText, getByLabelText, queryByTestId} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    fireEvent.change(getByLabelText('Search field'), {target: {value: 'no matched results'}})
+    await act(async () => jest.advanceTimersByTime(500))
+    expect(getByLabelText('Search field')).toBeEnabled()
+    expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
+  })
+
+  it('debounces search string typed by user', async () => {
+    const {getByText, getByLabelText} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps,
+      mocks: [
+        ...courseMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: 200}),
+        ...groupDetailMocks({
+          groupId: 200,
+          contextType: 'Course',
+          contextId: '2',
+          searchQuery: 'Outcome 1'
+        })
+      ]
+    })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    const searchInput = getByLabelText('Search field')
+    fireEvent.change(searchInput, {target: {value: 'Outcome'}})
+    await act(async () => jest.advanceTimersByTime(100))
+    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    fireEvent.change(searchInput, {target: {value: 'Outcome '}})
+    await act(async () => jest.advanceTimersByTime(300))
+    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    fireEvent.change(searchInput, {target: {value: 'Outcome 1'}})
+    await act(async () => jest.advanceTimersByTime(500))
+    expect(getByText('1 "Group 200" Outcome')).toBeInTheDocument()
+  })
 })

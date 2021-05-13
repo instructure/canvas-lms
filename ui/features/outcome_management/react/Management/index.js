@@ -77,6 +77,7 @@ const OutcomeManagementPanel = () => {
   const {contextType, contextId} = useCanvasContext()
   const {
     search: searchString,
+    debouncedSearch: debouncedSearchString,
     onChangeHandler: onSearchChangeHandler,
     onClearHandler: onSearchClearHandler
   } = useSearch()
@@ -97,8 +98,9 @@ const OutcomeManagementPanel = () => {
     selectedGroupId,
     selectedParentGroupId
   } = useManageOutcomes()
-  const {loading, group, loadMore} = useGroupDetail({
-    id: selectedGroupId
+  const {group, loading, loadMore} = useGroupDetail({
+    id: selectedGroupId,
+    searchString: debouncedSearchString
   })
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
