@@ -21,8 +21,9 @@ module CC
   module AssignmentResources
 
     def add_assignments
-      Assignments::ScopedToUser.new(@course, @user).scope.
-        no_submittables.each do |assignment|
+      # @user is nil if it's kicked off by the system, like a course template
+      relation = @user ? Assignments::ScopedToUser.new(@course, @user).scope : @course.active_assignments
+      relation.no_submittables.each do |assignment|
         next unless export_object?(assignment)
         next if @user && assignment.locked_for?(@user, check_policies: true)
 
