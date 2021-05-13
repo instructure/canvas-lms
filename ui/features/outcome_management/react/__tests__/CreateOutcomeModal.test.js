@@ -23,7 +23,11 @@ import {createCache} from '@canvas/apollo'
 import {within} from '@testing-library/dom'
 import CreateOutcomeModal from '../CreateOutcomeModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
+import {
+  accountMocks,
+  smallOutcomeTree,
+  setFriendlyDescriptionOutcomeMock
+} from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import axios from '@canvas/axios'
 
@@ -65,13 +69,13 @@ describe('CreateOutcomeModal', () => {
 
   it('shows modal if isOpen prop true', async () => {
     const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Create Outcome')).toBeInTheDocument()
   })
 
   it('does not show modal if isOpen prop false', async () => {
     const {queryByText} = render(<CreateOutcomeModal {...defaultProps({isOpen: false})} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(queryByText('Create Outcome')).not.toBeInTheDocument()
   })
 
@@ -79,7 +83,9 @@ describe('CreateOutcomeModal', () => {
     const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 0'))
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.click(getByText('Create'))
@@ -88,28 +94,28 @@ describe('CreateOutcomeModal', () => {
 
   it('calls onCloseHandler on Cancel button click', async () => {
     const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Cancel'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   it('calls onCloseHandler on Close (X) button click', async () => {
     const {getByRole} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(within(getByRole('dialog')).getByText('Close'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   it('does not show error message below Name field on initial load and disables Create button', async () => {
     const {getByText, queryByText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
     expect(queryByText('Cannot be blank')).not.toBeInTheDocument()
   })
 
   it('shows error message below Name field if no name after user makes changes to name and disables Create button', async () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: '123'}})
     fireEvent.change(getByLabelText('Name'), {target: {value: ''}})
     expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
@@ -118,7 +124,7 @@ describe('CreateOutcomeModal', () => {
 
   it('shows error message below Name field if name includes only spaces and disables Create button', async () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: '  '}})
     expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
     expect(getByText('Cannot be blank')).toBeInTheDocument()
@@ -126,7 +132,7 @@ describe('CreateOutcomeModal', () => {
 
   it('shows error message below Name field if name > 255 characters and disables Create button', async () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
     expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
@@ -134,7 +140,7 @@ describe('CreateOutcomeModal', () => {
 
   it('shows error message below displayName field if displayName > 255 characters and disables Create button', async () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
     expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
@@ -144,9 +150,11 @@ describe('CreateOutcomeModal', () => {
     const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Group 100 folder 0')).toBeInTheDocument()
   })
 
@@ -157,8 +165,10 @@ describe('CreateOutcomeModal', () => {
         mocks: [...smallOutcomeTree('Account')]
       }
     )
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(within(getByRole('dialog')).getByText('Create').closest('button')).not.toHaveAttribute(
       'disabled'
@@ -169,7 +179,7 @@ describe('CreateOutcomeModal', () => {
     const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: []
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     const {getByText} = within(getByTestId('loading-error'))
     expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
   })
@@ -180,23 +190,28 @@ describe('CreateOutcomeModal', () => {
       contextId: '2',
       mocks: []
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     const {getByText} = within(getByTestId('loading-error'))
     expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
   })
 
   it('displays flash confirmation with proper message if create request succeeds', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    axios.post.mockResolvedValue({status: 200})
+    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree('Account')]
+      mocks: [
+        ...smallOutcomeTree('Account'),
+        setFriendlyDescriptionOutcomeMock({
+          inputDescription: 'Alternate description'
+        })
+      ]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Outcome "Outcome 123" was successfully created',
@@ -211,15 +226,15 @@ describe('CreateOutcomeModal', () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while creating this outcome: Network error',
+        message: 'An error occurred while creating this outcome: Network error.',
         type: 'error'
       })
     })
@@ -231,16 +246,77 @@ describe('CreateOutcomeModal', () => {
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while creating this outcome.',
         type: 'error'
+      })
+    })
+  })
+
+  it('handles create outcome failure due to alternate description', async () => {
+    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
+    const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+      mocks: [
+        ...smallOutcomeTree('Account'),
+        setFriendlyDescriptionOutcomeMock({
+          inputDescription: 'Alternate description',
+          failResponse: true
+        })
+      ]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+    fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
+    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
+      target: {value: 'Alternate description'}
+    })
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Create'))
+    await act(async () => jest.runOnlyPendingTimers())
+    await waitFor(() => {
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred while creating this outcome: GraphQL error: mutation failed.',
+        type: 'error'
+      })
+    })
+  })
+
+  it('does not throw error if alternate description mutation succeeds', async () => {
+    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    axios.post.mockResolvedValue({status: 200, data: {outcome: {id: '1'}}})
+    const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+      mocks: [
+        ...smallOutcomeTree('Account'),
+        setFriendlyDescriptionOutcomeMock({
+          inputDescription: 'Alternate description'
+        })
+      ]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+    fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
+    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
+      target: {value: 'Alternate description'}
+    })
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Create'))
+    await act(async () => jest.runOnlyPendingTimers())
+    await waitFor(() => {
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Outcome "Outcome 123" was successfully created',
+        type: 'success'
       })
     })
   })

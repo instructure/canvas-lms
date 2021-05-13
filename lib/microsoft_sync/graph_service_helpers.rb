@@ -26,6 +26,13 @@ module MicrosoftSync
   class GraphServiceHelpers
     attr_reader :graph_service
 
+    class UnexpectedResponseError < Errors::PublicError
+      def public_message
+        I18n.t('Unexpected response from Microsoft API. This is likely a bug. ' \
+               'Please contact support.')
+      end
+    end
+
     MAX_MAIL_NICKNAME_LENGTH = 64
 
     def initialize(tenant)
@@ -70,17 +77,42 @@ module MicrosoftSync
     # property that Canvas has.  An AAD (short term for AAD [Azure Active
     # Directory] object ID) is the ID for the user on the Microsoft side, which
     # is what Microsoft references in their groups/teams.
+    #
+    # UPNs are case-insensitive on the Microsoft side; this method downcases
+    # them before requesting them from Microsoft, but the keys in the return
+    # hash match the case of the upns that were passed in.
     def users_upns_to_aads(upns)
-      if upns.length > USERS_UPNS_TO_AADS_BATCH_SIZE
+      downcased_uniqued = upns.map(&:downcase).uniq
+      if downcased_uniqued.length > USERS_UPNS_TO_AADS_BATCH_SIZE
         raise ArgumentError, "Can't look up #{upns.length} UPNs at once"
       end
 
+      upns_downcased_to_given_forms = upns.group_by(&:downcase)
+
+      unexpected = []
+      result_hash = {}
+
       graph_service.list_users(
         select: %w[id userPrincipalName],
-        filter: {userPrincipalName: upns}
-      ).map do |result|
-        [result['userPrincipalName'], result['id']]
-      end.to_h
+        filter: {userPrincipalName: downcased_uniqued}
+      ).each do |result|
+        given_forms = upns_downcased_to_given_forms[result['userPrincipalName'].downcase]
+        if given_forms
+          given_forms.each do |given_form|
+            result_hash[given_form] = result['id']
+          end
+        else
+          unexpected << result['userPrincipalName']
+        end
+      end
+
+      if unexpected.present?
+        raise UnexpectedResponseError,
+              "/users returned unexpected UPN(s) #{unexpected.inspect}, " \
+              "asked for #{downcased_uniqued}"
+      end
+
+      result_hash
     end
 
     def get_group_users_aad_ids(group_id, owners: false)

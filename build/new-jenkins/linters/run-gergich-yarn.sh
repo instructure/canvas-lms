@@ -6,7 +6,7 @@ cat <<-EOF | docker run \
   $DOCKER_INPUTS \
   --interactive \
   --volume $GERGICH_VOLUME:/home/docker/gergich \
-  local/gergich /bin/bash -
+  $LINTERS_RUNNER_IMAGE /bin/bash -
 set -ex
 read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
 rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST_ARR[@]}")

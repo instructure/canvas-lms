@@ -31,7 +31,8 @@ export default {
     onCopy: {action: 'Copy'},
     onEdit: {action: 'Edit'},
     onTogglePublish: {action: 'Toggle Publish'},
-    onToggleSubscription: {action: 'Toggle Subscription'}
+    onToggleSubscription: {action: 'Toggle Subscription'},
+    onPeerReviews: {action: 'Peer Reviews'}
   }
 }
 

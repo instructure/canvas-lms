@@ -46,6 +46,10 @@ describe('DiscussionThreadContainer', () => {
   const defaultProps = () => {
     return {
       discussionTopicId: '1',
+      discussionTopic: {
+        id: 'RGlzY3Vzc2lvbi0zMw==',
+        _id: '1'
+      },
       threads: [
         {
           _id: '49',

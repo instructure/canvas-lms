@@ -158,9 +158,26 @@ describe SubAccountsController do
       end
 
       it "accepts :manage_courses permission" do
+        @root_account.disable_feature!(:granular_permissions_manage_courses)
         admin = account_admin_user_with_role_changes(role_changes: {manage_account_settings: false, manage_courses: true}, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
         user_session(admin)
         get 'index', params: {account_id: @root_account.id}
+        expect(response.status).to eq 200
+      end
+
+      it 'accepts :manage_courses_admin permission (granular permissions)' do
+        @root_account.enable_feature!(:granular_permissions_manage_courses)
+        admin =
+          account_admin_user_with_role_changes(
+            role_changes: {
+              manage_account_settings: false,
+              manage_courses_admin: true
+            },
+            account: @root_account,
+            role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account)
+          )
+        user_session(admin)
+        get 'index', params: { account_id: @root_account.id }
         expect(response.status).to eq 200
       end
 

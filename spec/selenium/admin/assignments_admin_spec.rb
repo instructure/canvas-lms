@@ -19,19 +19,19 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe "assignments" do
-  include_context "in-process server selenium tests"
+describe 'assignments' do
+  include_context 'in-process server selenium tests'
 
-  context "as an admin" do
+  context 'as an admin' do
     before do
-      @student = user_with_pseudonym(:active_user => true)
-      course_with_student(:active_all => true, :user => @student)
-      assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
+      @student = user_with_pseudonym(active_user: true)
+      course_with_student(active_all: true, user: @student)
+      assignment_model(course: @course, submission_types: 'online_upload', title: 'Assignment 1')
       site_admin_logged_in
     end
 
-    it "should not show google docs tab for masquerading admin" do
-      PluginSetting.create!(:name => 'google_drive', :settings => {})
+    it 'should not show google docs tab for masquerading admin' do
+      PluginSetting.create!(name: 'google_drive', settings: {})
       masquerade_url = "/users/#{@student.id}/masquerade"
       get masquerade_url
       expect_new_page_load { f('a[href="' + masquerade_url + '"]').click }
@@ -40,7 +40,7 @@ describe "assignments" do
       wait_for_ajaximations
 
       f('.submit_assignment_link').click
-      expect(f("#content")).not_to contain_css('#submit_google_doc_form')
+      expect(f('#content')).not_to contain_css('#submit_google_doc_form')
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -49,13 +49,13 @@ describe "assignments" do
       driver.switch_to.default_content
     end
 
-    it "should show the submit button if admin is enrolled as student" do
+    it 'should show the submit button if admin is enrolled as student' do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations
 
-      expect(f("#content")).not_to contain_css('.submit_assignment_link')
+      expect(f('#content')).not_to contain_css('.submit_assignment_link')
 
-      @course.enroll_student(@admin, :enrollment_state => 'active')
+      @course.enroll_student(@admin, enrollment_state: 'active')
 
       refresh_page
       wait_for_ajaximations
@@ -63,15 +63,26 @@ describe "assignments" do
     end
   end
 
-  context "with limited permissions" do
+  context 'with limited permissions' do
     before :once do
-      @student = user_with_pseudonym(:active_user => true)
-      course_with_student(:active_all => true, :user => @student)
-      assignment_model(:course => @course, :submission_types => 'online_upload', :title => 'Assignment 1')
+      @student = user_with_pseudonym(active_user: true)
+      course_with_student(active_all: true, user: @student)
+      assignment_model(course: @course, submission_types: 'online_upload', title: 'Assignment 1')
     end
 
     it "shouldn't kersplode on the index without the `manage_courses` permission" do
-      account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      account_admin_user_with_role_changes(role_changes: { manage_courses: false })
+      user_session(@user)
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
+    end
+
+    it "shouldn't kersplode on the index without the `manage_courses_admin` permission (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      account_admin_user_with_role_changes(role_changes: { manage_courses_admin: false })
       user_session(@user)
 
       get "/courses/#{@course.id}/assignments"
@@ -80,7 +91,7 @@ describe "assignments" do
     end
 
     it "shouldn't kersplode on the index without the `manage_assignments` permission" do
-      account_admin_user_with_role_changes(:role_changes => {:manage_assignments => false})
+      account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
       user_session(@user)
 
       get "/courses/#{@course.id}/assignments"

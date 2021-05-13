@@ -733,6 +733,29 @@ describe Submission do
       end
     end
 
+    context 'when the submission is for a new quiz' do
+      before do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+      end
+
+      it 'subtracts 60 seconds from the submitted_at' do
+        Timecop.freeze(@date) do
+          submission = @assignment.submissions.find_by!(user: @student)
+          submission.update!(submitted_at: Time.now.utc)
+          expect(submission.seconds_late).to eql 59.minutes.to_i
+        end
+      end
+    end
+
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -1666,6 +1689,17 @@ describe Submission do
         @assignment.ensure_post_policy(post_manually: false)
         Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
         submission_spec_model(submit_homework: true)
+      end
+
+      it "updates 'graded_at' on the submission when the late_policy_status is changed" do
+        now = Time.zone.now
+        Timecop.freeze(1.hour.ago(now)) do
+          @submission.update!(late_policy_status: "late")
+        end
+        Timecop.freeze(now) do
+          @submission.update!(late_policy_status: "missing")
+        end
+        expect(@submission.graded_at).to eq now
       end
 
       it "should create a message when the assignment has been graded and published" do

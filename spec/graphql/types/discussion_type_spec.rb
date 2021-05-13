@@ -26,6 +26,107 @@ describe Types::DiscussionType do
 
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
+  let(:permissions) {
+    [
+      {
+        value: 'attach',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :attach)}
+      },
+      {
+        value: 'create',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :create)}
+      },
+      {
+        value: 'delete',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any)}
+      },
+      {
+        value: 'duplicate',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :duplicate)}
+      },
+      {
+        value: 'moderateForum',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :moderate_forum)}
+      },
+      {
+        value: 'rate',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :rate)}
+      },
+      {
+        value: 'read',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read)}
+      },
+      {
+        value: 'readAsAdmin',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read_as_admin)}
+      },
+      {
+        value: 'readReplies',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :read_replies)}
+      },
+      {
+        value: 'reply',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :reply)}
+      },
+      {
+        value: 'update',
+        allowed: -> (user) {discussion.grants_right?(user, nil, :update)}
+      },
+      {
+        value: 'speedGrader',
+        allowed: -> (user) {
+          permission = !discussion.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
+          if discussion.context.concluded?
+            return permission && discussion.context.grants_right?(user, :read_as_admin)
+          else
+            return permission && discussion.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+          end
+        }
+      },
+      {
+        value: 'peerReview',
+        allowed: -> (user) {
+          discussion.assignment_id &&
+          discussion.assignment.published? &&
+          discussion.assignment.has_peer_reviews? &&
+          discussion.assignment.grants_right?(user, :grade)
+        }
+      },
+      {
+        value: 'showRubric',
+        allowed: -> (user) {!discussion.assignment_id.nil? && !discussion.assignment.rubric.nil?}
+      },
+      {
+        value: 'addRubric',
+        allowed: -> (user) {
+          !discussion.assignment_id.nil? &&
+          discussion.assignment.rubric.nil? &&
+          discussion.assignment.grants_right?(user, :update)
+        }
+      },
+      {
+        value: 'openForComments',
+        allowed: -> (user) {
+          !discussion.comments_disabled? &&
+          discussion.locked &&
+          discussion.grants_right?(user, :moderate_forum)
+        }
+      },
+      {
+        value: 'closeForComments',
+        allowed: -> (user) {
+          !discussion.comments_disabled? &&
+          !discussion.locked &&
+          discussion.grants_right?(user, :moderate_forum)
+        }
+      },
+      {
+        value: 'copyAndSendTo',
+        allowed: -> (user) {discussion.context.grants_right?(user, :read_as_admin)}
+      }
+    ]
+  }
+
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
@@ -57,6 +158,15 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("assignment { _id }")).to eq discussion.assignment_id.to_s
     expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
+  end
+
+  it "allows querying root discussion entries (via rootEntries param)" do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
+
+    result = discussion_type.resolve('discussionEntriesConnection(rootEntries:true) { nodes { message } }')
+    expect(result.count).to be 1
+    expect(result[0]).to eq de.message
   end
 
   it "allows querying root discussion entries" do
@@ -135,29 +245,13 @@ describe Types::DiscussionType do
   end
 
   it 'returns the current user permissions' do
-    permissions = {
-      attach: 'attach',
-      create: 'create',
-      delete: 'delete',
-      duplicate: 'duplicate',
-      moderate_forum: 'moderateForum',
-      rate: 'rate',
-      read: 'read',
-      read_as_admin: 'readAsAdmin',
-      read_replies: 'readReplies',
-      reply: 'reply',
-      update: 'update'
-    }
-
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
-    permissions.keys.each do |key|
-      permission = discussion.grants_right?(@teacher, nil, key)
-      expect(discussion_type.resolve("permissions { #{permissions[key]} }")).to eq permission
+    permissions.each do |permission|
+      expect(discussion_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
 
-      permission = discussion.grants_right?(@student, nil, key)
-      expect(type_with_student.resolve("permissions { #{permissions[key]} }")).to eq permission
+      expect(type_with_student.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
     end
   end
 
@@ -199,6 +293,12 @@ describe Types::DiscussionType do
     it 'returns total number of root entry pages' do
       (1..@total_root_entries).each do |i|
         expect(discussion_type.resolve("rootEntriesTotalPages(perPage: #{i})")).to eq((@total_root_entries.to_f / i).ceil)
+      end
+    end
+
+    it 'returns total number of root entry pages (via rootEntries param)' do
+      (1..@total_root_entries).each do |i|
+        expect(discussion_type.resolve("entriesTotalPages(perPage: #{i}, rootEntries: true)")).to eq((@total_root_entries.to_f / i).ceil)
       end
     end
 

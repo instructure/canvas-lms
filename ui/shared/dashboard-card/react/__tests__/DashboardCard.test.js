@@ -82,7 +82,7 @@ describe('PublishButton', () => {
     it('renders the button for users that have the permission', () => {
       const props = createMockProps({
         published: false,
-        canChangeCourseState: true,
+        canChangeCoursePublishState: true,
         pagesUrl: '',
         defaultView: ''
       })
@@ -93,7 +93,7 @@ describe('PublishButton', () => {
     it('does not render the button for users that do not have the permission', () => {
       const props = createMockProps({
         published: false,
-        canChangeCourseState: false,
+        canChangeCoursePublishState: false,
         pagesUrl: '',
         defaultView: ''
       })
@@ -106,7 +106,7 @@ describe('PublishButton', () => {
     it('does not render the button for users that have the permission', () => {
       const props = createMockProps({
         published: false,
-        canChangeCourseState: true,
+        canChangeCoursePublishState: true,
         pagesUrl: '',
         defaultView: ''
       })

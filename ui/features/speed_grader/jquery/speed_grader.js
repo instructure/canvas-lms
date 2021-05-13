@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {TextArea} from '@instructure/ui-text-area'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
@@ -32,6 +31,7 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AssessmentAuditButton from '../react/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
+import CommentArea from '../react/CommentArea'
 import originalityReportSubmissionKey from '@canvas/grading/originalityReportSubmissionKey'
 import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -168,7 +168,6 @@ let $assignment_submission_originality_report_url
 let $assignment_submission_vericite_report_url
 let $assignment_submission_resubmit_to_vericite_url
 let $rubric_holder
-let $rubric_full_resizer_handle
 let $no_annotation_warning
 let $comment_submitted
 let $comment_submitted_message
@@ -656,21 +655,12 @@ function renderCommentTextArea() {
   // unmounting is a temporary workaround for INSTUI-870 to allow
   // for textarea minheight to be reset
   unmountCommentTextArea()
-  function textareaRef(textarea) {
+  function getTextAreaRef(textarea) {
     $add_a_comment_textarea = $(textarea)
   }
 
-  const textAreaProps = {
-    height: '4rem',
-    id: 'speed_grader_comment_textarea',
-    label: <ScreenReaderContent>{I18n.t('Add a Comment')}</ScreenReaderContent>,
-    placeholder: I18n.t('Add a Comment'),
-    resize: 'vertical',
-    textareaRef
-  }
-
   ReactDOM.render(
-    <TextArea {...textAreaProps} />,
+    <CommentArea getTextAreaRef={getTextAreaRef} courseId={ENV.course_id} />,
     document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT)
   )
 }
@@ -918,30 +908,6 @@ function initRubricStuff() {
 
   selectors.get('#rubric_assessments_select').change(() => {
     handleSelectedRubricAssessmentChanged()
-  })
-
-  $rubric_full_resizer_handle.draggable({
-    axis: 'x',
-    cursor: 'crosshair',
-    scroll: false,
-    containment: '#left_side',
-    snap: '#full_width_container',
-    appendTo: '#full_width_container',
-    start() {
-      $rubric_full_resizer_handle.draggable('option', 'minWidth', $right_side.width())
-    },
-    helper() {
-      return $rubric_full_resizer_handle.clone().addClass('clone')
-    },
-    drag(event, ui) {
-      const offset = ui.offset,
-        windowWidth = $window.width()
-      selectors.get('#rubric_full').width(windowWidth - offset.left)
-      $rubric_full_resizer_handle.css('left', '0')
-    },
-    stop(event, ui) {
-      event.stopImmediatePropagation()
-    }
   })
 
   $('.save_rubric_button').click(function () {
@@ -2336,8 +2302,9 @@ EG = {
       if (
         !!currentSubmission.cached_due_date &&
         currentSubmission.submission_type &&
-        currentSubmission.submission_type.startsWith('online_') &&
-        currentSubmission.submission_type !== 'online_quiz'
+        (currentSubmission.submission_type === 'media_recording' ||
+          (currentSubmission.submission_type.startsWith('online_') &&
+            currentSubmission.submission_type !== 'online_quiz'))
       ) {
         $reassign_assignment.show()
       } else {
@@ -3778,7 +3745,6 @@ function setupSelectors() {
   $resize_overlay = $('#resize_overlay')
   $right_side = $('#right_side')
   $rightside_inner = $('#rightside_inner')
-  $rubric_full_resizer_handle = $('#rubric_full_resizer_handle')
   $rubric_holder = $('#rubric_holder')
   $score = $grade_container.find('.score')
   $selectmenu = null

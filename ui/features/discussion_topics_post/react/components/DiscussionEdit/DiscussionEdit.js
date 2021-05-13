@@ -42,7 +42,7 @@ export const DiscussionEdit = props => {
       data-testid="DiscussionEdit-container"
     >
       <View display="block">
-        <textarea ref={setRCERef} />
+        <textarea ref={setRCERef} data-testid="message-body" />
       </View>
       <Flex margin="small none none none">
         <Flex.Item shouldGrow shouldShrink textAlign="end">
@@ -56,7 +56,9 @@ export const DiscussionEdit = props => {
           </Button>
           <Button
             onClick={() => {
-              props.onSubmit(getRCEText())
+              if (props.onSubmit) {
+                props.onSubmit(getRCEText())
+              }
             }}
             display="inline-block"
             color="primary"

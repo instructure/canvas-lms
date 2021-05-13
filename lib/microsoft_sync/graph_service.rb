@@ -31,12 +31,14 @@ module MicrosoftSync
   class GraphService
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
-    GROUP_USERS_ADD_BATCH_SIZE = 20
+    GROUP_USERS_BATCH_SIZE = 20
     STATSD_PREFIX = 'microsoft_sync.graph_service'
 
     class ApplicationNotAuthorizedForTenant < StandardError
       include Errors::GracefulCancelErrorMixin
     end
+
+    class BatchRequestFailed < StandardError; end
 
     attr_reader :tenant
 
@@ -62,11 +64,7 @@ module MicrosoftSync
     end
 
     def add_users_to_group(group_id, members: [], owners: [])
-      raise ArgumentError, 'Missing users to add to group' if members.empty? && owners.empty?
-      if (n_total_additions = members.length + owners.length) > GROUP_USERS_ADD_BATCH_SIZE
-        raise ArgumentError, "Only #{GROUP_USERS_ADD_BATCH_SIZE} users can be added at " \
-          "once. Got #{n_total_additions}."
-      end
+      check_group_users_args(members, owners)
 
       body = {}
       unless members.empty?
@@ -95,12 +93,53 @@ module MicrosoftSync
       get_paginated_list("groups/#{group_id}/owners", options, &blk)
     end
 
-    def remove_group_member(group_id, user_aad_id)
-      request(:delete, "groups/#{group_id}/members/#{user_aad_id}/$ref")
+    # Returns nil if all removed, or a hash with a list of :members and/or :owners that did
+    # not exist in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+    # NOTE: Microsoft API does not distinguish between a group not existing, a
+    # user not existing, and an owner not existing in the group. If the group
+    # doesn't exist, this will return the full lists of members and owners
+    # passed in.
+    def remove_group_users_ignore_missing(group_id, members: [], owners: [])
+      check_group_users_args(members, owners)
+
+      reqs =
+        group_remove_user_requests(group_id, members, 'members') +
+        group_remove_user_requests(group_id, owners, 'owners')
+      failed_req_ids = run_batch(reqs) do |resp|
+        (
+          resp['status'] == 404 && resp['body'].to_s =~
+            /does not exist or one of its queried reference-property objects are not present/i
+        ) || (
+          # This variant seems to happen right after removing a user with the UI
+          resp['status'] == 400 && resp['body'].to_s =~
+            /One or more removed object references do not exist for the following modified/i
+        )
+      end
+      split_request_ids_to_hash(failed_req_ids)
     end
 
-    def remove_group_owner(group_id, user_aad_id)
-      request(:delete, "groups/#{group_id}/owners/#{user_aad_id}/$ref")
+    # Returns {owners: ['a', 'b', 'c'], members: ['d', 'e', 'f']} if there are owners
+    # or members not added. If all were added successfully, returns nil.
+    def add_users_to_group_via_batch(group_id, members, owners)
+      reqs =
+        group_add_user_requests(group_id, members, 'members') +
+        group_add_user_requests(group_id, owners, 'owners')
+      failed_req_ids = run_batch(reqs) do |r|
+        r['status'] == 400 && r['body'].to_s =~ /One or more added object references already exist/i
+      end
+      split_request_ids_to_hash(failed_req_ids)
+    end
+
+    # Returns nil if all added, or a hash with a list of :members and/or :owners that already
+    # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+    def add_users_to_group_ignore_duplicates(group_id, members: [], owners: [])
+      add_users_to_group(group_id, members: members, owners: owners)
+
+      nil
+    rescue MicrosoftSync::Errors::HTTPBadRequest => e
+      raise unless e.response_body =~ /One or more added object references already exist/i
+
+      add_users_to_group_via_batch(group_id, members, owners)
     end
 
     # === Teams ===
@@ -241,6 +280,76 @@ module MicrosoftSync
 
     def quote_value(str)
       "'#{str.gsub("'", "''")}'"
+    end
+
+    # ==== Helpers for removing and adding in batch ===
+
+    def check_group_users_args(members, owners)
+      raise ArgumentError, 'Missing members/owners' if members.empty? && owners.empty?
+
+      if (n_total_additions = members.length + owners.length) > GROUP_USERS_BATCH_SIZE
+        raise ArgumentError, "Only #{GROUP_USERS_BATCH_SIZE} users can be batched at " \
+          "once. Got #{n_total_additions}."
+      end
+    end
+
+    # Uses Microsoft API's JSON batching to run requests in parallel with one
+    # HTTP request. Expected failures can be ignored by passing in a block which checks
+    # the response. Other non-2xx responses cause a BatchRequestFailed error.
+    # Returns a list of ids of the requests that were ignored.
+    def run_batch(requests, &response_should_be_ignored)
+      ignored_request_ids = []
+      failed = []
+
+      response = request(:post, '$batch', body: { requests: requests })
+      response['responses'].each do |subresponse|
+        if response_should_be_ignored[subresponse]
+          ignored_request_ids << subresponse['id']
+        elsif subresponse['status'] < 200 || subresponse['status'] >= 300
+          failed << subresponse
+        end
+      end
+
+      if failed.any?
+        codes = failed.map{|resp| resp['status']}
+        bodies = failed.map{|resp| resp['body'].to_s.truncate(500)}
+        msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
+        raise BatchRequestFailed, msg
+      end
+
+      ignored_request_ids
+    end
+
+    # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
+    # to a hash like {members: %w[a b], owners: %w[a]}
+    def split_request_ids_to_hash(req_ids)
+      return nil if req_ids.blank?
+
+      req_ids
+        .group_by{|id| id.split("_").first.to_sym}
+        .transform_values{|ids| ids.map{|id| id.split("_").last}}
+    end
+
+    def group_add_user_requests(group_id, user_aad_ids, members_or_owners)
+      user_aad_ids.map do |aad_id|
+        {
+          id: "#{members_or_owners}_#{aad_id}",
+          url: "/groups/#{group_id}/#{members_or_owners}/$ref",
+          method: 'POST',
+          body: { "@odata.id": DIRECTORY_OBJECT_PREFIX + aad_id },
+          headers: { 'Content-Type' => 'application/json' }
+        }
+      end
+    end
+
+    def group_remove_user_requests(group_id, user_aad_ids, members_or_owners)
+      user_aad_ids.map do |aad_id|
+        {
+          id: "#{members_or_owners}_#{aad_id}",
+          url: "/groups/#{group_id}/#{members_or_owners}/#{aad_id}/$ref",
+          method: 'DELETE'
+        }
+      end
     end
   end
 end

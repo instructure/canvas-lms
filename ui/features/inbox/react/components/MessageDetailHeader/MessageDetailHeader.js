@@ -29,7 +29,7 @@ import I18n from 'i18n!conversations_2'
 
 export const MessageDetailHeader = ({...props}) => {
   return (
-    <Flex padding="x-small">
+    <Flex padding="small">
       <Flex.Item shouldGrow shouldShrink>
         <Heading>{props.text}</Heading>
       </Flex.Item>

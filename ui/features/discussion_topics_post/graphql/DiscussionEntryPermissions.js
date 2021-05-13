@@ -29,6 +29,7 @@ export const DiscussionEntryPermissions = {
       read
       reply
       update
+      viewRating
     }
   `,
 
@@ -39,6 +40,28 @@ export const DiscussionEntryPermissions = {
     rate: bool,
     read: bool,
     reply: bool,
-    update: bool
+    update: bool,
+    viewRating: bool
+  }),
+
+  mock: ({
+    attach = true,
+    create = true,
+    canDelete = true, // Special case because `delete` is a special word
+    rate = true,
+    read = true,
+    reply = true,
+    update = true,
+    viewRating = true
+  } = {}) => ({
+    attach,
+    create,
+    delete: canDelete,
+    rate,
+    read,
+    reply,
+    update,
+    viewRating,
+    __typename: 'DiscussionEntryPermissions'
   })
 }

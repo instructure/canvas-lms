@@ -21,6 +21,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 import moment from 'moment-timezone'
+import PropTypes from 'prop-types'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -131,30 +132,27 @@ export const sendMessage = (recipientId, message, subject) =>
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
 
-/* Creates a new course with name in provided account */
+/* Creates a new course with name in provided account, and enrolls the user as a teacher */
 export const createNewCourse = (accountId, courseName) =>
   doFetchApi({
     path: `/api/v1/accounts/${accountId}/courses`,
     method: 'POST',
-    params: {'course[name]': courseName}
+    params: {
+      'course[name]': courseName,
+      enroll_me: true
+    }
   }).then(data => data.json)
 
-/* Enrolls the current user as a teacher in the provided course */
-export const enrollAsTeacher = courseId =>
-  doFetchApi({
-    path: `/api/v1/courses/${courseId}/enrollments`,
-    method: 'POST',
-    params: {
-      'enrollment[type]': 'TeacherEnrollment',
-      'enrollment[user_id]': 'self',
-      'enrollment[enrollment_state]': 'active'
-    }
-  })
-
 /* Takes raw response from assignment_groups API and returns an array of objects with each
-   assignment group's id, name, and total score. */
-export const getAssignmentGroupTotals = data =>
-  data.map(group => {
+   assignment group's id, name, and total score. If gradingPeriodId is passed, only return
+   totals for assignment groups which have assignments in the provided grading period. */
+export const getAssignmentGroupTotals = (data, gradingPeriodId) => {
+  if (gradingPeriodId) {
+    data = data.filter(group =>
+      group.assignments?.some(a => a.submission?.grading_period_id === gradingPeriodId)
+    )
+  }
+  return data.map(group => {
     const groupScores = AssignmentGroupGradeCalculator.calculate(
       group.assignments.map(a => ({
         points_possible: a.points_possible,
@@ -177,6 +175,7 @@ export const getAssignmentGroupTotals = data =>
             })
     }
   })
+}
 
 /* Takes raw response from assignment_groups API and returns an array of assignments with
    grade information, sorted by due date. */
@@ -195,6 +194,7 @@ export const getAssignmentGrades = data =>
         score: a.submission?.score,
         grade: a.submission?.grade,
         submissionDate: a.submission?.submitted_at,
+        unread: a.submission?.read_state === 'unread',
         late: a.submission?.late,
         excused: a.submission?.excused,
         missing: a.submission?.missing
@@ -206,6 +206,34 @@ export const getAssignmentGrades = data =>
       if (b.dueDate == null) return -1
       return moment(a.dueDate).diff(moment(b.dueDate))
     })
+
+/* Return array of objects containing id and name of accounts associated with each
+   enrollment. */
+export const getAccountsFromEnrollments = enrollments =>
+  enrollments
+    .reduce((acc, e) => {
+      if (!acc.find(({id}) => id === e.account.id)) {
+        acc.push({
+          id: e.account.id,
+          name: e.account.name
+        })
+      }
+      return acc
+    }, [])
+    .sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
+
+/* Formats course total score and grade (if applicable) into string from enrollments API
+   response */
+export const getTotalGradeStringFromEnrollments = (enrollments, userId) => {
+  const grades = enrollments.find(({user_id}) => user_id === userId)?.grades
+  if (grades?.current_score == null) {
+    return I18n.t('n/a')
+  }
+  const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
+  return grades.current_grade == null
+    ? score
+    : I18n.t('%{score} (%{grade})', {score, grade: grades.current_grade})
+}
 
 export const TAB_IDS = {
   HOME: 'tab-home',
@@ -222,3 +250,11 @@ export const FOCUS_TARGETS = {
 }
 
 export const DEFAULT_COURSE_COLOR = '#394B58'
+
+export const GradingPeriodShape = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  end_date: PropTypes.string,
+  start_date: PropTypes.string,
+  workflow_state: PropTypes.string
+}

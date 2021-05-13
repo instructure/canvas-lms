@@ -185,6 +185,7 @@ describe "courses/settings.html.erb" do
 
   context "account_id selection" do
     it "should let sub-account admins see other accounts within their sub-account as options" do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
       @user = account_admin_user(:account => @subaccount, :active_user => true)
       expect(Account.default.grants_right?(@user, :manage_courses)).to be_falsey
       view_context(@course, @user)
@@ -196,6 +197,30 @@ describe "courses/settings.html.erb" do
       #select.children.count.should == 3
 
       option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
+      expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
+    end
+
+    it 'should let sub-account admins see other accounts within their sub-account as options (granular permissions)' do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      @user = account_admin_user(account: @subaccount, active_user: true)
+      expect(Account.default.grants_right?(@user, :manage_courses_admin)).to be_falsey
+      view_context(@course, @user)
+
+      render
+      doc = Nokogiri.HTML5(response.body)
+      select = doc.at_css('select#course_account_id')
+      expect(select).not_to be_nil
+
+      option_ids =
+        select
+          .search('option')
+          .map do |c|
+            begin
+              c.attributes['value'].value.to_i
+            rescue StandardError
+              c.to_s
+            end
+          end
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 

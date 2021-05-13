@@ -384,11 +384,19 @@ describe "people" do
     end
 
     it "should validate that the TA cannot delete / conclude or reset course" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       get "/courses/#{@course.id}/settings"
       expect(f("#content")).not_to contain_css('.delete_course_link')
       expect(f("#content")).not_to contain_css('.reset_course_content_button')
       get "/courses/#{@course.id}/confirm_action?event=conclude"
       expect(f('#unauthorized_message')).to include_text('Access Denied')
+    end
+
+    it "should validate that the TA cannot delete or reset course (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#content")).not_to contain_css('.delete_course_link')
+      expect(f("#content")).not_to contain_css('.reset_course_content_button')
     end
 
     # TODO reimplement per CNVS-29609, but make sure we're testing at the right level

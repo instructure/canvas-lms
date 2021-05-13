@@ -30,7 +30,7 @@ import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-conte
 export default function EmptyHomeroomAnnouncement({courseUrl, courseName}) {
   return (
     <View>
-      <Heading level="h3" as="h2" margin="small 0">
+      <Heading level="h3" as="h2" margin="medium 0 small">
         <Link href={courseUrl} isWithinText={false}>
           {courseName}
         </Link>

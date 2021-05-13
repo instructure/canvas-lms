@@ -27,7 +27,7 @@
       <% @module_dnd_FF = @domain_root_account.feature_enabled?(:module_dnd) %>
       <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
       <% @homeroom_course = @context.elementary_homeroom_course? %>
-      <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
+      <% if can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) %>
         <div id="course_status">
           <h3>
             <%= t('headers.course_status', %{Course Status}) %>
@@ -87,7 +87,7 @@
                           publish_course: course_path(@context)
                         },
                         permissions: {
-                          can_change_course_state: can_do(@context, @current_user, :change_course_state)
+                          can_change_course_publish_state: can_do(@context, @current_user, :change_course_state, :manage_courses_publish)
                         }
                       }
                     }).to_json %>

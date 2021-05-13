@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect, useCallback, useRef} from 'react'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const useRCE = (height = 256, customOptions = {}) => {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [elemRef, setElemRef] = useState(null)
+  const [code, setCodeState] = useState(null)
+  const elemRef = useRef(null)
+  const intervalRef = useRef(null)
 
   const {useRceEnhancements} = useCanvasContext()
   const plugins = useRceEnhancements
@@ -38,40 +39,61 @@ const useRCE = (height = 256, customOptions = {}) => {
     }
   }
 
-  useEffect(() => {
-    if (!isLoaded && elemRef) {
-      RichContentEditor.loadNewEditor(
-        elemRef,
-        {
-          focus: false,
-          manageParent: false,
-          tinyOptions: {
-            ...defaultOptions,
-            ...customOptions
-          }
-        },
-        () => setIsLoaded(true)
-      )
+  const clear = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
     }
-    return () => {
-      if (elemRef) {
-        if (RichContentEditor.callOnRCE(elemRef, 'exists?')) {
-          RichContentEditor.closeRCE(elemRef)
-          RichContentEditor.destroyRCE(elemRef)
+
+    if (elemRef.current && RichContentEditor.callOnRCE(elemRef.current, 'exists?')) {
+      RichContentEditor.closeRCE(elemRef.current)
+      RichContentEditor.destroyRCE(elemRef.current)
+    }
+  }
+
+  const setElemRef = useCallback(elem => {
+    // somehow, is calling elem with null
+    if (!elem) {
+      return
+    }
+    if (elemRef.current !== elem) {
+      clear()
+      elemRef.current = elem
+
+      intervalRef.current = setInterval(() => {
+        setCodeState(getCode())
+      }, 500)
+
+      RichContentEditor.loadNewEditor(elemRef.current, {
+        focus: false,
+        manageParent: false,
+        tinyOptions: {
+          ...defaultOptions,
+          ...customOptions
         }
-        setIsLoaded(false)
-      }
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elemRef])
+  }, [])
 
-  const getCode = useCallback(() => RichContentEditor.callOnRCE(elemRef, 'get_code'), [elemRef])
-  const setCode = useCallback(
-    content => RichContentEditor.callOnRCE(elemRef, 'set_code', content),
-    [elemRef]
-  )
+  const getCode = useCallback(() => {
+    if (elemRef.current) {
+      return RichContentEditor.callOnRCE(elemRef.current, 'get_code')
+    }
+  }, [])
 
-  return [setElemRef, getCode, setCode]
+  const setCode = useCallback(content => {
+    if (elemRef.current) {
+      RichContentEditor.callOnRCE(elemRef.current, 'set_code', content)
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      clear()
+    }
+  }, [])
+
+  return [setElemRef, getCode, setCode, code]
 }
 
 export default useRCE

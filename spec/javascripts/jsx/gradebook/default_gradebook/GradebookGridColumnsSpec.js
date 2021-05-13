@@ -154,44 +154,47 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
 
-    QUnit.skip('adds the student column to the grid as a frozen column', () => {
+    test('adds the student column to the grid as a frozen column', () => {
       ok(gridSpecHelper.listFrozenColumnIds().includes('student'))
     })
 
-    QUnit.skip('adds the total grade column to the grid as a scrollable column', () => {
+    test('adds the total grade column to the grid as a scrollable column', () => {
       ok(gridSpecHelper.listScrollableColumnIds().includes('total_grade'))
     })
 
-    QUnit.skip('adds each assignment column to the grid', () => {
+    test('adds each assignment column to the grid', () => {
       const columns = gridSpecHelper.listColumns().filter(column => column.type === 'assignment')
-      deepEqual(columns.map(column => column.id), ['assignment_2301', 'assignment_2302'])
+      deepEqual(
+        columns.map(column => column.id),
+        ['assignment_2301', 'assignment_2302']
+      )
     })
 
-    QUnit.skip('adds each assignment group column to the grid', () => {
+    test('adds each assignment group column to the grid', () => {
       const columns = gridSpecHelper
         .listColumns()
         .filter(column => column.type === 'assignment_group')
-      deepEqual(columns.map(column => column.id), [
-        'assignment_group_2201',
-        'assignment_group_2202'
-      ])
+      deepEqual(
+        columns.map(column => column.id),
+        ['assignment_group_2201', 'assignment_group_2202']
+      )
     })
 
-    QUnit.skip('freezes custom columns', () => {
+    test('freezes custom columns', () => {
       const columnIds = gridSpecHelper
         .listFrozenColumnIds()
         .filter(columnId => columnId.match(/^custom_col_/))
       deepEqual(columnIds.sort(), ['custom_col_2401', 'custom_col_2402'])
     })
 
-    QUnit.skip('does not freeze assignment columns', () => {
+    test('does not freeze assignment columns', () => {
       const columnIds = gridSpecHelper
         .listScrollableColumnIds()
         .filter(columnId => columnId.match(/^assignment_(?!group)/))
       deepEqual(columnIds.sort(), ['assignment_2301', 'assignment_2302'])
     })
 
-    QUnit.skip('does not freeze assignment group columns', () => {
+    test('does not freeze assignment group columns', () => {
       const columnIds = gridSpecHelper
         .listScrollableColumnIds()
         .filter(columnId => columnId.match(/^assignment_group_/))
@@ -215,7 +218,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       reorderEventData = null
     })
 
-    QUnit.skip('updates the stored custom column order when custom columns were reordered', () => {
+    test('updates the stored custom column order when custom columns were reordered', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2402',
@@ -227,10 +230,13 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         'total_grade'
       ])
       reorderApiResponse.resolve()
-      deepEqual(gradebook.gradebookContent.customColumns.map(column => column.id), ['2402', '2401'])
+      deepEqual(
+        gradebook.gradebookContent.customColumns.map(column => column.id),
+        ['2402', '2401']
+      )
     })
 
-    QUnit.skip('stores "custom" column order when assignment columns were reordered', () => {
+    test('stores "custom" column order when assignment columns were reordered', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2401',
@@ -244,7 +250,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       strictEqual(gradebook.saveCustomColumnOrder.callCount, 1)
     })
 
-    QUnit.skip('stores "custom" column order when assignment group columns were reordered', () => {
+    test('stores "custom" column order when assignment group columns were reordered', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2401',
@@ -258,7 +264,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       strictEqual(gradebook.saveCustomColumnOrder.callCount, 1)
     })
 
-    QUnit.skip('triggers the "onColumnsReordered" event with updated frozen columns', () => {
+    test('triggers the "onColumnsReordered" event with updated frozen columns', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2402',
@@ -269,14 +275,13 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         'assignment_group_2202',
         'total_grade'
       ])
-      deepEqual(reorderEventData.frozen.map(column => column.id), [
-        'student',
-        'custom_col_2402',
-        'custom_col_2401'
-      ])
+      deepEqual(
+        reorderEventData.frozen.map(column => column.id),
+        ['student', 'custom_col_2402', 'custom_col_2401']
+      )
     })
 
-    QUnit.skip('triggers the "onColumnsReordered" event with updated scrollable columns', () => {
+    test('triggers the "onColumnsReordered" event with updated scrollable columns', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2401',
@@ -294,10 +299,13 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         'assignment_group_2202',
         'total_grade'
       ]
-      deepEqual(reorderEventData.scrollable.map(column => column.id), expectedOrder)
+      deepEqual(
+        reorderEventData.scrollable.map(column => column.id),
+        expectedOrder
+      )
     })
 
-    QUnit.skip('does not trigger the "onColumnsReordered" event when column order did not change', () => {
+    test('does not trigger the "onColumnsReordered" event when column order did not change', () => {
       const spy = sinon.spy()
       gradebook.gradebookGrid.events.onColumnsReordered.subscribe(spy)
       gridSpecHelper.updateColumnOrder([
@@ -320,7 +328,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
 
-    QUnit.skip('reorders sortable grid columns to match intended ascending sort order', () => {
+    test('reorders sortable grid columns to match intended ascending sort order', () => {
       gradebook.arrangeColumnsBy({sortBy: 'default', direction: 'ascending'})
       const expectedOrder = [
         'assignment_2301',
@@ -332,7 +340,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('reorders sortable grid columns to match intended descending sort order', () => {
+    test('reorders sortable grid columns to match intended descending sort order', () => {
       gradebook.arrangeColumnsBy({sortBy: 'default', direction: 'descending'})
       const expectedOrder = [
         'assignment_2302',
@@ -344,7 +352,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('does not reorder frozen grid columns', () => {
+    test('does not reorder frozen grid columns', () => {
       gridSpecHelper.updateColumnOrder([
         'custom_col_2402',
         'student',
@@ -370,7 +378,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
 
-    QUnit.skip('places the total grade column after the student column', () => {
+    test('places the total grade column after the student column', () => {
       gradebook.freezeTotalGradeColumn()
       deepEqual(gridSpecHelper.listFrozenColumnIds(), [
         'student',
@@ -380,7 +388,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       ])
     })
 
-    QUnit.skip('removes the total grade column from the scrollable columns', () => {
+    test('removes the total grade column from the scrollable columns', () => {
       gradebook.freezeTotalGradeColumn()
       const expectedOrder = [
         'assignment_2301',
@@ -391,7 +399,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('preserves relative order of frozen columns', () => {
+    test('preserves relative order of frozen columns', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2402',
@@ -411,7 +419,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       ])
     })
 
-    QUnit.skip('preserves relative order of other scrollable columns', () => {
+    test('preserves relative order of other scrollable columns', () => {
       gridSpecHelper.updateColumnOrder([
         'student',
         'custom_col_2402',
@@ -442,7 +450,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         gradebook.freezeTotalGradeColumn()
       })
 
-      QUnit.skip('removes the total grade column from the frozen columns', () => {
+      test('removes the total grade column from the frozen columns', () => {
         gradebook.moveTotalGradeColumnToEnd()
         deepEqual(gridSpecHelper.listFrozenColumnIds(), [
           'student',
@@ -451,7 +459,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         ])
       })
 
-      QUnit.skip('places the total grade column after all scrollable columns', () => {
+      test('places the total grade column after all scrollable columns', () => {
         gradebook.moveTotalGradeColumnToEnd()
         const expectedOrder = [
           'assignment_2301',
@@ -463,7 +471,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
       })
 
-      QUnit.skip('preserves relative order of frozen columns', () => {
+      test('preserves relative order of frozen columns', () => {
         gridSpecHelper.updateColumnOrder([
           'student',
           'custom_col_2402',
@@ -482,7 +490,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         ])
       })
 
-      QUnit.skip('preserves relative order of other scrollable columns', () => {
+      test('preserves relative order of other scrollable columns', () => {
         gridSpecHelper.updateColumnOrder([
           'student',
           'custom_col_2402',
@@ -514,7 +522,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
       })
 
-      QUnit.skip('places the total grade column after all scrollable columns', () => {
+      test('places the total grade column after all scrollable columns', () => {
         gridSpecHelper.updateColumnOrder([
           'student',
           'custom_col_2401',
@@ -536,7 +544,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
       })
 
-      QUnit.skip('preserves order of frozen columns', () => {
+      test('preserves order of frozen columns', () => {
         gridSpecHelper.updateColumnOrder([
           'student',
           'custom_col_2402',
@@ -555,7 +563,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
         ])
       })
 
-      QUnit.skip('preserves relative order of other scrollable columns', () => {
+      test('preserves relative order of other scrollable columns', () => {
         gridSpecHelper.updateColumnOrder([
           'student',
           'custom_col_2402',
@@ -602,37 +610,46 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       })
     })
 
-    QUnit.skip('excludes assignment group columns when setting is disabled', () => {
+    test('excludes assignment group columns when setting is disabled', () => {
       initializeAndAddData()
       const columns = gridSpecHelper
         .listColumns()
         .filter(column => column.type === 'assignment_group')
-      deepEqual(columns.map(column => column.id), [])
+      deepEqual(
+        columns.map(column => column.id),
+        []
+      )
     })
 
-    QUnit.skip('excludes the total grade column when setting is disabled', () => {
+    test('excludes the total grade column when setting is disabled', () => {
       initializeAndAddData()
       const columns = gridSpecHelper.listColumns().filter(column => column.type === 'total_grade')
-      deepEqual(columns.map(column => column.id), [])
+      deepEqual(
+        columns.map(column => column.id),
+        []
+      )
     })
 
-    QUnit.skip('includes assignment group and total grade columns when setting is enabled', () => {
+    test('includes assignment group and total grade columns when setting is enabled', () => {
       gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = true
       initializeAndAddData()
       const columns = gridSpecHelper
         .listColumns()
         .filter(column => column.type === 'assignment_group')
-      deepEqual(columns.map(column => column.id), [
-        'assignment_group_2201',
-        'assignment_group_2202'
-      ])
+      deepEqual(
+        columns.map(column => column.id),
+        ['assignment_group_2201', 'assignment_group_2202']
+      )
     })
 
-    QUnit.skip('includes the total grade column when setting is enabled', () => {
+    test('includes the total grade column when setting is enabled', () => {
       gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = true
       initializeAndAddData()
       const columns = gridSpecHelper.listColumns().filter(column => column.type === 'total_grade')
-      deepEqual(columns.map(column => column.id), ['total_grade'])
+      deepEqual(
+        columns.map(column => column.id),
+        ['total_grade']
+      )
     })
   })
 
@@ -660,7 +677,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gradebook.getAssignment('2302').published = false
     })
 
-    QUnit.skip('removes unpublished assignment columns when filtered', () => {
+    test('removes unpublished assignment columns when filtered', () => {
       gradebook.toggleUnpublishedAssignments()
       const expectedOrder = [
         'assignment_2301',
@@ -671,7 +688,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('removes unrelated assignment columns when filtering by assignment group', () => {
+    test('removes unrelated assignment columns when filtering by assignment group', () => {
       gradebook.updateCurrentAssignmentGroup('2202')
       const expectedOrder = [
         'assignment_2302',
@@ -682,7 +699,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('removes unrelated assignment columns when filtering by grading period', () => {
+    test('removes unrelated assignment columns when filtering by grading period', () => {
       gradebook.updateCurrentGradingPeriod('1401')
       const expectedOrder = [
         'assignment_2301',
@@ -693,7 +710,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       deepEqual(gridSpecHelper.listScrollableColumnIds(), expectedOrder)
     })
 
-    QUnit.skip('does not duplicate the total column when filtering by grading period', () => {
+    test('does not duplicate the total column when filtering by grading period', () => {
       gradebook.freezeTotalGradeColumn()
       gradebook.updateCurrentGradingPeriod('1401')
       const totalGradeColumns = gridSpecHelper
@@ -712,12 +729,15 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
 
-    QUnit.skip('does not include the column in the grid', () => {
+    test('does not include the column in the grid', () => {
       const columns = gridSpecHelper.listColumns().filter(column => column.id.match(/^custom_col_/))
-      deepEqual(columns.map(column => column.id), ['custom_col_2402'])
+      deepEqual(
+        columns.map(column => column.id),
+        ['custom_col_2402']
+      )
     })
 
-    QUnit.skip('adds the column to the frozen columns when showing', () => {
+    test('adds the column to the frozen columns when showing', () => {
       gradebook.showNotesColumn()
       deepEqual(gridSpecHelper.listFrozenColumnIds(), [
         'student',
@@ -733,7 +753,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
     })
 
-    QUnit.skip('removes the column from the frozen columns', () => {
+    test('removes the column from the frozen columns', () => {
       gradebook.hideNotesColumn()
       deepEqual(gridSpecHelper.listFrozenColumnIds(), ['student', 'custom_col_2402'])
     })

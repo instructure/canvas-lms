@@ -35,7 +35,7 @@ const useGroupDetail = (id, loadOutcomesIsImported = false) => {
   const [error, setError] = useState(null)
   const outcomeIsImportedVariables = loadOutcomesIsImported
     ? {outcomeIsImportedContextType: contextType, outcomeIsImportedContextId: contextId}
-    : {}
+    : {outcomesContextType: contextType, outcomesContextId: contextId}
 
   const load = currentGroup => {
     if (id && String(id) !== String(ACCOUNT_FOLDER_ID)) {

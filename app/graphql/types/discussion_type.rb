@@ -77,6 +77,7 @@ module Types
       argument :search_term, String, required: false
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :root_entries, Boolean, required: false
     end
     def discussion_entries_connection(**args)
       get_entries(args)
@@ -117,7 +118,10 @@ module Types
     field :permissions, Types::DiscussionPermissionsType, null: true
     def permissions
       load_association(:context).then do
-        Loaders::PermissionsLoader.for(object, current_user: current_user, session: session)
+        {
+          loader: Loaders::PermissionsLoader.for(object, current_user: current_user, session: session),
+          discussion_topic: object
+        }
       end
     end
 
@@ -136,6 +140,7 @@ module Types
       argument :search_term, String, required: false
       argument :filter, DiscussionFilterType, required: false
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :root_entries, Boolean, required: false
     end
     def entries_total_pages(**args)
       get_entry_page_count(args)

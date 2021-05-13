@@ -129,7 +129,9 @@ module MicrosoftSync
 
     let(:state_record) { MicrosoftSync::Group.create(course: course_model) }
     let(:steps_object) { StateMachineJobTestSteps1.new }
-    let(:strand) { "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:#{state_record.id}" }
+    let(:strand) do
+      "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:#{state_record.global_id}"
+    end
 
     around(:each) { |example| Timecop.freeze { example.run } }
 
@@ -154,6 +156,15 @@ module MicrosoftSync
         expect(steps_object.steps_run).to eq([
           [:delay_run, [{strand: strand, run_at: nil}], [nil]],
         ])
+      end
+
+      # On Jenkins, global and local IDs seems to be the same, so test this explicitly:
+      it 'uses the global id in the strand name' do
+        expect(state_record).to receive(:global_id).and_return 987650000000012345
+        subject.send(:run_later)
+        expect(steps_object.steps_run[0][1][0][:strand]).to eq(
+          "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:987650000000012345"
+        )
       end
     end
 

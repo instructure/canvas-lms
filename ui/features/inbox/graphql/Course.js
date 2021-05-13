@@ -41,11 +41,3 @@ export const Course = {
     __typename: 'Course'
   })
 }
-
-export const DefaultMocks = {
-  Course: () => ({
-    _id: 'someId',
-    contextName: 'someString',
-    assetString: 'someId'
-  })
-}

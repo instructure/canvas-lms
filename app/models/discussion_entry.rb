@@ -38,6 +38,7 @@ class DiscussionEntry < ActiveRecord::Base
   # also null if a root entry
   belongs_to :root_entry, :class_name => 'DiscussionEntry', :foreign_key => :root_entry_id
   belongs_to :user
+  has_many :mentions, inverse_of: :discussion_entry
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
   belongs_to :root_account, class_name: 'Account'
@@ -58,6 +59,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
+  # parse_and_create_mentions has to run before has_a_broadcast_policy and the
+  # after_save hook it adds.
+  after_save :parse_and_create_mentions
   has_a_broadcast_policy
   attr_accessor :new_record_header
 
@@ -66,13 +70,33 @@ class DiscussionEntry < ActiveRecord::Base
     state :deleted
   end
 
+  def parse_and_create_mentions
+    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]').map(&:values)
+    user_ids = mention_data.map(&:first)
+    User.where(id: user_ids).each do |u|
+      mentions.create!(user: u, root_account_id: root_account_id)
+    end
+  end
+
+  def mentioned_users
+    users = User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+    discussion_topic.filter_message_users(users)
+  end
+
   def course_broadcast_data
     discussion_topic.context&.broadcast_data
   end
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { discussion_topic.subscribers - [user] }
+    p.to { discussion_topic.subscribers - [user] - mentioned_users }
+    p.whenever { |record|
+      record.just_created && record.active?
+    }
+    p.data { course_broadcast_data }
+
+    p.dispatch :new_discussion_mention
+    p.to { mentioned_users - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -146,9 +170,9 @@ class DiscussionEntry < ActiveRecord::Base
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
-      raise "Only context participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,

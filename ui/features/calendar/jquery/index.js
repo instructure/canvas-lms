@@ -70,6 +70,8 @@ export default class Calendar {
     this.displayAppointmentEvents = null
     this.activateEvent = this.options && this.options.activateEvent
 
+    this.prevWindowHeight = window.innerHeight
+    this.prevWindowWidth = window.innerWidth
     this.somethingIsFullscreen = isSomethingFullscreen(document)
 
     this.activeAjax = 0
@@ -322,6 +324,17 @@ export default class Calendar {
   }
 
   windowResize = _view => {
+    // The below hack to call .trigger('resize') for the weekly view also triggers this event handler,
+    // which causes the pop-up to close if it is already open by the time the resize callback is called.
+    // That hack doesn't rely on this handler to run, so let's just make sure that the window size has
+    // actually changed before doing anything.
+    if (this.prevWindowHeight === window.innerHeight && this.prevWindowWidth === window.innerWidth) {
+      return
+    }
+
+    this.prevWindowHeight = window.innerHeight
+    this.prevWindowWidth = window.innerWidth
+
     if (
       (!this.somethingIsFullscreen && isSomethingFullscreen(document)) ||
       (this.somethingIsFullscreen && !isSomethingFullscreen(document))

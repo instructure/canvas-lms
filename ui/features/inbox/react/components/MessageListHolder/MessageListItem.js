@@ -153,6 +153,7 @@ export const MessageListItem = ({...props}) => {
                 {props.isUnread && (
                   <Badge
                     type="notification"
+                    data-testid="unread-badge"
                     standalone
                     margin="x-small"
                     formatOutput={() => {

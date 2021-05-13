@@ -18,12 +18,28 @@
 
 import 'isomorphic-fetch'
 import {parse} from 'url'
+import {saveClosedCaptions} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../../common/fileUrl'
 import formatMessage from '../../format-message'
 import alertHandler from '../../rce/alertHandler'
 
-function headerFor(jwt) {
+export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
+}
+
+export function originFromHost(host, windowOverride) {
+  let origin = host
+
+  if (typeof origin !== 'string') {
+    origin = ''
+  } else if (origin && origin.substr(0, 4) !== 'http') {
+    origin = `//${origin}`
+    const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
+    if (origin.length > 0 && windowHandle?.location?.protocol) {
+      origin = `${windowHandle.location.protocol}${origin}`
+    }
+  }
+  return origin
 }
 
 // filter a response to raise an error on a 400+ status
@@ -200,52 +216,16 @@ class RceApiSource {
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
   // receive back a 200 with the new subtitles, or a 4xx error
   updateClosedCaptions(apiProps, {media_object_id, subtitles}) {
-    // read all the subtitle files' contents
-    const file_promises = []
-    subtitles.forEach(st => {
-      if (st.isNew) {
-        const p = new Promise((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = function(e) {
-            resolve({locale: st.locale, content: e.target.result})
-          }
-          reader.onerror = function(e) {
-            e.target.abort()
-            reject(e)
-          }
-          reader.readAsText(st.file)
-        })
-        file_promises.push(p)
-      } else {
-        file_promises.push(Promise.resolve({locale: st.locale}))
-      }
+    return saveClosedCaptions(media_object_id, subtitles, {
+      origin: originFromHost(apiProps.host),
+      headers: headerFor(apiProps.jwt)
+    }).catch(e => {
+      console.error('Failed saving CC', e)
+      this.alertFunc({
+        text: formatMessage('Uploading closed captions/subtitles failed.'),
+        variant: 'error'
+      })
     })
-
-    // once all the promises from reading the subtitles' files
-    // have resolved, PUT the resulting subtitle objects to the RCS
-    // when that completes, the update_promise will resolve
-    const update_promise = new Promise((resolve, reject) => {
-      Promise.all(file_promises)
-        .then(closed_captions => {
-          const uri = `${this.baseUri(
-            'media_objects',
-            apiProps.host
-          )}/${media_object_id}/media_tracks`
-          return this.apiPost(uri, headerFor(this.jwt), closed_captions, 'PUT')
-            .then(resolve)
-            .catch(e => {
-              console.error('failed updating media_tracks') // eslint-disable-line no-console
-              reject(e)
-            })
-        })
-        .catch(_e => {
-          this.alertFunc({
-            text: formatMessage('Reading a media track file failed. Aborting.'),
-            variant: 'error'
-          })
-        })
-    })
-    return update_promise
   }
 
   // GET /media_objects/:mediaId/media_tracks
@@ -492,20 +472,8 @@ class RceApiSource {
     if (!host && this.host) {
       host = this.host
     }
-    if (typeof host !== 'string') {
-      host = ''
-    } else if (host && host.substr(0, 4) !== 'http') {
-      host = `//${host}`
-      const windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
-      if (
-        host.length > 0 &&
-        windowHandle &&
-        windowHandle.location &&
-        windowHandle.location.protocol
-      ) {
-        host = `${windowHandle.location.protocol}${host}`
-      }
-    }
+    host = originFromHost(host, windowOverride)
+
     const sharedEndpoints = ['images', 'media', 'documents', 'all'] // 'all' will eventually be something different
     const endpt = sharedEndpoints.includes(endpoint) ? 'documents' : endpoint
     return `${host}/api/${endpt}`

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {MessageDetailItem} from '../MessageDetailItem'
@@ -25,20 +26,31 @@ describe('MessageDetailItem', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
-        participants: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
-        created_at: 'November 10, 2020 at 5:48pm',
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.'
       },
-      context: {name: 'Fake Course 1'}
+      contextName: 'Fake Course 1'
     }
 
     const {getByText} = render(<MessageDetailItem {...props} />)
 
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
-    expect(getByText('November 10, 2020 at 5:48pm')).toBeInTheDocument()
     expect(getByText('This is the body text for the message.')).toBeInTheDocument()
     expect(getByText('Fake Course 1')).toBeInTheDocument()
+
+    const dateOptions = {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric'
+    }
+
+    const createdAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+      new Date(props.conversationMessage.createdAt)
+    )
+    expect(getByText(createdAt)).toBeInTheDocument()
   })
 
   it('sends the selected option to the provided callback function', () => {
@@ -46,11 +58,11 @@ describe('MessageDetailItem', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
-        participants: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
-        created_at: 'November 10, 2020 at 5:48pm',
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.'
       },
-      context: {name: 'Fake Course 1'},
+      contextName: 'Fake Course 1',
       handleOptionSelect: handleOptionSelectMock
     }
 

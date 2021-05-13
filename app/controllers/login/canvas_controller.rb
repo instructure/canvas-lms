@@ -77,6 +77,7 @@ class Login::CanvasController < ApplicationController
 
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
         next unless res
+
         unique_id = if aac.identifier_format.present?
                       res.first[aac.identifier_format].first
                     else
@@ -89,6 +90,7 @@ class Login::CanvasController < ApplicationController
         next unless pseudonym
 
         pseudonym.instance_variable_set(:@ldap_result, res.first)
+        pseudonym.infer_auth_provider(aac)
         @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
         session[:login_aac] = aac.id
@@ -115,7 +117,7 @@ class Login::CanvasController < ApplicationController
       return
     end
 
-    pseudonym = @pseudonym_session && @pseudonym_session.record
+    pseudonym = @pseudonym_session&.record
     # If the user's @domain_root_account has been deleted, feel free to share that information
     if pseudonym && (!pseudonym.user || pseudonym.user.unavailable?)
       unsuccessful_login t("That user account has been deleted.  Please contact your system administrator to have your account re-activated.")
@@ -126,9 +128,10 @@ class Login::CanvasController < ApplicationController
     if found
       # Call for some cleanups that should be run when a user logs in
       user = pseudonym.login_assertions_for_user
-      session[:login_aac] ||= pseudonym.authentication_provider_id ||
-        pseudonym.ldap_authentication_provider_used&.id ||
-        @domain_root_account.canvas_authentication_provider&.id
+      ap = pseudonym.authentication_provider
+
+      session[:login_aac] ||= ap.id
+      pseudonym.infer_auth_provider(ap)
       successful_login(user, pseudonym)
     else
       link_url = Setting.get('invalid_login_faq_url', nil)

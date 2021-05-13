@@ -45,7 +45,8 @@ const dashboardCards = [
     originalName: 'Economics 101',
     courseCode: 'ECON-001',
     isHomeroom: false,
-    canManage: true
+    canManage: true,
+    published: true
   },
   {
     id: '2',
@@ -55,7 +56,8 @@ const dashboardCards = [
     originalName: 'Home Room',
     courseCode: 'HOME-001',
     isHomeroom: true,
-    canManage: true
+    canManage: true,
+    published: false
   }
 ]
 const homeroomAnnouncement = [
@@ -364,6 +366,12 @@ describe('K-5 Dashboard', () => {
       const attachment = getByText('exam1.pdf')
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://google.com/download')
+    })
+
+    it('shows unpublished indicator if homeroom is unpublished', async () => {
+      const {findByText, getByText} = render(<K5Dashboard {...defaultProps} />)
+      await findByText('Announcement here')
+      expect(getByText('Your homeroom is currently unpublished.')).toBeInTheDocument()
     })
 
     it('shows a due today link pointing to the first item on schedule tab for today', async () => {

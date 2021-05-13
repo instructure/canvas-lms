@@ -785,4 +785,21 @@ This text has a http://www.google.com link in it...
       expect(comment).to be_active
     end
   end
+
+  describe "#allows_posting_submission?" do
+    it "returns true if the comment is hidden and published" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: true, draft_comment: false)
+      expect(comment).to be_allows_posting_submission
+    end
+
+    it "returns false if the comment is not hidden" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: false, draft_comment: false)
+      expect(comment).not_to be_allows_posting_submission
+    end
+
+    it "returns false if the comment is a draft" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: true, draft_comment: true)
+      expect(comment).not_to be_allows_posting_submission
+    end
+  end
 end

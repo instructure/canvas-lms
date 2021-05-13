@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
-import sinon from 'sinon'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 import TextEntry from '../TextEntry'
+
+jest.mock('@canvas/rce/RichContentEditor')
 
 async function makeProps(opts = {}) {
   const mockedSubmission =
@@ -34,160 +36,346 @@ async function makeProps(opts = {}) {
   return {
     createSubmissionDraft: jest.fn(),
     editingDraft: opts.editingDraft || false,
+    readOnly: opts.readOnly || false,
+    onContentsChanged: jest.fn(),
     submission: mockedSubmission,
     updateEditingDraft: jest.fn()
   }
 }
 
 describe('TextEntry', () => {
-  describe('when the submission draft body is null', () => {
-    it('renders a Start Entry item', async () => {
-      const mockedSubmission = await mockSubmission()
-      const props = await makeProps({submission: mockedSubmission})
-      const {getByText} = render(<TextEntry {...props} />)
+  let finishLoadingEditor
+  let fakeEditor
+  let editorContent
 
-      expect(getByText('Start Entry')).toBeInTheDocument()
+  beforeEach(() => {
+    jest.useFakeTimers()
+
+    jest.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => editorContent)
+    jest.spyOn(RichContentEditor, 'destroyRCE')
+    jest.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation((_textarea, options) => {
+      fakeEditor = {
+        focus: () => {},
+        getBody: () => {},
+        getContent: jest.fn(() => editorContent),
+        mode: {
+          set: jest.fn()
+        },
+        setContent: jest.fn(content => {
+          editorContent = content
+        }),
+        selection: {
+          collapse: () => {},
+          select: () => {}
+        }
+      }
+
+      finishLoadingEditor = () => {
+        options.tinyOptions.init_instance_callback(fakeEditor)
+      }
     })
   })
 
-  describe('when the submission draft body is not null', () => {
-    describe('with the RCE view disabled', () => {
-      it('renders the Edit button', async () => {
-        const props = await makeProps()
-        const {getByTestId, getByText} = render(<TextEntry {...props} />)
-        const editButton = getByTestId('edit-text-draft')
+  afterEach(() => {
+    jest.runOnlyPendingTimers()
+    jest.useRealTimers()
+  })
 
-        expect(editButton).toContainElement(getByText('Edit'))
+  const renderWithoutFinishing = async props => {
+    const propsToRender = props || (await makeProps())
+    return render(<TextEntry {...propsToRender} />)
+  }
+
+  const renderEditor = async props => {
+    const result = await renderWithoutFinishing(props)
+    finishLoadingEditor()
+
+    return result
+  }
+
+  describe('initial rendering', () => {
+    describe('before rendering has finished', () => {
+      it('renders a placeholder text area with the submission contents', async () => {
+        const {getByRole} = await renderWithoutFinishing()
+
+        const textarea = getByRole('textbox')
+        expect(textarea).toBeInTheDocument()
+        expect(textarea).toHaveTextContent('words')
       })
 
-      it('renders the Delete button', async () => {
-        const props = await makeProps()
-        const {getByTestId} = render(<TextEntry {...props} />)
-
-        expect(getByTestId('delete-text-draft')).toBeInTheDocument()
-      })
-
-      it('enables the RCE view when the Edit button is clicked', async () => {
-        const props = await makeProps()
-        const {getByTestId} = render(<TextEntry {...props} />)
-        const editButton = getByTestId('edit-text-draft')
-        fireEvent.click(editButton)
-
-        expect(props.updateEditingDraft).toHaveBeenCalledWith(true)
-      })
-
-      it('deletes the saved draft when the Delete button is clicked', async () => {
-        const props = await makeProps()
-        const {getByTestId} = render(<TextEntry {...props} />)
-        const editButton = getByTestId('delete-text-draft')
-        fireEvent.click(editButton)
-
-        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-          variables: {
-            id: '1',
-            activeSubmissionType: 'online_text_entry',
-            attempt: 1,
-            body: null
-          }
-        })
-      })
-    })
-
-    describe.skip('with the RCE view enabled', () => {
-      // TODO: get this to work with latest @testing-library
-      it('renders the RCE when the draft body is not null', async () => {
-        const props = await makeProps({editingDraft: true})
-        const {getByTestId} = render(<TextEntry {...props} />)
-
-        expect(getByTestId('text-editor')).toBeInTheDocument()
-      })
-
-      it('renders the loading indicator of the RCE', async () => {
-        const props = await makeProps({editingDraft: true})
-        const {getByText} = render(<TextEntry {...props} />)
+      it('renders a loading indicator for the RCE', async () => {
+        const {getByText} = await renderWithoutFinishing()
 
         expect(getByText('Loading')).toBeInTheDocument()
       })
+    })
 
-      it('renders the Cancel button when the RCE is loaded', async () => {
-        const props = await makeProps({editingDraft: true})
-        const {getByTestId, getByText} = render(<TextEntry {...props} />)
-
-        const cancelButton = getByTestId('cancel-text-entry')
-        expect(cancelButton).toContainElement(getByText('Cancel'))
+    describe('when the RCE has finished rendering', () => {
+      it('hides the loading indicator', async () => {
+        const {queryByText} = await renderEditor()
+        expect(queryByText('Loading')).not.toBeInTheDocument()
       })
 
-      it('renders the Save button when the RCE is loaded', async () => {
-        const props = await makeProps({editingDraft: true})
-        const {getByTestId, getByText} = render(<TextEntry {...props} />)
+      describe('read-only mode', () => {
+        it('is enabled if the readOnly prop is true', async () => {
+          await renderEditor(await makeProps({readOnly: true}))
+          expect(fakeEditor.mode.set).toHaveBeenCalledWith('readonly')
+        })
 
-        const saveButton = getByTestId('save-text-entry')
-        expect(saveButton).toContainElement(getByText('Save'))
-      })
-
-      it('saves the text draft when the Save button is clicked', async () => {
-        const props = await makeProps({editingDraft: true})
-        const {getByTestId} = render(<TextEntry {...props} />)
-
-        const saveButton = getByTestId('save-text-entry')
-        fireEvent.click(saveButton)
-
-        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-          variables: {
-            id: '1',
-            attempt: 1,
-            body: 'words'
-          }
+        it('is not enabled if the readOnly prop is false', async () => {
+          await renderEditor()
+          expect(fakeEditor.mode.set).toHaveBeenCalledWith('design')
         })
       })
 
-      it.skip('stops displaying the RCE when the Cancel button is clicked', async () => {
-        // TODO: get this to work with latest @testing-library
-        const props = await makeProps({editingDraft: true})
-        const {getByTestId} = render(<TextEntry {...props} />)
+      describe('text contents', () => {
+        it('uses the submission body if the submission is graded', async () => {
+          const props = await makeProps({
+            submission: {
+              body: 'I am graded!',
+              state: 'graded'
+            }
+          })
+          await renderEditor(props)
 
-        const cancelButton = getByTestId('cancel-text-entry')
-        fireEvent.click(cancelButton)
+          expect(fakeEditor.setContent).toHaveBeenCalledWith('I am graded!')
+        })
 
-        expect(props.updateEditingDraft).toHaveBeenCalledWith(false)
+        it('uses the submission body if the submission is submitted', async () => {
+          const props = await makeProps({
+            submission: {
+              body: 'I am not graded!',
+              state: 'submitted'
+            }
+          })
+          await renderEditor(props)
+          expect(fakeEditor.setContent).toHaveBeenCalledWith('I am not graded!')
+        })
+
+        it('uses the contents of the draft if not graded or submitted and a draft is present', async () => {
+          const props = await makeProps({
+            submission: {
+              submissionDraft: {body: 'just a draft'}
+            }
+          })
+          await renderEditor(props)
+          expect(fakeEditor.setContent).toHaveBeenCalledWith('just a draft')
+        })
+
+        it('is empty if not graded or submitted and no draft is present', async () => {
+          const props = await makeProps({
+            submission: {
+              body: 'this should be ignored',
+              state: 'unsubmitted'
+            }
+          })
+          await renderEditor(props)
+          expect(fakeEditor.setContent).toHaveBeenCalledWith('')
+        })
       })
     })
   })
 
-  it('displays the submitted text body when the text has been submitted', async () => {
-    const mockedSubmission = await mockSubmission({
-      Submission: {
-        body: '<p>thundercougarfalconbird</p>',
-        state: 'submitted'
-      }
-    })
-    const props = await makeProps({submission: mockedSubmission})
-    const {getByTestId, getByText} = render(<TextEntry {...props} />)
+  describe('receiving updated props', () => {
+    const initialSubmission = {
+      attempt: 1,
+      state: 'unsubmitted',
+      submissionDraft: {body: 'hello'}
+    }
 
-    expect(getByTestId('text-submission')).toBeInTheDocument()
-    expect(getByText('thundercougarfalconbird')).toBeInTheDocument()
+    const doInitialRender = async () => {
+      const props = await makeProps({submission: initialSubmission})
+      const result = await renderEditor(props)
+
+      // Some of these mocks will have been called above; clear their call
+      // counts so we can test the re-render sensibly
+      fakeEditor.mode.set.mockClear()
+      fakeEditor.setContent.mockClear()
+
+      return result
+    }
+
+    it('updates the mode of the editor if the readOnly prop has changed', async () => {
+      const {rerender} = await doInitialRender()
+      const newProps = await makeProps({
+        readOnly: true,
+        submission: initialSubmission
+      })
+
+      rerender(<TextEntry {...newProps} />)
+      expect(fakeEditor.mode.set).toHaveBeenCalledWith('readonly')
+    })
+
+    it('does not update the mode of the editor if the readOnly prop has not changed', async () => {
+      const {rerender} = await doInitialRender()
+      const updatedProps = await makeProps({
+        submission: {
+          ...initialSubmission,
+          submissionDraft: {body: 'hello?'}
+        }
+      })
+
+      rerender(<TextEntry {...updatedProps} />)
+      expect(fakeEditor.mode.set).not.toHaveBeenCalled()
+    })
+
+    it('sets the content of the editor if the attempt has changed', async () => {
+      const {rerender} = await doInitialRender()
+
+      const newProps = await makeProps({
+        submission: {
+          attempt: 2,
+          state: 'unsubmitted',
+          submissionDraft: {body: 'hello, again'}
+        }
+      })
+      rerender(<TextEntry {...newProps} />)
+      expect(fakeEditor.setContent).toHaveBeenCalledWith('hello, again')
+    })
+
+    it('does not set the content of the editor if the attempt has not changed', async () => {
+      const {rerender} = await doInitialRender()
+      const newProps = await makeProps({
+        submission: {...initialSubmission, grade: 0, state: 'graded'}
+      })
+
+      rerender(<TextEntry {...newProps} />)
+      expect(fakeEditor.setContent).not.toHaveBeenCalled()
+    })
   })
 
-  it('displays the submitted text body when the submission has been graded', async () => {
-    const mockedSubmission = await mockSubmission({
-      Submission: {
-        body: '<p>thundercougarfalconbird</p>',
-        state: 'graded'
-      }
-    })
-    const props = await makeProps({submission: mockedSubmission})
-    const {getByTestId, getByText} = render(<TextEntry {...props} />)
+  describe('onContentsChanged prop', () => {
+    it('checks for changes every 250ms', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
 
-    expect(getByTestId('text-submission')).toBeInTheDocument()
-    expect(getByText('thundercougarfalconbird')).toBeInTheDocument()
+      fakeEditor.setContent('hello?')
+      jest.advanceTimersByTime(250)
+      expect(props.onContentsChanged).toHaveBeenCalled()
+    })
+
+    it('runs no more often than every 250ms', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
+
+      props.onContentsChanged.mockClear()
+      fakeEditor.setContent('hello?')
+      jest.advanceTimersByTime(200)
+      fakeEditor.setContent('hello!')
+      jest.advanceTimersByTime(200)
+      fakeEditor.setContent('hello.')
+      jest.advanceTimersByTime(200)
+
+      expect(props.onContentsChanged).toHaveBeenCalledTimes(2)
+    })
+
+    it('is not called if there have been no changes within 250ms', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
+
+      jest.advanceTimersByTime(275)
+      expect(props.onContentsChanged).not.toHaveBeenCalled()
+    })
   })
 
-  it('sets up beforeunload handler', async () => {
-    sinon.spy(window, 'addEventListener')
+  describe('createSubmissionDraft prop', () => {
+    it('is called when the user has made changes, then stopped for at least one second', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
 
-    const props = await makeProps()
-    render(<TextEntry {...props} />)
+      fakeEditor.setContent('I')
+      jest.advanceTimersByTime(500)
+      fakeEditor.setContent('I am editing')
+      jest.advanceTimersByTime(500)
+      fakeEditor.setContent('I am still editing')
 
-    expect(window.addEventListener.lastCall.args).toContain('beforeunload')
+      expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+      jest.advanceTimersByTime(1250)
+
+      expect(props.createSubmissionDraft).toHaveBeenCalled()
+    })
+
+    it('is called once for each batch of changes', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
+
+      fakeEditor.setContent('I')
+      jest.advanceTimersByTime(500)
+      fakeEditor.setContent('I am')
+      jest.advanceTimersByTime(500)
+      fakeEditor.setContent('I am editing')
+
+      jest.advanceTimersByTime(5000)
+      expect(props.createSubmissionDraft).toHaveBeenCalledTimes(1)
+    })
+
+    it('is not called for any changes inexplicably emitted in read-only mode', async () => {
+      const props = await makeProps({readOnly: true})
+      await renderEditor(props)
+
+      fakeEditor.setContent('No')
+      jest.advanceTimersByTime(500)
+      fakeEditor.setContent('No way')
+
+      jest.advanceTimersByTime(3000)
+      expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+    })
+
+    it('is not called for a brand new entry with no content', async () => {
+      const props = await makeProps()
+      const {rerender} = await renderEditor(props)
+
+      const newProps = await makeProps({
+        submission: {
+          attempt: 2,
+          state: 'unsubmitted'
+        }
+      })
+      rerender(<TextEntry {...newProps} />)
+
+      jest.advanceTimersByTime(3000)
+      expect(newProps.createSubmissionDraft).not.toHaveBeenCalled()
+    })
+
+    it('passes the contents of the submission in its current form', async () => {
+      const props = await makeProps()
+      await renderEditor(props)
+
+      fakeEditor.setContent('hello there!')
+      jest.advanceTimersByTime(1500)
+
+      expect(props.createSubmissionDraft).toHaveBeenCalled()
+
+      const args = props.createSubmissionDraft.mock.calls[0]
+      expect(args[0]).toEqual({
+        variables: {
+          activeSubmissionType: 'online_text_entry',
+          attempt: 1,
+          body: 'hello there!',
+          id: '1'
+        }
+      })
+    })
+  })
+
+  describe('unmounting', () => {
+    it('calls the destroyRCE method', async () => {
+      const {unmount} = await renderEditor()
+      unmount()
+
+      expect(RichContentEditor.destroyRCE).toHaveBeenCalled()
+    })
+
+    it('does not process any outstanding changes to the text', async () => {
+      const props = await makeProps()
+      const {unmount} = await renderEditor(props)
+
+      fakeEditor.setContent('oh no')
+      jest.advanceTimersByTime(100)
+      unmount()
+
+      jest.advanceTimersByTime(3000)
+      expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+    })
   })
 })

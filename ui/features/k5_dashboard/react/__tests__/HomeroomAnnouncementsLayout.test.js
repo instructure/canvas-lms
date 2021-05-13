@@ -35,7 +35,8 @@ const homeroomAnnouncements = [
         url: 'http://google.com/download',
         filename: '1608134586_366__exam1.pdf'
       }
-    }
+    },
+    published: true
   },
   {
     courseId: 1235,
@@ -46,13 +47,15 @@ const homeroomAnnouncements = [
       title: 'Sign the permission slip!',
       message: '<p>Hello</p>',
       url: 'http://google.com/otherclass'
-    }
+    },
+    published: true
   },
   {
     courseId: 1236,
     courseName: 'New Homeroom',
     courseUrl: 'http://google.com',
-    canEdit: true
+    canEdit: true,
+    published: true
   }
 ]
 
@@ -63,15 +66,15 @@ describe('HomeroomAnnouncementsLayout', () => {
     ...overrides
   })
 
-  it('renders a view for each child passed', async () => {
-    const {findByText} = render(<HomeroomAnnouncementsLayout {...getProps()} />)
-    expect(await findByText('Homeroom - Mr. Jessie')).toBeInTheDocument()
-    expect(await findByText('Homeroom 0144232')).toBeInTheDocument()
-    expect(await findByText('New Homeroom')).toBeInTheDocument()
+  it('renders a view for each child passed', () => {
+    const {getByText} = render(<HomeroomAnnouncementsLayout {...getProps()} />)
+    expect(getByText('Homeroom - Mr. Jessie')).toBeInTheDocument()
+    expect(getByText('Homeroom 0144232')).toBeInTheDocument()
+    expect(getByText('New Homeroom')).toBeInTheDocument()
   })
 
-  it('shows text and button for homeroom courses with no announcements to users that can edit', async () => {
-    const {findByText} = render(
+  it('shows text and button for homeroom courses with no announcements to users that can edit', () => {
+    const {getByText} = render(
       <HomeroomAnnouncementsLayout
         {...getProps({
           homeroomAnnouncements: [
@@ -86,9 +89,9 @@ describe('HomeroomAnnouncementsLayout', () => {
       />
     )
     expect(
-      await findByText('New announcements show up in this area. Create a new announcement now.')
+      getByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
-    expect(await findByText('Announcement')).toBeInTheDocument()
+    expect(getByText('Announcement')).toBeInTheDocument()
   })
 
   it('does not show prompt to create announcement to students', () => {
@@ -114,8 +117,10 @@ describe('HomeroomAnnouncementsLayout', () => {
   })
 
   it('renders an empty view if no announcements are passed', () => {
-    const {container} = render(<HomeroomAnnouncementsLayout loading={false} />)
-    expect(container.firstChild).toBeEmpty()
+    const {container} = render(
+      <HomeroomAnnouncementsLayout homeroomAnnouncements={[]} loading={false} />
+    )
+    expect(container.firstChild).toBeEmptyDOMElement()
   })
 
   it('renders loading skeletons if loading', () => {

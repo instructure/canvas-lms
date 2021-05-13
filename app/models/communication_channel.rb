@@ -21,6 +21,7 @@
 class CommunicationChannel < ActiveRecord::Base
   # You should start thinking about communication channels
   # as independent of pseudonyms
+  include ManyRootAccounts
   include Workflow
 
   serialize :last_bounce_details
@@ -448,12 +449,6 @@ class CommunicationChannel < ActiveRecord::Base
         # Reset bounce count when we're being reactivated
         reset_bounce_count!
       end
-    end
-  end
-
-  def global_root_account_ids
-    root_account_ids&.map do |id|
-      Shard.global_id_for(id, self.shard)
     end
   end
 

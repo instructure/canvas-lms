@@ -65,10 +65,3 @@ export const MediaComment = {
     __typename: 'MediaObject'
   })
 }
-
-export const DefaultMocks = {
-  MediaObject: () => ({
-    title: 'Test Media Comment Video',
-    canAddCaptions: true
-  })
-}

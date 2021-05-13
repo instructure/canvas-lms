@@ -188,20 +188,55 @@ describe MicrosoftSync::GraphServiceHelpers do
   end
 
   describe '#users_upns_to_aads' do
-    it 'returns a hash from UPN to AAD object id' do
-      expect(subject.graph_service).to \
-        receive(:list_users).
-        with(select: %w[id userPrincipalName], filter: {userPrincipalName: %w[a b c d]}).
-        and_return([
-          {'id' => '789', 'userPrincipalName' => 'd'},
-          {'id' => '456', 'userPrincipalName' => 'b'},
+    let(:requested) { %w[a b c d] }
+
+    before do
+      allow(subject.graph_service).to \
+        receive(:list_users)
+        .with(select: %w[id userPrincipalName], filter: {userPrincipalName: requested})
+        .and_return([
+          {'id' => '789', 'userPrincipalName' => 'D'},
           {'id' => '123', 'userPrincipalName' => 'a'},
+          {'id' => '456', 'userPrincipalName' => 'b'},
         ])
-      expect(subject.users_upns_to_aads(%w[a b c d])).to eq(
-        'a' => '123',
-        'b' => '456',
-        'd' => '789'
-      )
+    end
+
+    context "when the graph service sends a UPN back that differs in case" do
+      it 'maps the response back to case of the UPN in the input array' do
+        expect(subject.users_upns_to_aads(%w[a b c d])).to eq(
+          'a' => '123',
+          'b' => '456',
+          'd' => '789'
+        )
+      end
+    end
+
+    context "when the graph service sends a upn back that it didn't ask for" do
+      let(:requested) { %w[c d] }
+
+      it "raises an error" do
+        expect { subject.users_upns_to_aads(%w[c D]) }.to \
+          raise_error do |err|
+          expect(err.message).to eq(
+            '/users returned unexpected UPN(s) ["a", "b"], asked for ["c", "d"]'
+          )
+          expect(err.public_message).to eq(
+            'Unexpected response from Microsoft API. This is likely a bug. Please contact support.'
+          )
+          expect(err).to be_a(MicrosoftSync::Errors::PublicError)
+        end
+      end
+    end
+
+    context 'when given different-case duplicates of the same UPN' do
+      it "only requests one and copies the AAD on all matching UPNs" do
+        expect(subject.users_upns_to_aads(%w[a b c A C D])).to eq(
+          'a' => '123',
+          'A' => '123',
+          'b' => '456',
+          'D' => '789'
+        )
+      end
     end
 
     context 'when passed in more than 15' do

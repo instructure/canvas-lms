@@ -21,7 +21,7 @@ import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import {Course} from './Course'
 import {Enrollment} from './Enrollment'
-import {graphql} from 'msw'
+import {graphql, mswAssign} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
 
@@ -95,7 +95,10 @@ export const handlers = [
     } else {
       data.legacyNode.conversationsConnection.nodes = [
         {
-          ...ConversationParticipant.mock({_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2'}),
+          ...ConversationParticipant.mock(
+            {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
+            {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+          ),
           conversation: Conversation.mock({_id: '197', subject: 'This is an inbox conversation'})
         }
       ]
@@ -107,17 +110,41 @@ export const handlers = [
           body: 'this is a message for the inbox',
           author: User.mock({_id: '1', name: 'Charles Xavier'}),
           recipients: [User.mock({_id: '1', name: 'Charels Xavier'})]
+        }),
+        ConversationMessage.mock({
+          _id: '2800',
+          id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjj0',
+          createdAt: '2021-03-16T12:09:23-05:00',
+          body: 'Watch out for that Magneto guy',
+          author: User.mock({_id: '1', name: 'Charles Xavier'}),
+          recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
+        }),
+        ConversationMessage.mock({
+          _id: '2801',
+          id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjj1',
+          createdAt: '2021-03-16T12:09:23-04:00',
+          body: 'Wolverine is not so bad when you get to know him',
+          author: User.mock({_id: '1', name: 'Charles Xavier'}),
+          recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
         })
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationParticipantsConnection.nodes = [
         ConversationParticipant.mock({
           _id: '255',
           id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU1',
-          user: User.mock({_id: '1', name: 'Charles Xavier'})
+          user: User.mock({_id: '1', name: 'Charles Xavier'}),
+          workflowState: 'unread'
         }),
         ConversationParticipant.mock({
           _id: '256',
-          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2'
+          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2',
+          workflowState: 'unread'
+        }),
+        ConversationParticipant.mock({
+          _id: '257',
+          id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4',
+          user: User.mock({_id: '1', name: 'Charles Xavier'}),
+          workflowState: 'unread'
         })
       ]
     }
@@ -166,5 +193,66 @@ export const handlers = [
       }
     }
     return res(ctx.data(data))
+  }),
+
+  graphql.query('ReplyConversationQuery', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        ...Conversation.mock()
+      }
+    }
+    // Remove uneeded fields from response that are
+    // automatically included through mocks
+    delete data.legacyNode.contextId
+    delete data.legacyNode.contextType
+    delete data.legacyNode.conversationParticipantsConnection
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.mutation('CreateConversation', (req, res, ctx) => {
+    const data = {
+      createConversation: {
+        conversations: [
+          {
+            ...ConversationParticipant.mock(),
+            conversation: Conversation.mock({subject: req.variables.subject})
+          }
+        ],
+        errors: null,
+        __typename: 'CreateConversationPayload'
+      }
+    }
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.mutation('AddConversationMessage', (req, res, ctx) => {
+    const data = {
+      addConversationMessage: {
+        conversationMessage: ConversationMessage.mock({body: req.variables.body}),
+        errors: null,
+        __typename: 'AddConversationMessagePayload'
+      }
+    }
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.mutation('UpdateConversationParticipants', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        UpdateConversationParticipants: {
+          conversationParticipants: mswAssign(
+            {...ConversationParticipant.mock()},
+            {
+              id: req.body.variables.conversationId,
+              read: req.body.variables.read
+            }
+          ),
+          __typename: 'UpdateConversationParticipantsPayload'
+        }
+      })
+    )
   })
 ]

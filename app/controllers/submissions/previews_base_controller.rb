@@ -39,6 +39,13 @@ module Submissions
       @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
       @body_classes << 'is-inside-submission-frame'
 
+      # We're re-using the preview view for viewing Student Annotation
+      # submissions in SpeedGrader, but the default padding for previews does
+      # not work well for SpeedGrader.
+      if @submission.submission_type == "student_annotation"
+        @body_classes.push('full-width', 'student-annotation-container')
+      end
+
       if @assignment.moderated_grading?
         @moderated_grading_allow_list = @submission.moderated_grading_allow_list
       end

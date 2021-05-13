@@ -328,6 +328,7 @@ exports[`The Ratings component renders the root component as expected 1`] = `
     wrap="no-wrap"
   >
     <Item
+      align="start"
       as="span"
       elementRef={[Function]}
       key="tier-0"
@@ -353,6 +354,7 @@ exports[`The Ratings component renders the root component as expected 1`] = `
       />
     </Item>
     <Item
+      align="start"
       as="span"
       elementRef={[Function]}
       key="tier-1"
@@ -379,6 +381,7 @@ exports[`The Ratings component renders the root component as expected 1`] = `
       />
     </Item>
     <Item
+      align="start"
       as="span"
       elementRef={[Function]}
       key="tier-2"

@@ -39,6 +39,10 @@ describe 'user_content post processing' do
     @course.wiki_pages.create!(title: page_title, body: page_content)
   end
 
+  def wait_for_loading_image
+    wait_for_transient_element('.loading_image_holder') { yield }
+  end
+
   describe 'with rce_better_file_downloading flag on' do
     before(:each) { Account.site_admin.enable_feature!(:rce_better_file_downloading) }
 
@@ -221,8 +225,7 @@ describe 'user_content post processing' do
       expect(file_link.attribute('class')).to include('file_preview_link')
       expect(f('.instructure_file_holder')).not_to contain_css('img[alt="Preview the document"]')
 
-      file_link.click
-      expect(f('.loading_image_holder')).to be_displayed
+      wait_for_loading_image { file_link.click }
       preview_container = f('#preview_1[role="region"]')
       expect(f('.hide_file_preview_link', preview_container)).to be_displayed
       expect(f('iframe', preview_container)).to be_displayed
@@ -240,8 +243,7 @@ describe 'user_content post processing' do
       expect(file_link.attribute('class')).to include('file_preview_link')
       expect(f('.instructure_file_holder')).not_to contain_css('img[alt="Preview the document"]')
 
-      file_link.click
-      expect(f('.loading_image_holder')).to be_displayed
+      wait_for_loading_image { file_link.click }
       preview_container = f('#preview_1[role="region"]')
       expect(f('.hide_file_preview_link', preview_container)).to be_displayed
       expect(f('iframe', preview_container)).to be_displayed

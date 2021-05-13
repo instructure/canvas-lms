@@ -127,6 +127,9 @@ end
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
   Canvas::Redis.clear_idle_connections
+  job.current_shard.activate do
+    LoadAccount.check_schema_cache
+  end
 
   # context for our custom logger
   Thread.current[:context] = {

@@ -24,6 +24,18 @@ const setup = props => {
   return render(<DiscussionEdit {...props} />)
 }
 
+const defaultProps = ({
+  show = undefined,
+  value = undefined,
+  onCancel = jest.fn(),
+  onSubmit = jest.fn()
+} = {}) => ({
+  show,
+  value,
+  onCancel,
+  onSubmit
+})
+
 describe('DiscussionEdit', () => {
   beforeEach(() => {
     RichContentEditor.loadNewEditor = jest.fn()
@@ -38,18 +50,18 @@ describe('DiscussionEdit', () => {
 
   describe('Rendering', () => {
     it('should render', () => {
-      const component = setup()
+      const component = setup(defaultProps())
       expect(component).toBeTruthy()
     })
 
     it('should not show when show is false', () => {
-      const {getByTestId} = setup({show: false})
+      const {getByTestId} = setup(defaultProps({show: false}))
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('none')
     })
 
     it('should show by default', () => {
-      const {getByTestId} = setup()
+      const {getByTestId} = setup(defaultProps())
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('')
     })
@@ -58,7 +70,7 @@ describe('DiscussionEdit', () => {
   describe('Callbacks', () => {
     it('should fire onCancel when clicked', () => {
       const onCancelMock = jest.fn()
-      const {getByTestId} = setup({onCancel: onCancelMock})
+      const {getByTestId} = setup(defaultProps({onCancel: onCancelMock}))
       const cancelButton = getByTestId('DiscussionEdit-cancel')
       fireEvent.click(cancelButton)
       expect(onCancelMock.mock.calls.length).toBe(1)
@@ -66,7 +78,7 @@ describe('DiscussionEdit', () => {
 
     it('should fire obSubmit when clicked', () => {
       const onSubmitMock = jest.fn()
-      const {getByTestId} = setup({onSubmit: onSubmitMock})
+      const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
       expect(onSubmitMock.mock.calls.length).toBe(1)

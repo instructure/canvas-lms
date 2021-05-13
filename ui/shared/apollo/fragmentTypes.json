@@ -78,6 +78,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommentBankItem"
+          },
+          {
             "name": "CommunicationChannel"
           },
           {
@@ -142,6 +145,9 @@
           },
           {
             "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeFriendlyDescriptionType"
           },
           {
             "name": "OutcomeProficiency"
@@ -270,6 +276,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommentBankItem"
+          },
+          {
             "name": "CommunicationChannel"
           },
           {
@@ -331,6 +340,9 @@
           },
           {
             "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeFriendlyDescriptionType"
           },
           {
             "name": "OutcomeProficiency"
@@ -420,6 +432,9 @@
             "name": "AssignmentOverride"
           },
           {
+            "name": "CommentBankItem"
+          },
+          {
             "name": "CommunicationChannel"
           },
           {
@@ -472,6 +487,9 @@
           },
           {
             "name": "NotificationPolicy"
+          },
+          {
+            "name": "OutcomeFriendlyDescriptionType"
           },
           {
             "name": "Page"

@@ -139,6 +139,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def sections_for(user)
+    return unless is_section_specific?
+    CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: self.id)
+      .where("EXISTS (?)", Enrollment.active_or_pending.where(user_id: user)
+        .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
+      .select("discussion_topic_section_visibilities.course_section_id"))
+  end
+
+  def address_book_context_for(user)
+    if self.is_section_specific?
+      sections_for(user)
+    else
+      context
+    end
+  end
+
   def threaded=(v)
     self.discussion_type = Canvas::Plugin.value_to_boolean(v) ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
   end
@@ -1028,9 +1044,9 @@ class DiscussionTopic < ActiveRecord::Base
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
-      raise "Only context participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     elsif !self.grants_right?(user, :read)
       nil
     else
@@ -1360,6 +1376,12 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids).to_a
 
+    subscribed_users = filter_message_users(subscribed_users)
+
+    subscribed_users
+  end
+
+  def filter_message_users(users)
     if self.for_assignment?
       students_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
@@ -1367,14 +1389,13 @@ class DiscussionTopic < ActiveRecord::Base
       observer_ids = course.participating_observers.pluck(:id)
       observed_students = ObserverEnrollment.observed_student_ids_by_observer_id(course, observer_ids)
 
-      subscribed_users.select!{ |user|
+      users.select! do |user|
         students_with_visibility.include?(user.id) || admin_ids.include?(user.id) ||
-        # an observer with no students or one with students who have visibility
-        (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
-      }
+          # an observer with no students or one with students who have visibility
+          (observed_students[user.id] && (observed_students[user.id] == [] || (observed_students[user.id] & students_with_visibility).any?))
+      end
     end
-
-    subscribed_users
+    users
   end
 
   def posters

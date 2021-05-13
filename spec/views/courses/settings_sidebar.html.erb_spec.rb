@@ -53,6 +53,17 @@ describe "courses/_settings_sidebar.html.erb" do
 
   describe "Reset course content" do
     it "should not display the dialog contents under the button" do
+      @course.account.disable_feature!(:granular_permissions_manage_courses)
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
+    end
+
+    it "should not display the dialog contents under the button (granular permissions)" do
+      @course.account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(permission: 'manage_courses_delete', role: teacher_role, enabled: true)
       view_context(@course, @user)
       assign(:current_user, @user)
       render

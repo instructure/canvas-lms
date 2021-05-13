@@ -32,6 +32,7 @@ import {
   MediaCaptureStrings,
   SelectStrings
 } from '../../helpers/UploadMediaTranslations'
+import {getRCSAuthenticationHeaders, getRCSOriginFromHost} from '@instructure/canvas-rce'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -129,7 +130,11 @@ export default class MediaAttempt extends React.Component {
               />
             </div>
           ) : (
-            <MediaPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />
+            <MediaPlayer
+              tracks={mediaTracks}
+              sources={mediaObject.mediaSources}
+              captionPosition="bottom"
+            />
           )}
         </Flex.Item>
         <Flex.Item overflowY="visible" margin="medium 0">
@@ -171,8 +176,12 @@ export default class MediaAttempt extends React.Component {
       <UploadMedia
         onUploadComplete={this.onComplete}
         onDismiss={this.onDismiss}
-        contextId={this.props.assignment.env.courseId}
-        contextType="course"
+        rcsConfig={{
+          contextId: this.props.assignment.env.courseId,
+          contextType: 'course',
+          origin: getRCSOriginFromHost(ENV.RICH_CONTENT_APP_HOST),
+          headers: getRCSAuthenticationHeaders(ENV.JWT)
+        }}
         open={this.state.mediaModalOpen}
         tabs={{embed: false, record: true, upload: true}}
         uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}

@@ -106,9 +106,15 @@ module Types
       course.resolved_outcome_proficiency
     end
 
-    field :comment_bank_items_connection, CommentBankItemType.connection_type, null: true
-    def comment_bank_items_connection
-      course.comment_bank_items_visible_to(current_user)
+    field :comment_bank_items_connection, CommentBankItemType.connection_type, null: true do
+      argument :query, String, <<~DOC, required: false
+        Only include comments that match the query string.
+      DOC
+    end
+    def comment_bank_items_connection(query: nil)
+      comments = course.comment_bank_items_visible_to(current_user)
+      comments = comments.where(ActiveRecord::Base.wildcard("comment", query)) if query
+      comments
     end
 
     # field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true

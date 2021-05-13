@@ -127,7 +127,7 @@ class InfoFrame extends React.Component {
       )
     }
     if (this.state.itemShown.key === 'publish_course') {
-      if (window.ENV.COURSE_WIZARD.permissions.can_change_course_state) {
+      if (window.ENV.COURSE_WIZARD.permissions.can_change_course_publish_state) {
         return (
           <form
             acceptCharset="UTF-8"

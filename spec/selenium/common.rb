@@ -41,46 +41,6 @@ end
 
 Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
 
-module SeleniumErrorRecovery
-  class RecoverableException < StandardError
-    extend Forwardable
-    def_delegators :@exception, :class, :message, :backtrace
-
-    def initialize(exception)
-      @exception = exception
-    end
-  end
-
-  # this gets called wherever an exception happens (example, before/after/around, each/all)
-  #
-  # the example will still fail, but if we recover successfully, subsequent
-  # specs should pass. additionally, the rerun phase will exempt this
-  # failure from the threshold, since it's not a problem with the spec
-  # per se
-  def set_exception(exception, *args)
-    exception = RecoverableException.new(exception) if maybe_recover_from_exception(exception)
-    super exception, *args
-  end
-
-  def maybe_recover_from_exception(exception)
-    case exception
-    when Errno::ENOMEM
-      # no sense trying anymore, give up and hope that other nodes pick up the slack
-      puts "Error: got `#{exception}`, aborting"
-      RSpec.world.wants_to_quit = true
-    when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout, Selenium::WebDriver::Error::UnknownError
-      return false if SeleniumDriverSetup.saucelabs_test_run?
-      return false if RSpec.world.wants_to_quit
-      return false if exception.backtrace.grep(/selenium-webdriver/).blank?
-
-      SeleniumDriverSetup.reset!
-      return true
-    end
-    false
-  end
-end
-RSpec::Core::Example.prepend(SeleniumErrorRecovery)
-
 if defined?(TestQueue::Runner::RSpec::LazyGroups)
   # because test-queue's lazy loading requires this file *after* the before
   # :suite hooks run, we can't do this in such a hook... so just do it as
@@ -107,7 +67,6 @@ module SeleniumDependencies
   include CustomWaitMethods
   include CustomDateHelpers
   include LoginAndSessionMethods
-  include SeleniumErrorRecovery
 end
 
 shared_context "in-process server selenium tests" do

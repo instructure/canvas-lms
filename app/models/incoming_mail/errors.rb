@@ -24,5 +24,7 @@ module IncomingMail
     class UnknownSender < ReplyFrom; end
     class ReplyToLockedTopic < ReplyFrom; end
     class ReplyToDeletedDiscussion < ReplyFrom; end
+    class InvalidParticipant < ReplyFrom; end
+    class BlankMessage < ReplyFrom; end
   end
 end

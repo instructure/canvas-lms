@@ -19,8 +19,11 @@
 
 require 'apis/api_spec_helper'
 require 'sharding_spec_helper'
+require 'feature_flag_helper'
 
 describe "Feature Flags API", type: :request do
+  include FeatureFlagHelper
+
   let_once(:t_site_admin) { Account.site_admin }
   let_once(:t_root_account) { account_model }
   let_once(:t_teacher) { user_with_pseudonym account: t_root_account }
@@ -29,6 +32,13 @@ describe "Feature Flags API", type: :request do
   let_once(:t_root_admin) { account_admin_user account: t_root_account }
 
   let(:live_event_feature) { Feature.new(feature: 'compact_live_event_payloads', applies_to: 'RootAccount', state: 'allowed') }
+  let(:granular_permissions_feature) do
+    Feature.new(
+      feature: 'granular_permissions_manage_courses',
+      applies_to: 'RootAccount',
+      state: 'allowed'
+    )
+  end
 
   before do
     allow_any_instance_of(User).to receive(:set_default_feature_flags)
@@ -42,6 +52,7 @@ describe "Feature Flags API", type: :request do
       'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
       'compact_live_event_payloads' => live_event_feature
     })
+    silence_undefined_feature_flag_errors
   end
 
   describe "index" do
@@ -196,6 +207,18 @@ describe "Feature Flags API", type: :request do
     end
 
     it "should operate on a course" do
+      allow(Feature).to receive(:definitions).and_return({
+        'granular_permissions_manage_courses' => granular_permissions_feature,
+        'course_feature' => Feature.new(
+          feature: 'course_feature',
+          applies_to: 'Course',
+          state: 'allowed',
+          development: true,
+          release_notes_url: 'http://example.com',
+          display_name: "not localized",
+          description: "srsly"
+        )
+      })
       json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features",
                       { controller: 'feature_flags', action: 'index', format: 'json', course_id: t_course.to_param })
       expect(json.map { |f| f['feature'] }).to eql %w(course_feature)
@@ -292,6 +315,18 @@ describe "Feature Flags API", type: :request do
     end
 
     it "should create a new flag" do
+      allow(Feature).to receive(:definitions).and_return({
+        'granular_permissions_manage_courses' => granular_permissions_feature,
+        'course_feature' => Feature.new(
+          feature: 'course_feature',
+          applies_to: 'Course',
+          state: 'allowed',
+          development: true,
+          release_notes_url: 'http://example.com',
+          display_name: "not localized",
+          description: "srsly"
+        )
+      })
       api_call_as_user(t_teacher, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on",
                { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature', state: 'on' })
       expect(t_course.feature_flags.map(&:state)).to eql ['on']
@@ -509,7 +544,8 @@ describe "Feature Flags API", type: :request do
                   transitions['on'] = { 'locked'=>false, 'message'=>"this is permanent?!" } if transitions.has_key?('on')
                 end
           ),
-          'compact_live_event_payloads' => live_event_feature
+          'compact_live_event_payloads' => live_event_feature,
+          'granular_permissions_manage_courses' => granular_permissions_feature
       })
     end
 
@@ -558,7 +594,8 @@ describe "Feature Flags API", type: :request do
                   t_state_changes << [user.id, context.id, from_state, to_state]
                 end
           ),
-          'compact_live_event_payloads' => live_event_feature
+          'compact_live_event_payloads' => live_event_feature,
+          'granular_permissions_manage_courses' => granular_permissions_feature
       })
     end
 

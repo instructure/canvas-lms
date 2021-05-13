@@ -397,65 +397,6 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  %w{column_definitions primary_keys indexes}.each do |method|
-    class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{method}(table_name)
-        # migrations need to see any interstitial states; also, we don't
-        # want to pollute the cache with an interstitial state
-        return super if ActiveRecord::Base.in_migration
-
-        # be wary of error reporting inside of MultiCache triggering a
-        # separate model access
-        return super if @nested_#{method}
-
-        @nested_#{method} = true
-        begin
-          got_inside = false
-          MultiCache.fetch(["schema/#{method}", table_name]) do
-            got_inside = true
-            super
-          end
-        rescue
-          raise if got_inside
-
-          # we never got inside, so something is wrong with the cache,
-          # just ignore it
-          super
-        ensure
-          @nested_#{method} = false
-        end
-      end
-    RUBY
-  end
-
-  # same as above, but no arguments
-  def data_sources
-    # migrations need to see any interstitial states; also, we don't
-    # want to pollute the cache with an interstitial state
-    return super if ActiveRecord::Base.in_migration
-
-    # be wary of error reporting inside of MultiCache triggering a
-    # separate model access
-    return super if @nested_data_sources
-
-    @nested_data_sources = true
-    begin
-      got_inside = false
-      MultiCache.fetch(["schema/data_sources"]) do
-        got_inside = true
-        super
-      end
-    rescue
-      raise if got_inside
-
-      # we never got inside, so something is wrong with the cache,
-      # just ignore it
-      super
-    ensure
-      @nested_data_sources = false
-    end
-  end
-
   def icu_collations
     return [] if postgresql_version < 120000
     @collations ||= select_rows <<~SQL, "SCHEMA"

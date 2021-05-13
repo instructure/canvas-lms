@@ -123,6 +123,7 @@ const MoveModal = ({
                   onCollectionClick={onCollectionClick}
                   collections={collections}
                   rootId={rootId}
+                  showRootCollection
                 />
                 <AddContentItem
                   labelInstructions={I18n.t('Create New Group')}

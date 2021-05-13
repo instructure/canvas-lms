@@ -34,20 +34,20 @@ export const WithMultipleRecipients = Template.bind({})
 WithMultipleRecipients.args = {
   conversationMessage: {
     author: {name: 'Bob Barker'},
-    participants: [{name: 'Bob Barker'}, {name: 'Sally Ford'}, {name: 'Russel Franks'}],
-    created_at: 'November 5, 2020 at 2:25pm',
+    recipients: [{name: 'Bob Barker'}, {name: 'Sally Ford'}, {name: 'Russel Franks'}],
+    createdAt: 'November 5, 2020 at 2:25pm',
     body: 'This is the body text for the message.'
   },
-  context: {name: 'Fake Course 1'}
+  contextName: 'Fake Course 1'
 }
 
 export const WithOneRecipient = Template.bind({})
 WithOneRecipient.args = {
   conversationMessage: {
     author: {name: 'Bob Barker'},
-    participants: [{name: 'Bob Barker'}, {name: 'Sally Ford'}],
-    created_at: 'November 5, 2020 at 2:25pm',
+    recipients: [{name: 'Bob Barker'}, {name: 'Sally Ford'}],
+    createdAt: 'November 5, 2020 at 2:25pm',
     body: 'This is the body text for the message.'
   },
-  context: {name: 'Fake Course 1'}
+  contextName: 'Fake Course 1'
 }

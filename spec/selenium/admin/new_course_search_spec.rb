@@ -112,8 +112,7 @@ describe "new account course search" do
     expect(ff("##{option_list_id} [role='option']").count).to eq 2
     set_value(term_filter, 'spring')
     term = @account.enrollment_terms.where(name: 'Spring').first
-    fj("##{option_list_id} [role='option']:contains(#{term.name})").click
-    wait_for_spinner
+    wait_for_spinner { fj("##{option_list_id} [role='option']:contains(#{term.name})").click }
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(term.name)
   end

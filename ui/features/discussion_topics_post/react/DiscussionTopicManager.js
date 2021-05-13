@@ -23,21 +23,61 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PER_PAGE} from './utils/constants'
+import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
+import {PER_PAGE, SearchContext} from './utils/constants'
 import PropTypes from 'prop-types'
-import React from 'react'
-import {useQuery} from 'react-apollo'
+import React, {useContext, useState} from 'react'
+import {useMutation, useQuery} from 'react-apollo'
+import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const DiscussionTopicManager = props => {
-  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
-    variables: {
-      discussionID: props.discussionTopicId,
-      perPage: PER_PAGE,
-      page: btoa(0)
+  const [searchTerm, setSearchTerm] = useState('')
+  const value = {searchTerm, setSearchTerm}
+
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const variables = {
+    discussionID: props.discussionTopicId,
+    perPage: PER_PAGE,
+    page: btoa(0),
+    searchTerm,
+    rootEntries: !searchTerm
+  }
+  const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
+
+  const updateCache = (cache, result) => {
+    try {
+      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
+      const options = {
+        query: DISCUSSION_QUERY,
+        variables: {...variables, page: btoa(lastPage * PER_PAGE)}
+      }
+      const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      if (currentDiscussion && newDiscussionEntry) {
+        currentDiscussion.legacyNode.entryCounts.repliesCount += 1
+        currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+
+        // TODO: Handle sorting.
+        cache.writeQuery({...options, data: currentDiscussion})
+      }
+    } catch (e) {
+      discussionTopicQuery.refetch(variables)
+    }
+  }
+
+  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
+    update: updateCache,
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
     }
   })
 
-  if (discussionTopicQuery.loading) {
+  if (discussionTopicQuery.loading && !searchTerm) {
     return <LoadingIndicator />
   }
 
@@ -53,14 +93,31 @@ const DiscussionTopicManager = props => {
 
   return (
     <>
-      <DiscussionTopicContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
-      <DiscussionThreadsContainer
-        discussionTopic={discussionTopicQuery.data.legacyNode}
-        discussionTopicId={props.discussionTopicId}
-        threads={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.nodes}
-        pageInfo={discussionTopicQuery.data.legacyNode.rootDiscussionEntriesConnection.pageInfo}
-        totalPages={discussionTopicQuery.data.legacyNode.rootEntriesTotalPages}
-      />
+      <SearchContext.Provider value={value}>
+        <DiscussionTopicContainer
+          discussionTopic={discussionTopicQuery.data.legacyNode}
+          createDiscussionEntry={text => {
+            createDiscussionEntry({
+              variables: {
+                discussionTopicId: ENV.discussion_topic_id,
+                message: text
+              }
+            })
+          }}
+        />
+        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
+        searchTerm ? (
+          <NoResultsFound />
+        ) : (
+          <DiscussionThreadsContainer
+            discussionTopic={discussionTopicQuery.data.legacyNode}
+            discussionTopicId={props.discussionTopicId}
+            threads={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes}
+            pageInfo={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.pageInfo}
+            totalPages={discussionTopicQuery.data.legacyNode.entriesTotalPages}
+          />
+        )}
+      </SearchContext.Provider>
     </>
   )
 }

@@ -35,6 +35,7 @@ export const SubmissionInterface = {
       body
       deductedPoints
       enteredGrade
+      extraAttempts
       grade
       gradeHidden
       gradingStatus
@@ -63,6 +64,7 @@ export const SubmissionInterface = {
     body: string,
     deductedPoints: number,
     enteredGrade: string,
+    extraAttempts: number,
     grade: string,
     gradeHidden: bool.isRequired,
     gradingStatus: oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
@@ -85,6 +87,7 @@ export const DefaultMocks = {
     body: null,
     deductedPoints: null,
     enteredGrade: null,
+    extraAttempts: null,
     gradeHidden: false,
     grade: null,
     gradingStatus: null,

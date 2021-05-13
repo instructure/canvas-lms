@@ -252,7 +252,7 @@
       title="<%= t "Student Annotation submission" %>"
       src="<%= annotation_context.attachment.canvadoc_url(@current_user, preview_url_opts.dup) %>"
       class="ef-file-preview-frame annotated-document-submission"
-      style="width: 100%;">
+      style="height: 100vh; width: 100%;">
     </iframe>
   </div>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>

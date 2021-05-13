@@ -20,10 +20,11 @@ import I18n from 'i18n!discussion_posts'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import React from 'react'
+import {View} from '@instructure/ui-view'
 
 export const NoResultsFound = () => {
   return (
-    <>
+    <View as="div" margin="medium none none none">
       <Text lineHeight="double">{I18n.t('Your search did not match any entries.')}</Text>
       <br />
       <Text lineHeight="double">{I18n.t('Suggestions:')}</Text>
@@ -42,6 +43,6 @@ export const NoResultsFound = () => {
           <Text lineHeight="double">{I18n.t('Try disabling the "Unread" filter.')}</Text>
         </List.Item>
       </List>
-    </>
+    </View>
   )
 }

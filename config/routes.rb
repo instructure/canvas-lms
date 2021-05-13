@@ -732,6 +732,8 @@ CanvasRails::Application.routes.draw do
       get :statistics
     end
     resources :developer_keys, only: :index
+
+    get 'release_notes' => 'release_notes#manage', as: :release_notes_manage
   end
 
   get 'images/users/:user_id' => 'users#avatar_image', as: :avatar_image
@@ -2196,6 +2198,16 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get 'announcements', action: :index, as: :announcements
+    end
+
+    scope(controller: :release_notes) do
+      get 'release_notes', action: :index, as: :release_notes
+      post 'release_notes', action: :create
+      get 'release_notes/latest', action: :latest
+      put 'release_notes/:id', action: :update
+      delete 'release_notes/:id', action: :destroy
+      put 'release_notes/:id/published', action: :publish
+      delete 'release_notes/:id/published', action: :unpublish
     end
 
     scope(controller: :rubrics_api) do

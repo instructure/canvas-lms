@@ -26,6 +26,29 @@ describe LearningOutcome do
     @outcome.errors[prop].map(&:to_s)
   end
 
+  context 'validations' do
+    describe 'lengths' do
+      it { is_expected.to validate_length_of(:description).is_at_most(described_class.maximum_text_length) }
+      it { is_expected.to validate_length_of(:short_description).is_at_most(described_class.maximum_string_length) }
+      it { is_expected.to validate_length_of(:vendor_guid).is_at_most(described_class.maximum_string_length) }
+      it { is_expected.to validate_length_of(:display_name).is_at_most(described_class.maximum_string_length) }
+    end
+
+    describe 'nullable' do
+      it { is_expected.to allow_value(nil).for(:description) }
+      it { is_expected.not_to allow_value(nil).for(:short_description) }
+      it { is_expected.to allow_value(nil).for(:vendor_guid) }
+      it { is_expected.to allow_value(nil).for(:display_name) }
+    end
+
+    describe 'blankable' do
+      it { is_expected.to allow_value("").for(:description) }
+      it { is_expected.not_to allow_value("").for(:short_description) }
+      it { is_expected.to allow_value("").for(:vendor_guid) }
+      it { is_expected.to allow_value("").for(:display_name) }
+    end
+  end
+
   context "outcomes" do
     before :once do
       assignment_model
@@ -920,6 +943,7 @@ describe LearningOutcome do
       second_root_account.root_outcome_group.add_outcome(outcome)
       outcome.update! root_account_ids: nil
       expect(outcome.root_account_ids).to match_array [root_account.id, second_root_account.id]
+      expect(outcome.global_root_account_ids).to match_array [root_account.global_id, second_root_account.global_id]
     end
 
     context 'add_root_account_id_for_context!' do

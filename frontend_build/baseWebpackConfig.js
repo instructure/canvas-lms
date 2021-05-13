@@ -34,6 +34,7 @@ const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
+
 require('./bundles')
 
 // We have a bunch of things (like our selenium jenkins builds) that have
@@ -50,6 +51,10 @@ const skipSourcemaps = Boolean(
 )
 
 const root = path.resolve(__dirname, '..')
+const createBundleAnalyzerPlugin = (...args) => {
+  const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+  return new BundleAnalyzerPlugin(...args)
+}
 
 module.exports = {
   mode: process.env.NODE_ENV,
@@ -265,20 +270,6 @@ module.exports = {
   },
 
   plugins: [
-    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
-    function () {
-      this.plugin('done', ({compilation}) => {
-        if (compilation.warnings && compilation.warnings.length) {
-          console.error(compilation.warnings)
-          // If there's a bad import, webpack doesn't say where.
-          // Only if we let the compilation complete do we get
-          // the callstack where the import happens
-          // If you're having problems, comment out the following
-          throw new Error('webpack build had warnings. Failing.')
-        }
-      })
-    },
-
     // sets these environment variables in compiled code.
     // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
     // debug/propType checking in prod.
@@ -313,8 +304,36 @@ module.exports = {
     // be removed when that issue is fixed
     new webpack.IgnorePlugin(/\.flow$/),
 
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
   ].concat(
+    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
+    process.env.WEBPACK_PEDANTIC !== '0' ? function () {
+      this.plugin('done', ({compilation}) => {
+        if (compilation.warnings && compilation.warnings.length) {
+          console.error(compilation.warnings)
+          // If there's a bad import, webpack doesn't say where.
+          // Only if we let the compilation complete do we get
+          // the callstack where the import happens
+          // If you're having problems, comment out the following
+          throw new Error('webpack build had warnings. Failing.')
+        }
+      })
+    } : []
+  ).concat(
+    process.env.WEBPACK_ANALYSIS === '1' ? createBundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: process.env.WEBPACK_ANALYSIS_FILE ? (
+        path.resolve(process.env.WEBPACK_ANALYSIS_FILE)
+      ) : (
+        path.resolve(__dirname, '../tmp/webpack-bundle-analysis.html')
+      ),
+      openAnalyzer: false,
+      generateStatsFile: false,
+      statsOptions: {
+        source: false
+      }
+    }) : []
+  ).concat(
     process.env.NODE_ENV === 'test'
       ? []
       : [

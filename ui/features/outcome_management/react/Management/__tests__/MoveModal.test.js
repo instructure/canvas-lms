@@ -116,9 +116,9 @@ describe('MoveModal', () => {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 0'))
+    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('Group 100 folder 0')).toBeInTheDocument()
+    expect(getByText('Account folder 0')).toBeInTheDocument()
   })
 
   it('disables the move button when the selected group is equal to the group to be moved', async () => {
@@ -126,6 +126,8 @@ describe('MoveModal', () => {
     const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     await act(async () => jest.runAllTimers())
@@ -142,6 +144,8 @@ describe('MoveModal', () => {
       }
     )
     await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     await act(async () => jest.runAllTimers())
     expect(within(getByRole('dialog')).getByText('Move').closest('button')).toHaveAttribute(
@@ -153,6 +157,8 @@ describe('MoveModal', () => {
     const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runAllTimers())

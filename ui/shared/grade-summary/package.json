@@ -2,5 +2,6 @@
   "name": "@canvas/grade-summary",
   "private": true,
   "version": "1.0.0",
-  "author": "neme"
+  "author": "neme",
+  "main": "./react/IndividualStudentMastery/index.js"
 }

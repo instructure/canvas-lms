@@ -358,7 +358,7 @@ class CoursesController < ApplicationController
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
-  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export, :user_progress]
+  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :confirm_action, :copy, :effective_due_dates, :offline_web_exports, :link_validator, :settings, :start_offline_web_export, :statistics, :user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -736,7 +736,7 @@ class CoursesController < ApplicationController
   #   course. This parameter is required when using the API, as this option is
   #   not displayed in the Course Settings page.
   #
-  # @argument course[term_id] [Integer]
+  # @argument course[term_id] [String]
   #   The unique ID of the term to create to course in.
   #
   # @argument course[sis_course_id] [String]
@@ -910,7 +910,7 @@ class CoursesController < ApplicationController
 
   def unconclude
     get_context
-    if authorized_action(@context, @current_user, :change_course_state)
+    if authorized_action(@context, @current_user, [:change_course_state, :manage_courses_conclude])
       @context.unconclude
       Auditors::Course.record_unconcluded(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t('notices.unconcluded', "Course un-concluded")
@@ -1322,8 +1322,9 @@ class CoursesController < ApplicationController
     if api_request? && !['delete', 'conclude'].include?(params[:event])
       return render(:json => { :message => 'Only "delete" and "conclude" events are allowed.' }, :status => :bad_request)
     end
+    return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
+
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
-      return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
       if (success = @context.destroy)
         Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t('notices.deleted', "Course successfully deleted")
@@ -1331,8 +1332,6 @@ class CoursesController < ApplicationController
         flash[:notice] = t("Course cannot be deleted")
       end
     else
-      return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
-
       @context.complete
       if (success = @context.save)
         Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
@@ -1344,14 +1343,13 @@ class CoursesController < ApplicationController
     @current_user.touch
     respond_to do |format|
       format.html { redirect_to dashboard_url }
-      format.json {
+      format.json do
         render :json => { params[:event] => success }, status: success ? 200 : 400
-      }
+      end
     end
   end
 
   def statistics
-    get_context
     if authorized_action(@context, @current_user, :read_reports)
       @student_ids = @context.student_ids
 
@@ -1402,7 +1400,6 @@ class CoursesController < ApplicationController
   end
 
   def settings
-    get_context
     if authorized_action(@context, @current_user, :read_as_admin)
       load_all_contexts(:context => @context)
 
@@ -1418,12 +1415,12 @@ class CoursesController < ApplicationController
 
       course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_permissions = {
-        :manage_courses => @context.account.grants_right?(@current_user, session, :manage_courses),
-        :manage_students => @context.grants_right?(@current_user, session, :manage_students),
-        :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
-        :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
-        :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
-        :manage => @context.grants_right?(@current_user, session, :manage)
+        can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
+        manage_students: @context.grants_right?(@current_user, session, :manage_students),
+        manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
+        create_tool_manually: @context.grants_right?(@current_user, session, :create_tool_manually),
+        manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
+        manage: @context.grants_right?(@current_user, session, :manage)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
@@ -1454,7 +1451,6 @@ class CoursesController < ApplicationController
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
         NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
-        NEW_COURSE_AVAILABILITY_UI: @context.root_account.feature_enabled?(:new_course_availability_ui),
         STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect{|term| term[:enrollment_type]=="StudentEnrollment"}&.slice(:start_at,:end_at),
         DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at,:end_at),
         COURSE_DATES: {:start_at => @context.start_at,:end_at => @context.conclude_at},
@@ -2084,7 +2080,11 @@ class CoursesController < ApplicationController
                    is_student: @context.user_is_student?(@current_user),
                    is_instructor: @context.user_is_instructor?(@current_user),
                    course_overview: @context&.wiki&.front_page&.body,
-                   hide_final_grades: @context.hide_final_grades?
+                   hide_final_grades: @context.hide_final_grades?,
+                   student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+                   outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
+                   show_student_view: can_do(@context, @current_user, :use_student_view),
+                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1)
                  }
                })
 
@@ -2181,12 +2181,15 @@ class CoursesController < ApplicationController
           js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
-          js_env(PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) })
-          js_env(STUDENT_PLANNER_ENABLED: planner_enabled?)
-          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+          js_env(
+              CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+              PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) },
+              STUDENT_PLANNER_ENABLED: planner_enabled?,
+              TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
+          )
 
           js_bundle :k5_course, :context_modules
-          css_bundle :k5_dashboard, :content_next, :context_modules2
+          css_bundle :k5_dashboard, :content_next, :context_modules2, :grade_summary
         when 'announcements'
           js_bundle :announcements
           css_bundle :announcements_index
@@ -2231,7 +2234,6 @@ class CoursesController < ApplicationController
   end
 
   def confirm_action
-    get_context
     params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? 'delete' : 'conclude'
     return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
   end
@@ -2413,19 +2415,17 @@ class CoursesController < ApplicationController
   end
 
   def copy
-    get_context
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     account = @context.account
-    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
       account = @domain_root_account.manually_created_courses_account
     end
-    return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
+    return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
 
     # For prepopulating the date fields
     js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
     js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
-    #
     js_env(:QUIZZES_NEXT_ENABLED => new_quizzes_enabled?)
     js_env(:NEW_QUIZZES_IMPORT => new_quizzes_import_enabled?)
     js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
@@ -2435,21 +2435,26 @@ class CoursesController < ApplicationController
   def copy_course
     get_context
     if authorized_action(@context, @current_user, :read) &&
-      authorized_action(@context, @current_user, :read_as_admin)
+        authorized_action(@context, @current_user, :read_as_admin)
       args = params.require(:course).permit(:name, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
       end
-      account = nil unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+      account = nil unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
       account ||= @domain_root_account.manually_created_courses_account
-      return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
-      if account.grants_right?(@current_user, session, :manage_courses)
+      return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
+
+      if account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
         root_account = account.root_account
-        enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
-        args[:enrollment_term] = root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
+        enrollment_term_id =
+          params[:course].delete(:term_id).presence ||
+            params[:course].delete(:enrollment_term_id).presence
+        args[:enrollment_term] =
+          root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
       end
-      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage) # this will be false for teachers in concluded courses
+      # :manage will be false for teachers in concluded courses
+      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage)
       args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
@@ -2700,12 +2705,19 @@ class CoursesController < ApplicationController
     params[:course][:event] = :offer if value_to_boolean(params[:offer])
 
     if params[:course][:event] && params[:course].keys.size == 1
-      if authorized_action(@course, @current_user, :change_course_state) && verified_user_check
-        if process_course_event
-          render_update_success
-        else
-          render_update_failure
-        end
+      return unless verified_user_check
+
+      event = params[:course][:event].to_s
+      # check permissions on processable events
+      # allow invalid and non_events to pass through
+      if %w[offer claim conclude delete undelete].include?(event)
+        return unless authorized_action(@course, @current_user, permission_for_event(event))
+      end
+      # authorized, invalid, and non_events are processed
+      if process_course_event
+        render_update_success
+      else
+        render_update_failure
       end
       return
     end
@@ -2716,7 +2728,7 @@ class CoursesController < ApplicationController
       unless @course.grants_right?(@current_user, :update)
         params_for_update = params_for_update.slice(:syllabus_body) # let users with :manage_content only update the body
       end
-      if params_for_update.has_key?(:syllabus_body)
+      if params_for_update.key?(:syllabus_body)
         params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
       end
       unless @course.grants_right?(@current_user, :manage_course_visibility)
@@ -2731,15 +2743,15 @@ class CoursesController < ApplicationController
       end
 
       account_id = params[:course].delete :account_id
-      if account_id && @course.account.grants_right?(@current_user, session, :manage_courses)
+      if account_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
         account = api_find(Account, account_id)
-        if account && account != @course.account && account.grants_right?(@current_user, session, :manage_courses)
+        if account && account != @course.account && account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
           @course.account = account
         end
       end
 
       root_account_id = params[:course].delete :root_account_id
-      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
+      if root_account_id && Account.site_admin.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
         @course.root_account = Account.root_accounts.find(root_account_id)
         @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
@@ -2758,12 +2770,12 @@ class CoursesController < ApplicationController
 
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
-      if enrollment_term_id && @course.account.grants_right?(@current_user, session, :manage_courses)
+      if enrollment_term_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
         enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id)
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       end
 
-      if params_for_update.has_key? :grading_standard_id
+      if params_for_update.key? :grading_standard_id
         standard_id = params_for_update.delete :grading_standard_id
         grading_standard = GradingStandard.for(@course).where(id: standard_id).first if standard_id.present?
         if grading_standard != @course.grading_standard
@@ -2779,9 +2791,10 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params_for_update.has_key?(:grade_passback_setting)
+      if params_for_update.key?(:grade_passback_setting)
         grade_passback_setting = params_for_update.delete(:grade_passback_setting)
         return unless authorized_action?(@course, @current_user, :manage_grades)
+
         update_grade_passback_setting(grade_passback_setting)
       end
 
@@ -2789,7 +2802,7 @@ class CoursesController < ApplicationController
         params_for_update.delete :storage_quota
         params_for_update.delete :storage_quota_mb
       end
-      unless @course.account.grants_right?(@current_user, session, :manage_courses)
+      unless @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
           params_for_update.delete :name
           params_for_update.delete :course_code
@@ -2820,12 +2833,20 @@ class CoursesController < ApplicationController
         @course.usage_rights_required = value_to_boolean(params[:course].delete(:usage_rights_required))
       end
 
-      if params_for_update.has_key?(:locale) && params_for_update[:locale].blank?
+      if params_for_update.key?(:locale) && params_for_update[:locale].blank?
         params_for_update[:locale] = nil
       end
 
-      if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      if params[:course][:event]
         return unless verified_user_check
+
+        event = params[:course][:event].to_s
+        # check permissions on processable events
+        # allow invalid and non_events to pass through
+        if %w[offer claim conclude delete undelete].include?(event)
+          return unless authorized_action(@course, @current_user, permission_for_event(event))
+        end
+        # authorized, invalid, and non_events are processed
         unless process_course_event
           render_update_failure
           return
@@ -2874,13 +2895,14 @@ class CoursesController < ApplicationController
         @course.image_id = nil
       end
 
-      params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
+      params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
-      if params[:course].has_key?(:blueprint)
+      if params[:course].key?(:blueprint)
         master_course = value_to_boolean(params[:course].delete(:blueprint))
         if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
           return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+
           message = master_course && why_cant_i_enable_master_course(@course)
           if message
             @course.errors.add(:master_course, message)
@@ -2891,10 +2913,10 @@ class CoursesController < ApplicationController
         end
       end
       blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
-      if blueprint_keys.any?{|k| params[:course].has_key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
+      if blueprint_keys.any?{|k| params[:course].key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
 
-        if params[:course].has_key?(:use_blueprint_restrictions_by_object_type)
+        if params[:course].key?(:use_blueprint_restrictions_by_object_type)
           template.use_default_restrictions_by_type = value_to_boolean(params[:course][:use_blueprint_restrictions_by_object_type])
         end
 
@@ -2914,6 +2936,7 @@ class CoursesController < ApplicationController
 
         if template.changed?
           return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+
           @course.errors.add(:master_course_restrictions, t("Invalid restrictions")) unless template.save
         end
       end
@@ -2927,7 +2950,7 @@ class CoursesController < ApplicationController
       changes = changed_settings(@course.changes, @course.settings, old_settings)
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
-      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes , **{})
+      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
@@ -2973,6 +2996,7 @@ class CoursesController < ApplicationController
     event = event.to_sym
     event = :complete if event == :conclude
     return true if non_event?(@course, event)
+
     if event == :claim && !@course.unpublishable?
       cant_unpublish_message = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
       respond_to do |format|
@@ -3053,16 +3077,20 @@ class CoursesController < ApplicationController
     if params[:event] == 'undelete'
       permission = :undelete_courses
     else
-      permission = :manage_courses
+      permission = [:manage_courses, :manage_courses_admin]
     end
 
     if authorized_action(@account, @current_user, permission)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
+
       @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account, @current_user)
       return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
+
       update_params = params.permit(:event).to_unsafe_h
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
+
       return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
+
       progress = Course.batch_update(@account, @current_user, @course_ids, update_params, :api)
       render :json => progress_json(progress, @current_user, session)
     end
@@ -3070,6 +3098,7 @@ class CoursesController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:course])
+
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
       f.links << Atom::Link.new(:href => course_url(@context), :rel => 'self')
@@ -3259,11 +3288,28 @@ class CoursesController < ApplicationController
   protected :enter_student_view
 
   def permission_for_event(event)
+    @context ||= @course
     case event
-    when 'conclude'
-      :change_course_state
+    when 'offer', 'claim'
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
+        :manage_courses_publish
+      else
+        :change_course_state
+      end
+    when 'conclude', 'complete'
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
+        :manage_courses_conclude
+      else
+        :change_course_state
+      end
     when 'delete'
       :delete
+    when 'undelete'
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
+        :delete
+      else
+        :change_course_state
+      end
     else
       :nothing
     end
@@ -3326,7 +3372,6 @@ class CoursesController < ApplicationController
   end
 
   def link_validator
-    get_context
     return unless authorized_action(@context, @current_user, :manage_content)
     # render view
   end

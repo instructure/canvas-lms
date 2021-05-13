@@ -180,7 +180,6 @@ class ApplicationController < ActionController::Base
           SETTINGS: {
             open_registration: @domain_root_account.try(:open_registration?),
             collapse_global_nav: @current_user.try(:collapse_global_nav?),
-            show_feedback_link: show_feedback_link?
           },
         }
 
@@ -906,7 +905,7 @@ class ApplicationController < ActionController::Base
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
-  def get_context
+  def get_context(include_deleted: false)
     GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id]
@@ -934,7 +933,8 @@ class ApplicationController < ActionController::Base
           @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
           @context_membership = @context_enrollment
         elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
-          @context = api_find(User, params[:user_id])
+          scope = include_deleted ? User : User.active
+          @context = api_find(scope, params[:user_id])
           params[:context_id] = params[:user_id]
           params[:context_type] = "User"
           @context_membership = @context if @context == @current_user

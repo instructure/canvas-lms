@@ -59,6 +59,34 @@ describe AddressBook::MessageableUser do
       expect(known_users.map(&:id)).not_to include(student3.id)
     end
 
+    it 'works for a discussion topic' do
+      course = course_factory(active_all: true)
+      topic = course.discussion_topics.create!
+
+      student1 = student_in_course(user: @sender, course: course, active_all: true).user
+      student2 = student_in_course(course: course, active_all: true).user
+
+      address_book = AddressBook::MessageableUser.new(student1)
+      known_users = address_book.known_users([student2], context: topic)
+      expect(known_users.map(&:id)).to include(student2.id)
+    end
+
+    it 'works for a group discussion topic' do
+      course = course_factory(active_all: true)
+
+      student1 = student_in_course(user: @sender, course: course, active_all: true).user
+      student2 = student_in_course(course: course, active_all: true).user
+      student3 = student_in_course(course: course, active_all: true).user
+      group = group_with_user(user: student1, group_context: course).group
+      group.add_user(student2)
+      topic = group.discussion_topics.create!
+
+      address_book = AddressBook::MessageableUser.new(student1)
+      known_users = address_book.known_users([student2, student3], context: topic)
+      expect(known_users.map(&:id)).to include(student2.id)
+      expect(known_users.map(&:id)).not_to include(student3.id)
+    end
+
     it "caches the results for known users" do
       teacher = teacher_in_course(active_all: true).user
       student = student_in_course(active_all: true).user

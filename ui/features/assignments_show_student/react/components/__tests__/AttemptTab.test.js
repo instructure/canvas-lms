@@ -19,14 +19,20 @@
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import AttemptTab from '../AttemptTab'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
+jest.mock('@canvas/rce/RichContentEditor')
+
 describe('ContentTabs', () => {
+  beforeEach(() => {
+    window.ENV.use_rce_enhancements = true
+  })
+
   describe('the assignment is locked aka passed the until date', () => {
     it('renders the availability dates if the submission is unsubmitted', async () => {
       const props = await mockAssignmentAndSubmission({
@@ -124,7 +130,71 @@ describe('ContentTabs', () => {
         })
 
         const {findByTestId} = render(<AttemptTab {...props} />)
-        expect(await findByTestId('text-entry')).toBeInTheDocument()
+        expect(await findByTestId('text-editor')).toBeInTheDocument()
+      })
+
+      // The following tests don't match how the text editor actually works.
+      // The RCE doesn't play nicely with our test environment, so we stub it
+      // out and instead test for the read-only property (and possibly others
+      // eventually) on the TextEntry component's placeholder text-area. This
+      // does not mirror real-world usage but at least lets us verify that our
+      // props are being passed through and correctly on the initial render.
+      describe('text area', () => {
+        it('renders as read-only if the submission has been submitted', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'submitted'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('renders as read-only if the submission has been graded', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'graded'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('renders as read-only if changes are not allowed to the submission', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'unsubmitted'
+            }
+          })
+
+          const {findByRole} = render(
+            <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
+              <AttemptTab {...props} />
+            </StudentViewContext.Provider>
+          )
+          const textarea = await findByRole('textbox')
+          expect(textarea).toHaveAttribute('readonly')
+        })
+
+        it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'unsubmitted'
+            }
+          })
+
+          const {findByRole} = render(<AttemptTab {...props} />)
+          const textarea = await findByRole('textbox')
+          expect(textarea).not.toHaveAttribute('readonly')
+        })
       })
     })
   })
@@ -135,60 +205,65 @@ describe('ContentTabs', () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
         })
-        const {getByText} = render(<AttemptTab {...props} />)
+        const {getByTestId} = render(<AttemptTab {...props} />)
 
-        expect(getByText('Choose One Submission Type')).toBeInTheDocument()
+        expect(getByTestId('submission-type-selector')).toBeInTheDocument()
       })
 
-      it('shows the correct submission types in the selector', async () => {
+      it('shows buttons for the available submission types', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
         })
-        const {container, getByText} = render(<AttemptTab {...props} />)
+        const {getAllByRole} = render(<AttemptTab {...props} />)
 
-        const selector = container.querySelector('select')
-        expect(selector).toContainElement(getByText('Choose One'))
-        expect(selector).toContainElement(getByText('Text Entry'))
-        expect(selector).toContainElement(getByText('File'))
+        const buttons = getAllByRole('button')
+        expect(buttons).toHaveLength(2)
+        expect(buttons[0]).toHaveTextContent('Text')
+        expect(buttons[1]).toHaveTextContent('Upload')
       })
 
       it('does not render the submission type selector if the submission cannot be modified', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
         })
-        const {queryByText} = render(
+        const {queryByTestId} = render(
           <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
             <AttemptTab {...props} />
           </StudentViewContext.Provider>
         )
 
-        expect(queryByText('Choose One Submission Type')).not.toBeInTheDocument()
+        expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
       })
     })
+
     it('updates the active type after selecting a type', async () => {
       const mockedUpdateActiveSubmissionType = jest.fn()
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
-      const {container} = render(
+      const {getByRole} = render(
         <AttemptTab {...props} updateActiveSubmissionType={mockedUpdateActiveSubmissionType} />
       )
 
-      const selector = container.querySelector('select')
-      fireEvent.change(selector, {target: {value: 'online_text_entry'}})
+      const textButton = getByRole('button', {name: /Text/})
+      act(() => {
+        fireEvent.click(textButton)
+      })
 
       expect(mockedUpdateActiveSubmissionType).toHaveBeenCalledWith('online_text_entry')
     })
 
     it('renders the active submission type if available', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        Assignment: {submissionTypes: ['online_url']}
       })
-      const {getByTestId} = render(
-        <AttemptTab {...props} activeSubmissionType="online_text_entry" />
+      const {findByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} activeSubmissionType="online_url" />
+        </MockedProvider>
       )
 
-      expect(await getByTestId('text-entry')).toBeInTheDocument()
+      expect(await findByTestId('url-entry')).toBeInTheDocument()
     })
 
     it('does not render the selector if the submission state is submitted', async () => {
@@ -198,9 +273,9 @@ describe('ContentTabs', () => {
           state: 'submitted'
         }
       })
-      const {container} = render(<AttemptTab {...props} />)
+      const {queryByTestId} = render(<AttemptTab {...props} />)
 
-      expect(container.querySelector('select')).not.toBeInTheDocument()
+      expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
 
     it('does not render the selector if the submission state is graded', async () => {
@@ -210,9 +285,9 @@ describe('ContentTabs', () => {
           state: 'graded'
         }
       })
-      const {container} = render(<AttemptTab {...props} />)
+      const {queryByTestId} = render(<AttemptTab {...props} />)
 
-      expect(container.querySelector('select')).not.toBeInTheDocument()
+      expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
 
     it('does not render the selector if the context indicates the submission cannot be modified', async () => {
@@ -220,13 +295,13 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
 
-      const {container} = render(
+      const {queryByTestId} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
           <AttemptTab {...props} />
         </StudentViewContext.Provider>
       )
 
-      expect(container.querySelector('select')).not.toBeInTheDocument()
+      expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
   })
 })

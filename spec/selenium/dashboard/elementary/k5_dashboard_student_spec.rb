@@ -179,7 +179,7 @@ describe "student k5 dashboard" do
   context 'homeroom dashboard student grades panel' do
     let(:math_subject_grade) { "75" }
 
-    let(:assignment) { create_and_submit_assignment(@subject_course) }
+    let(:assignment) { create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100) }
 
     it 'shows the grades panel with two courses' do
       subject_title2 = "Social Studies"
@@ -200,15 +200,7 @@ describe "student k5 dashboard" do
     end
 
     it 'shows the grades with a different grading scheme' do
-      grading_standard = @subject_course.grading_standards.create!(
-        title: "Fun Grading Standard",
-        standard_data: {
-          "scheme_0" => { name: "Awesome", value: "90" },
-          "scheme_1" => { name: "Fabulous", value: "80" },
-          "scheme_2" => { name: "You got this", value: "70" },
-          "scheme_3" => { name: "See me", value: "0" }
-        }
-      )
+      grading_standard = create_grading_standard(@subject_course)
       @subject_course.update!(grading_standard_enabled: true, grading_standard_id: grading_standard.id)
 
       assignment.grade_student(@student, grader: @teacher, score: math_subject_grade, points_deducted: 0)

@@ -52,7 +52,7 @@ function removeFlag(flagName) {
   })
 }
 
-export default function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
+function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const popoverEl = useRef(null)
@@ -85,7 +85,7 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
       }
     } catch (e) {
       showFlashAlert({
-        message: I18n.t('An error occured updating the flag'),
+        message: I18n.t('An error occurred updating the flag'),
         err: null,
         type: 'error'
       })
@@ -98,7 +98,7 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
   const isReadonly = ENV.PERMISSIONS?.manage_feature_flags === false || effectiveFlag.locked
   const isEnabled = flagUtils.isEnabled(effectiveFlag)
 
-  // Only some FFs at some levels can be be overriden at lower levels
+  // Only some FFs at some levels can be be overridden at lower levels
   // Show the appropriate text depending
   // Also if we are in a course context then our FFs can't ever be inherited
   const allowsDefaults = flagUtils.doesAllowDefaults(effectiveFlag, disableDefaults)
@@ -219,3 +219,5 @@ FeatureFlagButton.propTypes = {
   displayName: string,
   disableDefaults: bool
 }
+
+export default React.memo(FeatureFlagButton)

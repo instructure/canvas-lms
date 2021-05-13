@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Discussion} from '../../graphql/Discussion'
+import {DiscussionEntry} from '../../graphql/DiscussionEntry'
+import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
+import {PER_PAGE} from './constants'
+
 export const isGraded = (assignment = null) => {
   return assignment !== null && (assignment?.dueAt || assignment?.pointsPossible)
 }
@@ -32,4 +37,73 @@ export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {
 
 export const getEditUrl = (courseId, discussionTopicId) => {
   return `/courses/${courseId}/discussion_topics/${discussionTopicId}/edit`
+}
+
+export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
+  const options = {
+    id: discussionTopicGraphQLId,
+    fragment: Discussion.fragment,
+    fragmentName: 'Discussion'
+  }
+  const data = JSON.parse(JSON.stringify(cache.readFragment(options)))
+
+  if (data) {
+    data.entryCounts.repliesCount += 1
+
+    cache.writeFragment({
+      ...options,
+      data
+    })
+  }
+}
+
+export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDiscussionEntry) => {
+  const options = {
+    id: discussionEntryGraphQLId,
+    fragment: DiscussionEntry.fragment,
+    fragmentName: 'DiscussionEntry'
+  }
+  const data = JSON.parse(JSON.stringify(cache.readFragment(options)))
+
+  if (data) {
+    // On nested-replies we don't have rootEntryParticipantCounts or a last reply.
+    if (data.rootEntryParticipantCounts) {
+      data.rootEntryParticipantCounts.unreadCount += 1
+      data.rootEntryParticipantCounts.repliesCount += 1
+      data.lastReply = {
+        createdAt: newDiscussionEntry.createdAt,
+        __typename: 'DiscussionEntry'
+      }
+    }
+
+    data.subentriesCount += 1
+
+    cache.writeFragment({
+      ...options,
+      data
+    })
+  }
+}
+export const addReplyToSubentries = (cache, discussionEntryId, newDiscussionEntry) => {
+  try {
+    const options = {
+      query: DISCUSSION_SUBENTRIES_QUERY,
+      variables: {
+        discussionEntryID: discussionEntryId,
+        perPage: PER_PAGE
+      }
+    }
+    const currentSubentries = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+    if (currentSubentries) {
+      const subentriesLegacyNode = currentSubentries.legacyNode
+      subentriesLegacyNode.subentriesCount += 1
+
+      // TODO: Handle sorting.
+      subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
+
+      cache.writeQuery({...options, data: currentSubentries})
+    }
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
 }

@@ -134,6 +134,7 @@ class CollaborationsController < ApplicationController
   include Api::V1::Collaborator
   include Api::V1::Collaboration
   include Api::V1::User
+  include K5Mode
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&

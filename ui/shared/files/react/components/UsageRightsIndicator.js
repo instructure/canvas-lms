@@ -86,7 +86,7 @@ export default class UsageRightsIndicator extends React.Component {
           <button
             className="UsageRightsIndicator__openModal btn-link"
             onClick={this.handleClick}
-            title={this.props.suppressWarning ? null : this.warningMessage}
+            title={this.props.suppressWarning ? I18n.t('Manage usage rights') : this.warningMessage}
             data-tooltip="top"
           >
             {!this.props.suppressWarning && (

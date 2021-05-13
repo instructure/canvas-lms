@@ -81,6 +81,10 @@ extract all of th `.js` files to `./src/rce/languages/`. After commiting the
 changed locale files you can run `git clean -f ./src/rce/languages/` to remove
 the untracked language files.
 
+Any time tinymce languages are updated, it would be best to run
+`yarn genTranslationGetters` to update the getter function to guarantee
+it remains in sync with the list of files.
+
 ## Adding Languages
 
 ### TinyMCE Language Pack

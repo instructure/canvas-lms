@@ -6,6 +6,7 @@
 # environments
 ADMIN_URL=http://pulsar:8080/
 DISPATCHER_URL=pulsar://pulsar:6650/
+PULSAR_TENANT=canvas
 
 function check_ready {
   bin/pulsar-client --url $DISPATCHER_URL produce my-topic --messages "hello-pulsar"
@@ -39,17 +40,22 @@ echo "Pulsar is ready!"
 # and namespaces for canvas operations.  You can run them in
 # this order within the pulsar container to get your pulsar
 # broker into an appropriate state for handling AUA traffic.
-bin/pulsar-admin --admin-url $ADMIN_URL tenants create canvas
+echo "creating tenant..."
+bin/pulsar-admin --admin-url $ADMIN_URL tenants create $PULSAR_TENANT
 # the "test-only" namespace is provided to set an example
 # of how to configure a namespace and for using in tests
 # of the message bus integration.  In general you probably
 # want to create a different namespace for each usecase within
 # the application.
-bin/pulsar-admin --admin-url $ADMIN_URL namespaces create canvas/test-only
-bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m canvas/test-only
+echo "creating namespaces..."
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces create $PULSAR_TENANT/test-only
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m $PULSAR_TENANT/test-only
 # namespaces for specific use cases within canvas that will be tested
 # via integration with the message bus (both manually and in specs)
 # should be added here so that they exist when you need them, kind of
 # like database migrations.
-bin/pulsar-admin --admin-url $ADMIN_URL namespaces create canvas/asset_user_access_log
-bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m canvas/asset_user_access_log
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces create $PULSAR_TENANT/asset_user_access_log
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces set-retention --size 5M --time 5m $PULSAR_TENANT/asset_user_access_log
+
+echo "PULSAR BOOTSTRAP COMPLETE, LISTING NAMESPACES:"
+bin/pulsar-admin --admin-url $ADMIN_URL namespaces list $PULSAR_TENANT

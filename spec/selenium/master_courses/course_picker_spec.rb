@@ -74,14 +74,7 @@ describe "master courses - course picker" do
   let(:sub_account_filter) {'#subAccountsFilter'}
 
   def wait_for_spinner
-    begin
-      f(loading) # the loading spinner appears
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      # ignore - sometimes spinner doesn't appear in Chrome
-    rescue SpecTimeLimit::Error
-      # ignore - sometimes spinner doesn't appear in Chrome
-    end
-    expect(f(filter_output)).not_to contain_css(loading) # and disappears
+    wait_for_transient_element(loading) { yield }
   end
 
   # enter search term into the filter text box and wait for the response
@@ -94,8 +87,7 @@ describe "master courses - course picker" do
     open_courses_list
     filter = f(course_search_input)
     filter.click
-    filter.send_keys(search_term) # type into the filter text box
-    wait_for_spinner
+    wait_for_spinner { filter.send_keys(search_term) } # type into the filter text box
     available_courses
   end
 
@@ -132,8 +124,7 @@ describe "master courses - course picker" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    click_INSTUI_Select_option(term_filter, 'fall term')
-    wait_for_spinner
+    wait_for_spinner { click_INSTUI_Select_option(term_filter, 'fall term') }
     expect(available_courses().length).to eq(4)
   end
 
@@ -141,8 +132,7 @@ describe "master courses - course picker" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    click_INSTUI_Select_option(sub_account_filter, 'sub-account 1')
-    wait_for_spinner
+    wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, 'sub-account 1') }
     expect(available_courses().length).to eq(1)
   end
 end

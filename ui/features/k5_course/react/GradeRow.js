@@ -26,26 +26,21 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {IconCheckDarkSolid, IconXSolid} from '@instructure/ui-icons'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Badge} from '@instructure/ui-badge'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 export const GradeRow = ({
-  // these unused vars should be used in future grades tickets
-  // eslint-disable-next-line no-unused-vars
-  id,
   assignmentName,
   url,
   dueDate,
   assignmentGroupName,
-  // eslint-disable-next-line no-unused-vars
-  assignmentGroupId,
   pointsPossible,
   gradingType,
-  // eslint-disable-next-line no-unused-vars
-  score,
   grade,
   submissionDate,
+  unread,
   late,
   excused,
   missing
@@ -132,22 +127,43 @@ export const GradeRow = ({
     }
   }
 
+  const renderTitleCell = () => (
+    <Flex direction="column" margin="0 0 0 small">
+      <Link
+        href={url}
+        isWithinText={false}
+        theme={{
+          color: k5Theme.variables.colors.textDarkest,
+          hoverColor: k5Theme.variables.colors.textDarkest
+        }}
+      >
+        {assignmentName}
+      </Link>
+      {renderStatus()}
+    </Flex>
+  )
+
   return (
-    <Table.Row>
+    <Table.Row data-testid="grades-table-row">
       <Table.Cell>
-        <Flex direction="column">
-          <Link
-            href={url}
-            isWithinText={false}
+        {unread ? (
+          <Badge
+            type="notification"
+            placement="start center"
+            formatOutput={() => (
+              <ScreenReaderContent>
+                {I18n.t('New grade for %{assignmentName}', {assignmentName})}
+              </ScreenReaderContent>
+            )}
             theme={{
-              color: k5Theme.variables.colors.textDarkest,
-              hoverColor: k5Theme.variables.colors.textDarkest
+              sizeNotification: '0.45rem'
             }}
           >
-            {assignmentName}
-          </Link>
-          {renderStatus()}
-        </Flex>
+            {renderTitleCell()}
+          </Badge>
+        ) : (
+          renderTitleCell()
+        )}
       </Table.Cell>
       <Table.Cell>
         {dueDate && <Text>{tz.format(dueDate, 'date.formats.full_with_weekday')}</Text>}
@@ -168,12 +184,10 @@ export const GradeRow = ({
 }
 
 GradeRow.propTypes = {
-  id: PropTypes.string.isRequired,
   assignmentName: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   dueDate: PropTypes.string,
   assignmentGroupName: PropTypes.string.isRequired,
-  assignmentGroupId: PropTypes.string.isRequired,
   pointsPossible: PropTypes.number,
   gradingType: PropTypes.oneOf([
     'pass_fail',
@@ -183,9 +197,9 @@ GradeRow.propTypes = {
     'points',
     'not_graded'
   ]).isRequired,
-  score: PropTypes.number,
   grade: PropTypes.string,
   submissionDate: PropTypes.string,
+  unread: PropTypes.bool.isRequired,
   late: PropTypes.bool,
   excused: PropTypes.bool,
   missing: PropTypes.bool

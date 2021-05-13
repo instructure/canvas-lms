@@ -63,6 +63,7 @@ module MicrosoftSync
     STATSD_PREFIX = 'microsoft_sync.smj'
 
     # job_state_record is assumed to be a model with the following used here:
+    #  - global_id
     #  - job_state
     #  - workflow_state
     #    -> update_unless_deleted() -- atomically updates attributes if workflow_state != 'deleted'
@@ -267,7 +268,7 @@ module MicrosoftSync
     end
 
     def strand
-      @strand ||= "#{self.class.name}:#{job_state_record.class.name}:#{job_state_record.id}"
+      @strand ||= "#{self.class.name}:#{job_state_record.class.name}:#{job_state_record.global_id}"
     end
 
     def run_with_delay(step=nil, delay_amount=nil, synchronous: false)

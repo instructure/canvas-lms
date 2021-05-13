@@ -2,7 +2,7 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-cat <<EOF | docker run --interactive $DOCKER_INPUTS --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash -
+cat <<EOF | docker run --interactive $DOCKER_INPUTS --volume $GERGICH_VOLUME:/home/docker/gergich $LINTERS_RUNNER_IMAGE /bin/bash -
 set -ex
 export GERGICH_REVIEW_LABEL="Lint-Review"
 gergich status

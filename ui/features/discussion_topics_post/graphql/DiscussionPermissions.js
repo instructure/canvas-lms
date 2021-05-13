@@ -32,6 +32,14 @@ export const DiscussionPermissions = {
       readReplies
       reply
       update
+      speedGrader
+      peerReview
+      showRubric
+      addRubric
+      openForComments
+      closeForComments
+      copyAndSendTo
+      moderateForum
     }
   `,
 
@@ -45,6 +53,55 @@ export const DiscussionPermissions = {
     readAsAdmin: bool,
     readReplies: bool,
     reply: bool,
-    update: bool
+    update: bool,
+    speedGrader: bool,
+    peerReview: bool,
+    showRubric: bool,
+    addRubric: bool,
+    openForComments: bool,
+    closeForComment: bool,
+    copyAndSendTo: bool,
+    moderateForum: bool
+  }),
+
+  mock: ({
+    attach = true,
+    create = true,
+    canDelete = true, // Special case because `delete` is a special word
+    duplicate = true,
+    rate = true,
+    read = true,
+    readAsAdmin = true,
+    readReplies = true,
+    reply = true,
+    update = true,
+    speedGrader = true,
+    peerReview = true,
+    showRubric = true,
+    addRubric = true,
+    openForComments = true,
+    closeForComment = false,
+    copyAndSendTo = true,
+    moderateForum = true
+  } = {}) => ({
+    attach,
+    create,
+    delete: canDelete,
+    duplicate,
+    rate,
+    read,
+    readAsAdmin,
+    readReplies,
+    reply,
+    update,
+    speedGrader,
+    peerReview,
+    showRubric,
+    addRubric,
+    openForComments,
+    closeForComment,
+    copyAndSendTo,
+    moderateForum,
+    __typename: 'DiscussionPermissions'
   })
 }

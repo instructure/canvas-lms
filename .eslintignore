@@ -1,7 +1,6 @@
-/gems/canvas_i18nliner/*
 /doc/*
-
-spec/selenium/helpers/jquery.simulate.js
-spec/javascripts/support/jquery.mockjax.js
-
-packages/**/node_modules/**
+/frontend_build/**
+/gems/canvas_i18nliner/*
+/packages/*/node_modules/**
+/spec/javascripts/support/jquery.mockjax.js
+/spec/selenium/helpers/jquery.simulate.js

@@ -42,6 +42,8 @@
 
 class ReleaseNote
   include ActiveModel::Dirty
+  include ActiveModel::Serializers::JSON
+
   attr_reader :id, :published, :created_at
   define_attribute_methods :id, :show_ats, :target_roles, :published
 
@@ -58,6 +60,10 @@ class ReleaseNote
     @target_roles = ddb_item['TargetRoles']
     @published = ddb_item['Published']
     @created_at = Time.parse(ddb_item['CreatedAt']).utc
+  end
+
+  def attributes
+    {'id' => nil, 'show_ats' => nil, 'target_roles' => nil, 'published' => nil, 'langs' => nil}
   end
 
   def target_roles
@@ -215,6 +221,13 @@ class ReleaseNote
     @langs[lang] = translations
   end
 
+  def langs
+    load_all_langs
+    @langs
+  end
+
+  private
+
   def load_all_langs
     return if @all_langs_loaded
 
@@ -304,7 +317,7 @@ class ReleaseNote
           scan_index_forward: false,
           exclusive_start_key: start
         )
-        
+
         pager.replace(load_raw_records(res.items, include_langs: include_langs))
         pager.has_more! unless res.last_evaluated_key.nil?
         pager
@@ -327,9 +340,13 @@ class ReleaseNote
 
     def load_raw_records(records, include_langs: false)
       ret = records.map { |it| ReleaseNote.new(it) }
-      ret.each(&:load_all_langs) if include_langs
+      ret.each { |it| it.send(:load_all_langs) } if include_langs
 
       ret
+    end
+
+    def enabled?
+      !ddb_table_name.nil?
     end
 
     def settings

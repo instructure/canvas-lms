@@ -176,10 +176,9 @@
           <% unless @current_user.nil? %>
             <%= render(:partial => 'external_tools/global_nav_menu_items') %>
           <% end %>
-          <% if show_help_link? %>
           <li class="ic-app-header__menu-list-item">
            <%= link_to help_link_url,
-                :id => show_feedback_link? ? 'global_nav_help_link' : '',
+                :id => 'global_nav_help_link',
                 :role => 'button',
                 :class => "ic-app-header__menu-list-link",
                 :data => help_link_data do %>
@@ -195,7 +194,6 @@
               </div>
             <% end %>
           </li>
-          <% end %>
         </ul>
       </div>
       <div class="ic-app-header__secondary-navigation">

@@ -95,6 +95,61 @@ export const Discussion = {
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
     rootEntriesTotalPages: number
+  }),
+
+  mock: ({
+    id = 'RGlzY3Vzc2lvbi0x',
+    _id = '1',
+    title = 'X-Men Powers Discussion',
+    message = 'Lets talk about our powers and their applications',
+    createdAt = '2020-11-23T11:40:44-07:00',
+    updatedAt = '2021-04-22T12:41:56-06:00',
+    postedAt = '2020-11-23T11:40:44-07:00',
+    requireInitialPost = false,
+    isSectionSpecific = false,
+    discussionType = 'threaded',
+    allowRating = true,
+    onlyGradersCanRate = false,
+    delayedPostAt = null,
+    subscribed = true,
+    published = true,
+    canUnpublish = true,
+    entryCounts = {
+      unreadCount: 2,
+      repliesCount: 56,
+      __typename: 'DiscussionEntryCounts'
+    },
+    author = User.mock({_id: '1', name: 'Charles Xavier'}),
+    editor = User.mock({_id: '1', name: 'Charles Xavier'}),
+    assignment = Assignment.mock(),
+    permissions = DiscussionPermissions.mock(),
+    courseSections = Section.mock(),
+    rootEntriesTotalPages = 2
+  } = {}) => ({
+    id,
+    _id,
+    title,
+    message,
+    createdAt,
+    updatedAt,
+    postedAt,
+    requireInitialPost,
+    isSectionSpecific,
+    discussionType,
+    allowRating,
+    onlyGradersCanRate,
+    delayedPostAt,
+    subscribed,
+    published,
+    canUnpublish,
+    entryCounts,
+    author,
+    editor,
+    assignment,
+    permissions,
+    courseSections,
+    rootEntriesTotalPages,
+    __typename: 'Discussion'
   })
 }
 

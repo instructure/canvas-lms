@@ -48,10 +48,3 @@ export const User = {
     _id
   })
 }
-
-export const DefaultMocks = {
-  User: () => ({
-    name: 'Scott Summers',
-    pronouns: 'He/Him'
-  })
-}

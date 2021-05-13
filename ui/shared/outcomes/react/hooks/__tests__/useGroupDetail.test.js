@@ -24,6 +24,7 @@ import {groupDetailMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
 import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import OutcomesContext from '../../contexts/OutcomesContext'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
@@ -43,7 +44,9 @@ describe('groupDetailHook', () => {
 
   const wrapper = ({children}) => (
     <MockedProvider cache={cache} mocks={mocks}>
-      {children}
+      <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+        {children}
+      </OutcomesContext.Provider>
     </MockedProvider>
   )
 

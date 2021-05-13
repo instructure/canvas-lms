@@ -23,7 +23,12 @@ import {CondensedButton} from '@instructure/ui-buttons'
 
 export function Reply({...props}) {
   return (
-    <CondensedButton onClick={props.onClick} withBackground={props.withBackground} color="primary">
+    <CondensedButton
+      onClick={props.onClick}
+      withBackground={props.withBackground}
+      color="primary"
+      data-testid="threading-toolbar-reply"
+    >
       {I18n.t('Reply')}
     </CondensedButton>
   )

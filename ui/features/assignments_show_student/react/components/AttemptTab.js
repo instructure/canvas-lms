@@ -18,17 +18,24 @@
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
-import {FormField} from '@instructure/ui-form-field'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {friendlyTypeName, getCurrentSubmissionType} from '../helpers/SubmissionHelpers'
+import {
+  IconAttachMediaLine,
+  IconLinkLine,
+  IconUploadLine,
+  IconTextLine
+} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import SubmissionChoiceSVG from '../../images/SubmissionChoice.svg'
-import SVGWithTextPlaceholder from '../SVGWithTextPlaceholder'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
 const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
@@ -36,12 +43,56 @@ const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
 const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
 const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
 
+const iconsByType = {
+  media_recording: IconAttachMediaLine,
+  online_text_entry: IconTextLine,
+  online_upload: IconUploadLine,
+  online_url: IconLinkLine
+}
+
+function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
+  const foregroundColor = selected ? 'primary-inverse' : 'brand'
+  const screenReaderText = selected
+    ? I18n.t('Submission type %{displayName}, currently selected', {displayName})
+    : I18n.t('Select submission type %{displayName}', {displayName})
+
+  return (
+    <View
+      as="div"
+      className="submission-type-icon-contents"
+      background={selected ? 'brand' : 'primary'}
+      borderColor="brand"
+      borderWidth="small"
+      borderRadius="medium"
+      height="80px"
+      minWidth="90px"
+    >
+      <Button
+        display="block"
+        interaction={selected ? 'readonly' : 'enabled'}
+        onClick={onSelected}
+        theme={{borderWidth: '0'}}
+        withBackground={false}
+      >
+        <Icon size="small" color={foregroundColor} />
+        <View as="div" margin="small 0 0">
+          <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
+          <Text color={foregroundColor} weight="normal" size="medium">
+            {displayName}
+          </Text>
+        </View>
+      </Button>
+    </View>
+  )
+}
+
 export default class AttemptTab extends Component {
   static propTypes = {
     activeSubmissionType: string,
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
     editingDraft: bool,
+    onContentsChanged: func,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
     updateEditingDraft: func,
@@ -77,12 +128,17 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderTextAttempt = () => {
+  renderTextAttempt = context => {
+    const readOnly =
+      !context.allowChangesToSubmission ||
+      ['submitted', 'graded'].includes(this.props.submission.state)
+
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
           createSubmissionDraft={this.props.createSubmissionDraft}
-          editingDraft={this.props.editingDraft}
+          onContentsChanged={this.props.onContentsChanged}
+          readOnly={readOnly}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
         />
@@ -118,12 +174,12 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderByType(submissionType) {
+  renderByType(submissionType, context) {
     switch (submissionType) {
       case 'media_recording':
         return this.renderMediaAttempt()
       case 'online_text_entry':
-        return this.renderTextAttempt()
+        return this.renderTextAttempt(context)
       case 'online_upload':
         return this.renderFileAttempt()
       case 'online_url':
@@ -131,15 +187,6 @@ export default class AttemptTab extends Component {
       default:
         throw new Error('submission type not yet supported in A2')
     }
-  }
-
-  renderUnselectedType() {
-    return (
-      <SVGWithTextPlaceholder
-        text={I18n.t('Choose One Submission Type')}
-        url={SubmissionChoiceSVG}
-      />
-    )
   }
 
   renderSubmissionTypeSelector() {
@@ -150,28 +197,26 @@ export default class AttemptTab extends Component {
     }
 
     return (
-      <FormField
-        id="select-submission-type"
-        label={<Text weight="bold">{I18n.t('Submission Type')}</Text>}
-      >
-        <select
-          onChange={event => this.props.updateActiveSubmissionType(event.target.value)}
-          style={{
-            margin: '0 0 10px 0',
-            width: '225px'
-          }}
-          value={this.props.activeSubmissionType || 'default'}
-        >
-          <option hidden key="default" value="default">
-            {I18n.t('Choose One')}
-          </option>
+      <View as="div" data-testid="submission-type-selector" margin="0 auto small">
+        <Text as="p" weight="bold">
+          {I18n.t('Choose a submission type')}
+        </Text>
+
+        <Flex>
           {this.props.assignment.submissionTypes.map(type => (
-            <option key={type} value={type}>
-              {friendlyTypeName(type)}
-            </option>
+            <Flex.Item as="div" key={type} margin="0 medium 0 0">
+              <SubmissionTypeButton
+                displayName={friendlyTypeName(type)}
+                icon={iconsByType[type]}
+                selected={this.props.activeSubmissionType === type}
+                onSelected={() => {
+                  this.props.updateActiveSubmissionType(type)
+                }}
+              />
+            </Flex.Item>
           ))}
-        </select>
-      </FormField>
+        </Flex>
+      </View>
     )
   }
 
@@ -204,9 +249,7 @@ export default class AttemptTab extends Component {
               context.allowChangesToSubmission &&
               this.renderSubmissionTypeSelector()}
 
-            {selectedType != null
-              ? this.renderByType(selectedType)
-              : context.allowChangesToSubmission && this.renderUnselectedType()}
+            {selectedType != null && this.renderByType(selectedType, context)}
           </div>
         )}
       </StudentViewContext.Consumer>

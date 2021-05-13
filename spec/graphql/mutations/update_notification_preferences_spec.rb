@@ -315,6 +315,21 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicies, 0, :frequency)
       ).to eq('immediately')
     end
+
+    it 'creates notification policies for newly created notification types' do
+      Notification.create!(name: "Discussion Mention", subject: "Test", category: 'DiscussionMention')
+      result = run_mutation(
+        context_type: 'Account',
+        account_id: @account.id,
+        communication_channel_id: @teacher.communication_channels.first.id,
+        notification_category: 'DiscussionMention',
+        frequency: 'immediately'
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(
+        result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicies, 0, :frequency)
+      ).to eq('immediately')
+    end
   end
 
   describe 'invalid input' do
