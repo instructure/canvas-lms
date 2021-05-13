@@ -156,9 +156,4 @@ def _runRspecTestSuite(
   }
 }
 
-def uploadParallelLog() {
-  reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
-  archiveArtifacts(artifacts: 'parallel_logs/**')
-}
-
 return this

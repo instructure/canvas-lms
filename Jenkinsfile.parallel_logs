@@ -98,7 +98,8 @@ pipeline {
     stage('Copy Files') {
       steps {
         script {
-          rspec.uploadParallelLog()
+          reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
+          archiveArtifacts(artifacts: 'parallel_logs/**')
         }
       }
     }
