@@ -15,7 +15,6 @@ services:
       RANDOMIZE_SEQUENCES: 1
       DISABLE_SPRING: 'true'
       RERUNS_RETRY:
-      MAX_FAIL:
       COVERAGE:
       FORCE_FAILURE:
       CANVAS_RAILS6_0:

@@ -19,7 +19,6 @@
 def seleniumConfig() {
   [
     node_total: configuration.getInteger('selenium-ci-node-total'),
-    max_fail: configuration.getInteger('selenium-max-fail'),
     reruns_retry: configuration.getInteger('selenium-rerun-retry'),
     force_failure: configuration.isForceFailureSelenium() ? '1' : '',
   ]
@@ -32,7 +31,6 @@ def runSeleniumSuite(total, index) {
       index,
       'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      config.max_fail,
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
@@ -44,7 +42,6 @@ def runSeleniumSuite(total, index) {
 def rspecConfig() {
   [
     node_total: configuration.getInteger('rspec-ci-node-total'),
-    max_fail: configuration.getInteger('rspec-max-fail'),
     reruns_retry: configuration.getInteger('rspec-rerun-retry'),
     force_failure: configuration.isForceFailureRSpec() ? '1' : '',
   ]
@@ -57,7 +54,6 @@ def runRSpecSuite(total, index) {
       index,
       'docker-compose.new-jenkins.yml',
       'rspec',
-      config.max_fail,
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/(selenium|contracts)',
@@ -71,7 +67,6 @@ def _runRspecTestSuite(
     index,
     compose,
     prefix,
-    maxFail,
     rerunsRetry,
     testFilePattern,
     excludeRegex,
@@ -82,7 +77,6 @@ def _runRspecTestSuite(
       "CI_NODE_INDEX=$index",
       "COMPOSE_FILE=$compose",
       "RERUNS_RETRY=$rerunsRetry",
-      "MAX_FAIL=$maxFail",
       "TEST_PATTERN=$testFilePattern",
       "EXCLUDE_TESTS=$excludeRegex",
       "CI_NODE_TOTAL=$total",
