@@ -17,11 +17,11 @@
  */
 
 import I18n from 'i18n!permissions_v2'
-import React, {useRef, useState} from 'react'
-import useStateWithCallback from '@canvas/use-state-with-callback-hook'
+import React, {useEffect, useState} from 'react'
 import {func, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
-import {debounce, isEqual} from 'lodash'
+import {isEqual} from 'lodash'
+import {useDebounce} from 'use-debounce'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
@@ -36,7 +36,12 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
 
 import actions from '../actions'
-import propTypes, {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '@canvas/permissions/react/propTypes'
+import propTypes, {
+  COURSE,
+  ACCOUNT,
+  ALL_ROLES_VALUE,
+  ALL_ROLES_LABEL
+} from '@canvas/permissions/react/propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
 import {ConnectedPermissionTray} from './PermissionTray'
@@ -51,26 +56,26 @@ function setDiff(minuend, subtrahend) {
   return difference
 }
 
-const SEARCH_DELAY = 350
+const SEARCH_DELAY = 500
 
 export default function PermissionsIndex(props) {
-  const setPermissionSearchString = useStateWithCallback('')[1]
-  const [contextType, setContextType] = useStateWithCallback(COURSE)
+  const [contextType, setContextType] = useState(COURSE)
   const [selectedTabId, setSelectedTabId] = useState('course')
+  const [permissionSearchString, setPermissionSearchString] = useState('')
+  const [debouncedSearchString] = useDebounce(permissionSearchString, SEARCH_DELAY)
 
-  function filterPermissions(searchString) {
-    props.searchPermissions({
-      contextType,
-      permissionSearchString: searchString
+  useEffect(() => {
+    const searchPermissions = props.searchPermissions
+
+    searchPermissions({
+      permissionSearchString: debouncedSearchString,
+      contextType
     })
+  }, [contextType, debouncedSearchString, props.searchPermissions])
+
+  function onSearchStringChange(e) {
+    setPermissionSearchString(e.target.value)
   }
-
-  const debouncedFilterPermissions = useRef(
-    debounce(filterPermissions, SEARCH_DELAY, {
-      leading: false,
-      trailing: true
-    })
-  )
 
   function onRoleFilterChange(newIdList) {
     let resultSet = new Set(newIdList)
@@ -102,10 +107,6 @@ export default function PermissionsIndex(props) {
     })
   }
 
-  function onSearchStringChange(e) {
-    setPermissionSearchString(e.target.value, debouncedFilterPermissions.current)
-  }
-
   function onTabChanged(_e, {id}) {
     if (id === selectedTabId) return
     const newContextType = id === 'course' ? COURSE : ACCOUNT
@@ -114,8 +115,9 @@ export default function PermissionsIndex(props) {
       contextType
     })
     setPermissionSearchString('')
-    setContextType(newContextType, props.tabChanged)
+    setContextType(newContextType)
     setSelectedTabId(id)
+    props.tabChanged(newContextType)
   }
 
   function optionsToRender() {
