@@ -620,14 +620,20 @@ $(function () {
   }
   if (ENV.FEATURES?.rce_better_file_previewing) {
     $('a.preview_in_overlay').live('click', event => {
-      const matches = event.target.href.match(/\/files\/(\d+)/)
+      let target = null
+      if (event.target.href) {
+        target = event.target
+      } else if (event.currentTarget?.href) {
+        target = event.currentTarget
+      }
+      const matches = target?.href.match(/\/files\/(\d+)/)
       if (matches) {
         if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
           // if any modifier keys are pressed, do the browser default thing
           return
         }
         event.preventDefault()
-        const url = new URL(event.target.href)
+        const url = new URL(target.href)
         const verifier = url?.searchParams.get('verifier')
         const file_id = matches[1]
         import('../react/showFilePreview')
