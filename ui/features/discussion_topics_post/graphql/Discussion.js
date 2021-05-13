@@ -94,7 +94,8 @@ export const Discussion = {
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
-    rootEntriesTotalPages: number
+    rootEntriesTotalPages: number,
+    entriesTotalPages: number
   }),
 
   mock: ({
@@ -123,8 +124,9 @@ export const Discussion = {
     editor = User.mock({_id: '1', name: 'Charles Xavier'}),
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
-    courseSections = Section.mock(),
-    rootEntriesTotalPages = 2
+    courseSections = [Section.mock()],
+    rootEntriesTotalPages = 2,
+    entriesTotalPages = 2
   } = {}) => ({
     id,
     _id,
@@ -149,6 +151,7 @@ export const Discussion = {
     permissions,
     courseSections,
     rootEntriesTotalPages,
+    entriesTotalPages,
     __typename: 'Discussion'
   })
 }

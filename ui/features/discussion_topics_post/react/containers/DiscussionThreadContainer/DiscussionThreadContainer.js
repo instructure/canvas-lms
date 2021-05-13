@@ -36,7 +36,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
@@ -81,8 +81,6 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const AUTO_MARK_AS_READ_DELAY = 3000
-
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -163,18 +161,6 @@ export const DiscussionThreadContainer = props => {
       }
     })
   }
-
-  const markAsRead = useCallback(() => {
-    setTimeout(
-      updateDiscussionEntryParticipant({
-        variables: {
-          discussionEntryId: props.discussionEntry._id,
-          read: true
-        }
-      }),
-      AUTO_MARK_AS_READ_DELAY
-    )
-  }, [updateDiscussionEntryParticipant, props.discussionEntry._id])
 
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
@@ -284,7 +270,7 @@ export const DiscussionThreadContainer = props => {
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
     if (!props.discussionEntry.read) {
-      const observer = new IntersectionObserver(markAsRead, {
+      const observer = new IntersectionObserver(() => props.markAsRead(props.discussionEntry._id), {
         root: null,
         rootMargin: '0px',
         threshold: 0.1
@@ -296,7 +282,7 @@ export const DiscussionThreadContainer = props => {
         if (threadRef.current) observer.unobserve(threadRef.current)
       }
     }
-  }, [threadRef, markAsRead, props.discussionEntry.read])
+  }, [threadRef, props.discussionEntry.read, props])
 
   return (
     <>
@@ -399,7 +385,8 @@ DiscussionThreadContainer.propTypes = {
   discussionTopicGraphQLId: PropTypes.string,
   discussionEntry: DiscussionEntry.shape,
   depth: PropTypes.number,
-  assignment: Assignment.shape
+  assignment: Assignment.shape,
+  markAsRead: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -437,6 +424,7 @@ const DiscussionSubentries = props => {
       assignment={discussionTopic?.assignment}
       discussionEntry={entry}
       discussionTopicGraphQLId={props.discussionTopicGraphQLId}
+      markAsRead={props.markAsRead}
     />
   ))
 }
@@ -444,5 +432,6 @@ const DiscussionSubentries = props => {
 DiscussionSubentries.propTypes = {
   discussionTopicGraphQLId: PropTypes.string,
   discussionEntryId: PropTypes.string,
-  depth: PropTypes.number
+  depth: PropTypes.number,
+  markAsRead: PropTypes.func
 }

@@ -434,5 +434,21 @@ export const handlers = [
         __typename: 'UpdateDiscussionEntryPayload'
       }
     })
+  }),
+  graphql.mutation('UpdateDiscussionEntriesReadState', (req, res, ctx) => {
+    const discussionEntries = req.variables.discussionEntryIds.map(id => ({
+      ...defaultEntry,
+      id,
+      read: req.variables.read
+    }))
+
+    return res(
+      ctx.data({
+        updateDiscussionEntriesReadState: {
+          discussionEntries,
+          __typename: 'UpdateDiscussionEntriesReadState'
+        }
+      })
+    )
   })
 ]

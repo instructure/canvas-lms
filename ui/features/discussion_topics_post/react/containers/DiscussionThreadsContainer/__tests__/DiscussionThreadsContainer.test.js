@@ -18,11 +18,14 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../../../graphql/Discussion'
+import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionThreadsContainer} from '../DiscussionThreadsContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
 describe('DiscussionThreadContainer', () => {
@@ -45,56 +48,15 @@ describe('DiscussionThreadContainer', () => {
 
   const defaultProps = () => {
     return {
-      discussionTopicId: '1',
       discussionTopic: {
-        id: 'RGlzY3Vzc2lvbi0zMw==',
-        _id: '1'
-      },
-      threads: [
-        {
-          _id: '49',
-          id: '49',
-          createdAt: '2021-04-05T13:40:50-06:00',
-          updatedAt: '2021-04-05T13:40:50-06:00',
-          deleted: false,
-          message: '<p>This is the parent reply</p>',
-          ratingCount: null,
-          ratingSum: null,
-          rating: false,
-          read: true,
-          subentriesCount: 1,
-          rootEntryParticipantCounts: {
-            unreadCount: 1,
-            repliesCount: 1
-          },
-          author: {
-            _id: '1',
-            id: 'VXNlci0x',
-            avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-            name: 'Matthew Lemon'
-          },
-          editor: null,
-          lastReply: {
-            createdAt: '2021-04-05T13:41:42-06:00'
-          },
-          permissions: {
-            attach: true,
-            create: true,
-            delete: true,
-            rate: true,
-            read: true,
-            reply: true,
-            update: true
-          }
+        ...Discussion.mock(),
+        discussionEntriesConnection: {
+          nodes: [DiscussionEntry.mock({read: false})],
+          pageInfo: PageInfo.mock(),
+          __typename: 'DiscussionEntriesConnection'
         }
-      ],
-      pageInfo: {
-        endCursor: 'MQ',
-        hasNextPage: false,
-        hasPreviousPage: false,
-        startCursor: 'MQ'
       },
-      totalPages: 2
+      searchTerm: ''
     }
   }
 
@@ -123,7 +85,7 @@ describe('DiscussionThreadContainer', () => {
 
   it('renders discussion entries', async () => {
     const {queryByText, getByTestId, findByText} = setup(defaultProps())
-    expect(await findByText('This is the parent reply')).toBeTruthy()
+    expect(await findByText('Who has the best power?')).toBeTruthy()
     expect(queryByText('This is the child reply')).toBe(null)
 
     const expandButton = getByTestId('expand-button')
@@ -138,10 +100,19 @@ describe('DiscussionThreadContainer', () => {
   })
 
   it('does not render the pagination component if there is only 1 page', () => {
-    const {queryByTestId} = setup({
-      ...defaultProps(),
-      totalPages: 1
-    })
+    const props = defaultProps()
+    props.discussionTopic.entriesTotalPages = 1
+    const {queryByTestId} = setup(props)
     expect(queryByTestId('pagination')).toBeNull()
+  })
+
+  it('updates unread discussion entries read state to read', async () => {
+    const container = setup(defaultProps())
+
+    expect(container.getByTestId('is-unread')).toBeInTheDocument()
+    window.setTimeout(
+      () => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument(),
+      3000
+    )
   })
 })

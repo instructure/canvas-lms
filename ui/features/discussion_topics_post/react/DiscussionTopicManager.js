@@ -111,10 +111,7 @@ const DiscussionTopicManager = props => {
         ) : (
           <DiscussionThreadsContainer
             discussionTopic={discussionTopicQuery.data.legacyNode}
-            discussionTopicId={props.discussionTopicId}
-            threads={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes}
-            pageInfo={discussionTopicQuery.data.legacyNode.discussionEntriesConnection.pageInfo}
-            totalPages={discussionTopicQuery.data.legacyNode.entriesTotalPages}
+            searchTerm={searchTerm}
           />
         )}
       </SearchContext.Provider>
