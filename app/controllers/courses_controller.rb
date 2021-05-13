@@ -879,6 +879,13 @@ class CoursesController < ApplicationController
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
+          # Sync homeroom enrollments if enabled
+          if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+            progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
+            progress.user = @current_user
+            progress.reset!
+            progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+          end
           format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,

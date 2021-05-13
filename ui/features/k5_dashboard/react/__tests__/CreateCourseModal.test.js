@@ -114,6 +114,7 @@ describe('CreateCourseModal', () => {
     expect(createButton).toBeDisabled()
     fireEvent.click(getByLabelText('Which account will this course be associated with?'))
     fireEvent.click(getByText('Elementary'))
+    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
     expect(createButton).not.toBeDisabled()
   })
 
@@ -161,6 +162,7 @@ describe('CreateCourseModal', () => {
     await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
     fireEvent.click(getByLabelText('Which account will this course be associated with?'))
     fireEvent.click(getByText('Elementary'))
+    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
     fireEvent.change(getByLabelText('Course Name'), {target: {value: 'Science'}})
     fireEvent.click(getByText('Create'))
     expect(getByText('Creating new course...')).toBeInTheDocument()
@@ -175,6 +177,7 @@ describe('CreateCourseModal', () => {
     await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
     fireEvent.click(getByLabelText('Which account will this course be associated with?'))
     fireEvent.click(getByText('CS'))
+    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
     fireEvent.change(getByLabelText('Course Name'), {target: {value: 'Math'}})
     fireEvent.click(getByText('Create'))
     await waitFor(() => expect(getAllByText('Error creating new course')[0]).toBeInTheDocument())

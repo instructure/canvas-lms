@@ -44,7 +44,8 @@ const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_test'
 const CONVERSATIONS_URL = '/api/v1/conversations'
-const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science&enroll_me=true'
+const NEW_COURSE_URL =
+  '/api/v1/accounts/15/courses?course[name]=Science&course[sync_enrollments_from_homeroom]=true&course[homeroom_course_id]=14&enroll_me=true'
 const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
 afterEach(() => {
@@ -264,7 +265,7 @@ describe('sendMessage', () => {
 describe('createNewCourse', () => {
   it('posts to the new course endpoint and returns the new id', async () => {
     fetchMock.post(encodeURI(NEW_COURSE_URL), {id: '56'})
-    const result = await createNewCourse(15, 'Science')
+    const result = await createNewCourse(15, 'Science', true, 14)
     expect(result.id).toBe('56')
   })
 })
