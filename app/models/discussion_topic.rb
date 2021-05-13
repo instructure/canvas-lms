@@ -1142,7 +1142,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| user_can_create(user, session) }
     can :create
 
-    given { |user, session| user_can_create(user, session) && (self.context.is_a?(Group) || self.course.user_is_instructor?(user)) }
+    given { |user, session| user_can_create(user, session) && user_can_duplicate(user, session) }
     can :duplicate
 
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_any_right?(user, session, :create_forum, :post_to_forum) }
@@ -1188,6 +1188,12 @@ class DiscussionTopic < ActiveRecord::Base
     !is_announcement &&
       context.grants_right?(user, session, :create_forum) &&
       context_allows_user_to_create?(user)
+  end
+
+  def user_can_duplicate(user, session)
+    self.context.is_a?(Group) ||
+      self.course.user_is_instructor?(user) ||
+      context.grants_right?(user, session, :read_as_admin)
   end
 
   def discussion_topic_id
