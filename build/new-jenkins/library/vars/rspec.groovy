@@ -16,49 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def seleniumConfig() {
-  [
-    node_total: configuration.getInteger('selenium-ci-node-total'),
-    reruns_retry: configuration.getInteger('selenium-rerun-retry'),
-    force_failure: configuration.isForceFailureSelenium() ? '1' : '',
-  ]
-}
-
 def runSeleniumSuite(total, index) {
-  def config = seleniumConfig()
   _runRspecTestSuite(
       total,
       index,
       'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      config.reruns_retry,
+      configuration.getInteger('selenium-rerun-retry'),
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
       '3',
-      config.force_failure
+      configuration.isForceFailureSelenium() ? '1' : ''
   )
 }
 
-def rspecConfig() {
-  [
-    node_total: configuration.getInteger('rspec-ci-node-total'),
-    reruns_retry: configuration.getInteger('rspec-rerun-retry'),
-    force_failure: configuration.isForceFailureRSpec() ? '1' : '',
-  ]
-}
-
 def runRSpecSuite(total, index) {
-  def config = rspecConfig()
   _runRspecTestSuite(
       total,
       index,
       'docker-compose.new-jenkins.yml',
       'rspec',
-      config.reruns_retry,
+      configuration.getInteger('rspec-rerun-retry'),
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/(selenium|contracts)',
       '4',
-      config.force_failure
+      configuration.isForceFailureRSpec() ? '1' : ''
   )
 }
 

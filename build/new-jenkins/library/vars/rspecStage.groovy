@@ -17,8 +17,8 @@
  */
 
 def createDistribution(nestedStages) {
-  def rspecNodeTotal = rspec.rspecConfig().node_total
-  def seleniumNodeTotal = rspec.seleniumConfig().node_total
+  def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
+  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
   def setupNodeHook = this.&setupNode
 
   rspecNodeTotal.times { index ->
