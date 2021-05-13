@@ -6409,6 +6409,30 @@ describe Course, "#show_total_grade_as_points?" do
       expect(course).not_to be_valid
     end
   end
+
+  describe "#copy_from_course_template" do
+    it "copies unpublished content" do
+      course = Course.create!(template: true)
+      course.root_account.enable_feature!(:course_templates)
+      course.account.update!(course_template: course)
+      a = course.assignments.create!(title: 'bob', workflow_state: 'unpublished')
+      expect(a).to be_unpublished
+      q = course.quizzes.create!(title: 'joe', workflow_state: 'unpublished')
+      expect(q).to be_unpublished
+      wp = course.wiki_pages.create!(title: 'george', workflow_state: 'unpublished')
+      expect(wp).to be_unpublished
+      dt = course.discussion_topics.create!(title: 'phil', workflow_state: 'unpublished')
+      expect(dt).to be_unpublished
+
+      course2 = Course.create!
+      run_jobs
+
+      expect(course2.assignments.pluck(:title)).to eq ['bob']
+      expect(course2.quizzes.pluck(:title)).to eq ['joe']
+      expect(course2.wiki_pages.pluck(:title)).to eq ['george']
+      expect(course2.discussion_topics.pluck(:title)).to eq ['phil']
+    end
+  end
 end
 
 describe Course, "#has_modules?" do
