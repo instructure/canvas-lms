@@ -277,5 +277,40 @@ describe ReleaseNotesController do
         get 'latest'
       end
     end
+
+    it "should clear the new flag after the first request" do
+      get 'latest'
+      res = JSON.parse(response.body)
+      expect(res[0]['new']).to eq(true)
+      subject.send(:clear_ivars)
+      get 'latest'
+      res = JSON.parse(response.body)
+      expect(res[0]['new']).to eq(false)
+    end
+  end
+
+  describe 'unread_count' do
+    before do
+      @student_enrollment = student_in_course(active_all: true)
+      user_session(@student_enrollment.user)
+
+      the_note = ReleaseNote.find(note.id)
+      the_note.published = true
+      the_note.save
+    end
+
+    it 'should include all notes if the user has seen none' do
+      get 'unread_count'
+      res = JSON.parse(response.body)
+      expect(res['unread_count']).to eq(1)
+    end
+
+    it 'should include no notes if the user has seen them all' do
+      get 'latest'
+      subject.send(:clear_ivars)
+      get 'unread_count'
+      res = JSON.parse(response.body)
+      expect(res['unread_count']).to eq(0)
+    end
   end
 end

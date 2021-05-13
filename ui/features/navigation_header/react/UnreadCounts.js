@@ -33,7 +33,7 @@
 //                It passes the fetch error as argument. Defaults to just
 //                issuing a console warning.
 //       pollIntervalMs: how often to poll the API for an updated unread
-//                       count. Defaults to 60000ms or one minute.
+//                       count. Defaults to 60000ms or one minute.  Use 0 to disable.
 //       allowedAge: how old the saved unread count can be without hitting
 //                   the API for a new value. Defaults to 1/2 the poll interval.
 //       maxTries: how many API failures can occur in a row before we just give
@@ -154,14 +154,18 @@ export default function UnreadCounts(props) {
 
       await getData()
       attempts += 1
-      if (attempts < maxTries) timerId = setTimeout(poll, attempts * pollIntervalMs)
+      if (attempts < maxTries && pollIntervalMs > 0)
+        timerId = setTimeout(poll, attempts * pollIntervalMs)
       if (error) onError(`URL=${dataUrl} error text=${error.message}`)
     }
 
     if (ableToRun()) {
       const delay = syncState.current.msUntilFirstPoll
+      // If polling is disabled, it's also fine to just use the cached value
       if (delay > 0) {
-        timerId = setTimeout(poll, delay)
+        if (pollIntervalMs > 0) {
+          timerId = setTimeout(poll, delay)
+        }
       } else {
         poll()
       }

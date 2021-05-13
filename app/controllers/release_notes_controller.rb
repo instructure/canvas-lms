@@ -19,7 +19,7 @@
 
 class ReleaseNotesController < ApplicationController
   before_action :get_context, only: %w[manage]
-  before_action :require_manage_release_notes, except: %[latest]
+  before_action :require_manage_release_notes, except: %w[latest unread_count]
 
   def require_manage_release_notes
     require_site_admin_with_permission(:manage_release_notes)
@@ -70,18 +70,32 @@ class ReleaseNotesController < ApplicationController
   end
 
   def latest
-    json = release_notes_for_user.map do |note|
+    transformed_notes = release_notes_for_user.map do |note|
       localized_text = note[release_note_lang] || note['en']
       {
         id: note.id,
         title: localized_text[:title],
         description: localized_text[:description],
         url: localized_text[:url],
-        date: note.show_ats[Canvas.environment]
+        date: note.show_ats[Canvas.environment],
+        new: note.show_ats[Canvas.environment] > last_seen_release_note
       }
     end
 
-    render json: json
+    unless @current_user.nil? || transformed_notes.empty?
+      if transformed_notes.first[:date] > last_seen_release_note
+        @current_user.last_seen_release_note = transformed_notes.first[:date]
+        @current_user.save!
+      end
+    end
+
+    render json: transformed_notes
+  end
+
+  def unread_count
+    render json: {
+      unread_count: release_notes_for_user.count { |rn| rn.show_ats[Canvas.environment] > last_seen_release_note }
+    }
   end
 
   def manage
