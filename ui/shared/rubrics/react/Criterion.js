@@ -129,7 +129,7 @@ export default class Criterion extends React.Component {
     const useRange = criterion.criterion_use_range
     const ignoreForScoring = criterion.ignore_for_scoring
     const assessing = onAssessmentChange !== null && assessment !== null
-    const updatePoints = tier => {
+    const updatePoints = (tier, isSelected) => {
       // Tier will be a string if entered directly from the point input field. In those situations,
       // the tier description and ID will be added based off the point value upon saving in the
       // rubric_association model
@@ -141,11 +141,17 @@ export default class Criterion extends React.Component {
       const text = tier.points.toString()
       const value = numberHelper.parse(text)
       const valid = !Number.isNaN(value)
-      onAssessmentChange({
-        points: {text, valid, value: valid ? value : undefined},
-        description: tier.description,
-        id: tier.id
-      })
+      if (isSelected) {
+        onAssessmentChange({
+          points: {text: '', valid: true}
+        })
+      } else {
+        onAssessmentChange({
+          points: {text, valid, value: valid ? value : undefined},
+          description: tier.description,
+          id: tier.id
+        })
+      }
     }
     const onPointChange = assessing ? updatePoints : undefined
 
