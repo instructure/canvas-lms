@@ -1292,6 +1292,11 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :discussion_topic_users) do
+      get "courses/:course_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "course_discussion_messageable_users"
+      get "groups/:group_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "group_discussion_messageable_users"
+    end
+
     scope(controller: :collaborations) do
       get 'collaborations/:id/members', action: :members, as: 'collaboration_members'
       get 'courses/:course_id/potential_collaborators', action: :potential_collaborators, as: 'course_potential_collaborators'
