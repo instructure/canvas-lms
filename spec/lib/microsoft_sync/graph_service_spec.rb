@@ -251,6 +251,17 @@ describe MicrosoftSync::GraphService do
           ])
         end
       end
+
+      context 'when top is used' do
+        let(:method_args) { super() + [top: 999] }
+        let(:with_params) { {query: {'$top' => 999}} }
+
+        it 'uses the $top parameter in the first request' do
+          expect(all_pages).to eq([
+            expected_first_page_results, [{'id' => 'page2_item'}], [{'id' => 'page3_item'}]
+          ])
+        end
+      end
     end
   end
 

@@ -260,10 +260,11 @@ module MicrosoftSync
     end
 
     # Builds a query string (hash) from options used by get or list endpoints
-    def expand_options(filter: {}, select: [])
+    def expand_options(filter: {}, select: [], top: nil)
       {}.tap do |query|
         query['$filter'] = filter_clause(filter) unless filter.empty?
         query['$select'] = select.join(',') unless select.empty?
+        query['$top'] = top if top
       end
     end
 
