@@ -33,7 +33,7 @@
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch",
     "build:cafe": "webpack --config webpack.testcafe.config.js",
-    "prepublishOnly": "yarn test && yarn build:all",
+    "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
     "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean"
@@ -73,7 +73,6 @@
     "@instructure/ui-flex": "7",
     "@instructure/ui-focusable": "7",
     "@instructure/ui-form-field": "7",
-    "@instructure/ui-forms": "6",
     "@instructure/ui-heading": "7",
     "@instructure/ui-icons": "7",
     "@instructure/ui-img": "7",
@@ -131,7 +130,7 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "3.0.0-rc2"
+    "tinymce-a11y-checker": "^3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7",

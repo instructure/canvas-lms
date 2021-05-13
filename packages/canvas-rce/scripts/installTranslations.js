@@ -202,7 +202,7 @@ export default function getTranslations(locale) {
         p.then(resolve).catch(reject)
       })
       .catch(() => {
-        throw new Error('whoops')
+        throw new Error('Failed loading tinymce.')
       })
   })
   return transReadyPromise
