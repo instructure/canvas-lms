@@ -46,7 +46,7 @@ function buildFooterStyle() {
 
 const StudentFooter = ({buttons}) => (
   <div data-testid="student-footer" id="assignments-student-footer" style={buildFooterStyle()}>
-    <Flex margin="xx-small" justifyItems="end">
+    <Flex alignItems="center" height="100%" margin="0" justifyItems="end">
       {buttons.map(button => (
         <Flex.Item key={button.key} padding="auto small">
           {button.element}

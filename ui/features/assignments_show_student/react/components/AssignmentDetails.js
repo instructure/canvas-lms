@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 export default function AssignmentDetails({assignment}) {
   return (
     <>
-      <Heading margin="0 small x-small 0" level="h1" as="h2" data-test-id="title">
+      <Heading margin="0" as="h2" data-test-id="title" theme={{h2FontWeight: 300}}>
         <TruncateText maxLines={1} truncate="character">
           {assignment.name}
         </TruncateText>

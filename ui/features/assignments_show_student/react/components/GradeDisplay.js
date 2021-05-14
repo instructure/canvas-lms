@@ -81,7 +81,8 @@ export default function PointsDisplay(props) {
           <Text
             dangerouslySetInnerHTML={{__html: formatGrade()}}
             data-testid="grade-display"
-            size="xx-large"
+            lineHeight="fit"
+            size="x-large"
             transform="capitalize"
           />
         </Flex.Item>
