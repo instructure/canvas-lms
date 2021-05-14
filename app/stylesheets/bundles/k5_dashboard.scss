@@ -118,3 +118,12 @@
 .outcomeGroup {
   margin-top: 1em;
 }
+// Adds some transition effects to make the course header resizing smoother
+// when scrolling
+#k5-course-header {
+  transition: padding-top 140ms ease;
+
+  & #k5-course-header-hero {
+    transition: min-height 140ms ease;
+  }
+}

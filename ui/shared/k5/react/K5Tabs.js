@@ -19,8 +19,6 @@
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import I18n from 'i18n!dashboard'
-import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 
@@ -39,7 +37,7 @@ K5IconTab.propTypes = {
   selected: PropTypes.bool.isRequired
 }
 
-const K5Tabs = ({children, currentTab, name, onTabChange, tabs, tabsRef}) => {
+const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef}) => {
   const [sticky, setSticky] = useState(false)
   const containerRef = useRef(null)
   useEffect(() => {
@@ -65,12 +63,7 @@ const K5Tabs = ({children, currentTab, name, onTabChange, tabs, tabsRef}) => {
       style={{backgroundColor: k5Theme.variables.colors.background.backgroundLightest}}
     >
       <View as="div" borderWidth="none none small none">
-        {name && (
-          <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
-            {I18n.t('Welcome, %{name}!', {name})}
-          </Heading>
-        )}
-        {children}
+        {children(sticky)}
         <Tabs
           elementRef={tabsRef}
           onRequestTabChange={(_, {id}) => onTabChange(id)}
@@ -93,9 +86,8 @@ const K5Tabs = ({children, currentTab, name, onTabChange, tabs, tabsRef}) => {
 }
 
 K5Tabs.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.func,
   currentTab: PropTypes.string.isRequired,
-  name: PropTypes.string,
   onTabChange: PropTypes.func.isRequired,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({

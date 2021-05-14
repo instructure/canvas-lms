@@ -113,9 +113,10 @@ const toRenderTabs = tabs =>
     return acc
   }, [])
 
-export function CourseHeaderHero({name, image, backgroundColor}) {
+export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   return (
     <div
+      id="k5-course-header-hero"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -126,7 +127,7 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
         borderRadius: '8px',
-        minHeight: '25vh',
+        minHeight: shouldShrink ? '100px' : '25vh',
         maxHeight: `${HERO_HEIGHT_PX}px`,
         marginBottom: '1rem'
       }}
@@ -256,8 +257,8 @@ export function K5Course({
       .finally(() => setAppsLoading(false))
   }, [id, name])
 
-  const courseHeader = (
-    <>
+  const courseHeader = shouldShrink => (
+    <View id="k5-course-header" as="div" padding={shouldShrink ? 'medium 0 0 0' : '0'}>
       {(canManage || showStudentView) && (
         <CourseHeaderOptions
           canManage={canManage}
@@ -270,8 +271,9 @@ export function K5Course({
         name={name}
         image={imageUrl}
         backgroundColor={color || DEFAULT_COURSE_COLOR}
+        shouldShrink={shouldShrink}
       />
-    </>
+    </View>
   )
 
   // Only render the K5Tabs component if we actually have any visible tabs
@@ -282,10 +284,10 @@ export function K5Course({
       tabs={renderTabs}
       tabsRef={setTabsRef}
     >
-      {courseHeader}
+      {sticky => courseHeader(sticky)}
     </K5Tabs>
   ) : (
-    courseHeader
+    courseHeader()
   )
 
   const announcementDetails = parseAnnouncementDetails(latestAnnouncement, {

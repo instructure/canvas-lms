@@ -301,9 +301,9 @@ afterEach(() => {
 })
 
 describe('K-5 Dashboard', () => {
-  it('displays a welcome message to the logged-in user', async () => {
-    const {findByText} = render(<K5Dashboard {...defaultProps} />)
-    expect(await findByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
+  it('displays a welcome message to the logged-in user', () => {
+    const {getByText} = render(<K5Dashboard {...defaultProps} />)
+    expect(getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
   })
 
   describe('Tabs', () => {

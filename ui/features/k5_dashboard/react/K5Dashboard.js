@@ -19,6 +19,7 @@ import React, {useEffect, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
+import {Heading} from '@instructure/ui-heading'
 
 import {
   createTeacherPreview,
@@ -119,6 +120,12 @@ export const K5Dashboard = ({
     switchToToday()
   }
 
+  const dashboardHeader = (sticky, name) => (
+    <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
+      {I18n.t('Welcome, %{name}!', {name})}
+    </Heading>
+  )
+
   return (
     <View as="section">
       <K5DashboardContext.Provider
@@ -137,11 +144,12 @@ export const K5Dashboard = ({
         {currentTab && (
           <K5Tabs
             currentTab={currentTab}
-            name={display_name}
             onTabChange={handleTabChange}
             tabs={DASHBOARD_TABS}
             tabsRef={setTabsRef}
-          />
+          >
+            {sticky => dashboardHeader(sticky, display_name)}
+          </K5Tabs>
         )}
         <HomeroomPage
           cards={cards}
