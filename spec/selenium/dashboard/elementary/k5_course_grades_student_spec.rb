@@ -143,6 +143,7 @@ describe "student k5 course grades tab" do
     end
 
     it 'shows new grade indicator the first time the grades tab is accessed after grading' do
+      skip("LS-2224 skip because sometimes (a lot of times?) the page seems to refresh and the indicator goes away")
       get "/courses/#{@subject_course.id}#grades"
 
       expect(new_grade_badge).to be_displayed
