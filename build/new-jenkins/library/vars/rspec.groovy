@@ -18,56 +18,23 @@
 
 def runSeleniumSuite(total, index) {
   _runRspecTestSuite(
-      total,
       index,
-      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-      'selenium',
-      configuration.getInteger('selenium-rerun-retry'),
-      '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
-      '.*/performance',
-      '3',
-      configuration.isForceFailureSelenium() ? '1' : ''
+      'selenium'
   )
 }
 
 def runRSpecSuite(total, index) {
   _runRspecTestSuite(
-      total,
       index,
-      'docker-compose.new-jenkins.yml',
-      'rspec',
-      configuration.getInteger('rspec-rerun-retry'),
-      '^./(spec|gems/plugins/.*/spec_canvas)/',
-      '.*/(selenium|contracts)',
-      '4',
-      configuration.isForceFailureRSpec() ? '1' : ''
+      'rspec'
   )
 }
 
 def _runRspecTestSuite(
-    total,
     index,
-    compose,
-    prefix,
-    rerunsRetry,
-    testFilePattern,
-    excludeRegex,
-    rspecProcesses,
-    forceFailure
+    prefix
 ) {
-  withEnv([
-      "CI_NODE_INDEX=$index",
-      "COMPOSE_FILE=$compose",
-      "RERUNS_RETRY=$rerunsRetry",
-      "TEST_PATTERN=$testFilePattern",
-      "EXCLUDE_TESTS=$excludeRegex",
-      "CI_NODE_TOTAL=$total",
-      "RSPEC_PROCESSES=$rspecProcesses",
-      "FORCE_FAILURE=$forceFailure",
-      'POSTGRES_PASSWORD=sekret',
-      'SELENIUM_VERSION=3.141.59-20201119',
-      "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-  ]) {
+  withEnv([]) {
     try {
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 15) {
