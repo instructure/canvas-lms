@@ -141,6 +141,127 @@ function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMov
   )
 }
 
+function hideEditObject(type) {
+  const $box = $('#' + type + '_name_holder')
+  const $input = $('#' + type + '_name')
+  const val = $input.val()
+  const $obj = $box.parents('li.' + type)
+  $obj.find('.name').text(val)
+  if ($obj.parent('ul').length > 0) {
+    $box.hide().appendTo($('body'))
+    $obj.find('.' + type + '_url').show()
+  }
+  if ($obj.attr('id') === type + '_new') {
+    $obj.remove()
+  }
+}
+function saveObject($obj, type) {
+  const isSaving = $obj.data('event_pending')
+  if (isSaving || $obj.length === 0) {
+    return
+  }
+  let method = 'PUT'
+  let url = $obj.find('.rename_' + type + '_url').attr('href')
+  if ($obj.attr('id') === type + '_new') {
+    method = 'POST'
+    url = $('.add_' + type + '_url').attr('href')
+  }
+  const $objs = $obj.parents('ul').find('.' + type + ':not(.unsaved)')
+  let newName = $obj.find('#' + type + '_name').val()
+  $objs.each(function () {
+    if (this !== $obj[0] && $(this).find('.name').text() === newName) {
+      newName = ''
+    }
+  })
+  if (!newName) {
+    return false
+  }
+  let object_name = 'eportfolio_category'
+  if (type === 'page') {
+    object_name = 'eportfolio_entry'
+  }
+  const data = {}
+  data[object_name + '[name]'] = newName
+  if (type === 'page') {
+    data[object_name + '[eportfolio_category_id]'] = $('#eportfolio_category_id').text()
+  }
+  if (method === 'POST') {
+    $obj.attr('id', type + '_saving')
+  }
+  $obj.data('event_pending', true)
+  $obj.addClass('event_pending')
+  $.ajaxJSON(
+    url,
+    method,
+    data,
+    res => {
+      $obj.removeClass('event_pending')
+      $obj.removeClass('unsaved')
+      const obj = res[object_name]
+      if (method === 'POST') {
+        $obj.remove()
+        $(document).triggerHandler(type + '_added', res)
+      } else {
+        $(document).triggerHandler(type + '_updated', res)
+      }
+      $obj.fillTemplateData({
+        data: obj,
+        id: type + '_' + obj.id,
+        hrefValues: ['id', 'slug']
+      })
+      $obj.data('event_pending', false)
+      countObjects(type)
+    },
+    // error callback
+    (_res, xhr, _textStatus, _errorThrown) => {
+      $obj.removeClass('event_pending')
+      $obj.data('event_pending', false)
+      let name_message = I18n.t('errors.section_name_invalid', 'Section name is not valid')
+      if (xhr.name && xhr.name.length > 0 && xhr.name[0].message === 'too_long') {
+        name_message = I18n.t('errors.section_name_too_long', 'Section name is too long')
+      }
+      if ($obj.hasClass('unsaved')) {
+        /* eslint-disable-next-line no-alert */
+        alert(name_message)
+        $obj.remove()
+      } else {
+        // put back in "edit" mode
+        $obj.find('.edit_section_link').click()
+        $obj.find('#section_name').errorBox(name_message).css('z-index', 20)
+      }
+    },
+    // options
+    {skipDefaultError: true}
+  )
+  return true
+}
+function editObject($obj, type) {
+  const $name = $obj.find('.' + type + '_url')
+  let width = $name.outerWidth() - 30
+  if (type === 'page') {
+    width = 145
+  } else {
+    width = 145
+  }
+  const $box = $('#' + type + '_name_holder')
+  const $input = $('#' + type + '_name')
+  $input.width(width)
+  $name.hide().before($box)
+  $input.val($.trim($name.find('.name').text()))
+  $box.show()
+  $input.focus().select()
+}
+function countObjects(type) {
+  const cnt = $('#' + type + '_list .' + type + ':not(.unsaved)').length
+  if (cnt > 1) {
+    $('#' + type + '_list .remove_' + type + '_link').css('display', '')
+    $('#' + type + '_list .move_' + type + '_link').css('display', '')
+  } else {
+    $('#' + type + '_list .remove_' + type + '_link').hide()
+    $('#' + type + '_list .move_' + type + '_link').hide()
+  }
+}
+
 $(document).ready(function () {
   $('.portfolio_settings_link').click(event => {
     event.preventDefault()
@@ -649,9 +770,7 @@ $(document).ready(function () {
     })
   })
   $(document).blur(() => {})
-})
 
-$(document).ready(function () {
   $('.submission_list').instTree({
     multi: false,
     dragdrop: false
@@ -666,129 +785,7 @@ $(document).ready(function () {
       $(this).addClass('active')
     }
   })
-})
 
-function hideEditObject(type) {
-  const $box = $('#' + type + '_name_holder')
-  const $input = $('#' + type + '_name')
-  const val = $input.val()
-  const $obj = $box.parents('li.' + type)
-  $obj.find('.name').text(val)
-  if ($obj.parent('ul').length > 0) {
-    $box.hide().appendTo($('body'))
-    $obj.find('.' + type + '_url').show()
-  }
-  if ($obj.attr('id') === type + '_new') {
-    $obj.remove()
-  }
-}
-function saveObject($obj, type) {
-  const isSaving = $obj.data('event_pending')
-  if (isSaving || $obj.length === 0) {
-    return
-  }
-  let method = 'PUT'
-  let url = $obj.find('.rename_' + type + '_url').attr('href')
-  if ($obj.attr('id') === type + '_new') {
-    method = 'POST'
-    url = $('.add_' + type + '_url').attr('href')
-  }
-  const $objs = $obj.parents('ul').find('.' + type + ':not(.unsaved)')
-  let newName = $obj.find('#' + type + '_name').val()
-  $objs.each(function () {
-    if (this !== $obj[0] && $(this).find('.name').text() === newName) {
-      newName = ''
-    }
-  })
-  if (!newName) {
-    return false
-  }
-  let object_name = 'eportfolio_category'
-  if (type === 'page') {
-    object_name = 'eportfolio_entry'
-  }
-  const data = {}
-  data[object_name + '[name]'] = newName
-  if (type === 'page') {
-    data[object_name + '[eportfolio_category_id]'] = $('#eportfolio_category_id').text()
-  }
-  if (method === 'POST') {
-    $obj.attr('id', type + '_saving')
-  }
-  $obj.data('event_pending', true)
-  $obj.addClass('event_pending')
-  $.ajaxJSON(
-    url,
-    method,
-    data,
-    res => {
-      $obj.removeClass('event_pending')
-      $obj.removeClass('unsaved')
-      const obj = res[object_name]
-      if (method === 'POST') {
-        $obj.remove()
-        $(document).triggerHandler(type + '_added', res)
-      } else {
-        $(document).triggerHandler(type + '_updated', res)
-      }
-      $obj.fillTemplateData({
-        data: obj,
-        id: type + '_' + obj.id,
-        hrefValues: ['id', 'slug']
-      })
-      $obj.data('event_pending', false)
-      countObjects(type)
-    },
-    // error callback
-    (_res, xhr, _textStatus, _errorThrown) => {
-      $obj.removeClass('event_pending')
-      $obj.data('event_pending', false)
-      let name_message = I18n.t('errors.section_name_invalid', 'Section name is not valid')
-      if (xhr.name && xhr.name.length > 0 && xhr.name[0].message === 'too_long') {
-        name_message = I18n.t('errors.section_name_too_long', 'Section name is too long')
-      }
-      if ($obj.hasClass('unsaved')) {
-        /* eslint-disable-next-line no-alert */
-        alert(name_message)
-        $obj.remove()
-      } else {
-        // put back in "edit" mode
-        $obj.find('.edit_section_link').click()
-        $obj.find('#section_name').errorBox(name_message).css('z-index', 20)
-      }
-    },
-    // options
-    {skipDefaultError: true}
-  )
-  return true
-}
-function editObject($obj, type) {
-  const $name = $obj.find('.' + type + '_url')
-  let width = $name.outerWidth() - 30
-  if (type === 'page') {
-    width = 145
-  } else {
-    width = 145
-  }
-  const $box = $('#' + type + '_name_holder')
-  const $input = $('#' + type + '_name')
-  $input.width(width)
-  $name.hide().before($box)
-  $input.val($.trim($name.find('.name').text()))
-  $box.show()
-  $input.focus().select()
-}
-function countObjects(type) {
-  const cnt = $('#' + type + '_list .' + type + ':not(.unsaved)').length
-  if (cnt > 1) {
-    $('#' + type + '_list .remove_' + type + '_link').css('display', '')
-    $('#' + type + '_list .move_' + type + '_link').css('display', '')
-  } else {
-    $('#' + type + '_list .remove_' + type + '_link').hide()
-    $('#' + type + '_list .move_' + type + '_link').hide()
-  }
-}
-$(document).ready(function () {
   countObjects('page')
   $(document).bind('page_deleted', (event, data) => {
     if (!data) {
@@ -947,83 +944,81 @@ $(document).ready(function () {
         hideEditObject('page')
       }
     })
-})
 
-const $wizard_box = $('#wizard_box')
+  const $wizard_box = $('#wizard_box')
 
-function setWizardSpacerBoxDisplay(action) {
-  $('#wizard_spacer_box')
-    .height($wizard_box.height() || 0)
-    .showIf(action === 'show')
-}
+  function setWizardSpacerBoxDisplay(action) {
+    $('#wizard_spacer_box')
+      .height($wizard_box.height() || 0)
+      .showIf(action === 'show')
+  }
 
-const pathname = window.location.pathname
-$('.close_wizard_link').click(event => {
-  event.preventDefault()
-  userSettings.set('hide_wizard_' + pathname, true)
-
-  $wizard_box.slideUp('fast', () => {
-    $('.wizard_popup_link').slideDown('fast')
-    $('.wizard_popup_link').focus()
-    setWizardSpacerBoxDisplay('hide')
-  })
-})
-
-$('.wizard_popup_link').click(event => {
-  event.preventDefault()
-  $('.wizard_popup_link').slideUp('fast')
-  $wizard_box.slideDown('fast', () => {
-    $wizard_box.triggerHandler('wizard_opened')
-    $wizard_box.focus()
-    $([document, window]).triggerHandler('scroll')
-  })
-})
-
-if ($wizard_box.length) {
-  $wizard_box.bind('wizard_opened', () => {
-    const $wizard_options = $wizard_box.find('.wizard_options'),
-      height = $wizard_options.height()
-    $wizard_options.height(height)
-    $wizard_box.find('.wizard_details').css({
-      maxHeight: height - 5,
-      overflow: 'auto'
-    })
-    setWizardSpacerBoxDisplay('show')
-  })
-
-  $wizard_box.find('.wizard_options_list .option').click(function (event) {
-    const $this = $(this)
-    const $a = $(event.target).closest('a')
-    if ($a.length > 0 && $a.attr('href') !== '#') {
-      return
-    }
+  const pathname = window.location.pathname
+  $('.close_wizard_link').click(event => {
     event.preventDefault()
-    $this.parents('.wizard_options_list').find('.option.selected').removeClass('selected')
-    $this.addClass('selected')
-    const $details = $wizard_box.find('.wizard_details')
-    const data = $this.getTemplateData({textValues: ['header']})
-    data.link = data.header
-    $details.fillTemplateData({
-      data
-    })
-    $details.find('.details').remove()
-    $details.find('.header').after($this.find('.details').clone(true).show())
-    const url = $this.find('.header').attr('href')
-    if (url !== '#') {
-      $details.find('.link').show().attr('href', url)
-    } else {
-      $details.find('.link').hide()
-    }
-    $details.hide().fadeIn('fast')
-  })
-  setTimeout(() => {
-    if (!userSettings.get('hide_wizard_' + pathname)) {
-      $('.wizard_popup_link.auto_open:first').click()
-    }
-  }, 500)
-}
+    userSettings.set('hide_wizard_' + pathname, true)
 
-$(document).ready(function () {
+    $wizard_box.slideUp('fast', () => {
+      $('.wizard_popup_link').slideDown('fast')
+      $('.wizard_popup_link').focus()
+      setWizardSpacerBoxDisplay('hide')
+    })
+  })
+
+  $('.wizard_popup_link').click(event => {
+    event.preventDefault()
+    $('.wizard_popup_link').slideUp('fast')
+    $wizard_box.slideDown('fast', () => {
+      $wizard_box.triggerHandler('wizard_opened')
+      $wizard_box.focus()
+      $([document, window]).triggerHandler('scroll')
+    })
+  })
+
+  if ($wizard_box.length) {
+    $wizard_box.bind('wizard_opened', () => {
+      const $wizard_options = $wizard_box.find('.wizard_options'),
+        height = $wizard_options.height()
+      $wizard_options.height(height)
+      $wizard_box.find('.wizard_details').css({
+        maxHeight: height - 5,
+        overflow: 'auto'
+      })
+      setWizardSpacerBoxDisplay('show')
+    })
+
+    $wizard_box.find('.wizard_options_list .option').click(function (event) {
+      const $this = $(this)
+      const $a = $(event.target).closest('a')
+      if ($a.length > 0 && $a.attr('href') !== '#') {
+        return
+      }
+      event.preventDefault()
+      $this.parents('.wizard_options_list').find('.option.selected').removeClass('selected')
+      $this.addClass('selected')
+      const $details = $wizard_box.find('.wizard_details')
+      const data = $this.getTemplateData({textValues: ['header']})
+      data.link = data.header
+      $details.fillTemplateData({
+        data
+      })
+      $details.find('.details').remove()
+      $details.find('.header').after($this.find('.details').clone(true).show())
+      const url = $this.find('.header').attr('href')
+      if (url !== '#') {
+        $details.find('.link').show().attr('href', url)
+      } else {
+        $details.find('.link').hide()
+      }
+      $details.hide().fadeIn('fast')
+    })
+    setTimeout(() => {
+      if (!userSettings.get('hide_wizard_' + pathname)) {
+        $('.wizard_popup_link.auto_open:first').click()
+      }
+    }, 500)
+  }
+
   countObjects('section')
   $(document).bind('section_deleted', (event, data) => {
     const category = data.eportfolio_category
