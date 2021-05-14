@@ -735,6 +735,11 @@ describe CoursesController do
       expect(controller.js_env[:MSFT_SYNC_ENABLED]).to eq false
     end
 
+    it 'sets MSFT_SYNC_CAN_BYPASS_COOLDOWN in the JS ENV' do
+      subject
+      expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to eq false
+    end
+
     it 'sets the external tools create url' do
       user_session(@teacher)
       get 'settings', params: {:course_id => @course.id}

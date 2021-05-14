@@ -1464,7 +1464,8 @@ class CoursesController < ApplicationController
         RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
         PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers],
         MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown,
-        MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled]
+        MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled],
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?
       })
 
       set_tutorial_js_env
