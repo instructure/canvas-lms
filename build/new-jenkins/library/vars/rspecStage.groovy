@@ -50,19 +50,19 @@ def createDistribution(nestedStages) {
   rspecNodeTotal.times { index ->
     extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks([onNodeAcquired: setupNodeHook])
+      .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
       .timeout(15)
-      .queue(nestedStages) { rspec.runSuite('rspec') }
+      .queue(nestedStages) { rspec.runSuite() }
   }
 
   seleniumNodeTotal.times { index ->
     extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks([onNodeAcquired: setupNodeHook])
+      .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
       .timeout(15)
-      .queue(nestedStages) { rspec.runSuite('selenium') }
+      .queue(nestedStages) { rspec.runSuite() }
     }
 }
 
@@ -74,4 +74,51 @@ def setupNode() {
   }
 
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+}
+
+def tearDownNode(prefix) {
+  sh 'rm -rf ./tmp && mkdir -p tmp'
+  sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
+  sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
+
+  if (configuration.getBoolean('upload-docker-logs', 'false')) {
+    sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log"
+    archiveArtifacts(artifacts: "tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log")
+  }
+
+  archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
+  findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
+    // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+    // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+
+    def pathCategory = file.getPath().split('/')[5]
+    def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
+    def splitPath = file.getPath().split('/').toList()
+    def specTitle = splitPath.subList(6, splitPath.size() - 1).join('/')
+    def artifactsPath = "../artifact/${file.getPath()}"
+
+    buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
+
+    if (pathCategory == finalCategory) {
+      buildSummaryReport.setFailureCategory(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_NEVER_PASSED)
+    } else {
+      buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
+    }
+  }
+
+  // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
+  def preStatus = currentBuild.rawBuild.@result
+
+  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml'
+
+  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
+    currentBuild.rawBuild.@result = preStatus
+  }
+
+  if (env.RSPEC_LOG == '1') {
+    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
+    archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
+  }
+
+  sh 'rm -rf ./tmp'
 }
