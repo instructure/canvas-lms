@@ -123,21 +123,57 @@ def tearDownNode(prefix) {
   sh 'rm -rf ./tmp'
 }
 
-def runSuite() {
-  try {
-    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
-  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas_") )
-        for i in "${ids[@]}"
-        do
-          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-        done
-      '''
-    }
+def runSuite(stageConfig) {
+  def threadStages = [:]
 
-    throw e
+  (env.RSPEC_PROCESSES as Integer).times { index ->
+    def baseStageName = "${stageConfig.name} - Thread ${index}"
+
+    extendedStage(baseStageName).queue(threadStages) {
+      def currentAttempt = 0
+      def maxAttempts = env.RERUNS_RETRY as Integer
+      def errorContextBasePathPrefix = '/usr/src/app/log/spec_failures/'
+
+      while (currentAttempt <= maxAttempts) {
+        def attemptName = currentAttempt == 0 ? 'Initial' : "Rerun_${currentAttempt}"
+        def rerunSuffix = currentAttempt == 0 ? '' : 'only-failures'
+
+        extendedStage("${baseStageName} - Attempt ${currentAttempt + 1}")
+          .envVars(["ERROR_CONTEXT_BASE_PATH=${errorContextBasePathPrefix}${attemptName}"])
+          .execute { innerStageConfig ->
+            buildSummaryReport.setStageGroup(innerStageConfig.name, baseStageName, attemptName)
+
+            def cmdStatus = sh(
+              script: """
+                docker-compose exec -T -e ERROR_CONTEXT_BASE_PATH -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c 'build/new-jenkins/rspec-tests.sh ${index} ${rerunSuffix}'
+              """,
+              label: 'Run Tests',
+              returnStatus: true
+            )
+
+            if (cmdStatus == 0) {
+              // If a retry passes, the preceding attempts need to be ignored by the build summary report to prevent
+              // intermittent failures from appearing in the Stage Failures section.
+              while (currentAttempt-- > 0) {
+                buildSummaryReport.setStageIgnored("${baseStageName} - Attempt ${currentAttempt + 1}")
+              }
+
+              currentAttempt = maxAttempts + 1
+            } else if (cmdStatus != 1) {
+              error "rspecStage: test failed with unexpected error code: ${cmdStatus}"
+            } else if (currentAttempt < maxAttempts) {
+              catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                error "rspecStage: test run failed with retries remaining: ${maxAttempts - currentAttempt}"
+              }
+
+              currentAttempt = currentAttempt + 1
+            } else {
+              error 'rspecStage: test run failed with no retries remaining'
+            }
+          }
+      }
+    }
   }
+
+  parallel(threadStages)
 }

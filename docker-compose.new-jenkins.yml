@@ -22,6 +22,7 @@ services:
       # parallel_tests
       CI_NODE_TOTAL:
       CI_NODE_INDEX:
+      ERROR_CONTEXT_BASE_PATH:
       RSPEC_PROCESSES:
       EXCLUDE_TESTS:
       TEST_PATTERN:
