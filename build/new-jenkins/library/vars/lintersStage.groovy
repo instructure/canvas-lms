@@ -122,3 +122,10 @@ def yarnStage() {
     error 'lintersStage: force failing due to flag'
   }
 }
+
+def groovyStage() {
+  sh '''docker run $LINTERS_RUNNER_IMAGE \
+    npx npm-groovy-lint --path "./build/new-jenkins/library/" \
+    --files "**/*.groovy" --config ".groovylintrc.json"  \
+    --loglevel info --failon info'''
+}

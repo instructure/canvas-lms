@@ -384,6 +384,7 @@ pipeline {
                 .timeout(2)
                 .execute { stageConfig ->
                   stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
+                  stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy'], 'HEAD^'))
                   stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
 
                   dir(env.LOCAL_WORKDIR) {
@@ -481,7 +482,7 @@ pipeline {
                 .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])
                 .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
                 .required(!configuration.isChangeMerged())
-                .execute {
+                .execute { stageConfig, buildConfig ->
                   def nestedStages = [:]
 
                   extendedStage('Linters - Code')
@@ -497,6 +498,10 @@ pipeline {
                   extendedStage('Linters - Yarn')
                     .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                     .queue(nestedStages, lintersStage.&yarnStage)
+
+                  extendedStage('Linters - Groovy')
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('groovyFiles'))
+                    .queue(nestedStages, lintersStage.&groovyStage)
 
                   parallel(nestedStages)
                 }
