@@ -52,6 +52,7 @@ def createDistribution(nestedStages) {
       .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+      .timeout(15)
       .queue(nestedStages) { rspec.runSuite('rspec') }
   }
 
@@ -60,10 +61,17 @@ def createDistribution(nestedStages) {
       .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+      .timeout(15)
       .queue(nestedStages) { rspec.runSuite('selenium') }
     }
 }
 
 def setupNode() {
   distribution.unstashBuildScripts()
+
+  credentials.withStarlordDockerLogin { ->
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+  }
+
+  sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }

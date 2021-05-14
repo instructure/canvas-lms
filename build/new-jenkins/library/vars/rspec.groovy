@@ -19,14 +19,7 @@
 def runSuite(prefix) {
   withEnv([]) {
     try {
-      sh 'rm -rf ./tmp && mkdir -p tmp'
-      timeout(time: 15) {
-        credentials.withStarlordDockerLogin { ->
-          sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-        }
-        sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
-        sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
-      }
+      sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
     } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
         /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -41,15 +34,15 @@ def runSuite(prefix) {
 
       throw e
     } finally {
-      def index = env.CI_NODE_INDEX
+      sh 'rm -rf ./tmp && mkdir -p tmp'
 
       // copy spec failures to local
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
 
       if (configuration.getBoolean('upload-docker-logs', 'false')) {
-        sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${index}.log"
-        archiveArtifacts(artifacts: "tmp/docker-${prefix}-${index}.log")
+        sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log"
+        archiveArtifacts(artifacts: "tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log")
       }
 
       archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
