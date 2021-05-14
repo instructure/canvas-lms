@@ -20,11 +20,29 @@ import getCookie from 'get-cookie'
 
 const authenticity_token = () => getCookie('_csrf_token')
 
-$(document).on('submit', 'form', function() {
-  $(this)
-    .find('input[name="authenticity_token"]')
-    .val(authenticity_token())
-})
+const getHostname = function (href) {
+  const a = document.createElement('a')
+  a.href = href
+  return a.hostname
+}
+
+const isCrossSite = function (href) {
+  // eslint-disable-next-line no-restricted-globals
+  return getHostname(href) !== location.hostname
+}
+
+const injectTokenIntoLocalRequests = function () {
+  if (isCrossSite(this.action)) {
+    return
+  }
+
+  $(this).find('input[name="authenticity_token"]').val(authenticity_token())
+}
+
+$(document).on('submit', 'form', injectTokenIntoLocalRequests)
 
 // return a function to be used elsewhere
 export default authenticity_token
+
+// for testing
+export {isCrossSite}
