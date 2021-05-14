@@ -711,6 +711,9 @@
       end %>
       <h3 class="screenreader-only"><%= t('Enabled Links') %></h3>
       <ul id="nav_enabled_list" class="nav_list connectedSortable">
+        <li class="disabled" aria-hidden="true" style="height: 1px">
+          <%# This item is just here to serve as an anchor for dragging/dropping if all tabs are disabled %>
+        </li>
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
           <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
               id="nav_edit_tab_id_<%= tab[:id] %>"
