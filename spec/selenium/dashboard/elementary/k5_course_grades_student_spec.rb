@@ -136,6 +136,41 @@ describe "student k5 course grades tab" do
     end
   end
 
+  context 'assignment groups' do
+    before :once do
+      @subject_course.require_assignment_group
+      @ag1 = "AG 1"
+      @ag2 = "AG 2"
+      assignment_group1 = @subject_course.assignment_groups.create!(name: @ag1)
+      assignment_group2 = @subject_course.assignment_groups.create!(name: @ag2)
+      @assignment1 = create_and_submit_assignment(@subject_course, "Assignment 1", "a1d", 100)
+      @assignment2 = create_and_submit_assignment(@subject_course, "Assignment 2", "a2d", 100)
+      @assignment1.update!(assignment_group: assignment_group1)
+      @assignment2.update!(assignment_group: assignment_group2)
+    end
+
+    it 'shows different assignment groups for assignments in grades list' do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(grades_assignments_list[0]).to include_text(@ag1)
+      expect(grades_assignments_list[1]).to include_text(@ag2)
+    end
+
+    it 'can open assignments group dropdown and see assignment group-specific grades' do
+      @assignment1.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+      @assignment2.grade_student(@student, grader: @teacher, score: "60", points_deducted: 0)
+
+      get "/courses/#{@subject_course.id}#grades"
+
+      click_assignment_group_toggle
+
+      expect(assignment_group_totals.count).to eq 3
+      expect(assignment_group_totals[0]).to include_text("Assignments: n/a")
+      expect(assignment_group_totals[1]).to include_text("#{@ag1}: 90.00%")
+      expect(assignment_group_totals[2]).to include_text("#{@ag2}: 60.00%")
+    end
+  end
+
   context 'new grade indicator' do
     before :each do
       assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)

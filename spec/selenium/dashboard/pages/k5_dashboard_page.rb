@@ -360,6 +360,10 @@ module K5PageObject
     "[data-testid='new-grade-indicator']"
   end
 
+  def assignment_group_totals_selector
+    "[data-testid='assignment-group-totals']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -715,6 +719,14 @@ module K5PageObject
     f(new_grade_badge_selector)
   end
 
+  def assignment_group_toggle
+    f(assignment_group_toggle_selector)
+  end
+
+  def assignment_group_totals
+    ff(assignment_group_totals_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -848,6 +860,10 @@ module K5PageObject
 
   def click_pink_color_button
     pink_color_button.click
+  end
+
+  def click_assignment_group_toggle
+    assignment_group_toggle.click
   end
 
   #------------------------------Retrieve Text----------------------#

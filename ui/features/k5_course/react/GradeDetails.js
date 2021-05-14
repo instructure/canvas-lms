@@ -141,7 +141,12 @@ const GradeDetails = ({
               summary={I18n.t('View Assignment Group Totals')}
             >
               {assignmentGroupTotals.map(group => (
-                <Text as="div" margin="small 0" key={group.id}>
+                <Text
+                  data-testid="assignment-group-totals"
+                  as="div"
+                  margin="small 0"
+                  key={group.id}
+                >
                   {I18n.t('%{groupName}: %{score}', {groupName: group.name, score: group.score})}
                 </Text>
               ))}
