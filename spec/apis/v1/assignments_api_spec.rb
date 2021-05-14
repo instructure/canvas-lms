@@ -3235,6 +3235,21 @@ describe AssignmentsApiController, type: :request do
         )
         expect(@assignment.reload.annotatable_attachment_id).to be_nil
       end
+
+      it "does not remove the assignment's annotatable_attachment_id when submission_types is not a param" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        expect {
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+            endpoint_params,
+            { assignment: { name: "unrelated change to attachment" } }
+          )
+        }.not_to change {
+          @assignment.reload.annotatable_attachment_id
+        }
+      end
     end
 
     describe 'final_grader_id' do
