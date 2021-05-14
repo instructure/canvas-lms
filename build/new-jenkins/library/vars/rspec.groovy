@@ -16,24 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def runSeleniumSuite(total, index) {
-  _runRspecTestSuite(
-      index,
-      'selenium'
-  )
-}
-
-def runRSpecSuite(total, index) {
-  _runRspecTestSuite(
-      index,
-      'rspec'
-  )
-}
-
-def _runRspecTestSuite(
-    index,
-    prefix
-) {
+def runSuite(prefix) {
   withEnv([]) {
     try {
       sh 'rm -rf ./tmp && mkdir -p tmp'
@@ -57,6 +40,8 @@ def _runRspecTestSuite(
 
       throw e
     } finally {
+      def index = env.CI_NODE_INDEX
+
       // copy spec failures to local
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'

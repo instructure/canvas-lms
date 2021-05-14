@@ -52,7 +52,7 @@ def createDistribution(nestedStages) {
       .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
-      .queue(nestedStages) { unitStage(rspecNodeTotal, index) }
+      .queue(nestedStages) { rspec.runSuite('rspec') }
   }
 
   seleniumNodeTotal.times { index ->
@@ -60,18 +60,10 @@ def createDistribution(nestedStages) {
       .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
-      .queue(nestedStages) { seleniumStage(seleniumNodeTotal, index) }
+      .queue(nestedStages) { rspec.runSuite('selenium') }
     }
 }
 
 def setupNode() {
   distribution.unstashBuildScripts()
-}
-
-def seleniumStage(seleniumNodeTotal, index) {
-  rspec.runSeleniumSuite(seleniumNodeTotal, index)
-}
-
-def unitStage(rspecNodeTotal, index) {
-  rspec.runRSpecSuite(rspecNodeTotal, index)
 }
