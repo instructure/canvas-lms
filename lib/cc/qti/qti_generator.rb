@@ -61,7 +61,10 @@ module CC
           end
         end
 
-        Quizzes::ScopedToUser.new(@course, @user, @course.quizzes.active).scope.each do |quiz|
+        scope = @course.quizzes.active
+        # @user is nil if it's kicked off by the system, like a course template
+        scope = Quizzes::ScopedToUser.new(@course, @user, @course.quizzes.active).scope if @user
+        scope.each do |quiz|
           next unless export_object?(quiz) || export_object?(quiz.assignment)
           next if @user && !@course.grants_right?(@user, :read_as_admin) && quiz.locked_for?(@user, check_policies: true)
 
