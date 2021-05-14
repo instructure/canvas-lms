@@ -156,7 +156,10 @@ module Api::V1::Attachment
       url_opts = {
         annotate: 0
       }
-      url_opts[:verifier] = attachment.uuid unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
+      omit_verifier = options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
+      if downloadable && !omit_verifier
+        url_opts[:verifier] = attachment.uuid
+      end
       hash['preview_url'] = context_url(attachment.context, :context_file_file_preview_url, attachment, url_opts)
     end
     if includes.include? 'usage_rights'
