@@ -4497,7 +4497,7 @@ hu:
         unfulfilled: Beküldés
     module_locked: Zárolt
     module_started: Folyamatban
-    module_unlocked: Befejezetlen
+    module_unlocked: Megkezdetlen
     optgroup: 
       assignments: Feladatok
       discussion_topics: Fórumok
@@ -4869,6 +4869,7 @@ hu:
   course_calendar_7d3cba7b: Kurzusnaptár
   course_calendar_add_edit_delete_events_76b97c04: "Kurzus Naptár - események hozzáadása / szerkesztése / törlése"
   course_canvas_id_9e36b24c: "Canvas kurzusazonosító"
+  course_card_image_5285f1bf: "Kurzuskártya képe"
   course_catalog_4cc7c8ce: Kurzuskatalógus
   course_collaborations_dadb327e: "Kurzus Együttműködés"
   course_conferences_3d914c96: Kurzuskonferenciák
