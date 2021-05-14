@@ -49,12 +49,7 @@ module Lti
         expect(described_class.valid_placements(Account.default)).to include(:conference_selection)
       end
 
-      it 'does not include submission_type_selection when FF disabled' do
-        expect(described_class.valid_placements(Account.default)).not_to include(:submission_type_selection)
-      end
-
       it 'includes submission_type_selection when FF enabled' do
-        Account.default.enable_feature!(:submission_type_tool_placement)
         expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
       end
     end

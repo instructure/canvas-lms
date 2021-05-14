@@ -20,13 +20,6 @@ bookmarking_for_enrollments_index:
   applies_to: RootAccount
   display_name: Bookmarking for Enrollments Index API
   description: Use bookmarking for API pagination in Enrollments Index
-submission_type_tool_placement:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Submission Type LTI Placement
-  description: |-
-    If an LTI tool configured with the placement is installed, will show a new entry in the
-    assignment submission type dropdown to quickly configure the assignment for the tool
 new_math_equation_handling:
   state: hidden
   display_name: 'Math: Updated equation handling'
