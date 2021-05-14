@@ -31,7 +31,7 @@ const textAreaProps = {
   resize: 'vertical'
 }
 
-export default function CommentArea({getTextAreaRef, courseId}) {
+export default function CommentArea({getTextAreaRef, courseId, userId}) {
   const [comment, setComment] = useState('')
   const textAreaRef = useRef()
   const showCommentLibrary = ENV.assignment_comment_library_feature_enabled
@@ -44,7 +44,12 @@ export default function CommentArea({getTextAreaRef, courseId}) {
   return (
     <>
       {showCommentLibrary && (
-        <CommentLibrary textAreaRef={textAreaRef} setComment={setComment} courseId={courseId} />
+        <CommentLibrary
+          textAreaRef={textAreaRef}
+          setComment={setComment}
+          courseId={courseId}
+          userId={userId}
+        />
       )}
       <TextArea
         value={comment}
@@ -58,5 +63,6 @@ export default function CommentArea({getTextAreaRef, courseId}) {
 
 CommentArea.propTypes = {
   getTextAreaRef: PropTypes.func.isRequired,
-  courseId: PropTypes.string.isRequired
+  courseId: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired
 }

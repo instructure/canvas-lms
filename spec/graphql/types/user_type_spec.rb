@@ -514,4 +514,49 @@ describe Types::UserType do
       expect(result).to match_array([@group.id.to_s])
     end
   end
+
+  context 'CommentBankItemsConnection' do
+    before do
+      @comment_bank_item = comment_bank_item_model(user: @teacher, context: @course, comment: 'great comment!')
+    end
+
+    let(:type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it 'returns comment bank items for the queried user' do
+      expect(
+        type.resolve('commentBankItemsConnection { nodes { _id } }')
+      ).to eq [@comment_bank_item.id.to_s]
+    end
+
+    describe 'with a search query' do
+      before do
+        @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: 'new comment!')
+      end
+
+      it 'returns results that match the query' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"new\") { nodes { _id } }").length
+        ).to eq 1
+      end
+
+      it 'strips leading/trailing white space' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"    new   \") { nodes { _id } }").length
+        ).to eq 1
+      end
+
+      it 'does not query results if query.strip is blank' do
+        expect(
+          type.resolve("commentBankItemsConnection(query: \"  \") { nodes { _id } }").length
+        ).to eq 2
+      end
+    end
+  end
 end

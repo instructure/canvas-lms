@@ -27,10 +27,10 @@ import {COMMENTS_QUERY} from './graphql/Queries'
 import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
 
-const LibraryManager = ({setComment, courseId, textAreaRef}) => {
+const LibraryManager = ({setComment, courseId, textAreaRef, userId}) => {
   const [removedItemIndex, setRemovedItemIndex] = useState(null)
   const {loading, error, data} = useQuery(COMMENTS_QUERY, {
-    variables: {courseId}
+    variables: {userId}
   })
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
       JSON.stringify(
         cache.readQuery({
           query: COMMENTS_QUERY,
-          variables: {courseId}
+          variables: {userId}
         })
       )
     )
@@ -56,7 +56,7 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
   const writeComments = (cache, comments) => {
     cache.writeQuery({
       query: COMMENTS_QUERY,
-      variables: {courseId},
+      variables: {userId},
       data: comments
     })
   }
@@ -64,14 +64,14 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
   const removeDeletedCommentFromCache = (cache, result) => {
     const commentsFromCache = getCachedComments(cache)
     const resultId = result.data.deleteCommentBankItem.commentBankItemId
-    const removedIndex = commentsFromCache.course.commentBankItemsConnection.nodes.findIndex(
+    const removedIndex = commentsFromCache.legacyNode.commentBankItemsConnection.nodes.findIndex(
       comment => comment._id === resultId
     )
-    const updatedComments = commentsFromCache.course.commentBankItemsConnection.nodes.filter(
+    const updatedComments = commentsFromCache.legacyNode.commentBankItemsConnection.nodes.filter(
       (_comment, index) => index !== removedIndex
     )
 
-    commentsFromCache.course.commentBankItemsConnection.nodes = updatedComments
+    commentsFromCache.legacyNode.commentBankItemsConnection.nodes = updatedComments
     writeComments(cache, commentsFromCache)
     setRemovedItemIndex(removedIndex)
   }
@@ -80,11 +80,11 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
     const commentsFromCache = getCachedComments(cache)
     const newComment = result.data.createCommentBankItem.commentBankItem
     const updatedComments = [
-      ...commentsFromCache.course.commentBankItemsConnection.nodes,
+      ...commentsFromCache.legacyNode.commentBankItemsConnection.nodes,
       newComment
     ]
 
-    commentsFromCache.course.commentBankItemsConnection.nodes = updatedComments
+    commentsFromCache.legacyNode.commentBankItemsConnection.nodes = updatedComments
     writeComments(cache, commentsFromCache)
   }
 
@@ -143,12 +143,11 @@ const LibraryManager = ({setComment, courseId, textAreaRef}) => {
 
   return (
     <Library
-      comments={data?.course?.commentBankItemsConnection?.nodes || []}
+      comments={data?.legacyNode?.commentBankItemsConnection?.nodes || []}
       setComment={handleSetComment}
       onAddComment={handleAddComment}
       onDeleteComment={id => deleteComment({variables: {id}})}
       isAddingComment={isAddingComment}
-      courseId={courseId}
       removedItemIndex={removedItemIndex}
     />
   )
@@ -159,7 +158,8 @@ LibraryManager.propTypes = {
   courseId: PropTypes.string.isRequired,
   textAreaRef: shape({
     current: instanceOf(Element)
-  }).isRequired
+  }).isRequired,
+  userId: PropTypes.string.isRequired
 }
 
 export default LibraryManager
