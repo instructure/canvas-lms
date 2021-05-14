@@ -125,7 +125,7 @@ pipeline {
 
                       // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
                       // which means we don't think we can retry, so just let it die.
-                      sh 'docker-compose logs pulsar | grep "zoo keeper disconnected"'
+                      sh "docker-compose logs pulsar | grep \"zoo keeper disconnected\\|Failed to get Partitioned Metadata\""
 
                       reportToSplunk('pulsar_retrying')
                       sh '''
