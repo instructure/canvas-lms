@@ -172,14 +172,13 @@ describe "student k5 course grades tab" do
   end
 
   context 'new grade indicator' do
-    before :each do
+    it 'shows new grade indicator the first time the grades tab is accessed after grading', custom_timeout: 25 do
+      get "/courses/#{@subject_course.id}#grades"
+      # Doing the get first, then creating the assignment and refreshing to get around a weird Jenkins
+      # quirk that seems to be refreshing the page automatically on occasion.
       assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)
       assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
-    end
-
-    it 'shows new grade indicator the first time the grades tab is accessed after grading' do
-      skip("LS-2224 skip because sometimes (a lot of times?) the page seems to refresh and the indicator goes away")
-      get "/courses/#{@subject_course.id}#grades"
+      refresh_page
 
       expect(new_grade_badge).to be_displayed
     end
