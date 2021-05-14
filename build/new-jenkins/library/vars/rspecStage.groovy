@@ -53,7 +53,7 @@ def createDistribution(nestedStages) {
       .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
       .timeout(15)
-      .queue(nestedStages) { rspec.runSuite() }
+      .queue(nestedStages, this.&runSuite)
   }
 
   seleniumNodeTotal.times { index ->
@@ -62,7 +62,7 @@ def createDistribution(nestedStages) {
       .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
       .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
       .timeout(15)
-      .queue(nestedStages) { rspec.runSuite() }
+      .queue(nestedStages, this.&runSuite)
     }
 }
 
@@ -121,4 +121,23 @@ def tearDownNode(prefix) {
   }
 
   sh 'rm -rf ./tmp'
+}
+
+def runSuite() {
+  try {
+    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      /* groovylint-disable-next-line GStringExpressionWithinString */
+      sh '''#!/bin/bash
+        ids=( $(docker ps -aq --filter "name=canvas_") )
+        for i in "${ids[@]}"
+        do
+          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+        done
+      '''
+    }
+
+    throw e
+  }
 }
