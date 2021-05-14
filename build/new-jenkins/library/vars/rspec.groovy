@@ -29,6 +29,7 @@ def runSuite(prefix) {
       }
     } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+        /* groovylint-disable-next-line GStringExpressionWithinString */
         sh '''#!/bin/bash
           ids=( $(docker ps -aq --filter "name=canvas_") )
           for i in "${ids[@]}"
