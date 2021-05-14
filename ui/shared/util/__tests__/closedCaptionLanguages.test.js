@@ -17,12 +17,9 @@
  */
 
 describe('closedCaptionLanguages', () => {
-  it('has extended languages when expand_cc_languages feature is on', () => {
-    global.ENV.FEATURES = {
-      expand_cc_languages: true
-    }
+  it('has extended CC languages', () => {
     return import('../closedCaptionLanguages').then(cclanguages => {
-      // spot check expected changed
+      // spot check some expected changes
       expect(cclanguages.default.he).toEqual('Hebrew')
       expect(cclanguages.default['zh-Hant']).toEqual('Chinese Traditional')
       expect(cclanguages.default['en-GB']).toEqual('English (United Kingdom)')

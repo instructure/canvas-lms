@@ -39,12 +39,6 @@ const closedCaptionLanguages = {
   get zh() {
     return I18n.t('Chinese')
   },
-  get 'zh-cn'() {
-    return I18n.t('Chinese Simplified')
-  },
-  get 'zh-tw'() {
-    return I18n.t('Chinese Traditional')
-  },
   get hr() {
     return I18n.t('Croatian')
   },
@@ -83,9 +77,6 @@ const closedCaptionLanguages = {
   },
   get ht() {
     return I18n.t('Haitian Creole')
-  },
-  get iw() {
-    return I18n.t('Hebrew')
   },
   get hi() {
     return I18n.t('Hindi')
@@ -182,92 +173,42 @@ const closedCaptionLanguages = {
   },
   get yi() {
     return I18n.t('Yiddish')
+  },
+  get 'en-CA'() {
+    return I18n.t('English (Canada)')
+  },
+  // added when we expanded CC languages to all
+  // those supported in canvas
+  get 'en-AU'() {
+    return I18n.t('English (Australia)')
+  },
+  get 'en-GB'() {
+    return I18n.t('English (United Kingdom)')
+  },
+  get 'fr-CA'() {
+    return I18n.t('French (Canada)')
+  },
+  get he() {
+    return I18n.t('Hebrew')
+  },
+  get hy() {
+    return I18n.t('Armenian')
+  },
+  get mi() {
+    return I18n.t('Māori (New Zealand)')
+  },
+  get nb() {
+    return I18n.t('Norwegian Bokmål')
+  },
+  get nn() {
+    return I18n.t('Norwegian Nynorsk')
+  },
+  get 'zh-Hans'() {
+    return I18n.t('Chinese Simplified')
+  },
+  get 'zh-Hant'() {
+    return I18n.t('Chinese Traditional')
   }
-}
-
-if (ENV.FEATURES?.expand_cc_languages) {
-  Object.defineProperties(closedCaptionLanguages, {
-    'en-CA': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('English (Canada)')
-      }
-    },
-    'en-AU': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('English (Australia)')
-      }
-    },
-    'en-GB': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('English (United Kingdom)')
-      }
-    },
-    'fr-CA': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('French (Canada)')
-      }
-    },
-    he: {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Hebrew')
-      }
-    },
-    hy: {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Armenian')
-      }
-    },
-    mi: {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Māori (New Zealand)')
-      }
-    },
-    nb: {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Norwegian Bokmål')
-      }
-    },
-    nn: {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Norwegian Nynorsk')
-      }
-    },
-    'zh-Hans': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Chinese Simplified')
-      }
-    },
-    'zh-Hant': {
-      configurable: false,
-      enumerable: true,
-      get() {
-        return I18n.t('Chinese Traditional')
-      }
-    }
-  })
-  delete closedCaptionLanguages['zh-cn']
-  delete closedCaptionLanguages['zh-tw']
-  delete closedCaptionLanguages.iw
 }
 
 export default closedCaptionLanguages
