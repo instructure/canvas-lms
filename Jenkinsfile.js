@@ -19,6 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 def COFFEE_NODE_COUNT = 4
 def DEFAULT_NODE_COUNT = 1
@@ -42,15 +43,6 @@ def makeKarmaStage(group, ciNode, ciTotal) {
       } finally {
         copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
       }
-    }
-  }
-}
-
-def cleanupFn() {
-  timeout(time: 2) {
-    if(env.TEST_SUITE != 'upload') {
-      archiveArtifacts artifacts: 'tmp/**/*.xml'
-      junit "tmp/**/*.xml"
     }
   }
 }
@@ -81,27 +73,13 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
-            stage('Setup') {
-              timeout(time: 3) {
-                sh 'rm -vrf ./tmp/*'
-                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+          def stageHooks = [
+            onNodeAcquired: jsStage.&setupNode,
+            onNodeReleasing: jsStage.&tearDownNode,
+          ]
 
-                checkoutRepo("canvas-lms", refspecToCheckout, 1)
-
-                credentials.withStarlordDockerLogin { ->
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
-                }
-              }
-            }
-
-            def postBuildHandler = [
-              onStageEnded: { _ ->
-                cleanupFn()
-              }
-            ]
-
-            extendedStage('Run Tests').hooks(postBuildHandler).obeysAllowStages(false).execute {
+          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
+            extendedStage('Run Tests').obeysAllowStages(false).execute {
               timeout(time: 10) {
                 script {
                   def tests = [:]
