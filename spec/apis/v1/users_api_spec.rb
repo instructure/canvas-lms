@@ -389,6 +389,8 @@ describe Api::V1::User do
     let(:course) { Course.create! }
     let(:student_enrollment) { course_with_user("StudentEnrollment", course: course, active_all: true) }
     let(:student) { student_enrollment.user }
+    let(:enrollment_json) { @test_api.enrollment_json(student_enrollment, subject, nil) }
+    let(:grades) { enrollment_json.fetch("grades") }
 
     before(:each) do
       course.enable_feature!(:final_grades_override)
@@ -396,8 +398,20 @@ describe Api::V1::User do
       @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73, override_score: 99)
     end
 
+    context "when user is a classmate" do
+      let(:subject) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
+
+      it "excludes activity data for other students" do
+        expect(enrollment_json).not_to include('last_activity_at', 'last_attended_at', 'total_activity_time')
+      end
+    end
+
     context "when user is the student" do
-      let(:grades) { @test_api.enrollment_json(student_enrollment, student, nil).fetch("grades") }
+      let(:subject) { student }
+
+      it "includes student's own activity data" do
+        expect(enrollment_json).to include('last_activity_at', 'last_attended_at', 'total_activity_time')
+      end
 
       context "when Final Grade Override is enabled and allowed" do
         context "when a grade override exists" do
@@ -495,8 +509,11 @@ describe Api::V1::User do
     end
 
     context "when user is a teacher" do
-      let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
-      let(:grades) { @test_api.enrollment_json(student_enrollment, teacher, nil).fetch("grades") }
+      let(:subject) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+
+      it "includes activity data" do
+        expect(enrollment_json).to include('last_activity_at', 'last_attended_at', 'total_activity_time')
+      end
 
       context "when Final Grade Override is enabled and allowed" do
         context "when a grade override exists" do
