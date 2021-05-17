@@ -123,4 +123,36 @@ describe Types::DiscussionEntryType do
       expect(discussion_entry_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
     end
   end
+
+  describe "forced_read_state attribute" do
+    context "forced_read_state is nil" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:nil})
+      end
+
+      it 'returns false' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+      end
+    end
+
+    context "forced_read_state is false" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:false})
+      end
+
+      it 'returns false' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+      end
+    end
+
+    context "forced_read_state is true" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:true})
+      end
+      
+      it 'returns true' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be true
+      end
+    end
+  end
 end

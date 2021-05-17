@@ -48,6 +48,13 @@ module Types
       end
     end
 
+    field :forced_read_state, Boolean, null: true
+    def forced_read_state
+      Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
+        !!deps.find_by(user: current_user)&.forced_read_state
+      end
+    end
+
     field :author, Types::UserType, null: false
     def author
       load_association(:user)

@@ -29,6 +29,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
   argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
   argument :read, Boolean, required: false
   argument :rating, RatingInputType, required: false
+  argument :forced_read_state, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: false
   def resolve(input:)
@@ -36,7 +37,8 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
     raise GraphQL::ExecutionError, "not found" unless discussion_entry.grants_right?(current_user, session, :read)
 
     unless input[:read].nil?
-      input[:read] ? discussion_entry.change_read_state('read', current_user) : discussion_entry.change_read_state('unread', current_user)
+      opt = input[:forced_read_state].nil? ? {} : {forced:input[:forced_read_state]}
+      input[:read] ? discussion_entry.change_read_state('read', current_user, opt) : discussion_entry.change_read_state('unread', current_user, opt)
     end
 
     unless input[:rating].nil?
