@@ -105,6 +105,11 @@ module Types
       end
     end
 
+    field :group_set, Types::GroupSetType, null: true
+    def group_set
+      load_association(:group_category)
+    end
+
     field :author, Types::UserType, null: true
     def author
       load_association(:user)

@@ -186,6 +186,10 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
   end
 
+  it "has a group_set" do
+    expect(discussion_type.resolve('groupSet { name }')).to eq "category"
+  end
+
   context 'graded discussion' do
     it 'allows querying the assignment type on a discussion' do
       Assignment::ALLOWED_GRADING_TYPES.each do |grading_type|
