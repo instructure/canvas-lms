@@ -63,5 +63,30 @@ module Types
     def view_rating
       object[:discussion_entry].discussion_topic.allow_rating && !object[:discussion_entry].deleted?
     end
+
+    field :speed_grader, Boolean, null: true
+    def speed_grader
+      topic = object[:discussion_entry].discussion_topic
+      return false if topic.assignment_id.nil?
+
+      Promise.all([
+        Loaders::AssociationLoader.for(Course, :enrollment_term).load(topic.context),
+        Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(topic)
+      ]).then do
+        small_roster_and_published = !topic.context.large_roster? && topic.assignment.published?
+        course_permission_loader = Loaders::PermissionsLoader.for(topic.context, current_user: current_user, session: session)
+        if topic.context.concluded?
+          course_permission_loader.load(:read_as_admin).then do |read_as_admin|
+            small_roster_and_published && read_as_admin
+          end
+        else
+          course_permission_loader.load(:manage_grades).then do |manage_grades|
+            course_permission_loader.load(:view_all_grades).then do |view_all_grades|
+              small_roster_and_published && (manage_grades || view_all_grades)
+            end
+          end
+        end
+      end
+    end
   end
 end

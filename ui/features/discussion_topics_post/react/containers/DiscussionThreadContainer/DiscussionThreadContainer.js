@@ -42,7 +42,6 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {
-  isGraded,
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   addReplyToSubentries,
@@ -265,10 +264,6 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  // TODO: Change this to the new canGrade permission.
-  const canGrade =
-    (isGraded(props.assignment) && props.discussionEntry.permissions?.update) || false
-
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
     if (!props.discussionEntry.read) {
@@ -311,7 +306,7 @@ export const DiscussionThreadContainer = props => {
                     : null
                 }
                 onOpenInSpeedGrader={
-                  canGrade
+                  props.discussionEntry.permissions?.speedGrader
                     ? () => {
                         window.location.assign(
                           getSpeedGraderUrl(
