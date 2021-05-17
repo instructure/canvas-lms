@@ -44,7 +44,8 @@ const GradeDetails = ({
   selectedGradingPeriodId,
   showTotals,
   currentUser,
-  loadingGradingPeriods
+  loadingGradingPeriods,
+  userIsInstructor
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -112,7 +113,7 @@ const GradeDetails = ({
   }
 
   return !loadingAssignmentGroups && grades?.length === 0 ? (
-    <GradesEmptyPage userIsInstructor={false} courseId={courseId} />
+    <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
   ) : (
     <>
       {showTotals && (
@@ -179,7 +180,8 @@ GradeDetails.propTypes = {
   selectedGradingPeriodId: PropTypes.string,
   showTotals: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
-  loadingGradingPeriods: PropTypes.bool.isRequired
+  loadingGradingPeriods: PropTypes.bool.isRequired,
+  userIsInstructor: PropTypes.bool.isRequired
 }
 
 export default GradeDetails

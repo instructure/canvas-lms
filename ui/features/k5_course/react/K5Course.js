@@ -214,6 +214,7 @@ export function K5Course({
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
+  userIsStudent,
   userIsInstructor,
   showStudentView,
   studentViewPath,
@@ -322,6 +323,7 @@ export function K5Course({
             courseName={name}
             hideFinalGrades={hideFinalGrades}
             currentUser={currentUser}
+            userIsStudent={userIsStudent}
             userIsInstructor={userIsInstructor}
             showLearningMasteryGradebook={showLearningMasteryGradebook}
             outcomeProficiency={outcomeProficiency}
@@ -349,6 +351,7 @@ K5Course.propTypes = {
   courseOverview: PropTypes.string.isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
+  userIsStudent: PropTypes.bool.isRequired,
   userIsInstructor: PropTypes.bool.isRequired,
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,

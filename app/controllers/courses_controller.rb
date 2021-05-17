@@ -2092,7 +2092,7 @@ class CoursesController < ApplicationController
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
-                   is_instructor: @context.user_is_instructor?(@current_user),
+                   is_instructor: @context.user_is_instructor?(@current_user) || @context.grants_right?(@current_user, session, :read_as_admin),
                    course_overview: @context&.wiki&.front_page&.body,
                    hide_final_grades: @context.hide_final_grades?,
                    student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
