@@ -768,7 +768,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument account_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "in_nav_context", "borderless", or "default"
   #
   # @argument user_navigation[url] [String]
   #   The url of the external tool for user navigation
@@ -821,7 +821,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument course_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "in_nav_context", "borderless", or "default"
   #
   # @argument editor_button[url] [String]
   #   The url of the external tool

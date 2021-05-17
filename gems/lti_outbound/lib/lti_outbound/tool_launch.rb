@@ -40,6 +40,7 @@ module LtiOutbound
       @selected_html = options[:selected_html]
       @link_params = options[:link_params] || {}
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
+      @include_module_context = options[:include_module_context] || false
 
       @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
       @hash = {}
@@ -143,6 +144,10 @@ module LtiOutbound
     def add_assignment_substitutions!(assignment)
       if tool.public?
         hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
+        if @include_module_context
+          hash['custom_canvas_module_id'] = '$Canvas.module.id'
+          hash['custom_canvas_module_item_id'] = '$Canvas.moduleItem.id'
+        end
       end
 
       hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'

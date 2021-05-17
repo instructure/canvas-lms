@@ -1036,7 +1036,8 @@ export default class EditView extends ValidatedFormView
     return params['return_to'] if returnToHelper.isValid(params['return_to'])
     useCancelLocation = @assignment.showBuildButton() && @preventBuildNavigation
     return @locationAfterCancel(deparam()) if useCancelLocation
-    @model.get 'html_url'
+    htmlUrl = @model.get 'html_url'
+    if @assignment.showBuildButton() then "#{htmlUrl}?display=full_width" else htmlUrl
 
   redirectAfterCancel: ->
     location = @locationAfterCancel(deparam())

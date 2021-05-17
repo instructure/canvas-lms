@@ -46,6 +46,12 @@ describe('requestFullWindowLaunch', () => {
       const launch_url = new URL(window.location.assign.mock.calls[0][0])
       expect(launch_url.searchParams.get('client_id')).toEqual('hello')
     })
+
+    it('pulls out assignment_id if provided', () => {
+      handler('http://localhost/test?client_id=hello&assignment_id=50')
+      const launch_url = new URL(window.location.assign.mock.calls[0][0])
+      expect(launch_url.searchParams.get('assignment_id')).toEqual('50')
+    })
   })
 
   describe('with object provided', () => {
@@ -96,6 +102,18 @@ describe('requestFullWindowLaunch', () => {
         'popupLaunch',
         expect.stringContaining('width=420,height=400')
       )
+    })
+
+    it('uses display type borderless by default', () => {
+      handler({url: 'http://localhost/test'})
+      const launch_url = new URL(window.location.assign.mock.calls[0][0])
+      expect(launch_url.searchParams.get('display')).toEqual('borderless')
+    })
+
+    it('allows display type to be overridden', () => {
+      handler({url: 'http://localhost/test', display: 'full_width_in_context'})
+      const launch_url = new URL(window.location.assign.mock.calls[0][0])
+      expect(launch_url.searchParams.get('display')).toEqual('full_width_in_context')
     })
   })
 

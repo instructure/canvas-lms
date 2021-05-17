@@ -924,9 +924,36 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'display_type == "in_nav_context"' do
+          before do
+            tool.settings[:assignment_selection] = { "display_type" => "in_nav_context" }
+            tool.save!
+          end
+
+          it 'does not display the assignment lti header' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:prepend_template]).to be_blank
+          end
+
+          it 'does display the assignment edit sidebar' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:append_template]).to be_present
+          end
+        end
+
         it 'gives priority to the "display" parameter' do
           expect(Lti::AppUtil).to receive(:display_template).with('borderless')
           controller.params['display'] = 'borderless'
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+        end
+
+        it 'overrides the configured display_type for the quiz_lti in module context when feature flag is on' do
+          Account.site_admin.enable_feature!(:new_quizzes_in_module_progression)
+          allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
+          module1 = course.context_modules.create!(name: 'Module 1')
+          content_tag.context.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')
+
+          expect(Lti::AppUtil).to receive(:display_template).with('in_nav_context')
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 

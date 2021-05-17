@@ -1848,7 +1848,8 @@ class ApplicationController < ActionController::Base
             launch_url: @tool.login_or_launch_url(content_tag_uri: @resource_url),
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            domain: HostUrl.context_host(@domain_root_account, request.host)
+            domain: HostUrl.context_host(@domain_root_account, request.host),
+            include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1888,7 +1889,7 @@ class ApplicationController < ActionController::Base
           return unless require_user
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-          @prepend_template = 'assignments/lti_header' unless render_external_tool_full_width?
+          @prepend_template = 'assignments/lti_header' if render_external_tool_prepend_template?
           begin
             @lti_launch.params = lti_launch_params(adapter)
           rescue Lti::Ims::AdvantageErrors::InvalidLaunchError
@@ -1906,7 +1907,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
 
-        @append_template = 'context_modules/tool_sequence_footer' unless render_external_tool_full_width?
+        @append_template = 'context_modules/tool_sequence_footer' if render_external_tool_append_template?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
       end
     else
@@ -1954,14 +1955,25 @@ class ApplicationController < ActionController::Base
   private :lti_launch_params
 
   def external_tool_redirect_display_type
-    params['display'] || @tool&.extension_setting(:assignment_selection)&.dig('display_type')
+    if params['display'].present?
+      params['display']
+    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
+      'in_nav_context'
+    else
+      @tool&.extension_setting(:assignment_selection)&.dig('display_type')
+    end
   end
   private :external_tool_redirect_display_type
 
-  def render_external_tool_full_width?
-    external_tool_redirect_display_type == 'full_width'
+  def render_external_tool_prepend_template?
+    !%w[full_width in_nav_context].include?(external_tool_redirect_display_type)
   end
-  private :render_external_tool_full_width?
+  private :render_external_tool_prepend_template?
+
+  def render_external_tool_append_template?
+    external_tool_redirect_display_type != 'full_width'
+  end
+  private :render_external_tool_append_template?
 
   # pass it a context or an array of contexts and it will give you a link to the
   # person's calendar with only those things checked.
