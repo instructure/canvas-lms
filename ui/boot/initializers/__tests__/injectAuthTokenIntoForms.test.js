@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isCrossSite} from '../index'
+import {isCrossSite} from '../injectAuthTokenIntoForms'
 
 describe('isCrossSite', () => {
   // eslint-disable-next-line no-restricted-globals
