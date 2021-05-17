@@ -35,6 +35,25 @@ const mswAssign = (target, ...objects) => {
 
 export const handlers = [
   graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+    if (req.body.variables.filter === 'unread') {
+      return res(
+        ctx.data({
+          legacyNode: Discussion.mock({
+            discussionEntriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  _id: '50',
+                  id: '50',
+                  message: '<p>This is an Unread Reply</p>'
+                })
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionSubentriesConnection'
+            }
+          })
+        })
+      )
+    }
     return res(
       ctx.data({
         legacyNode: Discussion.mock()
@@ -173,7 +192,7 @@ export const handlers = [
   }),
   graphql.mutation('UpdateDiscussionEntriesReadState', (req, res, ctx) => {
     const discussionEntries = req.variables.discussionEntryIds.map(id => ({
-      ...defaultEntry,
+      ...DiscussionEntry.mock(),
       id,
       read: req.variables.read
     }))

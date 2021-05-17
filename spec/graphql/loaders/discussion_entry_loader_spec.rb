@@ -84,7 +84,7 @@ describe Loaders::DiscussionEntryLoader do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
-          filter: 'All'
+          filter: 'all'
         ).load(@discussion).then { |discussion_entries|
           expect(discussion_entries).to match @discussion.discussion_entries
         }
@@ -97,7 +97,7 @@ describe Loaders::DiscussionEntryLoader do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
-          filter: 'Unread'
+          filter: 'unread'
         ).load(@discussion).then { |discussion_entries|
           expect(discussion_entries).to match [@de1]
         }
@@ -108,7 +108,7 @@ describe Loaders::DiscussionEntryLoader do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
           current_user: @teacher,
-          filter: 'Deleted'
+          filter: 'deleted'
         ).load(@discussion).then { |discussion_entries|
           expect(discussion_entries[0].deleted?).to be true
         }

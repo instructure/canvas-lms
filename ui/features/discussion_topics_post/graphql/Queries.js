@@ -28,25 +28,17 @@ export const DISCUSSION_QUERY = gql`
     $perPage: Int!
     $searchTerm: String
     $rootEntries: Boolean
+    $filter: DiscussionFilterType
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
-        rootDiscussionEntriesConnection(after: $page, first: $perPage) {
-          nodes {
-            ...DiscussionEntry
-          }
-          pageInfo {
-            ...PageInfo
-          }
-        }
-        rootEntriesTotalPages(perPage: $perPage)
-
         discussionEntriesConnection(
           after: $page
           first: $perPage
           searchTerm: $searchTerm
           rootEntries: $rootEntries
+          filter: $filter
         ) {
           nodes {
             ...DiscussionEntry
@@ -55,7 +47,12 @@ export const DISCUSSION_QUERY = gql`
             ...PageInfo
           }
         }
-        entriesTotalPages(perPage: $perPage, rootEntries: $rootEntries)
+        entriesTotalPages(
+          perPage: $perPage
+          rootEntries: $rootEntries
+          filter: $filter
+          searchTerm: $searchTerm
+        )
       }
     }
   }

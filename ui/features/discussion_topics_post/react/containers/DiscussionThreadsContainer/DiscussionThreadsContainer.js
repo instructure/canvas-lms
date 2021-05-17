@@ -22,8 +22,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PER_PAGE} from '../../utils/constants'
-import PropTypes from 'prop-types'
+import {PER_PAGE, SearchContext} from '../../utils/constants'
 import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
@@ -33,6 +32,8 @@ import {View} from '@instructure/ui-view'
 export const DiscussionThreadsContainer = props => {
   let discussionTopic = props.discussionTopic
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {searchTerm, filter} = useContext(SearchContext)
+
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
   const AUTO_MARK_AS_READ_DELAY = 3000
@@ -101,8 +102,9 @@ export const DiscussionThreadsContainer = props => {
         discussionID: discussionTopic._id,
         perPage: PER_PAGE,
         page: btoa(pageNumber * PER_PAGE),
-        searchTerm: props.searchTerm,
-        rootEntries: !props.searchTerm
+        searchTerm,
+        rootEntries: !searchTerm,
+        filter
       }
     })
   }
@@ -134,8 +136,7 @@ export const DiscussionThreadsContainer = props => {
 }
 
 DiscussionThreadsContainer.propTypes = {
-  discussionTopic: Discussion.shape,
-  searchTerm: PropTypes.string
+  discussionTopic: Discussion.shape
 }
 
 export default DiscussionThreadsContainer

@@ -21,6 +21,8 @@ export const PER_PAGE = 20
 
 const searchFilter = {
   searchTerm: '',
-  setSearchTerm: () => {}
+  setSearchTerm: () => {},
+  filter: '',
+  setFilter: () => {}
 }
 export const SearchContext = React.createContext(searchFilter)

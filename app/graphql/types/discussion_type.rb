@@ -21,9 +21,9 @@
 class DiscussionFilterType < Types::BaseEnum
   graphql_name 'DiscussionFilterType'
   description 'Search types that can be associated with discussions'
-  value 'All'
-  value 'Unread'
-  value 'Deleted'
+  value 'all'
+  value 'unread'
+  value 'deleted'
 end
 
 class DiscussionSortOrderType < Types::BaseEnum

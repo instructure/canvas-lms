@@ -36,8 +36,9 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         scope = scope.joins(:user).where("message ILIKE '#{UserSearch.like_string_for(@search_term)}'")
           .or(scope.joins(:user).where("users.name ILIKE '#{UserSearch.like_string_for(@search_term)}'"))
       end
-      scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'Unread'
-      scope = scope.where(workflow_state: 'deleted') if @filter == 'Deleted'
+
+      scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
+      scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
       fulfill(discussion_topic, scope)
     end
   end

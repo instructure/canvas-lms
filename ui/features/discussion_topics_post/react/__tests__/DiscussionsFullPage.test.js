@@ -143,6 +143,26 @@ describe('DiscussionFullPage', () => {
     })
   })
 
+  describe('searchFilter', () => {
+    it('filters by unread', async () => {
+      const container = setup()
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+
+      await waitFor(() => expect(container.queryByText('This is an Unread Reply')).toBeNull())
+
+      const simpleSelect = await container.getByLabelText('Filter by')
+      await fireEvent.click(simpleSelect)
+      const unread = await container.getByText('Unread')
+      await fireEvent.click(unread)
+
+      await waitFor(() =>
+        expect(container.queryByText('This is an Unread Reply')).toBeInTheDocument()
+      )
+    })
+  })
+
   describe('discussion topic', () => {
     it('should render', async () => {
       const container = setup()
@@ -176,17 +196,6 @@ describe('DiscussionFullPage', () => {
   })
 
   describe('error handling', () => {
-    it('should render generic error page when DISCUSSION_QUERY returns null', async () => {
-      server.use(
-        graphql.query('GetDiscussionQuery', (req, res, ctx) => {
-          return res.once(ctx.data({legacyNode: null}))
-        })
-      )
-
-      const container = setup()
-      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
-    })
-
     it('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
       server.use(
         graphql.query('GetDiscussionQuery', (req, res, ctx) => {
@@ -197,6 +206,17 @@ describe('DiscussionFullPage', () => {
               }
             ])
           )
+        })
+      )
+
+      const container = setup()
+      await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
+    })
+
+    it('should render generic error page when DISCUSSION_QUERY returns null', async () => {
+      server.use(
+        graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+          return res.once(ctx.data({legacyNode: null}))
         })
       )
 

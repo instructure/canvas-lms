@@ -47,7 +47,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
 
-  const {setSearchTerm} = useContext(SearchContext)
+  const {setSearchTerm, filter, setFilter} = useContext(SearchContext)
 
   const discussionTopicData = {
     _id: props.discussionTopic._id,
@@ -177,17 +177,25 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     setSearchTerm(value)
   }
 
+  const onViewFilter = (_event, value) => {
+    setFilter(value.value)
+  }
+
+  const onSortClick = (_event, value) => {
+    // Set sort value in context
+  }
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
         <View as="div" padding="medium 0" background="primary">
           <DiscussionPostToolbar
-            selectedView="all"
+            selectedView={filter}
             sortDirection="asc"
             isCollapsedReplies
             onSearchChange={onSearchChange}
-            onViewFilter={() => {}}
-            onSortClick={() => {}}
+            onViewFilter={onViewFilter}
+            onSortClick={onSortClick}
             onCollapseRepliesToggle={() => {}}
             onTopClick={() => {}}
           />

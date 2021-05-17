@@ -127,12 +127,6 @@ export const Discussion = {
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
     courseSections = [Section.mock()],
-    rootEntriesTotalPages = 2,
-    rootDiscussionEntriesConnection = {
-      nodes: [DiscussionEntry.mock()],
-      pageInfo: PageInfo.mock(),
-      __typename: 'RootDiscussionEntriesConnection'
-    },
     entriesTotalPages = 2,
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
@@ -162,8 +156,6 @@ export const Discussion = {
     assignment,
     permissions,
     courseSections,
-    rootEntriesTotalPages,
-    rootDiscussionEntriesConnection,
     entriesTotalPages,
     discussionEntriesConnection,
     __typename: 'Discussion'
