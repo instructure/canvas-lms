@@ -596,7 +596,8 @@ describe('parseAnnouncementDetails', () => {
         filename: 'file12.pdf',
         url: 'http://localhost:3000/files/longpath'
       }
-    ]
+    ],
+    posted_at: '2021-05-14T17:06:21-06:00'
   }
 
   const course = {
@@ -625,6 +626,7 @@ describe('parseAnnouncementDetails', () => {
       'http://localhost:3000/files/longpath'
     )
     expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
+    expect(announcementDetails.announcement.postedDate).toBe('2021-05-14T17:06:21-06:00')
   })
 
   it('handles a missing attachment', () => {

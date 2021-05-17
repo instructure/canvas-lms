@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import tz from '@canvas/timezone'
 import {render} from '@testing-library/react'
 import K5Announcement from '../K5Announcement'
 
@@ -110,5 +111,13 @@ describe('K5Announcement', () => {
       <K5Announcement {...getProps({published: false, showCourseDetails: false})} />
     )
     expect(queryByText('Your homeroom is currently unpublished.')).not.toBeInTheDocument()
+  })
+
+  it('shows the posted date if passed', () => {
+    const date = '2021-05-14T17:06:21-06:00'
+    const {getByText} = render(<K5Announcement {...getProps({postedDate: date})} />)
+    expect(
+      getByText(`Posted on ${tz.format(date, 'date.formats.full_with_weekday')}`)
+    ).toBeInTheDocument()
   })
 })

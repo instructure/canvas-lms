@@ -18,6 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!k5_dashboard'
+import tz from '@canvas/timezone'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -40,6 +41,7 @@ export default function K5Announcement({
   canEdit,
   attachment,
   published,
+  postedDate,
   showCourseDetails
 }) {
   const renderWithEditButton = content => (
@@ -89,6 +91,13 @@ export default function K5Announcement({
         {showCourseDetails
           ? renderAnnouncementTitle()
           : renderWithEditButton(renderAnnouncementTitle())}
+        {postedDate && (
+          <Text as="div" size="small" color="secondary">
+            {I18n.t('Posted on %{date}', {
+              date: tz.format(postedDate, 'date.formats.full_with_weekday')
+            })}
+          </Text>
+        )}
         <div
           className="user_content"
           /* html sanitized by server */
@@ -125,5 +134,6 @@ K5Announcement.propTypes = {
   url: PropTypes.string.isRequired,
   attachment: PropTypes.object,
   published: PropTypes.bool,
+  postedDate: PropTypes.string,
   showCourseDetails: PropTypes.bool.isRequired
 }

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import moxios from 'moxios'
+import tz from '@canvas/timezone'
 import {render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
@@ -78,7 +79,8 @@ const defaultProps = {
     ],
     permissions: {
       update: true
-    }
+    },
+    posted_at: '2021-05-14T17:06:21-06:00'
   }
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
@@ -235,7 +237,7 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('subject announcements', () => {
-    it('shows the latest announcement, attachment and edit button on the subject home', () => {
+    it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
       expect(getByText('Important announcement')).toBeInTheDocument()
       expect(getByText('Read this closely.')).toBeInTheDocument()
@@ -245,6 +247,11 @@ describe('K-5 Subject Course', () => {
       const attachment = getByRole('link', {name: 'hw.pdf'})
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://address/to/hw.pdf')
+      expect(
+        getByText(
+          `Posted on ${tz.format('2021-05-14T17:06:21-06:00', 'date.formats.full_with_weekday')}`
+        )
+      ).toBeInTheDocument()
     })
 
     it('hides the edit button if student', () => {

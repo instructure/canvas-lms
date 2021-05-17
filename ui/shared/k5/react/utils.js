@@ -281,6 +281,7 @@ export const parseAnnouncementDetails = (announcement, course) => {
       title: announcement.title,
       message: announcement.message,
       url: announcement.html_url,
+      postedDate: announcement.posted_at,
       attachment
     }
   }
