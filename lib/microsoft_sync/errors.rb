@@ -89,11 +89,19 @@ module MicrosoftSync
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
     class HTTPConflict < HTTPInvalidStatus; end
-    class HTTPTooManyRequests < HTTPInvalidStatus; end
     class HTTPInternalServerError < HTTPInvalidStatus; end
     class HTTPBadGateway < HTTPInvalidStatus; end
     class HTTPServiceUnavailable < HTTPInvalidStatus; end
     class HTTPGatewayTimeout < HTTPInvalidStatus; end
+
+    class HTTPTooManyRequests < HTTPInvalidStatus
+      attr_reader :retry_after_seconds
+
+      def initialize(**args)
+        @retry_after_seconds = args[:response].headers['Retry-After'].presence&.to_f
+        super(**args)
+      end
+    end
 
     INTERMITTENT = [
       EOFError,
@@ -104,6 +112,7 @@ module MicrosoftSync
       Timeout::Error,
 
       HTTPBadGateway, HTTPGatewayTimeout, HTTPInternalServerError, HTTPServiceUnavailable,
+      HTTPTooManyRequests,
     ].freeze
 
     # Microsoft's API being eventually consistent requires us to retry 404s

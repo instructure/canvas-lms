@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../spec_helper'
+require 'httparty'
 
 describe MicrosoftSync::Errors do
   describe '.user_facing_message' do
@@ -72,12 +73,15 @@ describe MicrosoftSync::Errors do
   describe described_class::HTTPInvalidStatus do
     subject do
       described_class.for(
-        service: 'my api', response: double(code: code, body: body), tenant: 'mytenant'
+        service: 'my api',
+        response: double(code: code, body: body, headers: HTTParty::Response::Headers.new(headers)),
+        tenant: 'mytenant'
       )
     end
 
     let(:code) { 422 }
     let(:body) { 'abc' }
+    let(:headers) { {} }
 
     it 'gives a public message with the service name, status code, and tenant' do
       expect(subject.public_message).to eq('My api service returned 422 for tenant mytenant')
@@ -120,6 +124,20 @@ describe MicrosoftSync::Errors do
 
           it "returns a #{error_class}" do
             expect(subject).to be_a(error_class)
+          end
+        end
+      end
+
+      context 'when the response status code is 429' do
+        let(:code) { 429 }
+
+        it { expect(subject.retry_after_seconds).to eq(nil) }
+
+        context 'when the retry-after header is set' do
+          let(:headers) { {'Retry-After' => '12.345'} }
+
+          it 'sets retry_after_seconds' do
+            expect(subject.retry_after_seconds).to eq(12.345)
           end
         end
       end

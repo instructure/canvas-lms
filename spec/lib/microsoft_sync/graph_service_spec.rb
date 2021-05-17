@@ -22,8 +22,12 @@ require_relative '../../spec_helper'
 describe MicrosoftSync::GraphService do
   include WebMock::API
 
-  def json_response(status, body)
-    {status: status, body: body.to_json, headers: {'Content-type' => 'application/json'}}
+  def json_response(status, body, extra_headers={})
+    {
+      status: status,
+      body: body.to_json,
+      headers: extra_headers.merge('Content-type' => 'application/json')
+    }
   end
 
   before do
@@ -89,7 +93,9 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'with a 429 status code' do
-      let(:response) { json_response(429, error: {message: 'uh-oh!'}) }
+      let(:response) do
+        json_response(429, {error: {message: 'uh-oh!'}}, 'Retry-After' => '2.128')
+      end
 
       it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
         expect(InstStatsd::Statsd).to receive(:increment)
@@ -98,6 +104,12 @@ describe MicrosoftSync::GraphService do
           MicrosoftSync::Errors::HTTPTooManyRequests,
           /Graph service returned 429 for tenant mytenant.*uh-oh!/
         )
+      end
+
+      it 'includes the retry-after time in the error' do
+        expect { subject }.to raise_error do |err|
+          expect(err.retry_after_seconds).to eq(2.128)
+        end
       end
     end
 

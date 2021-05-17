@@ -60,9 +60,11 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  def new_http_error(code)
+  def new_http_error(code, headers={})
     MicrosoftSync::Errors::HTTPInvalidStatus.for(
-      response: double('response', code: code, body: ''),
+      response: double(
+        'response', code: code, body: '', headers: HTTParty::Response::Headers.new(headers)
+      ),
       service: 'test',
       tenant: 'test'
     )
@@ -124,11 +126,30 @@ describe MicrosoftSync::SyncerSteps do
       end
     end
 
-    context "when Microsoft API returns a 500" do
+    context "when the Microsoft API returns a 500" do
       it 'returns a Retry object' do
         expect(graph_service).to receive(:request).and_raise(new_http_error(500))
         expect_retry(subject,
                      error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
+      end
+    end
+
+    context 'when the Microsoft API returns a 429 with a retry-after header' do
+      it 'returns a Retry object with that retry-after time' do
+        expect(graph_service).to receive(:request).and_raise(
+          new_http_error(429, 'retry-after' => '3.14')
+        )
+        expect_retry(subject,
+                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
+                     **retry_args.merge(delay_amount: 3.14))
+      end
+    end
+
+    context 'when the Microsoft API returns a 429 with no retry-after header' do
+      it 'returns a Retry object with our default retry times' do
+        expect(graph_service).to receive(:request).and_raise(new_http_error(429))
+        expect_retry(subject,
+                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
       end
     end
   end
