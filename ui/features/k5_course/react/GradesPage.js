@@ -37,6 +37,7 @@ export const GradesPage = ({
   courseName,
   hideFinalGrades,
   currentUser,
+  userIsStudent,
   userIsInstructor,
   showLearningMasteryGradebook,
   outcomeProficiency
@@ -54,8 +55,8 @@ export const GradesPage = ({
     loading: setLoadingGradingPeriods,
     success: useCallback(data => {
       setGradingPeriods(data.grading_periods)
-      setCurrentGradingPeriodId(data.enrollments[0].current_grading_period_id)
-      setAllowTotalsForAllPeriods(data.enrollments[0].totals_for_all_grading_periods_option)
+      setCurrentGradingPeriodId(data.enrollments[0]?.current_grading_period_id)
+      setAllowTotalsForAllPeriods(data.enrollments[0]?.totals_for_all_grading_periods_option)
     }, []),
     error: setError,
     params: {
@@ -93,6 +94,7 @@ export const GradesPage = ({
         showTotals={showTotals}
         currentUser={currentUser}
         loadingGradingPeriods={loadingGradingPeriods}
+        userIsInstructor={userIsInstructor}
       />
     </>
   )
@@ -112,8 +114,8 @@ export const GradesPage = ({
     </>
   )
 
-  if (userIsInstructor) {
-    return <GradesEmptyPage userIsInstructor courseId={courseId} />
+  if (!userIsStudent) {
+    return <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
   } else if (showLearningMasteryGradebook) {
     return (
       <Tabs
@@ -149,6 +151,7 @@ GradesPage.propTypes = {
   courseName: PropTypes.string.isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
+  userIsStudent: PropTypes.bool.isRequired,
   userIsInstructor: PropTypes.bool.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape

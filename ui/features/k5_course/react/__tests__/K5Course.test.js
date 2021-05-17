@@ -57,6 +57,7 @@ const defaultProps = {
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
+  userIsStudent: true,
   userIsInstructor: false,
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
