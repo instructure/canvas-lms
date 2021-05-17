@@ -385,6 +385,7 @@ pipeline {
                 .execute { stageConfig ->
                   stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
                   stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy'], 'HEAD^'))
+                  stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                   stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
 
                   dir(env.LOCAL_WORKDIR) {
@@ -496,7 +497,7 @@ pipeline {
                     .queue(nestedStages, lintersStage.&webpackStage)
 
                   extendedStage('Linters - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('yarnFiles'))
                     .queue(nestedStages, lintersStage.&yarnStage)
 
                   extendedStage('Linters - Groovy')
