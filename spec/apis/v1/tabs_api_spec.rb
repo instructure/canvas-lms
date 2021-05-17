@@ -637,7 +637,7 @@ describe TabsController, type: :request do
             "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/syllabus",
             "position" => 8,
             "visibility" => "public",
-            "label" => "Syllabus",
+            "label" => "Important Info",
             "type" => "internal"
           },
           {

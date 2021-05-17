@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
 import StaffInfo, {StaffShape} from './StaffInfo'
-import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import LoadingSkeleton from './LoadingSkeleton'
 
 const StaffContactInfoLayout = ({isLoading, staff}) => {
   const skeletons = []

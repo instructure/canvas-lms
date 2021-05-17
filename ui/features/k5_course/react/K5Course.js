@@ -48,20 +48,14 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {
-  fetchCourseApps,
-  parseAnnouncementDetails,
-  DEFAULT_COURSE_COLOR,
-  TAB_IDS
-} from '@canvas/k5/react/utils'
+import {parseAnnouncementDetails, DEFAULT_COURSE_COLOR, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
-import AppsList from '@canvas/k5/react/AppsList'
 import EmptyCourse from './EmptyCourse'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
 import {GradesPage} from './GradesPage'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 import K5Announcement from '@canvas/k5/react/K5Announcement'
+import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 
 const HERO_HEIGHT_PX = 400
 
@@ -189,16 +183,6 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
   )
 }
 
-const fetchApps = (courseId, courseName) =>
-  fetchCourseApps(courseId).then(apps =>
-    apps.map(app => ({
-      id: app.id,
-      courses: [{id: courseId, name: courseName}],
-      title: app.course_navigation.text || app.name,
-      icon: app.course_navigation.icon_url || app.icon_url
-    }))
-  )
-
 export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
@@ -235,8 +219,6 @@ export function K5Course({
     callback: () => loadAllOpportunities(),
     singleCourse: true
   })
-  const [apps, setApps] = useState([])
-  const [isAppsLoading, setAppsLoading] = useState(false)
 
   const modulesRef = useRef(null)
   useEffect(() => {
@@ -248,14 +230,6 @@ export function K5Course({
       modulesRef.current.style.display = currentTab === TAB_IDS.MODULES ? 'block' : 'none'
     }
   }, [currentTab])
-
-  useEffect(() => {
-    setAppsLoading(true)
-    fetchApps(id, name)
-      .then(setApps)
-      .catch(showFlashError(I18n.t('Failed to load apps for %{name}.', {name})))
-      .finally(() => setAppsLoading(false))
-  }, [id, name])
 
   const courseHeader = shouldShrink => (
     <View id="k5-course-header" as="div" padding={shouldShrink ? 'medium 0 0 0' : '0'}>
@@ -331,7 +305,15 @@ export function K5Course({
             outcomeProficiency={outcomeProficiency}
           />
         )}
-        {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
+        {currentTab === TAB_IDS.RESOURCES && (
+          <ResourcesPage
+            cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
+            cardsSettled
+            visible={currentTab === TAB_IDS.RESOURCES}
+            showStaff={false}
+            filterToHomerooms={false}
+          />
+        )}
       </View>
     </K5DashboardContext.Provider>
   )

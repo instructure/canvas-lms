@@ -45,7 +45,7 @@ import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
-import ResourcesPage from './ResourcesPage'
+import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import {FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
@@ -167,6 +167,8 @@ export const K5Dashboard = ({
             cards={cards}
             cardsSettled={cardsSettled}
             visible={currentTab === TAB_IDS.RESOURCES}
+            showStaff
+            filterToHomerooms
           />
         )}
       </K5DashboardContext.Provider>

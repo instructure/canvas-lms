@@ -19,11 +19,11 @@
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
 <%
-  show_summary = @context.syllabus_course_summary? && !@context.elementary_homeroom_course?
-  if @context.elementary_homeroom_course?
+  show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled?
+  if @context.elementary_enabled?
     title_text = t("Important Info")
     submit_btn_text = t("Update Important Info")
-    help_text = t("You can add important information here that you want to display under the Resources tab in your homeroom.")
+    help_text = t("You can add important information here that you want to display under the Resources tab.")
   else
     title_text = t("titles.course_syllabus", "Course Syllabus")
     submit_btn_text = t("buttons.update_syllabus", "Update Syllabus")
@@ -69,7 +69,7 @@ To add some comments, click the "Edit" link at the top.
       <a href="#" class="toggle_views_link toggle_rich_editor_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
     </div>
   <% end %>
-  <% if @context.elementary_homeroom_course? %>
+  <% if @context.elementary_enabled? %>
     <%= f.blabel :syllabus_body, :important_info_description, :en => "Important Info Description" %>
   <% else %>
     <%= f.blabel :syllabus_body, :syllabus_description, :en => "Syllabus Description" %>
@@ -77,7 +77,7 @@ To add some comments, click the "Edit" link at the top.
   <div class="clear"></div>
   <%= f.text_area :syllabus_body, :style => "width: 100%; height: 300px;", :id => "course_syllabus_body" %>
 
-  <% if !@context.elementary_homeroom_course? %>
+  <% if !@context.elementary_enabled? %>
     <div class="ic-Form-control ic-Form-control--checkbox">
       <%= f.check_box :syllabus_course_summary, :checked => @context.syllabus_course_summary? %>
       <%= f.label :syllabus_course_summary, :class => 'ic-Label', :en => "Show Course Summary" %>

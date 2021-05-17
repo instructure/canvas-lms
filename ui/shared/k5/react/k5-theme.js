@@ -95,6 +95,14 @@ export const theme = {
   }
 }
 
+/** Overrides applied specifically to resources pages */
+export const resourcesTheme = {
+  [Heading.theme]: {
+    h2FontSize: '1.375rem',
+    h3FontSize: '1.125rem'
+  }
+}
+
 export default {
   use: options => {
     const fontOnly = options?.fontOnly || false

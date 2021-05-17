@@ -23,10 +23,7 @@ import PropTypes from 'prop-types'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
-import ImportantInfo, {
-  ImportantInfoShape,
-  ImportantInfoEditHeader
-} from '@canvas/k5/react/ImportantInfo'
+import ImportantInfo, {ImportantInfoShape, ImportantInfoEditHeader} from './ImportantInfo'
 
 const ImportantInfoLayout = ({isLoading, importantInfos}) => {
   const sectionHeading = <Heading level="h2">{I18n.t('Important Info')}</Heading>

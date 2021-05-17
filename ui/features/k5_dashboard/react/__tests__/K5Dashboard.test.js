@@ -461,7 +461,10 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
-      const missingAssignments = await findByRole('button', {name: 'Show 2 missing items'})
+      const missingAssignments = await findByRole('button', {
+        name: 'Show 2 missing items',
+        timeout: 5000
+      })
       expect(missingAssignments).toBeInTheDocument()
 
       act(() => missingAssignments.click())

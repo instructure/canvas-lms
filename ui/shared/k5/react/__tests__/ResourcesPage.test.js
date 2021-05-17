@@ -22,7 +22,7 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import ResourcesPage from '../ResourcesPage'
 
 jest.mock('@canvas/k5/react/utils')
-const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
+const utils = require('../utils') // eslint-disable-line import/no-commonjs
 
 const defaultImportantInfoResponse = [
   {
@@ -52,11 +52,15 @@ const defaultAppsResponse = [
 
 const defaultStaffResponse = [
   {
-    id: '5',
-    short_name: 'Valerie Frizzle',
-    bio: 'Take chances, make mistakes, get messy!',
-    avatar_url: '/avatar.jpg',
-    enrollments: [{role: 'TeacherEnrollment'}]
+    id: '1',
+    short_name: 'Mrs. Thompson',
+    bio: 'Office Hours: 1-3pm W',
+    avatar_url: '/images/avatar1.png',
+    enrollments: [
+      {
+        role: 'TeacherEnrollment'
+      }
+    ]
   }
 ]
 
@@ -76,6 +80,8 @@ describe('ResourcesPage', () => {
       }
     ],
     cardsSettled: true,
+    showStaff: true,
+    filterToHomerooms: true,
     ...overrides
   })
 
@@ -152,7 +158,21 @@ describe('ResourcesPage', () => {
     })
   })
 
-  describe('Staff Info section', () => {
+  describe('Staff section', () => {
+    it('shows staff', async () => {
+      const {getByText, findByText} = render(<ResourcesPage {...getProps()} />)
+      expect(await findByText('Mrs. Thompson')).toBeInTheDocument()
+      expect(getByText('Staff Contact Info')).toBeInTheDocument()
+      expect(getByText('Office Hours: 1-3pm W')).toBeInTheDocument()
+    })
+
+    it('does not render if showStaff is false', async () => {
+      const {findByText, queryByText} = render(<ResourcesPage {...getProps({showStaff: false})} />)
+      expect(await findByText('Student Applications')).toBeInTheDocument()
+      expect(queryByText('Staff Contact Info')).not.toBeInTheDocument()
+      expect(queryByText('Mrs. Thompson')).not.toBeInTheDocument()
+    })
+
     it('does not display staff info if the user is unauthorized to view course participants', async () => {
       const error = new Error()
       error.response = {status: 401}

@@ -18,22 +18,24 @@
 
 import I18n from 'i18n!k5_dashboard'
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
+
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {IconEmailLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
-import {readableRoleName, sendMessage} from '@canvas/k5/react/utils'
 import {Avatar} from '@instructure/ui-avatar'
-import PropTypes from 'prop-types'
 import {Heading} from '@instructure/ui-heading'
 import {TextArea} from '@instructure/ui-text-area'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Spinner} from '@instructure/ui-spinner'
+
+import {readableRoleName, sendMessage} from './utils'
+import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 export default function StaffInfo({
   id,

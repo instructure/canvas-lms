@@ -2789,6 +2789,11 @@ describe Course, "tabs_available" do
           expect(tab_ids.length).to eql(length)
         end
 
+        it 'renames the syllabus tab to important info' do
+          syllabus_tab = @course.tabs_available(@user).find{|t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq('Important Info')
+        end
+
         context "with course_subject_tabs option" do
           it "returns subject tabs only by default" do
             length = Course.course_subject_tabs.length

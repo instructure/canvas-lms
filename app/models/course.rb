@@ -2960,7 +2960,9 @@ class Course < ActiveRecord::Base
   end
 
   def self.elementary_course_nav_tabs
-    Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs.find{|tab| tab[:id] == TAB_SYLLABUS}[:label] = t("Important Info")
+    tabs
   end
 
   def tab_enabled?(tab)
