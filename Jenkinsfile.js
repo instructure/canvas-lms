@@ -78,50 +78,44 @@ pipeline {
             onNodeReleasing: jsStage.&tearDownNode,
           ]
 
-          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
-            extendedStage('Run Tests').obeysAllowStages(false).execute {
-              timeout(time: 10) {
-                script {
-                  def tests = [:]
+          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).execute {
+            def tests = [:]
 
-                  if(env.TEST_SUITE == 'jest') {
-                    tests['Jest'] = {
-                      withEnv(['CONTAINER_NAME=tests-jest']) {
-                        try {
-                          sh 'build/new-jenkins/js/tests-jest.sh'
-                        } finally {
-                          copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-                        }
-                      }
-                    }
-                  } else if(env.TEST_SUITE == 'coffee') {
-                    for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
-                      tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
-                    }
-                  } else if(env.TEST_SUITE == 'karma') {
-                    tests['Packages'] = {
-                      withEnv(['CONTAINER_NAME=tests-packages']) {
-                        try {
-                          sh 'build/new-jenkins/js/tests-packages.sh'
-                        } finally {
-                          copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
-                        }
-                      }
-                    }
-
-                    for(int i = 0; i < JSG_NODE_COUNT; i++) {
-                      tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
-                    }
-
-                    ['jsa', 'jsh'].each { group ->
-                      tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
-                    }
+            if(env.TEST_SUITE == 'jest') {
+              tests['Jest'] = {
+                withEnv(['CONTAINER_NAME=tests-jest']) {
+                  try {
+                    sh 'build/new-jenkins/js/tests-jest.sh'
+                  } finally {
+                    copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
                   }
-
-                  parallel(tests)
                 }
               }
+            } else if(env.TEST_SUITE == 'coffee') {
+              for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
+                tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
+              }
+            } else if(env.TEST_SUITE == 'karma') {
+              tests['Packages'] = {
+                withEnv(['CONTAINER_NAME=tests-packages']) {
+                  try {
+                    sh 'build/new-jenkins/js/tests-packages.sh'
+                  } finally {
+                    copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+                  }
+                }
+              }
+
+              for(int i = 0; i < JSG_NODE_COUNT; i++) {
+                tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
+              }
+
+              ['jsa', 'jsh'].each { group ->
+                tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
+              }
             }
+
+            parallel(tests)
           }
         }
       }
