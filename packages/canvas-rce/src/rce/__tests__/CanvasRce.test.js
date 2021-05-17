@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {createRef} from 'react'
 import {render, waitFor} from '@testing-library/react'
 import CanvasRce from '../CanvasRce'
 import bridge from '../../bridge'
@@ -37,7 +37,7 @@ const fakeTinyMCE = {
   plugins: {
     AccessibilityChecker: {}
   },
-  editors: [new FakeEditor()]
+  editors: [new FakeEditor('textarea3')]
 }
 
 describe('CanvasRce', () => {
@@ -60,5 +60,25 @@ describe('CanvasRce', () => {
   it('bridges newly rendered editors', async () => {
     render(<CanvasRce textareaId="textarea3" tinymce={fakeTinyMCE.editors[0]} />, target)
     await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
+  })
+
+  it('supports getCode() and setCode() on its ref', async () => {
+    const rceRef = createRef(null)
+    fakeTinyMCE.editors[0].$container.innerHTML = 'Hello RCE!' // because it won't happen organically
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        tinymce={fakeTinyMCE}
+        defaultContent="Hello RCE!"
+      />,
+      target
+    )
+
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+    expect(rceRef.current.getCode()).toEqual('Hello RCE!')
+    rceRef.current.setCode('How sweet.')
+    expect(rceRef.current.getCode()).toEqual('How sweet.')
   })
 })

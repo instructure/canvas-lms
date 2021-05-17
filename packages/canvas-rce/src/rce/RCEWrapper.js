@@ -200,6 +200,7 @@ class RCEWrapper extends React.Component {
     id: PropTypes.string,
     language: PropTypes.string,
     liveRegion: PropTypes.func.isRequired,
+    onContentChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onInitted: PropTypes.func,
@@ -908,7 +909,7 @@ class RCEWrapper extends React.Component {
     // first view
     this.setEditorView(this.state.editorView)
 
-    this.props.onInitted?.()
+    this.props.onInitted?.(editor)
   }
 
   _toggleFullscreen = event => {
@@ -1185,6 +1186,10 @@ class RCEWrapper extends React.Component {
       .map(p => p.nodeName.toLowerCase())
       .reverse()
     this.setState({path})
+  }
+
+  onEditorChange = (content, _editor) => {
+    this.props.onContentChange?.(content)
   }
 
   onResize = (_e, coordinates) => {
@@ -1598,6 +1603,7 @@ class RCEWrapper extends React.Component {
             onFocus={this.handleFocusEditor}
             onBlur={this.handleBlurEditor}
             onNodeChange={this.onNodeChange}
+            onEditorChange={this.onEditorChange}
           />
         </div>
         <StatusBar

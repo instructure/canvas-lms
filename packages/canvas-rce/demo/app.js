@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
 import CanvasRce from '../src/rce/CanvasRce'
 import DemoOptions from './DemoOptions'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 import '@instructure/canvas-theme'
 
 import * as fakeSource from '../src/sidebar/sources/fake'
@@ -84,6 +86,9 @@ function Demo() {
   const [menu, set_menu] = useState(() => updateMenu())
   const [plugins, set_plugins] = useState(() => updatePlugins())
   const [tinymce_editor, set_tinymce_editor] = useState(null)
+  const [currentContent, setCurrentContent] = useState('')
+
+  const rceRef = useRef(null)
 
   useEffect(() => {
     document.documentElement.setAttribute('dir', dir)
@@ -177,6 +182,7 @@ function Demo() {
     <>
       <main className="main" id="content">
         <CanvasRce
+          ref={rceRef}
           language={lang}
           textareaId="textarea3"
           defaultContent="hello RCE"
@@ -188,9 +194,34 @@ function Demo() {
           plugins={plugins}
           onInitted={editor => {
             set_tinymce_editor(editor)
+            setCurrentContent(editor.getContent())
+          }}
+          onContentChange={value => {
+            setCurrentContent(value)
           }}
         />
-        ,
+        <View margin="small 0 0 0">
+          <pre>{currentContent}</pre>
+        </View>
+        <View margin="small 0 0 0">
+          <Button
+            interaction={rceRef.current ? 'enabled' : 'disabled'}
+            onClick={() => {
+              alert(rceRef.current.getCode())
+            }}
+          >
+            Get Code
+          </Button>
+          &nbsp;&nbsp;
+          <Button
+            interaction={rceRef.current ? 'enabled' : 'disabled'}
+            onClick={() => {
+              rceRef.current.setCode('<p>Hello world</p>')
+            }}
+          >
+            Set Code
+          </Button>
+        </View>
       </main>
       <div className="sidebar">
         <div id="options">

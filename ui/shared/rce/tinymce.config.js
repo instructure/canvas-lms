@@ -76,18 +76,9 @@ export default class EditorConfig {
       directionality: getDirection(),
       plugins: `autolink,media,paste,table,lists,${
         window.ENV.use_rce_enhancements
-          ? 'hr,fullscreen,instructure-ui-icons,instructure_condensed_buttons,instructure_documents,instructure_html_view,instructure_media_embed'
+          ? 'hr,fullscreen,instructure-ui-icons,instructure_condensed_buttons,instructure_documents,instructure_image,instructure_links,instructure_equation,instructure_external_tools,instructure_record,instructure_html_view,instructure_media_embed'
           : 'textcolor'
       },link,directionality,a11y_checker,wordcount`,
-      external_plugins: {
-        instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
-        instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
-        instructure_embed: '/javascripts/tinymce_plugins/instructure_embed/plugin.js',
-        instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
-        instructure_external_tools:
-          '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
-        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js'
-      },
       language_load: false,
       convert_urls: false,
       // we add the menubar for a11y purposes but then

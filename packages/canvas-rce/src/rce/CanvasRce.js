@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, useState} from 'react'
-import {arrayOf, number, string} from 'prop-types'
+import React, {forwardRef, useState} from 'react'
+import {arrayOf, func, number, string} from 'prop-types'
 import formatMessage from '../format-message'
 import RCEWrapper, {toolbarPropType, menuPropType} from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
@@ -39,7 +39,7 @@ const baseProps = {
   autosave: {enabled: false},
   defaultContent: '',
   // handleUnmount: () => {},
-  instRecordDisabled: true,
+  instRecordDisabled: false,
   language: 'en',
   // languages: [],
   liveRegion: () => document.getElementById('flash_screenreader_holder'),
@@ -130,21 +130,23 @@ const baseProps = {
 function addCanvasConnection(propsOut, propsIn) {
   if (propsIn.trayProps) {
     propsOut.trayProps = propsIn.trayProps
-    propsOut.editorOptions.plugins.splice(
-      0,
-      0,
-      'instructure_documents',
-      'instructure_image',
-      'instructure_record',
-      'instructure_external_tools'
-    )
     propsOut.editorOptions.menu.insert.items =
       'instructure_links instructure_image instructure_media instructure_document | inserttable instructure_media_embed | hr'
   }
 }
-export default function CanvasRce(props) {
-  const {defaultContent, textareaId, height, language, highContrastCSS, trayProps, ...rest} = props
-  const rceRef = createRef(null)
+
+// forward rceRef to it refs the RCEWrapper where clients can call getCode etc. on it.
+const CanvasRce = forwardRef((props, rceRef) => {
+  const {
+    defaultContent,
+    textareaId,
+    height,
+    language,
+    highContrastCSS,
+    trayProps,
+    onContentChange,
+    ...rest
+  } = props
   useState(() => formatMessage.setup({locale: normalizeLocale(props.language)}))
   const [translations, setTranslations] = useState(() => {
     const locale = normalizeLocale(props.language)
@@ -158,11 +160,7 @@ export default function CanvasRce(props) {
         setTranslations(false)
       })
     return p
-  })
-
-  // useEffect(() => {
-  //   rceRef.current?.setCode(props.content)
-  // }, [props.content, rceRef])
+  }, [])
 
   // merge CanvasRce props into the base properties
   // Note: languages is a bit of a mess. Tinymce and Canvas
@@ -170,24 +168,31 @@ export default function CanvasRce(props) {
   // takes the lanbuage prop and returns the locale Canvas knows.
   // editorLanguage takes the language prop and returns the
   // corresponding name for tinymce.
-  const rceProps = {...baseProps}
-  rceProps.language = normalizeLocale(props.language || 'en')
-  rceProps.highContrastCSS = highContrastCSS || []
-  rceProps.defaultContent = defaultContent
-  rceProps.textareaId = textareaId
-  rceProps.editorOptions.selector = `#${textareaId}`
-  rceProps.editorOptions.height = height
-  rceProps.editorOptions.language = editorLanguage(props.language || 'en')
-  rceProps.trayProps = trayProps
+  const [wrapperProps] = useState(() => {
+    const rceProps = {...baseProps}
+    rceProps.language = normalizeLocale(props.language || 'en')
+    rceProps.highContrastCSS = highContrastCSS || []
+    rceProps.defaultContent = defaultContent
+    rceProps.textareaId = textareaId
+    rceProps.onContentChange = onContentChange
+    rceProps.editorOptions.selector = `#${textareaId}`
+    rceProps.editorOptions.height = height
+    rceProps.editorOptions.language = editorLanguage(props.language || 'en')
+    rceProps.trayProps = trayProps
 
-  addCanvasConnection(rceProps, props)
+    addCanvasConnection(rceProps, props)
+
+    return rceProps
+  }, [])
 
   if (typeof translations !== 'boolean') {
     return formatMessage('Loading...')
   } else {
-    return <RCEWrapper ref={rceRef} tinymce={tinyRCE} {...rceProps} {...rest} />
+    return <RCEWrapper ref={rceRef} tinymce={tinyRCE} {...wrapperProps} {...rest} />
   }
-}
+})
+
+export default CanvasRce
 
 CanvasRce.propTypes = {
   language: string,
@@ -197,5 +202,9 @@ CanvasRce.propTypes = {
   highContrastCSS: arrayOf(string),
   trayProps: trayPropTypes,
   toolbar: toolbarPropType,
-  menu: menuPropType
+  menu: menuPropType,
+  plugins: arrayOf(string),
+
+  onInitted: func, // f(tinymce_editor)
+  onContentChange: func // don't mistake this as an indication CanvasRce is a controlled component
 }
