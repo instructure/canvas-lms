@@ -20,11 +20,13 @@
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
 require_relative '../../helpers/k5_common'
+require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 course grades tab" do
   include_context "in-process server selenium tests"
   include K5PageObject
   include K5Common
+  include GradebookSetup
 
   before :once do
     student_setup
@@ -168,6 +170,35 @@ describe "student k5 course grades tab" do
       expect(assignment_group_totals[0]).to include_text("Assignments: n/a")
       expect(assignment_group_totals[1]).to include_text("#{@ag1}: 90.00%")
       expect(assignment_group_totals[2]).to include_text("#{@ag2}: 60.00%")
+    end
+  end
+
+  context 'grading periods' do
+    before :once do
+      @course = @subject_course
+      create_grading_periods('Fall Term')
+      associate_course_to_term("Fall Term")
+      @assignment = create_and_submit_assignment(@subject_course, "new assignment", "assignment submitted", 100)
+      @assignment.grade_student(@student, grader: @teacher, score: "90", points_deducted: 0)
+    end
+
+    it 'shows the current grading period grades' do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(element_value_for_attr(course_grading_period, "value")).to eq('GP Current (Current)')
+      expect(grades_total).to include_text("90.00%")
+    end
+
+    it 'shows the grades for a different grading period' do
+      @assignment.update!(due_at: 1.week.ago)
+      @assignment.grade_student(@student, grader: @teacher, score: "80", points_deducted: 0)
+
+      get "/courses/#{@subject_course.id}#grades"
+
+      click_option(course_grading_period_selector, "GP Ended")
+
+      expect(element_value_for_attr(course_grading_period, "value")).to eq('GP Ended')
+      expect(grades_total).to include_text("80.00%")
     end
   end
 

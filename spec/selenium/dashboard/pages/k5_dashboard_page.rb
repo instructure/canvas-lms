@@ -364,6 +364,10 @@ module K5PageObject
     "[data-testid='assignment-group-totals']"
   end
 
+  def course_grading_period_selector
+    "[data-testid='select-course-grading-period']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -725,6 +729,10 @@ module K5PageObject
 
   def assignment_group_totals
     ff(assignment_group_totals_selector)
+  end
+
+  def course_grading_period
+    f(course_grading_period_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
