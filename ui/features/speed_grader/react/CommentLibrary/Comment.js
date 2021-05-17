@@ -22,17 +22,20 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!CommentLibrary'
+import CommentEditView from './CommentEditView'
 
-const Comment = ({comment, onClick, onDelete, shouldFocus}) => {
+const Comment = ({comment, onClick, onDelete, shouldFocus, id, updateComment}) => {
   const deleteButtonRef = useRef(null)
+  const editButtonRef = useRef(null)
+  const [hasMounted, setHasMounted] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [isTruncated, setIsTruncated] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isFocused, setIsFocused] = useState(false)
   const handleUpdate = truncated => {
     setIsTruncated(truncated)
   }
@@ -49,45 +52,56 @@ const Comment = ({comment, onClick, onDelete, shouldFocus}) => {
   }
 
   useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  useEffect(() => {
     if (shouldFocus) {
       deleteButtonRef.current.focus()
     }
   }, [shouldFocus])
 
+  useEffect(() => {
+    if (hasMounted && !isEditing) {
+      editButtonRef.current.focus()
+    }
+  }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (isEditing) {
+    return (
+      <CommentEditView
+        comment={comment}
+        id={id}
+        updateComment={updateComment}
+        onClose={() => setIsEditing(false)}
+      />
+    )
+  }
+
   return (
     <View as="div" position="relative" borderWidth="none none small none">
       <Flex>
         <Flex.Item as="div" shouldGrow size="80%" shouldShrink>
-          <View
-            as="div"
-            padding="small"
-            cursor="pointer"
-            isWithinText={false}
-            onClick={() => onClick(comment)}
-            background={isFocused ? 'brand' : 'transparent'}
-            onMouseEnter={() => setIsFocused(true)}
-            onMouseLeave={() => setIsFocused(false)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          >
-            <PresentationContent>
-              {!isExpanded ? (
-                <TruncateText onUpdate={handleUpdate} maxLines={4}>
-                  {comment}
-                </TruncateText>
-              ) : (
-                <Text wrap="break-word">{comment}</Text>
-              )}
-            </PresentationContent>
-            <ScreenReaderContent>
-              <Button onClick={() => onClick(comment)}>
-                {I18n.t('Use comment %{comment}', {comment})}
-              </Button>
-            </ScreenReaderContent>
-          </View>
+          <FocusedComment
+            onClick={onClick}
+            comment={comment}
+            handleUpdate={handleUpdate}
+            isExpanded={isExpanded}
+          />
         </Flex.Item>
         <Flex.Item size="20%" shouldGrow align="start" textAlign="end">
-          <View as="div" padding="x-small small 0 0">
+          <View as="div" display="inline-block" padding="x-small x-small 0 0">
+            <IconButton
+              screenReaderLabel={I18n.t('Edit comment: %{comment}', {comment})}
+              renderIcon={IconEditLine}
+              onClick={() => setIsEditing(true)}
+              withBackground={false}
+              withBorder={false}
+              elementRef={el => (editButtonRef.current = el)}
+              size="small"
+            />
+          </View>
+          <View as="div" display="inline-block" padding="x-small small 0 0">
             <IconButton
               screenReaderLabel={I18n.t('Delete comment: %{comment}', {comment})}
               renderIcon={IconTrashLine}
@@ -117,11 +131,46 @@ const Comment = ({comment, onClick, onDelete, shouldFocus}) => {
   )
 }
 
+const FocusedComment = ({onClick, comment, handleUpdate, isExpanded}) => {
+  const [isFocused, setIsFocused] = useState(false)
+  return (
+    <View
+      as="div"
+      padding="small"
+      cursor="pointer"
+      isWithinText={false}
+      onClick={() => onClick(comment)}
+      background={isFocused ? 'brand' : 'transparent'}
+      onMouseEnter={() => setIsFocused(true)}
+      onMouseLeave={() => setIsFocused(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    >
+      <PresentationContent>
+        {!isExpanded ? (
+          <TruncateText onUpdate={handleUpdate} maxLines={4}>
+            {comment}
+          </TruncateText>
+        ) : (
+          <Text wrap="break-word">{comment}</Text>
+        )}
+      </PresentationContent>
+      <ScreenReaderContent>
+        <Button onClick={() => onClick(comment)}>
+          {I18n.t('Use comment %{comment}', {comment})}
+        </Button>
+      </ScreenReaderContent>
+    </View>
+  )
+}
+
 Comment.propTypes = {
   comment: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  shouldFocus: PropTypes.bool.isRequired
+  shouldFocus: PropTypes.bool.isRequired,
+  id: PropTypes.string.isRequired,
+  updateComment: PropTypes.func.isRequired
 }
 
 export default Comment

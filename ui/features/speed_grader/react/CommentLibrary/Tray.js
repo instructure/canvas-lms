@@ -40,7 +40,8 @@ const Tray = ({
   isAddingComment,
   removedItemIndex,
   showSuggestions,
-  setShowSuggestions
+  setShowSuggestions,
+  updateComment
 }) => {
   const closeButtonRef = useRef(null)
   useEffect(() => {
@@ -119,6 +120,7 @@ const Tray = ({
                   onDelete={() => onDeleteComment(commentItem._id)}
                   comment={commentItem.comment}
                   shouldFocus={shouldFocus}
+                  updateComment={updateComment}
                 />
               )
             })}
@@ -147,7 +149,8 @@ Tray.propTypes = {
   isAddingComment: PropTypes.bool.isRequired,
   removedItemIndex: PropTypes.number,
   showSuggestions: PropTypes.bool.isRequired,
-  setShowSuggestions: PropTypes.func.isRequired
+  setShowSuggestions: PropTypes.func.isRequired,
+  updateComment: PropTypes.func.isRequired
 }
 
 Tray.defaultProps = {

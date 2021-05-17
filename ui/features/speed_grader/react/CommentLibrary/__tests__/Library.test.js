@@ -48,6 +48,7 @@ describe('Library', () => {
       showSuggestions: true,
       setShowSuggestions: () => {},
       setFocusToTextArea: setFocusToTextAreaMock,
+      updateComment: () => {},
       ...props
     }
   }

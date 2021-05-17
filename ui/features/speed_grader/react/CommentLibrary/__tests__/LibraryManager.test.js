@@ -25,7 +25,8 @@ import {
   commentBankItemMocks,
   makeDeleteCommentMutation,
   makeCreateMutationMock,
-  searchMocks
+  searchMocks,
+  makeUpdateMutationMock
 } from './mocks'
 import LibraryManager from '../LibraryManager'
 
@@ -311,6 +312,47 @@ describe('LibraryManager', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(queryByText('search result 0')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('update', () => {
+    const variables = {comment: 'updated comment!', id: '0'}
+    const overrides = {CommentBankItem: {comment: 'updated comment!'}}
+
+    it('updates the comment and rerenders', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const mutationMock = await makeUpdateMutationMock({variables, overrides})
+      const mocks = [...commentBankItemMocks(), ...mutationMock]
+      const {getByText, getByLabelText} = render({mocks})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+
+      fireEvent.click(getByText('Edit comment: Comment item 0'))
+      const input = getByLabelText('Edit comment')
+      fireEvent.change(input, {target: {value: 'updated comment!'}})
+      fireEvent.click(getByText('Save'))
+      expect(getByText('updated comment!')).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Comment updated',
+        type: 'success'
+      })
+    })
+
+    it('displays an error if the update mutation failed', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText, getByLabelText} = render()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByText('Edit comment: Comment item 0'))
+      const input = getByLabelText('Edit comment')
+      fireEvent.change(input, {target: {value: 'not mocked!'}})
+      fireEvent.click(getByText('Save'))
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Error updating comment',
+        type: 'error'
+      })
     })
   })
 })

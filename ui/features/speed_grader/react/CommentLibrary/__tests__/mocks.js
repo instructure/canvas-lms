@@ -17,7 +17,11 @@
  */
 
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
-import {DELETE_COMMENT_MUTATION, CREATE_COMMENT_MUTATION} from '../graphql/Mutations'
+import {
+  DELETE_COMMENT_MUTATION,
+  CREATE_COMMENT_MUTATION,
+  UPDATE_COMMENT_MUTATION
+} from '../graphql/Mutations'
 import {COMMENTS_QUERY} from '../graphql/Queries'
 
 export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {}) => [
@@ -101,3 +105,17 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
     }
   }
 ]
+
+export async function makeUpdateMutationMock({overrides = {}, variables = {}} = {}) {
+  const result = await mockGraphqlQuery(UPDATE_COMMENT_MUTATION, overrides, variables)
+
+  return [
+    {
+      request: {
+        query: UPDATE_COMMENT_MUTATION,
+        variables
+      },
+      result
+    }
+  ]
+}

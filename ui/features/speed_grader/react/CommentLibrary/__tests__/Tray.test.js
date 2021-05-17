@@ -33,6 +33,7 @@ describe('Tray', () => {
       isAddingComment: false,
       showSuggestions: false,
       setShowSuggestions: setShowSuggestionsMock,
+      updateComment: () => {},
       ...props
     }
   }

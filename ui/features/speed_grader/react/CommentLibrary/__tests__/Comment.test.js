@@ -29,6 +29,8 @@ describe('Comment', () => {
       onClick: onClickMock,
       onDelete: onDeleteMock,
       shouldFocus: false,
+      id: '1',
+      updateComment: () => {},
       ...props
     }
   }
@@ -77,5 +79,19 @@ describe('Comment', () => {
     const {getByText, rerender} = render(<Comment {...defaultProps()} />)
     rerender(<Comment {...defaultProps({shouldFocus: true})} />)
     expect(getByText('Delete comment: My assignment comment').closest('button')).toHaveFocus()
+  })
+
+  it('renders an edit view when the edit button is clicked', () => {
+    const {getByText, queryByText, getByLabelText} = render(<Comment {...defaultProps()} />)
+    fireEvent.click(getByText('Edit comment: My assignment comment').closest('button'))
+    expect(getByLabelText('Edit comment')).toBeInTheDocument()
+    expect(queryByText('Delete comment: My assignment comment')).not.toBeInTheDocument()
+  })
+
+  it('focuses on the edit button when the user closes the edit view', () => {
+    const {getByText} = render(<Comment {...defaultProps()} />)
+    fireEvent.click(getByText('Edit comment: My assignment comment').closest('button'))
+    fireEvent.click(getByText('Cancel'))
+    expect(getByText('Edit comment: My assignment comment').closest('button')).toHaveFocus()
   })
 })

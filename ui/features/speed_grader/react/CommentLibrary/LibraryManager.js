@@ -23,7 +23,13 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import useDebouncedSearchTerm from '@canvas/direct-sharing/react/hooks/useDebouncedSearchTerm'
-import {DELETE_COMMENT_MUTATION, CREATE_COMMENT_MUTATION} from './graphql/Mutations'
+import {
+  DELETE_COMMENT_MUTATION,
+  CREATE_COMMENT_MUTATION,
+  UPDATE_COMMENT_MUTATION,
+  addCommentToCache,
+  removeDeletedCommentFromCache
+} from './graphql/Mutations'
 import {COMMENTS_QUERY} from './graphql/Queries'
 import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
@@ -87,54 +93,11 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
     [setComment, setFocusToTextArea]
   )
 
-  const getCachedComments = cache => {
-    return JSON.parse(
-      JSON.stringify(
-        cache.readQuery({
-          query: COMMENTS_QUERY,
-          variables: {userId}
-        })
-      )
-    )
-  }
-
-  const writeComments = (cache, comments) => {
-    cache.writeQuery({
-      query: COMMENTS_QUERY,
-      variables: {userId},
-      data: comments
-    })
-  }
-
-  const removeDeletedCommentFromCache = (cache, result) => {
-    const commentsFromCache = getCachedComments(cache)
-    const resultId = result.data.deleteCommentBankItem.commentBankItemId
-    const removedIndex = commentsFromCache.legacyNode.commentBankItemsConnection.nodes.findIndex(
-      comment => comment._id === resultId
-    )
-    const updatedComments = commentsFromCache.legacyNode.commentBankItemsConnection.nodes.filter(
-      (_comment, index) => index !== removedIndex
-    )
-
-    commentsFromCache.legacyNode.commentBankItemsConnection.nodes = updatedComments
-    writeComments(cache, commentsFromCache)
-    setRemovedItemIndex(removedIndex)
-  }
-
-  const addCommentToCache = (cache, result) => {
-    const commentsFromCache = getCachedComments(cache)
-    const newComment = result.data.createCommentBankItem.commentBankItem
-    const updatedComments = [
-      ...commentsFromCache.legacyNode.commentBankItemsConnection.nodes,
-      newComment
-    ]
-
-    commentsFromCache.legacyNode.commentBankItemsConnection.nodes = updatedComments
-    writeComments(cache, commentsFromCache)
-  }
-
   const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
-    update: removeDeletedCommentFromCache,
+    update: (cache, result) => {
+      const removedIndex = removeDeletedCommentFromCache(cache, result, userId)
+      setRemovedItemIndex(removedIndex)
+    },
     onCompleted(_data) {
       showFlashAlert({
         message: I18n.t('Comment destroyed'),
@@ -150,7 +113,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
   })
 
   const [addComment, {loading: isAddingComment}] = useMutation(CREATE_COMMENT_MUTATION, {
-    update: addCommentToCache,
+    update: (cache, result) => addCommentToCache(cache, result, userId),
     onCompleted(_data) {
       showFlashAlert({
         message: I18n.t('Comment added'),
@@ -168,6 +131,21 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
   const handleAddComment = comment => {
     addComment({variables: {comment, courseId}})
   }
+
+  const [updateComment] = useMutation(UPDATE_COMMENT_MUTATION, {
+    onCompleted(_data) {
+      showFlashAlert({
+        message: I18n.t('Comment updated'),
+        type: 'success'
+      })
+    },
+    onError(_error) {
+      showFlashAlert({
+        message: I18n.t('Error updating comment'),
+        type: 'error'
+      })
+    }
+  })
 
   if (loading) {
     return (
@@ -197,6 +175,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
           : []
       }
       setFocusToTextArea={setFocusToTextArea}
+      updateComment={updateComment}
     />
   )
 }
