@@ -82,6 +82,11 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
 
   const label = currentNote ? I18n.t('Edit Release Note') : I18n.t('New Release Note')
 
+  function submit(payload) {
+    onSubmit(payload)
+    reducer({action: 'RESET', payload: null})
+  }
+
   return (
     <Modal
       as="form"
@@ -89,7 +94,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
       onDismiss={onClose}
       onSubmit={e => {
         e.preventDefault()
-        onSubmit(state)
+        submit(state)
       }}
       size="fullscreen"
       label={label}
@@ -196,7 +201,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
         </Button>
         <Button
           disabled={!isFormSubmittable(state)}
-          onClick={() => onSubmit({...state, published: true})}
+          onClick={() => submit({...state, published: true})}
           data-testid="submit_button"
         >
           {I18n.t('Save and Publish')}
