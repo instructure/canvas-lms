@@ -160,4 +160,69 @@ describe "teacher k5 course dashboard" do
       expect(hex_value_for_color(dashboard_header)).to eq(new_color)
     end
   end
+
+  context 'course tab navigation' do
+    let(:lti_a) { 'LTI Resource A' }
+    let(:lti_b) { 'LTI Resource B' }
+    let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', lti_a, lti_b] }
+
+    before :once do
+      @resource_a = "context_external_tool_" + create_lti_resource(lti_a).id.to_s
+      @resource_b = "context_external_tool_" + create_lti_resource(lti_b).id.to_s
+    end
+
+    it 'shows the k5 navigation tabs and LTIs on the settings page' do
+      get "/courses/#{@subject_course.id}/settings#tab-navigation"
+
+      navigation_list = navigation_items
+
+      expect(navigation_list.count).to eq(6)
+
+      navigation_names.count.times do |x|
+        expect(navigation_list[x]).to include_text(navigation_names[x])
+      end
+    end
+
+    it 'has tabs rearranged in new configuration on the subject page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
+      )
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(k5_tablist).to include_text("Schedule\nHome\nGrades\nModules\nResources")
+    end
+
+    it 'has tabs that are hidden from the subject page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME, hidden: true}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
+      )
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(k5_tablist).to include_text("Schedule\nGrades\nModules\nResources")
+    end
+
+    it 'has ltis that are rearranged in new order on the resources page' do
+      @subject_course.update!(
+        tab_configuration: [{id: Course::TAB_HOME}, {id: Course::TAB_SCHEDULE}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES}, {id: @resource_b}, {id: @resource_a}]
+      )
+
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(k5_app_buttons[0].text).to eq lti_b
+      expect(k5_app_buttons[1].text).to eq lti_a
+    end
+
+    it 'has ltis that are hidden on the resources page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: @resource_a, hidden: true}, {id: @resource_b}]
+      )
+
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(k5_app_buttons.count).to eq 1
+      expect(k5_app_buttons[0].text).to eq lti_b
+    end
+  end
 end

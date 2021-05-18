@@ -368,6 +368,14 @@ module K5PageObject
     "[data-testid='select-course-grading-period']"
   end
 
+  def navigation_item_selector
+    ".navitem"
+  end
+
+  def k5_tablist_selector
+    "[role='tablist']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -733,6 +741,14 @@ module K5PageObject
 
   def course_grading_period
     f(course_grading_period_selector)
+  end
+
+  def navigation_items
+    ff(navigation_item_selector)
+  end
+
+  def k5_tablist
+    f(k5_tablist_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
