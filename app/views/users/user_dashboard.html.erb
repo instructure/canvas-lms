@@ -38,6 +38,7 @@
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}") %>
     <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable') %>
   <% end %>
+  <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards") %>
 <% end %>
 
 <% provide :right_side do %>

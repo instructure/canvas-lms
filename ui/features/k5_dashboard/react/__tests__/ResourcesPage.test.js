@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import ResourcesPage from '../ResourcesPage'
 
 jest.mock('@canvas/k5/react/utils')
@@ -49,6 +50,16 @@ const defaultAppsResponse = [
   }
 ]
 
+const defaultStaffResponse = [
+  {
+    id: '5',
+    short_name: 'Valerie Frizzle',
+    bio: 'Take chances, make mistakes, get messy!',
+    avatar_url: '/avatar.jpg',
+    enrollments: [{role: 'TeacherEnrollment'}]
+  }
+]
+
 describe('ResourcesPage', () => {
   const getProps = (overrides = {}) => ({
     visible: true,
@@ -71,6 +82,13 @@ describe('ResourcesPage', () => {
   beforeEach(() => {
     utils.fetchImportantInfos.mockReturnValue(Promise.resolve(defaultImportantInfoResponse))
     utils.fetchCourseApps.mockReturnValue(Promise.resolve(defaultAppsResponse))
+    utils.fetchCourseInstructors.mockReturnValue(Promise.resolve(defaultStaffResponse))
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    // Clear flash alerts between tests
+    destroyContainer()
   })
 
   describe('Important Info section', () => {
@@ -131,6 +149,20 @@ describe('ResourcesPage', () => {
       const image = getByTestId('renderedIcon')
       expect(image).toBeInTheDocument()
       expect(image.src).toContain('/2.png')
+    })
+  })
+
+  describe('Staff Info section', () => {
+    it('does not display staff info if the user is unauthorized to view course participants', async () => {
+      const error = new Error()
+      error.response = {status: 401}
+      utils.fetchCourseInstructors.mockReturnValue(Promise.reject(error))
+
+      const {getAllByText, queryByText} = render(<ResourcesPage {...getProps()} />)
+      expect(getAllByText('Loading staff...')).toHaveLength(2)
+      await waitFor(() => expect(queryByText('Loading staff...')).not.toBeInTheDocument())
+      expect(queryByText('Staff Contact Info')).not.toBeInTheDocument()
+      expect(queryByText('Failed to load staff.')).not.toBeInTheDocument()
     })
   })
 })

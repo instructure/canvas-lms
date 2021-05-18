@@ -81,6 +81,7 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
   const [infos, setInfos] = useState([])
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
+  const [staffAuthorized, setStaffAuthorized] = useState(true)
   const [isInfoLoading, setInfoLoading] = useState(false)
   const [isAppsLoading, setAppsLoading] = useState(false)
   const [isStaffLoading, setStaffLoading] = useState(false)
@@ -101,7 +102,12 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
         setStaffLoading(true)
         fetchStaff(cards)
           .then(setStaff)
-          .catch(showFlashError(I18n.t('Failed to load staff.')))
+          .catch(err => {
+            if (err?.response?.status === 401) {
+              return setStaffAuthorized(false)
+            }
+            showFlashError(I18n.t('Failed to load staff.'))(err)
+          })
           .finally(() => setStaffLoading(false))
       }
     },
@@ -122,7 +128,7 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
         <View>
           <ImportantInfoLayout isLoading={isInfoLoading} importantInfos={infos} />
           <AppsList isLoading={isAppsLoading} apps={apps} />
-          <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
+          {staffAuthorized && <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />}
         </View>
       </ApplyTheme>
     </section>
