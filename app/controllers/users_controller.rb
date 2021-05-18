@@ -476,7 +476,6 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
-    @k5_mode = use_k5?
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -485,7 +484,6 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :K5_MODE => @k5_mode,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
@@ -508,7 +506,7 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
-    if @k5_mode
+    if k5_user?
       css_bundle :k5_dashboard
       css_bundle :dashboard_card
       js_bundle :k5_dashboard
@@ -3005,12 +3003,5 @@ class UsersController < ApplicationController
     else
       raise "Error connecting to recaptcha #{response}"
     end
-  end
-
-  def use_k5?
-    k5_accounts = @domain_root_account.settings[:k5_accounts]
-    return false if k5_accounts.blank?
-
-    @current_user.user_account_associations.where(account_id: k5_accounts).exists?
   end
 end

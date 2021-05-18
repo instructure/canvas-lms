@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 
 describe "student k5 course dashboard" do
   include_context "in-process server selenium tests"

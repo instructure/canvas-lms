@@ -210,8 +210,9 @@ class ApplicationController < ActionController::Base
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
         @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
-        @js_env[:HOMEROOM_COURSE] = @context.elementary_homeroom_course? if @context.is_a?(Course)
-        @js_env[:K5_MODE] = @context.is_a?(Course) && @context.elementary_subject_course?
+        @js_env[:K5_USER] = k5_user?
+        @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
+        @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
       end
     end
 
@@ -2797,4 +2798,29 @@ class ApplicationController < ActionController::Base
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
   end
   helper_method :show_student_view_button?
+
+  def uncached_k5_user?
+    if @current_user && @domain_root_account
+      # See if the user has associations with any k5-enabled accounts
+      k5_accounts = @domain_root_account.settings[:k5_accounts]
+      return false if k5_accounts.blank?
+
+      @current_user.user_account_associations.where(account_id: k5_accounts).exists?
+    else
+      # Default to classic canvas if the user isn't logged in
+      false
+    end
+  end
+
+  def k5_user?
+    if @current_user
+      # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
+      Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+        uncached_k5_user?
+      end
+    else
+      uncached_k5_user?
+    end
+  end
+  helper_method :k5_user?
 end

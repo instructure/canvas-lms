@@ -68,7 +68,9 @@ export default class EditorConfig {
       ...defaultTinymceConfig,
 
       body_class:
-        window.ENV.FEATURES.canvas_k6_theme || window.ENV.K5_MODE
+        window.ENV.FEATURES.canvas_k6_theme ||
+        window.ENV.K5_SUBJECT_COURSE ||
+        window.ENV.K5_HOMEROOM_COURSE
           ? 'elementary-theme'
           : 'default-theme',
       selector: `#${this.idAttribute}`,

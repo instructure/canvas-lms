@@ -514,6 +514,9 @@ class CoursesController < ApplicationController
 
   def load_enrollments_for_index
     all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    if @current_user.roles(@domain_root_account).all? { |role| role == 'student' || role == 'user' }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? }
+    end
     @past_enrollments = []
     @current_enrollments = []
     @future_enrollments = []
@@ -2053,8 +2056,7 @@ class CoursesController < ApplicationController
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
         # No matter who the user is we want the course dashboard to hide the left nav
-        set_k5_mode
-        @show_left_side = !@k5_mode
+        @show_left_side = !@context.elementary_subject_course?
 
         check_for_readonly_enrollment_state
 
@@ -2062,7 +2064,7 @@ class CoursesController < ApplicationController
 
         check_incomplete_registration
 
-        unless @k5_mode
+        unless @context.elementary_subject_course?
           add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
         end
         GuardRail.activate(:primary) do
@@ -2074,7 +2076,7 @@ class CoursesController < ApplicationController
         default_view = @context.default_view || @context.default_home_page
         @course_home_view = "feed" if params[:view] == "feed"
         @course_home_view ||= default_view
-        @course_home_view = "k5_dashboard" if @k5_mode
+        @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
         start_date = 14.days.ago.beginning_of_day
@@ -2087,7 +2089,7 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    name: @context.name,
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
-                   color: @k5_mode ? @context.course_color : nil,
+                   color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,

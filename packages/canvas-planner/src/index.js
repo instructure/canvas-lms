@@ -121,8 +121,8 @@ function mergeDefaultOptions(options) {
   return newOpts
 }
 
-function getCourseColor({assetString, color}, {K5_MODE, PREFERENCES: {custom_colors = {}}}) {
-  if (K5_MODE) {
+function getCourseColor({assetString, color}, {K5_USER, PREFERENCES: {custom_colors = {}}}) {
+  if (K5_USER) {
     return color || '#394B58'
   } else {
     return custom_colors[assetString]
@@ -206,7 +206,7 @@ export function initializePlanner(options) {
     initializeDateTimeFormatters(options.dateTimeFormatters)
 
     options.plannerNewActivityButtonId = plannerNewActivityButtonId
-    if (options.env.K5_MODE) {
+    if (options.env.K5_USER) {
       dynamicUiManager.setOffsetElementIds(weeklyPlannerHeaderId, null)
     } else {
       dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
@@ -261,8 +261,8 @@ export function createPlannerApp() {
             plannerActive={plannerActive}
             currentUser={store.getState().currentUser}
             focusFallback={() => dynamicUiManager.focusFallback('item')}
-            k5Mode={initializedOptions.env.K5_MODE}
-            isWeekly={initializedOptions.env.K5_MODE}
+            k5Mode={initializedOptions.env.K5_USER}
+            isWeekly={initializedOptions.env.K5_USER}
           />
         </Suspense>
       </Provider>

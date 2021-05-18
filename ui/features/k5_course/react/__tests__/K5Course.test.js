@@ -38,7 +38,7 @@ const currentUser = {
 }
 const defaultEnv = {
   current_user: currentUser,
-  K5_MODE: true,
+  K5_USER: true,
   FEATURES: {
     unpublished_courses: true
   },

@@ -29,7 +29,7 @@ function initialState(opts = {}) {
       payload: {
         env: {
           TIMEZONE: TZ,
-          K5_MODE: true,
+          K5_USER: true,
           FEATURES: {}
         }
       }

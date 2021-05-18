@@ -187,7 +187,7 @@ const staff = [
 const defaultEnv = {
   current_user: currentUser,
   current_user_id: '1',
-  K5_MODE: true,
+  K5_USER: true,
   FEATURES: {
     unpublished_courses: true
   },

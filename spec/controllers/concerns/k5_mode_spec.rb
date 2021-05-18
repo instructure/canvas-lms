@@ -37,7 +37,6 @@ describe K5Mode do
       it 'should set k5 variables' do
         user_session(@teacher)
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_mode)).to eq(true)
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)
@@ -49,7 +48,6 @@ describe K5Mode do
       it 'should set k5 variables' do
         user_session(@student)
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_mode)).to eq(true)
         expect(assigns(:k5_details_view)).to eq(true)
         expect(assigns(:show_left_side)).to eq(false)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)

@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 require_relative '../../courses/pages/course_settings_page'
 
 describe "teacher k5 course dashboard" do
@@ -132,7 +132,7 @@ describe "teacher k5 course dashboard" do
   end
 
   context 'course color selection' do
-    it 'allows for available color to be selected', ignore_js_errors: true do
+    it 'allows for available color to be selected', ignore_js_errors: true, custom_timeout: 30 do
       get "/courses/#{@subject_course.id}/settings"
       visit_course_details_tab
 

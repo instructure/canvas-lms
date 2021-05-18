@@ -20,6 +20,7 @@
 
 require_relative '../spec_helper'
 require_relative '../lti_1_3_spec_helper'
+require_relative '../helpers/k5_common'
 
 RSpec.describe ApplicationController do
   before :each do
@@ -373,29 +374,34 @@ RSpec.describe ApplicationController do
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
       end
 
-      describe "HOMEROOM_COURSE" do
+      describe "K5_HOMEROOM_COURSE" do
         describe "with canvas_for_elementary account setting on" do
           it "is true if the course is a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
             course.homeroom_course = true
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_truthy
           end
 
           it "is false if the course is a homeroom course and not in a K-5 account" do
             course.homeroom_course = true
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
           end
 
           it "is false if the course is not a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
           end
         end
 
         it "is false with the canvas_for_elementary account setting off" do
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+
+          course.homeroom_course = true
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
+
           course.homeroom_course = false
           course.account.settings[:enable_as_k5_account] = {value: true}
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
         end
       end
     end
@@ -1479,6 +1485,8 @@ RSpec.describe ApplicationController do
 end
 
 describe ApplicationController do
+  include K5Common
+
   describe "flash_notices" do
     it 'should return notice text for each type' do
       [:error, :warning, :info, :notice].each do |type|
@@ -2006,8 +2014,45 @@ describe ApplicationController do
       expect(@controller.use_new_math_equation_handling?).to be_truthy
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
     end
+  end
 
+  describe "k5_user? helper" do
+    before :once do
+      course_with_student :active_all => true
+      toggle_k5_setting(@course.account)
+    end
 
+    before :each do
+      user_session(@student)
+      @controller.instance_variable_set(:@current_user, @student)
+      @controller.instance_variable_set(:@domain_root_account, @course.root_account)
+    end
+
+    it "caches the result after computing" do
+      enable_cache do
+        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @student, batched_keys: [:k5_user]) do
+          "cached :)"
+        end
+        expect(@controller.send(:k5_user?)).to eq "cached :)"
+      end
+    end
+
+    it "returns true if associated with a k5 account" do
+      expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns false if not associated with a k5 account" do
+      @course.account.settings[:enable_as_k5_account] = {value: false}
+      @course.account.save!
+      @course.root_account.settings[:k5_accounts] = []
+      @course.root_account.save!
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns false if no current user" do
+      @controller.instance_variable_set(:@current_user, nil)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
   end
 end
 

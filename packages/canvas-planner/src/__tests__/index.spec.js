@@ -40,7 +40,7 @@ function defaultPlannerOptions() {
       PREFERENCES: {
         custom_colors: {}
       },
-      K5_MODE: false
+      K5_USER: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
@@ -140,7 +140,7 @@ describe('with mock api', () => {
   describe('renderWeeklyPlannerHeader', () => {
     beforeEach(() => {
       const opts = defaultPlannerOptions()
-      opts.env.K5_MODE = true
+      opts.env.K5_USER = true
       initializePlanner(opts)
     })
 

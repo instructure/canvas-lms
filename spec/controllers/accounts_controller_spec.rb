@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe AccountsController do
+  include K5Common
+
   def account_with_admin_logged_in(opts = {})
     account_with_admin(opts)
     user_session(@admin)
@@ -576,11 +579,19 @@ describe AccountsController do
         end
 
         it "contains nothing once disabled" do
-          @root_account.settings[:k5_accounts] = [@root_account.id]
-          @root_account.save!
+          toggle_k5_setting(@root_account)
           post 'update', params: toggle_k5_params(@root_account.id, false)
           @root_account.reload
           expect(@root_account.settings[:k5_accounts]).to be_empty
+        end
+
+        it "is not changed unless enable_as_k5_account is modified" do
+          @root_account.settings[:k5_accounts] = [@root_account.id] # in reality this wouldn't ever contain the account if enable_as_k5_account is off
+          @root_account.save!
+          post 'update', params: toggle_k5_params(@root_account.id, false) # already set to false, so shouldn't touch k5_accounts
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts][0]).to be @root_account.id
+          expect(@root_account.settings[:k5_accounts].length).to be 1
         end
       end
     end

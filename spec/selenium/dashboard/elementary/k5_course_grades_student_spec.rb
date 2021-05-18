@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 course grades tab" do
