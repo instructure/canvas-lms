@@ -1331,6 +1331,11 @@ class Account < ActiveRecord::Base
     can :view_bounced_emails
   end
 
+  def reload(*)
+    @account_chain = nil
+    super
+  end
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.transaction do

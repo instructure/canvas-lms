@@ -24,16 +24,16 @@ module Account::Settings
         opts[:hash] = true
         opts[:values] = [:value, :locked]
 
-        self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end"
+        self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end", __FILE__, __LINE__
       elsif (opts && opts[:boolean] && opts.has_key?(:default))
         if opts[:default]
           # if the default is true, we want a nil result to evaluate to true.
           # this prevents us from having to backfill true values into a
           # serialized column, which would be expensive.
-          self.class_eval "def #{setting}?; settings[:#{setting}] != false; end"
+          self.class_eval "def #{setting}?; settings[:#{setting}] != false; end", __FILE__, __LINE__
         else
           # if the default is not true, we can fall back to a straight boolean.
-          self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
+          self.class_eval "def #{setting}?; !!settings[:#{setting}]; end", __FILE__, __LINE__
         end
       end
       self.account_settings_options[setting.to_sym] = opts || {}
