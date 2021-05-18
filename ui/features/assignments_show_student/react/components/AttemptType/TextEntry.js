@@ -54,11 +54,13 @@ export default class TextEntry extends React.Component {
   getDraftBody = () => {
     const {submission} = this.props
     if (['graded', 'submitted'].includes(submission.state)) {
-      // If this attempt has been submitted/graded, use it
-      return submission.body
+      // If this attempt has been submitted/graded, use it. (It could be null
+      // if a grade was given without a proper submission; the RCE will throw
+      // an error in that case, so default to an empty string.)
+      return submission.body || ''
     } else if (submission.submissionDraft != null) {
       // If a draft object exists, get the submission contents from it
-      return submission.submissionDraft.body
+      return submission.submissionDraft.body || ''
     }
 
     // If the submission is marked as unsubmitted and there's no draft object,
@@ -71,7 +73,7 @@ export default class TextEntry extends React.Component {
   componentDidMount() {
     this._isMounted = true
 
-    if (this.getDraftBody() != null && !this.state.editorLoaded) {
+    if (!this.state.editorLoaded) {
       this.loadRCE()
     }
   }
