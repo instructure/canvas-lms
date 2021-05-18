@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
-import {Heading} from '@instructure/ui-heading'
 
 import {
   createTeacherPreview,
@@ -29,6 +28,7 @@ import {
   store,
   toggleMissingItems
 } from '@instructure/canvas-planner'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -46,10 +46,12 @@ import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
-import {FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
+import {groupAnnouncementsByHomeroom, FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
+import useFetchApi from '@canvas/use-fetch-api-hook'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const DASHBOARD_TABS = [
   {
@@ -92,6 +94,9 @@ export const K5Dashboard = ({
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
+  const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
+  const [subjectAnnouncements, setSubjectAnnouncements] = useState([])
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -103,11 +108,37 @@ export const K5Dashboard = ({
   useEffect(() => {
     if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
-        setCards(dc)
+        setCards(dc.filter(({enrollmentState}) => enrollmentState !== 'invited'))
         setCardsSettled(cardsFinishedLoading)
       })
     }
   }, [cards, currentTab])
+
+  useFetchApi({
+    path: '/api/v1/announcements',
+    loading: setLoadingAnnouncements,
+    success: useCallback(
+      data => {
+        if (data) {
+          const groupedAnnouncements = groupAnnouncementsByHomeroom(data, cards)
+          setHomeroomAnnouncements(groupedAnnouncements.true)
+          setSubjectAnnouncements(groupedAnnouncements.false)
+        }
+      },
+      [cards]
+    ),
+    error: useCallback(showFlashError(I18n.t('Failed to load announcements.')), []),
+    // This is a bit hacky, but we need to wait to fetch the announcements until the cards have
+    // settled. Setting forceResult skips the fetch until it changes to undefined.
+    forceResult: cardsSettled ? undefined : false,
+    fetchAllPages: true,
+    params: {
+      active_only: true,
+      context_codes: cards && cards.map(({id}) => `course_${id}`),
+      latest_only: true,
+      per_page: '100'
+    }
+  })
 
   const handleSwitchToToday = () => {
     handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.TODAY)
@@ -133,10 +164,11 @@ export const K5Dashboard = ({
           assignmentsDueToday,
           assignmentsMissing,
           assignmentsCompletedForToday,
-          cardsSettled,
+          loadingAnnouncements,
           loadingOpportunities,
           isStudent: plannerEnabled,
           responsiveSize,
+          subjectAnnouncements,
           switchToMissingItems: handleSwitchToMissingItems,
           switchToToday: handleSwitchToToday
         }}
@@ -153,11 +185,10 @@ export const K5Dashboard = ({
         )}
         <HomeroomPage
           cards={cards}
-          cardsSettled={cardsSettled}
-          isStudent={plannerEnabled}
-          responsiveSize={responsiveSize}
-          visible={currentTab === TAB_IDS.HOMEROOM}
           createPermissions={createPermissions}
+          homeroomAnnouncements={homeroomAnnouncements}
+          loadingAnnouncements={loadingAnnouncements}
+          visible={currentTab === TAB_IDS.HOMEROOM}
         />
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}

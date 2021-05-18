@@ -44,6 +44,7 @@ const dashboardCards = [
     shortName: 'Econ 101',
     originalName: 'Economics 101',
     courseCode: 'ECON-001',
+    enrollmentState: 'active',
     isHomeroom: false,
     canManage: true,
     published: true
@@ -55,13 +56,27 @@ const dashboardCards = [
     shortName: 'Homeroom1',
     originalName: 'Home Room',
     courseCode: 'HOME-001',
+    enrollmentState: 'active',
     isHomeroom: true,
     canManage: true,
     published: false
+  },
+  {
+    id: '3',
+    assetString: 'course_3',
+    href: '/courses/3',
+    originalName: 'The Maths',
+    courseCode: 'DA-MATHS',
+    enrollmentState: 'invited',
+    isHomeroom: false,
+    canManage: true,
+    published: true
   }
 ]
-const homeroomAnnouncement = [
+const announcements = [
   {
+    id: '20',
+    context_code: 'course_2',
     title: 'Announcement here',
     message: '<p>This is the announcement</p>',
     html_url: 'http://google.com/announcement',
@@ -75,6 +90,13 @@ const homeroomAnnouncement = [
         filename: '1608134586_366__exam1.pdf'
       }
     ]
+  },
+  {
+    id: '21',
+    context_code: 'course_1',
+    title: "This sure isn't a homeroom",
+    message: '<p>Definitely not!</p>',
+    html_url: '/courses/1/announcements/21'
   }
 ]
 const gradeCourses = [
@@ -178,6 +200,7 @@ const defaultEnv = {
 }
 const defaultProps = {
   currentUser,
+  createPermissions: 'none',
   plannerEnabled: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE
@@ -278,11 +301,7 @@ beforeEach(() => {
     response: opportunities
   })
   fetchMock.get('/api/v1/courses/1/activity_stream/summary', JSON.stringify(cardSummary))
-  fetchMock.get(
-    /\/api\/v1\/announcements\?context_codes=course_2.*/,
-    JSON.stringify(homeroomAnnouncement)
-  )
-  fetchMock.get(/\/api\/v1\/announcements\?context_codes=course_1.*/, '[]')
+  fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
   fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
@@ -358,10 +377,11 @@ describe('K-5 Dashboard', () => {
       expect(await findByText('My Subjects')).toBeInTheDocument()
     })
 
-    it('shows course cards, excluding homerooms', async () => {
+    it('shows course cards, excluding homerooms and subjects with pending invites', async () => {
       const {findByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
       expect(await findByText('Economics 101')).toBeInTheDocument()
       expect(queryByText('Home Room')).not.toBeInTheDocument()
+      expect(queryByText('The Maths')).not.toBeInTheDocument()
     })
 
     it('shows latest announcement from each homeroom', async () => {
@@ -388,6 +408,13 @@ describe('K-5 Dashboard', () => {
       expect(await findByText('Assignment 15')).toBeInTheDocument()
       // window.requestAnimationFrame doesn't really work in jsdom, so we can't test that the
       // correct element is focused since that occurs at the end of the scrolling animation
+    })
+
+    it('shows the latest announcement for each subject course if one exists', async () => {
+      const {findByText} = render(<K5Dashboard {...defaultProps} />)
+      const announcementLink = await findByText("This sure isn't a homeroom")
+      expect(announcementLink).toBeInTheDocument()
+      expect(announcementLink.closest('a').href).toMatch('/courses/1/announcements/21')
     })
 
     it('shows a missing items link pointing to the missing items section on the schedule tab', async () => {
@@ -431,8 +458,8 @@ describe('K-5 Dashboard', () => {
               response: dashboardCards
             })
             .then(() => {
-              // Expect one announcement request for each card
-              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(2)
+              // Expect just one announcement request for all cards
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(1)
               // Expect one LTI request for each non-homeroom card
               expect(
                 fetchMock.calls('/api/v1/courses/1/external_tools/visible_course_nav_tools').length

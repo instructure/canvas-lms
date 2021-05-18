@@ -52,6 +52,11 @@ class AnnouncementsApiController < ApplicationController
   #   unpublished items.
   #   Defaults to false for users with access to view unpublished items,
   #   otherwise true and unmodifiable.
+  # @argument latest_only [Optional, Boolean]
+  #   Only return the latest announcement for each associated context.
+  #   The response will include at most one announcement for each
+  #   specified context in the context_codes[] parameter.
+  #   Defaults to false.
   #
   # @argument include [Optional, array]
   #   Optional list of resources to include with the response. May include
@@ -97,7 +102,12 @@ class AnnouncementsApiController < ApplicationController
 
     @start_date ||= 14.days.ago.beginning_of_day
     @end_date ||= @start_date + 28.days
-    scope = scope.ordered_between(@start_date, @end_date)
+    if value_to_boolean(params[:latest_only])
+      scope = scope.ordered_between_by_context(@start_date, @end_date)
+      scope = scope.select("DISTINCT ON (context_id) *")
+    else
+      scope = scope.ordered_between(@start_date, @end_date)
+    end
 
     # only filter by section visibility if user has no course manage rights
     skip_section_filtering = courses.all? do |course|

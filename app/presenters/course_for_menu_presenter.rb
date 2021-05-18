@@ -51,6 +51,7 @@ class CourseForMenuPresenter
       href: course_path(course, invitation: course.read_attribute(:invitation)),
       term: term || nil,
       subtitle: subtitle,
+      enrollmentState: course.primary_enrollment_state,
       enrollmentType: course.primary_enrollment_type,
       observee: observee,
       id: course.id,

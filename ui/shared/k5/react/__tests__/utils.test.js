@@ -32,7 +32,8 @@ import {
   getAccountsFromEnrollments,
   getTotalGradeStringFromEnrollments,
   fetchImportantInfos,
-  parseAnnouncementDetails
+  parseAnnouncementDetails,
+  groupAnnouncementsByHomeroom
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -632,5 +633,66 @@ describe('parseAnnouncementDetails', () => {
   it('handles a missing attachment', () => {
     const announcementDetails = parseAnnouncementDetails({...announcement, attachments: []}, course)
     expect(announcementDetails.announcement.attachment).toBeUndefined()
+  })
+})
+
+describe('groupAnnouncementsByHomeroom', () => {
+  const announcements = [
+    {
+      id: '10',
+      context_code: 'course_1'
+    },
+    {
+      id: '11',
+      context_code: 'course_2',
+      permissions: {
+        update: false
+      },
+      attachments: []
+    },
+    {
+      id: '12',
+      context_code: 'course_3'
+    }
+  ]
+  const courses = [
+    {
+      id: '1',
+      isHomeroom: false
+    },
+    {
+      id: '2',
+      isHomeroom: true
+    }
+  ]
+
+  it('groups returned announcements by whether they are associated with a homeroom or not', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect(Object.keys(grouped)).toEqual(['true', 'false'])
+    expect(grouped.true).toHaveLength(1)
+    expect(grouped.false).toHaveLength(1)
+    expect(grouped.true[0].announcement.id).toBe('11')
+    expect(grouped.false[0].id).toBe('10')
+  })
+
+  it('parses announcement details on homeroom announcements only', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect(grouped.true[0].courseId).toBe('2')
+    expect(grouped.false[0].courseId).toBeUndefined()
+  })
+
+  it('ignores announcements not associated with a passed-in course', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect([...grouped.true, ...grouped.false]).toHaveLength(2)
+  })
+
+  it('handles missing announcements and courses gracefully', () => {
+    const emptyGroups = {true: [], false: []}
+    expect(groupAnnouncementsByHomeroom([], courses)).toEqual({
+      true: [{courseId: '2'}],
+      false: []
+    })
+    expect(groupAnnouncementsByHomeroom(announcements, [])).toEqual(emptyGroups)
+    expect(groupAnnouncementsByHomeroom()).toEqual(emptyGroups)
   })
 })

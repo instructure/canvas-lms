@@ -37,9 +37,16 @@ class Announcement < DiscussionTopic
 
   acts_as_list scope: { context: self, type: 'Announcement' }
 
-  scope :ordered_between, lambda { |start_date, end_date|
+  scope :between , lambda { |start_date, end_date|
     where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', start_date, end_date)
-      .order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
+  }
+
+  scope :ordered_between, lambda { |start_date, end_date|
+    between(start_date, end_date).order(Arel.sql("COALESCE(delayed_post_at, posted_at, created_at) DESC"))
+  }
+
+  scope :ordered_between_by_context, lambda { |start_date, end_date|
+    between(start_date, end_date).order(Arel.sql("context_id, COALESCE(delayed_post_at, posted_at, created_at) DESC"))
   }
 
   def validate_draft_state_change
