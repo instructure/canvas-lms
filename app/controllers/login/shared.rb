@@ -79,6 +79,7 @@ module Login::Shared
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
     @current_user = user
+    @current_pseudonym = pseudonym
 
     fullstory_init(@domain_root_account, session)
 

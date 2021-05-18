@@ -87,7 +87,7 @@ describe Login::CasController do
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:cas_session]).to eq 'ST-abcd'
     # the auth provider got set on the pseudonym
-    expect(@pseudonym.reload.authentication_provider).to eq account.authentication_providers.active.find_by(id: 'cas')
+    expect(assigns[:current_pseudonym].authentication_provider).to eq account.authentication_providers.active.find('cas')
   end
 
   it "should scope logins to the correct domain root account" do
