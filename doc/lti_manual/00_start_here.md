@@ -16,6 +16,15 @@
 **Contents**
 - [LTI Overview](./01_lti_overview.md)
 - [Tool Installation](./02_tool_installation.md)
+	- [Example Tools](./10_example_tools.md)
+- [LTI Launches](./03_lti_launches.md)
+	- [1.1 Launches](./05_lti_1_1_launches.md)
+	- [2.0 Launches](./06_lti_2_0_launches.md)
+	- [1.3 Launches](./07_lti_1_3_launches.md)
+- [Plagiarism Platform](./04_plagiarism_detection_platform.md)
+- [Custom Parameters](./08_custom_parameters.md)
+- [1.1 Implementation](./09_lti_1_1_implementation.md)
+- [Common Testing Scenarios](./11_testing.md)
 
 **Other Docs**
 - [External Tools Introduction - Canvas LMS REST API Documentation (instructure.com)](https://canvas.instructure.com/doc/api/file.tools_intro.html)
@@ -26,15 +35,11 @@
 ---
 
 More topics to write about:
-- Test tools to use
-- Launch flow
-- Launches in code (same page as above?)
-- Tool installation
 - PostMessage
 - list of placements and the postmessages and variable substitutions that work for each of them - probably also worth making customer facing
 - variable expansion and custom fields
 - deep linking and custom params
-- Services
+- Services (implementation specifics)
 	- Outcomes 1.1
 	- AGS 1.3
 	- Plagiarism Platform 2.0
