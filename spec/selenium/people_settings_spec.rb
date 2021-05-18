@@ -23,7 +23,7 @@ describe "course people" do
   include_context "in-process server selenium tests"
 
   before :each do
-    course_with_teacher_logged_in :limit_privileges_to_course_section => false
+    course_with_teacher_logged_in limit_privileges_to_course_section: false, active_all: true
     @account = @course.account # for custom roles
     @custom_student_role = custom_student_role("custom stu")
     Account.default.root_account.disable_feature!(:granular_permissions_manage_users)
@@ -393,7 +393,7 @@ describe "course people" do
 
       %w[student teacher ta designer observer].each do |base_type|
         it "should allow adding custom #{base_type} enrollments" do
-          user = user_with_pseudonym(:active_user => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
+          user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
@@ -407,7 +407,7 @@ describe "course people" do
 
         %w[student teacher ta designer observer].each do |base_type|
           it "should allow adding custom #{base_type} enrollments" do
-            user = user_with_pseudonym(:active_user => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
+            user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
             send "custom_#{base_type}_role", "custom"
             add_user(user.name, "custom")
             expect(f("#user_#{user.id} .admin-links")).not_to be_nil

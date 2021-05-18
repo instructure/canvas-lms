@@ -230,22 +230,23 @@ class UserListV2
     search_for_results(restricted_shards) do
       ccs = []
       if sms_paths.any?
-        ccs = CommunicationChannel.
-          sms.
-          unretired.
-          preload(user: :pseudonyms).
-          where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths).
-          to_a
+        ccs = CommunicationChannel
+          .sms
+          .active
+          .preload(user: :pseudonyms)
+          .where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths)
+          .to_a
       end
-      ccs += CommunicationChannel.
-        email.
-        unretired.
-        preload(user: :pseudonyms).
-        where("LOWER(path) IN (?)", email_paths).
-        to_a
+      ccs += CommunicationChannel
+        .email
+        .active
+        .preload(user: :pseudonyms)
+        .where("LOWER(path) IN (?)", email_paths)
+        .to_a
 
       ccs.map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
+
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
