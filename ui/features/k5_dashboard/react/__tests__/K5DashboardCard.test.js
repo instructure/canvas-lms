@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
 import {render} from '@testing-library/react'
 import K5DashboardCard, {
   DashboardCardHeaderHero,
@@ -30,26 +29,19 @@ const defaultContext = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
-  cardsSettled: true,
+  loadingAnnouncements: false,
+  loadingOpportunities: false,
   isStudent: true,
+  subjectAnnouncements: [],
   switchToMissingItems: jest.fn(),
   switchToToday: jest.fn()
 }
 
 const defaultProps = {
   id: 'test',
-  href: '/courses/5',
+  href: '/courses/test',
   originalName: 'test course'
 }
-
-beforeEach(() => {
-  fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
-})
-
-afterEach(() => {
-  fetchMock.restore()
-  jest.clearAllMocks()
-})
 
 describe('DashboardCardHeaderHero', () => {
   const heroProps = {
@@ -92,19 +84,16 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it('displays a link to the latest announcement if one exists', async () => {
-    fetchMock.get(
-      '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1',
-      JSON.stringify([
-        {
-          id: '55',
-          html_url: '/courses/test/discussion_topics/55',
-          title: 'How do you do, fellow kids?'
-        }
-      ]),
-      {overwriteRoutes: true}
-    )
+    const subjectAnnouncements = [
+      {
+        id: '55',
+        context_code: 'course_test',
+        html_url: '/courses/test/discussion_topics/55',
+        title: 'How do you do, fellow kids?'
+      }
+    ]
     const {findByText} = render(
-      <K5DashboardContext.Provider value={defaultContext}>
+      <K5DashboardContext.Provider value={{...defaultContext, subjectAnnouncements}}>
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
@@ -186,7 +175,14 @@ describe('LatestAnnouncementLink', () => {
 describe('AssignmentLinks', () => {
   it('renders loading skeleton while loading', () => {
     const {getByText, queryByText} = render(
-      <AssignmentLinks loading color="red" requestTabChange={jest.fn()} numMissing={2} />
+      <AssignmentLinks
+        loading
+        color="red"
+        courseName="test"
+        switchToMissingItems={jest.fn()}
+        switchToToday={jest.fn()}
+        numMissing={2}
+      />
     )
     expect(getByText('Loading missing assignments link')).toBeInTheDocument()
     expect(queryByText('2 missing')).not.toBeInTheDocument()
