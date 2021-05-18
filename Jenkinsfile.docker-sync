@@ -80,7 +80,7 @@ pipeline {
               """
 
               if (dstJob) {
-                def buildResult = build(job: dstJob, parameters: [
+                build(job: dstJob, parameters: [
                   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
                 ], propagate: false, wait: false)
               }

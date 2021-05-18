@@ -87,8 +87,8 @@ def computeTestCount() {
     return
   }
 
-  def changedTestsArr = changedTests.split('\n').collect {
-    "$DOCKER_WORKDIR/$it"
+  def changedTestsArr = changedTests.split('\n').collect { changedTest ->
+    "$DOCKER_WORKDIR/$changedTest"
   }
 
   sh """
@@ -109,8 +109,8 @@ def computeTestCount() {
   }
 
   def testCount = changedTestsArr.size()
-  def weightedValues = changedTestsArr.collect {
-    it.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
+  def weightedValues = changedTestsArr.collect { changedTest ->
+    changedTest.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
   }
 
   def distributedFactor = env.TESTS_PER_NODE.toInteger()

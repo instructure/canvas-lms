@@ -371,13 +371,13 @@ pipeline {
               extendedStage('Setup')
                 .obeysAllowStages(false)
                 .timeout(2)
-                .execute({ setupStage() })
+                .execute { setupStage() }
 
               extendedStage('Rebase')
                 .obeysAllowStages(false)
                 .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
                 .timeout(2)
-                .execute({ rebaseStage() })
+                .execute { rebaseStage() }
 
               extendedStage(FILES_CHANGED_STAGE)
                 .obeysAllowStages(false)
@@ -389,7 +389,7 @@ pipeline {
                   stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
 
                   dir(env.LOCAL_WORKDIR) {
-                    stageConfig.value('specFiles', sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)
+                    stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
                   }
 
                   // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
@@ -415,7 +415,7 @@ pipeline {
               extendedStage(RUN_MIGRATIONS_STAGE)
                 .obeysAllowStages(false)
                 .timeout(10)
-                .execute({ runMigrationsStage() })
+                .execute { runMigrationsStage() }
 
               extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
                 def stages = [:]

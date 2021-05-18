@@ -117,6 +117,7 @@ pipeline {
                         docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
                       '''
                       stillRunning = false
+                    /* groovylint-disable-next-line CatchException */
                     } catch (Exception ex) {
                       // want to be able to debug in build output what
                       // made the pulsar container fail.
@@ -124,7 +125,7 @@ pipeline {
 
                       // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
                       // which means we don't think we can retry, so just let it die.
-                      sh "docker-compose logs pulsar | grep \"zoo keeper disconnected\""
+                      sh 'docker-compose logs pulsar | grep "zoo keeper disconnected"'
 
                       reportToSplunk('pulsar_retrying')
                       sh '''
