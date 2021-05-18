@@ -294,45 +294,52 @@ module MicrosoftSync
       end
     end
 
+    # Returns a hash with possible keys (:ignored, :throttled, :success:, :error) and values
+    # being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
+    def group_batch_subresponses_by_type(responses, &response_should_be_ignored)
+      responses.group_by do |subresponse|
+        if response_should_be_ignored[subresponse]
+          :ignored
+        elsif subresponse['status'] == 429
+          :throttled
+        elsif (200..299).cover?(subresponse['status'])
+          :success
+        else
+          :error
+        end
+      end
+    end
+
+    def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
+      responses_grouped_by_type.each do |type, responses|
+        responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
+          tags = {msft_endpoint: endpoint_name, status: code}
+          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+        end
+      end
+    end
+
     # Uses Microsoft API's JSON batching to run requests in parallel with one
     # HTTP request. Expected failures can be ignored by passing in a block which checks
     # the response. Other non-2xx responses cause a BatchRequestFailed error.
     # Returns a list of ids of the requests that were ignored.
     def run_batch(endpoint_name, requests, &response_should_be_ignored)
-      ignored_request_ids = []
-      failed = []
-
       Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
 
       response = request(:post, '$batch', body: { requests: requests })
+      grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
 
-      statsd_names_and_codes = []
-      response['responses'].each do |subresponse|
-        code = subresponse['status']
-        if response_should_be_ignored[subresponse]
-          ignored_request_ids << subresponse['id']
-          statsd_names_and_codes << [:ignored, code]
-        elsif code < 200 || code >= 300
-          failed << subresponse
-          statsd_names_and_codes << [code == 429 ? :throttled : :error, code]
-        else
-          statsd_names_and_codes << [:success, code]
-        end
-      end
+      increment_batch_statsd_counters(endpoint_name, grouped)
 
-      statsd_names_and_codes.group_by{|c| c}.transform_values(&:count).each do |(name, code), count|
-        tags = {msft_endpoint: endpoint_name, status: code}
-        InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{name}", count, tags: tags)
-      end
-
-      if failed.any?
+      failed = (grouped[:error] || []) + (grouped[:throttled] || [])
+      if failed.present?
         codes = failed.map{|resp| resp['status']}
         bodies = failed.map{|resp| resp['body'].to_s.truncate(500)}
         msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
         raise BatchRequestFailed, msg
       end
 
-      ignored_request_ids
+      grouped[:ignored]&.map{|r| r['id']} || []
     end
 
     # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
