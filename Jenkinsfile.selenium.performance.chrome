@@ -35,6 +35,7 @@ pipeline {
     NODE = configuration.node()
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby()
+    RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20201119"
 
@@ -94,7 +95,7 @@ pipeline {
     stage ('Selenium Performance Tests') {
       steps {
         timeout(time: 60) {
-          sh 'docker-compose exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99'
+          sh 'build/new-jenkins/rspec-with-retries.sh performance'
         }
       }
     }
