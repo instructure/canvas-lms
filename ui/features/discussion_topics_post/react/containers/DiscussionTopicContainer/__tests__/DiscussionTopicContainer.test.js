@@ -326,4 +326,19 @@ describe('DiscussionTopicContainer', () => {
     await waitFor(() => expect(container.queryByTestId('discussion-topic-reply')).toBeNull())
     defaultTopic.permissions.reply = true
   })
+
+  it('should find "Super Group" group name', async () => {
+    const container = setup({discussionTopic: {...defaultTopic}})
+    expect(await container.queryByText('Super Group')).toBeFalsy()
+    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
+    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+  })
+
+  it('should not render group menu button when there is child topics but no group set', async () => {
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, groupSet: null}
+    })
+
+    await expect(container.queryByTestId('groups-menu-btn')).toBeFalsy()
+  })
 })

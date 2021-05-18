@@ -19,33 +19,22 @@
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
 
-export const ChildTopic = {
+export const GroupSet = {
   fragment: gql`
-    fragment ChildTopic on Discussion {
+    fragment GroupSet on GroupSet {
       id
       _id
-      contextName
-      contextId
     }
   `,
 
   shape: shape({
     id: string,
-    _id: string,
-    contextName: string,
-    contextId: string
+    _id: string
   }),
 
-  mock: ({
-    id = 'QXNzaWdubWVudC0x22',
-    _id = '1',
-    contextName = 'Super Group',
-    contextId = '5'
-  } = {}) => ({
+  mock: ({id = 'QXNzaWHGVJBkn0x22', _id = '1'} = {}) => ({
     id,
     _id,
-    contextId,
-    contextName,
-    __typename: 'ChildTopic'
+    __typename: 'GroupSet'
   })
 }

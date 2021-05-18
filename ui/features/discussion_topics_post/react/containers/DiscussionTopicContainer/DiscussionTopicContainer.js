@@ -61,7 +61,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     title: props.discussionTopic?.title || '',
     unread: props.discussionTopic?.entryCounts?.unreadCount,
     replies: props.discussionTopic?.entryCounts?.repliesCount,
-    assignment: props.discussionTopic?.assignment
+    assignment: props.discussionTopic?.assignment,
+    childTopics: props.discussionTopic?.childTopics || [],
+    groupSet: props.discussionTopic?.groupSet || false
   }
 
   // TODO: Change this to the new canGrade permission.
@@ -77,6 +79,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish
+  // TODO: add check for childTopics
+  const canSeeGroupsMenu =
+    discussionTopicData?.permissions?.readAsAdmin &&
+    discussionTopicData?.childTopics.length > 0 &&
+    discussionTopicData?.groupSet
 
   if (isGraded(discussionTopicData.assignment)) {
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
@@ -190,6 +197,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
         <View as="div" padding="medium 0" background="primary">
           <DiscussionPostToolbar
+            childTopics={canSeeGroupsMenu ? discussionTopicData.childTopics : null}
             selectedView={filter}
             sortDirection={sort}
             isCollapsedReplies
