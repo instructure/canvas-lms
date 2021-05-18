@@ -1204,13 +1204,7 @@ describe GradebooksController do
         expect(context_id).to eq @course.id.to_param
       end
 
-      it "doesn't enable context cards when feature is off" do
-        get :show, params: {course_id: @course.id}
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
-      end
-
-      it "enables context cards when feature is on" do
-        @course.root_account.enable_feature! :student_context_cards
+      it "is enabled for teachers" do
         get :show, params: {course_id: @course.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
       end

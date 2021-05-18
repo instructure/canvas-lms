@@ -103,16 +103,7 @@ describe ContextController do
     end
 
     context 'student context cards' do
-      before(:once) { @course.root_account.enable_feature! :student_context_cards }
-
-      it 'is disabled when feature_flag is off' do
-        @course.root_account.disable_feature! :student_context_cards
-        user_session(@teacher)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
-      end
-
-      it 'is enabled for teachers when feature_flag is on' do
+      it 'is always enabled for teachers' do
         %w[manage_students manage_admin_users].each do |perm|
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end

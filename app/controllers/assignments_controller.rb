@@ -362,7 +362,6 @@ class AssignmentsController < ApplicationController
     css_bundle :assignment_grade_summary
     js_bundle :assignment_grade_summary
     js_env(show_moderate_env)
-    set_student_context_cards_js_env
 
     @page_title = @assignment.title
 

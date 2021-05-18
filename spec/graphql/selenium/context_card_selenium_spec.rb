@@ -45,7 +45,6 @@ describe "graphql student context cards" do
       @section = @course.default_section
       add_enrollment('active', @section)
       grade_assignment(@course, @student, @teacher)
-      Account.default.enable_feature!(:student_context_cards)
     end
 
     it "should pull student context card data from graphql", priority: "2", test_id: 3418826 do
@@ -85,7 +84,6 @@ describe "graphql student context cards" do
       @section = @course.default_section
       add_enrollment('active', @section)
       grade_assignment(@course, @student, @admin)
-      Account.default.enable_feature!(:student_context_cards)
     end
 
     it "should pull student context card data from graphql on gradebook page", priority: "2", test_id: 3418825 do

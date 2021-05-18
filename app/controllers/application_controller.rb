@@ -299,12 +299,10 @@ class ApplicationController < ActionController::Base
   helper_method :conditional_release_js_env
 
   def set_student_context_cards_js_env
-    if @domain_root_account.feature_enabled?(:student_context_cards)
-      js_env(
-        STUDENT_CONTEXT_CARDS_ENABLED: true,
-        student_context_card_tools: external_tools_display_hashes(:student_context_card)
-      )
-    end
+    js_env(
+      STUDENT_CONTEXT_CARDS_ENABLED: true,
+      student_context_card_tools: external_tools_display_hashes(:student_context_card)
+    )
   end
 
   def external_tools_display_hashes(type, context=@context, custom_settings=[], tool_ids: nil)

@@ -372,12 +372,6 @@ strip_origin_from_quiz_answer_file_references:
     This was already happening for images in the question, but not answers
     causing CORS failures when a quiz is created in one domain and
     taken in another (like a vanity domain).
-student_context_cards:
-  state: allowed
-  display_name: Student Context Card
-  description: Enable student context card links
-  applies_to: RootAccount
-  root_opt_in: true
 student_outcome_gradebook:
   state: allowed
   display_name:
