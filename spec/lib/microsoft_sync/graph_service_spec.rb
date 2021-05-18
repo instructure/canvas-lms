@@ -54,6 +54,8 @@ describe MicrosoftSync::GraphService do
 
   let(:url_path_prefix_for_statsd) { URI.parse(url).path.split('/')[2] }
 
+  ###### SHARED CODE
+
   shared_examples_for 'a graph service endpoint' do |opts={}|
     let(:statsd_tags) do
       {
@@ -277,6 +279,145 @@ describe MicrosoftSync::GraphService do
     end
   end
 
+  # Shared helpers/examples for batching
+
+  def succ(id)
+    {id: id, status: 204, body: nil}
+  end
+
+  def err(id)
+    {id: id, status: 400, body: "bad"}
+  end
+
+  def err2(id)
+    {id: id, status: 500, body: "bad2"}
+  end
+
+  def throttled(id, retry_after=nil)
+    resp = {id: id, status: 429, body: "badthrottled"}
+    resp[:headers] = {'Retry-After' => retry_after.to_s} if retry_after
+    resp
+  end
+
+  shared_examples_for 'a batch request that fails' do
+    it 'raises an error with a message with the codes/bodies' do
+      expect { subject }.to raise_error(
+        expected_error,
+        "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
+      )
+    end
+
+    it 'increments statsd counters based on the responses' do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      expect { subject }.to raise_error(expected_error)
+
+      codes.each do |type, codes_list|
+        codes_list = [codes_list].flatten
+        codes_list.uniq.each do |code|
+          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+            "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code),
+            tags: {msft_endpoint: endpoint_name, status: code}
+          )
+        end
+      end
+    end
+  end
+
+  shared_examples_for 'a members/owners batch request that can fail' do
+    let(:ignored_code) { ignored_members_m1_response[:status] }
+    let(:expected_error) { described_class::BatchRequestFailed }
+
+    context 'a batch request with an errored subrequest' do
+      it_behaves_like 'a batch request that fails' do
+        let(:bad_codes) { [400] }
+        let(:bad_bodies) { %w[bad] }
+        let(:codes) { { success: [204, 204], error: 400, ignored: ignored_code } }
+        let(:batch_responses) do
+          [ignored_members_m1_response, succ('members_m2'), err('owners_o1'), succ('owners_o2')]
+        end
+      end
+    end
+
+    context 'a batch request with different types of errored subrequests' do
+      it_behaves_like 'a batch request that fails' do
+        let(:bad_codes) { [400, 400, 500] }
+        let(:bad_bodies) { %w[bad bad bad2] }
+        let(:codes) { { success: 204, error: [400, 400, 500] } }
+        let(:batch_responses) do
+          [err('members_m1'), err('members_m2'), err2('owners_o1'), succ('owners_o2')]
+        end
+      end
+    end
+
+    context 'a batch request with two throttled subrequests' do
+      let(:batch_responses) do
+        [
+          ignored_members_m1_response,
+          throttled('members_m2', retry_delay1), throttled('owners_o1', retry_delay2),
+          succ('owners_o2')
+        ]
+      end
+
+      let(:retry_delay1) { nil }
+      let(:retry_delay2) { nil }
+
+      it_behaves_like 'a batch request that fails' do
+        let(:bad_codes) { [429, 429] }
+        let(:bad_bodies) { %w[badthrottled badthrottled] }
+        let(:codes) { { success: 204, throttled: [429, 429], ignored: ignored_code } }
+        let(:expected_error) { described_class::BatchRequestThrottled }
+      end
+
+      context 'when no response has a retry delay' do
+        it 'raises an error with retry_after_delay of nil' do
+          expect { subject }.to raise_error(MicrosoftSync::Errors::Throttled) do |e|
+            expect(e.retry_after_seconds).to eq(nil)
+          end
+        end
+      end
+
+      context 'when one response has a retry delay' do
+        let(:retry_delay1) { '1.23' }
+
+        it 'raises an error with that retry delay' do
+          expect { subject }.to raise_error { |e| expect(e.retry_after_seconds).to eq(1.23) }
+        end
+      end
+
+      context 'when both responses have a retry delay' do
+        let(:retry_delay1) { '1.23' }
+        let(:retry_delay2) { '2.34' }
+
+        it 'raises an error with the greater retry delay' do
+          expect { subject }.to raise_error { |e| expect(e.retry_after_seconds).to eq(2.34) }
+        end
+      end
+    end
+
+    context 'a batch request with throttled and errored subrequests' do
+      let(:bad_codes) { [400, 429] }
+      let(:bad_bodies) { %w[bad badthrottled] }
+      let(:codes) { { success: 204, error: 400, throttled: 429, ignored: ignored_code } }
+      let(:batch_responses) do
+        [
+          ignored_members_m1_response,
+          err('members_m2'), throttled('owners_o1'), succ('owners_o2')
+        ]
+      end
+      let(:expected_error) { described_class::BatchRequestThrottled }
+
+      it_behaves_like 'a batch request that fails'
+
+      context 'when the overall response is a 424' do
+        let(:batch_overall_response_code) { 424 }
+
+        it_behaves_like 'a batch request that fails'
+      end
+    end
+  end
+
+  #### INDIVIDUAL METHODS / ENDPOINTS
+
   describe '#list_education_classes' do
     let(:method_name) { :list_education_classes }
     let(:method_args) { [] }
@@ -392,6 +533,7 @@ describe MicrosoftSync::GraphService do
 
     context 'when using JSON batching because some users already exist' do
       let(:response) { {status: 400, body: 'One or more added object references already exist'} }
+      let(:batch_overall_response_code) { 200 }
       let(:batch_url) { 'https://graph.microsoft.com/v1.0/$batch' }
       let(:batch_method) { :post }
       let(:batch_body) do
@@ -421,18 +563,6 @@ describe MicrosoftSync::GraphService do
         }
       end
 
-      def succ(id)
-        {id: id, status: 204, body: nil}
-      end
-
-      def err(id)
-        {id: id, status: 400, body: "bad"}
-      end
-
-      def throttled(id)
-        {id: id, status: 429, body: "bad2"}
-      end
-
       def dupe(id)
         err_msg = "One or more added object references already exist for the following modified properties: 'members'."
         {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: err_msg}}}
@@ -440,7 +570,7 @@ describe MicrosoftSync::GraphService do
 
       before do
         stub_request(batch_method, batch_url).with(body: batch_body)
-          .to_return(json_response(200, responses: batch_responses))
+          .to_return(json_response(batch_overall_response_code, responses: batch_responses))
       end
 
       context 'when all are successfully added' do
@@ -481,39 +611,9 @@ describe MicrosoftSync::GraphService do
         end
       end
 
-      context 'when some users failed for some other reason' do
-        let(:batch_responses) do
-          [dupe('members_m1'), err('members_m2'), throttled('owners_o1'), succ('owners_o2')]
-        end
-
-        it 'raises a BatchRequestFailed error' do
-          expect { subject }.to raise_error(
-            described_class::BatchRequestFailed,
-            'Batch of 2: codes [400, 429], bodies ["bad", "bad2"]'
-          )
-        end
-
-        it 'increments statsd counters based on the responses' do
-          allow(InstStatsd::Statsd).to receive(:increment)
-          expect { subject }.to raise_error(described_class::BatchRequestFailed)
-
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-            'microsoft_sync.graph_service.batch.error', 1,
-            tags: {msft_endpoint: 'group_add_users', status: 400}
-          )
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-            'microsoft_sync.graph_service.batch.throttled', 1,
-            tags: {msft_endpoint: 'group_add_users', status: 429}
-          )
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-            'microsoft_sync.graph_service.batch.ignored', 1,
-            tags: {msft_endpoint: 'group_add_users', status: 400}
-          )
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-            'microsoft_sync.graph_service.batch.success', 1,
-            tags: {msft_endpoint: 'group_add_users', status: 204}
-          )
-        end
+      it_behaves_like 'a members/owners batch request that can fail' do
+        let(:endpoint_name) { 'group_add_users' }
+        let(:ignored_members_m1_response) { dupe('members_m1') }
       end
     end
   end
@@ -573,16 +673,10 @@ describe MicrosoftSync::GraphService do
         }
       }
     end
-    let(:response_body) { {responses: subresponses} }
-    let(:subresponses) { [] }
-
-    def succ(id)
-      {id: id, status: 204, body: nil}
-    end
-
-    def err(id)
-      {id: id, status: 400, body: "bad"}
-    end
+    let(:response_body) { {responses: batch_responses} }
+    let(:batch_responses) { [] }
+    let(:status) { batch_overall_response_code }
+    let(:batch_overall_response_code) { 200 }
 
     def missing(id)
       err_msg = "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of " \
@@ -598,13 +692,15 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when all are successfully removed' do
-      let(:subresponses) { [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')] }
+      let(:batch_responses) do
+        [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
+      end
 
       it { is_expected.to eq(nil) }
     end
 
     context 'when some owners were not in the group' do
-      let(:subresponses) do
+      let(:batch_responses) do
         [succ('members_m1'), succ('members_m2'), succ('owners_o1'), missing('owners_o2')]
       end
 
@@ -614,7 +710,7 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when some members were not in the group' do
-      let(:subresponses) do
+      let(:batch_responses) do
         [missing('members_m1'), missing('members_m2'), succ('owners_o1'), succ('owners_o2')]
       end
 
@@ -624,7 +720,7 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when some members were not in the group' do
-      let(:subresponses) do
+      let(:batch_responses) do
         [missing2('members_m1'), missing2('members_m2'), succ('owners_o1'), succ('owners_o2')]
       end
 
@@ -634,43 +730,12 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when some members and owners were not in the group' do
-      let(:subresponses) do
+      let(:batch_responses) do
         [missing('members_m1'), succ('members_m2'), missing('owners_o1'), missing('owners_o2')]
       end
 
       it 'returns a hash with arrays with those users' do
         expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
-      end
-    end
-
-    context 'when some users failed for some other reason' do
-      let(:subresponses) do
-        [missing('members_m1'), err('members_m2'), err('owners_o1'), succ('owners_o2')]
-      end
-
-      it 'raises a BatchRequestFailed error' do
-        expect { subject }.to raise_error(
-          described_class::BatchRequestFailed,
-          'Batch of 2: codes [400, 400], bodies ["bad", "bad"]'
-        )
-      end
-
-      it 'increments statsd counters based on the responses' do
-        allow(InstStatsd::Statsd).to receive(:increment)
-        expect { subject }.to raise_error(described_class::BatchRequestFailed)
-
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-          'microsoft_sync.graph_service.batch.error', 2,
-          tags: {msft_endpoint: 'group_remove_users', status: 400}
-        )
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-          'microsoft_sync.graph_service.batch.ignored', 1,
-          tags: {msft_endpoint: 'group_remove_users', status: 404}
-        )
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with(
-          'microsoft_sync.graph_service.batch.success', 1,
-          tags: {msft_endpoint: 'group_remove_users', status: 204}
-        )
       end
     end
 
@@ -682,6 +747,11 @@ describe MicrosoftSync::GraphService do
           )
         }.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
       end
+    end
+
+    it_behaves_like 'a members/owners batch request that can fail' do
+      let(:endpoint_name) { 'group_remove_users' }
+      let(:ignored_members_m1_response) { missing('members_m1') }
     end
   end
 

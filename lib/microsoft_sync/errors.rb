@@ -57,7 +57,7 @@ module MicrosoftSync
     # code, which allows consumers to select semi-expected cases if they need to.
     class HTTPInvalidStatus < PublicError
       attr_reader :public_message
-      attr_reader :response_body
+      attr_reader :response
       attr_reader :code
 
       def self.subclasses_by_status_code
@@ -65,6 +65,7 @@ module MicrosoftSync
           400 => HTTPBadRequest,
           404 => HTTPNotFound,
           409 => HTTPConflict,
+          424 => HTTPFailedDependency,
           429 => HTTPTooManyRequests,
           500 => HTTPInternalServerError,
           502 => HTTPBadGateway,
@@ -79,23 +80,29 @@ module MicrosoftSync
       end
 
       def initialize(service:, response:, tenant:)
-        @response_body = response.body
+        @response = response
         @code = response.code
         @public_message = "#{service.capitalize} service returned #{response.code} for tenant #{tenant}"
         super("#{@public_message}, full body: #{response.body.inspect.truncate(1000)}")
       end
     end
 
+    # Mixin for errors that are considered 'throttled'
+    module Throttled
+      attr_reader :retry_after_seconds
+    end
+
     class HTTPNotFound < HTTPInvalidStatus; end
     class HTTPBadRequest < HTTPInvalidStatus; end
     class HTTPConflict < HTTPInvalidStatus; end
+    class HTTPFailedDependency < HTTPInvalidStatus; end
     class HTTPInternalServerError < HTTPInvalidStatus; end
     class HTTPBadGateway < HTTPInvalidStatus; end
     class HTTPServiceUnavailable < HTTPInvalidStatus; end
     class HTTPGatewayTimeout < HTTPInvalidStatus; end
 
     class HTTPTooManyRequests < HTTPInvalidStatus
-      attr_reader :retry_after_seconds
+      include Throttled
 
       def initialize(**args)
         @retry_after_seconds = args[:response].headers['Retry-After'].presence&.to_f
@@ -112,7 +119,8 @@ module MicrosoftSync
       Timeout::Error,
 
       HTTPBadGateway, HTTPGatewayTimeout, HTTPInternalServerError, HTTPServiceUnavailable,
-      HTTPTooManyRequests,
+
+      Throttled,
     ].freeze
 
     # Microsoft's API being eventually consistent requires us to retry 404s

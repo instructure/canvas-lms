@@ -83,7 +83,7 @@ module MicrosoftSync
     end
 
     def retry_object_for_error(e, **extra_args)
-      delay_amount = e.retry_after_seconds if e.is_a?(Errors::HTTPTooManyRequests)
+      delay_amount = e.retry_after_seconds if e.is_a?(Errors::Throttled)
       delay_amount ||= STANDARD_RETRY_DELAY
       StateMachineJob::Retry.new(error: e, delay_amount: delay_amount, **extra_args)
     end

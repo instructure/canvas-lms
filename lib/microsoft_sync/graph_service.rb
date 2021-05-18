@@ -39,6 +39,18 @@ module MicrosoftSync
     end
 
     class BatchRequestFailed < StandardError; end
+    class BatchRequestThrottled < StandardError
+      include Errors::Throttled
+
+      def initialize(msg, responses)
+        super(msg)
+
+        @retry_after_seconds = responses.map do |resp|
+          headers = resp['headers']&.transform_keys(&:downcase) || {}
+          headers['retry-after'].presence&.to_f
+        end.compact.max
+      end
+    end
 
     attr_reader :tenant
 
@@ -137,7 +149,7 @@ module MicrosoftSync
 
       nil
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response_body =~ /One or more added object references already exist/i
+      raise unless e.response.body =~ /One or more added object references already exist/i
 
       add_users_to_group_via_batch(group_id, members, owners)
     end
@@ -163,11 +175,11 @@ module MicrosoftSync
       }
       request(:post, 'teams', body: body)
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response_body =~ /must have one or more owners in order to create a Team/i
+      raise unless e.response.body =~ /must have one or more owners in order to create a Team/i
 
       raise MicrosoftSync::Errors::GroupHasNoOwners
     rescue MicrosoftSync::Errors::HTTPConflict => e
-      raise unless e.response_body =~ /group is already provisioned/i
+      raise unless e.response.body =~ /group is already provisioned/i
 
       raise MicrosoftSync::Errors::TeamAlreadyExists
     end
@@ -326,7 +338,15 @@ module MicrosoftSync
     def run_batch(endpoint_name, requests, &response_should_be_ignored)
       Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
 
-      response = request(:post, '$batch', body: { requests: requests })
+      response =
+        begin
+          request(:post, '$batch', body: { requests: requests })
+        rescue Errors::HTTPFailedDependency => e
+          # The main request may return a 424 if any subrequests fail (esp. if throttled).
+          # Regardless, we handle subrequests failures below.
+          e.response.parsed_response
+        end
+
       grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
 
       increment_batch_statsd_counters(endpoint_name, grouped)
@@ -336,6 +356,9 @@ module MicrosoftSync
         codes = failed.map{|resp| resp['status']}
         bodies = failed.map{|resp| resp['body'].to_s.truncate(500)}
         msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
+
+        raise BatchRequestThrottled.new(msg, grouped[:throttled]) if grouped[:throttled]
+
         raise BatchRequestFailed, msg
       end
 
