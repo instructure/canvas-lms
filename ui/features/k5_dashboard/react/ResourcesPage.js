@@ -74,6 +74,7 @@ const fetchApps = cards =>
 export default function ResourcesPage({cards, cardsSettled, visible}) {
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
+  const [staffAuthorized, setStaffAuthorized] = useState(true)
   const [isAppsLoading, setAppsLoading] = useState(false)
   const [isStaffLoading, setStaffLoading] = useState(false)
 
@@ -93,14 +94,14 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
 
         setStaffLoading(true)
         fetchStaff(cards)
-          .then(data => {
-            setStaff(data)
-            setStaffLoading(false)
-          })
+          .then(setStaff)
           .catch(err => {
-            setStaffLoading(false)
+            if (err?.response?.status === 401) {
+              return setStaffAuthorized(false)
+            }
             showFlashError(I18n.t('Failed to load staff.'))(err)
           })
+          .finally(() => setStaffLoading(false))
       }
     },
     [cards, cardsSettled],
@@ -110,7 +111,7 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
   return (
     <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
       <AppsList isLoading={isAppsLoading} apps={apps} />
-      <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
+      {staffAuthorized && <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />}
     </section>
   )
 }
