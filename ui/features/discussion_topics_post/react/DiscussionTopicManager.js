@@ -34,17 +34,28 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
-  const value = {searchTerm, setSearchTerm, filter, setFilter}
-  // define sort
+  const [sort, setSort] = useState('desc')
+  const [pageNumber, setPageNumber] = useState(0)
+  const value = {
+    searchTerm,
+    setSearchTerm,
+    filter,
+    setFilter,
+    sort,
+    setSort,
+    pageNumber,
+    setPageNumber
+  }
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const variables = {
     discussionID: props.discussionTopicId,
     perPage: PER_PAGE,
-    page: btoa(0),
+    page: btoa(pageNumber * PER_PAGE),
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
-    filter
+    filter,
+    sort
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
@@ -53,7 +64,7 @@ const DiscussionTopicManager = props => {
     if (!discussionTopicQuery.error && !discussionTopicQuery.loading) {
       discussionTopicQuery.refetch()
     }
-  }, [discussionTopicQuery, filter, searchTerm])
+  }, [discussionTopicQuery, filter, searchTerm, sort])
 
   const updateCache = (cache, result) => {
     try {
@@ -69,7 +80,6 @@ const DiscussionTopicManager = props => {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
         currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
 
-        // TODO: Handle sorting.
         cache.writeQuery({...options, data: currentDiscussion})
       }
     } catch (e) {
@@ -116,7 +126,7 @@ const DiscussionTopicManager = props => {
           }}
         />
         {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
-        searchTerm ? (
+        (searchTerm || filter === 'unread') ? (
           <NoResultsFound />
         ) : (
           <DiscussionThreadsContainer discussionTopic={discussionTopicQuery.data.legacyNode} />

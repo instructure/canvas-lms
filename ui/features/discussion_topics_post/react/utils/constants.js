@@ -23,6 +23,10 @@ const searchFilter = {
   searchTerm: '',
   setSearchTerm: () => {},
   filter: '',
-  setFilter: () => {}
+  setFilter: () => {},
+  sort: '',
+  setSort: () => {},
+  pageNumber: 0,
+  setPageNumber: () => {}
 }
 export const SearchContext = React.createContext(searchFilter)

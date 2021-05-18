@@ -99,7 +99,6 @@ export const addReplyToSubentries = (cache, discussionEntryId, newDiscussionEntr
       const subentriesLegacyNode = currentSubentries.legacyNode
       subentriesLegacyNode.subentriesCount += 1
 
-      // TODO: Handle sorting.
       subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
 
       cache.writeQuery({...options, data: currentSubentries})

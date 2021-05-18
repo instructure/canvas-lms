@@ -17,22 +17,20 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DISCUSSION_QUERY} from '../../../graphql/Queries'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
-import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
-import {useMutation, useLazyQuery} from 'react-apollo'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
-  let discussionTopic = props.discussionTopic
+  const discussionTopic = props.discussionTopic
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
@@ -85,28 +83,8 @@ export const DiscussionThreadsContainer = props => {
     }
   }
 
-  const [discussionTopicQuery, {called, loading, data}] = useLazyQuery(DISCUSSION_QUERY)
-
-  if (called && loading) {
-    return <LoadingIndicator />
-  }
-
-  if (called && data) {
-    // setDiscussionTopic(data.legacyNode)
-    discussionTopic = data.legacyNode
-  }
-
-  const setPage = pageNumber => {
-    discussionTopicQuery({
-      variables: {
-        discussionID: discussionTopic._id,
-        perPage: PER_PAGE,
-        page: btoa(pageNumber * PER_PAGE),
-        searchTerm,
-        rootEntries: !searchTerm,
-        filter
-      }
-    })
+  const setPage = pageNum => {
+    setPageNumber(pageNum)
   }
 
   return (

@@ -34,7 +34,7 @@ import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
-import {PER_PAGE} from '../../utils/constants'
+import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
@@ -90,7 +90,7 @@ export const DiscussionThreadContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
-    addReplyToDiscussion(cache, props.discussionTopicGraphQLId, newDiscussionEntry)
+    addReplyToDiscussion(cache, props.discussionTopicGraphQLId)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
     addReplyToSubentries(cache, props.discussionEntry._id, newDiscussionEntry)
   }
@@ -398,9 +398,11 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
+  const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    perPage: PER_PAGE
+    perPage: PER_PAGE,
+    sort
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables

@@ -161,6 +161,20 @@ describe('DiscussionFullPage', () => {
         expect(container.queryByText('This is an Unread Reply')).toBeInTheDocument()
       )
     })
+
+    it('sorts dEntry by asc', async () => {
+      const container = setup()
+      await waitFor(() =>
+        expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      )
+
+      await waitFor(() => expect(container.queryByText('This is a Reply asc')).toBeNull())
+
+      const button = await container.getByTestId('sortButton')
+      await button.click()
+
+      await waitFor(() => expect(container.queryByText('This is a Reply asc')).toBeInTheDocument())
+    })
   })
 
   describe('discussion topic', () => {
