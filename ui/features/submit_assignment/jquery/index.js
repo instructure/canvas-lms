@@ -24,10 +24,8 @@ import axios from '@canvas/axios'
 import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView.coffee'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
 import RCEKeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {uploadFile} from '@canvas/upload-file'
-import {submitContentItem, recordEulaAgreement, verifyPledgeIsChecked} from './helper'
+import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tree'
@@ -45,82 +43,6 @@ import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
 
-const SubmitAssignment = {
-  // This ensures that the tool links in the "More" tab (which only appears with 4
-  // or more tools) behave properly when clicked
-  moreToolsListClickHandler(event) {
-    event.preventDefault()
-
-    const tool = $(this).data('tool')
-    const url = `/courses/${ENV.COURSE_ID}/external_tools/${tool.id}/resource_selection?homework=1&assignment_id=${ENV.SUBMIT_ASSIGNMENT.ID}`
-
-    // create return view and attach postMessage listener for tools launched in dialog from the More tab
-    SubmitAssignment.homeworkSubmissionLtiContainer.embedLtiLaunch(tool.get('id'))
-
-    const width = tool.get('homework_submission').selection_width || tool.get('selection_width')
-    const height = tool.get('homework_submission').selection_height || tool.get('selection_height')
-    const title = tool.get('display_text')
-    const $div = $('<div/>', {
-      id: 'homework_selection_dialog',
-      style: 'padding: 0; overflow-y: hidden;'
-    }).appendTo($('body'))
-
-    $div
-      .append(
-        $('<iframe/>', {
-          frameborder: 0,
-          src: url,
-          allow: iframeAllowances(),
-          id: 'homework_selection_iframe',
-          tabindex: '0'
-        }).css({width, height})
-      )
-      .bind('selection', (selectionEvent, _data) => {
-        submitContentItem(selectionEvent.contentItems[0])
-        $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
-        $div.dialog('close')
-      })
-      .on('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
-      .dialog({
-        width: 'auto',
-        height: 'auto',
-        title,
-        close() {
-          $div.remove()
-        }
-      })
-
-    const tabHelperHeight = 35
-    $div.append(
-      $('<div/>', {id: 'tab-helper', style: 'height:0px;padding:5px', tabindex: '0'})
-        .focus(function () {
-          $(this).height(`${tabHelperHeight}px`)
-          const joke = document.createTextNode(
-            I18n.t('Q: What goes black, white, black, white?  A: A panda rolling down a hill.')
-          )
-          this.appendChild(joke)
-        })
-        .blur(function () {
-          $(this).html('').height('0px')
-        })
-    )
-
-    return $div
-  },
-
-  beforeUnloadHandler(e) {
-    return (e.returnValue = I18n.t('Changes you made may not be saved.'))
-  },
-  dialogCancelHandler(event, _ui) {
-    const r = window.confirm(
-      I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
-    )
-    if (r == false) {
-      event.preventDefault()
-    }
-  }
-}
-
 let submissionAttachmentIndex = -1
 
 RichContentEditor.preloadRemoteModule()
@@ -129,12 +51,7 @@ $(document).ready(function () {
   let submitting = false
   const submissionForm = $('.submit_assignment_form')
 
-  const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer(
-    '#submit_from_external_tool_form'
-  )
-
-  // store for launching of tools from the More tab
-  SubmitAssignment.homeworkSubmissionLtiContainer = homeworkSubmissionLtiContainer
+  const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer()
 
   // Add the Keyboard shortcuts info button
   if (!ENV.use_rce_enhancements) {
@@ -177,12 +94,6 @@ $(document).ready(function () {
     const self = this
     const $turnitin = $(this).find('.turnitin_pledge')
     const $vericite = $(this).find('.vericite_pledge')
-    if ($('#external_tool_submission_type').val() == 'online_url_to_file') {
-      event.preventDefault()
-      event.stopPropagation()
-      uploadFileFromUrl()
-      return
-    }
 
     if (!verifyPledgeIsChecked($turnitin)) {
       event.preventDefault()
@@ -399,7 +310,6 @@ $(document).ready(function () {
     $('.submit_assignment_link').hide()
     $('html,body').scrollTo($('#submit_assignment'))
     createSubmitAssignmentTabs()
-    homeworkSubmissionLtiContainer.loadExternalTools()
     $('#submit_assignment_tabs li').first().focus()
   })
 
@@ -682,41 +592,3 @@ $(document).ready(() => {
       })
   }
 })
-
-const $tools = $('#submit_from_external_tool_form')
-
-function uploadFileFromUrl() {
-  const preflightUrl = $('#homework_file_url').attr('href')
-  const preflightData = {
-    url: $('#external_tool_url').val(),
-    name: $('#external_tool_filename').val(),
-    content_type: $('#external_tool_content_type').val()
-  }
-  const uploadPromise = uploadFile(preflightUrl, preflightData, null)
-    .then(attachment => {
-      $('#external_tool_submission_type').val('online_upload')
-      $('#external_tool_file_id').val(attachment.id)
-      $tools.submit()
-    })
-    .catch(error => {
-      console.log(error)
-      $tools.find('.submit').text(I18n.t('file_retrieval_error', 'Retrieving File Failed'))
-      $.flashError(
-        I18n.t(
-          'invalid_file_retrieval',
-          'There was a problem retrieving the file sent from this tool.'
-        )
-      )
-    })
-  $tools.disableWhileLoading(uploadPromise, {
-    buttons: {'.submit': I18n.t('getting_file', 'Retrieving File...')}
-  })
-  return uploadPromise
-}
-
-$('#submit_from_external_tool_form .tools li').live(
-  'click',
-  SubmitAssignment.moreToolsListClickHandler
-)
-
-export default SubmitAssignment

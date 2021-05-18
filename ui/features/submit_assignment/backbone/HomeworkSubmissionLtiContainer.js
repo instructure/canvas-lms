@@ -19,7 +19,7 @@ import Backbone from '@canvas/backbone'
 import I18n from 'i18n!external_toolsHomeworkSubmissionLtiContainer'
 import $ from 'jquery'
 import _ from 'underscore'
-import homeworkSubmissionTool from '../jst/homework_submission_tool.handlebars'
+import mime from 'mime-types'
 import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView.coffee'
 import ExternalToolCollection from './collections/ExternalToolCollection'
 import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView.coffee'
@@ -31,26 +31,10 @@ import processSingleContentItem from '@canvas/deep-linking/processors/processSin
 import '@canvas/jquery/jquery.disableWhileLoading'
 
 export default class HomeworkSubmissionLtiContainer {
-  constructor(toolsFormSelector) {
+  constructor() {
     this.renderedViews = {}
-    this.toolsForm = $(toolsFormSelector)
     this.externalToolCollection = new ExternalToolCollection()
     this.externalToolCollection.add(ENV.EXTERNAL_TOOLS)
-  }
-
-  // load external tools and populate 'More' tab with the returned tools
-  loadExternalTools() {
-    if (this.externalToolCollection.length > 0) {
-      $('.submit_from_external_tool_option')
-        .parent()
-        .show() // display the 'More' tab
-      this.toolsForm.find('ul.tools').empty()
-      this.externalToolCollection.forEach(tool => {
-        this.addToolToMoreList(tool)
-      })
-    } else {
-      return this.toolsForm.find('ul.tools li').text(I18n.t('no_tools_found', 'No tools found'))
-    }
   }
 
   handleDeepLinking = event => {
@@ -105,13 +89,6 @@ export default class HomeworkSubmissionLtiContainer {
     $('.submit_assignment_link').show()
   }
 
-  addToolToMoreList(tool) {
-    tool.attributes.display_text = tool.get('homework_submission').label
-    const html = homeworkSubmissionTool(tool.attributes)
-    const $li = $(html).data('tool', tool)
-    return this.toolsForm.find('ul.tools').append($li)
-  }
-
   createReturnView(tool) {
     const returnView = new ExternalContentReturnView({
       model: tool,
@@ -124,12 +101,11 @@ export default class HomeworkSubmissionLtiContainer {
 
     returnView.on(
       'ready',
-      (function(_this) {
-        return function(data) {
+      (function (_this) {
+        return function (data) {
           // render inline submitted file view
-          let homeworkSubmissionView
           tool = this.model // this will return the model from returnView
-          homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
+          const homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
           homeworkSubmissionView.parentView = _this
           this.remove()
           $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el)
@@ -137,8 +113,11 @@ export default class HomeworkSubmissionLtiContainer {
           _this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
           homeworkSubmissionView.render()
 
-          // close dialog if launched from the More tab
-          window.external_tool_dialog.ready(data.contentItems)
+          // Disable submit button if the file does not match the required type
+          if (!_this.validFileSubmission(homeworkSubmissionView.model.attributes)) {
+            $('.external-tool-submission button[type=submit]').attr('disabled', true)
+            $.flashError(I18n.t('Invalid submission file type'))
+          }
 
           return $('input.turnitin_pledge').click(e =>
             recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
@@ -147,32 +126,49 @@ export default class HomeworkSubmissionLtiContainer {
       })(this)
     )
 
-    returnView.on('cancel', data => {})
+    returnView.on('cancel', () => {})
 
     return returnView
   }
 
   createHomeworkSubmissionView(tool, data) {
     const item = data.contentItems[0]
-    const viewClass =
+    const ViewClass =
       HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap[item['@type']] ||
       ExternalContentUrlSubmissionView
 
-    const homeworkSubmissionView = new viewClass({
+    const homeworkSubmissionView = new ViewClass({
       externalTool: tool,
       model: new Backbone.Model(item)
     })
 
-    homeworkSubmissionView.on('relaunchTool', function(tool, model) {
+    homeworkSubmissionView.on('relaunchTool', function (tool, _model) {
       this.remove()
       return this.parentView.embedLtiLaunch(tool.get('id'))
     })
 
-    homeworkSubmissionView.on('cancel', function(tool, model) {
+    homeworkSubmissionView.on('cancel', function (_tool, _model) {
       return this.parentView.cancelSubmission()
     })
 
     return homeworkSubmissionView
+  }
+
+  extensionFromString(string) {
+    const ext = string?.split('.')?.pop()?.split('?')?.shift()
+    return mime?.types[ext] != null ? ext : null
+  }
+
+  validFileSubmission(contentItem) {
+    if (!ENV?.SUBMIT_ASSIGNMENT?.ALLOWED_EXTENSIONS) {
+      return true
+    }
+    const ext =
+      (contentItem?.mediaType && mime.extension(contentItem.mediaType)) ||
+      this.extensionFromString(contentItem.url) ||
+      this.extensionFromString(contentItem.title) ||
+      this.extensionFromSTring(contentItem.text)
+    return ext && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.includes(ext)
   }
 }
 HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap = {
