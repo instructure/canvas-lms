@@ -67,7 +67,7 @@ pipeline {
             def srcImageId = sh(script: "docker images --filter=reference=$srcTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
             def dstImageId = sh(script: "docker images --filter=reference=$dstTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
 
-            if(srcImageId == dstImageId) {
+            if (srcImageId == dstImageId) {
               slackSend(
                 channel: '#devx-alerts',
                 color: 'good',
@@ -79,7 +79,7 @@ pipeline {
                 docker push $dstTag
               """
 
-              if(dstJob) {
+              if (dstJob) {
                 def buildResult = build(job: dstJob, parameters: [
                   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
                 ], propagate: false, wait: false)

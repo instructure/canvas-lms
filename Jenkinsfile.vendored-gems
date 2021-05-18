@@ -34,7 +34,7 @@ def cleanupFn() {
     allowMissing: false,
     alwaysLinkToLastBuild: false,
     keepAll: true,
-    reportDir: "spec_results",
+    reportDir: 'spec_results',
     reportFiles: htmlFiles.join(','),
     reportName: 'Test Results'
   ]
@@ -69,13 +69,13 @@ pipeline {
             extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
               stage ('Setup') {
                 timeout(time: 2) {
-                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+                  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
+                  checkoutRepo('canvas-lms', refspecToCheckout, 1)
 
-                 credentials.withStarlordDockerLogin { ->
-                   sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-                 }
+                  credentials.withStarlordDockerLogin { ->
+                    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+                  }
                   sh 'build/new-jenkins/docker-compose-build-up.sh'
                 }
               }
@@ -94,13 +94,13 @@ pipeline {
 
               stage ('Run Pulsar specs') {
                 withEnv([
-                    "COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml"
+                    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml'
                 ]) {
-                  int retries = 0;
-                  int retry_limit = 4;
-                  Boolean still_running = true;
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest"
-                  while(still_running && retries < retry_limit){
+                  int retries = 0
+                  int retry_limit = 4
+                  Boolean still_running = true
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest'
+                  while (still_running && retries < retry_limit) {
                     try {
                       // sometimes the pulsar container kills itself on boot
                       // if it can't talk to it's own internal zookeeper.
@@ -112,32 +112,31 @@ pipeline {
                       // a very limited number of retries because the pulsar client has exponential backoff
                       // baked in already so waiting many more times is just wasted time.
 
-
-                      sh """
+                      sh '''
                         docker-compose run pulsar-admin ./scripts/bootstrap.sh
                         docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
-                      """
-                      still_running = false;
-                    } catch(Exception ex) {
+                      '''
+                      still_running = false
+                    } catch (Exception ex) {
                       // want to be able to debug in build output what
                       // made the pulsar container fail.
-                      sh "docker-compose logs pulsar"
+                      sh 'docker-compose logs pulsar'
 
                       // kinda hacky, but this will return a non-0 exit code if we did NOT find this string
                       // which means we don't think we can retry, so just let it die.
                       sh "docker-compose logs pulsar | grep \"zoo keeper disconnected\""
 
                       reportToSplunk('pulsar_retrying')
-                      sh """
+                      sh '''
                         docker-compose stop pulsar
                         docker-compose rm -f pulsar
-                      """
+                      '''
                       retries += 1
-                      if(retries >= retry_limit){
-                        sh """
+                      if (retries >= retry_limit) {
+                        sh '''
                           echo \"*********PULSAR LOGS*********\"
                           docker-compose logs pulsar
-                        """
+                        '''
                         reportToSplunk('pulsar_failed')
                       }
                     }

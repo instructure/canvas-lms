@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -37,11 +37,11 @@ pipeline {
     RUBY = configuration.ruby()
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = "3.141.59-20201119"
+    SELENIUM_VERSION = '3.141.59-20201119'
 
-    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
-    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
-    POSTGRES_IMAGE_TAG=imageTag.postgres()
+    CASSANDRA_IMAGE_TAG = imageTag.cassandra()
+    DYNAMODB_IMAGE_TAG = imageTag.dynamodb()
+    POSTGRES_IMAGE_TAG = imageTag.postgres()
   }
 
   stages {
@@ -64,7 +64,7 @@ pipeline {
             gems.each { gem ->
               pullGerritRepo(gem, 'master', 'gems/plugins')
             }
-            pullGerritRepo("qti_migration_tool", "master", "vendor")
+            pullGerritRepo('qti_migration_tool', 'master', 'vendor')
 
             sh '''
               mv -v gerrit_builder/canvas-lms/config/* config/
@@ -128,7 +128,7 @@ pipeline {
               allowMissing: false,
               alwaysLinkToLastBuild: false,
               keepAll: true,
-              reportDir: "tmp",
+              reportDir: 'tmp',
               reportFiles: htmlFiles.join(','),
               reportName: 'Test Failures'
             ]

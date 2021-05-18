@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
@@ -31,8 +29,8 @@ pipeline {
   }
 
   environment {
-    JENKINS='true'
-    DOCKER='true'
+    JENKINS = 'true'
+    DOCKER = 'true'
   }
 
   stages {
@@ -42,7 +40,7 @@ pipeline {
           protectedNode('canvas-docker') {
             stage('Setup') {
               // always pull from gerrit refspec to test the changed docker dev code
-              checkoutRepo("canvas-lms", env.GERRIT_REFSPEC, 1)
+              checkoutRepo('canvas-lms', env.GERRIT_REFSPEC, 1)
               sh '''#!/bin/bash
               cat <<EOF > docker-compose.local.jenkins.yml
 version: '2.3'
@@ -67,8 +65,8 @@ EOF
               '''
             }
 
-             stage('Copy App Directory') {
-               sh """#!/bin/bash
+            stage('Copy App Directory') {
+              sh """#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
                  CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.getString('ruby')})"
                  docker cp ./ "\$CONTAINER:/usr/src/app/"
@@ -76,7 +74,7 @@ EOF
                  docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
                  docker commit \$CONTAINER "local/ruby-passenger:${configuration.getString('ruby')}"
                """
-             }
+            }
 
             stage('Build Canvas') {
               sh '''#!/bin/bash
@@ -116,9 +114,9 @@ EOF
     unsuccessful {
       script {
         def causes = currentBuild.getBuildCauses()[0].shortDescription
-        if (causes.contains("Started by timer")) {
+        if (causes.contains('Started by timer')) {
           slackSend(
-            channel: "#flaky-spec-alerts",
+            channel: '#flaky-spec-alerts',
             color: 'danger',
             message: "${env.JOB_NAME} failed! Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n"
           )

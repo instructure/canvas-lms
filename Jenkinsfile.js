@@ -61,11 +61,11 @@ pipeline {
 
   environment {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_DOCKER_CLI_BUILD=1
+    COMPOSE_DOCKER_CLI_BUILD = 1
     COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
-    DOCKER_BUILDKIT=1
+    DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
-    PROGRESS_NO_TRUNC=1
+    PROGRESS_NO_TRUNC = 1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
   }
 
@@ -81,7 +81,7 @@ pipeline {
           extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).execute {
             def tests = [:]
 
-            if(env.TEST_SUITE == 'jest') {
+            if (env.TEST_SUITE == 'jest') {
               tests['Jest'] = {
                 withEnv(['CONTAINER_NAME=tests-jest']) {
                   try {
@@ -91,11 +91,11 @@ pipeline {
                   }
                 }
               }
-            } else if(env.TEST_SUITE == 'coffee') {
-              for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
+            } else if (env.TEST_SUITE == 'coffee') {
+              for (int i = 0; i < COFFEE_NODE_COUNT; i++) {
                 tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
               }
-            } else if(env.TEST_SUITE == 'karma') {
+            } else if (env.TEST_SUITE == 'karma') {
               tests['Packages'] = {
                 withEnv(['CONTAINER_NAME=tests-packages']) {
                   try {
@@ -106,7 +106,7 @@ pipeline {
                 }
               }
 
-              for(int i = 0; i < JSG_NODE_COUNT; i++) {
+              for (int i = 0; i < JSG_NODE_COUNT; i++) {
                 tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
               }
 

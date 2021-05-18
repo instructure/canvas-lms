@@ -29,24 +29,24 @@ def fsc_status = null
 def FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
 
 def isPlugin() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '0' : '1'
 }
 
 def getDockerWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def getLocalWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def setupNode() {
   sh 'rm -vrf ./tmp'
-  def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-  checkoutRepo("canvas-lms", refspecToCheckout, 2)
+  checkoutRepo('canvas-lms', refspecToCheckout, 2)
 
-  if (env.IS_PLUGIN == "1") {
+  if (env.IS_PLUGIN == '1') {
     dir(env.LOCAL_WORKDIR) {
       checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
     }
@@ -81,8 +81,8 @@ def computeTestCount() {
 
   echo "raw result from catcher: \n====\n$changed_tests\n===="
 
-  if(changed_tests.length() == 0) {
-    echo "no tests found to execute"
+  if (changed_tests.length() == 0) {
+    echo 'no tests found to execute'
 
     return
   }
@@ -102,8 +102,8 @@ def computeTestCount() {
 
   echo "raw result from splitter: \n====\n$changed_tests\n===="
 
-  if(changed_tests.length() == 0) {
-    echo "no tests found to execute"
+  if (changed_tests.length() == 0) {
+    echo 'no tests found to execute'
 
     return
   }
@@ -119,11 +119,11 @@ def computeTestCount() {
   def cur_partition = []
   def cur_weight = 0
 
-  while(i < test_count) {
+  while (i < test_count) {
     cur_partition.add(changed_tests_arr[i])
     cur_weight += weighted_values[i]
 
-    if(cur_weight >= distributed_factor) {
+    if (cur_weight >= distributed_factor) {
       partitions.add(cur_partition)
 
       cur_partition = []
@@ -133,7 +133,7 @@ def computeTestCount() {
     i++
   }
 
-  if(cur_partition.size() > 0) {
+  if (cur_partition.size() > 0) {
     partitions.add(cur_partition)
   }
 
@@ -146,11 +146,11 @@ def executeFlakeySpecCatcher(prefix = 'main') {
     sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      echo "Failing the build due to timeouts"
+      echo 'Failing the build due to timeouts'
       fsc_status = 'timeout'
       throw e
-    } else if(e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
-      echo "Build aborted"
+    } else if (e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
+      echo 'Build aborted'
       fsc_status = 'aborted'
     } else {
       throw e
@@ -172,7 +172,7 @@ def sendSlack(success) {
 }
 
 def cleanupFn(status) {
-  if(fsc_status != 'aborted') {
+  if (fsc_status != 'aborted') {
     sendSlack(status == 'SUCCESS')
   }
 }
@@ -196,9 +196,9 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureFSC()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
-    FSC_IGNORE_FILES = "gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/"
+    FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = "3.141.59-20201119"
+    SELENIUM_VERSION = '3.141.59-20201119'
 
     // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
     // repeats each test FSC_REPEAT_FACTOR times.
@@ -227,14 +227,14 @@ pipeline {
                 setupNode()
               }
 
-              stage("Compute Build Distribution") {
+              stage('Compute Build Distribution') {
                 computeTestCount()
               }
 
               stage('Run Flakey Spec Catcher') {
-                if(partitions.size() == 0) {
+                if (partitions.size() == 0) {
                   return
-                } else if(partitions.size() > env.MAX_NODES.toInteger()) {
+                } else if (partitions.size() > env.MAX_NODES.toInteger()) {
                   error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
 
                   return
@@ -242,16 +242,16 @@ pipeline {
 
                 def stages = [:]
 
-                stages["flakey set 00"] = {
+                stages['flakey set 00'] = {
                   withEnv([
                     "FSC_TESTS=${partitions[0].join(',')}",
-                    "NODE_NUMBER=00"
+                    'NODE_NUMBER=00'
                   ]) {
                     executeFlakeySpecCatcher()
                   }
                 }
 
-                for(int i = 1; i < partitions.size(); i++) {
+                for (int i = 1; i < partitions.size(); i++) {
                   // make sure to create a new index variable so this value gets
                   // captured by the lambda
                   def index = i

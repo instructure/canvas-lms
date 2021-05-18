@@ -21,9 +21,9 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn(status) {
-  junit "tmp/spec_results/**/*.xml"
+  junit 'tmp/spec_results/**/*.xml'
 
-  if(status == 'SUCCESS' && configuration.isChangeMerged()) {
+  if (status == 'SUCCESS' && configuration.isChangeMerged()) {
     sh 'build/new-jenkins/pact/contracts-publish-api.sh'
   }
 }
@@ -54,8 +54,8 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
     POSTGRES_PASSWORD = 'sekret'
     PACT_BROKER = credentials('PACT_BROKER')
-    PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
-    PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
+    PACT_BROKER_USERNAME = "${env.PACT_BROKER_USR}"
+    PACT_BROKER_PASSWORD = "${env.PACT_BROKER_PSW}"
     RSPEC_PROCESSES = '7'
   }
 
@@ -66,9 +66,9 @@ pipeline {
           extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
               timeout(time: 3) {
-                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+                def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-                checkoutRepo("canvas-lms", refspecToCheckout, 1)
+                checkoutRepo('canvas-lms', refspecToCheckout, 1)
 
                 credentials.withStarlordDockerLogin { ->
                   sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')

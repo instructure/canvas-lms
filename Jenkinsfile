@@ -543,7 +543,6 @@ pipeline {
                   string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                 ])
 
-
               rspecStage.createDistribution(nestedStages)
 
               parallel(nestedStages)
