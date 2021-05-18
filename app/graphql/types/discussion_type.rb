@@ -28,8 +28,8 @@ end
 
 class DiscussionSortOrderType < Types::BaseEnum
   graphql_name 'DiscussionSortOrderType'
-  value 'Ascending', value: :asc
-  value 'Descending', value: :desc
+  value 'asc', value: :asc
+  value 'desc', value: :desc
 end
 
 module Types

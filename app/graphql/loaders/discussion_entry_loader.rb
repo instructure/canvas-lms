@@ -27,10 +27,10 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
     @root_entries = root_entries
   end
 
-  def perform(discussion_topics)
-    discussion_topics.each do |discussion_topic|
-      scope = discussion_topic.discussion_entries
-      scope = @sort_order == :asc ? scope.order(:created_at) : scope
+  def perform(objects)
+    objects.each do |object|
+      scope = scope_for(object)
+      scope = scope.reorder("created_at #{@sort_order}")
       scope = scope.where(parent_id: nil) if @root_entries
       if @search_term
         scope = scope.joins(:user).where("message ILIKE '#{UserSearch.like_string_for(@search_term)}'")
@@ -39,7 +39,15 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
 
       scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
       scope = scope.where(workflow_state: 'deleted') if @filter == 'deleted'
-      fulfill(discussion_topic, scope)
+      fulfill(object, scope)
+    end
+  end
+
+  def scope_for(object)
+    if object.is_a?(DiscussionTopic)
+      object.discussion_entries
+    elsif object.is_a?(DiscussionEntry)
+      object.discussion_subentries
     end
   end
 end

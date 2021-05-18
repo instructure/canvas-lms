@@ -65,6 +65,15 @@ describe Types::DiscussionEntryType do
     expect(result[0]).to eq de.message
   end
 
+  it 'allows querying for discussion subentries with sort' do
+    discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
+    de1 = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry 1', user: @teacher, parent_id: discussion_entry.id)
+
+    result = discussion_entry_type.resolve('discussionSubentriesConnection(sortOrder: desc) { nodes { message } }')
+    expect(result.count).to be 2
+    expect(result[0]).to eq de1.message
+  end
+
   it 'allows querying for the last subentry' do
     de = discussion_entry
     4.times do |i|

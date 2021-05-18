@@ -38,7 +38,7 @@ describe Loaders::DiscussionEntryLoader do
         current_user: @teacher
       )
       discussion_entry_loader.load(@discussion).then { |discussion_entries|
-        expect(discussion_entries).to match @discussion.discussion_entries
+        expect(discussion_entries).to match @discussion.discussion_entries.reorder(created_at: "desc")
       }
     end
   end
@@ -86,7 +86,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           filter: 'all'
         ).load(@discussion).then { |discussion_entries|
-          expect(discussion_entries).to match @discussion.discussion_entries
+          expect(discussion_entries).to match @discussion.discussion_entries.reorder(created_at: "desc")
         }
       end
     end
@@ -134,7 +134,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           sort_order: :desc
         ).load(@discussion).then { |discussion_entries|
-          expect(discussion_entries[0]).to match @de1
+          expect(discussion_entries[0]).to match @de4
         }
       end
     end

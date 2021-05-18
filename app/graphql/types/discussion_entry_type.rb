@@ -73,9 +73,14 @@ module Types
       load_association(:discussion_topic)
     end
 
-    field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true
-    def discussion_subentries_connection
-      load_association(:discussion_subentries)
+    field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
+      argument :sort_order, DiscussionSortOrderType, required: false
+    end
+    def discussion_subentries_connection(sort_order: :asc)
+      Loaders::DiscussionEntryLoader.for(
+        current_user: current_user,
+        sort_order: sort_order
+      ).load(object)
     end
 
     field :parent, Types::DiscussionEntryType, null: true
