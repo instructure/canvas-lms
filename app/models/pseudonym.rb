@@ -381,8 +381,9 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def infer_auth_provider(ap)
+    previously_changed = changed?
     self.authentication_provider ||= ap
-    save! if changed? && account.feature_enabled?(:persist_inferred_authentication_providers)
+    save! if !previously_changed && changed? && account.feature_enabled?(:persist_inferred_authentication_providers)
   end
 
   # managed_password? and passwordable? differ in their treatment of pseudonyms
