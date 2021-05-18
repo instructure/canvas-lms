@@ -492,7 +492,7 @@ module AccountReports
         # rather than a cursor for this iteration
         # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
-        enrol.preload(:root_account, :sis_pseudonym).find_in_batches(start: 0) do |batch|
+        enrol.preload(:root_account, :sis_pseudonym, :role).find_in_batches(start: 0) do |batch|
           users = batch.map {|e| User.new(id: e.user_id)}.compact
           users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
           users.uniq!
