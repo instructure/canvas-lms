@@ -21,9 +21,9 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-def COFFEE_NODE_COUNT = 4
-def DEFAULT_NODE_COUNT = 1
-def JSG_NODE_COUNT = 3
+final static COFFEE_NODE_COUNT = 4
+final static DEFAULT_NODE_COUNT = 1
+final static JSG_NODE_COUNT = 3
 
 def copyFiles(dockerName, dockerPath, hostPath) {
   sh "mkdir -vp ./$hostPath"

@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def SYNC_IMAGES = [
+final static SYNC_IMAGES = [
   'busybox:latest': [
     job: null,
     target: 'starlord.inscloudgate.net/jenkins/busybox:latest',

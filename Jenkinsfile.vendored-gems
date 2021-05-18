@@ -68,7 +68,7 @@ pipeline {
 
             extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
               stage ('Setup') {
-                timeout(time: 2) {
+                timeout(2) {
                   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                   checkoutRepo('canvas-lms', refspecToCheckout, 1)
@@ -81,13 +81,13 @@ pipeline {
               }
 
               stage ('Run Vendored Gems specs') {
-                timeout(time: 10) {
+                timeout(10) {
                   sh 'build/new-jenkins/test-gems.sh'
                 }
               }
 
               stage ('Run Engine specs') {
-                timeout(time: 10) {
+                timeout(10) {
                   sh 'build/new-jenkins/test-engines.sh'
                 }
               }
@@ -97,10 +97,10 @@ pipeline {
                     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml'
                 ]) {
                   int retries = 0
-                  int retry_limit = 4
-                  Boolean still_running = true
+                  int retryLimit = 4
+                  Boolean stillRunning = true
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest'
-                  while (still_running && retries < retry_limit) {
+                  while (stillRunning && retries < retryLimit) {
                     try {
                       // sometimes the pulsar container kills itself on boot
                       // if it can't talk to it's own internal zookeeper.
@@ -116,7 +116,7 @@ pipeline {
                         docker-compose run pulsar-admin ./scripts/bootstrap.sh
                         docker-compose run canvas bash -c "cp ./config/overrides/dynamic_settings.pulsar.yml ./config/dynamic_settings.yml && ./build/new-jenkins/rspec-pulsar.sh"
                       '''
-                      still_running = false
+                      stillRunning = false
                     } catch (Exception ex) {
                       // want to be able to debug in build output what
                       // made the pulsar container fail.
@@ -132,7 +132,7 @@ pipeline {
                         docker-compose rm -f pulsar
                       '''
                       retries += 1
-                      if (retries >= retry_limit) {
+                      if (retries >= retryLimit) {
                         sh '''
                           echo \"*********PULSAR LOGS*********\"
                           docker-compose logs pulsar

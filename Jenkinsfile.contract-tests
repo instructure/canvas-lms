@@ -28,15 +28,15 @@ def cleanupFn(status) {
   }
 }
 
-def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenkins/pact/contracts-verify-api.sh') {
+def runAndCopyResults(databaseName, consumerName, scriptName='build/new-jenkins/pact/contracts-verify-api.sh') {
   withEnv([
-    "DATABASE_NAME=${database_name}",
-    "PACT_API_CONSUMER=${consumer_name}",
+    "DATABASE_NAME=${databaseName}",
+    "PACT_API_CONSUMER=${consumerName}",
   ]) {
     try {
-      sh script_name
+      sh scriptName
     } finally {
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+      sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir"
     }
   }
 }
@@ -45,7 +45,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
-    timeout(time: 15)
+    timeout(15)
     timestamps()
   }
 
@@ -65,7 +65,7 @@ pipeline {
         script {
           extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
-              timeout(time: 3) {
+              timeout(3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo('canvas-lms', refspecToCheckout, 1)
@@ -87,37 +87,37 @@ pipeline {
               def stages = [:]
 
               stages['Android'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('pact_test1', 'android')
                 }
               }
 
               stages['Canvas iOS'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('pact_test2', 'canvas-ios')
                 }
               }
 
               stages['Quiz LTI'] = {
-                timeout(time: 10) {
+                timeout(10) {
                   runAndCopyResults('pact_test3', 'Quiz LTI')
                 }
               }
 
               stages['Sistemic'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('pact_test4', 'Sistemic')
                 }
               }
 
               stages['Live Events'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('live_events', '', 'build/new-jenkins/pact/contracts-verify-live-events.sh')
                 }
               }
 
               stages['Outcomes'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('pact_test6', '', 'build/new-jenkins/pact/contracts-generate-api.sh')
                 }
               }

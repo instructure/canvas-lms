@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-def FILES_CHANGED_STAGE = 'Detect Files Changed'
-def JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
-def LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
-def RUN_MIGRATIONS_STAGE = 'Run Migrations'
+final static FILES_CHANGED_STAGE = 'Detect Files Changed'
+final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
+final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
+final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -190,7 +190,7 @@ def getSlackChannel() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
 
-@groovy.transform.Field def CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
+@groovy.transform.Field final static CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
 
 def getCanvasBuildsRefspec() {
   def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
@@ -202,7 +202,7 @@ def getCanvasBuildsRefspec() {
   return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
 }
 
-@groovy.transform.Field def CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
+@groovy.transform.Field final static CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
   // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
   if (env.GERRIT_BRANCH.contains('stable/')) {
@@ -550,8 +550,8 @@ pipeline {
 
             parallel(rootStages)
           }
-        }//script
-      }//steps
-    }//environment
-  }//stages
-}//pipeline
+        } //script
+      } //steps
+    } //environment
+  } //stages
+} //pipeline

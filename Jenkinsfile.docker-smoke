@@ -104,11 +104,11 @@ EOF
             stage('Test') {
               sh 'docker-compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
             }
-          }//protectedNode
-        }//script
-      }//steps
-    }//environment
-  }//stages
+          } //protectedNode
+        } //script
+      } //steps
+    } //environment
+  } //stages
 
   post {
     unsuccessful {
@@ -124,4 +124,4 @@ EOF
       }
     }
   }
-}//pipeline
+} //pipeline

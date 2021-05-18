@@ -23,10 +23,10 @@ library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 @groovy.transform.Field
 def partitions = []
 @groovy.transform.Field
-def changed_tests = ''
+def changedTests = ''
 @groovy.transform.Field
-def fsc_status = null
-def FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
+def fscStatus = null
+final static FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
 
 def isPlugin() {
   return env.GERRIT_PROJECT == 'canvas-lms' ? '0' : '1'
@@ -65,7 +65,7 @@ def computeTestCount() {
   sh 'chmod -vv 777 $LOCAL_WORKDIR/tmp'
 
   if (FORCE_FAILURE == '1') {
-    changed_tests = 'spec/force_failure_spec.rb'
+    changedTests = 'spec/force_failure_spec.rb'
   } else {
     sh '''
       docker run --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
@@ -76,68 +76,68 @@ def computeTestCount() {
           bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
     '''
 
-    changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
+    changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
   }
 
-  echo "raw result from catcher: \n====\n$changed_tests\n===="
+  echo "raw result from catcher: \n====\n$changedTests\n===="
 
-  if (changed_tests.length() == 0) {
+  if (changedTests.length() == 0) {
     echo 'no tests found to execute'
 
     return
   }
 
-  def changed_tests_arr = changed_tests.split('\n').collect {
+  def changedTestsArr = changedTests.split('\n').collect {
     "$DOCKER_WORKDIR/$it"
   }
 
   sh """
     docker-compose run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
       canvas \
-      bash -c "bundle exec rspec --dry-run ${changed_tests_arr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
+      bash -c "bundle exec rspec --dry-run ${changedTestsArr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
   """
 
-  changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
-  changed_tests_arr = changed_tests.split('\n')
+  changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
+  changedTestsArr = changedTests.split('\n')
 
-  echo "raw result from splitter: \n====\n$changed_tests\n===="
+  echo "raw result from splitter: \n====\n$changedTests\n===="
 
-  if (changed_tests.length() == 0) {
+  if (changedTests.length() == 0) {
     echo 'no tests found to execute'
 
     return
   }
 
-  def test_count = changed_tests_arr.size()
-  def weighted_values = changed_tests_arr.collect {
+  def testCount = changedTestsArr.size()
+  def weightedValues = changedTestsArr.collect {
     it.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
   }
 
-  def distributed_factor = env.TESTS_PER_NODE.toInteger()
+  def distributedFactor = env.TESTS_PER_NODE.toInteger()
 
   def i = 0
-  def cur_partition = []
-  def cur_weight = 0
+  def curPartition = []
+  def curWeight = 0
 
-  while (i < test_count) {
-    cur_partition.add(changed_tests_arr[i])
-    cur_weight += weighted_values[i]
+  while (i < testCount) {
+    curPartition.add(changedTestsArr[i])
+    curWeight += weightedValues[i]
 
-    if (cur_weight >= distributed_factor) {
-      partitions.add(cur_partition)
+    if (curWeight >= distributedFactor) {
+      partitions.add(curPartition)
 
-      cur_partition = []
-      cur_weight = 0
+      curPartition = []
+      curWeight = 0
     }
 
     i++
   }
 
-  if (cur_partition.size() > 0) {
-    partitions.add(cur_partition)
+  if (curPartition.size() > 0) {
+    partitions.add(curPartition)
   }
 
-  echo "expected nodes to run on for $test_count tests: ${partitions.size()}"
+  echo "expected nodes to run on for $testCount tests: ${partitions.size()}"
 }
 
 def executeFlakeySpecCatcher(prefix = 'main') {
@@ -147,11 +147,11 @@ def executeFlakeySpecCatcher(prefix = 'main') {
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       echo 'Failing the build due to timeouts'
-      fsc_status = 'timeout'
+      fscStatus = 'timeout'
       throw e
     } else if (e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
       echo 'Build aborted'
-      fsc_status = 'aborted'
+      fscStatus = 'aborted'
     } else {
       throw e
     }
@@ -162,17 +162,17 @@ def executeFlakeySpecCatcher(prefix = 'main') {
 }
 
 def sendSlack(success) {
-  def color = fsc_status == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
+  def color = fscStatus == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
-  def message = "$jobInfo\n$changed_tests"
-  if (fsc_status == 'timeout') {
+  def message = "$jobInfo\n$changedTests"
+  if (fscStatus == 'timeout') {
     message = "Timeout Occurred!\n$message"
   }
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
 def cleanupFn(status) {
-  if (fsc_status != 'aborted') {
+  if (fscStatus != 'aborted') {
     sendSlack(status == 'SUCCESS')
   }
 }
@@ -255,16 +255,16 @@ pipeline {
                   // make sure to create a new index variable so this value gets
                   // captured by the lambda
                   def index = i
-                  def node_number = (index).toString().padLeft(2, '0')
+                  def nodeNumber = (index).toString().padLeft(2, '0')
 
-                  stages["flakey set $node_number"] = {
+                  stages["flakey set $nodeNumber"] = {
                     protectedNode('canvas-docker') {
                       withEnv([
                         "FSC_TESTS=${partitions[index].join(',')}",
-                        "NODE_NUMBER=$node_number"
+                        "NODE_NUMBER=$nodeNumber"
                       ]) {
                         setupNode()
-                        executeFlakeySpecCatcher("node$node_number")
+                        executeFlakeySpecCatcher("node$nodeNumber")
                       }
                     }
                   }
