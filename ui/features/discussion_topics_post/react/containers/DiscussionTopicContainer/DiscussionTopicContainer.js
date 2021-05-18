@@ -205,7 +205,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
             {isGraded(discussionTopicData.assignment) && (
               <View as="div" padding="none medium none">
                 <Alert
-                  contextDisplayText="Section 2"
                   dueAtDisplayText={discussionTopicData.dueAt}
                   pointsPossible={discussionTopicData.pointsPossible}
                 />

@@ -23,15 +23,12 @@ import React from 'react'
 import {render} from '@testing-library/react'
 
 const setup = () => {
-  return render(
-    <Alert contextDisplayText="Section 4" pointsPossible={7} dueAtDisplayText="Jan 26 11:49pm" />
-  )
+  return render(<Alert pointsPossible={7} dueAtDisplayText="Jan 26 11:49pm" />)
 }
 
 describe('Alert', () => {
   it('displays alert info', () => {
     const {queryByText} = setup()
-    expect(queryByText('Section 4')).toBeTruthy()
     expect(queryByText('This is a graded discussion: 7 points possible')).toBeTruthy()
     expect(queryByText('Due: Jan 26 11:49pm')).toBeTruthy()
   })

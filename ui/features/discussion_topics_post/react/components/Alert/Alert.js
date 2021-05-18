@@ -27,21 +27,16 @@ import {Flex} from '@instructure/ui-flex'
 export function Alert({...props}) {
   return (
     <Flex data-testid="graded-discussion-info">
-      <Flex.Item padding="x-small" align="start">
-        <Text weight="light" size="small">
-          {props.contextDisplayText}
-        </Text>
-      </Flex.Item>
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
-          {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {
-            pointsPossible: props.pointsPossible
-          })}
+          {I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
         </Text>
       </Flex.Item>
       <Flex.Item padding="x-small" align="end">
         <Text weight="light" size="small">
-          {I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
+          {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {
+            pointsPossible: props.pointsPossible
+          })}
         </Text>
       </Flex.Item>
     </Flex>
@@ -49,7 +44,6 @@ export function Alert({...props}) {
 }
 
 Alert.propTypes = {
-  contextDisplayText: PropTypes.string.isRequired,
   pointsPossible: PropTypes.number.isRequired,
   dueAtDisplayText: PropTypes.string.isRequired
 }
