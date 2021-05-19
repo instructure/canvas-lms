@@ -1,0 +1,80 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2021 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
+  graphql_name "MoveOutcomeLinks"
+
+  argument :outcome_link_ids, [ID], <<~DESC, required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ContentTag')
+    A list of ContentTags that will be moved
+  DESC
+  argument :group_id, ID, <<~DESC, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+    The id of the destination group
+  DESC
+
+  field :moved_outcome_link_ids, [ID], <<~DOC, null: false
+    List of Outcome Link ids that were sucessfully moved to the group
+  DOC
+
+  def resolve(input:)
+    group = get_group!(input)
+    outcome_links, missing_ids = get_outcome_links(input, group.context)
+
+    errors = missing_ids.map do |id|
+      [id, I18n.t("Could not find associated outcome in this context")]
+    end
+
+    outcome_links.find_each do |outcome_link|
+      group.adopt_outcome_link(outcome_link, skip_parent_group_touch: true)
+    end
+
+    group.touch_parent_group if outcome_links.any?
+
+    context[:group] = group
+
+    {
+      errors: errors,
+      moved_outcome_link_ids: outcome_links.pluck(:id)
+    }
+  end
+
+  def self.moved_outcome_link_ids_log_entry(_ids, ctx)
+    ctx[:group]
+  end
+
+  private
+
+  def get_group!(input)
+    LearningOutcomeGroup.active.find_by(id: input[:group_id]).tap do |group|
+      raise GraphQL::ExecutionError, I18n.t("Group not found") unless group
+      raise GraphQL::ExecutionError, I18n.t("Insufficient permission") unless
+        group.context.grants_right?(current_user, session, :manage_outcomes)
+    end
+  end
+
+  def get_outcome_links(input, context)
+    ids = input[:outcome_link_ids].map(&:to_i).uniq
+    links = ContentTag.active.learning_outcome_links.where(
+      context: context,
+      id: ids
+    )
+    missing_ids = ids - links.pluck(:id)
+    [links, missing_ids]
+  end
+end

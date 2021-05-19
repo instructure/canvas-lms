@@ -131,7 +131,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     # change the parent
     outcome_link.associated_asset = self
     outcome_link.save!
-    touch_parent_group
+    touch_parent_group unless opts[:skip_parent_group_touch]
     outcome_link
   end
 
