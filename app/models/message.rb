@@ -84,7 +84,7 @@ class Message < ActiveRecord::Base
   before_save :infer_defaults
   before_save :move_dashboard_messages
   before_save :move_messages_for_deleted_users
-  before_save :truncate_invalid_message
+  before_validation :truncate_invalid_message
 
   # Validations
   validate :prevent_updates
