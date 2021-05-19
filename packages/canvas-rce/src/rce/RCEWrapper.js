@@ -192,7 +192,7 @@ class RCEWrapper extends React.Component {
     onInitted: PropTypes.func,
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
-    textareaId: PropTypes.string,
+    textareaId: PropTypes.string.isRequired,
     languages: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
@@ -1113,7 +1113,7 @@ class RCEWrapper extends React.Component {
 
   get autoSaveKey() {
     const userId = this.props.trayProps?.containingContext.userId
-    return `rceautosave:${userId}${window.location.href}:${this.getTextarea().id}`
+    return `rceautosave:${userId}${window.location.href}:${this.props.textareaId}`
   }
 
   doAutoSave = (e, retry = false) => {

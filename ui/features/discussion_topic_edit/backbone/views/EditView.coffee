@@ -205,7 +205,7 @@ export default class EditView extends ValidatedFormView
       RichContentEditor.initSidebar()
       _.defer =>
         @loadNewEditor(@$textarea)
-        $('.rte_switch_views_link').click (event) ->
+        $('.rte_switch_views_link').click (event) =>
           event.preventDefault()
           event.stopPropagation()
           RichContentEditor.callOnRCE(@$textarea, 'toggle')
