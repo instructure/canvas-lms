@@ -1425,6 +1425,9 @@ module Lti
     # Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
     # "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
     #
+    # Only functional when `com_instructure_course_accept_canvas_resource_types` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
+    #
     # @example
     #   ```
     #   "page"
@@ -1435,8 +1438,7 @@ module Lti
                        -> {
                          val = @request.parameters['com_instructure_course_accept_canvas_resource_types']
                          val.is_a?(Array) ? val.join(",") : val
-                       },
-                       default_name: 'com_instructure_course_accept_canvas_resource_types'
+                       }
 
     # Returns the target resource type for the current page, forwarded from the request.
     # Value is the largest logical unit of the page. Possible values are: ["assignment", "assignment_group",
@@ -1445,28 +1447,35 @@ module Lti
     #   on Modules -> 'module'
     #   and so on.
     #
+    # Only functional when `com_instructure_course_canvas_resource_type` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
+    #
     # @example
     #   ```
     #   page
     #   ```
     register_expansion 'com.instructure.Course.canvas_resource_type', [],
-                       -> { @request.parameters['com_instructure_course_canvas_resource_type'] },
-                       default_name: 'com_instructure_course_canvas_resource_type'
+                       -> { @request.parameters['com_instructure_course_canvas_resource_type'] }
 
     # Returns whether a content can be imported into a specific group on the page, forwarded from the request.
     # True for Modules page and Assignment Groups page. False for other content index pages.
+    #
+    # Only functional when `com_instructure_course_allow_canvas_resource_selection` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
     #
     # @example
     #   ```
     #   true
     #   ```
     register_expansion 'com.instructure.Course.allow_canvas_resource_selection', [],
-                       -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] },
-                       default_name: 'com_instructure_course_allow_canvas_resource_selection'
+                       -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] }
 
     # Returns a JSON-encoded list of content groups which can be selected, providing ID and name of each group,
     # forwarded from the request.
     # Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
+    #
+    # Only functional when `com_instructure_course_available_canvas_resources` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
     #
     # @example
     #   ```
@@ -1488,8 +1497,7 @@ module Lti
                            end
                          end
                          val&.to_json
-                       },
-                       default_name: 'com_instructure_course_available_canvas_resources'
+                       }
 
     private
 
