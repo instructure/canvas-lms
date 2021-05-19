@@ -132,6 +132,8 @@ describe('DiscussionTopicContainer', () => {
     })
     expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
 
+    expect(await container.queryByText('No Due Date')).toBeTruthy()
+
     expect(
       await container.queryByText('This is a graded discussion: 0 points possible')
     ).toBeTruthy()

@@ -29,7 +29,9 @@ export function Alert({...props}) {
     <Flex data-testid="graded-discussion-info">
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
-          {I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
+          {props.dueAtDisplayText === ''
+            ? I18n.t('No Due Date')
+            : I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
         </Text>
       </Flex.Item>
       <Flex.Item padding="x-small" align="end">
