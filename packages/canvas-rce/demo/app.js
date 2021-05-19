@@ -24,7 +24,7 @@ import '@instructure/canvas-theme'
 
 import * as fakeSource from '../src/sidebar/sources/fake'
 
-// import './test-plugin/plugin'
+import './test-plugin/plugin'
 
 function getSetting(settingKey, defaultValue) {
   let val = localStorage.getItem(settingKey) || defaultValue
@@ -48,7 +48,10 @@ function saveSettings(state) {
     'jwt',
     'contextType',
     'contextId',
-    'userId'
+    'userId',
+    'include_test_plugin',
+    'test_plugin_toolbar',
+    'test_plugin_menu'
   ].forEach(settingKey => {
     saveSetting(settingKey, state[settingKey])
   })
@@ -70,8 +73,15 @@ function Demo() {
   const [include_test_plugin, set_include_test_plugin] = useState(
     getSetting('include_test_plugin', false)
   )
+  const [test_plugin_toolbar, set_test_plugin_toolbar] = useState(
+    getSetting('test_plugin_toolbar', '__none__')
+  )
+  const [test_plugin_menu, set_test_plugin_menu] = useState(
+    getSetting('test_plugin_menu', '__none__')
+  )
   const [trayProps, set_trayProps] = useState(() => getTrayPropsFromOpts())
   const [toolbar, set_toolbar] = useState(() => updateToolbar())
+  const [menu, set_menu] = useState(() => updateMenu())
   const [plugins, set_plugins] = useState(() => updatePlugins())
   const [tinymce_editor, set_tinymce_editor] = useState(null)
 
@@ -86,7 +96,9 @@ function Demo() {
     const refresh =
       canvas_exists !== newOpts.canvas_exists ||
       lang !== newOpts.lang ||
-      include_test_plugin !== newOpts.include_test_plugin
+      include_test_plugin !== newOpts.include_test_plugin ||
+      test_plugin_toolbar !== newOpts.test_plugin_toolbar ||
+      test_plugin_menu !== newOpts.test_plugin_menu
 
     set_canvas_exists(newOpts.canvas_exists)
     set_canvas_origin(newOpts.canvas_origin)
@@ -99,8 +111,11 @@ function Demo() {
     set_sourceType(newOpts.sourceType)
     set_lang(newOpts.lang)
     set_include_test_plugin(newOpts.include_test_plugin)
+    set_test_plugin_toolbar(newOpts.test_plugin_toolbar)
+    set_test_plugin_menu(newOpts.test_plugin_menu)
     set_trayProps(getTrayPropsFromOpts())
     set_toolbar(updateToolbar())
+    set_menu(updateMenu())
     set_plugins(updatePlugins())
 
     saveSettings(newOpts)
@@ -137,13 +152,20 @@ function Demo() {
   }
 
   function updateToolbar() {
-    return include_test_plugin
+    return include_test_plugin && test_plugin_toolbar !== '__none__'
       ? [
           {
-            name: 'Content',
+            name: test_plugin_toolbar,
             items: ['rce_demo_test']
           }
         ]
+      : undefined
+  }
+  function updateMenu() {
+    return include_test_plugin && test_plugin_menu !== '__none__'
+      ? {
+          [test_plugin_menu]: {items: ['rce_demo_test']}
+        }
       : undefined
   }
 
@@ -162,6 +184,7 @@ function Demo() {
           highContrastCSS={[]}
           trayProps={trayProps}
           toolbar={toolbar}
+          menu={menu}
           plugins={plugins}
           onInitted={editor => {
             set_tinymce_editor(editor)
@@ -183,6 +206,8 @@ function Demo() {
             lang={lang}
             dir={dir}
             include_test_plugin={include_test_plugin}
+            test_plugin_toolbar={test_plugin_toolbar}
+            test_plugin_menu={test_plugin_menu}
             onChange={handleOptionsChange}
           />
         </div>

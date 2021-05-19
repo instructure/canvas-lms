@@ -65,6 +65,8 @@ function createdMountedElement(additionalProps = {}) {
 function trayProps() {
   return {
     trayProps: {
+      host: 'rcs.host',
+      jwt: 'donotlookatme',
       contextType: 'course',
       contextId: '17',
       containingContext: {
@@ -333,7 +335,7 @@ describe('RCEWrapper', () => {
         // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
-        global.Image = function () {
+        global.Image = function() {
           return {
             src: null,
             width: '10',

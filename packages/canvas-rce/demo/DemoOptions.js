@@ -77,17 +77,56 @@ export default class DemoOptions extends Component {
                 </SimpleSelect.Option>
               ))}
             </SimpleSelect>
-            {/*
-            <View as="div" margin="medium 0 0 0">
-              <FormFieldGroup description="External plugins">
+            <View as="div" margin="medium 0 0 0" padding="small" borderWidth="small">
+              <FormFieldGroup
+                description="External plugins"
+                messages={[{text: 'Pick the toolbar and menu to place the plugin', type: 'hint'}]}
+              >
                 <Checkbox
                   label="Include test plugin"
                   checked={this.state.include_test_plugin}
                   onChange={e => this.setState({include_test_plugin: e.target.checked})}
                 />
+                <SimpleSelect
+                  renderLabel="Toolbar"
+                  value={this.state.test_plugin_toolbar || '__none__'}
+                  onChange={(_e, option) => this.setState({test_plugin_toolbar: option.value})}
+                  interaction={this.state.include_test_plugin ? 'enabled' : 'disabled'}
+                >
+                  <SimpleSelect.Option id="Content" value="Content">
+                    Content
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="Miscellaneous" value="Miscellaneous">
+                    Miscellaneous
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="Ext_Plugin" value="Ext Plugin">
+                    External Plugin (new!)
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="none" value="__none__">
+                    None
+                  </SimpleSelect.Option>
+                </SimpleSelect>
+                <SimpleSelect
+                  renderLabel="Menu"
+                  value={this.state.test_plugin_menu}
+                  onChange={(_e, option) => this.setState({test_plugin_menu: option.value})}
+                  interaction={this.state.include_test_plugin ? 'enabled' : 'disabled'}
+                >
+                  <SimpleSelect.Option id="Content" value="insert">
+                    Insert
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="Miscellaneous" value="tools">
+                    Tools
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="Ext_Plugin" value="Ext Plugin">
+                    External Plugin (new!)
+                  </SimpleSelect.Option>
+                  <SimpleSelect.Option id="none" value="__none__">
+                    None
+                  </SimpleSelect.Option>
+                </SimpleSelect>
               </FormFieldGroup>
             </View>
-            */}
             <View as="div" margin="medium 0 0 0">
               <RadioInputGroup
                 description="Canvas"

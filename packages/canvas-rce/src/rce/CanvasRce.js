@@ -19,7 +19,7 @@
 import React, {createRef, useState} from 'react'
 import {arrayOf, number, string} from 'prop-types'
 import formatMessage from '../format-message'
-import RCEWrapper from './RCEWrapper'
+import RCEWrapper, {toolbarPropType, menuPropType} from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -195,5 +195,7 @@ CanvasRce.propTypes = {
   textareaId: string.isRequired,
   height: number,
   highContrastCSS: arrayOf(string),
-  trayProps: trayPropTypes
+  trayProps: trayPropTypes,
+  toolbar: toolbarPropType,
+  menu: menuPropType
 }
