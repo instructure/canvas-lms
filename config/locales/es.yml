@@ -2318,7 +2318,7 @@ es:
   allows_user_to_delete_a_submission_file_65f1dd7d: "Permite al usuario eliminar un archivo de entrega."
   allows_user_to_delete_course_pages_allows_user_to__d6e4174d: "Permite al usuario eliminar páginas del curso. Permite al usuario editar las configuraciones de bloqueo de plantilla para páginas individuales en un Curso principal de plantilla."
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "Permite al usuario eliminar secciones del curso. Permite al usuario eliminar a un usuario de una sección del curso."
-  allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permite al usuario designar un curso como Curso plantilla. Permite al usuario administrar las Configuraciones del curso plantilla en Configuraciones del curso. Permite al usuario agregar cursos asociados."
+  allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permite al usuario designar un curso como Curso de proyecto. Permite al usuario administrar las Configuraciones del Curso de proyecto en Configuraciones del curso. Permite al usuario agregar cursos asociados."
   allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
       Permite al usuario designar un curso como Curso de proyectos.
       Permite al usuario administrar las configuraciones del Curso de proyectos en Configuraciones del curso.
@@ -2335,7 +2335,7 @@ es:
       en un curso maestro de proyectos.
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permite al usuario editar las configuraciones de bloqueo de proyectos en la página de índice de Foros de discusión en un curso maestro de proyectos."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permite al usuario editar las configuraciones de bloqueo de proyectos en la página Archivos en un curso maestro de proyectos."
-  allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permite al usuario editar las configuraciones de bloqueo de plantilla en las páginas de índice de Tareas y Exámenes en un Curso plantilla maestro."
+  allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permite al usuario editar las configuraciones de bloqueo de plantilla en las páginas de índice de Tareas y Exámenes en un Curso de proyecto maestro."
   allows_user_to_edit_conferences_61eb62e0: "Permite que el usuario edite Conferencias."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Permite al usuario editar configuraciones para aplicaciones externas agregadas manualmente."
   allows_user_to_edit_course_pages_allows_user_to_de_abb54eb8: |-
@@ -2353,7 +2353,7 @@ es:
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Permite al usuario editar la identificación del SIS del curso."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Permite al usuario editar el programa del curso."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permite al usuario exportar el Libro de calificaciones a un archivo de valores separados por comas (CSV). Permite al usuario acceder al Libro de calificaciones de dominio del aprendizaje (si está habilitado)."
-  allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permite al usuario filtrar los cursos plantilla como nivel de la cuenta. Permite al usuario agregar cursos asociados."
+  allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permite al usuario filtrar los cursos de proyecto como nivel de la cuenta. Permite al usuario agregar cursos asociados."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Permite al usuario filtrar los cursos de proyectos como nivel de la cuenta.
       Permite al usuario agregar cursos asociados.
@@ -4270,18 +4270,18 @@ es:
   blocked_domain_name_b5b93150: "Nombre de dominio bloqueado"
   blue_daf8fea9: Azul
   blueprint_5cca2ef: Proyecto
-  blueprint_course_associations_72c9609: "Asociaciones del curso plantilla"
-  blueprint_course_e16ed131: "Curso Plantilla"
+  blueprint_course_associations_72c9609: "Asociaciones del curso de proyecto"
+  blueprint_course_e16ed131: "Curso de Proyecto"
   blueprint_course_id_9ee357fb: blueprint_course_id
-  blueprint_course_information_term_course_10d5cf30: "Información del curso plantilla: %{term} - %{course}"
+  blueprint_course_information_term_course_10d5cf30: "Información del curso de proyecto: %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "La sincronización del curso de proyectos ha terminado"
   blueprint_course_sync_in_progress_a1e2622b: "La sincronización del curso de proyectos está en proceso"
-  blueprint_courses_9dd321b8: "Cursos Plantilla"
+  blueprint_courses_9dd321b8: "Cursos de Proyecto"
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cursos de proyecto (agregar/editar/asociar/eliminar)"
   blueprint_courses_are_an_account_level_feature_opt_3388f731: "Los cursos de proyectos son una opción de funcionalidad a nivel de la cuenta.\n\n\
       Para editar las configuraciones de bloqueo del proyecto desde la página de índice de Foros de discusión, debe estar habilitado Curso: agregar/editar/eliminar y Foros de discusión: moderar. "
   blueprint_courses_are_an_account_level_feature_opt_e1f9ec2d: "Cursos plantilla es una opción de funcionalidad al nivel de la cuenta. Para editar las configuraciones de bloqueo de plantilla desde la página de índice de Foros de discusión, también deben estar habilitados Curso: agregar/editar/eliminar (Course - add / edit / delete) y Foros de discusión: moderar (Discussions - moderate). "
-  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos plantilla (crear/editar/asociar/eliminar)"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos de proyecto (crear/editar/asociar/eliminar)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Cursos de proyectos es una opción de funcionalidad a nivel de la cuenta. Los roles del curso solamente pueden administrar cursos de proyectos si se agregan al curso de proyectos con rol de profesor, profesor auxiliar o diseñador. Para acceder a la barra lateral Cursos de proyectos, debe estar habilitado Curso: agregar/editar/eliminar. Para agregar un curso asociado, también debe estar habilitado Curso: agregar/editar/eliminar. Para editar las configuraciones de bloqueo en cualquier tipo de objeto del proyecto, debe estar habilitado Curso: agregar/editar/eliminar."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Cursos plantilla es una opción de funcionalidad al nivel de la cuenta. Para agregar cursos asociados, también deben estar habilitados Cursos plantilla: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
   blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Cursos plantilla es una opción de funcionalidad al nivel de la cuenta. Los roles del curso solamente pueden administrar Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Para acceder a la barra lateral Cursos plantilla, debe estar habilitado Cursos: agregar/editar/eliminar cursos (Courses - add / edit / delete courses). Para agregar un curso asociado, también deben estar habilitados Cursos: ver lista (Courses - view list) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete). Para editar las configuraciones de bloqueo en cualquier tipo de objeto plantilla, debe estar habilitado Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
@@ -4316,19 +4316,19 @@ es:
       
       Para editar las configuraciones de bloqueo del proyecto desde la página de índice de Foros de discusión, también debe estar habilitado Foros de discusión: moderar.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Un administrador debe habilitar los Cursos plantilla (Blueprint courses) para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Si esta configuración está deshabilitada, y Foros de discusión: ver (Discussions - view) está habilitado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros de discusión individuales en un Curso plantilla maestro."
-  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Un administrador debe habilitar los Cursos plantilla para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Si esta configuración está deshabilitada, y Foros de discusión: ver (Discussions - view) está habilitado, el usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros de discusión individuales en un Curso plantilla maestro."
+  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Un administrador debe habilitar los Cursos de proyecto para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos de proyecto si dichos roles se agregan al Curso de proyecto con rol de profesor, profesor asistente o diseñador. Si esta configuración está deshabilitada, y Foros de discusión: ver (Discussions - view) está habilitado, el usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros de discusión individuales en un Curso de proyecto maestro."
   blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Un administrador debe habilitar los Cursos plantilla para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Si este permiso está deshabilitado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en páginas individuales en un curso plantilla maestro."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Un administrador debe habilitar los Cursos de proyectos para una cuenta.
       Los roles del curso solamente pueden administrar el contenido en Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
       Si este permiso está desactivado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en páginas individuales en un curso maestro de proyectos.
-  blueprint_courses_must_be_enabled_for_an_account_b_a8e326ea: "Un administrador debe habilitar los Cursos plantilla (Blueprint courses) para una cuenta. Para editar las configuraciones de bloqueo de plantilla para archivos del curso, también debe estar habilitado Curso: agregar/editar/eliminar (Courses - add / edit / delete)."
+  blueprint_courses_must_be_enabled_for_an_account_b_a8e326ea: "Un administrador debe habilitar los Cursos de proyecto (Blueprint courses) para una cuenta. Para editar las configuraciones de bloqueo de plantilla para archivos del curso, también debe estar habilitado Curso: agregar/editar/eliminar (Courses - add / edit / delete)."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Un administrador debe habilitar los Cursos de proyectos para una cuenta.
       Los roles del curso solamente pueden administrar el contenido en Cursos de proyectos si se agregan al Curso de proyectos con rol de profesor, profesor auxiliar o diseñador.
       Si este permiso está desactivado y Foros de discusión: ver está habilitado, un usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros de discusión individuales en un curso maestro de proyectos.
-  blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Un administrador debe habilitar los Cursos plantilla (Blueprint courses) para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Para editar las configuraciones de bloqueo de plantilla desde la página de índice de Foros de discusión, también debe estar habilitado Foros de discusión: moderar (Discussions - moderate)."
-  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Un administrador debe habilitar los Cursos plantilla (Blueprint courses) para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador."
+  blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Un administrador debe habilitar los Cursos de proyecto (Blueprint courses) para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos de proyecto si dichos roles se agregan al Curso de proyecto con rol de profesor, profesor asistente o diseñador. Para editar las configuraciones de bloqueo de plantilla desde la página de índice de Foros de discusión, también debe estar habilitado Foros de discusión: moderar (Discussions - moderate)."
+  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Un administrador debe habilitar los Cursos de proyecto (Blueprint courses) para una cuenta. Los roles del curso solamente pueden administrar el contenido de Cursos de proyecto si dichos roles se agregan al Curso de proyecto con rol de profesor, profesor asistente o diseñador."
   blueprint_information_95dcef55: "Información del plano"
   blueprint_settings_233e909a: "Configuración del proyecto"
   blueprint_sync_90d0dfd5: "Sincronización de plantillas"
@@ -5019,7 +5019,7 @@ es:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "No se puede eliminar una anulación con una fecha de entrega dentro de un período de calificación cerrado"
   cannot_give_outcomes_extra_credit_696208f0: "No se pueden dar créditos adicionales a los resultados"
   cannot_grade_at_this_time_489744b0: "No se puede calificar en este momento"
-  cannot_have_a_blueprint_course_with_students_248e3e76: "No puede tener un curso plantilla con los estudiantes"
+  cannot_have_a_blueprint_course_with_students_248e3e76: "No puede tener un curso de proyecto con los estudiantes"
   cannot_import_a_root_group_d4654def: "No se puede importar un grupo de origen"
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "No se pueden modificar campos para el resultado de otro contexto: %{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "No se puede modificar la competencia desde otro contexto: %{changes}; la competencia se debe modificar en %{context}"
@@ -7130,7 +7130,7 @@ es:
   course_results_updated_df9d1c95: "Resultados del curso actualizados."
   course_role_role_type_119c2f64: "Rol del curso: %{role_type}"
   course_roles_1314f962: "Roles del curso"
-  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Los roles del curso solamente pueden administrar Cursos plantilla si dichos roles se agregan al Curso plantilla con rol de profesor, profesor asistente o diseñador. Para acceder a la barra lateral Cursos plantilla, debe estar habilitado Cursos: agregar/editar/eliminar cursos (Courses - add / edit / delete courses). Para agregar un curso asociado, también deben estar habilitados Cursos: ver lista (Courses - view list) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete). Para editar las configuraciones de bloqueo en cualquier tipo de objeto plantilla, debe estar habilitado Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
+  course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Los roles del curso solamente pueden administrar Cursos de proyecto si dichos roles se agregan al Curso de proyecto con rol de profesor, profesor asistente o diseñador. Para acceder a la barra lateral Cursos de proyecto, debe estar habilitado Cursos: agregar/editar/eliminar cursos (Courses - add / edit / delete courses). Para agregar un curso asociado, también deben estar habilitados Cursos: ver lista (Courses - view list) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete). Para editar las configuraciones de bloqueo en cualquier tipo de objeto plantilla, debe estar habilitado Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
   course_roles_d2d5d666: "Roles del curso"
   course_roster_78f70e97: "Lista del curso"
   course_rubrics_881dcf0: "Rúbricas del curso"
@@ -7527,7 +7527,7 @@ es:
         allow_student_forum_attachments: "Permitir que los estudiantes adjunten archivos a los foros de discusión"
         allow_student_organized_groups: "Permitir que los estudiantes organicen sus propios grupos"
         blueprint: "Habilitar curso como Curso de proyectos"
-        blueprint_course: "Curso Plantilla"
+        blueprint_course: "Curso de Proyecto"
         conclude_at: Finaliza
         course_code: "Código del curso"
         course_color: Color
@@ -9393,7 +9393,7 @@ es:
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: "Habilitar las calificaciones anónimas de las tareas. Solo relevante si la función de Calificación moderada anónima está habilitada."
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "Habilite la activación o desactivación de los indicadores de funcionalidades del nivel de usuario byte_order_mark y semi_colon_field_separator para las exportaciones de resultados."
   enable_content_security_policy_8bd0b492: "Activar política de seguridad del contenido"
-  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como curso plantilla"
+  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como curso de proyecto"
   enable_course_as_a_course_template_5299afb6: "Habilitar curso como Plantilla de Curso"
   enable_dashboard_images_for_courses_5af458b0: "Habilitar Imágenes del tablero para cursos"
   enable_extra_filter_options_b52c23e6: "activar opciones de filtros adicionales"
@@ -14656,38 +14656,38 @@ es:
     assignment_unpublished_module: "Esta tarea es parte de un módulo sin publicar y aún no está disponible."
     blueprint_content_added: 
       email: 
-        body: "Los cambios del curso plantilla se han sincronizado en %{name}."
+        body: "Los cambios del curso de proyecto se han sincronizado en %{name}."
         details_link: "Ver cambios: %{link}"
         html: 
-          body: "Los cambios del curso plantilla se han sincronizado en %{name}."
+          body: "Los cambios del curso de proyecto se han sincronizado en %{name}."
           details_link: "Ver cambios"
           subject: "Sincronización de proyectos: %{name}"
         subject: "Sincronización de proyectos: %{name}"
       sms: 
-        body: "Cambios del curso plantilla sincronizados en %{name}."
+        body: "Cambios del curso de proyecto sincronizados en %{name}."
         link_message: "Más información en %{url}"
       summary: 
         body: "Sincronización de proyectos: Cambios sincronizados en %{name}."
         subject: "Sincronización de proyectos: %{name}"
       twitter: 
-        tweet: "Alerta de Canvas: los cambios en el curso plantilla se sincronizaron en %{name}"
+        tweet: "Alerta de Canvas: los cambios en el curso de proyecto se sincronizaron en %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "Su curso plantilla, %{name}, ha sincronizado cambios en todos los cursos asociados."
+        body: "Su curso de proyecto, %{name}, ha sincronizado cambios en todos los cursos asociados."
         details_link: "Más información: %{link}"
         html: 
-          body: "Su curso plantilla, %{name}, ha sincronizado cambios en todos los cursos asociados."
+          body: "Su curso de proyecto, %{name}, ha sincronizado cambios en todos los cursos asociados."
           details_link: "Más información"
           subject: "Sincronización de proyectos finalizada: %{name}"
         subject: "Sincronización de proyectos finalizada: %{name}"
       sms: 
-        body: "Cambios del curso plantilla sincronizados desde %{name}."
+        body: "Cambios del curso de proyecto sincronizados desde %{name}."
         link_message: "Más información en %{url}"
       summary: 
         body: "Sincronización de proyectos: Cambios sincronizados desde %{name}."
         subject: "Sincronización de proyectos finalizada: %{name}"
       twitter: 
-        tweet: "Alerta de Canvas: los cambios en el curso plantilla se sincronizaron desde %{name}."
+        tweet: "Alerta de Canvas: los cambios en el curso de proyecto se sincronizaron desde %{name}."
     collaboration_invitation: 
       email: 
         body: |-
@@ -16754,7 +16754,7 @@ es:
     blueprint_description: |-
         *Solo profesor y administrador:*
         
-        El contenido ha sido sincronizado desde un curso plantilla a cursos asociados
+        El contenido ha sido sincronizado desde un curso de proyecto a cursos asociados
     blueprint_display: "Sincronización de proyectos"
     calendar_description: "Items nuevos y modificados de su calendario de curso"
     calendar_display: Calendario
@@ -22534,7 +22534,7 @@ es:
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Mostrar Nuevos Exámenes en la página Exámenes"
   show_notes_column_22d2b6c1: "Mostrar la columna de notas"
   show_one_question_at_a_time_271e346d: "Mostrar una pregunta a la vez"
-  show_only_blueprint_courses_9fb37b41: "Mostrar únicamente los cursos plantilla"
+  show_only_blueprint_courses_9fb37b41: "Mostrar únicamente los cursos de proyecto"
   show_originality_report_to_students_be22f5ee: "Mostrar informe de originalidad a los alumnos"
   show_params_3401895b: "Mostrar parámetros"
   show_past_account_level_announcements_to_users_3b8208e2: "Mostrarles a los usuarios los anuncios anteriores a nivel de la cuenta"
@@ -23989,7 +23989,7 @@ es:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Esta imagen aparece como una filigrana de fondo a su página. Formatos aceptados: png, svg, gif, jpeg"
   this_image_is_currently_unavailable_25c68857: "Esta imagen no está disponible actualmente"
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Esta integración no está activada. Actívela para interactuar con la configuración."
-  this_is_a_blueprint_course_5e7b47fe: "Este es un curso plantilla"
+  this_is_a_blueprint_course_5e7b47fe: "Este es un curso de proyecto"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Esta es una lista separada por comas de URL de confianza. Confiar en cualquier URL de confianza de las que aparecen en esta lista hará que se derive el token CSRF cuando inicien sesión en Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Este curso ha concluido, por lo que solo están disponibles matrículas concluidas."
   this_is_a_course_template_99bbe698: "Esta es una plantilla del curso"
@@ -24416,7 +24416,7 @@ es:
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "Para activar los SMS, introduzca el código de confirmación de cuatro caracteres enviado a%{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Para activar este canal de comunicación, ingrese el código de confirmación de cuatro caracteres enviado a %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "Para agregar anuncios, también debe estar habilitado Foros de discusión: moderar. Para ver anuncios recientes en la página de inicio, la casilla de verificación Mostrar anuncios recientes en la página de inicio del curso debe estar seleccionada en las Configuraciones del curso."
-  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Para agregar cursos asociados, también deben estar habilitados Cursos plantilla: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
+  to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Para agregar cursos asociados, también deben estar habilitados Cursos de proyecto: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Para agregar usuarios, cursos e inscripciones de forma masiva, haga clic en importaciones de SIS (SIS Imports)."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Para agregar, editar o eliminar grupos, también debe estar habilitado Grupos: agregar/editar/eliminar."
   to_add_individual_courses_click_courses_c5355180: "Para agregar cursos individuales, haga clic en Cursos (Courses)."
@@ -24519,7 +24519,7 @@ es:
   to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: "Para editar la sección de un usuario, también debe estar habilitado el permiso de Usuarios correspondiente (por ejemplo, Usuarios - Profesores (Users - Teachers), Usuarios: permitir acciones administrativas en cursos (Users - allow administrative actions in courses), y Conversaciones: enviar a miembros individuales del curso (Conversations - send to individual course members)."
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: "Para editar la sección de un usuario, también se debe habilitar Usuarios: permitir acciones administrativas en cursos (Users - allow administrative actions in courses) y Usuarios - ver lista (Users - view list). "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "Para editar la sección de un usuario, también se debe habilitar Usuarios: permitir acciones administrativas en cursos (Users - allow administrative actions in courses) y Usuarios - ver lista (Users - view list)."
-  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Para editar las configuraciones del Curso plantilla en Configuraciones del curso, también debe estar habilitado Cursos plantilla: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete). Para agregar un curso asociado, también deben estar habilitados Cursos plantilla: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos: ver lista (Courses - view list). Para editar las configuraciones de bloqueo en cualquier objeto plantilla, este permiso debe estar habilitado. Para editar las configuraciones en archivos, también debe estar habilitado Archivos del curso: agregar/editar/eliminar (Course Files - add / edit / delete). Para editar las configuraciones en exámenes, también debe estar habilitado Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
+  to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Para editar las configuraciones del Curso de proyecto en Configuraciones del curso, también debe estar habilitado Cursos de proyecto: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete). Para agregar un curso asociado, también deben estar habilitados Cursos de proyecto: agregar/editar/asociar/eliminar (Blueprint Courses - add / edit / associate / delete) y Cursos: ver lista (Courses - view list). Para editar las configuraciones de bloqueo en cualquier objeto plantilla, este permiso debe estar habilitado. Para editar las configuraciones en archivos, también debe estar habilitado Archivos del curso: agregar/editar/eliminar (Course Files - add / edit / delete). Para editar las configuraciones en exámenes, también debe estar habilitado Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Para editar las configuraciones de bloqueo de plantilla desde la página de índice de Tareas, también debe estar habilitado Cursos: agregar/editar/eliminar (Courses - add / edit / delete). Si este permiso no está habilitado y Cursos: agregar/editar/eliminar (Courses - add / edit / delete) está habilitado, las configuraciones de bloqueo de plantilla para una tarea pueden administrarse desde la página de detalles de la tarea. Para editar las configuraciones de bloqueo de plantilla en un examen individual en la página de índice de Exámenes, también debe estar habilitado Cursos: agregar/editar/eliminar (Courses - add / edit / delete)."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Para editar las configuraciones de bloqueo de una plantilla desde la página de índice de Foros de discusión, también deben estar habilitados Cursos: agregar/editar/eliminar (Courses - add / edit / delete) y Foros de discusión: moderar (Discussions - moderate). "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Para editar las configuraciones de bloqueo de plantilla desde la página de índice de Foros de discusión, también deben estar habilitados Cursos: agregar/editar/eliminar (Courses - add / edit / delete) y Foros de discusión: ver (Discussions - view). Si este permiso no está habilitado, y Cursos: agregar/editar/eliminar (Courses - add / edit / delete) y Foros de discusión: ver (Discussions - view) está habilitado, las configuraciones de bloqueo de plantilla pueden editarse en los foros de discusión individuales."
