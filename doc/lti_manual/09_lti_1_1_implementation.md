@@ -52,7 +52,7 @@ For a conceptual overview of LTI 1.1 launches, see [LTI 1.1 Launches](doc/lti_ma
 
 LTI 1.1 launches use have five primary components in play:
 - The user's browser
-- Rails Controllers Actions
+- Rails Controller Actions
 - LTI Outbound Adapter / Related Factories
 - LTI Outbound Gem
 - IMS LTI Gem
@@ -189,7 +189,138 @@ We'll talk more about the `prepare_tool_launch` method getting called there late
 Next, the controller action uses some public methods from the adapter to construct the parameters. Let's see what the adapter is doing under the hood:
 
 ### 3. LTI Outbound Adapter & Related Factories
-TODO
+As noted above, all LTI launch controller actions construct an instance of the Lti::LtiOutboundAdapter class.
+
+This adapter helps to map Canvas-side models (Course, Account, User, etc) to `lti_outbound` gem models (LtiContext, LtiUser, etc.). It then exercises the `lti_outbound` gem to generate the hash that will be used to populate the `params` attribute of the `Lti::Launch` mentioned in section II of the "Rails Controller Actions" section.
+
+This adapter adheres to an "LTI Adapter" interface that is also implemented by another adapter described in the LTI 1.3 Implementation docs. The public methods of that "LTI Adapter" interface are:
+- generate_post_payload
+- generate_post_payload_for_assignment
+- generate_post_payload_for_homework_submission
+- launch_url
+
+Note that there is no code that actually enforced adherence to this interface. Currently there are two classes that adhere to this interface, however. One for LTI 1.1 (`Lti::LtiOutboundAdapter`) and one for LTI 1.3 (`Lti::LtiAdvantageAdapter`). Future versions of LTI may be implemented by introducing a new adapter.
+
+The LTI controller action will choose _one_ of the `generate_post_payload*` methods, depending on the placement of the launch. These `generate_post_payload*` methods return a hash of LTI launch parameters that will finally be used for the `Lti::Launch.params` attribute and ultimately sent in the LTI launch post request.
+
+An example of an LTI controller action choosing one of these methods can be seen in the `ExternalToolsController#show` action:
+
+```ruby
+# ExternalToolsController#basic_lti_launch_request
+...
+lti_launch.params = if selection_type == 'homework_submission' && assignment && !tool.use_1_3?
+    adapter.generate_post_payload_for_homework_submission(assignment)
+  elsif selection_type == "student_context_card" && params[:student_id]
+    student = api_find(User, params[:student_id])
+    can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session) &&
+      @context.user_has_been_student?(student)
+    raise Lti::Errors::UnauthorizedError unless can_launch
+    adapter.generate_post_payload(student_id: student.global_id)
+  elsif tool.extension_setting(selection_type, 'required_permissions')
+    can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session)
+    raise Lti::Errors::UnauthorizedError unless can_launch
+    adapter.generate_post_payload
+  else
+    adapter.generate_post_payload
+  end
+...
+```
+
+Before any of the `generate_post_payload*` methods can be called, however, the `prepare_tool_launch` method must be invoked. It's essentially an initializer that sets up the adapter for servicing the `generate_post_payload*` methods (in fact, I personally think we can have the _actual_ initializer just call this method).
+
+Let's break down what these methods do:
+**I. LtiOutboundAdapter#prepare_tool_launch**
+As described above, this method helps prepare the adapter for servicing calls to the `generate_post_payload*` methods.
+
+This method simply initializes the `lti_outbound` models by making calls to various factories.
+
+As a reminder, the `lti_outbound` internal gem is ultimately responsible for generating the hash of LTI parameters.
+
+The `lti_outbound` models initialized in this method are:
+
+**LtiOutbound::LtiContext**
+```ruby
+# Lti::LtiOutboundAdapter#prepare_tool_launch
+...
+lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
+```
+
+**LtiOutbound::LtiUser**
+```ruby
+# Lti::LtiOutboundAdapter#prepare_tool_launch
+...
+lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
+```
+
+**LtiOutbound::LtiTool**
+```ruby
+# Lti::LtiOutboundAdapter#prepare_tool_launch
+...
+lti_tool = Lti::LtiToolCreator.new(@tool).convert
+```
+
+**LtiOutbound::LtiAccount**
+```ruby
+# Lti::LtiOutboundAdapter#prepare_tool_launch
+...
+lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
+```
+
+and
+
+**LtiOutbound::ToolLaunch**
+```ruby
+# Lti::LtiOutboundAdapter#prepare_tool_launch
+...
+@tool_launch = LtiOutbound::ToolLaunch.new(
+  {
+    ...
+    context: lti_context,
+    user: lti_user,
+    tool: lti_tool,
+    account: lti_account,
+    variable_expander: variable_expander
+  }
+)
+```
+
+As can bee seen, the lti-context, lti_user, lti_tool, and lti_account models are used to create an instance of `LtiOutbound::ToolLaunch`, which will be used to generate the launch parameters in the generate_post_payload_for*` methods.
+
+**II. LtiOutboundAdapter#generate_post_payload**
+
+One of the public methods required by the "LTI Adapter" interface mentioned in "*IV. Construct an Lti::LtiOutboundAdapter instance*"
+
+This method ultimately generates the "default" LTI launch payload. It returns the LTI launch parameters, including OAuth parameters, as a hash.
+
+As noted above, the `#prepare_tool_launch` method previously created an instance of `LtiOutbound::ToolLaunch` and set it to a variable named `@tool_launch`. The first thing `#generate_post_payload` does is call `generate` on `@tool_launch`.
+
+This generates a hash of all the default LTI parameters.
+
+`#generate_post_payload` then uses ` Lti::Security.signed_post_params` to generate the OAuth parameters for the LTI parameters hash.
+
+The OAuth parameters and the default LTI parameters are merged and returned.
+
+**III. LtiOutboundAdapter#generate_post_payload_for_assignment**
+
+One of the public methods required by the "LTI Adapter" interface mentioned in "*IV. Construct an Lti::LtiOutboundAdapter instance*"
+
+Serves the same purpose as `#generate_post_payload`, but adds additional parameters related to Canvas assignments to the LTI parameters hash.
+
+This method is used to generate the LTI 1.1 launches that occur when an "External Tool Assignment" is launched in Canvas.
+
+**IV. LtiOutboundAdapter#generate_post_payload_for_homework_submission**
+
+One of the public methods required by the "LTI Adapter" interface mentioned in "*IV. Construct an Lti::LtiOutboundAdapter instance*"
+
+Serves the same purpose as `#generate_post_payload`, but adds additional parameters related to Canvas submissions to the LTI parameters hash.
+
+This method is used to generate the LTI 1.1 launches that occur in SpeedGrader and the submission details view.
+
+**V. LtiOutboundAdapter#launch_url**
+
+One of the public methods required by the "LTI Adapter" interface mentioned in "*IV. Construct an Lti::LtiOutboundAdapter instance*"
+
+Returns the URL that the LTI launch should be made to.
 
 ### 4. LTI Outbound Gem
 TODO
@@ -198,3 +329,4 @@ TODO
 TODO
 
 ### 6. Self-submitting HTML form
+TODO
