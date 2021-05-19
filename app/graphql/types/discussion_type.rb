@@ -44,6 +44,8 @@ module Types
     global_id_field :id
     field :title, String, null: true
     field :message, String, null: true
+    field :context_id, ID, null: false
+    field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
     field :lock_at, Types::DateTimeType, null: true
     field :locked, Boolean, null: false
@@ -108,6 +110,19 @@ module Types
     field :group_set, Types::GroupSetType, null: true
     def group_set
       load_association(:group_category)
+    end
+
+    field :child_topics, [Types::DiscussionType], null: true
+    def child_topics
+      load_association(:child_topics)
+    end
+
+    field :context_name, String, null: true
+    def context_name
+      # load_association(:context).then(&:name)
+      load_association(:context).then do |context|
+        context&.name
+      end
     end
 
     field :author, Types::UserType, null: true

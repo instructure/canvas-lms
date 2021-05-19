@@ -24,6 +24,7 @@ import gql from 'graphql-tag'
 import {User} from './User'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
+import {ChildTopic} from './ChildTopic'
 
 export const Discussion = {
   fragment: gql`
@@ -63,11 +64,15 @@ export const Discussion = {
       courseSections {
         ...Section
       }
+      childTopics {
+        ...ChildTopic
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
     ${Section.fragment}
+    ${ChildTopic.fragment}
   `,
 
   shape: shape({
@@ -96,6 +101,7 @@ export const Discussion = {
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
+    childTopics: arrayOf(ChildTopic.shape),
     rootEntriesTotalPages: number,
     entriesTotalPages: number
   }),
@@ -127,6 +133,7 @@ export const Discussion = {
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
     courseSections = [Section.mock()],
+    childTopics = [ChildTopic.mock()],
     entriesTotalPages = 2,
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
@@ -156,6 +163,7 @@ export const Discussion = {
     assignment,
     permissions,
     courseSections,
+    childTopics,
     entriesTotalPages,
     discussionEntriesConnection,
     __typename: 'Discussion'
