@@ -1467,6 +1467,22 @@ describe GradebooksController do
             end
           end
         end
+
+        describe 'IMPROVED_LMGB' do
+          it 'is false if the feature flag is off' do
+            @course.root_account.disable_feature! :improved_lmgb
+            get :show, params: {course_id: @course.id}
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:IMPROVED_LMGB]).to eq false
+          end
+
+          it 'is true if the feature flag is on' do
+            @course.root_account.enable_feature! :improved_lmgb
+            get :show, params: {course_id: @course.id}
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:IMPROVED_LMGB]).to eq true
+          end
+        end
       end
     end
   end
