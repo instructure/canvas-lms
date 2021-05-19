@@ -96,7 +96,7 @@
               </a>
             </li>
           <% end %>
-          <% if @current_user && @current_user.roles(@domain_root_account).include?('admin') %>
+          <% if @current_user && @current_user.adminable_accounts.present? %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
               <button id="global_nav_accounts_link" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
