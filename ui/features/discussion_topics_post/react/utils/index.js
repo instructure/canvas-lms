@@ -22,7 +22,7 @@ import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {PER_PAGE} from './constants'
 
 export const isGraded = (assignment = null) => {
-  return assignment !== null && (assignment?.dueAt || assignment?.pointsPossible)
+  return assignment !== null
 }
 
 export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {

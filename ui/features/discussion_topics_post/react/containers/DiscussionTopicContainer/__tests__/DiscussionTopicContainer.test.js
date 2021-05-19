@@ -132,7 +132,9 @@ describe('DiscussionTopicContainer', () => {
     })
     expect(await container.queryByText('24 replies, 4 unread')).toBeTruthy()
 
-    expect(await container.queryByTestId('graded-discussion-info')).toBeNull()
+    expect(
+      await container.queryByText('This is a graded discussion: 0 points possible')
+    ).toBeTruthy()
   })
 
   it('renders infoText only when there are replies', async () => {
