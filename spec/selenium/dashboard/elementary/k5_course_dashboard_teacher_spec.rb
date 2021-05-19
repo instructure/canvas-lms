@@ -20,11 +20,13 @@
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
 require_relative '../../helpers/k5_common'
+require_relative '../../courses/pages/course_settings_page'
 
 describe "teacher k5 course dashboard" do
   include_context "in-process server selenium tests"
   include K5PageObject
   include K5Common
+  include CourseSettingsPage
 
   before :once do
     teacher_setup
@@ -132,6 +134,7 @@ describe "teacher k5 course dashboard" do
   context 'course color selection' do
     it 'allows for available color to be selected', ignore_js_errors: true do
       get "/courses/#{@subject_course.id}/settings"
+      visit_course_details_tab
 
       click_pink_color_button
 
@@ -144,6 +147,8 @@ describe "teacher k5 course dashboard" do
 
     it 'allows for hex color to be input', ignore_js_errors: true do
       get "/courses/#{@subject_course.id}/settings"
+      visit_course_details_tab
+
       new_color = '#07AB99'
       input_color_hex_value(new_color)
       wait_for_new_page_load(submit_form('#course_form'))
