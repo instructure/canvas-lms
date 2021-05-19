@@ -28,7 +28,7 @@ import React from 'react'
 
 jest.mock('@canvas/rce/RichContentEditor')
 
-describe('DiscussionFullPage', () => {
+describe.skip('DiscussionFullPage', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
@@ -99,7 +99,7 @@ describe('DiscussionFullPage', () => {
       expect(await container.findByText('Deleted by Hank Mccoy')).toBeInTheDocument()
     })
 
-    it.skip('toggles an entries read state when the Mark as Read/Unread is clicked', async () => {
+    it('toggles an entries read state when the Mark as Read/Unread is clicked', async () => {
       const container = setup()
       const actionsButton = await container.findByTestId('thread-actions-menu')
 
