@@ -20,6 +20,7 @@ import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 export function Reply({...props}) {
   return (
@@ -29,7 +30,9 @@ export function Reply({...props}) {
       color="primary"
       data-testid="threading-toolbar-reply"
     >
-      {I18n.t('Reply')}
+      <AccessibleContent alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}>
+        {I18n.t('Reply')}
+      </AccessibleContent>
     </CondensedButton>
   )
 }
@@ -52,5 +55,9 @@ Reply.propTypes = {
   /**
    * Key consumed by ThreadingToolbar's InlineList
    */
-  delimiterKey: PropTypes.string.isRequired
+  delimiterKey: PropTypes.string.isRequired,
+  /**
+   * Name of author of the post being replied to
+   */
+  authorName: PropTypes.string.isRequired
 }

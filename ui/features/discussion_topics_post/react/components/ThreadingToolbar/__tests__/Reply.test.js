@@ -21,10 +21,16 @@ import React from 'react'
 import {Reply} from '../Reply'
 
 const setup = props => {
-  return render(<Reply onClick={Function.prototype} delimiterKey="reply" {...props} />)
+  return render(
+    <Reply onClick={Function.prototype} delimiterKey="reply" authorName="Nikita" {...props} />
+  )
 }
 
 describe('Reply', () => {
+  it('uses authorName for screenreaders', () => {
+    const {getByText} = setup()
+    expect(getByText('Reply to post from Nikita')).toBeTruthy()
+  })
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getByText} = setup({onClick: onClickMock})

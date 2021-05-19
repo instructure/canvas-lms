@@ -22,7 +22,14 @@ import {Like} from '../Like'
 
 const setup = props => {
   return render(
-    <Like isLiked onClick={Function.prototype} delimiterKey="like" likeCount={0} {...props} />
+    <Like
+      isLiked
+      onClick={Function.prototype}
+      delimiterKey="like"
+      likeCount={0}
+      authorName="Xerxes"
+      {...props}
+    />
   )
 }
 
@@ -51,14 +58,22 @@ describe('Like', () => {
     })
     expect(queryByTestId('not-liked-icon')).toBeTruthy()
     expect(queryByTestId('liked-icon')).toBeFalsy()
-    expect(queryByText('Like post')).toBeTruthy()
-    expect(queryByText('Unlike post')).toBeFalsy()
+    expect(queryByText('Like post from Xerxes')).toBeTruthy()
+    expect(queryByText('Unlike post from Xerxes')).toBeFalsy()
 
-    rerender(<Like onClick={Function.prototype} isLiked delimiterKey="like" likeCount={0} />)
+    rerender(
+      <Like
+        onClick={Function.prototype}
+        isLiked
+        authorName="Xerxes"
+        delimiterKey="like"
+        likeCount={0}
+      />
+    )
 
     expect(queryByTestId('not-liked-icon')).toBeFalsy()
     expect(queryByTestId('liked-icon')).toBeTruthy()
-    expect(queryByText('Like post')).toBeFalsy()
-    expect(queryByText('Unlike post')).toBeTruthy()
+    expect(queryByText('Like post from Xerxes')).toBeFalsy()
+    expect(queryByText('Unlike post from Xerxes')).toBeTruthy()
   })
 })

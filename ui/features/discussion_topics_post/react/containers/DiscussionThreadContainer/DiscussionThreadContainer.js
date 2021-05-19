@@ -170,6 +170,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
+        authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
           setEditorExpanded(!editorExpanded)
@@ -186,6 +187,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry.id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={toggleRating}
+        authorName={props.discussionEntry.author.name}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
