@@ -125,7 +125,7 @@ def yarnStage() {
 
 def groovyStage() {
   sh '''docker run $LINTERS_RUNNER_IMAGE \
-    npx npm-groovy-lint --path "./build/new-jenkins/library/" \
-    --files "**/*.groovy" --config ".groovylintrc.json"  \
+    npx npm-groovy-lint --path "." --ignorepattern "**/node_modules/**" \
+    --files "**/*.groovy,**/Jenkinsfile*" --config ".groovylintrc.json"  \
     --loglevel info --failon info'''
 }
