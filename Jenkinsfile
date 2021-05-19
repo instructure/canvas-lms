@@ -323,7 +323,7 @@ pipeline {
           maybeSlackSendRetrigger()
 
           def buildSummaryReportHooks = [
-            onStageEnded: { stageName, _, buildResult ->
+            onStageEnded: { stageName, stageConfig, buildResult ->
               if (buildResult) {
                 buildSummaryReport.addFailureRun(stageName, buildResult)
                 buildSummaryReport.addRunTestActions(stageName, buildResult)
@@ -333,7 +333,7 @@ pipeline {
           ]
 
           def postBuildHandler = [
-            onStageEnded: { _, stageConfig ->
+            onStageEnded: { stageName, stageConfig ->
               buildSummaryReport.addFailureRun('Main Build', currentBuild)
               postFn(stageConfig.status())
             }
@@ -417,7 +417,7 @@ pipeline {
                 .timeout(10)
                 .execute { runMigrationsStage() }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                 def stages = [:]
 
                 extendedStage('Consumer Smoke Test').queue(stages) {
@@ -434,7 +434,7 @@ pipeline {
               }
             }
 
-            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('Local Docker Dev Build')
@@ -508,7 +508,7 @@ pipeline {
                 }
             }
 
-            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('CDC Schema Check')

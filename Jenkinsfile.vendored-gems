@@ -61,7 +61,7 @@ pipeline {
         script {
           extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             def postBuildHandler = [
-              onStageEnded: { _ ->
+              onStageEnded: { stageName ->
                 cleanupFn()
               }
             ]

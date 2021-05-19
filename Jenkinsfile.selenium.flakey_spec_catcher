@@ -140,7 +140,7 @@ def computeTestCount() {
   echo "expected nodes to run on for $testCount tests: ${partitions.size()}"
 }
 
-def executeFlakeySpecCatcher(prefix = 'main') {
+def executeFlakeySpecCatcher() {
   sh 'rm -vrf tmp'
   try {
     sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
@@ -217,7 +217,7 @@ pipeline {
         script {
           extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             def postBuildHandler = [
-              onStageEnded: { _, stageConfig ->
+              onStageEnded: { stageName, stageConfig ->
                 cleanupFn(stageConfig.status())
               }
             ]
@@ -264,7 +264,7 @@ pipeline {
                         "NODE_NUMBER=$nodeNumber"
                       ]) {
                         setupNode()
-                        executeFlakeySpecCatcher("node$nodeNumber")
+                        executeFlakeySpecCatcher()
                       }
                     }
                   }
