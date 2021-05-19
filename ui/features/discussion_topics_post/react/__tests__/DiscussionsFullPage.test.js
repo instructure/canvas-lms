@@ -99,7 +99,7 @@ describe('DiscussionFullPage', () => {
       expect(await container.findByText('Deleted by Hank Mccoy')).toBeInTheDocument()
     })
 
-    it('toggles an entries read state when the Mark as Read/Unread is clicked', async () => {
+    it.skip('toggles an entries read state when the Mark as Read/Unread is clicked', async () => {
       const container = setup()
       const actionsButton = await container.findByTestId('thread-actions-menu')
 
