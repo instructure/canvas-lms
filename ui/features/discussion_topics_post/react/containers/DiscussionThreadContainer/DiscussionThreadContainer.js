@@ -156,7 +156,8 @@ export const DiscussionThreadContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        read: !props.discussionEntry.read
+        read: !props.discussionEntry.read,
+        forcedReadState: props.discussionEntry.read || null
       }
     })
   }
@@ -257,6 +258,7 @@ export const DiscussionThreadContainer = props => {
             setIsEditing(false)
           }}
           onSave={onUpdate}
+          isForcedRead={props.discussionEntry.forcedReadState}
         >
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </PostMessage>
@@ -266,7 +268,7 @@ export const DiscussionThreadContainer = props => {
 
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
-    if (!props.discussionEntry.read) {
+    if (!props.discussionEntry.read && !props.discussionEntry?.forcedReadState) {
       const observer = new IntersectionObserver(() => props.markAsRead(props.discussionEntry._id), {
         root: null,
         rootMargin: '0px',
@@ -353,6 +355,7 @@ export const DiscussionThreadContainer = props => {
           discussionTopicGraphQLId={props.discussionTopicGraphQLId}
           discussionEntryId={props.discussionEntry._id}
           depth={props.depth + 1}
+          markAsRead={props.markAsRead}
         />
       )}
       {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (

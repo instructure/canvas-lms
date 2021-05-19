@@ -106,7 +106,9 @@ describe('DiscussionFullPage', () => {
       expect(container.queryByTestId('is-unread')).toBeNull()
       fireEvent.click(actionsButton)
       fireEvent.click(container.getByTestId('markAsUnread'))
-      expect(await container.findByTestId('is-unread')).toBeInTheDocument()
+      const unreadBadge = await container.findByTestId('is-unread')
+      expect(unreadBadge).toBeInTheDocument()
+      expect(unreadBadge.getAttribute('data-isforcedread')).toBe('true')
 
       fireEvent.click(actionsButton)
       fireEvent.click(container.getByTestId('markAsRead'))

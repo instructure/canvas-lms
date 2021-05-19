@@ -110,9 +110,22 @@ describe('DiscussionThreadContainer', () => {
     const container = setup(defaultProps())
 
     expect(container.getByTestId('is-unread')).toBeInTheDocument()
+    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe('false')
+
     window.setTimeout(
       () => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument(),
       3000
     )
+  })
+
+  it('unread discussion entry does not update when forceReadState is true', async () => {
+    const props = defaultProps()
+    props.discussionTopic.discussionEntriesConnection.nodes[0].forcedReadState = true
+
+    const container = setup(props)
+    expect(container.getByTestId('is-unread')).toBeInTheDocument()
+    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe('true')
+
+    window.setTimeout(() => expect(container.queryByTestId('is-unread')).toBeInTheDocument(), 3000)
   })
 })

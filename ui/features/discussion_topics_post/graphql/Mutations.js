@@ -39,9 +39,15 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     $discussionEntryId: ID!
     $read: Boolean
     $rating: RatingInputType
+    $forcedReadState: Boolean
   ) {
     updateDiscussionEntryParticipant(
-      input: {discussionEntryId: $discussionEntryId, read: $read, rating: $rating}
+      input: {
+        discussionEntryId: $discussionEntryId
+        read: $read
+        rating: $rating
+        forcedReadState: $forcedReadState
+      }
     ) {
       discussionEntry {
         ...DiscussionEntry

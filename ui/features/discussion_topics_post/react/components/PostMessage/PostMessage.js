@@ -83,6 +83,7 @@ export function PostMessage({...props}) {
             marginTop: '13px'
           }}
           data-testid="is-unread"
+          data-isforcedread={props.isForcedRead}
         >
           <Badge
             type="notification"
@@ -148,7 +149,11 @@ PostMessage.propTypes = {
   /**
    * Callback for when Editor Cancel button is pressed
    */
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  /**
+   * Marks whether an unread message has a forcedReadState
+   */
+  isForcedRead: PropTypes.bool
 }
 
 export default PostMessage

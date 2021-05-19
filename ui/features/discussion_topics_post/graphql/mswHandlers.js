@@ -127,7 +127,8 @@ export const handlers = [
               id: req.body.variables.discussionEntryId,
               read: req.body.variables.read,
               rating: req.body.variables.rating === 'liked',
-              ratingSum: req.body.variables.rating === 'liked' ? 1 : 0
+              ratingSum: req.body.variables.rating === 'liked' ? 1 : 0,
+              forcedReadState: req.body.variables.forcedReadState
             }
           ),
           __typename: 'UpdateDiscussionEntryParticipantPayload'
