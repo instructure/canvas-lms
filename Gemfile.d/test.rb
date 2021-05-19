@@ -58,6 +58,7 @@ group :test do
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.40.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
+  gem 'json-schema', '~> 2.8.1'
 
   gem 'parallel_tests'
   gem 'flakey_spec_catcher', require: false

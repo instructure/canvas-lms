@@ -30,15 +30,27 @@ describe MicrosoftSync::GraphService do
     }
   end
 
+  before :once do
+    @url_logger = MicrosoftSync::GraphService::SpecHelper::UrlLogger.new
+
+    WebMock.after_request do |request, response|
+      @url_logger.log(request, response)
+    end
+  end
+
+  after :all do
+    @url_logger.verify_responses
+    # Uncomment below when mock responses are actually valid. I plan to do those
+    # in a later commit.
+    # raise "Schema mismatch on the following: \n #{@url_logger.errors.to_yaml}" if @url_logger.errors.any?
+  end
+
   before do
     WebMock.disable_net_connect!
+
     allow(MicrosoftSync::LoginService).to receive(:token).with('mytenant').and_return('mytoken')
     if url
-      if with_params.empty?
-        WebMock.stub_request(http_method, url).and_return(response)
-      else
-        WebMock.stub_request(http_method, url).with(with_params).and_return(response)
-      end
+      @url_logger.stub_request(http_method, url, response, url_variables, with_params)
     end
 
     allow(InstStatsd::Statsd).to receive(:increment).and_call_original
@@ -53,6 +65,7 @@ describe MicrosoftSync::GraphService do
 
   let(:service) { described_class.new('mytenant', extra_tag: 'abc') }
   let(:url) { nil }
+  let(:url_variables) { [] }
 
   let(:response) { json_response(200, response_body) }
   let(:with_params) { {} }
@@ -715,6 +728,7 @@ describe MicrosoftSync::GraphService do
     let(:method_name) { :list_group_owners }
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners' }
+    let(:url_variables) { ['mygroup'] }
 
     it_behaves_like 'a paginated list endpoint' do
       it_behaves_like 'an endpoint that uses up quota', [2, 0]
@@ -851,6 +865,7 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
+    let(:url_variables) { ['mygroupid'] }
     let(:response_body) { {'foo' => 'bar'} }
 
     it_behaves_like 'a graph service endpoint', ignore_404: true
