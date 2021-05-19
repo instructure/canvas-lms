@@ -1457,7 +1457,7 @@ class RCEWrapper extends React.Component {
       code = this.mceInstance().getContent({format: 'html'})
     } else {
       // Reproducing the raw HTML editor behavior
-      this.mceInstance().getContent({format: 'raw'})
+      code = this.mceInstance().getContent({format: 'raw'})
     }
 
     // the div keeps the editor from collapsing while the code editor is downloaded
