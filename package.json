@@ -206,7 +206,7 @@
     "enzyme-adapter-react-16": "^1",
     "enzyme-to-json": "^3.3.4",
     "es-check": "^5",
-    "eslint": "^6",
+    "eslint": "^7",
     "eslint-config-airbnb": "^18",
     "eslint-config-prettier": "^6",
     "eslint-plugin-babel": "^5",
