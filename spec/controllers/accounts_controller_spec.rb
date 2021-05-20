@@ -235,13 +235,8 @@ describe AccountsController do
       user_to_remove = account_admin_user(account: a1)
       au_id = user_to_remove.account_users.first.id
       account_with_admin_logged_in(account: a2)
-      begin
-        post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
-        # rails3 returns 404 status
-        expect(response).to be_not_found
-      rescue ActiveRecord::RecordNotFound
-        # rails2 passes the exception through here
-      end
+      post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
+      expect(response).to be_not_found
       expect(AccountUser.where(id: au_id).first).not_to be_nil
     end
   end
@@ -905,6 +900,13 @@ describe AccountsController do
           BASE_URL: 'https://login.microsoftonline.com'
         )
       end
+    end
+
+    it "should not be accessible to teachers" do
+      course_with_teacher
+      user_session(@teacher)
+      get 'settings', params: {account_id: @course.root_account.id}
+      expect(response).to be_unauthorized
     end
 
     it "should load account report details" do

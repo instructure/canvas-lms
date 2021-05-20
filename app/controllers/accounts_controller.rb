@@ -1141,7 +1141,7 @@ class AccountsController < ApplicationController
   end
 
   def settings
-    if authorized_action(@account, @current_user, :read)
+    if authorized_action(@account, @current_user, :read_as_admin)
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
