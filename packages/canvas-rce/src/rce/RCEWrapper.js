@@ -1269,15 +1269,17 @@ class RCEWrapper extends React.Component {
     const wrappedOpts = {
       ...options,
 
-      height: this.state.height,
+      height: options.height || DEFAULT_RCE_HEIGHT,
 
-      block_formats: [
-        `${formatMessage('Heading 2')}=h2`,
-        `${formatMessage('Heading 3')}=h3`,
-        `${formatMessage('Heading 4')}=h4`,
-        `${formatMessage('Preformatted')}=pre`,
-        `${formatMessage('Paragraph')}=p`
-      ].join('; '),
+      block_formats:
+        options.block_formats ||
+        [
+          `${formatMessage('Heading 2')}=h2`,
+          `${formatMessage('Heading 3')}=h3`,
+          `${formatMessage('Heading 4')}=h4`,
+          `${formatMessage('Preformatted')}=pre`,
+          `${formatMessage('Paragraph')}=p`
+        ].join('; '),
 
       setup: editor => {
         addKebabIcon(editor)
@@ -1297,87 +1299,98 @@ class RCEWrapper extends React.Component {
       // in the editor matches the styles of the app it will be displayed in when saved.
       // This is just so we inject the helper class names that tinyMCE uses for
       // things like table resizing and stuff.
+      content_css: options.content_css || [],
       content_style: contentCSS,
 
-      toolbar: [
+      menubar: mergeMenuItems('edit view insert format tools table', options.menubar),
+      // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
+      // tinymce's default edit and table menus are fine
+      // insert will be updated by RCEWrapper if canvas is present
+      menu: mergeMenu(
         {
-          name: formatMessage('Styles'),
-          items: ['fontsizeselect', 'formatselect']
+          format: {
+            title: formatMessage('Format'),
+            items:
+              'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
+          },
+          insert: {
+            title: formatMessage('Insert'),
+            items: 'instructure_links | inserttable instructure_media_embed | hr'
+          },
+          tools: {title: formatMessage('Tools'), items: 'wordcount'},
+          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
         },
-        {
-          name: formatMessage('Formatting'),
-          items: [
-            'bold',
-            'italic',
-            'underline',
-            'forecolor',
-            'backcolor',
-            'inst_subscript',
-            'inst_superscript'
-          ]
-        },
-        {
-          name: formatMessage('Content'),
-          items: canvasPlugins
-        },
-        {
-          name: formatMessage('External Tools'),
-          items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
-        },
-        {
-          name: formatMessage('Alignment and Lists'),
-          items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
-        },
-        {
-          name: formatMessage('Miscellaneous'),
-          items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
-        }
-      ],
+        options.menu
+      ),
+
+      toolbar: mergeToolbar(
+        [
+          {
+            name: formatMessage('Styles'),
+            items: ['fontsizeselect', 'formatselect']
+          },
+          {
+            name: formatMessage('Formatting'),
+            items: [
+              'bold',
+              'italic',
+              'underline',
+              'forecolor',
+              'backcolor',
+              'inst_subscript',
+              'inst_superscript'
+            ]
+          },
+          {
+            name: formatMessage('Content'),
+            items: canvasPlugins
+          },
+          {
+            name: formatMessage('External Tools'),
+            items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
+          },
+          {
+            name: formatMessage('Alignment and Lists'),
+            items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
+          },
+          {
+            name: formatMessage('Miscellaneous'),
+            items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
+          }
+        ],
+        options.toolbar
+      ),
+
       contextmenu: '', // show the browser's native context menu
 
       toolbar_mode: 'floating',
       toolbar_sticky: true,
 
-      // tiny's external link create/edit dialog config
-      target_list: false, // don't show the target list when creating/editing links
-      link_title: false, // don't show the title input when creating/editing links
-      default_link_target: '_blank'
+      plugins: mergePlugins(
+        [
+          'autolink',
+          'media',
+          'paste',
+          'table',
+          'link',
+          'directionality',
+          'lists',
+          'hr',
+          'fullscreen',
+          'instructure-ui-icons',
+          'instructure_condensed_buttons',
+          'instructure_links',
+          'instructure_html_view',
+          'instructure_media_embed',
+          'instructure_external_tools',
+          'a11y_checker',
+          'wordcount'
+        ],
+        options.plugins
+      )
     }
 
-    // ********** props.toolbar and props.menu is experimental *******
-    if (this.props.toolbar) {
-      // merge given toolbar data into the default toolbar
-      this.props.toolbar.forEach(tb => {
-        const curr_tb = wrappedOpts.toolbar.find(t => tb.name === t.name)
-        if (curr_tb) {
-          curr_tb.items.splice(curr_tb.items.length, 0, ...tb.items)
-        } else {
-          wrappedOpts.toolbar.push(tb)
-        }
-      })
-    }
-    if (this.props.menu) {
-      // merge given menu data into the default toolbar
-      Object.keys(this.props.menu).forEach(k => {
-        const curr_m = wrappedOpts.menu[k]
-        if (curr_m) {
-          curr_m.items += ` | ${this.props.menu[k].items.join(' ')}`
-        } else {
-          const menu_key = k.replace(/\W/, '_')
-          wrappedOpts.menubar += ` ${menu_key}`
-          wrappedOpts.menu[menu_key] = {title: k, items: this.props.menu[k].items}
-        }
-      })
-    }
-
-    if (wrappedOpts.plugins) {
-      wrappedOpts.plugins.splice(wrappedOpts.plugins.length, 0, ...canvasPlugins)
-    } else {
-      wrappedOpts.plugins = canvasPlugins
-    }
-    if (this.props.plugins) {
-      wrappedOpts.plugins.splice(wrappedOpts.plugins.length, 0, ...this.props.plugins)
-    }
+    wrappedOpts.plugins.splice(wrappedOpts.plugins.length, 0, ...canvasPlugins)
 
     if (this.props.trayProps) {
       wrappedOpts.canvas_rce_user_context = {
@@ -1430,7 +1443,6 @@ class RCEWrapper extends React.Component {
     // Preload the LTI Tools modal
     // This helps with loading the favorited external tools
     if (this.ltiToolFavorites.length > 0) {
-      // eslint-disable-next-line babel/no-unused-expressions
       import('./plugins/instructure_external_tools/components/LtiToolsModal')
     }
 
@@ -1650,5 +1662,79 @@ class RCEWrapper extends React.Component {
   }
 }
 
+// standard: string of tinymce menu commands
+// e.g. 'instructure_links | inserttable instructure_media_embed | hr'
+// custom: a string of tinymce menu commands
+// returns: standard + custom with any duplicate commands removed from custom
+function mergeMenuItems(standard, custom) {
+  let c = custom?.trim?.()
+  if (!c) return standard
+
+  const s = new Set(standard.split(/[\s|]+/))
+  // remove any duplicates
+  c = c.split(/\s+/).filter(m => !s.has(m))
+  c = c
+    .join(' ')
+    .replace(/^\s*\|\s*/, '')
+    .replace(/\s*\|\s*$/, '')
+  return `${standard} | ${c}`
+}
+
+// standard: the incoming tinymce menu object
+// custom: tinymce menu object to merge into standard
+// returns: the merged result by mutating incoming standard arg.
+// It will add commands to existing menus, or add a new menu
+// if the custom one does not exist
+function mergeMenu(standard, custom) {
+  if (!custom) return standard
+
+  Object.keys(custom).forEach(k => {
+    const curr_m = standard[k]
+    if (curr_m) {
+      curr_m.items = mergeMenuItems(curr_m.items, custom[k].items)
+    } else {
+      standard[k] = {...custom[k]}
+    }
+  })
+  return standard
+}
+
+// standard: incoming tinymce toolbar array
+// custom: tinymce toolbar array to merge into standard
+// returns: the merged result by mutating the incoming standard arg.
+// It will add commands to existing toolbars, or add a new toolbar
+// if the custom one does not exist
+// This is a little awkward in that tinymce toolbar config does not
+// include a key to identify the individual toolbars, just a name
+// which is translated. The custom toolbar's name must be translated
+// in order to be merged correctly.
+function mergeToolbar(standard, custom) {
+  if (!custom) return standard
+
+  // merge given toolbar data into the default toolbar
+  custom.forEach(tb => {
+    const curr_tb = standard.find(t => formatMessage(tb.name) === t.name)
+    if (curr_tb) {
+      curr_tb.items.splice(curr_tb.items.length, 0, ...tb.items)
+    } else {
+      standard.push(tb)
+    }
+  })
+  return standard
+}
+
+// standard: incoming array of plugin names
+// custom: array of plugin names to merge
+// returns: the merged result, duplicates removed
+function mergePlugins(standard, custom) {
+  if (!custom) return standard
+
+  const union = new Set(standard)
+  for (const p of custom) {
+    union.add(p)
+  }
+  return [...union]
+}
+
 export default RCEWrapper
-export {toolbarPropType, menuPropType}
+export {toolbarPropType, menuPropType, mergeMenuItems, mergeMenu, mergeToolbar, mergePlugins}

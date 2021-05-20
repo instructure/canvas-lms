@@ -169,7 +169,7 @@ function Demo() {
   function updateMenu() {
     return include_test_plugin && test_plugin_menu !== '__none__'
       ? {
-          [test_plugin_menu]: {items: ['rce_demo_test']}
+          [test_plugin_menu]: {title: 'Test Plugin', items: 'rce_demo_test'}
         }
       : undefined
   }

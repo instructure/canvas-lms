@@ -48,6 +48,7 @@ export function renderIntoDiv(editorEl, props, cb) {
     getTranslations(language)
       .then(() => render(editorEl, props, cb))
       .catch(err => {
+        // eslint-disable-next-line no-console
         console.error(
           'Failed loading the language file for',
           language,

@@ -93,6 +93,9 @@ export default class DemoOptions extends Component {
                   onChange={(_e, option) => this.setState({test_plugin_toolbar: option.value})}
                   interaction={this.state.include_test_plugin ? 'enabled' : 'disabled'}
                 >
+                  <SimpleSelect.Option id="Formatting" value="Formatting">
+                    Formatting
+                  </SimpleSelect.Option>
                   <SimpleSelect.Option id="Content" value="Content">
                     Content
                   </SimpleSelect.Option>
@@ -118,7 +121,7 @@ export default class DemoOptions extends Component {
                   <SimpleSelect.Option id="Miscellaneous" value="tools">
                     Tools
                   </SimpleSelect.Option>
-                  <SimpleSelect.Option id="Ext_Plugin" value="Ext Plugin">
+                  <SimpleSelect.Option id="ext_plugin" value="ext_plugin">
                     External Plugin (new!)
                   </SimpleSelect.Option>
                   <SimpleSelect.Option id="none" value="__none__">
