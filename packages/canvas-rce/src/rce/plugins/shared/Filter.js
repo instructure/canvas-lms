@@ -143,9 +143,6 @@ function shouldSearch(searchString) {
   return searchString.length === 0 || searchString.length >= 3
 }
 
-const searchMessage = formatMessage('Enter at least 3 characters to search')
-const loadingMessage = formatMessage('Loading, please wait')
-
 export default function Filter(props) {
   const {
     contentType,
@@ -205,7 +202,8 @@ export default function Filter(props) {
     }
     return undefined
   }
-
+  const searchMessage = formatMessage('Enter at least 3 characters to search')
+  const loadingMessage = formatMessage('Loading, please wait')
   const msg = isContentLoading ? loadingMessage : searchMessage
   return (
     <View display="block" direction="column">
