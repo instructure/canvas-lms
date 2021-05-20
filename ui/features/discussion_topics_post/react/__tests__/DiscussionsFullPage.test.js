@@ -39,7 +39,8 @@ describe.skip('DiscussionFullPage', () => {
     server.listen()
 
     window.ENV = {
-      discussion_topic_id: '1'
+      discussion_topic_id: '1',
+      manual_mark_as_read: false
     }
   })
 
