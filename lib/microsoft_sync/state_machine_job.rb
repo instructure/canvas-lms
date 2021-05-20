@@ -24,7 +24,10 @@
 # somewhere else (see stash_block below).
 #
 # After initializing, you will want to run with `run_later` or (for debugging
-# in a console) `run_synchronously`.
+# in a console) `run_synchronously`. Either of these can take an initial
+# mem_state argument, which is useful if you have different flavors of jobs that
+# need to run on the same strand (and not start until the one currently
+# running/retrying has finished).
 #
 # The job runs on a strand tied to the state_record which means only one job
 # may be running at a time. In addition, if new a job is started while a job
@@ -157,17 +160,17 @@ module MicrosoftSync
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
 
     # Mostly used for debugging. May use sleep!
-    def run_synchronously(step=nil)
-      run_with_delay(step, synchronous: true)
+    def run_synchronously(initial_mem_state=nil)
+      run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
     end
 
-    def run_later
-      run_with_delay
+    def run_later(initial_mem_state=nil)
+      run_with_delay(initial_mem_state: initial_mem_state)
     end
 
     private
 
-    def run(step, synchronous=false)
+    def run(step, initial_mem_state, synchronous=false)
       job_state = job_state_record.job_state
 
       # Record has been deleted since we were enqueued:
@@ -177,7 +180,7 @@ module MicrosoftSync
 
       # Normal case: job continuation, or new job (step==nil) and no other job in-progress
       if step&.to_s == step_from_job_state&.to_s
-        return run_main_loop(step, job_state&.dig(:data), synchronous)
+        return run_main_loop(step, initial_mem_state, job_state&.dig(:data), synchronous)
       end
 
       unless step.nil?
@@ -200,18 +203,18 @@ module MicrosoftSync
         statsd_increment(:stalled, step_from_job_state)
         steps_object.after_failure
         job_state_record.update!(job_state: nil)
-        run_main_loop(nil, nil, synchronous)
+        run_main_loop(nil, initial_mem_state, nil, synchronous)
       end
 
       # else: Trying to run a new job while old job in-progress. Do nothing, i.e., drop this job.
     end
 
     # Only to be used from run(), which does other checks before kicking off main loop:
-    def run_main_loop(current_step, job_state_data, synchronous)
+    def run_main_loop(current_step, initial_mem_state, job_state_data, synchronous)
       return unless job_state_record&.update_unless_deleted(workflow_state: :running)
 
       current_step ||= steps_object.initial_step
-      memory_state = nil
+      memory_state = initial_mem_state
 
       loop do
         # TODO: consider checking if group object is deleted before every step (INTEROP-6621)
@@ -267,14 +270,18 @@ module MicrosoftSync
       @strand ||= "#{self.class.name}:#{job_state_record.class.name}:#{job_state_record.global_id}"
     end
 
-    def run_with_delay(step=nil, delay_amount=nil, synchronous: false)
+    def run_with_delay(step: nil, delay_amount: nil, initial_mem_state: nil, synchronous: false)
+      # step is used for retry/delay next step; initial_mem_state only for new jobs
+      raise InternalError unless step.nil? || initial_mem_state.nil?
+
       if synchronous
         sleep delay_amount if delay_amount
-        run(step, true)
+        run(step, initial_mem_state, true)
         return
       end
 
-      self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now).run(step)
+      self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
+        .run(step, initial_mem_state)
     end
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
@@ -306,7 +313,9 @@ module MicrosoftSync
       )
 
       run_with_delay(
-        delayed_next_step.step, delayed_next_step.delay_amount, synchronous: synchronous
+        step: delayed_next_step.step,
+        delay_amount: delayed_next_step.delay_amount,
+        synchronous: synchronous
       )
     end
 
@@ -347,7 +356,7 @@ module MicrosoftSync
       delay_amount = delay_amount[retries] || delay_amount.last if delay_amount.is_a?(Array)
       log { "handle_retry #{current_step} -> #{retry_step} - #{delay_amount}" }
 
-      run_with_delay(retry_step, delay_amount, synchronous: synchronous)
+      run_with_delay(step: retry_step, delay_amount: delay_amount, synchronous: synchronous)
     end
   end
 end
