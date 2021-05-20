@@ -3287,7 +3287,7 @@ class Course < ActiveRecord::Base
   add_setting :course_color
 
   def elementary_enabled?
-    root_account&.feature_enabled?(:canvas_for_elementary) && account.enable_as_k5_account?
+    account.enable_as_k5_account?
   end
 
   def elementary_homeroom_course?

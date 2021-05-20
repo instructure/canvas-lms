@@ -30,9 +30,7 @@ function initialState(opts = {}) {
         env: {
           TIMEZONE: TZ,
           K5_MODE: true,
-          FEATURES: {
-            canvas_for_elementary: true
-          }
+          FEATURES: {}
         }
       }
     }),

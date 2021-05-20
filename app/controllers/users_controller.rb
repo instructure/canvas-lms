@@ -3011,7 +3011,6 @@ class UsersController < ApplicationController
     k5_accounts = @domain_root_account.settings[:k5_accounts]
     return false if k5_accounts.blank?
 
-    @domain_root_account.feature_enabled?(:canvas_for_elementary) &&
-      @current_user.user_account_associations.where(account_id: k5_accounts).exists?
+    @current_user.user_account_associations.where(account_id: k5_accounts).exists?
   end
 end

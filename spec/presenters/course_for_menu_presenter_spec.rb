@@ -133,7 +133,6 @@ describe CourseForMenuPresenter do
       end
 
       it 'sets `color` if the course is associated with a K-5 account' do
-        course.root_account.enable_feature!(:canvas_for_elementary)
         course.account.settings[:enable_as_k5_account] = { value: true }
         course.account.save!
 

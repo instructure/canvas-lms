@@ -2686,23 +2686,23 @@ class CoursesController < ApplicationController
   #     course[blueprint_restrictions_by_object_type][assignment][content]=1
   #
   # @argument course[homeroom_course] [Boolean]
-  #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
-  #   is enabled and the course is associated with a K-5-enabled account.
+  #   Sets the course as a homeroom course. The setting takes effect only when the course is associated
+  #   with a Canvas for Elementary-enabled account.
   #
   # @argument course[sync_enrollments_from_homeroom] [String]
-  #   Syncs enrollments from the homeroom that is set in homeroom_course_id. The setting only takes effect when
-  #   Canvas for Elementary feature is enabled and sync_enrollments_from_homeroom is enabled.
+  #   Syncs enrollments from the homeroom that is set in homeroom_course_id. The setting only takes effect when the
+  #   course is associated with a Canvas for Elementary-enabled account and sync_enrollments_from_homeroom is enabled.
   #
   # @argument course[homeroom_course_id] [String]
-  #   Sets the Homeroom Course id to be used with sync_enrollments_from_homeroom. The setting only takes effect when
-  #   Canvas for Elementary feature is enabled and sync_enrollments_from_homeroom is enabled.
+  #   Sets the Homeroom Course id to be used with sync_enrollments_from_homeroom. The setting only takes effect when the
+  #   course is associated with a Canvas for Elementary-enabled account and sync_enrollments_from_homeroom is enabled.
   #
   # @argument course[template] [Boolean]
   #   Enable or disable the course as a template that can be selected by an account
   #
   # @argument course[course_color] [String]
-  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the
-  #   Canvas for Elementary feature is enabled and the course is associated with a K-5-enabled account.
+  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the course
+  #   is associated with a Canvas for Elementary-enabled account.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \

@@ -510,7 +510,6 @@ describe TabsController, type: :request do
     describe 'canvas for elementary' do
       before(:once) do
         course_with_teacher(:active_all => true)
-        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.account.settings[:enable_as_k5_account] = {value: true}
         @course.account.save!
       end

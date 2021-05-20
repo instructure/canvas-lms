@@ -821,16 +821,9 @@ describe DiscussionTopicsController do
     end
 
     context "in a homeroom course" do
-      let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
-
       before(:each) do
-        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.account.settings[:enable_as_k5_account] = {value: true}
         @course.account.save!
-      end
-
-      after(:each) do
-        @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
       end
 
       it "does not permit replies to assignments" do

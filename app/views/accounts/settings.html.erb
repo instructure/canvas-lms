@@ -462,15 +462,26 @@
           <h2 class="screenreader-only"><%= t('Features') %></h2>
           <legend><%= t(:features_title, "Features") %></legend>
           <%= f.fields_for :settings do |settings| %>
-            <% if @account.root_account.feature_enabled?(:canvas_for_elementary) %>
-              <%= settings.fields_for :enable_as_k5_account do |k5| %>
-                <div>
-                  <% k5_settings = @account.enable_as_k5_account %>
-                  <% disabled = k5_settings[:locked] && k5_settings[:inherited] %>
-                  <%= k5.check_box :value, :checked => k5_settings[:value], :disabled => disabled %>
-                  <%= k5.label :value, t("Canvas for Elementary (beta)") %>
+            <%= settings.fields_for :enable_as_k5_account do |k5| %>
+              <div>
+                <% k5_settings = @account.enable_as_k5_account %>
+                <% disabled = k5_settings[:locked] && k5_settings[:inherited] %>
+                <%= k5.check_box :value, :checked => k5_settings[:value], :disabled => disabled %>
+                <%= k5.label :value, t("Canvas for Elementary") %>
+                <div id="k5_account_warning_message" class="account_settings__k5-help-text">
+                  <i class='icon-warning-borderless'></i>
+                  <div class="account_settings__k5-help-text-container">
+                    <p>
+                      <%= t ("This setting significantly changes the Canvas experience for students and teachers.")%>
+                    </p>
+                    <p>
+                      <%= t do %>
+                        To learn more about Canvas for Elementary, please refer to <a href="https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board" target="_blank">our documentation</a>.
+                      <% end %>
+                    </p>
+                  </div>
                 </div>
-              <% end %>
+              </div>
             <% end %>
 
             <% if @account.root_account? %>

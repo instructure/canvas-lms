@@ -559,7 +559,7 @@ To remove the Blueprint Course link you can pass 'dissociate' in place of the id
 <td>boolean</td>
 <td></td>
 <td></td>
-<td>Whether the course is a homeroom course. Requires the "Canvas for Elementary" feature to be enabled.</td>
+<td>Whether the course is a homeroom course. Requires the coures to be associated with a "Canvas for Elementary"-enabled account.</td>
 </tr>
 </table>
 

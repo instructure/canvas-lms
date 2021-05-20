@@ -40,7 +40,6 @@ const defaultEnv = {
   current_user: currentUser,
   K5_MODE: true,
   FEATURES: {
-    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {

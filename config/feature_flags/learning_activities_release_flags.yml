@@ -41,14 +41,6 @@ inline_math_everywhere:
     This feature requires that the "Math: Updated equation handling"
     flag is also on.
   applies_to: RootAccount
-canvas_for_elementary:
-  state: hidden
-  display_name: Canvas for Elementary
-  applies_to: RootAccount
-  beta: true
-  description: |-
-    A simplified Canvas interface for K-5. Enable applicable
-    subaccount(s) as K-5 accounts in account settings.
 auto_show_cc:
   state: allowed
   display_name: Auto Show Closed Captions

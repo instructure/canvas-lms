@@ -166,6 +166,9 @@
     select, input[type="text"] {
       vertical-align: baseline;
     }
+    input[type="checkbox"] {
+      margin-#{direction(right)}: 0.2rem;
+    }
     .remove_domain_link img {
       vertical-align: -3px;
     }
@@ -173,6 +176,23 @@
   .account_settings__help-text {
     font-size: 90%;
     color: $ic-font-color--subdued;
+  }
+  .account_settings__k5-help-text {
+    display: flex;
+    font-size: 90%;
+    & i {
+      color: $ic-color-danger;
+      margin-#{direction(left)}: -0.1rem;
+      margin-#{direction(right)}: 0.3rem;
+    }
+    & .account_settings__k5-help-text-container {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0.5rem;
+      & p {
+        margin: 0;
+      }
+    }
   }
 }
 
@@ -186,7 +206,8 @@
     margin-#{direction(left)}: -5px;
   }
 }
-#global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message {
+#global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message,
+#k5_account_warning_message:not(.shown) {
   display: none;
 }
 

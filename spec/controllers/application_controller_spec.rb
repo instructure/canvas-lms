@@ -367,23 +367,14 @@ RSpec.describe ApplicationController do
 
     context "canvas for elementary" do
       let(:course) {create_course}
-      let(:canvas_for_elem_flag) {course.root_account.feature_enabled?(:canvas_for_elementary)}
 
       before(:each) do
         controller.instance_variable_set(:@context, course)
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
       end
 
-      after(:each) do
-        course.root_account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
-      end
-
       describe "HOMEROOM_COURSE" do
-        describe "with canvas_for_elementary flag on" do
-          before(:once) do
-            course.root_account.enable_feature!(:canvas_for_elementary)
-          end
-
+        describe "with canvas_for_elementary account setting on" do
           it "is true if the course is a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
             course.homeroom_course = true
@@ -395,18 +386,13 @@ RSpec.describe ApplicationController do
             expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
           end
 
-          it "is false if the course is not a homeroom course and n a K-5 account" do
+          it "is false if the course is not a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
             expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
           end
         end
 
-        it "is false with the canvas_for_elementary flag off" do
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
-
-          course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
-
+        it "is false with the canvas_for_elementary account setting off" do
           course.homeroom_course = false
           course.account.settings[:enable_as_k5_account] = {value: true}
           expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy

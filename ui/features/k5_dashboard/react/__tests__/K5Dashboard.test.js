@@ -189,7 +189,6 @@ const defaultEnv = {
   current_user_id: '1',
   K5_MODE: true,
   FEATURES: {
-    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {

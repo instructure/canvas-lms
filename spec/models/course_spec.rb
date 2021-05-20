@@ -2737,10 +2737,9 @@ describe Course, "tabs_available" do
       expect(available_tabs.select{|t| t[:hidden]}).to be_empty
     end
 
-    describe "with canvas_for_elementary feature on" do
+    describe "with canvas_for_elementary account setting on" do
       context "homeroom course" do
         before :once do
-          @course.root_account.enable_feature!(:canvas_for_elementary)
           @course.account.settings[:enable_as_k5_account] = {value: true}
           @course.homeroom_course = true
           @course.save!
@@ -2776,7 +2775,6 @@ describe Course, "tabs_available" do
 
       context "subject course" do
         before :once do
-          @course.root_account.enable_feature!(:canvas_for_elementary)
           @course.account.settings[:enable_as_k5_account] = {value: true}
           @course.save!
         end
@@ -4934,7 +4932,6 @@ end
 describe Course, "#sync_homeroom_enrollments" do
   before :once do
     @homeroom_course = course_factory(active_course: true)
-    @homeroom_course.root_account.enable_feature!(:canvas_for_elementary)
     @homeroom_course.account.settings[:enable_as_k5_account] = {value: true}
     @homeroom_course.homeroom_course = true
     @homeroom_course.save!

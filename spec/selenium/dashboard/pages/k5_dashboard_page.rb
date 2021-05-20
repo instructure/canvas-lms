@@ -1034,7 +1034,6 @@ module K5PageObject
 
   def feature_setup
     @account = Account.default
-    @account.enable_feature!(:canvas_for_elementary)
     toggle_k5_setting(@account)
   end
 

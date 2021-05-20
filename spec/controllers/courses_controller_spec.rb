@@ -769,7 +769,6 @@ describe CoursesController do
     end
 
     it "should only set course color js_env vars for elementary courses" do
-      @course.root_account.enable_feature!(:canvas_for_elementary)
       @course.account.settings[:enable_as_k5_account] = {value: true}
       @course.account.save!
       @course.course_color = "#BAD"
@@ -1553,7 +1552,6 @@ describe CoursesController do
 
     describe "when account is enabled as k5 account" do
       before :once do
-        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.account.settings[:enable_as_k5_account] = {value: true}
         @course.account.save!
       end

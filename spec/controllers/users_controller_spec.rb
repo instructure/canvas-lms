@@ -2525,70 +2525,45 @@ describe UsersController do
       end
     end
 
-    context "with canvas for elementary feature flag" do
-      before(:once) do
-        @account = Account.default
-      end
-
+    context "with canvas for elementary feature account setting" do
       before(:each) do
         course_with_student_logged_in(active_all: true)
       end
 
       context "disabled" do
-        context "and canvas for elementary setting disabled" do
-          it "only returns classic dashboard bundles" do
-            get 'user_dashboard'
-            expect(assigns[:js_bundles].flatten).to include :dashboard
-            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:css_bundles].flatten).to include :dashboard
-            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:js_env][:K5_MODE]).to be_falsy
-          end
+        before(:once) do
+          @account = Account.default
+          @account[:settings][:k5_accounts] = []
+          @account.save!
         end
 
-        context "and canvas for elementary setting enabled" do
-          it "only returns classic dashboard bundles" do
-            @current_user = @user
-            @account[:settings][:k5_accounts] = [@account.id]
-            @account.save!
-            get 'user_dashboard'
-            expect(assigns[:js_bundles].flatten).to include :dashboard
-            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:css_bundles].flatten).to include :dashboard
-            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:js_env][:K5_MODE]).to be_falsy
-          end
+        it "only returns classic dashboard bundles" do
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:js_env][:K5_MODE]).to be_falsy
         end
       end
 
       context "enabled" do
         before(:once) do
-          @account.enable_feature!(:canvas_for_elementary)
+          @account = Account.default
+          @account[:settings][:k5_accounts] = [@account.id]
+          @account.save!
         end
 
-        context "and canvas for elementary setting disabled" do
-          it "only returns classic dashboard bundles" do
-            get 'user_dashboard'
-            expect(assigns[:js_bundles].flatten).to include :dashboard
-            expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:css_bundles].flatten).to include :dashboard
-            expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
-            expect(assigns[:js_env][:K5_MODE]).to be_falsy
-          end
-        end
-
-        context "and canvas for elementary setting enabled" do
-          it "returns K-5 dashboard bundles" do
-            @current_user = @user
-            @account[:settings][:k5_accounts] = [@account.id]
-            @account.save!
-            get 'user_dashboard'
-            expect(assigns[:js_bundles].flatten).to include :k5_dashboard
-            expect(assigns[:js_bundles].flatten).not_to include :dashboard
-            expect(assigns[:css_bundles].flatten).to include :k5_dashboard
-            expect(assigns[:css_bundles].flatten).not_to include :dashboard
-            expect(assigns[:js_env][:K5_MODE]).to be_truthy
-          end
+        it "returns K-5 dashboard bundles" do
+          @current_user = @user
+          @account[:settings][:k5_accounts] = [@account.id]
+          @account.save!
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :dashboard
+          expect(assigns[:js_env][:K5_MODE]).to be_truthy
         end
       end
     end
