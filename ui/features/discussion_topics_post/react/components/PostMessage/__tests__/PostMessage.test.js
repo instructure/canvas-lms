@@ -38,6 +38,14 @@ describe('PostMessage', () => {
     expect(queryByText('Thoughts')).toBeTruthy()
   })
 
+  it('displays the title h1', () => {
+    const {queryByText} = setup()
+    const screenReaderText = queryByText('Discussion Topic: Thoughts')
+
+    expect(screenReaderText).toBeTruthy()
+    expect(screenReaderText.parentElement.tagName).toBe('H1')
+  })
+
   it('displays the message', () => {
     const {queryByText} = setup()
     expect(queryByText('Posts are fun')).toBeTruthy()

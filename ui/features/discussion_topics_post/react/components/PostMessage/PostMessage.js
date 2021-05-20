@@ -28,6 +28,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
+import {Heading} from '@instructure/ui-heading'
 
 export function PostMessage({...props}) {
   return (
@@ -50,9 +51,14 @@ export function PostMessage({...props}) {
       description={
         <>
           {props.title && (
-            <View as="div" margin="medium none">
-              <Text size="x-large">{props.title}</Text>
-            </View>
+            <>
+              <Heading level="h1">
+                <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
+              </Heading>
+              <View as="div" margin="medium none">
+                <Text size="x-large">{props.title}</Text>
+              </View>
+            </>
           )}
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
