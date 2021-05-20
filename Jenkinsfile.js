@@ -25,15 +25,6 @@ final COFFEE_NODE_COUNT = 4
 final DEFAULT_NODE_COUNT = 1
 final JSG_NODE_COUNT = 3
 
-def copyFiles() {
-  def dockerName = env.CONTAINER_NAME
-  def dockerPath = env.TEST_RESULT_OUTPUT_DIR
-  def hostPath = "./tmp/${env.CONTAINER_NAME}"
-
-  sh "mkdir -vp ./$hostPath"
-  sh "docker cp \$(docker ps -qa -f name=$dockerName):$dockerPath ./$hostPath"
-}
-
 def makeKarmaStage(group, ciNode, ciTotal) {
   return {
     withEnv([
@@ -42,11 +33,19 @@ def makeKarmaStage(group, ciNode, ciTotal) {
       "CONTAINER_NAME=tests-karma-${group}-${ciNode}",
       "JSPEC_GROUP=${group}"
     ]) {
-      try {
-        sh 'build/new-jenkins/js/tests-karma.sh'
-      } finally {
-        copyFiles()
-      }
+      executeTestStage('build/new-jenkins/js/tests-karma.sh')
+    }
+  }
+}
+
+def executeTestStage(scriptName) {
+  withEnv([
+    "TEST_RESULT_OUTPUT_DIR=${env.BASE_TEST_RESULT_OUTPUT_DIR}/${env.CONTAINER_NAME}"
+  ]) {
+    try {
+      sh scriptName
+    } finally {
+      jsStage.tearDownNode()
     }
   }
 }
@@ -71,7 +70,7 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
-    TEST_RESULT_OUTPUT_DIR = '/usr/src/app/js-results'
+    BASE_TEST_RESULT_OUTPUT_DIR = 'js-results'
   }
 
   stages {
@@ -80,7 +79,6 @@ pipeline {
         script {
           def stageHooks = [
             onNodeAcquired: jsStage.&setupNode,
-            onNodeReleasing: jsStage.&tearDownNode,
           ]
 
           extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).execute {
@@ -89,11 +87,7 @@ pipeline {
             if (env.TEST_SUITE == 'jest') {
               tests['Jest'] = {
                 withEnv(['CONTAINER_NAME=tests-jest']) {
-                  try {
-                    sh 'build/new-jenkins/js/tests-jest.sh'
-                  } finally {
-                    copyFiles()
-                  }
+                  executeTestStage('build/new-jenkins/js/tests-jest.sh')
                 }
               }
             } else if (env.TEST_SUITE == 'coffee') {
@@ -103,11 +97,7 @@ pipeline {
             } else if (env.TEST_SUITE == 'karma') {
               tests['Packages'] = {
                 withEnv(['CONTAINER_NAME=tests-packages']) {
-                  try {
-                    sh 'build/new-jenkins/js/tests-packages.sh'
-                  } finally {
-                    copyFiles()
-                  }
+                  executeTestStage('build/new-jenkins/js/tests-packages.sh')
                 }
               }
 

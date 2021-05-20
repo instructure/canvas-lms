@@ -27,6 +27,11 @@ def setupNode() {
 }
 
 def tearDownNode() {
-  archiveArtifacts artifacts: 'tmp/**/*.xml'
-  junit 'tmp/**/*.xml'
+  sh "mkdir -vp ${env.TEST_RESULT_OUTPUT_DIR}"
+  sh "docker cp \$(docker ps -qa -f name=${env.CONTAINER_NAME}):/usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${env.TEST_RESULT_OUTPUT_DIR}"
+
+  sh "find ${env.TEST_RESULT_OUTPUT_DIR}"
+
+  archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
+  junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
 }
