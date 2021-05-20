@@ -152,6 +152,7 @@ RSpec.describe ApplicationController do
     describe "ENV.DIRECT_SHARE_ENABLED" do
       before :each do
         allow(controller).to receive(:user_display_json)
+        allow(controller).to receive('api_v1_course_ping_url').and_return({})
         controller.instance_variable_set(:@domain_root_account, Account.default)
       end
 
@@ -171,6 +172,15 @@ RSpec.describe ApplicationController do
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+
+      it "sets the env var to false when the user can't use it in a course context" do
+        course_with_student(:active_all => true)
+        course = @course
+        course_with_teacher(:active_all => true, user: @student)
+        controller.instance_variable_set(:@current_user, @student)
+        controller.instance_variable_set(:@context, course)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end
