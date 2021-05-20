@@ -79,8 +79,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def mentioned_users
-    users = User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
-    discussion_topic.filter_message_users(users)
+    User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
   end
 
   def course_broadcast_data
