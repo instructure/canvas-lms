@@ -145,7 +145,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def check_for_media_object
     if self.media_comment? && self.saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(self.media_comment_id, 
+      MediaObject.ensure_media_object(self.media_comment_id,
         user: self.author,
         context: self.author
       )
@@ -285,9 +285,9 @@ class SubmissionComment < ActiveRecord::Base
     message = opts[:text].strip
     user = nil unless user && self.submission.grants_right?(user, :comment)
     if !user
-      raise "Only comment participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         SubmissionComment.create!({

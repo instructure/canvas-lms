@@ -344,7 +344,7 @@ This text has a http://www.google.com link in it...
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
       expect {
         comment.reply_from(:user => @observer, :text => "some reply")
-      }.to raise_error("Only comment participants may reply to messages")
+      }.to raise_error(IncomingMail::Errors::InvalidParticipant)
     end
 
     it "should create reply in the same provisional grade" do
