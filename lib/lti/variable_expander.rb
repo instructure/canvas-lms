@@ -44,6 +44,10 @@ module Lti
       )
     end
 
+    def self.deregister_expansion(name)
+      @expansions.delete "$#{name}".to_sym
+    end
+
     def self.expansions
       @expansions || {}
     end
