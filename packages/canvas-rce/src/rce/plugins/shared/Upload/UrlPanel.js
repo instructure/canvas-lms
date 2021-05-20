@@ -25,6 +25,7 @@ export default function UrlPanel({fileUrl, setFileUrl}) {
   return (
     <>
       <TextInput
+        name="file-url"
         renderLabel={formatMessage('File URL')}
         type="url"
         value={fileUrl}

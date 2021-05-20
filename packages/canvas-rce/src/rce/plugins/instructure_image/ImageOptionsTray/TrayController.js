@@ -73,6 +73,7 @@ export default class TrayController {
 
     if (imageOptions.displayAs === 'embed') {
       editor.dom.setAttribs($img, {
+        src: imageOptions.url,
         alt: imageOptions.altText,
         role: imageOptions.isDecorativeImage ? 'presentation' : null,
         width: imageOptions.appliedWidth,
