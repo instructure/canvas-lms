@@ -27,7 +27,7 @@ module.exports = {
       'jest-junit',
       {
         suiteName: 'Canvas Planner Jest Tests',
-        outputDirectory: './coverage',
+        outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
         outputName: 'canvas-planner-junit.xml'
       }
     ]

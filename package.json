@@ -306,9 +306,6 @@
   "browserslist": [
     "extends @instructure/browserslist-config-canvas-lms"
   ],
-  "jest-junit": {
-    "output": "./coverage-js/junit-reports/jest.xml"
-  },
   "repository": "instructure/canvas-lms",
   "scripts": {
     "test": "yarn test:packages && if [ \"$COVERAGE\" = \"1\" ]; then yarn test:jest:coverage --runInBand; else yarn test:jest --runInBand; fi && if [ \"$COVERAGE\" = \"1\" ]; then yarn test:karma; else yarn test:karma:concurrently; fi",

@@ -25,9 +25,13 @@ final COFFEE_NODE_COUNT = 4
 final DEFAULT_NODE_COUNT = 1
 final JSG_NODE_COUNT = 3
 
-def copyFiles(dockerName, dockerPath, hostPath) {
+def copyFiles() {
+  def dockerName = env.CONTAINER_NAME
+  def dockerPath = env.TEST_RESULT_OUTPUT_DIR
+  def hostPath = "./tmp/${env.CONTAINER_NAME}"
+
   sh "mkdir -vp ./$hostPath"
-  sh "docker cp \$(docker ps -qa -f name=$dockerName):/usr/src/app/$dockerPath ./$hostPath"
+  sh "docker cp \$(docker ps -qa -f name=$dockerName):$dockerPath ./$hostPath"
 }
 
 def makeKarmaStage(group, ciNode, ciTotal) {
@@ -41,7 +45,7 @@ def makeKarmaStage(group, ciNode, ciTotal) {
       try {
         sh 'build/new-jenkins/js/tests-karma.sh'
       } finally {
-        copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+        copyFiles()
       }
     }
   }
@@ -67,6 +71,7 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
+    TEST_RESULT_OUTPUT_DIR = '/usr/src/app/js-results'
   }
 
   stages {
@@ -87,7 +92,7 @@ pipeline {
                   try {
                     sh 'build/new-jenkins/js/tests-jest.sh'
                   } finally {
-                    copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                    copyFiles()
                   }
                 }
               }
@@ -101,7 +106,7 @@ pipeline {
                   try {
                     sh 'build/new-jenkins/js/tests-packages.sh'
                   } finally {
-                    copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+                    copyFiles()
                   }
                 }
               }
