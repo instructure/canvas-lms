@@ -81,8 +81,8 @@ module MicrosoftSync
     #   max_retries() -- for entire job
     #   restart_job_after_inactivity() -- staleness time, after which job is
     #     considered to be stalled and new jobs run will restart the job
-    #     instead of being ignored. should be significantly longer than your
-    #     longest Retry `delay_amount`
+    #     instead of being ignored. should be significantly longer (by
+    #     RETRY_DELAY_INACTIVITY_BUFFER) than your longest Retry `delay_amount`
     #   two arguments: memory_state, job_state_data.
     #     (If you don't need all the arguments, you can also make the methods
     #     take 0 or 1 arguments). They should return a NextStep or Retry object
@@ -153,6 +153,10 @@ module MicrosoftSync
         @step = step
       end
     end
+
+    # The max retry delay_amount will be `restart_job_after_inactivity` minus this to allow
+    # jobs time to wait in the queue
+    RETRY_DELAY_INACTIVITY_BUFFER = 5.minutes
 
     # SEE ALSO Errors::GracefulCancelErrorMixin
     # Raise an error with this mixin in your job if you want to cancel &
@@ -314,9 +318,17 @@ module MicrosoftSync
 
       run_with_delay(
         step: delayed_next_step.step,
-        delay_amount: delayed_next_step.delay_amount,
+        delay_amount: clip_delay_amount(delayed_next_step.delay_amount),
         synchronous: synchronous
       )
+    end
+
+    # Ensure delay amount is not too long so as to make the job look stalled:
+    def clip_delay_amount(delay_amount)
+      max_delay = steps_object.restart_job_after_inactivity.to_f - RETRY_DELAY_INACTIVITY_BUFFER.to_f
+      delay_amount.to_f.clamp(0, max_delay).tap do |clipped|
+        log { "Clipped delay #{delay_amount} to #{clipped}" } if clipped != delay_amount.to_f
+      end
     end
 
     # Raises the error if we have passed the retry limit
@@ -330,7 +342,6 @@ module MicrosoftSync
 
       retries_by_step = job_state&.dig(:retries_by_step) || {}
       retries = retries_by_step[retry_step.to_s] || 0
-
 
       if retries >= steps_object.max_retries
         update_state_record_to_errored_and_cleanup(
@@ -354,6 +365,7 @@ module MicrosoftSync
 
       delay_amount = retry_object.delay_amount
       delay_amount = delay_amount[retries] || delay_amount.last if delay_amount.is_a?(Array)
+      delay_amount = clip_delay_amount(delay_amount) if delay_amount
       log { "handle_retry #{current_step} -> #{retry_step} - #{delay_amount}" }
 
       run_with_delay(step: retry_step, delay_amount: delay_amount, synchronous: synchronous)

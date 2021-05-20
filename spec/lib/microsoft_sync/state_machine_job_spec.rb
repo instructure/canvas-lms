@@ -24,6 +24,8 @@ require_dependency "microsoft_sync/errors"
 
 module MicrosoftSync
   class StateMachineJobTestStepsBase
+    RESTART_JOB_AFTER_INACTIVITY = 6.hours
+
     def steps_run
       # For spec expectations
       @steps_run ||= []
@@ -38,7 +40,7 @@ module MicrosoftSync
     end
 
     def restart_job_after_inactivity
-      6.hours
+      RESTART_JOB_AFTER_INACTIVITY
     end
 
     def after_failure
@@ -89,8 +91,9 @@ module MicrosoftSync
   end
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
-    def initialize(step_first_retries)
+    def initialize(step_first_retries, step_second_delay_amounts=[1,2,3])
       @step_first_retries = step_first_retries
+      @step_second_delay_amounts = step_second_delay_amounts
     end
 
     def step_first(_mem_data, _job_state_data)
@@ -102,7 +105,10 @@ module MicrosoftSync
     end
 
     def step_second(_mem_data, _job_state_data)
-      StateMachineJob::Retry.new(error: Errors::PublicError.new('foo'), delay_amount: [1,2,3])
+      StateMachineJob::Retry.new(
+        error: Errors::PublicError.new('foo'),
+        delay_amount: @step_second_delay_amounts
+      )
     end
   end
 
@@ -343,6 +349,41 @@ module MicrosoftSync
               ])
             end
           end
+
+          context 'when a delay is greater than restart_job_after_inactivity (minus a buffer)' do
+            let(:max_delay) do
+              StateMachineJobTestStepsBase::RESTART_JOB_AFTER_INACTIVITY -
+                described_class::RETRY_DELAY_INACTIVITY_BUFFER
+            end
+
+            let(:run_ats) do
+              delays = steps_object.steps_run.select{|step| step.is_a?(Array)}
+              delays.map{|d| d[1][0][:run_at]}
+            end
+
+            it { expect(described_class::RETRY_DELAY_INACTIVITY_BUFFER).to eq(5.minutes) }
+
+            context 'when delay is a single duration value' do
+              let(:steps_object) { StateMachineJobTestSteps2.new(2, max_delay + 3.minutes) }
+
+              it 'clips the delay the maximum' do
+                expect(run_ats).to eq([nil, nil] + [max_delay.from_now] * 4)
+              end
+            end
+
+            context 'when delay is an array of integers' do
+              let(:steps_object) do
+                StateMachineJobTestSteps2.new(2, [-3, max_delay - 5, max_delay + 5])
+              end
+
+              it 'clips the delay to between 0 and the maximum' do
+                expect(run_ats).to eq([
+                  nil, nil, Time.zone.now, (max_delay - 5).from_now,
+                  max_delay.from_now, max_delay.from_now
+                ])
+              end
+            end
+          end
         end
 
         context 'when Retry points to a different step' do
@@ -395,10 +436,12 @@ module MicrosoftSync
       end
 
       context 'when the step returns a DelayedNextStep' do
+        let(:delay_amount) { 1.minute }
+
         before do
           subject.send(:run, nil, nil)
           allow(steps_object).to receive(:step_first).and_return \
-            described_class::DelayedNextStep.new(:step_second, 1.minute, 'abc123')
+            described_class::DelayedNextStep.new(:step_second, delay_amount, 'abc123')
           steps_object.steps_run.clear
         end
 
@@ -407,6 +450,20 @@ module MicrosoftSync
           expect(steps_object.steps_run).to eq([
             [:delay_run, [{run_at: 1.minute.from_now, strand: strand}], [:step_second, nil]],
           ])
+        end
+
+        context 'the delay_amount is greater than restart_job_after_inactivity' do
+          let(:delay_amount) { 100.days }
+
+          it 'clips the delay_amount to restart_job_after_inactivity minus a buffer' do
+            subject.send(:run, :step_first, nil)
+            run_at = Time.zone.now + StateMachineJobTestStepsBase::RESTART_JOB_AFTER_INACTIVITY -
+              described_class::RETRY_DELAY_INACTIVITY_BUFFER
+
+            expect(steps_object.steps_run).to eq([
+              [:delay_run, [{run_at: run_at, strand: strand}], [:step_second, nil]],
+            ])
+          end
         end
 
         it 'leaves retries_by_step untouched' do
