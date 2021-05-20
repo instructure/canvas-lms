@@ -320,6 +320,9 @@ describe Pseudonym do
     it "should ignore password if canvas authentication is disabled" do
       user_with_pseudonym(:password => 'qwertyuiop')
       expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_truthy
+      # once auth provider is required, this whole spec can go away, because the situation will
+      # not be possible
+      @pseudonym.update!(authentication_provider: nil)
 
       Account.default.authentication_providers.scope.delete_all
       Account.default.authentication_providers.create!(:auth_type => 'ldap')

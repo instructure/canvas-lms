@@ -791,13 +791,15 @@ module Api::V1::Assignment
       end
     end
 
-    if update_params[:submission_types]&.include?('student_annotation')
-      if assignment_params.key?(:annotatable_attachment_id)
-        attachment = Attachment.find(assignment_params.delete(:annotatable_attachment_id))
-        assignment.annotatable_attachment = attachment.copy_to_student_annotation_documents_folder(assignment.course)
+    if update_params.key?(:submission_types)
+      if update_params[:submission_types].include?('student_annotation')
+        if assignment_params.key?(:annotatable_attachment_id)
+          attachment = Attachment.find(assignment_params.delete(:annotatable_attachment_id))
+          assignment.annotatable_attachment = attachment.copy_to_student_annotation_documents_folder(assignment.course)
+        end
+      else
+        assignment.annotatable_attachment_id = nil
       end
-    else
-      assignment.annotatable_attachment_id = nil
     end
 
     if update_lockdown_browser?(assignment_params)

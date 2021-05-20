@@ -56,7 +56,7 @@ describe Login::SamlController do
     expect(session[:saml_unique_id]).to eq unique_id
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
     # the auth provider got set on the pseudonym
-    expect(user1.pseudonyms.first.authentication_provider).to eq account1.authentication_providers.active.find_by(id: 'saml')
+    expect(assigns[:current_pseudonym].authentication_provider).to eq account1.authentication_providers.active.find('saml')
 
     (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each do |var|
       controller.send :remove_instance_variable, var
