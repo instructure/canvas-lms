@@ -230,7 +230,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     <PostMessage
                       authorName={discussionTopicData.authorName}
                       avatarUrl={discussionTopicData.avatarUrl}
-                      pillText={I18n.t('Author')}
                       timingDisplay={discussionTopicData.postedAt}
                       title={discussionTopicData.title}
                       message={discussionTopicData.message}
