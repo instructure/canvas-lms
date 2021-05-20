@@ -168,16 +168,6 @@ module MicrosoftSync
       end
     end
 
-    describe '#enqueue_future_sync' do
-      it 'enqueues a job calling run_later with no args' do
-        time = 10.minutes.from_now
-        subject.enqueue_future_sync(run_at: time)
-        expect(steps_object.steps_run).to eq([
-          [:delay_run_later, [{singleton: "#{strand}:enqueue_future_sync", run_at: time, on_conflict: :overwrite}], []],
-        ])
-      end
-    end
-
     describe '#run' do
       it 'runs steps until it hits a retry then enqueues a delayed job' do
         subject.send(:run, nil)
