@@ -35,3 +35,38 @@ def tearDownNode() {
   archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
   junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
 }
+
+def queueJestStage(stages, delegate) {
+  queueTestStage(stages, delegate, 'tests-jest', []) {
+    sh('build/new-jenkins/js/tests-jest.sh')
+  }
+}
+
+def queueKarmaStage(stages, delegate, group, ciNode, ciTotal) {
+  queueTestStage(stages, delegate, "tests-karma-${group}-${ciNode}", [
+    "CI_NODE_INDEX=${ciNode}",
+    "CI_NODE_TOTAL=${ciTotal}",
+    "JSPEC_GROUP=${group}",
+  ]) {
+    sh('build/new-jenkins/js/tests-karma.sh')
+  }
+}
+
+def queuePackagesStage(stages, delegate) {
+  queueTestStage(stages, delegate, 'tests-packages', []) {
+    sh('build/new-jenkins/js/tests-packages.sh')
+  }
+}
+
+def queueTestStage(stages, delegate, containerName, additionalEnvVars, block) {
+  def baseEnvVars = [
+    "CONTAINER_NAME=${containerName}",
+    "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
+  ]
+
+  delegate.extendedStage(containerName)
+    .envVars(baseEnvVars + additionalEnvVars)
+    .hooks([onNodeReleasing: this.&tearDownNode])
+    .obeysAllowStages(false)
+    .queue(stages) { block() }
+}

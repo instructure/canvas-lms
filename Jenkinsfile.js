@@ -25,31 +25,6 @@ final COFFEE_NODE_COUNT = 4
 final DEFAULT_NODE_COUNT = 1
 final JSG_NODE_COUNT = 3
 
-def makeKarmaStage(group, ciNode, ciTotal) {
-  return {
-    withEnv([
-      "CI_NODE_INDEX=${ciNode}",
-      "CI_NODE_TOTAL=${ciTotal}",
-      "CONTAINER_NAME=tests-karma-${group}-${ciNode}",
-      "JSPEC_GROUP=${group}"
-    ]) {
-      executeTestStage('build/new-jenkins/js/tests-karma.sh')
-    }
-  }
-}
-
-def executeTestStage(scriptName) {
-  withEnv([
-    "TEST_RESULT_OUTPUT_DIR=${env.BASE_TEST_RESULT_OUTPUT_DIR}/${env.CONTAINER_NAME}"
-  ]) {
-    try {
-      sh scriptName
-    } finally {
-      jsStage.tearDownNode()
-    }
-  }
-}
-
 def getLoadAllLocales() {
   return configuration.isChangeMerged() ? 1 : 0
 }
@@ -70,7 +45,6 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
-    BASE_TEST_RESULT_OUTPUT_DIR = 'js-results'
   }
 
   stages {
@@ -82,31 +56,24 @@ pipeline {
           ]
 
           extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).execute {
+            def delegate = getDelegate()
             def tests = [:]
 
             if (env.TEST_SUITE == 'jest') {
-              tests['Jest'] = {
-                withEnv(['CONTAINER_NAME=tests-jest']) {
-                  executeTestStage('build/new-jenkins/js/tests-jest.sh')
-                }
-              }
+              jsStage.queueJestStage(tests, delegate)
             } else if (env.TEST_SUITE == 'coffee') {
               for (int i = 0; i < COFFEE_NODE_COUNT; i++) {
-                tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
+                jsStage.queueKarmaStage(tests, delegate, 'coffee', i, COFFEE_NODE_COUNT)
               }
             } else if (env.TEST_SUITE == 'karma') {
-              tests['Packages'] = {
-                withEnv(['CONTAINER_NAME=tests-packages']) {
-                  executeTestStage('build/new-jenkins/js/tests-packages.sh')
-                }
-              }
+              jsStage.queuePackagesStage(tests, delegate)
 
               for (int i = 0; i < JSG_NODE_COUNT; i++) {
-                tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
+                jsStage.queueKarmaStage(tests, delegate, 'jsg', i, JSG_NODE_COUNT)
               }
 
               ['jsa', 'jsh'].each { group ->
-                tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
+                jsStage.queueKarmaStage(tests, delegate, group, 0, DEFAULT_NODE_COUNT)
               }
             }
 
