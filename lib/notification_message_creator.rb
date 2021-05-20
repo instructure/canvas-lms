@@ -374,7 +374,7 @@ class NotificationMessageCreator
         break_this_loop = true
       # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled')
+      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
       start_time = end_time

@@ -720,6 +720,7 @@ describe NotificationMessageCreator do
         unless conditions.empty?
           expect(scope).to receive(:where).with(*conditions).ordered.and_return(scope)
         end
+        allow(Message.connection).to receive(:table_exists?).and_return(true)
         expect(scope).to receive(:update_all).ordered
       end
 
