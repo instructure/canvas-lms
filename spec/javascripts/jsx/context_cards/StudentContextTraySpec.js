@@ -24,18 +24,42 @@ import StudentContextTray from '@canvas/context-cards/react/StudentContextTray'
 
 QUnit.module('StudentContextTray', hooks => {
   let tray
-  const courseId = '1'
-  const studentId = '1'
+  let props
+  let user
+  let course
+  let analytics
+
+  function renderTray() {
+    return TestUtils.renderIntoDocument(
+      <StudentContextTray {...props} />,
+      document.getElementById('fixtures')
+    )
+  }
 
   hooks.beforeEach(() => {
-    tray = TestUtils.renderIntoDocument(
-      <StudentContextTray
-        courseId={courseId}
-        studentId={studentId}
-        returnFocusTo={() => {}}
-        data={{loading: true}}
-      />
-    )
+    props = {
+      data: {loading: true},
+      returnFocusTo: () => {},
+      courseId: '1',
+      studentId: '1'
+    }
+
+    user = {
+      short_name: 'wooper',
+      enrollments: []
+    }
+
+    course = {
+      permissions: {
+        view_analytics: true
+      },
+      submissionsConnection: {edges: []}
+    }
+
+    analytics = {
+      participations: {level: 2},
+      page_views: {level: 3}
+    }
   })
   hooks.afterEach(() => {
     if (tray) {
@@ -47,59 +71,43 @@ QUnit.module('StudentContextTray', hooks => {
     tray = null
   })
 
-  test('tray should set focus back to the result of the returnFocusTo prop', () => {
+  test('sets focus back to the result of the returnFocusTo prop', () => {
     $('#fixtures').append('<button id="someButton"><button>')
-    const component = TestUtils.renderIntoDocument(
-      <StudentContextTray
-        courseId={courseId}
-        studentId={studentId}
-        data={{loading: true}}
-        returnFocusTo={() => [$('#someButton')]}
-      />,
-      document.getElementById('fixtures')
-    )
-
+    props.returnFocusTo = () => [$('#someButton')]
+    tray = renderTray()
     const fakeEvent = {
       preventDefault() {}
     }
-    component.handleRequestClose(fakeEvent)
-    ok(document.activeElement === document.getElementById('someButton'))
+    tray.handleRequestClose(fakeEvent)
+    strictEqual(document.activeElement, document.getElementById('someButton'))
+  })
+
+  QUnit.module('Student name link', () => {
+    function studentNameLinkLabel() {
+      return document.querySelector('.StudentContextTray-Header__Name a').getAttribute('aria-label')
+    }
+
+    test('aria label includes only the student name when no pronouns are set', () => {
+      const userWithAnalytics = {...user, analytics}
+      props.data = {loading: false, user: userWithAnalytics, course}
+      tray = renderTray()
+      strictEqual(studentNameLinkLabel(), "Go to wooper's profile")
+    })
+
+    test('aria label includes the student name and pronouns when pronouns are set', () => {
+      user.pronouns = 'He/Him'
+      const userWithAnalytics = {...user, analytics}
+      props.data = {loading: false, user: userWithAnalytics, course}
+      tray = renderTray()
+      strictEqual(studentNameLinkLabel(), "Go to wooper He/Him's profile")
+    })
   })
 
   QUnit.module('analytics button', () => {
-    const user = {
-      short_name: 'wooper',
-      enrollments: []
-    }
-
-    const course = {
-      permissions: {
-        view_analytics: true
-      },
-      submissionsConnection: {edges: []}
-    }
-
-    const analytics = {
-      participations: {level: 2},
-      page_views: {level: 3}
-    }
-
     test('it renders with analytics data', () => {
       const userWithAnalytics = {...user, analytics}
-
-      tray = TestUtils.renderIntoDocument(
-        <StudentContextTray
-          courseId={courseId}
-          studentId={studentId}
-          returnFocusTo={() => {}}
-          data={{
-            loading: false,
-            user: userWithAnalytics,
-            course
-          }}
-        />,
-        document.getElementById('fixtures')
-      )
+      props.data = {loading: false, user: userWithAnalytics, course}
+      tray = renderTray()
       const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
 
@@ -110,30 +118,18 @@ QUnit.module('StudentContextTray', hooks => {
 
     test('it renders analytics 2 button (only) if the tool is installed', () => {
       const userWithAnalytics = {...user, analytics}
-
-      tray = TestUtils.renderIntoDocument(
-        <StudentContextTray
-          courseId={courseId}
-          studentId={studentId}
-          returnFocusTo={() => {}}
-          data={{
-            loading: false,
-            user: userWithAnalytics,
-            course
-          }}
-          externalTools={[
-            {
-              title: 'Analytics Beta',
-              base_url:
-                'http://example.com/courses/1/external_tools/29?launch_type=student_context_card',
-              tool_id: 'fd75124a-140e-470f-944c-114d2d93bb40',
-              icon_url: null,
-              canvas_icon_class: 'icon-analytics'
-            }
-          ]}
-        />,
-        document.getElementById('fixtures')
-      )
+      props.data = {loading: false, user: userWithAnalytics, course}
+      props.externalTools = [
+        {
+          title: 'Analytics Beta',
+          base_url:
+            'http://example.com/courses/1/external_tools/29?launch_type=student_context_card',
+          tool_id: 'fd75124a-140e-470f-944c-114d2d93bb40',
+          icon_url: null,
+          canvas_icon_class: 'icon-analytics'
+        }
+      ]
+      tray = renderTray()
       const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
 
@@ -145,22 +141,11 @@ QUnit.module('StudentContextTray', hooks => {
     })
 
     test('it does not render without analytics data', () => {
-      tray = TestUtils.renderIntoDocument(
-        <StudentContextTray
-          courseId={courseId}
-          studentId={studentId}
-          returnFocusTo={() => {}}
-          data={{
-            loading: false,
-            user,
-            course
-          }}
-        />,
-        document.getElementById('fixtures')
-      )
+      props.data = {loading: false, user, course}
+      tray = renderTray()
       const quickLinks = tray.renderQuickLinks(user, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
-      ok(children.length === 0)
+      strictEqual(children.length, 0)
     })
   })
 })
