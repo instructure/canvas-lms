@@ -207,6 +207,57 @@ export const getAssignmentGrades = data =>
       return moment(a.dueDate).diff(moment(b.dueDate))
     })
 
+/* Turns raw announcement data from API into usable object */
+export const parseAnnouncementDetails = (announcement, course) => {
+  if (!announcement) {
+    return {
+      courseId: course.id,
+      courseName: course.shortName,
+      courseUrl: course.href,
+      canEdit: course.canManage
+    }
+  }
+  let attachment
+  if (announcement.attachments[0]) {
+    attachment = {
+      display_name: announcement.attachments[0].display_name,
+      url: announcement.attachments[0].url,
+      filename: announcement.attachments[0].filename
+    }
+  }
+  return {
+    courseId: course.id,
+    courseName: course.shortName,
+    courseUrl: course.href,
+    canEdit: announcement.permissions.update,
+    published: course.published,
+    announcement: {
+      id: announcement.id,
+      title: announcement.title,
+      message: announcement.message,
+      url: announcement.html_url,
+      postedDate: announcement.posted_at,
+      attachment
+    }
+  }
+}
+
+/* Helper function to take a list of announcements coming back from API
+   and partition them into homeroom and non-homeroom groups */
+export const groupAnnouncementsByHomeroom = (announcements = [], courses = []) =>
+  courses.reduce(
+    (acc, course) => {
+      const announcement = announcements.find(a => a.context_code === `course_${course.id}`)
+      const group = acc[course.isHomeroom]
+      const parsedAnnouncement = course.isHomeroom
+        ? parseAnnouncementDetails(announcement, course)
+        : announcement
+      if (parsedAnnouncement) acc[course.isHomeroom] = [...group, parsedAnnouncement]
+      return acc
+    },
+    {true: [], false: []}
+  )
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

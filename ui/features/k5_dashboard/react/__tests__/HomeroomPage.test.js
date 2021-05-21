@@ -36,7 +36,7 @@ describe('HomeroomPage', () => {
   })
 
   it('shows loading skeletons while loading for announcements and cards', () => {
-    const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} />)
+    const {getAllByText, getByText} = render(<HomeroomPage {...getProps()} loadingAnnouncements />)
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
     expect(getByText('Loading Homeroom Announcement Content')).toBeInTheDocument()

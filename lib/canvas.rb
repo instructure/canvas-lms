@@ -68,12 +68,14 @@ module Canvas
     when 'redis_cache_store'
       Canvas::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
-      if config == {} && cluster == Rails.env && Canvas.redis_enabled?
+      if config.except('expires_in') == {} && cluster == Rails.env && Canvas.redis_enabled?
         ActiveSupport::Cache.lookup_store(:redis_cache_store, redis: Canvas.redis)
       else
         # merge in redis.yml, but give precedence to cache_store.yml
         redis_config = (ConfigFile.load('redis', cluster) || {})
         config = redis_config.merge(config) if redis_config.is_a?(Hash)
+        # back compat
+        config[:url] = config[:servers] if config[:servers]
         # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end

@@ -22,10 +22,11 @@ const DEFAULT_CONTEXT = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
-  cardsSettled: false,
+  loadingAnnouncements: false,
   loadingOpportunities: false,
   isStudent: false,
   responsiveSize: 'large',
+  subjectAnnouncements: [],
   switchToMissingItems: () => {},
   switchToToday: () => {}
 }

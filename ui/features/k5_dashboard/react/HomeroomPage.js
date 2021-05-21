@@ -32,55 +32,19 @@ import {Img} from '@instructure/ui-img'
 
 import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
-import {fetchLatestAnnouncement} from '@canvas/k5/react/utils'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import {CreateCourseModal} from './CreateCourseModal'
 import EmptyDashPandaUrl from '../images/empty-dashboard.svg'
 
-export const fetchHomeroomAnnouncements = cards =>
-  Promise.all(
-    cards
-      .filter(c => c.isHomeroom)
-      .map(course =>
-        fetchLatestAnnouncement(course.id).then(announcement => {
-          if (!announcement) {
-            return {
-              courseId: course.id,
-              courseName: course.shortName,
-              courseUrl: course.href,
-              canEdit: course.canManage
-            }
-          }
-          let attachment
-          if (announcement.attachments[0]) {
-            attachment = {
-              display_name: announcement.attachments[0].display_name,
-              url: announcement.attachments[0].url,
-              filename: announcement.attachments[0].filename
-            }
-          }
-          return {
-            courseId: course.id,
-            courseName: course.shortName,
-            courseUrl: course.href,
-            canEdit: announcement.permissions.update,
-            announcement: {
-              title: announcement.title,
-              message: announcement.message,
-              url: announcement.html_url,
-              attachment
-            }
-          }
-        })
-      )
-  ).then(announcements => announcements.filter(a => a))
-
-export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) => {
+export const HomeroomPage = ({
+  cards,
+  homeroomAnnouncements,
+  loadingAnnouncements,
+  visible,
+  canCreateCourses
+}) => {
   const [dashboardCards, setDashboardCards] = useState([])
-  const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
-  const [announcementsLoading, setAnnouncementsLoading] = useState(true)
   const [courseModalOpen, setCourseModalOpen] = useState(false)
 
   useImmediate(
@@ -91,19 +55,10 @@ export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) =
             headingLevel: 'h3'
           })
         )
-
-        if (cardsSettled) {
-          setAnnouncementsLoading(true)
-          fetchHomeroomAnnouncements(cards)
-            .then(setHomeroomAnnouncements)
-            .catch(showFlashError(I18n.t('Failed to load announcements.')))
-            .finally(() => setAnnouncementsLoading(false))
-        }
       }
     },
-    [cards, cardsSettled],
+    [cards],
     // Need to do deep comparison on cards to only re-trigger if they actually changed
-    // (they shouldn't after they're set the first time)
     {deep: true}
   )
 
@@ -133,7 +88,7 @@ export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) =
       <View as="section">
         <HomeroomAnnouncementsLayout
           homeroomAnnouncements={homeroomAnnouncements}
-          loading={announcementsLoading}
+          loading={loadingAnnouncements}
         />
       </View>
       <View as="section">
@@ -178,7 +133,8 @@ export const HomeroomPage = ({cards, cardsSettled, visible, canCreateCourses}) =
 
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
-  cardsSettled: PropTypes.bool.isRequired,
+  homeroomAnnouncements: PropTypes.array.isRequired,
+  loadingAnnouncements: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   canCreateCourses: PropTypes.bool.isRequired
 }
