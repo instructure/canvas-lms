@@ -108,8 +108,14 @@ export const K5Dashboard = ({
   useEffect(() => {
     if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
-        setCards(dc.filter(({enrollmentState}) => enrollmentState !== 'invited'))
+        const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
+        setCards(activeCards)
         setCardsSettled(cardsFinishedLoading)
+        if (cardsFinishedLoading && activeCards?.length === 0) {
+          setLoadingAnnouncements(false)
+          setHomeroomAnnouncements([])
+          setSubjectAnnouncements([])
+        }
       })
     }
   }, [cards, currentTab])
@@ -129,8 +135,9 @@ export const K5Dashboard = ({
     ),
     error: useCallback(showFlashError(I18n.t('Failed to load announcements.')), []),
     // This is a bit hacky, but we need to wait to fetch the announcements until the cards have
-    // settled. Setting forceResult skips the fetch until it changes to undefined.
-    forceResult: cardsSettled ? undefined : false,
+    // settled and there is at least 1 card because the announcements API requires context_codes.
+    // Setting forceResult skips the fetch until it changes to undefined.
+    forceResult: cardsSettled && cards?.length ? undefined : false,
     fetchAllPages: true,
     params: {
       active_only: true,

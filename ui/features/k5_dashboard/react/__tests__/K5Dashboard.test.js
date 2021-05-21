@@ -469,6 +469,26 @@ describe('K-5 Dashboard', () => {
         )
       })
     })
+
+    it('only fetches announcements if there are any cards', done => {
+      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify([]))
+      moxios.withMock(() => {
+        render(<K5Dashboard {...defaultProps} />)
+
+        moxios.wait(() =>
+          moxios.requests
+            .mostRecent()
+            .respondWith({
+              status: 200,
+              response: []
+            })
+            .then(() => {
+              expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
+              done()
+            })
+        )
+      })
+    })
   })
 
   describe('Schedule Section', () => {
