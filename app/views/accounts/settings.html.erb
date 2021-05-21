@@ -955,6 +955,7 @@ acknowledge that you have read and agreed to the
             <p>
               <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
               <br/>
+              <%= settings.label :outgoing_email_default_name_option_custom_name, :en => 'Name:' %>
               <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
             </p>
           </div>
@@ -989,7 +990,7 @@ acknowledge that you have read and agreed to the
           <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
           <table class="formtable">
             <tr>
-              <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
+              <td style="padding-top: 0;"><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
               <td>
                 <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
                 <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
