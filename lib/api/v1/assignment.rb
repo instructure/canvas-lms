@@ -408,6 +408,14 @@ module Api::V1::Assignment
           "max" => stats.maximum.to_f.round(1),
           "mean" => stats.mean.to_f.round(1)
         }
+        if stats.median.nil?
+          # We must be serving an old score statistics, go update in the background to ensure it exists next time
+          ScoreStatisticsGenerator.update_score_statistics_in_singleton(@context.id)
+        elsif Account.site_admin.feature_enabled?(:enhanced_grade_statistics)
+          hash["score_statistics"]["upper_q"] = stats.upper_q.to_f.round(1)
+          hash["score_statistics"]["median"] = stats.median.to_f.round(1)
+          hash["score_statistics"]["lower_q"] = stats.lower_q.to_f.round(1)
+        end
       end
     end
 

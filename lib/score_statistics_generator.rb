@@ -41,8 +41,11 @@ class ScoreStatisticsGenerator
   def self.update_score_statistics(course_id)
     root_account_id = Course.find_by(id: course_id)&.root_account_id
 
-    update_assignment_score_statistics(course_id, root_account_id: root_account_id)
-    update_course_score_statistic(course_id)
+    # Only necessary in local dev because we are not running in a job
+    GuardRail.activate(:primary) do
+      update_assignment_score_statistics(course_id, root_account_id: root_account_id)
+      update_course_score_statistic(course_id)
+    end
   end
 
   def self.update_assignment_score_statistics(course_id, root_account_id:)
@@ -74,6 +77,9 @@ class ScoreStatisticsGenerator
           MAX(s.score) AS max,
           MIN(s.score) AS min,
           AVG(s.score) AS avg,
+          percentile_cont(0.25) WITHIN GROUP (ORDER BY s.score) AS lower_q,
+          percentile_cont(0.5) WITHIN GROUP (ORDER BY s.score) AS median,
+          percentile_cont(0.75) WITHIN GROUP (ORDER BY s.score) AS upper_q,
           COUNT(*) AS count
         FROM
           interesting_submissions s
@@ -93,6 +99,9 @@ class ScoreStatisticsGenerator
           assignment["max"],
           assignment["min"],
           assignment["avg"],
+          assignment["lower_q"],
+          assignment["median"],
+          assignment["upper_q"],
           assignment["count"],
           now,
           now,
@@ -104,13 +113,16 @@ class ScoreStatisticsGenerator
     bulk_values.each_slice(100) do |bulk_slice|
       connection.execute(<<~SQL.squish)
         INSERT INTO #{ScoreStatistic.quoted_table_name}
-          (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)
+          (assignment_id, maximum, minimum, mean, lower_q, median, upper_q, count, created_at, updated_at, root_account_id)
         VALUES #{bulk_slice.join(",")}
         ON CONFLICT (assignment_id)
         DO UPDATE SET
            minimum = excluded.minimum,
            maximum = excluded.maximum,
            mean = excluded.mean,
+           lower_q = excluded.lower_q,
+           median = excluded.median,
+           upper_q = excluded.upper_q,
            count = excluded.count,
            updated_at = excluded.updated_at,
            root_account_id = #{root_account_id}

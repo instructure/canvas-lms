@@ -960,9 +960,9 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/score_statistics_generator.rb",
-      "line": 103,
+      "line": 113,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreStatistic.connection.execute(\"INSERT INTO #{ScoreStatistic.quoted_table_name}\\n  (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)\\nVALUES #{bulk_slice.join(\",\")}\\nON CONFLICT (assignment_id)\\nDO UPDATE SET\\n   minimum = excluded.minimum,\\n   maximum = excluded.maximum,\\n   mean = excluded.mean,\\n   count = excluded.count,\\n   updated_at = excluded.updated_at,\\n   root_account_id = #{root_account_id}\\n\")",
+      "code": "ScoreStatistic.connection.execute(\"INSERT INTO #{ScoreStatistic.quoted_table_name}\\n  (assignment_id, maximum, minimum, mean, lower_q, median, upper_q, count, created_at, updated_at, root_account_id)\\nVALUES #{bulk_slice.join(\",\")}\\nON CONFLICT (assignment_id)\\nDO UPDATE SET\\n   minimum = excluded.minimum,\\n   maximum = excluded.maximum,\\n   mean = excluded.mean,\\n   lower_q = excluded.lower_q,\\n   median = excluded.median,\\n   upper_q = excluded.upper_q,\\n   count = excluded.count,\\n   updated_at = excluded.updated_at,\\n   root_account_id = #{root_account_id}\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
