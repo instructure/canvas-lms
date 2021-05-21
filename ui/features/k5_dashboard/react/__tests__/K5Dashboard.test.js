@@ -483,7 +483,8 @@ describe('K-5 Dashboard', () => {
       // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
     })
 
-    it('displays a list of missing assignments if there are any', async () => {
+    // Skipping for flakiness. See https://instructure.atlassian.net/browse/LS-2243.
+    it.skip('displays a list of missing assignments if there are any', async () => {
       const {findByRole, getByRole, getByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
