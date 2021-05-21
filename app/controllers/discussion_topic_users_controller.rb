@@ -41,7 +41,7 @@ class DiscussionTopicUsersController < ApplicationController
   # @response_field avatar_url Avatar image url for the user/context
   def search
     calculator = ::MessageableUser::Calculator.new(@current_user)
-    users = calculator.search_messageable_users(context: @topic.context_code, search: params[:search])
+    users = calculator.search_messageable_users(context: @topic, search: params[:search])
     users = Api.paginate(users, self, messageable_user_pagination_url)
       .map { |user| conversation_user_json(user, @current_user, session) }
     render json: users
