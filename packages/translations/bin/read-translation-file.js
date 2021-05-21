@@ -22,12 +22,17 @@ const path = require('path')
 /**
  * This returns the contents of the translations for the given package and locale
  */
-async function getTranslationList(packageName, locale) {
-  const jsonData = await fs.promises.readFile(
-    path.resolve(__dirname, `../lib/${packageName}/${locale}.json`),
-    {encoding: 'utf8'}
-  )
+async function readTRanslationFile(packageName, locale) {
+  const filePath = path.resolve(__dirname, `../lib/${packageName}/${locale}.json`)
+  const jsonData = await fs.promises.readFile(filePath, {encoding: 'utf8'})
+  // sanity check
+  try {
+    JSON.parse(jsonData)
+  } catch (ex) {
+    console.log(ex)
+    throw new Error(`Failed parsing content from ${filePath}`)
+  }
   return jsonData
 }
 
-module.exports = getTranslationList
+module.exports = readTRanslationFile
