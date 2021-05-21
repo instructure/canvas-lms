@@ -28,7 +28,6 @@ import {
 } from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
@@ -398,7 +397,7 @@ export const DiscussionThreadContainer = props => {
 
 DiscussionThreadContainer.propTypes = {
   discussionTopicGraphQLId: PropTypes.string,
-  discussionEntry: DiscussionEntry.shape,
+  discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
   assignment: Assignment.shape,
   markAsRead: PropTypes.func,

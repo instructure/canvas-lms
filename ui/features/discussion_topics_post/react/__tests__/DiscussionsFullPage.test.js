@@ -28,7 +28,7 @@ import React from 'react'
 
 jest.mock('@canvas/rce/RichContentEditor')
 
-describe.skip('DiscussionFullPage', () => {
+describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
@@ -96,7 +96,7 @@ describe.skip('DiscussionFullPage', () => {
 
       const deleteButton = container.getByText('Delete')
       fireEvent.click(deleteButton)
-
+      await new Promise(resolve => setTimeout(resolve, 0))
       expect(await container.findByText('Deleted by Hank Mccoy')).toBeInTheDocument()
     })
 
