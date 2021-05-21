@@ -448,25 +448,10 @@ pipeline {
             extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
               def nestedStages = [:]
 
-              extendedStage('Javascript (Jest)')
+              extendedStage('Javascript')
                 .hooks(buildSummaryReportHooks)
                 .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                   string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'jest'),
-                ])
-
-              extendedStage('Javascript (Coffeescript)')
-                .hooks(buildSummaryReportHooks)
-                .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                  string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'coffee'),
-                ])
-
-              extendedStage('Javascript (Karma)')
-                .hooks(buildSummaryReportHooks)
-                .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                  string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'karma'),
                 ])
 
               parallel(nestedStages)
