@@ -71,7 +71,11 @@ namespace :i18n do
     File.open(Rails.root.join(yaml_file), "w") do |file|
       file.write(
         {
-          'en' => deep_sort_hash_by_keys(@translations.except(*special_keys))
+          'en' => deep_sort_hash_by_keys(
+            remove_dynamic_translations(
+              @translations.except(*special_keys)
+            )
+          )
         }.to_yaml(line_width: -1)
       )
     end
@@ -377,8 +381,21 @@ namespace :i18n do
 
   def remove_unwanted_translations(translations)
     translations['date'].delete('order')
-    translations['number'].fetch('nth', {}).delete('ordinals')
-    translations['number'].fetch('nth', {}).delete('ordinalized')
+  end
+
+  def remove_dynamic_translations(translations)
+    process = ->(node) do
+      case node
+      when Hash
+        node.delete_if { |k,v| process.call(v).nil? }
+      when Proc
+        nil
+      else
+        node
+      end
+    end
+
+    process.call(translations)
   end
 
   def autoimport(source_translations, new_translations)
