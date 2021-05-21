@@ -60,6 +60,10 @@ module K5PageObject
     '#tab-tab-modules'
   end
 
+  def dashboard_options_button_selector
+    "[data-testid = 'k5-dashboard-options']"
+  end
+
   def course_card_selector(course_title)
     "div[title='#{course_title}']"
   end
@@ -404,6 +408,10 @@ module K5PageObject
     "[data-testid='empty-modules-panda']"
   end
 
+  def classic_dashboard_header_selector
+    "h1:contains('Dashboard')"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -440,6 +448,14 @@ module K5PageObject
 
   def modules_tab
     f(modules_tab_selector)
+  end
+
+  def dashboard_options_button
+    f(dashboard_options_button_selector)
+  end
+
+  def dashboard_options
+    INSTUI_Menu_options(dashboard_options_button_selector)
   end
 
   def course_card(course_title)
@@ -807,6 +823,10 @@ module K5PageObject
     f(empty_modules_image_selector)
   end
 
+  def classic_dashboard_header
+    fj(classic_dashboard_header_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -882,6 +902,10 @@ module K5PageObject
 
   def click_k5_button(button_item)
     k5_app_buttons[button_item].click
+  end
+
+  def click_dashboard_options_button
+    dashboard_options_button.click
   end
 
   def click_dashboard_card

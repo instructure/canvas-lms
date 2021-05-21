@@ -482,12 +482,17 @@ class UsersController < ApplicationController
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
+    # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
+    @current_user.reload
+    js_env({K5_USER: k5_user?}, true)
+
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
+        :elementary_dashboard_disabled => k5_disabled?
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
       :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
@@ -496,7 +501,7 @@ class UsersController < ApplicationController
       :PERMISSIONS => {
         :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
         :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
-      }
+      },
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -1528,7 +1533,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled).freeze
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled).freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1549,6 +1554,10 @@ class UsersController < ApplicationController
   #
   # @argument comment_library_suggestions_enabled [Boolean]
   #   If true, suggestions within the comment library will be shown.
+  #
+  # @argument elementary_dashboard_disabled [Boolean]
+  #   If true, will display the user's preferred class Canvas dashboard
+  #   view instead of the canvas for elementary view.
   #
   # @example_request
   #

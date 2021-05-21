@@ -2826,8 +2826,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def k5_disabled?
+    # Only admins and teachers can opt-out of being considered a k5 user
+    can_disable = @current_user.roles(@domain_root_account).any? { |role| %w[admin teacher].include?(role) }
+    can_disable && @current_user.elementary_dashboard_disabled?
+  end
+
   def k5_user?
     if @current_user
+      return false if k5_disabled?
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
       Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
         uncached_k5_user?

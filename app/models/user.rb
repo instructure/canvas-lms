@@ -1694,6 +1694,10 @@ class User < ActiveRecord::Base
     !!preferences[:disable_inbox]
   end
 
+  def elementary_dashboard_disabled?
+    !!preferences[:elementary_dashboard_disabled]
+  end
+
   def create_announcements_unlocked?
     preferences.fetch(:create_announcements_unlocked, false)
   end

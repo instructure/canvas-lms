@@ -31,13 +31,15 @@ export default class DashboardOptionsMenu extends React.Component {
     view: PropTypes.string,
     planner_enabled: PropTypes.bool,
     onDashboardChange: PropTypes.func.isRequired,
-    menuButtonRef: PropTypes.func
+    menuButtonRef: PropTypes.func,
+    elementaryDashboardDisabled: PropTypes.bool
   }
 
   static defaultProps = {
     planner_enabled: false,
     view: 'cards',
-    menuButtonRef: () => {}
+    menuButtonRef: () => {},
+    elementaryDashboardDisabled: false
   }
 
   state = {
@@ -97,6 +99,9 @@ export default class DashboardOptionsMenu extends React.Component {
             <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>
           )}
           <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
+          {this.props.elementaryDashboardDisabled && (
+            <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
+          )}
         </Menu.Group>
         {cardView && <Menu.Separator />}
         {cardView && (

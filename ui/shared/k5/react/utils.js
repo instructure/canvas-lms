@@ -313,6 +313,13 @@ export const groupAnnouncementsByHomeroom = (announcements = [], courses = []) =
     {true: [], false: []}
   )
 
+export const saveElementaryDashboardPreference = disabled =>
+  doFetchApi({
+    path: '/api/v1/users/self/settings',
+    method: 'PUT',
+    body: {elementary_dashboard_disabled: disabled}
+  })
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',

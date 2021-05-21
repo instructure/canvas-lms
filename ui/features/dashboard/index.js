@@ -32,6 +32,7 @@ ready(() => {
     ReactDOM.render(
       <DashboardHeader
         dashboard_view={dashboard_view}
+        elementaryDashboardDisabled={!!ENV.PREFERENCES?.elementary_dashboard_disabled}
         planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
         flashError={$.flashError}
         flashMessage={$.flashMessage}
