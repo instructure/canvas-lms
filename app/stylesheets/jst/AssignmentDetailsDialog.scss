@@ -21,51 +21,75 @@
 #assignment-details-dialog {
   .distribution {
     margin: 15px 0;
-    height: 30px;
+    height: 40px;
     position: relative;
+
     div {
       position: absolute;
       top: 0;
+      #{direction(left)}: 0;
+      width: 0;
+      overflow: hidden;
       border-style: solid;
       border-color: #aaa;
-      overflow: hidden;
+      box-sizing: border-box;
     }
-    .bar-left, .bar-right {
-      height: 10px;
-      width: 0px;
-      margin: 5px 0px;
+
+    .zero, .points-possible{
+      top: 26px;
+      border-width: 0px;
+      width: auto;
     }
-    .bar-left {
-      #{direction(left)}: 0;
-      border-width: direction-sides(2px 0 2px 2px);
+
+    .points-possible {
+      #{direction(left)}: auto;
+      #{direction(right)}: 0;
     }
-    .none-left, .none-right {
-      height: 11px;
-      border-bottom-width: 2px;
+
+    .zero-point {
+      height: 24px;
+      margin: 0px;
+      border-width: 1px;
+      border-#{direction(right)}-width: 0;
     }
-    .some-left {
-      height: 20px;
-      border-width: direction-sides(2px 0pt 2px 2px);
+
+    .max-point, .min-point {
+      height: 14px;
+      height: 18px;
+      margin: 3px 0px;
+      border-width: 2px;
+      border-#{direction(left)}-width: 0;
+    }
+
+    .whisker {
+      height: 0px;
+      margin-top: 10px;
+      border-width: 2px;
+      border-#{direction(right)}-width: 0;
+    }
+
+    .left-box {
+      height: 24px;
+      border-width: 2px;
       border-top-#{direction(left)}-radius: 3px;
       border-bottom-#{direction(left)}-radius: 3px;
+      border-#{direction(right)}-width: 0;
       background: #fff;
-      z-index: 2;
     }
-    .some-right {
-      height: 20px;
+
+    .right-box {
+      height: 24px;
       border-width: 2px;
-      overflow: hidden;
       border-top-#{direction(right)}-radius: 3px;
       border-bottom-#{direction(right)}-radius: 3px;
       background: #fff;
-      z-index: 2;
     }
-    .bar-right {
-      width: 0;
-      height: 10px;
-      margin: 5px 0;
-      #{direction(right)}: 0;
-      border-width: direction-sides(2px 2px 2px 0);
+
+    .total-point {
+      height: 24px;
+      margin: 0px 1px;
+      border-width: 1px;
+      border-#{direction(left)}-width: 0;
     }
   }
 }

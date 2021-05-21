@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,9 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ScoreStatistic < ApplicationRecord
-  belongs_to :assignment
-
-  validates :assignment, :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, presence: true
-  validates :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, numericality: true
+module DataFixup::RunUpdateScoreStatistics
+  def self.run(start_at, end_at)
+    # The migration will have us at most a range of 100,000 items,
+    # we'll break it down to a thousand at a time here.
+    Course.active.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |batch_start, batch_end|
+      courses_ids_to_recompute = Course.active.where(id: batch_start..batch_end).pluck(:id)
+      courses_ids_to_recompute.each { |id| ScoreStatisticsGenerator.update_score_statistics(id) }
+    end
+  end
 end

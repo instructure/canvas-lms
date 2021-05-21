@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +16,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class ScoreStatistic < ApplicationRecord
-  belongs_to :assignment
+class AddQuartilesToScoreStatistics < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-  validates :assignment, :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, presence: true
-  validates :maximum, :minimum, :mean, :count, :lower_q, :median, :upper_q, numericality: true
+  def change
+    add_column :score_statistics, :lower_q, :float
+    add_column :score_statistics, :median, :float
+    add_column :score_statistics, :upper_q, :float
+  end
 end

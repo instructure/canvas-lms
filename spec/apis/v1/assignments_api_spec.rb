@@ -1052,6 +1052,9 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "shows min, max, and mean when include flag set" do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:enhanced_grade_statistics).and_return(true)
+
           setup_graded_submissions
           user_session @students[0]
           @user = @students[0]
@@ -1068,7 +1071,7 @@ describe AssignmentsApiController, type: :request do
             include: ["score_statistics", "submission"]
           )
           assign = json.first
-          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14 })
+          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14, "lower_q" => 14, "median" => 14, "upper_q" => 14 })
         end
 
         it "does not show score statistics when include flag not set" do
@@ -1199,6 +1202,9 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "shoulds show score statistics when include flag is set" do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:enhanced_grade_statistics).and_return(true)
+
           setup_graded_submissions
 
           @observer_enrollment.update_attribute(:associated_user_id, @students[0].id)
@@ -1216,7 +1222,7 @@ describe AssignmentsApiController, type: :request do
             include: %w[score_statistics submission observed_users]
           )
           assign = json.first
-          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14 })
+          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14, "lower_q" => 14, "median" => 14, "upper_q" => 14 })
         end
 
         it "shoulds not show score statistics when no observed student has a grade" do
@@ -1241,6 +1247,9 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "shoulds show score statistics when any observed student has a grade" do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:enhanced_grade_statistics).and_return(true)
+
           setup_graded_submissions
 
           @observer_enrollment.update_attribute(:associated_user_id, @students[5].id)
@@ -1266,7 +1275,7 @@ describe AssignmentsApiController, type: :request do
             include: %w[score_statistics submission observed_users]
           )
           assign = json.first
-          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14 })
+          expect(assign["score_statistics"]).to eq({ "min" => 10, "max" => 18, "mean" => 14, "lower_q" => 14, "median" => 14, "upper_q" => 14 })
         end
 
         it "shoulds not show score statistics when less than 5 students have a graded assignment" do

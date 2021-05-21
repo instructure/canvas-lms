@@ -395,6 +395,7 @@ a.screenreader-toggle {
   overflow: hidden;
   border-style: solid;
   border-color: $ic-border-dark;
+  box-sizing: border-box;
 }
 
 div.rubric-toggle {

@@ -126,6 +126,12 @@ speedgrader_dialog_for_unposted_comments:
   display_name: Draft Comment Warning Modal in SpeedGrader
   description: Enables modal to warn user when a draft comment is left unposted
     in SpeedGrader.
+enhanced_grade_statistics:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Show quartiles for grades and use them for box and whiskers
+  description: Updates the student-facing assignment statistics to include quartiles and makes the
+    box-and-whiskers plot a proper box and whiskers plot.
 submission_comment_emojis:
   state: hidden
   display_name: Emojis in Submission Comments
