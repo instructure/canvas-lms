@@ -262,6 +262,9 @@ class GroupsController < ApplicationController
                              eager_load(:group_category).preload(:root_account)
 
     unless api_request?
+      # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
+      return unless tab_enabled?(Course::TAB_PEOPLE)
+
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")
         set_active_tab "users"
@@ -322,7 +325,7 @@ class GroupsController < ApplicationController
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
-        if value_to_boolean(params[:only_own_groups])
+        if value_to_boolean(params[:only_own_groups]) || !tab_enabled?(Course::TAB_PEOPLE, no_render: true)
           all_groups = all_groups.merge(@current_user.current_groups)
         end
         @paginated_groups = Api.paginate(all_groups, self, path)
