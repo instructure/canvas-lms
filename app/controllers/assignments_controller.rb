@@ -135,7 +135,7 @@ class AssignmentsController < ApplicationController
       })
     end
 
-    if @assignment.turnitin_enabled? || @assignment.vericite_enabled?
+    if @assignment.turnitin_enabled? || @assignment.vericite_enabled? || @assignment.tool_settings_tool.present?
       similarity_pledge = {
         EULA_URL: tool_eula_url,
         COMMENTS: plagiarism_comments,

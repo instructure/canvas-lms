@@ -1246,7 +1246,21 @@ describe AssignmentsController do
             expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
           end
 
-          it "is not included if neither turnitin nor vericite is enabled" do
+          it "is included if tool_settings_tool returns a valid tool" do
+            tool = course.context_external_tools.create!(
+              name: "a",
+              url: "http://www.google.com",
+              consumer_key: '12345',
+              shared_secret: 'secret'
+            )
+            assignment.tool_settings_tool = tool
+            assignment.save!
+
+            get :show, params: {course_id: course.id, id: assignment.id}
+            expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "is not included if neither turnitin nor vericite is enabled and no appropriate tool exists" do
             get :show, params: {course_id: course.id, id: assignment.id}
             expect(assigns[:js_env]).not_to have_key(:SIMILARITY_PLEDGE)
           end
