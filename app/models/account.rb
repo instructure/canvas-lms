@@ -520,6 +520,10 @@ class Account < ActiveRecord::Base
     self.root_account_id ||= parent_account.root_account_id if parent_account && !parent_account.root_account?
     self.root_account_id ||= parent_account_id
     self.parent_account_id ||= self.root_account_id unless root_account?
+    unless root_account_id
+      Account.ensure_dummy_root_account
+      self.root_account_id = 0
+    end
     true
   end
 
