@@ -48,11 +48,8 @@ pipeline {
       steps {
         script {
           def runnerStages = [:]
-          def stageHooks = [
-            onNodeAcquired: jsStage.setupNode(),
-          ]
 
-          extendedStage('Runner - Jest').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+          extendedStage('Runner - Jest').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
             callableWithDelegate(jsStage.queueJestDistribution())(tests)
@@ -60,7 +57,7 @@ pipeline {
             parallel(tests)
           }
 
-          extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+          extendedStage('Runner - Coffee').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
             callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
@@ -68,7 +65,7 @@ pipeline {
             parallel(tests)
           }
 
-          extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+          extendedStage('Runner - Karma').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
             callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
