@@ -248,7 +248,9 @@ describe('useFetchApi', () => {
   it('reports forceResult when specified, without calling fetch', () => {
     const success = jest.fn()
     const meta = jest.fn()
-    renderHook(() => useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}}))
+    renderHook(() =>
+      useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}})
+    )
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     expect(meta).not.toHaveBeenCalled()
   })
