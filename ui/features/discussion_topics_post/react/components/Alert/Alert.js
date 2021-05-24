@@ -19,14 +19,28 @@
 import I18n from 'i18n!discussion_posts'
 
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
+import DateHelper from '../../../../../shared/datetime/dateHelper'
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {Link} from '@instructure/ui-link'
+import {View} from '@instructure/ui-view'
+import {Tray} from '@instructure/ui-tray'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Grid} from '@instructure/ui-grid'
 
 export function Alert({...props}) {
-  return (
-    <Flex data-testid="graded-discussion-info">
+  const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
+
+  const renderDueDates = () => {
+    return props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
+      ? multipleDueDates()
+      : singleDueDate()
+  }
+
+  const singleDueDate = () => {
+    return (
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
           {props.dueAtDisplayText === ''
@@ -34,6 +48,104 @@ export function Alert({...props}) {
             : I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
         </Text>
       </Flex.Item>
+    )
+  }
+
+  const multipleDueDates = () => {
+    return (
+      <Flex.Item padding="x-small" shouldGrow align="start">
+        <Link
+          as="button"
+          onClick={() => {
+            setDueDateTrayOpen(true)
+          }}
+        >
+          <Text>
+            {I18n.t('Show due dates (%{dueDateCount})', {
+              dueDateCount: props.assignmentOverrides.length
+            })}
+          </Text>
+        </Link>
+        <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
+          <View as="div" padding="medium">
+            <Flex direction="column">
+              <Flex.Item>
+                <CloseButton
+                  placement="end"
+                  offset="small"
+                  screenReaderLabel="Close"
+                  onClick={() => {
+                    setDueDateTrayOpen(false)
+                  }}
+                />
+              </Flex.Item>
+              <Flex.Item padding="none none medium none" shouldGrow shouldShrink>
+                <Text size="x-large" weight="bold" data-testid="due-dates-tray-heading">
+                  {I18n.t('Due Dates')}
+                </Text>
+              </Flex.Item>
+              <Grid>
+                <Grid.Row>
+                  <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                    <Text size="large" weight="bold">
+                      {I18n.t('Due At')}
+                    </Text>
+                  </Grid.Col>
+                  <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
+                    <Text size="large" weight="bold">
+                      {I18n.t('For')}
+                    </Text>
+                  </Grid.Col>
+                  <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                    <Text size="large" weight="bold">
+                      {I18n.t('Available From')}
+                    </Text>
+                  </Grid.Col>
+                  <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                    <Text size="large" weight="bold">
+                      {I18n.t('Until')}
+                    </Text>
+                  </Grid.Col>
+                </Grid.Row>
+                {props.assignmentOverrides.map(item => {
+                  return (
+                    <Grid.Row key={item.id}>
+                      <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                        <Text size="medium">
+                          {item.dueAt ? DateHelper.formatDatetimeForDiscussions(item.dueAt) : ''}
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
+                        <Text size="medium">
+                          {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                        <Text size="medium">
+                          {item.unlockAt
+                            ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
+                            : ''}
+                        </Text>
+                      </Grid.Col>
+                      <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                        <Text size="medium">
+                          {item.lockAt ? DateHelper.formatDatetimeForDiscussions(item.lockAt) : ''}
+                        </Text>
+                      </Grid.Col>
+                    </Grid.Row>
+                  )
+                })}
+              </Grid>
+            </Flex>
+          </View>
+        </Tray>
+      </Flex.Item>
+    )
+  }
+
+  return (
+    <Flex data-testid="graded-discussion-info">
+      {renderDueDates()}
       <Flex.Item padding="x-small" align="end">
         <Text weight="light" size="small">
           {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {
@@ -47,7 +159,9 @@ export function Alert({...props}) {
 
 Alert.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
-  dueAtDisplayText: PropTypes.string.isRequired
+  dueAtDisplayText: PropTypes.string.isRequired,
+  assignmentOverrides: PropTypes.array.isRequired,
+  canSeeMultipleDueDates: PropTypes.bool.isRequired
 }
 
 export default Alert

@@ -62,6 +62,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     unread: props.discussionTopic?.entryCounts?.unreadCount,
     replies: props.discussionTopic?.entryCounts?.repliesCount,
     assignment: props.discussionTopic?.assignment,
+    assignmentOverrides: props.discussionTopic?.assignment?.assignmentOverrides?.nodes || [],
     childTopics: props.discussionTopic?.childTopics || [],
     groupSet: props.discussionTopic?.groupSet || false
   }
@@ -86,7 +87,20 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     discussionTopicData?.childTopics.length > 0 &&
     discussionTopicData?.groupSet
 
+  const canSeeMultipleDueDates =
+    discussionTopicData?.permissions?.readAsAdmin &&
+    discussionTopicData?.assignmentOverrides?.length > 0
+
   if (isGraded(discussionTopicData.assignment)) {
+    if (discussionTopicData.assignmentOverrides.length > 0 && canSeeMultipleDueDates) {
+      discussionTopicData.assignmentOverrides.push({
+        dueAt: discussionTopicData.assignment.dueAt,
+        unlockAt: discussionTopicData.assignment.unlockAt,
+        lockAt: discussionTopicData.assignment.lockAt,
+        title: I18n.t('Everyone Else'),
+        id: discussionTopicData.assignment.id
+      })
+    }
     discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
       props.discussionTopic.assignment.dueAt
     )
@@ -229,6 +243,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Alert
                   dueAtDisplayText={discussionTopicData.dueAt}
                   pointsPossible={discussionTopicData.pointsPossible}
+                  assignmentOverrides={discussionTopicData.assignmentOverrides}
+                  canSeeMultipleDueDates={canSeeMultipleDueDates}
                 />
               </View>
             )}
