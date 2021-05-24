@@ -182,7 +182,7 @@ describe('MessageListHolder', () => {
   it('should be able to select messages', () => {
     const {getAllByText, getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversation = getAllByText('This is a different subject line')
-    fireEvent.mouseDown(conversation[0])
+    fireEvent.click(conversation[0])
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
   })
@@ -191,7 +191,7 @@ describe('MessageListHolder', () => {
     const onSelect = jest.fn()
     const {getAllByText} = render(<MessageListHolder {...props} onSelect={onSelect} />)
     const conversation = getAllByText('This is a different subject line')
-    fireEvent.mouseDown(conversation[0])
+    fireEvent.click(conversation[0])
     const expectedConversation = props.conversations[1].conversation
     expect(onSelect).toHaveBeenCalledWith([expectedConversation])
   })
@@ -200,18 +200,18 @@ describe('MessageListHolder', () => {
     const onOpenMock = jest.fn()
     const {getAllByText} = render(<MessageListHolder onOpen={onOpenMock} {...props} />)
     const conversation = getAllByText('This is a different subject line')
-    fireEvent.mouseDown(conversation[0])
+    fireEvent.click(conversation[0])
     expect(onOpenMock).toHaveBeenCalled()
   })
 
   it('should be able to select multiple messages using cmd key', () => {
     const {getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversations = getAllByTestId('messageListItem-Item')
-    fireEvent.mouseDown(conversations[0])
-    fireEvent.mouseDown(conversations[1], {
+    fireEvent.click(conversations[0])
+    fireEvent.click(conversations[1], {
       metaKey: true
     })
-    fireEvent.mouseDown(conversations[2], {
+    fireEvent.click(conversations[2], {
       metaKey: true
     })
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
@@ -221,11 +221,11 @@ describe('MessageListHolder', () => {
   it('should be able to select multiple messages using crtl key', () => {
     const {getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversations = getAllByTestId('messageListItem-Item')
-    fireEvent.mouseDown(conversations[1])
-    fireEvent.mouseDown(conversations[3], {
+    fireEvent.click(conversations[1])
+    fireEvent.click(conversations[3], {
       ctrlKey: true
     })
-    fireEvent.mouseDown(conversations[4], {
+    fireEvent.click(conversations[4], {
       ctrlKey: true
     })
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
@@ -235,8 +235,8 @@ describe('MessageListHolder', () => {
   it('should be able to select range of messages ASC', () => {
     const {getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversations = getAllByTestId('messageListItem-Item')
-    fireEvent.mouseDown(conversations[0])
-    fireEvent.mouseDown(conversations[3], {
+    fireEvent.click(conversations[0])
+    fireEvent.click(conversations[3], {
       shiftKey: true
     })
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
@@ -246,8 +246,8 @@ describe('MessageListHolder', () => {
   it('should be able to select range of messages DESC', () => {
     const {getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversations = getAllByTestId('messageListItem-Item')
-    fireEvent.mouseDown(conversations[3])
-    fireEvent.mouseDown(conversations[1], {
+    fireEvent.click(conversations[3])
+    fireEvent.click(conversations[1], {
       shiftKey: true
     })
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
@@ -257,14 +257,14 @@ describe('MessageListHolder', () => {
   it('should unselect multi select when message opened', () => {
     const {getAllByTestId} = render(<MessageListHolder {...props} />)
     const conversations = getAllByTestId('messageListItem-Item')
-    fireEvent.mouseDown(conversations[0])
-    fireEvent.mouseDown(conversations[1], {
+    fireEvent.click(conversations[0])
+    fireEvent.click(conversations[1], {
       metaKey: true
     })
-    fireEvent.mouseDown(conversations[2], {
+    fireEvent.click(conversations[2], {
       metaKey: true
     })
-    fireEvent.mouseDown(conversations[4])
+    fireEvent.click(conversations[4])
     const checkboxes = getAllByTestId('messageListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(1)
   })
