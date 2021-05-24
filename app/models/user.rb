@@ -205,6 +205,7 @@ class User < ActiveRecord::Base
     inverse_of: :grader
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
+  has_many :microsoft_sync_partial_sync_changes, :class_name => 'MicrosoftSync::PartialSyncChange', dependent: :destroy, inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 

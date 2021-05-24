@@ -228,6 +228,7 @@ class Course < ActiveRecord::Base
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   has_one :microsoft_sync_group, class_name: "MicrosoftSync::Group", dependent: :destroy, inverse_of: :course
+  has_many :microsoft_sync_partial_sync_changes, :class_name => 'MicrosoftSync::PartialSyncChange', dependent: :destroy, inverse_of: :course
 
   has_many :comment_bank_items, inverse_of: :course
 
