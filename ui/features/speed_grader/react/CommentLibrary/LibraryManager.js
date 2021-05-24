@@ -30,14 +30,33 @@ import {
   addCommentToCache,
   removeDeletedCommentFromCache
 } from './graphql/Mutations'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {COMMENTS_QUERY} from './graphql/Queries'
 import I18n from 'i18n!CommentLibrary'
 import Library from './Library'
 
+function persistCheckbox(state) {
+  doFetchApi({
+    path: '/api/v1/users/self/settings',
+    method: 'PUT',
+    body: {comment_library_suggestions_enabled: state}
+  })
+    .then(
+      ({json}) =>
+        (ENV.comment_library_suggestions_enabled = json.comment_library_suggestions_enabled)
+    )
+    .catch(() =>
+      showFlashAlert({
+        message: I18n.t('Error saving suggestion preference'),
+        type: 'error'
+      })
+    )
+}
+
 const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, commentAreaText}) => {
   const abortController = useRef()
   const [removedItemIndex, setRemovedItemIndex] = useState(null)
-  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(ENV.comment_library_suggestions_enabled)
   const {searchTerm, setSearchTerm} = useDebouncedSearchTerm('')
   // Sometimes, even if we get a new comment, we don't want to update the search term.
   // An example of this would be if the user clicks on a suggested comment.
@@ -159,6 +178,11 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
     return null
   }
 
+  const handleShowSuggestions = checked => {
+    persistCheckbox(checked)
+    setShowSuggestions(checked)
+  }
+
   return (
     <Library
       comments={data?.legacyNode?.commentBankItemsConnection?.nodes || []}
@@ -168,7 +192,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
       isAddingComment={isAddingComment}
       removedItemIndex={removedItemIndex}
       showSuggestions={showSuggestions}
-      setShowSuggestions={setShowSuggestions}
+      setShowSuggestions={checked => handleShowSuggestions(checked)}
       searchResults={
         searchTerm.length >= 3
           ? searchResults?.legacyNode?.commentBankItemsConnection?.nodes || []

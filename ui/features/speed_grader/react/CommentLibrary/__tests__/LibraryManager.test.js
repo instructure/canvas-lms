@@ -21,6 +21,7 @@ import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   commentBankItemMocks,
   makeDeleteCommentMutation,
@@ -31,6 +32,7 @@ import {
 import LibraryManager from '../LibraryManager'
 
 jest.useFakeTimers()
+jest.mock('@canvas/do-fetch-api-effect')
 
 describe('LibraryManager', () => {
   let setFocusToTextAreaMock
@@ -46,11 +48,16 @@ describe('LibraryManager', () => {
   }
 
   beforeEach(() => {
+    window.ENV = {comment_library_suggestions_enabled: true}
     setFocusToTextAreaMock = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+  })
+
+  afterAll(() => {
+    window.ENV = {}
   })
 
   const render = ({
@@ -86,13 +93,6 @@ describe('LibraryManager', () => {
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Comment item 0'))
       expect(setFocusToTextAreaMock).toHaveBeenCalled()
-    })
-
-    it('initially renders suggestions as disabled', async () => {
-      const {getByText, getByLabelText} = render({mocks: commentBankItemMocks()})
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
     })
   })
 
@@ -233,16 +233,9 @@ describe('LibraryManager', () => {
   describe('search', () => {
     it('loads search results when commentAreaText is provided', async () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
-      const {getByText, getByLabelText, rerender} = render({mocks})
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      fireEvent.click(getByLabelText('Show suggestions when typing'))
-      fireEvent.click(getByText('Close comment library'))
-
-      render({
+      const {getByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
-        mocks,
-        func: rerender
+        mocks
       })
 
       await act(async () => jest.runAllTimers())
@@ -251,16 +244,9 @@ describe('LibraryManager', () => {
 
     it('only loads results when the entered comment is 3 or more characters', async () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks({query: 'se'})]
-      const {getByText, getByLabelText, queryByText, rerender} = render({mocks})
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      fireEvent.click(getByLabelText('Show suggestions when typing'))
-      fireEvent.click(getByText('Close comment library'))
-
-      render({
+      const {queryByText} = render({
         props: defaultProps({commentAreaText: 'se'}),
-        mocks,
-        func: rerender
+        mocks
       })
       await act(async () => jest.runAllTimers())
       expect(queryByText('search result 0')).not.toBeInTheDocument()
@@ -268,16 +254,9 @@ describe('LibraryManager', () => {
 
     it('debounces the commentAreaText when displaying results', async () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
-      const {getByText, getByLabelText, rerender, queryByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      fireEvent.click(getByLabelText('Show suggestions when typing'))
-      fireEvent.click(getByText('Close comment library'))
-
-      render({
+      const {getByText, queryByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
-        mocks,
-        func: rerender
+        mocks
       })
 
       await act(async () => jest.advanceTimersByTime(50))
@@ -292,15 +271,8 @@ describe('LibraryManager', () => {
         ...searchMocks({query: 'search'}),
         ...searchMocks({query: 'search results 0', maxResults: 1})
       ]
-
-      const {getByText, getByLabelText, rerender, queryByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Open Comment Library'))
-      fireEvent.click(getByLabelText('Show suggestions when typing'))
-      fireEvent.click(getByText('Close comment library'))
-
       const props = defaultProps({commentAreaText: 'search'})
-      render({props, mocks, func: rerender})
+      const {getByText, queryByText, rerender} = render({props, mocks})
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('search result 0'))
       await act(async () => jest.runAllTimers())
@@ -312,6 +284,58 @@ describe('LibraryManager', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(queryByText('search result 0')).not.toBeInTheDocument()
+    })
+
+    it('renders the suggestions as enabled if comment_library_suggestions_enabled is true', async () => {
+      const {getByText, getByLabelText} = render({mocks: commentBankItemMocks()})
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      expect(getByLabelText('Show suggestions when typing')).toBeChecked()
+    })
+
+    it('renders the suggestions as disabled if comment_library_suggestions_enabled is false', async () => {
+      window.ENV = {comment_library_suggestions_enabled: false}
+      const {getByText, getByLabelText} = render()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
+    })
+
+    it("fires a request to save the checkbox state when it's clicked", async () => {
+      doFetchApi.mockImplementationOnce(() =>
+        Promise.resolve({json: {comment_library_suggestions_enabled: false}})
+      )
+      const {getByText, getByLabelText} = render()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      expect(doFetchApi).toHaveBeenCalledTimes(1)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'PUT',
+        path: '/api/v1/users/self/settings',
+        body: {
+          comment_library_suggestions_enabled: false
+        }
+      })
+      expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
+      await act(async () => jest.runAllTimers())
+      expect(ENV.comment_library_suggestions_enabled).toBe(false)
+    })
+
+    it('does not write to ENV if the request fails', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      doFetchApi.mockImplementationOnce(() => Promise.reject(new Error('Network error')))
+      const {getByText, getByLabelText} = render()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Open Comment Library'))
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      expect(doFetchApi).toHaveBeenCalledTimes(1)
+      await act(async () => jest.runAllTimers())
+      expect(ENV.comment_library_suggestions_enabled).toBe(true)
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Error saving suggestion preference',
+        type: 'error'
+      })
     })
   })
 

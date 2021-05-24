@@ -1528,7 +1528,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled).freeze
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled).freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1546,6 +1546,9 @@ class UsersController < ApplicationController
   # @argument hide_dashcard_color_overlays [Boolean]
   #   If true, images on course cards will be presented without being tinted
   #   to match the course color.
+  #
+  # @argument comment_library_suggestions_enabled [Boolean]
+  #   If true, suggestions within the comment library will be shown.
   #
   # @example_request
   #

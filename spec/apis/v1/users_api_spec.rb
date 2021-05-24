@@ -1989,13 +1989,15 @@ describe "Users API", type: :request do
       end
 
       it "should be able to update other users' settings" do
-        json = api_call(:put, path, path_options, manual_mark_as_read: true, hide_dashcard_color_overlays: false)
+        json = api_call(:put, path, path_options, manual_mark_as_read: true, hide_dashcard_color_overlays: false, comment_library_suggestions_enabled: true)
         expect(json['manual_mark_as_read']).to eq true
         expect(json['hide_dashcard_color_overlays']).to eq false
+        expect(json['comment_library_suggestions_enabled']).to eq true
 
-        json = api_call(:put, path, path_options, manual_mark_as_read: false, hide_dashcard_color_overlays: true)
+        json = api_call(:put, path, path_options, manual_mark_as_read: false, hide_dashcard_color_overlays: true, comment_library_suggestions_enabled: false)
         expect(json['manual_mark_as_read']).to eq false
         expect(json['hide_dashcard_color_overlays']).to eq true
+        expect(json['comment_library_suggestions_enabled']).to eq false
       end
     end
 

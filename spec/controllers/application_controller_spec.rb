@@ -376,6 +376,25 @@ RSpec.describe ApplicationController do
       end
     end
 
+    context "comment_library_suggestions_enabled" do
+      before(:each) do
+        user_factory
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.instance_variable_set(:@current_user, @user)
+        allow(controller).to receive(:user_display_json).and_return({})
+      end
+
+      it "is false by default" do
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq false
+      end
+
+      it "is true if user enables suggestions" do
+        @user.preferences[:comment_library_suggestions_enabled] = true
+        @user.save!
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq true
+      end
+    end
+
     context "canvas for elementary" do
       let(:course) {create_course}
 
