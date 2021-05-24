@@ -825,7 +825,13 @@ class Account < ActiveRecord::Base
   end
 
   def root_account?
-    root_account_id.nil? || local_root_account_id.zero?
+    if root_account_id
+      local_root_account_id.zero?
+    elsif new_record?
+      parent_account_id.nil?
+    else
+      false
+    end
   end
 
   def primary_settings_root_account?
@@ -2498,8 +2504,8 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  scope :root_accounts, -> { where("(accounts.root_account_id = 0 OR accounts.root_account_id IS NULL) AND accounts.id != 0") }
-  scope :non_root_accounts, -> { where("(accounts.root_account_id != 0 AND accounts.root_account_id IS NOT NULL)") }
+  scope :root_accounts, -> { where("accounts.root_account_id = 0 AND accounts.id != 0") }
+  scope :non_root_accounts, -> { where("accounts.root_account_id != 0") }
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, ->(name) { where(wildcard("accounts.name", name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
