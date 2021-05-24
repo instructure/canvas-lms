@@ -46,7 +46,7 @@ unless CANVAS_RAILS6_0
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
-        lockfile = "#{Bundler.default_gemfile}.lock"
+        lockfile = +"#{Bundler.default_gemfile}.lock"
         lockfile << ".next" unless CANVAS_RAILS6_0
         Pathname.new(lockfile)
       end
