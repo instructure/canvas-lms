@@ -31,6 +31,8 @@ import {
   getAssignmentGrades,
   getAccountsFromEnrollments,
   getTotalGradeStringFromEnrollments
+  parseAnnouncementDetails,
+  groupAnnouncementsByHomeroom
 } from '../utils'
 
 const ANNOUNCEMENT_URL =
@@ -533,5 +535,121 @@ describe('getTotalGradeStringFromEnrollments', () => {
       }
     ]
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('2.00%')
+  })
+})
+
+describe('parseAnnouncementDetails', () => {
+  const announcement = {
+    title: 'Hello class',
+    message: '<p>Some details</p>',
+    html_url: 'http://localhost:3000/courses/78/discussion_topics/72',
+    id: '72',
+    permissions: {
+      update: true
+    },
+    attachments: [
+      {
+        id: '409',
+        display_name: 'File.pdf',
+        filename: 'file12.pdf',
+        url: 'http://localhost:3000/files/longpath'
+      }
+    ],
+    posted_at: '2021-05-14T17:06:21-06:00'
+  }
+
+  const course = {
+    id: '78',
+    shortName: 'Reading',
+    href: 'http://localhost:3000/courses/78',
+    canManage: false,
+    published: true
+  }
+
+  it('filters and renames attributes in received object', () => {
+    const announcementDetails = parseAnnouncementDetails(announcement, course)
+
+    expect(announcementDetails.courseId).toBe('78')
+    expect(announcementDetails.courseName).toBe('Reading')
+    expect(announcementDetails.courseUrl).toBe('http://localhost:3000/courses/78')
+    expect(announcementDetails.canEdit).toBe(true)
+    expect(announcementDetails.published).toBe(true)
+    expect(announcementDetails.announcement.title).toBe('Hello class')
+    expect(announcementDetails.announcement.message).toBe('<p>Some details</p>')
+    expect(announcementDetails.announcement.url).toBe(
+      'http://localhost:3000/courses/78/discussion_topics/72'
+    )
+    expect(announcementDetails.announcement.attachment.display_name).toBe('File.pdf')
+    expect(announcementDetails.announcement.attachment.url).toBe(
+      'http://localhost:3000/files/longpath'
+    )
+    expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
+    expect(announcementDetails.announcement.postedDate).toBe('2021-05-14T17:06:21-06:00')
+  })
+
+  it('handles a missing attachment', () => {
+    const announcementDetails = parseAnnouncementDetails({...announcement, attachments: []}, course)
+    expect(announcementDetails.announcement.attachment).toBeUndefined()
+  })
+})
+
+describe('groupAnnouncementsByHomeroom', () => {
+  const announcements = [
+    {
+      id: '10',
+      context_code: 'course_1'
+    },
+    {
+      id: '11',
+      context_code: 'course_2',
+      permissions: {
+        update: false
+      },
+      attachments: []
+    },
+    {
+      id: '12',
+      context_code: 'course_3'
+    }
+  ]
+  const courses = [
+    {
+      id: '1',
+      isHomeroom: false
+    },
+    {
+      id: '2',
+      isHomeroom: true
+    }
+  ]
+
+  it('groups returned announcements by whether they are associated with a homeroom or not', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect(Object.keys(grouped)).toEqual(['true', 'false'])
+    expect(grouped.true).toHaveLength(1)
+    expect(grouped.false).toHaveLength(1)
+    expect(grouped.true[0].announcement.id).toBe('11')
+    expect(grouped.false[0].id).toBe('10')
+  })
+
+  it('parses announcement details on homeroom announcements only', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect(grouped.true[0].courseId).toBe('2')
+    expect(grouped.false[0].courseId).toBeUndefined()
+  })
+
+  it('ignores announcements not associated with a passed-in course', () => {
+    const grouped = groupAnnouncementsByHomeroom(announcements, courses)
+    expect([...grouped.true, ...grouped.false]).toHaveLength(2)
+  })
+
+  it('handles missing announcements and courses gracefully', () => {
+    const emptyGroups = {true: [], false: []}
+    expect(groupAnnouncementsByHomeroom([], courses)).toEqual({
+      true: [{courseId: '2'}],
+      false: []
+    })
+    expect(groupAnnouncementsByHomeroom(announcements, [])).toEqual(emptyGroups)
+    expect(groupAnnouncementsByHomeroom()).toEqual(emptyGroups)
   })
 })
