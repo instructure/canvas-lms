@@ -18,7 +18,6 @@
 
 import React, {useCallback} from 'react'
 import {bool, func, oneOf, string, arrayOf, shape} from 'prop-types'
-import tz from '@canvas/timezone'
 import moment from 'moment-timezone'
 import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -43,10 +42,6 @@ BulkDateInput.defaultProps = {
   interaction: 'enabled'
 }
 
-function formatDate(date) {
-  return tz.format(date, 'date.formats.medium_with_weekday')
-}
-
 function BulkDateInput({
   label,
   selectedDateString,
@@ -59,8 +54,25 @@ function BulkDateInput({
   fancyMidnight,
   interaction
 }) {
+  const locale = ENV?.LOCALE || navigator.language
+
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
+
+  const formatDate = useCallback(
+    date => {
+      const jsDate = date instanceof Date ? date : new Date(date)
+      const formatter = new Intl.DateTimeFormat(locale, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: timezone
+      })
+      return formatter.format(jsDate)
+    },
+    [locale, timezone]
+  )
 
   const setDate = useCallback(
     newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
@@ -91,11 +103,10 @@ function BulkDateInput({
 
   const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])
 
-  const selectedDate = tz.parse(selectedDateString)
   return (
     <CanvasDateInput
       renderLabel={renderLabel}
-      selectedDate={selectedDate}
+      selectedDate={selectedDateString}
       formatDate={formatDate}
       onSelectedDateChange={handleSelectedDateChange}
       timezone={timezone}
