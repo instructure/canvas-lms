@@ -16,14 +16,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SetRootAccountIdTo0ForRootAccounts < ActiveRecord::Migration[6.0]
+class AddReplicaIdentityForAccounts < ActiveRecord::Migration[6.0]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
-    Account.where(root_account_id: nil).update_all(root_account_id: 0)
+    add_replica_identity 'Account', :root_account_id, 0
+    remove_index :accounts, column: :root_account_id, if_exists: true
   end
 
   def down
-    Account.where(root_account_id: 0).update_all(root_account_id: nil)
+    add_index :accounts, :root_account_id, algorithm: :concurrently, if_not_exists: true
+    remove_replica_identity 'Account'
   end
 end
