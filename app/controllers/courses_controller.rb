@@ -2091,6 +2091,7 @@ class CoursesController < ApplicationController
                  COURSE: {
                    id: @context.id.to_s,
                    name: @context.name,
+                   long_name: "#{@context.name} - #{@context.short_name}",
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
                    color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),

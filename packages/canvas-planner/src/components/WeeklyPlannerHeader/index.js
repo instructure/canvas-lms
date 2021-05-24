@@ -27,10 +27,20 @@ import {themeable} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import {loadNextWeekItems, loadPastWeekItems, loadThisWeekItems, scrollToToday} from '../../actions'
+import {
+  loadNextWeekItems,
+  loadPastWeekItems,
+  loadThisWeekItems,
+  scrollToToday,
+  savePlannerItem,
+  deletePlannerItem,
+  cancelEditingPlannerItem,
+  openEditingPlannerItem
+} from '../../actions'
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
 import {isInMomentRange} from '../../utilities/dateUtils'
+import TodoEditorModal from '../TodoEditorModal'
 
 import theme from './theme'
 import styles from './styles.css'
@@ -75,7 +85,19 @@ export class WeeklyPlannerHeader extends Component {
     weekStartMoment: momentObj,
     weekEndMoment: momentObj,
     wayPastItemDate: PropTypes.string,
-    wayFutureItemDate: PropTypes.string
+    wayFutureItemDate: PropTypes.string,
+    locale: PropTypes.string.isRequired,
+    timeZone: PropTypes.string.isRequired,
+    todo: PropTypes.shape({
+      updateTodoItem: PropTypes.shape({
+        title: PropTypes.string
+      })
+    }),
+    savePlannerItem: PropTypes.func.isRequired,
+    deletePlannerItem: PropTypes.func.isRequired,
+    cancelEditingPlannerItem: PropTypes.func.isRequired,
+    openEditingPlannerItem: PropTypes.func.isRequired,
+    courses: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
   prevButtonRef = createRef()
@@ -287,6 +309,16 @@ export class WeeklyPlannerHeader extends Component {
           >
             <IconArrowOpenEndLine />
           </IconButton>
+          <TodoEditorModal
+            locale={this.props.locale}
+            timeZone={this.props.timeZone}
+            todoItem={this.props.todo?.updateTodoItem}
+            courses={this.props.courses}
+            onEdit={this.props.openEditingPlannerItem}
+            onClose={this.props.cancelEditingPlannerItem}
+            savePlannerItem={this.props.savePlannerItem}
+            deletePlannerItem={this.props.deletePlannerItem}
+          />
         </View>
       </div>
     )
@@ -302,7 +334,9 @@ const mapStateToProps = state => {
     weekStartMoment: state.weeklyDashboard.weekStart,
     weekEndMoment: state.weeklyDashboard.weekEnd,
     wayPastItemDate: state.weeklyDashboard.wayPastItemDate,
-    wayFutureItemDate: state.weeklyDashboard.wayFutureItemDate
+    wayFutureItemDate: state.weeklyDashboard.wayFutureItemDate,
+    todo: state.todo,
+    courses: state.courses
   }
 }
 
@@ -310,7 +344,11 @@ const mapDispatchToProps = {
   loadNextWeekItems,
   loadPastWeekItems,
   loadThisWeekItems,
-  scrollToToday
+  scrollToToday,
+  savePlannerItem,
+  deletePlannerItem,
+  cancelEditingPlannerItem,
+  openEditingPlannerItem
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ThemedWeeklyPlannerHeader)

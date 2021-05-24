@@ -32,6 +32,7 @@ const SchedulePage = ({
   plannerEnabled,
   plannerInitialized,
   timeZone,
+  locale,
   userHasEnrollments,
   visible
 }) => {
@@ -49,7 +50,7 @@ const SchedulePage = ({
   if (plannerInitialized && isPlannerCreated) {
     content = (
       <>
-        {renderWeeklyPlannerHeader({visible})}
+        {renderWeeklyPlannerHeader({visible, timeZone, locale})}
         {plannerApp.current}
         <JumpToHeaderButton />
       </>
@@ -78,6 +79,7 @@ SchedulePage.propTypes = {
   plannerEnabled: PropTypes.bool.isRequired,
   plannerInitialized: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
   timeZone: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
   userHasEnrollments: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired
 }

@@ -129,7 +129,8 @@
     "redux-devtools-extension": "^2.13.2",
     "@testing-library/dom": "^7",
     "@testing-library/jest-dom": "^5",
-    "@testing-library/react": "^11"
+    "@testing-library/react": "^11",
+    "@testing-library/user-event": "^12"
   },
   "lint-staged": {
     "*.js": "eslint"

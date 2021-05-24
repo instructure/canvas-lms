@@ -84,6 +84,7 @@ export const K5Dashboard = ({
   loadAllOpportunities,
   switchToToday,
   timeZone,
+  locale,
   toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
@@ -200,6 +201,7 @@ export const K5Dashboard = ({
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
+          locale={locale}
           userHasEnrollments={cards?.length}
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
@@ -230,6 +232,7 @@ K5Dashboard.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   switchToToday: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
   toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
