@@ -22,7 +22,7 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w(id name).freeze,
+    :only => %w(id name updated_at).freeze,
     :methods => %w(sortable_name short_name).freeze
   }.freeze
 
