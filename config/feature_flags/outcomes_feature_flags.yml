@@ -52,5 +52,5 @@ assignment_comment_library:
 improved_lmgb:
   state: hidden
   applies_to: RootAccount
-  display_name: Improved Learning Mastery Gradebook
-  description: Enhances the Canvas experience within the Learning Mastery Gradebook.
+  display_name: Learning Mastery Gradebook Redesign
+  description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
