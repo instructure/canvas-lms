@@ -79,6 +79,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
+  const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -90,7 +91,7 @@ export const DiscussionThreadContainer = props => {
 
     addReplyToDiscussion(cache, props.discussionTopicGraphQLId)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, props.discussionEntry._id, newDiscussionEntry)
+    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
