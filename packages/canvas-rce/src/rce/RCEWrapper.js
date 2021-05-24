@@ -220,7 +220,8 @@ class RCEWrapper extends React.Component {
     plugins: PropTypes.arrayOf(PropTypes.string),
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
-    use_rce_pretty_html_editor: PropTypes.bool
+    use_rce_pretty_html_editor: PropTypes.bool,
+    use_rce_buttons_and_icons: PropTypes.bool
   }
 
   static defaultProps = {
@@ -1263,6 +1264,14 @@ class RCEWrapper extends React.Component {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
 
+    if (
+      rcsExists &&
+      this.props.use_rce_buttons_and_icons &&
+      this.props.trayProps?.contextType === 'course'
+    ) {
+      canvasPlugins.push('instructure_buttons')
+    }
+
     const wrappedOpts = {
       ...options,
 
@@ -1315,7 +1324,7 @@ class RCEWrapper extends React.Component {
           insert: {
             title: formatMessage('Insert'),
             items:
-              'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable instructure_media_embed | hr'
+              'instructure_links instructure_image instructure_media instructure_document instructure_buttons | instructure_equation inserttable instructure_media_embed | hr'
           },
           tools: {title: formatMessage('Tools'), items: 'wordcount'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
@@ -1347,7 +1356,8 @@ class RCEWrapper extends React.Component {
               'instructure_links',
               'instructure_image',
               'instructure_record',
-              'instructure_documents'
+              'instructure_documents',
+              'instructure_buttons'
             ]
           },
           {

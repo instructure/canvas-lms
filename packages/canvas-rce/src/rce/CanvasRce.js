@@ -62,6 +62,7 @@ const baseProps = {
   // },
   highContrastCSS: [],
   use_rce_pretty_html_editor: true,
+  use_rce_buttons_and_icons: true,
   editorOptions: {...defaultTinymceConfig}
 }
 
