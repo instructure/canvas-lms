@@ -512,9 +512,9 @@ class Account < ActiveRecord::Base
     self.name&.delete!("\r")
     self.uuid ||= CanvasSlug.generate_securish_uuid if has_attribute?(:uuid)
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if has_attribute?(:lti_guid)
-    self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
-    self.root_account_id ||= self.parent_account_id
-    self.parent_account_id ||= self.root_account_id
+    self.root_account_id ||= parent_account.root_account_id if parent_account && !parent_account.root_account?
+    self.root_account_id ||= parent_account_id
+    self.parent_account_id ||= self.root_account_id unless root_account?
     true
   end
 
@@ -597,7 +597,7 @@ class Account < ActiveRecord::Base
   end
 
   def root_account?
-    !self.root_account_id
+    root_account_id.nil? || local_root_account_id.zero?
   end
 
   def root_account
@@ -606,7 +606,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_root_account_id
-    root_account_id || id
+    root_account? ? id : root_account_id
   end
 
   def sub_accounts_as_options(indent = 0, preloaded_accounts = nil)
@@ -1955,10 +1955,15 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  scope :root_accounts, -> { where(:root_account_id => nil).where.not(id: 0) }
+  scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
   scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
+
+  def self.resolved_root_account_id_sql(table = table_name)
+    quoted_table_name = connection.quote_local_table_name(table)
+    %{COALESCE(NULLIF(#{quoted_table_name}.root_account_id, 0), #{quoted_table_name}."id")}
+  end
 
   def change_root_account_setting!(setting_name, new_value)
     root_account.settings[setting_name] = new_value
