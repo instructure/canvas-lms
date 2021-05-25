@@ -58,7 +58,10 @@ function message {
 }
 
 function prompt {
-  read -r -p "$1 " "$2"
+  # for some reason read output is sent to stderr
+  # to avoid conflicts with untracked failure detection
+  # redirect the stderr to stdout for the read command
+  read -r -p "$1 " "$2" 2>&1
 }
 
 function print_missing_dependencies {
