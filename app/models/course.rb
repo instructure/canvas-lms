@@ -3318,8 +3318,11 @@ class Course < ActiveRecord::Base
 
     progress&.calculate_completion!(0, homeroom_course.enrollments.size)
     homeroom_course.all_enrollments.find_each do |enrollment|
-      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id)
+      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
       course_enrollment.workflow_state = enrollment.workflow_state
+      course_enrollment.start_at = enrollment.start_at
+      course_enrollment.end_at = enrollment.end_at
+      course_enrollment.completed_at = enrollment.completed_at
       course_enrollment.save!
       progress.increment_completion!(1) if progress&.total
     end

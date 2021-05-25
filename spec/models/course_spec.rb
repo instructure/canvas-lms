@@ -5018,6 +5018,19 @@ describe Course, "#sync_homeroom_enrollments" do
     expect(@course.user_is_instructor?(@teacher)).to eq(false)
   end
 
+  it "copies custom roles and enrollment dates" do
+    role = Account.default.roles.create!(name: 'Cool Student', base_role_type: 'StudentEnrollment')
+    e1 = @homeroom_course.enroll_student(@student, role: role, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
+    e1.conclude
+    @course.sync_homeroom_enrollments
+    expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
+    e2 = @course.enrollments.where(user_id: @student.id, role_id: role.id).take
+    expect(e2.role_id).to eq role.id
+    expect(e2.start_at).to eq e1.start_at
+    expect(e2.end_at).to eq e1.end_at
+    expect(e2.completed_at).to eq e1.completed_at
+  end
+
   it "returns false unless course is an elementary subject and sync setting is on and homeroom_course_id is set" do
     @course.sync_enrollments_from_homeroom = false
     @course.save!
