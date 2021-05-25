@@ -156,10 +156,12 @@ module Types
       return false if object[:discussion_topic].locked
 
       object[:loader].load(:moderate_forum).then do |can_moderate|
-        return can_moderate if object[:discussion_topic].assignment_id.nil?
-
-        Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
-          object[:discussion_topic].can_lock? && can_moderate
+        if object[:discussion_topic].assignment_id.nil?
+          can_moderate
+        else
+          Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
+            object[:discussion_topic].can_lock? && can_moderate
+          end
         end
       end
     end
