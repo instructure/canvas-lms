@@ -124,7 +124,7 @@ class ReleaseNotesController < ApplicationController
       # Since the time to show new notes could roll over at any time, just refresh the latest
       # notes per role every 5 minutes
       MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
-        notes = ReleaseNote.latest(env: Canvas.environment, role: role, limit: latest_limit)
+        notes = ReleaseNote.latest(env: Canvas.environment.downcase, role: role, limit: latest_limit)
         # Ensure we have loaded the locales *before* caching
         notes.each { |note| note[release_note_lang] || note['en']}
         notes
