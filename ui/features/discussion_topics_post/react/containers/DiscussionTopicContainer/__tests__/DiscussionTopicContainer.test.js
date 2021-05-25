@@ -61,7 +61,9 @@ const discussionTopicMock = {
       delete: true,
       speedGrader: true,
       moderateForum: true,
-      peerReview: true
+      peerReview: true,
+      openForComments: false,
+      closeForComments: true
     }
   }
 }
@@ -350,5 +352,33 @@ describe('DiscussionTopicContainer', () => {
     })
 
     await expect(container.queryByTestId('groups-menu-btn')).toBeFalsy()
+  })
+
+  it('Should be able to close for comments', async () => {
+    const {getByTestId, findByTestId} = setup(discussionTopicMock)
+    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('toggle-comments'))
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith(
+        'You have successfully updated the discussion topic.'
+      )
+    )
+  })
+
+  it('Should be able to open for comments', async () => {
+    const testDiscussionTopicMock = discussionTopicMock
+    testDiscussionTopicMock.discussionTopic.permissions.openForComments = true
+    testDiscussionTopicMock.discussionTopic.permissions.closeForComments = false
+
+    const {getByTestId, findByTestId} = setup(testDiscussionTopicMock)
+    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('toggle-comments'))
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith(
+        'You have successfully updated the discussion topic.'
+      )
+    )
   })
 })

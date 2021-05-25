@@ -70,9 +70,11 @@ export const DELETE_DISCUSSION_ENTRY = gql`
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
-export const PUBLISH_DISCUSSION_TOPIC = gql`
-  mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean) {
-    updateDiscussionTopic(input: {discussionTopicId: $discussionTopicId, published: $published}) {
+export const UPDATE_DISCUSSION_TOPIC = gql`
+  mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean, $locked: Boolean) {
+    updateDiscussionTopic(
+      input: {discussionTopicId: $discussionTopicId, published: $published, locked: $locked}
+    ) {
       discussionTopic {
         ...Discussion
       }

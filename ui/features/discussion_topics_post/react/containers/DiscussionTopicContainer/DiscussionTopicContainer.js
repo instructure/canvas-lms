@@ -31,7 +31,7 @@ import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
   DELETE_DISCUSSION_TOPIC,
-  PUBLISH_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC
 } from '../../../graphql/Mutations'
 import PropTypes from 'prop-types'
@@ -128,14 +128,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   }
 
-  const [publishDiscussionTopic] = useMutation(PUBLISH_DISCUSSION_TOPIC, {
+  const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
     onCompleted: data => {
       if (!data.updateDiscussionTopic.errors) {
-        setOnSuccess(
-          data.updateDiscussionTopic.discussionTopic.published
-            ? I18n.t('You have successfully published the discussion topic.')
-            : I18n.t('You have successfully unpublished the discussion topic.')
-        )
+        setOnSuccess(I18n.t('You have successfully updated the discussion topic.'))
       } else {
         setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
       }
@@ -146,10 +142,19 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   })
 
   const onPublish = () => {
-    publishDiscussionTopic({
+    updateDiscussionTopic({
       variables: {
         discussionTopicId: discussionTopicData._id,
         published: !discussionTopicData.published
+      }
+    })
+  }
+
+  const onToggleLocked = locked => {
+    updateDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        locked
       }
     })
   }
@@ -325,8 +330,20 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       isPublished={discussionTopicData.published}
                       canUnpublish={canUnpublish}
                       isSubscribed={discussionTopicData.subscribed}
-                      onOpenForComments={canOpenForComments ? () => {} : null}
-                      onCloseForComments={canCloseForComments ? () => {} : null}
+                      onOpenForComments={
+                        canOpenForComments
+                          ? () => {
+                              onToggleLocked(false)
+                            }
+                          : null
+                      }
+                      onCloseForComments={
+                        canCloseForComments
+                          ? () => {
+                              onToggleLocked(true)
+                            }
+                          : null
+                      }
                     />
                   </Flex.Item>
                 </Flex>
