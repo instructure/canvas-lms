@@ -86,11 +86,25 @@ const FindOutcomesView = ({
               <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
                 <Heading level="h4">
                   {searchString ? (
-                    <TruncateText>
-                      <Text wrap="break-word">
-                        {`${addZeroWidthSpace(groupTitle)} > ${addZeroWidthSpace(searchString)}`}
-                      </Text>
-                    </TruncateText>
+                    <Flex>
+                      <Flex.Item shouldShrink>
+                        <TruncateText>
+                          {`${addZeroWidthSpace(groupTitle)} > ${addZeroWidthSpace(searchString)}`}
+                        </TruncateText>
+                      </Flex.Item>
+                      <Flex.Item>
+                        {loading ? (
+                          <Spinner
+                            renderTitle={I18n.t('Loading')}
+                            size="x-small"
+                            margin="0 0 0 small"
+                            data-testid="search-loading"
+                          />
+                        ) : (
+                          ''
+                        )}
+                      </Flex.Item>
+                    </Flex>
                   ) : (
                     <Text wrap="break-word">
                       {I18n.t('All %{groupTitle} Outcomes', {

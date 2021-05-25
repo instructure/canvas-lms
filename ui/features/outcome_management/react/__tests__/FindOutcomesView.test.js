@@ -203,4 +203,11 @@ describe('FindOutcomesView', () => {
     const {getByTestId} = render(<FindOutcomesView {...defaultProps({loading: true})} />)
     expect(getByTestId('load-more-loading')).toBeInTheDocument()
   })
+
+  it('shows small loader when searching for outcomes', () => {
+    const {getByTestId} = render(
+      <FindOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
+    )
+    expect(getByTestId('search-loading')).toBeInTheDocument()
+  })
 })
