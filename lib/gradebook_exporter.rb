@@ -112,9 +112,7 @@ class GradebookExporter
     Assignment.preload_unposted_anonymous_submissions(assignments)
 
     ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
-    assignments.sort_by! do |a|
-      [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
-    end
+    assignments = sort_assignments(assignments)
 
     groups = calc.groups
 
@@ -290,6 +288,46 @@ class GradebookExporter
         end
       end
     end
+  end
+
+  def sort_assignments(assignments)
+    feature_enabled = Account.site_admin.feature_enabled?(:gradebook_csv_export_order_matches_gradebook_grid)
+    column_order_preferences = @user.get_preference(:gradebook_column_order, @course.global_id)&.fetch(:customOrder, {})
+
+    unless feature_enabled && column_order_preferences.present?
+
+      assignments.sort_by! do |a|
+        [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
+      end
+      return assignments
+    end
+
+    preference_indices = {}
+    column_order_preferences.each_with_index do |preference, idx|
+      # skip assignment groups and totals
+      next unless preference =~ /assignment_\d+$/
+
+      assignment_id = preference.split('_')[-1].to_i
+      preference_indices[assignment_id] = idx
+    end
+
+    # put assignments in their preferred idx
+    # preferences that correspond to deleted assignments will
+    # leave 'nil' in the corresponding slot of assignments_by_custom_order,
+    # so we compact at the end
+    assignments_by_custom_order = Array.new(column_order_preferences.length)
+    assignments_missing_preference = []
+    assignments.each do |assignment|
+      idx = preference_indices[assignment.id]
+      if idx
+        assignments_by_custom_order[idx] = assignment
+      else
+        # the assignment didn't have a preference listed
+        assignments_missing_preference << assignment
+      end
+    end
+    assignments_missing_preference.sort_by!(&:created_at)
+    assignments_by_custom_order.compact.concat(assignments_missing_preference)
   end
 
   def show_integration_id?

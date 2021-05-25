@@ -87,3 +87,12 @@ annotated_document_submissions:
   applies_to: SiteAdmin
   display_name: Student Annotation submissions
   description: Ability to submit student annotation assignments.
+gradebook_csv_export_order_matches_gradebook_grid:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Gradebook CSV Export Assignment Order Matches the Gradebook Grid
+  description: If set, the order of assignments in Gradebook CSV exports will
+    match the order in the Gradebook grid.
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
