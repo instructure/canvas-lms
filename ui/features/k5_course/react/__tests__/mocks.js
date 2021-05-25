@@ -29,7 +29,9 @@ export const MOCK_COURSE_APPS = [
     course_navigation: {
       text: 'Studio',
       icon_url: 'studio.png'
-    }
+    },
+    context_id: '30',
+    context_name: 'Arts and Crafts'
   }
 ]
 

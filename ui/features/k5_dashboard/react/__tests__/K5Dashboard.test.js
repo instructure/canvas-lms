@@ -157,7 +157,9 @@ const apps = [
     course_navigation: {
       text: 'Google Apps',
       icon_url: 'google.png'
-    }
+    },
+    context_id: '1',
+    context_name: 'Economics 101'
   }
 ]
 const staff = [
@@ -303,7 +305,7 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
-  fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
+  fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
   global.ENV = defaultEnv
 })
@@ -461,7 +463,7 @@ describe('K-5 Dashboard', () => {
               expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(1)
               // Expect one LTI request for each non-homeroom card
               expect(
-                fetchMock.calls('/api/v1/courses/1/external_tools/visible_course_nav_tools').length
+                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length
               ).toBe(1)
               done()
             })
@@ -469,7 +471,7 @@ describe('K-5 Dashboard', () => {
       })
     })
 
-    it('only fetches announcements if there are any cards', done => {
+    it('only fetches announcements and apps if there are any cards', done => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify([]))
       moxios.withMock(() => {
         render(<K5Dashboard {...defaultProps} />)
@@ -483,6 +485,9 @@ describe('K-5 Dashboard', () => {
             })
             .then(() => {
               expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
+              expect(
+                fetchMock.calls(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/).length
+              ).toBe(0)
               done()
             })
         )
@@ -596,7 +601,7 @@ describe('K-5 Dashboard', () => {
 
     it("shows apps installed in the user's courses", async () => {
       const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
-      expect(await wrapper.findByText('Google Apps')).toBeInTheDocument()
+      expect(await wrapper.findByRole('button', {name: 'Google Apps'})).toBeInTheDocument()
       const icon = wrapper.getByTestId('renderedIcon')
       expect(icon).toBeInTheDocument()
       expect(icon.src).toContain('google.png')

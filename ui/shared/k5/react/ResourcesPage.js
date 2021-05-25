@@ -48,33 +48,29 @@ const fetchStaff = cards =>
       }, [])
     )
 
-const fetchApps = cards =>
-  Promise.all(
-    cards
-      .filter(c => !c.isHomeroom)
-      .map(course =>
-        // reduce the results of each promise separately so we can include the course id
-        // and course title, which are not returned by the api call
-        fetchCourseApps(course.id).then(apps =>
-          apps.map(app => ({
-            id: app.id,
-            courses: [{id: course.id, name: course.originalName}],
-            title: app.course_navigation.text || app.name,
-            icon: app.course_navigation.icon_url || app.icon_url
-          }))
-        )
-      )
+const fetchApps = cards => {
+  if (!cards.length) return Promise.resolve([])
+  const courseIds = cards.filter(c => !c.isHomeroom).map(c => c.id)
+  return fetchCourseApps(courseIds).then(apps =>
+    // Combine LTIs into a unique set each containing a list of
+    // the courses with which they are associated
+    apps.reduce((acc, app) => {
+      const course = {id: app.context_id, name: app.context_name}
+      const existing = acc.find(({id}) => id === app.id)
+      if (existing) {
+        existing.courses.push(course)
+      } else {
+        acc.push({
+          id: app.id,
+          courses: [course],
+          title: app.course_navigation.text || app.name,
+          icon: app.course_navigation.icon_url || app.icon_url
+        })
+      }
+      return acc
+    }, [])
   )
-    // combine each course's array of apps into a single array of all the apps
-    .then(apps => apps.flat(1))
-    // combine duplicate apps, but remember which course each is associated with
-    .then(apps =>
-      apps.reduce((acc, app) => {
-        const i = acc.findIndex(({id}) => id === app.id)
-        i === -1 ? acc.push(app) : acc[i].courses.push(app.courses[0])
-        return acc
-      }, [])
-    )
+}
 
 export default function ResourcesPage({
   cards,
