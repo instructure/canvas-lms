@@ -311,7 +311,7 @@ class Course < ActiveRecord::Base
 
   def self.ensure_dummy_course
     Account.ensure_dummy_root_account
-    Course.find_or_create_by!(id: 0) { |c| c.account_id = c.root_account_id = 0 }
+    Course.create_with(account_id: 0, root_account_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
   end
 
   def self.skip_updating_account_associations(&block)
