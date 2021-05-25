@@ -77,8 +77,8 @@ class ReleaseNotesController < ApplicationController
         title: localized_text[:title],
         description: localized_text[:description],
         url: localized_text[:url],
-        date: note.show_ats[Canvas.environment],
-        new: note.show_ats[Canvas.environment] > last_seen_release_note
+        date: note.show_ats[release_note_env],
+        new: note.show_ats[release_note_env] > last_seen_release_note
       }
     end
 
@@ -94,7 +94,7 @@ class ReleaseNotesController < ApplicationController
 
   def unread_count
     render json: {
-      unread_count: release_notes_for_user.count { |rn| rn.show_ats[Canvas.environment] > last_seen_release_note }
+      unread_count: release_notes_for_user.count { |rn| rn.show_ats[release_note_env] > last_seen_release_note }
     }
   end
 
@@ -124,14 +124,14 @@ class ReleaseNotesController < ApplicationController
       # Since the time to show new notes could roll over at any time, just refresh the latest
       # notes per role every 5 minutes
       MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
-        notes = ReleaseNote.latest(env: Canvas.environment.downcase, role: role, limit: latest_limit)
+        notes = ReleaseNote.latest(env: release_note_env, role: role, limit: latest_limit)
         # Ensure we have loaded the locales *before* caching
         notes.each { |note| note[release_note_lang] || note['en']}
         notes
       end
     end
 
-    notes = all_notes.sort_by { |note| note.show_ats[Canvas.environment] }.reverse!.first(latest_limit)
+    notes = all_notes.sort_by { |note| note.show_ats[release_note_env] }.reverse!.first(latest_limit)
   end
 
   def last_seen_release_note
@@ -141,6 +141,10 @@ class ReleaseNotesController < ApplicationController
 
   def release_note_lang
     @release_note_lang ||= I18n.fallbacks[I18n.locale].detect { |locale| allowed_langs.include?(locale.to_s) }
+  end
+
+  def release_note_env
+    Canvas.environment.downcase
   end
 
   def upsert_params
