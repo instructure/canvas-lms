@@ -457,6 +457,17 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.showSubmissionDetails()
       strictEqual($('#reassign_assignment').is(':visible'), false)
     })
+
+    test('does not show the Reassign Assignment button when the submission history is empty', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'unsubmitted',
+        submission_history: [],
+        submission_type: null
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), false)
+    })
   })
 
   QUnit.module('#refreshGrades()', hooks => {
