@@ -2316,7 +2316,8 @@ EG = {
       }
     } else if (
       currentSubmission &&
-      currentSubmission?.submission_history &&
+      currentSubmission.submission_history &&
+      currentSubmission.submission_history.length > 0 &&
       currentSubmission.workflow_state === 'unsubmitted'
     ) {
       const index = currentSubmission.submission_history.length - 1
