@@ -79,7 +79,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish
-  // TODO: add check for childTopics
+  const canSeeCommons =
+    discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
   const canSeeGroupsMenu =
     discussionTopicData?.permissions?.readAsAdmin &&
     discussionTopicData?.childTopics.length > 0 &&
@@ -341,6 +342,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         canCloseForComments
                           ? () => {
                               onToggleLocked(true)
+                            }
+                          : null
+                      }
+                      onShareToCommons={
+                        canSeeCommons
+                          ? () => {
+                              window.location.assign(ENV.discussion_topic_menu_tools[0].base_url)
                             }
                           : null
                       }

@@ -63,7 +63,8 @@ const discussionTopicMock = {
       moderateForum: true,
       peerReview: true,
       openForComments: false,
-      closeForComments: true
+      closeForComments: true,
+      manageContent: true
     }
   }
 }
@@ -80,7 +81,8 @@ describe('DiscussionTopicContainer', () => {
     window.location = {assign: assignMock}
     window.ENV = {
       context_asset_string: 'course_1',
-      course_id: '1'
+      course_id: '1',
+      discussion_topic_menu_tools: [{base_url: 'example.com'}]
     }
 
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -309,6 +311,17 @@ describe('DiscussionTopicContainer', () => {
     const copyToButton = await container.findByText('Copy To...')
     fireEvent.click(copyToButton)
     expect(await container.findByText('Select a Course')).toBeTruthy()
+  })
+
+  it('can send users to Commons if they can manageContent', async () => {
+    const container = setup(discussionTopicMock)
+    const kebob = await container.findByTestId('discussion-post-menu-trigger')
+    fireEvent.click(kebob)
+    const shareToCommonsOption = await container.findByTestId('shareToCommons')
+    fireEvent.click(shareToCommonsOption)
+    await waitFor(() => {
+      expect(assignMock).toHaveBeenCalledWith('example.com')
+    })
   })
 
   it('renders a reply button if user has reply permission true', async () => {

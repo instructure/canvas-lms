@@ -69,6 +69,15 @@ module Types
       object[:loader].load(:read_as_admin)
     end
 
+    field :manage_content, Boolean, null: true
+    def manage_content
+      Loaders::PermissionsLoader.for(
+        object[:discussion_topic].context,
+        current_user: current_user,
+        session: session
+      ).load(:manage_content)
+    end
+
     field :rate, Boolean, null: true
     def rate
       object[:loader].load(:rate)
