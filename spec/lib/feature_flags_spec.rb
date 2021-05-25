@@ -52,6 +52,8 @@ describe FeatureFlags do
     expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
     expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
     expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
+    Account.ensure_dummy_root_account
+    expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
   end
 
   describe "#feature_allowed?" do
@@ -65,10 +67,6 @@ describe FeatureFlags do
   end
 
   describe "lookup_feature_flag" do
-    it "should raise an error if the feature isn't defined" do
-      expect { t_root_account.lookup_feature_flag('blah') }.to raise_error("no such feature - blah")
-    end
-
     it "should return nil if the feature is currently disabled" do
       expect(t_course.lookup_feature_flag('disabled_feature')).to be_nil
     end

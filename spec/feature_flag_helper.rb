@@ -40,10 +40,11 @@ module FeatureFlagHelper
   # isn't defined, so specs can do what they want
   def silence_undefined_feature_flag_errors
     [Account, Course, User].each do |model|
-      allow_any_instance_of(model).to receive(:feature_enabled?) do |m, feature|
-        flag = m.lookup_feature_flag(feature) rescue nil
-        next false unless flag
-        flag.enabled?
+      original_method = model.instance_method(:lookup_feature_flag)
+      allow_any_instance_of(model).to receive(:lookup_feature_flag) do |m, feature, **kwargs|
+        original_method.bind(m).call(feature, **kwargs)
+      rescue
+        nil
       end
     end
   end
