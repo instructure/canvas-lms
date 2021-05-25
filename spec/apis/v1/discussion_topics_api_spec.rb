@@ -2513,6 +2513,14 @@ describe DiscussionTopicsController, type: :request do
       expect(call_subscribe(@topic1, @student)).to eq 204
     end
 
+    it "should not 500 when user is not related to a child topic" do
+      gc = @course.group_categories.create!(name: 'children')
+      gc.groups.create!(name: 'first', context: @course, root_account_id: @course.root_account_id)
+      @topic1.group_category_id = gc
+      @topic1.save!
+      expect(call_subscribe(@topic1, @student)).to eq 400
+    end
+
     context "when initial_post_required" do
       it "should allow subscription with an initial post" do
         @user = @student

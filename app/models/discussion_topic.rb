@@ -637,7 +637,11 @@ class DiscussionTopic < ActiveRecord::Base
     return true if subscribed?(current_user) == new_state
 
     if root_topic?
-      change_child_topic_subscribed_state(new_state, current_user)
+      return if change_child_topic_subscribed_state(new_state, current_user)
+
+      ctss = DiscussionTopicParticipant.new
+      ctss.errors.add(:discussion_topic_id, I18n.t("no child topic found"))
+      ctss
     else
       update_or_create_participant(:current_user => current_user, :subscribed => new_state)
     end
@@ -651,7 +655,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def change_child_topic_subscribed_state(new_state, current_user)
     topic = child_topic_for(current_user)
-    topic.update_or_create_participant(current_user: current_user, subscribed: new_state)
+    topic&.update_or_create_participant(current_user: current_user, subscribed: new_state)
   end
   protected :change_child_topic_subscribed_state
 
