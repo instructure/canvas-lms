@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {getEditUrl, getSpeedGraderUrl} from '../../../utils'
+import {getEditUrl, getSpeedGraderUrl, getPeerReviewsUrl} from '../../../utils'
 import {graphql} from 'msw'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
@@ -60,7 +60,8 @@ const discussionTopicMock = {
       update: true,
       delete: true,
       speedGrader: true,
-      moderateForum: true
+      moderateForum: true,
+      peerReview: true
     }
   }
 }
@@ -171,6 +172,15 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByTestId('edit'))
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith(getEditUrl('1', '1'))
+    })
+  })
+
+  it('should be able to send to peer reviews page when canPeerReview', async () => {
+    const {getByTestId} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByTestId('peerReviews'))
+    await waitFor(() => {
+      expect(assignMock).toHaveBeenCalledWith(getPeerReviewsUrl('1', '1337'))
     })
   })
 

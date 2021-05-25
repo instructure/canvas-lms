@@ -38,7 +38,7 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation} from 'react-apollo'
-import {isGraded, getSpeedGraderUrl, getEditUrl} from '../../utils'
+import {isGraded, getSpeedGraderUrl, getEditUrl, getPeerReviewsUrl} from '../../utils'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
@@ -311,7 +311,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             }
                           : null
                       }
-                      onPeerReviews={canPeerReview ? () => {} : null}
+                      onPeerReviews={
+                        canPeerReview
+                          ? () => {
+                              window.location.assign(
+                                getPeerReviewsUrl(ENV.course_id, discussionTopicData.assignment._id)
+                              )
+                            }
+                          : null
+                      }
                       onShowRubric={canShowRubric ? () => {} : null}
                       onAddRubric={canAddRubric ? () => {} : null}
                       isPublished={discussionTopicData.published}

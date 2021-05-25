@@ -39,6 +39,10 @@ export const getEditUrl = (courseId, discussionTopicId) => {
   return `/courses/${courseId}/discussion_topics/${discussionTopicId}/edit`
 }
 
+export const getPeerReviewsUrl = (courseId, assignmentId) => {
+  return `/courses/${courseId}/assignments/${assignmentId}/peer_reviews`
+}
+
 export const getGroupDiscussionUrl = (groupId, childDiscussionId) => {
   return `/groups/${groupId}/discussion_topics/${childDiscussionId}`
 }
