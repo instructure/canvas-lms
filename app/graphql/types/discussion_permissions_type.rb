@@ -143,18 +143,24 @@ module Types
     field :open_for_comments, Boolean, null: true
     def open_for_comments
       return false if object[:discussion_topic].comments_disabled?
+      return false unless object[:discussion_topic].locked
 
       object[:loader].load(:moderate_forum).then do |can_moderate|
-        can_moderate && object[:discussion_topic].locked
+        can_moderate
       end
     end
 
     field :close_for_comments, Boolean, null: true
     def close_for_comments
       return false if object[:discussion_topic].comments_disabled?
+      return false if object[:discussion_topic].locked
 
       object[:loader].load(:moderate_forum).then do |can_moderate|
-        can_moderate && !object[:discussion_topic].locked
+        return can_moderate if object[:discussion_topic].assignment_id.nil?
+
+        Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
+          object[:discussion_topic].can_lock? && can_moderate
+        end
       end
     end
 

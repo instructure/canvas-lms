@@ -115,6 +115,7 @@ describe Types::DiscussionType do
       {
         value: 'closeForComments',
         allowed: -> (user) {
+          discussion.can_lock? &&
           !discussion.comments_disabled? &&
           !discussion.locked &&
           discussion.grants_right?(user, :moderate_forum)
