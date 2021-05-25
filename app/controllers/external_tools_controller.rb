@@ -26,12 +26,13 @@
 class ExternalToolsController < ApplicationController
   class InvalidSettingsError < StandardError; end
 
-  before_action :require_context
+  before_action :require_context, except: [:all_visible_nav_tools]
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
-  before_action :require_access_to_context, except: [:index, :sessionless_launch]
+  before_action :require_access_to_context, except: [:index, :sessionless_launch, :all_visible_nav_tools]
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
+  before_action :parse_context_codes, :only => [:all_visible_nav_tools]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
   include Api::V1::ExternalTools
@@ -1154,26 +1155,93 @@ class ExternalToolsController < ApplicationController
   # course settings and whose visibility settings apply to the requesting user. These tools are the
   # same that appear in the course navigation.
   #
+  # The response format is the same as for List external tools, but with additional context_id and
+  # context_name fields on each element in the array.
+  #
+  # @argument context_codes[] [Required]
+  #   List of context_codes to retrieve visible course nav tools for (for example, +course_123+). Only
+  #   courses are presently supported.
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_5' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @response_field context_id The unique identifier of the associated context
+  # @response_field context_name The name of the associated context
+  #
+  # @example_response
+  #      [{
+  #        "id": 1,
+  #        "domain": "domain.example.com",
+  #        "url": "http://www.example.com/ims/lti",
+  #        "context_id": 5,
+  #        "context_name": "Example Course",
+  #        ...
+  #      },
+  #      { ...  }]
+  #
+  def all_visible_nav_tools
+    courses = api_find_all(Course, @course_ids)
+    return unless courses.all? { |course| authorized_action(course, @current_user, :read) }
+
+    render :json => external_tools_json_for_courses(courses)
+  end
+
+  # @API Get visible course navigation tools for a single course
+  # Get a list of external tools with the course_navigation placement that have not been hidden in
+  # course settings and whose visibility settings apply to the requesting user. These tools are the
+  # same that appear in the course navigation.
+  #
+  # The response format is the same as Get visible course navigation tools.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/visible_course_nav_tools' \
   #        -H "Authorization: Bearer <token>"
   def visible_course_nav_tools
-    if authorized_action(@context, @current_user, :read)
-      if @context.is_a?(Course)
-        tabs = @context.tabs_available(@current_user, course_subject_tabs: true)
-        tool_ids = []
-        tabs.select{ |t| t[:external] }.each do |t|
-          tool_ids << t[:args][1] if t[:args] && t[:args][1]
-        end
-        @tools = ContextExternalTool.where(:id => tool_ids)
-        @tools = tool_ids.map{ |id| @tools.find{ |t| t[:id] == id }}.compact
-        render :json => external_tools_json(@tools, @context, @current_user, session)
-      end
-    end
+    return unless authorized_action(@context, @current_user, :read)
+    return render :json => { :message => 'Only course context is supported' }, :status => :bad_request unless context.is_a?(Course)
+
+    render :json => external_tools_json_for_courses([@context])
   end
 
   private
+
+  def external_tools_json_for_courses(courses)
+    json = courses.reduce([]) do |all_results, course|
+      tabs = course.tabs_available(@current_user, course_subject_tabs: true)
+      tool_ids = []
+      tabs.select{ |t| t[:external] }.each do |t|
+        tool_ids << t[:args][1] if t[:args] && t[:args][1]
+      end
+      @tools = ContextExternalTool.where(:id => tool_ids)
+      @tools = tool_ids.map{ |id| @tools.find{ |t| t[:id] == id }}.compact
+      results = external_tools_json(@tools, course, @current_user, session).map do |result|
+        # add some identifying information here to simplify grouping by context for the consumer
+        result['context_id'] = course.id
+        result['context_name'] = course.name
+        result
+      end
+      all_results.push(*results)
+    end
+
+    json
+  end
+
+  def parse_context_codes
+    context_codes = Array(params[:context_codes])
+    if context_codes.empty?
+      return render :json => { :message => 'Missing context_codes' }, :status => :bad_request
+    end
+    @course_ids = context_codes.inject([]) do |ids, context_code|
+      klass, id = ActiveRecord::Base.parse_asset_string(context_code)
+      unless klass == 'Course'
+        return render :json => { :message => 'Invalid context_codes; only `course` codes are supported' },
+                      :status => :bad_request
+      end
+      ids << id
+    end
+  end
 
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]

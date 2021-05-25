@@ -63,7 +63,8 @@ const defaultProps = {
   showLearningMasteryGradebook: false,
   tabs: defaultTabs
 }
-const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
+const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
+
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'

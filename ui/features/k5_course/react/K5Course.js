@@ -183,7 +183,7 @@ export function CourseHeaderOptions({handleOpenTray, showStudentView, studentVie
 }
 
 const fetchApps = (courseId, courseName) =>
-  fetchCourseApps(courseId).then(apps =>
+  fetchCourseApps([courseId]).then(apps =>
     apps.map(app => ({
       id: app.id,
       courses: [{id: courseId, name: courseName}],
