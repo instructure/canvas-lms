@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,14 +20,26 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import {IconOutcomesLine, IconTrashLine, IconMoveEndLine} from '@instructure/ui-icons'
 import I18n from 'i18n!OutcomeManagement'
+import OutcomesPopover from './OutcomesPopover'
 
 const ManageOutcomesFooter = ({selected, onRemoveHandler, onMoveHandler}) => {
   const btnState = selected && selected > 0 ? 'enabled' : 'disabled'
-
   if (selected == null) return null
+
+  // For this PS, the list of selected outcomes displayed in the OutcomesPopover component
+  // will be static. The second PS will contain the necessary update to the component's
+  // selected prop that will match the format below. The reason it is necessary to split
+  // OUT-4392 in to 2 PS, is because the underlying selected object is also used in other
+  // components which will require updates to adhere to the new structure.
+  const selectedOutcomes =
+    selected && selected > 0
+      ? new Array(selected).fill(0).map((_v, i) => ({
+          _id: i,
+          title: `Outcome ${i + 1}`
+        }))
+      : []
 
   return (
     <Flex as="div">
@@ -51,17 +63,7 @@ const ManageOutcomesFooter = ({selected, onRemoveHandler, onMoveHandler}) => {
                 </Flex.Item>
                 <Flex.Item as="div">
                   <div style={{paddingLeft: '1.1875rem'}}>
-                    <Text size="medium" color={selected > 0 ? 'brand' : 'secondary'}>
-                      {I18n.t(
-                        {
-                          one: '1 Outcome Selected',
-                          other: '%{count} Outcomes Selected'
-                        },
-                        {
-                          count: selected
-                        }
-                      )}
-                    </Text>
+                    <OutcomesPopover outcomes={selectedOutcomes} />
                   </div>
                 </Flex.Item>
               </Flex>
