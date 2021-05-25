@@ -109,11 +109,12 @@ const RCELoader = {
    */
   loadRCE(cb = () => {}) {
     if (!loadingPromise) {
-      loadingPromise = (window.ENV.use_rce_enhancements
-        ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
-        : import(
-            /* webpackChunkName: "canvas-rce-old-async-chunk" */ './canvas-rce-old-and-a11y-checker'
-          )
+      loadingPromise = (
+        window.ENV.use_rce_enhancements
+          ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
+          : import(
+              /* webpackChunkName: "canvas-rce-old-async-chunk" */ './canvas-rce-old-and-a11y-checker'
+            )
       ).then(RCE => {
         this.RCE = RCE
         loadEventListeners()

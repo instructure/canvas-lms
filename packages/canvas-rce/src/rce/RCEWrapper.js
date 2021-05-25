@@ -32,6 +32,10 @@ import getCookie from 'get-cookie'
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
 import indicatorRegion from './indicatorRegion'
+import editorLanguage from './editorLanguage'
+import normalizeLocale from './normalizeLocale'
+import {sanitizePlugins} from './sanitizeEditorOptions'
+
 import indicate from '../common/indicate'
 import bridge from '../bridge'
 import CanvasContentTray, {trayPropTypes} from './plugins/shared/CanvasContentTray'
@@ -237,6 +241,7 @@ class RCEWrapper extends React.Component {
     super(props)
 
     this.editor = null // my tinymce editor instance
+    this.language = normalizeLocale(this.props.language)
 
     // interface consistent with editorBox
     this.get_code = this.getCode
@@ -282,7 +287,7 @@ class RCEWrapper extends React.Component {
 
     this.a11yCheckerReady = import('./initA11yChecker')
       .then(initA11yChecker => {
-        initA11yChecker.default(this.props.language, this.props.highContrastCSS)
+        initA11yChecker.default(this.language, this.props.highContrastCSS)
       })
       .catch(err => {
         // eslint-disable-next-line no-console
@@ -867,10 +872,14 @@ class RCEWrapper extends React.Component {
   onInit = (_event, editor) => {
     editor.rceWrapper = this
     this.editor = editor
+    const textarea = this.editor.getElement()
+
+    // expected by canvas
+    textarea.dataset.rich_text = true
 
     // start with the textarea and tinymce in sync
-    this.getTextarea().value = this.getCode()
-    this.getTextarea().style.height = this.state.height
+    textarea.value = this.getCode()
+    textarea.style.height = this.state.height
 
     // Capture click events outside the iframe
     document.addEventListener('click', this.handleExternalClick)
@@ -889,7 +898,7 @@ class RCEWrapper extends React.Component {
       tinyapp.setAttribute('tabIndex', '-1')
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
-    this.getTextarea().style.resize = 'none'
+    textarea.style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
     editor.on('FullscreenStateChanged', this._toggleFullscreen)
@@ -1258,7 +1267,13 @@ class RCEWrapper extends React.Component {
     const setupCallback = options.setup
 
     const canvasPlugins = rcsExists
-      ? ['instructure_links', 'instructure_image', 'instructure_documents', 'instructure_equation']
+      ? [
+          'instructure_links',
+          'instructure_image',
+          'instructure_documents',
+          'instructure_equation',
+          'instructure_external_tools'
+        ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
@@ -1276,6 +1291,8 @@ class RCEWrapper extends React.Component {
       ...options,
 
       height: options.height || DEFAULT_RCE_HEIGHT,
+
+      language: editorLanguage(this.language),
 
       block_formats:
         options.block_formats ||
@@ -1311,8 +1328,7 @@ class RCEWrapper extends React.Component {
       menubar: mergeMenuItems('edit view insert format tools table', options.menubar),
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
-      // insert will be updated by RCEWrapper if canvas is present
-      // we can include all the canvas specific items in the menu and toolbar
+      // we include all the canvas specific items in the menu and toolbar
       // and rely on tinymce only showing them if the plugin is provided.
       menu: mergeMenu(
         {
@@ -1326,7 +1342,7 @@ class RCEWrapper extends React.Component {
             items:
               'instructure_links instructure_image instructure_media instructure_document instructure_buttons | instructure_equation inserttable instructure_media_embed | hr'
           },
-          tools: {title: formatMessage('Tools'), items: 'wordcount'},
+          tools: {title: formatMessage('Tools'), items: 'wordcount lti_tools_menuitem'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
         },
         options.menu
@@ -1401,7 +1417,7 @@ class RCEWrapper extends React.Component {
           'a11y_checker',
           'wordcount'
         ],
-        options.plugins
+        sanitizePlugins(options.plugins)
       )
     }
 

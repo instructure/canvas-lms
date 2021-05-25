@@ -22,6 +22,8 @@ const defaultTinymceConfig = {
   // to override (though you really should provide content_css)
   // ============================================================================
 
+  auto_focus: false,
+
   // any values provided (in an array) will be merged into the standard then sorted
   // you provide the translations
   block_formats: undefined,

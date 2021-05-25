@@ -17,18 +17,22 @@
  */
 
 import EditorConfig from './tinymce.config'
-import setupAndFocusTinyMCEConfig from './setupAndFocusTinyMCEConfig'
 import INST from 'browser-sniffer'
 
 function editorOptions(width, id, tinyMCEInitOptions, enableBookmarkingOverride, tinymce) {
   const editorConfig = new EditorConfig(tinymce, INST, width, id)
 
-  // RichContentEditor takes care of the autofocus functionality at a higher level
-  const autoFocus = undefined
-
   return {
     ...editorConfig.defaultConfig(),
-    ...setupAndFocusTinyMCEConfig(tinymce, autoFocus, enableBookmarkingOverride),
+    setup: ed => {
+      if (!ENV.use_rce_enhancements) {
+        ed.on('init', () => {
+          const getDefault = mod => (mod.default ? mod.default : mod)
+          const EditorAccessibility = getDefault(require('./jquery/editorAccessibility'))
+          new EditorAccessibility(ed).accessiblize()
+        })
+      }
+    },
     ...(tinyMCEInitOptions.tinyOptions || {})
   }
 }
