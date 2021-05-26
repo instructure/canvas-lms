@@ -49,6 +49,11 @@ function transformRubricData(rubric) {
 function transformRubricAssessmentData(rubricAssessment) {
   const assessmentCopy = JSON.parse(JSON.stringify(rubricAssessment))
   assessmentCopy.data.forEach(rating => {
+    // The Rubric component looks for the "id" field instead of "_id" (which
+    // the query returns) to determine the selected rating, so add it in.
+    // We don't want to change the component since it's also used by other
+    // non-GraphQL pages.
+    rating.id = rating._id
     rating.criterion_id = rating.criterion ? rating.criterion.id : null
     rating.learning_outcome_id = rating.outcome ? rating.outcome._id : null
     delete rating.criterion
