@@ -40,7 +40,12 @@ describe('DiscussionFullPage', () => {
 
     window.ENV = {
       discussion_topic_id: '1',
-      manual_mark_as_read: false
+      manual_mark_as_read: false,
+      current_user: {
+        id: 'PLACEHOLDER',
+        display_name: 'Omar Soto-Fortuño',
+        avatar_image_url: 'www.avatar.com'
+      }
     }
   })
 

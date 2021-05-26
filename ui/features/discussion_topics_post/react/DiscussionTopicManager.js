@@ -31,6 +31,56 @@ import {useMutation, useQuery} from 'react-apollo'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
+const getOptimisticResponse = text => {
+  return {
+    createDiscussionEntry: {
+      discussionEntry: {
+        id: 'PLACEHOLDER',
+        _id: 'PLACEHOLDER',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deleted: false,
+        message: text,
+        ratingCount: null,
+        ratingSum: null,
+        rating: false,
+        read: true,
+        forcedReadState: false,
+        subentriesCount: null,
+        rootEntryParticipantCounts: {
+          unreadCount: 0,
+          repliesCount: 0,
+          __typename: 'DiscussionEntryCounts'
+        },
+        author: {
+          id: 'PLACEHOLDER',
+          _id: ENV.current_user.id,
+          avatarUrl: ENV.current_user.avatar_image_url,
+          name: ENV.current_user.display_name,
+          __typename: 'User'
+        },
+        editor: null,
+        lastReply: null,
+        permissions: {
+          attach: false,
+          create: false,
+          delete: false,
+          rate: false,
+          read: false,
+          reply: false,
+          update: false,
+          viewRating: false,
+          speedGrader: false,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        __typename: 'DiscussionEntry'
+      },
+      errors: null,
+      __typename: 'CreateDiscussionEntryPayload'
+    }
+  }
+}
+
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
@@ -121,7 +171,8 @@ const DiscussionTopicManager = props => {
               variables: {
                 discussionTopicId: ENV.discussion_topic_id,
                 message: text
-              }
+              },
+              optimisticResponse: getOptimisticResponse(text)
             })
           }}
         />
