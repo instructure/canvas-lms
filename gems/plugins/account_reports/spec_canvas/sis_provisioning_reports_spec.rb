@@ -972,6 +972,82 @@ describe "Default Account Reports" do
                                         @enrollment6.id.to_s]]
       end
 
+      it "should run the provisioning report and return active teachers and ta's" do
+        parameters = {}
+        parameters["enrollments"] = true
+        parameters["enrollment_filter"] = 'TeacherEnrollment,TaEnrollment'
+        parameters["enrollment_states"] = 'active'
+        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+
+        expect(parsed.length).to eq 2
+
+        expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
+                                        "ta", ta_role(root_account_id: @account.id).id.to_s, @enrollment3.course_section_id.to_s,
+                                        nil, "active", nil, nil, "true", 'TaEnrollment', 'false',
+                                        @enrollment3.id.to_s],
+                                       [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
+                                        "teacher", teacher_role(root_account_id: @account.id).id.to_s, @enrollment9.course_section_id.to_s,
+                                        "english_section_1", "active", nil, nil, "true",
+                                        'TeacherEnrollment', 'false', @enrollment9.id.to_s]]
+      end
+
+      it "should run the provisioning report with active enrollments" do
+        parameters = {}
+        parameters["enrollments"] = true
+        parameters["enrollment_states"] = 'active'
+        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+
+        expect(parsed.length).to eq 8
+
+        expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1", @user1.id.to_s, "user_sis_id_01",
+                                        "observer", observer_role(root_account_id: @account.id).id.to_s, @enrollment1.course_section_id.to_s,
+                                        nil, "active", nil, nil, "true", 'ObserverEnrollment', 'false',
+                                        @enrollment1.id.to_s],
+                                       [@course2.id.to_s, "SIS_COURSE_ID_2", @user1.id.to_s, "user_sis_id_01",
+                                        "observer", observer_role(root_account_id: @account.id).id.to_s,
+                                        @enrollment7.course_section_id.to_s, nil, "active",
+                                        @user3.id.to_s, "user_sis_id_03", "true", 'ObserverEnrollment', 'false',
+                                        @enrollment7.id.to_s],
+                                       [@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
+                                        "ta", ta_role(root_account_id: @account.id).id.to_s, @enrollment3.course_section_id.to_s,
+                                        nil, "active", nil, nil, "true", 'TaEnrollment', 'false',
+                                        @enrollment3.id.to_s],
+                                       [@course3.id.to_s, "SIS_COURSE_ID_3", @user2.id.to_s, "user_sis_id_02",
+                                        "student", student_role(root_account_id: @account.id).id.to_s,
+                                        @enrollment2.course_section_id.to_s, nil, "active", nil, nil, "true",
+                                        'StudentEnrollment', 'false', @enrollment2.id.to_s],
+                                       [@course1.id.to_s, "SIS_COURSE_ID_1", @user3.id.to_s, "user_sis_id_03",
+                                        "student", student_role(root_account_id: @account.id).id.to_s,
+                                        @enrollment4.course_section_id.to_s, nil, "active", nil, nil, "true",
+                                        'StudentEnrollment', 'false', @enrollment4.id.to_s],
+                                       [@course2.id.to_s, "SIS_COURSE_ID_2", @user3.id.to_s, "user_sis_id_03",
+                                        "student", student_role(root_account_id: @account.id).id.to_s,
+                                        @enrollment5.course_section_id.to_s, nil, "active", nil, nil, "true",
+                                        'StudentEnrollment', 'false', @enrollment5.id.to_s],
+                                       [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
+                                        "teacher", teacher_role(root_account_id: @account.id).id.to_s, @enrollment9.course_section_id.to_s,
+                                        "english_section_1", "active", nil, nil, "true", 'TeacherEnrollment',
+                                        'false', @enrollment9.id.to_s],
+                                       [@course2.id.to_s, "SIS_COURSE_ID_2", @user4.id.to_s, "user_sis_id_04",
+                                        "Pixel Engineer", @role.id.to_s, @enrollment11.course_section_id.to_s,
+                                        nil, "active", nil, nil, "true", 'DesignerEnrollment', 'false',
+                                        @enrollment11.id.to_s]]
+      end
+
+      it "should run the provisioning report and return only ta's" do
+        parameters = {}
+        parameters["enrollments"] = true
+        parameters["enrollment_filter"] = 'TaEnrollment'
+        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+
+        expect(parsed.length).to eq 1
+
+        expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
+                                        "ta", ta_role(root_account_id: @account.id).id.to_s, @enrollment3.course_section_id.to_s,
+                                        nil, "active", nil, nil, "true", 'TaEnrollment', 'false',
+                                        @enrollment3.id.to_s]]
+      end
+
       it 'should handle cross listed enrollments' do
         sub = @account.sub_accounts.create!
         course = sub.courses.create!(name: 'the course', sis_source_id: 'sis1')
