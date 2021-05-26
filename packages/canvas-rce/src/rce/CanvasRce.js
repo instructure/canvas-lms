@@ -68,8 +68,6 @@ const baseProps = {
 function addCanvasConnection(propsOut, propsIn) {
   if (propsIn.trayProps) {
     propsOut.trayProps = propsIn.trayProps
-    propsOut.editorOptions.menu.insert.items =
-      'instructure_links instructure_image instructure_media instructure_document | inserttable instructure_media_embed | hr'
   }
 }
 

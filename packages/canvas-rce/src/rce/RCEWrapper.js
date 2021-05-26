@@ -1257,7 +1257,7 @@ class RCEWrapper extends React.Component {
     const setupCallback = options.setup
 
     const canvasPlugins = rcsExists
-      ? ['instructure_links', 'instructure_image', 'instructure_documents']
+      ? ['instructure_links', 'instructure_image', 'instructure_documents', 'instructure_equation']
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
@@ -1303,6 +1303,8 @@ class RCEWrapper extends React.Component {
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
       // insert will be updated by RCEWrapper if canvas is present
+      // we can include all the canvas specific items in the menu and toolbar
+      // and rely on tinymce only showing them if the plugin is provided.
       menu: mergeMenu(
         {
           format: {
@@ -1312,7 +1314,8 @@ class RCEWrapper extends React.Component {
           },
           insert: {
             title: formatMessage('Insert'),
-            items: 'instructure_links | inserttable instructure_media_embed | hr'
+            items:
+              'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable instructure_media_embed | hr'
           },
           tools: {title: formatMessage('Tools'), items: 'wordcount'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
@@ -1340,7 +1343,12 @@ class RCEWrapper extends React.Component {
           },
           {
             name: formatMessage('Content'),
-            items: canvasPlugins
+            items: [
+              'instructure_links',
+              'instructure_image',
+              'instructure_record',
+              'instructure_documents'
+            ]
           },
           {
             name: formatMessage('External Tools'),

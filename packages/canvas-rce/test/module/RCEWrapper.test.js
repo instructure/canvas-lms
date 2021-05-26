@@ -954,31 +954,24 @@ describe('RCEWrapper', () => {
   })
 
   describe('wrapOptions', () => {
-    it('includes instructure_record in toolbar if not instRecordDisabled', () => {
+    it('includes instructure_record in plugins if not instRecordDisabled', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
         instRecordDisabled: false
       })
       const options = wrapper.wrapOptions({})
-      const expected = [
-        'instructure_links',
-        'instructure_image',
-        'instructure_record',
-        'instructure_documents'
-      ]
-      assert.deepStrictEqual(options.toolbar[2].items, expected)
+      assert.ok(options.plugins.indexOf('instructure_record') >= 0)
     })
 
-    it('instructure_record in not toolbar if instRecordDisabled is set', () => {
+    it('instructure_record not in plugins if instRecordDisabled is set', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
         instRecordDisabled: true
       })
       const options = wrapper.wrapOptions({})
-      const expected = ['instructure_links', 'instructure_image', 'instructure_documents']
-      assert.deepStrictEqual(options.toolbar[2].items, expected)
+      assert.strictEqual(options.plugins.indexOf('instructure_record'), -1)
     })
   })
 
