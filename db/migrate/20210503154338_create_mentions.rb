@@ -18,6 +18,7 @@
 
 class CreateMentions < ActiveRecord::Migration[6.0]
   tag :predeploy
+  disable_ddl_transaction!
 
   def up
     unless table_exists? :mentions
