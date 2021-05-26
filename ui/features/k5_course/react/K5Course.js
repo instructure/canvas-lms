@@ -235,24 +235,33 @@ export function K5Course({
     }
   }, [currentTab])
 
-  const courseHeader = shouldShrink => (
-    <View id="k5-course-header" as="div" padding={shouldShrink ? 'medium 0 0 0' : '0'}>
-      {(canManage || showStudentView) && (
-        <CourseHeaderOptions
-          canManage={canManage}
-          settingsPath={settingsPath}
-          showStudentView={showStudentView}
-          studentViewPath={studentViewPath}
+  const courseHeader = sticky => {
+    const extendedViewport = window.innerHeight + 180
+    const contentHeight = document.body.scrollHeight
+    // makes sure that there is at least 180px of overflow, before shrinking the hero image
+    // this cancels the intermittent effect in the sticky prop when the window is almost
+    // the same size of the content
+    const shouldShrink =
+      sticky && activeTab.current === currentTab && contentHeight > extendedViewport
+    return (
+      <View id="k5-course-header" as="div" padding={sticky ? 'medium 0 0 0' : '0'}>
+        {(canManage || showStudentView) && (
+          <CourseHeaderOptions
+            canManage={canManage}
+            settingsPath={settingsPath}
+            showStudentView={showStudentView}
+            studentViewPath={studentViewPath}
+          />
+        )}
+        <CourseHeaderHero
+          name={name}
+          image={imageUrl}
+          backgroundColor={color || DEFAULT_COURSE_COLOR}
+          shouldShrink={shouldShrink}
         />
-      )}
-      <CourseHeaderHero
-        name={name}
-        image={imageUrl}
-        backgroundColor={color || DEFAULT_COURSE_COLOR}
-        shouldShrink={shouldShrink}
-      />
-    </View>
-  )
+      </View>
+    )
+  }
 
   // Only render the K5Tabs component if we actually have any visible tabs
   const courseTabs = renderTabs?.length ? (
