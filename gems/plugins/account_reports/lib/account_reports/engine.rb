@@ -183,6 +183,14 @@ module AccountReports
             },
             :include_deleted => {
               :description => 'Include deleted objects'
+            },
+            :enrollment_filter => {
+              :description => "Include objects from the specified role types. Accepted values are #{Enrollment.valid_types.to_sentence}",
+              :required => false
+            },
+            :enrollment_states => {
+              :description => "Include objects from the specified states.",
+              :required => false
             }
           }
         },

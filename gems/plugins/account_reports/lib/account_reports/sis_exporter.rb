@@ -35,6 +35,8 @@ module AccountReports
       @created_by_sis = @account_report.parameters['created_by_sis']
       extra_text_term(@account_report)
       include_deleted_objects
+      include_enrollment_filter
+      include_enrollment_states
     end
 
     def csv
@@ -549,6 +551,14 @@ module AccountReports
       if @sis_format
         enrol = enrol.where("enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
                                AND (courses.sis_source_id IS NOT NULL OR cs.sis_source_id IS NOT NULL)")
+      end
+
+      if @enrollment_filter
+        enrol = enrol.where(type: @enrollment_filter)
+      end
+
+      if @enrollment_states
+        enrol = enrol.where(workflow_state: @enrollment_states)
       end
       enrol
     end
