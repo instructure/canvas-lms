@@ -20,7 +20,7 @@
 !/config/credentials.test.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS6_0
+/config/RAILS6_1
 /coverage/
 /coverage-js/
 /db/schema.rb

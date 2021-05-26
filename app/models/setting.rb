@@ -18,10 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Setting < ActiveRecord::Base
+class Setting < Switchman::UnshardedRecord
   SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES = 'site_admin_access_to_new_dev_key_features'.freeze
-
-  self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
   def self.skip_cache
     @skip_cache, old_enabled = true, @skip_cache
