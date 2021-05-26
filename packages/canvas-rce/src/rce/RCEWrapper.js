@@ -248,7 +248,6 @@ class RCEWrapper extends React.Component {
     this._elementRef = React.createRef()
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
-    this._switchedFromWysiwygToPrettyHtml = false
 
     injectTinySkin()
 
@@ -604,8 +603,6 @@ class RCEWrapper extends React.Component {
       case RAW_HTML_EDITOR_VIEW:
         newState = {editorView: newView || WYSIWYG_VIEW}
     }
-    this._switchedFromWysiwygToPrettyHtml =
-      this.state.editorView === WYSIWYG_VIEW && newView === PRETTY_HTML_EDITOR_VIEW
     this.setState(newState, () => {
       if (wasFullscreen) {
         window.setTimeout(() => {
@@ -1525,15 +1522,6 @@ class RCEWrapper extends React.Component {
   renderHtmlEditor() {
     if (!this.props.use_rce_pretty_html_editor) return null
 
-    let code = ''
-    if (this._switchedFromWysiwygToPrettyHtml) {
-      // When changing from WYSIWYG to Pretty HTML we need to get the HTML styled content
-      code = this.mceInstance().getContent({format: 'html'})
-    } else {
-      // Reproducing the raw HTML editor behavior
-      code = this.mceInstance().getContent({format: 'raw'})
-    }
-
     // the div keeps the editor from collapsing while the code editor is downloaded
     return (
       <Suspense
@@ -1554,15 +1542,10 @@ class RCEWrapper extends React.Component {
           <RceHtmlEditor
             ref={this._prettyHtmlEditorRef}
             height={document[FS_ELEMENT] ? `${window.screen.height}px` : this.state.height}
-            code={code}
+            code={this.getCode()}
             onChange={value => {
               this.getTextarea().value = value
               this.handleTextareaChange()
-              // Enters only once, changes the way how the user can edit the content
-              // like the raw HTML editor
-              if (this._switchedFromWysiwygToPrettyHtml) {
-                this._switchedFromWysiwygToPrettyHtml = false
-              }
             }}
             onFocus={this.handleFocusHtmlEditor}
           />
