@@ -69,6 +69,23 @@ describe CoursesController do
       end
     end
 
+    it "sets k5_theme when k5 is enabled" do
+      course_with_student_logged_in
+      toggle_k5_setting(@course.account)
+
+      get_index @student
+      expect(assigns[:js_bundles].flatten).to include :k5_theme
+      expect(assigns[:css_bundles].flatten).to include :k5_theme
+    end
+
+    it "does not set k5_theme when k5 is off" do
+      course_with_student_logged_in
+
+      get_index @student
+      expect(assigns[:js_bundles].flatten).not_to include :k5_theme
+      expect(assigns[:css_bundles].flatten).not_to include :k5_theme
+    end
+
     describe "homeroom courses" do
       before :once do
         @account = Account.default

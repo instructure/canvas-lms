@@ -498,6 +498,8 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
+          set_k5_mode(require_k5_theme: true)
+
           if @current_user
             content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")})
           end
