@@ -220,9 +220,13 @@ export function K5Course({
     singleCourse: true
   })
 
+  /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
+     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it based off currentTab */
   const modulesRef = useRef(null)
+  const contentRef = useRef(null)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
+    contentRef.current.appendChild(modulesRef.current)
   }, [])
 
   useEffect(() => {
@@ -280,7 +284,7 @@ export function K5Course({
         isStudent: plannerEnabled
       }}
     >
-      <View as="section">
+      <View as="section" data-testid="main-content" elementRef={e => (contentRef.current = e)}>
         {courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
         {currentTab === renderTabs?.[0]?.id && latestAnnouncement && (

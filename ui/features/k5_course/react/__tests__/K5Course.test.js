@@ -94,8 +94,6 @@ const ASSIGNMENT_GROUPS_URL = encodeURI(
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
 
-let modulesContainer
-
 beforeAll(() => {
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
@@ -104,29 +102,26 @@ beforeAll(() => {
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-  if (!modulesContainer) {
-    modulesContainer = document.createElement('div')
-    modulesContainer.id = 'k5-modules-container'
-    modulesContainer.style.display = 'none'
-    modulesContainer.innerHTML = 'Course modules content'
-    document.body.appendChild(modulesContainer)
-  }
 })
 
 afterAll(() => {
   moxios.uninstall()
   fetchMock.restore()
-  if (modulesContainer) {
-    modulesContainer.remove()
-  }
 })
 
 beforeEach(() => {
   global.ENV = defaultEnv
+  const modulesContainer = document.createElement('div')
+  modulesContainer.id = 'k5-modules-container'
+  modulesContainer.style.display = 'none'
+  modulesContainer.innerHTML = 'Course modules content'
+  document.body.appendChild(modulesContainer)
 })
 
 afterEach(() => {
   global.ENV = {}
+  const modulesContainer = document.getElementById('k5-modules-container')
+  modulesContainer.remove()
 })
 
 describe('K-5 Subject Course', () => {
@@ -288,6 +283,13 @@ describe('K-5 Subject Course', () => {
     it('hides modules content if modules tab is not selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Course modules content')).not.toBeVisible()
+    })
+
+    it('moves the modules div inside the main content div on render', () => {
+      const {getByTestId} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
+      const mainContent = getByTestId('main-content')
+      const modules = document.getElementById('k5-modules-container')
+      expect(mainContent.contains(modules)).toBeTruthy()
     })
   })
 
