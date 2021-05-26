@@ -1612,7 +1612,9 @@ describe CoursesController do
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_bundles].flatten).to include :k5_course
+        expect(assigns[:js_bundles].flatten).to include :k5_theme
         expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+        expect(assigns[:css_bundles].flatten).to include :k5_theme
         expect(assigns[:js_env][:K5_USER]).to be_truthy
       end
 

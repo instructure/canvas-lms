@@ -2056,6 +2056,7 @@ class CoursesController < ApplicationController
       @context_enrollment ||= @pending_enrollment
       if @context.grants_right?(@current_user, session, :read)
         # No matter who the user is we want the course dashboard to hide the left nav
+        set_k5_mode
         @show_left_side = !@context.elementary_subject_course?
 
         check_for_readonly_enrollment_state
