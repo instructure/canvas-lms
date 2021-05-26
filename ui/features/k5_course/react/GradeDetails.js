@@ -87,7 +87,10 @@ const GradeDetails = ({
       [currentUser]
     ),
     error: setError,
-    params: gradingPeriodParam
+    params: {
+      user_id: currentUser.id,
+      ...gradingPeriodParam
+    }
   })
 
   useEffect(() => {
