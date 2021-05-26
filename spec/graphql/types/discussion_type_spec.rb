@@ -21,9 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
-describe Types::DiscussionType do
-  let_once(:discussion) { group_discussion_assignment }
-
+RSpec.shared_examples "DiscussionType" do
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
   let(:permissions) {
@@ -79,11 +77,11 @@ describe Types::DiscussionType do
       {
         value: 'speedGrader',
         allowed: -> (user) {
-          permission = !discussion.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
-          if discussion.context.concluded?
-            return permission && discussion.context.grants_right?(user, :read_as_admin)
+          permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
+          if discussion.assignment.context.concluded?
+            return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
           else
-            return permission && discussion.context.grants_any_right?(user, :manage_grades, :view_all_grades)
+            return permission && discussion.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
           end
         }
       },
@@ -158,7 +156,7 @@ describe Types::DiscussionType do
     expect(discussion_type.resolve("sortByRating")).to eq discussion.sort_by_rating
     expect(discussion_type.resolve("isSectionSpecific")).to eq discussion.is_section_specific
 
-    expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id
+    expect(discussion_type.resolve("rootTopic { _id }")).to eq discussion.root_topic_id&.to_s
 
     expect(discussion_type.resolve("assignment { _id }")).to eq discussion.assignment_id.to_s
     expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
@@ -188,11 +186,11 @@ describe Types::DiscussionType do
     module2 = discussion.course.context_modules.create!(name: 'Module 2')
     discussion.context_module_tags.create!(context_module: module1, context: discussion.course, tag_type: 'context_module')
     discussion.context_module_tags.create!(context_module: module2, context: discussion.course, tag_type: 'context_module')
-    expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+    expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s].sort
   end
 
   it "has a group_set" do
-    expect(discussion_type.resolve('groupSet { name }')).to eq "category"
+    expect(discussion_type.resolve('groupSet { name }')).to eq discussion.group_category&.name
   end
 
   context 'graded discussion' do
@@ -254,6 +252,7 @@ describe Types::DiscussionType do
   end
 
   it 'returns the current user permissions' do
+    @course.update!(workflow_state: "available")
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
@@ -316,5 +315,16 @@ describe Types::DiscussionType do
         expect(discussion_type.resolve("entriesTotalPages(perPage: #{i})")).to eq((@total_entries.to_f / i).ceil)
       end
     end
+  end
+end
+
+describe Types::DiscussionType do
+  context "course discussion" do
+    let_once(:discussion) { graded_discussion_topic }
+    include_examples "DiscussionType"
+  end
+  context "group discussion" do
+    let_once(:discussion) { group_discussion_assignment.child_topics.take }
+    include_examples "DiscussionType"
   end
 end
