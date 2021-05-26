@@ -18,14 +18,16 @@
 
 import {useEffect, useRef, useState} from 'react'
 import qs from 'qs'
-import {TAB_IDS} from '../utils'
 
-export const getInitialTab = defaultTab => {
+export const getInitialTab = (defaultTab, tabs) => {
   if (window.location.hash) {
     const newTab = window.location.hash.replace('#', 'tab-')
-    if (Object.values(TAB_IDS).includes(newTab)) {
+    if (tabs.find(({id}) => id === newTab)) {
       return newTab
     }
+  }
+  if (!defaultTab && tabs?.length) {
+    return tabs[0].id
   }
   return defaultTab
 }
@@ -46,20 +48,22 @@ export const getInitialTab = defaultTab => {
  * selected tab id, including a handler function for selecting a new tab by id.
  *
  * @param   {string} defaultTab - The id of the tab that should start selected.
+ * @param   {object[]} tabs - A list of valid tab objects (containing an "id" field)
  * @returns {useTabStateReturnVal} - See {@link useTabStateReturnVal}
  */
-export default function useTabState(defaultTab) {
+export default function useTabState(defaultTab, tabs = []) {
   // This ref is used to pass the current tab to the planner's getActiveApp()
   // function-- we can't use currentTab directly because that gets stuck in
   // a stale closure within the effect where it is referenced.
   const activeTab = useRef()
-  const [currentTab, setCurrentTab] = useState(() => getInitialTab(defaultTab))
+  const [currentTab, setCurrentTab] = useState(() => getInitialTab(defaultTab, tabs))
 
   useEffect(() => {
     activeTab.current = currentTab
   }, [currentTab])
 
   const handleTabChange = (id, focusTarget = '') => {
+    if (!tabs.some(tab => tab.id === id)) return
     setCurrentTab(id)
     const {protocol, host, pathname, search} = window.location
     if (window.history.replaceState) {

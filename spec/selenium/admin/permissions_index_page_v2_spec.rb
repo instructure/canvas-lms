@@ -187,9 +187,9 @@ describe "permissions index" do
       expect(f('#content')).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
     end
 
-    it "search by permission name works correctly" do
-      PermissionsIndex.enter_search("Course State")
-      expect(PermissionsIndex.permission_link("change_course_state")).to be_displayed
+    it "search by permission name works correctly ()" do
+      PermissionsIndex.enter_search("Manage Pages")
+      expect(PermissionsIndex.permission_link("manage_wiki")).to be_displayed
       expect(f('#content')).not_to contain_css("#permission_manage_interaction_alerts")
     end
   end

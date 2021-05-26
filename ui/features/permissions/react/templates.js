@@ -43,7 +43,7 @@ export const PERMISSION_DETAIL_SECTIONS = [
 ]
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
-  manage_courses: () => I18n.t('add / edit / delete Courses'),
+  manage_courses: () => I18n.t('add / publish / conclude / delete Courses'),
   manage_files: () => I18n.t('add / edit / delete Files'),
   manage_sections: () => I18n.t('add / edit / delete Sections'),
   manage_wiki: () => I18n.t('Create / Delete / Update Pages'),

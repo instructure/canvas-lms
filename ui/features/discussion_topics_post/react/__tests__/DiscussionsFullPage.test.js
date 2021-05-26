@@ -30,10 +30,17 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
+  const setOnFailure = jest.fn()
+  const setOnSuccess = jest.fn()
+
   beforeAll(() => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
+
+    window.ENV = {
+      discussion_topic_id: '1'
+    }
   })
 
   beforeEach(() => {
@@ -42,6 +49,8 @@ describe('DiscussionFullPage', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    setOnFailure.mockClear()
+    setOnSuccess.mockClear()
   })
 
   afterAll(() => {
@@ -53,7 +62,7 @@ describe('DiscussionFullPage', () => {
   const setup = () => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicManager discussionTopicId="1" />
         </AlertManagerContext.Provider>
       </ApolloProvider>
@@ -114,6 +123,23 @@ describe('DiscussionFullPage', () => {
 
       fireEvent.click(likeButton)
       await waitFor(() => expect(container.queryByText('Like count: 1')).toBeNull())
+    })
+
+    it('updates discussion entry', async () => {
+      const {getByTestId, queryByText, findByTestId, queryAllByTestId, getAllByTestId} = setup()
+      await waitFor(() => expect(queryByText('This is the parent reply')).toBeInTheDocument())
+
+      const actionsButton = await findByTestId('thread-actions-menu')
+      fireEvent.click(actionsButton)
+      fireEvent.click(getByTestId('edit'))
+
+      const bodyInput = queryAllByTestId('message-body')[1]
+      fireEvent.change(bodyInput, {target: {value: ''}})
+
+      const submitButton = getAllByTestId('DiscussionEdit-submit')[1]
+      fireEvent.click(submitButton)
+
+      await waitFor(() => expect(queryByText('This is the parent reply')).not.toBeInTheDocument())
     })
   })
 
@@ -180,10 +206,51 @@ describe('DiscussionFullPage', () => {
 
     it('renders the dates properly', async () => {
       const container = setup()
-      await waitFor(() => expect(container.findByText('Nov 23, 2020 6:40pm')).toBeTruthy())
-      await waitFor(() =>
-        expect(container.findByText('Apr 5 7:41pm, last reply Apr 5 7:41pm')).toBeTruthy()
-      )
+      expect(await container.findByText('Nov 23, 2020 6:40pm')).toBeInTheDocument()
+      expect(await container.findByText(', last reply Apr 5 7:41pm')).toBeInTheDocument()
     })
+  })
+
+  it('should be able to post a reply to the topic', async () => {
+    const {getByTestId, findByTestId, queryAllByTestId} = setup()
+
+    const replyButton = await findByTestId('discussion-topic-reply')
+    fireEvent.click(replyButton)
+
+    const rce = await findByTestId('DiscussionEdit-container')
+    expect(rce.style.display).toBe('')
+
+    const bodyInput = queryAllByTestId('message-body')[0]
+    fireEvent.change(bodyInput, {target: {value: 'This is a reply'}})
+
+    expect(bodyInput.value).toEqual('This is a reply')
+
+    const doReplyButton = getByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton)
+
+    expect((await findByTestId('DiscussionEdit-container')).style.display).toBe('none')
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+    )
+  })
+
+  it('should be able to post a reply to an entry', async () => {
+    const {findByTestId, findAllByTestId, getAllByTestId} = setup()
+
+    const replyButton = await findByTestId('threading-toolbar-reply')
+    fireEvent.click(replyButton)
+
+    const rce = await findAllByTestId('DiscussionEdit-container')
+    expect(rce[1].style.display).toBe('')
+
+    const doReplyButton = getAllByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton[1])
+
+    expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+    )
   })
 })

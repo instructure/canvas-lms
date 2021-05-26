@@ -47,7 +47,12 @@
   <% end %>
   <% if @user.workflow_state == 'deleted' %>
     <div class="alert alert-danger">
-      <i class="icon-warning" aria-hidden="true"></i> <%= t("This user has been deleted") %>
+      <i class="icon-warning" aria-hidden="true"></i> <%= t("This user has been deleted.") %>
+      <% if @user.merged_into_user %>
+        <%= t("They were merged into *%{other_user}*.",
+          other_user: @user.merged_into_user.name,
+          wrapper: { '*' => link_to('\1', user_path(@user.merged_into_user)) }) %>
+      <% end %>
     </div>
   <% end %>
   <h2><%= @user.short_name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h2>

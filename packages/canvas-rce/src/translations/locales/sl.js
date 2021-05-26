@@ -1,0 +1,443 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import formatMessage from '../../format-message'
+
+const locale = {
+  "accessibility_checker_b3af1f6c": {
+    "message": "Orodje za preverjanje dostopnosti"
+  },
+  "add_8523c19b": { "message": "Dodaj" },
+  "add_another_f4e50d57": { "message": "Dodaj dodatno" },
+  "add_cc_subtitles_55f0394e": { "message": "Dodaj Kp/podnaslov" },
+  "align_11050992": { "message": "Poravnaj" },
+  "align_center_ca078feb": { "message": "Poravnaj na sredino" },
+  "align_left_e9f1f93b": { "message": "Poravnaj levo" },
+  "align_right_9bad3ac1": { "message": "Poravnaj desno" },
+  "alignment_and_indentation_f7de34bf": { "message": "Poravnava in zamik" },
+  "all_4321c3a1": { "message": "Vse" },
+  "alphabetical_55b5b4e0": { "message": "Abecedno" },
+  "alt_text_611fb322": { "message": "Nadomestno besedilo" },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Pri ustvarjanju predogleda datoteke je prišlo do napake"
+  },
+  "an_error_occurred_making_a_network_request_d1bda348": {
+    "message": "Med podajanjem omrežne zahteve je prišlo do napake."
+  },
+  "an_error_occurred_uploading_your_media_71f1444d": {
+    "message": "Pri nalaganju medija je prišlo do napake."
+  },
+  "announcement_list_da155734": { "message": "Seznam obvestil" },
+  "announcements_a4b8ed4a": { "message": "Obvestila" },
+  "apps_54d24a47": { "message": "Aplikacije" },
+  "aspect_ratio_will_be_preserved_cb5fdfb8": {
+    "message": "Razmerje med širino in višino bo ohranjeno."
+  },
+  "assignments_1e02582c": { "message": "Naloge:" },
+  "audio_and_video_recording_is_not_available_c7173efc": {
+    "message": "Snemanje video- in zvočnih posnetkov ni na voljo."
+  },
+  "audio_player_for_title_20cc70d": {
+    "message": "Predvajalnik zvoka za { title }"
+  },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Obstaja samodejno shranjena vsebina. Ali želite namesto tega naložiti samodejno shranjeno vsebino?"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Samodejno odpri v predogledu v vrstici. (Predogled se prikaže šele po shranjevanju)"
+  },
+  "available_folders_694d0436": { "message": "Razpoložljive mape" },
+  "cancel_caeb1e68": { "message": "Prekliči" },
+  "canvas_plugins_705a5016": { "message": "Vtičniki sistema Canvas" },
+  "choose_caption_file_9c45bc4e": {
+    "message": "Izberite datoteko spremnega besedila"
+  },
+  "circle_unordered_list_9e3a0763": {
+    "message": "nerazvrščeni seznam s krogi"
+  },
+  "clear_selected_file_82388e50": { "message": "Počisti izbrano datoteko." },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Počisti izbrano datoteko: { filename }"
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Kliknite katero koli stran, da vstavite povezavo na to stran."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Kliknite, da vdelate { imageName }."
+  },
+  "click_to_hide_preview_3c707763": {
+    "message": "Kliknite, da skrijete predogled"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Kliknite, da vstavite povezavo v urejevalnik."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Kliknite, da prikažete predogled"
+  },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Zapri meni ali pogovorno okno Prav tako vas vrne v območje urejevalnika"
+  },
+  "close_d634289d": { "message": "Zapri" },
+  "collaborations_5c56c15f": { "message": "Skupinske naloge" },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "Strni za skrivanje { types }"
+  },
+  "computer_1d7dfa6f": { "message": "Računalnik" },
+  "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+    "message": "Vsebina se še vedno nalaga. Če nadaljujete, ne bo pravilno vdelana."
+  },
+  "content_subtype_5ce35e88": { "message": "Podvrsta vsebine" },
+  "content_type_2cf90d95": { "message": "Vrsta vsebine" },
+  "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+    "message": "{ count, plural,\n     =0 {0 besed}\n    one {1 beseda}\n  other {# besede}\n}"
+  },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {# elementov je naloženih}\n  other {# elementi so naloženi}\n}"
+  },
+  "course_documents_104d76e0": { "message": "Dokumenti predmeta" },
+  "course_files_62deb8f8": { "message": "Datoteke predmeta" },
+  "course_files_a31f97fc": { "message": "Datoteke predmeta" },
+  "course_images_f8511d04": { "message": "Slike predmeta" },
+  "course_links_b56959b9": { "message": "Povezave predmeta" },
+  "course_media_ec759ad": { "message": "Mediji predmeta" },
+  "course_navigation_dd035109": { "message": "Navigacija po predmetu" },
+  "current_volume_level_c55ab825": { "message": "Trenutna raven glasnosti" },
+  "custom_6979cd81": { "message": "Po meri" },
+  "date_added_ed5ad465": { "message": "Datum dodajanja" },
+  "decrease_indent_de6343ab": { "message": "Povečaj zamik" },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "privzeti neurejeni seznam z alinejami"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "privzeti številčno urejeni seznam"
+  },
+  "describe_the_image_e65d2e32": { "message": "(Opiši sliko)" },
+  "describe_the_video_2fe8f46a": { "message": "(Opišite videoposnetek)" },
+  "details_98a31b68": { "message": "Podrobnosti" },
+  "dimensions_45ddb7b7": { "message": "Mere" },
+  "directionality_ebcae6d0": { "message": "usmerjenost" },
+  "disable_in_line_preview_2a675175": {
+    "message": "Onemogoči predogled v vrstici."
+  },
+  "discussions_a5f96392": { "message": "Razprave" },
+  "discussions_index_6c36ced": { "message": "Kazalo razprav" },
+  "display_options_315aba85": { "message": "Prikaz možnosti" },
+  "display_text_link_opens_in_a_new_tab_75e9afc9": {
+    "message": "Prikaži besedilno povezavo (se odpre v novem zavihku)"
+  },
+  "document_678cd7bf": { "message": "Dokument" },
+  "documents_81393201": { "message": "Dokumenti" },
+  "done_54e3d4b6": { "message": "Dokončano" },
+  "drag_a_file_here_1bf656d5": { "message": "Datoteko povlecite sem" },
+  "drag_a_file_here_39357b48": { "message": "Datoteko povlecite sem" },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
+  },
+  "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+    "message": "Ravnanje ob vlečenju. Za spremembo velikosti uporabite puščici gor in dol"
+  },
+  "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+    "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
+  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Roki: Več datumov" },
+  "due_when_7eed10c6": { "message": "Roki: { when }" },
+  "edit_link_7f53bebb": { "message": "Uredi povezavo" },
+  "editor_statusbar_26ac81fc": { "message": "Vrstica stanja urejevalnika" },
+  "embed_828fac4a": { "message": "Vdelaj" },
+  "embed_code_314f1bd5": { "message": "Vdelaj kodo" },
+  "embed_image_1080badc": { "message": "Vdelaj sliko" },
+  "embed_options_tray_901cfd19": { "message": "Vrstica z možnostmi vdelave" },
+  "embed_preview_2d741e1f": { "message": "Predogled vdelave" },
+  "embed_video_a97a64af": { "message": "Vdelajte videoposnetek" },
+  "embed_video_code_703e10f2": { "message": "Vdelaj kodo videoposnetka" },
+  "embedded_content_aaeb4d3d": { "message": "vdelano vsebino" },
+  "equation_1c5ac93c": { "message": "Enačba" },
+  "error_uploading_video_audio_recording_16d9730a": {
+    "message": "Napaka pri nalaganju videoposnetka/zvočnega posnetka"
+  },
+  "expand_to_see_types_f5d29352": { "message": "Razširi za prikaz { types }" },
+  "external_links_3d9f074e": { "message": "Zunanje povezave" },
+  "extra_large_b6cdf1ff": { "message": "Zelo veliko" },
+  "file_name_8fd421ff": { "message": "Ime datoteke" },
+  "file_upload_failed_af22dd91": { "message": "Nalaganje datoteke ni uspelo" },
+  "file_uploading_56c9c0c8": { "message": "Nalaganje datoteke" },
+  "file_url_c12b64be": { "message": "URL datoteke" },
+  "filename_file_icon_602eb5de": { "message": "Ikona datoteke { filename }" },
+  "filename_image_preview_6cef8f26": {
+    "message": "Predogled slike { filename }"
+  },
+  "filename_text_preview_e41ca2d8": {
+    "message": "Predogled besedila { filename }"
+  },
+  "files_c300e900": { "message": "Datoteke" },
+  "files_index_af7c662b": { "message": "Kazalo datotek" },
+  "finish_bc343002": { "message": "Dokončaj" },
+  "focus_the_popup_context_toolbar_7979f4f8": {
+    "message": "Osredotoči na pojavno orodno vrstico v priročnem meniju"
+  },
+  "folder_tree_fbab0726": { "message": "Drevo map" },
+  "formatting_5b143aa8": { "message": "Oblikovanje" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Našli smo samodejno shranjeno vsebina"
+  },
+  "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+    "message": "Najdeno (najden) je { count, plural,\n     =0 {# rezultatov}\n    one {# rezultat }\n  other {# rezultatov}\n}"
+  },
+  "generating_preview_45b53be0": { "message": "Generiranje predogleda ..." },
+  "go_to_the_editor_s_menubar_e6674c81": {
+    "message": "Pojdi v menijsko vrstico urejevalnika"
+  },
+  "go_to_the_editor_s_toolbar_a5cb875f": {
+    "message": "Pojdi orodno vrstico urejevalnika"
+  },
+  "grades_a61eba0a": { "message": "Ocene" },
+  "group_files_4324f3df": { "message": "Datoteke skupine" },
+  "group_files_82e5dcdb": { "message": "Datoteke skupine" },
+  "group_navigation_99f191a": { "message": "Navigacija po skupini" },
+  "heading_2_5b84eed2": { "message": "Glava 2" },
+  "heading_3_2c83de44": { "message": "Glava 3" },
+  "heading_4_b2e74be7": { "message": "Glava 4" },
+  "height_69b03e15": { "message": "Višina" },
+  "image_8ad06": { "message": "Slika" },
+  "image_options_5412d02c": { "message": "Možnosti slike" },
+  "image_options_tray_90a46006": { "message": "Vrstica z možnostmi slike" },
+  "images_7ce26570": { "message": "Slike" },
+  "increase_indent_6d550a4a": { "message": "Povečaj zamik" },
+  "insert_593145ef": { "message": "Vstavi" },
+  "insert_equella_links_49a8dacd": {
+    "message": "Vstavi povezave storitve EQUELLA"
+  },
+  "insert_link_6dc23cae": { "message": "Vstavi povezavo" },
+  "insert_math_equation_57c6e767": { "message": "Vstavi matematično enačbo" },
+  "invalid_file_c11ba11": { "message": "Neveljavna datoteka" },
+  "invalid_file_type_881cc9b2": { "message": "Neveljavna vrsta datoteke" },
+  "keyboard_shortcuts_ed1844bd": { "message": "Bližnjice" },
+  "large_9c5e80e7": { "message": "Velika" },
+  "left_to_right_d6da6d7e": { "message": "iz leve proti desni" },
+  "link_7262adec": { "message": "Povezava" },
+  "link_options_a16b758b": { "message": "Možnosti povezave" },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Povezava na drugo vsebino v predmetu."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Povezava na drugo vsebino v skupini."
+  },
+  "links_14b70841": { "message": "Povezave" },
+  "load_more_35d33c7": { "message": "Naloži več" },
+  "load_more_results_460f49a9": { "message": "Naloži več rezultatov" },
+  "loading_25990131": { "message": "Nalaganje ..." },
+  "loading_bde52856": { "message": "Nalaganje" },
+  "loading_failed_b3524381": { "message": "Nalaganje ni uspelo ..." },
+  "loading_failed_e6a9d8ef": { "message": "Nalaganje ni uspelo." },
+  "loading_folders_d8b5869e": { "message": "Nalaganje map" },
+  "loading_media_f3455841": { "message": "Nalagam medij" },
+  "locked_762f138b": { "message": "Zaklenjeno" },
+  "media_af190855": { "message": "Mediji" },
+  "medium_5a8e9ead": { "message": "Srednja" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "miscellaneous_and_apps_f450a387": { "message": "Razno in aplikacije" },
+  "modules_c4325335": { "message": "Moduli" },
+  "must_be_at_least_width_x_height_px_41dc825e": {
+    "message": "Mora biti vsaj { width } x { height } px."
+  },
+  "my_files_2f621040": { "message": "Moje datoteke" },
+  "navigate_through_the_menu_or_toolbar_415a4e50": {
+    "message": "Navigirajte skozi meni ali orodno vrstico"
+  },
+  "next_page_d2a39853": { "message": "Naslednja stran" },
+  "no_alt_text_decorative_image_f318fc0e": {
+    "message": "Brez nadomestnega besedila (dekorativna slika)"
+  },
+  "no_e16d9132": { "message": "Ne" },
+  "no_file_chosen_9a880793": { "message": "Izbrana ni nobena datoteka" },
+  "no_results_940393cf": { "message": "Ni rezultatov." },
+  "no_results_found_for_filterterm_ad1b04c8": {
+    "message": "Ni najdenih rezultatov za { filterTerm }"
+  },
+  "no_results_found_for_term_1564c08e": {
+    "message": "Ni najdenih rezultatov za { term }."
+  },
+  "no_video_1ed00b26": { "message": "Ni videoposnetek" },
+  "open_this_keyboard_shortcuts_dialog_9658b83a": {
+    "message": "Odpri to pogovorno okno z bližnjicami"
+  },
+  "options_3ab0ea65": { "message": "Možnosti" },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Urejeni in neurejeni seznami"
+  },
+  "other_editor_shortcuts_may_be_found_at_404aba4a": {
+    "message": "Druge bližnjice urejevalnika je mogoče najti na"
+  },
+  "pages_e5414c2c": { "message": "Strani" },
+  "paragraph_5e5ad8eb": { "message": "Odstavek" },
+  "pause_12af3bb4": { "message": "Začasna zaustavitev" },
+  "people_b4ebb13c": { "message": "Sodelujoči" },
+  "play_1a47eaa7": { "message": "Predvajaj" },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Sistemu Canvas dovolite dostop do mikrofona in spletne kamere."
+  },
+  "posted_when_a578f5ab": { "message": "Objavljeno: { when }" },
+  "preformatted_d0670862": { "message": "Predoblikovano" },
+  "preview_53003fd2": { "message": "Predogled" },
+  "preview_a3f8f854": { "message": "PREDOGLED" },
+  "previous_page_928fc112": { "message": "Prejšnja stran" },
+  "published_c944a23d": { "message": "objavljeno" },
+  "published_when_302d8e23": { "message": "Objavljeno: { when }" },
+  "quizzes_7e598f57": { "message": "Kvizi" },
+  "reading_a_media_track_file_failed_aborting_be051b20": {
+    "message": "Branje datoteke z zapisi na mediju ni uspelo. Prekinjam."
+  },
+  "record_7c9448b": { "message": "Posnemi" },
+  "record_upload_media_5fdce166": { "message": "Posnemi/naloži medije" },
+  "recording_98da6bda": { "message": "Snemanje" },
+  "remove_link_d1f2f4d0": { "message": "Odstrani povezavo" },
+  "restore_auto_save_deccd84b": {
+    "message": "Obnovim samodejno shranjeno vsebino?"
+  },
+  "rich_content_editor_2708ef21": { "message": "Urejevalnik" },
+  "right_to_left_ec223c81": { "message": "z desne proti levi" },
+  "save_11a80ec3": { "message": "Shrani" },
+  "search_280d00bd": { "message": "Iskanje" },
+  "search_term_b2d2235": { "message": "Iskalni izraz" },
+  "select_app_3d08035a": { "message": "Izberi aplikacijo" },
+  "select_language_7c93a900": { "message": "Izberite jezik" },
+  "selected_274ce24f": { "message": "Izbrano" },
+  "show_embed_options_ef8d7ef": { "message": "Prikaži možnosti vdelave" },
+  "show_image_options_1e2ecc6b": { "message": "Prikaži možnosti slike" },
+  "show_link_options_545338fd": { "message": "Prikaži povezave na slike" },
+  "show_video_options_6ed3721a": {
+    "message": "Prikaži možnosti videoposnetka"
+  },
+  "size_b30e1077": { "message": "Velikost" },
+  "small_b070434a": { "message": "Majhna" },
+  "something_went_wrong_89195131": { "message": "Prišlo je do težav." },
+  "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+    "message": "Pri dostopu do vaše spletne kamere ali mikrofon je prišlo do težav."
+  },
+  "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
+    "message": "Prišlo je do težav in ne vem, kaj vam naj prikažem."
+  },
+  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
+    "message": "Prišlo je do težave; preverite svojo povezavo in poskusite znova."
+  },
+  "something_went_wrong_d238c551": { "message": "Prišlo je do težav" },
+  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
+    "message": "Prišlo je do težav; osvežite stran in poskusite znova."
+  },
+  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
+    "message": "Pri nalaganju je prišlo do težav; preverite svojo povezavo in poskusite znova."
+  },
+  "sort_by_e75f9e3e": { "message": "Razvrsti po" },
+  "square_unordered_list_b15ce93b": {
+    "message": "nerazvrščeni seznam s kvadrati"
+  },
+  "start_over_f7552aa9": { "message": "Začnite znova" },
+  "start_recording_9a65141a": { "message": "Zaženi snemanje" },
+  "styles_2aa721ef": { "message": "Slogi" },
+  "submit_a3cc6859": { "message": "Pošlji" },
+  "subscript_59744f96": { "message": "Podpisano" },
+  "success_file_uploaded_8174e93f": { "message": "Uspešno: Naložene datoteke" },
+  "superscript_8cb349a2": { "message": "Nadpisano" },
+  "supported_file_types_srt_or_webvtt_7d827ed": {
+    "message": "Podprte vrste datotek: SRT ali WebVTT"
+  },
+  "switch_to_raw_html_editor_4c9ac7de": {
+    "message": "Preklopi v surovi prikaz html"
+  },
+  "switch_to_rich_text_editor_35822d26": {
+    "message": "Preklopi v oboghateni prikaz html"
+  },
+  "syllabus_f191f65b": { "message": "Učni načrt" },
+  "tab_arrows_4cf5abfc": { "message": "ZAVIHEK/puščične tipke" },
+  "text_7f4593da": { "message": "Besedilo" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Čeprav bo vaš videoposnetek v brskalniku imel pravilen naslov, ga v zbirki podatkov nismo uspeli posodobiti."
+  },
+  "title_ee03d132": { "message": "Naslov" },
+  "to_be_posted_when_d24bf7dc": { "message": "Za objavo: { when }" },
+  "to_do_when_2783d78f": { "message": "Čakajoča opravila: { when }" },
+  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+    "message": "{ totalResults } najdenih rezultatov, od tega jih je trenutno prikazanih { numDisplayed }."
+  },
+  "tray_839df38a": { "message": "Trak" },
+  "type_control_f9_to_access_image_options_text_a47e319f": {
+    "message": "pritisnite Ctrl+F9 za dostop do možnosti slike. { text }"
+  },
+  "type_control_f9_to_access_link_options_text_4ead9682": {
+    "message": "pritisnite Ctrl+F9 za dostop do možnosti povezave. { text }"
+  },
+  "type_control_f9_to_access_table_options_text_92141329": {
+    "message": "pritisnite Ctrl+F9 za dostop do možnosti preglednice. { text }"
+  },
+  "unpublished_dfd8801": { "message": "neobjavljeno" },
+  "untitled_16aa4f2b": { "message": "Brez naslova" },
+  "upload_document_253f0478": { "message": "Naloži dokument" },
+  "upload_file_fd2361b8": { "message": "Naloži datoteko" },
+  "upload_image_6120b609": { "message": "Naloži sliko" },
+  "upload_media_ce31135a": { "message": "Naloži medije" },
+  "upload_not_available_for_this_folder_8f8623c6": {
+    "message": "Za to mapo ni na voljo nalaganje"
+  },
+  "upload_record_media_e4207d72": { "message": "Naloži/posnemi medij" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "abecedno urejeni seznam z velikimi začetnicami"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "abecedno urejeni seznam z rimskimi številkami"
+  },
+  "url_22a5f3b8": { "message": "URL" },
+  "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+    "message": "Uporabljajo ga bralniki zaslona za opisovanje vsebine slike"
+  },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Uporabljajo ga bralniki zaslona za opisovanje videoposnetka"
+  },
+  "user_documents_c206e61f": { "message": "Uporabniški dokumenti" },
+  "user_files_78e21703": { "message": "Uporabniške datoteke" },
+  "user_images_b6490852": { "message": "Uporabniške slike" },
+  "user_media_14fbf656": { "message": "Uporabnikovi mediji" },
+  "video_audio_recording_uploaded_6af5d378": {
+    "message": "Videoposnetek/zvočni posnetek je naložen"
+  },
+  "video_options_24ef6e5d": { "message": "Možnosti videoposnetka" },
+  "video_options_tray_3b9809a5": {
+    "message": "Vrstica z možnostmi videoposnetka"
+  },
+  "video_player_b371005": { "message": "Predvajalnik videoposnetkov" },
+  "video_player_for_9e7d373b": { "message": "Predvajalnik videoposnetkov za " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Predvajalnik videoposnetkov za { title }"
+  },
+  "view_keyboard_shortcuts_34d1be0b": {
+    "message": "Prikaži bližnjice na tipkovnici"
+  },
+  "webcam_fe91b20f": { "message": "Spletna kamera" },
+  "width_492fec76": { "message": "Širina" },
+  "width_and_height_must_be_numbers_110ab2e3": {
+    "message": "Širina in višina morata biti številki"
+  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
+  "wiki_home_9cd54d0": { "message": "Glavna stran wiki" },
+  "yes_dde87d5": { "message": "Da" },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Vaša spletna kamera je morda že v uporabi."
+  }
+}
+
+
+formatMessage.addLocale({sl: locale})

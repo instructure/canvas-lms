@@ -234,7 +234,7 @@ const Ratings = props => {
       })
 
       return (
-        <Flex.Item key={`tier-${index}`} width={`${100 / visible.length}%`}>
+        <Flex.Item key={`tier-${index}`} width={`${100 / visible.length}%`} align="start">
           <Rating
             key={index}
             assessing={assessing}

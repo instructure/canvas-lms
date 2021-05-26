@@ -24,37 +24,42 @@ module Types
 
     field :read, Boolean, null: true
     def read
-      object.load(:read)
+      object[:loader].load(:read)
     end
 
     field :reply, Boolean, null: true
     def reply
-      object.load(:reply)
+      object[:loader].load(:reply)
     end
 
     field :update, Boolean, null: true
     def update
-      object.load(:update)
+      object[:loader].load(:update)
     end
 
     field :delete, Boolean, null: true
     def delete
-      object.load(:delete)
+      object[:loader].load(:delete)
     end
 
     field :create, Boolean, null: true
     def create
-      object.load(:create)
+      object[:loader].load(:create)
     end
 
     field :attach, Boolean, null: true
     def attach
-      object.load(:attach)
+      object[:loader].load(:attach)
     end
 
     field :rate, Boolean, null: true
     def rate
-      object.load(:rate)
+      object[:loader].load(:rate)
+    end
+
+    field :view_rating, Boolean, null: true
+    def view_rating
+      object[:discussion_entry].discussion_topic.allow_rating && !object[:discussion_entry].deleted?
     end
   end
 end

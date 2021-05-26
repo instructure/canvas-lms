@@ -18,7 +18,9 @@
 import {
   CHILD_GROUPS_QUERY,
   GROUP_DETAIL_QUERY,
-  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES
+  GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+  UPDATE_LEARNING_OUTCOME
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -43,6 +45,9 @@ export const accountMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
+            description: `Root account group`,
+            title: `Root account folder`,
+            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: 1,
             childGroups: {
@@ -86,6 +91,9 @@ export const courseMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
+            description: `Root course group`,
+            title: `Root course folder`,
+            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: 2,
             childGroups: {
@@ -254,7 +262,9 @@ export const groupDetailMocks = ({
     request: {
       query: GROUP_DETAIL_QUERY,
       variables: {
-        id: groupId
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -282,6 +292,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -296,6 +307,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -313,7 +325,9 @@ export const groupDetailMocks = ({
       query: GROUP_DETAIL_QUERY,
       variables: {
         id: groupId,
-        outcomesCursor: 'Mg'
+        outcomesCursor: 'Mg',
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -341,6 +355,7 @@ export const groupDetailMocks = ({
                   canEdit,
                   contextId,
                   contextType,
+                  friendlyDescription: null,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -357,7 +372,9 @@ export const groupDetailMocks = ({
     request: {
       query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
       variables: {
-        id: groupId
+        id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -378,6 +395,7 @@ export const groupDetailMocks = ({
                 _id: '1',
                 description: '',
                 displayName: '',
+                friendlyDescription: null,
                 title: `Outcome 1 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               },
@@ -386,6 +404,7 @@ export const groupDetailMocks = ({
                 description: '',
                 displayName: '',
                 isImported: false,
+                friendlyDescription: null,
                 title: `Outcome 2 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -402,6 +421,8 @@ export const groupDetailMocks = ({
       query: GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES,
       variables: {
         id: groupId,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType,
         outcomesCursor: 'Mg'
       }
     },
@@ -424,6 +445,7 @@ export const groupDetailMocks = ({
                 description: '',
                 displayName: '',
                 isImported: false,
+                friendlyDescription: null,
                 title: `Outcome 3 - Group ${groupId}`,
                 __typename: 'LearningOutcome'
               }
@@ -433,6 +455,111 @@ export const groupDetailMocks = ({
           __typename: 'LearningOutcomeGroup'
         }
       }
+    }
+  }
+]
+
+export const setFriendlyDescriptionOutcomeMock = ({
+  inputDescription = 'Updated alternate description',
+  failResponse = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      setFriendlyDescription: {
+        outcomeFriendlyDescription: {
+          _id: '1',
+          description: 'Updated alternate description',
+          __typename: 'OutcomeFriendlyDescription'
+        },
+        __typename: 'SetFriendlyDescriptionPayload',
+        errors: null
+      }
+    }
+  }
+
+  const failedResponse = {
+    data: null,
+    errors: [
+      {
+        attribute: 'message',
+        message: 'mutation failed'
+      }
+    ]
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  }
+
+  return {
+    request: {
+      query: SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
+      variables: {
+        input: {
+          description: inputDescription,
+          contextId: '1',
+          contextType: 'Account',
+          outcomeId: '1'
+        }
+      }
+    },
+    result
+  }
+}
+
+export const updateOutcomeMocks = ({
+  id = '1',
+  title = 'Updated name',
+  displayName = 'Friendly outcome name',
+  description = 'Updated description'
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id,
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: {
+        updateLearningOutcome: {
+          learningOutcome: {
+            _id: '1',
+            title,
+            displayName,
+            description
+          },
+          errors: null
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME,
+      variables: {
+        input: {
+          id: '2',
+          title,
+          displayName,
+          description
+        }
+      }
+    },
+    result: {
+      data: null,
+      errors: [
+        {
+          attribute: 'title',
+          message: "can't be blank"
+        }
+      ]
     }
   }
 ]

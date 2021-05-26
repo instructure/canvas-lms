@@ -85,6 +85,8 @@ module Api::V1::User
         json[:pronouns] = user.pronouns
       end
 
+      json[:merged_into_user_id] = user.merged_into_user_id if user.deleted? && user.merged_into_user_id
+
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user)
       end

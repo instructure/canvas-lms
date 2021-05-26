@@ -751,11 +751,42 @@ describe RubricAssessment do
       expect(@assessment.grants_right?(@user, :read)).to eq false
     end
 
-    it "grants :read to an account user with :view_all_grades but not :manage_courses" do
+    it 'grants :read to an account user with :view_all_grades but not :manage_courses' do
+      @account.disable_feature!(:granular_permissions_manage_courses)
       user_factory
-      role = custom_account_role('custom', :account => @account)
-      RoleOverride.create!(:context => @account, :permission => 'view_all_grades', :role => role, :enabled => true)
-      RoleOverride.create!(:context => @account, :permission => 'manage_courses', :role => role, :enabled => false)
+      role = custom_account_role('custom', account: @account)
+      RoleOverride.create!(
+        context: @account,
+        permission: 'view_all_grades',
+        role: role,
+        enabled: true
+      )
+      RoleOverride.create!(
+        context: @account,
+        permission: 'manage_courses',
+        role: role,
+        enabled: false
+      )
+      @account.account_users.create!(user: @user, role: role)
+      expect(@assessment.grants_right?(@user, :read)).to eq true
+    end
+
+    it 'grants :read to an account user with :view_all_grades but not :manage_courses_admin (granular permissions)' do
+      @account.enable_feature!(:granular_permissions_manage_courses)
+      user_factory
+      role = custom_account_role('custom', account: @account)
+      RoleOverride.create!(
+        context: @account,
+        permission: 'view_all_grades',
+        role: role,
+        enabled: true
+      )
+      RoleOverride.create!(
+        context: @account,
+        permission: 'manage_courses_admin',
+        role: role,
+        enabled: false
+      )
       @account.account_users.create!(user: @user, role: role)
       expect(@assessment.grants_right?(@user, :read)).to eq true
     end

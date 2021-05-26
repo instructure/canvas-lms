@@ -82,13 +82,14 @@ describe('Upload data actions', () => {
   })
 
   const defaults = {
+    host: 'http://host:port',
     jwt: 'theJWT',
     source: successSource
   }
 
   function setupState(props) {
-    const {jwt, source} = {...defaults, ...props}
-    return {jwt, source}
+    const {host, jwt, source} = {...defaults, ...props}
+    return {host, jwt, source}
   }
 
   describe('fetchFolders', () => {
@@ -256,38 +257,44 @@ describe('Upload data actions', () => {
         type: 'video/mov'
       }
     }
+    let k5uploaderstub
 
     beforeEach(() => {
       moxios.install()
+      k5uploaderstub = sinon.stub(K5Uploader.prototype, 'loadUiConf').callsFake(() => 'mock')
     })
     afterEach(() => {
       moxios.uninstall()
+      k5uploaderstub.restore()
     })
 
     it('uploads directly to notorious/kaltura', () => {
+      const baseState = setupState()
+      const store = spiedStore(baseState)
+
       // I really just wanted to stub saveMediaRecording and assert that it's called,
       // but sinon can't stub functions from es6 modules.
       // The next best thing is to check that the K5Uploader is exercised
-      moxios.stubRequest('/api/v1/services/kaltura_session?include_upload_config=1', {
-        status: 200,
-        response: {
-          ks: 'averylongstring',
-          subp_id: '0',
-          partner_id: '9',
-          uid: '1234_567',
-          serverTime: 1234,
-          kaltura_setting: {
-            uploadUrl: 'url.url.url',
-            entryUrl: 'url.url.url',
-            uiconfUrl: 'url.url.url',
-            partnerData: 'data from our partners'
+      moxios.stubRequest(
+        'http://host:port/api/v1/services/kaltura_session?include_upload_config=1',
+        {
+          status: 200,
+          response: {
+            ks: 'averylongstring',
+            subp_id: '0',
+            partner_id: '9',
+            uid: '1234_567',
+            serverTime: 1234,
+            kaltura_setting: {
+              uploadUrl: 'url.url.url',
+              entryUrl: 'url.url.url',
+              uiconfUrl: 'url.url.url',
+              partnerData: 'data from our partners'
+            }
           }
         }
-      })
-      const k5uploaderstub = sinon.stub(K5Uploader.prototype, 'loadUiConf').callsFake(() => 'mock')
+      )
 
-      const baseState = setupState()
-      const store = spiedStore(baseState)
       return store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData)).then(() => {
         sinon.assert.called(k5uploaderstub)
       })
@@ -544,7 +551,7 @@ describe('Upload data actions', () => {
     const R = global.Response
     beforeEach(() => {
       if (typeof Response !== 'function') {
-        global.Response = function(body, status) {
+        global.Response = function (body, status) {
           this.status = status
           this.json = () => {
             return Promise.resolve(JSON.parse(body))

@@ -55,7 +55,6 @@ describe('useRCE', () => {
   })
 
   test('should call RCE.loadNewEditor when setElemRef fn is called', () => {
-    RichContentEditor.loadNewEditor.mockImplementation((_elem, _options, cb) => cb())
     const {result} = renderHook(() => useRCE())
     act(() => result.current[0]('elemRef'))
     expect(RichContentEditor.loadNewEditor).toHaveBeenCalledTimes(1)
@@ -91,7 +90,7 @@ describe('useRCE', () => {
     RichContentEditor.callOnRCE.mockReturnValue(true)
     const {result} = renderHook(() => useRCE())
     act(() => result.current[0]('elemRef'))
-    act(() => result.current[0]())
+    act(() => result.current[0]('newElemRef'))
     expect(RichContentEditor.closeRCE).toHaveBeenCalledTimes(1)
     expect(RichContentEditor.destroyRCE).toHaveBeenCalledTimes(1)
   })

@@ -231,23 +231,23 @@ describe "groups" do
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
         # Verifies teacher can access the group discussion & that it's the correct discussion
-        expect_new_page_load { f('.discussion-title').click }
+        expect_new_page_load{f("[data-testid='discussion-link-#{dt.id}']").click}
         expect(f('.message.user_content')).to include_text(dt.message)
       end
 
       it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
         skip_if_safari(:alert)
-        DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                 title: 'Group Discussion', message: 'Group')
         get discussions_page
-        expect(ff('.discussion-title').size).to eq 1
+        expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
         f('.discussions-index-manage-menu').click
         wait_for_animations
         f('#delete-discussion-menu-option').click
         wait_for_ajaximations
         f('#confirm_delete_discussions').click
         wait_for_ajaximations
-        expect(f(".discussions-container__wrapper")).not_to contain_css('.discussion-title')
+        expect(f(".discussions-container__wrapper")).not_to contain_css("[data-testid='discussion-link-#{dt.id}']")
       end
     end
 

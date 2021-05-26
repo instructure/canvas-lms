@@ -45,28 +45,31 @@ module MicrosoftSync
       end
     end
 
-    def additions_in_slices_of(slice_size)
-      # Admins/teachers need to be both owners and members in the remote group
-      owners_to_add = (@local_owners - @remote_owners).to_a
-      members_to_add = ((@local_members | @local_owners) - @remote_members).to_a
+    def in_slices_of(owners, members, slice_size, &_blk)
+      members = members.to_a # Convert from Set so we can 'shift'
 
-      owners_to_add.each_slice(slice_size) do |owners_slice|
+      owners.each_slice(slice_size) do |owners_slice|
         # If we have extra room, add some of the members, to possibly reduce
         # the number of API calls
-        yield owners: owners_slice, members: members_to_add.shift(slice_size - owners_slice.length)
+        yield owners: owners_slice, members: members.shift(slice_size - owners_slice.length)
       end
 
-      members_to_add.each_slice(slice_size) do |members_slice|
+      members.each_slice(slice_size) do |members_slice|
         yield(members: members_slice)
       end
     end
 
-    def members_to_remove
-      @remote_members - @local_members - @local_owners
+    def additions_in_slices_of(slice_size, &blk)
+      # Admins/teachers need to be both owners and members in the remote group
+      owners_to_add = (@local_owners - @remote_owners).to_a
+      members_to_add = ((@local_members | @local_owners) - @remote_members).to_a
+      in_slices_of owners_to_add, members_to_add, slice_size, &blk
     end
 
-    def owners_to_remove
-      @remote_owners - @local_owners
+    def removals_in_slices_of(slice_size, &blk)
+      owners_to_remove = @remote_owners - @local_owners
+      members_to_remove = @remote_members - @local_members - @local_owners
+      in_slices_of owners_to_remove, members_to_remove, slice_size, &blk
     end
 
     def max_enrollment_members_reached?

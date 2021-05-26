@@ -21,7 +21,13 @@ import moxios from 'moxios'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
-import {MOCK_COURSE_APPS, MOCK_COURSE_TABS, MOCK_ASSIGNMENT_GROUPS, MOCK_ENROLLMENTS} from './mocks'
+import {
+  MOCK_COURSE_APPS,
+  MOCK_COURSE_TABS,
+  MOCK_GRADING_PERIODS_EMPTY,
+  MOCK_ASSIGNMENT_GROUPS,
+  MOCK_ENROLLMENTS
+} from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 
 const currentUser = {
@@ -41,6 +47,7 @@ const defaultEnv = {
   MOMENT_LOCALE: 'en',
   TIMEZONE: 'America/Denver'
 }
+const defaultTabs = [{id: '0'}, {id: '19'}, {id: '10'}, {id: '5'}, {id: 'context_external_tool_1'}]
 const defaultProps = {
   currentUser,
   loadAllOpportunities: () => {},
@@ -50,12 +57,19 @@ const defaultProps = {
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
-  userIsInstructor: false
+  userIsInstructor: false,
+  showStudentView: false,
+  studentViewPath: '/courses/30/student_view/1',
+  showLearningMasteryGradebook: false,
+  tabs: defaultTabs
 }
 const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
+const GRADING_PERIODS_URL = encodeURI(
+  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
+)
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission'
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
 
@@ -65,6 +79,7 @@ beforeAll(() => {
   moxios.install()
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
   fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
+  fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
   if (!modulesContainer) {
@@ -122,16 +137,46 @@ describe('K-5 Subject Course', () => {
       expect(getByText(defaultProps.name)).toBeInTheDocument()
     })
 
-    it('shows Home, Schedule, Modules, Grades, and Resources options', () => {
+    it('shows Home, Schedule, Modules, Grades, and Resources options if configured', () => {
       const {getByText} = render(<K5Course {...defaultProps} />)
       ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
         expect(getByText(label)).toBeInTheDocument()
       )
     })
 
-    it('defaults to the Home tab', () => {
+    it('defaults to the first tab', () => {
       const {getByRole} = render(<K5Course {...defaultProps} />)
       expect(getByRole('tab', {name: 'Home', selected: true})).toBeInTheDocument()
+    })
+
+    it('only renders non-hidden tabs, in the order they are provided', () => {
+      const tabs = [
+        {id: '10'},
+        {id: '5', hidden: true},
+        {id: '19'},
+        {id: 'context_external_tool_3', hidden: true}
+      ]
+      const {getAllByRole} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      const renderedTabs = getAllByRole('tab')
+      expect(renderedTabs.map(({id}) => id.replace('tab-', ''))).toEqual([
+        TAB_IDS.MODULES,
+        TAB_IDS.SCHEDULE
+      ])
+    })
+
+    it('renders an empty state instead of any tabs if none are provided', () => {
+      const {getByTestId, getByText, queryByRole} = render(<K5Course {...defaultProps} tabs={[]} />)
+      expect(getByText(defaultProps.name)).toBeInTheDocument()
+      expect(queryByRole('tab')).not.toBeInTheDocument()
+      expect(getByTestId('space-panda')).toBeInTheDocument()
+      expect(getByText('Welcome to the cold, dark void of Arts and Crafts.')).toBeInTheDocument()
+    })
+
+    it('renders a link to update tab settings if no tabs are provided and the user has manage permissions', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} canManage tabs={[]} />)
+      const link = getByRole('link', {name: 'Reestablish your world'})
+      expect(link).toBeInTheDocument()
+      expect(link.href).toBe('http://localhost/courses/30/settings#tab-navigation')
     })
   })
 
@@ -185,6 +230,24 @@ describe('K-5 Subject Course', () => {
     })
   })
 
+  describe('Student View Button functionality', () => {
+    it('Shows the Student View button when the user has student view mode access', () => {
+      const {queryByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
+    })
+
+    it('Does not show the Student View button when the user does not have student view mode access', () => {
+      const {queryByRole} = render(<K5Course {...defaultProps} />)
+      expect(queryByRole('link', {name: 'Student View'})).not.toBeInTheDocument()
+    })
+
+    it('Should open student view path when clicked', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      const studentViewBtn = getByRole('link', {name: 'Student View'})
+      expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
+    })
+  })
+
   describe('home tab', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
@@ -217,6 +280,13 @@ describe('K-5 Subject Course', () => {
     it('shows course total', async () => {
       const {findByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.GRADES} />)
       expect(await findByText('Total: 89.39%')).toBeInTheDocument()
+    })
+
+    it('shows tab for LMGB if enabled', () => {
+      const {getByRole} = render(
+        <K5Course {...defaultProps} showLearningMasteryGradebook defaultTab={TAB_IDS.GRADES} />
+      )
+      expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
     })
   })
 

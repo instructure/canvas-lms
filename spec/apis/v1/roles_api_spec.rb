@@ -293,8 +293,13 @@ describe "Roles API", type: :request do
       expect(JSON.parse(response.body)["errors"]["name"].first["message"]).to eq("is reserved")
     end
 
-    it "should not create an override for course role for account-only permissions" do
-      api_call_with_settings(:permission => 'manage_courses', :base_role_type => 'TeacherEnrollment', :explicit => '1', :enabled => '1')
+    it 'should not create an override for course role for account-only permissions' do
+      api_call_with_settings(
+        permission: 'manage_master_courses',
+        base_role_type: 'TeacherEnrollment',
+        explicit: '1',
+        enabled: '1'
+      )
       expect(@account.role_overrides.reload.size).to eq @initial_count
     end
 
@@ -442,6 +447,7 @@ describe "Roles API", type: :request do
     describe "json response" do
       before :each do
         @account.root_account.disable_feature!(:granular_permissions_manage_users)
+        @account.root_account.disable_feature!(:granular_permissions_manage_courses)
         @expected_permissions = [
           "become_user", "change_course_state", "create_collaborations",
           "create_conferences", "manage_account_memberships",
@@ -500,6 +506,39 @@ describe "Roles API", type: :request do
           "remove_designer_from_course",
           "remove_student_from_course",
           "remove_observer_from_course"
+        ]
+
+        json = api_call_with_settings
+        expect(json.keys.sort).to eq %w[
+          account base_role_type created_at id is_account_role label last_updated_at
+          permissions role workflow_state
+        ]
+        expect(json["account"]["id"]).to eq @account.id
+        expect(json["id"]).to eq @role.id
+        expect(json["role"]).to eq @role_name
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
+
+        # make sure all the expected keys are there, but don't assert on a
+        # *only* the expected keys, since plugins may have added more.
+        expect(expected_perms - json["permissions"].keys).to be_empty
+
+        expect(json["permissions"][@permission]).to eq({
+          "explicit" => false,
+          "readonly" => false,
+          "enabled" => false,
+          "locked" => false
+        })
+      end
+
+      it "should return the expected json format with granular manage courses permission on" do
+        @account.root_account.enable_feature!(:granular_permissions_manage_courses)
+        expected_perms = @expected_permissions - ["manage_courses", "change_course_state"]
+        expected_perms += [
+          "manage_courses_add",
+          "manage_courses_admin",
+          "manage_courses_publish",
+          "manage_courses_conclude",
+          "manage_courses_delete"
         ]
 
         json = api_call_with_settings
@@ -606,11 +645,15 @@ describe "Roles API", type: :request do
             {}, { :expected_status => 404 })
       end
 
-      it "should be able to change permissions for account admins" do
-        json = api_call(:put, "/api/v1/accounts/#{@account.id}/roles/#{admin_role.id}",
-          @path_options.merge(:id => admin_role.id), { :permissions => {
-          :manage_courses => { :explicit => 1, :enabled => 0 }}})
-        expect(json['permissions']['manage_courses']['enabled']).to eql false
+      it 'should be able to change permissions for account admins' do
+        json =
+          api_call(
+            :put,
+            "/api/v1/accounts/#{@account.id}/roles/#{admin_role.id}",
+            @path_options.merge(id: admin_role.id),
+            { permissions: { manage_master_courses: { explicit: 1, enabled: 0 } } }
+          )
+        expect(json['permissions']['manage_master_courses']['enabled']).to eql false
       end
 
       it "should not be able to add an unavailable permission for a base role" do

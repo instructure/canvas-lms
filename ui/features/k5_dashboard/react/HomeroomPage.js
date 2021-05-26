@@ -39,10 +39,10 @@ import EmptyDashPandaUrl from '../images/empty-dashboard.svg'
 
 export const HomeroomPage = ({
   cards,
+  createPermissions,
   homeroomAnnouncements,
   loadingAnnouncements,
-  visible,
-  canCreateCourses
+  visible
 }) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [courseModalOpen, setCourseModalOpen] = useState(false)
@@ -79,6 +79,8 @@ export const HomeroomPage = ({
     )
   }
 
+  const canCreateCourses = createPermissions === 'admin' || createPermissions === 'teacher'
+
   return (
     <section
       id="dashboard_page_homeroom"
@@ -100,6 +102,7 @@ export const HomeroomPage = ({
             <Flex.Item>
               <Tooltip renderTip={I18n.t('Start a new course')}>
                 <IconButton
+                  data-testid="new-course-button"
                   screenReaderLabel={I18n.t('Open new course modal')}
                   withBackground={false}
                   withBorder={false}
@@ -125,7 +128,11 @@ export const HomeroomPage = ({
         )}
       </View>
       {courseModalOpen && (
-        <CreateCourseModal isModalOpen={courseModalOpen} setModalOpen={setCourseModalOpen} />
+        <CreateCourseModal
+          isModalOpen={courseModalOpen}
+          setModalOpen={setCourseModalOpen}
+          permissions={createPermissions}
+        />
       )}
     </section>
   )
@@ -133,10 +140,10 @@ export const HomeroomPage = ({
 
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
-  visible: PropTypes.bool.isRequired,
-  canCreateCourses: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired
 }
 
 export default HomeroomPage

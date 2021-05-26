@@ -180,7 +180,7 @@ module SpeedGrader
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
-        json[:has_postable_comments] = sub.all_submission_comments.any? { |comment| comment.hidden? }
+        json[:has_postable_comments] = sub.all_submission_comments.any?(&:allows_posting_submission?)
 
         json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: assignment,

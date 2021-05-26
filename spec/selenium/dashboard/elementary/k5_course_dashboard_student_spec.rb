@@ -44,9 +44,7 @@ describe "student k5 course dashboard" do
       expect(retrieve_title_text).to match(/#{@subject_course_title}/)
       expect(home_tab).to be_displayed
       expect(schedule_tab).to be_displayed
-      expect(modules_tab).to be_displayed
       expect(grades_tab).to be_displayed
-      expect(resources_tab).to be_displayed
     end
 
     it 'saves tab information for refresh' do
@@ -67,6 +65,19 @@ describe "student k5 course dashboard" do
 
       expect(front_page_info.text).to eq(wiki_page_data)
     end
+
+    it 'only displays the modules tab if a published module exists' do
+      get "/courses/#{@subject_course.id}#modules"
+      expect(modules_tab_exists?).to be false
+
+      create_course_module('unpublished')
+      get "/courses/#{@subject_course.id}#modules"
+      expect(modules_tab_exists?).to be false
+
+      @course_module.publish
+      get "/courses/#{@subject_course.id}#modules"
+      expect(modules_tab).to be_displayed
+    end
   end
 
   context 'course modules tab' do
@@ -78,14 +89,6 @@ describe "student k5 course dashboard" do
       get "/courses/#{@subject_course.id}#modules"
 
       expect(module_item(@module_title)).to be_displayed
-    end
-
-    it 'provides a no modules defined message when there are no modules' do
-      course_with_student(active_all: true, user: @student)
-
-      get "/courses/#{@course.id}#modules"
-
-      expect(no_module_content).to be_displayed
     end
 
     it 'allows for expand and collapse of module' do

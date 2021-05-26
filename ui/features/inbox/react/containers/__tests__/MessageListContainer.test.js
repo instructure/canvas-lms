@@ -57,7 +57,7 @@ describe('MessageListContainer', () => {
     )
   }
 
-  describe('converation_query', () => {
+  describe('conversation_query', () => {
     it('should render query when successful', async () => {
       const component = setup()
       expect(component.container).toBeTruthy()

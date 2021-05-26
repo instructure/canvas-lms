@@ -33,7 +33,7 @@
   </script>
 <% end %>
 <div>
-  <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) && @context.elementary_subject_course? %>
+  <% if can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) && @context.elementary_subject_course? %>
     <div id="course_status">
       <h4>
         <%= t('headers.course_status', %{Course Status}) %>
@@ -55,7 +55,7 @@
     <% end %>
   <% end %>
 
-  <% if can_do(@context, @current_user, :change_course_state) %>
+  <% if can_do(@context, @current_user, :change_course_state, :manage_courses_conclude) %>
     <% if @context.completed? %>
       <%= form_tag context_url(@context, :context_unconclude_url) do %>
         <button class="Button Button--link Button--link--has-divider Button--course-settings" type="submit">

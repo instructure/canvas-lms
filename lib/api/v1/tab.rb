@@ -97,7 +97,8 @@ module Api::V1::Tab
       api: true,
       precalculated_permissions: precalculated_permissions,
       root_account: root_account,
-      session: session
+      session: session,
+      course_subject_tabs: params['include']&.include?('course_subject_tabs')
     }
 
     tabs = context.tabs_available(user, opts).select do |tab|

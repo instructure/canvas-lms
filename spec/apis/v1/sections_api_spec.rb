@@ -820,11 +820,51 @@ describe SectionsController, type: :request do
         expect(json['course']['id']).to eql @dest_course.id
       end
 
-      it "should not confirm crosslisting when the caller lacks :manage rights on the destination course" do
-        somebody = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { :manage_courses => false })
-        user_session(somebody)
-        json = api_call(:get, "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.id}",
-                        @params.merge(:action => 'crosslist_check', :course_id => @course.to_param, :section_id => @section.to_param, :new_course_id => @dest_course.id))
+      it 'should not confirm crosslisting when the caller lacks :manage rights on the destination course' do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+        account_admin =
+          account_admin_user_with_role_changes(
+            account: @course.root_account,
+            role_changes: {
+              manage_courses: false
+            }
+          )
+        user_session(account_admin)
+        json =
+          api_call(
+            :get,
+            "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.id}",
+            @params.merge(
+              action: 'crosslist_check',
+              course_id: @course.to_param,
+              section_id: @section.to_param,
+              new_course_id: @dest_course.id
+            )
+          )
+        expect(json['allowed']).to eq false
+      end
+
+      it 'should not confirm crosslisting when the caller lacks :manage rights on the destination course (granular permissions)' do
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+        account_admin =
+          account_admin_user_with_role_changes(
+            account: @course.root_account,
+            role_changes: {
+              manage_courses_admin: false
+            }
+          )
+        user_session(account_admin)
+        json =
+          api_call(
+            :get,
+            "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.id}",
+            @params.merge(
+              action: 'crosslist_check',
+              course_id: @course.to_param,
+              section_id: @section.to_param,
+              new_course_id: @dest_course.id
+            )
+          )
         expect(json['allowed']).to eq false
       end
     end

@@ -21,11 +21,11 @@ import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
+import {headerFor, originFromHost} from '../../../sidebar/sources/api'
 
-export default function(ed, document) {
+export default function (ed, document) {
   return import('@instructure/canvas-media').then(CanvasMedia => {
     const UploadMedia = CanvasMedia.default
-    // return import('./UploadMedia').then(({UploadMedia}) => {
     let container = document.querySelector('.canvas-rce-media-upload')
     if (!container) {
       container = document.createElement('div')
@@ -80,8 +80,12 @@ export default function(ed, document) {
       <StoreProvider {...trayProps}>
         {contentProps => (
           <UploadMedia
-            contextType={ed.settings.canvas_rce_user_context.type}
-            contextId={ed.settings.canvas_rce_user_context.id}
+            rcsConfig={{
+              contextType: ed.settings.canvas_rce_user_context.type,
+              contextId: ed.settings.canvas_rce_user_context.id,
+              origin: originFromHost(contentProps.host),
+              headers: headerFor(contentProps.jwt)
+            }}
             languages={Bridge.languages}
             open
             liveRegion={() => document.getElementById('flash_screenreader_holder')}

@@ -127,6 +127,7 @@ describe "scheduler" do
         load_week_view
 
         scheduler_event.click
+        wait_for_ajaximations
         f('.event-details .unreserve_event_link').click
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click

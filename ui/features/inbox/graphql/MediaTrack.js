@@ -48,11 +48,3 @@ export const MediaTrack = {
     __typename: 'MediaTrack'
   })
 }
-
-export const DefaultMocks = {
-  MediaTrack: () => ({
-    content: 'mockContent',
-    local: 'en-us',
-    kind: 'kindString'
-  })
-}

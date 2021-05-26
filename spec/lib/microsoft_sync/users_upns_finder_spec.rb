@@ -65,6 +65,21 @@ describe MicrosoftSync::UsersUpnsFinder do
           expect(users_upns.size).to eq 1
           expect(users_upns[communication_channel.user_id]).to eq email_address
         end
+
+        context 'inactive communication channels' do
+          let(:second_user) { user_model }
+          let(:second_channel) do
+            communication_channel_model(workflow_state: :inactive, path: "a_email@example.com", user_id: second_user.id)
+          end
+          let(:user_ids) { [communication_channel.user_id, second_user.id]}
+
+          it 'only returns the confirmed email address upn' do
+            users_upns = subject.to_h
+
+            expect(users_upns.size).to eq 1
+            expect(users_upns[communication_channel.user_id]).to eq email_address
+          end
+        end
       end
 
       context 'when the login_attribute=preferred_username' do

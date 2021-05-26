@@ -34,5 +34,18 @@ export const PageInfo = {
     hasNextPage: bool,
     hasPreviousPage: bool,
     startCursor: string
+  }),
+
+  mock: ({
+    endCursor = 'MjA',
+    hasNextPage = true,
+    hasPreviousPage = false,
+    startCursor = 'MQ'
+  } = {}) => ({
+    endCursor,
+    hasNextPage,
+    hasPreviousPage,
+    startCursor,
+    __typename: 'PageInfo'
   })
 }

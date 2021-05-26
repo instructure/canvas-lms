@@ -26,12 +26,18 @@ const setup = props => {
       authorName="Foo Bar"
       timingDisplay="Jan 1 2000"
       message="Posts are fun"
+      title="Thoughts"
       {...props}
     />
   )
 }
 
 describe('PostMessage', () => {
+  it('displays the title', () => {
+    const {queryByText} = setup()
+    expect(queryByText('Thoughts')).toBeTruthy()
+  })
+
   it('displays the message', () => {
     const {queryByText} = setup()
     expect(queryByText('Posts are fun')).toBeTruthy()

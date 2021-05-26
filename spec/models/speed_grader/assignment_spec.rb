@@ -342,6 +342,19 @@ describe SpeedGrader::Assignment do
         submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
         expect(submission_json["has_postable_comments"]).to be false
       end
+
+      it "is false when submission is unposted and only draft comments exist" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(
+          author: @teacher,
+          comment: "conspiratorial draft comment",
+          hidden: true,
+          draft_comment: true
+        )
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be false
+      end
     end
 
     it "returns submission lateness" do

@@ -33,11 +33,11 @@ export function friendlyTypeName(type) {
     case 'media_recording':
       return I18n.t('Media')
     case 'online_text_entry':
-      return I18n.t('Text Entry')
+      return I18n.t('Text')
     case 'online_upload':
-      return I18n.t('File')
+      return I18n.t('Upload')
     case 'online_url':
-      return I18n.t('URL')
+      return I18n.t('Web URL')
     default:
       throw new Error('submission type not yet supported in A2')
   }
@@ -52,4 +52,10 @@ export function multipleTypesDrafted(submission) {
   ].filter(criteria => criteria === true)
 
   return matchingCriteria.length > 1
+}
+
+export function totalAllowedAttempts({assignment, submission}) {
+  return assignment.allowedAttempts != null
+    ? assignment.allowedAttempts + (submission?.extraAttempts || 0)
+    : null
 }

@@ -1062,8 +1062,38 @@ describe CoursesController, type: :request do
 
       context "without :manage_storage_quotas" do
         before :once do
+          @account.root_account.disable_feature!(:granular_permissions_manage_courses)
           @role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
+                                          :role => @role
+          user_factory
+          @account.account_users.create!(user: @user, role: @role)
+        end
+
+        it "should ignore storage_quota" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.storage_quota).to eq @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
+        end
+      end
+
+      context "without :manage_storage_quotas (granular permissions)" do
+        before :once do
+          @account.root_account.enable_feature!(:granular_permissions_manage_courses)
+          @role = custom_account_role 'lamer', :account => @account
+          @account.role_overrides.create! :permission => 'manage_courses_add', :enabled => true,
                                           :role => @role
           user_factory
           @account.account_users.create!(user: @user, role: @role)
@@ -1716,6 +1746,27 @@ describe CoursesController, type: :request do
     end
     context "an authorized user" do
       it "should be able to reset a course" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+        expect(Auditors::Course).to receive(:record_reset).once.
+          with(@course, anything, @user, anything)
+
+        json = api_call(:post, @path, @params)
+        @course.reload
+        expect(@course.workflow_state).to eql 'deleted'
+        new_course = Course.find(json['id'])
+        expect(new_course.workflow_state).to eql 'claimed'
+        expect(json['workflow_state']).to eql 'unpublished'
+      end
+    end
+
+    context "an authorized user (granular permissions)" do
+      it "should be able to reset a course" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+        @course.root_account.role_overrides.create!(
+          role: teacher_role,
+          permission: 'manage_courses_delete',
+          enabled: true
+        )
         expect(Auditors::Course).to receive(:record_reset).once.
           with(@course, anything, @user, anything)
 

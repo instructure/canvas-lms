@@ -28,8 +28,10 @@ import {View} from '@instructure/ui-view'
 import CanvasRce from '../src/rce/CanvasRce'
 import '@instructure/canvas-theme'
 
-import locales from '../src/locales'
+import {getLocaleList} from '../src/getTranslations'
 import * as fakeSource from '../src/sidebar/sources/fake'
+
+const locales = getLocaleList()
 
 function renderDemos(state) {
   const {
@@ -155,7 +157,8 @@ class DemoOptions extends Component {
 
   handleChange = () => {
     const canvas_exists = getSetting('canvas_exists', false)
-    const refresh = canvas_exists !== this.state.canvas_exists
+    const lang = getSetting('lang', null)
+    const refresh = canvas_exists !== this.state.canvas_exists || lang !== this.state.lang
     document.documentElement.setAttribute('dir', this.state.dir)
     saveSettings(this.state)
     if (refresh) {
@@ -196,7 +199,7 @@ class DemoOptions extends Component {
               value={this.state.lang}
               onChange={(_e, option) => this.setState({lang: option.value})}
             >
-              {['en', ...Object.keys(locales)].map(locale => (
+              {[...locales, 'bad-locale-default-en'].map(locale => (
                 <SimpleSelect.Option id={locale} key={locale} value={locale}>
                   {locale}
                 </SimpleSelect.Option>

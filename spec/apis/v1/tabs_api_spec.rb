@@ -507,6 +507,200 @@ describe TabsController, type: :request do
       ])
     end
 
+    describe 'canvas for elementary' do
+      before(:once) do
+        course_with_teacher(:active_all => true)
+        @course.root_account.enable_feature!(:canvas_for_elementary)
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
+      end
+
+      it 'should list a select subset of tabs if it is an elementary course and has the include[]=course_subject_tabs param' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                        { :include => ['course_subject_tabs']})
+        expect(json).to eq [
+          {
+            "id" => "home",
+            "html_url" => "/courses/#{@course.id}",
+            "full_url" => "http://localhost/courses/#{@course.id}",
+            "position" => 1,
+            "visibility" => "public",
+            "label" => "Home",
+            "type" => "internal"
+          },
+          {
+            "id" => "schedule",
+            "html_url" => "/courses/#{@course.id}",
+            "full_url" => "http://localhost/courses/#{@course.id}",
+            "position" => 2,
+            "visibility" => "public",
+            "label" => "Schedule",
+            "type" => "internal"
+          },
+          {
+            "id" => "modules",
+            "html_url" => "/courses/#{@course.id}/modules",
+            "full_url" => "http://localhost/courses/#{@course.id}/modules",
+            "position" => 3,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Modules",
+            "type" => "internal"
+          },
+          {
+            "id" => "grades",
+            "html_url" => "/courses/#{@course.id}/grades",
+            "full_url" => "http://localhost/courses/#{@course.id}/grades",
+            "position" => 4,
+            "visibility" => "public",
+            "label" => "Grades",
+            "type" => "internal"
+          }
+        ]
+      end
+
+      it 'should list list navigation tabs for an elementary course' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'})
+        expect(json).to eq [
+          {
+            "id" => "home",
+            "html_url" => "/courses/#{@course.id}",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}",
+            "position" => 1,
+            "visibility" => "public",
+            "label" => "Home",
+            "type" => "internal"
+          },
+          {
+            "id" => "announcements",
+            "html_url" => "/courses/#{@course.id}/announcements",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/announcements",
+            "position" => 2,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Announcements",
+            "type" => "internal"
+          },
+          {
+            "id" => "assignments",
+            "html_url" => "/courses/#{@course.id}/assignments",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments",
+            "position" => 3,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Assignments",
+            "type" => "internal"
+          },
+          {
+            "id" => "discussions",
+            "html_url" => "/courses/#{@course.id}/discussion_topics",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/discussion_topics",
+            "position" => 4,
+            "visibility" => "public",
+            "label" => "Discussions",
+            "type" => "internal"
+          },
+          {
+            "id" => "grades",
+            "html_url" => "/courses/#{@course.id}/grades",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/grades",
+            "position" => 5,
+            "visibility" => "public",
+            "label" => "Grades",
+            "type" => "internal"
+          },
+          {
+            "id" => "people",
+            "html_url" => "/courses/#{@course.id}/users",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/users",
+            "position" => 6,
+            "visibility" => "public",
+            "label" => "People",
+            "type" => "internal"
+          },
+          {
+            "id" => "pages",
+            "html_url" => "/courses/#{@course.id}/wiki",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/wiki",
+            "position" => 7,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Pages",
+            "type" => "internal"
+          },
+          {
+            "id" => "files",
+            "html_url" => "/courses/#{@course.id}/files",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/files",
+            "position" => 8,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Files",
+            "type" => "internal"
+          },
+          {
+            "id" => "syllabus",
+            "html_url" => "/courses/#{@course.id}/assignments/syllabus",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/syllabus",
+            "position" => 9,
+            "visibility" => "public",
+            "label" => "Syllabus",
+            "type" => "internal"
+          },
+          {
+            "id" => "outcomes",
+            "html_url" => "/courses/#{@course.id}/outcomes",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/outcomes",
+            "position" => 10,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Outcomes",
+            "type" => "internal"
+          },
+          {
+            "id" => "rubrics",
+            "html_url" => "/courses/#{@course.id}/rubrics",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/rubrics",
+            "position" => 11,
+            "visibility" => "admins",
+            "label" => "Rubrics",
+            "type" => "internal"
+          },
+          {
+            "id" => "quizzes",
+            "html_url" => "/courses/#{@course.id}/quizzes",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/quizzes",
+            "position" => 12,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Quizzes",
+            "type" => "internal"
+          },
+          {
+            "id" => "modules",
+            "html_url" => "/courses/#{@course.id}/modules",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/modules",
+            "position" => 13,
+            "unused" => true,
+            "visibility" => "admins",
+            "label" => "Modules",
+            "type" => "internal"
+          },
+          {
+            "id" => "settings",
+            "html_url" => "/courses/#{@course.id}/settings",
+            "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
+            "position" => 14,
+            "visibility" => "admins",
+            "label" => "Settings",
+            "type" => "internal"
+          }
+        ]
+      end
+    end
+
     describe "teacher in a course" do
       before :once do
         course_with_teacher(active_all: true)

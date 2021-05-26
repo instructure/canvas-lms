@@ -434,7 +434,7 @@ class SubmissionsController < SubmissionsBaseController
   def allowed_api_submission_type?(submission_type)
     valid_for_api = API_SUBMISSION_TYPES.key?(submission_type)
     allowed_for_assignment = @assignment.submission_types_array.include?(submission_type)
-    basic_lti_launch = (@assignment.submission_types.include?('online') && submission_type == 'basic_lti_launch')
+    basic_lti_launch = (@assignment.submission_types =~ /online|external_tool/ && submission_type == 'basic_lti_launch')
     valid_for_api && (allowed_for_assignment || basic_lti_launch)
   end
   private :allowed_api_submission_type?

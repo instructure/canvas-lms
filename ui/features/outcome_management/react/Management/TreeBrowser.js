@@ -26,7 +26,8 @@ const TreeBrowser = ({
   rootId,
   onCollectionToggle,
   onCollectionClick,
-  selectionType
+  selectionType,
+  showRootCollection
 }) => {
   const margin = '0.8em'
   const iconMargin = isRTL() ? {marginLeft: margin} : {marginRight: margin}
@@ -49,7 +50,7 @@ const TreeBrowser = ({
         </span>
       )}
       rootId={rootId}
-      showRootCollection={false}
+      showRootCollection={showRootCollection}
     />
   )
 }
@@ -59,7 +60,8 @@ TreeBrowser.defaultProps = {
   onCollectionClick: () => {},
   collections: {},
   rootId: 0,
-  selectionType: 'none'
+  selectionType: 'none',
+  showRootCollection: false
 }
 
 TreeBrowser.propTypes = {
@@ -67,7 +69,8 @@ TreeBrowser.propTypes = {
   onCollectionClick: PropTypes.func,
   collections: PropTypes.object.isRequired,
   rootId: PropTypes.number.isRequired,
-  selectionType: PropTypes.string
+  selectionType: PropTypes.string,
+  showRootCollection: PropTypes.bool
 }
 
 export default TreeBrowser

@@ -166,7 +166,7 @@ describe UsersController do
       course_factory(:account => account_model)
       student_in_course(:course => @course)
       get "/users/#{@student.id}"
-      assert_status(401)
+      assert_status(404)
     end
 
     it "should show user to account users that have the read_roster permission" do

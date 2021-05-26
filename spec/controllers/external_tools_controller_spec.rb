@@ -2342,5 +2342,54 @@ describe ExternalToolsController do
       tools = json_parse(response.body)
       expect(tools.count).to eq 0
     end
+
+    context "with configured navigation settings" do
+      before :once do
+        @tool1 = add_tool("Test nav tool 1")
+        @tool1.course_navigation = {enabled: true}
+        @tool1.save!
+        @tool2 = add_tool("Test nav tool 2")
+        @tool2.course_navigation = {enabled: true}
+        @tool2.save!
+        @tool3 = add_tool("Test nav tool 3")
+        @tool3.course_navigation = {enabled: true}
+        @tool3.save!
+      end
+
+      it "returns tools in the order they are configured in the navigation settings" do
+        saved_tabs = [
+          {id: "context_external_tool_#{@tool3.id}"},
+          {id: "context_external_tool_#{@tool1.id}"},
+          {id: "context_external_tool_#{@tool2.id}"}
+        ]
+        @course.tab_configuration = saved_tabs
+        @course.save!
+        user_session(@teacher)
+        get :visible_course_nav_tools, params: {:course_id => @course.id}
+
+        tools = json_parse(response.body)
+        expect(tools.count).to eq 3
+        expect(tools[0]['name']).to eq "Test nav tool 3"
+        expect(tools[1]['name']).to eq "Test nav tool 1"
+        expect(tools[2]['name']).to eq "Test nav tool 2"
+      end
+
+      it "excludes hidden tools from response for students" do
+        saved_tabs = [
+          {id: "context_external_tool_#{@tool3.id}"},
+          {id: "context_external_tool_#{@tool1.id}", hidden: true},
+        ]
+        @course.tab_configuration = saved_tabs
+        @course.save!
+        student_in_course(:course => @course)
+        user_session(@student)
+        get :visible_course_nav_tools, params: {:course_id => @course.id}
+
+        tools = json_parse(response.body)
+        expect(tools.count).to eq 2
+        expect(tools[0]['name']).to eq "Test nav tool 3"
+        expect(tools[1]['name']).to eq "Test nav tool 2"
+      end
+    end
   end
 end

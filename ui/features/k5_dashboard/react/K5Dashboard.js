@@ -28,6 +28,7 @@ import {
   store,
   toggleMissingItems
 } from '@instructure/canvas-planner'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -88,9 +89,9 @@ export const K5Dashboard = ({
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
   responsiveSize = 'large',
-  canCreateCourses = false
+  createPermissions
 }) => {
-  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab)
+  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
@@ -173,16 +174,18 @@ export const K5Dashboard = ({
           switchToToday: handleSwitchToToday
         }}
       >
-        <K5Tabs
-          currentTab={currentTab}
-          name={display_name}
-          onTabChange={handleTabChange}
-          tabs={DASHBOARD_TABS}
-          tabsRef={setTabsRef}
-        />
+        {currentTab && (
+          <K5Tabs
+            currentTab={currentTab}
+            name={display_name}
+            onTabChange={handleTabChange}
+            tabs={DASHBOARD_TABS}
+            tabsRef={setTabsRef}
+          />
+        )}
         <HomeroomPage
           cards={cards}
-          canCreateCourses={canCreateCourses}
+          createPermissions={createPermissions}
           homeroomAnnouncements={homeroomAnnouncements}
           loadingAnnouncements={loadingAnnouncements}
           visible={currentTab === TAB_IDS.HOMEROOM}
@@ -218,7 +221,7 @@ K5Dashboard.propTypes = {
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string,
-  canCreateCourses: PropTypes.bool
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired
 }
 
 const mapDispatchToProps = {

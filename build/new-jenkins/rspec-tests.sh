@@ -7,7 +7,7 @@ parallel_index=$1
 only_failures=${2-}
 
 # calculate which group to run
-max=$((CI_NODE_TOTAL * (DOCKER_PROCESSES * RSPEC_PROCESSES)))
+max=$((CI_NODE_TOTAL * RSPEC_PROCESSES))
 group=$(((max-CI_NODE_TOTAL * $parallel_index) - CI_NODE_INDEX))
 maybeOnlyFailures=()
 if [ "${only_failures}" = 'only-failures' ] && [ ! "${RSPEC_LOG:-}" == "1" ]; then

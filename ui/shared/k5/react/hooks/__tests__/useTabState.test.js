@@ -20,6 +20,14 @@ import {act, renderHook} from '@testing-library/react-hooks'
 import useTabState from '../useTabState'
 import {TAB_IDS} from '../../utils'
 
+const TABS = [
+  {id: TAB_IDS.HOME},
+  {id: TAB_IDS.GRADES},
+  {id: TAB_IDS.MODULES},
+  {id: TAB_IDS.SCHEDULE},
+  {id: TAB_IDS.RESOURCES}
+]
+
 beforeAll(() => {
   window.history.replaceState = jest.fn()
 })
@@ -31,12 +39,22 @@ afterEach(() => {
 
 describe('useTabState hook', () => {
   it('sets the current tab to the passed-in default tab', () => {
-    const {result} = renderHook(() => useTabState(TAB_IDS.GRADES))
+    const {result} = renderHook(() => useTabState(TAB_IDS.GRADES, TABS))
     expect(result.current.currentTab).toBe(TAB_IDS.GRADES)
   })
 
+  it('defaults the current tab to the first tab if no default is passed-in', () => {
+    const {result} = renderHook(() => useTabState(undefined, TABS))
+    expect(result.current.currentTab).toBe(TAB_IDS.HOME)
+  })
+
+  it('leaves the current tab unset if no default or tabs are passed-in', () => {
+    const {result} = renderHook(() => useTabState(undefined, []))
+    expect(result.current.currentTab).toBe(undefined)
+  })
+
   it('updates the current tab as handleTabChange is called and keeps activeTab in sync', () => {
-    const {result} = renderHook(() => useTabState(TAB_IDS.MODULES))
+    const {result} = renderHook(() => useTabState(TAB_IDS.MODULES, TABS))
     let {activeTab, currentTab} = result.current
     expect(currentTab).toBe(TAB_IDS.MODULES)
     expect(activeTab.current).toBe(TAB_IDS.MODULES)
@@ -49,6 +67,14 @@ describe('useTabState hook', () => {
     expect(activeTab.current).toBe(TAB_IDS.RESOURCES)
   })
 
+  it('does not update the current tab if the requested tab is invalid', () => {
+    const {result} = renderHook(() => useTabState(TAB_IDS.SCHEDULE, [TAB_IDS.MODULES]))
+    expect(result.current.currentTab).toBe(TAB_IDS.SCHEDULE)
+
+    act(() => result.current.handleTabChange(TAB_IDS.MODULES))
+    expect(result.current.currentTab).toBe(TAB_IDS.SCHEDULE)
+  })
+
   describe('stores current tab ID to URL', () => {
     afterEach(() => {
       window.location.hash = ''
@@ -56,18 +82,18 @@ describe('useTabState hook', () => {
 
     it('and starts at that tab if it is valid', () => {
       window.location.hash = '#schedule'
-      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES))
+      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES, TABS))
       expect(result.current.currentTab).toBe(TAB_IDS.SCHEDULE)
     })
 
     it('and starts at the default tab if it is invalid', () => {
       window.location.hash = '#fake-tab'
-      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES))
+      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES, TABS))
       expect(result.current.currentTab).toBe(TAB_IDS.GRADES)
     })
 
     it('and updates the URL hash as tabs are changed', () => {
-      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES))
+      const {result} = renderHook(() => useTabState(TAB_IDS.GRADES, TABS))
 
       act(() => result.current.handleTabChange(TAB_IDS.RESOURCES))
 

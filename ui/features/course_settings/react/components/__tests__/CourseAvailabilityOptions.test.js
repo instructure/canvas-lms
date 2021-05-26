@@ -218,7 +218,7 @@ describe('CourseAvailabilityOptions', () => {
     ).toBeTruthy()
   })
 
-  it('can manually type in a course end date', () => {
+  it('updates course end date when DateInput changes', () => {
     const {getByLabelText} = renderComponent(wrapper, {
       course_restrict_enrollments_to_course_dates: 'true'
     })
@@ -229,6 +229,28 @@ describe('CourseAvailabilityOptions', () => {
     fireEvent.click(endDate)
     fireEvent.blur(endDate)
     expect(document.getElementById('course_conclude_at').value).toBe(`${year}-01-01T00:00:00.000Z`)
+  })
+
+  it('updates course start date when Enter is hit on the DateInput', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const startDate = getByLabelText('Start')
+    const year = moment().year()
+    fireEvent.change(startDate, {target: {value: `Jan 1, ${year} 12:00am`}})
+    fireEvent.keyDown(startDate, {key: 'Enter'})
+    expect(document.getElementById('course_start_at').value).toBe(`${year}-01-01T00:00:00.000Z`)
+  })
+
+  it('updates course end date when Enter is hit on the DateInput', () => {
+    const {getByLabelText} = renderComponent(wrapper, {
+      course_restrict_enrollments_to_course_dates: 'true'
+    })
+    const endDate = getByLabelText('End')
+    const year = moment().year()
+    fireEvent.change(endDate, {target: {value: `Feb 1, ${year} 12:00am`}})
+    fireEvent.keyDown(endDate, {key: 'Enter'})
+    expect(document.getElementById('course_conclude_at').value).toBe(`${year}-02-01T00:00:00.000Z`)
   })
 
   it('can set the course end date for a different year', () => {

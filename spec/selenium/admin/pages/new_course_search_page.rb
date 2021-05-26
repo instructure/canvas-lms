@@ -62,10 +62,6 @@ module NewCourseSearchPage
     ff('[data-automation="courses list"] tr')
   end
 
-  def loading_spinner
-    fj('svg:contains("Loading...")')
-  end
-
   def hide_course_without_students_checkbox
     fj('label:contains("Hide courses without students")')
   end
@@ -100,8 +96,7 @@ module NewCourseSearchPage
   end
 
   def click_hide_courses_without_students
-    hide_course_without_students_checkbox.click
-    wait_for_spinner
+    wait_for_spinner { hide_course_without_students_checkbox.click }
   end
 
   def navigate_to_page(page_number)
@@ -109,13 +104,11 @@ module NewCourseSearchPage
   end
 
   def select_term(term)
-    click_INSTUI_Select_option('#termFilter', term.name)
-    wait_for_spinner
+    wait_for_spinner { click_INSTUI_Select_option('#termFilter', term.name) }
   end
 
   def search(search_text)
-    search_text_box.send_keys(search_text)
-    wait_for_spinner
+    wait_for_spinner { search_text_box.send_keys(search_text) }
   end
 
   def click_add_users_to_course(course)
@@ -132,13 +125,7 @@ module NewCourseSearchPage
   end
 
   def wait_for_spinner
-    begin
-      loading_spinner
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      # assume loading spinner was too quick to capture, continue
-    rescue SpecTimeLimit::Error
-      # ignore - sometimes spinner doesn't appear in Chrome
-    end
+    wait_for_transient_element('svg[role="img"] circle') { yield }
     wait_for_ajaximations
   end
 end

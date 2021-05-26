@@ -119,10 +119,14 @@ describe "Wiki Pages" do
     end
 
     it "does not mark valid links as invalid", priority: "2", test_id: 927788 do
+      Setting.set('link_validator_poll_timeout', 100)
+      Setting.set('link_validator_poll_timeout_initial', 100)
+
       @course.wiki_pages.create!(title: 'Page1', body: 'http://www.instructure.com/')
       get "/courses/#{@course.id}/link_validator"
       fj('button:contains("Start Link Validation")').click
       run_jobs
+      wait_for_ajaximations
       expect(f('#link_validator')).to contain_jqcss('div:contains("No broken links found")')
     end
   end

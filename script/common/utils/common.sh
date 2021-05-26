@@ -73,6 +73,9 @@ function _canvas_lms_telemetry_enabled() {
 }
 
 function _canvas_lms_opt_in_telemetry() {
+  if [ -n "$CANVAS_LMS_ACTIVATE_TELEMETRY" ]; then
+    eval "$CANVAS_LMS_ACTIVATE_TELEMETRY"
+  fi
   SCRIPT_NAME=$1
   LOG_FILE=$2
   if installed _canvas_lms_activate_telemetry; then

@@ -352,6 +352,7 @@ describe "admin settings tab" do
 
   context "who can create new courses" do
     before :each do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
       get "/accounts/#{Account.default.id}/settings"
     end
 
@@ -363,16 +364,17 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
     end
 
+    it "should check on users with no enrollments (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
+    end
+
     it "should check on students" do
       check_box_verifier("#account_settings_students_can_create_courses", :students_can_create_courses)
     end
   end
 
   context "custom help links" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     def set_checkbox(checkbox, checked)
       selector = "##{checkbox['id']}"
       checkbox.click if is_checked(selector) != checked
@@ -503,6 +505,8 @@ describe "admin settings tab" do
     end
 
     it "edits a default link" do
+      Setting.set('show_feedback_link', 'true')
+
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')

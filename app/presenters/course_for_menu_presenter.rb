@@ -60,7 +60,8 @@ class CourseForMenuPresenter
       canManage: course.grants_right?(@user, :manage_content),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       color: course.elementary_enabled? ? course.course_color : nil,
-      position: position.present? ? position.to_i : nil
+      position: position.present? ? position.to_i : nil,
+      published: course.published?
     }.tap do |hash|
       if @opts[:tabs]
         tabs = course.tabs_available(@user, {
@@ -79,8 +80,7 @@ class CourseForMenuPresenter
         end
       end
       if @context.root_account.feature_enabled?(:unpublished_courses)
-        hash[:published] = course.published?
-        hash[:canChangeCourseState] = course.grants_right?(@user, :change_course_state)
+        hash[:canChangeCoursePublishState] = course.grants_any_right?(@user, :change_course_state, :manage_courses_publish)
         hash[:defaultView] = course.default_view
         hash[:pagesUrl] = polymorphic_url([course, :wiki_pages])
         hash[:frontPageTitle] = course&.wiki&.front_page&.title

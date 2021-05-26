@@ -3,5 +3,6 @@
   "plugins": ["testcafe"],
   "rules": {
     "import/order": "off"
-  }
+  },
+  "ignorePatterns": ["scripts/installTranslations.js", "**/translations/**/*.js"]
 }

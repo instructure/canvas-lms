@@ -1,0 +1,18 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "You have been mentioned in %{discussion_topic}: %{course}", discussion_topic: asset.title, course: asset.context.name %>
+<% end %>
+
+<%= t :body, "%{user} mentioned you in a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %>
+
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
+
+<% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+  <%= t("Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion.", link: content(:link)) %>
+<% else %>
+  <%= t("Join the conversation using this link: %{link}.", link: content(:link)) %>
+<% end %>
+

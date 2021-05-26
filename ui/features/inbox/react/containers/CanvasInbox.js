@@ -18,9 +18,12 @@
 
 import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
 import {Flex} from '@instructure/ui-flex'
-import React, {useState, useEffect} from 'react'
-import MessageListContainer from './MessageListContainer'
+import {MessageDetailContainer} from './MessageDetailContainer/MessageDetailContainer'
 import MessageListActionContainer from './MessageListActionContainer'
+import MessageListContainer from './MessageListContainer'
+import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
+import React, {useState, useEffect} from 'react'
+import {View} from '@instructure/ui-view'
 
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
@@ -72,8 +75,14 @@ const CanvasInbox = () => {
             activeMailbox={scope}
             course={courseFilter}
             scope={scope}
-            onSelectMailbox={setScope}
-            onCourseFilterSelect={setCourseFilter}
+            onSelectMailbox={newScope => {
+              setSelectedConversations([])
+              setScope(newScope)
+            }}
+            onCourseFilterSelect={course => {
+              setSelectedConversations([])
+              setCourseFilter(course)
+            }}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
             onReply={() => {
@@ -101,8 +110,14 @@ const CanvasInbox = () => {
                 onSelectMessage={updateSelectedConversations}
               />
             </Flex.Item>
-            <Flex.Item shouldGrow shouldShrink height="100%">
-              <div className="testing-class-name-canvas-inbox">Message Content Goes Here</div>
+            <Flex.Item shouldGrow shouldShrink height="100%" overflowY="auto">
+              {selectedConversations.length > 0 ? (
+                <MessageDetailContainer conversation={selectedConversations[0]} />
+              ) : (
+                <View padding="small">
+                  <NoSelectedConversation />
+                </View>
+              )}
             </Flex.Item>
           </Flex>
         </Flex.Item>

@@ -425,6 +425,10 @@ class SubmissionComment < ActiveRecord::Base
     !draft? && submission.assignment.auditable? && !grade_posting_in_progress
   end
 
+  def allows_posting_submission?
+    hidden? && !draft?
+  end
+
   protected
   def skip_group_callbacks!
     @skip_group_callbacks = true

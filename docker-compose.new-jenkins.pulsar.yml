@@ -12,14 +12,9 @@ services:
     ports:
       - "6650"
       - "8080"
-    volumes:
-      - pulsar-data:/pulsar/data
   pulsar-admin:
     image: starlord.inscloudgate.net/jenkins/pulsar:latest
     volumes:
       - ./docker-compose/pulsar:/pulsar/scripts
     depends_on:
       - pulsar
-
-volumes:
-  pulsar-data: {}

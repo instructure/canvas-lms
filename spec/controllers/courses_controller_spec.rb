@@ -1628,6 +1628,14 @@ describe CoursesController do
         expect(bundle.size).to eq 1
       end
     end
+
+    it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
+      @course.enable_feature!(:student_outcome_gradebook)
+      user_session(@student)
+
+      get 'show', params: {:id => @course.id}
+      expect(assigns[:js_env][:COURSE][:student_outcome_gradebook_enabled]).to be_truthy
+    end
   end
 
   describe "POST 'unenroll_user'" do
@@ -1784,6 +1792,7 @@ describe CoursesController do
   describe "POST create" do
     before do
       @account = Account.default
+      @account.root_account.disable_feature!(:granular_permissions_manage_courses)
       role = custom_account_role 'lamer', :account => @account
       @account.role_overrides.create! :permission => 'manage_courses', :enabled => true, :role => role
       @visperm = @account.role_overrides.create! :permission => 'manage_course_visibility', :enabled => true, :role => role
@@ -1839,6 +1848,90 @@ describe CoursesController do
           public_syllabus_to_auth: true
         }
       }, format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be false
+      expect(json['public_syllabus']).to be false
+      expect(json['is_public_to_auth_users']).to be false
+      expect(json['public_syllabus_to_auth']).to be false
+    end
+  end
+
+  describe 'POST create (granular permissions)' do
+    before do
+      @account = Account.default
+      @account.root_account.enable_feature!(:granular_permissions_manage_courses)
+      role = custom_account_role 'lamer', account: @account
+      @account.role_overrides.create! permission: 'manage_courses_add', enabled: true, role: role
+      @visperm =
+        @account.role_overrides.create! permission: 'manage_course_visibility',
+                                        enabled: true,
+                                        role: role
+      user_factory
+      @account.account_users.create!(user: @user, role: role)
+      user_session @user
+    end
+
+    it 'should log create course event' do
+      course = @account.courses.build({ name: 'Course Name', lock_all_announcements: true })
+      changes = course.changes
+      changes.delete('settings')
+      changes['lock_all_announcements'] = [nil, true]
+
+      expect(Auditors::Course).to receive(:record_created).with(
+        anything,
+        anything,
+        changes,
+        anything
+      )
+
+      post 'create',
+           params: {
+             account_id: @account.id,
+             course: {
+               name: course.name,
+               lock_all_announcements: true
+             }
+           }
+    end
+
+    it 'should set the visibility settings when we have permission' do
+      post 'create',
+           params: {
+             account_id: @account.id,
+             course: {
+               name: 'new course',
+               is_public: true,
+               public_syllabus: true,
+               is_public_to_auth_users: true,
+               public_syllabus_to_auth: true
+             }
+           },
+           format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be true
+      expect(json['public_syllabus']).to be true
+      expect(json['is_public_to_auth_users']).to be true
+      expect(json['public_syllabus_to_auth']).to be true
+    end
+
+    it "should NOT allow visibility to be set when we don't have permission" do
+      @visperm.enabled = false
+      @visperm.save
+
+      post 'create',
+           params: {
+             account_id: @account.id,
+             course: {
+               name: 'new course',
+               is_public: true,
+               public_syllabus: true,
+               is_public_to_auth_users: true,
+               public_syllabus_to_auth: true
+             }
+           },
+           format: :json
 
       json = JSON.parse response.body
       expect(json['is_public']).to be false
@@ -1946,6 +2039,7 @@ describe CoursesController do
     end
 
     it "concludes a course" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       expect(Auditors::Course).to receive(:record_concluded).once
       user_session(@teacher)
       put 'update', params: {:id => @course.id, :course => {:event => "conclude"}, :format => :json}
@@ -1955,7 +2049,37 @@ describe CoursesController do
       expect(@course.workflow_state).to eq 'completed'
     end
 
+    it "concludes a course if given :manage_courses_conclude (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_conclude',
+        enabled: true
+      )
+      expect(Auditors::Course).to receive(:record_concluded).once
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :course => {:event => "conclude"}, :format => :json}
+      json = JSON.parse response.body
+      expect(json['course']['workflow_state']).to eq 'completed'
+      @course.reload
+      expect(@course.workflow_state).to eq 'completed'
+    end
+
+    it "doesn't conclude course if :manage_courses_conclude is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_conclude',
+        enabled: false
+      )
+      expect(Auditors::Course).not_to receive(:record_concluded)
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :course => {:event => "conclude"}, :format => :json}
+      assert_unauthorized
+    end
+
     it "publishes a course" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @course.claim!
       expect(Auditors::Course).to receive(:record_published).once
       user_session(@teacher)
@@ -1966,7 +2090,39 @@ describe CoursesController do
       expect(@course.workflow_state).to eq 'available'
     end
 
+    it "publishes a course if given :manage_courses_publish (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_publish',
+        enabled: true
+      )
+      @course.claim!
+      expect(Auditors::Course).to receive(:record_published).once
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :course => {:event => 'offer'}, :format => :json}
+      json = JSON.parse response.body
+      expect(json['course']['workflow_state']).to eq 'available'
+      @course.reload
+      expect(@course.workflow_state).to eq 'available'
+    end
+
+    it "doesn't publish course if :manage_courses_publish is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_publish',
+        enabled: false
+      )
+      @course.claim!
+      expect(Auditors::Course).not_to receive(:record_published)
+      user_session(@teacher)
+      put 'update', params: {:id => @course.id, :course => {:event => 'offer'}, :format => :json}
+      assert_unauthorized
+    end
+
     it "deletes a course" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_deleted).once
       put 'update', params: {:id => @course.id, :course => {:event => 'delete'}, :format => :json}
@@ -1974,6 +2130,35 @@ describe CoursesController do
       expect(json['course']['workflow_state']).to eq 'deleted'
       @course.reload
       expect(@course.workflow_state).to eq 'deleted'
+    end
+
+    it "deletes a course if given :manage_courses_delete (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_delete',
+        enabled: true
+      )
+      user_session(@teacher)
+      expect(Auditors::Course).to receive(:record_deleted).once
+      put 'update', params: {:id => @course.id, :course => {:event => 'delete'}, :format => :json}
+      json = JSON.parse response.body
+      expect(json['course']['workflow_state']).to eq 'deleted'
+      @course.reload
+      expect(@course.workflow_state).to eq 'deleted'
+    end
+
+    it "doesn't delete course if :manage_courses_delete is not enabled (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_delete',
+        enabled: false
+      )
+      user_session(@teacher)
+      expect(Auditors::Course).not_to receive(:record_deleted)
+      put 'update', params: {:id => @course.id, :course => {:event => 'delete'}, :format => :json}
+      assert_unauthorized
     end
 
     it "doesn't allow a teacher to undelete a course" do
@@ -2690,6 +2875,20 @@ describe CoursesController do
     end
 
     it "should allow teachers to reset" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      user_session(@teacher)
+      post 'reset_content', params: {:course_id => @course.id}
+      expect(response).to be_redirect
+      expect(@course.reload).to be_deleted
+    end
+
+    it "should only allow teachers to reset if granted :manage_courses_delete (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_delete',
+        enabled: true
+      )
       user_session(@teacher)
       post 'reset_content', params: {:course_id => @course.id}
       expect(response).to be_redirect
@@ -2705,6 +2904,20 @@ describe CoursesController do
     end
 
     it "does not allow resetting blueprint courses" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      MasterCourses::MasterTemplate.set_as_master_course(@course)
+      user_session(@teacher)
+      post 'reset_content', params: {:course_id => @course.id}
+      expect(response).to be_bad_request
+    end
+
+    it "does not allow resetting blueprint courses (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_delete',
+        enabled: true
+      )
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       user_session(@teacher)
       post 'reset_content', params: {:course_id => @course.id}
@@ -2712,6 +2925,20 @@ describe CoursesController do
     end
 
     it "should log reset audit event" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      user_session(@teacher)
+      expect(Auditors::Course).to receive(:record_reset).once.
+        with(@course, anything, @user, anything)
+      post 'reset_content', params: {:course_id => @course.id}
+    end
+
+    it "should log reset audit event (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_delete',
+        enabled: true
+      )
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_reset).once.
         with(@course, anything, @user, anything)
@@ -2848,6 +3075,7 @@ describe CoursesController do
       describe "create" do
         before :once do
           @account = Account.default
+          @account.disable_feature!(:granular_permissions_manage_courses)
           role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :role => role
@@ -2869,6 +3097,49 @@ describe CoursesController do
         it "should ignore storage_quota_mb" do
           post 'create', params: { :account_id => @account.id, :course =>
               { :name => 'xyzpdq', :storage_quota_mb => 111 } }
+          @course = @account.courses.where(name: 'xyzpdq').first
+          expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.megabyte
+        end
+      end
+
+      describe 'create (granular permissions)' do
+        before :once do
+          @account = Account.default
+          @account.enable_feature!(:granular_permissions_manage_courses)
+          role = custom_account_role 'lamer', account: @account
+          @account.role_overrides.create! permission: 'manage_courses_add',
+                                          enabled: true,
+                                          role: role
+          user_factory
+          @account.account_users.create!(user: @user, role: role)
+        end
+
+        before :each do
+          user_session @user
+        end
+
+        it 'should ignore storage_quota' do
+          post 'create',
+               params: {
+                 account_id: @account.id,
+                 course: {
+                   name: 'xyzzy',
+                   storage_quota: 111.megabytes
+                 }
+               }
+          @course = @account.courses.where(name: 'xyzzy').first
+          expect(@course.storage_quota).to eq @account.default_storage_quota
+        end
+
+        it 'should ignore storage_quota_mb' do
+          post 'create',
+               params: {
+                 account_id: @account.id,
+                 course: {
+                   name: 'xyzpdq',
+                   storage_quota_mb: 111
+                 }
+               }
           @course = @account.courses.where(name: 'xyzpdq').first
           expect(@course.storage_quota_mb).to eq @account.default_storage_quota / 1.megabyte
         end
@@ -2932,14 +3203,20 @@ describe CoursesController do
       submission = test_student.submissions.first
       auditor_rec = submission.auditor_grade_change_records.first
       expect(auditor_rec).to_not be_nil
-      OriginalityReport.create!(attachment: attachment_model, originality_score: '1', submission: test_student.submissions.first)
+      attachment = attachment_model
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: test_student.submissions.first)
+      submission.canvadocs_annotation_contexts.create!(
+        root_account: @course.root_account,
+        attachment: attachment,
+        launch_id: '1234'
+      )
       delete 'reset_test_student', params: {course_id: @course.id}
       test_student.reload
       expect(test_student.submissions.size).to be_zero
       expect(Auditors::ActiveRecord::GradeChangeRecord.where(id: auditor_rec.id).count).to be_zero
     end
 
-    it "removes provisional grades for by the test student" do
+    it "removes provisional grades for the test student" do
       user_session(@teacher)
       post 'student_view', params: {course_id: @course.id}
       test_student = @course.student_view_student

@@ -146,8 +146,7 @@ describe "assignment rubrics" do
       full_rubric_button.click
       set_value(f('td[data-testid="criterion-points"] input'), '2.5')
       f('#rubric_holder .save_rubric_button').click
-
-      expect(f("span[data-selenium='rubric_total']")).to include_text '2.5'
+      expect(fj("span[data-selenium='rubric_total']:visible")).to include_text '2.5'
     end
 
     it "should import rubric to assignment", priority: "1", test_id: 220317 do

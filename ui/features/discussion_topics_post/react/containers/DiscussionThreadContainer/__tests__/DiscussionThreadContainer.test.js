@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
 import {fireEvent, render} from '@testing-library/react'
+import {getSpeedGraderUrl} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -31,7 +32,14 @@ describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
+  const assignMock = jest.fn()
   beforeAll(() => {
+    delete window.location
+    window.location = {assign: assignMock}
+    window.ENV = {
+      course_id: '1'
+    }
+
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
@@ -41,6 +49,7 @@ describe('DiscussionThreadContainer', () => {
     server.resetHandlers()
     onFailureStub.mockClear()
     onSuccessStub.mockClear()
+    assignMock.mockClear()
   })
 
   afterAll(() => {
@@ -49,43 +58,47 @@ describe('DiscussionThreadContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const defaultProps = overrides => {
+  const defaultProps = ({discussionEntryOverrides = {}, assignment = undefined} = {}) => {
     return {
-      _id: '49',
-      id: '49',
-      createdAt: '2021-04-05T13:40:50-06:00',
-      updatedAt: '2021-04-05T13:40:50-06:00',
-      deleted: false,
-      message: '<p>This is the parent reply</p>',
-      ratingCount: null,
-      ratingSum: null,
-      rating: false,
-      read: true,
-      subentriesCount: 1,
-      rootEntryParticipantCounts: {
-        unreadCount: 1,
-        repliesCount: 1
-      },
-      author: {
-        _id: '1',
-        id: 'VXNlci0x',
-        avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-        name: 'Matthew Lemon'
-      },
-      editor: null,
-      lastReply: {
-        createdAt: '2021-04-05T13:41:42-06:00'
-      },
-      permissions: {
-        attach: true,
-        create: true,
-        delete: true,
-        rate: true,
+      discussionEntry: {
+        _id: '49',
+        id: '49',
+        createdAt: '2021-04-05T13:40:50-06:00',
+        updatedAt: '2021-04-05T13:40:50-06:00',
+        deleted: false,
+        message: '<p>This is the parent reply</p>',
+        ratingCount: null,
+        ratingSum: null,
+        rating: false,
         read: true,
-        reply: true,
-        update: true
+        subentriesCount: 1,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1
+        },
+        author: {
+          _id: '1',
+          id: 'VXNlci0x',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+          name: 'Matthew Lemon'
+        },
+        editor: null,
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00'
+        },
+        permissions: {
+          attach: true,
+          create: true,
+          delete: true,
+          rate: true,
+          read: true,
+          reply: true,
+          update: true,
+          viewRating: true
+        },
+        ...discussionEntryOverrides
       },
-      ...overrides
+      assignment
     }
   }
 
@@ -135,6 +148,25 @@ describe('DiscussionThreadContainer', () => {
     fireEvent.click(getByTestId('collapse-replies'))
 
     expect(queryByTestId('collapse-replies')).toBeNull()
+  })
+
+  describe('delete permission', () => {
+    it('removed when false', async () => {
+      const new_prop = defaultProps()
+      new_prop.discussionEntry.permissions.delete = false
+      const {getByTestId, queryAllByText} = setup(new_prop)
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryAllByText('Delete').length).toBe(0)
+    })
+
+    it('present when true', async () => {
+      const {getByTestId, queryAllByText} = setup(defaultProps())
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      const deletes = queryAllByText('Delete')
+      expect(deletes.length).toBe(1)
+    })
   })
 
   describe('read state', () => {
@@ -221,9 +253,10 @@ describe('DiscussionThreadContainer', () => {
 
   describe('SpeedGrader', () => {
     it('Should be able to open SpeedGrader', async () => {
-      const {getByTestId, findByText} = setup(
+      const {getByTestId} = setup(
         defaultProps({
           assignment: {
+            _id: '1337',
             dueAt: '2021-04-05T13:40:50Z',
             pointsPossible: 5
           }
@@ -234,9 +267,7 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(
-          findByText('This student does not have a submission for this assignment')
-        ).toBeTruthy()
+        expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337', '1'))
       })
     })
 

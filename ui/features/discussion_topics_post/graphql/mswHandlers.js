@@ -73,8 +73,12 @@ const defaultEntry = {
         ratingSum: 0,
         rating: false,
         read: true,
-        subentriesCount: 0,
-        rootEntryParticipantCounts: null,
+        subentriesCount: 1,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1,
+          __typename: 'RootEntryParticipantCount'
+        },
         author: {
           _id: '1',
           id: 'VXNlci0x',
@@ -83,7 +87,10 @@ const defaultEntry = {
           __typename: 'User'
         },
         editor: null,
-        lastReply: null,
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00',
+          __typename: 'DiscussionEntry'
+        },
         permissions: {
           attach: true,
           create: true,
@@ -92,6 +99,7 @@ const defaultEntry = {
           read: true,
           reply: true,
           update: true,
+          viewRating: true,
           __typename: 'DiscussionEntryPermissions'
         },
         __typename: 'DiscussionEntry'
@@ -114,12 +122,13 @@ const defaultEntry = {
     read: true,
     reply: true,
     update: true,
+    viewRating: true,
     __typename: 'DiscussionEntryPermissions'
   },
   __typename: 'DiscussionEntry'
 }
 
-const defaultTopic = {
+export const defaultTopic = {
   allowRating: true,
   assignment: null,
   author: {
@@ -169,6 +178,14 @@ const defaultTopic = {
     readReplies: true,
     reply: true,
     update: true,
+    speedGrader: true,
+    peerReview: true,
+    showRubric: true,
+    addRubric: true,
+    openForComments: true,
+    closeForComments: false,
+    copyAndSendTo: true,
+    moderateForum: true,
     __typename: 'DiscussionPermissions'
   },
   postedAt: '2020-11-23T11:40:44-07:00',
@@ -201,6 +218,7 @@ const defaultTopic = {
           read: true,
           reply: true,
           update: true,
+          viewRating: true,
           __typename: 'DiscussionEntryPermissions'
         },
         rating: false,
@@ -228,6 +246,61 @@ const defaultTopic = {
     __typename: 'DiscussionEntryConnection'
   },
   rootEntriesTotalPages: 1,
+  discussionEntriesConnection: {
+    nodes: [
+      {
+        author: {
+          avatarUrl: imageUrl,
+          id: 'VXNlci0x',
+          name: 'Matthew Lemon',
+          _id: '1',
+          __typename: 'User'
+        },
+        createdAt: '2021-04-05T13:40:50-06:00',
+        deleted: false,
+        editor: null,
+        id: '49',
+        lastReply: {
+          createdAt: '2021-04-05T13:41:42-06:00',
+          __typename: 'DiscussionEntry'
+        },
+        message: '<p>This is the parent reply</p>',
+        permissions: {
+          attach: true,
+          create: true,
+          delete: true,
+          rate: true,
+          read: true,
+          reply: true,
+          update: true,
+          viewRating: true,
+          __typename: 'DiscussionEntryPermissions'
+        },
+        rating: false,
+        ratingCount: null,
+        ratingSum: null,
+        read: true,
+        rootEntryParticipantCounts: {
+          unreadCount: 1,
+          repliesCount: 1,
+          __typename: 'RootEntryParticipantCount'
+        },
+        subentriesCount: 1,
+        updatedAt: '2021-04-05T13:40:50-06:00',
+        _id: '49',
+        __typename: 'DiscussionEntry'
+      }
+    ],
+    pageInfo: {
+      endCursor: 'MTg',
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: 'MQ',
+      __typename: 'PageInfo'
+    },
+    __typename: 'DiscussionEntryConnection'
+  },
+  entriesTotalPages: 1,
   subscribed: true,
   title: 'Cookie Cat',
   message: 'This is a Discussion Topic Message',
@@ -321,9 +394,44 @@ export const handlers = [
     )
   }),
   graphql.mutation('DeleteDiscussionTopic', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        deleteDiscussionTopic: {
+          discussionTopicId: req.variables.id,
+          errors: null,
+          __typename: 'DeleteDiscussionTopicPayload'
+        }
+      })
+    )
+  }),
+  graphql.mutation('CreateDiscussionEntry', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        createDiscussionEntry: {
+          discussionEntry: mswAssign(
+            {...defaultEntry},
+            {
+              id: req.body.variables.discussionTopicId,
+              message: req.body.variables.message
+            }
+          ),
+          errors: null,
+          __typename: 'CreateDiscussionEntryPayload'
+        }
+      })
+    )
+  }),
+  graphql.mutation('UpdateDiscussionEntry', (req, res, ctx) => {
     ctx.data({
-      deleteDiscussionTopic: {
-        discussionTopicId: req.body.variables.id
+      updateDiscussionEntry: {
+        discussionTopic: mswAssign(
+          {...defaultEntry},
+          {
+            id: req.body.variables.discussionEntryId,
+            message: req.body.variables.message
+          }
+        ),
+        __typename: 'UpdateDiscussionEntryPayload'
       }
     })
   })

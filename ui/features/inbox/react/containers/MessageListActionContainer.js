@@ -35,6 +35,26 @@ const MessageListActionContainer = props => {
   const conversationsQuery = CONVERSATIONS_QUERY
   const userID = ENV.current_user_id?.toString()
 
+  const selectedReadStates = () => {
+    const selectedStates =
+      props.selectedConversations
+        .map(cp =>
+          cp.conversationParticipantsConnection?.nodes?.find(
+            participant => participant.user._id === ENV.current_user?.id
+          )
+        )
+        .map(node => node?.workflowState) || []
+    return selectedStates
+  }
+
+  const shouldRenderMarkAsRead = () => selectedReadStates().includes('unread')
+
+  const shouldRenderMarkAsUnread = () => selectedReadStates().includes('read')
+
+  const hasMultipleSelectedMessages = () => selectedReadStates().length > 1
+
+  const hasSelectedConversations = () => props.selectedConversations.length > 0
+
   const removeDeletedConversationsFromCache = (cache, result) => {
     const conversationsFromCache = JSON.parse(
       JSON.stringify(
@@ -141,6 +161,21 @@ const MessageListActionContainer = props => {
     }
   }
 
+  const handleReadStateComplete = data => {
+    const readStateChangeSuccessMsg = I18n.t(
+      {
+        one: 'Read state Changed!',
+        other: 'Read states Changed!'
+      },
+      {count: props.selectedConversations.length}
+    )
+    if (data.updateConversationParticipants.errors) {
+      setOnFailure(I18n.t('Read state change operation failed'))
+    } else {
+      setOnSuccess(readStateChangeSuccessMsg)
+    }
+  }
+
   const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     update: removeOutOfScopeConversationsFromCache,
     onCompleted(data) {
@@ -148,6 +183,15 @@ const MessageListActionContainer = props => {
     },
     onError() {
       setOnFailure(I18n.t('Archive operation failed'))
+    }
+  })
+
+  const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted(data) {
+      handleReadStateComplete(data)
+    },
+    onError() {
+      setOnFailure(I18n.t('Read state change failed'))
     }
   })
 
@@ -233,6 +277,24 @@ const MessageListActionContainer = props => {
     }
   }
 
+  const handleMarkAsUnread = () => {
+    readStateChangeConversationParticipants({
+      variables: {
+        conversationIds: props.selectedConversations.map(convo => convo._id),
+        workflowState: 'unread'
+      }
+    })
+  }
+
+  const handleMarkAsRead = () => {
+    readStateChangeConversationParticipants({
+      variables: {
+        conversationIds: props.selectedConversations.map(convo => convo._id),
+        workflowState: 'read'
+      }
+    })
+  }
+
   return (
     <View
       as="div"
@@ -271,10 +333,15 @@ const MessageListActionContainer = props => {
             delete={handleDelete}
             deleteDisabled={props.deleteDisabled}
             forward={() => {}}
-            markAsUnread={() => {}}
+            markAsUnread={handleMarkAsUnread}
+            markAsRead={handleMarkAsRead}
             reply={props.onReply}
             replyAll={props.onReplyAll}
             star={() => {}}
+            settingsDisabled={!hasSelectedConversations()}
+            shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
+            shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
+            hasMultipleSelectedMessages={hasMultipleSelectedMessages()}
           />
         </Flex.Item>
       </Flex>
@@ -300,4 +367,8 @@ MessageListActionContainer.propTypes = {
   archiveDisabled: PropTypes.bool,
   onConversationRemove: PropTypes.func,
   displayUnarchiveButton: PropTypes.bool
+}
+
+MessageListActionContainer.defaultProps = {
+  selectedConversations: []
 }

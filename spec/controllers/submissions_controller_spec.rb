@@ -291,6 +291,18 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eq 'http://www.google.com'
     end
 
+    it 'accepts a basic_lti_launch url for external_tool submission type' do
+      course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'external_tool')
+      request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'basic_lti_launch', :url => 'http://www.google.com'}}
+      expect(response).to be_redirect
+      expect(assigns[:submission]).to_not be_nil
+      expect(assigns[:submission].submission_type).to eq 'basic_lti_launch'
+      expect(assigns[:submission].url).to eq 'http://www.google.com'
+    end
+
     it 'accepts eula agreement timestamp when api submission' do
       timestamp = Time.zone.now.to_i.to_s
       course_with_student_logged_in(:active_all => true)

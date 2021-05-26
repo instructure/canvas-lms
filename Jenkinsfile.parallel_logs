@@ -88,9 +88,7 @@ pipeline {
           def stages = [:]
 
           distribution.stashBuildScripts()
-
-          distribution.addRSpecSuites(stages)
-          distribution.addSeleniumSuites(stages)
+          rspecStage.createDistribution(stages)
 
           parallel(stages)
         }
@@ -100,7 +98,8 @@ pipeline {
     stage('Copy Files') {
       steps {
         script {
-          rspec.uploadParallelLog()
+          reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
+          archiveArtifacts(artifacts: 'parallel_logs/**')
         }
       }
     }

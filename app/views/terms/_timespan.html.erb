@@ -24,7 +24,7 @@
       </div>
       <div class="edit_term">
         <div class="date_field_container">
-          <label class="screenreader-only" id="<%= key %>_start_at_label">
+          <label class="screenreader-only" id="<%= key %>_start_at_label_<%= idx %>">
             <%= start_tooltip %> <%= datepicker_screenreader_prompt %>
           </label>
           <input type="text"
@@ -49,7 +49,7 @@
       </div>
       <div class="edit_term">
         <div class="date_field_container">
-          <label class="screenreader-only" id="<%= key %>_end_at_label">
+          <label class="screenreader-only" id="<%= key %>_end_at_label_<%= idx %>">
             <%= end_tooltip %> <%= datepicker_screenreader_prompt %>
           </label>
           <input

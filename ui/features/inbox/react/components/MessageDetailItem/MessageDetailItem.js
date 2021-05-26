@@ -32,7 +32,7 @@ import I18n from 'i18n!conversations_2'
 
 export const MessageDetailItem = ({...props}) => {
   const formatParticipants = () => {
-    const participantsStr = props.conversationMessage.participants
+    const participantsStr = props.conversationMessage.recipients
       .filter(p => p.name !== props.conversationMessage.author.name)
       .reduce((prev, curr) => {
         return prev + ', ' + curr.name
@@ -83,6 +83,17 @@ export const MessageDetailItem = ({...props}) => {
     )
   }
 
+  const dateOptions = {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  }
+
+  const createdAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+    new Date(props.conversationMessage.createdAt)
+  )
+
   return (
     <>
       <Flex>
@@ -90,20 +101,20 @@ export const MessageDetailItem = ({...props}) => {
           <Avatar
             margin="small small small none"
             name={props.conversationMessage.author.name}
-            src={props.conversationMessage.author.avatar_url}
+            src={props.conversationMessage.author.avatarUrl}
           />
         </Flex.Item>
         <Flex.Item shouldGrow>
           {formatParticipants()}
           <View as="div" margin="xx-small none xxx-small">
             <Text color="secondary" weight="light">
-              {props.context.name}
+              {props.contextName}
             </Text>
           </View>
         </Flex.Item>
         <Flex.Item textAlign="end">
           <View as="div" margin="none none x-small">
-            <Text weight="light">{props.conversationMessage.created_at}</Text>
+            <Text weight="light">{createdAt}</Text>
           </View>
           {renderActionButtons()}
         </Flex.Item>
@@ -116,7 +127,7 @@ export const MessageDetailItem = ({...props}) => {
 MessageDetailItem.propTypes = {
   // TODO: not sure yet the exact shape of the data that will be fetched, so these will likely change
   conversationMessage: PropTypes.object,
-  context: PropTypes.object,
+  contextName: PropTypes.string,
   handleOptionSelect: PropTypes.func
 }
 

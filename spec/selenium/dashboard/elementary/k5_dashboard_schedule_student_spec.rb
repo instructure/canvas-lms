@@ -137,6 +137,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'shows the list of missing assignments in dropdown' do
+      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
       assignment1 = create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
       create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
 
@@ -154,6 +155,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it 'clicking list twice hides missing assignments' do
+      skip('LS-2203 click_missing items is not working right all the time. unskip when fixed')
       create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
 
       get "/#schedule"
@@ -211,6 +213,18 @@ describe "student k5 dashboard schedule" do
       get "/courses/#{@subject_course.id}#schedule"
 
       expect(items_missing_exists?).to be_falsey
+    end
+  end
+
+  context 'course color' do
+    it 'shows the course color on the planner assignment listing' do
+      new_color = '#07AB99'
+      @subject_course.update!(course_color: new_color)
+      create_dated_assignment(@subject_course, 'assignment for other course', @now)
+
+      get "/#schedule"
+
+      expect(hex_value_for_color(planner_assignment_header)).to eq(new_color)
     end
   end
 end

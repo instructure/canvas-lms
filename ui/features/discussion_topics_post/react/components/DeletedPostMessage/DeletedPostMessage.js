@@ -19,33 +19,22 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Byline} from '@instructure/ui-byline'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 export function DeletedPostMessage({...props}) {
   return (
-    <Byline
-      alignContent="top"
-      margin="0 0 medium 0"
-      title={
-        <>
-          <Text weight="bold">
-            {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
-          </Text>
-          <View padding="0 small">
-            <Text color="secondary">{props.timingDisplay}</Text>
-          </View>
-        </>
-      }
-      description={
-        <View display="block" margin="small none none none">
-          {props.children}
-        </View>
-      }
-    >
-      <div style={{marginLeft: '3rem'}} />
-    </Byline>
+    <View as="div" margin="small none large">
+      <Text weight="bold">
+        {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
+      </Text>
+      <View padding="0 small">
+        <Text color="secondary">{props.timingDisplay}</Text>
+      </View>
+      <View display="block" margin="small none none none">
+        {props.children}
+      </View>
+    </View>
   )
 }
 

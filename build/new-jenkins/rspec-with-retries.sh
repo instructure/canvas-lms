@@ -19,11 +19,11 @@ while true; do
 
   if [[ $reruns_started ]]; then
     if [ $1 ] && [ $1 = 'performance' ]; then
-      commands+=("docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99")
+      commands+=("docker-compose exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99")
     fi
   else
     if [ $1 ] && [ $1 = 'performance' ]; then
-      commands+=("docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99")
+      commands+=("docker-compose exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99")
     else
       for i in $(seq 0 $PROCESSES); do
         commands+=("build/new-jenkins/rspec-tests.sh $i")

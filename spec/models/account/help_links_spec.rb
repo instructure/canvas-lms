@@ -57,6 +57,7 @@ describe Account::HelpLinks do
     end
 
     it 'infers text for default links that have not been customized' do
+      Setting.set 'show_feedback_link', 'true'
       links = [{ type: 'default', id: 'instructor_question', available_to: ['user'] }]
       translated = subject.map_default_links(links)
       expect(translated.first[:text].call).to eq 'Ask Your Instructor a Question'
@@ -65,6 +66,7 @@ describe Account::HelpLinks do
     end
 
     it 'uses default booleans when values have not been set' do
+      Setting.set 'show_feedback_link', 'true'
       links = [{ type: 'default', id: :instructor_question }, { type: 'default', id: :search_the_canvas_guides }]
       translated = subject.map_default_links(links)
       expect(translated.first[:is_featured]).to be false

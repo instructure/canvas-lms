@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!k5_dashboard'
 import React from 'react'
+import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
+
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -26,8 +27,9 @@ import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {PresentationContent} from '@instructure/ui-a11y-content'
+
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
 export default function HomeroomAnnouncement({
   title,
@@ -36,13 +38,14 @@ export default function HomeroomAnnouncement({
   courseName,
   courseUrl,
   canEdit,
-  attachment
+  attachment,
+  published
 }) {
   return (
     <View>
-      <Flex alignItems="center" justifyItems="space-between">
+      <Flex alignItems="center" justifyItems="space-between" margin="medium 0 0">
         <Flex.Item>
-          <Heading level="h3" as="h2" margin="small 0">
+          <Heading level="h3" as="h2">
             {canEdit ? (
               <Link href={courseUrl} isWithinText={false}>
                 {courseName}
@@ -69,7 +72,12 @@ export default function HomeroomAnnouncement({
       </Flex>
 
       <View>
-        <Heading level="h3">{title}</Heading>
+        {!published && (
+          <Text size="small">{I18n.t('Your homeroom is currently unpublished.')}</Text>
+        )}
+        <Heading level="h3" margin="x-small 0 0">
+          {title}
+        </Heading>
         <div
           className="user_content"
           /* html sanitized by server */
@@ -104,5 +112,6 @@ HomeroomAnnouncement.propTypes = {
   title: PropTypes.string.isRequired,
   message: PropTypes.node.isRequired,
   url: PropTypes.string.isRequired,
-  attachment: PropTypes.object
+  attachment: PropTypes.object,
+  published: PropTypes.bool.isRequired
 }

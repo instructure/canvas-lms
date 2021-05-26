@@ -26,7 +26,7 @@ import FeatureFlagButton from './FeatureFlagButton'
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
-export default function FeatureFlagTable({title, rows, disableDefaults}) {
+function FeatureFlagTable({title, rows, disableDefaults}) {
   rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
   return (
     <>
@@ -77,3 +77,5 @@ export default function FeatureFlagTable({title, rows, disableDefaults}) {
     </>
   )
 }
+
+export default React.memo(FeatureFlagTable)

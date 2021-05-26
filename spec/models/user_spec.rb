@@ -545,6 +545,32 @@ describe User do
       expect(@fake_student.reload.user_account_associations).to be_empty
     end
 
+    it "removes account associations after an enrollment concludes" do
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = Account.default.sub_accounts.create!
+      course1 = course_with_student(active_all: true, account: subaccount1).course
+      course2 = course_with_student(active_all: true, account: subaccount2, user: @student).course
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+
+      course2.complete
+      @student.update_account_associations
+      expect(@student.enrollments.where(course_id: course2).take.enrollment_state.state).to eq 'completed' # sanity check
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1].map(&:id))
+    end
+
+    it "removes account associations for inactive/rejected enrollments" do
+      subaccount1 = Account.default.sub_accounts.create!
+      subaccount2 = Account.default.sub_accounts.create!
+      enrollment1 = course_with_student(active_all: true, account: subaccount1)
+      enrollment2 = course_with_student(active_all: true, account: subaccount2, user: @student)
+      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
+
+      enrollment1.reject
+      enrollment2.update workflow_state: 'inactive'
+      @student.update_account_associations
+      expect(@student.user_account_associations.pluck(:account_id)).to be_empty
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -3421,6 +3447,19 @@ describe User do
       expect(@ta.can_create_enrollment_for?(@course, nil, 'DesignerEnrollment')).to be_falsey
       expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
       expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
+    end
+  end
+
+  describe "comment_bank_items" do
+    before(:once) do
+      course_with_teacher
+      @c1 = comment_bank_item_model({user: @teacher})
+      @c2 = comment_bank_item_model({user: @teacher})
+    end
+
+    it "only returns active records" do
+      @c2.destroy
+      expect(@teacher.comment_bank_items).to eq [@c1]
     end
   end
 end

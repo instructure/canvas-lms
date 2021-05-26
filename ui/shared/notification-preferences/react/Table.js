@@ -56,7 +56,8 @@ const notificationCategories = {
   },
   discussions: {
     Discussion: {},
-    DiscussionEntry: {}
+    DiscussionEntry: {},
+    DiscussionMention: {}
   },
   conversations: {
     'Added To Conversation': {},

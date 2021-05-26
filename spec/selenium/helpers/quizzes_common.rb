@@ -109,6 +109,16 @@ module QuizzesCommon
     wait_for_ajaximations
   end
 
+  def create_essay_question
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Essay Question')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    submit_form(question)
+    wait_for_ajaximations
+  end
+
   def create_file_upload_question
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'File Upload Question')
@@ -647,7 +657,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##
@@ -672,7 +681,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##
@@ -684,7 +692,6 @@ module QuizzesCommon
     # drag math gets off if we don't do this and things end up dropped in the wrong place
     scroll_page_to_top
     js_drag_and_drop source, target
-    wait_for_ajax_requests
   end
 
   ##

@@ -425,15 +425,6 @@ $icon-size: 1.4rem;
 }
 
 #rubric_full {
-  #rubric_full_resizer #rubric_full_resizer_handle {
-    position: absolute;
-    top: 50%;
-    #{direction(left)}: 0px;
-    background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-    cursor: pointer;
-    height: 20px;
-    width: 7px;
-  }
   a.big_link {
     display: none;
   }

@@ -27,6 +27,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {useLazyQuery} from 'react-apollo'
+import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
   let threads = props.threads
@@ -56,17 +57,14 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <div
-      style={{
-        marginTop: '1.5rem'
-      }}
-    >
-      {threads?.map(r => {
+    <View as="div" margin="medium none none none">
+      {threads?.map(thread => {
         return (
           <DiscussionThreadContainer
-            key={`discussion-thread-${r.id}`}
+            key={`discussion-thread-${thread.id}`}
             assignment={props.discussionTopic?.assignment}
-            {...r}
+            discussionEntry={thread}
+            discussionTopicGraphQLId={props.discussionTopic.id}
           />
         )
       })}
@@ -77,14 +75,14 @@ export const DiscussionThreadsContainer = props => {
           totalPages={props.totalPages}
         />
       )}
-    </div>
+    </View>
   )
 }
 
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionTopicId: PropTypes.string.isRequired,
-  threads: PropTypes.arrayOf(PropTypes.shape(DiscussionEntry.shape)).isRequired,
+  threads: PropTypes.arrayOf(DiscussionEntry.shape),
   pageInfo: PageInfo.shape.isRequired,
   totalPages: PropTypes.number
 }

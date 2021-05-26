@@ -27,9 +27,10 @@ import {
   fetchCourseApps,
   sendMessage,
   createNewCourse,
-  enrollAsTeacher,
   getAssignmentGroupTotals,
   getAssignmentGrades,
+  getAccountsFromEnrollments,
+  getTotalGradeStringFromEnrollments
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom
 } from '../utils'
@@ -42,9 +43,7 @@ const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
 const CONVERSATIONS_URL = '/api/v1/conversations'
-const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science'
-const ENROLL_AS_TEACHER_URL =
-  '/api/v1/courses/test/enrollments?enrollment[type]=TeacherEnrollment&enrollment[user_id]=self&enrollment[enrollment_state]=active'
+const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science&enroll_me=true'
 
 afterEach(() => {
   fetchMock.restore()
@@ -268,14 +267,6 @@ describe('createNewCourse', () => {
   })
 })
 
-describe('enrollAsTeacher', () => {
-  it('posts to the enrollments endpoint', async () => {
-    fetchMock.post(encodeURI(ENROLL_AS_TEACHER_URL), 200)
-    const result = await enrollAsTeacher('test')
-    expect(result.response.ok).toBeTruthy()
-  })
-})
-
 describe('getAssignmentGroupTotals', () => {
   it('returns an array of objects that have id, name, and score', () => {
     const data = [
@@ -334,6 +325,52 @@ describe('getAssignmentGroupTotals', () => {
     const totals = getAssignmentGroupTotals(data)
     expect(totals[0].score).toBe('n/a')
   })
+
+  it('excludes assignment groups without assignments in provided gradingPeriodId', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              grading_period_id: 1
+            }
+          }
+        ]
+      },
+      {
+        id: '55',
+        name: 'Papers',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 178,
+            name: '2',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              grading_period_id: 2
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGroupTotals(data, 1)
+    expect(totals.length).toBe(1)
+    expect(totals[0].name).toBe('Assignments')
+  })
 })
 
 describe('getAssignmentGrades', () => {
@@ -372,6 +409,187 @@ describe('getAssignmentGrades', () => {
     expect(totals.length).toBe(2)
     expect(totals[0].assignmentName).toBe('2')
     expect(totals[1].assignmentName).toBe('1')
+  })
+
+  it('saves unread as true if read_state is unread', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              read_state: 'unread'
+            }
+          }
+        ]
+      }
+    ]
+    const totals = getAssignmentGrades(data)
+    expect(totals[0].unread).toBeTruthy()
+  })
+})
+
+describe('getAccountsFromEnrollments', () => {
+  it('returns array of objects containing id and name', () => {
+    const enrollments = [
+      {
+        name: 'Algebra',
+        account: {
+          id: 6,
+          name: 'Elementary',
+          workflow_state: 'active'
+        }
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
+    expect(accounts[0].id).toBe(6)
+    expect(accounts[0].name).toBe('Elementary')
+    expect(accounts[0].workflow_state).toBeUndefined()
+  })
+
+  it('removes duplicate accounts from list', () => {
+    const enrollments = [
+      {
+        account: {
+          id: 12,
+          name: 'FFES'
+        }
+      },
+      {
+        account: {
+          id: 12,
+          name: 'FFES'
+        }
+      }
+    ]
+    const accounts = getAccountsFromEnrollments(enrollments)
+    expect(accounts.length).toBe(1)
+  })
+})
+
+describe('getTotalGradeStringFromEnrollments', () => {
+  it("returns n/a if there's no score or grade", () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: null,
+          current_grade: null
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('n/a')
+  })
+
+  it("returns just the percent with 2 decimals if there's no grade", () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 84,
+          current_grade: null
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('84.00%')
+  })
+
+  it('returns formatted score and grade if both exist', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 87.34,
+          current_grade: 'B+'
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('87.34% (B+)')
+  })
+
+  it('finds the correct enrollment if multiple are returned', () => {
+    const enrollments = [
+      {
+        user_id: '1',
+        grades: {
+          current_score: 1
+        }
+      },
+      {
+        user_id: '2',
+        grades: {
+          current_score: 2
+        }
+      },
+      {
+        user_id: '3',
+        grades: {
+          current_score: 3
+        }
+      }
+    ]
+    expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('2.00%')
+  })
+})
+
+describe('parseAnnouncementDetails', () => {
+  const announcement = {
+    title: 'Hello class',
+    message: '<p>Some details</p>',
+    html_url: 'http://localhost:3000/courses/78/discussion_topics/72',
+    id: '72',
+    permissions: {
+      update: true
+    },
+    attachments: [
+      {
+        id: '409',
+        display_name: 'File.pdf',
+        filename: 'file12.pdf',
+        url: 'http://localhost:3000/files/longpath'
+      }
+    ],
+    posted_at: '2021-05-14T17:06:21-06:00'
+  }
+
+  const course = {
+    id: '78',
+    shortName: 'Reading',
+    href: 'http://localhost:3000/courses/78',
+    canManage: false,
+    published: true
+  }
+
+  it('filters and renames attributes in received object', () => {
+    const announcementDetails = parseAnnouncementDetails(announcement, course)
+
+    expect(announcementDetails.courseId).toBe('78')
+    expect(announcementDetails.courseName).toBe('Reading')
+    expect(announcementDetails.courseUrl).toBe('http://localhost:3000/courses/78')
+    expect(announcementDetails.canEdit).toBe(true)
+    expect(announcementDetails.published).toBe(true)
+    expect(announcementDetails.announcement.title).toBe('Hello class')
+    expect(announcementDetails.announcement.message).toBe('<p>Some details</p>')
+    expect(announcementDetails.announcement.url).toBe(
+      'http://localhost:3000/courses/78/discussion_topics/72'
+    )
+    expect(announcementDetails.announcement.attachment.display_name).toBe('File.pdf')
+    expect(announcementDetails.announcement.attachment.url).toBe(
+      'http://localhost:3000/files/longpath'
+    )
+    expect(announcementDetails.announcement.attachment.filename).toBe('file12.pdf')
+    expect(announcementDetails.announcement.postedDate).toBe('2021-05-14T17:06:21-06:00')
+  })
+
+  it('handles a missing attachment', () => {
+    const announcementDetails = parseAnnouncementDetails({...announcement, attachments: []}, course)
+    expect(announcementDetails.announcement.attachment).toBeUndefined()
   })
 })
 

@@ -28,25 +28,50 @@ module SeleniumExtensions
   module UnexpectedPageReloadProtection
     include CustomWaitMethods
 
-    def click(*args)
-      reload_expected = driver.execute_script("return !!(window.INST && INST.still_on_old_page)")
-      super
+    def with_page_reload_protection(bridge)
+      yield
 
       begin
-        if !reload_expected && driver.execute_script("return window.canvasReadyState && window.canvasReadyState !== 'complete'")
-          msg = "[UnexpectedPageReloadProtection] The page was not fully loaded after executing this action. Usually it means the caller should be wrapped in a wait_for_new_page_load / expect_new_page_load block."
-          $stderr.puts msg
-          Rails.logger.warn msg
-          Rails.logger.info caller
-
-          wait_for_initializers
-          wait_for_ajaximations
-        end
+        wait_for_initializers(bridge)
+        wait_for_ajaximations(bridge)
       rescue Selenium::WebDriver::Error::UnexpectedAlertOpenError
         # If there is an alert open, the calling code needs to accept it, so we won't be reloading
-        # as part of this event.
+        # as part of this event. Once the alert is accepted or discarded, we will then wait for
+        # page reloads or outstanding AJAX requests.
         return
       end
+    end
+  end
+
+  module UnexpectedPageReloadProtectionActionBuilder
+    include UnexpectedPageReloadProtection
+
+    def perform(*args)
+      with_page_reload_protection(@bridge) { super(*args) }
+    end
+  end
+
+  module UnexpectedPageReloadProtectionAlert
+    include UnexpectedPageReloadProtection
+
+    def accept(*args)
+      with_page_reload_protection(@bridge) { super(*args) }
+    end
+  end
+
+  module UnexpectedPageReloadProtectionElement
+    include UnexpectedPageReloadProtection
+
+    def click(*args)
+      with_page_reload_protection(driver) { super(*args) }
+    end
+
+    def send_keys(*args)
+      with_page_reload_protection(driver) { super(*args) }
+    end
+
+    def submit(*args)
+      with_page_reload_protection(driver) { super(*args) }
     end
   end
 
@@ -220,9 +245,11 @@ module SeleniumExtensions
   end
 end
 
+Selenium::WebDriver::Alert.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionAlert)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::ElementNotInteractableProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::StaleElementProtection)
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::FinderWaiting)
-Selenium::WebDriver::Element.prepend(SeleniumExtensions::UnexpectedPageReloadProtection)
+Selenium::WebDriver::Element.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionElement)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::PreventEarlyInteraction)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::FinderWaiting)
+Selenium::WebDriver::W3CActionBuilder.prepend(SeleniumExtensions::UnexpectedPageReloadProtectionActionBuilder)

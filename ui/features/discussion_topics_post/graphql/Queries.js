@@ -22,7 +22,13 @@ import gql from 'graphql-tag'
 import {PageInfo} from './PageInfo'
 
 export const DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery($discussionID: ID!, $page: String, $perPage: Int!) {
+  query GetDiscussionQuery(
+    $discussionID: ID!
+    $page: String
+    $perPage: Int!
+    $searchTerm: String
+    $rootEntries: Boolean
+  ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
@@ -35,6 +41,21 @@ export const DISCUSSION_QUERY = gql`
           }
         }
         rootEntriesTotalPages(perPage: $perPage)
+
+        discussionEntriesConnection(
+          after: $page
+          first: $perPage
+          searchTerm: $searchTerm
+          rootEntries: $rootEntries
+        ) {
+          nodes {
+            ...DiscussionEntry
+          }
+          pageInfo {
+            ...PageInfo
+          }
+        }
+        entriesTotalPages(perPage: $perPage, rootEntries: $rootEntries)
       }
     }
   }

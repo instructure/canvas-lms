@@ -19,7 +19,7 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import IndividualStudentMastery from '../../react/IndividualStudentMastery/index'
+import IndividualStudentMastery from '@canvas/grade-summary/react/IndividualStudentMastery/index'
 import template from '../../jst/individual_student_view.handlebars'
 
 export default class IndividualStudentView extends Backbone.View {

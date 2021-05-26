@@ -183,13 +183,37 @@ describe "course settings" do
       # Show announcements and limit setting elements
       show_announcements_on_home_page = f('#course_show_announcements_on_home_page')
       home_page_announcement_limit = f('#course_home_page_announcement_limit')
-
       expect(is_checked(show_announcements_on_home_page)).not_to be_truthy
       expect(home_page_announcement_limit).to be_disabled
 
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+
+    it "should show participation by default" do
+      get "/courses/#{@course.id}/settings"
+
+      expect(element_exists?('.course-participation-row')).to be_truthy
+      expect(element_exists?('#availability_options_container')).to be_truthy
+    end
+
+    it "should check if it is a k5 course should not show the fields" do
+      @account.enable_feature!(:canvas_for_elementary)
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      get "/courses/#{@course.id}/settings"
+
+      more_options_link = f('.course_form_more_options_link')
+      more_options_link.click
+      wait_for_ajaximations
+
+      expect(element_exists?('#course_show_announcements_on_home_page')).to be_falsey
+      expect(element_exists?('#course_allow_student_discussion_topics')).to be_falsey
+      expect(element_exists?('#course_allow_student_organized_groups')).to be_falsey
+      expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
+      expect(element_exists?('#course_lock_all_announcements')).to be_falsey
+    end
+
   end
 
   describe "course items" do
@@ -246,7 +270,7 @@ describe "course settings" do
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click
       wait_for_ajaximations
-      f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
+      f('#nav_form button.btn.btn-primary').click
       wait_for_ajaximations
       enter_student_view
       wait_for_ajaximations
@@ -365,16 +389,14 @@ describe "course settings" do
     end
   end
 
-  it "should disable inherited settings if locked by the account" do
+  it "should restrict student access inputs be hidden" do
     @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
     @account.save!
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view')).not_to be_disabled
-    expect(f('#course_restrict_student_future_view')).to be_disabled
-
-    expect(is_checked('#course_restrict_student_future_view')).to be_truthy
+    expect(f('#course_restrict_student_past_view')).to_not be_displayed
+    expect(f('#course_restrict_student_future_view')).to_not be_displayed
   end
 
   it "should disable editing settings if :manage rights are not granted" do
@@ -410,6 +432,11 @@ describe "course settings" do
   end
 
   context "link validator" do
+    before (:each) do
+      Setting.set('link_validator_poll_timeout', 100)
+      Setting.set('link_validator_poll_timeout_initial', 100)
+    end
+
     it "should validate all the links" do
       allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 

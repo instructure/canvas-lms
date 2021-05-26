@@ -18,15 +18,22 @@
 
 import React, {useState} from 'react'
 import I18n from 'i18n!feature_flags'
+import useFetchApi from '@canvas/use-fetch-api-hook'
+import {groupBy, debounce} from 'lodash'
+import FeatureFlagTable from './FeatureFlagTable'
+
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import useFetchApi from '@canvas/use-fetch-api-hook'
-import {groupBy} from 'lodash'
-import FeatureFlagTable from './FeatureFlagTable'
+import {TextInput} from '@instructure/ui-text-input'
+import {IconSearchLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+const SEARCH_DELAY = 350
 
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useFetchApi({
     success: setFeatures,
@@ -40,7 +47,11 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   })
 
   const groupedFeatures = groupBy(
-    features.filter(feat => !hiddenFlags || !hiddenFlags.includes(feat.feature)),
+    features.filter(
+      feat =>
+        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
+        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
     'applies_to'
   )
   if (groupedFeatures.Account || groupedFeatures.RootAccount) {
@@ -67,12 +78,27 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
   ]
 
+  const handleQueryChange = debounce(setSearchQuery, SEARCH_DELAY, {
+    leading: false,
+    trailing: true
+  })
+
   return (
     <View as="div">
       {isLoading ? (
         <Spinner renderTitle={I18n.t('Loading features')} />
       ) : (
         <>
+          <View as="div" margin="0 0 medium">
+            <TextInput
+              renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
+              placeholder={I18n.t('Search')}
+              display="inline-block"
+              type="search"
+              onChange={(_e, val) => handleQueryChange(val)}
+              renderBeforeInput={<IconSearchLine inline={false} />}
+            />
+          </View>
           {categories.map(cat => {
             if (!groupedFeatures[cat.id]?.length) {
               return null

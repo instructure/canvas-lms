@@ -2516,6 +2516,14 @@ describe Assignment do
     end
   end
 
+  describe "#submittable_type?" do
+    it "is true for external_tool assignments" do
+      setup_assignment_without_submission
+      @assignment.submission_types = "external_tool"
+      expect(@assignment).to be_submittable_type
+    end
+  end
+
   it "should update a submission's graded_at when grading it" do
     setup_assignment_with_homework
     @assignment.grade_student(@user, grade: 1, grader: @teacher)
@@ -4469,6 +4477,19 @@ describe Assignment do
         @assignment.submission_types = 'online_quiz'
         @assignment.save!
         expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
+      end
+    end
+
+    context "to submit" do
+      describe "external_tool" do
+        before(:each) do
+          setup_assignment_without_submission
+          @assignment.submission_types = "external_tool"
+        end
+
+        it "is true for students" do
+          expect(@assignment.grants_right?(@student, :submit)).to be true
+        end
       end
     end
 

@@ -1870,3 +1870,13 @@ module MaxRuntimeConnectionPool
   end
 end
 ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
+
+Rails.application.config.after_initialize do
+  ActiveSupport.on_load(:active_record) do
+    cache = MultiCache.fetch("schema_cache")
+    next if cache.nil?
+
+    connection_pool.set_schema_cache(cache)
+    LoadAccount.schema_cache_loaded!
+  end
+end

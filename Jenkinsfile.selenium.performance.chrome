@@ -35,7 +35,6 @@ pipeline {
     NODE = configuration.node()
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby()
-    MAX_FAIL = 5
     RERUNS_RETRY = 0 // no reruns
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20201119"

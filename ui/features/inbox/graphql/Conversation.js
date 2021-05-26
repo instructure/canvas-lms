@@ -127,13 +127,3 @@ export const Conversation = {
     __typename: 'Conversation'
   })
 }
-
-export const DefaultMocks = {
-  Conversation: () => ({
-    _id: '1a',
-    contextType: 'context',
-    contextId: 2,
-    contextName: 'Context Name',
-    subject: 'Mock Subject'
-  })
-}

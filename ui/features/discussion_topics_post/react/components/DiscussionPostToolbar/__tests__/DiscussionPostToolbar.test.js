@@ -43,9 +43,9 @@ describe('DiscussionPostToolbar', () => {
       const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
       const searchInput = getByLabelText('Search entries or author')
       fireEvent.change(searchInput, {target: {value: 'A'}})
-      expect(onSearchChangeMock.mock.calls.length).toBe(1)
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(1), 1500)
       fireEvent.change(searchInput, {target: {value: 'B'}})
-      expect(onSearchChangeMock.mock.calls.length).toBe(2)
+      window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(2), 1500)
     })
   })
 

@@ -174,6 +174,15 @@ describe "teacher k5 dashboard" do
 
       expect(course_card_announcement(announcement2.title)).to be_displayed
     end
+
+    it 'shows course color selection on dashboard card' do
+      new_color = '#07AB99'
+      @subject_course.update!(course_color: new_color)
+
+      get "/"
+
+      expect(hex_value_for_color(dashboard_card)).to eq(new_color)
+    end
   end
 
   context 'homeroom dashboard grades panel' do

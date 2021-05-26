@@ -16,23 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {TextInput} from '@instructure/ui-text-input'
+import I18n from 'i18n!discussions_posts'
 import {
   IconArrowDownLine,
   IconArrowUpLine,
   IconCircleArrowUpLine,
   IconSearchLine
 } from '@instructure/ui-icons'
+import PropTypes from 'prop-types'
+import React, {useCallback} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!discussions_posts'
 
 export const getMenuConfig = props => {
   const options = {
@@ -47,6 +48,18 @@ export const getMenuConfig = props => {
 }
 
 export const DiscussionPostToolbar = props => {
+  const debouncedSave = useCallback(
+    debounce(nextValue => props.onSearchChange(nextValue), 500),
+    [] // will be created only once initially
+  )
+
+  const handleChange = event => {
+    const {value: nextValue} = event.target
+    // Even though handleChange is created on each render and executed
+    // it references the same debouncedSave that was created initially
+    debouncedSave(nextValue)
+  }
+
   return (
     <View maxWidth="56.875em">
       <Flex width="100%">
@@ -57,7 +70,7 @@ export const DiscussionPostToolbar = props => {
             layout="columns"
           >
             <TextInput
-              onChange={props.onSearchChange}
+              onChange={handleChange}
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>
               }

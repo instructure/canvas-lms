@@ -26,8 +26,14 @@ import {
   CREATE_SUBMISSION_DRAFT,
   DELETE_SUBMISSION_DRAFT
 } from '@canvas/assignments/graphql/student/Mutations'
-import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
+import {Flex} from '@instructure/ui-flex'
+import {
+  friendlyTypeName,
+  multipleTypesDrafted,
+  totalAllowedAttempts
+} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
+import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import {Modal} from '@instructure/ui-modal'
@@ -43,7 +49,48 @@ import {
 } from '@canvas/assignments/graphql/student/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+
+function DraftStatus({status}) {
+  const statusConfigs = {
+    saving: {
+      color: 'success',
+      icon: <IconRefreshSolid color="success" />,
+      text: I18n.t('Saving Draft')
+    },
+    saved: {
+      color: 'success',
+      icon: <IconCheckSolid color="success" />,
+      text: I18n.t('Draft Saved')
+    },
+    error: {
+      color: 'danger',
+      icon: <IconEndSolid color="error" />,
+      text: I18n.t('Error Saving Draft')
+    }
+  }
+
+  const config = statusConfigs[status]
+  if (config == null) {
+    return null
+  }
+
+  return (
+    <Flex as="div">
+      <Flex.Item>{config.icon}</Flex.Item>
+      <Flex.Item margin="0 small 0 x-small">
+        <Text color={config.color} weight="bold">
+          {config.text}
+        </Text>
+      </Flex.Item>
+    </Flex>
+  )
+}
+
+DraftStatus.propTypes = {
+  status: PropTypes.oneOf(['saving', 'saved', 'error'])
+}
 
 function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}) {
   const {attempt, id: submissionId, submissionDraft} = submission
@@ -108,6 +155,7 @@ export default class SubmissionManager extends Component {
   }
 
   state = {
+    draftStatus: null,
     editingDraft: false,
     openSubmitModal: false,
     similarityPledgeChecked: false,
@@ -120,6 +168,17 @@ export default class SubmissionManager extends Component {
     this.setState({
       activeSubmissionType: this.getActiveSubmissionTypeFromProps()
     })
+  }
+
+  componentDidUpdate(prevProps) {
+    // Clear the "draft saved" label when switching attempts
+    if (
+      this.props.submission.attempt !== prevProps.submission.attempt &&
+      this.state.draftStatus != null
+    ) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({draftStatus: null})
+    }
   }
 
   getActiveSubmissionTypeFromProps() {
@@ -265,15 +324,17 @@ export default class SubmissionManager extends Component {
     this.updateUploadingFiles(false)
 
     if (success) {
+      this.setState({draftStatus: 'saved'})
       this.context.setOnSuccess(I18n.t('Submission draft updated'))
     } else {
+      this.setState({draftStatus: 'error'})
       this.context.setOnFailure(I18n.t('Error updating submission draft'))
     }
   }
 
   handleSubmitConfirmation(submitMutation) {
     this.submitAssignment(submitMutation)
-    this.setState({openSubmitModal: false})
+    this.setState({openSubmitModal: false, draftStatus: null})
   }
 
   handleSubmitButton(submitMutation) {
@@ -310,6 +371,9 @@ export default class SubmissionManager extends Component {
               assignment={this.props.assignment}
               createSubmissionDraft={createSubmissionDraft}
               editingDraft={this.state.editingDraft}
+              onContentsChanged={() => {
+                this.setState({draftStatus: 'saving'})
+              }}
               submission={this.props.submission}
               updateActiveSubmissionType={this.updateActiveSubmissionType}
               updateEditingDraft={this.updateEditingDraft}
@@ -389,6 +453,15 @@ export default class SubmissionManager extends Component {
   footerButtons() {
     return [
       {
+        key: 'draft-status',
+        shouldRender: context =>
+          context.isLatestAttempt &&
+          this.props.submission.state === 'unsubmitted' &&
+          this.state.activeSubmissionType === 'online_text_entry' &&
+          this.state.draftStatus != null,
+        render: _context => <DraftStatus status={this.state.draftStatus} />
+      },
+      {
         key: 'cancel-draft',
         shouldRender: context =>
           this.props.submission === context.latestSubmission &&
@@ -425,6 +498,7 @@ export default class SubmissionManager extends Component {
         key: 'new-attempt',
         shouldRender: context => {
           const {assignment, submission} = this.props
+          const allowedAttempts = totalAllowedAttempts({assignment, submission})
 
           return (
             context.allowChangesToSubmission &&
@@ -432,7 +506,7 @@ export default class SubmissionManager extends Component {
             (submission.state === 'graded' || submission.state === 'submitted') &&
             submission.gradingStatus !== 'excused' &&
             context.latestSubmission.state !== 'unsubmitted' &&
-            (assignment.allowedAttempts == null || submission.attempt < assignment.allowedAttempts)
+            (allowedAttempts == null || submission.attempt < allowedAttempts)
           )
         },
         render: context => {
@@ -492,7 +566,11 @@ export default class SubmissionManager extends Component {
             <Button
               id="submit-button"
               data-testid="submit-button"
-              disabled={this.state.submittingAssignment || mustAgreeToPledge}
+              disabled={
+                this.state.draftStatus === 'saving' ||
+                this.state.submittingAssignment ||
+                mustAgreeToPledge
+              }
               color="primary"
               margin="auto auto auto small"
               onClick={() => this.handleSubmitButton(submitMutation)}

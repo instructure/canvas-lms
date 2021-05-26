@@ -17,19 +17,20 @@
  */
 
 import React from 'react'
-import {render as realRender, fireEvent, waitFor} from '@testing-library/react'
+import {render as realRender, fireEvent, act} from '@testing-library/react'
 import EditGroupModal from '../EditGroupModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {updateOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
+import useRCE from '../../hooks/useRCE'
 
+jest.mock('../../hooks/useRCE')
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.mock('@canvas/outcomes/graphql/Management')
-jest.mock('@canvas/rce/RichContentEditor')
+jest.useFakeTimers()
 
 describe('EditGroupModal', () => {
-  let onCloseHandlerMock
+  let onCloseHandlerMock, rceValue
   const contextType = 'Account'
   const contextId = '1'
   const group = {
@@ -53,96 +54,78 @@ describe('EditGroupModal', () => {
   }
 
   beforeEach(() => {
+    rceValue = 'Updated description'
+    useRCE.mockReturnValue([() => {}, () => rceValue, null, null, null])
     onCloseHandlerMock = jest.fn()
-    RichContentEditor.callOnRCE = jest.fn()
+    window.ENV.FEATURES = {}
   })
 
-  it('renders component with the content', () => {
+  it('renders component with the content', async () => {
     const {getByText} = render(<EditGroupModal {...defaultProps()} />)
     expect(getByText('Edit Group')).toBeInTheDocument()
-    expect(getByText('This is the Amazing Group 2')).toBeInTheDocument()
   })
 
-  it('shows modal if open prop true', () => {
-    const {getByText} = render(<EditGroupModal {...defaultProps()} />)
-    expect(getByText('Close')).toBeInTheDocument()
-  })
-
-  it('does not show modal if open prop false', () => {
-    const {queryByText} = render(<EditGroupModal {...defaultProps({isOpen: false})} />)
-    expect(queryByText('Close')).not.toBeInTheDocument()
-  })
-
-  it('calls onCloseHandlerMock on Close button click', () => {
-    RichContentEditor.callOnRCE.mockReturnValue('Updated description')
-    const {getByText} = render(<EditGroupModal {...defaultProps()} />)
-    const closeBtn = getByText('Close')
-    fireEvent.click(closeBtn)
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls onCloseHandlerMock on Cancel button click', () => {
-    RichContentEditor.callOnRCE.mockReturnValue('Updated description')
-    const {getByText} = render(<EditGroupModal {...defaultProps()} />)
-    const cancelBtn = getByText('Cancel')
-    fireEvent.click(cancelBtn)
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('setting blank title disables Save button and displays error', () => {
-    const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
-    const titleField = getByDisplayValue('Grade 2')
-    fireEvent.change(titleField, {target: {value: ''}})
-    expect(getByText('Save')).not.toHaveAttribute('disabled')
-    expect(getByText('Cannot be blank')).toBeInTheDocument()
-  })
-
-  it('setting title with more than 255 characters disables Save button and displays error', () => {
-    const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
-    const titleField = getByDisplayValue('Grade 2')
-    const text = 'x'.repeat(256)
-    fireEvent.change(titleField, {target: {value: text}})
-    expect(getByText('Save')).not.toHaveAttribute('disabled')
-    expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
-  })
-
-  it('updates the group and closes the modal on Save button click', async () => {
-    const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
+  it('updates the group, closes the modal', async () => {
     updateOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
-    RichContentEditor.callOnRCE.mockReturnValue('Updated description')
+    const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
     const titleField = getByDisplayValue('Grade 2')
     fireEvent.change(titleField, {target: {value: 'Grade 2 edited'}})
     fireEvent.click(getByText('Save'))
+    await act(async () => jest.runAllTimers())
     expect(updateOutcomeGroup).toHaveBeenCalledWith(contextType, contextId, group._id, {
       title: 'Grade 2 edited',
       description: 'Updated description'
     })
-    await waitFor(() => {
-      expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-      expect(showFlashAlert).toHaveBeenCalledWith({
-        type: 'success',
-        message: 'The group Grade 2 edited was successfully updated.'
-      })
+    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'The group Grade 2 edited was successfully updated.'
     })
   })
 
-  it('displays an error if an exception is produced on Save button click', async () => {
+  it('updates the group with blank attributes', async () => {
+    rceValue = ''
+    updateOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+    const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
+    const titleField = getByDisplayValue('Grade 2')
+    fireEvent.change(titleField, {target: {value: 'Grade 2 edited'}})
+    fireEvent.click(getByText('Save'))
+    await act(async () => jest.runAllTimers())
+    expect(updateOutcomeGroup).toHaveBeenCalledWith(contextType, contextId, group._id, {
+      title: 'Grade 2 edited',
+      description: ''
+    })
+    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'The group Grade 2 edited was successfully updated.'
+    })
+  })
+
+  it('reset the form on modal close', () => {
+    const {getByDisplayValue, rerender} = render(<EditGroupModal {...defaultProps()} />)
+    const titleField = getByDisplayValue('Grade 2')
+    fireEvent.change(titleField, {target: {value: 'Grade 2 edited'}})
+    rerender(<EditGroupModal {...defaultProps({isOpen: false})} />)
+    rerender(<EditGroupModal {...defaultProps({isOpen: true})} />)
+    expect(getByDisplayValue('Grade 2')).toBeInTheDocument()
+  })
+
+  it('displays an error if an exception is produced on submission', async () => {
     const {getByDisplayValue, getByText} = render(<EditGroupModal {...defaultProps()} />)
     updateOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
-    RichContentEditor.callOnRCE.mockReturnValue('Updated description')
     const titleField = getByDisplayValue('Grade 2')
     fireEvent.change(titleField, {target: {value: 'Grade 2 edited'}})
     fireEvent.click(getByText('Save'))
+    await act(async () => jest.runAllTimers())
     expect(updateOutcomeGroup).toHaveBeenCalledWith(contextType, contextId, group._id, {
       title: 'Grade 2 edited',
       description: 'Updated description'
     })
-    await waitFor(() => {
-      expect(onCloseHandlerMock).toHaveBeenCalled()
-      expect(showFlashAlert).toHaveBeenCalledWith({
-        type: 'error',
-        message: 'An error occurred while updating this group: Server is busy'
-      })
+    expect(onCloseHandlerMock).not.toHaveBeenCalled()
+    expect(showFlashAlert).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'An error occurred while updating the group: Server is busy'
     })
   })
 })

@@ -350,7 +350,7 @@ class AccountsController < ApplicationController
     @accounts = @current_user ? @current_user.adminable_accounts : []
     @all_accounts = Set.new
     @accounts.each do |a|
-      if a.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
+      if a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
         @all_accounts << a
         @all_accounts.merge Account.active.sub_accounts_recursive(a.id)
       end
@@ -1447,7 +1447,7 @@ class AccountsController < ApplicationController
     js_permissions = {
       can_read_course_list: can_read_course_list,
       can_read_roster: can_read_roster,
-      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+      can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),

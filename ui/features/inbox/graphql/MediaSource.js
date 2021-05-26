@@ -64,14 +64,3 @@ export const MediaSource = {
     __typename: 'MediaSource'
   })
 }
-
-export const DefaultMocks = {
-  MediaSource: () => ({
-    contentType: 'video/mp4',
-    bitrate: '558995',
-    filext: 'mp4',
-    height: '360',
-    width: '640',
-    size: '199'
-  })
-}

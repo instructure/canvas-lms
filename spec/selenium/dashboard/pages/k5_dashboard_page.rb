@@ -18,8 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../../helpers/color_common'
 
 module K5PageObject
+  include ColorCommon
+
   #------------------------- Selectors --------------------------
   def enable_homeroom_checkbox_selector
     '#course_homeroom_course'
@@ -213,6 +216,10 @@ module K5PageObject
     "[data-testid='k5-dashboard-card-hero']"
   end
 
+  def dashboard_header_selector
+    "[data-testid='k5-course-header-hero']"
+  end
+
   def front_page_info_selector
     "#course_home_content .user_content"
   end
@@ -283,6 +290,70 @@ module K5PageObject
 
   def missing_item_href_selector(course_id, assignment_id)
     "//*[contains(@href, '/courses/#{course_id}/assignments/#{assignment_id}')]"
+  end
+
+  def new_course_button_selector
+    "[data-testid='new-course-button']"
+  end
+
+  def new_course_modal_selector
+    "[aria-label='Create Course']"
+  end
+
+  def new_course_modal_close_button_selector
+    "[data-testid='instui-modal-close']"
+  end
+
+  def account_name_selector
+    "[placeholder='Begin typing to search']"
+  end
+
+  def course_name_input_selector
+    "[placeholder='Name...']"
+  end
+
+  def new_course_modal_create_selector
+    "//button[.//*[. = 'Create']]"
+  end
+
+  def new_course_modal_cancel_selector
+    "//button[.//*[. = 'Cancel']]"
+  end
+
+  def empty_grades_image_selector
+    "[data-testid='empty-grades-panda']"
+  end
+
+  def assignment_group_toggle_selector
+    "[data-testid='assignment-group-toggle']"
+  end
+
+  def grades_total_selector
+    "[data-testid='grades-total']"
+  end
+
+  def grades_table_row_selector
+    "[data-testid='grades-table-row']"
+  end
+
+  def grades_assignment_anchor_selector
+    "a"
+  end
+
+  def pink_color_button_selector
+    "//button[contains(@id,'DF6B91')]"
+  end
+
+  def selected_color_input_selector
+    "[name='course[course_color]']"
+  end
+
+  def course_color_preview_selector
+    "[data-testid='course-color-preview']"
+  end
+
+  def planner_assignment_header_selector
+    ".Grouping-styles__overlay"
   end
 
   #------------------------- Elements --------------------------
@@ -572,6 +643,70 @@ module K5PageObject
     find_from_element_fxpath(missing_assignment_element, missing_item_href_selector(course_id, assignment_id))
   end
 
+  def new_course_button
+    f(new_course_button_selector)
+  end
+
+  def new_course_modal
+    f(new_course_modal_selector)
+  end
+
+  def new_course_modal_close_button
+    f(new_course_modal_close_button_selector)
+  end
+
+  def account_name_element
+    f(account_name_selector)
+  end
+
+  def course_name_input
+    f(course_name_input_selector)
+  end
+
+  def new_course_modal_create
+    fxpath(new_course_modal_create_selector)
+  end
+
+  def new_course_modal_cancel
+    fxpath(new_course_modal_cancel_selector)
+  end
+
+  def empty_grades_image
+    f(empty_grades_image_selector)
+  end
+
+  def grades_total
+    f(grades_total_selector)
+  end
+
+  def grades_assignments_list
+    ff(grades_table_row_selector)
+  end
+
+  def grades_assignment_href(grade_row_element)
+    element_value_for_attr(grade_row_element.find_element(:css, grades_assignment_anchor_selector), "href")
+  end
+
+  def pink_color_button
+    fxpath(pink_color_button_selector)
+  end
+
+  def selected_color_input
+    f(selected_color_input_selector)
+  end
+
+  def course_color_preview
+    f(course_color_preview_selector)
+  end
+
+  def dashboard_header
+    f(dashboard_header_selector)
+  end
+
+  def planner_assignment_header
+    f(planner_assignment_header_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -683,6 +818,30 @@ module K5PageObject
     add_module_item_button.click
   end
 
+  def click_new_course_button
+    new_course_button.click
+  end
+
+  def click_new_course_close_button
+    new_course_modal_close_button.click
+  end
+
+  def select_account_from_list(account_name)
+    click_option(account_name_selector, account_name)
+  end
+
+  def click_new_course_create
+    new_course_modal_create.click
+  end
+
+  def click_new_course_cancel
+    new_course_modal_cancel.click
+  end
+
+  def click_pink_color_button
+    pink_color_button.click
+  end
+
   #------------------------------Retrieve Text----------------------#
 
   def retrieve_welcome_text
@@ -695,6 +854,10 @@ module K5PageObject
 
   def k5_resource_button_names_list
     k5_app_buttons.map(&:text)
+  end
+
+  def grades_total_text
+    grades_total.text
   end
 
   #----------------------------Element Management---------------------#
@@ -731,6 +894,10 @@ module K5PageObject
     element_exists?(course_navigation_tray_selector)
   end
 
+  def modules_tab_exists?
+    element_exists?(modules_tab_selector)
+  end
+
   def module_assignment_exists?(assignment_title)
     element_exists?(module_assignment_selector(assignment_title))
   end
@@ -745,6 +912,30 @@ module K5PageObject
 
   def schedule_item_exists?
     element_exists?(schedule_item_selector)
+  end
+
+  def new_course_modal_exists?
+    element_exists?(new_course_modal_selector)
+  end
+
+  def enter_account_search_data(search_term)
+    replace_content(account_name_element, search_term)
+    driver.action.send_keys(:enter).perform
+  end
+
+  def enter_course_name(course_name)
+    replace_content(course_name_input, course_name)
+    driver.action.send_keys(:enter).perform
+  end
+
+  def fill_out_course_modal(course_name)
+    enter_account_search_data(@account.name[0...3])
+    select_account_from_list(@account.name)
+    enter_course_name(course_name)
+  end
+
+  def input_color_hex_value(hex_value)
+    selected_color_input.send_keys(hex_value)
   end
 
   #----------------------------Create Content---------------------#
@@ -783,11 +974,11 @@ module K5PageObject
     tool
   end
 
-  def create_dated_assignment(course, assignment_title, assignment_due_at)
+  def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
     course.assignments.create!(
       title: assignment_title,
       grading_type: 'points',
-      points_possible: 100,
+      points_possible: points_possible,
       due_at: assignment_due_at,
       submission_types: 'online_text_entry'
     )
@@ -852,23 +1043,49 @@ module K5PageObject
     @subject_course = @course
   end
 
-  def create_and_submit_assignment(course)
-    assignment = course.assignments.create!(
-      title: "Math Assignment 5",
-      description: "General Assignment",
-      points_possible: 100,
+  def admin_setup
+    feature_setup
+    teacher_setup
+    account_admin_user(:account => @account)
+  end
+
+  def create_assignment(course, assignment_title, description, points_possible)
+    course.assignments.create!(
+      title: assignment_title,
+      description: description,
+      points_possible: points_possible,
       submission_types: 'online_text_entry',
       workflow_state: 'published'
     )
+  end
+
+  def create_and_submit_assignment(course, assignment_title, description, points_possible)
+    assignment = create_assignment(course, assignment_title, description, points_possible)
     assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
     assignment
   end
 
-  def create_course_module
+  def create_course_module(workflow_state = 'active')
     @module_title = "Course Module"
-    @course_module = @subject_course.context_modules.create!(:name => @module_title)
+    @course_module = @subject_course.context_modules.create!(:name => @module_title, :workflow_state => workflow_state)
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
     @course_module.add_item(:id => assignment.id, :type => 'assignment')
+  end
+
+  def create_grading_standard(course)
+    course.grading_standards.create!(
+      title: "Fun Grading Standard",
+      standard_data: {
+        "scheme_0" => { name: "Awesome", value: "90" },
+        "scheme_1" => { name: "Fabulous", value: "80" },
+        "scheme_2" => { name: "You got this", value: "70" },
+        "scheme_3" => { name: "See me", value: "0" }
+      }
+    )
+  end
+
+  def hex_value_for_color(element)
+    '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
   end
 end

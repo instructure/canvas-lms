@@ -15,5 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react'
 
 export const PER_PAGE = 20
+
+const searchFilter = {
+  searchTerm: '',
+  setSearchTerm: () => {}
+}
+export const SearchContext = React.createContext(searchFilter)

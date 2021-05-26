@@ -25,6 +25,8 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
+import {GradingPeriodShape} from '@canvas/k5/react/utils'
+
 const GradingPeriodSelect = ({
   gradingPeriods,
   handleSelectGradingPeriod,
@@ -56,14 +58,6 @@ const GradingPeriodSelect = ({
     </PresentationContent>
   </View>
 )
-
-const GradingPeriodShape = {
-  id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  end_date: PropTypes.string,
-  start_date: PropTypes.string,
-  workflow_state: PropTypes.string
-}
 
 GradingPeriodSelect.propTypes = {
   gradingPeriods: PropTypes.arrayOf(PropTypes.shape(GradingPeriodShape)).isRequired,

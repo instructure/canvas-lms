@@ -281,6 +281,23 @@ describe ContextController do
         end
       end
     end
+
+    context 'profiles enabled' do
+      it 'does not show the dummy course as common' do
+        account_admin_user
+        course_with_student(active_all: true)
+
+        account = Account.default
+        account.settings = { enable_profiles: true }
+        account.save!
+        expect(account.enable_profiles?).to be_truthy
+        Course.ensure_dummy_course
+
+        user_session(@admin)
+        get 'roster_user', params: { course_id: @course.id, id: @student.id }
+        expect(assigns['user_data'][:common_contexts]).to be_empty
+      end
+    end
   end
 
   describe "POST 'object_snippet'" do

@@ -23,6 +23,7 @@
 # jsx attribute type warnings
 #
 
+require_relative "../helpers/quizzes_common"
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
 require_relative 'pages/rcs_sidebar_page'
@@ -32,6 +33,7 @@ require_relative 'pages/rcs_sidebar_page'
 # Ignore js errors so specs can pass
 describe 'RCE next tests', ignore_js_errors: true do
   include_context 'in-process server selenium tests'
+  include QuizzesCommon
   include WikiAndTinyCommon
   include RCSSidebarPage
   include RCENextPage
@@ -1467,6 +1469,24 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect(f('textarea#wiki_page_body')).to be_displayed
         ensure
           driver.manage.delete_cookie('rce.htmleditor')
+        end
+
+        it 'saves pretty HTML editor text on submit' do
+          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35')
+          quiz_content = '<p>test</p>'
+          @quiz = @course.quizzes.create!
+          open_quiz_edit_form
+          click_questions_tab
+          click_new_question_button
+          create_essay_question
+          expect_new_page_load{ f('.save_quiz_button').click }
+          open_quiz_show_page
+          expect_new_page_load { f('#preview_quiz_button').click }
+          switch_to_html_view
+          expect(f('.RceHtmlEditor')).to be_displayed
+          f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
+          expect_new_page_load { submit_quiz }
+          expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(quiz_content)
         end
       end
     end

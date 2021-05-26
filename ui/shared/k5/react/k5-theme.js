@@ -41,9 +41,14 @@ const {borders, colors, typography} = variables
  * used as the `fontFamily` value in the `Text` component as well as the
  * `h1FontFamily` value in the `Heading` component.
  */
+const baseFont = {
+  typography: {
+    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`
+  }
+}
 const base = {
   typography: {
-    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`,
+    ...baseFont.typography,
     fontSizeSmall: '1rem',
     fontSizeMedium: '1.125rem',
     fontSizeLarge: '1.5rem',
@@ -87,6 +92,9 @@ export const theme = {
 }
 
 export default {
-  use: () => baseTheme.use({overrides: base}),
+  use: options => {
+    const fontOnly = options?.fontOnly || false
+    baseTheme.use({overrides: fontOnly ? baseFont : base})
+  },
   variables: mergeDeep(variables, base)
 }

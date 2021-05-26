@@ -23,19 +23,23 @@ import {gql} from '@canvas/apollo'
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
     _id
+    title
+    description
     outcomesCount
     childGroupsCount
+    canEdit
+  }
+`
+
+const childGroupsFragment = gql`
+  fragment ChildGroupsFragment on LearningOutcomeGroup {
     childGroups {
       nodes {
-        _id
-        title
-        description
-        outcomesCount
-        childGroupsCount
-        canEdit
+        ...GroupFragment
       }
     }
   }
+  ${groupFragment}
 `
 
 export const CHILD_GROUPS_QUERY = gql`
@@ -45,24 +49,35 @@ export const CHILD_GROUPS_QUERY = gql`
         _id
         rootOutcomeGroup {
           ...GroupFragment
+          ...ChildGroupsFragment
         }
       }
       ... on Course {
         _id
         rootOutcomeGroup {
           ...GroupFragment
+          ...ChildGroupsFragment
         }
       }
       ... on LearningOutcomeGroup {
-        ...GroupFragment
+        _id
+        outcomesCount
+        childGroupsCount
+        ...ChildGroupsFragment
       }
     }
   }
   ${groupFragment}
+  ${childGroupsFragment}
 `
 
 export const GROUP_DETAIL_QUERY = gql`
-  query GroupDetailQuery($id: ID!, $outcomesCursor: String) {
+  query GroupDetailQuery(
+    $id: ID!
+    $outcomesCursor: String
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+  ) {
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
@@ -86,6 +101,13 @@ export const GROUP_DETAIL_QUERY = gql`
                 canEdit
                 contextType
                 contextId
+                friendlyDescription(
+                  contextId: $outcomesContextId
+                  contextType: $outcomesContextType
+                ) {
+                  _id
+                  description
+                }
               }
             }
           }
@@ -131,6 +153,38 @@ export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
   }
 `
 
+export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
+  mutation SetOutcomeFriendlyDescription($input: SetFriendlyDescriptionInput!) {
+    setFriendlyDescription(input: $input) {
+      outcomeFriendlyDescription {
+        _id
+        description
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_LEARNING_OUTCOME = gql`
+  mutation UpdateLearningOutcome($input: UpdateLearningOutcomeInput!) {
+    updateLearningOutcome(input: $input) {
+      learningOutcome {
+        _id
+        title
+        displayName
+        description
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
   axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
@@ -148,9 +202,6 @@ export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
       contextType
     ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
   )
-
-export const updateOutcome = (outcomeId, outcome) =>
-  axios.put(`/api/v1/outcomes/${outcomeId}`, outcome)
 
 export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
   axios.put(

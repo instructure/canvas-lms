@@ -1,0 +1,111 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import formatMessage from '../../format-message'
+import '../tinymce/ko_KR'
+
+const locale = {
+  "add_8523c19b": { "message": "추가" },
+  "all_4321c3a1": { "message": "전부" },
+  "announcement_list_da155734": { "message": "공지 목록" },
+  "announcements_a4b8ed4a": { "message": "공지" },
+  "apps_54d24a47": { "message": "앱" },
+  "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "비율을 유지" },
+  "assignments_1e02582c": { "message": "과제" },
+  "cancel_caeb1e68": { "message": "취소" },
+  "canvas_plugins_705a5016": { "message": "Canvas 플러그 인" },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "페이지에 링크를 삽입하려면 해당 페이지를 클릭하십시오."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Click to embed { imageName }"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Click to insert a link into the editor."
+  },
+  "close_d634289d": { "message": "닫기" },
+  "collaborations_5c56c15f": { "message": "협업" },
+  "content_type_2cf90d95": { "message": "내용 유형" },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n  other {}\n}"
+  },
+  "course_files_a31f97fc": { "message": "과목 파일" },
+  "course_navigation_dd035109": { "message": "과목 탐색" },
+  "decrease_indent_de6343ab": { "message": "들여쓰기 축소" },
+  "details_98a31b68": { "message": "세부 정보" },
+  "dimensions_45ddb7b7": { "message": "치수" },
+  "discussions_a5f96392": { "message": "토론" },
+  "discussions_index_6c36ced": { "message": "토론 색인" },
+  "done_54e3d4b6": { "message": "마침" },
+  "embed_image_1080badc": { "message": "이미지 포함" },
+  "external_links_3d9f074e": { "message": "외부 링크" },
+  "files_c300e900": { "message": "파일" },
+  "files_index_af7c662b": { "message": "파일 색인" },
+  "grades_a61eba0a": { "message": "평점" },
+  "group_files_82e5dcdb": { "message": "그룹 파일" },
+  "group_navigation_99f191a": { "message": "그룹 탐색" },
+  "image_8ad06": { "message": "이미지" },
+  "images_7ce26570": { "message": "이미지" },
+  "increase_indent_6d550a4a": { "message": "들여쓰기 확대" },
+  "insert_593145ef": { "message": "삽입" },
+  "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
+  "insert_link_6dc23cae": { "message": "링크 삽입" },
+  "insert_math_equation_57c6e767": { "message": "Insert Math Equation" },
+  "invalid_file_type_881cc9b2": { "message": "유효하지 않은 파일 유형" },
+  "keyboard_shortcuts_ed1844bd": { "message": "키보드 단축키" },
+  "link_7262adec": { "message": "Link" },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "과목에 있는 다른 내용으로 링크합니다."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "그룹에 있는 다른 내용으로 링크합니다."
+  },
+  "links_14b70841": { "message": "링크" },
+  "load_more_results_460f49a9": { "message": "Load more results" },
+  "loading_25990131": { "message": "로드하는 중..." },
+  "loading_bde52856": { "message": "로드 중" },
+  "loading_failed_b3524381": { "message": "Loading failed..." },
+  "locked_762f138b": { "message": "잠김" },
+  "media_af190855": { "message": "미디어" },
+  "modules_c4325335": { "message": "모듈" },
+  "my_files_2f621040": { "message": "내 파일" },
+  "no_e16d9132": { "message": "아니요" },
+  "no_results_940393cf": { "message": "No results." },
+  "options_3ab0ea65": { "message": "옵션" },
+  "pages_e5414c2c": { "message": "페이지" },
+  "people_b4ebb13c": { "message": "사용자" },
+  "preview_53003fd2": { "message": "미리 보기" },
+  "quizzes_7e598f57": { "message": "퀴즈" },
+  "record_7c9448b": { "message": "녹음/녹화" },
+  "recording_98da6bda": { "message": "녹음/녹화" },
+  "save_11a80ec3": { "message": "저장" },
+  "search_280d00bd": { "message": "검색" },
+  "size_b30e1077": { "message": "크기" },
+  "sort_by_e75f9e3e": { "message": "정렬 조건" },
+  "start_over_f7552aa9": { "message": "새로 시작" },
+  "submit_a3cc6859": { "message": "제출" },
+  "syllabus_f191f65b": { "message": "요강" },
+  "title_ee03d132": { "message": "제목" },
+  "upload_file_fd2361b8": { "message": "파일 업로드" },
+  "url_22a5f3b8": { "message": "URL" },
+  "wiki_home_9cd54d0": { "message": "위키 홈" },
+  "yes_dde87d5": { "message": "예" }
+}
+
+
+formatMessage.addLocale({ko: locale})

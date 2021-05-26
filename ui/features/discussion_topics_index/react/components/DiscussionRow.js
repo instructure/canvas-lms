@@ -54,6 +54,7 @@ import {
   IconUpdownLine,
   IconUserLine
 } from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
 
@@ -634,17 +635,19 @@ export class DiscussionRow extends Component {
     }
     const linkUrl = this.props.discussion.html_url
     return (
-      <div className="ic-item-row__content-col">
-        <Heading level="h3" margin="0">
-          <a style={{color: 'inherit'}} className="discussion-title" ref={refFn} href={linkUrl}>
-            {this.props.discussion.read_state !== 'read' && (
-              <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
-            )}
-            <span aria-hidden="true">{this.props.discussion.title}</span>
-            <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
-          </a>
-        </Heading>
-      </div>
+      <Heading as="h3" level="h4" margin="0">
+        <Link
+          href={linkUrl}
+          ref={refFn}
+          data-testid={`discussion-link-${this.props.discussion.id}`}
+        >
+          {this.props.discussion.read_state !== 'read' && (
+            <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
+          )}
+          <span aria-hidden="true">{this.props.discussion.title}</span>
+          <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
+        </Link>
+      </Heading>
     )
   }
 

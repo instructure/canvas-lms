@@ -633,23 +633,19 @@ class DiscussionTopicsController < ApplicationController
 
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
-
-    # Render updated UI if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_announcement_discussion_edit)
-      js_bundle :discussion_topic_edit_v2
-      render html: '', layout: true
-      return
-    end
-
     render :edit
   end
 
   def show
     # Render updated Post UI if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_discussions_post)
+    if @context.feature_enabled?(:react_discussions_post)
+      @topic = @context.all_discussion_topics.find(params[:id])
+      add_discussion_or_announcement_crumb
+      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       js_env({
                course_id: params[:course_id],
-               discussion_topic_id: params[:id]
+               discussion_topic_id: params[:id],
+               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
              })
       js_bundle :discussion_topics_post
       render html: '', layout: true

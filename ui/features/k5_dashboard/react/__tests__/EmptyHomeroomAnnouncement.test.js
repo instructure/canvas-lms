@@ -27,25 +27,25 @@ describe('EmptyHomeroomAnnouncement', () => {
     ...overrides
   })
 
-  it('renders link to homeroom course', async () => {
-    const {findByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
-    const courseName = await findByText("Mr. Smith's Homeroom 2")
+  it('renders link to homeroom course', () => {
+    const {getByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+    const courseName = getByText("Mr. Smith's Homeroom 2")
     expect(courseName).toBeInTheDocument()
     expect(courseName.href).toBe('http://google.com/courseurl2')
   })
 
-  it('shows some helpful text', async () => {
-    const {findByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+  it('shows some helpful text', () => {
+    const {getByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
     expect(
-      await findByText('New announcements show up in this area. Create a new announcement now.')
+      getByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
   })
 
-  it('shows a button to create a new announcement with correct url', async () => {
-    const {findByText} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
-    const button = await findByText('Announcement')
+  it('shows a button to create a new announcement with correct url', () => {
+    const {getByRole} = render(<EmptyHomeroomAnnouncement {...getProps()} />)
+    const button = getByRole('link', {name: "Create a new announcement for Mr. Smith's Homeroom 2"})
     expect(button).toBeInTheDocument()
-    expect(button.closest('a').href).toBe(
+    expect(button.href).toBe(
       'http://google.com/courseurl2/discussion_topics/new?is_announcement=true'
     )
   })

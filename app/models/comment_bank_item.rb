@@ -31,5 +31,8 @@ class CommentBankItem < ActiveRecord::Base
   set_policy do
     given { |user| self.user == user }
     can :delete and can :read and can :update
+
+    given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
+    can :create
   end
 end

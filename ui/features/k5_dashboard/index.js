@@ -31,7 +31,13 @@ ready(() => {
         currentUser={ENV.current_user}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
-        canCreateCourses={ENV.PERMISSIONS?.create_courses}
+        createPermissions={
+          ENV.PERMISSIONS?.create_courses_as_admin
+            ? 'admin'
+            : ENV.PERMISSIONS?.create_courses_as_teacher
+            ? 'teacher'
+            : 'none'
+        }
       />,
       dashboardContainer
     )

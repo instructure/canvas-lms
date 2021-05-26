@@ -330,7 +330,7 @@ module ApplicationHelper
   end
 
   def sortable_tabs
-    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
+    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account, :course_subject_tabs => @context.try(:elementary_subject_course?))
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
@@ -430,8 +430,9 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user, account=nil)
-    return true if account && account.grants_any_right?(user, session, :create_courses, :manage_courses)
-    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
+    return true if account&.grants_any_right?(user, session, :manage_courses, :create_courses)
+
+    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :manage_courses, :create_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.
@@ -630,14 +631,10 @@ module ApplicationHelper
     support_url || '#'
   end
 
-  def show_help_link?
-    show_feedback_link? || support_url.present?
-  end
-
   def help_link_classes(additional_classes = [])
     css_classes = []
     css_classes << "support_url" if support_url
-    css_classes << "help_dialog_trigger" if show_feedback_link?
+    css_classes << "help_dialog_trigger"
     css_classes.concat(additional_classes) if additional_classes
     css_classes.join(" ")
   end
@@ -662,12 +659,10 @@ module ApplicationHelper
   end
 
   def help_link
-    if show_help_link?
-      link_content = help_link_name
-      link_to link_content.html_safe, help_link_url,
-        :class => help_link_classes,
-        :data => help_link_data
-    end
+    link_content = help_link_name
+    link_to link_content.html_safe, help_link_url,
+      :class => help_link_classes,
+      :data => help_link_data
   end
 
   def active_brand_config_cache

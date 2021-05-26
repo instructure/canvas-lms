@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
 
+  include ManyRootAccounts
   include TurnitinID
   include Pronouns
 
@@ -126,6 +127,7 @@ class User < ActiveRecord::Base
   has_many :attachments, :as => 'context', :dependent => :destroy
   has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
+  has_many :mentions, inverse_of: :user
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
@@ -201,6 +203,8 @@ class User < ActiveRecord::Base
     class_name: "Auditors::ActiveRecord::GradeChangeRecord",
     dependent: :destroy,
     inverse_of: :grader
+
+  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
@@ -443,12 +447,6 @@ class User < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
-  def global_root_account_ids
-    root_account_ids&.map do |id|
-      Shard.global_id_for(id, self.shard)
-    end
-  end
-
   # Update the root_account_ids column on the user
   # and all the users CommunicationChannels
   def update_root_account_ids
@@ -604,9 +602,11 @@ class User < ActiveRecord::Base
         shard_user_ids = users.map(&:id)
 
         data[:enrollments] += shard_enrollments =
-            Enrollment.where("workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
+            Enrollment.where("workflow_state NOT IN ('deleted','completed','inactive','rejected') AND type<>'StudentViewEnrollment'").
                 where(:user_id => shard_user_ids).
                 select([:user_id, :course_id, :course_section_id]).
+                joins(:enrollment_state).
+                where.not(enrollment_states: {state: 'completed'}).
                 distinct.to_a
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
@@ -1706,6 +1706,18 @@ class User < ActiveRecord::Base
 
   def default_notifications_disabled?
     !!preferences[:default_notifications_disabled]
+  end
+
+  def last_seen_release_note=(val)
+    preferences[:last_seen_release_note] = val
+  end
+
+  def last_seen_release_note
+    preferences[:last_seen_release_note] || Time.at(0)
+  end
+
+  def release_notes_badge_disabled?
+    !!preferences[:release_notes_badge_disabled]
   end
 
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***

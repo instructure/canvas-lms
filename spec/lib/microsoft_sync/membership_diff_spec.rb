@@ -134,36 +134,69 @@ describe MicrosoftSync::MembershipDiff do
     end
   end
 
-  describe '#members_to_remove' do
+  describe '#removals_in_slices_of' do
+    let(:removals) do
+      [].tap { |results| subject.removals_in_slices_of(slice_size) { |slice| results << slice } }
+    end
+    let(:removals_all_owners) { removals.map{|removal| removal[:owners] || []}.flatten.sort }
+    let(:removals_all_members) { removals.map{|removal| removal[:members] || []}.flatten.sort }
+
+    let(:remote_members) { %w[student1 student2 teacher1 teacher4 teacher5] }
+    let(:remote_owners) { %w[teacher1 teacher2 teacher3 teacher5] }
+
     before do
-      set_local_members 'student', [1, 3, 4, 5], member_enrollment_type
-      set_local_members 'teacher', [2, 4, 5, 6], owner_enrollment_type
+      set_local_members 'student', [2], member_enrollment_type
+      set_local_members 'teacher', [4], member_enrollment_type
+      set_local_members 'teacher', [5], owner_enrollment_type
+
+      # student1 (remote member, local missing) -> remove as member
+      # student2 (remove member, local member) -> OK
+      # teacher1 (remote member & owner, local missing) -> remove as member and owner
+      # teacher2 (remote owner, local member) -> remove as owner [add as member]
+      # teacher3 (remote owner, local missing) -> remove as owner
+      # teacher4 (remote member, local member) -> OK
+      # teacher5 (remote member & owner, local owner) -> OK
     end
 
-    it 'returns an Enumerable' do
-      expect(subject.members_to_remove).to be_a(Enumerable)
+    it 'batches in slices' do
+      counts = removals.map do |a|
+        (a[:owners] || []).length + (a[:members] || []).length
+      end
+      expect(counts).to eq([2, 2, 1])
     end
 
-    it 'returns remote users are members but are neither members/owners locally' do
-      expect(subject.members_to_remove.to_a.sort).to \
-        eq(%w[student2 teacher1])
-    end
-  end
-
-  describe '#owners_to_remove' do
-    before do
-      set_local_members 'student', [1, 3, 4, 5], member_enrollment_type
-      set_local_members 'teacher', [1], member_enrollment_type
-      set_local_members 'teacher', [2, 4, 5, 6], owner_enrollment_type
+    it 'yields owners first' do
+      expect(removals_all_owners).to eq(%w[teacher1 teacher2 teacher3])
+      expect((removals[0][:owners] + removals[1][:owners]).sort).to \
+        eq(%w[teacher1 teacher2 teacher3])
     end
 
-    it 'returns an Enumerable' do
-      expect(subject.owners_to_remove).to be_a(Enumerable)
+    it 'yields members' do
+      expect(removals_all_members).to eq(%w[student1 teacher1])
     end
 
-    it 'returns remote users are owners but are not owners locally' do
-      expect(subject.owners_to_remove.to_a.sort).to \
-        eq(%w[teacher1 teacher3])
+    it 'adds some members in to the last owners slice if there is room' do
+      expect(removals[1][:members].length).to eq(1)
+    end
+
+    context 'with a different slice size where no members fit into the last owners slice' do
+      let(:slice_size) { 3 }
+
+      it 'batches in slices' do
+        counts = removals.map do |a|
+          (a[:owners] || []).length + (a[:members] || []).length
+        end
+        expect(counts).to eq([3, 2])
+      end
+
+      it 'yields owners first' do
+        expect(removals_all_owners).to eq(%w[teacher1 teacher2 teacher3])
+        expect(removals[0][:owners]).to eq(%w[teacher1 teacher2 teacher3])
+      end
+
+      it 'yields members' do
+        expect(removals_all_members).to eq(%w[student1 teacher1])
+      end
     end
   end
 

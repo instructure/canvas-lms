@@ -59,7 +59,7 @@ describe('ManagementHeader', () => {
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
     const {getByText} = render(<ManagementHeader />)
     fireEvent.click(getByText('Create'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Create Outcome')).toBeInTheDocument()
   })
 })
