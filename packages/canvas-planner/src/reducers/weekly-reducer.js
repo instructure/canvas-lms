@@ -45,7 +45,7 @@ export default handleActions(
     WEEK_LOADED: (state, action) => {
       const newState = {...state}
       newState.weeks = {...state.weeks}
-      newState.weeks[state.weekStart.format()] = action.payload.weekDays
+      newState.weeks[action.payload.weekStart.format()] = action.payload.weekDays
       return newState
     },
     GOT_WAY_PAST_ITEM_DATE: (state, action) => {
