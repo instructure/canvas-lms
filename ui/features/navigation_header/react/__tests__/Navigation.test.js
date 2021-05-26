@@ -26,6 +26,7 @@ describe('GlobalNavigation', () => {
     window.ENV.current_user_disabled_inbox = false
     window.ENV.DIRECT_SHARE_ENABLED = true
     window.ENV.SETTINGS = {release_notes_badge_disabled: false}
+    window.ENV.FEATURES = {embedded_release_notes: true}
   })
 
   it('renders', () => {
