@@ -122,6 +122,19 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
   end
 
+  it "does not get tripped up by explicit and implicit psuedonyms" do
+    pseudonym2 = @user.pseudonyms.create!(
+      unique_id: 'jtfrd@instructure.com',
+      password: 'qwertyuiop',
+      password_confirmation: 'qwertyuiop',
+      authentication_provider: Account.default.canvas_authentication_provider)
+
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq pseudonym2
+  end
+
   it "password auth should work with extra whitespace around unique id " do
     post 'create', params: {:pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
