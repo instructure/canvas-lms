@@ -20,14 +20,19 @@ class CreateMentions < ActiveRecord::Migration[6.0]
   tag :predeploy
 
   def up
-    create_table :mentions do |t|
-      t.references :discussion_entry, foreign_key: true, index: true, null: false
-      t.references :user, foreign_key: true, index: true, null: false
-      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
-      t.string :workflow_state, default: "active", null: false, limit: 255
-      t.timestamps
+    unless table_exists? :mentions
+      create_table :mentions do |t|
+        t.references :discussion_entry, foreign_key: true, index: true, null: false
+        t.references :user, foreign_key: true, index: true, null: false
+        t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+        t.string :workflow_state, default: "active", null: false, limit: 255
+        t.timestamps
+        t.index [:root_account_id, :id], unique: true, name: 'index_mentions_replica_identity'
+      end
     end
-    set_replica_identity(:microsoft_sync_groups, :index_microsoft_sync_groups_replica_identity)
+
+    add_index :mentions, [:root_account_id, :id], name: 'index_mentions_replica_identity', algorithm: :concurrently, unique: true, if_not_exists: true
+    set_replica_identity(:mentions, :index_mentions_replica_identity)
   end
 
   def down
