@@ -252,7 +252,6 @@ RSpec.shared_examples "DiscussionType" do
   end
 
   it 'returns the current user permissions' do
-    @course.update!(workflow_state: "available")
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
@@ -323,6 +322,7 @@ describe Types::DiscussionType do
     let_once(:discussion) { graded_discussion_topic }
     include_examples "DiscussionType"
   end
+
   context "group discussion" do
     let_once(:discussion) { group_discussion_assignment.child_topics.take }
     include_examples "DiscussionType"
