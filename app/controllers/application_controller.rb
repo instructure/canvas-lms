@@ -238,17 +238,24 @@ class ApplicationController < ActionController::Base
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
     :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users
   ].freeze
-  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
+  JS_ENV_BRAND_ACCOUNT_FEATURES = [
+    :embedded_release_notes
+  ].freeze
+  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
-    # can be invalidated by a flag change on either site admin or the domain root account
+    # can be invalidated by a flag change on site admin, the domain root account, or the brand config account
     MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
-        Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags)].cache_key) do
+        Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags),
+        brand_config_account&.cache_key(:feature_flags)].cache_key) do
       results = {}
       JS_ENV_SITE_ADMIN_FEATURES.each do |f|
         results[f] = Account.site_admin.feature_enabled?(f)
       end
       JS_ENV_ROOT_ACCOUNT_FEATURES.each do |f|
         results[f] = !!@domain_root_account&.feature_enabled?(f)
+      end
+      JS_ENV_BRAND_ACCOUNT_FEATURES.each do |f|
+        results[f] = !!brand_config_account&.feature_enabled?(f)
       end
       results
     end
