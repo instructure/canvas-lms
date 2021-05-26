@@ -384,6 +384,18 @@ module K5PageObject
     ".user_content"
   end
 
+  def learning_mastery_tab_selector
+    "#tab-k5-outcomes"
+  end
+
+  def assignments_tab_selector
+    "#tab-k5-assignments"
+  end
+
+  def outcomes_group_selector
+    "#outcomes"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -767,6 +779,18 @@ module K5PageObject
     f(important_info_content_selector)
   end
 
+  def learning_mastery_tab
+    f(learning_mastery_tab_selector)
+  end
+
+  def assignments_tab
+    f(assignments_tab_selector)
+  end
+
+  def outcomes_group
+    f(outcomes_group_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -904,6 +928,10 @@ module K5PageObject
 
   def click_assignment_group_toggle
     assignment_group_toggle.click
+  end
+
+  def click_learning_mastery_tab
+    learning_mastery_tab.click
   end
 
   #------------------------------Retrieve Text----------------------#
@@ -1155,5 +1183,29 @@ module K5PageObject
   def create_important_info_content(course, info_text)
     course.syllabus_body = "<p>#{info_text}</p>"
     course.save!
+  end
+
+  def add_and_assess_rubric_assignment
+    rubric = outcome_with_rubric(course: @subject_course)
+    assignment = create_assignment(@course, "Rubric Assignment", "Description of Rubric", 10)
+    association = rubric.associate_with(assignment, @subject_course, purpose: 'grading', use_for_grading: true)
+    submission = assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    association.assess(
+      user: @student,
+      assessor: @teacher,
+      artifact: submission,
+      assessment: {
+       assessment_type: 'grading',
+       :"criterion_#{@rubric.criteria_object.first.id}" => {
+         points: 3,
+         comments: "a comment",
+       }
+     }
+    )
+    assignment
+  end
+
+  def turn_on_learning_mastery_gradebook
+    @subject_course.enable_feature!(:student_outcome_gradebook)
   end
 end
