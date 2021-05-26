@@ -176,4 +176,20 @@ describe MicrosoftSync::UserMapping do
       end
     end
   end
+
+  describe '.user_ids_without_mappings' do
+    it 'filters the given user ids to ones without mappings in the root account' do
+      users = 4.times.map{user_model}
+      accounts = 2.times.map{account_model}
+
+      described_class.create!(root_account: accounts[0], user: users[1])
+      described_class.create!(root_account: accounts[1], user: users[0])
+
+      result = described_class.user_ids_without_mappings(
+        [users[0].id, users[1].id, users[2].id], accounts[0].id
+      )
+
+      expect(result).to match_array([users[0].id, users[2].id])
+    end
+  end
 end

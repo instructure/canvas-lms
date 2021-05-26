@@ -60,6 +60,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     end
   end
 
+  def self.user_ids_without_mappings(user_ids, root_account_id)
+    existing_mappings = where(root_account_id: root_account_id, user_id: user_ids)
+    user_ids - existing_mappings.pluck(:user_id)
+  end
+
   # Example: bulk_insert_for_root_account_id(course.root_account_id,
   #                                          user1.id => 'aad1', user1.id => 'aad2')
   # Uses Rails 6's insert_all, which unlike our bulk_insert(), ignores

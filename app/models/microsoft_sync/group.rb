@@ -131,4 +131,17 @@ class MicrosoftSync::Group < ActiveRecord::Base
       on_conflict: :overwrite
     ).run_later
   end
+
+  def enqueue_future_partial_sync(enrollment)
+    return unless update_unless_deleted(workflow_state: :scheduled)
+
+    MicrosoftSync::PartialSyncChange.upsert_for_enrollment(enrollment)
+
+    syncer_job.delay(
+      singleton: "#{self.class.name}:#{global_id}:enqueue_future_partial_sync",
+      run_at: Setting.get('microsoft_group_enrollments_partial_syncing_debounce_minutes', '10')
+              .to_f.minutes.from_now,
+      on_conflict: :overwrite
+    ).run_later(:partial)
+  end
 end

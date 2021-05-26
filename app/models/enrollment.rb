@@ -1566,6 +1566,6 @@ class Enrollment < ActiveRecord::Base
     return unless self.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
     return unless self.root_account.settings[:microsoft_sync_enabled]
 
-    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_sync
+    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_partial_sync self
   end
 end

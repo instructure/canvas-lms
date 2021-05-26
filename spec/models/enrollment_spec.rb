@@ -3524,6 +3524,11 @@ describe Enrollment do
         it 'should enqueue a job' do
           expect { enroll_user }.to change { Delayed::Job.count }.by 1
         end
+
+        it 'calls MicrosoftSync::Group#enqueue_future_partial_sync' do
+          expect_any_instance_of(MicrosoftSync::Group).to receive(:enqueue_future_partial_sync)
+          enroll_user
+        end
       end
     end
   end
