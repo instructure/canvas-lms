@@ -63,20 +63,20 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Sort control', () => {
-    it('should show down arrow when ascending', () => {
+    it('should show up arrow when ascending', () => {
       const {getByTestId} = setup({
         sortDirection: 'asc'
       })
-      const downArrow = getByTestId('DownArrow')
-      expect(downArrow).toBeTruthy()
+      const upArrow = getByTestId('UpArrow')
+      expect(upArrow).toBeTruthy()
     })
 
-    it('should show up arrow when descending', () => {
+    it('should show down arrow when descending', () => {
       const {getByTestId} = setup({
         sortDirection: 'desc'
       })
-      const upArrow = getByTestId('UpArrow')
-      expect(upArrow).toBeTruthy()
+      const downArrow = getByTestId('DownArrow')
+      expect(downArrow).toBeTruthy()
     })
 
     it('should call onClick when clicked', () => {
