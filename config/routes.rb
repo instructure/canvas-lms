@@ -1319,6 +1319,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :accounts) do
       get 'accounts', action: :index, as: :accounts
       get 'course_accounts', :action => :course_accounts, :as => :course_accounts
+      get 'accounts/uuid:account_uuid', action: :show_account_by_uuid
       get 'accounts/:id', action: :show, as: :account
       put 'accounts/:id', action: :update
       get 'accounts/:account_id/courses', action: :courses_api, as: 'account_courses'
