@@ -91,7 +91,7 @@ module UserSearch
           pseudonyms.workflow_state <> 'deleted' AND
           pseudonyms.account_id = ?
         LIMIT 1) AS sis_user_id",
-        context.root_account_id || context.id
+        context.try(:resolved_root_account_id) || context.root_account_id
       ]))
       users_scope.order(Arel.sql("sis_user_id#{order}"))
     else
