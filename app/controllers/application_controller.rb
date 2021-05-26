@@ -2462,6 +2462,9 @@ class ApplicationController < ActionController::Base
     data[:known_user] = viewer.address_book.known_user(profile.user)
     if data[:known_user] && viewer != profile.user
       common_courses = viewer.address_book.common_courses(profile.user)
+      # address book can return a fake record in common courses with course_id
+      # 0 which represents an admin -> user commonality.
+      common_courses.delete(0)
       common_groups = viewer.address_book.common_groups(profile.user)
     else
       common_courses = {}
@@ -2472,8 +2475,8 @@ class ApplicationController < ActionController::Base
   end
 
   def common_contexts(common_courses, common_groups, current_user, session)
-    courses = Course.where(id: common_courses.keys).to_a
-    groups = Group.where(id: common_groups.keys).to_a
+    courses = Course.active.where(id: common_courses.keys).to_a
+    groups = Group.active.where(id: common_groups.keys).to_a
 
     common_courses = courses.map do |course|
       course_json(course, current_user, session, ['html_url'], false).merge({
