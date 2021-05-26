@@ -1053,14 +1053,17 @@ module Api::V1::Assignment
   end
 
   def allowed_assignment_input_fields(assignment)
+    should_update_submission_types =
+      !assignment.submission_types&.include?('online_quiz') ||
+      assignment.submissions.having_submission.empty?
+
     API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
       {'turnitin_settings' => strong_anything},
       {'vericite_settings' => strong_anything},
       {'allowed_extensions' => strong_anything},
       {'integration_data' => strong_anything},
       {'external_tool_tag_attributes' => strong_anything},
-      # prevent editing submission_types via the REST API if the assignment has submissions
-      ({'submission_types' => strong_anything} if assignment.submissions.having_submission.empty?)
+      ({'submission_types' => strong_anything} if should_update_submission_types)
     ].compact
   end
 
