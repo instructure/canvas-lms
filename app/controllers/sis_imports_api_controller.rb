@@ -378,6 +378,8 @@ class SisImportsApiController < ApplicationController
   #
   # @argument created_since [Optional, DateTime]
   #   If set, only shows imports created after the specified date (use ISO8601 format)
+  # @argument created_before [Optional, DateTime]
+  #   If set, only shows imports created before the specified date (use ISO8601 format)
   #
   # @argument workflow_state[] [String, "initializing"|"created"|"importing"|"cleanup_batch"|"imported"|"imported_with_messages"|"aborted"|"failed"|"failed_with_messages"|"restoring"|"partially_restored"|"restored"]
   #   If set, only returns imports that are in the given state.
@@ -392,6 +394,9 @@ class SisImportsApiController < ApplicationController
       scope = @account.sis_batches.order('created_at DESC')
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
+      end
+      if (created_before = CanvasTime.try_parse(params[:created_before]))
+        scope = scope.where("created_at < ?", created_before)
       end
 
       state = Array(params[:workflow_state])&['initializing', 'created', 'importing', 'cleanup_batch', 'imported', 'imported_with_messages',
