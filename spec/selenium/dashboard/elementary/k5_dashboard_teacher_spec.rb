@@ -76,6 +76,12 @@ describe "teacher k5 dashboard" do
       expect(element_exists?(course_card_selector(@course_name))).to eq(false)
       expect(element_exists?(course_card_selector(@subject_course_title))).to eq(true)
     end
+
+    it 'shows Important Info on the course navigation list' do
+      get "/courses/#{@homeroom_course.id}"
+
+      expect(important_info_link).to include_text("Important Info")
+    end
   end
 
   context 'homeroom announcements' do
@@ -223,7 +229,7 @@ describe "teacher k5 dashboard" do
     end
   end
 
-  context 'homeroom dashboard resource panel contacts' do
+  context 'homeroom dashboard resource panel' do
     it 'shows the resource panel staff contacts' do
       course_with_ta(
         course: @homeroom_course,
@@ -257,6 +263,14 @@ describe "teacher k5 dashboard" do
       get "/#resources"
 
       expect(instructor_bio(bio)).to be_displayed
+    end
+
+    it 'shows the Important Info for the main resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@homeroom_course, important_info_text)
+
+      get "#resources"
+      expect(important_info_content).to include_text(important_info_text)
     end
   end
 

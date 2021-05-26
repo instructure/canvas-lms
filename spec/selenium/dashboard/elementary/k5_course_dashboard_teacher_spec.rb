@@ -85,6 +85,12 @@ describe "teacher k5 course dashboard" do
 
       expect(driver.current_url).to match(course_settings_path(@subject_course.id))
     end
+
+    it 'shows Important Info in the course navigation list' do
+      get "/courses/#{@subject_course.id}/settings"
+
+      expect(important_info_link).to include_text("Important Info")
+    end
   end
 
   context 'course modules tab' do
@@ -228,6 +234,17 @@ describe "teacher k5 course dashboard" do
 
       expect(k5_app_buttons.count).to eq 1
       expect(k5_app_buttons[0].text).to eq lti_b
+    end
+  end
+
+  context 'course resources tab' do
+    it 'shows the Important Info for subject resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@subject_course, important_info_text)
+      create_lti_resource("fake LTI")
+      get "/courses/#{@subject_course.id}#resources"
+      
+      expect(important_info_content).to include_text(important_info_text)
     end
   end
 end

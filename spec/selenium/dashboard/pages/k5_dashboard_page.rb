@@ -376,6 +376,14 @@ module K5PageObject
     "[role='tablist']"
   end
 
+  def important_info_link_selector
+    ".syllabus"
+  end
+
+  def important_info_content_selector
+    ".user_content"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -749,6 +757,14 @@ module K5PageObject
 
   def k5_tablist
     f(k5_tablist_selector)
+  end
+
+  def important_info_link
+    f(important_info_link_selector)
+  end
+
+  def important_info_content
+    f(important_info_content_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
@@ -1134,5 +1150,10 @@ module K5PageObject
 
   def hex_value_for_color(element)
     '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
+  end
+
+  def create_important_info_content(course, info_text)
+    course.syllabus_body = "<p>#{info_text}</p>"
+    course.save!
   end
 end
