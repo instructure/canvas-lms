@@ -390,7 +390,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       onShareToCommons={
                         canSeeCommons
                           ? () => {
-                              window.location.assign(ENV.discussion_topic_menu_tools[0].base_url)
+                              window.location.assign(
+                                `${ENV.discussion_topic_menu_tools[0].base_url}&discussion_topics%5B%5D=${discussionTopicData._id}`
+                              )
                             }
                           : null
                       }

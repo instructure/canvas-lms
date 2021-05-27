@@ -332,7 +332,9 @@ describe('DiscussionTopicContainer', () => {
     const shareToCommonsOption = await container.findByTestId('shareToCommons')
     fireEvent.click(shareToCommonsOption)
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith('example.com')
+      expect(assignMock).toHaveBeenCalledWith(
+        `example.com&discussion_topics%5B%5D=${discussionTopicMock.discussionTopic._id}`
+      )
     })
   })
 
