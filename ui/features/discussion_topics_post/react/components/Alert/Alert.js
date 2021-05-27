@@ -161,7 +161,7 @@ Alert.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
   dueAtDisplayText: PropTypes.string.isRequired,
   assignmentOverrides: PropTypes.array.isRequired,
-  canSeeMultipleDueDates: PropTypes.bool.isRequired
+  canSeeMultipleDueDates: PropTypes.bool
 }
 
 export default Alert
