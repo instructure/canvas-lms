@@ -29,6 +29,7 @@ export default function HelpTray({
   closeTray,
   links,
   hasLoaded,
+  showNotes,
   badgeDisabled,
   setBadgeDisabled
 }) {
@@ -39,7 +40,9 @@ export default function HelpTray({
       </Heading>
       <hr role="presentation" />
       <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray} />
-      <ReleaseNotesList badgeDisabled={badgeDisabled} setBadgeDisabled={setBadgeDisabled} />
+      {showNotes ? (
+        <ReleaseNotesList badgeDisabled={badgeDisabled} setBadgeDisabled={setBadgeDisabled} />
+      ) : null}
     </View>
   )
 }
@@ -49,6 +52,7 @@ HelpTray.propTypes = {
   closeTray: func.isRequired,
   links: array,
   hasLoaded: bool,
+  showNotes: bool,
   badgeDisabled: bool,
   setBadgeDisabled: func
 }

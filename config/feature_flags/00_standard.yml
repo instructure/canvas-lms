@@ -105,6 +105,11 @@ duplicate_modules:
   description: Allows the duplicating of modules in Canvas
   applies_to: Account
   root_opt_in: true
+embedded_release_notes:
+  state: allowed_on
+  display_name: Embedded Release Notes
+  description: Shows Instructure-provided release notes in the help menu for all users (filtered by user role)
+  applies_to: Account
 encrypted_sourcedids:
   state: allowed
   display_name: Encrypted Sourcedids for Basic Outcomes

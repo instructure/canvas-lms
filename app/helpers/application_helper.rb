@@ -729,7 +729,6 @@ module ApplicationHelper
     end
     @brand_account
   end
-  private :brand_config_account
 
   def pseudonym_can_see_custom_assets
     # custom JS could be used to hijack user stuff.  Let's not allow

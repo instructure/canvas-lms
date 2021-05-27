@@ -105,7 +105,8 @@ export default class Navigation extends React.Component {
     profileAreLoaded: false,
     historyLoading: false,
     historyAreLoaded: false,
-    releaseNotesBadgeDisabled: ENV.SETTINGS.release_notes_badge_disabled
+    releaseNotesBadgeDisabled:
+      !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled
   }
 
   componentDidMount() {
@@ -324,6 +325,7 @@ export default class Navigation extends React.Component {
             links={this.state.help}
             hasLoaded={this.state.helpAreLoaded}
             closeTray={this.closeTray}
+            showNotes={ENV.FEATURES.embedded_release_notes}
             badgeDisabled={this.state.releaseNotesBadgeDisabled}
             setBadgeDisabled={val => this.setState({releaseNotesBadgeDisabled: val})}
           />

@@ -425,7 +425,9 @@ class ContentMigration < ActiveRecord::Base
           worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
           self.workflow_state = :exporting
           self.save
-          Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
+          self.class.connection.after_transaction_commit do
+            Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
+          end
         rescue NameError
           self.workflow_state = 'failed'
           message = "The migration plugin #{migration_type} doesn't have a worker."
