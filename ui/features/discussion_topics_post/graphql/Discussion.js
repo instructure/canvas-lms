@@ -25,6 +25,7 @@ import {User} from './User'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
 import {ChildTopic} from './ChildTopic'
+import {RootTopic} from './RootTopic'
 import {GroupSet} from './GroupSet'
 
 export const Discussion = {
@@ -71,6 +72,9 @@ export const Discussion = {
       groupSet {
         ...GroupSet
       }
+      rootTopic {
+        ...RootTopic
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
@@ -78,6 +82,7 @@ export const Discussion = {
     ${Section.fragment}
     ${ChildTopic.fragment}
     ${GroupSet.fragment}
+    ${RootTopic.fragment}
   `,
 
   shape: shape({
@@ -108,6 +113,7 @@ export const Discussion = {
     courseSections: arrayOf(Section.shape),
     childTopics: arrayOf(ChildTopic.shape),
     groupSet: GroupSet.shape,
+    rootTopic: RootTopic.shape,
     rootEntriesTotalPages: number,
     entriesTotalPages: number
   }),
@@ -141,6 +147,7 @@ export const Discussion = {
     courseSections = [Section.mock()],
     childTopics = [ChildTopic.mock()],
     groupSet = GroupSet.mock(),
+    rootTopic = RootTopic.mock(),
     entriesTotalPages = 2,
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
@@ -172,6 +179,7 @@ export const Discussion = {
     courseSections,
     childTopics,
     groupSet,
+    rootTopic,
     entriesTotalPages,
     discussionEntriesConnection,
     __typename: 'Discussion'

@@ -64,7 +64,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     assignment: props.discussionTopic?.assignment,
     assignmentOverrides: props.discussionTopic?.assignment?.assignmentOverrides?.nodes || [],
     childTopics: props.discussionTopic?.childTopics || [],
-    groupSet: props.discussionTopic?.groupSet || false
+    groupSet: props.discussionTopic?.groupSet || false,
+    siblingTopics: props.discussionTopic?.rootTopic?.childTopics || []
   }
 
   // TODO: Change this to the new canGrade permission.
@@ -80,12 +81,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish
+
   const canSeeCommons =
     discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
-  const canSeeGroupsMenu =
-    discussionTopicData?.permissions?.readAsAdmin &&
-    discussionTopicData?.childTopics.length > 0 &&
-    discussionTopicData?.groupSet
 
   const canSeeMultipleDueDates = !!(
     discussionTopicData?.permissions?.readAsAdmin &&
@@ -213,12 +211,28 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     sort === 'asc' ? setSort('desc') : setSort('asc')
   }
 
+  const getGroupsMenuTopics = () => {
+    if (!discussionTopicData?.permissions?.readAsAdmin) {
+      return null
+    }
+    if (!discussionTopicData?.groupSet) {
+      return null
+    }
+    if (discussionTopicData.childTopics.length > 0) {
+      return discussionTopicData.childTopics
+    } else if (discussionTopicData.siblingTopics.length > 0) {
+      return discussionTopicData.siblingTopics
+    } else {
+      return null
+    }
+  }
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
         <View as="div" padding="medium 0" background="primary">
           <DiscussionPostToolbar
-            childTopics={canSeeGroupsMenu ? discussionTopicData.childTopics : null}
+            childTopics={getGroupsMenuTopics()}
             selectedView={filter}
             sortDirection={sort}
             isCollapsedReplies

@@ -360,6 +360,15 @@ describe('DiscussionTopicContainer', () => {
     await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
   })
 
+  it('should show groups menu when discussion has no child topics but has sibling topics', async () => {
+    // defaultTopic has a root topic which has a child topic named Super Group
+    // we are only removing the child topic from defaultTopic itself, not its root topic
+    const container = setup({discussionTopic: {...defaultTopic, childTopics: null}})
+    expect(await container.queryByText('Super Group')).toBeFalsy()
+    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
+    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+  })
+
   it('should not render group menu button when there is child topics but no group set', async () => {
     const container = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, groupSet: null}
