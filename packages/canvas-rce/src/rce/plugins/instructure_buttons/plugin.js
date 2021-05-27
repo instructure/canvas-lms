@@ -18,9 +18,10 @@
 
 import formatMessage from '../../../format-message'
 import {isOKToLink} from '../../contentInsertionUtils'
+import clickCallback from './clickCallback'
 
-const CREATE_BUTTON = 'create_button'
-const LIST_BUTTON = 'list_buttons'
+const CREATE_BUTTON = 'create'
+const LIST_BUTTON = 'list'
 
 function getMenuItems() {
   return [
@@ -51,9 +52,9 @@ function handleOptionSelected(ed, value) {
 tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
   init(ed) {
     // Register tray control command
-    ed.addCommand('instructureTrayForButtonsPlugin', (ui, action) => {
-      console.log(`show tray for ${action}`)
-    })
+    ed.addCommand('instructureTrayForButtonsPlugin', (ui, type) =>
+      clickCallback(ed, document, type)
+    )
 
     // Register menu items
     ed.ui.registry.addNestedMenuItem('instructure_buttons', {
