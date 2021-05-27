@@ -2561,7 +2561,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course, :course_color, :sync_enrollments_from_homeroom, :homeroom_course_id
+      :homeroom_course, :course_color
     ]
   end
 
