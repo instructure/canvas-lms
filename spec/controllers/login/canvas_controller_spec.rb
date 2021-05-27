@@ -110,8 +110,29 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
     # session reset
     expect(session[:sentinel]).to be_nil
+  end
+
+  it "persists the auth provider if the feature flag is enabled" do
+    Account.default.enable_feature!(:persist_inferred_authentication_providers)
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    expect(assigns[:pseudonym_session].record.authentication_provider).to eq Account.default.canvas_authentication_provider
+    
     # the auth provider got set on the pseudonym
     expect(@pseudonym.reload.authentication_provider).to eq Account.default.canvas_authentication_provider
+  end
+
+  it "sets, but does not persist, the auth provider if the feature flag is not enabled" do
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    expect(assigns[:pseudonym_session].record.authentication_provider).to eq Account.default.canvas_authentication_provider
+    
+    # the auth provider got set on the pseudonym
+    expect(@pseudonym.reload.authentication_provider).to be_nil
   end
 
   it "password auth should work for an explicit Canvas pseudonym" do
@@ -122,7 +143,7 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
   end
 
-  it "does not get tripped up by explicit and implicit psuedonyms" do
+  it "does not get tripped up by explicit and implicit pseudonyms" do
     pseudonym2 = @user.pseudonyms.create!(
       unique_id: 'jtfrd@instructure.com',
       password: 'qwertyuiop',
@@ -194,7 +215,7 @@ describe Login::CanvasController do
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
       # the auth provider got set on the pseudonym
-      expect(@pseudonym.reload.authentication_provider).to eq aac
+      expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac
     end
 
     it "works for a pseudonym explicitly linked to LDAP" do
@@ -271,7 +292,7 @@ describe Login::CanvasController do
 
         post 'create', params: {:pseudonym_session => {:unique_id => 'username', :password => 'password'}}
         expect(session[:login_aac]).to eq aac2.id
-        expect(@pseudonym.reload.authentication_provider).to eq aac2
+        expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac2
       end
 
       it 'when an ldap authentication provider was used without an identifier_format' do
@@ -287,7 +308,7 @@ describe Login::CanvasController do
 
         post 'create', params: {pseudonym_session: {unique_id: 'username', password: 'password'}}
         expect(session[:login_aac]).to eq aac2.id
-        expect(@pseudonym.reload.authentication_provider).to eq aac2
+        expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac2
       end
 
       it 'when canvas authentication was used' do
