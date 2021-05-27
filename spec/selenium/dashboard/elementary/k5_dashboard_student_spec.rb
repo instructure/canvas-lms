@@ -324,7 +324,7 @@ describe "student k5 dashboard" do
       important_info_text = "Show me what you can do"
       create_important_info_content(@homeroom_course, important_info_text)
 
-      get "#resources"
+      get "/#resources"
       expect(important_info_content).to include_text(important_info_text)
     end
   end
