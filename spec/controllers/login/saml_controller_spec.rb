@@ -57,6 +57,8 @@ describe Login::SamlController do
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
     # the auth provider got set on the pseudonym
     expect(assigns[:current_pseudonym].authentication_provider).to eq account1.authentication_providers.active.find('saml')
+    # but not persisted, because the feature flag isn't set
+    expect(@pseudonym.reload.authentication_provider).to be_nil
 
     (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each do |var|
       controller.send :remove_instance_variable, var
