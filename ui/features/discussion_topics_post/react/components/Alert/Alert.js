@@ -96,12 +96,12 @@ export function Alert({...props}) {
                       {I18n.t('For')}
                     </Text>
                   </Grid.Col>
-                  <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                  <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
                     <Text size="large" weight="bold">
                       {I18n.t('Available From')}
                     </Text>
                   </Grid.Col>
-                  <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                  <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                     <Text size="large" weight="bold">
                       {I18n.t('Until')}
                     </Text>
@@ -120,14 +120,14 @@ export function Alert({...props}) {
                           {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
                         </Text>
                       </Grid.Col>
-                      <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                      <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
                         <Text size="medium">
                           {item.unlockAt
                             ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
                             : ''}
                         </Text>
                       </Grid.Col>
-                      <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                      <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                         <Text size="medium">
                           {item.lockAt ? DateHelper.formatDatetimeForDiscussions(item.lockAt) : ''}
                         </Text>

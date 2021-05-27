@@ -64,7 +64,8 @@ const discussionTopicMock = {
       peerReview: true,
       openForComments: false,
       closeForComments: true,
-      manageContent: true
+      manageContent: true,
+      readAsAdmin: true
     }
   }
 }

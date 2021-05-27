@@ -46,6 +46,6 @@ export const ChildTopic = {
     _id,
     contextId,
     contextName,
-    __typename: 'ChildTopic'
+    __typename: 'Discussion'
   })
 }

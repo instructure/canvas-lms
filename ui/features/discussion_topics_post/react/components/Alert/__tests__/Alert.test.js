@@ -86,7 +86,7 @@ describe('Alert', () => {
 
   it('displays tray and correctly formatted dates', async () => {
     const {queryByText, findByText, findByTestId} = setup(true)
-    expect(await queryByText('Show due dates (3)')).toBeTruthy()
+    expect(queryByText('Show due dates (3)')).toBeTruthy()
     fireEvent.click(queryByText('Show due dates (3)'))
     expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
     expect(await findByText('Sep 4 5:59am')).toBeTruthy()
