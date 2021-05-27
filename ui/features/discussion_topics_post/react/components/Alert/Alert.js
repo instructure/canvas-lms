@@ -43,9 +43,7 @@ export function Alert({...props}) {
     return (
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
-          {props.dueAtDisplayText === ''
-            ? I18n.t('No Due Date')
-            : I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
+          {props.dueAtDisplayText}
         </Text>
       </Flex.Item>
     )
@@ -61,7 +59,7 @@ export function Alert({...props}) {
           }}
         >
           <Text>
-            {I18n.t('Show due dates (%{dueDateCount})', {
+            {I18n.t('Show Due Dates (%{dueDateCount})', {
               dueDateCount: props.assignmentOverrides.length
             })}
           </Text>

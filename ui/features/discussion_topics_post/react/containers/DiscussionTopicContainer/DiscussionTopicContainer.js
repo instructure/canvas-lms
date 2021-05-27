@@ -90,8 +90,20 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     discussionTopicData?.assignmentOverrides?.length > 0
   )
 
+  const defaultDateSet =
+    !!discussionTopicData.assignment?.dueAt ||
+    !!discussionTopicData.assignment?.lockAt ||
+    !!discussionTopicData.assignment?.unlockAt
+
+  const singleOverrideWithNoDefault =
+    !defaultDateSet && discussionTopicData.assignmentOverrides.length === 1
+
   if (isGraded(discussionTopicData.assignment)) {
-    if (discussionTopicData.assignmentOverrides.length > 0 && canSeeMultipleDueDates) {
+    if (
+      discussionTopicData.assignmentOverrides.length > 0 &&
+      canSeeMultipleDueDates &&
+      defaultDateSet
+    ) {
       discussionTopicData.assignmentOverrides.push({
         dueAt: discussionTopicData.assignment.dueAt,
         unlockAt: discussionTopicData.assignment.unlockAt,
@@ -100,9 +112,32 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
         id: discussionTopicData.assignment.id
       })
     }
-    discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
-      props.discussionTopic.assignment.dueAt
-    )
+
+    const showSingleOverrideDueDate = () => {
+      return discussionTopicData.assignmentOverrides[0]?.dueAt
+        ? I18n.t('%{title}: Due %{date}', {
+            title: discussionTopicData.assignmentOverrides[0]?.title,
+            date: DateHelper.formatDatetimeForDiscussions(
+              discussionTopicData.assignmentOverrides[0]?.dueAt
+            )
+          })
+        : I18n.t('No Due Date')
+    }
+
+    const showDefaultDueDate = () => {
+      return props.discussionTopic.assignment?.dueAt
+        ? I18n.t('Everyone: Due %{dueAtDisplayDate}', {
+            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
+              props.discussionTopic.assignment?.dueAt
+            )
+          })
+        : I18n.t('No Due Date')
+    }
+
+    discussionTopicData.dueAt = singleOverrideWithNoDefault
+      ? showSingleOverrideDueDate()
+      : showDefaultDueDate()
+
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
 
@@ -258,7 +293,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Alert
                   dueAtDisplayText={discussionTopicData.dueAt}
                   pointsPossible={discussionTopicData.pointsPossible}
-                  assignmentOverrides={discussionTopicData.assignmentOverrides}
+                  assignmentOverrides={
+                    singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
+                  }
                   canSeeMultipleDueDates={canSeeMultipleDueDates}
                 />
               </View>

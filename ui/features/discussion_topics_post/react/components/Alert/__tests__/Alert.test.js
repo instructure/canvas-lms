@@ -61,7 +61,7 @@ const setup = withOverrides => {
     : render(
         <Alert
           pointsPossible={7}
-          dueAtDisplayText="Jan 26 11:49pm"
+          dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
           assignmentOverrides={[]}
           canSeeMultipleDueDates={withOverrides}
         />
@@ -76,18 +76,18 @@ describe('Alert', () => {
 
   it('displays due date when there are no overrides', () => {
     const {queryByText} = setup(false)
-    expect(queryByText('Due: Jan 26 11:49pm')).toBeTruthy()
+    expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
   })
 
   it('displays "Show due dates" button when there are overrides', () => {
     const {queryByText} = setup(true)
-    expect(queryByText('Show due dates (3)')).toBeTruthy()
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
   })
 
   it('displays tray and correctly formatted dates', async () => {
     const {queryByText, findByText, findByTestId} = setup(true)
-    expect(queryByText('Show due dates (3)')).toBeTruthy()
-    fireEvent.click(queryByText('Show due dates (3)'))
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+    fireEvent.click(queryByText('Show Due Dates (3)'))
     expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
     expect(await findByText('Sep 4 5:59am')).toBeTruthy()
   })
