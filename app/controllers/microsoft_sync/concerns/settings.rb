@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Copyright (C) 2021 - present Instructure, Inc.
 #
@@ -26,10 +27,22 @@ module MicrosoftSync::Concerns
       return if enabled.nil? && tenant.blank? && login_attribute.blank?
       return unless valid_settings?(enabled, tenant, login_attribute)
 
-      @account.settings[:microsoft_sync_enabled] = format_enabled(enabled)
-      @account.settings[:microsoft_sync_tenant] = format_tenant(tenant)
-      @account.settings[:microsoft_sync_login_attribute] = format_login_attribute(login_attribute)
+      enabled = format_enabled(enabled)
+      tenant = format_tenant(tenant)
+      login_attribute = format_login_attribute(login_attribute)
+
+      old_tenant = @account.settings[:microsoft_sync_tenant]
+      old_attr = @account.settings[:microsoft_sync_login_attribute]
+
+      if (old_tenant || old_attr) && (tenant != old_tenant || login_attribute != old_attr)
+        MicrosoftSync::UserMapping.delete_old_user_mappings_later(@account)
+      end
+      @account.settings[:microsoft_sync_enabled] = enabled
+      @account.settings[:microsoft_sync_tenant] = tenant
+      @account.settings[:microsoft_sync_login_attribute] = login_attribute
     end
+
+    private
 
     def format_enabled(sync_enabled)
       ActiveModel::Type::Boolean.new.cast(sync_enabled)

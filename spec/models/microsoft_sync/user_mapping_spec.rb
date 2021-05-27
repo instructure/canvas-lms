@@ -134,4 +134,46 @@ describe MicrosoftSync::UserMapping do
       expect(res.sort).to eq(subject)
     end
   end
+
+  describe '.delete_old_user_mappings_later' do
+    let(:account) { account_model }
+    let(:teacher) { user_model }
+    let(:student) { user_model }
+    let(:user_id_to_aad_hash) do
+      {
+        teacher.id => "teacher@example.com", student.id => "student@example.com"
+      }
+    end
+
+    def setup_microsoft_sync_data(account, id_to_aad_hash)
+      MicrosoftSync::UserMapping.bulk_insert_for_root_account_id(account.id, id_to_aad_hash)
+    end
+
+    before(:each) do
+      setup_microsoft_sync_data(account, user_id_to_aad_hash)
+    end
+
+    it 'deletes all UserMappings associated with the current account' do
+      expect {
+        MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
+      }.to change { MicrosoftSync::UserMapping.where(root_account: account).count }.from(2).to(0)
+    end
+
+    context 'multiple root accounts' do
+      let(:account2) { account_model }
+      let(:teacher2) { user_model }
+      let(:student2) { user_model }
+      let(:id_to_aad_hash2) { { teacher2.id => "teacher2@example.com", student2.id => "student2@example.com" }}
+
+      before(:each) do
+        setup_microsoft_sync_data(account2, id_to_aad_hash2)
+      end
+
+      it "doesn't delete the other root account's UserMappings" do
+        expect {
+          MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
+        }.to not_change { MicrosoftSync::UserMapping.where(root_account: account2).count }.from(2)
+      end
+    end
+  end
 end

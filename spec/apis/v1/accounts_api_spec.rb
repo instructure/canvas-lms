@@ -626,9 +626,10 @@ describe "Accounts API", type: :request do
 
         context 'disabling sync' do
 
+          let(:sync_enabled) { false }
+
           context('no tenant or login attribute specified') do
 
-            let(:sync_enabled) { false }
             let(:tenant_name) { nil }
             let(:attribute) { nil }
 
@@ -649,11 +650,12 @@ describe "Accounts API", type: :request do
         end
 
         context 'admin user' do
-          it "should save valid settings" do
+          it "should save valid settings and not try to delete UserMappings" do
             api_call(:put, update_path, header_options_hash,
                      update_sync_settings_params, { expected_result: 200 })
             @a1.reload
             expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
+            expect(MicrosoftSync::UserMapping).not_to receive(:delete_old_user_mappings_later).with(@a1)
           end
 
           it 'should allow strings to be used for sync_enabled' do
@@ -673,6 +675,28 @@ describe "Accounts API", type: :request do
                        update_sync_settings_params, { expected_result: 200 })
               @a1.reload
               expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
+            end
+          end
+
+          context 'account already has settings' do
+
+            before(:each) do
+              @a1.settings[:microsoft_sync_enabled] = true
+              @a1.settings[:microsoft_sync_tenant] = 'canvastest2.onmicrosoft.com'
+              @a1.settings[:microsoft_sync_login_attribute] = 'email'
+              @a1.save!
+            end
+
+            context 'changing tenant or login attribute' do
+
+              let(:tenant_name) { "testing.123.onmicrosoft.com" }
+              let(:attribute) { "preferred_username" }
+
+              it 'tries to cleanup UserMappings' do
+                expect(MicrosoftSync::UserMapping).to receive(:delete_old_user_mappings_later).with(@a1)
+                api_call(:put, update_path, header_options_hash,
+                         update_sync_settings_params, { expected_result: 200 })
+              end
             end
           end
 
