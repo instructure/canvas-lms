@@ -23,7 +23,7 @@ class CreateQuizLtiNavigationPlacements < ActiveRecord::Migration[6.0]
   def up
     DataFixup::CreateQuizLtiNavigationPlacements.delay_if_production(
       priority: Delayed::LOW_PRIORITY,
-      n_strand: 'long_datafixups'
+      strand: "placements_for_shard:#{Shard.current.id}"
     ).run
   end
 
