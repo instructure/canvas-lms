@@ -110,7 +110,9 @@ export function Alert({...props}) {
                     <Grid.Row key={item.id}>
                       <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                         <Text size="medium">
-                          {item.dueAt ? DateHelper.formatDatetimeForDiscussions(item.dueAt) : ''}
+                          {item.dueAt
+                            ? DateHelper.formatDatetimeForDiscussions(item.dueAt)
+                            : I18n.t('No Due Date')}
                         </Text>
                       </Grid.Col>
                       <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
@@ -122,12 +124,14 @@ export function Alert({...props}) {
                         <Text size="medium">
                           {item.unlockAt
                             ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
-                            : ''}
+                            : I18n.t('No Start Date')}
                         </Text>
                       </Grid.Col>
                       <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                         <Text size="medium">
-                          {item.lockAt ? DateHelper.formatDatetimeForDiscussions(item.lockAt) : ''}
+                          {item.lockAt
+                            ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
+                            : I18n.t('No End Date')}
                         </Text>
                       </Grid.Col>
                     </Grid.Row>
