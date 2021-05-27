@@ -193,7 +193,7 @@ describe('DiscussionFullPage', () => {
       expect(await container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     })
 
-    it('toggles a topics subscribed state when subscribed is clicked', async () => {
+    it.skip('toggles a topics subscribed state when subscribed is clicked', async () => {
       const container = setup()
       await waitFor(() =>
         expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
@@ -205,7 +205,7 @@ describe('DiscussionFullPage', () => {
       expect(await container.findByText('Subscribed')).toBeInTheDocument()
     })
 
-    it('renders a readonly publish button if canUnpublish is false', async () => {
+    it.skip('renders a readonly publish button if canUnpublish is false', async () => {
       const container = setup()
       await waitFor(() =>
         expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
@@ -218,7 +218,7 @@ describe('DiscussionFullPage', () => {
   })
 
   describe('error handling', () => {
-    it('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
+    it.skip('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
       server.use(
         graphql.query('GetDiscussionQuery', (req, res, ctx) => {
           return res.once(
