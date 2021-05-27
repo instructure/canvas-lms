@@ -417,4 +417,36 @@ describe('DiscussionTopicContainer', () => {
       )
     )
   })
+
+  it('Should find due date text', async () => {
+    const container = setup(discussionTopicMock)
+    expect(await container.findByText('Everyone: Due Apr 5 1:40pm')).toBeTruthy()
+  })
+
+  it('Should find "Show Due Dates" link button', async () => {
+    const props = {discussionTopic: Discussion.mock({})}
+    const container = setup(props)
+    expect(await container.findByText('Show Due Dates (2)')).toBeTruthy()
+  })
+
+  it('Should find due date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '2021-04-05T13:40:50Z',
+        lockAt: '2021-09-03T23:59:59-06:00',
+        unlockAt: '2021-03-21T00:00:00-06:00',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+    expect(await container.findByText('assignment override 3: Due Apr 5 1:40pm')).toBeTruthy()
+  })
 })
