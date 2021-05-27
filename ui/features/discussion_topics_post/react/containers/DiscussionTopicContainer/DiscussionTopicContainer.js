@@ -87,9 +87,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     discussionTopicData?.childTopics.length > 0 &&
     discussionTopicData?.groupSet
 
-  const canSeeMultipleDueDates =
+  const canSeeMultipleDueDates = !!(
     discussionTopicData?.permissions?.readAsAdmin &&
     discussionTopicData?.assignmentOverrides?.length > 0
+  )
 
   if (isGraded(discussionTopicData.assignment)) {
     if (discussionTopicData.assignmentOverrides.length > 0 && canSeeMultipleDueDates) {
