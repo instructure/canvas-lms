@@ -230,7 +230,7 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('speedGrader')).toBeNull()
   })
 
-  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
+  it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {addRubric: true}}
     })
@@ -239,7 +239,7 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Add Rubric')).toBeInTheDocument()
   })
 
-  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+  it.skip('Renders Show Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {showRubric: true}}
     })
