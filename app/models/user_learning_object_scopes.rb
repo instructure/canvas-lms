@@ -127,8 +127,8 @@ module UserLearningObjectScopes
           return object_type.constantize.none # fallback
         end
       else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
-        params_cache_key = Digest::MD5.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
+        course_ids_cache_key = Digest::SHA256.hexdigest(course_ids.sort.join('/'))
+        params_cache_key = Digest::SHA256.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
         Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do

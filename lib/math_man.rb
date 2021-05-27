@@ -29,7 +29,7 @@ module MathMan
   end
 
   def self.cache_key_for(latex, target)
-    ["mathman", dynamic_settings.fetch('version'), Digest::MD5.hexdigest(latex), target].compact.cache_key
+    ["mathman", dynamic_settings.fetch('version'), Digest::SHA256.hexdigest(latex), target].compact.cache_key
   end
 
   def self.use_for_mml?

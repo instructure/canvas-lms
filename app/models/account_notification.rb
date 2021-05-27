@@ -241,7 +241,7 @@ class AccountNotification < ActiveRecord::Base
 
     if all_visible_account_ids || include_past
       # Refreshes every 10 minutes at the longest
-      all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
+      all_account_ids_hash = Digest::SHA256.hexdigest all_visible_account_ids.try(:sort).to_s
       Rails.cache.fetch(['account_notifications5', root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
     else
       # no point in doing an additional layer of caching for _only_ root accounts when root accounts are explicitly cached
