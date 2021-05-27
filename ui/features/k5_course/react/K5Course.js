@@ -38,7 +38,6 @@ import {
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Mask} from '@instructure/ui-overlays'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -49,20 +48,14 @@ import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {
-  fetchCourseApps,
-  fetchCourseTabs,
-  DEFAULT_COURSE_COLOR,
-  TAB_IDS
-} from '@canvas/k5/react/utils'
+import {parseAnnouncementDetails, DEFAULT_COURSE_COLOR, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
-import AppsList from '@canvas/k5/react/AppsList'
 import EmptyCourse from './EmptyCourse'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import OverviewPage from './OverviewPage'
-import ManageCourseTray from './ManageCourseTray'
 import {GradesPage} from './GradesPage'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
+import K5Announcement from '@canvas/k5/react/K5Announcement'
+import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 
 const HERO_HEIGHT_PX = 400
 
@@ -114,9 +107,10 @@ const toRenderTabs = tabs =>
     return acc
   }, [])
 
-export function CourseHeaderHero({name, image, backgroundColor}) {
+export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   return (
     <div
+      id="k5-course-header-hero"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -127,7 +121,7 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
         borderRadius: '8px',
-        minHeight: '25vh',
+        minHeight: shouldShrink ? '100px' : '25vh',
         maxHeight: `${HERO_HEIGHT_PX}px`,
         marginBottom: '1rem'
       }}
@@ -150,18 +144,25 @@ export function CourseHeaderHero({name, image, backgroundColor}) {
   )
 }
 
-export function CourseHeaderOptions({handleOpenTray, showStudentView, studentViewPath, canManage}) {
+export function CourseHeaderOptions({settingsPath, showStudentView, studentViewPath, canManage}) {
   return (
-    <View as="section" borderWidth="0 0 small 0" padding="0 0 medium 0" margin="0 0 medium 0">
+    <View
+      id="k5-course-header-options"
+      as="section"
+      borderWidth="0 0 small 0"
+      padding="0 0 medium 0"
+      margin="0 0 medium 0"
+    >
       <Flex direction="row">
         {canManage && (
           <Flex.Item shouldGrow shouldShrink>
             <Button
+              id="manage-subject-btn"
               data-testid="manage-button"
-              onClick={handleOpenTray}
+              href={settingsPath}
               renderIcon={<IconEditSolid />}
             >
-              {I18n.t('Manage')}
+              {I18n.t('Manage Subject')}
             </Button>
           </Flex.Item>
         )}
@@ -182,16 +183,6 @@ export function CourseHeaderOptions({handleOpenTray, showStudentView, studentVie
   )
 }
 
-const fetchApps = (courseId, courseName) =>
-  fetchCourseApps(courseId).then(apps =>
-    apps.map(app => ({
-      id: app.id,
-      courses: [{id: courseId, name: courseName}],
-      title: app.course_navigation.text || app.name,
-      icon: app.course_navigation.icon_url || app.icon_url
-    }))
-  )
-
 export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
@@ -208,18 +199,19 @@ export function K5Course({
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
+  userIsStudent,
   userIsInstructor,
   showStudentView,
   studentViewPath,
   showLearningMasteryGradebook,
   outcomeProficiency,
-  tabs
+  tabs,
+  settingsPath,
+  latestAnnouncement
 }) {
   const renderTabs = toRenderTabs(tabs)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
-  const [courseNavLinks, setCourseNavLinks] = useState([])
   const [tabsRef, setTabsRef] = useState(null)
-  const [trayOpen, setTrayOpen] = useState(false)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -227,12 +219,14 @@ export function K5Course({
     callback: () => loadAllOpportunities(),
     singleCourse: true
   })
-  const [apps, setApps] = useState([])
-  const [isAppsLoading, setAppsLoading] = useState(false)
 
+  /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
+     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it based off currentTab */
   const modulesRef = useRef(null)
+  const contentRef = useRef(null)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
+    contentRef.current.appendChild(modulesRef.current)
   }, [])
 
   useEffect(() => {
@@ -241,26 +235,12 @@ export function K5Course({
     }
   }, [currentTab])
 
-  useEffect(() => {
-    setAppsLoading(true)
-    fetchApps(id, name)
-      .then(setApps)
-      .catch(showFlashError(I18n.t('Failed to load apps for %{name}.', {name})))
-      .finally(() => setAppsLoading(false))
-    fetchCourseTabs(id)
-      .then(setCourseNavLinks)
-      .catch(showFlashError(I18n.t('Failed to load course navigation for %{name}.', {name})))
-  }, [id, name])
-
-  const handleOpenTray = () => setTrayOpen(true)
-  const handleCloseTray = () => setTrayOpen(false)
-
-  const courseHeader = (
-    <>
+  const courseHeader = shouldShrink => (
+    <View id="k5-course-header" as="div" padding={shouldShrink ? 'medium 0 0 0' : '0'}>
       {(canManage || showStudentView) && (
         <CourseHeaderOptions
           canManage={canManage}
-          handleOpenTray={handleOpenTray}
+          settingsPath={settingsPath}
           showStudentView={showStudentView}
           studentViewPath={studentViewPath}
         />
@@ -269,8 +249,9 @@ export function K5Course({
         name={name}
         image={imageUrl}
         backgroundColor={color || DEFAULT_COURSE_COLOR}
+        shouldShrink={shouldShrink}
       />
-    </>
+    </View>
   )
 
   // Only render the K5Tabs component if we actually have any visible tabs
@@ -281,11 +262,18 @@ export function K5Course({
       tabs={renderTabs}
       tabsRef={setTabsRef}
     >
-      {courseHeader}
+      {sticky => courseHeader(sticky)}
     </K5Tabs>
   ) : (
-    courseHeader
+    courseHeader()
   )
+
+  const announcementDetails = parseAnnouncementDetails(latestAnnouncement, {
+    id,
+    shortName: name,
+    href: `/courses/${id}`,
+    canManage
+  })
 
   return (
     <K5DashboardContext.Provider
@@ -296,13 +284,16 @@ export function K5Course({
         isStudent: plannerEnabled
       }}
     >
-      <View as="section">
-        {trayOpen && <Mask onClick={handleCloseTray} fullscreen />}
-        {canManage && (
-          <ManageCourseTray navLinks={courseNavLinks} open={trayOpen} onClose={handleCloseTray} />
-        )}
+      <View as="section" data-testid="main-content" elementRef={e => (contentRef.current = e)}>
         {courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
+        {currentTab === renderTabs?.[0]?.id && latestAnnouncement && (
+          <K5Announcement
+            showCourseDetails={false}
+            {...announcementDetails.announcement}
+            {...announcementDetails}
+          />
+        )}
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
         {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
@@ -312,12 +303,21 @@ export function K5Course({
             courseName={name}
             hideFinalGrades={hideFinalGrades}
             currentUser={currentUser}
+            userIsStudent={userIsStudent}
             userIsInstructor={userIsInstructor}
             showLearningMasteryGradebook={showLearningMasteryGradebook}
             outcomeProficiency={outcomeProficiency}
           />
         )}
-        {currentTab === TAB_IDS.RESOURCES && <AppsList isLoading={isAppsLoading} apps={apps} />}
+        {currentTab === TAB_IDS.RESOURCES && (
+          <ResourcesPage
+            cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
+            cardsSettled
+            visible={currentTab === TAB_IDS.RESOURCES}
+            showStaff={false}
+            filterToHomerooms={false}
+          />
+        )}
       </View>
     </K5DashboardContext.Provider>
   )
@@ -339,12 +339,15 @@ K5Course.propTypes = {
   courseOverview: PropTypes.string.isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
+  userIsStudent: PropTypes.bool.isRequired,
   userIsInstructor: PropTypes.bool.isRequired,
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape,
-  tabs: PropTypes.arrayOf(PropTypes.object).isRequired
+  tabs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  settingsPath: PropTypes.string.isRequired,
+  latestAnnouncement: PropTypes.object
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

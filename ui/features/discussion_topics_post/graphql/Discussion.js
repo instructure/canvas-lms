@@ -22,6 +22,10 @@ import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
+import {DiscussionEntry} from './DiscussionEntry'
+import {PageInfo} from './PageInfo'
+import {ChildTopic} from './ChildTopic'
+import {GroupSet} from './GroupSet'
 
 export const Discussion = {
   fragment: gql`
@@ -61,11 +65,19 @@ export const Discussion = {
       courseSections {
         ...Section
       }
+      childTopics {
+        ...ChildTopic
+      }
+      groupSet {
+        ...GroupSet
+      }
     }
     ${User.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
     ${Section.fragment}
+    ${ChildTopic.fragment}
+    ${GroupSet.fragment}
   `,
 
   shape: shape({
@@ -94,14 +106,17 @@ export const Discussion = {
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
-    rootEntriesTotalPages: number
+    childTopics: arrayOf(ChildTopic.shape),
+    groupSet: GroupSet.shape,
+    rootEntriesTotalPages: number,
+    entriesTotalPages: number
   }),
 
   mock: ({
     id = 'RGlzY3Vzc2lvbi0x',
     _id = '1',
     title = 'X-Men Powers Discussion',
-    message = 'Lets talk about our powers and their applications',
+    message = 'This is a Discussion Topic Message',
     createdAt = '2020-11-23T11:40:44-07:00',
     updatedAt = '2021-04-22T12:41:56-06:00',
     postedAt = '2020-11-23T11:40:44-07:00',
@@ -113,7 +128,7 @@ export const Discussion = {
     delayedPostAt = null,
     subscribed = true,
     published = true,
-    canUnpublish = true,
+    canUnpublish = false,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -123,8 +138,15 @@ export const Discussion = {
     editor = User.mock({_id: '1', name: 'Charles Xavier'}),
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
-    courseSections = Section.mock(),
-    rootEntriesTotalPages = 2
+    courseSections = [Section.mock()],
+    childTopics = [ChildTopic.mock()],
+    groupSet = GroupSet.mock(),
+    entriesTotalPages = 2,
+    discussionEntriesConnection = {
+      nodes: [DiscussionEntry.mock()],
+      pageInfo: PageInfo.mock(),
+      __typename: 'DiscussionEntriesConnection'
+    }
   } = {}) => ({
     id,
     _id,
@@ -148,7 +170,10 @@ export const Discussion = {
     assignment,
     permissions,
     courseSections,
-    rootEntriesTotalPages,
+    childTopics,
+    groupSet,
+    entriesTotalPages,
+    discussionEntriesConnection,
     __typename: 'Discussion'
   })
 }

@@ -18,10 +18,12 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import tz from '@canvas/timezone'
+import {render, waitFor} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
 import {
+  MOCK_COURSE_SYLLABUS,
   MOCK_COURSE_APPS,
   MOCK_COURSE_TABS,
   MOCK_GRADING_PERIODS_EMPTY,
@@ -36,9 +38,8 @@ const currentUser = {
 }
 const defaultEnv = {
   current_user: currentUser,
-  K5_MODE: true,
+  K5_USER: true,
   FEATURES: {
-    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {
@@ -57,13 +58,34 @@ const defaultProps = {
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
+  userIsStudent: true,
   userIsInstructor: false,
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
   showLearningMasteryGradebook: false,
-  tabs: defaultTabs
+  tabs: defaultTabs,
+  settingsPath: '/courses/30/settings',
+  latestAnnouncement: {
+    id: '12',
+    title: 'Important announcement',
+    message: '<p>Read this closely.</p>',
+    html_url: '/courses/30/discussion_topics/12',
+    attachments: [
+      {
+        filename: 'hw.pdf',
+        display_name: 'hw.pdf',
+        url: 'http://address/to/hw.pdf'
+      }
+    ],
+    permissions: {
+      update: true
+    },
+    posted_at: '2021-05-14T17:06:21-06:00'
+  }
 }
-const FETCH_APPS_URL = '/api/v1/courses/30/external_tools/visible_course_nav_tools'
+const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
+const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
+
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
@@ -73,38 +95,34 @@ const ASSIGNMENT_GROUPS_URL = encodeURI(
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
 
-let modulesContainer
-
 beforeAll(() => {
   moxios.install()
+  fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
   fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
   fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
   fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
   fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
   fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-  if (!modulesContainer) {
-    modulesContainer = document.createElement('div')
-    modulesContainer.id = 'k5-modules-container'
-    modulesContainer.style.display = 'none'
-    modulesContainer.innerHTML = 'Course modules content'
-    document.body.appendChild(modulesContainer)
-  }
 })
 
 afterAll(() => {
   moxios.uninstall()
   fetchMock.restore()
-  if (modulesContainer) {
-    modulesContainer.remove()
-  }
 })
 
 beforeEach(() => {
   global.ENV = defaultEnv
+  const modulesContainer = document.createElement('div')
+  modulesContainer.id = 'k5-modules-container'
+  modulesContainer.style.display = 'none'
+  modulesContainer.innerHTML = 'Course modules content'
+  document.body.appendChild(modulesContainer)
 })
 
 afterEach(() => {
   global.ENV = {}
+  const modulesContainer = document.getElementById('k5-modules-container')
+  modulesContainer.remove()
 })
 
 describe('K-5 Subject Course', () => {
@@ -183,50 +201,18 @@ describe('K-5 Subject Course', () => {
   describe('Manage course functionality', () => {
     it('Shows a manage button when the user has manage permissions', () => {
       const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      expect(getByRole('button', {name: 'Manage'})).toBeInTheDocument()
+      expect(getByRole('link', {name: 'Manage Subject'})).toBeInTheDocument()
     })
 
-    it('The manage button opens a slide-out tray with the course navigation tabs when clicked', async () => {
+    it('Should redirect to course settings path when clicked', async () => {
       const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      const manageButton = getByRole('button', {name: 'Manage'})
-
-      act(() => manageButton.click())
-
-      const validateLink = (name, href) => {
-        const link = getByRole('link', {name})
-        expect(link).toBeInTheDocument()
-        expect(link.href).toBe(href)
-      }
-
-      await waitFor(() => {
-        validateLink('Home', 'http://localhost/courses/30')
-        validateLink('Modules', 'http://localhost/courses/30/modules')
-        validateLink('Assignments', 'http://localhost/courses/30/assignments')
-        validateLink('Settings', 'http://localhost/courses/30/settings')
-      })
-    })
-
-    it('Displays an icon indicating that a nav link is hidden from students', async () => {
-      const {findAllByTestId, getByRole, getByText} = render(
-        <K5Course {...defaultProps} canManage />
-      )
-      const manageButton = getByRole('button', {name: 'Manage'})
-
-      act(() => manageButton.click())
-
-      const hiddenIcons = await findAllByTestId('k5-course-nav-hidden-icon')
-      // Doesn't show the icon for settings, though
-      expect(hiddenIcons.length).toBe(1)
-
-      fireEvent.mouseOver(hiddenIcons[0])
-      await waitFor(() =>
-        expect(getByText('Disabled. Not visible to students')).toBeInTheDocument()
-      )
+      const manageSubjectBtn = getByRole('link', {name: 'Manage Subject'})
+      expect(manageSubjectBtn.href).toBe('http://localhost/courses/30/settings')
     })
 
     it('Does not show a manage button when the user does not have manage permissions', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} />)
-      expect(queryByRole('button', {name: 'Manage'})).not.toBeInTheDocument()
+      expect(queryByRole('link', {name: 'Manage Subject'})).not.toBeInTheDocument()
     })
   })
 
@@ -248,6 +234,40 @@ describe('K-5 Subject Course', () => {
     })
   })
 
+  describe('subject announcements', () => {
+    it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
+      const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
+      expect(getByText('Important announcement')).toBeInTheDocument()
+      expect(getByText('Read this closely.')).toBeInTheDocument()
+      const button = getByRole('link', {name: 'Edit announcement Important announcement'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toContain('/courses/30/discussion_topics/12')
+      const attachment = getByRole('link', {name: 'hw.pdf'})
+      expect(attachment).toBeInTheDocument()
+      expect(attachment.href).toBe('http://address/to/hw.pdf')
+      expect(
+        getByText(
+          `Posted on ${tz.format('2021-05-14T17:06:21-06:00', 'date.formats.full_with_weekday')}`
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('hides the edit button if student', () => {
+      const props = defaultProps
+      props.latestAnnouncement.permissions.update = false
+      const {queryByRole} = render(<K5Course {...props} />)
+      expect(
+        queryByRole('link', {name: 'Edit announcement Important announcement'})
+      ).not.toBeInTheDocument()
+    })
+
+    it('puts the announcement on whichever tab is set as main tab', () => {
+      const tabs = [{id: '10'}, {id: '0'}]
+      const {getByText} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      expect(getByText('Important announcement')).toBeInTheDocument()
+    })
+  })
+
   describe('home tab', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
@@ -264,6 +284,13 @@ describe('K-5 Subject Course', () => {
     it('hides modules content if modules tab is not selected', async () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Course modules content')).not.toBeVisible()
+    })
+
+    it('moves the modules div inside the main content div on render', () => {
+      const {getByTestId} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
+      const mainContent = getByTestId('main-content')
+      const modules = document.getElementById('k5-modules-container')
+      expect(mainContent.contains(modules)).toBeTruthy()
     })
   })
 
@@ -291,30 +318,71 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('resources tab', () => {
-    it("displays user's apps", async () => {
-      const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-      await waitFor(() => {
-        expect(getByText('Studio')).toBeInTheDocument()
-        expect(getByText('Student Applications')).toBeInTheDocument()
+    describe('important info section', () => {
+      it('shows syllabus content with link to edit if teacher', async () => {
+        const {findByText, getByRole} = render(
+          <K5Course {...defaultProps} canManage defaultTab={TAB_IDS.RESOURCES} />
+        )
+        expect(await findByText('This is really important.')).toBeInTheDocument()
+        const editLink = getByRole('link', {name: 'Edit important info for Arts and Crafts'})
+        expect(editLink).toBeInTheDocument()
+        expect(editLink.href).toContain('/courses/30/assignments/syllabus')
+      })
+
+      it("doesn't show an edit button if not canManage", async () => {
+        const {findByText, queryByRole} = render(
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+        )
+        expect(await findByText('This is really important.')).toBeInTheDocument()
+        expect(
+          queryByRole('link', {name: 'Edit important info for Arts and Crafts'})
+        ).not.toBeInTheDocument()
+      })
+
+      it('shows loading skeletons while loading', async () => {
+        const {getByText, queryByText} = render(
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+        )
+        expect(getByText('Loading important info')).toBeInTheDocument()
+        await waitFor(() => {
+          expect(queryByText('Loading important info')).not.toBeInTheDocument()
+        })
+      })
+
+      it('shows an error if syllabus content fails to load', async () => {
+        fetchMock.get(FETCH_IMPORTANT_INFO_URL, 400, {overwriteRoutes: true})
+        const {findAllByText} = render(
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+        )
+        const errors = await findAllByText('Failed to load important info.')
+        expect(errors[0]).toBeInTheDocument()
       })
     })
 
-    it('shows a loading spinner while apps are loading', async () => {
-      const {getByText, queryByText} = render(
-        <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
-      )
-      await waitFor(() => {
-        expect(getByText('Loading apps...')).toBeInTheDocument()
-        expect(queryByText('Studio')).not.toBeInTheDocument()
+    describe('apps section', () => {
+      it("displays user's apps", async () => {
+        const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() => {
+          expect(getByText('Studio')).toBeInTheDocument()
+          expect(getByText('Student Applications')).toBeInTheDocument()
+        })
       })
-    })
 
-    it('shows an error if apps fail to load', async () => {
-      fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
-      const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
-      await waitFor(() =>
-        expect(getAllByText('Failed to load apps for Arts and Crafts.')[0]).toBeInTheDocument()
-      )
+      it('shows some loading skeletons while apps are loading', async () => {
+        const {getAllByText, queryByText} = render(
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+        )
+        await waitFor(() => {
+          expect(getAllByText('Loading apps...')[0]).toBeInTheDocument()
+          expect(queryByText('Studio')).not.toBeInTheDocument()
+        })
+      })
+
+      it('shows an error if apps fail to load', async () => {
+        fetchMock.get(FETCH_APPS_URL, 400, {overwriteRoutes: true})
+        const {getAllByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
+        await waitFor(() => expect(getAllByText('Failed to load apps.')[0]).toBeInTheDocument())
+      })
     })
   })
 })

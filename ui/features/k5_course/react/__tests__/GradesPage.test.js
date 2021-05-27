@@ -40,6 +40,7 @@ describe('GradesPage', () => {
   const getProps = (overrides = {}) => ({
     courseId: '12',
     courseName: 'History',
+    userIsStudent: true,
     userIsInstructor: false,
     hideFinalGrades: false,
     currentUser: {
@@ -96,6 +97,15 @@ describe('GradesPage', () => {
       })
     })
 
+    it('shows a panda and text for users who are neither a student nor instructor', async () => {
+      const {getByTestId, getByText, queryByText} = render(
+        <GradesPage {...getProps({userIsStudent: false})} />
+      )
+      await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
+      expect(getByText("You don't have any grades yet.")).toBeInTheDocument()
+      expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
+    })
+
     it('renders the returned assignment details', async () => {
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -107,7 +117,7 @@ describe('GradesPage', () => {
 
     it('shows a panda and link to gradebook for teachers', async () => {
       const {getByText, getByTestId, getByRole, queryByText} = render(
-        <GradesPage {...getProps({userIsInstructor: true})} />
+        <GradesPage {...getProps({userIsInstructor: true, userIsStudent: false})} />
       )
       await waitFor(() => expect(getByText('Students see their grades here.')).toBeInTheDocument())
       expect(getByTestId('empty-grades-panda')).toBeInTheDocument()

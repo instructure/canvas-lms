@@ -40,8 +40,8 @@ class LtiApiController < ApplicationController
 
     @xml = Nokogiri::XML.parse(request.body)
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+    render body: lti_response.to_xml, content_type: 'application/xml', status: status
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome
@@ -50,8 +50,8 @@ class LtiApiController < ApplicationController
   def legacy_grade_passback
     verify_oauth
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
+    render body: lti_response.to_xml, content_type: 'application/xml'
   end
 
   # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
@@ -187,7 +187,7 @@ class LtiApiController < ApplicationController
   end
 
   def check_outcome(outcome)
-    return outcome unless ['unsupported', 'failure'].include? outcome.code_major
+    return outcome, 200 unless ['unsupported', 'failure'].include? outcome.code_major
 
     opts = {type: :grade_passback}
     error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
@@ -200,6 +200,6 @@ class LtiApiController < ApplicationController
 
     capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
     outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
-    outcome
+    [outcome, 422]
   end
 end

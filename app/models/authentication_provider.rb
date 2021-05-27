@@ -131,7 +131,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def self.recognized_params
-    [].freeze
+    [:mfa_required].freeze
   end
 
   def self.site_admin_params
@@ -204,6 +204,19 @@ class AuthenticationProvider < ActiveRecord::Base
     settings['federated_attributes'] ||= {}
   end
 
+  def mfa_required?
+    return false if account.mfa_settings == :disabled
+    return true if account.mfa_settings == :required
+
+    !!settings['mfa_required']
+  end
+  alias mfa_required mfa_required?
+
+  def mfa_required=(value)
+    value = false if account.mfa_settings == :disabled
+    settings['mfa_required'] = ::Canvas::Plugin.value_to_boolean(value)
+  end
+
   def federated_attributes_for_api
     if jit_provisioning?
       federated_attributes
@@ -211,6 +224,7 @@ class AuthenticationProvider < ActiveRecord::Base
       result = {}
       federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
         next if provider_attribute_config['provisioning_only']
+
         result[canvas_attribute_name] = provider_attribute_config['attribute']
       end
       result

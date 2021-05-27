@@ -810,7 +810,6 @@ describe "people" do
     context "student tray" do
       before :once do
         @account = Account.default
-        @account.enable_feature!(:student_context_cards)
         @student = create_user('student@test.com')
         @enrollment = @course.enroll_student(@student, enrollment_state: :active)
       end

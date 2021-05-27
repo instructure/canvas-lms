@@ -54,14 +54,14 @@ describe AuthenticationProvider::PluginSettings do
     context 'with plugin config' do
       it 'returns nothing' do
         allow(plugin).to receive(:enabled?).and_return(true)
-        expect(klass.recognized_params).to eq []
+        expect(klass.recognized_params).to eq [:mfa_required]
       end
     end
 
     context 'without plugin config' do
       it 'returns plugin params' do
         allow(plugin).to receive(:enabled?).and_return(false)
-        expect(klass.recognized_params).to eq [:auth_host, :noninherited_method]
+        expect(klass.recognized_params).to eq [:auth_host, :noninherited_method, :mfa_required]
       end
     end
   end

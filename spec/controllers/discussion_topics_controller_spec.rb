@@ -797,7 +797,6 @@ describe DiscussionTopicsController do
     context "student context cards" do
       before(:once) do
         course_topic user: @teacher
-        @course.root_account.enable_feature! :student_context_cards
       end
 
       it "is disabed for students" do
@@ -806,14 +805,7 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
 
-      it "is disabled for teachers when feature_flag is off" do
-        @course.root_account.disable_feature! :student_context_cards
-        user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @topic.id}
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
-      end
-
-      it "is enabled for teachers when feature_flag is on" do
+      it "is enabled for teachers" do
         user_session(@teacher)
         get :show, params: {course_id: @course.id, id: @topic.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
@@ -829,16 +821,9 @@ describe DiscussionTopicsController do
     end
 
     context "in a homeroom course" do
-      let(:canvas_for_elem_flag){@course.root_account.feature_enabled?(:canvas_for_elementary)}
-
       before(:each) do
-        @course.root_account.enable_feature!(:canvas_for_elementary)
         @course.account.settings[:enable_as_k5_account] = {value: true}
         @course.account.save!
-      end
-
-      after(:each) do
-        @course.root_account.disable_feature!(:canvas_for_elementary) unless canvas_for_elem_flag
       end
 
       it "does not permit replies to assignments" do

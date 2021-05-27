@@ -64,7 +64,7 @@ export function insertContent(editor, content) {
     // but doesn't correctly forward the second "args" argument. Let's go right for
     // execCommand
     // editor.insertContent(content, {skip_focus: true})
-    editor.execCommand('mceInsertContent', false, content + ' ', {skip_focus: true})
+    editor.execCommand('mceInsertContent', false, content, {skip_focus: true})
     return editor.selection.getEnd()
   }
 }

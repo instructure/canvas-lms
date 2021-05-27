@@ -49,3 +49,8 @@ assignment_comment_library:
   applies_to: RootAccount
   display_name: Comment Library
   description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
+improved_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Improved Learning Mastery Gradebook
+  description: Enhances the Canvas experience within the Learning Mastery Gradebook.

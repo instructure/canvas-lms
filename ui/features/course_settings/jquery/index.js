@@ -109,7 +109,7 @@ var GradePublishing = {
     GradePublishing.status = 'publishing'
     GradePublishing.update({}, true)
     const successful_statuses = {published: 1, publishing: 1, pending: 1}
-    const error = function(data, xhr, status, error) {
+    const error = function (data, xhr, status, error) {
       GradePublishing.status = 'unknown'
       $.flashError(
         I18n.t(
@@ -140,7 +140,27 @@ var GradePublishing = {
   }
 }
 
-$(document).ready(function() {
+function checkHomeroomSyncProgress(progress) {
+  setTimeout(function () {
+    $.ajaxJSON(
+      progress.data('url'),
+      'GET',
+      {},
+      data => {
+        if (data.workflow_state === 'completed') {
+          progress.replaceWith(I18n.t('Last synced: right now'))
+        } else {
+          checkHomeroomSyncProgress(progress)
+        }
+      },
+      _data => {
+        checkHomeroomSyncProgress(progress)
+      }
+    )
+  }, 1000)
+}
+
+$(document).ready(function () {
   const $add_section_form = $('#add_section_form'),
     $edit_section_form = $('#edit_section_form'),
     $course_form = $('#course_form'),
@@ -162,9 +182,7 @@ $(document).ready(function() {
     },
     success(data) {
       const section = data.course_section,
-        $section = $('.section_blank:first')
-          .clone(true)
-          .attr('class', 'section'),
+        $section = $('.section_blank:first').clone(true).attr('class', 'section'),
         $option = $('<option/>')
 
       $add_section_form
@@ -197,7 +215,7 @@ $(document).ready(function() {
         .text(I18n.t('errors.section', 'Add Section Failed, Please Try Again'))
     }
   })
-  $('.cant_delete_section_link').click(function(event) {
+  $('.cant_delete_section_link').click(function (event) {
     alert($(this).attr('title'))
     return false
   })
@@ -206,10 +224,7 @@ $(document).ready(function() {
       beforeSubmit(data) {
         $edit_section_form.hide()
         const $section = $edit_section_form.parents('.section')
-        $section
-          .find('.name')
-          .text(data['course_section[name]'])
-          .show()
+        $section.find('.name').text(data['course_section[name]']).show()
         $section.loadingImage({image_size: 'small'})
         return $section
       },
@@ -217,15 +232,10 @@ $(document).ready(function() {
         const section = data.course_section
         $section.loadingImage('remove')
         $('.option_for_section_' + section.id).text(section.name)
-        this.parent()
-          .find('.edit_section_link')
-          .focus()
+        this.parent().find('.edit_section_link').focus()
       },
       error(data, $section) {
-        $section
-          .loadingImage('remove')
-          .find('.edit_section_link')
-          .click()
+        $section.loadingImage('remove').find('.edit_section_link').click()
         $edit_section_form.formErrors(data)
         this.find('#course_section_name_edit').focus()
       }
@@ -234,34 +244,25 @@ $(document).ready(function() {
     .bind('blur', () => {
       $edit_section_form.submit()
     })
-    .keycodes('return esc', function(event) {
+    .keycodes('return esc', function (event) {
       if (event.keyString == 'return') {
         $edit_section_form.submit()
       } else {
-        $(this)
-          .parents('.section')
-          .find('.name')
-          .show()
+        $(this).parents('.section').find('.name').show()
         $('body').append($edit_section_form.hide())
       }
     })
-  $('.edit_section_link').click(function() {
+  $('.edit_section_link').click(function () {
     const $this = $(this),
       $section = $this.parents('.section'),
       data = $section.getTemplateData({textValues: ['name']})
     $edit_section_form.fillFormData(data, {object_name: 'course_section'})
-    $section
-      .find('.name')
-      .hide()
-      .after($edit_section_form.show())
+    $section.find('.name').hide().after($edit_section_form.show())
     $edit_section_form.attr('action', $this.attr('href'))
-    $edit_section_form
-      .find(':text:first')
-      .focus()
-      .select()
+    $edit_section_form.find(':text:first').focus().select()
     return false
   })
-  $('.delete_section_link').click(function() {
+  $('.delete_section_link').click(function () {
     $(this)
       .parents('.section')
       .confirmDelete({
@@ -272,7 +273,7 @@ $(document).ready(function() {
           const $toFocus = $prevItem.length
             ? $prevItem.find('.delete_section_link,.cant_delete_section_link')
             : $('#sections_tab > a')
-          $(this).slideUp(function() {
+          $(this).slideUp(function () {
             $(this).remove()
             $toFocus.focus()
           })
@@ -280,17 +281,17 @@ $(document).ready(function() {
       })
     return false
   })
-  $('#nav_form').submit(function() {
+  $('#nav_form').submit(function () {
     const tab_id_regex = /(\d+)$/
 
     const tabs = []
-    $('#nav_enabled_list li').each(function() {
+    $('#nav_enabled_list li').each(function () {
       const tab_id = tabIdFromElement(this)
       if (tab_id !== null) {
         tabs.push({id: tab_id})
       }
     })
-    $('#nav_disabled_list li').each(function() {
+    $('#nav_disabled_list li').each(function () {
       const tab_id = tabIdFromElement(this)
       if (tab_id !== null) {
         tabs.push({id: tab_id, hidden: true})
@@ -352,30 +353,33 @@ $(document).ready(function() {
   })
   $course_form
     .find('.grading_standard_checkbox')
-    .change(function() {
+    .change(function () {
       $course_form.find('.grading_standard_link').showIf($(this).attr('checked'))
     })
     .change()
-  $course_form.find('#course_conclude_at').change(function() {
+  $course_form
+    .find('.sync_enrollments_from_homeroom_checkbox')
+    .change(function () {
+      $course_form.find('.sync_enrollments_from_homeroom_select').showIf($(this).attr('checked'))
+    })
+    .change()
+  $course_form.find('.sync_enrollments_from_homeroom_progress').each(function () {
+    const progress = $(this)
+    checkHomeroomSyncProgress(progress)
+  })
+  $course_form.find('#course_conclude_at').change(function () {
     const $warning = $course_form.find('#course_conclude_at_warning')
     const $parent = $(this).parent()
     const date = $(this).data('unfudged-date')
     const isMidnight = tz.isMidnight(date)
-    $warning
-      .detach()
-      .appendTo($parent)
-      .showIf(isMidnight)
+    $warning.detach().appendTo($parent).showIf(isMidnight)
     $(this).attr('aria-describedby', isMidnight ? 'course_conclude_at_warning' : null)
   })
   $course_form.formSubmit({
     beforeSubmit(data) {
       $(this).loadingImage()
-      $(this)
-        .find('.readable_license,.account_name,.term_name,.grading_scheme_set')
-        .text('...')
-      $(this)
-        .find('.storage_quota_mb')
-        .text(data['course[storage_quota_mb]'])
+      $(this).find('.readable_license,.account_name,.term_name,.grading_scheme_set').text('...')
+      $(this).find('.storage_quota_mb').text(data['course[storage_quota_mb]'])
       $('.course_form_more_options').hide()
     },
     success(data) {
@@ -386,7 +390,7 @@ $(document).ready(function() {
     },
     disableWhileLoading: 'spin_on_success'
   })
-  $('.associated_user_link').click(function(event) {
+  $('.associated_user_link').click(function (event) {
     event.preventDefault()
     const $user = $(this).parents('.user')
     const $enrollment = $(this).parents('.enrollment_link')
@@ -413,18 +417,16 @@ $(document).ready(function() {
   })
   $('.course_info')
     .not('.uneditable')
-    .click(function(event) {
+    .click(function (event) {
       if (event.target.nodeName == 'INPUT') {
         return
       }
-      const $obj = $(this)
-        .parents('td')
-        .find('.course_form')
+      const $obj = $(this).parents('td').find('.course_form')
       if ($obj.length) {
         $obj.focus().select()
       }
     })
-  $('.course_form_more_options_link').click(function(event) {
+  $('.course_form_more_options_link').click(function (event) {
     event.preventDefault()
     const $moreOptions = $('.course_form_more_options')
     const optionText = $moreOptions.is(':visible')
@@ -447,7 +449,7 @@ $(document).ready(function() {
     $enrollment_dialog.dialog('close')
   })
 
-  $enrollment_dialog.find('.re_send_invitation_link').click(function(event) {
+  $enrollment_dialog.find('.re_send_invitation_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $link.text(I18n.t('links.re_sending_invitation', 'Re-Sending Invitation...'))
@@ -480,7 +482,7 @@ $(document).ready(function() {
     'current_default_wiki_editing_roles',
     $default_edit_roles_select.val()
   )
-  $default_edit_roles_select.change(function() {
+  $default_edit_roles_select.change(function () {
     const $this = $(this)
     $('.changed_default_wiki_editing_roles').showIf(
       $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles')
@@ -488,7 +490,7 @@ $(document).ready(function() {
     $('.default_wiki_editing_roles_change').text($this.find(':selected').text())
   })
 
-  $('.re_send_invitations_link').click(function(event) {
+  $('.re_send_invitations_link').click(function (event) {
     event.preventDefault()
     const $button = $(this),
       oldText = I18n.t('links.re_send_all', 'Re-Send All Unaccepted Invitations')
@@ -500,11 +502,11 @@ $(document).ready(function() {
       $button.attr('href'),
       'POST',
       {},
-      function(data) {
+      function (data) {
         $button
           .text(I18n.t('buttons.re_sent_all', 'Re-Sent All Unaccepted Invitations!'))
           .attr('disabled', false)
-        $('.user_list .user.pending').each(function() {
+        $('.user_list .user.pending').each(function () {
           const $user = $(this)
           $user.fillTemplateData({
             data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
@@ -521,16 +523,14 @@ $(document).ready(function() {
       }
     )
   })
-  $('#enrollment_type').change(function() {
+  $('#enrollment_type').change(function () {
     $('.teacherless_invite_message').showIf(
-      $(this)
-        .find(':selected')
-        .hasClass('teacherless_invite')
+      $(this).find(':selected').hasClass('teacherless_invite')
     )
   })
 
   $('.self_enrollment_checkbox')
-    .change(function() {
+    .change(function () {
       $('.open_enrollment_holder').showIf($(this).attr('checked'))
     })
     .change()
@@ -558,7 +558,7 @@ $(document).ready(function() {
     $('#reset_course_content_dialog').dialog('close')
   })
 
-  $('#course_custom_course_visibility').click(function(event) {
+  $('#course_custom_course_visibility').click(function (event) {
     $('#customize_course_visibility').toggle(this.checked)
   })
 
@@ -570,17 +570,13 @@ $(document).ready(function() {
     }
   })
 
-  $('#course_course_visibility').change(function(event) {
+  $('#course_course_visibility').change(function (event) {
     const order = $(this).children()
     const selected = $(this).find(':selected')
     $.each($('#customize_course_visibility select'), (i, sel) => {
-      $(sel)
-        .children('option')
-        .remove()
+      $(sel).children('option').remove()
       for (var i = $.inArray(selected[0], order), len = order.length; i < len; i++) {
-        $(order[i])
-          .clone()
-          .appendTo($(sel))
+        $(order[i]).clone().appendTo($(sel))
       }
     })
     $('#customize_course_visibility select').val($('#course_course_visibility').val())
@@ -591,19 +587,15 @@ $(document).ready(function() {
     const selected = $('#course_course_visibility').find(':selected')
     const current = $('#customize_course_visibility select').find(':selected')
     $.each($('#customize_course_visibility select'), (i, sel) => {
-      $(sel)
-        .children('option')
-        .remove()
+      $(sel).children('option').remove()
       for (var i = $.inArray(selected[0], order), len = order.length; i < len; i++) {
-        $(order[i])
-          .clone()
-          .appendTo($(sel))
+        $(order[i]).clone().appendTo($(sel))
       }
     })
     $('#customize_course_visibility select').val($(current).val())
   })
 
-  $('#course_show_announcements_on_home_page').change(function(event) {
+  $('#course_show_announcements_on_home_page').change(function (event) {
     $('#course_home_page_announcement_limit').prop('disabled', !$(this).prop('checked'))
   })
 })

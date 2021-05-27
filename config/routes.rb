@@ -1292,6 +1292,11 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :discussion_topic_users) do
+      get "courses/:course_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "course_discussion_messageable_users"
+      get "groups/:group_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "group_discussion_messageable_users"
+    end
+
     scope(controller: :collaborations) do
       get 'collaborations/:id/members', action: :members, as: 'collaboration_members'
       get 'courses/:course_id/potential_collaborators', action: :potential_collaborators, as: 'course_potential_collaborators'
@@ -1310,6 +1315,7 @@ CanvasRails::Application.routes.draw do
       delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
 
       get "/courses/:course_id/external_tools/visible_course_nav_tools", action: :visible_course_nav_tools, as: :visible_course_nav_tools
+      get "/external_tools/visible_course_nav_tools", action: :all_visible_nav_tools, as: :all_visible_nav_tools
 
       %w(course account).each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"

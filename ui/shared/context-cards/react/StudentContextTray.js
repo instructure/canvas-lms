@@ -239,7 +239,10 @@ export default class StudentContextTray extends React.Component {
                               fluidWidth
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
                               aria-label={I18n.t("Go to %{name}'s profile", {
-                                name: user.short_name + ' ' + user.pronouns
+                                name:
+                                  user.pronouns != null
+                                    ? `${user.short_name} ${user.pronouns}`
+                                    : user.short_name
                               })}
                               theme={{largePadding: '0', largeHeight: 'normal'}}
                             >

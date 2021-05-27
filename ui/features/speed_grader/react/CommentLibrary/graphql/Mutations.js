@@ -17,6 +17,7 @@
  */
 
 import {gql} from '@canvas/apollo'
+import {COMMENTS_QUERY} from './Queries'
 
 export const CREATE_COMMENT_MUTATION = gql`
   mutation CreateCommentBankItem($courseId: ID!, $comment: String!) {
@@ -44,3 +45,61 @@ export const DELETE_COMMENT_MUTATION = gql`
     }
   }
 `
+
+export const UPDATE_COMMENT_MUTATION = gql`
+  mutation UpdateCommentBankItem($id: ID!, $comment: String!) {
+    updateCommentBankItem(input: {id: $id, comment: $comment}) {
+      commentBankItem {
+        _id
+        comment
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+const getCache = (cache, userId) => {
+  return JSON.parse(
+    JSON.stringify(
+      cache.readQuery({
+        query: COMMENTS_QUERY,
+        variables: {userId}
+      })
+    )
+  )
+}
+
+const writeToCache = (cache, comments, userId) => {
+  cache.writeQuery({
+    query: COMMENTS_QUERY,
+    variables: {userId},
+    data: comments
+  })
+}
+
+export const removeDeletedCommentFromCache = (cache, result, userId) => {
+  const comments = getCache(cache, userId)
+  const resultId = result.data.deleteCommentBankItem.commentBankItemId
+  const removedIndex = comments.legacyNode.commentBankItemsConnection.nodes.findIndex(
+    comment => comment._id === resultId
+  )
+  const updatedComments = comments.legacyNode.commentBankItemsConnection.nodes.filter(
+    (_comment, index) => index !== removedIndex
+  )
+
+  comments.legacyNode.commentBankItemsConnection.nodes = updatedComments
+  writeToCache(cache, comments, userId)
+  return removedIndex
+}
+
+export const addCommentToCache = (cache, result, userId) => {
+  const comments = getCache(cache, userId)
+  const newComment = result.data.createCommentBankItem.commentBankItem
+  const updatedComments = [...comments.legacyNode.commentBankItemsConnection.nodes, newComment]
+
+  comments.legacyNode.commentBankItemsConnection.nodes = updatedComments
+  writeToCache(cache, comments, userId)
+}

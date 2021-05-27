@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {memo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -154,4 +154,4 @@ ManageOutcomeItem.propTypes = {
   canManageOutcome: PropTypes.bool.isRequired
 }
 
-export default ManageOutcomeItem
+export default memo(ManageOutcomeItem)

@@ -33,7 +33,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
       roles = Role.where.not(workflow_state: 'deleted').where(base_role_type: base_role_types)
 
       roles.each do |role|
-        next if role.root_account.site_admin? || role.root_account.id == 0
+        next if role.root_account.site_admin? || role.root_account_id == 0
 
         root_account = role.root_account
         role_context = role.built_in? ? root_account : role.account

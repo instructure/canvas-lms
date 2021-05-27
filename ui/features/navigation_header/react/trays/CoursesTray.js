@@ -28,7 +28,7 @@ import {Link} from '@instructure/ui-link'
 
 const UNPUBLISHED = 'unpublished'
 
-export default function CoursesTray({courses, hasLoaded}) {
+export default function CoursesTray({courses, hasLoaded, k5User}) {
   const showSplitList =
     window.ENV?.FEATURES?.unpublished_courses && window.ENV.current_user_roles?.includes('teacher')
 
@@ -39,7 +39,7 @@ export default function CoursesTray({courses, hasLoaded}) {
       <>
         {published.length > 0 && (
           <Heading level="h4" as="h3" key="published_courses">
-            {I18n.t('Published Courses')}
+            {k5User ? I18n.t('Published Subjects') : I18n.t('Published Courses')}
           </Heading>
         )}
         <List key="published" variant="unstyled" margin="small small" itemSpacing="small">
@@ -47,7 +47,7 @@ export default function CoursesTray({courses, hasLoaded}) {
         </List>
         {unpublished.length > 0 && (
           <Heading level="h4" as="h3" key="unpublished_courses">
-            {I18n.t('Unpublished Courses')}
+            {k5User ? I18n.t('Unpublished Subjects') : I18n.t('Unpublished Courses')}
           </Heading>
         )}
         <List key="unpublished" variant="unstyled" margin="small small" itemSpacing="small">
@@ -89,7 +89,7 @@ export default function CoursesTray({courses, hasLoaded}) {
           </List.Item>
           <List.Item key="all">
             <Link isWithinText={false} href="/courses">
-              {I18n.t('All Courses')}
+              {k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
             </Link>
           </List.Item>
         </List>
@@ -110,15 +110,19 @@ export default function CoursesTray({courses, hasLoaded}) {
   return (
     <View as="div" padding="medium">
       <Heading level="h3" as="h2">
-        {I18n.t('Courses')}
+        {k5User ? I18n.t('Subjects') : I18n.t('Courses')}
       </Heading>
       <hr role="presentation" />
       {hasLoaded ? renderContent() : renderLoading()}
       <br />
       <Text as="div">
-        {I18n.t(
-          'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
-        )}
+        {k5User
+          ? I18n.t(
+              'Welcome to your subjects! To customize the list of subjects,  click on the "All Subjects" link and star the subjects to display.'
+            )
+          : I18n.t(
+              'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
+            )}
       </Text>
     </View>
   )
@@ -131,7 +135,8 @@ CoursesTray.propTypes = {
       name: string.isRequired
     })
   ).isRequired,
-  hasLoaded: bool.isRequired
+  hasLoaded: bool.isRequired,
+  k5User: bool.isRequired
 }
 
 CoursesTray.defaultProps = {

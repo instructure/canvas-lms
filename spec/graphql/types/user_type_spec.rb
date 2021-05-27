@@ -535,6 +535,32 @@ describe Types::UserType do
       ).to eq [@comment_bank_item.id.to_s]
     end
 
+    describe 'cross sharding' do
+      specs_require_sharding
+
+      it 'returns comments across shards' do
+        @shard1.activate do
+          account = Account.create!(name: 'new shard account')
+          @course2 = course_factory(account: account)
+          @course2.enroll_user(@teacher)
+          @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: 'shard 2 comment')
+        end
+
+        expect(
+          type.resolve('commentBankItemsConnection { nodes { comment } }').sort
+        ).to eq ['great comment!', 'shard 2 comment']
+      end
+    end
+
+    describe 'with the limit argument' do
+      it 'returns a limited number of results' do
+        comment_bank_item_model(user: @teacher, context: @course, comment: '2nd great comment!')
+        expect(
+          type.resolve('commentBankItemsConnection(limit: 1) { nodes { comment } }').length
+        ).to eq 1
+      end
+    end
+
     describe 'with a search query' do
       before do
         @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: 'new comment!')

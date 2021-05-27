@@ -591,7 +591,7 @@ describe('FileBrowser', () => {
     })
 
     it('allows uploads without folder selection when a default folder is provided', () => {
-      const overrides = {defaultUploadFolderId: courseFolder().id}
+      const overrides = {defaultUploadFolderId: courseFolder().id.toString()}
       const wrapper = mount(<FileBrowser {...getProps(overrides)} />)
       const collections = {
         0: {collections: [1]},

@@ -311,7 +311,7 @@ class Course < ActiveRecord::Base
 
   def self.ensure_dummy_course
     Account.ensure_dummy_root_account
-    Course.find_or_create_by!(id: 0) { |c| c.account_id = c.root_account_id = 0 }
+    Course.create_with(account_id: 0, root_account_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
   end
 
   def self.skip_updating_account_associations(&block)
@@ -822,6 +822,8 @@ class Course < ActiveRecord::Base
 
   scope :templates, -> { where(template: true) }
 
+  scope :sync_homeroom_enrollments_enabled, -> { where('settings LIKE ?', '%sync_enrollments_from_homeroom: true%') }
+
   def potential_collaborators
     current_users
   end
@@ -1132,6 +1134,7 @@ class Course < ActiveRecord::Base
         Enrollment.where(:course_id => self).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
         User.touch_and_clear_cache_keys(user_ids, :enrollments)
+        User.clear_cache_keys(user_ids, :k5_user)
       end
 
       data
@@ -1408,6 +1411,7 @@ class Course < ActiveRecord::Base
       EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
         update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
+      User.clear_cache_keys(user_ids, :k5_user)
       User.delay_if_production.update_account_associations(user_ids) if user_ids.any?
     end
     c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: 'deleted', batch_mode_delete: batch_mode)
@@ -2557,7 +2561,7 @@ class Course < ActiveRecord::Base
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
       :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
-      :homeroom_course, :course_color
+      :homeroom_course, :course_color, :sync_enrollments_from_homeroom, :homeroom_course_id
     ]
   end
 
@@ -2937,6 +2941,9 @@ class Course < ActiveRecord::Base
   def self.default_homeroom_tabs
     default_tabs = Course.default_tabs
     homeroom_tabs = [default_tabs.find {|tab| tab[:id] == TAB_ANNOUNCEMENTS}]
+    syllabus_tab = default_tabs.find {|tab| tab[:id] == TAB_SYLLABUS}
+    syllabus_tab[:label] = t("Important Info")
+    homeroom_tabs << syllabus_tab
     homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_PEOPLE}
     homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_SETTINGS}
     homeroom_tabs.compact
@@ -2952,6 +2959,12 @@ class Course < ActiveRecord::Base
       :href => :course_path
     })
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
+  end
+
+  def self.elementary_course_nav_tabs
+    tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs.find{|tab| tab[:id] == TAB_SYLLABUS}[:label] = t("Important Info")
+    tabs
   end
 
   def tab_enabled?(tab)
@@ -2979,13 +2992,13 @@ class Course < ActiveRecord::Base
 
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
-    # The request params are nested within the session variable. Here we attempt to dig deep and find the params we
-    # care about to display elementary course subject tabs
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
+                   elsif elementary_subject_course?
+                     Course.elementary_course_nav_tabs
                    else
                      Course.default_tabs
                    end
@@ -3003,6 +3016,8 @@ class Course < ActiveRecord::Base
                       else
                         []
                       end
+      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tabs)
+
       tabs = tabs.map do |tab|
         default_tab = default_tabs.find {|t| t[:id] == tab[:id] } || external_tabs.find{|t| t[:id] == tab[:id] }
         if default_tab
@@ -3101,8 +3116,8 @@ class Course < ActiveRecord::Base
         admin_only_tabs = tabs.select{ |t| t[:visibility] == 'admins' }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
-        hidden_exteral_tabs = tabs.select{ |t| t[:hidden] && t[:external] }
-        tabs -= hidden_exteral_tabs if hidden_exteral_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
+        hidden_external_tabs = tabs.select{ |t| t[:hidden] && t[:external] }
+        tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
 
@@ -3111,6 +3126,8 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
+
+        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, :manage_assignments)
 
         if self.root_account.feature_enabled?(:granular_permissions_course_files)
           delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
@@ -3269,10 +3286,12 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :homeroom_course, :boolean => true, :default => false
+  add_setting :sync_enrollments_from_homeroom, :boolean => true, :default => false
+  add_setting :homeroom_course_id
   add_setting :course_color
 
   def elementary_enabled?
-    root_account&.feature_enabled?(:canvas_for_elementary) && account.enable_as_k5_account?
+    account.enable_as_k5_account?
   end
 
   def elementary_homeroom_course?
@@ -3285,6 +3304,28 @@ class Course < ActiveRecord::Base
 
   def lock_all_announcements?
     !!lock_all_announcements || elementary_homeroom_course?
+  end
+
+  def self.sync_homeroom_enrollments
+    sync_homeroom_enrollments_enabled.find_each(&:sync_homeroom_enrollments)
+  end
+
+  def sync_homeroom_enrollments(progress=nil)
+    return false unless elementary_subject_course? && sync_enrollments_from_homeroom && homeroom_course_id.present?
+
+    homeroom_course = account.courses.find_by(id: homeroom_course_id)
+    return false if homeroom_course.nil?
+
+    progress&.calculate_completion!(0, homeroom_course.enrollments.size)
+    homeroom_course.all_enrollments.find_each do |enrollment|
+      course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
+      course_enrollment.workflow_state = enrollment.workflow_state
+      course_enrollment.start_at = enrollment.start_at
+      course_enrollment.end_at = enrollment.end_at
+      course_enrollment.completed_at = enrollment.completed_at
+      course_enrollment.save!
+      progress.increment_completion!(1) if progress&.total
+    end
   end
 
   def user_can_manage_own_discussion_posts?(user)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -41,14 +41,19 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
     getTextAreaRef(el)
   }
 
+  const setFocusToTextArea = useCallback(() => {
+    textAreaRef.current.focus()
+  }, [textAreaRef])
+
   return (
     <>
       {showCommentLibrary && (
         <CommentLibrary
-          textAreaRef={textAreaRef}
+          setFocusToTextArea={setFocusToTextArea}
           setComment={setComment}
           courseId={courseId}
           userId={userId}
+          commentAreaText={comment}
         />
       )}
       <TextArea
@@ -57,6 +62,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
         textareaRef={setTextAreaRef}
         {...textAreaProps}
       />
+      {showCommentLibrary && <div id="library-suggestions" />}
     </>
   )
 }

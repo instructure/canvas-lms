@@ -87,7 +87,6 @@ describe DeveloperKeysController do
         it 'includes all valid LTI placements in js env' do
           # enable conference placement
           Account.site_admin.enable_feature! :conference_selection_lti_placement
-          Account.default.enable_feature!(:submission_type_tool_placement)
           get 'index', params: { account_id: Account.site_admin.id }
           expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement::PLACEMENTS
         end

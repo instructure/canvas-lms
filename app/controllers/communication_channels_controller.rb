@@ -271,31 +271,35 @@ class CommunicationChannelsController < ApplicationController
       end
 
       # load merge opportunities
-      merge_users = cc.merge_candidates
-      merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
-      observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
-      merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
-      # remove users that don't have a pseudonym for this account, or one can't be created
-      merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
-      @merge_opportunities = []
-      merge_users.each do |user|
-        account_to_pseudonyms_hash = {}
-        root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
-        if root_account_pseudonym
-          @merge_opportunities << [user, [root_account_pseudonym]]
-        else
-          user.all_active_pseudonyms.each do |p|
-            # populate reverse association
-            p.user = user
-            (account_to_pseudonyms_hash[p.account] ||= []) << p
+      if @domain_root_account.feature_enabled?(:self_service_user_merge)
+        merge_users = cc.merge_candidates
+        merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
+        observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
+        merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
+        # remove users that don't have a pseudonym for this account, or one can't be created
+        merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
+        @merge_opportunities = []
+        merge_users.each do |user|
+          account_to_pseudonyms_hash = {}
+          root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
+          if root_account_pseudonym
+            @merge_opportunities << [user, [root_account_pseudonym]]
+          else
+            user.all_active_pseudonyms.each do |p|
+              # populate reverse association
+              p.user = user
+              (account_to_pseudonyms_hash[p.account] ||= []) << p
+            end
+            @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
+              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
+            end]
+            @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
-          @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
-          end]
-          @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
+        @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
+      else
+        @merge_opportunities = []
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 

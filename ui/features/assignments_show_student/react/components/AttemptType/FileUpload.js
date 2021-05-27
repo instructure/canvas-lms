@@ -18,25 +18,25 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {chunk} from 'lodash'
-import {DEFAULT_ICON} from '@canvas/mime/react/mimeClassIconHelper'
+import axios from '@canvas/axios'
 import elideString from '../../helpers/elideString'
 import {func} from 'prop-types'
 import {getFileThumbnail} from '@canvas/util/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
-import LoadingIndicator from '@canvas/loading-indicator'
 import MoreOptions from './MoreOptions/index'
 import React, {Component} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {uploadFiles} from '@canvas/upload-file'
+import {uploadFile} from '@canvas/upload-file'
+import UploadFileSVG from '../../../images/UploadFile.svg'
 
-import {Billboard} from '@instructure/ui-billboard'
-import {Button} from '@instructure/ui-buttons'
 import {FileDrop} from '@instructure/ui-file-drop'
-import {Grid} from '@instructure/ui-grid'
 import {Flex} from '@instructure/ui-flex'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconCompleteSolid, IconTrashLine} from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
+import {ProgressBar} from '@instructure/ui-progress'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 
@@ -118,10 +118,13 @@ export default class FileUpload extends Component {
     this.setState(
       {
         filesToUpload: files.map((file, i) => {
-          if (file.url) {
-            return {isLoading: true, _id: `${i}-${file.url}`}
-          }
-          return {isLoading: true, _id: `${i}-${file.name}`}
+          const name = file.name || file.title
+          const _id = `${i}-${file.url || file.name}`
+
+          // As we receive progress events for this upload, we'll update the
+          // "loaded and "total" values. Set some placeholder values so that
+          // we start at 0%.
+          return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
         })
       },
       () => {
@@ -130,13 +133,66 @@ export default class FileUpload extends Component {
     )
     this.updateUploadingFiles(async () => {
       try {
-        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
+        const newFiles = await this.uploadFiles(files)
         await this.createSubmissionDraft(newFiles.map(file => file.id))
       } catch (err) {
         this.context.setOnFailure(I18n.t('Error updating submission draft'))
       } finally {
         this.setState({filesToUpload: []})
       }
+    })
+  }
+
+  uploadFiles = async files => {
+    // This is taken almost verbatim from the uploadFiles method in the
+    // upload-file module.  Rather than calling that method, we call uploadFile
+    // for each file to track progress for the individual uploads.
+    const uploadUrl = submissionFileUploadUrl(this.props.assignment)
+
+    const uploadPromises = []
+    files.forEach((file, i) => {
+      const onProgress = event => {
+        const {loaded, total} = event
+        this.updateUploadProgress({index: i, loaded, total})
+      }
+
+      let promise
+      if (file.url) {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            url: file.url,
+            name: file.title,
+            content_type: file.mediaType,
+            submit_assignment: false
+          },
+          null,
+          axios,
+          onProgress
+        )
+      } else {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            name: file.name,
+            content_type: file.type
+          },
+          file,
+          axios,
+          onProgress
+        )
+      }
+      uploadPromises.push(promise)
+    })
+
+    return Promise.all(uploadPromises)
+  }
+
+  updateUploadProgress = ({index, loaded, total}) => {
+    this.setState(state => {
+      const filesToUpload = [...state.filesToUpload]
+      filesToUpload[index] = {...filesToUpload[index], loaded, total}
+      return {filesToUpload}
     })
   }
 
@@ -208,9 +264,45 @@ export default class FileUpload extends Component {
   }
 
   renderUploadBox() {
+    const fileDropLabel = (
+      <>
+        <ScreenReaderContent>
+          {I18n.t('Drag a file here, or click to select a file to upload')}
+        </ScreenReaderContent>
+        <Flex justifyItems="center" margin="small">
+          <Flex.Item>
+            <Img src={UploadFileSVG} size="large" />
+          </Flex.Item>
+          <Flex.Item padding="0 0 0 small">
+            <Flex direction="column" textAlign="start">
+              <Flex.Item margin="0 0 small 0">
+                <Text lineHeight="fit" size="x-large">
+                  {I18n.t('Drag a file here, or')}
+                </Text>
+              </Flex.Item>
+              <Flex.Item>
+                <Text color="brand" size="medium">
+                  {I18n.t('Choose a file to upload')}
+                </Text>
+              </Flex.Item>
+              {this.props.assignment.allowedExtensions.length && (
+                <Flex.Item>
+                  {I18n.t('File permitted: %{fileTypes}', {
+                    fileTypes: this.props.assignment.allowedExtensions
+                      .map(ext => ext.toUpperCase())
+                      .join(', ')
+                  })}
+                </Flex.Item>
+              )}
+            </Flex>
+          </Flex.Item>
+        </Flex>
+      </>
+    )
+
     return (
       <div data-testid="upload-box">
-        <Flex direction="column">
+        <Flex direction="column" padding="xx-small">
           <Flex.Item margin="0 0 small 0" overflowY="visible">
             <FileDrop
               accept={
@@ -218,37 +310,15 @@ export default class FileUpload extends Component {
                   ? this.props.assignment.allowedExtensions
                   : ''
               }
-              allowMultiple
-              enablePreview
               id="inputFileDrop"
               data-testid="input-file-drop"
-              label={
-                <Billboard
-                  heading={I18n.t('Upload File')}
-                  hero={DEFAULT_ICON}
-                  message={
-                    <Flex direction="column">
-                      {this.props.assignment.allowedExtensions.length ? (
-                        <Flex.Item>
-                          {I18n.t('File permitted: %{fileTypes}', {
-                            fileTypes: this.props.assignment.allowedExtensions
-                              .map(ext => ext.toUpperCase())
-                              .join(', ')
-                          })}
-                        </Flex.Item>
-                      ) : null}
-                      <Flex.Item padding="small 0 0">
-                        <Text size="small">
-                          {I18n.t('Drag and drop, or click to browse your computer')}
-                        </Text>
-                      </Flex.Item>
-                    </Flex>
-                  }
-                />
-              }
+              margin="xx-small"
               messages={this.state.messages}
               onDropAccepted={files => this.handleDropAccepted(files)}
               onDropRejected={this.handleDropRejected}
+              renderLabel={fileDropLabel}
+              shouldAllowMultiple
+              shouldEnablePreview
             />
           </Flex.Item>
           <Flex.Item padding="xx-small" textAlign="center">
@@ -265,81 +335,91 @@ export default class FileUpload extends Component {
     )
   }
 
-  renderUploadedFile(file) {
-    if (file.isLoading) {
-      return <LoadingIndicator />
-    }
+  renderFileProgress = file => {
+    // If we're calling this function, we know that "file" represents one of
+    // the entries in the filesToUpload state variable, and so it will have
+    // values representing the progress of the upload.
+    const {name, loaded, total} = file
+
     return (
-      <Billboard
-        heading={I18n.t('Uploaded')}
-        headingLevel="h3"
-        hero={getFileThumbnail(file, 'large')}
-        message={
-          <div>
-            <span aria-hidden title={file.displayName}>
-              {elideString(file.displayName)}
-            </span>
-            <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
-            <Button
-              icon={IconTrashLine}
-              id={file._id}
-              margin="0 0 0 x-small"
-              onClick={this.handleRemoveFile}
-              size="small"
-            >
-              <ScreenReaderContent>
-                {I18n.t('Remove %{filename}', {filename: file.displayName})}
-              </ScreenReaderContent>
-            </Button>
-          </div>
-        }
+      <ProgressBar
+        formatScreenReaderValue={({valueNow, valueMax}) => {
+          return Math.round((valueNow / valueMax) * 100) + ' percent'
+        }}
+        meterColor="brand"
+        screenReaderLabel={I18n.t('Upload progress for %{name}', {name})}
+        size="x-small"
+        valueMax={total}
+        valueNow={loaded}
       />
     )
   }
 
-  renderUploadBoxAndUploadedFiles() {
+  renderTableRow = file => {
+    // "file" is either a previously-uploaded file or one being uploaded right
+    // now.  For the former, we can use the displayName property; files being
+    // uploaded don't have that set yet, so use the local file's name.
+    const displayName = file.displayName || file.name
+
+    return (
+      <Table.Row key={file._id}>
+        <Table.Cell>{getFileThumbnail(file, 'small')}</Table.Cell>
+        <Table.Cell>
+          <span aria-hidden title={displayName}>
+            {elideString(displayName)}
+          </span>
+          <ScreenReaderContent>{displayName}</ScreenReaderContent>
+        </Table.Cell>
+        <Table.Cell>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
+        <Table.Cell>{!file.isLoading && <IconCompleteSolid color="success" />}</Table.Cell>
+        <Table.Cell>
+          {!file.isLoading && (
+            <IconButton
+              id={file._id}
+              onClick={this.handleRemoveFile}
+              screenReaderLabel={I18n.t('Remove %{displayName}', {displayName})}
+              size="small"
+              withBackground={false}
+              withBorder={false}
+            >
+              <IconTrashLine />
+            </IconButton>
+          )}
+        </Table.Cell>
+      </Table.Row>
+    )
+  }
+
+  renderUploadedFiles = files => {
+    return (
+      <Table caption={I18n.t('Uploaded files')}>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="thumbnail" width="1rem" />
+            <Table.ColHeader id="filename">{I18n.t('File Name')}</Table.ColHeader>
+            <Table.ColHeader id="upload-progress" width="30%" />
+            <Table.ColHeader id="upload-success" width="1rem" />
+            <Table.ColHeader id="delete" width="1rem" />
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>{files.map(this.renderTableRow)}</Table.Body>
+      </Table>
+    )
+  }
+
+  render() {
     let files = this.getDraftAttachments()
     if (this.state.filesToUpload.length) {
       files = files.concat(this.state.filesToUpload)
     }
-    // The first two uploaded files are rendered on the same row as the upload box
-    const firstFileRow = files.slice(0, 2)
-    // All uploaded files after the first two are rendered on rows below the upload
-    // box; thus, each row has three columns, with the first row having an upload box
-    // and two rendered files and all subsequent rows having three rendered files
-    const nextFileRows = files.length > 2 ? chunk(files.slice(2, files.length), 3) : []
-    return (
-      <Grid>
-        <Grid.Row key="upload-box">
-          <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
-          {firstFileRow.map(file => (
-            <Grid.Col width={4} key={file._id} vAlign="bottom">
-              {this.renderUploadedFile(file)}
-            </Grid.Col>
-          ))}
-        </Grid.Row>
-        {nextFileRows.map((row, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Grid.Row key={i}>
-            {row.map(file => (
-              <Grid.Col width={4} key={file._id} vAlign="bottom">
-                {this.renderUploadedFile(file)}
-              </Grid.Col>
-            ))}
-          </Grid.Row>
-        ))}
-      </Grid>
-    )
-  }
 
-  shouldRenderFiles = () => {
-    return this.getDraftAttachments().length !== 0 || this.state.filesToUpload.length !== 0
-  }
-
-  render() {
     return (
       <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
-        {this.renderUploadBoxAndUploadedFiles()}
+        <Flex direction="column" width="100%" alignItems="stretch">
+          <Flex.Item>{this.renderUploadBox()}</Flex.Item>
+
+          {files.length > 0 && <Flex.Item>{this.renderUploadedFiles(files)}</Flex.Item>}
+        </Flex>
       </div>
     )
   }

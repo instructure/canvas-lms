@@ -35,7 +35,7 @@ import useRCE from './hooks/useRCE'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {
-  createOutcome,
+  CREATE_LEARNING_OUTCOME,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
 } from '@canvas/outcomes/graphql/Management'
 import TreeBrowser from './Management/TreeBrowser'
@@ -51,6 +51,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [setRCERef, getRCECode, setRCECode] = useRCE()
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
+  const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
   const {
     error,
     isLoading,
@@ -79,24 +80,37 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const onCreateOutcomeHandler = () => {
     ;(async () => {
       try {
-        const result = await createOutcome(contextType, contextId, selectedGroupId, {
-          title,
-          description: getRCECode(),
-          display_name: displayName
+        const createLearningOutcomeResult = await createLearningOutcome({
+          variables: {
+            input: {
+              groupId: selectedGroupId,
+              title,
+              displayName,
+              description: getRCECode()
+            }
+          }
         })
-        if (result.status === 200 && altDescription) {
-          const altDescriptionResult = await setOutcomeFriendlyDescription({
+
+        const outcomeId =
+          createLearningOutcomeResult.data?.createLearningOutcome?.learningOutcome?._id
+        const errorMessage =
+          createLearningOutcomeResult.data?.createLearningOutcome?.errors?.[0]?.message
+
+        if (!outcomeId) throw new Error(errorMessage)
+
+        if (altDescription) {
+          await setOutcomeFriendlyDescription({
             variables: {
               input: {
-                outcomeId: result.data.outcome.id,
+                outcomeId,
                 description: altDescription,
                 contextId,
                 contextType
               }
             }
           })
-          if (altDescriptionResult.data?.setFriendlyDescription?.errors) throw new Error()
         }
+
         showFlashAlert({
           message: I18n.t('Outcome "%{title}" was successfully created', {title}),
           type: 'success'

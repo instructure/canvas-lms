@@ -210,7 +210,6 @@ end
 
 def generate_k5_dashboard
   puts "Generate K5 Dashboard Homeroom and Subjects"
-  Account.default.enable_feature!(:canvas_for_elementary)
   toggle_k5_setting(@root_account, true)
   course_with_teacher_enrolled
   homeroom = @course

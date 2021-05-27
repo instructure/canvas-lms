@@ -18,6 +18,8 @@
 
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-elements'
 import {Flex} from '@instructure/ui-flex'
@@ -36,7 +38,10 @@ const Tray = ({
   onDeleteComment,
   onAddComment,
   isAddingComment,
-  removedItemIndex
+  removedItemIndex,
+  showSuggestions,
+  setShowSuggestions,
+  updateComment
 }) => {
   const closeButtonRef = useRef(null)
   useEffect(() => {
@@ -56,7 +61,7 @@ const Tray = ({
       <View as="div" padding="small">
         <Flex direction="column" as="div">
           <Flex.Item textAlign="center" as="header">
-            <View as="div" padding="small 0 medium xx-small" borderWidth="none none medium none">
+            <View as="div" padding="small 0 medium xx-small">
               <div style={{float: 'left', margin: '6px'}}>
                 <IconButton
                   size="small"
@@ -74,6 +79,34 @@ const Tray = ({
                 </Text>
               </View>
             </View>
+            <View
+              textAlign="start"
+              as="div"
+              padding="0 0 medium small"
+              borderWidth="none none medium none"
+            >
+              <PresentationContent>
+                <View as="div" display="inline-block">
+                  <Text size="small" weight="bold">
+                    {I18n.t('Show suggestions when typing')}
+                  </Text>
+                </View>
+              </PresentationContent>
+              <div style={{display: 'inline-block', float: 'right'}}>
+                <Checkbox
+                  label={
+                    <ScreenReaderContent>
+                      {I18n.t('Show suggestions when typing')}
+                    </ScreenReaderContent>
+                  }
+                  variant="toggle"
+                  size="small"
+                  inline
+                  onChange={e => setShowSuggestions(e.target.checked)}
+                  checked={showSuggestions}
+                />
+              </div>
+            </View>
           </Flex.Item>
           <Flex.Item size="65vh" shouldGrow>
             {comments.map((commentItem, index) => {
@@ -87,6 +120,7 @@ const Tray = ({
                   onDelete={() => onDeleteComment(commentItem._id)}
                   comment={commentItem.comment}
                   shouldFocus={shouldFocus}
+                  updateComment={updateComment}
                 />
               )
             })}
@@ -113,7 +147,10 @@ Tray.propTypes = {
   onAddComment: PropTypes.func.isRequired,
   onDeleteComment: PropTypes.func.isRequired,
   isAddingComment: PropTypes.bool.isRequired,
-  removedItemIndex: PropTypes.number
+  removedItemIndex: PropTypes.number,
+  showSuggestions: PropTypes.bool.isRequired,
+  setShowSuggestions: PropTypes.func.isRequired,
+  updateComment: PropTypes.func.isRequired
 }
 
 Tray.defaultProps = {

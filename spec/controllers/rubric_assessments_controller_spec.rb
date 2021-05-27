@@ -61,6 +61,24 @@ describe RubricAssessmentsController do
       expect(response).to be_successful
     end
 
+    it "should return anonymized user comments when anonymous grading is enabled" do
+      course_with_teacher_logged_in(:active_all => true)
+      @student = factory_with_protected_attributes(User, :name => "Some Student", :workflow_state => "registered")
+      @course.enroll_student(@student).accept!
+      @assignment = @course.assignments.create!(:title => "Some Assignment")
+      @assignment.update(anonymous_grading: true)
+      rubric_assessment_model(:user => @user, :context => @course, :association_object => @assignment, :purpose => 'grading')
+      @assignment.find_or_create_submission(@student)
+      submission = @rubric_assessment.artifact
+      submission.submission_comments.create!(author: @student, comment: 'A Comment')
+
+      put 'update', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}}
+      response_json = JSON.parse(response.body)
+      expect(response_json.dig('artifact', 'submission_comments').first).to have_key('anonymous_id')
+      expect(response_json.dig('artifact', 'submission_comments').first).to_not have_key('author_id')
+      expect(response_json.dig('artifact', 'submission_comments').first).to_not have_key('author_name')
+    end
+
     context 'setting a provisional grade to be final' do
       before(:once) do
         @course = Course.create!

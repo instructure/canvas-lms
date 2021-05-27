@@ -37,6 +37,7 @@ ready(() => {
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         courseOverview={ENV.COURSE.course_overview}
+        userIsStudent={ENV.COURSE.is_student}
         userIsInstructor={ENV.COURSE.is_instructor}
         hideFinalGrades={ENV.COURSE.hide_final_grades}
         showLearningMasteryGradebook={
@@ -46,6 +47,8 @@ ready(() => {
         showStudentView={ENV.COURSE.show_student_view}
         studentViewPath={ENV.COURSE.student_view_path}
         tabs={ENV.TABS}
+        settingsPath={ENV.COURSE.settings_path}
+        latestAnnouncement={ENV.COURSE.latest_announcement}
       />,
       courseContainer
     )

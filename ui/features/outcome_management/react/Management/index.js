@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useReducer, useState} from 'react'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
@@ -40,6 +40,7 @@ import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import startMoveOutcome from '@canvas/outcomes/react/helpers/startMoveOutcome'
 
 const NoOutcomesBillboard = () => {
   const {contextType} = useCanvasContext()
@@ -74,15 +75,19 @@ const NoOutcomesBillboard = () => {
 
 const OutcomeManagementPanel = () => {
   const {contextType, contextId} = useCanvasContext()
-  const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
-  const [selectedOutcomes, setSelectedOutcomes] = useState({})
+  const {
+    search: searchString,
+    debouncedSearch: debouncedSearchString,
+    onChangeHandler: onSearchChangeHandler,
+    onClearHandler: onSearchClearHandler
+  } = useSearch()
+  const [selectedOutcomes, toggleSelectedOutcomes] = useReducer((prevState, id) => {
+    const updatedState = {...prevState}
+    prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
+    return updatedState
+  }, {})
+
   const selected = Object.keys(selectedOutcomes).length
-  const onSelectOutcomesHandler = id =>
-    setSelectedOutcomes(prevState => {
-      const updatedState = {...prevState}
-      prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
-      return updatedState
-    })
   const noop = () => {}
   const {
     error,
@@ -93,12 +98,16 @@ const OutcomeManagementPanel = () => {
     selectedGroupId,
     selectedParentGroupId
   } = useManageOutcomes()
-  const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
+  const {group, loading, loadMore} = useGroupDetail({
+    id: selectedGroupId,
+    searchString: debouncedSearchString
+  })
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
@@ -106,6 +115,10 @@ const OutcomeManagementPanel = () => {
   }
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
+    setSelectedOutcome(null)
+  }
+  const onCloseOutcomeMoveModal = () => {
+    closeOutcomeMoveModal()
     setSelectedOutcome(null)
   }
   const onCloseEditGroupModal = () => {
@@ -120,14 +133,20 @@ const OutcomeManagementPanel = () => {
       openEditGroupModal()
     }
   }
-  const outcomeMenuHandler = (id, action) => {
-    setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id)?.node)
-    if (action === 'remove') {
-      openOutcomeRemoveModal()
-    } else if (action === 'edit') {
-      openOutcomeEditModal()
-    }
-  }
+  const outcomeMenuHandler = useCallback(
+    (id, action) => {
+      setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id)?.node)
+      if (action === 'remove') {
+        openOutcomeRemoveModal()
+      } else if (action === 'edit') {
+        openOutcomeEditModal()
+      } else if (action === 'move') {
+        openOutcomeMoveModal()
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [group]
+  )
 
   const onMoveHandler = async newParentGroup => {
     closeMoveGroupModal()
@@ -156,6 +175,11 @@ const OutcomeManagementPanel = () => {
         type: 'error'
       })
     }
+  }
+
+  const onMoveOutcomeHandler = newParentGroup => {
+    startMoveOutcome(contextType, contextId, selectedOutcome, selectedGroupId, newParentGroup)
+    onCloseOutcomeMoveModal()
   }
 
   if (isLoading) {
@@ -235,7 +259,7 @@ const OutcomeManagementPanel = () => {
                     loading={loading}
                     selectedOutcomes={selectedOutcomes}
                     searchString={searchString}
-                    onSelectOutcomesHandler={onSelectOutcomesHandler}
+                    onSelectOutcomesHandler={toggleSelectedOutcomes}
                     onOutcomeGroupMenuHandler={groupMenuHandler}
                     onOutcomeMenuHandler={outcomeMenuHandler}
                     onSearchChangeHandler={onSearchChangeHandler}
@@ -284,6 +308,15 @@ const OutcomeManagementPanel = () => {
                 outcome={selectedOutcome}
                 isOpen={isOutcomeEditModalOpen}
                 onCloseHandler={onCloseOutcomeEditModal}
+              />
+              <MoveModal
+                title={selectedOutcome.title}
+                groupId={selectedGroupId}
+                parentGroupId={selectedGroupId}
+                type="outcome"
+                isOpen={isOutcomeMoveModalOpen}
+                onCloseHandler={onCloseOutcomeMoveModal}
+                onMoveHandler={onMoveOutcomeHandler}
               />
             </>
           )}

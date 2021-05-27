@@ -118,6 +118,25 @@ describe ReleaseNote do
     expect(notes.length).to eq(0)
   end
 
+  it 'should remvove published notes when deleted' do
+    show_at = Time.now.utc - 1.hour
+    note = ReleaseNote.new
+    note.target_roles = ['student', 'ta']
+    note.set_show_at('prod', show_at)
+    note.published = true
+    note.save
+    id = note.id
+
+    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    expect(notes.length).to eq(1)
+    expect(notes.first.id).to eq(id)
+
+    note.delete
+
+    notes = ReleaseNote.latest(env: 'prod', role: 'student')
+    expect(notes.length).to eq(0)
+  end
+
   it 'should not show future notes' do
     show_at = Time.now.utc + 1.hour
     note = ReleaseNote.new

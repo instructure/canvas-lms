@@ -27,7 +27,7 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    [ :auth_base, :log_in_url, :jit_provisioning ].freeze
+    super + [ :auth_base, :log_in_url, :jit_provisioning ].freeze
   end
 
   def self.deprecated_params

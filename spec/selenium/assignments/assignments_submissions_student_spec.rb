@@ -21,12 +21,14 @@ require_relative '../common'
 require_relative '../helpers/files_common'
 require_relative '../helpers/submissions_common'
 require_relative '../helpers/gradebook_common'
+require_relative '../../helpers/k5_common'
 
 describe "submissions" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include GradebookCommon
   include SubmissionsCommon
+  include K5Common
 
   context 'as a student' do
 
@@ -486,6 +488,12 @@ describe "submissions" do
       end
     end
 
+    it "should not show course nav on submissions detail page in k5 subject" do
+      toggle_k5_setting(@course.account)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      expect(f("#back_to_subject")).to include_text "Back to Subject"
+      expect(f("#main")).not_to contain_css("#left-side")
+    end
   end
 
   context 'Excused assignment' do

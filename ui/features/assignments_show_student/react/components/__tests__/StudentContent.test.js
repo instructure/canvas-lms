@@ -302,4 +302,19 @@ describe('Assignment Student Content View', () => {
       expect(getAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
     })
   })
+
+  describe('Unpublished module', () => {
+    it('renders UnpublishedModule', async () => {
+      window.ENV = {belongs_to_unpublished_module: true}
+      const props = await mockAssignmentAndSubmission()
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        getByText('This assignment is part of an unpublished module and is not available yet.')
+      ).toBeInTheDocument()
+    })
+  })
 })

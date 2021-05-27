@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "5.0.3",
+  "version": "5.1.1",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -11,9 +11,9 @@
     "lint:fix": "eslint --fix \"src/**/*.js\" \"test/**/*.js\"",
     "_test": "Test cafe will be added back to test as part of CORE-2995",
     "test": "yarn test:mocha && yarn test:jest",
-    "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
-    "test:mocha:one": "BABEL_ENV=test-node mocha --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
-    "test:mocha:debug": "BABEL_ENV=test-node mocha --inspect-brk --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
+    "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.js",
+    "test:mocha:one": "BABEL_ENV=test-node mocha --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.js",
+    "test:mocha:debug": "BABEL_ENV=test-node mocha --inspect-brk --require @instructure/canvas-theme --require jsdom-global/register --require ./babel-register.js --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.js",
     "test:jest": "jest --color --runInBand",
     "test:cafe": "yarn build:cafe && yarn test:cafe:only",
     "test:cafe:only": "testcafe chrome testcafe/**/*.test.js",
@@ -33,7 +33,7 @@
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch",
     "build:cafe": "webpack --config webpack.testcafe.config.js",
-    "prepublishOnly": "yarn test && yarn build:all",
+    "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
     "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean"
@@ -73,7 +73,6 @@
     "@instructure/ui-flex": "7",
     "@instructure/ui-focusable": "7",
     "@instructure/ui-form-field": "7",
-    "@instructure/ui-forms": "6",
     "@instructure/ui-heading": "7",
     "@instructure/ui-icons": "7",
     "@instructure/ui-img": "7",
@@ -130,7 +129,8 @@
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
-    "tinymce": "^5"
+    "tinymce": "^5",
+    "tinymce-a11y-checker": "^3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -169,7 +169,7 @@
     "mocha-multi-reporters": "^1.1.7",
     "moxios": "^0.4",
     "nyc": "^13",
-    "prettier": "^1.12.1",
+    "prettier": "^2.2.1",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
     "sinon": "^7",

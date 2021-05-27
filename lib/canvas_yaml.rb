@@ -43,6 +43,7 @@ SafeYAML::OPTIONS.merge!(
     # This tag whitelist is syck specific. We'll need to tweak it when we upgrade to psych.
     # See the tests in spec/lib/safe_yaml_spec.rb
     whitelisted_tags: %w[
+        !ruby/sym
         !ruby/symbol
         !binary
         !float

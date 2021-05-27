@@ -29,10 +29,8 @@ function initialState(opts = {}) {
       payload: {
         env: {
           TIMEZONE: TZ,
-          K5_MODE: true,
-          FEATURES: {
-            canvas_for_elementary: true
-          }
+          K5_USER: true,
+          FEATURES: {}
         }
       }
     }),

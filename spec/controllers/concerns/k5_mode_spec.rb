@@ -28,7 +28,6 @@ describe K5Mode do
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @course.root_account.enable_feature!(:canvas_for_elementary)
     @course.account.settings[:enable_as_k5_account] = { value: true }
     @course.account.save!
   end
@@ -38,7 +37,6 @@ describe K5Mode do
       it 'should set k5 variables' do
         user_session(@teacher)
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_mode)).to eq(true)
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)
@@ -50,7 +48,6 @@ describe K5Mode do
       it 'should set k5 variables' do
         user_session(@student)
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_mode)).to eq(true)
         expect(assigns(:k5_details_view)).to eq(true)
         expect(assigns(:show_left_side)).to eq(false)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)

@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import I18n from 'i18n!OutcomeManagement'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
@@ -32,6 +33,7 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 
 const FindOutcomesView = ({
   collection,
+  outcomesCount,
   outcomes,
   loading,
   loadMore,
@@ -40,8 +42,7 @@ const FindOutcomesView = ({
   onClearHandler,
   onAddAllHandler
 }) => {
-  const groupTitle = collection?.name
-  const outcomesCount = collection?.outcomesCount || 0
+  const groupTitle = collection?.name || I18n.t('Outcome Group')
   const enabled = !!outcomesCount && outcomesCount > 0
 
   const onSelectOutcomesHandler = _id => {
@@ -68,19 +69,13 @@ const FindOutcomesView = ({
         <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
           <View as="div" padding="small 0 0">
             <Heading level="h2" as="h3">
-              <div style={{overflowWrap: 'break-word'}}>
-                {groupTitle ? addZeroWidthSpace(groupTitle) : I18n.t('Outcome Group')}
-              </div>
+              <Text wrap="break-word">{addZeroWidthSpace(groupTitle)}</Text>
             </Heading>
           </View>
           <View as="div" padding="large 0 medium">
             <OutcomeSearchBar
-              enabled={enabled}
-              placeholder={
-                groupTitle
-                  ? I18n.t('Search within %{groupTitle}', {groupTitle})
-                  : I18n.t('Search within outcome group')
-              }
+              enabled={enabled || searchString.length > 0}
+              placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
               searchString={searchString}
               onChangeHandler={onChangeHandler}
               onClearHandler={onClearHandler}
@@ -90,13 +85,33 @@ const FindOutcomesView = ({
             <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
               <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
                 <Heading level="h4">
-                  <div style={{overflowWrap: 'break-word'}}>
-                    {groupTitle
-                      ? I18n.t('All %{groupTitle} Outcomes', {
-                          groupTitle: addZeroWidthSpace(groupTitle)
-                        })
-                      : I18n.t('All Group Outcomes')}
-                  </div>
+                  {searchString ? (
+                    <Flex>
+                      <Flex.Item shouldShrink>
+                        <TruncateText>
+                          {`${addZeroWidthSpace(groupTitle)} > ${addZeroWidthSpace(searchString)}`}
+                        </TruncateText>
+                      </Flex.Item>
+                      <Flex.Item>
+                        {loading ? (
+                          <Spinner
+                            renderTitle={I18n.t('Loading')}
+                            size="x-small"
+                            margin="0 0 0 small"
+                            data-testid="search-loading"
+                          />
+                        ) : (
+                          ''
+                        )}
+                      </Flex.Item>
+                    </Flex>
+                  ) : (
+                    <Text wrap="break-word">
+                      {I18n.t('All %{groupTitle} Outcomes', {
+                        groupTitle: addZeroWidthSpace(groupTitle)
+                      })}
+                    </Text>
+                  )}
                 </Heading>
               </Flex.Item>
               <Flex.Item>
@@ -117,7 +132,7 @@ const FindOutcomesView = ({
                   <Flex.Item>
                     <Button
                       margin="x-small 0"
-                      interaction={enabled ? 'enabled' : 'disabled'}
+                      interaction={enabled && !searchString ? 'enabled' : 'disabled'}
                       onClick={onAddAllHandler}
                     >
                       {I18n.t('Add All Outcomes')}
@@ -156,7 +171,7 @@ const FindOutcomesView = ({
             }
           >
             <View as="div" data-testid="find-outcome-items-list">
-              {outcomes?.nodes.map(({_id, title, description, isImported}, index) => (
+              {outcomes?.edges?.map(({node: {_id, title, description, isImported}}, index) => (
                 <FindOutcomeItem
                   key={_id}
                   id={_id}
@@ -178,15 +193,18 @@ const FindOutcomesView = ({
 FindOutcomesView.propTypes = {
   collection: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    outcomesCount: PropTypes.number.isRequired
+    name: PropTypes.string.isRequired
   }).isRequired,
+  outcomesCount: PropTypes.number.isRequired,
   outcomes: PropTypes.shape({
-    nodes: PropTypes.arrayOf(
+    edges: PropTypes.arrayOf(
       PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        description: PropTypes.string
+        node: PropTypes.shape({
+          _id: PropTypes.string.isRequired,
+          title: PropTypes.string.isRequired,
+          isImported: PropTypes.bool.isRequired,
+          description: PropTypes.string
+        })
       })
     ),
     pageInfo: PropTypes.shape({

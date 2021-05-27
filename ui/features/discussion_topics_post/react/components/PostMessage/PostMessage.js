@@ -23,19 +23,28 @@ import React from 'react'
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {Byline} from '@instructure/ui-byline'
-import {Pill} from '@instructure/ui-pill'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
+import {Heading} from '@instructure/ui-heading'
+import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 
 export function PostMessage({...props}) {
   return (
     <Byline
       title={
         <>
-          <Text weight="bold">{props.authorName}</Text>
-          <View padding="0 small">
+          <View padding="none small none none">
+            <Text weight="bold">{props.authorName}</Text>
+          </View>
+          {!!props.discussionRoles && (
+            <RolePillContainer
+              discussionRoles={props.discussionRoles}
+              data-testid="pill-container"
+            />
+          )}
+          <View display="inline-flex" padding="none small none none">
             <Text color="secondary">{props.timingDisplay}</Text>
             <Text color="secondary">
               {!!props.lastReplyAtDisplayText &&
@@ -44,15 +53,19 @@ export function PostMessage({...props}) {
                 })}
             </Text>
           </View>
-          {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
         </>
       }
       description={
         <>
           {props.title && (
-            <View as="div" margin="medium none">
-              <Text size="x-large">{props.title}</Text>
-            </View>
+            <>
+              <Heading level="h1">
+                <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
+              </Heading>
+              <View as="div" margin="medium none">
+                <Text size="x-large">{props.title}</Text>
+              </View>
+            </>
           )}
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
@@ -83,6 +96,7 @@ export function PostMessage({...props}) {
             marginTop: '13px'
           }}
           data-testid="is-unread"
+          data-isforcedread={props.isForcedRead}
         >
           <Badge
             type="notification"
@@ -129,10 +143,10 @@ PostMessage.propTypes = {
    */
   message: PropTypes.string.isRequired,
   /**
-   * Display text for the message pill.
-   * Providing this prop will result in the pill being displayed.
+   * Array of discussion author roles represented as strings
+   * Determines if RolePillContainer is rendered
    */
-  pillText: PropTypes.string,
+  discussionRoles: PropTypes.arrayOf(PropTypes.string),
   /**
    * Determines if the unread badge should be displayed
    */
@@ -148,7 +162,11 @@ PostMessage.propTypes = {
   /**
    * Callback for when Editor Cancel button is pressed
    */
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  /**
+   * Marks whether an unread message has a forcedReadState
+   */
+  isForcedRead: PropTypes.bool
 }
 
 export default PostMessage

@@ -166,8 +166,12 @@ Grades are passed back to Canvas from the tool's servers using the
 outcomes component of LTI 1.1</a>. Notably, one of the major limitations of the
 LTI 1.1 Outcomes Service is the inability of tools to return grades _before_ a
 student accesses the assignment from Canvas. If this functionality is desirable,
-
 you should upgrade to LTI Advantage's Assignment and Grading Services.
+
+**Note** that in the past Canvas would return a 200 HTTP response code, even if the
+XML in the body of the response indicated failure. This behavior has changed,
+and now if the `imsx_codeMajor` in the XML response is not `success`, then
+Canvas will return a 422 (Unprocessable Entity) HTTP response code.
 
 ## Data Return Extension
 

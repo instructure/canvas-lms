@@ -54,6 +54,19 @@ const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
 const ASYNC_FOCUS_TIMEOUT = 250
 const DEFAULT_RCE_HEIGHT = '400px'
 
+const toolbarPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    items: PropTypes.arrayOf(PropTypes.string).isRequired
+  })
+)
+const menuPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    items: PropTypes.arrayOf(PropTypes.string).isRequired
+  })
+)
+
 // we  `require` instead of `import` because the ui-themeable babel require hook only works with `require`
 // 2021-04-21: This is no longer true, but I didn't want to make a gratutious change when I found this out.
 // see https://gerrit.instructure.com/c/canvas-lms/+/263299/2/packages/canvas-rce/src/rce/RCEWrapper.js#50
@@ -187,12 +200,13 @@ class RCEWrapper extends React.Component {
     id: PropTypes.string,
     language: PropTypes.string,
     liveRegion: PropTypes.func.isRequired,
+    onContentChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     onInitted: PropTypes.func,
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
-    textareaId: PropTypes.string,
+    textareaId: PropTypes.string.isRequired,
     languages: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
@@ -201,14 +215,19 @@ class RCEWrapper extends React.Component {
     ),
     tinymce: PropTypes.object,
     trayProps: trayPropTypes,
+    toolbar: toolbarPropType,
+    menu: menuPropType,
+    plugins: PropTypes.arrayOf(PropTypes.string),
     instRecordDisabled: PropTypes.bool,
+    highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     use_rce_pretty_html_editor: PropTypes.bool
   }
 
   static defaultProps = {
     trayProps: null,
     languages: [{id: 'en', label: 'English'}],
-    autosave: {enabled: false}
+    autosave: {enabled: false},
+    highContrastCSS: []
   }
 
   static skinCssInjected = false
@@ -254,9 +273,20 @@ class RCEWrapper extends React.Component {
       }
     }
 
+    this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
+
     alertHandler.alertFunc = this.addAlert
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
+
+    this.a11yCheckerReady = import('./initA11yChecker')
+      .then(initA11yChecker => {
+        initA11yChecker.default(this.props.language, this.props.highContrastCSS)
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error('Failed initializing a11y checker', err)
+      })
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -876,7 +906,7 @@ class RCEWrapper extends React.Component {
     // first view
     this.setEditorView(this.state.editorView)
 
-    this.props.onInitted?.()
+    this.props.onInitted?.(editor)
   }
 
   _toggleFullscreen = event => {
@@ -1099,7 +1129,7 @@ class RCEWrapper extends React.Component {
 
   get autoSaveKey() {
     const userId = this.props.trayProps?.containingContext.userId
-    return `rceautosave:${userId}${window.location.href}:${this.getTextarea().id}`
+    return `rceautosave:${userId}${window.location.href}:${this.props.textareaId}`
   }
 
   doAutoSave = (e, retry = false) => {
@@ -1155,6 +1185,10 @@ class RCEWrapper extends React.Component {
     this.setState({path})
   }
 
+  onEditorChange = (content, _editor) => {
+    this.props.onContentChange?.(content)
+  }
+
   onResize = (_e, coordinates) => {
     const editor = this.mceInstance()
     if (editor) {
@@ -1173,7 +1207,10 @@ class RCEWrapper extends React.Component {
   }
 
   onA11yChecker = () => {
-    this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
+    // eslint-disable-next-line promise/catch-or-return
+    this.a11yCheckerReady.then(() => {
+      this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
+    })
   }
 
   openKBShortcutModal = () => {
@@ -1215,25 +1252,31 @@ class RCEWrapper extends React.Component {
       .slice(0, 2) || []
 
   wrapOptions(options = {}) {
+    const rcsExists = !!(this.props.trayProps?.host && this.props.trayProps?.jwt)
+
     const setupCallback = options.setup
 
-    const canvasPlugins = ['instructure_links', 'instructure_image', 'instructure_documents']
-    if (!this.props.instRecordDisabled) {
+    const canvasPlugins = rcsExists
+      ? ['instructure_links', 'instructure_image', 'instructure_documents', 'instructure_equation']
+      : ['instructure_links']
+    if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
 
     const wrappedOpts = {
       ...options,
 
-      height: this.state.height,
+      height: options.height || DEFAULT_RCE_HEIGHT,
 
-      block_formats: [
-        `${formatMessage('Heading 2')}=h2`,
-        `${formatMessage('Heading 3')}=h3`,
-        `${formatMessage('Heading 4')}=h4`,
-        `${formatMessage('Preformatted')}=pre`,
-        `${formatMessage('Paragraph')}=p`
-      ].join('; '),
+      block_formats:
+        options.block_formats ||
+        [
+          `${formatMessage('Heading 2')}=h2`,
+          `${formatMessage('Heading 3')}=h3`,
+          `${formatMessage('Heading 4')}=h4`,
+          `${formatMessage('Preformatted')}=pre`,
+          `${formatMessage('Paragraph')}=p`
+        ].join('; '),
 
       setup: editor => {
         addKebabIcon(editor)
@@ -1253,52 +1296,106 @@ class RCEWrapper extends React.Component {
       // in the editor matches the styles of the app it will be displayed in when saved.
       // This is just so we inject the helper class names that tinyMCE uses for
       // things like table resizing and stuff.
+      content_css: options.content_css || [],
       content_style: contentCSS,
 
-      toolbar: [
+      menubar: mergeMenuItems('edit view insert format tools table', options.menubar),
+      // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
+      // tinymce's default edit and table menus are fine
+      // insert will be updated by RCEWrapper if canvas is present
+      // we can include all the canvas specific items in the menu and toolbar
+      // and rely on tinymce only showing them if the plugin is provided.
+      menu: mergeMenu(
         {
-          name: formatMessage('Styles'),
-          items: ['fontsizeselect', 'formatselect']
+          format: {
+            title: formatMessage('Format'),
+            items:
+              'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
+          },
+          insert: {
+            title: formatMessage('Insert'),
+            items:
+              'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable instructure_media_embed | hr'
+          },
+          tools: {title: formatMessage('Tools'), items: 'wordcount'},
+          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
         },
-        {
-          name: formatMessage('Formatting'),
-          items: [
-            'bold',
-            'italic',
-            'underline',
-            'forecolor',
-            'backcolor',
-            'inst_subscript',
-            'inst_superscript'
-          ]
-        },
-        {
-          name: formatMessage('Content'),
-          items: canvasPlugins
-        },
-        {
-          name: formatMessage('External Tools'),
-          items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
-        },
-        {
-          name: formatMessage('Alignment and Lists'),
-          items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
-        },
-        {
-          name: formatMessage('Miscellaneous'),
-          items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
-        }
-      ],
+        options.menu
+      ),
+
+      toolbar: mergeToolbar(
+        [
+          {
+            name: formatMessage('Styles'),
+            items: ['fontsizeselect', 'formatselect']
+          },
+          {
+            name: formatMessage('Formatting'),
+            items: [
+              'bold',
+              'italic',
+              'underline',
+              'forecolor',
+              'backcolor',
+              'inst_subscript',
+              'inst_superscript'
+            ]
+          },
+          {
+            name: formatMessage('Content'),
+            items: [
+              'instructure_links',
+              'instructure_image',
+              'instructure_record',
+              'instructure_documents'
+            ]
+          },
+          {
+            name: formatMessage('External Tools'),
+            items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
+          },
+          {
+            name: formatMessage('Alignment and Lists'),
+            items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
+          },
+          {
+            name: formatMessage('Miscellaneous'),
+            items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
+          }
+        ],
+        options.toolbar
+      ),
+
       contextmenu: '', // show the browser's native context menu
 
       toolbar_mode: 'floating',
       toolbar_sticky: true,
 
-      // tiny's external link create/edit dialog config
-      target_list: false, // don't show the target list when creating/editing links
-      link_title: false, // don't show the title input when creating/editing links
-      default_link_target: '_blank'
+      plugins: mergePlugins(
+        [
+          'autolink',
+          'media',
+          'paste',
+          'table',
+          'link',
+          'directionality',
+          'lists',
+          'hr',
+          'fullscreen',
+          'instructure-ui-icons',
+          'instructure_condensed_buttons',
+          'instructure_links',
+          'instructure_html_view',
+          'instructure_media_embed',
+          'instructure_external_tools',
+          'a11y_checker',
+          'wordcount'
+        ],
+        options.plugins
+      )
     }
+
+    wrappedOpts.plugins.splice(wrappedOpts.plugins.length, 0, ...canvasPlugins)
 
     if (this.props.trayProps) {
       wrappedOpts.canvas_rce_user_context = {
@@ -1351,7 +1448,6 @@ class RCEWrapper extends React.Component {
     // Preload the LTI Tools modal
     // This helps with loading the favorited external tools
     if (this.ltiToolFavorites.length > 0) {
-      // eslint-disable-next-line babel/no-unused-expressions
       import('./plugins/instructure_external_tools/components/LtiToolsModal')
     }
 
@@ -1500,7 +1596,7 @@ class RCEWrapper extends React.Component {
           <Editor
             id={mceProps.textareaId}
             textareaName={mceProps.name}
-            init={this.wrapOptions(mceProps.editorOptions)}
+            init={this.tinymceInitOptions}
             initialValue={mceProps.defaultContent}
             onInit={this.onInit}
             onClick={this.handleFocusEditor}
@@ -1510,6 +1606,7 @@ class RCEWrapper extends React.Component {
             onFocus={this.handleFocusEditor}
             onBlur={this.handleBlurEditor}
             onNodeChange={this.onNodeChange}
+            onEditorChange={this.onEditorChange}
           />
         </div>
         <StatusBar
@@ -1556,4 +1653,79 @@ class RCEWrapper extends React.Component {
   }
 }
 
+// standard: string of tinymce menu commands
+// e.g. 'instructure_links | inserttable instructure_media_embed | hr'
+// custom: a string of tinymce menu commands
+// returns: standard + custom with any duplicate commands removed from custom
+function mergeMenuItems(standard, custom) {
+  let c = custom?.trim?.()
+  if (!c) return standard
+
+  const s = new Set(standard.split(/[\s|]+/))
+  // remove any duplicates
+  c = c.split(/\s+/).filter(m => !s.has(m))
+  c = c
+    .join(' ')
+    .replace(/^\s*\|\s*/, '')
+    .replace(/\s*\|\s*$/, '')
+  return `${standard} | ${c}`
+}
+
+// standard: the incoming tinymce menu object
+// custom: tinymce menu object to merge into standard
+// returns: the merged result by mutating incoming standard arg.
+// It will add commands to existing menus, or add a new menu
+// if the custom one does not exist
+function mergeMenu(standard, custom) {
+  if (!custom) return standard
+
+  Object.keys(custom).forEach(k => {
+    const curr_m = standard[k]
+    if (curr_m) {
+      curr_m.items = mergeMenuItems(curr_m.items, custom[k].items)
+    } else {
+      standard[k] = {...custom[k]}
+    }
+  })
+  return standard
+}
+
+// standard: incoming tinymce toolbar array
+// custom: tinymce toolbar array to merge into standard
+// returns: the merged result by mutating the incoming standard arg.
+// It will add commands to existing toolbars, or add a new toolbar
+// if the custom one does not exist
+// This is a little awkward in that tinymce toolbar config does not
+// include a key to identify the individual toolbars, just a name
+// which is translated. The custom toolbar's name must be translated
+// in order to be merged correctly.
+function mergeToolbar(standard, custom) {
+  if (!custom) return standard
+
+  // merge given toolbar data into the default toolbar
+  custom.forEach(tb => {
+    const curr_tb = standard.find(t => formatMessage(tb.name) === t.name)
+    if (curr_tb) {
+      curr_tb.items.splice(curr_tb.items.length, 0, ...tb.items)
+    } else {
+      standard.push(tb)
+    }
+  })
+  return standard
+}
+
+// standard: incoming array of plugin names
+// custom: array of plugin names to merge
+// returns: the merged result, duplicates removed
+function mergePlugins(standard, custom) {
+  if (!custom) return standard
+
+  const union = new Set(standard)
+  for (const p of custom) {
+    union.add(p)
+  }
+  return [...union]
+}
+
 export default RCEWrapper
+export {toolbarPropType, menuPropType, mergeMenuItems, mergeMenu, mergeToolbar, mergePlugins}

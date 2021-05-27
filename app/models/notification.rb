@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Notification < ActiveRecord::Base
-  self.shard_category = :unsharded
-
+class Notification < Switchman::UnshardedRecord
   include Workflow
   include TextHelper
 

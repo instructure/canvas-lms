@@ -69,6 +69,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
     $comment: String!
     $fileIds: [ID!]
     $mediaObjectId: ID
+    $mediaObjectType: String
   ) {
     createSubmissionComment(
       input: {
@@ -77,6 +78,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
         comment: $comment
         fileIds: $fileIds
         mediaObjectId: $mediaObjectId
+        mediaObjectType: $mediaObjectType
       }
     ) {
       submissionComment {

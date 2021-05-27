@@ -93,6 +93,59 @@ describe('CommentTextArea', () => {
     })
   }
 
+  describe('Media Uploads', () => {
+    let createSubmissionComment
+    let mediaObject
+
+    beforeEach(() => {
+      createSubmissionComment = jest.fn()
+      mediaObject = {
+        id: 1,
+        name: 'Never Gonna Give You Up',
+        type: 'video/mp4'
+      }
+    })
+
+    function renderCommentTextArea(props) {
+      const ref = React.createRef()
+      render(
+        mockContext(
+          <MockedProvider>
+            <CommentTextArea {...props} ref={ref} />
+          </MockedProvider>
+        )
+      )
+      return ref.current
+    }
+
+    it('creates a media comment on successful upload', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const componentRef = renderCommentTextArea(props)
+      componentRef.handleMediaUpload(null, mediaObject, createSubmissionComment)
+      expect(createSubmissionComment).toHaveBeenCalled()
+    })
+
+    it('shows an error message if the upload fails', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const componentRef = renderCommentTextArea(props)
+      const error = {file: {size: 100}, maxFileSize: 250}
+      componentRef.handleMediaUpload(error, mediaObject, createSubmissionComment)
+      await waitFor(() =>
+        expect(mockedSetOnFailure).toHaveBeenCalledWith('Error uploading video/audio recording')
+      )
+    })
+
+    it('shows a specific file size error message if the upload fails due to size limits', async () => {
+      const props = await mockAssignmentAndSubmission()
+      const componentRef = renderCommentTextArea(props)
+      const error = {file: {size: 262144010}, maxFileSize: 250}
+      componentRef.handleMediaUpload(error, mediaObject, createSubmissionComment)
+      await waitFor(() =>
+        expect(mockedSetOnFailure).toHaveBeenCalledWith('File size exceeds the maximum of 250 MB')
+      )
+    })
+  })
+
   it('renders the CommentTextArea by default', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByText} = render(

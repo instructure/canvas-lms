@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shape, object, func, string, oneOfType, arrayOf, node} from 'prop-types'
+import {shape, object, func, string, oneOfType, arrayOf, node, bool} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -39,7 +39,8 @@ import {
   IconQuestionLine,
   IconInboxLine,
   IconCalendarMonthLine,
-  IconClockLine
+  IconClockLine,
+  IconHomeLine
 } from '@instructure/ui-icons'
 import I18n from 'i18n!MobileGlobalMenu'
 import HelpDialog from './HelpDialog/index'
@@ -70,11 +71,15 @@ export default class MobileGlobalMenu extends React.Component {
       ensureLoaded: func.isRequired,
       state: object.isRequired
     }).isRequired,
-    onDismiss: func.isRequired
+    onDismiss: func.isRequired,
+    k5User: bool,
+    isStudent: bool
   }
 
   static defaultProps = {
-    current_user: ENV.current_user
+    current_user: ENV.current_user,
+    k5User: ENV.K5_USER,
+    isStudent: ENV.current_user_roles?.every(role => role === 'student' || role === 'user')
   }
 
   UNSAFE_componentWillMount() {
@@ -98,6 +103,11 @@ export default class MobileGlobalMenu extends React.Component {
       if (isExpanded) this.props.DesktopNavComponent.ensureLoaded(type)
     }
 
+    const courses =
+      this.props.k5User && this.props.isStudent
+        ? this.props.DesktopNavComponent.state.courses.filter(c => !c.homeroom_course)
+        : this.props.DesktopNavComponent.state.courses
+
     return (
       <View
         display="block"
@@ -115,7 +125,9 @@ export default class MobileGlobalMenu extends React.Component {
           <Flex.Item grow shrink>
             <Heading>
               <a className="ic-brand-mobile-global-nav-logo" href="/">
-                <span className="screenreader-only">{I18n.t('My Dashboard')}</span>
+                <span className="screenreader-only">
+                  {this.props.k5User ? I18n.t('Homeroom') : I18n.t('My Dashboard')}
+                </span>
               </a>
             </Heading>
           </Flex.Item>
@@ -125,10 +137,16 @@ export default class MobileGlobalMenu extends React.Component {
             <Button variant="link" href="/" size="small" fluidWidth>
               <Flex>
                 <Flex.Item width="3rem">
-                  <IconDashboardLine inline={false} size="small" />
+                  {this.props.k5User ? (
+                    <IconHomeLine inline={false} size="small" />
+                  ) : (
+                    <IconDashboardLine inline={false} size="small" />
+                  )}
                 </Flex.Item>
                 <Flex.Item>
-                  <Text size="medium">{I18n.t('Dashboard')}</Text>
+                  <Text size="medium">
+                    {this.props.k5User ? I18n.t('Homeroom') : I18n.t('Dashboard')}
+                  </Text>
                 </Flex.Item>
               </Flex>
             </Button>
@@ -245,14 +263,16 @@ export default class MobileGlobalMenu extends React.Component {
                     <IconCoursesLine inline={false} size="small" color="brand" />
                   </Flex.Item>
                   <Flex.Item>
-                    <Text color="brand">{I18n.t('Courses')}</Text>
+                    <Text color="brand">
+                      {this.props.k5User ? I18n.t('Subjects') : I18n.t('Courses')}
+                    </Text>
                   </Flex.Item>
                 </Flex>
               }
             >
               <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
                 {this.props.DesktopNavComponent.state.coursesAreLoaded ? (
-                  this.props.DesktopNavComponent.state.courses
+                  courses
                     .map(course => (
                       <List.Item key={course.id}>
                         <Button variant="link" fluidWidth href={`/courses/${course.id}`}>
@@ -270,7 +290,7 @@ export default class MobileGlobalMenu extends React.Component {
                     .concat([
                       <List.Item key="all">
                         <Button variant="link" fluidWidth href="/courses">
-                          {I18n.t('All Courses')}
+                          {this.props.k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
                         </Button>
                       </List.Item>
                     ])

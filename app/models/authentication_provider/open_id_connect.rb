@@ -30,15 +30,16 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
   end
 
   def self.recognized_params
-    [ :client_id,
-      :client_secret,
-      :authorize_url,
-      :token_url,
-      :scope,
-      :login_attribute,
-      :end_session_endpoint,
-      :userinfo_endpoint,
-      :jit_provisioning ].freeze
+    super + 
+      [ :client_id,
+        :client_secret,
+        :authorize_url,
+        :token_url,
+        :scope,
+        :login_attribute,
+        :end_session_endpoint,
+        :userinfo_endpoint,
+        :jit_provisioning ].freeze
   end
 
   def self.recognized_federated_attributes

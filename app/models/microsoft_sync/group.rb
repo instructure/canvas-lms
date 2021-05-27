@@ -124,8 +124,11 @@ class MicrosoftSync::Group < ActiveRecord::Base
   def enqueue_future_sync
     return unless update_unless_deleted(workflow_state: :scheduled)
 
-    syncer_job.enqueue_future_sync(
-      run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', '10').to_i.minutes.from_now
-    )
+    syncer_job.delay(
+      singleton: "#{self.class.name}:#{global_id}:enqueue_future_sync",
+      run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', '10')
+              .to_i.minutes.from_now,
+      on_conflict: :overwrite
+    ).run_later
   end
 end

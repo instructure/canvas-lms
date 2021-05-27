@@ -110,7 +110,7 @@ const RCELoader = {
   loadRCE(cb = () => {}) {
     if (!loadingPromise) {
       loadingPromise = (window.ENV.use_rce_enhancements
-        ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce-and-a11y-checker')
+        ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
         : import(
             /* webpackChunkName: "canvas-rce-old-async-chunk" */ './canvas-rce-old-and-a11y-checker'
           )
@@ -242,6 +242,7 @@ const RCELoader = {
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
+      highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
       use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor
     }
   }

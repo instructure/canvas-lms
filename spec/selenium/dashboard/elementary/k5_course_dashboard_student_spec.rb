@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 
 describe "student k5 course dashboard" do
   include_context "in-process server selenium tests"
@@ -108,6 +108,17 @@ describe "student k5 course dashboard" do
       wait_for_ajaximations
 
       expect(assignment_page_title.text).to eq(@module_assignment_title)
+    end
+  end
+
+  context 'course resources tab' do
+    it 'shows the Important Info for subject resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@subject_course, important_info_text)
+      create_lti_resource("fake LTI")
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(important_info_content).to include_text(important_info_text)
     end
   end
 end

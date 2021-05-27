@@ -15,16 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import getCookie from 'get-cookie'
 
-const authenticity_token = () => getCookie('_csrf_token')
+const authenticityToken = () => getCookie('_csrf_token')
 
-$(document).on('submit', 'form', function() {
-  $(this)
-    .find('input[name="authenticity_token"]')
-    .val(authenticity_token())
-})
-
-// return a function to be used elsewhere
-export default authenticity_token
+export default authenticityToken

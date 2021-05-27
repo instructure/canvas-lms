@@ -26,6 +26,7 @@ function trap_result {
     echo_console_and_log "  /o\ Something went wrong. Check ${LOG} for details."
     _canvas_lms_telemetry_report_status $exit_code
   fi
+  trap - EXIT
   exit ${exit_code}
 }
 

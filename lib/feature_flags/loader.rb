@@ -60,7 +60,8 @@ module FeatureFlags
 
     def self.load_yaml_files
       result = {}
-      Dir.glob(Rails.root.join('config', 'feature_flags', "*.yml")).sort!.each do |path|
+      (Dir.glob(Rails.root.join('config', 'feature_flags', '*.yml')) +
+        Dir.glob(Rails.root.join('gems', 'plugins', '*', 'config', 'feature_flags', '*.yml'))).sort.each do |path|
         result.merge!(YAML.load_file(path))
       end
       result.each do |_name, definition|

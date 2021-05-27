@@ -24,14 +24,18 @@ module FeatureFlags
   end
 
   def feature_enabled?(feature)
+    return false if id&.zero?
+
     flag = lookup_feature_flag(feature)
     return flag.enabled? if flag
+
     false
   end
 
   def feature_allowed?(feature)
     flag = lookup_feature_flag(feature)
     return false unless flag
+
     flag.enabled? || flag.can_override?
   end
 

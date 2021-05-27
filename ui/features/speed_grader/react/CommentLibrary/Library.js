@@ -16,15 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {IconCommentLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {Tooltip} from '@instructure/ui-tooltip'
 import Tray from './Tray'
+import Suggestions from './Suggestions'
 import I18n from 'i18n!CommentLibrary'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const renderTooltip = () => (
+  <Tooltip renderTip={I18n.t('Comment Library (Suggestions Disabled)')} on={['hover']}>
+    <IconCommentLine />
+  </Tooltip>
+)
 
 const Library = ({
   comments,
@@ -32,9 +41,45 @@ const Library = ({
   onAddComment,
   onDeleteComment,
   isAddingComment,
-  removedItemIndex
+  removedItemIndex,
+  showSuggestions,
+  setShowSuggestions,
+  searchResults,
+  setFocusToTextArea,
+  updateComment
 }) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+
+  useEffect(() => {
+    const parent = document.getElementById('library-suggestions')?.parentNode
+    const handleBlur = event => {
+      if (!parent.contains(event.relatedTarget)) {
+        setShowResults(false)
+      }
+    }
+    if (parent) {
+      parent.addEventListener('focusout', handleBlur)
+      return () => {
+        parent.removeEventListener('focusout', handleBlur)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (showResults && searchResults.length === 0) {
+      setShowResults(false)
+    }
+    if (searchResults.length > 0) {
+      showFlashAlert({
+        message: I18n.t(
+          'There are new comment suggestions available. Press Tab to access the suggestions menu.'
+        ),
+        srOnly: true
+      })
+      setShowResults(true)
+    }
+  }, [searchResults]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCommentClick = comment => {
     if (isTrayOpen) {
@@ -42,6 +87,19 @@ const Library = ({
     }
     setComment(comment)
   }
+
+  const setCommentFromSuggestion = useCallback(
+    comment => {
+      setShowResults(false)
+      setComment(comment)
+    },
+    [setComment]
+  )
+
+  const closeSuggestions = useCallback(() => {
+    setShowResults(false)
+    setFocusToTextArea()
+  }, [setFocusToTextArea])
 
   return (
     <>
@@ -51,12 +109,20 @@ const Library = ({
             <Link
               isWithinText={false}
               onClick={() => setIsTrayOpen(true)}
-              renderIcon={<IconCommentLine />}
+              renderIcon={showSuggestions ? <IconCommentLine /> : renderTooltip()}
               iconPlacement="start"
             >
-              <ScreenReaderContent>{I18n.t('Open Comment Tray')}</ScreenReaderContent>
+              <ScreenReaderContent>{I18n.t('Open Comment Library')}</ScreenReaderContent>
               <PresentationContent>{I18n.n(comments.length)}</PresentationContent>
             </Link>
+            {showSuggestions && (
+              <Suggestions
+                searchResults={searchResults}
+                setComment={setCommentFromSuggestion}
+                closeSuggestions={closeSuggestions}
+                showResults={showResults}
+              />
+            )}
           </View>
         </Flex.Item>
       </Flex>
@@ -69,6 +135,9 @@ const Library = ({
         onDeleteComment={onDeleteComment}
         setIsOpen={setIsTrayOpen}
         removedItemIndex={removedItemIndex}
+        showSuggestions={showSuggestions}
+        setShowSuggestions={setShowSuggestions}
+        updateComment={updateComment}
       />
     </>
   )
@@ -85,7 +154,12 @@ Library.propTypes = {
   isAddingComment: PropTypes.bool.isRequired,
   onAddComment: PropTypes.func.isRequired,
   onDeleteComment: PropTypes.func.isRequired,
-  removedItemIndex: PropTypes.number
+  removedItemIndex: PropTypes.number,
+  showSuggestions: PropTypes.bool.isRequired,
+  setShowSuggestions: PropTypes.func.isRequired,
+  searchResults: PropTypes.array.isRequired,
+  setFocusToTextArea: PropTypes.func.isRequired,
+  updateComment: PropTypes.func.isRequired
 }
 
 export default Library

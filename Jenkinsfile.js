@@ -19,41 +19,11 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-def COFFEE_NODE_COUNT = 4
-def DEFAULT_NODE_COUNT = 1
-def JSG_NODE_COUNT = 3
-
-def copyFiles(dockerName, dockerPath, hostPath) {
-  sh "mkdir -vp ./$hostPath"
-  sh "docker cp \$(docker ps -qa -f name=$dockerName):/usr/src/app/$dockerPath ./$hostPath"
-}
-
-def makeKarmaStage(group, ciNode, ciTotal) {
-  return {
-    withEnv([
-      "CI_NODE_INDEX=${ciNode}",
-      "CI_NODE_TOTAL=${ciTotal}",
-      "CONTAINER_NAME=tests-karma-${group}-${ciNode}",
-      "JSPEC_GROUP=${group}"
-    ]) {
-      try {
-        sh 'build/new-jenkins/js/tests-karma.sh'
-      } finally {
-        copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-      }
-    }
-  }
-}
-
-def cleanupFn() {
-  timeout(time: 2) {
-    if(env.TEST_SUITE != 'upload') {
-      archiveArtifacts artifacts: 'tmp/**/*.xml'
-      junit "tmp/**/*.xml"
-    }
-  }
-}
+final COFFEE_NODE_COUNT = 4
+final DEFAULT_NODE_COUNT = 1
+final JSG_NODE_COUNT = 3
 
 def getLoadAllLocales() {
   return configuration.isChangeMerged() ? 1 : 0
@@ -69,11 +39,11 @@ pipeline {
 
   environment {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_DOCKER_CLI_BUILD=1
+    COMPOSE_DOCKER_CLI_BUILD = 1
     COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
-    DOCKER_BUILDKIT=1
+    DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
-    PROGRESS_NO_TRUNC=1
+    PROGRESS_NO_TRUNC = 1
     RAILS_LOAD_ALL_LOCALES = getLoadAllLocales()
   }
 
@@ -81,70 +51,49 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
-            stage('Setup') {
-              timeout(time: 3) {
-                sh 'rm -vrf ./tmp/*'
-                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+          def runnerStages = [:]
+          def stageHooks = [
+            onNodeAcquired: jsStage.&setupNode,
+          ]
 
-                checkoutRepo("canvas-lms", refspecToCheckout, 1)
+          extendedStage('Runner - Jest').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            def delegate = getDelegate()
+            def tests = [:]
 
-                credentials.withStarlordDockerLogin { ->
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
-                }
-              }
-            }
+            jsStage.queueJestStage(tests, delegate)
 
-            def postBuildHandler = [
-              onStageEnded: { _ ->
-                cleanupFn()
-              }
-            ]
-
-            extendedStage('Run Tests').hooks(postBuildHandler).obeysAllowStages(false).execute {
-              timeout(time: 10) {
-                script {
-                  def tests = [:]
-
-                  if(env.TEST_SUITE == 'jest') {
-                    tests['Jest'] = {
-                      withEnv(['CONTAINER_NAME=tests-jest']) {
-                        try {
-                          sh 'build/new-jenkins/js/tests-jest.sh'
-                        } finally {
-                          copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-                        }
-                      }
-                    }
-                  } else if(env.TEST_SUITE == 'coffee') {
-                    for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
-                      tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
-                    }
-                  } else if(env.TEST_SUITE == 'karma') {
-                    tests['Packages'] = {
-                      withEnv(['CONTAINER_NAME=tests-packages']) {
-                        try {
-                          sh 'build/new-jenkins/js/tests-packages.sh'
-                        } finally {
-                          copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
-                        }
-                      }
-                    }
-
-                    for(int i = 0; i < JSG_NODE_COUNT; i++) {
-                      tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
-                    }
-
-                    ['jsa', 'jsh'].each { group ->
-                      tests["Karma - Spec Group - ${group}"] = makeKarmaStage(group, 0, DEFAULT_NODE_COUNT)
-                    }
-                  }
-
-                  parallel(tests)
-                }
-              }
-            }
+            parallel(tests)
           }
+
+          extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            def delegate = getDelegate()
+            def tests = [:]
+
+            for (int i = 0; i < COFFEE_NODE_COUNT; i++) {
+              jsStage.queueKarmaStage(tests, delegate, 'coffee', i, COFFEE_NODE_COUNT)
+            }
+
+            parallel(tests)
+          }
+
+          extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            def delegate = getDelegate()
+            def tests = [:]
+
+            jsStage.queuePackagesStage(tests, delegate)
+
+            for (int i = 0; i < JSG_NODE_COUNT; i++) {
+              jsStage.queueKarmaStage(tests, delegate, 'jsg', i, JSG_NODE_COUNT)
+            }
+
+            ['jsa', 'jsh'].each { group ->
+              jsStage.queueKarmaStage(tests, delegate, group, 0, DEFAULT_NODE_COUNT)
+            }
+
+            parallel(tests)
+          }
+
+          parallel(runnerStages)
         }
       }
     }

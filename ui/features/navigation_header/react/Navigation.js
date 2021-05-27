@@ -37,7 +37,8 @@ const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
 const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
-const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
+const ACTIVE_ROUTE_REGEX =
+  /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 const TYPE_URL_MAP = {
@@ -266,9 +267,15 @@ export default class Navigation extends React.Component {
       case 'courses':
         return (
           <CoursesTray
-            courses={this.state.courses}
+            courses={
+              window.ENV.K5_USER &&
+              window.ENV.current_user_roles?.every(role => role === 'student' || role === 'user')
+                ? this.state.courses.filter(c => !c.homeroom_course)
+                : this.state.courses
+            }
             hasLoaded={this.state.coursesAreLoaded}
             closeTray={this.closeTray}
+            k5User={window.ENV.K5_USER}
           />
         )
       case 'groups':

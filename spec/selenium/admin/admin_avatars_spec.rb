@@ -135,7 +135,6 @@ describe "admin avatars" do
 
     before(:each) do
       @account = Account.default
-      @account.enable_feature!(:student_context_cards)
       @student = student_in_course.user
       @student.avatar_image_url = "http://www.example.com"
       Gradebook.visit(@course)

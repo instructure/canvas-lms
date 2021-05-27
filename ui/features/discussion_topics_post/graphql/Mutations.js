@@ -39,9 +39,15 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     $discussionEntryId: ID!
     $read: Boolean
     $rating: RatingInputType
+    $forcedReadState: Boolean
   ) {
     updateDiscussionEntryParticipant(
-      input: {discussionEntryId: $discussionEntryId, read: $read, rating: $rating}
+      input: {
+        discussionEntryId: $discussionEntryId
+        read: $read
+        rating: $rating
+        forcedReadState: $forcedReadState
+      }
     ) {
       discussionEntry {
         ...DiscussionEntry
@@ -64,9 +70,11 @@ export const DELETE_DISCUSSION_ENTRY = gql`
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
-export const PUBLISH_DISCUSSION_TOPIC = gql`
-  mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean) {
-    updateDiscussionTopic(input: {discussionTopicId: $discussionTopicId, published: $published}) {
+export const UPDATE_DISCUSSION_TOPIC = gql`
+  mutation updateDiscussionTopic($discussionTopicId: ID!, $published: Boolean, $locked: Boolean) {
+    updateDiscussionTopic(
+      input: {discussionTopicId: $discussionTopicId, published: $published, locked: $locked}
+    ) {
       discussionTopic {
         ...Discussion
       }
@@ -127,4 +135,17 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
   }
   ${DiscussionEntry.fragment}
   ${Error.fragment}
+`
+
+export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
+  mutation UpdateDiscsussionEntriesReadState($discussionEntryIds: [ID!]!, $read: Boolean!) {
+    updateDiscussionEntriesReadState(
+      input: {discussionEntryIds: $discussionEntryIds, read: $read}
+    ) {
+      discussionEntries {
+        ...DiscussionEntry
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
 `

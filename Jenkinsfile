@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-def FILES_CHANGED_STAGE = 'Detect Files Changed'
-def JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
-def LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
-def RUN_MIGRATIONS_STAGE = 'Run Migrations'
+final static FILES_CHANGED_STAGE = 'Detect Files Changed'
+final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
+final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
+final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -190,7 +190,7 @@ def getSlackChannel() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
 
-@groovy.transform.Field def CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
+@groovy.transform.Field final static CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
 
 def getCanvasBuildsRefspec() {
   def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
@@ -202,7 +202,7 @@ def getCanvasBuildsRefspec() {
   return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
 }
 
-@groovy.transform.Field def CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
+@groovy.transform.Field final static CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
   // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
   if (env.GERRIT_BRANCH.contains('stable/')) {
@@ -323,7 +323,7 @@ pipeline {
           maybeSlackSendRetrigger()
 
           def buildSummaryReportHooks = [
-            onStageEnded: { stageName, _, buildResult ->
+            onStageEnded: { stageName, stageConfig, buildResult ->
               if (buildResult) {
                 buildSummaryReport.addFailureRun(stageName, buildResult)
                 buildSummaryReport.addRunTestActions(stageName, buildResult)
@@ -333,7 +333,7 @@ pipeline {
           ]
 
           def postBuildHandler = [
-            onStageEnded: { _, stageConfig ->
+            onStageEnded: { stageName, stageConfig ->
               buildSummaryReport.addFailureRun('Main Build', currentBuild)
               postFn(stageConfig.status())
             }
@@ -371,23 +371,25 @@ pipeline {
               extendedStage('Setup')
                 .obeysAllowStages(false)
                 .timeout(2)
-                .execute({ setupStage() })
+                .execute { setupStage() }
 
               extendedStage('Rebase')
                 .obeysAllowStages(false)
                 .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
                 .timeout(2)
-                .execute({ rebaseStage() })
+                .execute { rebaseStage() }
 
               extendedStage(FILES_CHANGED_STAGE)
                 .obeysAllowStages(false)
                 .timeout(2)
                 .execute { stageConfig ->
                   stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
+                  stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
+                  stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
                   stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
 
                   dir(env.LOCAL_WORKDIR) {
-                    stageConfig.value('specFiles', sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)
+                    stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
                   }
 
                   // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
@@ -413,9 +415,9 @@ pipeline {
               extendedStage(RUN_MIGRATIONS_STAGE)
                 .obeysAllowStages(false)
                 .timeout(10)
-                .execute({ runMigrationsStage() })
+                .execute { runMigrationsStage() }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { _, buildConfig ->
+              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                 def stages = [:]
 
                 extendedStage('Consumer Smoke Test').queue(stages) {
@@ -432,7 +434,7 @@ pipeline {
               }
             }
 
-            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('Local Docker Dev Build')
@@ -446,25 +448,10 @@ pipeline {
             extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
               def nestedStages = [:]
 
-              extendedStage('Javascript (Jest)')
+              extendedStage('Javascript')
                 .hooks(buildSummaryReportHooks)
                 .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                   string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'jest'),
-                ])
-
-              extendedStage('Javascript (Coffeescript)')
-                .hooks(buildSummaryReportHooks)
-                .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                  string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'coffee'),
-                ])
-
-              extendedStage('Javascript (Karma)')
-                .hooks(buildSummaryReportHooks)
-                .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                  string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                  string(name: 'TEST_SUITE', value: 'karma'),
                 ])
 
               parallel(nestedStages)
@@ -481,7 +468,7 @@ pipeline {
                 .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])
                 .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
                 .required(!configuration.isChangeMerged())
-                .execute {
+                .execute { stageConfig, buildConfig ->
                   def nestedStages = [:]
 
                   extendedStage('Linters - Code')
@@ -495,14 +482,18 @@ pipeline {
                     .queue(nestedStages, lintersStage.&webpackStage)
 
                   extendedStage('Linters - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('yarnFiles'))
                     .queue(nestedStages, lintersStage.&yarnStage)
+
+                  extendedStage('Linters - Groovy')
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('groovyFiles'))
+                    .queue(nestedStages, lintersStage.&groovyStage)
 
                   parallel(nestedStages)
                 }
             }
 
-            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { _, buildConfig ->
+            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('CDC Schema Check')
@@ -537,7 +528,6 @@ pipeline {
                   string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                 ])
 
-
               rspecStage.createDistribution(nestedStages)
 
               parallel(nestedStages)
@@ -545,8 +535,8 @@ pipeline {
 
             parallel(rootStages)
           }
-        }//script
-      }//steps
-    }//environment
-  }//stages
-}//pipeline
+        } //script
+      } //steps
+    } //environment
+  } //stages
+} //pipeline

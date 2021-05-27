@@ -1,20 +1,14 @@
 # Canvas Rich Content Editor
 
-_WARNING:_ While our intent is to make the RCE avaiable outside of
-canvas-lms, it currently has dependencies on canvas that make that
-impossible. Please be patient.
-
----
-
 The Canvas LMS Rich Content Editor extracted in it's own npm package for use
-across multiple services. This npm module is used in pair with a running
-`canvas-rce-api` microservice.
+across multiple services. In the canvas ecosystem, this npm module is used
+in pair with a running `canvas-rce-api` microservice.
 
-You need a running instance of the `canvas-rce-api` in order to utilize
-the `canvas-rce` npm module, but you do not need that instance in order to
+Some features require a running instance of the `canvas-rce-api`,
+but you do not need that instance in order to
 do development on `canvas-rce`. (see [docs/development.md](docs/development.md))
 
-The first customer of the `canvas-rce` was the `canvas-lms` LMS so documentation
+The first customer of the `canvas-rce` is the `canvas-lms` LMS so documentation
 and references throughout documentation might reflect and assume the use of
 `canvas-lms`.
 
@@ -27,18 +21,44 @@ the following:
 npm install canvas-rce --save
 ```
 
-Please reference the [canvas-lms use of canvas-rce](https://github.com/instructure/canvas-lms/tree/stable/ui/shared/rce)
+For guidance on how `canvas-rce` is used within canvas, please reference
+the [canvas-lms use of canvas-rce](https://github.com/instructure/canvas-lms/tree/stable/ui/shared/rce)
 to get an idea on how to incorporate it into your project. Pay
 special attention to the `RichContentEditor.js` and `serviceRCELoader.js`.
 
+Outside of canvas, the `CanvasRce` React component is your entry point.
+_Work is ongoing to make the props to `CanvasRce` more rational.
+Please be patient._
+
 ## Tests
 
-Jest tests are run against the .cjs version of the source, so make sure you've built the .cjs assets before running tests:
+While canvas consumes the es modules build of the rce,
+Jest tests are run against the commonjs build, so make sure you've built the
+commonjs assets before running tests:
 
 ```bash
-npm run build:canvas
-npm run test:jest
+yarn build:canvas
+yarn test:jest
 ```
+
+There are still legacy mocha tests run with `yarn test:mocha`. `yarn test` runs them all.
+
+### test debugging hints
+
+```
+yarn test:jest:debug path/to/__test__/file.test.js
+```
+
+will break and wait for you to attach a debugger (e.g. `chrome://inspect/#devices`).
+
+Similarly, for mocha tests
+
+```
+yarn test:mocha:debug path/to/test/file.test.js
+```
+
+Both those commands may include a `--watch` argument to keep the process alive
+while you iterate.
 
 ## Polyfills
 
@@ -47,7 +67,9 @@ Array.prototype.includes, etc. which are present in modern
 browsers but may not be present in old browsers like IE 11. In order to not
 send unnecessarily large and duplicated code bundles to the browser, consumers
 are expected to have already globally polyfilled those APIs.
-Canvas already does this but if you need suggestions for how to this in your
+Canvas only supports modern browsers and the rce has not been tested
+in older browsers like IE. If you need suggestions for how to include
+polyfills in your
 own app, you can just put this in your html above the script that includes
 canvas-rce:
 

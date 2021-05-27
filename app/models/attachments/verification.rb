@@ -108,6 +108,12 @@ class Attachments::Verification
     if verifier == attachment.uuid
       InstStatsd::Statsd.increment("attachments.legacy_verifier_success")
       return true
+    elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?
+      # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
+      # (meaning another copy of the same file, to deal with a question bank migration issue in which
+      # the source file's verifier remains in the URL)
+      InstStatsd::Statsd.increment("attachments.related_verifier_success")
+      return true
     end
 
     body = decode_verifier(verifier)

@@ -21,7 +21,7 @@ import $ from 'jquery'
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
-    extensions: ['color.js']
+    extensions: ['autoload-all.js']
   },
   tex2jax: {
     ignoreClass: 'mathjax_ignore'

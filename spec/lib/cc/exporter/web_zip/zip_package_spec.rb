@@ -799,6 +799,34 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{type: "file", name: "amazing_file.txt", size: 26, files: nil}]
       end
 
+      it 'should export media files linked from other linked items' do
+        media = add_file(fixture_file_upload('files/292.mp3', 'audio/mpeg'), @course, '292.mp3')
+        image =
+          add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, 'cn_image.jpg')
+        text =
+          add_file(
+            fixture_file_upload('files/amazing_file.txt', 'plain/txt'),
+            @course,
+            'amazing_file.txt'
+          )
+        page =
+          @course.wiki_pages.create!(
+            title: 'Home Page',
+            wiki: @course.wiki,
+            body:
+              "<p><iframe style=\"width: 320px; height: 14.25rem; display: inline-block;\" title=\"Audio player for 292.mp3\" data-media-type=\"audio\" src=\"/media_objects_iframe?mediahref=/files/#{media.id}/download&amp;type=audio?type=audio\" data-media-id=\"maybe\"></iframe><img src=\"/courses/#{@course.id}/files/#{image.id}/preview\" alt=\"cn_image.jpg\"</p>" \
+                "<p><a class=\"instructure_file_link instructure_scribd_file\" title=\"amazing_file.txt\" href=\"/courses/#{@course.id}/files/#{text.id}?wrap=1\" target=\"_blank\" data-canvas-previewable=\"true\">amazing_file.txt</a>&nbsp;</p>"
+          )
+        @module.content_tags.create!(content: page, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:pages].length).to eq 1
+        expect(course_data[:files]).to include(
+          { type: 'file', name: '292.mp3', size: 123716, files: nil },
+          { type: 'file', name: 'cn_image.jpg', size: 30339, files: nil },
+          { type: 'file', name: 'amazing_file.txt', size: 26, files: nil }
+        )
+      end
+
       it "should handle circle-linked items" do
         assign = @course.assignments.create!(title: 'Assignment 1',
           description: "<a href=\"/courses/#{@course.id}/pages/page-1\">Link</a>")

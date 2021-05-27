@@ -21,15 +21,11 @@ import Gradebook from '../Gradebook'
 export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
     api_max_per_page: 50,
-    // TODO: remove `assignment_groups_url` with TALLY-831
-    assignment_groups_url: '/api/v1/courses/1201/assignment_groups',
     chunk_size: 50,
     closed_grading_period_ids: [],
     colors: {},
     context_allows_gradebook_uploads: true,
     context_id: '1',
-    // TODO: remove `context_modules_url` with TALLY-831
-    context_modules_url: '/api/v1/courses/1201/modules',
     context_url: '/courses/1/',
 
     course_settings: {
@@ -38,10 +34,6 @@ export function createGradebook(options = {}) {
     },
 
     currentUserId: '1',
-    // TODO: remove `custom_column_data_url` with TALLY-831
-    custom_column_data_url: '/api/v1/courses/1201/custom_gradebook_columns/:id/data',
-    // TODO: remove `custom_columns_url` with TALLY-831
-    custom_columns_url: '/api/v1/courses/1201/custom_gradebook_columns',
     dataloader_improvements: true,
     default_grading_standard: [
       ['A', 0.9],
@@ -90,10 +82,6 @@ export function createGradebook(options = {}) {
     settings_update_url: '/path/to/settingsUpdateUrl',
     speed_grader_enabled: true,
     student_groups: [],
-    // TODO: remove `students_stateless_url` with TALLY-831
-    students_stateless_url: '/api/v1/courses/1201/users',
-    // TODO: remove `submissions_url` with TALLY-831
-    submissions_url: '/api/v1/courses/1201/students/submissions',
     ...options
   })
 

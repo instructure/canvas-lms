@@ -77,15 +77,22 @@ class Enrollment::BatchStateUpdater
   end
 
   # bulk version of Enrollment.destroy
-  def self.mark_enrollments_as_deleted(batch, sis_batch: nil, batch_mode: false)
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: 'deleted', batch_mode_delete: batch_mode)
-    updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
-    updates[:sis_batch_id] = sis_batch.id if sis_batch
-    Enrollment.where(id: batch).update_all_locked_in_order(updates)
+  def self.mark_enrollments_as_deleted(batch, **kwargs)
+    data = mark_enrollments_as_state(batch, workflow_state: 'deleted', **kwargs)
     EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
     # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
     # _and_ the fact that the former runs first
     Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).update_all_locked_in_order(workflow_state: 'deleted', updated_at: Time.zone.now)
+    data
+  end
+
+  # updates enrollment objects to a workflow_state and generates sis_batch_data
+  # and assigns sis_batch_id if there is a sis_batch.
+  def self.mark_enrollments_as_state(batch, workflow_state:, sis_batch: nil, batch_mode: false)
+    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
+    updates = {workflow_state: workflow_state, updated_at: Time.now.utc}
+    updates[:sis_batch_id] = sis_batch.id if sis_batch
+    Enrollment.where(id: batch).update_all_locked_in_order(updates)
     data
   end
 
@@ -204,20 +211,16 @@ class Enrollment::BatchStateUpdater
 
   # this is to be used for enrollments that just changed workflow_states but are
   # not deleted. This also skips notifying users.
-  def self.run_call_backs_for(batch, root_account=nil)
+  def self.run_call_backs_for(batch, root_account:, n_strand_root: "restore_states_enrollment_states")
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     return if batch.empty?
-    root_account ||= Enrollment.where(id: batch).take&.root_account
-    return unless root_account
     EnrollmentState.delay_if_production(run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
-       n_strand: ["restore_states_enrollment_states", root_account.global_id],
+       n_strand: [n_strand_root, root_account.global_id],
        max_attempts: 2).
       force_recalculation(batch)
     students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
     user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
     courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
-    root_account ||= courses.first.root_account
-    return unless root_account
     touch_and_update_associations(user_ids)
     update_linked_enrollments(students, restore: true)
     needs_grading_count_updated(courses)
@@ -225,5 +228,19 @@ class Enrollment::BatchStateUpdater
     update_cached_due_dates(students)
     touch_all_graders_if_needed(students)
     sync_microsoft_group(courses, root_account)
+  end
+
+  def self.update_batch_state(batch, root_account:, **kwargs)
+    data = mark_enrollments_as_state(batch, **kwargs)
+    run_call_backs_for(batch, root_account: root_account, n_strand_root: 'batch_mode_for')
+    data
+  end
+
+  def self.complete_batch(batch, **kwargs)
+    update_batch_state(batch, workflow_state: 'completed', **kwargs)
+  end
+
+  def self.inactivate_batch(batch, **kwargs)
+    update_batch_state(batch, workflow_state: 'inactive', **kwargs)
   end
 end

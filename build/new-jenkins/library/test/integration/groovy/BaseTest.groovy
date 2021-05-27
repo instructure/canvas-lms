@@ -1,3 +1,4 @@
+/* groovylint-disable PublicInstanceField */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,7 +21,7 @@ import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.Rule
-import com.lesfurets.jenkins.unit.*
+import com.lesfurets.jenkins.unit.BasePipelineTest
 
 class BaseTest extends BasePipelineTest {
   // Implement a rule to intercept test failures and print the callStack

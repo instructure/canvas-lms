@@ -216,11 +216,11 @@ describe DiscussionEntry do
       topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
       topic.subscribe(@student)
       entry = topic.discussion_entries.new(:user => @teacher, :message => "Oh, and another thing...")
-      entry.mentions.new(user: @student, root_account_id: @course.root_account_id)
+      mention = entry.mentions.new(user: @student, root_account_id: @course.root_account_id)
       entry.save! # also saves the mention.
-      expect(entry.messages_sent[@notification_name]).to be_blank
-      expect(entry.messages_sent[@notification_mention]).not_to be_blank
-      expect(entry.messages_sent["Announcement Reply"]).to be_blank
+      expect(mention.messages_sent[@notification_name]).to be_blank
+      expect(mention.messages_sent[@notification_mention]).not_to be_blank
+      expect(mention.messages_sent["Announcement Reply"]).to be_blank
     end
 
   end

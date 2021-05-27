@@ -65,6 +65,15 @@ describe Types::DiscussionEntryType do
     expect(result[0]).to eq de.message
   end
 
+  it 'allows querying for discussion subentries with sort' do
+    discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
+    de1 = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry 1', user: @teacher, parent_id: discussion_entry.id)
+
+    result = discussion_entry_type.resolve('discussionSubentriesConnection(sortOrder: desc) { nodes { message } }')
+    expect(result.count).to be 2
+    expect(result[0]).to eq de1.message
+  end
+
   it 'allows querying for the last subentry' do
     de = discussion_entry
     4.times do |i|
@@ -112,6 +121,38 @@ describe Types::DiscussionEntryType do
       expect(type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
 
       expect(discussion_entry_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
+    end
+  end
+
+  describe "forced_read_state attribute" do
+    context "forced_read_state is nil" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:nil})
+      end
+
+      it 'returns false' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+      end
+    end
+
+    context "forced_read_state is false" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:false})
+      end
+
+      it 'returns false' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be false
+      end
+    end
+
+    context "forced_read_state is true" do
+      before do
+        discussion_entry.update_or_create_participant({current_user:@teacher, forced:true})
+      end
+      
+      it 'returns true' do
+        expect(discussion_entry_type.resolve("forcedReadState")).to be true
+      end
     end
   end
 end

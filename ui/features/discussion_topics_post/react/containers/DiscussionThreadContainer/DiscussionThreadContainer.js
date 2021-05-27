@@ -28,21 +28,19 @@ import {
 } from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
-import {PER_PAGE} from '../../utils/constants'
+import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {
-  isGraded,
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   addReplyToSubentries,
@@ -81,8 +79,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const AUTO_MARK_AS_READ_DELAY = 3000
-
+  const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -92,9 +89,9 @@ export const DiscussionThreadContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
-    addReplyToDiscussion(cache, props.discussionTopicGraphQLId, newDiscussionEntry)
+    addReplyToDiscussion(cache, props.discussionTopicGraphQLId)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, props.discussionEntry._id, newDiscussionEntry)
+    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -159,31 +156,21 @@ export const DiscussionThreadContainer = props => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        read: !props.discussionEntry.read
+        read: !props.discussionEntry.read,
+        forcedReadState: props.discussionEntry.read || null
       }
     })
   }
-
-  const markAsRead = useCallback(() => {
-    setTimeout(
-      updateDiscussionEntryParticipant({
-        variables: {
-          discussionEntryId: props.discussionEntry._id,
-          read: true
-        }
-      }),
-      AUTO_MARK_AS_READ_DELAY
-    )
-  }, [updateDiscussionEntryParticipant, props.discussionEntry._id])
 
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
 
   const threadActions = []
-  if (!props.discussionEntry.deleted) {
+  if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
+        authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
           setEditorExpanded(!editorExpanded)
@@ -200,6 +187,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry.id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={toggleRating}
+        authorName={props.discussionEntry.author.name}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -270,6 +258,7 @@ export const DiscussionThreadContainer = props => {
             setIsEditing(false)
           }}
           onSave={onUpdate}
+          isForcedRead={props.discussionEntry.forcedReadState}
         >
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </PostMessage>
@@ -277,14 +266,14 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  // TODO: Change this to the new canGrade permission.
-  const canGrade =
-    (isGraded(props.assignment) && props.discussionEntry.permissions?.update) || false
-
   // Scrolling auto listener to mark messages as read
   useEffect(() => {
-    if (!props.discussionEntry.read) {
-      const observer = new IntersectionObserver(markAsRead, {
+    if (
+      !ENV.manual_mark_as_read &&
+      !props.discussionEntry.read &&
+      !props.discussionEntry?.forcedReadState
+    ) {
+      const observer = new IntersectionObserver(() => props.markAsRead(props.discussionEntry._id), {
         root: null,
         rootMargin: '0px',
         threshold: 0.1
@@ -296,14 +285,11 @@ export const DiscussionThreadContainer = props => {
         if (threadRef.current) observer.unobserve(threadRef.current)
       }
     }
-  }, [threadRef, markAsRead, props.discussionEntry.read])
+  }, [threadRef, props.discussionEntry.read, props])
 
   return (
     <>
-      <div
-        style={{marginLeft: marginDepth, paddingLeft: theme.variables.spacing.small}}
-        ref={threadRef}
-      >
+      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
             {renderPostMessage()}
@@ -323,7 +309,7 @@ export const DiscussionThreadContainer = props => {
                     : null
                 }
                 onOpenInSpeedGrader={
-                  canGrade
+                  props.discussionEntry.permissions?.speedGrader
                     ? () => {
                         window.location.assign(
                           getSpeedGraderUrl(
@@ -335,6 +321,19 @@ export const DiscussionThreadContainer = props => {
                       }
                     : null
                 }
+                goToParent={
+                  props.depth === 0
+                    ? null
+                    : () => {
+                        const topOffset = props.parentRef.current.offsetTop
+                        window.scrollTo(0, topOffset - 44)
+                      }
+                }
+                goToTopic={() => {
+                  setTimeout(() => {
+                    window.scrollTo(0, 0)
+                  })
+                }}
               />
             </Flex.Item>
           )}
@@ -370,6 +369,8 @@ export const DiscussionThreadContainer = props => {
           discussionTopicGraphQLId={props.discussionTopicGraphQLId}
           discussionEntryId={props.discussionEntry._id}
           depth={props.depth + 1}
+          markAsRead={props.markAsRead}
+          parentRef={threadRef}
         />
       )}
       {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
@@ -397,9 +398,11 @@ export const DiscussionThreadContainer = props => {
 
 DiscussionThreadContainer.propTypes = {
   discussionTopicGraphQLId: PropTypes.string,
-  discussionEntry: DiscussionEntry.shape,
+  discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
-  assignment: Assignment.shape
+  assignment: Assignment.shape,
+  markAsRead: PropTypes.func,
+  parentRef: PropTypes.object
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -411,9 +414,11 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
+  const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    perPage: PER_PAGE
+    perPage: PER_PAGE,
+    sort
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables
@@ -437,6 +442,8 @@ const DiscussionSubentries = props => {
       assignment={discussionTopic?.assignment}
       discussionEntry={entry}
       discussionTopicGraphQLId={props.discussionTopicGraphQLId}
+      markAsRead={props.markAsRead}
+      parentRef={props.parentRef}
     />
   ))
 }
@@ -444,5 +451,7 @@ const DiscussionSubentries = props => {
 DiscussionSubentries.propTypes = {
   discussionTopicGraphQLId: PropTypes.string,
   discussionEntryId: PropTypes.string,
-  depth: PropTypes.number
+  depth: PropTypes.number,
+  markAsRead: PropTypes.func,
+  parentRef: PropTypes.object
 }

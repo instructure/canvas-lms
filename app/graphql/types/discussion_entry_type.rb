@@ -48,6 +48,13 @@ module Types
       end
     end
 
+    field :forced_read_state, Boolean, null: true
+    def forced_read_state
+      Loaders::AssociationLoader.for(DiscussionEntryParticipant, :discussion_entry_participants).load(object).then do |deps|
+        !!deps.find_by(user: current_user)&.forced_read_state
+      end
+    end
+
     field :author, Types::UserType, null: false
     def author
       load_association(:user)
@@ -73,9 +80,14 @@ module Types
       load_association(:discussion_topic)
     end
 
-    field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true
-    def discussion_subentries_connection
-      load_association(:discussion_subentries)
+    field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
+      argument :sort_order, DiscussionSortOrderType, required: false
+    end
+    def discussion_subentries_connection(sort_order: :asc)
+      Loaders::DiscussionEntryLoader.for(
+        current_user: current_user,
+        sort_order: sort_order
+      ).load(object)
     end
 
     field :parent, Types::DiscussionEntryType, null: true

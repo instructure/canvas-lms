@@ -47,7 +47,12 @@ export const DiscussionEdit = props => {
       <Flex margin="small none none none">
         <Flex.Item shouldGrow shouldShrink textAlign="end">
           <Button
-            onClick={props.onCancel}
+            onClick={() => {
+              if (props.onCancel) {
+                props.onCancel()
+              }
+              setRCEText('')
+            }}
             display="inline-block"
             color="secondary"
             data-testid="DiscussionEdit-cancel"
@@ -59,6 +64,7 @@ export const DiscussionEdit = props => {
               if (props.onSubmit) {
                 props.onSubmit(getRCEText())
               }
+              setRCEText('')
             }}
             display="inline-block"
             color="primary"

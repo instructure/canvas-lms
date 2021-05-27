@@ -24,7 +24,8 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'new_discussion_mention' do
   before :once do
     discussion_topic_model
-    @object = @topic.discussion_entries.create!(user: user_model)
+    entry = @topic.discussion_entries.create!(user: user_model)
+    @object = entry.mentions.create!(user: @user, root_account: entry.root_account)
   end
 
   let(:asset) { @object }

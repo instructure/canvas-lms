@@ -53,6 +53,11 @@ withLongGroupName.args = {
   }
 }
 
+export const withLongSearch = Template.bind({})
+withLongSearch.args = {
+  searchString: 'This is a very long search '.repeat(7)
+}
+
 export const withSpaceSeparatedGroupName = Template.bind({})
 withSpaceSeparatedGroupName.args = {
   collection: {

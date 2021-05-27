@@ -24,7 +24,7 @@ class PseudonymSession < Authlogic::Session::Base
   last_request_at_threshold LAST_REQUEST_WINDOW
   verify_password_method :valid_arbitrary_credentials?
   login_field :unique_id
-  find_by_login_method :custom_find_by_unique_id
+  record_selection_method :custom_find_by_unique_id
   remember_me_for 2.weeks
   allow_http_basic_auth false
   consecutive_failed_logins_limit 0

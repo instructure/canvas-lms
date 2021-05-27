@@ -26,13 +26,14 @@ module K5Mode
 
   private
 
-  def set_k5_mode
-    @k5_mode = @context.try(:elementary_subject_course?)
+  # Setting :require_k5_theme will enable k5 theming on the page as long as user is a k5 user, even if the current
+  # context is not a k5 course. Intended for use on pages that are not in a course context (like the courses index)
+  def set_k5_mode(require_k5_theme: false)
     # Only students should see the details view
-    @k5_details_view = @k5_mode && @context.try(:students)&.include?(@current_user)
+    @k5_details_view = @context.try(:elementary_subject_course?) && @context.try(:students)&.include?(@current_user)
     @show_left_side = !@k5_details_view
 
-    if @context.try(:elementary_enabled?)
+    if @context.try(:elementary_enabled?) || (require_k5_theme && k5_user?)
       css_bundle :k5_theme
       js_bundle :k5_theme
     elsif @context.try(:feature_enabled?, :canvas_k6_theme)

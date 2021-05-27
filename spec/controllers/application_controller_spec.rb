@@ -20,6 +20,7 @@
 
 require_relative '../spec_helper'
 require_relative '../lti_1_3_spec_helper'
+require_relative '../helpers/k5_common'
 
 RSpec.describe ApplicationController do
   before :each do
@@ -151,6 +152,7 @@ RSpec.describe ApplicationController do
     describe "ENV.DIRECT_SHARE_ENABLED" do
       before :each do
         allow(controller).to receive(:user_display_json)
+        allow(controller).to receive('api_v1_course_ping_url').and_return({})
         controller.instance_variable_set(:@domain_root_account, Account.default)
       end
 
@@ -170,6 +172,15 @@ RSpec.describe ApplicationController do
         course_with_teacher(:active_all => true)
         controller.instance_variable_set(:@current_user, @teacher)
         controller.instance_variable_set(:@context, group_model)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+
+      it "sets the env var to false when the user can't use it in a course context" do
+        course_with_student(:active_all => true)
+        course = @course
+        course_with_teacher(:active_all => true, user: @student)
+        controller.instance_variable_set(:@current_user, @student)
+        controller.instance_variable_set(:@context, course)
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
       end
     end
@@ -365,51 +376,61 @@ RSpec.describe ApplicationController do
       end
     end
 
+    context "comment_library_suggestions_enabled" do
+      before(:each) do
+        user_factory
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        controller.instance_variable_set(:@current_user, @user)
+        allow(controller).to receive(:user_display_json).and_return({})
+      end
+
+      it "is false by default" do
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq false
+      end
+
+      it "is true if user enables suggestions" do
+        @user.preferences[:comment_library_suggestions_enabled] = true
+        @user.save!
+        expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq true
+      end
+    end
+
     context "canvas for elementary" do
       let(:course) {create_course}
-      let(:canvas_for_elem_flag) {course.root_account.feature_enabled?(:canvas_for_elementary)}
 
       before(:each) do
         controller.instance_variable_set(:@context, course)
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
       end
 
-      after(:each) do
-        course.root_account.set_feature_flag!(:canvas_for_elementary, canvas_for_elem_flag ? 'on' : 'off')
-      end
-
-      describe "HOMEROOM_COURSE" do
-        describe "with canvas_for_elementary flag on" do
-          before(:once) do
-            course.root_account.enable_feature!(:canvas_for_elementary)
-          end
-
+      describe "K5_HOMEROOM_COURSE" do
+        describe "with canvas_for_elementary account setting on" do
           it "is true if the course is a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
             course.homeroom_course = true
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_truthy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_truthy
           end
 
           it "is false if the course is a homeroom course and not in a K-5 account" do
             course.homeroom_course = true
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
           end
 
-          it "is false if the course is not a homeroom course and n a K-5 account" do
+          it "is false if the course is not a homeroom course and in a K-5 account" do
             course.account.settings[:enable_as_k5_account] = {value: true}
-            expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+            expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
           end
         end
 
-        it "is false with the canvas_for_elementary flag off" do
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+        it "is false with the canvas_for_elementary account setting off" do
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
 
           course.homeroom_course = true
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
 
           course.homeroom_course = false
           course.account.settings[:enable_as_k5_account] = {value: true}
-          expect(@controller.js_env[:HOMEROOM_COURSE]).to be_falsy
+          expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
         end
       end
     end
@@ -1493,6 +1514,8 @@ RSpec.describe ApplicationController do
 end
 
 describe ApplicationController do
+  include K5Common
+
   describe "flash_notices" do
     it 'should return notice text for each type' do
       [:error, :warning, :info, :notice].each do |type|
@@ -2020,8 +2043,45 @@ describe ApplicationController do
       expect(@controller.use_new_math_equation_handling?).to be_truthy
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
     end
+  end
 
+  describe "k5_user? helper" do
+    before :once do
+      course_with_student :active_all => true
+      toggle_k5_setting(@course.account)
+    end
 
+    before :each do
+      user_session(@student)
+      @controller.instance_variable_set(:@current_user, @student)
+      @controller.instance_variable_set(:@domain_root_account, @course.root_account)
+    end
+
+    it "caches the result after computing" do
+      enable_cache do
+        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @student, batched_keys: [:k5_user]) do
+          "cached :)"
+        end
+        expect(@controller.send(:k5_user?)).to eq "cached :)"
+      end
+    end
+
+    it "returns true if associated with a k5 account" do
+      expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns false if not associated with a k5 account" do
+      @course.account.settings[:enable_as_k5_account] = {value: false}
+      @course.account.save!
+      @course.root_account.settings[:k5_accounts] = []
+      @course.root_account.save!
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns false if no current user" do
+      @controller.instance_variable_set(:@current_user, nil)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
   end
 end
 

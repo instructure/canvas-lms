@@ -92,6 +92,10 @@ export default class RosterView extends Backbone.View {
     return ENV.canManageCourse
   }
 
+  canAddGroupSet() {
+    return ENV.canAddGroupSet
+  }
+
   toJSON() {
     return this
   }

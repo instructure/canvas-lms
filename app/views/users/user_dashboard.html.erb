@@ -16,7 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% provide :page_title do %><%= t('Dashboard') %><% end %>
+<%
+  if k5_user?
+    dashboard_title = t('Homeroom')
+  else
+    dashboard_title = t('Dashboard')
+  end
+%>
+
+<% provide :page_title do %><%= dashboard_title %><% end %>
 <%
   if show_planner?
     # fire off these `fetch` requests now so they are ready sooner
@@ -26,7 +34,7 @@
     end_of_week = Time.zone.now.end_of_week(:sunday).utc.iso8601(3)
     next_year = Time.zone.now.utc.at_beginning_of_day.years_since(1).iso8601
     last_year = Time.zone.now.utc.at_beginning_of_day.years_ago(1).iso8601
-    if @k5_mode
+    if k5_user?
 %>
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&order=asc&per_page=1") %>
     <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&order=desc&per_page=1") %>
@@ -42,7 +50,7 @@
 <% end %>
 
 <% provide :right_side do %>
-  <% if !show_planner? and !@k5_mode %>
+  <% if !show_planner? and !k5_user? %>
     <div class="placeholder"></div>
   <% end %>
 <% end %>
@@ -50,12 +58,12 @@
 <div id="dashboard" class="ic-dashboard-app">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
-  <% if @k5_mode %>
+  <% if k5_user? %>
     <div id="dashboard-app-container"></div>
   <% else %>
     <div id="dashboard_header_container" class="ic-Dashboard-header">
       <h1 class="ic-Dashboard-header__title hidden-phone">
-        <%= t('Dashboard') %>
+        <%= dashboard_title %>
       </h1>
     </div>
     <% if planner_enabled? %>

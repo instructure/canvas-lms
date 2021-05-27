@@ -88,7 +88,7 @@ FilesApp.render = function () {
       <header>
         <h1 className="screenreader-only">{I18n.t('Files')}</h1>
       </header>
-      {!window.ENV.K5_MODE && (
+      {!window.ENV.K5_SUBJECT_COURSE && (
         <div className="ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print">
           <button
             className="Button Button--link ic-app-course-nav-toggle"

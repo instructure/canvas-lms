@@ -17,20 +17,27 @@
  */
 
 import React from 'react'
-import PropTypes, {shape, instanceOf} from 'prop-types'
+import PropTypes from 'prop-types'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 import LibraryManager from './LibraryManager'
 
 const client = createClient()
 
-export default function CommentLibrary({setComment, courseId, textAreaRef, userId}) {
+export default function CommentLibrary({
+  setComment,
+  courseId,
+  setFocusToTextArea,
+  userId,
+  commentAreaText
+}) {
   return (
     <ApolloProvider client={client}>
       <LibraryManager
         setComment={setComment}
         courseId={courseId}
-        textAreaRef={textAreaRef}
+        setFocusToTextArea={setFocusToTextArea}
         userId={userId}
+        commentAreaText={commentAreaText}
       />
     </ApolloProvider>
   )
@@ -39,8 +46,7 @@ export default function CommentLibrary({setComment, courseId, textAreaRef, userI
 CommentLibrary.propTypes = {
   setComment: PropTypes.func.isRequired,
   courseId: PropTypes.string.isRequired,
-  textAreaRef: shape({
-    current: instanceOf(Element)
-  }).isRequired,
-  userId: PropTypes.string.isRequired
+  setFocusToTextArea: PropTypes.func.isRequired,
+  userId: PropTypes.string.isRequired,
+  commentAreaText: PropTypes.string.isRequired
 }

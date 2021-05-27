@@ -30,7 +30,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.recognized_params
-    [
+    super + [
       :log_in_url,
       :log_out_url,
       :requested_authn_context,

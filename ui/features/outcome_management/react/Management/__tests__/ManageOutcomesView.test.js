@@ -122,4 +122,11 @@ describe('ManageOutcomesView', () => {
     const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
     expect(getByText('Outcome Group Menu')).toBeInTheDocument()
   })
+
+  it('shows small loader when searching for outcomes', () => {
+    const {getByTestId} = render(
+      <ManageOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
+    )
+    expect(getByTestId('search-loading')).toBeInTheDocument()
+  })
 })

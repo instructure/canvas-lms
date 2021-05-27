@@ -111,4 +111,5 @@ if (process.env.JSPEC_PATH) {
   requireAll(require.context(CONTEXT_COFFEESCRIPT_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_COFFEESCRIPT_SPEC))
   requireAll(require.context(CONTEXT_EMBER_GRADEBOOK_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_EMBER_GRADEBOOK_SPEC))
   requireAll(require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC))
+  require(WEBPACK_PLUGIN_SPECS)
 }

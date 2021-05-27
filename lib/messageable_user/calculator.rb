@@ -381,11 +381,19 @@ class MessageableUser
     # |  top-level query construction methods  |
     # ==========================================
 
-    def messageable_users_in_context_scope(asset_string, options={})
-      return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
+    def messageable_users_in_context_scope(asset_string_or_asset, options={})
+      if asset_string_or_asset.is_a?(String)
+        asset_string = asset_string_or_asset
+        return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
 
-      context_type = $1
-      context_id = $2.to_i
+        context_type = $1
+        context_id_or_object = $2.to_i
+      else
+        context_type = asset_string_or_asset.class_name.underscore
+        context_type = 'section' if context_type == 'course_section'
+        context_id_or_object = asset_string_or_asset
+      end
+
       enrollment_type = $4
       if enrollment_type == 'admins'
         enrollment_types = ['TeacherEnrollment','TaEnrollment']
@@ -394,10 +402,10 @@ class MessageableUser
       end
 
       case context_type
-      when 'course' then messageable_users_in_course_scope(context_id, enrollment_types, options)
-      when 'section' then messageable_users_in_section_scope(context_id, enrollment_types, options)
-      when 'group' then messageable_users_in_group_scope(context_id, options)
-      when 'discussion_topic' then messageable_users_in_discussion_scope(context_id, options)
+      when 'course' then messageable_users_in_course_scope(context_id_or_object, enrollment_types, options)
+      when 'section' then messageable_users_in_section_scope(context_id_or_object, enrollment_types, options)
+      when 'group' then messageable_users_in_group_scope(context_id_or_object, options)
+      when 'announcement', 'discussion_topic' then messageable_users_in_discussion_scope(context_id_or_object, options)
       end
     end
 

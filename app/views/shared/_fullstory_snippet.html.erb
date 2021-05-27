@@ -48,9 +48,13 @@
     })(window,document,window['_fs_namespace'],'script','user');
 
     FS.identify('<%=@current_user.global_id%>')
+    // These variables are useful for providing filterable values
+    // to product analysts so that we can find just the sessions
+    // that involved a user with a given feature or experience enabled.
     FS.setUserVars({
       accountName_str: '<%=@current_user&.account.name || '?'%>',
-      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>'
+      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>',
+      feature_homeroom_course_bool: <%= !!(@js_env[:HOMEROOM_COURSE]) %>
     })
   </script>
 <% end %>

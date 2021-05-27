@@ -31,7 +31,7 @@ export default handleActions(
     INITIAL_OPTIONS: (state, action) => {
       const env = action.payload.env
       state = null
-      if (env.K5_MODE) {
+      if (env.K5_USER) {
         const thisWeekStart = moment.tz(env.TIMEZONE).startOf('week')
         state = {
           weekStart: thisWeekStart,

@@ -24,7 +24,7 @@ import PostAssignmentGradesTray from '@canvas/post-assignment-grades-tray'
 import SpeedGraderHelpers from '../../jquery/speed_grader_helpers'
 
 function submissionsPostedAtUpdater({submissionsMap, updateSubmission, afterUpdateSubmission}) {
-  return function({postedAt, userIds}) {
+  return function ({postedAt, userIds}) {
     userIds.forEach(userId => {
       const submission = submissionsMap[userId]
       if (submission != null) {

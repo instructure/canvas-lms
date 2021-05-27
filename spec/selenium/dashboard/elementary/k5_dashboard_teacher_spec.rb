@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 
 describe "teacher k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -75,6 +75,12 @@ describe "teacher k5 dashboard" do
 
       expect(element_exists?(course_card_selector(@course_name))).to eq(false)
       expect(element_exists?(course_card_selector(@subject_course_title))).to eq(true)
+    end
+
+    it 'shows Important Info on the course navigation list' do
+      get "/courses/#{@homeroom_course.id}"
+
+      expect(important_info_link).to include_text("Important Info")
     end
   end
 
@@ -223,7 +229,7 @@ describe "teacher k5 dashboard" do
     end
   end
 
-  context 'homeroom dashboard resource panel contacts' do
+  context 'homeroom dashboard resource panel' do
     it 'shows the resource panel staff contacts' do
       course_with_ta(
         course: @homeroom_course,
@@ -257,6 +263,14 @@ describe "teacher k5 dashboard" do
       get "/#resources"
 
       expect(instructor_bio(bio)).to be_displayed
+    end
+
+    it 'shows the Important Info for the main resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@homeroom_course, important_info_text)
+
+      get "#resources"
+      expect(important_info_content).to include_text(important_info_text)
     end
   end
 
@@ -310,6 +324,72 @@ describe "teacher k5 dashboard" do
       get "/courses/#{@subject_course.id}#schedule"
 
       expect(teacher_preview).to be_displayed
+    end
+  end
+
+  context 'k5 teacher new course creation' do
+    before :once do
+      @account.root_account.update!(settings: { teachers_can_create_courses: true })
+    end
+    it 'provides a new course button for teacher' do
+      get "/"
+      expect(new_course_button).to be_displayed
+    end
+
+    it 'provides a new course modal when new course button clicked' do
+      get "/"
+      click_new_course_button
+
+      expect(new_course_modal).to be_displayed
+    end
+
+    it 'closes the course modal when x is clicked' do
+      get "/"
+
+      click_new_course_button
+
+      expect(new_course_modal_close_button).to be_displayed
+
+      click_new_course_close_button
+
+      expect(new_course_modal_exists?).to be_falsey
+    end
+
+    it 'closes the course modal when cancel is clicked' do
+      get "/"
+
+      click_new_course_button
+
+      expect(new_course_modal_close_button).to be_displayed
+
+      course_name = "Awesome Course"
+      enter_course_name(course_name)
+      click_new_course_cancel
+
+      expect(new_course_modal_exists?).to be_falsey
+      latest_course = Course.last
+      expect(latest_course.name).not_to eq(course_name)
+    end
+
+    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 25 do
+      @sub_account = @account.sub_accounts.create!(name: 'test')
+      course_with_teacher(
+        account: @sub_account,
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: "Amazing course",
+        user: @homeroom_teacher
+      )
+
+      get "/"
+      click_new_course_button
+      course_name = "Amazing course"
+      fill_out_course_modal(course_name)
+      click_new_course_create
+      wait_for_ajaximations
+      latest_course = Course.last
+      expect(latest_course.name).to eq(course_name)
+      expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
     end
   end
 end

@@ -109,7 +109,13 @@
           </button>
           <div class="ic-app-crumbs">
         <% end %>
-        <%= render_crumbs %>
+        <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
+        <%= link_to course_path(id: @context.id), :class => "btn", :id => "back_to_subject" do %>
+          <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
+        <% end %>
+        <% else %>
+          <%= render_crumbs %>
+        <% end %>
         <% if @show_left_side %></div><% end %>
         <% if tutorials_enabled? %>
           <div class="TutorialToggleHolder"></div>

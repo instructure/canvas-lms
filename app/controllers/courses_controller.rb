@@ -498,6 +498,8 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
+          set_k5_mode(require_k5_theme: true)
+
           if @current_user
             content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")})
           end
@@ -514,6 +516,9 @@ class CoursesController < ApplicationController
 
   def load_enrollments_for_index
     all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user.in_region_associated_shards).preload(:enrollment_state, :course, :course_section).to_a
+    if @current_user.roles(@domain_root_account).all? { |role| role == 'student' || role == 'user' }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? }
+    end
     @past_enrollments = []
     @current_enrollments = []
     @future_enrollments = []
@@ -1410,6 +1415,12 @@ class CoursesController < ApplicationController
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
         can_do(@context, @current_user, :manage_grades)
 
+      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+        @context.account.courses.active.select(&:homeroom_course)
+      else
+        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).select(&:homeroom_course)
+      end
+
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
@@ -1458,7 +1469,8 @@ class CoursesController < ApplicationController
         RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
         PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers],
         MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown,
-        MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled]
+        MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled],
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?
       })
 
       set_tutorial_js_env
@@ -1600,6 +1612,8 @@ class CoursesController < ApplicationController
       :syllabus_course_summary,
       :home_page_announcement_limit,
       :homeroom_course,
+      :sync_enrollments_from_homeroom,
+      :homeroom_course_id,
       :course_color
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
@@ -2045,7 +2059,7 @@ class CoursesController < ApplicationController
       if @context.grants_right?(@current_user, session, :read)
         # No matter who the user is we want the course dashboard to hide the left nav
         set_k5_mode
-        @show_left_side = !@k5_mode
+        @show_left_side = !@context.elementary_subject_course?
 
         check_for_readonly_enrollment_state
 
@@ -2053,7 +2067,7 @@ class CoursesController < ApplicationController
 
         check_incomplete_registration
 
-        unless @k5_mode
+        unless @context.elementary_subject_course?
           add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
         end
         GuardRail.activate(:primary) do
@@ -2065,26 +2079,33 @@ class CoursesController < ApplicationController
         default_view = @context.default_view || @context.default_home_page
         @course_home_view = "feed" if params[:view] == "feed"
         @course_home_view ||= default_view
-        @course_home_view = "k5_dashboard" if @k5_mode
+        @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
+
+        start_date = 14.days.ago.beginning_of_day
+        end_date = start_date + 28.days
+        latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+          .ordered_between(start_date, end_date).limit(1).first
 
         js_env({
                  COURSE: {
                    id: @context.id.to_s,
                    name: @context.name,
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
-                   color: @k5_mode ? @context.course_color : nil,
+                   color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
                    default_view: default_view,
                    is_student: @context.user_is_student?(@current_user),
-                   is_instructor: @context.user_is_instructor?(@current_user),
+                   is_instructor: @context.user_is_instructor?(@current_user) || @context.grants_right?(@current_user, session, :read_as_admin),
                    course_overview: @context&.wiki&.front_page&.body,
                    hide_final_grades: @context.hide_final_grades?,
                    student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                    outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
                    show_student_view: can_do(@context, @current_user, :use_student_view),
-                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1)
+                   student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
+                   settings_path: course_settings_path(@context.id),
+                   latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session)
                  }
                })
 
@@ -2670,15 +2691,23 @@ class CoursesController < ApplicationController
   #     course[blueprint_restrictions_by_object_type][assignment][content]=1
   #
   # @argument course[homeroom_course] [Boolean]
-  #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
-  #   is enabled and the course is associated with a K-5-enabled account.
+  #   Sets the course as a homeroom course. The setting takes effect only when the course is associated
+  #   with a Canvas for Elementary-enabled account.
+  #
+  # @argument course[sync_enrollments_from_homeroom] [String]
+  #   Syncs enrollments from the homeroom that is set in homeroom_course_id. The setting only takes effect when the
+  #   course is associated with a Canvas for Elementary-enabled account and sync_enrollments_from_homeroom is enabled.
+  #
+  # @argument course[homeroom_course_id] [String]
+  #   Sets the Homeroom Course id to be used with sync_enrollments_from_homeroom. The setting only takes effect when the
+  #   course is associated with a Canvas for Elementary-enabled account and sync_enrollments_from_homeroom is enabled.
   #
   # @argument course[template] [Boolean]
   #   Enable or disable the course as a template that can be selected by an account
   #
   # @argument course[course_color] [String]
-  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the
-  #   Canvas for Elementary feature is enabled and the course is associated with a K-5-enabled account.
+  #   Sets a color in hex code format to be associated with the course. The setting takes effect only when the course
+  #   is associated with a Canvas for Elementary-enabled account.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2957,6 +2986,13 @@ class CoursesController < ApplicationController
         @current_user.touch
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
+        end
+        # Sync homeroom enrollments if enabled
+        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+          progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
+          progress.user = @current_user
+          progress.reset!
+          progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
         end
         render_update_success
       else
@@ -3607,7 +3643,7 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom
     )
   end
 end

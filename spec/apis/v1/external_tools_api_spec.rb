@@ -23,10 +23,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require 'nokogiri'
 
 describe ExternalToolsController, type: :request do
-  before(:once) do
-    Account.default.enable_feature!(:submission_type_tool_placement)
-  end
-
   describe "in a course" do
     before(:once) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)

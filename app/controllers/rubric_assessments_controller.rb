@@ -26,7 +26,7 @@ class RubricAssessmentsController < ApplicationController
   before_action :require_context
   before_action :require_user
 
-
+  include Api::V1::SubmissionComment
   # @API Create a single rubric assessment
   #
   # Returns the rubric assessment with the given id.
@@ -144,7 +144,7 @@ class RubricAssessmentsController < ApplicationController
           artifact_includes =
             case @asset
             when Submission
-              { artifact: Submission.json_serialization_full_parameters, rubric_association: {} }
+              { artifact: Submission.json_serialization_full_parameters(except: [:submission_comments]), rubric_association: {} }
             when ModeratedGrading::ProvisionalGrade
               { rubric_association: {} }
             else
@@ -155,6 +155,17 @@ class RubricAssessmentsController < ApplicationController
             include: artifact_includes,
             include_root: false
           )
+
+          if @asset.is_a?(Submission)
+            json[:artifact][:submission_comments] = anonymous_moderated_submission_comments_json(
+              assignment: @asset.assignment,
+              course: @asset.course,
+              current_user: @current_user,
+              avatars: service_enabled?(:avatars),
+              submission_comments: @asset.visible_submission_comments_for(@current_user),
+              submissions: [@asset]
+            )
+          end
 
           if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
             json[:artifact] = @asset.submission.

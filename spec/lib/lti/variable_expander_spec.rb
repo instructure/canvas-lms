@@ -112,6 +112,21 @@ module Lti
       )
     end
 
+    describe ".deregister_expansion" do
+      subject { described_class.expansions }
+
+      let(:expansion) { 'com.Instructure.Foo.Bar' }
+
+      before do
+        described_class.register_expansion(expansion, ['a'], -> { 'test' })
+        described_class.deregister_expansion(expansion)
+      end
+
+      it 'removes the requested expansion' do
+        expect(subject).not_to include("$#{expansion}".to_sym)
+      end
+    end
+
     it 'returns sis_id for enrollment' do
       user.save!
       course.save!
@@ -246,18 +261,21 @@ module Lti
       it 'does not use expansions that do not have default names' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> {'test'})
         expanded = variable_expander.enabled_capability_params(enabled_capability)
+        VariableExpander.deregister_expansion('TestCapability.Foo')
         expect(expanded.keys).not_to include 'TestCapability.Foo'
       end
 
       it 'does use expansion that have default names' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> { 'test' }, default_name: 'test_capability_foo')
         expanded = variable_expander.enabled_capability_params(enabled_capability)
+        VariableExpander.deregister_expansion('TestCapability.Foo')
         expect(expanded.values).to include('test')
       end
 
       it 'does use the default name as the key' do
         VariableExpander.register_expansion('TestCapability.Foo', ['a'], -> { 'test' }, default_name: 'test_capability_foo')
         expanded = variable_expander.enabled_capability_params(enabled_capability)
+        VariableExpander.deregister_expansion('TestCapability.Foo')
         expect(expanded['test_capability_foo']).to eq 'test'
       end
 

@@ -1824,7 +1824,11 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRunti
 module MaxRuntimeConnectionPool
   def max_runtime
     # TODO: Rails 6.1 uses a PoolConfig object instead
-    @spec.config[:max_runtime]
+    if CANVAS_RAILS6_0
+      @spec.config[:max_runtime]
+    else
+      db_config.configuration_hash[:max_runtime]
+    end
   end
 
   def acquire_connection(*)

@@ -151,7 +151,7 @@ export const GradeRow = ({
             type="notification"
             placement="start center"
             formatOutput={() => (
-              <ScreenReaderContent>
+              <ScreenReaderContent data-testid="new-grade-indicator">
                 {I18n.t('New grade for %{assignmentName}', {assignmentName})}
               </ScreenReaderContent>
             )}

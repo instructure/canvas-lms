@@ -44,12 +44,21 @@ describe('MicrosoftSyncTitle', () => {
   })
 
   it('renders as checked or unchecked based on props', () => {
-    const container = setup({isEnabled: true, handleClick: jest.fn()})
+    const container = setup({syncEnabled: true, handleClick: jest.fn()})
 
     expect(
       container.getByRole('checkbox', {
         name: /microsoft sync toggle button/i
       }).checked
+    ).toBeTruthy()
+  })
+
+  it('disables the checkbox according to props', () => {
+    const container = setup({interactionDisabled: true})
+    expect(
+      container.getByRole('checkbox', {
+        name: /microsoft sync toggle button/i
+      }).disabled
     ).toBeTruthy()
   })
 })

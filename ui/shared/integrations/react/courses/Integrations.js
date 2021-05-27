@@ -45,6 +45,7 @@ const Integrations = () => {
 
   return (
     <>
+      <h2>{I18n.t('Integrations')}</h2>
       {anyIntegrationsAvailable ? (
         <>
           <View

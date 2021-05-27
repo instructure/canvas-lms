@@ -18,13 +18,20 @@
 
 import moment from 'moment-timezone'
 
+export const MOCK_COURSE_SYLLABUS = {
+  id: '30',
+  syllabus_body: '<p>This is really important.</p>'
+}
+
 export const MOCK_COURSE_APPS = [
   {
     id: '7',
     course_navigation: {
       text: 'Studio',
       icon_url: 'studio.png'
-    }
+    },
+    context_id: '30',
+    context_name: 'Arts and Crafts'
   }
 ]
 

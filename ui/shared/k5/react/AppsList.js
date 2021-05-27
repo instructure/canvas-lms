@@ -19,29 +19,37 @@
 import I18n from 'i18n!dashboard_pages_AppsList'
 import React from 'react'
 import PropTypes from 'prop-types'
-import K5AppLink, {AppShape} from './K5AppLink'
+
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import {Spinner} from '@instructure/ui-spinner'
 
-export default function AppsList({isLoading, apps}) {
+import K5AppLink, {AppShape} from './K5AppLink'
+import LoadingSkeleton from './LoadingSkeleton'
+
+const AppsList = ({isLoading, apps}) => {
+  const skeletons = []
+  for (let i = 0; i < 3; i++) {
+    skeletons.push(
+      <View
+        key={`skeleton-${i}`}
+        display="inline-block"
+        width="16em"
+        height="2.875em"
+        margin="small"
+      >
+        <LoadingSkeleton width="100%" height="100%" screenReaderLabel={I18n.t('Loading apps...')} />
+      </View>
+    )
+  }
+
   return (
     <View as="section">
-      {isLoading && (
-        <View as="div" textAlign="center" margin="large 0">
-          <Spinner renderTitle={I18n.t('Loading apps...')} size="large" />
-        </View>
+      {(isLoading || apps.length > 0) && (
+        <Heading level="h2" margin="large 0 0">
+          {I18n.t('Student Applications')}
+        </Heading>
       )}
-      {apps.length > 0 && (
-        <>
-          <Heading level="h3" as="h2" margin="medium 0 0">
-            {I18n.t('Student Applications')}
-          </Heading>
-          {apps.map(app => (
-            <K5AppLink key={app.id} app={app} />
-          ))}
-        </>
-      )}
+      {isLoading ? skeletons : apps.map(app => <K5AppLink key={app.id} app={app} />)}
     </View>
   )
 }
@@ -50,3 +58,5 @@ AppsList.propTypes = {
   isLoading: PropTypes.bool,
   apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired
 }
+
+export default AppsList

@@ -34,8 +34,11 @@ class CanvadocsAnnotationContext < ApplicationRecord
 
   set_policy do
     given do |user|
-      user &&
-        (submission.grants_right?(user, :grade) || (draft? && user == submission.user))
+      user && (
+        submission.grants_right?(user, :grade) ||
+        (submission.assignment.moderated_grading? && submission.assignment.can_be_moderated_grader?(user)) ||
+        (draft? && user == submission.user)
+      )
     end
 
     can :readwrite

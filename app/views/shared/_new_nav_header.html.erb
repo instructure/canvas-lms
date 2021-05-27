@@ -22,12 +22,24 @@
   <% js_bundle :nav_tourpoints %>
   <% end %>
 
+  <%
+    if k5_user?
+      dashboard_title = t('Homeroom')
+      dashboard_icon_path = "shared/svg/svg_icon_home.svg"
+      courses_title = t('Subjects')
+    else
+      dashboard_title = t('Dashboard')
+      dashboard_icon_path = "shared/svg/#{'k12/' if k12?}svg_icon_dashboard.svg"
+      courses_title = t('Courses')
+    end
+  %>
+
   <% if use_responsive_layout? %>
     <header id="mobile-header" class="no-print">
       <button type="button" class="Button Button--icon-action-rev Button--large mobile-header-hamburger">
         <i class="icon-solid icon-hamburger"></i>
         <span id="mobileHeaderInboxUnreadBadge" class="menu-item__badge" style="min-width: 0; top: 12px; height: 12px; right: 6px; display:none;"></span>
-        <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
+        <span class="screenreader-only"><%= dashboard_title %></span>
       </button>
       <div class="mobile-header-space"></div>
       <% context_crumb = crumbs.length > 1 && crumbs[1] %>
@@ -65,7 +77,7 @@
       <% unless @current_user.try(:prefers_high_contrast?) %>
         <div class="ic-app-header__logomark-container">
           <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
-            <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
+            <span class="screenreader-only"><%= dashboard_title %></span>
           </a>
         </div>
       <% end %>
@@ -111,9 +123,9 @@
           <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
             <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
-                <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_dashboard.svg") %>
+                <%= render(partial: dashboard_icon_path) %>
               </div>
-              <div class="menu-item__text"><%= t('Dashboard') %></div>
+              <div class="menu-item__text"><%= dashboard_title %></div>
             </a>
           </li>
           <% if @current_user %>
@@ -123,7 +135,7 @@
                   <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles.svg") %>
                 </div>
                 <div class="menu-item__text">
-                  <%= t('Courses') %>
+                  <%= courses_title %>
                 </div>
               </button>
             </li>

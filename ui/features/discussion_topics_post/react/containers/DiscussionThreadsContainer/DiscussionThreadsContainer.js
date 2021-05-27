@@ -16,63 +16,97 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DISCUSSION_QUERY} from '../../../graphql/Queries'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Discussion} from '../../../graphql/Discussion'
-import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
-import LoadingIndicator from '@canvas/loading-indicator'
-import {PageInfo} from '../../../graphql/PageInfo'
-import {PER_PAGE} from '../../utils/constants'
-import PropTypes from 'prop-types'
-import React from 'react'
+import I18n from 'i18n!discussion_topics_post'
+import {PER_PAGE, SearchContext} from '../../utils/constants'
+import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
-import {useLazyQuery} from 'react-apollo'
+import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionThreadsContainer = props => {
-  let threads = props.threads
-  let selectedPage = Math.ceil(atob(props.pageInfo.startCursor) / PER_PAGE)
+  const discussionTopic = props.discussionTopic
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setPageNumber} = useContext(SearchContext)
 
-  const [discussionTopicQuery, {called, loading, data}] = useLazyQuery(DISCUSSION_QUERY)
+  const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
-  if (called && loading) {
-    return <LoadingIndicator />
+  const AUTO_MARK_AS_READ_DELAY = 3000
+
+  const [updateDiscussionEntriesReadState] = useMutation(UPDATE_DISCUSSION_ENTRIES_READ_STATE, {
+    onCompleted: () => {
+      setOnSuccess(I18n.t('The replies were successfully updated'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while updating the replies'))
+    }
+  })
+
+  useEffect(() => {
+    if (discussionEntriesToUpdate.size > 0) {
+      const interval = setInterval(() => {
+        const entryIds = Array.from(discussionEntriesToUpdate)
+        const entries = discussionTopic.discussionEntriesConnection.nodes.filter(entry =>
+          entryIds.includes(entry._id)
+        )
+        entries.forEach(entry => (entry.read = true))
+        setDiscussionEntriesToUpdate(new Set())
+        updateDiscussionEntriesReadState({
+          variables: {
+            discussionEntryIds: entryIds,
+            read: true
+          },
+          optimisticResponse: {
+            updateDiscussionEntriesReadState: {
+              discussionEntries: entries,
+              __typename: 'UpdateDiscussionEntriesReadStatePayload'
+            }
+          }
+        })
+      }, AUTO_MARK_AS_READ_DELAY)
+
+      return () => clearInterval(interval)
+    }
+  }, [
+    discussionEntriesToUpdate,
+    discussionTopic.discussionEntriesConnection.nodes,
+    updateDiscussionEntriesReadState
+  ])
+
+  const markAsRead = entryId => {
+    if (!discussionEntriesToUpdate.has(entryId)) {
+      const entries = Array.from(discussionEntriesToUpdate)
+      setDiscussionEntriesToUpdate(new Set([...entries, entryId]))
+    }
   }
 
-  if (called && data) {
-    selectedPage = Math.ceil(
-      atob(data.legacyNode.rootDiscussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
-    )
-    threads = data.legacyNode.rootDiscussionEntriesConnection.nodes
-  }
-
-  const setPage = pageNumber => {
-    discussionTopicQuery({
-      variables: {
-        discussionID: props.discussionTopicId,
-        perPage: PER_PAGE,
-        page: btoa(pageNumber * PER_PAGE)
-      }
-    })
+  const setPage = pageNum => {
+    setPageNumber(pageNum)
   }
 
   return (
     <View as="div" margin="medium none none none">
-      {threads?.map(thread => {
+      {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer
             key={`discussion-thread-${thread.id}`}
-            assignment={props.discussionTopic?.assignment}
+            assignment={discussionTopic?.assignment}
             discussionEntry={thread}
-            discussionTopicGraphQLId={props.discussionTopic.id}
+            discussionTopicGraphQLId={discussionTopic.id}
+            markAsRead={markAsRead}
           />
         )
       })}
-      {props.totalPages > 1 && (
+      {discussionTopic.entriesTotalPages > 1 && (
         <ThreadPagination
           setPage={setPage}
-          selectedPage={selectedPage}
-          totalPages={props.totalPages}
+          selectedPage={Math.ceil(
+            atob(discussionTopic.discussionEntriesConnection.pageInfo.startCursor) / PER_PAGE
+          )}
+          totalPages={discussionTopic.entriesTotalPages}
         />
       )}
     </View>
@@ -80,11 +114,7 @@ export const DiscussionThreadsContainer = props => {
 }
 
 DiscussionThreadsContainer.propTypes = {
-  discussionTopic: Discussion.shape,
-  discussionTopicId: PropTypes.string.isRequired,
-  threads: PropTypes.arrayOf(DiscussionEntry.shape),
-  pageInfo: PageInfo.shape.isRequired,
-  totalPages: PropTypes.number
+  discussionTopic: Discussion.shape
 }
 
 export default DiscussionThreadsContainer

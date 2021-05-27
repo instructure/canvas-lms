@@ -26,12 +26,6 @@ const DIST = 'public/dist'
 const STUFF_TO_REV = [
   'public/fonts/**/*.{eot,otf,svg,ttf,woff,woff2}',
   'public/images/**/*',
-
-  // Include *everything* from plugins
-  // so we don't have to worry about their internals
-  // TODO: do we need these if we are all-webpack?
-  // exclude .js here
-  'public/plugins/**/*.*'
 ]
 
 gulp.task('rev', () => {

@@ -69,6 +69,15 @@ module Types
       object[:loader].load(:read_as_admin)
     end
 
+    field :manage_content, Boolean, null: true
+    def manage_content
+      Loaders::PermissionsLoader.for(
+        object[:discussion_topic].context,
+        current_user: current_user,
+        session: session
+      ).load(:manage_content)
+    end
+
     field :rate, Boolean, null: true
     def rate
       object[:loader].load(:rate)
@@ -83,20 +92,21 @@ module Types
     def speed_grader
       return false if object[:discussion_topic].assignment_id.nil?
 
-      Promise.all([
-        Loaders::AssociationLoader.for(Course, :enrollment_term).load(object[:discussion_topic].context),
-        Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic])
-      ]).then do
-        permission = !object[:discussion_topic].context.large_roster? && object[:discussion_topic].assignment.published?
-        course_permission_loader = Loaders::PermissionsLoader.for(object[:discussion_topic].context, current_user: current_user, session: session)
-        if object[:discussion_topic].context.concluded?
-          course_permission_loader.load(:read_as_admin).then do |read_as_admin|
-            permission && read_as_admin
-          end
-        else
-          course_permission_loader.load(:manage_grades).then do |manage_grades|
-            course_permission_loader.load(:view_all_grades).then do |view_all_grades|
-              permission && (manage_grades || view_all_grades)
+      Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
+        Loaders::AssociationLoader.for(Assignment, :context).load(object[:discussion_topic].assignment).then do
+          Loaders::AssociationLoader.for(Course, :enrollment_term).load(object[:discussion_topic].assignment.context).then do
+            permission = !object[:discussion_topic].assignment.context.large_roster? && object[:discussion_topic].assignment.published?
+            course_permission_loader = Loaders::PermissionsLoader.for(object[:discussion_topic].assignment.context, current_user: current_user, session: session)
+            if object[:discussion_topic].assignment.context.concluded?
+              course_permission_loader.load(:read_as_admin).then do |read_as_admin|
+                permission && read_as_admin
+              end
+            else
+              course_permission_loader.load(:manage_grades).then do |manage_grades|
+                course_permission_loader.load(:view_all_grades).then do |view_all_grades|
+                  permission && (manage_grades || view_all_grades)
+                end
+              end
             end
           end
         end
@@ -143,18 +153,26 @@ module Types
     field :open_for_comments, Boolean, null: true
     def open_for_comments
       return false if object[:discussion_topic].comments_disabled?
+      return false unless object[:discussion_topic].locked
 
       object[:loader].load(:moderate_forum).then do |can_moderate|
-        can_moderate && object[:discussion_topic].locked
+        can_moderate
       end
     end
 
     field :close_for_comments, Boolean, null: true
     def close_for_comments
       return false if object[:discussion_topic].comments_disabled?
+      return false if object[:discussion_topic].locked
 
       object[:loader].load(:moderate_forum).then do |can_moderate|
-        can_moderate && !object[:discussion_topic].locked
+        if object[:discussion_topic].assignment_id.nil?
+          can_moderate
+        else
+          Loaders::AssociationLoader.for(DiscussionTopic, :assignment).load(object[:discussion_topic]).then do
+            object[:discussion_topic].can_lock? && can_moderate
+          end
+        end
       end
     end
 

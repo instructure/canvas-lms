@@ -18,7 +18,17 @@
 
 module.exports = {
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
-  reporters: ['default', ['jest-junit', {outputDirectory: './coverage'}]],
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        suiteName: 'Canvas RCE Jest Tests',
+        outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
+        outputName: 'canvas-rce-jest.xml'
+      }
+    ]
+  ],
   setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],

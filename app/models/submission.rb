@@ -2083,6 +2083,11 @@ class Submission < ActiveRecord::Base
     allow_list = []
     return allow_list unless current_user.present? && assignment.moderated_grading?
 
+    if assignment.annotated_document?
+      # The student's annotations are what make up the submission in this case.
+      allow_list.push(self.user)
+    end
+
     if posted?
       allow_list.push(self.grader, self.user, current_user)
     elsif self.user == current_user

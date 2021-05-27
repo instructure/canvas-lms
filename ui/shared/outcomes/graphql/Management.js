@@ -71,21 +71,63 @@ export const CHILD_GROUPS_QUERY = gql`
   ${childGroupsFragment}
 `
 
-export const GROUP_DETAIL_QUERY = gql`
-  query GroupDetailQuery(
+export const FIND_GROUP_OUTCOMES = gql`
+  query GroupDetailWithSearchQuery(
     $id: ID!
-    $outcomesCursor: String
     $outcomesContextId: ID!
     $outcomesContextType: String!
+    $outcomeIsImported: Boolean!
+    $searchQuery: String
+    $outcomesCursor: String
   ) {
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
         description
         title
-        outcomesCount
+        outcomesCount(searchQuery: $searchQuery)
         canEdit
-        outcomes(first: 10, after: $outcomesCursor) {
+        outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              ... on LearningOutcome {
+                _id
+                description
+                title
+                displayName
+                isImported(
+                  targetContextType: $outcomesContextType
+                  targetContextId: $outcomesContextId
+                ) @include(if: $outcomeIsImported)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const SEARCH_GROUP_OUTCOMES = gql`
+  query SearchGroupDetailQuery(
+    $id: ID!
+    $outcomesCursor: String
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+    $searchQuery: String
+  ) {
+    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
+      ... on LearningOutcomeGroup {
+        _id
+        description
+        title
+        outcomesCount(searchQuery: $searchQuery)
+        canEdit
+        outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
@@ -117,47 +159,28 @@ export const GROUP_DETAIL_QUERY = gql`
   }
 `
 
-export const GROUP_DETAIL_QUERY_WITH_IMPORTED_OUTCOMES = gql`
-  query GroupDetailQuery(
-    $id: ID!
-    $outcomeIsImportedContextType: String!
-    $outcomeIsImportedContextId: ID!
-    $outcomesCursor: String
-  ) {
-    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
-      ... on LearningOutcomeGroup {
-        _id
-        description
-        title
-        outcomesCount
-        outcomes(first: 10, after: $outcomesCursor) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          nodes {
-            ... on LearningOutcome {
-              _id
-              description
-              title
-              displayName
-              isImported(
-                targetContextType: $outcomeIsImportedContextType
-                targetContextId: $outcomeIsImportedContextId
-              )
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
 export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
   mutation SetOutcomeFriendlyDescription($input: SetFriendlyDescriptionInput!) {
     setFriendlyDescription(input: $input) {
       outcomeFriendlyDescription {
         _id
+        description
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const CREATE_LEARNING_OUTCOME = gql`
+  mutation CreateLearningOutcome($input: CreateLearningOutcomeInput!) {
+    createLearningOutcome(input: $input) {
+      learningOutcome {
+        _id
+        title
+        displayName
         description
       }
       errors {
@@ -209,14 +232,6 @@ export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroup
     {parent_outcome_group_id: newParentGroupId}
   )
 
-export const createOutcome = (contextType, contextId, groupId, outcome) =>
-  axios.post(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes`,
-    outcome
-  )
-
 export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {
   return axios.post(
     `/api/v1/${pluralize(
@@ -225,3 +240,17 @@ export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) =>
     {title}
   )
 }
+
+export const moveOutcome = (
+  contextType,
+  contextId,
+  outcomeId,
+  oldParentGroupId,
+  newParentGroupId
+) =>
+  axios.put(
+    `/api/v1/${pluralize(
+      contextType
+    ).toLowerCase()}/${contextId}/outcome_groups/${newParentGroupId}/outcomes/${outcomeId}`,
+    {move_from: oldParentGroupId}
+  )

@@ -1,8 +1,7 @@
 paths:
   public_dir: public
   sass_dir: app/stylesheets
-  all_sass_bundles: 'app/stylesheets/{,plugins/*/}**/[^_]*.s[ac]ss'
-  all_sass_files: 'app/stylesheets/{,plugins/*/}**/*.s[ac]ss'
+  all_sass_bundles: '{.,gems/plugins/*}/app/stylesheets/**/[^_]*.s[ac]ss'
   brandable_variables_json: app/stylesheets/brandable_variables.json
   bundles_with_deps: public/dist/brandable_css/brandable_css_bundles_with_deps.json
   file_checksums: public/dist/brandable_css/brandable_css_file_checksums.json

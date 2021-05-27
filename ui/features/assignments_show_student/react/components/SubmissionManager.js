@@ -292,31 +292,27 @@ export default class SubmissionManager extends Component {
     this.setState({submittingAssignment: false})
   }
 
-  shouldRenderSubmit(context) {
-    let activeTypeMeetsCriteria = false
-    switch (this.state.activeSubmissionType) {
-      case 'media_recording':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
-          ?.meetsMediaRecordingCriteria
-        break
-      case 'online_text_entry':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
-        break
-      case 'online_upload':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUploadCriteria
-        break
-      case 'online_url':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
-    }
-
+  shouldRenderNewAttempt(context) {
+    const {assignment, submission} = this.props
+    const allowedAttempts = totalAllowedAttempts({assignment, submission})
     return (
-      this.props.submission.submissionDraft &&
-      activeTypeMeetsCriteria &&
+      context.allowChangesToSubmission &&
+      !assignment.lockInfo.isLocked &&
+      (submission.state === 'graded' || submission.state === 'submitted') &&
+      submission.gradingStatus !== 'excused' &&
+      context.latestSubmission.state !== 'unsubmitted' &&
+      (allowedAttempts == null || submission.attempt < allowedAttempts)
+    )
+  }
+
+  shouldRenderSubmit(context) {
+    return (
       !this.state.uploadingFiles &&
       !this.state.editingDraft &&
       context.isLatestAttempt &&
       context.allowChangesToSubmission &&
-      !this.props.assignment.lockInfo.isLocked
+      !this.props.assignment.lockInfo.isLocked &&
+      !this.shouldRenderNewAttempt(context)
     )
   }
 
@@ -496,19 +492,7 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'new-attempt',
-        shouldRender: context => {
-          const {assignment, submission} = this.props
-          const allowedAttempts = totalAllowedAttempts({assignment, submission})
-
-          return (
-            context.allowChangesToSubmission &&
-            !assignment.lockInfo.isLocked &&
-            (submission.state === 'graded' || submission.state === 'submitted') &&
-            submission.gradingStatus !== 'excused' &&
-            context.latestSubmission.state !== 'unsubmitted' &&
-            (allowedAttempts == null || submission.attempt < allowedAttempts)
-          )
-        },
+        shouldRender: context => this.shouldRenderNewAttempt(context),
         render: context => {
           return (
             <Button color="primary" onClick={context.startNewAttemptAction}>
@@ -545,6 +529,22 @@ export default class SubmissionManager extends Component {
     const mustAgreeToPledge =
       window.ENV.SIMILARITY_PLEDGE != null && !this.state.similarityPledgeChecked
 
+    let activeTypeMeetsCriteria = false
+    switch (this.state.activeSubmissionType) {
+      case 'media_recording':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
+          ?.meetsMediaRecordingCriteria
+        break
+      case 'online_text_entry':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
+        break
+      case 'online_upload':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUploadCriteria
+        break
+      case 'online_url':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
+    }
+
     return (
       <Mutation
         mutation={CREATE_SUBMISSION}
@@ -567,9 +567,11 @@ export default class SubmissionManager extends Component {
               id="submit-button"
               data-testid="submit-button"
               disabled={
+                !this.props.submission.submissionDraft ||
                 this.state.draftStatus === 'saving' ||
                 this.state.submittingAssignment ||
-                mustAgreeToPledge
+                mustAgreeToPledge ||
+                !activeTypeMeetsCriteria
               }
               color="primary"
               margin="auto auto auto small"

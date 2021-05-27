@@ -19,12 +19,14 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
+require_relative '../../courses/pages/course_settings_page'
 
 describe "teacher k5 course dashboard" do
   include_context "in-process server selenium tests"
   include K5PageObject
   include K5Common
+  include CourseSettingsPage
 
   before :once do
     teacher_setup
@@ -70,33 +72,24 @@ describe "teacher k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
-    it 'has manage button' do
+    it 'has manage subject button' do
       get "/courses/#{@subject_course.id}#home"
 
       expect(manage_button).to be_displayed
     end
 
-    it 'slides out manage tray when manage button is clicked and closes with X' do
+    it 'opens the course setting path when manage subject button is clicked' do
       get "/courses/#{@subject_course.id}#home"
 
       click_manage_button
 
-      expect(course_navigation_tray_exists?).to be_truthy
-
-      click_nav_tray_close
-
-      expect(course_navigation_tray_exists?).to be_falsey
+      expect(driver.current_url).to match(course_settings_path(@subject_course.id))
     end
 
-    it 'navigates to the assignment index page when clicked from nav tray' do
-      get "/courses/#{@subject_course.id}#home"
+    it 'shows Important Info in the course navigation list' do
+      get "/courses/#{@subject_course.id}/settings"
 
-      click_manage_button
-
-      click_assignments_link
-      wait_for_ajaximations
-
-      expect(driver.current_url).to include("/courses/#{@subject_course.id}/assignments")
+      expect(important_info_link).to include_text("Important Info")
     end
   end
 
@@ -145,8 +138,9 @@ describe "teacher k5 course dashboard" do
   end
 
   context 'course color selection' do
-    it 'allows for available color to be selected', ignore_js_errors: true do
+    it 'allows for available color to be selected', ignore_js_errors: true, custom_timeout: 30 do
       get "/courses/#{@subject_course.id}/settings"
+      visit_course_details_tab
 
       click_pink_color_button
 
@@ -159,6 +153,8 @@ describe "teacher k5 course dashboard" do
 
     it 'allows for hex color to be input', ignore_js_errors: true do
       get "/courses/#{@subject_course.id}/settings"
+      visit_course_details_tab
+
       new_color = '#07AB99'
       input_color_hex_value(new_color)
       wait_for_new_page_load(submit_form('#course_form'))
@@ -173,6 +169,82 @@ describe "teacher k5 course dashboard" do
       get "/courses/#{@subject_course.id}#home"
 
       expect(hex_value_for_color(dashboard_header)).to eq(new_color)
+    end
+  end
+
+  context 'course tab navigation' do
+    let(:lti_a) { 'LTI Resource A' }
+    let(:lti_b) { 'LTI Resource B' }
+    let(:navigation_names) { ['Home', 'Schedule', 'Modules', 'Grades', lti_a, lti_b] }
+
+    before :once do
+      @resource_a = "context_external_tool_" + create_lti_resource(lti_a).id.to_s
+      @resource_b = "context_external_tool_" + create_lti_resource(lti_b).id.to_s
+    end
+
+    it 'shows the k5 navigation tabs and LTIs on the settings page' do
+      get "/courses/#{@subject_course.id}/settings#tab-navigation"
+
+      navigation_list = navigation_items
+
+      expect(navigation_list.count).to eq(6)
+
+      navigation_names.count.times do |x|
+        expect(navigation_list[x]).to include_text(navigation_names[x])
+      end
+    end
+
+    it 'has tabs rearranged in new configuration on the subject page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
+      )
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(k5_tablist).to include_text("Schedule\nHome\nGrades\nModules\nResources")
+    end
+
+    it 'has tabs that are hidden from the subject page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: Course::TAB_SCHEDULE}, {id: Course::TAB_HOME, hidden: true}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES} ]
+      )
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(k5_tablist).to include_text("Schedule\nGrades\nModules\nResources")
+    end
+
+    it 'has ltis that are rearranged in new order on the resources page' do
+      @subject_course.update!(
+        tab_configuration: [{id: Course::TAB_HOME}, {id: Course::TAB_SCHEDULE}, {id: Course::TAB_GRADES}, {id: Course::TAB_MODULES}, {id: @resource_b}, {id: @resource_a}]
+      )
+
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(k5_app_buttons[0].text).to eq lti_b
+      expect(k5_app_buttons[1].text).to eq lti_a
+    end
+
+    it 'has ltis that are hidden on the resources page' do
+      @subject_course.update!(
+        tab_configuration: [ {id: @resource_a, hidden: true}, {id: @resource_b}]
+      )
+
+      get "/courses/#{@subject_course.id}#resources"
+
+      expect(k5_app_buttons.count).to eq 1
+      expect(k5_app_buttons[0].text).to eq lti_b
+    end
+  end
+
+  context 'course resources tab' do
+    it 'shows the Important Info for subject resources tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@subject_course, important_info_text)
+      create_lti_resource("fake LTI")
+      get "/courses/#{@subject_course.id}#resources"
+      
+      expect(important_info_content).to include_text(important_info_text)
     end
   end
 end

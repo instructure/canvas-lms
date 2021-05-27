@@ -33,22 +33,28 @@ describe "course settings" do
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
+  context "k5 courses" do
+    before(:each) do
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+    end
+
+    it "should show a Back to Subject button that sends the user to the course home path" do
+      get "/courses/#{@course.id}/settings"
+      expect(f('#back_to_subject')).to be_displayed
+      expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
+    end
+  end
+
   context "considering homeroom courses" do
     before(:each) do
-      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'on')
       @account.settings[:enable_as_k5_account] = {value: true}
       @account.save!
       @course.homeroom_course = true
       @course.save!
     end
 
-    after(:each) do
-      @account.root_account.set_feature_flag!(:canvas_for_elementary, 'off')
-    end
-
     it 'hides most tabs if set' do
-      @account.root_account.enable_feature!(:canvas_for_elementary)
-
       get "/courses/#{@course.id}/settings"
       expect(ff('#course_details_tabs > ul li').length).to eq 2
       expect(f('#course_details_tab')).to be_displayed
@@ -198,7 +204,6 @@ describe "course settings" do
     end
 
     it "should check if it is a k5 course should not show the fields" do
-      @account.enable_feature!(:canvas_for_elementary)
       @account.settings[:enable_as_k5_account] = {value: true}
       @account.save!
       get "/courses/#{@course.id}/settings"
@@ -379,7 +384,6 @@ describe "course settings" do
     end
 
     it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
-      @account.root_account.enable_feature!(:canvas_for_elementary)
       @account.settings[:enable_as_k5_account] = {value: true}
       @account.save!
       course_with_teacher_logged_in(:active_all => true)

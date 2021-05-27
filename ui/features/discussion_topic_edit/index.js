@@ -101,7 +101,7 @@ const view = new EditView({
   },
   lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
   announcementsLocked,
-  homeroomCourse: window.ENV.HOMEROOM_COURSE
+  homeroomCourse: window.ENV.K5_HOMEROOM_COURSE
 })
 view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 

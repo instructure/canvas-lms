@@ -89,6 +89,8 @@ class Types::MutationType < Types::ApplicationObjectType
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
   field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
   field :delete_comment_bank_item, mutation: Mutations::DeleteCommentBankItem
+  field :update_comment_bank_item, mutation: Mutations::UpdateCommentBankItem
+  field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

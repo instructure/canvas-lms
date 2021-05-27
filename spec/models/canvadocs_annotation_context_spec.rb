@@ -23,8 +23,8 @@ describe CanvadocsAnnotationContext do
   before(:once) do
     @course = course_model
     student = @course.enroll_student(User.create!).user
-    assignment = assignment_model(course: @course)
-    @sub = assignment.submissions.find_by(user: student)
+    @assignment = assignment_model(course: @course)
+    @sub = @assignment.submissions.find_by(user: student)
     @att = attachment_model(context: student)
   end
 
@@ -90,6 +90,42 @@ describe CanvadocsAnnotationContext do
         other_student = @course.enroll_student(User.create!).user
         annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: nil)
         expect(annotation_context.grants_right?(other_student, :readwrite)).to be false
+      end
+    end
+
+    context "when assignment is moderated" do
+      before(:once) do
+        @final_grader = @course.enroll_teacher(User.create!, enrollment_state: :active).user
+        @provisional_grader_1 = @course.enroll_teacher(User.create!).user
+        @provisional_grader_2 = @course.enroll_teacher(User.create!).user
+        @provisional_grader_3 = @course.enroll_teacher(User.create!).user
+        @assignment.update!(final_grader: @final_grader, grader_count: 2, moderated_grading: true)
+      end
+
+      it "grants readwrite if grader slots are still available" do
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(@provisional_grader_1, :readwrite)).to be true
+      end
+
+      it "grants readwrite if grader is final grader and slots are full" do
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(@final_grader, :readwrite)).to be true
+      end
+
+      it "grants readwrite if grader is not final grader, slots are full, but user has graded before" do
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(@provisional_grader_1, :readwrite)).to be true
+      end
+
+      it "does not grant readwrite if grader is not final grader, slots are full, and user has not graded before" do
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
+        @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
+        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
+        expect(annotation_context.grants_right?(@provisional_grader_3, :readwrite)).to be false
       end
     end
   end

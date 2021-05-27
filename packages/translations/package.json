@@ -1,7 +1,9 @@
 {
   "name": "@instructure/translations",
   "version": "1.0.0",
-  "engines": {"node": ">= 10.10"},
+  "engines": {
+    "node": ">= 10.10"
+  },
   "description": "Contains translations to be used by other packages",
   "directories": {
     "lib": "lib"
@@ -13,6 +15,6 @@
   },
   "devDependencies": {
     "jest": "^24",
-    "prettier": "^1"
+    "prettier": "^2"
   }
 }

@@ -40,7 +40,9 @@ export function Like({...props}) {
       interaction={props.interaction}
     >
       <ScreenReaderContent>
-        {props.isLiked ? I18n.t('Unlike post') : I18n.t('Like post')}
+        {props.isLiked
+          ? I18n.t('Unlike post from %{author}', {author: props.authorName})
+          : I18n.t('Like post from %{author}', {author: props.authorName})}
       </ScreenReaderContent>
       {props.likeCount > 0 && (
         <>
@@ -76,5 +78,9 @@ Like.propTypes = {
   /**
    * Specifies if the interaction with Like is enabled, disabled, or readonly
    */
-  interaction: PropTypes.string
+  interaction: PropTypes.string,
+  /**
+   * Name of the author of the post being liked
+   */
+  authorName: PropTypes.string.isRequired
 }

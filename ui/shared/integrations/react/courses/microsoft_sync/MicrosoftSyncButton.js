@@ -32,7 +32,11 @@ const syncReducer = (state, action) => {
       return {...state, loading: true, error: false, previousError: state.error}
     case 'SCHEDULE_SUCCESS': {
       const {group} = action.payload
-      const newSecondsRemaining = secondsUntilEditable(group, state.coolDownSeconds)
+      const newSecondsRemaining = secondsUntilEditable(
+        group,
+        state.coolDownSeconds,
+        state.canBypassCooldown
+      )
 
       return {
         ...state,
@@ -43,7 +47,9 @@ const syncReducer = (state, action) => {
         error: false,
         secondsRemaining: newSecondsRemaining,
         readyForManualSync: readyStates.includes(group.workflow_state),
-        showCountdown: coolDownRequiredStates.includes(group.workflow_state)
+        // We don't need to show the countdown for Site Admins
+        showCountdown:
+          coolDownRequiredStates.includes(group.workflow_state) && !state.canBypassCooldown
       }
     }
     case 'SCHEDULE_FAILED':
@@ -53,8 +59,9 @@ const syncReducer = (state, action) => {
   }
 }
 
-const secondsUntilEditable = (group, coolDownSeconds) => {
-  if (!group.last_manually_synced_at) {
+const secondsUntilEditable = (group, coolDownSeconds, canBypassCooldown) => {
+  // Site admins can bypass the cooldown timer.
+  if (!group.last_manually_synced_at || canBypassCooldown) {
     return 0 // No manual sync has ocurred yet- sync away!
   }
 
@@ -70,9 +77,14 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
     error,
     coolDownSeconds: ENV.MANUAL_MSFT_SYNC_COOLDOWN,
     previousError: error,
-    secondsRemaining: secondsUntilEditable(group, ENV.MANUAL_MSFT_SYNC_COOLDOWN),
+    secondsRemaining: secondsUntilEditable(
+      group,
+      ENV.MANUAL_MSFT_SYNC_COOLDOWN,
+      ENV.MSFT_SYNC_CAN_BYPASS_COOLDOWN
+    ),
     readyForManualSync: readyStates.includes(group.workflow_state),
     showCountdown: coolDownRequiredStates.includes(group.workflow_state),
+    canBypassCooldown: ENV.MSFT_SYNC_CAN_BYPASS_COOLDOWN,
     enabled,
     group
   })

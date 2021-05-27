@@ -1878,6 +1878,7 @@ uk:
   ange_name: "Angel конвертер"
   angel: 
     file_copy_fail: "Не вдалося скопіювати папку \"%{base_path}\""
+    file_copy_fail_message: "Не вдалося перейменувати папку \"%{base_path}\""
     file_import_fail: "Не вдалося імпортувати файл \"%{file_path}\""
   angel_display: "ANGEL навчання"
   angel_file_description: "Angel експорт .zip формат"

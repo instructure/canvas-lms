@@ -92,13 +92,11 @@ describe('DiscussionPostToolbar', () => {
 
   describe('Back to Top Button', () => {
     it('should call onChange when toggle is changed', () => {
-      const onTopClickMock = jest.fn()
-      const {getByTestId} = setup({
-        onTopClick: onTopClickMock
-      })
+      window.scrollTo = jest.fn()
+      const {getByTestId} = setup()
       const button = getByTestId('topButton')
       button.click()
-      expect(onTopClickMock.mock.calls.length).toBe(1)
+      expect(window.scrollTo.mock.calls.length).toBe(1)
     })
   })
 })
