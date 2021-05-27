@@ -32,5 +32,5 @@ course_templates:
 persist_inferred_authentication_providers:
   state: hidden
   applies_to: RootAccount
-  display_name: Require Authenticion Provider on Logins
+  display_name: Require Authentication Provider on Logins
   description: Persists the used authentication provider when logging in, and defaults new logins to the default provider
