@@ -145,7 +145,11 @@ module K5PageObject
   end
 
   def teacher_preview_selector
-    "h2:contains('Teacher Schedule Preview')"
+    "h2:contains('Schedule Preview')"
+  end
+
+  def empty_dashboard_selector
+    "[data-testid = 'empty-dash-panda']:visible"
   end
 
   def previous_week_button_selector
@@ -520,6 +524,10 @@ module K5PageObject
 
   def teacher_preview
     fj(teacher_preview_selector)
+  end
+
+  def empty_dashboard
+    fj(empty_dashboard_selector)
   end
 
   def beginning_of_week_date

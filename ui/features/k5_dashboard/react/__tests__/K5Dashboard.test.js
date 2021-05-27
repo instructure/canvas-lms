@@ -445,6 +445,27 @@ describe('K-5 Dashboard', () => {
       expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
     })
 
+    it('displays an empty state on the homeroom and schedule tabs if the user has no cards', async () => {
+      moxios.stubs.reset()
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+        status: 200,
+        response: []
+      })
+      const {getByRole, getByTestId, getByText} = render(
+        <K5Dashboard {...defaultProps} plannerEnabled />
+      )
+      await waitFor(() =>
+        expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
+      )
+      expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
+
+      const scheduleTab = getByRole('tab', {name: 'Schedule'})
+      act(() => scheduleTab.click())
+
+      expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
+      expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
+    })
+
     it('only fetches announcements and LTIs based on cards once per page load', done => {
       sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
       moxios.withMock(() => {
@@ -570,9 +591,9 @@ describe('K-5 Dashboard', () => {
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()
-      expect(getByText('Teacher Schedule Preview')).toBeInTheDocument()
+      expect(getByText('Schedule Preview')).toBeInTheDocument()
       expect(
-        getByText('Below is an example of how your students will see their schedule')
+        getByText('Below is an example of how students will see their schedule')
       ).toBeInTheDocument()
       expect(getByText('Social Studies')).toBeInTheDocument()
       expect(getByText('A great discussion assignment')).toBeInTheDocument()

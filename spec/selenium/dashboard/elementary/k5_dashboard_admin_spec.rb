@@ -110,10 +110,10 @@ describe "admin k5 dashboard" do
   end
 
   context 'admin schedule' do
-    it 'shows a sample preview for admin (teacher) view of the schedule tab' do
+    it 'shows an empty state for the admin (teacher) view of the course schedule tab with no enrollments' do
       get "/#schedule"
 
-      expect(teacher_preview).to be_displayed
+      expect(empty_dashboard).to be_displayed
     end
 
     it 'shows a sample preview for admin (teacher) view of the course schedule tab' do

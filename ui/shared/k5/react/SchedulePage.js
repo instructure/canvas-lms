@@ -21,18 +21,44 @@ import PropTypes from 'prop-types'
 
 import {
   createPlannerApp,
+  createPlannerPreview,
   renderWeeklyPlannerHeader,
   JumpToHeaderButton
 } from '@instructure/canvas-planner'
 
-const SchedulePage = ({visible = false}) => {
+import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
+
+const SchedulePage = ({
+  plannerEnabled,
+  plannerInitialized,
+  timeZone,
+  userHasEnrollments,
+  visible
+}) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
   const plannerApp = useRef()
 
   useEffect(() => {
-    plannerApp.current = createPlannerApp()
-    setPlannerCreated(true)
-  }, [])
+    if (plannerInitialized) {
+      plannerApp.current = createPlannerApp()
+      setPlannerCreated(true)
+    }
+  }, [plannerInitialized])
+
+  let content = <></>
+  if (plannerInitialized && isPlannerCreated) {
+    content = (
+      <>
+        {renderWeeklyPlannerHeader({visible})}
+        {plannerApp.current}
+        <JumpToHeaderButton />
+      </>
+    )
+  } else if (!userHasEnrollments) {
+    content = <EmptyDashboardState />
+  } else if (!plannerEnabled) {
+    content = createPlannerPreview(timeZone)
+  }
 
   return (
     <section
@@ -43,15 +69,17 @@ const SchedulePage = ({visible = false}) => {
       }}
       aria-hidden={!visible}
     >
-      {renderWeeklyPlannerHeader({visible})}
-      {isPlannerCreated && plannerApp.current}
-      {isPlannerCreated && <JumpToHeaderButton />}
+      {content}
     </section>
   )
 }
 
 SchedulePage.propTypes = {
-  visible: PropTypes.bool
+  plannerEnabled: PropTypes.bool.isRequired,
+  plannerInitialized: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
+  timeZone: PropTypes.string.isRequired,
+  userHasEnrollments: PropTypes.bool.isRequired,
+  visible: PropTypes.bool.isRequired
 }
 
 export default SchedulePage

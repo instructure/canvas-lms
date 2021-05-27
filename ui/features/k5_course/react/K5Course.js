@@ -21,11 +21,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
 
-import {
-  createTeacherPreview,
-  startLoadingAllOpportunities,
-  store
-} from '@instructure/canvas-planner'
+import {startLoadingAllOpportunities, store} from '@instructure/canvas-planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -304,8 +300,13 @@ export function K5Course({
           />
         )}
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
-        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-        {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        <SchedulePage
+          plannerEnabled={plannerEnabled}
+          plannerInitialized={plannerInitialized}
+          timeZone={timeZone}
+          userHasEnrollments
+          visible={currentTab === TAB_IDS.SCHEDULE}
+        />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage
             courseId={id}

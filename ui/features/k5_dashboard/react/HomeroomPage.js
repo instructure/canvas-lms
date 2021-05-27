@@ -27,15 +27,13 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {Text} from '@instructure/ui-text'
-import {Img} from '@instructure/ui-img'
 
 import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import {CreateCourseModal} from './CreateCourseModal'
-import EmptyDashPandaUrl from '../images/empty-dashboard.svg'
+import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
 export const HomeroomPage = ({
   cards,
@@ -121,10 +119,7 @@ export const HomeroomPage = ({
         ) : cards.length > 0 ? (
           dashboardCards
         ) : (
-          <Flex direction="column" alignItems="center" margin="x-large large">
-            <Img src={EmptyDashPandaUrl} margin="0 0 medium 0" data-testid="empty-dash-panda" />
-            <Text>{I18n.t("You don't have any active courses yet.")}</Text>
-          </Flex>
+          <EmptyDashboardState />
         )}
       </View>
       {courseModalOpen && (

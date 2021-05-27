@@ -21,7 +21,6 @@ import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 
 import {
-  createTeacherPreview,
   loadThisWeekItems,
   startLoadingAllOpportunities,
   responsiviser,
@@ -106,7 +105,7 @@ export const K5Dashboard = ({
   })
 
   useEffect(() => {
-    if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
+    if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
         const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
         setCards(activeCards)
@@ -197,8 +196,13 @@ export const K5Dashboard = ({
           loadingAnnouncements={loadingAnnouncements}
           visible={currentTab === TAB_IDS.HOMEROOM}
         />
-        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-        {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        <SchedulePage
+          plannerEnabled={plannerEnabled}
+          plannerInitialized={plannerInitialized}
+          timeZone={timeZone}
+          userHasEnrollments={cards?.length}
+          visible={currentTab === TAB_IDS.SCHEDULE}
+        />
         <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         {cards && (
           <ResourcesPage
