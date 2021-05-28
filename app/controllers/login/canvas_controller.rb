@@ -131,7 +131,6 @@ class Login::CanvasController < ApplicationController
       ap = pseudonym.authentication_provider
 
       session[:login_aac] ||= ap.id
-      pseudonym.infer_auth_provider(ap)
       successful_login(user, pseudonym)
     else
       link_url = Setting.get('invalid_login_faq_url', nil)
