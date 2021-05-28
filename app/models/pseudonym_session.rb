@@ -152,11 +152,6 @@ class PseudonymSession < Authlogic::Session::Base
     r = alternate_record || record
     if r != priority_record
       if r&.has_changes_to_save? && !r.readonly?
-        if r.authentication_provider_id_changed? && !r.account.feature_enabled?(:persist_inferred_authentication_providers)
-          saved_auth_provider = r.authentication_provider
-          r.authentication_provider_id = r.authentication_provider_id_was
-        end
-
         changed_columns = r.changes_to_save.keys
         if changed_columns == ["last_request_at"]
           # we're ONLY updating the last_request_at field.  This
@@ -171,7 +166,6 @@ class PseudonymSession < Authlogic::Session::Base
         else
           r.save_without_transaction
         end
-        r.authentication_provider = saved_auth_provider if saved_auth_provider
       end
     end
   end

@@ -314,6 +314,19 @@ describe Pseudonym do
       expect(u.email_channel.path).to eq 'jt@instructure.com'
       expect(u.email_channel).to be_active
     end
+
+    it "does not persist the auth provider if inferred" do
+      account = Account.create!
+      ap = account.authentication_providers.create!(:auth_type => 'ldap')
+      u = User.create!
+      u.register
+      pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
+      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
+
+      pseudonym.infer_auth_provider(ap)
+      pseudonym.add_ldap_channel
+      expect(pseudonym.reload.authentication_provider).to be_nil
+    end
   end
 
   describe 'valid_arbitrary_credentials?' do
