@@ -384,8 +384,9 @@ class Pseudonym < ActiveRecord::Base
 
   def infer_auth_provider(ap)
     previously_changed = changed?
+    @inferred_auth_provider = true if ap && authentication_provider_id.nil?
     self.authentication_provider ||= ap
-    save! if !previously_changed && changed? && account.feature_enabled?(:persist_inferred_authentication_providers)
+    save! if !previously_changed && changed?
   end
 
   # managed_password? and passwordable? differ in their treatment of pseudonyms
@@ -472,6 +473,25 @@ class Pseudonym < ActiveRecord::Base
       self.communication_channel = cc
       self.save_without_session_maintenance if self.changed?
     end
+  end
+
+  def changed?
+    !strip_inferred_authentication_provider(changed_attribute_names_to_save).empty?
+  end
+  alias has_changes_to_save? changed?
+
+  def attribute_names_for_partial_writes
+    strip_inferred_authentication_provider(super)
+  end
+
+  def strip_inferred_authentication_provider(attribute_names)
+    if attribute_names.include?('authentication_provider_id') &&
+      @inferred_auth_provider &&
+      authentication_provider_id &&
+      !account.feature_enabled?(:persist_inferred_authentication_providers)
+      attribute_names.delete('authentication_provider_id')
+    end
+    attribute_names
   end
 
   attr_reader :ldap_result
