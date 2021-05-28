@@ -23,7 +23,7 @@ class SetNavigationPlacementSettingsForQuizLtiTools < ActiveRecord::Migration[6.
   def up
     DataFixup::SetNavigationPlacementSettingsForQuizLtiTools.delay_if_production(
       priority: Delayed::LOW_PRIORITY,
-      n_strand: 'long_datafixups'
+      strand: "placements_settings_for_shard:#{Shard.current.id}"
     ).run
   end
 
