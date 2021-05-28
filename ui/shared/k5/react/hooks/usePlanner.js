@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import I18n from 'i18n!use_planner'
+import I18n from 'i18n!k5_use_planner'
 import $ from 'jquery'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!k5_course_GradesPage'
+import I18n from 'i18n!grade_row'
 import tz from '@canvas/timezone'
 import PropTypes from 'prop-types'
 

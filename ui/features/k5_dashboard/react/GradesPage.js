@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!dashboard_grades_page'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'

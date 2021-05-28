@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!homeroom_page'
 
 import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'

@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import I18n from 'i18n!k5_course_GradesPage'
+import I18n from 'i18n!course_grades_page'
 import PropTypes from 'prop-types'
 
 import {Tabs} from '@instructure/ui-tabs'

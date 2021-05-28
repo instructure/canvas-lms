@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!k5_course_GradesEmptyPage'
+import I18n from 'i18n!grades_empty_page'
 import PropTypes from 'prop-types'
 
 import {Img} from '@instructure/ui-img'

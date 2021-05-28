@@ -18,7 +18,7 @@
 
 import React, {useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_dashboard_CreateCourseModal'
+import I18n from 'i18n!create_course_modal'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!dashboard_layout_HomeroomAnnouncementsLayout'
+import I18n from 'i18n!homeroom_announcements_layout'
 import {array, bool} from 'prop-types'
 
 import {View} from '@instructure/ui-view'

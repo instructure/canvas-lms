@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import I18n from 'i18n!k5_course_GradeDetails'
+import I18n from 'i18n!grade_details'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'

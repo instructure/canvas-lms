@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!dashboard_pages_ResourcesPage'
+import I18n from 'i18n!resources_page'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
