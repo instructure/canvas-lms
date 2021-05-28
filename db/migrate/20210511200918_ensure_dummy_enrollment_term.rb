@@ -34,7 +34,7 @@ class EnsureDummyEnrollmentTerm < ActiveRecord::Migration[6.0]
     EnrollmentTerm.ensure_dummy_enrollment_term
     # fix any dummy courses already created
     Course.where(id: 0).update_all(enrollment_term_id: 0)
-    
+
     execute("SET CONSTRAINTS #{connection.quote_table_name(fk_name)} IMMEDIATE")
   end
 end

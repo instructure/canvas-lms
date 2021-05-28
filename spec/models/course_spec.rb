@@ -5045,12 +5045,6 @@ describe Course, "#sync_homeroom_enrollments" do
     @course.save!
     expect(@course.sync_homeroom_enrollments).not_to eq(false)
   end
-
-  it "returns false unless the homeroom_course_id is accessible within the account" do
-    @course.homeroom_course_id = 0
-    @course.save!
-    expect(@course.sync_homeroom_enrollments).to eq(false)
-  end
 end
 
 describe Course, "user_is_instructor?" do
