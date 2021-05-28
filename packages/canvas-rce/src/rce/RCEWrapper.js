@@ -1290,6 +1290,8 @@ class RCEWrapper extends React.Component {
     const wrappedOpts = {
       ...options,
 
+      theme: 'silver', // some older code specified 'modern', which doesn't exist any more
+
       height: options.height || DEFAULT_RCE_HEIGHT,
 
       language: editorLanguage(this.language),
@@ -1727,10 +1729,9 @@ function mergeMenu(standard, custom) {
 // in order to be merged correctly.
 function mergeToolbar(standard, custom) {
   if (!custom) return standard
-
   // merge given toolbar data into the default toolbar
   custom.forEach(tb => {
-    const curr_tb = standard.find(t => formatMessage(tb.name) === t.name)
+    const curr_tb = standard.find(t => tb.name && formatMessage(tb.name) === t.name)
     if (curr_tb) {
       curr_tb.items.splice(curr_tb.items.length, 0, ...tb.items)
     } else {
