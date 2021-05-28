@@ -98,8 +98,8 @@ describe('Alert', () => {
     overrides[2].unlockAt = null
     overrides[2].lockAt = null
     const {queryByText, findByText} = setup(true)
-    expect(await queryByText('Show due dates (3)')).toBeTruthy()
-    fireEvent.click(queryByText('Show due dates (3)'))
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+    fireEvent.click(queryByText('Show Due Dates (3)'))
     expect(await findByText('No Due Date')).toBeTruthy()
     expect(await findByText('No Start Date')).toBeTruthy()
     expect(await findByText('No End Date')).toBeTruthy()
