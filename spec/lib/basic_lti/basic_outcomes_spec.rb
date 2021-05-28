@@ -24,7 +24,7 @@ require 'nokogiri'
 
 describe BasicLTI::BasicOutcomes do
   before(:each) do
-    course_model
+    course_model.offer
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
     @course.update_attribute(:account, @account)
@@ -145,13 +145,6 @@ describe BasicLTI::BasicOutcomes do
         to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
     end
 
-    it 'throws Invalid sourcedid if course is concluded' do
-      @course.soft_conclude!
-      @course.save!
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is concluded')
-    end
-
     it "throws User is no longer in course isuser enrollment is missing" do
       @user.enrollments.destroy_all
       expect{described_class.decode_source_id(tool, source_id)}.
@@ -218,6 +211,68 @@ describe BasicLTI::BasicOutcomes do
       expect(response.code_major).to eq('failure')
       expect(response.description).to eq('Invalid sourcedid')
       expect(response.body).not_to be_nil
+    end
+
+    context 'when the sourcedid points to a concluded course' do
+      before do
+        @course.start_at = 1.month.ago
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates =  true
+        @course.save
+      end
+
+      it 'rejects replace_result' do
+        xml.css('resultData').remove
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq 'failure'
+        expect(request.body).to eq '<replaceResultResponse />'
+        expect(request.description).to eq 'Course not available for student'
+        expect(request.handle_request(tool)).to be_truthy
+      end
+
+      it 'replace_result succeeds when section dates override course dates' do
+        cs = CourseSection.where(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id)).take
+        cs.start_at = 1.day.ago
+        cs.end_at = 1.day.from_now
+        cs.restrict_enrollments_to_section_dates =  true
+        cs.save
+        xml.css('resultData').remove
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq 'success'
+        expect(request.body).to eq '<replaceResultResponse />'
+        expect(request.handle_request(tool)).to be_truthy
+      end
+
+      it 'rejects delete_result' do
+        xml.css('resultData').remove
+        xml.css('replaceResultRequest').each do |node|
+          node.replace(Nokogiri::XML::DocumentFragment.parse(
+            "<deleteResultRequest>#{xml.css('replaceResultRequest').inner_html}</deleteResultRequest>"
+          ))
+        end
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq 'failure'
+        expect(request.body).to eq '<deleteResultResponse />'
+        expect(request.description).to eq 'Course not available for student'
+        expect(request.handle_request(tool)).to be_truthy
+      end
+
+      # not 100% sure they should be able to read when the course is concluded, but I think they can
+      it 'allows a read_result' do
+        xml.css('resultData').remove
+        xml.css('replaceResultRequest').each do |node|
+          node.replace(Nokogiri::XML::DocumentFragment.parse(
+            "<readResultRequest>#{xml.css('replaceResultRequest').inner_html}</readResultRequest>"
+          ))
+        end
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq 'success'
+        expect(request.handle_request(tool)).to be_truthy
+      end
     end
   end
 
