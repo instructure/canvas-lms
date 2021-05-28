@@ -97,10 +97,11 @@ const OutcomeManagementPanel = () => {
     rootId,
     selectedGroupId,
     selectedParentGroupId
-  } = useManageOutcomes()
+  } = useManageOutcomes(true)
   const {group, loading, loadMore} = useGroupDetail({
     id: selectedGroupId,
-    searchString: debouncedSearchString
+    searchString: debouncedSearchString,
+    showAlert: false
   })
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
