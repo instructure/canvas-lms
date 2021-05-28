@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {totalAllowedAttempts} from '../SubmissionHelpers'
+import {totalAllowedAttempts, friendlyTypeName} from '../SubmissionHelpers'
 
 describe('totalAllowedAttempts', () => {
   it('returns null if allowedAttempts on the assignment is null', () => {
@@ -39,5 +39,9 @@ describe('totalAllowedAttempts', () => {
     const assignment = {allowedAttempts: 7}
     const submission = {extraAttempts: 5}
     expect(totalAllowedAttempts({assignment, submission})).toBe(12)
+  })
+
+  it('returns the value Annotation for the submission type student_annotation', () => {
+    expect(friendlyTypeName('student_annotation')).toBe('Annotation')
   })
 })

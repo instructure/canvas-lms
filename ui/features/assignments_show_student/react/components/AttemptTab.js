@@ -25,7 +25,8 @@ import {
   IconAttachMediaLine,
   IconLinkLine,
   IconUploadLine,
-  IconTextLine
+  IconTextLine,
+  IconAnnotateLine
 } from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -42,12 +43,14 @@ const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
 const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
 const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
 const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
+const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,
   online_text_entry: IconTextLine,
   online_upload: IconUploadLine,
-  online_url: IconLinkLine
+  online_url: IconLinkLine,
+  student_annotation: IconAnnotateLine
 }
 
 function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
@@ -174,6 +177,14 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderStudentAnnotationAttempt = () => {
+    return (
+      <Suspense fallback={<LoadingIndicator />}>
+        <StudentAnnotationAttempt />
+      </Suspense>
+    )
+  }
+
   renderByType(submissionType, context) {
     switch (submissionType) {
       case 'media_recording':
@@ -184,6 +195,8 @@ export default class AttemptTab extends Component {
         return this.renderFileAttempt()
       case 'online_url':
         return this.renderUrlAttempt()
+      case 'student_annotation':
+        return this.renderStudentAnnotationAttempt()
       default:
         throw new Error('submission type not yet supported in A2')
     }

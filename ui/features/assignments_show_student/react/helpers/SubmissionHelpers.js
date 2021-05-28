@@ -38,6 +38,8 @@ export function friendlyTypeName(type) {
       return I18n.t('Upload')
     case 'online_url':
       return I18n.t('Web URL')
+    case 'student_annotation':
+      return I18n.t('Annotation')
     default:
       throw new Error('submission type not yet supported in A2')
   }
