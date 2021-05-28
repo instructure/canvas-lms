@@ -56,6 +56,8 @@ class Course < ActiveRecord::Base
   has_many :templated_courses, :class_name => 'Course', :foreign_key => 'template_course_id'
   has_many :templated_accounts, class_name: 'Account', foreign_key: 'course_template_id'
 
+  belongs_to :linked_homeroom_course, class_name: 'Course', foreign_key: 'homeroom_course_id'
+
   has_many :course_sections
   has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
   has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
@@ -823,7 +825,8 @@ class Course < ActiveRecord::Base
 
   scope :templates, -> { where(template: true) }
 
-  scope :sync_homeroom_enrollments_enabled, -> { where('settings LIKE ?', '%sync_enrollments_from_homeroom: true%') }
+  scope :homeroom, -> { where(homeroom_course: true) }
+  scope :sync_homeroom_enrollments_enabled, -> { where(sync_enrollments_from_homeroom: true) }
 
   def potential_collaborators
     current_users
@@ -3287,9 +3290,6 @@ class Course < ActiveRecord::Base
 
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
-  add_setting :homeroom_course, :boolean => true, :default => false
-  add_setting :sync_enrollments_from_homeroom, :boolean => true, :default => false
-  add_setting :homeroom_course_id
   add_setting :course_color
 
   def elementary_enabled?
@@ -3301,7 +3301,7 @@ class Course < ActiveRecord::Base
   end
 
   def elementary_subject_course?
-    !homeroom_course && elementary_enabled?
+    !homeroom_course? && elementary_enabled?
   end
 
   def lock_all_announcements?
@@ -3313,13 +3313,10 @@ class Course < ActiveRecord::Base
   end
 
   def sync_homeroom_enrollments(progress=nil)
-    return false unless elementary_subject_course? && sync_enrollments_from_homeroom && homeroom_course_id.present?
+    return false unless elementary_subject_course? && sync_enrollments_from_homeroom && linked_homeroom_course
 
-    homeroom_course = account.courses.find_by(id: homeroom_course_id)
-    return false if homeroom_course.nil?
-
-    progress&.calculate_completion!(0, homeroom_course.enrollments.size)
-    homeroom_course.all_enrollments.find_each do |enrollment|
+    progress&.calculate_completion!(0, linked_homeroom_course.enrollments.size)
+    linked_homeroom_course.all_enrollments.find_each do |enrollment|
       course_enrollment = all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
       course_enrollment.workflow_state = enrollment.workflow_state
       course_enrollment.start_at = enrollment.start_at

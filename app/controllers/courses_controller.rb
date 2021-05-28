@@ -1416,9 +1416,9 @@ class CoursesController < ApplicationController
         can_do(@context, @current_user, :manage_grades)
 
       @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
-        @context.account.courses.active.select(&:homeroom_course)
+        @context.account.courses.active.homeroom.to_a
       else
-        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).select(&:homeroom_course)
+        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a
       end
 
       @alerts = @context.alerts
