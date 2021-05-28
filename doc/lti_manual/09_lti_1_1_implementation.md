@@ -322,9 +322,20 @@ One of the public methods required by the "LTI Adapter" interface mentioned in "
 
 Returns the URL that the LTI launch should be made to.
 
-### 4. LTI Outbound Gem
-TODO
+After one of the these `*generate_post_payload` methods constructs the LTI parameters, those parameters are used in a Rails view to generate an HTML form that launches the tool. See section 6 for more details.
 
+### 4. LTI Outbound Gem
+The LTI Outbound Gem is a library used to model objects required to build an LTI launch. For example, the gem can model courses, roles, users, etc.
+
+This gem was initially intended to be released publicly, but the need never arose.
+
+The `Lti::LtiOutboundAdapter` (described in Section 3) is used to convert Canvas models (like `Course`) into LTI Outbound models (like `LTIOutbound::LTICourse`).
+
+The models themselves are self-explanatory.
+
+One model of special significance is the `LtiOutBound::ToolLaunch` located at `gems/lti_outbound/lib/lti_outbound/tool_launch.rb` This model is the class that generates the LTI 1.1 launch parameters as a hash (more details in Section 3).
+
+This layer of abstraction between Canvas models and the LTI 1.1 launch was originally intended to allow other Instructure or external systems to become LTI tool consumers. This vision was never realized, however.
 ### 5.IMS LTI Gem
 TODO
 
