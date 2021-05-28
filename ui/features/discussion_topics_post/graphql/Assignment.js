@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {arrayOf, number, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 
 import {AssignmentOverride} from './AssignmentOverride'
 
@@ -29,6 +29,7 @@ export const Assignment = {
       dueAt(applyOverrides: false)
       lockAt(applyOverrides: false)
       unlockAt(applyOverrides: false)
+      onlyVisibleToOverrides
       pointsPossible
       assignmentOverrides {
         nodes {
@@ -45,6 +46,7 @@ export const Assignment = {
     dueAt: string,
     lockAt: string,
     unlockAt: string,
+    onlyVisibleToOverrides: bool,
     pointsPossible: number,
     assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)})
   }),
@@ -55,6 +57,7 @@ export const Assignment = {
     dueAt = '2021-03-30T23:59:59-06:00',
     lockAt = '2021-04-03T23:59:59-06:00',
     unlockAt = '2021-03-24T00:00:00-06:00',
+    onlyVisibleToOverrides = false,
     pointsPossible = 10,
     assignmentOverrides = {
       nodes: [AssignmentOverride.mock()],
@@ -66,6 +69,7 @@ export const Assignment = {
     dueAt,
     lockAt,
     unlockAt,
+    onlyVisibleToOverrides,
     pointsPossible,
     assignmentOverrides,
     __typename: 'Assignment'
@@ -78,6 +82,7 @@ export const DefaultMocks = {
     dueAt: '2021-03-25T13:22:24-06:00',
     lockAt: '2021-03-27T13:22:24-06:00',
     unlockAt: '2021-03-21T13:22:24-06:00',
+    onlyVisibleToOverrides: false,
     pointsPossible: 10,
     assignmentOverrides: {
       nodes: [AssignmentOverride.mock()],

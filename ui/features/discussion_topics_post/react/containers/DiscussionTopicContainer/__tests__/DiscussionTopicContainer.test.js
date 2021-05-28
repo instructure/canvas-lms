@@ -132,6 +132,17 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
 
+  it('renders a special alert for differentiated assignments', async () => {
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        groupSet: {name: 'test'},
+        assignment: {onlyVisibleToOverrides: true}
+      }
+    })
+    expect(await container.findByTestId('differentiated-alert')).toBeTruthy()
+  })
+
   it('renders without optional props', async () => {
     const container = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, assignment: {}}

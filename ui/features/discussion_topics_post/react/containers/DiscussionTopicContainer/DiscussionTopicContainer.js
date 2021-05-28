@@ -17,6 +17,7 @@
  */
 
 import {Alert} from '../../components/Alert/Alert'
+import {Alert as AssignmentAlert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
@@ -230,6 +231,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           />
         </View>
       </div>
+      {discussionTopicData.groupSet && discussionTopicData.assignment?.onlyVisibleToOverrides && (
+        <View as="div" margin="none none small" width="80%" data-testid="differentiated-alert">
+          <AssignmentAlert renderCloseButtonLabel="Close">
+            {I18n.t(
+              'Note: for differentiated group topics, some threads may not have any students assigned.'
+            )}
+          </AssignmentAlert>
+        </View>
+      )}
       <Flex as="div" direction="column">
         <Flex.Item>
           <View
@@ -249,6 +259,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 />
               </View>
             )}
+
             <Flex direction="column">
               <Flex.Item>
                 <Flex
