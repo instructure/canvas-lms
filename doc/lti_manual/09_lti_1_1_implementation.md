@@ -337,7 +337,26 @@ One model of special significance is the `LtiOutBound::ToolLaunch` located at `g
 
 This layer of abstraction between Canvas models and the LTI 1.1 launch was originally intended to allow other Instructure or external systems to become LTI tool consumers. This vision was never realized, however.
 ### 5.IMS LTI Gem
-TODO
+The IMS LTI Gem can be found [here](https://github.com/instructure/ims-lti).
 
+This gem provides helpers useful to both LTI tool consumers and tool providers. For example: helper methods to generate OAuth parameters for launches and helpers to validate LTI launches.
+
+During an LTI 1.1 launch, this gem is used by the `Lti::LtiOutboundAdapter` (described in section 3) to generate the OAuth parameters needed for an LTI launch. This call to the IMS LTI gem is wrapped in the `Lti::Security` module.
+
+See `Lti::Security.signed_post_params_frd`.
 ### 6. Self-submitting HTML form
-TODO
+After LTI launch parameters have been generated using the `Lti::LtiOutboundAdapter` described in section 3, the controller uses the `Lti::AppUtil.Lti::AppUtil.display_template` method to determine what view should be used to show the launch.
+
+Options are:
+- borderless (no Canvas UI is shown)
+- full_width (The Canvas global navigation is shown)
+- in_context (default - The Canvas global and context navigations are shown)
+- full_width_in_context (The Canvas global and context navigations are shown, but the tool's iframe takes all remaining space).
+
+Which view is selected is determined by the `display_type` top-level or placement-level tool configuration.
+
+Each ultimately uses the `lti/lti_message' partial view. This view renders a form with one hidden input tag per LTI launch parameter. The form's action is the LTI launch url (determined from the adapter in section 3).
+
+Importantly, this form targets an iframe also rendered in this view (#tool_content).
+
+The form is auto-submitted, which sends all LTI parameters to the tool's launch URL within the iframe.
