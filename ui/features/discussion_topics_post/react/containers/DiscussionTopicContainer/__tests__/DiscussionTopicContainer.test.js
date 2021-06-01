@@ -232,6 +232,13 @@ describe('DiscussionTopicContainer', () => {
     })
   })
 
+  it('Should find due date text for assignment', async () => {
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {readAsAdmin: false}}
+    })
+    expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
+  })
+
   it('Should not be able to open SpeedGrader if the user does not have permission', () => {
     const {getByTestId, queryByTestId} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}

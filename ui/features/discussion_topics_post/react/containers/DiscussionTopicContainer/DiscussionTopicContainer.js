@@ -128,7 +128,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
 
     const showDefaultDueDate = () => {
-      return props.discussionTopic.assignment?.dueAt
+      return discussionTopicData.assignment?.dueAt
         ? I18n.t('Everyone: Due %{dueAtDisplayDate}', {
             dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
               props.discussionTopic.assignment?.dueAt
@@ -137,9 +137,24 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
         : I18n.t('No Due Date')
     }
 
-    discussionTopicData.dueAt = singleOverrideWithNoDefault
-      ? showSingleOverrideDueDate()
-      : showDefaultDueDate()
+    const showNonAdminDueDate = () => {
+      return props.discussionTopic.assignment?.dueAt
+        ? I18n.t('Due: %{dueAtDisplayDate}', {
+            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
+              props.discussionTopic.assignment?.dueAt
+            )
+          })
+        : I18n.t('No Due Date')
+    }
+
+    const getDueDateText = () => {
+      if (discussionTopicData?.permissions?.readAsAdmin)
+        return singleOverrideWithNoDefault ? showSingleOverrideDueDate() : showDefaultDueDate()
+
+      return showNonAdminDueDate()
+    }
+
+    discussionTopicData.dueAt = getDueDateText()
 
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
