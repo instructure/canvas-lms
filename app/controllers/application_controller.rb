@@ -2818,7 +2818,7 @@ class ApplicationController < ActionController::Base
       k5_accounts = @domain_root_account.settings[:k5_accounts]
       return false if k5_accounts.blank?
 
-      @current_user.user_account_associations.where(account_id: k5_accounts).exists?
+      @current_user.user_account_associations.shard(@domain_root_account).where(account_id: k5_accounts).exists?
     else
       # Default to classic canvas if the user isn't logged in
       false
@@ -2828,7 +2828,7 @@ class ApplicationController < ActionController::Base
   def k5_user?
     if @current_user
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+      Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
         uncached_k5_user?
       end
     else

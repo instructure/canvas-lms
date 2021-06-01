@@ -30,6 +30,7 @@ function initialState(opts = {}) {
         env: {
           TIMEZONE: TZ,
           K5_USER: true,
+          K5_SUBJECT_COURSE: true,
           FEATURES: {}
         }
       }
