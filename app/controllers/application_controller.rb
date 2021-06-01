@@ -2589,6 +2589,7 @@ class ApplicationController < ActionController::Base
         permissions[:manage] && 'module_ids'
       ].reject(&:blank?),
       exclude_response_fields: ['description', 'rubric'],
+      exclude_assignment_submission_types: ['wiki_page'],
       override_assignment_dates: !permissions[:manage],
       per_page: ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX
     ), id: 'assignment_groups_url')

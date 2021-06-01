@@ -19,9 +19,12 @@
 
 require_relative '../common'
 require_relative '../../conditional_release_spec_helper'
+require_relative '../assignments/page_objects/assignments_index_page.rb'
 require_relative 'page_objects/conditional_release_objects'
 
 describe 'native canvas conditional release' do
+  include AssignmentsIndexPage
+
   include_context 'in-process server selenium tests'
   before(:once) do
     Account.default.enable_feature! :conditional_release
@@ -43,10 +46,10 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.conditional_content_exists?).to eq(false)
     end
 
-    it 'hides scores fields for page assignments' do
+    it 'is not included in the assignments page' do
       page_title = "MP Page to Verify"
       @new_page = @course.wiki_pages.create!(:title => page_title)
-      @new_page.course.assignments.create!(
+      page_assignment = @new_page.course.assignments.create!(
         :wiki_page => @new_page,
         :submission_types => 'wiki_page',
         :title => @new_page.title
@@ -54,10 +57,7 @@ describe 'native canvas conditional release' do
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      ConditionalReleaseObjects.assignment_kebob(page_title).click
-      ConditionalReleaseObjects.edit_assignment(page_title).click
-      expect(ConditionalReleaseObjects.due_at_exists?).to eq(false)
-      expect(ConditionalReleaseObjects.points_possible_exists?).to eq(false)
+      expect { assignment_row(page_assignment.id) }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
     end
   end
 
