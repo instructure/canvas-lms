@@ -100,7 +100,7 @@ describe DiscussionEntry do
 
     it 'should create on entry save' do
       entry = @topic.discussion_entries.new(user: @student)
-      allow(entry).to receive(:message).and_return("<p>hello</p><span data-mention=#{@mentioned_student.id} </span> what's up dude")
+      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{@mentioned_student.id} class=mention>@#{@mentioned_student.short_name}</span> what's up dude</p>")
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq @mentioned_student.id
     end
