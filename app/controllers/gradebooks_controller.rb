@@ -264,7 +264,6 @@ class GradebooksController < ApplicationController
     end
 
     set_default_gradebook_env
-    opt_in_datadog_rum_js
     render "gradebooks/gradebook"
   end
   private :show_default_gradebook
