@@ -1016,6 +1016,17 @@ describe "Accounts API", type: :request do
       end
     end
 
+    it "limits the response to homeroom courses if requested" do
+      @c1 = course_factory(account: @a1, course_name: 'c1')
+      @c2 = course_factory(account: @a1, course_name: 'c2')
+      @c2.homeroom_course = true
+      @c2.save!
+      json = api_call_as_user(account_admin_user(account: @a1), :get, "/api/v1/accounts/#{@a1.id}/courses?homeroom=1",
+                              controller: 'accounts', action: 'courses_api', account_id: @a1.to_param,
+                              format: 'json', homeroom: '1')
+      expect(json.map { |c| c['name'] }).to match_array(['c2'])
+    end
+
     describe 'sort' do
       before :once do
         @me = @user
