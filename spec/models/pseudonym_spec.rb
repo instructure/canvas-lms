@@ -353,6 +353,11 @@ describe Pseudonym do
     context "sharding" do
       specs_require_sharding
       let_once(:account2) { @shard1.activate { Account.create! } }
+      before(:once) do
+        # need these instantiated before we set up our mocks
+        Account.default
+        account2
+      end
 
       it "should only query the pertinent shard" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([@shard1])

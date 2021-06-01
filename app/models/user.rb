@@ -654,10 +654,7 @@ class User < ActiveRecord::Base
         current_associations[key] = [aa.id, aa.depth]
       end
 
-      account_id_to_root_account_id = Account.where(id: precalculated_associations&.keys).pluck(:id, :root_account_id).reduce({}) do |cache, fields|
-        cache[fields[0]] = fields[1] || fields[0]
-        cache
-      end
+      account_id_to_root_account_id = Account.where(id: precalculated_associations&.keys).pluck(:id, Arel.sql(Account.resolved_root_account_id_sql)).to_h
 
       users_or_user_ids.uniq.sort_by{|u| u.try(:id) || u}.each do |user_id|
         if user_id.is_a? User

@@ -25,7 +25,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     @cm = @course.context_modules.create!
     @cm.update_columns(root_account_id: nil)
     user_model
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.ensure_dummy_root_account
   end
 
   # add additional models here as they are calculated and added to migration_tables.
@@ -891,12 +891,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         {submission: :id, assignment: :root_account_id}
       )
     end
-
-    it 'should turn string associations/columns into symbols' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.hash_association(
-        [{'submission' => ['root_account_id', 'id']}, 'assignment']
-      )).to eq({submission: [:root_account_id, :id], assignment: :root_account_id})
-    end
   end
 
   describe '#replace_polymorphic_associations' do
@@ -918,7 +912,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           course: [:root_account_id, :id],
           learning_outcome_group: [:root_account_id, :id],
           assignment: [:root_account_id, :id],
-          account: [:root_account_id, :id],
+          account: Account.resolved_root_account_id_sql,
           quiz: [:root_account_id, :id],
           context_module: :root_account_id
         }
@@ -933,7 +927,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           course: [:root_account_id, :id],
           learning_outcome_group: :root_account_id,
           assignment: :root_account_id,
-          account: [:root_account_id, :id],
+          account: Account.resolved_root_account_id_sql,
           quiz: :root_account_id
         }
       )
@@ -958,8 +952,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         ContextExternalTool, {course: :root_account_id, account: :root_account_id}
       )).to eq(
         {
-          :account=>[:root_account_id, :id],
-          :course=>:root_account_id
+          :account => Account.resolved_root_account_id_sql,
+          :course => :root_account_id
         }
       )
     end
@@ -1065,19 +1059,19 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#create_column_names' do
     it 'should create a single column name' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Assignment.reflections["course"], 'root_account_id')).to eq(
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Assignment.reflections["course"], :root_account_id)).to eq(
         'courses.root_account_id'
       )
     end
 
     it 'should coalesce multiple column names on a table' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Course.reflections["account"], ['root_account_id', :id])).to eq(
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(Course.reflections["account"], [:root_account_id, :id])).to eq(
         "COALESCE(accounts.root_account_id, accounts.id)"
       )
     end
 
     it 'should use actual table names for strangely named columns' do
-      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(AssetUserAccess.reflections["context_course"], 'root_account_id')).to eq(
+      expect(DataFixup::PopulateRootAccountIdOnModels.create_column_names(AssetUserAccess.reflections["context_course"], :root_account_id)).to eq(
         'courses.root_account_id'
       )
     end
