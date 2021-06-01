@@ -610,6 +610,13 @@ describe DiscussionEntry do
         expect(participant_from_id.id).not_to be_nil
         expect(participant_from_id.id).to eq participant_from_user.id
       end
+
+      it "should update stream item from a mention" do
+        @reply2.mentions.create!(user_id: @student, root_account_id: @reply2.root_account_id)
+        expect(@student.stream_item_instances.last.workflow_state).to eq 'unread'
+        @reply2.change_read_state('read', @student, forced: true)
+        expect(@student.stream_item_instances.last.workflow_state).to eq 'read'
+      end
     end
 
   end
