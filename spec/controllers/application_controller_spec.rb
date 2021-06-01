@@ -2059,7 +2059,7 @@ describe ApplicationController do
 
     it "caches the result after computing" do
       enable_cache do
-        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @student, batched_keys: [:k5_user]) do
+        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @student, batched_keys: [:k5_user]) do
           "cached :)"
         end
         expect(@controller.send(:k5_user?)).to eq "cached :)"
@@ -2081,6 +2081,27 @@ describe ApplicationController do
     it "returns false if no current user" do
       @controller.instance_variable_set(:@current_user, nil)
       expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    context "with sharding" do
+      require_relative '../sharding_spec_helper'
+      specs_require_sharding
+
+      before :once do
+        @shard2.activate do
+          @student2 = User.create!
+        end
+        @course.enroll_student(@student2)
+      end
+
+      before :each do
+        user_session(@student2)
+        @controller.instance_variable_set(:@current_user, @student2)
+      end
+
+      it "returns true for user on another shard if associated with a k5 account" do
+        expect(@controller.send(:k5_user?)).to be_truthy
+      end
     end
   end
 end
