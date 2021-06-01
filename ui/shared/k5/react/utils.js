@@ -101,10 +101,12 @@ export const fetchCourseInstructors = courseId =>
     )
   )
 
-export const fetchCourseApps = courseId =>
+export const fetchCourseApps = courseIds =>
   asJson(
     window.fetch(
-      `/api/v1/courses/${courseId}/external_tools/visible_course_nav_tools`,
+      `/api/v1/external_tools/visible_course_nav_tools?${courseIds
+        .map(id => `context_codes[]=course_${id}`)
+        .join('&')}`,
       defaultFetchOptions
     )
   )

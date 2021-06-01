@@ -2979,8 +2979,6 @@ class Course < ActiveRecord::Base
 
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
-    # The request params are nested within the session variable. Here we attempt to dig deep and find the params we
-    # care about to display elementary course subject tabs
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
@@ -3101,8 +3099,8 @@ class Course < ActiveRecord::Base
         admin_only_tabs = tabs.select{ |t| t[:visibility] == 'admins' }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
-        hidden_exteral_tabs = tabs.select{ |t| t[:hidden] && t[:external] }
-        tabs -= hidden_exteral_tabs if hidden_exteral_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
+        hidden_external_tabs = tabs.select{ |t| t[:hidden] && t[:external] }
+        tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
 

@@ -2248,8 +2248,8 @@ describe ExternalToolsController do
   end
 
   describe "GET 'visible_course_nav_tools'" do
-    def add_tool(name)
-      tool = @course.context_external_tools.new(
+    def add_tool(name, course)
+      tool = course.context_external_tools.new(
         name: name,
         consumer_key: "key1",
         shared_secret: "secret1"
@@ -2262,134 +2262,157 @@ describe ExternalToolsController do
     end
 
     before :once do
-      course_with_teacher(:active_all => true)
+      student_in_course(:active_all => true)
+      @course1 = @course
+      course_with_teacher(:active_all => true, :user => @teacher)
+      student_in_course(:active_all => true, :user => @student)
+      @course2 = @course
+
+      @tool1 = add_tool("Course nav tool 1", @course1)
+      @tool1.course_navigation = {enabled: true}
+      @tool1.save!
+      @tool2 = add_tool("Course nav tool 2", @course1)
+      @tool2.course_navigation = {enabled: true}
+      @tool2.save!
+      @tool3 = add_tool("Course nav tool 3", @course2)
+      @tool3.course_navigation = {enabled: true}
+      @tool3.save!
     end
 
-    it "ignores requests from unauthorized users" do
-      tool1 = add_tool("Course nav tool 1")
-      tool1.course_navigation = {enabled: true}
-      tool1.save!
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
+    it "returns a 400 response if no context_codes are provided for the batch endpoint" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:course_id => @course1.id}
+
+      message = json_parse(response.body)['message']
+      expect(response.status).to be 400
+      expect(message).to eq "Missing context_codes"
+    end
+
+    it "returns a 404 response if no context could be found for the single-context endpoint" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
+
+      expect(response.status).to be 404
+    end
+
+    it "returns a 400 response if any context_codes besides courses are provided" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["account_#{@course.account.id}"]}
+
+      message = json_parse(response.body)['message']
+      expect(response.status).to be 400
+      expect(message).to eq "Invalid context_codes; only `course` codes are supported"
+    end
+
+    it "returns an empty array if no courses are found or the courses found have no associated tools" do
+      course_with_teacher(:active_all => true)
+      user_session(@teacher)
+
+      get :all_visible_nav_tools, params: {:context_codes => ["course_fake"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 0
+
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 0
+    end
+
+    it "returns unauthorized if the user lacks read access to any of the supplied courses for the batch endpoint" do
+      @course2.claim!
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
       assert_unauthorized
     end
 
-    it "handles bad requests" do
-      user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
-      expect(response.status).to eq 404
-    end
-
-    it "shows course nav tool to teacher" do
-      name = "Course nav tool 1"
-      tool1 = add_tool(name)
-      tool1.course_navigation = {enabled: true}
-      tool1.save!
-      user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
-      expect(response).to be_successful
-      tools = json_parse(response.body)
-      expect(tools.count).to eq 1
-      expect(tools.first["name"]).to eq name
-    end
-
-    it "shows course nav tool to student" do
-      name = "Course nav tool 1"
-      tool1 = add_tool(name)
-      tool1.course_navigation = {enabled: true}
-      tool1.save!
-      student_in_course(:course => @course)
+    it "returns unauthorized if the user lacks read access the context for the single-context endpoint" do
+      @course2.claim!
       user_session(@student)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      get :visible_course_nav_tools, params: {:course_id => @course2.id}
+      assert_unauthorized
+    end
+
+    it "shows course nav tools to teacher" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 3
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+    end
+
+    it "shows course nav tools for the single-context endpoint" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course1.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 2
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2"]
+    end
+
+    it "shows course nav tools to student" do
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 3
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+    end
+
+    it "only returns tools with a course navigation placement" do
+      @tool2.course_navigation = {enabled: false}
+      @tool2.save!
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 1
-      expect(tools.first["name"]).to eq name
-    end
-
-    it "returns an empty array if there are no tools" do
-      user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
-      expect(response).to be_successful
-      tools = json_parse(response.body)
-      expect(tools.count).to eq 0
-    end
-
-    it "doesn't return tools without course nav placement" do
-      add_tool("Random tool")
-      user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
-      expect(response).to be_successful
-      tools = json_parse(response.body)
-      expect(tools.count).to eq 0
+      expect(tools.none?{|t| t['name'] == "Course nav tool 2"}).to be_truthy
     end
 
     it "doesn't return tools to student marked with admins visibility" do
-      name = "Course nav tool 2"
-      tool1 = add_tool(name)
-      tool1.course_navigation = {enabled: true, visibility: "admins"}
-      tool1.save!
+      @tool3.course_navigation = {enabled: true, visibility: "admins"}
+      @tool3.save!
       user_session(@teacher)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 1
-      expect(tools.first["name"]).to eq name
+      expect(tools.first["name"]).to eq "Course nav tool 3"
 
-      student_in_course(:course => @course)
       user_session(@student)
-      get :visible_course_nav_tools, params: {:course_id => @course.id}
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to eq 0
     end
 
-    context "with configured navigation settings" do
-      before :once do
-        @tool1 = add_tool("Test nav tool 1")
-        @tool1.course_navigation = {enabled: true}
-        @tool1.save!
-        @tool2 = add_tool("Test nav tool 2")
-        @tool2.course_navigation = {enabled: true}
-        @tool2.save!
-        @tool3 = add_tool("Test nav tool 3")
-        @tool3.course_navigation = {enabled: true}
-        @tool3.save!
-      end
+    it "returns tools in the order they are configured in the navigation settings" do
+      saved_tabs = [
+        {id: "context_external_tool_#{@tool2.id}"},
+        {id: "context_external_tool_#{@tool1.id}"}
+      ]
+      @course1.tab_configuration = saved_tabs
+      @course1.save!
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
 
-      it "returns tools in the order they are configured in the navigation settings" do
-        saved_tabs = [
-          {id: "context_external_tool_#{@tool3.id}"},
-          {id: "context_external_tool_#{@tool1.id}"},
-          {id: "context_external_tool_#{@tool2.id}"}
-        ]
-        @course.tab_configuration = saved_tabs
-        @course.save!
-        user_session(@teacher)
-        get :visible_course_nav_tools, params: {:course_id => @course.id}
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 2
+      expect(tools[0]['name']).to eq "Course nav tool 2"
+      expect(tools[1]['name']).to eq "Course nav tool 1"
+    end
 
-        tools = json_parse(response.body)
-        expect(tools.count).to eq 3
-        expect(tools[0]['name']).to eq "Test nav tool 3"
-        expect(tools[1]['name']).to eq "Test nav tool 1"
-        expect(tools[2]['name']).to eq "Test nav tool 2"
-      end
+    it "excludes hidden tools from response for students" do
+      saved_tabs = [{id: "context_external_tool_#{@tool3.id}", hidden: true}]
+      @course2.tab_configuration = saved_tabs
+      @course2.save!
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
 
-      it "excludes hidden tools from response for students" do
-        saved_tabs = [
-          {id: "context_external_tool_#{@tool3.id}"},
-          {id: "context_external_tool_#{@tool1.id}", hidden: true},
-        ]
-        @course.tab_configuration = saved_tabs
-        @course.save!
-        student_in_course(:course => @course)
-        user_session(@student)
-        get :visible_course_nav_tools, params: {:course_id => @course.id}
-
-        tools = json_parse(response.body)
-        expect(tools.count).to eq 2
-        expect(tools[0]['name']).to eq "Test nav tool 3"
-        expect(tools[1]['name']).to eq "Test nav tool 2"
-      end
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
     end
   end
 end

@@ -41,7 +41,7 @@ const GRADES_URL = /\/api\/v1\/users\/self\/courses\?.*/
 const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
 const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
-const APPS_URL = '/api/v1/courses/test/external_tools/visible_course_nav_tools'
+const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_test'
 const CONVERSATIONS_URL = '/api/v1/conversations'
 const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science&enroll_me=true'
 
@@ -244,7 +244,7 @@ describe('fetchCourseApps', () => {
         }
       ])
     )
-    const apps = await fetchCourseApps('test')
+    const apps = await fetchCourseApps(['test'])
     expect(apps.length).toBe(2)
     expect(apps[0].id).toBe(1)
     expect(apps[1].id).toBe(2)
