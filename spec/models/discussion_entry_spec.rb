@@ -600,6 +600,16 @@ describe DiscussionEntry do
         expect(participant.workflow_state).to eq 'unread'
         expect(participant.forced_read_state).to be_falsey
       end
+
+      it "should work with user_id or user" do
+        participant = @reply2.find_existing_participant(@student.id)
+        expect(participant.id).to be_nil
+        @reply2.change_read_state('read', @student, forced: true)
+        participant_from_id = @reply2.find_existing_participant(@student.id)
+        participant_from_user = @reply2.find_existing_participant(@student)
+        expect(participant_from_id.id).not_to be_nil
+        expect(participant_from_id.id).to eq participant_from_user.id
+      end
     end
 
   end

@@ -554,16 +554,17 @@ class DiscussionEntry < ActiveRecord::Base
   # Public: Find the existing DiscussionEntryParticipant, or create a default
   # participant, for the specified user.
   #
-  # user - The User to lookup the participant for.
+  # user - The User or user_id to lookup the participant for.
   #
   # Returns the DiscussionEntryParticipant for the user, or a participant with
   # default values set. The returned record is marked as readonly! If you need
   # to update a participant, use the #update_or_create_participant method
   # instead.
   def find_existing_participant(user)
+    user_id = user.is_a?(User) ? user.id : user
     participant = discussion_entry_participants.loaded? ?
-      discussion_entry_participants.detect{|dep| dep.user_id == user.id} :
-      discussion_entry_participants.where(:user_id => user).first
+      discussion_entry_participants.detect{|dep| dep.user_id == user_id} :
+      discussion_entry_participants.where(:user_id => user_id).first
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({
@@ -571,7 +572,7 @@ class DiscussionEntry < ActiveRecord::Base
         :forced_read_state => false,
         })
       participant.discussion_entry = self
-      participant.user = user
+      participant.user_id = user_id
     end
 
     # Do not save this record. Use update_or_create_participant instead if you need to save it
