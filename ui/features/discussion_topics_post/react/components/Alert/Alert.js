@@ -19,7 +19,7 @@
 import I18n from 'i18n!discussion_posts'
 
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useMemo, useState} from 'react'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 
 import {Text} from '@instructure/ui-text'
@@ -33,24 +33,19 @@ import {Grid} from '@instructure/ui-grid'
 export function Alert({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
 
-  const renderDueDates = () => {
-    return props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
-      ? multipleDueDates()
-      : singleDueDate()
-  }
-
-  const singleDueDate = () => {
-    return (
+  const singleDueDate = useMemo(
+    () => (
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
           {props.dueAtDisplayText}
         </Text>
       </Flex.Item>
-    )
-  }
+    ),
+    [props.dueAtDisplayText]
+  )
 
-  const multipleDueDates = () => {
-    return (
+  const multipleDueDates = useMemo(
+    () => (
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Link
           as="button"
@@ -105,49 +100,50 @@ export function Alert({...props}) {
                     </Text>
                   </Grid.Col>
                 </Grid.Row>
-                {props.assignmentOverrides.map(item => {
-                  return (
-                    <Grid.Row key={item.id}>
-                      <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                        <Text size="medium">
-                          {item.dueAt
-                            ? DateHelper.formatDatetimeForDiscussions(item.dueAt)
-                            : I18n.t('No Due Date')}
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
-                        <Text size="medium">
-                          {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
-                        <Text size="medium">
-                          {item.unlockAt
-                            ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
-                            : I18n.t('No Start Date')}
-                        </Text>
-                      </Grid.Col>
-                      <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                        <Text size="medium">
-                          {item.lockAt
-                            ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
-                            : I18n.t('No End Date')}
-                        </Text>
-                      </Grid.Col>
-                    </Grid.Row>
-                  )
-                })}
+                {props.assignmentOverrides.map(item => (
+                  <Grid.Row key={item.id}>
+                    <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                      <Text size="medium">
+                        {item.dueAt
+                          ? DateHelper.formatDatetimeForDiscussions(item.dueAt)
+                          : I18n.t('No Due Date')}
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
+                      <Text size="medium">
+                        {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                      <Text size="medium">
+                        {item.unlockAt
+                          ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
+                          : I18n.t('No Start Date')}
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                      <Text size="medium">
+                        {item.lockAt
+                          ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
+                          : I18n.t('No End Date')}
+                      </Text>
+                    </Grid.Col>
+                  </Grid.Row>
+                ))}
               </Grid>
             </Flex>
           </View>
         </Tray>
       </Flex.Item>
-    )
-  }
+    ),
+    [dueDateTrayOpen, props.assignmentOverrides]
+  )
 
   return (
     <Flex data-testid="graded-discussion-info">
-      {renderDueDates()}
+      {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
+        ? multipleDueDates
+        : singleDueDate}
       <Flex.Item padding="x-small" align="end">
         <Text weight="light" size="small">
           {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {

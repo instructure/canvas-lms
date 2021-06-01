@@ -28,7 +28,34 @@ export default {
   argTypes: {}
 }
 
-const Template = args => <Alert pointsPossible="5" dueAtDisplayText="Jan 26 11:49pm" {...args} />
+const Template = args => <Alert pointsPossible={5} dueAtDisplayText="Jan 26 11:49pm" {...args} />
 
-export const Default = Template.bind({})
-Default.args = {}
+export const SingleDueDate = Template.bind({})
+SingleDueDate.args = {
+  assignmentOverrides: [],
+  canSeeMultipleDueDates: false
+}
+
+export const MultipleDueDates = Template.bind({})
+MultipleDueDates.args = {
+  assignmentOverrides: [
+    {
+      id: '1',
+      dueAt: 'Sat, 29 May 2021 05:59:59 UTC +00:00',
+      title: 'Mutants Group 1'
+    },
+    {
+      id: '2',
+      dueAt: 'Sun, 30 May 2021 05:59:59 UTC +00:00',
+      title: 'Mutants Group 2',
+      unlockAt: 'Fri, 28 May 2021 05:59:59 UTC +00:00',
+      lockAt: 'Tue, 1 June 2021 05:59:59 UTC +00:00'
+    },
+    {
+      id: '3',
+      dueAt: 'Mon, 31 May 2021 05:59:59 UTC +00:00',
+      title: 'Mutants Group 3'
+    }
+  ],
+  canSeeMultipleDueDates: true
+}
