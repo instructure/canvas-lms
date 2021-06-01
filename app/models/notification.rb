@@ -35,6 +35,9 @@ class Notification < Switchman::UnshardedRecord
     "Grade Weight Changed",
     "Group Assignment Submitted Late",
 
+    # Mentions
+    "Discussion Mention",
+
     # Testing
     "Show In Feed",
   ].freeze

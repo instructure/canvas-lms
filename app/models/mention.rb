@@ -17,6 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Mention < ApplicationRecord
+  include SendToStream
   include Canvas::SoftDeletable
 
   belongs_to :user, inverse_of: :mentions
@@ -32,6 +33,10 @@ class Mention < ApplicationRecord
     p.to { user }
     p.whenever { |record| record.just_created && record.active? && user != discussion_entry.user }
     p.data { discussion_entry.course_broadcast_data }
+  end
+
+  on_create_send_to_streams do
+    user
   end
 
   def message

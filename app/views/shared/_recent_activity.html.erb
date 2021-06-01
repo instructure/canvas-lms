@@ -32,6 +32,7 @@
 %>
 <% %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest).each do |category| %>
   <% items = categorized_items[category] %>
+  <% items = items.to_a + categorized_items['DiscussionEntry'].to_a if category == 'DiscussionTopic'%>
   <% category_class = category.underscore %>
   <% if items.present? %>
     <li class="stream-category stream-<%= category_class %>" data-category="<%= category %>">
