@@ -653,6 +653,9 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user has an enrollment with the given state.
   #   This will respect section/course/term date overrides.
   #
+  # @argument homeroom [Optional, Boolean]
+  #   If set, only return homeroom courses.
+  #
   # @returns [Course]
   def user_index
     GuardRail.activate(:secondary) do
@@ -3513,6 +3516,11 @@ class CoursesController < ApplicationController
     if enrollments.any? && value_to_boolean(params[:exclude_blueprint_courses])
       mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => enrollments.map(&:course_id)).pluck(:course_id)
       enrollments.reject!{|e| mc_ids.include?(e.course_id)}
+    end
+
+    if value_to_boolean(params[:homeroom])
+      homeroom_ids = Course.homeroom.where(id: enrollments.map(&:course_id)).pluck(:id)
+      enrollments.reject!{|e| homeroom_ids.exclude?(e.course_id)}
     end
 
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
