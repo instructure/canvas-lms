@@ -49,8 +49,8 @@ const fetchStaff = cards =>
     )
 
 const fetchApps = cards => {
-  if (!cards.length) return Promise.resolve([])
   const courseIds = cards.filter(c => !c.isHomeroom).map(c => c.id)
+  if (!courseIds.length) return Promise.resolve([])
   return fetchCourseApps(courseIds).then(apps =>
     // Combine LTIs into a unique set each containing a list of
     // the courses with which they are associated
