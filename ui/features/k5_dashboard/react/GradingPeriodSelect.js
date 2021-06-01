@@ -32,7 +32,7 @@ const GradingPeriodSelect = ({
   handleSelectGradingPeriod,
   selectedGradingPeriodId
 }) => (
-  <View as="div" margin="medium 0">
+  <View as="div">
     <SimpleSelect
       id="grading-period-select"
       renderLabel={I18n.t('Select Grading Period')}

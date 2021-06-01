@@ -89,7 +89,8 @@ export const K5Dashboard = ({
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
   responsiveSize = 'large',
-  createPermissions
+  createPermissions,
+  currentUserRoles
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
   const [cards, setCards] = useState(null)
@@ -212,7 +213,7 @@ export const K5Dashboard = ({
           userHasEnrollments={cards?.length}
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
-        <GradesPage visible={currentTab === TAB_IDS.GRADES} />
+        <GradesPage visible={currentTab === TAB_IDS.GRADES} currentUserRoles={currentUserRoles} />
         {cards && (
           <ResourcesPage
             cards={cards}
@@ -244,7 +245,8 @@ K5Dashboard.propTypes = {
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 const mapDispatchToProps = {

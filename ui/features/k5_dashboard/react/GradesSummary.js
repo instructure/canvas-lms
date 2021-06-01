@@ -191,7 +191,7 @@ GradeSummaryLine.propTypes = GradeSummaryShape
 
 const GradesSummary = ({courses}) => {
   return (
-    <View as="div" margin="medium 0">
+    <View as="div" margin="medium none none">
       {courses.map(course => (
         <GradeSummaryLine key={course.courseId} {...course} />
       ))}

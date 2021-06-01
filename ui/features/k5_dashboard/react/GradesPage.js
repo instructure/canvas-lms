@@ -21,13 +21,11 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard_grades_page'
 
-import {Spinner} from '@instructure/ui-spinner'
-import {View} from '@instructure/ui-view'
-
 import {fetchGrades, fetchGradesForGradingPeriod} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
 import GradingPeriodSelect from './GradingPeriodSelect'
+import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 export const getGradingPeriodsFromCourses = courses =>
   courses
@@ -66,7 +64,7 @@ export const overrideCourseGradingPeriods = (
     // Filter out nulls
     .filter(c => c)
 
-export const GradesPage = ({visible}) => {
+export const GradesPage = ({visible, currentUserRoles}) => {
   const [courses, setCourses] = useState(null)
   const [gradingPeriods, setGradingPeriods] = useState([])
   const [loading, setLoading] = useState(false)
@@ -123,36 +121,50 @@ export const GradesPage = ({visible}) => {
     specificPeriodGrades
   )
 
-  // Only show the grading period selector if the user has an enrollment that can view grades
-  const hasStudentEnrollment =
-    !!courses && courses.some(c => ['student', 'observer'].includes(c.enrollmentType))
+  // Only show the grading period selector if the user has student role
+  const hasStudentRole = currentUserRoles?.some(r => ['student', 'observer'].includes(r))
 
   return (
     <section
       id="dashboard_page_grades"
-      style={{display: visible ? 'block' : 'none'}}
+      style={{display: visible ? 'block' : 'none', margin: '1.5rem 0'}}
       aria-hidden={!visible}
     >
-      {hasStudentEnrollment && gradingPeriods.length > 1 && (
-        <GradingPeriodSelect
-          gradingPeriods={gradingPeriods}
-          handleSelectGradingPeriod={handleSelectGradingPeriod}
-          selectedGradingPeriodId={selectedGradingPeriodId}
-        />
+      {hasStudentRole && (
+        <LoadingWrapper
+          isLoading={loading && gradingPeriods.length === 0}
+          width="20rem"
+          height="5.7rem"
+          margin="none none medium"
+          screenReaderLabel={I18n.t('Loading grading periods...')}
+        >
+          {gradingPeriods.length > 1 && (
+            <GradingPeriodSelect
+              gradingPeriods={gradingPeriods}
+              handleSelectGradingPeriod={handleSelectGradingPeriod}
+              selectedGradingPeriodId={selectedGradingPeriodId}
+            />
+          )}
+        </LoadingWrapper>
       )}
-      {loading && (
-        <View as="div" textAlign="center" margin="large 0">
-          <Spinner renderTitle={I18n.t('Loading grades...')} size="large" />
-        </View>
-      )}
-      {selectedCourses && !loading && <GradesSummary courses={selectedCourses} />}
+      <LoadingWrapper
+        isLoading={loading}
+        skeletonsCount={selectedCourses?.length || 3}
+        width="100%"
+        height="8.5rem"
+        margin="none none medium"
+        screenReaderLabel={I18n.t('Loading grades...')}
+      >
+        {selectedCourses && <GradesSummary courses={selectedCourses} />}
+      </LoadingWrapper>
     </section>
   )
 }
 
 GradesPage.displayName = 'GradesPage'
 GradesPage.propTypes = {
-  visible: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired,
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default GradesPage

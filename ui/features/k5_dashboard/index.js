@@ -29,6 +29,7 @@ ready(() => {
     ReactDOM.render(
       <K5Dashboard
         currentUser={ENV.current_user}
+        currentUserRoles={ENV.current_user_roles}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
         locale={ENV.LOCALE}
