@@ -116,6 +116,25 @@ describe('Upload Media', () => {
       fireEvent.click(getByText('Submit'))
       expect(getByText('Submit').closest('button')).toBeDisabled()
     })
+
+    it('is disabled while uploading if file title is empty', () => {
+      computerFile = new File(['bits'], 'dummy-video.mp4', {
+        lastModifiedDate: 1568991600840,
+        type: 'video/mp4'
+      })
+      const {getByPlaceholderText, getByText} = renderComponent({
+        disableSubmitWhileUploading: false,
+        onStartUpload: jest.fn(),
+        tabs: {upload: true},
+        computerFile
+      })
+      const submitButton = getByText('Submit').closest('button')
+      const titleInput = getByPlaceholderText('File name')
+      fireEvent.change(titleInput, {target: {value: ''}})
+      expect(submitButton).toBeDisabled()
+      fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
+      expect(submitButton).toBeEnabled()
+    })
     // the submit button is not rendered for the record tab
   })
 

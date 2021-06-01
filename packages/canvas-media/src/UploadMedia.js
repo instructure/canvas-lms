@@ -82,9 +82,12 @@ export default class UploadMedia extends React.Component {
     } else if (props.tabs.record) {
       defaultSelectedPanel = 1
     }
+    if (props.computerFile) {
+      props.computerFile.title = props.computerFile.name
+    }
 
     this.state = {
-      hasUploadedFile: false,
+      hasUploadedFile: !!props.computerFile,
       uploading: false,
       progress: 0,
       selectedPanel: defaultSelectedPanel,
@@ -122,6 +125,15 @@ export default class UploadMedia extends React.Component {
         break
       default:
         throw new Error('Selected Panel is invalid') // Should never get here
+    }
+  }
+
+  submitEnabled = () => {
+    switch (this.state.selectedPanel) {
+      case PANELS.COMPUTER:
+        return this.isReady() && !!this.state.computerFile?.title
+      default:
+        return this.isReady()
     }
   }
 
@@ -277,9 +289,9 @@ export default class UploadMedia extends React.Component {
             e.preventDefault()
             this.handleSubmit()
           }}
-          variant="primary"
+          color="primary"
           type="submit"
-          disabled={!this.isReady()}
+          interaction={this.submitEnabled() ? 'enabled' : 'disabled'}
         >
           {SUBMIT_TEXT}
         </Button>
@@ -300,9 +312,12 @@ export default class UploadMedia extends React.Component {
         liveRegion={this.props.liveRegion}
       >
         <Modal.Header>
-          <CloseButton onClick={this.onModalClose} offset="medium" placement="end">
-            {CLOSE_TEXT}
-          </CloseButton>
+          <CloseButton
+            onClick={this.onModalClose}
+            offset="medium"
+            placement="end"
+            screenReaderLabel={CLOSE_TEXT}
+          />
           <Heading>{UPLOAD_MEDIA_LABEL}</Heading>
         </Modal.Header>
         <Modal.Body ref={this.modalBodyRef}>{this.renderModalBody()}</Modal.Body>
