@@ -121,7 +121,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               discussionTopicData.assignmentOverrides[0]?.dueAt
             )
           })
-        : I18n.t('No Due Date')
+        : I18n.t('%{title}: No Due Date', {
+            title: discussionTopicData.assignmentOverrides[0]?.title
+          })
     }
 
     const showDefaultDueDate = () => {
