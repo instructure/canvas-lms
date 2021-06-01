@@ -106,6 +106,11 @@ class Account < ActiveRecord::Base
            class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
            dependent: :destroy,
            inverse_of: :root_account
+  has_many :auditor_feature_flag_records,
+           foreign_key: 'root_account_id',
+           class_name: 'Auditors::ActiveRecord::FeatureFlagRecord',
+           dependent: :destroy,
+           inverse_of: :root_account
   has_many :lti_resource_links,
            as: :context,
            inverse_of: :context,

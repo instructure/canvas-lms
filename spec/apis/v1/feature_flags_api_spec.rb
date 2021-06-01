@@ -314,7 +314,7 @@ describe "Feature Flags API", type: :request do
                {}, {}, { expected_status: 400 })
     end
 
-    it "should create a new flag" do
+    it "should create a new flag with an audit log" do
       allow(Feature).to receive(:definitions).and_return({
         'granular_permissions_manage_courses' => granular_permissions_feature,
         'course_feature' => Feature.new(
@@ -327,9 +327,24 @@ describe "Feature Flags API", type: :request do
           description: "srsly"
         )
       })
-      api_call_as_user(t_teacher, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on",
-               { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature', state: 'on' })
-      expect(t_course.feature_flags.map(&:state)).to eql ['on']
+      params = {
+        controller: 'feature_flags',
+        action: 'update',
+        format: 'json',
+        course_id: t_course.to_param,
+        feature: 'course_feature',
+        state: 'on'
+      }
+      url_path = "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on"
+      api_call_as_user(t_teacher, :put, url_path, params)
+      flags = t_course.feature_flags
+      expect(flags.size).to eq(1)
+      flag = flags.first
+      expect(flag.state).to eql 'on'
+      log = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1).first
+      expect(log.context_type).to eq('Course')
+      expect(log.context_id).to eq(t_course.id)
+      expect(log.state_after).to eq('on')
     end
 
     it "should update an existing flag" do
