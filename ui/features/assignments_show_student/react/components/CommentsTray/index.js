@@ -67,7 +67,7 @@ export default function CommentsTray(props) {
       size="regular"
       placement="end"
     >
-      <div style={{position: 'absolute', top: 0, bottom: 0, width: '100%'}}>
+      <div id="comments-tray">
         <Flex direction="column" height="100%">
           <Flex.Item>
             <View as="div" padding="medium">
