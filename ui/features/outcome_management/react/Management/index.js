@@ -306,14 +306,16 @@ const OutcomeManagementPanel = () => {
             </Flex.Item>
           </Flex>
           <hr />
+          <>
+            <ManageOutcomesFooter
+              selected={selectedOutcomes}
+              selectedCount={selectedOutcomesCount}
+              onRemoveHandler={openOutcomeRemoveMultiModal}
+              onMoveHandler={noop}
+            />
+          </>
           {selectedGroupId && (
             <>
-              <ManageOutcomesFooter
-                selected={selectedOutcomesCount}
-                onRemoveHandler={openOutcomeRemoveMultiModal}
-                onMoveHandler={noop}
-              />
-
               <MoveModal
                 title={loading ? '' : group.title}
                 groupId={selectedGroupId}

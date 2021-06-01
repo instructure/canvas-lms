@@ -21,11 +21,16 @@ import {render, fireEvent} from '@testing-library/react'
 import OutcomesPopover from '../OutcomesPopover'
 
 describe('OutcomesPopover', () => {
-  const defaultProps = () => ({
-    outcomes: new Array(3).fill(0).map((_v, i) => ({
-      _id: i,
-      title: `Outcome ${i + 1} `
-    }))
+  const generateOutcomes = (num, canUnlink) =>
+    new Array(num).fill(0).reduce(
+      (_val, idx) => ({
+        [idx + 1]: {_id: `idx + 1`, title: `Outcome ${idx + 1}`, canUnlink}
+      }),
+      {}
+    )
+  const defaultProps = (numberToGenerate, canUnlink = true) => ({
+    outcomes: generateOutcomes(numberToGenerate, canUnlink),
+    outcomeCount: numberToGenerate
   })
 
   afterEach(() => {
@@ -33,19 +38,19 @@ describe('OutcomesPopover', () => {
   })
 
   it('renders the OutcomesPopover component', () => {
-    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps()} />)
-    expect(getByText('3 Outcomes Selected')).toBeInTheDocument()
+    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps(2)} />)
+    expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
     expect(getByRole('button').hasAttribute('aria-disabled')).toBe(false)
   })
 
   it('renders the OutcomesPopover component with 0 outcomes selected', () => {
-    const {getByText, getByRole} = render(<OutcomesPopover outcomes={[]} />)
+    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps(0)} />)
     expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
     expect(getByRole('button').hasAttribute('aria-disabled')).toBe(true)
   })
 
   it('shows details on click', () => {
-    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps()} />)
+    const {getByText, getByRole} = render(<OutcomesPopover {...defaultProps(2)} />)
     const button = getByRole('button')
     fireEvent.click(button)
     expect(getByText('Selected')).toBeInTheDocument()
@@ -53,7 +58,7 @@ describe('OutcomesPopover', () => {
   })
 
   it('closes popover when clicking Close button', () => {
-    const {getByRole, getByText} = render(<OutcomesPopover {...defaultProps()} />)
+    const {getByRole, getByText} = render(<OutcomesPopover {...defaultProps(2)} />)
     const button = getByRole('button')
     fireEvent.click(button)
     const closeButton = getByText('Close')
