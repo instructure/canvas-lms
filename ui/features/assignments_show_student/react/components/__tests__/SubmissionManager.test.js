@@ -502,6 +502,21 @@ describe('SubmissionManager', () => {
       expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
     })
 
+    it('is not rendered if the student has been graded before submitting', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.graded,
+          attempt: 0
+        }
+      })
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+    })
+
     it('is not rendered if excused', async () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {...SubmissionMocks.excused}

@@ -29,6 +29,7 @@ import {
 import {Flex} from '@instructure/ui-flex'
 import {
   friendlyTypeName,
+  isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts
 } from '../helpers/SubmissionHelpers'
@@ -309,7 +310,7 @@ export default class SubmissionManager extends Component {
     return (
       context.allowChangesToSubmission &&
       !assignment.lockInfo.isLocked &&
-      (submission.state === 'graded' || submission.state === 'submitted') &&
+      isSubmitted(submission) &&
       submission.gradingStatus !== 'excused' &&
       context.latestSubmission.state !== 'unsubmitted' &&
       (allowedAttempts == null || submission.attempt < allowedAttempts)

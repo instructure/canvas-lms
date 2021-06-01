@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
+import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import MoreOptions from './MoreOptions/index'
 import React from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -217,7 +218,7 @@ class UrlEntry extends React.Component {
   }
 
   render() {
-    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+    if (isSubmitted(this.props.submission)) {
       return this.renderSubmission()
     } else {
       return this.renderAttempt()

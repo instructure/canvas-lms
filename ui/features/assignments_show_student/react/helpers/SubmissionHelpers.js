@@ -50,6 +50,10 @@ export function friendlyTypeName(type) {
   }
 }
 
+export function isSubmitted({state, attempt}) {
+  return state === 'submitted' || (state === 'graded' && attempt !== 0)
+}
+
 export function multipleTypesDrafted(submission) {
   const submissionDraft = submission?.submissionDraft
   const matchingCriteria = [

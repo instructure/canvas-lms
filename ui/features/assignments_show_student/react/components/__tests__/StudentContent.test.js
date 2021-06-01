@@ -256,7 +256,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText('1 Attempt')).toBeInTheDocument()
+      expect(getByText('1 Attempt Allowed')).toBeInTheDocument()
     })
 
     it('renders the number of attempts with unlimited attempts', async () => {
@@ -268,7 +268,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText('Unlimited Attempts')).toBeInTheDocument()
+      expect(getByText('Unlimited Attempts Allowed')).toBeInTheDocument()
     })
 
     it('renders the number of attempts with multiple attempts', async () => {
@@ -280,7 +280,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText('3 Attempts')).toBeInTheDocument()
+      expect(getByText('3 Attempts Allowed')).toBeInTheDocument()
     })
 
     it('does not render the number of attempts if the assignment does not involve digital submissions', async () => {
@@ -293,7 +293,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(queryByText('3 Attempts')).not.toBeInTheDocument()
+      expect(queryByText('3 Attempts Allowed')).not.toBeInTheDocument()
     })
 
     it('takes into account extra attempts awarded to the student', async () => {
@@ -306,7 +306,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText('5 Attempts')).toBeInTheDocument()
+      expect(getByText('5 Attempts Allowed')).toBeInTheDocument()
     })
 
     it('treats a null value for extraAttempts as zero', async () => {
@@ -319,7 +319,7 @@ describe('Assignment Student Content View', () => {
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText('3 Attempts')).toBeInTheDocument()
+      expect(getByText('3 Attempts Allowed')).toBeInTheDocument()
     })
   })
 

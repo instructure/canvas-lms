@@ -17,9 +17,10 @@
  */
 
 import {
-  totalAllowedAttempts,
   friendlyTypeName,
-  getCurrentSubmissionType
+  getCurrentSubmissionType,
+  isSubmitted,
+  totalAllowedAttempts
 } from '../SubmissionHelpers'
 
 describe('totalAllowedAttempts', () => {
@@ -77,5 +78,27 @@ describe('getCurrentSubmissionType', () => {
     }
     const assignment = {submissionTypes: ['online_text_entry', 'student_annotation']}
     expect(getCurrentSubmissionType(submission, assignment)).toBe('student_annotation')
+  })
+})
+
+describe('isSubmitted', () => {
+  it('returns true when the submission has a state of "submitted"', () => {
+    const submission = {state: 'submitted', attempt: 1}
+    expect(isSubmitted(submission)).toBe(true)
+  })
+
+  it('returns true when the submission has been graded after the student submitted', () => {
+    const submission = {state: 'graded', attempt: 1}
+    expect(isSubmitted(submission)).toBe(true)
+  })
+
+  it('returns false when the submission has been graded before the student submitted', () => {
+    const submission = {state: 'graded', attempt: 0}
+    expect(isSubmitted(submission)).toBe(false)
+  })
+
+  it('returns false when the submission state is neither "submitted" nor "graded"', () => {
+    const submission = {state: 'unsubmitted', attempt: 1}
+    expect(isSubmitted(submission)).toBe(false)
   })
 })

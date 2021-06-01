@@ -20,6 +20,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
+import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_media_attempt'
 import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -210,7 +211,7 @@ export default class MediaAttempt extends React.Component {
       return <LoadingIndicator />
     }
 
-    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+    if (isSubmitted(this.props.submission)) {
       return this.renderSubmission()
     }
 

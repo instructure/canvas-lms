@@ -85,7 +85,11 @@ function renderAttemptsAndAvailability({assignment, submission}) {
       {assignment.expectsSubmission && (
         <Text as="div" weight="bold">
           {I18n.t(
-            {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+            {
+              zero: 'Unlimited Attempts Allowed',
+              one: '1 Attempt Allowed',
+              other: '%{count} Attempts Allowed'
+            },
             {count: totalAllowedAttempts({assignment, submission}) || 0}
           )}
         </Text>
