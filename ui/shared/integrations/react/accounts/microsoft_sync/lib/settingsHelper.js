@@ -66,8 +66,6 @@ export function validateTenant(state) {
         type: 'error'
       }
     ]
-  } else {
-    state.tenantErrorMessages = []
   }
   return state
 }

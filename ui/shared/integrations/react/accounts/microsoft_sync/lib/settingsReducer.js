@@ -118,7 +118,8 @@ export function settingsReducer(state, {type, payload, dispatch}) {
     case reducerActions.updateTenant: {
       return {
         ...state,
-        microsoft_sync_tenant: payload.microsoft_sync_tenant
+        microsoft_sync_tenant: payload.microsoft_sync_tenant,
+        tenantErrorMessages: []
       }
     }
     case reducerActions.updateSettings: {
