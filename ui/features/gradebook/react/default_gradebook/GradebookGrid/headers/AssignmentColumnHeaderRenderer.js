@@ -123,7 +123,7 @@ function getProps(column, gradebook, options) {
     },
 
     postGradesAction: {
-      featureEnabled: gradebook.postPolicies != null,
+      enabledForUser: gradebook.options.gradebook_is_editable,
       hasGradesOrPostableComments,
       hasGradesOrCommentsToPost: students.some(student => isPostable(student.submission)),
       onSelect(onExited) {
