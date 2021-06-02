@@ -275,10 +275,8 @@ export default class FileUpload extends Component {
           </Flex.Item>
           <Flex.Item padding="0 0 0 small">
             <Flex direction="column" textAlign="start">
-              <Flex.Item margin="0 0 small 0">
-                <Text lineHeight="fit" size="x-large">
-                  {I18n.t('Drag a file here, or')}
-                </Text>
+              <Flex.Item margin="0 0 small 0" overflowY="visible">
+                <Text size="x-large">{I18n.t('Drag a file here, or')}</Text>
               </Flex.Item>
               <Flex.Item>
                 <Text color="brand" size="medium">
