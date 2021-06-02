@@ -1574,7 +1574,8 @@ class CoursesController < ApplicationController
   #   Restrict students from viewing courses before start date
   #
   # @argument show_announcements_on_home_page [Boolean]
-  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit)
+  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit).
+  #   Canvas for Elementary subjects ignore this setting.
   #
   # @argument home_page_announcement_limit [Integer]
   #   Limit the number of announcements on the home page if enabled via show_announcements_on_home_page

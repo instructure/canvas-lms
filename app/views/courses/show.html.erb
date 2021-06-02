@@ -179,7 +179,7 @@
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
-<% if @context.show_announcements_on_home_page? %>
+<% if @context.show_announcements_on_home_page? && !@context.elementary_subject_course? %>
   <div id="announcements_on_home_page"></div>
   <% js_bundle :announcements_on_home_page %>
 <% end %>
