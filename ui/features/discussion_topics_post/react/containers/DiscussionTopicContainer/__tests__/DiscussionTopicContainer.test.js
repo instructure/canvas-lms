@@ -132,7 +132,7 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
 
-  it('renders a special alert for differentiated assignments', async () => {
+  it('renders a special alert for differentiated group assignments for readAsAdmin', async () => {
     const container = setup({
       discussionTopic: {
         ...discussionTopicMock.discussionTopic,
@@ -141,6 +141,19 @@ describe('DiscussionTopicContainer', () => {
       }
     })
     expect(await container.findByTestId('differentiated-alert')).toBeTruthy()
+  })
+
+  it('non-readAsAdmin does not see Diff. Group Assignments alert', async () => {
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        groupSet: {name: 'test'},
+        assignment: {onlyVisibleToOverrides: true},
+        permissions: {readAsAdmin: false}
+      }
+    })
+    expect(await container.findByTestId('graded-discussion-info')).toBeTruthy()
+    expect(await container.queryByTestId('differentiated-alert')).toBeFalsy()
   })
 
   it('renders without optional props', async () => {
