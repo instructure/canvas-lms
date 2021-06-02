@@ -131,7 +131,7 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
     expect(assigns[:pseudonym_session].record.authentication_provider).to eq Account.default.canvas_authentication_provider
     
-    # the auth provider got set on the pseudonym
+    # the auth provider did not get set on the pseudonym
     expect(@pseudonym.reload.authentication_provider).to be_nil
   end
 
@@ -216,6 +216,7 @@ describe Login::CanvasController do
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
       # the auth provider got set on the pseudonym
       expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac
+      expect(@pseudonym.reload.authentication_provider).to be_nil
     end
 
     it "works for a pseudonym explicitly linked to LDAP" do

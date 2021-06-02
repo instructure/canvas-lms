@@ -742,10 +742,10 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      self.id = self.class._insert_record(attributes_with_values(changed_attribute_names_to_save))
+      self.id = self.class._insert_record(attributes_with_values(attribute_names_for_partial_writes))
       @new_record = false
     else
-      update_columns(attributes_with_values(changed_attribute_names_to_save))
+      update_columns(attributes_with_values(attribute_names_for_partial_writes))
     end
     changes_applied
   end

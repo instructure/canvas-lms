@@ -99,7 +99,7 @@ export const DiscussionPostToolbar = props => {
 
             <Tooltip
               renderTip={
-                props.sortDirection === 'asc' ? I18n.t('Newest First') : I18n.t('Oldest First')
+                props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')
               }
               width="78px"
               data-testid="sortButtonTooltip"
@@ -107,7 +107,7 @@ export const DiscussionPostToolbar = props => {
               <Button
                 onClick={props.onSortClick}
                 renderIcon={
-                  props.sortDirection === 'asc' ? (
+                  props.sortDirection === 'desc' ? (
                     <IconArrowDownLine data-testid="DownArrow" />
                   ) : (
                     <IconArrowUpLine data-testid="UpArrow" />
@@ -159,5 +159,5 @@ DiscussionPostToolbar.propTypes = {
 }
 
 DiscussionPostToolbar.defaultProps = {
-  sortDirection: 'asc'
+  sortDirection: 'desc'
 }
