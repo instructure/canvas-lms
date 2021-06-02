@@ -22,33 +22,34 @@ import React from 'react'
 
 import {fireEvent, render} from '@testing-library/react'
 
+const overrides = [
+  {
+    id: 'QXNzaWdebTVubC0x',
+    _id: '1',
+    dueAt: '2021-03-30T23:59:59-06:00',
+    lockAt: '2021-04-03T23:59:59-06:00',
+    unlockAt: '2021-03-24T00:00:00-06:00',
+    title: 'assignment override 1'
+  },
+  {
+    id: 'QXMzaWdebTubeC0x',
+    _id: '2',
+    dueAt: '2021-03-27T23:59:59-06:00',
+    lockAt: '2021-04-03T23:59:59-06:00',
+    unlockAt: '2021-03-21T00:00:00-06:00',
+    title: 'assignment override 2'
+  },
+  {
+    id: 'BXMzaWdebTVubC0x',
+    _id: '3',
+    dueAt: '2021-03-27T23:59:59-06:00',
+    lockAt: '2021-09-03T23:59:59-06:00',
+    unlockAt: '2021-03-21T00:00:00-06:00',
+    title: 'assignment override 3'
+  }
+]
+
 const setup = withOverrides => {
-  const overrides = [
-    {
-      id: 'QXNzaWdebTVubC0x',
-      _id: '1',
-      dueAt: '2021-03-30T23:59:59-06:00',
-      lockAt: '2021-04-03T23:59:59-06:00',
-      unlockAt: '2021-03-24T00:00:00-06:00',
-      title: 'assignment override 1'
-    },
-    {
-      id: 'QXMzaWdebTubeC0x',
-      _id: '2',
-      dueAt: '2021-03-27T23:59:59-06:00',
-      lockAt: '2021-04-03T23:59:59-06:00',
-      unlockAt: '2021-03-21T00:00:00-06:00',
-      title: 'assignment override 2'
-    },
-    {
-      id: 'BXMzaWdebTVubC0x',
-      _id: '3',
-      dueAt: '2021-03-27T23:59:59-06:00',
-      lockAt: '2021-09-03T23:59:59-06:00',
-      unlockAt: '2021-03-21T00:00:00-06:00',
-      title: 'assignment override 3'
-    }
-  ]
   return withOverrides
     ? render(
         <Alert
@@ -61,7 +62,7 @@ const setup = withOverrides => {
     : render(
         <Alert
           pointsPossible={7}
-          dueAtDisplayText="Jan 26 11:49pm"
+          dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
           assignmentOverrides={[]}
           canSeeMultipleDueDates={withOverrides}
         />
@@ -76,19 +77,31 @@ describe('Alert', () => {
 
   it('displays due date when there are no overrides', () => {
     const {queryByText} = setup(false)
-    expect(queryByText('Due: Jan 26 11:49pm')).toBeTruthy()
+    expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
   })
 
   it('displays "Show due dates" button when there are overrides', () => {
     const {queryByText} = setup(true)
-    expect(queryByText('Show due dates (3)')).toBeTruthy()
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
   })
 
   it('displays tray and correctly formatted dates', async () => {
     const {queryByText, findByText, findByTestId} = setup(true)
-    expect(await queryByText('Show due dates (3)')).toBeTruthy()
-    fireEvent.click(queryByText('Show due dates (3)'))
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+    fireEvent.click(queryByText('Show Due Dates (3)'))
     expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
     expect(await findByText('Sep 4 5:59am')).toBeTruthy()
+  })
+
+  it('correct text is shown when a date is not set', async () => {
+    overrides[2].dueAt = null
+    overrides[2].unlockAt = null
+    overrides[2].lockAt = null
+    const {queryByText, findByText} = setup(true)
+    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+    fireEvent.click(queryByText('Show Due Dates (3)'))
+    expect(await findByText('No Due Date')).toBeTruthy()
+    expect(await findByText('No Start Date')).toBeTruthy()
+    expect(await findByText('No End Date')).toBeTruthy()
   })
 })

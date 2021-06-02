@@ -230,7 +230,7 @@ describe('PostToolbar', () => {
       })
     })
 
-    describe('rubric', () => {
+    describe.skip('rubric', () => {
       it('does not render if the callback is not provided', () => {
         const {queryByText, getByTestId} = setup()
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))

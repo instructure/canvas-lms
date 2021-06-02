@@ -64,7 +64,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     assignment: props.discussionTopic?.assignment,
     assignmentOverrides: props.discussionTopic?.assignment?.assignmentOverrides?.nodes || [],
     childTopics: props.discussionTopic?.childTopics || [],
-    groupSet: props.discussionTopic?.groupSet || false
+    groupSet: props.discussionTopic?.groupSet || false,
+    siblingTopics: props.discussionTopic?.rootTopic?.childTopics || []
   }
 
   // TODO: Change this to the new canGrade permission.
@@ -80,19 +81,29 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish
+
   const canSeeCommons =
     discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
-  const canSeeGroupsMenu =
-    discussionTopicData?.permissions?.readAsAdmin &&
-    discussionTopicData?.childTopics.length > 0 &&
-    discussionTopicData?.groupSet
 
-  const canSeeMultipleDueDates =
+  const canSeeMultipleDueDates = !!(
     discussionTopicData?.permissions?.readAsAdmin &&
     discussionTopicData?.assignmentOverrides?.length > 0
+  )
+
+  const defaultDateSet =
+    !!discussionTopicData.assignment?.dueAt ||
+    !!discussionTopicData.assignment?.lockAt ||
+    !!discussionTopicData.assignment?.unlockAt
+
+  const singleOverrideWithNoDefault =
+    !defaultDateSet && discussionTopicData.assignmentOverrides.length === 1
 
   if (isGraded(discussionTopicData.assignment)) {
-    if (discussionTopicData.assignmentOverrides.length > 0 && canSeeMultipleDueDates) {
+    if (
+      discussionTopicData.assignmentOverrides.length > 0 &&
+      canSeeMultipleDueDates &&
+      defaultDateSet
+    ) {
       discussionTopicData.assignmentOverrides.push({
         dueAt: discussionTopicData.assignment.dueAt,
         unlockAt: discussionTopicData.assignment.unlockAt,
@@ -101,9 +112,49 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
         id: discussionTopicData.assignment.id
       })
     }
-    discussionTopicData.dueAt = DateHelper.formatDatetimeForDiscussions(
-      props.discussionTopic.assignment.dueAt
-    )
+
+    const showSingleOverrideDueDate = () => {
+      return discussionTopicData.assignmentOverrides[0]?.dueAt
+        ? I18n.t('%{title}: Due %{date}', {
+            title: discussionTopicData.assignmentOverrides[0]?.title,
+            date: DateHelper.formatDatetimeForDiscussions(
+              discussionTopicData.assignmentOverrides[0]?.dueAt
+            )
+          })
+        : I18n.t('%{title}: No Due Date', {
+            title: discussionTopicData.assignmentOverrides[0]?.title
+          })
+    }
+
+    const showDefaultDueDate = () => {
+      return discussionTopicData.assignment?.dueAt
+        ? I18n.t('Everyone: Due %{dueAtDisplayDate}', {
+            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
+              props.discussionTopic.assignment?.dueAt
+            )
+          })
+        : I18n.t('No Due Date')
+    }
+
+    const showNonAdminDueDate = () => {
+      return props.discussionTopic.assignment?.dueAt
+        ? I18n.t('Due: %{dueAtDisplayDate}', {
+            dueAtDisplayDate: DateHelper.formatDatetimeForDiscussions(
+              props.discussionTopic.assignment?.dueAt
+            )
+          })
+        : I18n.t('No Due Date')
+    }
+
+    const getDueDateText = () => {
+      if (discussionTopicData?.permissions?.readAsAdmin)
+        return singleOverrideWithNoDefault ? showSingleOverrideDueDate() : showDefaultDueDate()
+
+      return showNonAdminDueDate()
+    }
+
+    discussionTopicData.dueAt = getDueDateText()
+
     discussionTopicData.pointsPossible = props.discussionTopic.assignment.pointsPossible || 0
   }
 
@@ -212,12 +263,28 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     sort === 'asc' ? setSort('desc') : setSort('asc')
   }
 
+  const getGroupsMenuTopics = () => {
+    if (!discussionTopicData?.permissions?.readAsAdmin) {
+      return null
+    }
+    if (!discussionTopicData?.groupSet) {
+      return null
+    }
+    if (discussionTopicData.childTopics.length > 0) {
+      return discussionTopicData.childTopics
+    } else if (discussionTopicData.siblingTopics.length > 0) {
+      return discussionTopicData.siblingTopics
+    } else {
+      return null
+    }
+  }
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
         <View as="div" padding="medium 0" background="primary">
           <DiscussionPostToolbar
-            childTopics={canSeeGroupsMenu ? discussionTopicData.childTopics : null}
+            childTopics={getGroupsMenuTopics()}
             selectedView={filter}
             sortDirection={sort}
             isCollapsedReplies
@@ -243,7 +310,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Alert
                   dueAtDisplayText={discussionTopicData.dueAt}
                   pointsPossible={discussionTopicData.pointsPossible}
-                  assignmentOverrides={discussionTopicData.assignmentOverrides}
+                  assignmentOverrides={
+                    singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
+                  }
                   canSeeMultipleDueDates={canSeeMultipleDueDates}
                 />
               </View>
@@ -364,7 +433,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       onShareToCommons={
                         canSeeCommons
                           ? () => {
-                              window.location.assign(ENV.discussion_topic_menu_tools[0].base_url)
+                              window.location.assign(
+                                `${ENV.discussion_topic_menu_tools[0].base_url}&discussion_topics%5B%5D=${discussionTopicData._id}`
+                              )
                             }
                           : null
                       }

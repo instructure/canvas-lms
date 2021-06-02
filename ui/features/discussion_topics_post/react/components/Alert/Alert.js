@@ -43,9 +43,7 @@ export function Alert({...props}) {
     return (
       <Flex.Item padding="x-small" shouldGrow align="start">
         <Text weight="light" size="small">
-          {props.dueAtDisplayText === ''
-            ? I18n.t('No Due Date')
-            : I18n.t('Due: %{dueAtDisplayText}', {dueAtDisplayText: props.dueAtDisplayText})}
+          {props.dueAtDisplayText}
         </Text>
       </Flex.Item>
     )
@@ -61,7 +59,7 @@ export function Alert({...props}) {
           }}
         >
           <Text>
-            {I18n.t('Show due dates (%{dueDateCount})', {
+            {I18n.t('Show Due Dates (%{dueDateCount})', {
               dueDateCount: props.assignmentOverrides.length
             })}
           </Text>
@@ -96,12 +94,12 @@ export function Alert({...props}) {
                       {I18n.t('For')}
                     </Text>
                   </Grid.Col>
-                  <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                  <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
                     <Text size="large" weight="bold">
                       {I18n.t('Available From')}
                     </Text>
                   </Grid.Col>
-                  <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                  <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                     <Text size="large" weight="bold">
                       {I18n.t('Until')}
                     </Text>
@@ -112,7 +110,9 @@ export function Alert({...props}) {
                     <Grid.Row key={item.id}>
                       <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                         <Text size="medium">
-                          {item.dueAt ? DateHelper.formatDatetimeForDiscussions(item.dueAt) : ''}
+                          {item.dueAt
+                            ? DateHelper.formatDatetimeForDiscussions(item.dueAt)
+                            : I18n.t('No Due Date')}
                         </Text>
                       </Grid.Col>
                       <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
@@ -120,16 +120,18 @@ export function Alert({...props}) {
                           {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
                         </Text>
                       </Grid.Col>
-                      <Grid.Col c width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
+                      <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
                         <Text size="medium">
                           {item.unlockAt
                             ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
-                            : ''}
+                            : I18n.t('No Start Date')}
                         </Text>
                       </Grid.Col>
-                      <Grid.Col c width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
+                      <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                         <Text size="medium">
-                          {item.lockAt ? DateHelper.formatDatetimeForDiscussions(item.lockAt) : ''}
+                          {item.lockAt
+                            ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
+                            : I18n.t('No End Date')}
                         </Text>
                       </Grid.Col>
                     </Grid.Row>
@@ -161,7 +163,7 @@ Alert.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
   dueAtDisplayText: PropTypes.string.isRequired,
   assignmentOverrides: PropTypes.array.isRequired,
-  canSeeMultipleDueDates: PropTypes.bool.isRequired
+  canSeeMultipleDueDates: PropTypes.bool
 }
 
 export default Alert

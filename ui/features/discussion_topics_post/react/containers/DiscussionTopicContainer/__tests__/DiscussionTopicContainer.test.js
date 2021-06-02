@@ -64,7 +64,8 @@ const discussionTopicMock = {
       peerReview: true,
       openForComments: false,
       closeForComments: true,
-      manageContent: true
+      manageContent: true,
+      readAsAdmin: true
     }
   }
 }
@@ -220,6 +221,13 @@ describe('DiscussionTopicContainer', () => {
     })
   })
 
+  it('Should find due date text for assignment', async () => {
+    const container = setup({
+      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {readAsAdmin: false}}
+    })
+    expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
+  })
+
   it('Should not be able to open SpeedGrader if the user does not have permission', () => {
     const {getByTestId, queryByTestId} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
@@ -229,7 +237,7 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('speedGrader')).toBeNull()
   })
 
-  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
+  it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {addRubric: true}}
     })
@@ -238,7 +246,7 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Add Rubric')).toBeInTheDocument()
   })
 
-  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+  it.skip('Renders Show Rubric in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {showRubric: true}}
     })
@@ -320,7 +328,9 @@ describe('DiscussionTopicContainer', () => {
     const shareToCommonsOption = await container.findByTestId('shareToCommons')
     fireEvent.click(shareToCommonsOption)
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith('example.com')
+      expect(assignMock).toHaveBeenCalledWith(
+        `example.com&discussion_topics%5B%5D=${discussionTopicMock.discussionTopic._id}`
+      )
     })
   })
 
@@ -354,6 +364,15 @@ describe('DiscussionTopicContainer', () => {
 
   it('should find "Super Group" group name', async () => {
     const container = setup({discussionTopic: {...defaultTopic}})
+    expect(await container.queryByText('Super Group')).toBeFalsy()
+    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
+    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+  })
+
+  it('should show groups menu when discussion has no child topics but has sibling topics', async () => {
+    // defaultTopic has a root topic which has a child topic named Super Group
+    // we are only removing the child topic from defaultTopic itself, not its root topic
+    const container = setup({discussionTopic: {...defaultTopic, childTopics: null}})
     expect(await container.queryByText('Super Group')).toBeFalsy()
     fireEvent.click(await container.queryByTestId('groups-menu-btn'))
     await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
@@ -393,5 +412,58 @@ describe('DiscussionTopicContainer', () => {
         'You have successfully updated the discussion topic.'
       )
     )
+  })
+
+  it('Should find due date text', async () => {
+    const container = setup(discussionTopicMock)
+    expect(await container.findByText('Everyone: Due Apr 5 1:40pm')).toBeTruthy()
+  })
+
+  it('Should find "Show Due Dates" link button', async () => {
+    const props = {discussionTopic: Discussion.mock({})}
+    const container = setup(props)
+    expect(await container.findByText('Show Due Dates (2)')).toBeTruthy()
+  })
+
+  it('Should find due date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '2021-04-05T13:40:50Z',
+        lockAt: '2021-09-03T23:59:59-06:00',
+        unlockAt: '2021-03-21T00:00:00-06:00',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+    expect(await container.findByText('assignment override 3: Due Apr 5 1:40pm')).toBeTruthy()
+  })
+
+  it('Should find no due date text for "assignment override 3"', async () => {
+    const overrides = [
+      {
+        id: 'BXMzaWdebTVubC0x',
+        _id: '3',
+        dueAt: '',
+        lockAt: '2021-09-03T23:59:59-06:00',
+        unlockAt: '2021-03-21T00:00:00-06:00',
+        title: 'assignment override 3'
+      }
+    ]
+
+    const props = {discussionTopic: Discussion.mock({})}
+    props.discussionTopic.assignment.assignmentOverrides.nodes = overrides
+    props.discussionTopic.assignment.dueAt = null
+    props.discussionTopic.assignment.unlockAt = null
+    props.discussionTopic.assignment.lockAt = null
+    const container = setup(props)
+    expect(await container.findByText('assignment override 3: No Due Date')).toBeTruthy()
   })
 })
