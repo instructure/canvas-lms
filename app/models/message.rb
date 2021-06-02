@@ -684,7 +684,7 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    check_acct = root_account || user&.account || Account.site_admin
+    check_acct = infer_feature_account
     if path_type == 'sms'
       if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
         return skip_and_cancel
@@ -992,6 +992,19 @@ class Message < ActiveRecord::Base
   end
 
   protected
+
+  # Internal: Choose account to check feature flags on.
+  #
+  # used to choose which account to trust for inspecting
+  # feature state to decide how to send messages.  In general
+  # the root account is a good choice, but for a user-context
+  # message (which would intentionally have a dummy root account),
+  # we want to make sure we aren't inspecting
+  # features on the dummy account
+  def infer_feature_account
+    root_account&.unless_dummy || user&.account || Account.site_admin
+  end
+
   # Internal: Deliver the message through email.
   #
   # Returns nothing.
