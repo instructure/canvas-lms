@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 require 'nokogiri'
 
@@ -217,7 +217,7 @@ describe BasicLTI::BasicOutcomes do
       before do
         @course.start_at = 1.month.ago
         @course.conclude_at = 1.day.ago
-        @course.restrict_enrollments_to_course_dates =  true
+        @course.restrict_enrollments_to_course_dates = true
         @course.save
       end
 
@@ -235,7 +235,7 @@ describe BasicLTI::BasicOutcomes do
         cs = CourseSection.where(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id)).take
         cs.start_at = 1.day.ago
         cs.end_at = 1.day.from_now
-        cs.restrict_enrollments_to_section_dates =  true
+        cs.restrict_enrollments_to_section_dates = true
         cs.save
         xml.css('resultData').remove
         request = BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -348,12 +348,18 @@ describe BasicLTI::BasicOutcomes do
       expect(submission.attempt).to eq 1
     end
 
-    it "sets 'submitted_at' to the current time when result data is not sent" do
+    it "when result data is not sent, only changes 'submitted_at' if the submission is not submitted yet" do
       xml.css('resultData').remove
+      submission = assignment.submissions.where(user_id: @user.id).first
+      submitted_at = nil
       Timecop.freeze do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
-        submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at).to eq Time.zone.now
+        submitted_at = submission.reload.submitted_at
+        expect(submitted_at).to eq Time.zone.now
+      end
+      Timecop.freeze(2.minutes.from_now) do
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.submitted_at).to eq submitted_at
       end
     end
 
@@ -370,7 +376,7 @@ describe BasicLTI::BasicOutcomes do
         expect(submission.submitted_at.iso8601(3)).to eq timestamp
       end
 
-      it "does not increment the submision count" do
+      it "does not increment the submission count" do
         xml.css('resultData').remove
         xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
           "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
@@ -584,6 +590,19 @@ describe BasicLTI::BasicOutcomes do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
       end
+    end
+  end
+
+  context 'with attachments' do
+    it 'if not provided should submit the homework at the submitted_at time of when the request was received' do
+      xml.css('resultScore').remove
+      xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+      submitted_at = Timecop.freeze(1.hour.ago) do
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        Time.zone.now
+      end
+      run_jobs
+      expect(assignment.submissions.find_by(user_id: @user).submitted_at).to eq submitted_at
     end
   end
 
