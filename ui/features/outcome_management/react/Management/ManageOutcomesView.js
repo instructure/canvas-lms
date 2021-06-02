@@ -39,7 +39,8 @@ const ManageOutcomesView = ({
   onSearchChangeHandler,
   onSearchClearHandler,
   loading,
-  loadMore
+  loadMore,
+  scrollContainer
 }) => {
   const groupTitle = outcomeGroup?.title
   const groupDescription = outcomeGroup?.description
@@ -63,6 +64,7 @@ const ManageOutcomesView = ({
         hasMore={outcomes?.pageInfo?.hasNextPage}
         loadMore={loadMore}
         loader={<p>{I18n.t('Loading')} ...</p>}
+        scrollContainer={scrollContainer}
       >
         <OutcomeGroupHeader
           title={groupTitle}
@@ -168,7 +170,8 @@ ManageOutcomesView.propTypes = {
   onOutcomeMenuHandler: PropTypes.func.isRequired,
   onSearchChangeHandler: PropTypes.func.isRequired,
   onSearchClearHandler: PropTypes.func.isRequired,
-  loadMore: PropTypes.func.isRequired
+  loadMore: PropTypes.func.isRequired,
+  scrollContainer: PropTypes.instanceOf(Element)
 }
 
 export default ManageOutcomesView

@@ -88,6 +88,7 @@ const OutcomeManagementPanel = () => {
     return updatedState
   }, {})
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
+  const [scrollContainer, setScrollContainer] = useState(null)
 
   const selected = Object.keys(selectedOutcomes).length
   const noop = () => {}
@@ -265,7 +266,10 @@ const OutcomeManagementPanel = () => {
               height="60vh"
               overflowY="visible"
               overflowX="auto"
-              elementRef={setRightColumnRef}
+              elementRef={el => {
+                setRightColumnRef(el)
+                setScrollContainer(el)
+              }}
             >
               <View as="div" padding="x-small none none x-small">
                 {selectedGroupId && (
@@ -281,6 +285,7 @@ const OutcomeManagementPanel = () => {
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
+                    scrollContainer={scrollContainer}
                   />
                 )}
               </View>

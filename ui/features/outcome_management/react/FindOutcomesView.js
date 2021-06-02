@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -44,6 +44,7 @@ const FindOutcomesView = ({
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const enabled = !!outcomesCount && outcomesCount > 0
+  const [scrollContainer, setScrollContainer] = useState(null)
 
   const onSelectOutcomesHandler = _id => {
     // TODO: OUT-4154
@@ -143,10 +144,14 @@ const FindOutcomesView = ({
             </Flex>
           </View>
         </View>
-        <div style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}>
+        <div
+          style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}
+          ref={setScrollContainer}
+        >
           <InfiniteScroll
             hasMore={outcomes?.pageInfo?.hasNextPage}
             loadMore={loadMore}
+            scrollContainer={scrollContainer}
             loader={
               // Temp solution until InfiniteScroll is fixed (ticket OUT-4190)
               <Flex

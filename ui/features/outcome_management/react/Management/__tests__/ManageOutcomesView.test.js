@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import ManageOutcomesView from '../ManageOutcomesView'
 import {outcomeGroup} from '@canvas/outcomes/mocks/Management'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
@@ -55,6 +55,10 @@ describe('ManageOutcomesView', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  const mockContainer = (container, prop, value) => {
+    jest.spyOn(container, prop, 'get').mockImplementation(() => value)
+  }
 
   it('renders loading indicator', () => {
     const {queryByTestId} = render(
@@ -128,5 +132,50 @@ describe('ManageOutcomesView', () => {
       <ManageOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
     )
     expect(getByTestId('search-loading')).toBeInTheDocument()
+  })
+
+  it('calls load more when hasNextPage is true and scroll reaches the infinite scroll threshold', () => {
+    const scrollContainer = document.createElement('div')
+    mockContainer(scrollContainer, 'scrollHeight', 1000)
+    mockContainer(scrollContainer, 'clientHeight', 400)
+    mockContainer(scrollContainer, 'scrollTop', 0)
+
+    render(
+      <ManageOutcomesView
+        {...defaultProps({
+          scrollContainer,
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: true}},
+            canEdit: false
+          }
+        })}
+      />
+    )
+
+    mockContainer(scrollContainer, 'scrollTop', 600)
+    fireEvent.scroll(scrollContainer)
+    expect(loadMore).toHaveBeenCalled()
+  })
+
+  it('doesnt calls load more when hasNextPage is false and scroll reaches the infinite scroll threshold', () => {
+    const scrollContainer = document.createElement('div')
+    mockContainer(scrollContainer, 'scrollHeight', 1000)
+    mockContainer(scrollContainer, 'clientHeight', 400)
+    mockContainer(scrollContainer, 'scrollTop', 0)
+
+    render(
+      <ManageOutcomesView
+        {...defaultProps({
+          scrollContainer
+        })}
+      />
+    )
+
+    mockContainer(scrollContainer, 'scrollTop', 600)
+    fireEvent.scroll(scrollContainer)
+    expect(loadMore).not.toHaveBeenCalled()
   })
 })
