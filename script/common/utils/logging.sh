@@ -130,7 +130,7 @@ function display_next_steps {
     Vimeo channel: https://vimeo.com/canvaslms
     API docs:      https://canvas.instructure.com/doc/api/index.html
     Mailing list:  http://groups.google.com/group/canvas-lms-users
-    IRC:           http://webchat.freenode.net/?channels=canvas-lms
+    IRC:           https://web.libera.chat/#canvas-lms
 
     Please do not open a GitHub issue until you have tried asking for help on
     the mailing list or IRC - GitHub issues are for verified bugs only.
