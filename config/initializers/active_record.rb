@@ -1782,9 +1782,9 @@ end
 ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)
 
 ActiveRecord::Base.prepend(DefeatInspectionFilterMarshalling)
-ActiveRecord::Base.prepend(Canvas::CacheRegister::ActiveRecord::Base)
-ActiveRecord::Base.singleton_class.prepend(Canvas::CacheRegister::ActiveRecord::Base::ClassMethods)
-ActiveRecord::Relation.prepend(Canvas::CacheRegister::ActiveRecord::Relation)
+ActiveRecord::Base.prepend(ActiveRecord::CacheRegister::Base)
+ActiveRecord::Base.singleton_class.prepend(ActiveRecord::CacheRegister::Base::ClassMethods)
+ActiveRecord::Relation.prepend(ActiveRecord::CacheRegister::Relation)
 
 # see https://github.com/rails/rails/issues/37745
 module DontExplicitlyNameColumnsBecauseOfIgnores
