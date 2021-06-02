@@ -1742,6 +1742,22 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:latest_announcement]).to be_nil
       end
+
+      it "is set to nil if there's announcements but user doesn't have :read_announcements" do
+        @course.account.role_overrides.create!(permission: :read_announcements, role: student_role, enabled: false)
+        Announcement.create!(
+          :title => "New Announcement",
+          :message => "You shouldn't see this one without :read_announcements",
+          :user => @teacher,
+          :context => @course,
+          :workflow_state => "published",
+          :posted_at => 1.hour.ago
+        )
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:latest_announcement]).to be_nil
+      end
     end
   end
 

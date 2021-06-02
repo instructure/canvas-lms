@@ -2083,10 +2083,12 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
-        start_date = 14.days.ago.beginning_of_day
-        end_date = start_date + 28.days
-        latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
-          .ordered_between(start_date, end_date).limit(1).first
+        if @context.grants_right?(@current_user, session, :read_announcements)
+          start_date = 14.days.ago.beginning_of_day
+          end_date = start_date + 28.days
+          latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+            .ordered_between(start_date, end_date).limit(1).first
+        end
 
         js_env({
                  COURSE: {
