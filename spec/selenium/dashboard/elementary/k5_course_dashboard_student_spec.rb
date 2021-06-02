@@ -78,6 +78,32 @@ describe "student k5 course dashboard" do
       get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
     end
+
+    it 'displays the latest announcement on the Home tab' do
+      new_announcement(@subject_course, "Let's do science", "it's fun!")
+
+      announcement_heading = "Happy Monday!"
+      announcement_content = "Let's get to work"
+      new_announcement(@subject_course, announcement_heading, announcement_content)
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(course_dashboard_title).to include_text("Science")
+      expect(announcement_title(announcement_heading)).to be_displayed
+      expect(announcement_content_text(announcement_content)).to be_displayed
+    end
+
+    it 'does not display old announcements on the Home tab' do
+      announcement_heading = "Do science"
+      announcement = new_announcement(@subject_course, announcement_heading, "it's fun!")
+
+      announcement.posted_at = 15.days.ago
+      announcement.save!
+
+      get "/courses/#{@subject_course.id}"
+
+      expect(announcement_title_exists?(announcement_heading)).to be_falsey
+    end
   end
 
   context 'course modules tab' do

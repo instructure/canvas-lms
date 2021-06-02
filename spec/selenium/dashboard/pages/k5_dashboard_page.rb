@@ -88,8 +88,8 @@ module K5PageObject
     "h2:contains('#{title}')"
   end
 
-  def announcement_title_selector(announcement_title)
-    "h3:contains('#{announcement_title}')"
+  def announcement_title_xpath_selector(announcement_title)
+    "//h3[text() = '#{announcement_title}']"
   end
 
   def announcement_content_text_selector(content_text)
@@ -471,7 +471,7 @@ module K5PageObject
   end
 
   def announcement_title(announcement_title)
-    fj(announcement_title_selector(announcement_title))
+    fxpath(announcement_title_xpath_selector(announcement_title))
   end
 
   def announcement_content_text(content_text)
@@ -1036,6 +1036,10 @@ module K5PageObject
 
   def input_color_hex_value(hex_value)
     selected_color_input.send_keys(hex_value)
+  end
+
+  def announcement_title_exists?(announcement_heading)
+    element_exists?(announcement_title_xpath_selector(announcement_heading), true)
   end
 
   #----------------------------Create Content---------------------#
