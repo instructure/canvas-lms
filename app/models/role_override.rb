@@ -606,7 +606,7 @@ class RoleOverride < ActiveRecord::Base
 
     add_teacher_to_course: {
       label: lambda { t("Add Teachers to courses") },
-      label_v2: lambda { t("Add Teachers to courses") },
+      label_v2: lambda { t("Teachers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -624,7 +624,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_teacher_from_course: {
       label: lambda { t("Remove Teachers from courses") },
-      label_v2: lambda { t("Remove Teachers from courses") },
+      label_v2: lambda { t("Teachers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -642,7 +642,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_ta_to_course: {
       label: lambda { t("Add TAs to courses") },
-      label_v2: lambda { t("Add TAs to courses") },
+      label_v2: lambda { t("TAs - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -660,7 +660,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_ta_from_course: {
       label: lambda { t("Remove TAs from courses") },
-      label_v2: lambda { t("Remove TAs from courses") },
+      label_v2: lambda { t("TAs - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -678,7 +678,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_observer_to_course: {
       label: lambda { t("Add Observers to courses") },
-      label_v2: lambda { t("Add Observers to courses") },
+      label_v2: lambda { t("Observers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -698,7 +698,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_observer_from_course: {
       label: lambda { t("Remove Observers from courses") },
-      label_v2: lambda { t("Remove Observers from courses") },
+      label_v2: lambda { t("Observers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -718,7 +718,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_designer_to_course: {
       label: lambda { t("Add Designers to courses") },
-      label_v2: lambda { t("Add Designers to courses") },
+      label_v2: lambda { t("Designers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -736,7 +736,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_designer_from_course: {
       label: lambda { t("Remove Designers from courses") },
-      label_v2: lambda { t("Remove Designers from courses") },
+      label_v2: lambda { t("Designers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -775,7 +775,7 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_calendar => {
       :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
-      :label_v2 => lambda { t("Course Calendar - add / edit / delete events") },
+      :label_v2 => lambda { t("Course Calendar - add / edit / delete") },
       :available_to => [
         'StudentEnrollment',
         'TaEnrollment',
@@ -814,8 +814,8 @@ class RoleOverride < ActiveRecord::Base
     },
     # Course Template account permissions
     add_course_template: {
-      label: lambda { t("Create Course Templates") },
-      label_v2: lambda { t("Create Course Templates") },
+      label: lambda { t("Course Templates - create") },
+      label_v2: lambda { t("Course Templates - create") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -824,13 +824,13 @@ class RoleOverride < ActiveRecord::Base
         "AccountAdmin"
       ],
       group: "manage_course_templates",
-      group_label: -> { t("Courses - Course Templates") },
+      group_label: -> { t("Manage Course Templates") },
       account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
       account_only: true
     },
     edit_course_template: {
-      label: lambda { t("Edit Course Templates") },
-      label_v2: lambda { t("Edit Course Templates") },
+      label: lambda { t("Course Templates - edit") },
+      label_v2: lambda { t("Course Templates - edit") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -844,8 +844,8 @@ class RoleOverride < ActiveRecord::Base
       account_only: true
     },
     delete_course_template: {
-      label: lambda { t("Delete Course Templates") },
-      label_v2: lambda { t("Delete Course Templates") },
+      label: lambda { t("Course Templates - delete") },
+      label_v2: lambda { t("Course Templates - delete") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -854,7 +854,7 @@ class RoleOverride < ActiveRecord::Base
         "AccountAdmin"
       ],
       group: "manage_course_templates",
-      group_label: -> { t("Courses - Course Templates") },
+      group_label: -> { t("Manage Course Templates") },
       account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
       account_only: true
     },
@@ -1098,7 +1098,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_student_to_course: {
       label: lambda { t("Add Students to courses") },
-      label_v2: lambda { t("Add Students to courses") },
+      label_v2: lambda { t("Students - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -1118,7 +1118,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_student_from_course: {
       label: lambda { t("Remove Students from courses") },
-      label_v2: lambda { t("Remove Students from courses") },
+      label_v2: lambda { t("Students - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -1171,28 +1171,7 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_wiki_create => {
       :label => lambda { t("Create pages") },
-      :label_v2 =>  lambda { t("Pages - Create") },
-      :available_to => [
-        'TaEnrollment',
-        'TeacherEnrollment',
-        'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
-        'ObserverEnrollment',
-        'AccountAdmin',
-        'AccountMembership'
-      ],
-      :true_for => [
-        'TaEnrollment',
-        'TeacherEnrollment',
-        'DesignerEnrollment',
-        'AccountAdmin'
-      ],
-      :group => 'manage_wiki',
-      :group_label => lambda { t('Manage Pages') }
-    },
-    :manage_wiki_delete => {
-      :label => lambda { t("Delete pages") },
-      :label_v2 =>  lambda { t("Pages - Delete") },
+      :label_v2 =>  lambda { t("Pages - create") },
       :available_to => [
         'TaEnrollment',
         'TeacherEnrollment',
@@ -1213,7 +1192,28 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_wiki_update => {
       :label => lambda { t("Update pages") },
-      :label_v2 =>  lambda { t("Pages - Update") },
+      :label_v2 =>  lambda { t("Pages - update") },
+      :available_to => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'AccountAdmin'
+      ],
+      :group => 'manage_wiki',
+      :group_label => lambda { t('Manage Pages') }
+    },
+    :manage_wiki_delete => {
+      :label => lambda { t("Delete pages") },
+      :label_v2 =>  lambda { t("Pages - delete") },
       :available_to => [
         'TaEnrollment',
         'TeacherEnrollment',
