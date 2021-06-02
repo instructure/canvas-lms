@@ -1572,6 +1572,10 @@ class Account < ActiveRecord::Base
     self == Account.site_admin
   end
 
+  def dummy?
+    local_id.zero?
+  end
+
   def display_name
     self.name
   end
