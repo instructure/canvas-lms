@@ -30,7 +30,7 @@ import {
   getAssignmentGroupTotals,
   getAssignmentGrades,
   getAccountsFromEnrollments,
-  getTotalGradeStringFromEnrollments
+  getTotalGradeStringFromEnrollments,
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom
 } from '../utils'
