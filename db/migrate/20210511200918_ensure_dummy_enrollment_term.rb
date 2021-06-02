@@ -28,13 +28,12 @@ class EnsureDummyEnrollmentTerm < ActiveRecord::Migration[6.0]
     table = connection.quote_table_name('courses')
 
     execute("ALTER TABLE #{table} ALTER CONSTRAINT #{connection.quote_column_name(fk_name)} DEFERRABLE")
-    execute("SET CONSTRAINTS #{connection.quote_table_name(fk_name)} DEFERRED")
-    # find a pre-existing one referencing the dummy root account, and make it the dummy
-    EnrollmentTerm.where(root_account_id: 0).update_all(id: 0)
-    EnrollmentTerm.ensure_dummy_enrollment_term
-    # fix any dummy courses already created
-    Course.where(id: 0).update_all(enrollment_term_id: 0)
-
-    execute("SET CONSTRAINTS #{connection.quote_table_name(fk_name)} IMMEDIATE")
+    defer_constraints(fk_name) do
+      # find a pre-existing one referencing the dummy root account, and make it the dummy
+      EnrollmentTerm.where(root_account_id: 0).update_all(id: 0)
+      EnrollmentTerm.ensure_dummy_enrollment_term
+      # fix any dummy courses already created
+      Course.where(id: 0).update_all(enrollment_term_id: 0)
+    end
   end
 end
