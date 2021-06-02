@@ -869,4 +869,26 @@ describe Message do
       end
     end
   end
+
+  describe ".infer_feature_account" do
+    it "is the root account for the message when available" do
+      ra = account_model
+      message = Message.new(root_account: ra)
+      expect(message.send(:infer_feature_account)).to eq(ra)
+    end
+
+    it "is the user's account if the RA is a dummy account" do
+      Account.ensure_dummy_root_account
+      root_account = Account.find(0)
+      user_account = Account.default
+      user = user_model
+      message = Message.new(root_account_id: root_account.id, user: user)
+      expect(message.send(:infer_feature_account)).to eq(user_account)
+    end
+
+    it "falls back to siteadmin" do
+      message = Message.new(root_account_id: nil, user_id: nil)
+      expect(message.send(:infer_feature_account)).to eq(Account.site_admin)
+    end
+  end
 end
