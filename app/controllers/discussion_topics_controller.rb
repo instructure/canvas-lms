@@ -649,6 +649,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
              })
       js_bundle :discussion_topics_post
+      css_bundle :discussions_index
       render html: '', layout: true
       return
     end
