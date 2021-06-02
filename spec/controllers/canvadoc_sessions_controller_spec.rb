@@ -183,6 +183,11 @@ describe CanvadocSessionsController do
         post :create, params: params
         expect(blob["submission_id"]).to be @submission.id
       end
+
+      it "disables the annotation notifications" do
+        post :create, params: params
+        expect(blob["disable_annotation_notifications"]).to be true
+      end
     end
   end
 

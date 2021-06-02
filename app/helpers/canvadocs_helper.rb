@@ -22,7 +22,7 @@ module CanvadocsHelper
   include CoursesHelper
 
   private
-  def canvadocs_session_url(user, annotation_context, submission)
+  def canvadocs_session_url(user, annotation_context, submission, disable_annotation_notifications = false)
     assignment = submission.assignment
     opts = {
       annotation_context: annotation_context.launch_id,
@@ -30,7 +30,8 @@ module CanvadocsHelper
       enable_annotations: true,
       enrollment_type: canvadocs_user_role(assignment.course, user),
       moderated_grading_allow_list: submission.moderated_grading_allow_list(user),
-      submission_id: submission.id
+      submission_id: submission.id,
+      disable_annotation_notifications: disable_annotation_notifications
     }
     annotation_context.attachment.canvadoc_url(user, opts)
   end

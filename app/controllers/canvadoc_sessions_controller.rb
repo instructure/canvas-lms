@@ -57,7 +57,7 @@ class CanvadocSessionsController < ApplicationController
 
     render json: {
       annotation_context_launch_id: annotation_context.launch_id,
-      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission)
+      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission, true)
     }
   end
 
