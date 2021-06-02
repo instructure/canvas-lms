@@ -24,7 +24,11 @@ class EnsureDummyEnrollmentTerm < ActiveRecord::Migration[6.0]
     # belonging to a dummy root account, whose id is _not_ 0. we're going to change
     # that ID, but we don't want postgres to whine about the broken FK. we'll also
     # fix the FK, but it doesn't happen in the same statement
-    execute("SET CONSTRAINTS ALL DEFERRED")
+    fk_name = connection.foreign_key_for(:courses, to_table: :enrollment_terms).name
+    table = connection.quote_table_name('courses')
+
+    execute("ALTER TABLE #{table} ALTER CONSTRAINT #{connection.quote_column_name(fk_name)} DEFERRABLE")
+    execute("SET CONSTRAINTS #{connection.quote_table_name(fk_name)} DEFERRED")
     # find a pre-existing one referencing the dummy root account, and make it the dummy
     EnrollmentTerm.where(root_account_id: 0).update_all(id: 0)
     EnrollmentTerm.ensure_dummy_enrollment_term
