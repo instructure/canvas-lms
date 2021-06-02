@@ -22,5 +22,8 @@ import ready from '@instructure/ready'
 import LearningMastery from './react'
 
 ready(() => {
-  ReactDOM.render(<LearningMastery />, document.getElementById('learning_mastery_gradebook'))
+  ReactDOM.render(
+    <LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />,
+    document.getElementById('learning_mastery_gradebook')
+  )
 })

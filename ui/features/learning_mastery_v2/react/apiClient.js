@@ -15,19 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import axios from '@canvas/axios'
 
-import PropTypes from 'prop-types'
-
-export const proficiencyRatingShape = {
-  points: PropTypes.number,
-  color: PropTypes.string,
-  description: PropTypes.string.isRequired,
-  masteryAt: PropTypes.number.isRequired
-}
-
-export const studentShape = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  display_name: PropTypes.string.isRequired,
-  avatar_url: PropTypes.string
+export const loadRollups = (courseId, page = 1) => {
+  const params = {
+    params: {
+      rating_percents: true,
+      per_page: 20,
+      include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+      page
+    }
+  }
+  return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)
 }
