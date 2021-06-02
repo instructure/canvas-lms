@@ -1585,6 +1585,11 @@ class Account < ActiveRecord::Base
     local_id.zero?
   end
 
+  def unless_dummy
+    return nil if dummy?
+    self
+  end
+
   def display_name
     self.name
   end

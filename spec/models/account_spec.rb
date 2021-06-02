@@ -2377,4 +2377,23 @@ describe Account do
       expect(a).to be_valid
     end
   end
+
+  describe "#dummy?" do
+    it "returns false for most accounts" do
+      act = Account.new(id: 1)
+      expect(act.dummy?).to be_falsey
+    end
+
+    it "is true for a 0-id account" do
+      act = Account.new(id: 0)
+      expect(act.dummy?).to be_truthy
+    end
+
+    it "determines the outcome of `unless_dummy`" do
+      act = Account.new(id: 0)
+      expect(act.unless_dummy).to be_nil
+      act.id = 1
+      expect(act.unless_dummy).to be(act)
+    end
+  end
 end
