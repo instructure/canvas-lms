@@ -5,7 +5,7 @@ class AddIdToUsersSortableNameIndex < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up(dir = :up)
-    collkey = connection.extension_installed?(:pg_collkey)
+    collkey = connection.extension(:pg_collkey)&.schema
 
     rename_index :users, :index_users_on_sortable_name, :index_users_on_sortable_name_old
 

@@ -71,7 +71,7 @@ class ActiveRecord::Base
 
     def vacuum
       GuardRail.activate(:deploy) do
-        connection.execute("VACUUM ANALYZE #{quoted_table_name}")
+        connection.vacuum(table_name, analyze: true)
       end
     end
   end
@@ -426,7 +426,7 @@ class ActiveRecord::Base
       # Johnson, Bob sorting before Johns, Jimmy
       unless @collkey&.key?(Shard.current.database_server.id)
         @collkey ||= {}
-        @collkey[Shard.current.database_server.id] = connection.extension_installed?(:pg_collkey)
+        @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
       end
       if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
         "(#{col} COLLATE #{collation})"
@@ -665,17 +665,11 @@ class ActiveRecord::Base
 
     start ||= current_xlog_location
     GuardRail.activate(:secondary) do
-      diff_fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_wal_lsn_diff" :
-        "pg_xlog_location_diff"
-      fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_last_wal_replay_lsn()" :
-        "pg_last_xlog_replay_location()"
       # positive == first value greater, negative == second value greater
-      # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
-      start_time = Time.now
-      while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
-        return false if timeout && Time.now > start_time + timeout
+      start_time = Time.now.utc
+      while connection.wal_lsn_diff(start, :last_replay) >= 0
+        return false if timeout && Time.now.utc > start_time + timeout
+
         sleep 0.1
       end
     end
