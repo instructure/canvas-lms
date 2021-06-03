@@ -54,3 +54,10 @@ show_push_notification_account_setting:
   description: |-
     Enable an account setting which toggles push notifications for that account
   applies_to: SiteAdmin
+
+deprecate_sms:
+  state: hidden
+  display_name: Deprecate SMS
+  description: |-
+    When enabled it deprecates the Short Message Service (SMS).
+  applies_to: SiteAdmin
