@@ -57,6 +57,7 @@ const defaultProps = {
   canManage: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,
+  userIsStudent: true,
   userIsInstructor: false,
   showStudentView: false,
   studentViewPath: '/courses/30/student_view/1',
@@ -72,7 +73,7 @@ const GRADING_PERIODS_URL = encodeURI(
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state'
 )
-const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments'
+const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
 
 let modulesContainer
 

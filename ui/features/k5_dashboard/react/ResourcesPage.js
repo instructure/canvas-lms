@@ -107,7 +107,6 @@ export default function ResourcesPage({cards, cardsSettled, visible}) {
   return (
     <section style={{display: visible ? 'block' : 'none'}} aria-hidden={!visible}>
       <AppsList isLoading={isAppsLoading} apps={apps} />
-      <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
       {staffAuthorized && <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />}
     </section>
   )

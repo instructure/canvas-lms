@@ -135,9 +135,10 @@ describe('ResourcesPage', () => {
       const error = new Error()
       error.response = {status: 401}
       utils.fetchCourseInstructors.mockReturnValue(Promise.reject(error))
+      utils.fetchCourseApps.mockReturnValue(Promise.resolve(defaultResponse))
 
       const {getAllByText, queryByText} = render(<ResourcesPage {...getProps()} />)
-      expect(getAllByText('Loading staff...')).toHaveLength(2)
+      expect(getAllByText('Loading staff...')).toHaveLength(1)
       await waitFor(() => expect(queryByText('Loading staff...')).not.toBeInTheDocument())
       expect(queryByText('Staff Contact Info')).not.toBeInTheDocument()
       expect(queryByText('Failed to load staff.')).not.toBeInTheDocument()
