@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconGroupLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,14 +26,19 @@ import {Menu} from '@instructure/ui-menu'
 import {getGroupDiscussionUrl} from '../../utils'
 
 export const GroupsMenu = ({...props}) => {
-  const menuItems = props.childTopics?.map(childTopic => (
-    <Menu.Item
-      href={getGroupDiscussionUrl(childTopic.contextId, childTopic._id)}
-      key={childTopic._id}
-    >
-      {childTopic.contextName}
-    </Menu.Item>
-  ))
+  const menuItems = useMemo(
+    () =>
+      props.childTopics?.map(childTopic => (
+        <Menu.Item
+          href={getGroupDiscussionUrl(childTopic.contextId, childTopic._id)}
+          key={childTopic._id}
+        >
+          {childTopic.contextName}
+        </Menu.Item>
+      )),
+    [props.childTopics]
+  )
+
   return (
     <Menu
       placement="bottom"
