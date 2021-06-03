@@ -42,7 +42,7 @@ export default class ScopesMethod extends React.Component {
         text={this.props.method}
         variant={this.methodColorMap()[this.props.method.toLowerCase()]}
         margin={this.props.margin}
-        color="#6D7883"
+        color="primary"
         theme={this.themeOverride()}
       />
     )

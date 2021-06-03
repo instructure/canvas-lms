@@ -25,7 +25,7 @@ import {useDebounce} from 'use-debounce'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'

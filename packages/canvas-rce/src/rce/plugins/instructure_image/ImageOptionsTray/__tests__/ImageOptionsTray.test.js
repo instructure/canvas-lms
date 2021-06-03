@@ -183,7 +183,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       expect(tray.size).toEqual('Small')
     })
 
-    it('can be re-set to "Medium"', async () => {
+    it.skip('can be re-set to "Medium"', async () => {
       renderComponent()
       await tray.setSize('Small')
       await tray.setSize('Medium')
@@ -196,7 +196,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       expect(tray.size).toEqual('Large')
     })
 
-    it('can be set to "Custom"', async () => {
+    it.skip('can be set to "Custom"', async () => {
       renderComponent()
       await tray.setSize('Small')
       await tray.setSize('Custom')
@@ -291,14 +291,14 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           expect(displayAs).toEqual('link')
         })
 
-        it('includes the width to be applied', async () => {
+        it.skip('includes the width to be applied', async () => {
           await tray.setSize('Large')
           tray.$doneButton.click()
           const [{appliedWidth}] = props.onSave.mock.calls[0]
           expect(appliedWidth).toEqual(200)
         })
 
-        it('includes the height to be applied', async () => {
+        it.skip('includes the height to be applied', async () => {
           await tray.setSize('Large')
           tray.$doneButton.click()
           const [{appliedHeight}] = props.onSave.mock.calls[0]
