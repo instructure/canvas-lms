@@ -53,41 +53,38 @@ pipeline {
         script {
           def runnerStages = [:]
           def stageHooks = [
-            onNodeAcquired: jsStage.&setupNode,
+            onNodeAcquired: jsStage.setupNode(),
           ]
 
           extendedStage('Runner - Jest').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
             def tests = [:]
 
-            jsStage.queueJestStage(tests, delegate)
+            callableWithDelegate(jsStage.queueJestStage())(tests)
 
             parallel(tests)
           }
 
           extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
             def tests = [:]
 
             for (int i = 0; i < COFFEE_NODE_COUNT; i++) {
-              jsStage.queueKarmaStage(tests, delegate, 'coffee', i, COFFEE_NODE_COUNT)
+              callableWithDelegate(jsStage.queueKarmaStage())(tests, 'coffee', i, COFFEE_NODE_COUNT)
             }
 
             parallel(tests)
           }
 
           extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
             def tests = [:]
 
-            jsStage.queuePackagesStage(tests, delegate)
+            callableWithDelegate(jsStage.queuePackagesStage())(tests)
 
             for (int i = 0; i < JSG_NODE_COUNT; i++) {
-              jsStage.queueKarmaStage(tests, delegate, 'jsg', i, JSG_NODE_COUNT)
+              callableWithDelegate(jsStage.queueKarmaStage())(tests, 'jsg', i, JSG_NODE_COUNT)
             }
 
             ['jsa', 'jsh'].each { group ->
-              jsStage.queueKarmaStage(tests, delegate, group, 0, DEFAULT_NODE_COUNT)
+              callableWithDelegate(jsStage.queueKarmaStage())(tests, group, 0, DEFAULT_NODE_COUNT)
             }
 
             parallel(tests)

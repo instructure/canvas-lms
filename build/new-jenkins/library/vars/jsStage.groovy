@@ -17,56 +17,62 @@
  */
 
 def setupNode() {
-  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+  { ->
+    def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-  checkoutRepo('canvas-lms', refspecToCheckout, 1)
+    checkoutRepo('canvas-lms', refspecToCheckout, 1)
 
-  credentials.withStarlordDockerLogin { ->
-    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
+    credentials.withStarlordDockerLogin { ->
+      sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
+    }
   }
 }
 
 def tearDownNode() {
-  sh "mkdir -vp ${env.TEST_RESULT_OUTPUT_DIR}"
-  sh "docker cp \$(docker ps -qa -f name=${env.CONTAINER_NAME}):/usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${env.TEST_RESULT_OUTPUT_DIR}"
+  { ->
+    sh "mkdir -vp ${env.TEST_RESULT_OUTPUT_DIR}"
+    sh "docker cp \$(docker ps -qa -f name=${env.CONTAINER_NAME}):/usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${env.TEST_RESULT_OUTPUT_DIR}"
 
-  sh "find ${env.TEST_RESULT_OUTPUT_DIR}"
+    sh "find ${env.TEST_RESULT_OUTPUT_DIR}"
 
-  archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
-  junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
-}
-
-def queueJestStage(stages, delegate) {
-  queueTestStage(stages, delegate, 'tests-jest', []) {
-    sh('build/new-jenkins/js/tests-jest.sh')
+    archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
+    junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
   }
 }
 
-def queueKarmaStage(stages, delegate, group, ciNode, ciTotal) {
-  queueTestStage(stages, delegate, "tests-karma-${group}-${ciNode}", [
-    "CI_NODE_INDEX=${ciNode}",
-    "CI_NODE_TOTAL=${ciTotal}",
-    "JSPEC_GROUP=${group}",
-  ]) {
-    sh('build/new-jenkins/js/tests-karma.sh')
+def queueJestStage() {
+  { stages ->
+    callableWithDelegate(queueTestStage())(stages, 'tests-jest', [], 'build/new-jenkins/js/tests-jest.sh')
   }
 }
 
-def queuePackagesStage(stages, delegate) {
-  queueTestStage(stages, delegate, 'tests-packages', []) {
-    sh('build/new-jenkins/js/tests-packages.sh')
+def queueKarmaStage() {
+  { stages, group, ciNode, ciTotal ->
+    callableWithDelegate(queueTestStage())(stages, "tests-karma-${group}-${ciNode}", [
+      "CI_NODE_INDEX=${ciNode}",
+      "CI_NODE_TOTAL=${ciTotal}",
+      "JSPEC_GROUP=${group}",
+    ], 'build/new-jenkins/js/tests-karma.sh')
   }
 }
 
-def queueTestStage(stages, delegate, containerName, additionalEnvVars, block) {
-  def baseEnvVars = [
-    "CONTAINER_NAME=${containerName}",
-    "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
-  ]
+def queuePackagesStage() {
+  { stages ->
+    callableWithDelegate(queueTestStage())(stages, 'tests-packages', [], 'build/new-jenkins/js/tests-packages.sh')
+  }
+}
 
-  delegate.extendedStage(containerName)
-    .envVars(baseEnvVars + additionalEnvVars)
-    .hooks([onNodeReleasing: this.&tearDownNode])
-    .obeysAllowStages(false)
-    .queue(stages) { block() }
+def queueTestStage() {
+  { stages, containerName, additionalEnvVars, scriptName ->
+    def baseEnvVars = [
+      "CONTAINER_NAME=${containerName}",
+      "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
+    ]
+
+    extendedStage(containerName)
+      .envVars(baseEnvVars + additionalEnvVars)
+      .hooks([onNodeReleasing: this.tearDownNode()])
+      .obeysAllowStages(false)
+      .queue(stages) { sh(scriptName) }
+  }
 }
