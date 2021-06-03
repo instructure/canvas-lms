@@ -23429,7 +23429,7 @@ nl:
       now_overdue: "De inleverdatum voor deze opdracht is verstreken.  Nieuwe inzendingen worden als ‘te laat’ gemarkeerd.  Toch doorgaan?"
       overdue: "De inleverdatum voor deze opdracht is verstreken.  Wil je de opdracht toch inleveren?"
       record_before_submitting: "Registreren voor inleveren"
-      submit_failed: "Het toevoegen van de cursus is mislukt, probeer het opnieuw."
+      submit_failed: "Het inleveren is mislukt, probeer het opnieuw."
       submitting: "Bezig met inleveren..."
     titles: 
       uploading: "Bezig met uploaden van inzending"
