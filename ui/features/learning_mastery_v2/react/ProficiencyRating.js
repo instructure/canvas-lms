@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {Tag, Text} from '@instructure/ui-elements'
+import {Tag} from '@instructure/ui-tag'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import SVGWrapper from '@canvas/svg-wrapper'

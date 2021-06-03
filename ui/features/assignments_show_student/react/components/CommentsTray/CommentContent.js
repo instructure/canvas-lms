@@ -28,7 +28,7 @@ import {SUBMISSION_COMMENT_QUERY, SUBMISSION_HISTORIES_QUERY} from '@canvas/assi
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

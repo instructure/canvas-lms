@@ -17,7 +17,8 @@
  */
 import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
-import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
+import {scopeTab} from '@instructure/ui-a11y-utils'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import keycode from 'keycode'
 
 import {Tabs} from '@instructure/ui-tabs'

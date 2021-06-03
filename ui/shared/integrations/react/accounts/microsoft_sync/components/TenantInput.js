@@ -17,16 +17,16 @@
  */
 
 import {IconButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
-import {TextInput} from '@instructure/ui-forms'
+import {Heading} from '@instructure/ui-heading'
+import {TextInput} from '@instructure/ui-text-input'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!account_settings_jsx_bundle'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function TenantInput(props) {
   return (

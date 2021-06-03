@@ -27,7 +27,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
 import CanvasMultiSelect from '@canvas/multi-select'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 
 import {roles} from './util'

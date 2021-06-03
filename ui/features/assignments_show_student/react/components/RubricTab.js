@@ -27,7 +27,7 @@ import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssoc
 import RubricComponent from '@canvas/rubrics/react/Rubric'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 const ENROLLMENT_STRINGS = {
   StudentEnrollment: I18n.t('Student'),
