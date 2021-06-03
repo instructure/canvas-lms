@@ -26,7 +26,9 @@ describe 'as a student' do
   context 'on assignments 2 page' do
     before(:once) do
       Account.default.enable_feature!(:assignments_2_student)
-      course_with_student(course: @course, active_all: true)
+      @course = course_factory(name: 'course', active_course: true)
+      @student = student_in_course(name: 'Student', course: @course, enrollment_state: :active).user
+      @teacher = teacher_in_course(name: 'teacher', course: @course, enrollment_state: :active).user
     end
 
     context 'assignment details' do
@@ -35,37 +37,120 @@ describe 'as a student' do
           name: 'assignment',
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_upload'
+          submission_types: 'online_text_entry'
         )
+        rubric_model(
+          title: 'rubric',
+          data: [{
+            description: "Some criterion",
+            points: 5,
+            id: 'crit1',
+            ratings: [{description: "Good", points: 5, id: 'rat1', criterion_id: 'crit1'}]
+          }],
+          description: 'new rubric description'
+        )
+        @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
       end
 
       before(:each) do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
-      it 'should show submission workflow tracker' do
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to be_displayed
+      it 'shows submission workflow tracker status as Inprogress with no submission' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
       end
 
-      it 'should show assignment title' do
+      it 'shows assignment title' do
         expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).to_not be_nil
       end
 
-      it 'available assignment should show details toggle' do
+      it 'shows details toggle' do
         expect(StudentAssignmentPageV2.details_toggle).to be_displayed
       end
 
-      it 'should show assignment due date' do
+      it 'shows rubric toggle' do
+        expect(StudentAssignmentPageV2.rubric_toggle).to be_displayed
+      end
+
+      it 'shows missing pill when assignment is late with no submission' do
+        expect(StudentAssignmentPageV2.missing_pill).to be_displayed
+      end
+
+      it 'shows assignment due date' do
         expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
       end
 
-      it 'should show how many points possible the assignment is worth' do
+      it 'shows how many points possible the assignment is worth' do
         expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).to_not be_nil
       end
+    end
 
-      it 'available assignment should show content tablist' do
-        expect(StudentAssignmentPageV2.content_tablist).to be_displayed
+    context 'submitted assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+        @assignment.submit_homework(@student, { body: "blah" })
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it 'shows late pill when assignment is late with at least one submission' do
+        expect(StudentAssignmentPageV2.late_pill).to be_displayed
+      end
+
+      it 'changes the submit assignment button to try again button after the first submission is made' do
+        expect(StudentAssignmentPageV2.try_again_button).to be_displayed
+      end
+
+      it 'shows submission workflow tracker status as submitted after the student submits' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("SUBMITTED")
+      end
+    end
+
+    context 'graded assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+        @assignment.submit_homework(@student, { body: "blah" })
+        @assignment.grade_student(@student, grade: '4', grader: @teacher)
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it 'shows submission workflow tracker status as review feedback after the student is graded' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
+      end
+
+      it 'shows Cancel Attempt X button when a subsequent submission is in progress but not submitted' do
+        StudentAssignmentPageV2.try_again_button.click
+
+        expect(StudentAssignmentPageV2.cancel_attempt_button).to be_displayed
+      end
+
+      it 'cancels attempt when Cancel Attempt button is selected during subsequent attempt' do
+        StudentAssignmentPageV2.try_again_button.click
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
+        StudentAssignmentPageV2.cancel_attempt_button.click
+
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
       end
     end
 
@@ -116,6 +201,7 @@ describe 'as a student' do
       before(:each) do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
       it 'should be able to be submitted' do
@@ -150,6 +236,7 @@ describe 'as a student' do
 
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
       it "shows the module sequence footer" do
@@ -172,12 +259,64 @@ describe 'as a student' do
         stub_kaltura
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
       it "should be able to open the media modal" do
         skip 'LS-1514 10/5/2020'
         StudentAssignmentPageV2.record_upload_button.click
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
+      end
+    end
+
+    context 'mark as done' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'mark as done assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'on_paper'
+        )
+        @module = @course.context_modules.create!(name: 'Module 1')
+        @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+        @module.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+        @module.save!
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it "allows student to select and deselct mark as done button in the assignment footer" do
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Mark as done')
+        StudentAssignmentPageV2.mark_as_done_toggle.click
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Done')
+        StudentAssignmentPageV2.mark_as_done_toggle.click
+        expect(StudentAssignmentPageV2.mark_as_done_toggle).to include_text('Mark as done')
+      end
+    end
+
+    context 'turnitin' do
+      before(:once) do
+        @turnitin_assignment = @course.assignments.create!(
+          submission_types: 'online_url',
+          turnitin_enabled: true
+        )
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @turnitin_assignment)
+        wait_for_ajaximations
+      end
+
+      it "displays similarity pledge checkbox and disables submit button until checked" do
+        StudentAssignmentPageV2.create_url_draft("www.google.com")
+
+        expect(StudentAssignmentPageV2.similarity_pledge).to include_text("This assignment submission is my own, original work")
+        expect(StudentAssignmentPageV2.submit_button).to be_disabled
       end
     end
   end

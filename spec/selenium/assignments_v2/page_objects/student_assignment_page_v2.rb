@@ -31,6 +31,10 @@ class StudentAssignmentPageV2
       f("img[alt='Assignment Locked']")
     end
 
+    def attempt_dropdown
+      f("input[data-testid='attemptSelect']")
+    end
+
     def lock_icon
       f("svg[name='IconLock']")
     end
@@ -57,10 +61,6 @@ class StudentAssignmentPageV2
 
     def points_possible_css(points_possible)
       "span:contains('#{points_possible}')"
-    end
-
-    def content_tablist
-      f("div[data-testid='assignment-2-student-content-tabs']")
     end
 
     def comment_container
@@ -149,8 +149,48 @@ class StudentAssignmentPageV2
       f("span[aria-label='Upload Media']")
     end
 
+    def mark_as_done_toggle
+      f("button[data-testid='set-module-item-completion-button']")
+    end
+
+    def missing_pill
+      f("span[data-test-id='missing-pill']")
+    end
+
+    def late_pill
+      f("span[data-test-id='late-pill']")
+    end
+
+    def rubric_toggle
+      f("div[data-testid='rubric-tab']")
+    end
+
+    def similarity_pledge_checkbox
+      f("input[data-testid='similarity-pledge-checkbox']")
+    end
+
+    def similarity_pledge
+      f("div[data-testid='similarity-pledge']")
+    end
+
     def submit_button
       f('#submit-button')
+    end
+
+    def try_again_button
+      f("button[data-testid='try-again-button']")
+    end
+
+    def cancel_attempt_button
+      f("button[data-testid='cancel-attempt-button']")
+    end
+
+    def back_to_attempt_button
+      f("button[data-testid='back-to-attempt-button']")
+    end
+
+    def footer
+      f("div[data-testid='student-footer']")
     end
 
     def leave_a_comment(comment)
