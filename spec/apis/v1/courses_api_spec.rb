@@ -727,17 +727,6 @@ describe CoursesController, type: :request do
       entry = json.detect { |course| course['id'] == @course.id }
       expect(entry['name']).to eq 'meh'
     end
-
-    it "limits the response to homeroom courses if requested" do
-      c1 = course_with_teacher(course_name: 'not homeroom', active_all: true).course
-      c2 = course_with_teacher(user: @teacher, course_name: 'homeroom frd', active_all: true).course
-      c2.homeroom_course = true
-      c2.save!
-      json = api_call_as_user(@teacher, :get, "/api/v1/users/self/courses?homeroom=true",
-                              user_id: 'self', controller: 'courses', action: 'user_index', homeroom: 'true',
-                              format: 'json')
-      expect(json.map{|c|c['name']}).to eq(['homeroom frd'])
-    end
   end
 
   describe "user_progress" do
