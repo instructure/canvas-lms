@@ -40,7 +40,8 @@ function defaultPlannerOptions() {
       PREFERENCES: {
         custom_colors: {}
       },
-      K5_USER: false
+      K5_USER: false,
+      K5_SUBJECT_COURSE: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
@@ -141,6 +142,7 @@ describe('with mock api', () => {
     beforeEach(() => {
       const opts = defaultPlannerOptions()
       opts.env.K5_USER = true
+      opts.env.K5_SUBJECT_COURSE = true
       initializePlanner(opts)
     })
 

@@ -133,7 +133,14 @@ export const K5Dashboard = ({
       },
       [cards]
     ),
-    error: useCallback(showFlashError(I18n.t('Failed to load announcements.')), []),
+    error: useCallback(err => {
+      // Don't show an error if user doesn't have permission to read announcements - this is a
+      // permission that can be set.
+      if (err?.response?.status === 401) {
+        return
+      }
+      showFlashError(I18n.t('Failed to load announcements.'))(err)
+    }, []),
     // This is a bit hacky, but we need to wait to fetch the announcements until the cards have
     // settled and there is at least 1 card because the announcements API requires context_codes.
     // Setting forceResult skips the fetch until it changes to undefined.
