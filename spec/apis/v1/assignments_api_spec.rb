@@ -1609,6 +1609,61 @@ describe AssignmentsApiController, type: :request do
         { :expected_status => 400 })
     end
 
+    it "creates audit events for the duplicated assignment if it is auditable" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
+    it "creates audit events even if assignments are inserted in the middle of the assignment group" do
+      anonymous_assignment = @course.assignments.create!(anonymous_grading: true)
+      @course.assignments.create!(title: "placeholder so duplicated assignment isn't last")
+
+      api_call_as_user(
+        @teacher,
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{anonymous_assignment.id}/duplicate.json",
+        {
+          controller: "assignments_api",
+          action: "duplicate",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: anonymous_assignment.id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
+
+      new_assignment = Assignment.find_by!(duplicate_of: anonymous_assignment.id)
+      audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
+      aggregate_failures do
+        expect(audit_event.event_type).to eq "assignment_created"
+        expect(audit_event.payload["anonymous_grading"]).to eq true
+      end
+    end
+
     context "Quizzes.Next course copy retry" do
       let(:assignment) do
         @course.assignments.create(
