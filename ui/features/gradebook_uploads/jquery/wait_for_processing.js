@@ -17,28 +17,40 @@
  */
 
 import $ from 'jquery'
+import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON' // eslint-disable-line no-unused-vars
 import I18n from 'i18n!gradebook_uploads'
 import 'spin.js/jquery.spin'
 
-export function waitForProcessing(progress) {
-  const dfd = $.Deferred()
+async function sleep(milliseconds) {
+  return new Promise(resolve => {
+    setTimeout(resolve, milliseconds)
+  })
+}
+
+/**
+ * The sleep_time parameter is included here to speed up testing.
+ * There is an issue with jest.useFakeTimers and native Promises
+ * that prevents this from being tested efficiently otherwise.
+ * https://github.com/facebook/jest/issues/7151
+ */
+export async function waitForProcessing(progress, sleep_time = 2000) {
   const spinner = $('#spinner').spin()
-
-  const amIDoneYet = currentProgress => {
-    if (currentProgress.workflow_state === 'completed') {
-      $.ajaxJSON(ENV.uploaded_gradebook_data_path, 'GET').then(uploadedGradebook => {
-        spinner.hide()
-        dfd.resolve(uploadedGradebook)
-      })
-    } else if (currentProgress.workflow_state === 'failed') {
-      dfd.reject(I18n.t('Invalid CSV file. Grades could not be updated.'))
-    } else {
-      setTimeout(() => {
-        $.ajaxJSON(`/api/v1/progress/${currentProgress.id}`, 'GET').then(amIDoneYet)
-      }, 2000)
-    }
+  while (!['completed', 'failed'].includes(progress.workflow_state)) {
+    /* eslint-disable no-await-in-loop */
+    await sleep(sleep_time)
+    progress = await $.ajaxJSON(`/api/v1/progress/${progress.id}`, 'GET').promise()
+    /* eslint-enable no-await-in-loop */
   }
-  amIDoneYet(progress)
 
-  return dfd
+  if (progress.workflow_state === 'completed') {
+    const uploadedGradebook = await $.ajaxJSON(ENV.uploaded_gradebook_data_path, 'GET').promise()
+    spinner.hide()
+    return uploadedGradebook
+  } else if (progress.message?.includes('Invalid header row')) {
+    throw new Error(I18n.t('The CSV header row is invalid.'))
+  } else {
+    throw new Error(
+      I18n.t('An unknown error has occurred. Verify the CSV file or try again later.')
+    )
+  }
 }
