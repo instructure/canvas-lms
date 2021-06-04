@@ -52,6 +52,7 @@ import {GradesPage} from './GradesPage'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
+import EmptyModules from './EmptyModules'
 
 const HERO_HEIGHT_PX = 400
 
@@ -218,19 +219,23 @@ export function K5Course({
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
-     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it based off currentTab */
+     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it (if there's at least one
+     module) based off currentTab */
   const modulesRef = useRef(null)
   const contentRef = useRef(null)
+  const [modulesExist, setModulesExist] = useState(true)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
+    setModulesExist(document.getElementById('context_modules').childElementCount > 0)
   }, [])
 
   useEffect(() => {
     if (modulesRef.current) {
-      modulesRef.current.style.display = currentTab === TAB_IDS.MODULES ? 'block' : 'none'
+      modulesRef.current.style.display =
+        currentTab === TAB_IDS.MODULES && (modulesExist || canManage) ? 'block' : 'none'
     }
-  }, [currentTab])
+  }, [currentTab, modulesExist, canManage])
 
   const courseHeader = sticky => {
     const extendedViewport = window.innerHeight + 180
@@ -330,6 +335,7 @@ export function K5Course({
             filterToHomerooms={false}
           />
         )}
+        {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
       </View>
     </K5DashboardContext.Provider>
   )

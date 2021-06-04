@@ -2860,6 +2860,12 @@ describe Course, "tabs_available" do
             expected_tab_ids = Course.course_subject_tabs.map{|t| t[:id]} + [t1.asset_string, t2.asset_string]
             expect(available_tabs.map{|t| t[:id]}).to eql(expected_tab_ids)
           end
+
+          it "includes modules tab even if there's no modules" do
+            course_with_student_logged_in(:active_all => true)
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map{ |t| t[:id] }
+            expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+          end
         end
       end
     end

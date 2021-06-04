@@ -400,6 +400,10 @@ module K5PageObject
     "#outcomes"
   end
 
+  def empty_modules_image_selector
+    "[data-testid='empty-modules-panda']"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -797,6 +801,10 @@ module K5PageObject
 
   def outcomes_group
     f(outcomes_group_selector)
+  end
+
+  def empty_modules_image
+    f(empty_modules_image_selector)
   end
 
   #----------------------- Actions & Methods -------------------------

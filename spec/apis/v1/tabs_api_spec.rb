@@ -542,8 +542,7 @@ describe TabsController, type: :request do
             "html_url" => "/courses/#{@course.id}/modules",
             "full_url" => "http://localhost/courses/#{@course.id}/modules",
             "position" => 3,
-            "unused" => true,
-            "visibility" => "admins",
+            "visibility" => "public",
             "label" => "Modules",
             "type" => "internal"
           },

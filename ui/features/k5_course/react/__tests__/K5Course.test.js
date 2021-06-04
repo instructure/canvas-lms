@@ -95,6 +95,19 @@ const ASSIGNMENT_GROUPS_URL = encodeURI(
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
 
+const createModulesPartial = () => {
+  const modulesContainer = document.createElement('div')
+  modulesContainer.id = 'k5-modules-container'
+  modulesContainer.style.display = 'none'
+  const contextModules = document.createElement('div')
+  contextModules.id = 'context_modules'
+  modulesContainer.appendChild(contextModules)
+  const moduleItem = document.createElement('p')
+  moduleItem.innerHTML = 'Course modules content'
+  contextModules.appendChild(moduleItem)
+  return modulesContainer
+}
+
 beforeAll(() => {
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
@@ -112,11 +125,7 @@ afterAll(() => {
 
 beforeEach(() => {
   global.ENV = defaultEnv
-  const modulesContainer = document.createElement('div')
-  modulesContainer.id = 'k5-modules-container'
-  modulesContainer.style.display = 'none'
-  modulesContainer.innerHTML = 'Course modules content'
-  document.body.appendChild(modulesContainer)
+  document.body.appendChild(createModulesPartial())
 })
 
 afterEach(() => {
@@ -291,6 +300,19 @@ describe('K-5 Subject Course', () => {
       const mainContent = getByTestId('main-content')
       const modules = document.getElementById('k5-modules-container')
       expect(mainContent.contains(modules)).toBeTruthy()
+    })
+
+    it('shows an empty state if no modules exist', () => {
+      const contextModules = document.getElementById('context_modules')
+      contextModules.removeChild(contextModules.firstChild)
+      const {getByText, getByTestId} = render(
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />
+      )
+      expect(
+        getByText("Your modules will appear here after they're assembled.")
+      ).toBeInTheDocument()
+      expect(getByTestId('empty-modules-panda')).toBeInTheDocument()
+      expect(contextModules).not.toBeVisible()
     })
   })
 

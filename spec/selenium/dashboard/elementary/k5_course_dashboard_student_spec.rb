@@ -66,17 +66,15 @@ describe "student k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
-    it 'only displays the modules tab if a published module exists' do
+    it 'displays modules empty state if no published module exists' do
       get "/courses/#{@subject_course.id}#modules"
-      expect(modules_tab_exists?).to be false
+      expect(modules_tab).to be_displayed
+      expect(empty_modules_image).to be_displayed
 
       create_course_module('unpublished')
       get "/courses/#{@subject_course.id}#modules"
-      expect(modules_tab_exists?).to be false
-
-      @course_module.publish
-      get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
+      expect(empty_modules_image).to be_displayed
     end
 
     it 'displays the latest announcement on the Home tab' do

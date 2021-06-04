@@ -3094,6 +3094,11 @@ class Course < ActiveRecord::Base
         {id: TAB_DISCUSSIONS, relation: :discussions, additional_check: -> { allow_student_discussion_topics }}
       ].select{ |hidable_tab| tabs.any?{ |t| t[:id] == hidable_tab[:id] } }
 
+      # Show modules tab in k5 even if there's no modules (but not if its hidden)
+      if course_subject_tabs
+        tabs_that_can_be_marked_hidden_unused.reject!{ |t| t[:id] == TAB_MODULES }
+      end
+
       if tabs_that_can_be_marked_hidden_unused.present?
         ar_types = active_record_types(only_check: tabs_that_can_be_marked_hidden_unused.map{|t| t[:relation]})
         tabs_that_can_be_marked_hidden_unused.each do |t|
