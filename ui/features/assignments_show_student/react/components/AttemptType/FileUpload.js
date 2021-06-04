@@ -118,7 +118,7 @@ export default class FileUpload extends Component {
     this.setState(
       {
         filesToUpload: files.map((file, i) => {
-          const name = file.name || file.title
+          const name = file.name || file.title || file.url
           const _id = `${i}-${file.url || file.name}`
 
           // As we receive progress events for this upload, we'll update the
@@ -356,17 +356,22 @@ export default class FileUpload extends Component {
   renderTableRow = file => {
     // "file" is either a previously-uploaded file or one being uploaded right
     // now.  For the former, we can use the displayName property; files being
-    // uploaded don't have that set yet, so use the local file's name.
+    // uploaded don't have that set yet, so use the local name (which we've set
+    // to the URL for files from an LTI).
     const displayName = file.displayName || file.name
 
     return (
       <Table.Row key={file._id}>
         <Table.Cell>{getFileThumbnail(file, 'small')}</Table.Cell>
         <Table.Cell>
-          <span aria-hidden title={displayName}>
-            {elideString(displayName)}
-          </span>
-          <ScreenReaderContent>{displayName}</ScreenReaderContent>
+          {displayName && (
+            <>
+              <span aria-hidden title={displayName}>
+                {elideString(displayName)}
+              </span>
+              <ScreenReaderContent>{displayName}</ScreenReaderContent>
+            </>
+          )}
         </Table.Cell>
         <Table.Cell>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
         <Table.Cell>{!file.isLoading && <IconCompleteSolid color="success" />}</Table.Cell>
