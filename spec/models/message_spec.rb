@@ -446,6 +446,30 @@ describe Message do
         @message.deliver
       end
 
+      context 'deprecate_sms is enabled' do
+        before do
+          Account.site_admin.enable_feature!(:deprecate_sms)
+        end
+
+        after do
+          Account.site_admin.disable_feature!(:deprecate_sms)
+        end
+
+        it "doesn't allow sms notification" do
+          message_model(
+            dispatch_at: Time.zone.now,
+            workflow_state: 'staged',
+            to: '+18015550100',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'sms',
+            notification_name: 'Assignment Graded',
+            user: @user
+          )
+          expect(@message).to_not receive(:deliver_via_sms)
+          @message.deliver
+        end
+      end
+
       it "does not deliver notification types not on the whitelist" do
         message_model(
           dispatch_at: Time.now,
