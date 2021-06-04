@@ -20,6 +20,7 @@ import React, {useState} from 'react'
 import I18n from 'i18n!Navigation'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
@@ -30,9 +31,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
-
-// Export so that tests can look for the right strings
-export const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {month: 'short', day: 'numeric'})
 
 function persistBadgeDisabled(state) {
   doFetchApi({
@@ -46,6 +44,8 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [releaseNotes, setReleaseNotes] = useState([])
+  const dateFormatter = useDateTimeFormat('date.formats.short')
+
   useFetchApi({
     success: setReleaseNotes,
     loading: setLoading,
@@ -93,9 +93,7 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
                   {note.title}
                 </Link>
                 <Text color="secondary">
-                  <span style={{whiteSpace: 'nowrap'}}>
-                    {dateFormatter.format(new Date(note.date))}
-                  </span>
+                  <span style={{whiteSpace: 'nowrap'}}>{dateFormatter(note.date)}</span>
                 </Text>
               </Flex>
               {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}

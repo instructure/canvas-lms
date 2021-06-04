@@ -18,13 +18,19 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import ReleaseNotesList, {dateFormatter} from '../ReleaseNotesList'
+import ReleaseNotesList from '../ReleaseNotesList'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/use-fetch-api-hook')
 jest.mock('@canvas/do-fetch-api-effect')
+
+const Format = ({date}) => {
+  const formatter = useDateTimeFormat('date.formats.short')
+  return <span data-testid="output">{formatter(date)}</span>
+}
 
 describe('ReleaseNotesList', () => {
   const notes = [
@@ -65,11 +71,20 @@ describe('ReleaseNotesList', () => {
     const {queryByText} = render(<ReleaseNotesList />)
 
     notes.forEach(note => {
+      // Get the expected date text. Note that we can't render the
+      // useDateTimeFormat hook outside of a React component, so we
+      // have to render a trivial little component that just spits the
+      // formatted date back to us. Remember to unmount it so it doesn't
+      // interfere with the document body we are trying to test in.
+      const {getByTestId, unmount} = render(<Format date={note.date} />)
+      const expectedDate = getByTestId('output').innerHTML
+      unmount()
+
       const title = queryByText(note.title)
       expect(title).toBeInTheDocument()
       expect(title.closest('a').href).toBe(note.url)
       expect(queryByText(note.description)).toBeInTheDocument()
-      expect(queryByText(dateFormatter.format(new Date(note.date)))).toBeInTheDocument()
+      expect(queryByText(expectedDate)).toBeInTheDocument()
     })
   })
 
