@@ -668,4 +668,35 @@ describe('FileUpload', () => {
       'Upload progress for file2.pdf 20 percent'
     )
   })
+
+  it('shows the URL of a file being uploaded if no title is given', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
+
+    const {getAllByRole} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'A2ExternalContentReady',
+          content_items: [
+            {
+              url: 'http://somefile.com',
+              mediaType: 'application/octet-stream'
+            }
+          ]
+        }
+      })
+    )
+
+    const tableRows = getAllByRole('row')
+    // The first row is the header, the second is the item we're uploading
+    expect(tableRows).toHaveLength(2)
+    expect(tableRows[1]).toHaveTextContent('http://somefile.com')
+  })
 })
