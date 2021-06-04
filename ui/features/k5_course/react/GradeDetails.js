@@ -24,6 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -129,9 +130,15 @@ const GradeDetails = ({
               screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
             />
           ) : (
-            <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
-              {totalGrade && I18n.t('Total: %{grade}', {grade: totalGrade})}
-            </Heading>
+            totalGrade && (
+              <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
+                <AccessibleContent
+                  alt={I18n.t('%{courseName} Total: %{grade}', {courseName, grade: totalGrade})}
+                >
+                  {I18n.t('Total: %{grade}', {grade: totalGrade})}
+                </AccessibleContent>
+              </Heading>
+            )
           )}
           {loadingAssignmentGroups || loadingGradingPeriods ? (
             <LoadingSkeleton
@@ -142,7 +149,13 @@ const GradeDetails = ({
           ) : (
             <ToggleDetails
               data-testid="assignment-group-toggle"
-              summary={I18n.t('View Assignment Group Totals')}
+              summary={
+                <AccessibleContent
+                  alt={I18n.t("View %{courseName}'s Assignment Group Totals", {courseName})}
+                >
+                  {I18n.t('View Assignment Group Totals')}
+                </AccessibleContent>
+              }
             >
               {assignmentGroupTotals.map(group => (
                 <Text
