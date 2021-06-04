@@ -257,6 +257,7 @@ const mathImageHelper = {
             mathtex.setAttribute('class', 'math_equation_latex')
             mathtex.setAttribute('style', img.getAttribute('style'))
             mathtex.textContent = `\\(${equation_text}\\)`
+            mathtex.style.maxWidth = ''
             if (img.nextSibling) {
               img.parentElement.insertBefore(mathtex, img.nextSibling)
             } else {
