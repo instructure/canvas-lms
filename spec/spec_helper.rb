@@ -139,8 +139,15 @@ module ActionView::TestCase::Behavior
 end
 
 if ENV['ENABLE_AXE_SELENIUM'] == '1'
-  require_relative './axe_selenium_helper'
-  AxeSelenium.install!
+  require 'stormbreaker'
+  Stormbreaker.install!
+  Stormbreaker.configure do |config|
+    config.driver = lambda { SeleniumDriverSetup.driver }
+    config.skip = [:'color-contrast', :'duplicate-id']
+    config.rules = [:wcag2a, :wcag2aa, :section508]
+    config.serialize_output = true
+    config.serialize_prefix = 'log/results/stormbreaker_results'
+  end
 end
 
 module RSpec::Rails
