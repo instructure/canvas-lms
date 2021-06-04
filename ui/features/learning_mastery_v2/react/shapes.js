@@ -31,3 +31,8 @@ export const studentShape = {
   display_name: PropTypes.string.isRequired,
   avatar_url: PropTypes.string
 }
+
+export const outcomeShape = {
+  title: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
+}

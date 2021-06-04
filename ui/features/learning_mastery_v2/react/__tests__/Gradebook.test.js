@@ -39,6 +39,16 @@ describe('Gradebook', () => {
           id: '2'
         }
       ],
+      outcomes: [
+        {
+          id: '1',
+          title: 'outcome 1'
+        },
+        {
+          id: '2',
+          title: 'outcome 2'
+        }
+      ],
       courseId: '100',
       ...props
     }
@@ -49,6 +59,14 @@ describe('Gradebook', () => {
     const {getByText} = render(<Gradebook {...props} />)
     props.students.forEach(student => {
       expect(getByText(student.display_name)).toBeInTheDocument()
+    })
+  })
+
+  it('renders each outcome', () => {
+    const props = defaultProps()
+    const {getByText} = render(<Gradebook {...props} />)
+    props.outcomes.forEach(outcome => {
+      expect(getByText(outcome.title)).toBeInTheDocument()
     })
   })
 })

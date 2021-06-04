@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {render, act, waitFor} from '@testing-library/react'
 import axios from '@canvas/axios'
 import LearningMastery from '../index'
 
 jest.useFakeTimers()
 
 describe('LearningMastery', () => {
-  let axiosMock
   const ratings = [
     {
       color: 'blue',
@@ -67,61 +65,41 @@ describe('LearningMastery', () => {
               display_name: 'Student 1',
               avatar_url: 'url'
             }
+          ],
+          outcomes: [
+            {
+              id: '1',
+              title: 'outcome 1'
+            }
           ]
         }
       }
     })
-    axiosMock = jest.spyOn(axios, 'get').mockResolvedValue(promise)
+    jest.spyOn(axios, 'get').mockResolvedValue(promise)
   })
 
   afterAll(() => {
     window.ENV = {}
   })
 
-  it('renders each proficiency rating description specified in window.ENV', () => {
+  it('renders each proficiency rating description specified in window.ENV', async () => {
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
     ratings.forEach(rating => {
       expect(getByText(rating.description)).toBeInTheDocument()
     })
   })
 
-  it('renders a loading spinner', () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
+  it('renders a loading spinner until loading is finished', async () => {
+    const {queryByText, getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByText('Loading')).toBeInTheDocument()
+    expect(await waitFor(() => queryByText('Loading'))).not.toBeInTheDocument()
   })
 
-  it('calls the /rollups url', () => {
-    render(<LearningMastery {...defaultProps()} />)
-    const params = {
-      params: {
-        rating_percents: true,
-        per_page: 20,
-        include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
-        page: 1
-      }
-    }
-    expect(axiosMock).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
-  })
-
-  it('renders each student', async () => {
+  it('renders each student, outcome from the response', async () => {
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Student 1')).toBeInTheDocument()
-  })
-
-  describe('when the rollup request is not successful', () => {
-    beforeEach(() => {
-      jest.spyOn(axios, 'get').mockRejectedValue({})
-    })
-
-    it("displays a flash alert if the rollups couldn't be fetched", async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-      render(<LearningMastery {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'Error loading rollups',
-        type: 'error'
-      })
-    })
+    expect(getByText('outcome 1')).toBeInTheDocument()
   })
 })

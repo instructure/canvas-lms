@@ -18,31 +18,47 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import StudentCell from './StudentCell'
-import {studentShape} from './shapes'
+import OutcomeHeader from './OutcomeHeader'
+import StudentHeader from './StudentHeader'
+import {studentShape, outcomeShape} from './shapes'
 
-const Gradebook = ({courseId, students}) => {
-  return (
-    <View as="div">
-      {students.map(student => (
-        <View
-          key={student.id}
-          as="div"
-          background="primary"
-          height="50px"
-          borderWidth="0 small small 0"
-          maxWidth="185px"
-          overflowX="auto"
-        >
-          <StudentCell courseId={courseId} student={student} />
-        </View>
+const Gradebook = ({courseId, students, outcomes}) => (
+  <View as="div" padding="medium 0 0 0">
+    <Flex>
+      <Flex.Item size="185px" overflowX="hidden" borderWidth="large 0 medium 0">
+        <StudentHeader />
+      </Flex.Item>
+      <Flex.Item size="16px" />
+      {outcomes.map(({id, title}) => (
+        <React.Fragment key={id}>
+          <Flex.Item size="180px" overflowX="hidden" borderWidth="large 0 medium 0">
+            <OutcomeHeader title={title} />
+          </Flex.Item>
+          <Flex.Item size="5px" />
+        </React.Fragment>
       ))}
-    </View>
-  )
-}
+    </Flex>
+    {students.map(student => (
+      <View
+        key={student.id}
+        as="div"
+        background="primary"
+        height="50px"
+        borderWidth="0 small small 0"
+        maxWidth="185px"
+        overflowX="auto"
+      >
+        <StudentCell courseId={courseId} student={student} />
+      </View>
+    ))}
+  </View>
+)
 
 Gradebook.propTypes = {
   courseId: PropTypes.string.isRequired,
-  students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired
+  students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
+  outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired
 }
 export default Gradebook
