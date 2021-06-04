@@ -24,6 +24,8 @@ import {Tray} from '@instructure/ui-tray'
 
 import formatMessage from '../../../../format-message'
 import {getTrayHeight} from '../../shared/trayUtils'
+import {CreateButtonForm} from './CreateButtonForm'
+import {SavedButtonList} from './SavedButtonList'
 
 const TITLE = {
   create: formatMessage('Buttons and Icons'),
@@ -58,6 +60,10 @@ export function ButtonsTray({onUnmount, type}) {
               </CloseButton>
             </Flex.Item>
           </Flex>
+        </Flex.Item>
+
+        <Flex.Item as="content" padding="small">
+          {type === 'create' ? <CreateButtonForm /> : <SavedButtonList />}
         </Flex.Item>
       </Flex>
     </Tray>
