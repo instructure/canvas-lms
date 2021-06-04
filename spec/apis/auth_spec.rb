@@ -812,7 +812,8 @@ describe "API Authentication", type: :request do
         'time_zone' => 'Etc/UTC',
         'locale' => nil,
         'effective_locale' => 'en',
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'k5_user' => false
       })
 
       # as_user_id is ignored if it's not allowed
@@ -835,7 +836,8 @@ describe "API Authentication", type: :request do
           'time_zone' => 'Etc/UTC',
           'locale' => nil,
           'effective_locale' => 'en',
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+          'k5_user' => false
       })
 
       # as_user_id is ignored if it's blank
@@ -856,7 +858,8 @@ describe "API Authentication", type: :request do
           'time_zone' => 'Etc/UTC',
           'locale' => nil,
           'effective_locale' => 'en',
-          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+          'k5_user' => false
       })
     end
 
@@ -884,6 +887,7 @@ describe "API Authentication", type: :request do
         'locale' => nil,
         'effective_locale' => 'en',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'k5_user' => false
       })
     end
 
@@ -912,6 +916,7 @@ describe "API Authentication", type: :request do
           'locale' => nil,
           'effective_locale' => 'en',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+          'k5_user' => false
       })
     end
 
