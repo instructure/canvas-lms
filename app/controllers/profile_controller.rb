@@ -85,6 +85,11 @@
 #         "locale": {
 #           "description": "The users locale.",
 #           "type": "string"
+#         },
+#         "k5_user": {
+#           "description": "Optional: Whether or not the user is a K5 user. This field is nil if the user settings are not for the user making the request.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
