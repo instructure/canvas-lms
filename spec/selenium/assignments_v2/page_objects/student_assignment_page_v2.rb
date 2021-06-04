@@ -115,12 +115,26 @@ class StudentAssignmentPageV2
       f("button[data-testid='start-text-entry']")
     end
 
+    def edit_text_entry_button
+      f("button[data-testid='edit-text-draft']")
+    end
+
     def text_display_area
-      f('body[id="tinymce"]')
+      text_entry_area
     end
 
     def text_entry_area
-      f('iframe', f('.ic-RichContentEditor'))
+      f('[data-testid="text-editor"]')
+    end
+
+    def text_entry_text
+      driver.execute_script(
+        "return document.querySelector('iframe.tox-edit-area__iframe').contentDocument.body.textContent"
+      )
+    end
+
+    def student_footer
+      f('[data-testid="student-footer"]')
     end
 
     def mce_iframe_id
@@ -177,6 +191,10 @@ class StudentAssignmentPageV2
       f('#submit-button')
     end
 
+    def submit_button_enabled
+      f('#submit-button:not([disabled]')
+    end
+
     def text_entry_submission_button
       f("div[data-testid='online_text_entry']")
     end
@@ -203,7 +221,6 @@ class StudentAssignmentPageV2
     end
 
     def create_text_entry_draft(text)
-      wait_for_tiny(text_entry_area)
       type_in_tiny('textarea', text)
     end
 

@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import TextEntry from '../TextEntry'
-
-jest.mock('@canvas/rce/RichContentEditor')
 
 async function makeProps(opts = {}) {
   const mockedSubmission =
@@ -44,36 +42,20 @@ async function makeProps(opts = {}) {
 }
 
 describe('TextEntry', () => {
-  let finishLoadingEditor
   let fakeEditor
-  let editorContent
+
+  beforeAll(() => {
+    window.INST = {
+      editorButtons: []
+    }
+    const liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
 
   beforeEach(() => {
     jest.useFakeTimers()
-
-    jest.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => editorContent)
-    jest.spyOn(RichContentEditor, 'destroyRCE')
-    jest.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation((_textarea, options) => {
-      fakeEditor = {
-        focus: () => {},
-        getBody: () => {},
-        getContent: jest.fn(() => editorContent),
-        mode: {
-          set: jest.fn()
-        },
-        setContent: jest.fn(content => {
-          editorContent = content
-        }),
-        selection: {
-          collapse: () => {},
-          select: () => {}
-        }
-      }
-
-      finishLoadingEditor = () => {
-        options.tinyOptions.init_instance_callback(fakeEditor)
-      }
-    })
   })
 
   afterEach(() => {
@@ -81,50 +63,43 @@ describe('TextEntry', () => {
     jest.useRealTimers()
   })
 
-  const renderWithoutFinishing = async props => {
-    const propsToRender = props || (await makeProps())
-    return render(<TextEntry {...propsToRender} />)
-  }
-
   const renderEditor = async props => {
-    const result = await renderWithoutFinishing(props)
-    finishLoadingEditor()
-
-    return result
+    const propsToRender = props || (await makeProps())
+    const retval = render(<TextEntry {...propsToRender} />)
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+    fakeEditor = tinymce.editors[0]
+    return retval
   }
 
   describe('initial rendering', () => {
     describe('before rendering has finished', () => {
       it('renders a placeholder text area with the submission contents', async () => {
-        const {getByRole} = await renderWithoutFinishing()
-
-        const textarea = getByRole('textbox')
+        const {findByDisplayValue} = await renderEditor()
+        const textarea = await findByDisplayValue('words', {exact: false})
         expect(textarea).toBeInTheDocument()
-        expect(textarea).toHaveTextContent('words')
-      })
-
-      it('renders a loading indicator for the RCE', async () => {
-        const {getByText} = await renderWithoutFinishing()
-
-        expect(getByText('Loading')).toBeInTheDocument()
       })
     })
 
     describe('when the RCE has finished rendering', () => {
-      it('hides the loading indicator', async () => {
-        const {queryByText} = await renderEditor()
-        expect(queryByText('Loading')).not.toBeInTheDocument()
-      })
-
       describe('read-only mode', () => {
         it('is enabled if the readOnly prop is true', async () => {
-          await renderEditor(await makeProps({readOnly: true}))
-          expect(fakeEditor.mode.set).toHaveBeenCalledWith('readonly')
+          await renderEditor(
+            await makeProps({
+              readOnly: true
+            })
+          )
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toBeTruthy()
+          })
         })
 
         it('is not enabled if the readOnly prop is false', async () => {
           await renderEditor()
-          expect(fakeEditor.mode.set).toHaveBeenCalledWith('design')
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(false)
+          })
         })
       })
 
@@ -136,9 +111,10 @@ describe('TextEntry', () => {
               state: 'graded'
             }
           })
-          await renderEditor(props)
+          const {findByDisplayValue} = await renderEditor(props)
 
-          expect(fakeEditor.setContent).toHaveBeenCalledWith('I am graded!')
+          const textarea = await findByDisplayValue('I am graded', {exact: false})
+          expect(textarea).toBeInTheDocument()
         })
 
         it('uses the submission body if the submission is submitted', async () => {
@@ -148,8 +124,10 @@ describe('TextEntry', () => {
               state: 'submitted'
             }
           })
-          await renderEditor(props)
-          expect(fakeEditor.setContent).toHaveBeenCalledWith('I am not graded!')
+          const {findByDisplayValue} = await renderEditor(props)
+
+          const textarea = await findByDisplayValue('I am not graded', {exact: false})
+          expect(textarea).toBeInTheDocument()
         })
 
         it('uses the contents of the draft if not graded or submitted and a draft is present', async () => {
@@ -158,8 +136,10 @@ describe('TextEntry', () => {
               submissionDraft: {body: 'just a draft'}
             }
           })
-          await renderEditor(props)
-          expect(fakeEditor.setContent).toHaveBeenCalledWith('just a draft')
+          const {findByDisplayValue} = await renderEditor(props)
+
+          const textarea = await findByDisplayValue('just a draft', {exact: false})
+          expect(textarea).toBeInTheDocument()
         })
 
         it('is empty if not graded or submitted and no draft is present', async () => {
@@ -169,8 +149,9 @@ describe('TextEntry', () => {
               state: 'unsubmitted'
             }
           })
-          await renderEditor(props)
-          expect(fakeEditor.setContent).toHaveBeenCalledWith('')
+          const {findByDisplayValue} = await renderEditor(props)
+          const textarea = await findByDisplayValue('', {exact: true})
+          expect(textarea).toBeInTheDocument()
         })
       })
     })
@@ -186,12 +167,6 @@ describe('TextEntry', () => {
     const doInitialRender = async () => {
       const props = await makeProps({submission: initialSubmission})
       const result = await renderEditor(props)
-
-      // Some of these mocks will have been called above; clear their call
-      // counts so we can test the re-render sensibly
-      fakeEditor.mode.set.mockClear()
-      fakeEditor.setContent.mockClear()
-
       return result
     }
 
@@ -201,9 +176,15 @@ describe('TextEntry', () => {
         readOnly: true,
         submission: initialSubmission
       })
+      await waitFor(() => {
+        expect(fakeEditor.readonly).toStrictEqual(false)
+      })
 
       rerender(<TextEntry {...newProps} />)
-      expect(fakeEditor.mode.set).toHaveBeenCalledWith('readonly')
+
+      await waitFor(() => {
+        expect(fakeEditor.readonly).toStrictEqual(true)
+      })
     })
 
     it('does not update the mode of the editor if the readOnly prop has not changed', async () => {
@@ -214,9 +195,11 @@ describe('TextEntry', () => {
           submissionDraft: {body: 'hello?'}
         }
       })
+      const setModeSpy = jest.spyOn(fakeEditor.mode, 'set')
 
       rerender(<TextEntry {...updatedProps} />)
-      expect(fakeEditor.mode.set).not.toHaveBeenCalled()
+
+      expect(setModeSpy).not.toHaveBeenCalled()
     })
 
     it('sets the content of the editor if the attempt has changed', async () => {
@@ -229,8 +212,9 @@ describe('TextEntry', () => {
           submissionDraft: {body: 'hello, again'}
         }
       })
+      const setContentSpy = jest.spyOn(fakeEditor, 'setContent')
       rerender(<TextEntry {...newProps} />)
-      expect(fakeEditor.setContent).toHaveBeenCalledWith('hello, again')
+      expect(setContentSpy).toHaveBeenCalledWith('hello, again')
     })
 
     it('does not set the content of the editor if the attempt has not changed', async () => {
@@ -238,6 +222,7 @@ describe('TextEntry', () => {
       const newProps = await makeProps({
         submission: {...initialSubmission, grade: 0, state: 'graded'}
       })
+      jest.spyOn(fakeEditor, 'setContent')
 
       rerender(<TextEntry {...newProps} />)
       expect(fakeEditor.setContent).not.toHaveBeenCalled()
@@ -245,36 +230,19 @@ describe('TextEntry', () => {
   })
 
   describe('onContentsChanged prop', () => {
-    it('checks for changes every 250ms', async () => {
+    it('calls onContentsChanged when the content changes', async () => {
       const props = await makeProps()
       await renderEditor(props)
-
       fakeEditor.setContent('hello?')
-      jest.advanceTimersByTime(250)
       expect(props.onContentsChanged).toHaveBeenCalled()
     })
 
-    it('runs no more often than every 250ms', async () => {
+    it('calls onContentsChanged when the user types', async () => {
       const props = await makeProps()
       await renderEditor(props)
-
       props.onContentsChanged.mockClear()
-      fakeEditor.setContent('hello?')
-      jest.advanceTimersByTime(200)
-      fakeEditor.setContent('hello!')
-      jest.advanceTimersByTime(200)
-      fakeEditor.setContent('hello.')
-      jest.advanceTimersByTime(200)
-
-      expect(props.onContentsChanged).toHaveBeenCalledTimes(2)
-    })
-
-    it('is not called if there have been no changes within 250ms', async () => {
-      const props = await makeProps()
-      await renderEditor(props)
-
-      jest.advanceTimersByTime(275)
-      expect(props.onContentsChanged).not.toHaveBeenCalled()
+      userEvent.type(document.getElementById('textentry_text'), '!')
+      expect(props.onContentsChanged).toHaveBeenCalled()
     })
   })
 
@@ -359,13 +327,6 @@ describe('TextEntry', () => {
   })
 
   describe('unmounting', () => {
-    it('calls the destroyRCE method', async () => {
-      const {unmount} = await renderEditor()
-      unmount()
-
-      expect(RichContentEditor.destroyRCE).toHaveBeenCalled()
-    })
-
     it('does not process any outstanding changes to the text', async () => {
       const props = await makeProps()
       const {unmount} = await renderEditor(props)

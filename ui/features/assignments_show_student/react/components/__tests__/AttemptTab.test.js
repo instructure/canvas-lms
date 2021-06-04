@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import AttemptTab from '../AttemptTab'
+import TextEntry from '../AttemptType/TextEntry'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -26,12 +27,31 @@ import React from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
-jest.mock('@canvas/rce/RichContentEditor')
-
 describe('ContentTabs', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     window.ENV.use_rce_enhancements = true
+    window.INST = window.INST || {}
+    window.INST.editorButtons = []
   })
+
+  let fakeEditor
+
+  const renderAttemptTab = async props => {
+    const retval = render(<AttemptTab {...props} />)
+
+    if (props.assignment.submissionTypes.includes('online_text_entry')) {
+      await waitFor(
+        () => {
+          expect(tinymce?.editors[0]).toBeDefined()
+        },
+        {timeout: 4000}
+      )
+      fakeEditor = tinymce.editors[0]
+      return retval
+    } else {
+      return Promise.resolve(retval)
+    }
+  }
 
   describe('the assignment is locked aka passed the until date', () => {
     it('renders the availability dates if the submission is unsubmitted', async () => {
@@ -43,6 +63,7 @@ describe('ContentTabs', () => {
           <AttemptTab {...props} />
         </MockedProvider>
       )
+
       expect(await findByText('Availability Dates')).toBeInTheDocument()
     })
 
@@ -117,10 +138,18 @@ describe('ContentTabs', () => {
   })
 
   describe('the submission type is online_text_entry', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
       uploadFileModule.uploadFiles = jest.fn()
       window.URL.createObjectURL = jest.fn()
+
+      // This gets the lazy loaded components loaded before our specs.
+      // otherwise, the first one (at least) will fail.
+      const {unmount} = render(<TextEntry submission={{state: 'unsubmitted'}} />)
+      await waitFor(() => {
+        expect(tinymce.editors[0]).toBeDefined()
+      })
+      unmount()
     })
 
     describe('uploading a text draft', () => {
@@ -129,7 +158,7 @@ describe('ContentTabs', () => {
           Assignment: {submissionTypes: ['online_text_entry']}
         })
 
-        const {findByTestId} = render(<AttemptTab {...props} />)
+        const {findByTestId} = await renderAttemptTab(props)
         expect(await findByTestId('text-editor')).toBeInTheDocument()
       })
 
@@ -147,10 +176,10 @@ describe('ContentTabs', () => {
               state: 'submitted'
             }
           })
-
-          const {findByRole} = render(<AttemptTab {...props} />)
-          const textarea = await findByRole('textbox')
-          expect(textarea).toHaveAttribute('readonly')
+          await renderAttemptTab(props)
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(true)
+          })
         })
 
         it('renders as read-only if the submission has been graded', async () => {
@@ -161,9 +190,10 @@ describe('ContentTabs', () => {
             }
           })
 
-          const {findByRole} = render(<AttemptTab {...props} />)
-          const textarea = await findByRole('textbox')
-          expect(textarea).toHaveAttribute('readonly')
+          await renderAttemptTab(props)
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(true)
+          })
         })
 
         it('renders as read-only if changes are not allowed to the submission', async () => {
@@ -174,13 +204,14 @@ describe('ContentTabs', () => {
             }
           })
 
-          const {findByRole} = render(
+          render(
             <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
               <AttemptTab {...props} />
             </StudentViewContext.Provider>
           )
-          const textarea = await findByRole('textbox')
-          expect(textarea).toHaveAttribute('readonly')
+          await waitFor(() => {
+            expect(tinymce?.editors[0]?.readonly).toStrictEqual(true)
+          })
         })
 
         it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
@@ -191,9 +222,10 @@ describe('ContentTabs', () => {
             }
           })
 
-          const {findByRole} = render(<AttemptTab {...props} />)
-          const textarea = await findByRole('textbox')
-          expect(textarea).not.toHaveAttribute('readonly')
+          await renderAttemptTab(props)
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(false)
+          })
         })
       })
     })
