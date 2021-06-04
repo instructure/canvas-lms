@@ -203,6 +203,42 @@ describe('RCE StatusBar', () => {
     })
   })
 
+  describe('in readonly mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar({readOnly: true})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(2)
+
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
+
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar({readOnly: true})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(2)
+
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let focusedButton = buttons.length - 1; focusedButton >= 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(focusedButton - 1 + buttons.length) % buttons.length]
+        )
+      }
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
+  })
+
   describe('default focus button', () => {
     it('shifts button when entering edit mode', () => {
       const {container, rerender} = renderStatusBar({editorView: WYSIWYG_VIEW})

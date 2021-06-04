@@ -194,7 +194,7 @@ class RCEWrapper extends React.Component {
   static propTypes = {
     autosave: PropTypes.shape({
       enabled: PropTypes.bool,
-      rce_auto_save_max_age_ms: PropTypes.number
+      maxAge: PropTypes.number
     }),
     confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
@@ -217,6 +217,7 @@ class RCEWrapper extends React.Component {
         label: PropTypes.string.isRequired
       })
     ),
+    readOnly: PropTypes.bool,
     tinymce: PropTypes.object,
     trayProps: trayPropTypes,
     toolbar: toolbarPropType,
@@ -567,7 +568,6 @@ class RCEWrapper extends React.Component {
 
   destroy() {
     this._destroyCalled = true
-    this.onTinyMCEInstance('mceRemoveEditor')
     this.unhandleTextareaChange()
     this.props.handleUnmount && this.props.handleUnmount()
   }
@@ -1070,9 +1070,7 @@ class RCEWrapper extends React.Component {
 
   cleanupAutoSave = (deleteAll = false) => {
     if (this.storage) {
-      const expiry = deleteAll
-        ? Date.now()
-        : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
+      const expiry = deleteAll ? Date.now() : Date.now() - this.props.autosave.maxAge
       let i = 0
       let key
       while ((key = this.storage.key(i++))) {
@@ -1448,7 +1446,7 @@ class RCEWrapper extends React.Component {
 
   unhandleTextareaChange() {
     if (this._textareaEl) {
-      this._textareaEl.removeEventListener('change', this.handleTextareaChange)
+      this._textareaEl.removeEventListener('input', this.handleTextareaChange)
     }
   }
 
@@ -1457,7 +1455,7 @@ class RCEWrapper extends React.Component {
     if (this._textareaEl !== el) {
       this.unhandleTextareaChange()
       if (el) {
-        el.addEventListener('change', this.handleTextareaChange)
+        el.addEventListener('input', this.handleTextareaChange)
         if (this.props.textareaClassName) {
           // split the string on whitespace because classList doesn't let you add multiple
           // space seperated classes at a time but does let you add an array of them
@@ -1500,11 +1498,14 @@ class RCEWrapper extends React.Component {
     bridge.renderEditor(this)
   }
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     this.registerTextareaChange()
     if (prevState.editorView !== this.state.editorView) {
       this.setEditorView(this.state.editorView)
       this.focusCurrentView()
+    }
+    if (prevProps.readOnly !== this.props.readOnly) {
+      this.mceInstance().mode.set(this.props.readOnly ? 'readonly' : 'design')
     }
   }
 
@@ -1638,6 +1639,7 @@ class RCEWrapper extends React.Component {
           />
         </div>
         <StatusBar
+          readOnly={this.props.readOnly}
           onChangeView={newView => this.toggleView(newView)}
           path={this.state.path}
           wordCount={this.state.wordCount}

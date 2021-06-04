@@ -224,9 +224,7 @@ const RCELoader = {
     // the autosave property in RCEWrapper to reasonable values
     const autosave = {
       enabled: ENV.use_rce_enhancements && ENV.rce_auto_save,
-      rce_auto_save_max_age_ms: Number.isNaN(ENV.rce_auto_save_max_age_ms)
-        ? 3600000
-        : ENV.rce_auto_save_max_age_ms
+      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
     }
 
     return {
