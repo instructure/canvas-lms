@@ -160,15 +160,15 @@ export default class HomeworkSubmissionLtiContainer {
   }
 
   validFileSubmission(contentItem) {
-    if (!ENV?.SUBMIT_ASSIGNMENT?.ALLOWED_EXTENSIONS) {
-      return true
+    if (ENV?.SUBMIT_ASSIGNMENT?.ALLOWED_EXTENSIONS?.length) {
+      const ext =
+        (contentItem?.mediaType && mime.extension(contentItem.mediaType)) ||
+        this.extensionFromString(contentItem.url) ||
+        this.extensionFromString(contentItem.title) ||
+        this.extensionFromSTring(contentItem.text)
+      return ext && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.includes(ext)
     }
-    const ext =
-      (contentItem?.mediaType && mime.extension(contentItem.mediaType)) ||
-      this.extensionFromString(contentItem.url) ||
-      this.extensionFromString(contentItem.title) ||
-      this.extensionFromSTring(contentItem.text)
-    return ext && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.includes(ext)
+    return true
   }
 }
 HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap = {
