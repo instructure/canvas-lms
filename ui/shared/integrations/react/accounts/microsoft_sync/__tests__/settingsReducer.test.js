@@ -32,6 +32,7 @@ const flushPromises = () => new Promise(setImmediate)
 const expectedSettings = {
   microsoft_sync_enabled: true,
   microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
+  last_saved_microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
   microsoft_sync_login_attribute: 'email'
 }
 
@@ -135,6 +136,58 @@ describe('settingsReducer', () => {
       expect(doUpdateSettings).toHaveBeenCalledTimes(0)
       expect(dispatchMock).toHaveBeenCalledTimes(0)
       expect(state.uiEnabled).toBeTruthy()
+    })
+
+    const state = {
+      ...defaultState,
+      microsoft_sync_tenant: 'saved_value',
+      last_saved_microsoft_sync_tenant: 'saved_value'
+    }
+
+    it('does not set info message if the tenant is unchanged', () => {
+      const result = settingsReducer(state, {
+        type: reducerActions.updateTenant,
+        payload: {microsoft_sync_tenant: 'saved_value'}
+      })
+
+      expect(result.tenantInfoMessages.length).toBe(0)
+    })
+
+    it('sets an info message if the tenant is changed', () => {
+      const result = settingsReducer(state, {
+        type: reducerActions.updateTenant,
+        payload: {microsoft_sync_tenant: 'new_value'}
+      })
+
+      expect(result.tenantInfoMessages.length).toBe(1)
+    })
+
+    it('updates the last saved tenant value on save', () => {
+      const result = settingsReducer(
+        {
+          ...defaultState,
+          microsoft_sync_tenant: 'new_value'
+        },
+        {
+          type: reducerActions.updateSuccess
+        }
+      )
+
+      expect(result.last_saved_microsoft_sync_tenant).toBe('new_value')
+    })
+
+    it('does not update the last saved tenant or error', () => {
+      const result = settingsReducer(
+        {
+          ...defaultState,
+          microsoft_sync_tenant: 'new_value'
+        },
+        {
+          type: reducerActions.updateError
+        }
+      )
+
+      expect(result.last_saved_microsoft_sync_tenant).not.toBe('new_value')
     })
 
     it('tries to update settings and indicates success', async () => {
