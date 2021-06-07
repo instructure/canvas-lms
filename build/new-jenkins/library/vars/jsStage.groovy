@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import groovy.transform.Field
+
+@Field static final COFFEE_NODE_COUNT = 4
+@Field static final JSG_NODE_COUNT = 3
+
 def setupNode() {
   { ->
     def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
@@ -40,25 +45,43 @@ def tearDownNode() {
   }
 }
 
-def queueJestStage() {
+def queueCoffeeDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'tests-jest', [], 'build/new-jenkins/js/tests-jest.sh')
+    COFFEE_NODE_COUNT.times { index ->
+      def coffeeEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "CI_NODE_TOTAL=${COFFEE_NODE_COUNT}",
+        'JSPEC_GROUP=coffee',
+      ]
+
+      callableWithDelegate(queueTestStage())(stages, "coffee${index}", coffeeEnvVars, 'build/new-jenkins/js/tests-karma.sh')
+    }
   }
 }
 
-def queueKarmaStage() {
-  { stages, group, ciNode, ciTotal ->
-    callableWithDelegate(queueTestStage())(stages, "tests-karma-${group}-${ciNode}", [
-      "CI_NODE_INDEX=${ciNode}",
-      "CI_NODE_TOTAL=${ciTotal}",
-      "JSPEC_GROUP=${group}",
-    ], 'build/new-jenkins/js/tests-karma.sh')
+def queueJestDistribution() {
+  { stages ->
+    callableWithDelegate(queueTestStage())(stages, 'jest', [], 'build/new-jenkins/js/tests-jest.sh')
   }
 }
 
-def queuePackagesStage() {
+def queueKarmaDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'tests-packages', [], 'build/new-jenkins/js/tests-packages.sh')
+    JSG_NODE_COUNT.times { index ->
+      def jsgEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "CI_NODE_TOTAL=${JSG_NODE_COUNT}",
+        'JSPEC_GROUP=jsg',
+      ]
+
+      callableWithDelegate(queueTestStage())(stages, "jsg${index}", jsgEnvVars, 'build/new-jenkins/js/tests-karma.sh')
+    }
+
+    ['jsa', 'jsh'].each { group ->
+      callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'build/new-jenkins/js/tests-karma.sh')
+    }
+
+    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'build/new-jenkins/js/tests-packages.sh')
   }
 }
 
