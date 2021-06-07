@@ -73,4 +73,6 @@ group :test do
   gem 'rspec_junit_formatter', require: false
   gem 'axe-core-selenium', '4.1.0', require: false
   gem 'axe-core-rspec', '4.1.0', require: false
+  gem 'axe-core-api', '4.1.0', require:false
+
 end
