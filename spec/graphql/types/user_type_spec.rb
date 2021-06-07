@@ -35,6 +35,7 @@ describe Types::UserType do
     @course = course
     @student = student
     @teacher = teacher
+    @ta = ta_in_course(active_all: true).user
   end
 
   let(:user_type) do
@@ -426,7 +427,7 @@ describe Types::UserType do
     end
 
     it 'returns known users' do
-      known_users = @student.address_book.search_users().paginate(per_page: 3)
+      known_users = @student.address_book.search_users().paginate(per_page: 4)
       result = type.resolve('recipients { usersConnection { nodes { _id } } }')
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
     end
@@ -585,4 +586,101 @@ describe Types::UserType do
       end
     end
   end
+
+  context "courseBuiltInRoles" do
+    before do
+      @teacher_with_multiple_roles = user_factory(name: "blah")
+      @course.enroll_user(@teacher_with_multiple_roles, "TeacherEnrollment")
+      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", :allow_multiple_enrollments => true)
+
+      @custom_teacher = user_factory(name: "blah")
+      role = custom_teacher_role('CustomTeacher', :account => @course.account)
+      @course.enroll_user(@custom_teacher, 'TeacherEnrollment', role: role)
+
+      @teacher_with_duplicate_roles = user_factory(name: "blah")
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", :allow_multiple_enrollments => true)
+    end
+
+    let(:user_ta_type) do
+      GraphQLTypeTester.new(@ta, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:user_teacher_type) do
+      GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:teacher_ta_type) do
+      GraphQLTypeTester.new(@teacher_with_multiple_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:teacher_with_duplicate_role_types) do
+      GraphQLTypeTester.new(@teacher_with_duplicate_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    let(:custom_teacher_type) do
+      GraphQLTypeTester.new(@custom_teacher, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+    end
+
+    it "correctly returns default teacher role" do
+      expect(
+        user_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TeacherEnrollment"]
+    end
+
+    it "correctly returns default TA role" do
+      expect(
+        user_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TaEnrollment"]
+    end
+
+    it "does not return student role" do
+      expect(
+        user_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "returns empty array for course that does not exist" do
+      expect(
+        user_type.resolve(%|courseRoles(courseId: -1, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "does not return custom roles based on teacher" do
+      expect(
+        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "Returns multiple roles when mutiple enrollments exist" do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to include("TaEnrollment", "TeacherEnrollment")
+    end
+
+    it "does not return duplicate roles when mutiple enrollments exist" do
+      expect(
+        teacher_with_duplicate_role_types.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq ["TeacherEnrollment"]
+    end
+
+    it "returns all roles if no role types are specified " do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
+      ).to include("TaEnrollment", "TeacherEnrollment")
+    end
+
+    it "returns only the role specified" do
+      expect(
+        teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TaEnrollment"])|)
+      ).to eq ["TaEnrollment"]
+    end
+
+    it "returns custom role's base_type if built_in_only is set to false" do
+      expect(
+        custom_teacher_type.resolve(%|courseRoles(courseId: #{@course.id}, roleTypes: ["TeacherEnrollment"], builtInOnly: false)|)
+      ).to eq ["TeacherEnrollment"]
+    end
+  end
+
 end
