@@ -16,14 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def setupNode() {
-  distribution.unstashBuildScripts()
+def nodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.LINTERS_RUNNER_IMAGE,
+    command: 'cat',
+    ttyEnabled: true,
+    resourceRequestCpu: '1',
+    resourceLimitCpu: '8',
+  ]
 
-  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $LINTERS_RUNNER_IMAGE'
+  return [
+    containers: [baseTestContainer + [name: 'dependency-check']],
+  ]
 }
 
-def call() {
-  credentials.withSnykCredentials {
-    sh './build/new-jenkins/linters/run-snyk.sh'
+def queueTestStage() {
+  { ->
+    credentials.withSnykCredentials {
+      sh 'cd /usr/src/app && ./build/new-jenkins/linters/run-snyk.sh'
+    }
   }
 }

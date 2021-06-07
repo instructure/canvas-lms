@@ -16,101 +16,118 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import groovy.transform.Field
+def nodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.LINTERS_RUNNER_IMAGE,
+    command: 'cat',
+    ttyEnabled: true,
+    resourceRequestCpu: '1',
+    resourceLimitCpu: '8',
 
-@Field static dockerVolumeName = "gergich-results-${System.currentTimeMillis()}"
-
-def _getDockerInputs() {
-  def inputVars = [
-    '--env GERGICH_DB_PATH=/home/docker/gergich',
-    "--env GERGICH_PUBLISH=$GERGICH_PUBLISH",
-    "--env GERGICH_KEY=$GERGICH_KEY",
-    "--env GERRIT_HOST=$GERRIT_HOST",
-    "--env GERRIT_PROJECT=$GERRIT_PROJECT",
-    "--env GERRIT_BRANCH=$GERRIT_BRANCH",
-    "--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL",
-    "--env GERRIT_PATCHSET_NUMBER=$GERRIT_PATCHSET_NUMBER",
-    "--env GERRIT_PATCHSET_REVISION=$GERRIT_PATCHSET_REVISION",
-    "--env GERRIT_CHANGE_ID=$GERRIT_CHANGE_ID",
-    "--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER",
-    "--env GERRIT_REFSPEC=$GERRIT_REFSPEC",
+    envVars: [
+      GERGICH_DB_PATH: '/home/docker/gergich',
+      GERGICH_GIT_PATH: env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/$GERRIT_PROJECT",
+    ]
   ]
 
-  if (env.GERRIT_PROJECT != 'canvas-lms') {
-    inputVars.addAll([
-      "--env GERGICH_GIT_PATH=/usr/src/app/gems/plugins/$GERRIT_PROJECT",
-    ])
+  def containers = ['code', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+    baseTestContainer + [name: containerName]
   }
 
-  return inputVars.join(' ')
-}
-
-def setupNode() {
-  distribution.unstashBuildScripts()
-
-  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $LINTERS_RUNNER_IMAGE'
-  sh "docker volume create $dockerVolumeName"
+  return [
+    containers: containers,
+    volumes: [
+      baseTestContainer.envVars.GERGICH_DB_PATH,
+    ]
+  ]
 }
 
 def tearDownNode() {
-  withEnv([
-    "DOCKER_INPUTS=${_getDockerInputs()}",
-    "GERGICH_VOLUME=$dockerVolumeName",
-  ]) {
-    sh './build/new-jenkins/linters/run-gergich-publish.sh'
+  { ->
+    container('code') {
+      sh 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-publish.sh'
+    }
   }
 }
 
-def codeStage() {
-  withEnv([
-    "DOCKER_INPUTS=${_getDockerInputs()}",
-    "GERGICH_VOLUME=$dockerVolumeName",
-    "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}",
-  ]) {
-    sh './build/new-jenkins/linters/run-gergich-linters.sh'
-  }
+def codeStage(stages) {
+  { ->
+    def codeEnvVars = [
+      "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}"
+    ]
 
-  if (configuration.getBoolean('force-failure-linters', 'false')) {
-    error 'lintersStage: force failing due to flag'
-  }
-}
-
-def masterBouncerStage() {
-  credentials.withMasterBouncerCredentials {
-    sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'code',
+      envVars: codeEnvVars,
+      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-linters.sh'
+    )
   }
 }
 
-def webpackStage() {
-  withEnv([
-    "DOCKER_INPUTS=${_getDockerInputs()}",
-    "GERGICH_VOLUME=$dockerVolumeName",
-  ]) {
-    sh './build/new-jenkins/linters/run-gergich-webpack.sh'
-  }
+def masterBouncerStage(stages) {
+  { ->
+    credentials.withMasterBouncerCredentials {
+      def masterBouncerEnvVars = [
+        'GERGICH_REVIEW_LABEL=Lint-Review',
+        "MASTER_BOUNCER_KEY=$MASTER_BOUNCER_KEY",
+      ]
 
-  if (configuration.getBoolean('force-failure-linters', 'false')) {
-    error 'lintersStage: force failing due to flag'
-  }
-}
-
-def yarnStage() {
-  withEnv([
-    "DOCKER_INPUTS=${_getDockerInputs()}",
-    "GERGICH_VOLUME=$dockerVolumeName",
-    "PLUGINS_LIST=${configuration.plugins().join(' ')}",
-  ]) {
-    sh './build/new-jenkins/linters/run-gergich-yarn.sh'
-  }
-
-  if (configuration.getBoolean('force-failure-linters', 'false')) {
-    error 'lintersStage: force failing due to flag'
+      callableWithDelegate(queueTestStage())(stages,
+        name: 'master-bouncer',
+        envVars: masterBouncerEnvVars,
+        required: env.MASTER_BOUNCER_RUN == '1',
+        command: 'cd /usr/src/app && master_bouncer check'
+      )
+    }
   }
 }
 
-def groovyStage() {
-  sh '''docker run $LINTERS_RUNNER_IMAGE \
-    npx npm-groovy-lint --path "." --ignorepattern "**/node_modules/**" \
-    --files "**/*.groovy,**/Jenkinsfile*" --config ".groovylintrc.json"  \
-    --loglevel info --failon info'''
+def webpackStage(stages) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'webpack',
+      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-webpack.sh'
+    )
+  }
+}
+
+def yarnStage(stages, buildConfig) {
+  { ->
+    def yarnEnvVars = [
+      "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+    ]
+
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'yarn',
+      envVars: yarnEnvVars,
+      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasYarnFiles(buildConfig),
+      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-yarn.sh',
+    )
+  }
+}
+
+def groovyStage(stages, buildConfig) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'groovy',
+      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig),
+      command: 'cd /usr/src/app && npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon info',
+    )
+  }
+}
+
+def queueTestStage() {
+  { opts, stages ->
+    extendedStage("Linters - ${opts.name}")
+      .envVars(opts.containsKey('envVars') ? opts.envVars : [])
+      .nodeRequirements(container: opts.name)
+      .required(opts.containsKey('required') ? opts.required : true)
+      .queue(stages) {
+        sh(opts.command)
+
+        if (configuration.getBoolean('force-failure-linters', 'false')) {
+          error 'lintersStage: force failing due to flag'
+        }
+      }
+  }
 }

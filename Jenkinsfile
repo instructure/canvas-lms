@@ -429,37 +429,24 @@ pipeline {
               parallel(nestedStages)
             }
 
-            extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
+            extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               extendedStage('Linters - Dependency Check')
-                .hooks([onNodeAcquired: lintersStage.&setupNode])
-                .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+                .nodeRequirements(label: 'canvas-docker', podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
                 .required(configuration.isChangeMerged())
-                .execute(dependencyCheckStage.&call)
+                .execute(dependencyCheckStage.queueTestStage())
 
               extendedStage('Linters')
-                .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])
-                .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+                .hooks([onNodeReleasing: lintersStage.tearDownNode()])
+                .nodeRequirements(label: 'canvas-docker', podTemplate: lintersStage.nodeRequirementsTemplate())
                 .required(!configuration.isChangeMerged())
-                .execute { stageConfig, buildConfig ->
+                .execute {
                   def nestedStages = [:]
 
-                  extendedStage('Linters - Code')
-                    .queue(nestedStages, lintersStage.&codeStage)
-
-                  extendedStage('Linters - Master Bouncer')
-                    .required(env.MASTER_BOUNCER_RUN == '1')
-                    .queue(nestedStages, lintersStage.&masterBouncerStage)
-
-                  extendedStage('Linters - Webpack')
-                    .queue(nestedStages, lintersStage.&webpackStage)
-
-                  extendedStage('Linters - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasYarnFiles(buildConfig))
-                    .queue(nestedStages, lintersStage.&yarnStage)
-
-                  extendedStage('Linters - Groovy')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig))
-                    .queue(nestedStages, lintersStage.&groovyStage)
+                  callableWithDelegate(lintersStage.codeStage(nestedStages))()
+                  callableWithDelegate(lintersStage.groovyStage(nestedStages, buildConfig))()
+                  callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
+                  callableWithDelegate(lintersStage.webpackStage(nestedStages))()
+                  callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 
                   parallel(nestedStages)
                 }
