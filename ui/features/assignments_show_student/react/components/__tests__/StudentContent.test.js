@@ -16,17 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentDetails from '../AssignmentDetails'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {
-  mockAssignment,
-  mockAssignmentAndSubmission,
-  mockQuery
-} from '@canvas/assignments/graphql/studentMocks'
+import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import StudentContent from '../StudentContent'
-import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
+import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 
 jest.mock('../AttemptSelect')
 
@@ -69,7 +65,10 @@ describe('Assignment Student Content View', () => {
       window.ENV = {...window.ENV}
 
       props = await mockAssignmentAndSubmission({
-        Assignment: {description: 'this is my assignment', nonDigitalSubmission: true},
+        Assignment: {
+          ...AssignmentMocks.onPaper,
+          name: 'this is my assignment'
+        },
         Submission: {}
       })
     })
@@ -79,12 +78,12 @@ describe('Assignment Student Content View', () => {
     })
 
     it('renders the assignment details', async () => {
-      const {getByText} = render(
+      const {getAllByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
       )
-      expect(getByText(/this is my assignment/)).toBeInTheDocument()
+      expect(getAllByText(/this is my assignment/)).not.toHaveLength(0)
     })
 
     it('does not render the interface for submitting to the assignment', async () => {
@@ -118,6 +117,45 @@ describe('Assignment Student Content View', () => {
         </MockedProvider>
       )
       expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
+    })
+
+    it('renders the rubric if the assignment has one', async () => {
+      props.assignment.rubric = {}
+
+      const variables = {
+        assignmentLid: '1',
+        courseID: '1',
+        submissionAttempt: 0,
+        submissionID: '1'
+      }
+      const overrides = {
+        Account: {outcomeProficiency: {proficiencyRatingsConnection: null}},
+        Assignment: {rubric: {}},
+        Course: {id: '1'},
+        Node: {__typename: 'Assignment'},
+        Rubric: {
+          criteria: [],
+          title: 'Some On-paper Rubric'
+        }
+      }
+      const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
+      const mocks = [
+        {
+          request: {
+            query: RUBRIC_QUERY,
+            variables
+          },
+          result
+        }
+      ]
+
+      const {findByText} = render(
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      expect(await findByText('View Rubric')).toBeInTheDocument()
     })
   })
 
@@ -247,7 +285,7 @@ describe('Assignment Student Content View', () => {
 
     it('does not render the number of attempts if the assignment does not involve digital submissions', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3, nonDigitalSubmission: true}
+        Assignment: {...AssignmentMocks.onPaper}
       })
 
       const {queryByText} = render(
