@@ -44,6 +44,31 @@ describe "course settings" do
       expect(f('#back_to_subject')).to be_displayed
       expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
     end
+
+    it 'should provide sync to homeroom and homeroom selection' do
+      @course.update!(homeroom_course: true, name: 'homeroom1')
+      orig_teacher = @teacher
+      course_with_teacher(user: orig_teacher, course_name: 'homeroom2')
+      @course.update!(homeroom_course: true)
+      course_with_teacher_logged_in(user: orig_teacher)
+
+      get "/courses/#{@course.id}/settings"
+
+      sync_checkbox = f(".sync_enrollments_from_homeroom_checkbox")
+      expect(sync_checkbox).to be_displayed
+
+      sync_checkbox.click
+
+      homeroom_selection = f("#course_homeroom_course_id")
+      expect(homeroom_selection).not_to be_nil
+      expect(homeroom_selection).to be_displayed
+
+      homeroom_selection.click
+      options = ff("#course_homeroom_course_id option").map(&:text).map(&:strip)
+      expect(options).to include 'homeroom1'
+      expect(options).to include 'homeroom2'
+    end
+
   end
 
   context "considering homeroom courses" do
@@ -60,7 +85,6 @@ describe "course settings" do
       expect(f('#course_details_tab')).to be_displayed
       expect(f('#sections_tab')).to be_displayed
     end
-
   end
 
   describe('Integrations tab') do
