@@ -294,7 +294,7 @@ describe Auditors::GradeChange do
     end
 
     it "inserts a record" do
-      expect(Auditors::GradeChange::Stream).to receive(:insert).once
+      expect(Auditors::GradeChange::Stream).to receive(:insert).at_least(:once)
       Auditors::GradeChange.record(submission: @submission)
     end
 
