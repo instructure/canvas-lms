@@ -123,9 +123,13 @@ module Api::V1::Submission
     end
 
     if includes.include?('read_state')
-      # Save the current read state to the hash, then mark as read
+      # Save the current read state to the hash, then mark as read if needed
       hash['read_state'] = submission.read_state(current_user)
-      submission.mark_read(current_user)
+      if hash['read_state'] == 'unread'
+        GuardRail.activate(:primary) do
+          submission.mark_read(current_user)
+        end
+      end
     end
 
     if context.account_membership_allows(current_user)
