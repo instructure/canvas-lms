@@ -166,14 +166,15 @@ describe('K-5 Subject Course', () => {
 
     it('shows Home, Schedule, Modules, Grades, and Resources options if configured', () => {
       const {getByText} = render(<K5Course {...defaultProps} />)
-      ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label =>
+      ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources'].forEach(label => {
         expect(getByText(label)).toBeInTheDocument()
-      )
+        expect(getByText('Arts and Crafts ' + label)).toBeInTheDocument()
+      })
     })
 
     it('defaults to the first tab', () => {
       const {getByRole} = render(<K5Course {...defaultProps} />)
-      expect(getByRole('tab', {name: 'Home', selected: true})).toBeInTheDocument()
+      expect(getByRole('tab', {name: 'Arts and Crafts Home', selected: true})).toBeInTheDocument()
     })
 
     it('only renders non-hidden tabs, in the order they are provided', () => {
@@ -209,19 +210,20 @@ describe('K-5 Subject Course', () => {
 
   describe('Manage course functionality', () => {
     it('Shows a manage button when the user has manage permissions', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      expect(getByRole('link', {name: 'Manage Subject'})).toBeInTheDocument()
+      const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
+      expect(getByRole('link', {name: 'Manage Subject: Arts and Crafts'})).toBeInTheDocument()
+      expect(getByText('Manage Subject')).toBeInTheDocument()
     })
 
     it('Should redirect to course settings path when clicked', async () => {
       const {getByRole} = render(<K5Course {...defaultProps} canManage />)
-      const manageSubjectBtn = getByRole('link', {name: 'Manage Subject'})
+      const manageSubjectBtn = getByRole('link', {name: 'Manage Subject: Arts and Crafts'})
       expect(manageSubjectBtn.href).toBe('http://localhost/courses/30/settings')
     })
 
     it('Does not show a manage button when the user does not have manage permissions', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} />)
-      expect(queryByRole('link', {name: 'Manage Subject'})).not.toBeInTheDocument()
+      expect(queryByRole('link', {name: 'Manage Subject: Arts and Crafts'})).not.toBeInTheDocument()
     })
   })
 

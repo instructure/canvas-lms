@@ -37,6 +37,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs from '@canvas/k5/react/K5Tabs'
@@ -141,7 +142,13 @@ export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   )
 }
 
-export function CourseHeaderOptions({settingsPath, showStudentView, studentViewPath, canManage}) {
+export function CourseHeaderOptions({
+  settingsPath,
+  showStudentView,
+  studentViewPath,
+  canManage,
+  courseContext
+}) {
   return (
     <View
       id="k5-course-header-options"
@@ -159,7 +166,9 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
               href={settingsPath}
               renderIcon={<IconEditSolid />}
             >
-              {I18n.t('Manage Subject')}
+              <AccessibleContent alt={I18n.t('Manage Subject: %{courseContext}', {courseContext})}>
+                {I18n.t('Manage Subject')}
+              </AccessibleContent>
             </Button>
           </Flex.Item>
         )}
@@ -178,6 +187,14 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
       </Flex>
     </View>
   )
+}
+
+CourseHeaderOptions.propTypes = {
+  settingsPath: PropTypes.string.isRequired,
+  showStudentView: PropTypes.bool.isRequired,
+  studentViewPath: PropTypes.string.isRequired,
+  canManage: PropTypes.bool.isRequired,
+  courseContext: PropTypes.string.isRequired
 }
 
 export function K5Course({
@@ -253,6 +270,7 @@ export function K5Course({
             settingsPath={settingsPath}
             showStudentView={showStudentView}
             studentViewPath={studentViewPath}
+            courseContext={name}
           />
         )}
         <CourseHeaderHero
@@ -272,6 +290,7 @@ export function K5Course({
       onTabChange={handleTabChange}
       tabs={renderTabs}
       tabsRef={setTabsRef}
+      courseContext={name}
     >
       {sticky => courseHeader(sticky)}
     </K5Tabs>

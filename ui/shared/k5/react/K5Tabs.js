@@ -17,27 +17,36 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
+import I18n from 'i18n!k5_tabs'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import k5Theme from './k5-theme'
 
-const K5IconTab = ({icon: Icon, label, selected}) => (
+const K5IconTab = ({icon: Icon, label, selected, courseContext}) => (
   <span className={classnames('ic-Dashboard-tabs__tab', {selected})}>
     <Icon />
-    {label}
+    {courseContext ? (
+      <AccessibleContent alt={I18n.t('%{courseContext} %{label}', {courseContext, label})}>
+        {label}
+      </AccessibleContent>
+    ) : (
+      label
+    )}
   </span>
 )
 
 K5IconTab.propTypes = {
   icon: PropTypes.elementType.isRequired,
   label: PropTypes.string.isRequired,
-  selected: PropTypes.bool.isRequired
+  selected: PropTypes.bool.isRequired,
+  courseContext: PropTypes.string
 }
 
-const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef}) => {
+const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext}) => {
   const [sticky, setSticky] = useState(false)
   const containerRef = useRef(null)
   useEffect(() => {
@@ -73,7 +82,14 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef}) => {
             <Tabs.Panel
               id={id}
               key={id}
-              renderTitle={<K5IconTab icon={icon} label={label} selected={currentTab === id} />}
+              renderTitle={
+                <K5IconTab
+                  icon={icon}
+                  label={label}
+                  selected={currentTab === id}
+                  courseContext={courseContext}
+                />
+              }
               selected={currentTab === id}
             >
               <span />
@@ -96,7 +112,8 @@ K5Tabs.propTypes = {
       label: PropTypes.string.isRequired
     })
   ).isRequired,
-  tabsRef: PropTypes.func
+  tabsRef: PropTypes.func,
+  courseContext: PropTypes.string
 }
 
 export {K5IconTab}
