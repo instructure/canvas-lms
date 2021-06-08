@@ -3888,7 +3888,6 @@ class Course < ActiveRecord::Base
         initiated_source: :course_template
       )
       content_migration.migration_settings[:source_course_id] = template.id
-      content_migration.migration_settings[:import_quizzes_next] = true
 
       content_migration.migration_settings[:import_immediately] = true
       content_migration.copy_options = { everything: true }
