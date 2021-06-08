@@ -169,6 +169,11 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+important_dates:
+  state: hidden
+  display_name: Important Dates
+  description: Enables important dates to be applied to assignments, calendar events, and others.
+  applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
   state: allowed
   display_name: Include Byte-Order Mark in compatible spreadsheet exports
