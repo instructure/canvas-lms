@@ -192,6 +192,14 @@ describe('GradesPage', () => {
         const {findByText} = render(<GradesPage {...getProps()} />)
         expect(await findByText('Total: 84.60% (B)')).toBeInTheDocument()
       })
+
+      it('shows a message explaining how totals are calculated if totals are shown', async () => {
+        const {findByText, getByText} = render(<GradesPage {...getProps()} />)
+        expect(await findByText('Total: 89.39%')).toBeInTheDocument()
+        expect(
+          getByText('Totals are calculated based only on graded assignments.')
+        ).toBeInTheDocument()
+      })
     })
   })
 

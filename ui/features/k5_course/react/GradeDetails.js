@@ -25,6 +25,7 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -130,12 +131,12 @@ const GradeDetails = ({
             <LoadingSkeleton
               height="1.8em"
               width="10em"
-              margin="medium 0 small"
+              margin="medium 0 0"
               screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
             />
           ) : (
             totalGrade && (
-              <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
+              <Heading data-testid="grades-total" level="h2" margin="medium 0 0">
                 <AccessibleContent
                   alt={I18n.t('%{courseName} Total: %{grade}', {courseName, grade: totalGrade})}
                 >
@@ -144,6 +145,11 @@ const GradeDetails = ({
               </Heading>
             )
           )}
+          <View as="div" margin="x-small 0">
+            <Text as="div" size="small">
+              {I18n.t('Totals are calculated based only on graded assignments.')}
+            </Text>
+          </View>
           {loadingAssignmentGroups || loadingGradingPeriods ? (
             <LoadingSkeleton
               height="1.5em"
