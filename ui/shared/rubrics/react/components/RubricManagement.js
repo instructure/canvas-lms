@@ -18,39 +18,50 @@
 
 /* TODO: Remove when feature flag account_level_mastery_scales is enabled */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import _ from 'lodash'
-import PropTypes from 'prop-types'
+import React, {useState, useRef} from 'react'
+import {string} from 'prop-types'
 import I18n from 'i18n!RubricManagement'
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import ProficiencyTable from './ProficiencyTable'
 import RubricPanel from './RubricPanel'
 
-export default class RubricManagement extends React.Component {
-  static propTypes = {
-    accountId: PropTypes.string.isRequired
+function RubricManagement(props) {
+  const [tab, setTab] = useState('tab-panel-rubrics')
+  const masteryTab = useRef(null)
+
+  function changeTab(_ev, {id}) {
+    setTab(id)
   }
 
-  focusTab = _.memoize(ix => () => {
-    ReactDOM.findDOMNode(this.tabList._tabs[ix]).focus()
-  })
+  function focusMasteryTab() {
+    if (masteryTab.current) masteryTab.current.focus()
+  }
 
-  render() {
-    return (
-      <TabList
-        ref={tabList => {
-          this.tabList = tabList
-        }}
-        defaultSelectedIndex={0}
+  return (
+    <Tabs onRequestTabChange={changeTab}>
+      <Tabs.Panel
+        renderTitle={I18n.t('Account Rubrics')}
+        id="tab-panel-rubrics"
+        isSelected={tab === 'tab-panel-rubrics'}
       >
-        <TabList.Panel title={I18n.t('Account Rubrics')}>
-          <RubricPanel />
-        </TabList.Panel>
-        <TabList.Panel title={I18n.t('Learning Mastery')}>
-          <ProficiencyTable focusTab={this.focusTab(1)} accountId={this.props.accountId} />
-        </TabList.Panel>
-      </TabList>
-    )
-  }
+        <RubricPanel />
+      </Tabs.Panel>
+      <Tabs.Panel
+        renderTitle={I18n.t('Learning Mastery')}
+        id="tab-panel-mastery"
+        isSelected={tab === 'tab-panel-mastery'}
+        elementRef={ref => {
+          masteryTab.current = ref
+        }}
+      >
+        <ProficiencyTable focusTab={focusMasteryTab} accountId={props.accountId} />
+      </Tabs.Panel>
+    </Tabs>
+  )
 }
+
+RubricManagement.propTypes = {
+  accountId: string.isRequired
+}
+
+export default RubricManagement

@@ -1,38 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`RubricManagement renders the RubricManagement component 1`] = `
-<TabList
-  defaultSelectedIndex={0}
+<Tabs
   elementRef={[Function]}
-  focus={false}
-  variant="simple"
+  onRequestTabChange={[Function]}
+  shouldFocusOnRender={false}
+  tabOverflow="stack"
+  variant="default"
 >
-  <TabPanel
-    disabled={false}
-    id={null}
+  <Panel
+    elementRef={[Function]}
+    id="tab-panel-rubrics"
+    isDisabled={false}
+    isSelected={true}
     labelledBy={null}
     padding="small"
-    selected={false}
-    tabRef={[Function]}
-    title="Account Rubrics"
-    variant="simple"
+    renderTitle="Account Rubrics"
+    textAlign="start"
+    variant="default"
   >
     <RubricPanel />
-  </TabPanel>
-  <TabPanel
-    disabled={false}
-    id={null}
+  </Panel>
+  <Panel
+    elementRef={[Function]}
+    id="tab-panel-mastery"
+    isDisabled={false}
+    isSelected={false}
     labelledBy={null}
     padding="small"
-    selected={false}
-    tabRef={[Function]}
-    title="Learning Mastery"
-    variant="simple"
+    renderTitle="Learning Mastery"
+    textAlign="start"
+    variant="default"
   >
     <ProficiencyTable
       accountId="1"
       focusTab={[Function]}
     />
-  </TabPanel>
-</TabList>
+  </Panel>
+</Tabs>
 `;

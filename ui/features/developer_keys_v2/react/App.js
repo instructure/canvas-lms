@@ -19,7 +19,7 @@
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 
 import I18n from 'i18n!react_developer_keys'
@@ -32,7 +32,8 @@ import DeveloperKeyModalTrigger from './NewKeyTrigger'
 
 class DeveloperKeysApp extends React.Component {
   state = {
-    focusTab: false
+    focusTab: false,
+    selectedTab: 'tab-panel-account'
   }
 
   get isSiteAdmin() {
@@ -124,6 +125,10 @@ class DeveloperKeysApp extends React.Component {
     return null
   }
 
+  changeTab(_ev, {id}) {
+    this.setState({selectedTab: id})
+  }
+
   render() {
     const {
       applicationState: {
@@ -140,13 +145,22 @@ class DeveloperKeysApp extends React.Component {
       actions,
       ctx
     } = this.props
+    const tab = this.state.selectedTab
+
     return (
       <div>
         <View as="div" margin="0 0 small 0" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
-        <TabList variant="minimal" focus={this.state.focusTab}>
-          <TabList.Panel title={I18n.t('Account')}>
+        <Tabs
+          onRequestTabChange={this.changeTab.bind(this)}
+          shouldFocusOnRender={this.state.focusTab}
+        >
+          <Tabs.Panel
+            renderTitle={I18n.t('Account')}
+            id="tab-panel-account"
+            isSelected={tab === 'tab-panel-account'}
+          >
             <DeveloperKeyModalTrigger
               store={store}
               actions={actions}
@@ -173,9 +187,14 @@ class DeveloperKeysApp extends React.Component {
               {listDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
             </View>
-          </TabList.Panel>
+          </Tabs.Panel>
           {this.isSiteAdmin ? null : (
-            <TabList.Panel title={I18n.t('Inherited')} tabRef={this.setInheritedTabRef}>
+            <Tabs.Panel
+              renderTitle={I18n.t('Inherited')}
+              elementRef={this.setInheritedTabRef}
+              id="tab-panel-inherited"
+              isSelected={tab === 'tab-panel-inherited'}
+            >
               <DeveloperKeysTable
                 ref={this.setInheritedTableRef}
                 store={store}
@@ -191,9 +210,9 @@ class DeveloperKeysApp extends React.Component {
                 ) : null}
                 {this.showMoreInheritedButton()}
               </View>
-            </TabList.Panel>
+            </Tabs.Panel>
           )}
-        </TabList>
+        </Tabs>
       </div>
     )
   }
