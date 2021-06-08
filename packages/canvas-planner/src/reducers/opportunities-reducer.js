@@ -46,10 +46,18 @@ export default handleActions(
         dismissedOpportunity.planner_override = action.payload
       }
       return stateCopy
+    },
+    TOGGLE_MISSING_ITEMS: (state, action) => {
+      const stateCopy = cloneDeep(state)
+      stateCopy.missingItemsExpanded = action.payload?.forceExpanded
+        ? true
+        : !state.missingItemsExpanded
+      return stateCopy
     }
   },
   {
     items: [],
+    missingItemsExpanded: false,
     nextUrl: null
   }
 )

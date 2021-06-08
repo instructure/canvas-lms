@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MarkTemplateStreaming
   def render_to_body(options={})
     @streaming_template = true if options[:stream]
@@ -106,8 +108,8 @@ ActionView::StreamingBuffer.prepend(SkipEmptyTemplateConcats)
 
 module ActivateShardsOnRender
   def render(view, *)
-    if active_shards = view.request&.env&.[]('canvas.active_shards')
-      Shard.activate(active_shards) do
+    if active_shard = view.request&.env&.[]('canvas.active_shard')
+      active_shard.activate do
         super
       end
     else

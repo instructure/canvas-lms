@@ -1,0 +1,78 @@
+{
+  "name": "course_section_created",
+  "definition": "The event is emitted anytime a new course section is created by an end user or API request.",
+  "trigger": "Triggered when a new section is created in a course.",
+  "schema": {
+    "accepting_enrollments": "True if this section is open for enrollment. False or null otherwise.",
+    "can_manually_enroll": "Deprecated, will always be null.",
+    "course_id": "The Canvas id of the course that this section belongs to.",
+    "course_section_id": "The local Canvas id of the created course section.",
+    "default_section": "True if this is the default section for the course. False or null otherwise.",
+    "end_at": "Section end date in ISO8601 format.",
+    "enrollment_term_id": "The Canvas id of the enrollment term.",
+    "integration_id": "The integration id of the section.",
+    "name": "The name of this section.",
+    "nonxlist_course_id": "The unique identifier of the original course of a cross-listed section.",
+    "restrict_enrollments_to_section_dates": "True when 'Users can only participate in the course between these dates' is checked.",
+    "root_account_id": "Canvas id of the root account that this section is in.",
+    "sis_batch_id": "The SIS Batch id of the section.",
+    "sis_source_id": "Correlated id for the record for this course in the SIS system (assuming SIS integration is configured).",
+    "start_at": "Section start date in ISO8601 format.",
+    "stuck_sis_fields": "Array of strings of field names with the SIS stickiness field set, indicating they will not be replaced by SIS imports.",
+    "workflow_state": "The workflow state of the section."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "developer_key_id": "170000000056",
+          "event_name": "course_section_created",
+          "event_time": "2019-11-05T20:42:54.587Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": null,
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000011",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/New_York",
+          "url": "https://oxana.instructure.com/api/v1/courses/2198496/sections?grant_type=authorization_code&access_token=111~sGvKF4Yzr2AqdwShKj7CwwopgwJuMFONBqWu44Upk1F4jgkFvpXc9HY20PCU5r0&course_section%5Bname%5D=Winter%185572%4Business%1Writing&course_section%5Bsis_section_id%5D=WRIT-684-L0_16169&course_section%5Bstart_at%5D=1326-0-2T0.15510549083388048%3A0.38873681067928767%3A0.039724554014499924&course_section%5Bend_at%5D=766-2-2T0.7605609524181581%3A0.995511619163594%3A0.013954836230862355&course_section%5Brestrict_enrollments_to_section_dates%5D=true&enable_sis_reactivation=false",
+          "user_account_id": "21070000000000011",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "accepting_enrollments": true,
+          "can_manually_enroll": null,
+          "course_id": "565",
+          "course_section_id": "1234567",
+          "default_section": true,
+          "end_at": "2020-06-17T04:00:00Z",
+          "enrollment_term_id": "1234",
+          "integration_id": "1234",
+          "name": "Winter 2020 Linear Algebra",
+          "nonxlist_course_id": "1234",
+          "restrict_enrollments_to_section_dates": true,
+          "root_account_id": "121",
+          "sis_batch_id": "1234",
+          "sis_source_id": "MATH-123-A12_12345",
+          "start_at": "2020-01-03T05:00:00Z",
+          "stuck_sis_fields": [
+            "[\"course_id\"",
+            " \"name\"]"
+          ],
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

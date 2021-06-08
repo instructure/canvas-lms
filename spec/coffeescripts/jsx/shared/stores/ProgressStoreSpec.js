@@ -17,7 +17,7 @@
  */
 
 import {isEmpty} from 'lodash'
-import ProgressStore from 'jsx/shared/stores/ProgressStore'
+import ProgressStore from '@canvas/progress/stores/ProgressStore'
 
 QUnit.module('ProgressStoreSpec', {
   setup() {

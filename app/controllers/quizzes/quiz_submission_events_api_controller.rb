@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -43,8 +45,8 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_action :require_user,
-    :require_context,
+  before_action :require_user, only: [:index]
+  before_action :require_context,
     :require_quiz,
     :require_active_quiz_submission
 

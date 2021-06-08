@@ -22,10 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "people" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
-
-  end
-
   def add_user(option_text, username, user_list_selector)
     click_option('#enrollment_type', option_text)
     f('textarea.user_list').send_keys(username)
@@ -388,11 +384,19 @@ describe "people" do
     end
 
     it "should validate that the TA cannot delete / conclude or reset course" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       get "/courses/#{@course.id}/settings"
       expect(f("#content")).not_to contain_css('.delete_course_link')
       expect(f("#content")).not_to contain_css('.reset_course_content_button')
       get "/courses/#{@course.id}/confirm_action?event=conclude"
       expect(f('#unauthorized_message')).to include_text('Access Denied')
+    end
+
+    it "should validate that the TA cannot delete or reset course (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#content")).not_to contain_css('.delete_course_link')
+      expect(f("#content")).not_to contain_css('.reset_course_content_button')
     end
 
     # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
@@ -806,7 +810,6 @@ describe "people" do
     context "student tray" do
       before :once do
         @account = Account.default
-        @account.enable_feature!(:student_context_cards)
         @student = create_user('student@test.com')
         @enrollment = @course.enroll_student(@student, enrollment_state: :active)
       end

@@ -41,7 +41,7 @@
   <div id="gradebook_header" class="subheadContent" style="display:none;">
     <div class="subheadContent subheadContent--flex-start">
       <div id="speedgrader-icons" class="gradebookActions">
-        <a href="<%= polymorphic_url([@context, 'gradebook']) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
+        <a href="<%= polymorphic_url([@context, :gradebook]) %>" id="speed_grader_gradebook_link" class="Button Button--icon-action gradebookActions__Button gradebook-icon-link" title="<%= t('Gradebook') %>">
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
@@ -54,7 +54,7 @@
           <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
         </a>
         <p class="assignmentDetails__Info">
-          <span><%= translated_due_date(@assignment) %></span>
+          <span><%= translated_due_date_for_speedgrader(@assignment) %></span>
           - <a id="context_title" href="<%= context_url(@context, :context_url) %>"><%= @context.short_name %></a>
         </p>
       </div>
@@ -124,6 +124,12 @@
           <%= t :comment_submitted, "Your comment has been submitted." %>
         </div>
       </div>
+      <div id="reassignment_complete" class="alert alert-success speedgrader_alert">
+        <button aria-label="<%= t 'Close' %>" class="dismiss_alert close">×</button>
+        <div id="reassignment_complete_message">
+          <%= t "The assignment has been reassigned." %>
+        </div>
+      </div>
       <div id='submissions_container'>
         <div id="this_student_does_not_have_a_submission">
           <h3>
@@ -165,12 +171,15 @@
                   download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
                   preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
                 %>
-                <a class="submission-file-download icon-download" href="<%= download_url %>" download>
-                  <span class="screenreader-only"><%= t("Download this file") %></span>
-                </a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
                 <span id="react_pill_container"></span>
+                <a class="submission-file-delete icon-trash" href="/api/v1/files/{{attachmentId}}?replace=1" style="display:none;">
+                  <span class="screenreader-only"><%= t("Delete this file") %></span>
+                </a>
+                <a class="submission-file-download icon-download" href="<%= download_url %>" download>
+                  <span class="screenreader-only"><%= t("Download this file") %></span>
+                </a>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>
@@ -185,11 +194,8 @@
         </div>
 
         <div class="content_box">
-          <% if @assignment.rubric_association %>
+          <% if @assignment.active_rubric_association? %>
           <div id="rubric_full" style="display: none;">
-            <div id="rubric_full_resizer">
-              <div id="rubric_full_resizer_handle"></div>
-            </div>
               <h2><%= t("Grading") %></h2>
               <div id="rubric_holder">
                 <%= render :partial => "shared/rubric",
@@ -210,7 +216,7 @@
           </div>
           <% end %>
 
-          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+          <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
           <div id="grading">
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
@@ -224,7 +230,7 @@
               <div id="grading_details_mount_point"></div>
             <% end %>
 
-            <% if @assignment.rubric_association %>
+            <% if @assignment.active_rubric_association? %>
               <div id="rubric_summary_holder">
                 <div id="rubric_assessments_list_and_edit_button_holder">
                   <span id="rubric_assessments_list">
@@ -320,7 +326,7 @@
                 </a>
               </div>
               <div class="ic-Action-header">
-                <div class="ic-Action-header__Primary attach_things" role="group" aria-labelledby="speedgrader_attach_things_label">
+                <div class="ic-Action-header__Primary attach_things" role="group">
                   <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
                     <i class="icon-paperclip" aria-hidden="true"></i>
                     <span class="screenreader-only">
@@ -349,6 +355,12 @@
                 </div>
               </div>
             </form>
+
+            <% if @can_reassign_submissions %>
+              <div id="reassign_assignment_wrapper">
+                <button id="reassign_assignment" disabled class="Button"><%= t("Reassign Assignment") %></button>
+              </div>
+            <% end %>
           <% end %>
 
           <div id="speed_grader_submission_comments_download_mount_point"></div>

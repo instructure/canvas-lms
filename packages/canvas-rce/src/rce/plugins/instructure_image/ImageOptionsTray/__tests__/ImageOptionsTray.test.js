@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 
 import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
+import {CUSTOM} from '../../ImageEmbedOptions'
 
 describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   let props
@@ -32,6 +33,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         altText: '',
         appliedHeight: 300,
         appliedWidth: 150,
+        imageSize: CUSTOM,
         isLinked: false,
         isDecorativeImage: false,
         naturalHeight: 200,
@@ -64,6 +66,37 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   it('is labeled with "Image Options Tray"', () => {
     renderComponent()
     expect(tray.label).toEqual('Image Options Tray')
+  })
+
+  describe('"File URL" field', () => {
+    it('uses the value of .url in the given image url', () => {
+      renderComponent()
+      expect(tray.urlText).toEqual('https://www.fillmurray.com/200/100')
+    })
+
+    it('can be set', async () => {
+      renderComponent()
+      await tray.setUrl('https://www.fillmurray.com/140/100')
+      expect(tray.urlText).toEqual('https://www.fillmurray.com/140/100')
+    })
+
+    it("doesn't appear when url is not external", () => {
+      props.imageOptions.url = 'http://localhost/fake-image.jpg'
+      renderComponent()
+      expect(tray.$urlField).toBeNull()
+    })
+
+    it("appears when url's domain is different than the window's origin", () => {
+      props.imageOptions.url = 'https://www.fillmurray.com/140/100'
+      renderComponent()
+      expect(tray.$urlField).not.toBeNull()
+    })
+
+    it("appears when url's domain is an invalid url", () => {
+      props.imageOptions.url = 'invalidprotocol://www.fillmurray.com/140/100'
+      renderComponent()
+      expect(tray.$urlField).not.toBeNull()
+    })
   })
 
   describe('"Alt Text" field', () => {
@@ -215,6 +248,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       })
 
       describe('when calling the .onSave prop', () => {
+        it('includes the url', () => {
+          tray.$doneButton.click()
+          const [{url}] = props.onSave.mock.calls[0]
+          expect(url).toEqual('https://www.fillmurray.com/200/100')
+        })
+
         it('includes the Alt Text', () => {
           tray.setAltText('A turtle in a party suit.')
           tray.$doneButton.click()

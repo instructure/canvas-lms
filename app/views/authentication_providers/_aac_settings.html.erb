@@ -50,6 +50,13 @@
           <%= render partial: "debugging", locals: { provider: aac } %>
         <% end %>
 
+        <% if aac.account.mfa_settings != :disabled && aac.account.mfa_settings != :required %>
+          <div class="ic-Form-control">
+            <%= f.label :mfa_required, t('MFA Required'), class: 'ic-Label', for: "mfa_required_#{presenter.id_suffix(aac)}" %>
+            <%= f.check_box :mfa_required, class: 'mfa_required_checkbox', id: "mfa_required_#{presenter.id_suffix(aac)}" %>
+          </div>
+        <% end %>
+
         <% if presenter.configs.length > 1 %>
           <div class="ic-Form-control">
             <%= f.label(:position,

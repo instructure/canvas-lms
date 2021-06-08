@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless Rails.env.production?
   require 'pact_broker/client/tasks'
   require_relative '../../spec/contracts/service_consumers/pact_config'

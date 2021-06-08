@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe AccountsController do
+  include K5Common
+
   def account_with_admin_logged_in(opts = {})
     account_with_admin(opts)
     user_session(@admin)
@@ -235,13 +238,8 @@ describe AccountsController do
       user_to_remove = account_admin_user(account: a1)
       au_id = user_to_remove.account_users.first.id
       account_with_admin_logged_in(account: a2)
-      begin
-        post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
-        # rails3 returns 404 status
-        expect(response).to be_not_found
-      rescue ActiveRecord::RecordNotFound
-        # rails2 passes the exception through here
-      end
+      post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
+      expect(response).to be_not_found
       expect(AccountUser.where(id: au_id).first).not_to be_nil
     end
   end
@@ -395,6 +393,7 @@ describe AccountsController do
     end
 
     it "doesn't break I18n by setting customized text for default help links unnecessarily" do
+      Setting.set('show_feedback_link', 'true')
       account_with_admin_logged_in
       post 'update', params: {:id => @account.id, :account => { :custom_help_links => { '0' =>
         { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
@@ -498,6 +497,103 @@ describe AccountsController do
       expect([@subaccount.reload.default_dashboard_view,
               @teacher.dashboard_view(@subaccount),
               @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
+    end
+
+    describe "k5 settings" do
+      def toggle_k5_params(account_id, enable)
+        {:id => account_id,
+         :account => {
+           :settings => {
+             :enable_as_k5_account => {
+               :value => enable
+             }
+           }
+         }}
+      end
+
+      describe "enable_as_k5_account setting" do
+        before :once do
+          @account = Account.create!
+          @user = account_admin_user(account: @account)
+        end
+
+        before :each do
+          user_session(@user)
+        end
+
+        it "should be locked once the setting is enabled" do
+          post 'update', params: toggle_k5_params(@account.id, true)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
+        end
+
+        it "should be unlocked if the setting is disabled" do
+          @account.settings[:enable_as_k5_account] = {
+            value: true,
+            locked: true
+          }
+          post 'update', params: toggle_k5_params(@account.id, false)
+          @account.reload
+          expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
+          expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
+        end
+      end
+
+      describe "k5_accounts set on root account" do
+        before :once do
+          @root_account = Account.create!
+          @subaccount1 = @root_account.sub_accounts.create!
+          @subaccount2 = @subaccount1.sub_accounts.create!
+          @user = account_admin_user(account: @root_account)
+        end
+
+        before :each do
+          user_session(@user)
+        end
+
+        it "is nil by default" do
+          expect(@root_account.settings[:k5_accounts]).to be_nil
+        end
+
+        it "contains root account id if k5 is enabled on root account" do
+          post 'update', params: toggle_k5_params(@root_account.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@root_account.id)
+        end
+
+        it "contains subaccount id (but not other ids) if k5 is enabled on subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount2.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount2.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount1.id)
+        end
+
+        it "contains middle subaccount id (but not other ids) if k5 is enabled on middle subaccount" do
+          post 'update', params: toggle_k5_params(@subaccount1.id, true)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to include(@subaccount1.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
+          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount2.id)
+        end
+
+        it "contains nothing once disabled" do
+          toggle_k5_setting(@root_account)
+          post 'update', params: toggle_k5_params(@root_account.id, false)
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts]).to be_empty
+        end
+
+        it "is not changed unless enable_as_k5_account is modified" do
+          @root_account.settings[:k5_accounts] = [@root_account.id] # in reality this wouldn't ever contain the account if enable_as_k5_account is off
+          @root_account.save!
+          post 'update', params: toggle_k5_params(@root_account.id, false) # already set to false, so shouldn't touch k5_accounts
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts][0]).to be @root_account.id
+          expect(@root_account.settings[:k5_accounts].length).to be 1
+        end
+      end
     end
 
     describe "quotas" do
@@ -735,6 +831,43 @@ describe AccountsController do
         :settings => {:outgoing_email_default_name_option => "default"}}}
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
     end
+
+  context "course_template_id" do
+      before do
+        account_with_admin_logged_in
+        @account.enable_feature!(:course_templates)
+      end
+
+      let(:template) { @account.courses.create!(template: true) }
+
+      it "does nothing when not passed" do
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: {} }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "sets to null when blank" do
+        @account.grants_right?(@admin, :edit_course_template)
+        @account.update!(course_template: template)
+        post 'update', params: { id: @account.id, account: { course_template_id: ''} }
+        @account.reload
+        expect(@account.course_template).to be_nil
+      end
+
+      it "sets it" do
+        post 'update', params: { id: @account.id, account: { course_template_id: template.id } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+
+      it "supports lookup by sis id" do
+        template.update!(sis_source_id: 'sis_id')
+        post 'update', params: { id: @account.id, account: { course_template_id: 'sis_course_id:sis_id' } }
+        @account.reload
+        expect(@account.course_template).to eq template
+      end
+    end
   end
 
   describe "#settings" do
@@ -764,10 +897,27 @@ describe AccountsController do
       end
 
       it 'passes on correct value for new feature flags ui' do
-        account.root_account.enable_feature!(:new_features_ui)
+        Account.site_admin.enable_feature!(:new_features_ui)
         get 'settings', params: {account_id: account.id}
         expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end
+
+      it 'sets microsoft sync values' do
+        allow(MicrosoftSync::LoginService).to receive(:client_id).and_return('1234')
+        get 'settings', params: {account_id: account.id}
+        expect(assigns.dig(:js_env, :MICROSOFT_SYNC)).to include(
+          CLIENT_ID: '1234',
+          REDIRECT_URI: 'https://www.instructure.com/',
+          BASE_URL: 'https://login.microsoftonline.com'
+        )
+      end
+    end
+
+    it "should not be accessible to teachers" do
+      course_with_teacher
+      user_session(@teacher)
+      get 'settings', params: {account_id: @course.root_account.id}
+      expect(response).to be_unauthorized
     end
 
     it "should load account report details" do
@@ -964,6 +1114,7 @@ describe AccountsController do
     end
 
     it "should return default help links" do
+      Setting.set('show_feedback_link', 'true')
       get 'help_links', params: {account_id: @account.id}
 
       expect(response).to be_successful
@@ -1262,24 +1413,82 @@ describe AccountsController do
       expect(response.body).to match(/\"name\":\"hot dog eating\".+\"name\":\"xylophone\"/)
     end
 
-    it "should be able to search by course name" do
+    it "should filter course search by teacher enrollment state" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      user = @c3.shard.activate { user_factory(name: 'rejected') }
       enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
       user.save!
       enrollment.course = @c3
-      enrollment.workflow_state = 'active'
+      enrollment.workflow_state = 'rejected'
       enrollment.save!
-      @c3.reload
 
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      user2 = @c3.shard.activate { user_factory(name: 'inactive') }
       enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
       user2.save!
       enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
+      enrollment2.workflow_state = 'inactive'
       enrollment2.save!
-      @c3.reload
+
+      user3 = @c3.shard.activate { user_factory(name: 'completed') }
+      enrollment3 = @c3.enroll_user(user, 'TeacherEnrollment')
+      user3.save!
+      enrollment3.course = @c3
+      enrollment3.workflow_state = 'completed'
+      enrollment3.save!
+
+      user4 = @c3.shard.activate { user_factory(name: 'deleted') }
+      enrollment4 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user4.save!
+      enrollment4.course = @c3
+      enrollment4.workflow_state = 'deleted'
+      enrollment4.save!
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "hot dog eating", sis_source_id: 63))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach"}
+
+      expect(JSON.parse(response.body).length).to eq 2
+    end
+
+    it "should exclude teachers that don't have an active enrollment workflow state" do
+      user = user_factory(name: 'rejected')
+      enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+      enrollment.update!(workflow_state: 'rejected')
+
+      user2 = user_factory(name: 'inactive')
+      enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+      enrollment2.update!(workflow_state: 'inactive')
+
+      user3 = user_factory(name: 'completed')
+      enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+      enrollment3.update!(workflow_state: 'completed')
+
+      user4 = user_factory(name: 'deleted')
+      enrollment4 = @c1.enroll_user(user4, 'TeacherEnrollment')
+      enrollment4.update!(workflow_state: 'deleted')
+
+      user5 = user_factory(name: 'Teachy McTeacher')
+      enrollment5 = @c1.enroll_user(user5, 'TeacherEnrollment')
+      enrollment5.update!(workflow_state: 'active')
+
+      admin_logged_in(@account)
+
+      get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                  order: 'asc', search_by: 'course',
+                                  include: ['active_teachers']}
+
+      expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+      expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+      expect(response.body).not_to match(/\"display_name\":\"completed\"/)
+      expect(response.body).not_to match(/\"display_name\":\"deleted\"/)
+      expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+    end
+
+    it "should be able to search by course name" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 52))
 
@@ -1297,22 +1506,6 @@ describe AccountsController do
     it "should be able to search by course sis id" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30012)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
-      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
-
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
-      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
 
       @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
@@ -1326,6 +1519,82 @@ describe AccountsController do
       expect(response.body).not_to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"bar\".+\"name\":\"cappuccino\".+\"name\":\"foo\"/)
     end
 
+    it "should be able to search by a course sis id that is > than bigint max" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: "9223372036854775808")
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc", search_by: "course", search_term: "9223372036854775808"}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"name\":\"apple\"/)
+      expect(response.body).not_to match(/\"name\":\"Apps\"/)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "excludes inactive teachers regardless of requestor's active shard" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        @shard1.activate do
+          get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                      order: 'asc', search_by: 'course',
+                                      include: ['active_teachers']}
+        end
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+
+      it "excludes cross-shard teachers without an active enrollment workflow state" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                    order: 'asc', search_by: 'course',
+                                    include: ['active_teachers']}
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+    end
   end
 
   describe "#eportfolio_moderation" do
@@ -1399,6 +1668,65 @@ describe AccountsController do
         get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
         expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
       end
+    end
+  end
+
+  describe("manageable_accounts") do
+    before :once do
+      @account1 = Account.create!(:name => "Account 1", :root_account => Account.default)
+      account_with_admin(:account => @account1)
+      @admin1 = @admin
+      @account2 = Account.create!(:name => "Account 2", :root_account => Account.default)
+      account_admin_user(:account => @account2, :user => @admin1)
+      @subaccount1 = @account1.sub_accounts.create!(:name => "Subaccount 1")
+    end
+
+    it "includes all top-level and subaccounts" do
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts[0]["name"]).to eq "Account 1"
+      expect(accounts[1]["name"]).to eq "Subaccount 1"
+      expect(accounts[2]["name"]).to eq "Account 2"
+    end
+
+    it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
+      account3 = Account.create!(:name => "Account 3", :root_account => Account.default)
+      account_admin_user_with_role_changes(:account => account3, :user => @admin1, :role_changes => {:manage_courses => false, :create_courses => false})
+      user_session @admin1
+      get "manageable_accounts"
+      accounts = json_parse(response.body)
+      expect(accounts.length).to be 3
+      accounts.each do |a|
+        expect(a["name"]).not_to eq "Account 3"
+      end
+    end
+
+    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      account3 = Account.create!(name: 'Account 3', root_account: Account.default)
+      account_admin_user_with_role_changes(
+        account: account3,
+        user: @admin1,
+        role_changes: {
+          manage_courses_admin: false,
+          manage_courses_add: false
+        }
+      )
+      user_session @admin1
+      get 'manageable_accounts'
+      accounts = json_parse(response.body)
+      expect(accounts.length).to be 3
+      accounts.each { |a| expect(a['name']).not_to eq 'Account 3' }
+    end
+
+    it "returns an empty list for students" do
+      student_in_course(:active_all => true, :account => @account1)
+      user_session @student
+      get "manageable_accounts"
+      expect(response).to be_successful
+      expect(json_parse(response.body).length).to be 0
     end
   end
 end

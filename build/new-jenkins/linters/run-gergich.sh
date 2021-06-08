@@ -2,80 +2,19 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"' \
-    git fetch --depth 1 --force --no-tags origin "$GERRIT_BRANCH":"$GERRIT_BRANCH"
+DOCKER_INPUTS=$DOCKER_INPUTS GERGICH_VOLUME=$GERGICH_VOLUME ./build/new-jenkins/linters/run-gergich-webpack.sh &
+WEBPACK_BUILD_PID=$!
 
-inputs=()
-inputs+=("--volume $(pwd)/.git:/usr/src/app/.git")
-inputs+=("--env GERGICH_PUBLISH=$GERGICH_PUBLISH")
-inputs+=("--env GERGICH_KEY=$GERGICH_KEY")
-inputs+=("--env GERRIT_HOST=$GERRIT_HOST")
-inputs+=("--env GERRIT_PROJECT=$GERRIT_PROJECT")
-inputs+=("--env GERRIT_BRANCH=$GERRIT_BRANCH")
-inputs+=("--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL")
-inputs+=("--env GERRIT_PATCHSET_NUMBER=$GERRIT_PATCHSET_NUMBER")
-inputs+=("--env GERRIT_PATCHSET_REVISION=$GERRIT_PATCHSET_REVISION")
-inputs+=("--env GERRIT_CHANGE_ID=$GERRIT_CHANGE_ID")
-inputs+=("--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER")
+DOCKER_INPUTS=$DOCKER_INPUTS GERGICH_VOLUME=$GERGICH_VOLUME ./build/new-jenkins/linters/run-gergich-linters.sh &
+LINTER_PID=$!
 
-# the GERRIT_REFSPEC is required for the commit message to actually
-# send things to gergich
-inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
-
-cat <<EOF | docker run --interactive ${inputs[@]} "$PATCHSET_TAG" /bin/bash -
-set -ex
-
-# ensure we run the gergich comments with the Lint-Review label
-export GERGICH_REVIEW_LABEL="Lint-Review"
-
-# when parent is not in \$GERRIT_BRANCH (i.e. master)
-if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
-  message="This commit is built upon commits not currently merged in \$GERRIT_BRANCH. Ensure that your dependent patchsets are merged first!\\n"
-  gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"warn\",\"message\":\"\$message\"}"
+if [ "$GERRIT_PROJECT" == "canvas-lms" ] && git diff --name-only HEAD~1..HEAD | grep -E "package.json|yarn.lock"; then
+  DOCKER_INPUTS=$DOCKER_INPUTS GERGICH_VOLUME=$GERGICH_VOLUME ./build/new-jenkins/linters/run-gergich-yarn.sh &
+  YARN_LOCK_PID=$!
 fi
 
-# we need to remove the hooks because compile_assets calls yarn install which will
-# try to create the .git commit hooks
-> ./script/install_hooks
-export COMPILE_ASSETS_NPM_INSTALL=0
-export COMPILE_ASSETS_API_DOCS=0
-export COMPILE_ASSETS_STYLEGUIDE=0
-export JS_BUILD_NO_FALLBACK=1
-gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets "rake canvas:compile_assets"
+wait $WEBPACK_BUILD_PID
+wait $LINTER_PID
+[ ! -z "${YARN_LOCK_PID-}" ] && wait $YARN_LOCK_PID
 
-gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint "node script/xsslint.js"
-gergich capture i18nliner "rake i18n:check"
-bundle exec ruby script/brakeman
-bundle exec ruby script/tatl_tael
-bundle exec ruby script/stylelint
-bundle exec ruby script/rlint
-bundle exec ruby script/eslint
-bundle exec ruby script/lint_commit_message
-
-plugins_list=\$(cat config/plugins_list)
-for gem in \$plugins_list
-do
-  echo \$gem
-  rm -r gems/plugins/\$gem
-done
-yarn install
-if ! git diff --exit-code yarn.lock; then
-  message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
-  gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
-fi
-
-bundle exec rake doc:api css:styleguide
-if ! git diff --exit-code lib/api_scope_mapper.rb; then
-  message="lib/api_scope_mapper.rb changes need to be checked in. Make sure you run 'bundle exec rake doc:api' without private canvas-lms plugins installed."
-  gergich comment "{\"path\":\"lib/api_scope_mapper.rb\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
-fi
-
-git status
-gergich status
-if [[ "\$GERGICH_PUBLISH" == "1" ]]; then
-  # we need to do this because it forces gergich to not use git (because no git repo is there).
-  # and being that we rebased, the commit hash changes, so this will make it use the variables passed in
-  export GERGICH_GIT_PATH=".."
-  gergich publish
-fi
-EOF
+exit 0

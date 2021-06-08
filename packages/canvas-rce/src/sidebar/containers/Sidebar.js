@@ -31,18 +31,16 @@ export function propsFromState(state) {
     flickr,
     upload,
     session,
-    newPageLinkExpanded
+    newPageLinkExpanded,
+    all_files,
+    jwt,
+    host
   } = state
 
   const collections = {}
   for (const key in state.collections) {
     const collection = state.collections[key]
-    collections[key] = {
-      links: collection.links,
-      lastError: collection.error,
-      isLoading: !!collection.loading,
-      hasMore: !!collection.bookmark
-    }
+    collections[key] = collection
   }
 
   return {
@@ -60,6 +58,9 @@ export function propsFromState(state) {
     upload,
     session,
     newPageLinkExpanded,
-    ...ui
+    ...ui,
+    all_files,
+    jwt,
+    host
   }
 }

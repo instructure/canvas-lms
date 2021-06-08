@@ -44,8 +44,8 @@ describe 'as a student' do
         StudentAssignmentPageV2.visit(@course, @assignment)
       end
 
-      it 'should show available checkmark stepper' do
-        expect(StudentAssignmentPageV2.checkmark_icon).to be_displayed
+      it 'should show submission workflow tracker' do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to be_displayed
       end
 
       it 'should show assignment title' do
@@ -54,10 +54,6 @@ describe 'as a student' do
 
       it 'available assignment should show details toggle' do
         expect(StudentAssignmentPageV2.details_toggle).to be_displayed
-      end
-
-      it 'should show assignment group link' do
-        expect(StudentAssignmentPageV2.assignment_group_link).to be_displayed
       end
 
       it 'should show assignment due date' do
@@ -86,9 +82,11 @@ describe 'as a student' do
       before(:each) do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
       end
 
-      it 'should be able to be submitted' do
+      it 'should be able to be submitted', custom_timeout: 30 do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.submit_assignment
@@ -97,6 +95,7 @@ describe 'as a student' do
       end
 
       it 'should be able to be saved as a draft' do
+        skip("Skip for now and fix with LS-2164")
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
         StudentAssignmentPageV2.edit_text_entry_button.click
@@ -179,33 +178,6 @@ describe 'as a student' do
         skip 'LS-1514 10/5/2020'
         StudentAssignmentPageV2.record_upload_button.click
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
-      end
-    end
-
-    context 'with new rce' do
-      before(:once) do
-        Account.default.enable_feature!(:rce_enhancements)
-        @assignment = @course.assignments.create!(
-          name: 'assignment',
-          due_at: 5.days.ago,
-          points_possible: 10,
-          submission_types: 'online_text_entry'
-        )
-      end
-
-      before(:each) do
-        user_session(@student)
-        StudentAssignmentPageV2.visit(@course, @assignment)
-        driver.manage.window.resize_to(1000, 800)
-      end
-
-      it "should clean up RCE when switching tabs" do
-        StudentAssignmentPageV2.start_text_entry_button.click
-        f('button[aria-label="More..."]').click
-        expect(f('.tox-toolbar__overflow')).to be_displayed
-
-        fj('[role="tab"]:contains("Comments")').click
-        expect(f('body')).not_to contain_css('.tox-toolbar__overflow')
       end
     end
   end

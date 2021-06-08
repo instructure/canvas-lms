@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function sanitizePlugins(plugins) {
+export function sanitizePlugins(plugins) {
   if (plugins !== undefined) {
     let cleanPlugins = plugins
     if (typeof plugins === 'string') {

@@ -63,7 +63,7 @@ class Attachments::Verification
     pm = opts[:permission_map_id]
     body[:pm] = pm.to_s if pm && PERMISSION_MAPS.key?(pm)
 
-    Canvas::Security.create_jwt(body, opts[:expires])
+    CanvasSecurity.create_jwt(body, opts[:expires])
   end
 
   # Decodes a verifier and asserts its validity (but does not check permissions!). You
@@ -75,7 +75,7 @@ class Attachments::Verification
   # a Hash of the body contents if it can.
   def decode_verifier(verifier)
     begin
-      body = Canvas::Security.decode_jwt(verifier)
+      body = CanvasSecurity.decode_jwt(verifier)
       if body[:id] != attachment.global_id
         InstStatsd::Statsd.increment("attachments.token_verifier_id_mismatch")
         Rails.logger.warn("Attachment verifier token id mismatch. token id: #{body[:id]}, attachment id: #{attachment.global_id}, token: #{verifier}")
@@ -83,11 +83,11 @@ class Attachments::Verification
       end
 
       InstStatsd::Statsd.increment("attachments.token_verifier_success")
-    rescue Canvas::Security::TokenExpired
+    rescue CanvasSecurity::TokenExpired
       InstStatsd::Statsd.increment("attachments.token_verifier_expired")
       Rails.logger.warn("Attachment verifier token expired: #{verifier}")
       return nil
-    rescue Canvas::Security::InvalidToken
+    rescue CanvasSecurity::InvalidToken
       InstStatsd::Statsd.increment("attachments.token_verifier_invalid")
       Rails.logger.warn("Attachment verifier token invalid: #{verifier}")
       return nil
@@ -107,6 +107,12 @@ class Attachments::Verification
     # Support for legacy verifiers.
     if verifier == attachment.uuid
       InstStatsd::Statsd.increment("attachments.legacy_verifier_success")
+      return true
+    elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?
+      # if we have a uuid-sized verifier that doesn't match, see whether it matches a related attachment
+      # (meaning another copy of the same file, to deal with a question bank migration issue in which
+      # the source file's verifier remains in the URL)
+      InstStatsd::Statsd.increment("attachments.related_verifier_success")
       return true
     end
 

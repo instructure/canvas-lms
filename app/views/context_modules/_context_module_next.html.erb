@@ -21,7 +21,7 @@
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
   editable ||= can_do(@context, @current_user, :manage_content)
-  can_direct_share = can_do(@context, @current_user, :read_as_admin) && @domain_root_account&.feature_enabled?(:direct_share)
+  can_direct_share = can_do(@context, @current_user, :read_as_admin)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
   module_dnd = @context&.root_account&.feature_enabled?(:module_dnd)

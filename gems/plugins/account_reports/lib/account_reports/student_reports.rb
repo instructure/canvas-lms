@@ -249,30 +249,16 @@ module AccountReports
     def last_user_access
       report_extra_text
 
-      students = root_account.pseudonyms.
-        select('pseudonyms.last_request_at, pseudonyms.user_id,
-                  pseudonyms.sis_user_id, users.sortable_name,
-                  pseudonyms.current_login_ip').
-        joins(:user)
-
+      students = root_account.pseudonyms.joins(:user)
       students = add_user_sub_account_scope(students)
 
-      if term
-        students = students.
-          joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
-                 INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id")
-        students = add_term_scope(students, 'c')
-      end
-
-      if course
-        students = students.
-          joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
-                 INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id").
-          where('c.id = ?', course)
-      end
+      courses = term.courses if term
+      courses = course if course
 
       if course || term
-        students = students.where('e.workflow_state <> ?', "deleted") unless @include_deleted
+        enrollments = root_account.enrollments.where(course_id: courses).distinct.select(:user_id)
+        enrollments = enrollments.active unless @include_deleted
+        students = students.where(user_id: enrollments)
       end
 
       students = students.active unless @include_deleted
@@ -284,12 +270,13 @@ module AccountReports
       headers << I18n.t('#account_reports.report_header_last_access_at', 'last access at')
       headers << I18n.t('#account_reports.report_header_last_ip', 'last ip')
 
-      write_report headers do |csv|
+      @account_report.update(total_lines: students.count)
 
-        pseudonyms_in_report = Set.new
+      students = students.select('pseudonyms.last_request_at, pseudonyms.user_id,
+        pseudonyms.sis_user_id, users.sortable_name, pseudonyms.current_login_ip')
+
+      write_report headers do |csv|
         students.find_each do |u|
-          next if pseudonyms_in_report.include? [u.user_id, u.sis_user_id]
-          pseudonyms_in_report << [u.user_id, u.sis_user_id]
           row = []
           row << u.user_id
           row << u.sis_user_id

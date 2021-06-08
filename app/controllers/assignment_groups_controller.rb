@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -108,6 +110,10 @@ class AssignmentGroupsController < ApplicationController
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
   #
+  # @argument assignment_ids[] [String]
+  #  If "assignments" are included, optionally return only assignments having their ID in this array. This argument may also be passed as
+  #  a comma separated string.
+  #
   # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
   #  If "assignments" are included, those with the specified submission types
   #  will be excluded from the assignment groups.
@@ -174,7 +180,7 @@ class AssignmentGroupsController < ApplicationController
       if assignment_ids_to_update.any?
         assignments.where(:id => assignment_ids_to_update).update_all(assignment_group_id: @group.id, updated_at: Time.now.utc)
         tags_to_update += MasterCourses::ChildContentTag.where(:content_type => "Assignment", :content_id => assignment_ids_to_update).to_a
-        Canvas::LiveEvents.send_later_if_production(:assignments_bulk_updated, assignment_ids_to_update)
+        Canvas::LiveEvents.delay_if_production.assignments_bulk_updated(assignment_ids_to_update)
       end
       quizzes = @context.active_quizzes.where(assignment_id: order)
       quiz_ids_to_update = quizzes.where.not(:assignment_group_id => @group.id).pluck(:id)
@@ -397,12 +403,19 @@ class AssignmentGroupsController < ApplicationController
 
   def visible_assignments(context, current_user, groups)
     return Assignment.none unless include_params.include?('assignments')
-    # TODO: possible keyword arguments refactor
+
+    assignment_ids = if params[:assignment_ids].is_a?(String)
+      params[:assignment_ids].split(",")
+    else
+      params[:assignment_ids]
+    end
+
     assignments = AssignmentGroup.visible_assignments(
       current_user,
       context,
       groups,
-      assignment_includes
+      includes: assignment_includes,
+      assignment_ids: assignment_ids
     )
 
     if params[:exclude_assignment_submission_types].present?

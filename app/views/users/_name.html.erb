@@ -18,7 +18,12 @@
 
 <% unless @read_only
     account = @context && (@context.is_a?(Account) ? @context : @context.account)
-    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :manage_admin_users) }
+    # Note: we'd like to pick :allow_course_admin_actions or :manage_admin_users depending on
+    # whether or not the :granular_permissions_manage_users FF is on for the root account, but
+    # we need the permission in order to even figure out what the appropriate root account is.
+    # So in this case, we'll take either; this appears to be safe because the permission check
+    # is not used anywhere else in this view.
+    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :allow_course_admin_actions, :manage_admin_users) }
     account ||= managed_accounts.first
     root_account = account.root_account if account
   end
@@ -85,6 +90,9 @@
           <% if @user.grants_right?(@current_user, :merge) %>
             <%= "|" unless first %><% first = false %>
             <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
+            <% if UserMergeData.active.splitable.where(user_id: @user).shard(@user).exists? %>
+              | <a class="split_user_link" href="<%= user_admin_split_url(@user) %>"><%= t('Split Merged Users')%></a>
+            <% end %>
           <% end %>
 
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>
@@ -92,8 +100,13 @@
             <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
           <% end %>
 
+          <% if @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
+            <%= "|" unless first %><% first = false %>
+            <a class="destroy_user_link" href="<%= api_v1_destroy_user_url(@user) %>"><%= t('Delete from ALL accounts') %></a>
+          <% end %>
+
           <% if Canvas::CacheRegister.enabled? && @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
-            <%= "|" unless first %>
+            <%= "|" unless first %><% first = false %>
             <a class="clear_user_cache_link" href="<%= api_v1_clear_cache_url(@user) %>"><%= t('Clear User Cache') %></a>
           <% end %>
         </td>

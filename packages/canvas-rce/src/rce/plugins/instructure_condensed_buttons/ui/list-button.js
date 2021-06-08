@@ -113,7 +113,8 @@ export default function register(editor) {
 
     onSetup: api => {
       const $svgContainer = editor.$(
-        editor.editorContainer.querySelector(`[aria-label="${buttonLabel}"] .tox-icon`)
+        `.tox-split-button[aria-label="${buttonLabel}"] .tox-icon`,
+        document
       )
       const allIcons = editor.ui.registry.getAll().icons
 
@@ -132,6 +133,7 @@ export default function register(editor) {
         $svgContainer.html(svg)
       }
 
+      nodeChangeHandler({parents: editor.dom.getParents(editor.selection.getNode(), 'ol,ul')})
       editor.on('NodeChange', nodeChangeHandler)
       return () => editor.off('NodeChange', nodeChangeHandler)
     }

@@ -104,6 +104,8 @@ function itemDateIsLoaded(state, item) {
     itemMoment.isSame(lastDayMoment) ||
     itemMoment.isBefore(lastDayMoment)
 
+  // TODO: If K5 users can create ToDos, handle the weekly planner case too
+
   return isFirstOrAfter && isLastOrBefore
 }
 

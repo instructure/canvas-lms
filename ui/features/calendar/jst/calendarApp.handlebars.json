@@ -1,0 +1,4 @@
+{
+  "brandableCSSBundle": "jst/calendar/calendarApp",
+  "i18nScope": "calendar.calendar_app"
+}

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -93,6 +95,8 @@ class SubmissionsController < SubmissionsBaseController
   before_action :get_course_from_section, :only => :create
   before_action :require_context
 
+  include K5Mode
+
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)
@@ -134,7 +138,8 @@ class SubmissionsController < SubmissionsBaseController
     "online_url" => ["url"].freeze,
     "online_upload" => ["file_ids"].freeze,
     "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
-    "basic_lti_launch" => ["url"].freeze
+    "basic_lti_launch" => ["url"].freeze,
+    "student_annotation" => ["annotatable_attachment_id"].freeze
   }.freeze
 
   # @API Submit an assignment
@@ -152,7 +157,7 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
@@ -195,6 +200,12 @@ class SubmissionsController < SubmissionsBaseController
   # @argument submission[user_id] [Integer]
   #   Submit on behalf of the given user. Requires grading permission.
   #
+  # @argument submission[annotatable_attachment_id] [Integer]
+  #   The Attachment ID of the document being annotated. This should match
+  #   the annotatable_attachment_id on the assignment.
+  #
+  #   Requires a submission_type of "student_annotation".
+  #
   # @argument submission[submitted_at] [DateTime]
   #   Choose the time the submission is listed as submitted at.  Requires grading permission.
 
@@ -236,22 +247,30 @@ class SubmissionsController < SubmissionsBaseController
         return unless has_file_attached?
       elsif is_google_doc?
         params[:submission][:submission_type] = 'online_upload'
-        attachment = submit_google_doc(params[:google_doc][:document_id])
-        if attachment
-          params[:submission][:attachments] << attachment
+        attachment, err_message = submit_google_doc(params[:google_doc][:document_id])
+        if attachment.nil? || err_message
+          flash[:error] = err_message || t('errors.no_attachment_found', "Could not find an attachment to send to google drive")
+          return redirect_to(course_assignment_url(@context, @assignment))
         else
-          return
+          params[:submission][:attachments] << attachment
         end
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      elsif params[:submission][:submission_type] == 'student_annotation' && params[:submission][:annotatable_attachment_id].blank?
+        flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
+        return redirect_to(course_assignment_url(@context, @assignment))
       end
     end
+
+    # When the `resource_link_lookup_uuid` is given, we need to validate if it exists,
+    # in case not, we'll return an error and won't record the submission.
+    return unless valid_resource_link_lookup_uuid?
 
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :attachment_ids => []
+      :resource_link_lookup_uuid, :annotatable_attachment_id, attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
@@ -314,6 +333,14 @@ class SubmissionsController < SubmissionsBaseController
     @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
     @user = @context.all_students.find(params.fetch(:id))
     @submission = @assignment.find_or_create_submission(@user)
+
+    super
+  end
+
+  def redo_submission
+    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
+    @user = get_user_considering_section(params.fetch(:submission_id))
+    @submission = @assignment.submission_for_student(@user)
 
     super
   end
@@ -409,7 +436,7 @@ class SubmissionsController < SubmissionsBaseController
   def allowed_api_submission_type?(submission_type)
     valid_for_api = API_SUBMISSION_TYPES.key?(submission_type)
     allowed_for_assignment = @assignment.submission_types_array.include?(submission_type)
-    basic_lti_launch = (@assignment.submission_types.include?('online') && submission_type == 'basic_lti_launch')
+    basic_lti_launch = (@assignment.submission_types =~ /online|external_tool/ && submission_type == 'basic_lti_launch')
     valid_for_api && (allowed_for_assignment || basic_lti_launch)
   end
   private :allowed_api_submission_type?
@@ -498,26 +525,24 @@ class SubmissionsController < SubmissionsBaseController
   end
   private :is_google_doc?
 
+  # to avoid rendering/redirecting in a helper,
+  # this method returns both the attachment and an error message.
+  # A non-nil error message tells the consuming code that it should not proceed
+  # and should just render the error.
   def submit_google_doc(document_id)
     # fetch document from google
     # since google drive can have many different export types, we need to send along our preferred extensions
     document_response, display_name, file_extension, content_type = google_drive_connection.download(document_id,
-                                                                                         @assignment.allowed_extensions)
+                                                                                        @assignment.allowed_extensions)
 
-    # error handling
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
-      flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
+      return nil, t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 
     restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
     if restriction_enabled && !restricted_google_docs_domain.blank? && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
-      flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
-    end
-
-    if flash[:error]
-      redirect_to(course_assignment_url(@context, @assignment))
-      return false
+      return nil, t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
     end
 
     # process the file and create an attachment
@@ -535,7 +560,13 @@ class SubmissionsController < SubmissionsBaseController
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
       attachment.save!
     end
-    attachment
+    return attachment, nil # error message doesn't exist if we got this far
+  rescue GoogleDrive::WorkflowError => e
+    Canvas::Errors.capture_exception(:google_drive, e, :warn)
+    return nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')
+  rescue GoogleDrive::ConnectionException => e
+    Canvas::Errors.capture_exception(:google_drive, e, :warn)
+    return nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')
   end
   protected :submit_google_doc
 
@@ -547,10 +578,35 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = [:eula_agreement_timestamp, :submitted_at].freeze
+    always_permitted_params = [:eula_agreement_timestamp, :submitted_at, :resource_link_lookup_uuid].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
+
+  def valid_resource_link_lookup_uuid?
+    return true if params[:submission][:resource_link_lookup_uuid].nil?
+
+    resource_link = Lti::ResourceLink.find_by(
+      lookup_uuid: params[:submission][:resource_link_lookup_uuid],
+      context: @context
+    )
+
+    return true if resource_link
+
+    message = t('Resource link not found for given `resource_link_lookup_uuid`')
+
+    # Homework submission is done by API request, but I saw other parts of code
+    # that are handling HTML and JSON format. So, I kept the same logic here...
+    if api_request?
+      render(json: { message: message }, status: 400)
+    else
+      flash[:error] = message
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+    end
+
+    false
+  end
+  private :valid_resource_link_lookup_uuid?
 
   protected
 

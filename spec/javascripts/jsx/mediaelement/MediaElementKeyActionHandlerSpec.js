@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyActionHandler'
+import MediaElementKeyActionHandler from '@canvas/media-comments/jquery/MediaElementKeyActionHandler'
 
 let handler
 let fakeMejs

@@ -47,6 +47,33 @@ describe "assignments" do
       create_session(@pseudonym)
     end
 
+    describe 'keyboard shortcuts' do
+      context 'when the user has keyboard shortcuts enabled' do
+        before do
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut "SHIFT-?"' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).to be_displayed
+        end
+      end
+
+      context 'when the user has keyboard shortcuts disabled' do
+        before do
+          @teacher.enable_feature!(:disable_keyboard_shortcuts)
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut dialog is not accesible when user disables keyboard shortcuts' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).not_to be_displayed
+        end
+      end
+    end
+
     context "save and publish button" do
 
       def create_assignment(publish = true, params = {name: "Test Assignment"})
@@ -99,35 +126,6 @@ describe "assignments" do
           expect(f('#moderated_grading_button')).not_to be_displayed
         end
       end
-    end
-
-    it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
-      stub_rcs_config
-      @assignment = @course.assignments.create(name: 'Test Assignment')
-      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
-      file.context = @course
-      file.save!
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      insert_file_from_rce
-    end
-
-    it "should switch text editor context from RCE to HTML", priority: "1", test_id: 699624 do
-      get "/courses/#{@course.id}/assignments/new"
-      wait_for_ajaximations
-      text_editor=f('.mce-tinymce')
-      expect(text_editor).to be_displayed
-      html_editor_link=fln('HTML Editor')
-      expect(html_editor_link).to be_displayed
-      type_in_tiny 'textarea[name=description]', 'Testing HTML- RCE Toggle'
-      html_editor_link.click
-      wait_for_ajaximations
-      rce_link=fln('Rich Content Editor')
-      rce_editor=f('#assignment_description')
-      expect(html_editor_link).not_to be_displayed
-      expect(rce_link).to be_displayed
-      expect(text_editor).not_to be_displayed
-      expect(rce_editor).to be_displayed
-      expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
     end
 
     it "should edit an assignment", priority: "1", test_id: 56012 do
@@ -413,6 +411,64 @@ describe "assignments" do
         expect(f("#intra_group_peer_reviews")).to be_displayed
         f("#has_group_category").click
         expect(f("#intra_group_peer_reviews")).not_to be_displayed
+      end
+    end
+
+    context "student annotation" do
+      before do
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        @course.account.settings[:usage_rights_required] = true
+        @course.account.save!
+        attachment = attachment_model(content_type: "application/pdf", context: @course)
+        @assignment = @course.assignments.create(name: "Student Annotation", submission_types: 'student_annotation,online_text_entry', annotatable_attachment_id: attachment.id)
+      end
+
+       it "creates a student annotation assignment with annotatable attachment with usage rights" do
+        get "/courses/#{@course.id}/assignments"
+
+        wait_for_new_page_load { f(".new_assignment").click }
+        f('#assignment_name').send_keys("Annotated Test")
+
+        replace_content(f('#assignment_points_possible'), "10")
+        click_option('#assignment_submission_type', 'Online')
+
+        ['#assignment_annotated_document','#assignment_text_entry'].each do |element|
+          f(element).click
+        end
+
+        wait_for_ajaximations
+
+        expect(f('#assignment_annotated_document_info')).to be_displayed
+
+        #select attachment from file explorer
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
+        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+
+        #set usage rights
+        f('#usageRightSelector').click
+        fxpath('//*[@id="usageRightSelector"]/option[2]').click
+        f('#copyrightHolder').send_keys('Me')
+
+        submit_assignment_form
+        wait_for_ajaximations
+
+        expect(f('#assignment_show fieldset')).to include_text('a text entry box or a student annotation')
+      end
+
+      it 'displays annotatbale document to student and submits assignment for grading' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        f('.submit_assignment_link').click
+
+        expect(f('.submit_annotated_document_option')).to be_displayed
+        f('.submit_annotated_document_option').click
+
+        expect(fxpath('//*[@id="submit_annotated_document_form"]/div/iframe')).to be_displayed
+
+        f('#submit_annotated_document_form .btn-primary').click
+        wait_for_ajaximations
+        expect(f('#right-side-wrapper')).to include_text("Submitted!")
       end
     end
 

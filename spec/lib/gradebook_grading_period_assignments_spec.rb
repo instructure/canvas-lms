@@ -31,7 +31,7 @@ describe GradebookGradingPeriodAssignments do
       @assignment1_in_gp1 = @example_course.assignments.create!(due_at: 3.months.ago)
       @assignment2_in_gp2 = @example_course.assignments.create!(due_at: 1.day.from_now)
       @assignment3_in_gp2 = @example_course.assignments.create!(due_at: 2.days.from_now)
-      @assignment4 = @example_course.assignments.create!(due_at: 6.months.from_now)
+      @assignment_not_in_gp = @example_course.assignments.create!(due_at: 6.months.from_now)
     end
 
     let(:hash) { GradebookGradingPeriodAssignments.new(@example_course).to_h }
@@ -43,14 +43,14 @@ describe GradebookGradingPeriodAssignments do
         @period1, @period2, @period3 = Factories::GradingPeriodHelper.new.create_presets_for_group(
           @group, :past, :current, :future
         )
-        [@assignment1_in_gp1, @assignment2_in_gp2, @assignment3_in_gp2, @assignment4].each do |assignment|
+        [@assignment1_in_gp1, @assignment2_in_gp2, @assignment3_in_gp2, @assignment_not_in_gp].each do |assignment|
           DueDateCacher.recompute(assignment)
         end
       end
 
-      it "includes the grading period ids as keys on the hash" do
+      it "includes the grading period ids as keys on the hash, and a 'none' key to indicate no grading period" do
         @example_course.assignments.create!(due_at: 3.months.from_now)
-        expect(hash.keys).to match_array([@period1.id, @period2.id, @period3.id])
+        expect(hash.keys).to match_array([@period1.id, @period2.id, @period3.id, :none])
       end
 
       it "lists the related assignment ids as strings for the grading periods" do
@@ -62,11 +62,24 @@ describe GradebookGradingPeriodAssignments do
         expect(hash[@period2.id]).to include(@assignment3_in_gp2.id.to_s)
       end
 
+      it "includes all assignments due outside of any grading period" do
+        assignment = @example_course.assignments.create!(due_at: 9.months.from_now)
+        expect(hash[:none]).to include(@assignment_not_in_gp.id.to_s)
+        expect(hash[:none]).to include(assignment.id.to_s)
+      end
+
       it "includes assignments with due dates in multiple grading periods" do
         override = @assignment1_in_gp1.assignment_overrides.create!(due_at: 1.day.ago, due_at_overridden: true)
         override.assignment_override_students.create!(user: @student2)
         expect(hash[@period1.id]).to include(@assignment1_in_gp1.id.to_s)
         expect(hash[@period2.id]).to include(@assignment1_in_gp1.id.to_s)
+      end
+
+      it "includes assignments with due dates in a grading period and outside of a grading period" do
+        override = @assignment1_in_gp1.assignment_overrides.create!(due_at: 9.months.from_now, due_at_overridden: true)
+        override.assignment_override_students.create!(user: @student2)
+        expect(hash[@period1.id]).to include(@assignment1_in_gp1.id.to_s)
+        expect(hash[:none]).to include(@assignment1_in_gp1.id.to_s)
       end
 
       it "optionally returns results for a specific student" do
@@ -78,8 +91,8 @@ describe GradebookGradingPeriodAssignments do
       end
 
       it "excludes assignments due outside of any grading period" do
-        expect(hash[@period1.id]).not_to include(@assignment4.id.to_s)
-        expect(hash[@period2.id]).not_to include(@assignment4.id.to_s)
+        expect(hash[@period1.id]).not_to include(@assignment_not_in_gp.id.to_s)
+        expect(hash[@period2.id]).not_to include(@assignment_not_in_gp.id.to_s)
       end
 
       it "excludes grading periods without assignments" do

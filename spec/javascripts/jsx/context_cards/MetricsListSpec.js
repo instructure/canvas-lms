@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import MetricsList from 'jsx/context_cards/MetricsList'
+import MetricsList from '@canvas/context-cards/react/MetricsList'
 
 QUnit.module('StudentContextTray/MetricsList', hooks => {
   let subject

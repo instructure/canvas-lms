@@ -102,9 +102,18 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     state :preview
   end
 
+  def unenrolled_user_can_read?(user, session)
+    course = quiz.course
+    !quiz.graded? && course.available? && course.unenrolled_user_can_read?(user, session)
+  end
+
   set_policy do
     given { |user| user && user.id == self.user_id }
     can :read
+
+    # allow anonymous users take ungraded quizzes from a public course
+    given { |user, session| unenrolled_user_can_read?(user, session) }
+    can :record_events
 
     given { |user| user && user.id == self.user_id && end_date_is_valid? }
     can :record_events
@@ -736,6 +745,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       if !self.completed? && self.submission
         s = self.submission
         s.score = self.kept_score
+        s.grade_change_event_author_id = params[:grader_id]
         s.grade_matches_current_submission = true
         s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
@@ -930,5 +940,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def end_at_without_time_limit
     quiz.build_submission_end_at(self, false)
+  end
+
+  def filter_attributes_for_user(hash, user, session)
+    if submission.present? && !submission.user_can_read_grade?(user, session)
+      secret_keys = %w(score kept_score)
+      hash.except!(*secret_keys)
+    end
   end
 end

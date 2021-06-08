@@ -13,19 +13,13 @@
     <tr>
       <td><%= f.blabel :partner_id, :en => "Partner ID" %></td>
       <td>
-        <%= f.text_field :partner_id,:size => "90" %>
+        <%= f.text_field :partner_id, :size => "90" %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :partner_key, :en => "Partner Key" %></td>
       <td>
         <%= f.text_field :partner_key %>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :common_core_guid, :en => "Common Core GUID (optional)" %></td>
-      <td>
-        <%= f.text_field :common_core_guid %> <%= t :common_core_guid, "(e.g. %{guid})", :guid => AcademicBenchmark::Converter::COMMON_CORE_GUID %>
       </td>
     </tr>
   </table>

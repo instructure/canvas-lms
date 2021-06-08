@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintSidebar from 'jsx/blueprint_courses/components/BlueprintSidebar'
+import BlueprintSidebar from 'ui/features/blueprint_course_master/react/components/BlueprintSidebar.js'
 
 QUnit.module('BlueprintSidebar', hooks => {
   let clock

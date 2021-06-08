@@ -20,8 +20,8 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import AssignmentGroupColumnHeaderRenderer from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeaderRenderer'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import AssignmentGroupColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeaderRenderer.js'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => {
@@ -170,7 +170,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
     })
 
     test('sets the "Sort by" disabled setting to true when assignments are not loaded', () => {
-      gradebook.setAssignmentsLoaded(false)
+      gradebook.contentLoadStates.assignmentsLoaded.all = false
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       render()
@@ -178,7 +178,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
     })
 
     test('sets the "Sort by" disabled setting to true when students are not loaded', () => {
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(false)
       gradebook.setSubmissionsLoaded(true)
       render()
@@ -186,7 +186,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
     })
 
     test('sets the "Sort by" disabled setting to true when submissions are not loaded', () => {
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(false)
       render()
@@ -194,7 +194,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
     })
 
     test('sets the "Sort by" disabled setting to false when necessary data are loaded', () => {
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       render()

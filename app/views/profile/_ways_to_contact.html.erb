@@ -64,7 +64,7 @@
             <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label="<%= t("Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t("Remove email address") %>"></i></a>
           <% end %>
           <span class="screenreader-only cant_delete_default_text"><%= t("You cannot remove your default email address") %></span>
-          <% if c.active? && c.has_merge_candidates? %>
+          <% if c.active? && @domain_root_account.feature_enabled?(:self_service_user_merge) && c.has_merge_candidates? %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover" aria-label="<%= t('titles.merge_users_aria_label', "Another user has the same email address.  Click here to combine user accounts.") %>"><i class="icon-group-new standalone-icon" alt="<%= t('titles.merge_users_alt', "Another user has the same email address.  Click here to combine user accounts.") %>" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
           <% end %>
           <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>

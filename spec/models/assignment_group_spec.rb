@@ -51,21 +51,79 @@ describe AssignmentGroup do
     expect(score.assignment_group_id).to be ag.id
   end
 
-  context "visible assignments" do
+  context "visible_assignments" do
     before(:each) do
       @ag = @course.assignment_groups.create!(@valid_attributes)
       @s = @course.course_sections.create!(name: "test section")
       student_in_section(@s, user: @student)
-      assignments = (0...4).map { @course.assignments.create!({:title => "test_foo",
-                                  :assignment_group => @ag,
-                                  :points_possible => 10,
-                                  :only_visible_to_overrides => true})}
-      assignments.first.destroy
-      assignments.second.grade_student(@student, grade: 10, grader: @teacher)
-      assignment_to_override = assignments.last
-      create_section_override_for_assignment(assignment_to_override, course_section: @s)
+      assignments = (0...4).map do
+        @course.assignments.create!(
+          title: "test_foo",
+          assignment_group: @ag,
+          points_possible: 10,
+          only_visible_to_overrides: true
+        )
+      end
+      @destroyed_assignment = assignments.first
+      @destroyed_assignment.destroy
+      @assignment = assignments.second
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @overridden_assignment = assignments.last
+      create_section_override_for_assignment(@overridden_assignment, course_section: @s)
       @course.reload
       @ag.reload
+    end
+
+    describe "class method" do
+      it "optionally scopes results to specific assignment IDs" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: [@assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "does not include requested assignments that would otherwise not be returned" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: [@assignment.id, @destroyed_assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "gracefully ignores assignment_ids if passed nil" do
+        assignment_ids = AssignmentGroup.visible_assignments(
+          @student,
+          @course,
+          [@ag],
+          assignment_ids: nil
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id, @overridden_assignment.id]
+      end
+    end
+
+    describe "instance method" do
+      it "optionally scopes results to specific assignment IDs" do
+        assignment_ids = @ag.visible_assignments(@student, assignment_ids: [@assignment.id]).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "does not include requested assignments that would otherwise not be returned" do
+        assignment_ids = @ag.visible_assignments(
+          @student,
+          assignment_ids: [@assignment.id, @destroyed_assignment.id]
+        ).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id]
+      end
+
+      it "gracefully ignores assignment_ids if passed nil" do
+        assignment_ids = @ag.visible_assignments(@student, assignment_ids: nil).pluck(:id)
+        expect(assignment_ids).to match_array [@assignment.id, @overridden_assignment.id]
+      end
     end
 
     context "with differentiated assignments and draft state on" do

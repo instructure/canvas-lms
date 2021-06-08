@@ -39,6 +39,7 @@
 <% if @context.is_a?(Course) %>
   <% js_bundle :roster %>
   <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
+  <% js_env :canAddGroupSet => can_do(@context.groups.temp_record, @current_user, :create) %>
 <% else %>
   <div class="roster-container">
     <div class="roster roster-column student_roster">

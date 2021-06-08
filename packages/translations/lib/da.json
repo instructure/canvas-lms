@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "cirkel usorteret liste"
     },
+    "clear_2084585f": {
+        "message": "Ryd"
+    },
     "clear_selected_file_82388e50": {
         "message": "Ryd valgt fil"
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "indlejret indhold"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Indtast mindst 3 tegn for at søge"
     },
     "equation_1c5ac93c": {
         "message": "Regnestykke"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Indlæser planlægningselementer"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Indlæser, vent venligst"
     },
     "location_3b6ff307": {
         "message": "Sted:"

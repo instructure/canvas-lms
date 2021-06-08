@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook > Submissions', suiteHooks => {
   let $container
@@ -371,6 +371,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         createGradebookAndLoadData()
         // Select "All Grading Periods"
         gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+        gradebook.setCurrentGradingPeriod()
         deepEqual(getSubmissionIds().sort(), ['2501', '2502'])
       })
 
@@ -380,6 +381,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
           createGradebookAndLoadData()
           // Select "Q2"
           gradebook.setFilterColumnsBySetting('gradingPeriodId', '1502')
+          gradebook.setCurrentGradingPeriod()
           deepEqual(getSubmissionIds(), ['2502'])
         })
       })

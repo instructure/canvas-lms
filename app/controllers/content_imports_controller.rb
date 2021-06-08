@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -40,9 +42,12 @@ class ContentImportsController < ApplicationController
 
   # current files UI uses this page for .zip uploads
   def files
-    authorized_action(@context, @current_user, [:manage_content, :manage_files])
-    js_env(return_or_context_url: return_or_context_url,
-           return_to: params[:return_to])
+    authorized_action(
+      @context,
+      @current_user,
+      [:manage_content, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    )
+    js_env(return_or_context_url: return_or_context_url, return_to: params[:return_to])
   end
 
   # @API Get course copy status

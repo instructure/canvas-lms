@@ -22,6 +22,7 @@ require 'spec_helper'
 
 describe SubmissionsController do
   it_behaves_like 'a submission update action', :submissions
+  it_behaves_like 'a submission redo_submission action', :submissions
 
   describe "POST create" do
     it "should require authorization" do
@@ -134,6 +135,56 @@ describe SubmissionsController do
       end
     end
 
+    context 'setting the `resource_link_lookup_uuid` to the submission' do
+      let(:tool) do
+        Account.default.context_external_tools.create!(
+          name: 'Undertow',
+          url: 'http://www.example.com',
+          consumer_key: '12345',
+          shared_secret: 'secret'
+        )
+      end
+      let(:resource_link) do
+        Lti::ResourceLink.create(context: @course, context_external_tool: tool)
+      end
+      let(:params) do
+        {
+          course_id: @course.id,
+          assignment_id: @assignment.id,
+          submission: {
+            submission_type: 'online_url',
+          }
+        }
+      end
+
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.account.enable_service(:avatars)
+        @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_url')
+      end
+
+      it "should display an error when lti resource link is not found" do
+        params[:submission][:resource_link_lookup_uuid] = 'FOO&BAR'
+
+        post 'create', params: params
+
+        expect(response).to be_redirect
+        expect(assigns[:submission]).to be_nil
+        expect(flash[:error]).not_to be_nil
+        expect(flash[:error]).to match(/Resource link not found for given `resource_link_lookup_uuid`/)
+      end
+
+      it "should create the submission when lti resource link is found" do
+        params[:submission][:resource_link_lookup_uuid] = resource_link.lookup_uuid
+
+        post 'create', params: params
+
+        expect(response).to be_redirect
+        expect(assigns[:submission]).not_to be_nil
+        expect(assigns[:submission].resource_link_lookup_uuid).to eql(resource_link.lookup_uuid)
+      end
+    end
+
     it "should copy attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
@@ -236,6 +287,18 @@ describe SubmissionsController do
       post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'basic_lti_launch', :url => 'http://www.google.com'}}
       expect(response).to be_redirect
       expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].submission_type).to eq 'basic_lti_launch'
+      expect(assigns[:submission].url).to eq 'http://www.google.com'
+    end
+
+    it 'accepts a basic_lti_launch url for external_tool submission type' do
+      course_with_student_logged_in(:active_all => true)
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'external_tool')
+      request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      post 'create', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'basic_lti_launch', :url => 'http://www.google.com'}}
+      expect(response).to be_redirect
+      expect(assigns[:submission]).to_not be_nil
       expect(assigns[:submission].submission_type).to eq 'basic_lti_launch'
       expect(assigns[:submission].url).to eq 'http://www.google.com'
     end
@@ -348,6 +411,49 @@ describe SubmissionsController do
       expect(response).to be_redirect
       expect(flash[:error]).not_to be_nil
       expect(assigns[:submission]).to be_nil
+    end
+
+    context 'when the submission_type is student_annotation' do
+      before(:once) do
+        @course = course_model(workflow_state: "available")
+        @attachment = attachment_model(context: @course)
+        @assignment = @course.assignments.create!(
+          annotatable_attachment: @attachment,
+          submission_types: 'student_annotation'
+        )
+      end
+
+      it 'redirects with an error if annotatable_attachment_id is not present in params' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        post :create, params: {
+          assignment_id: @assignment.id,
+          course_id: @course.id,
+          submission: { submission_type: 'student_annotation' }
+        }
+
+        aggregate_failures do
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Student Annotation submissions require an annotatable_attachment_id to submit"
+        end
+      end
+
+      it 'changes a CanvadocsAnnotationContext from draft attempt to the current attempt' do
+        course_with_student_logged_in(active_all: true, course: @course)
+        submission = @assignment.submissions.find_by(user: @student)
+        annotation_context = submission.annotation_context(draft: true)
+
+        post :create, params: {
+          assignment_id: @assignment.id,
+          course_id: @course.id,
+          submission: { annotatable_attachment_id: @attachment.id, submission_type: 'student_annotation' }
+        }
+
+        aggregate_failures do
+          annotation_context.reload
+          expect(annotation_context.submission_attempt).not_to be_nil
+          expect(annotation_context.submission_attempt).to eq submission.reload.attempt
+        end
+      end
     end
 
     context "group comments" do
@@ -482,6 +588,36 @@ describe SubmissionsController do
         attachment = @assignment.submissions.first.attachments.new
         SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
         expect(attachment.instfs_uuid).to eq uuid
+      end
+
+      it "gracefully reports a gdrive timeout" do
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
+        expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
+        post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' }})
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq("Timed out while talking to google drive")
+      end
+
+      it "gracefully reports an invalid entry" do
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
+        expect(google_docs).to receive(:download).and_raise(GoogleDrive::WorkflowError, "fake bad entry")
+        post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' }})
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq("Google Drive entry was unable to be downloaded")
       end
     end
 
@@ -659,6 +795,7 @@ describe SubmissionsController do
     it "renders show template" do
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       expect(response).to render_template(:show)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @teacher.asset_string
     end
 
     it "renders json with scores for teachers" do
@@ -752,6 +889,7 @@ describe SubmissionsController do
       @assignment.ensure_post_policy(post_manually: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_status(200)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @student.asset_string
     end
 
     describe "peer reviewers" do

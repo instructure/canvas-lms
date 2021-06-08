@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ZipUploader from 'compiled/react_files/modules/ZipUploader'
+import ZipUploader from '@canvas/files/react/modules/ZipUploader'
 import moxios from 'moxios'
 
 function setupMocks() {

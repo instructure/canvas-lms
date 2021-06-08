@@ -39,26 +39,28 @@ describe LtiApiController, type: :request do
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
   end
 
-  def check_error_response(message, check_generated_sig=true)
+  def check_error_response(message, check_generated_sig=true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
     json = JSON.parse response.body
     expect(json["errors"][0]["message"]).to eq message
-    expect(json["error_report_id"]).to be > 0
 
-    data = error_data(json)
+    if with_report
+      expect(json["error_report_id"]).to be > 0
+      data = error_data(json)
 
-    expect(data.key?('oauth_signature')).to be true
-    expect(data.key?('oauth_signature_method')).to be true
-    expect(data.key?('oauth_nonce')).to be true
-    expect(data.key?('oauth_timestamp')).to be true
-    expect(data.key?('generated_signature')).to be true if check_generated_sig
+      expect(data.key?('oauth_signature')).to be true
+      expect(data.key?('oauth_signature_method')).to be true
+      expect(data.key?('oauth_nonce')).to be true
+      expect(data.key?('oauth_timestamp')).to be true
+      expect(data.key?('generated_signature')).to be true if check_generated_sig
 
-    expect(data['oauth_signature']).to_not be_empty
-    expect(data['oauth_signature_method']).to_not be_empty
-    expect(data['oauth_nonce']).to_not be_empty
-    expect(data['oauth_timestamp']).to_not be_empty
-    expect(data['generated_signature']).to_not be_empty if check_generated_sig
+      expect(data['oauth_signature']).to_not be_empty
+      expect(data['oauth_signature_method']).to_not be_empty
+      expect(data['oauth_nonce']).to_not be_empty
+      expect(data['oauth_timestamp']).to_not be_empty
+      expect(data['generated_signature']).to_not be_empty if check_generated_sig
+    end
   end
 
   def error_data(json=nil)
@@ -84,7 +86,6 @@ describe LtiApiController, type: :request do
     post "https://www.example.com#{req.path}",
       params: req.body,
       headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
-
   end
 
   def source_id
@@ -111,23 +112,26 @@ describe LtiApiController, type: :request do
     assert_status(415)
   end
 
+  it "fail when the XML encoding is invalid" do
+    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    make_call('body' => body)
+    check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
+  end
+
   context "OAuth Requests" do
     it "should fail on invalid signature method" do
       make_call('override_signature_method' => 'BawkBawk256')
-      check_error_response("Invalid authorization header", false)
-      data = error_data
-
-      expect(data['error_class']).to eq "OAuth::Signature::UnknownSignatureMethod"
+      check_error_response("Invalid authorization header", false, with_report: false)
       assert_status(401)
     end
 
     it "should require the correct shared secret" do
+      allow(Lti::Logging).to receive(:lti_1_api_signature_verification_failed)
       make_call('secret' => 'bad secret is bad')
-      check_error_response("Invalid authorization header")
-
-      data = error_data
-      expect(data['error_class']).to eq "OAuth::Unauthorized"
-
+      expect(Lti::Logging).to have_received(:lti_1_api_signature_verification_failed) do |base_str|
+        expect(base_str).to start_with('POST&https%3A%2F%2Fwww.example.com%2F')
+      end
+      check_error_response("Invalid authorization header", with_report: false)
       assert_status(401)
     end
 
@@ -138,7 +142,7 @@ describe LtiApiController, type: :request do
           assert_status(415)
           make_call('nonce' => 'not_so_random', 'content-type' => 'application/json')
           assert_status(401)
-          check_error_response("Duplicate nonce detected")
+          check_error_response("Duplicate nonce detected", with_report: false)
         end
       end
     end
@@ -148,7 +152,7 @@ describe LtiApiController, type: :request do
       make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'application/json')
       assert_status(401)
       expect(response.body).to match(/expired/i)
-      check_error_response("Timestamp too old or too far in the future, request has expired")
+      check_error_response("Timestamp too old or too far in the future, request has expired", with_report: false)
     end
   end
 
@@ -265,7 +269,7 @@ XML
   end
 
   def check_failure(failure_type = 'unsupported', error_message = nil)
-    expect(response).to be_successful
+    expect(response.code.to_i).to eq 422
     expect(response.media_type).to eq 'application/xml'
     xml = Nokogiri::XML.parse(response.body)
     expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
@@ -350,7 +354,7 @@ XML
 
     it "should fail if no score and not submission data" do
       make_call('body' => replace_result(score: nil, sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^No score given/
@@ -360,7 +364,7 @@ XML
 
     it "should fail if bad score given" do
       make_call('body' => replace_result(score: '1.5', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Score is not between 0 and 1/
@@ -371,7 +375,7 @@ XML
     it "should fail if assignment has no points possible" do
       @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
       expect(xml.at_css('imsx_description').content).to match /^Assignment has no points possible\./
@@ -394,7 +398,7 @@ XML
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_successful
+      expect(response.code.to_i).to eq 422
       submissions = @assignment.submissions.where(user_id: @student).to_a
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
@@ -432,9 +436,9 @@ to because the assignment has no points possible.
     end
 
     context "pass_fail zero point assignments" do
-      it "should succeed with incomplete grade when score < 1" do
+      it "should succeed with incomplete grade when score = 0" do
         @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
-        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        make_call('body' => replace_result(score: '0', sourceid: nil))
         check_success
 
         verify_xml(response)
@@ -448,7 +452,7 @@ to because the assignment has no points possible.
         expect(submission.grade).to eq 'incomplete'
       end
 
-      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
+      it "should succeed with complete grade when score < 1 for a 0 point assignment" do
         @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
@@ -461,7 +465,7 @@ to because the assignment has no points possible.
         expect(submission).to be_submitted_at
         expect(submission.submission_type).to eql 'external_tool'
         expect(submission.score).to eq 0
-        expect(submission.grade).to eq 'incomplete'
+        expect(submission.grade).to eq 'complete'
       end
 
       it "should succeed with complete grade when score = 1" do

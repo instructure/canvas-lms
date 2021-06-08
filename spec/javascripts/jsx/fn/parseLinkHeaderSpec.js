@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 
 QUnit.module('parseLinkHeader', {
   setup() {

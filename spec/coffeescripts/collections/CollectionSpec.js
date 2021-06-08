@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import Backbone from 'Backbone'
+import Backbone from '@canvas/backbone'
 
 class TestCollection extends Backbone.Collection {}
 TestCollection.prototype.defaults = {

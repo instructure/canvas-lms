@@ -89,9 +89,7 @@ class OutcomeImport < ApplicationRecord
   end
 
   def schedule
-    send_later_enqueue_args(:run, {
-      strand: "OutcomeImport::run::#{root_account.global_id}"
-    })
+    delay(strand: "OutcomeImport::run::#{root_account.global_id}").run
   end
 
   def locale

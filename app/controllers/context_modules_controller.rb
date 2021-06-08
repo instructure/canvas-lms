@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -23,6 +25,8 @@ class ContextModulesController < ApplicationController
   before_action :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_action { |c| c.active_tab = "modules" }
+
+  include K5Mode
 
   module ModuleIndexHelper
     include ContextModulesHelper
@@ -52,10 +56,11 @@ class ContextModulesController < ApplicationController
     end
 
     def load_modules
-      @modules = @context.modules_visible_to(@current_user)
+      @modules = @context.modules_visible_to(@current_user).limit(Setting.get('course_module_limit', '1000').to_i)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
+      @combined_active_quizzes = combined_active_quizzes
 
       @can_edit = can_do(@context, @current_user, :manage_content)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
@@ -90,10 +95,17 @@ class ContextModulesController < ApplicationController
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.usage_rights_required?,
-           manage_files: @context.grants_right?(@current_user, session, :manage_files)
+           manage_files_edit:
+            @context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_edit
+            )
         },
         :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},
-        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account)
+        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+        :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
@@ -106,6 +118,25 @@ class ContextModulesController < ApplicationController
       end
 
       conditional_release_js_env(includes: :active_rules)
+    end
+
+    private
+    def combined_active_quizzes
+      classic_quizzes = @context.
+        active_quizzes.
+        reorder(Quizzes::Quiz.best_unicode_collation_key('title')).
+        limit(400).
+        pluck(:id, :title, Arel.sql("'quiz' AS type"))
+
+      lti_quizzes = @context.
+        active_assignments.
+        type_quiz_lti.
+        reorder(Assignment.best_unicode_collation_key('title')).
+        limit(400).
+        pluck(:id, :title, Arel.sql("'assignment' AS type"))
+
+      @combined_active_quizzes_includes_both_types = !classic_quizzes.empty? && !lti_quizzes.empty?
+      (classic_quizzes + lti_quizzes).sort_by{ |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
     end
   end
   include ModuleIndexHelper
@@ -124,10 +155,7 @@ class ContextModulesController < ApplicationController
       end
       add_body_class('padless-content')
       js_bundle :context_modules
-      js_env(
-        CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
-        PROCESS_MULTIPLE_CONTENT_ITEMS: Account.site_admin.feature_enabled?(:process_multiple_content_items_modules_index)
-      )
+      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       css_bundle :content_next, :context_modules2
       render stream: can_stream_template?
     end
@@ -303,7 +331,7 @@ class ContextModulesController < ApplicationController
       @context.touch
 
       # # Background this, not essential that it happen right away
-      # ContextModule.send_later(:update_tag_order, @context)
+      # ContextModule.delay.update_tag_order(@context)
       render :json => @modules.map{ |m| m.as_json(include: :content_tags, methods: :workflow_state) }
     end
   end
@@ -427,7 +455,7 @@ class ContextModulesController < ApplicationController
     elsif @progression.locked?
       res[:locked] = true
       res[:modules] = []
-      previous_modules = @context.context_modules.active.where('position<?', @module.position).order(:position).to_a
+      previous_modules = @context.context_modules.active.where('position<?', @module.position).ordered.to_a
       previous_modules.reverse!
       valid_previous_modules = []
       prereq_ids = @module.prerequisites.select{|p| p[:type] == 'context_module' }.map{|p| p[:id] }
@@ -466,12 +494,11 @@ class ContextModulesController < ApplicationController
     progression = mod.evaluate_for(@current_user)
     progression ||= ContextModuleProgression.new
     if value_to_boolean(should_collapse)
-      progression.collapsed = true
+      progression.collapse!(skip_save: progression.new_record?)
     else
-      progression.uncollapse!
+      progression.uncollapse!(skip_save: progression.new_record?)
     end
-    progression.save unless progression.new_record?
-    progression
+    return progression
   end
 
   def toggle_collapse
@@ -582,7 +609,8 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
-        return render :json => @tag.errors, :status => :bad_request
+        body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
+        return render :json => body, :status => :bad_request
       end
       json = @tag.as_json
       json['content_tag'].merge!(

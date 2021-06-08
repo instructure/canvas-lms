@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {classNamesForAssignmentCell} from 'jsx/gradebook/default_gradebook/GradebookGrid/formatters/CellStyles'
+import {classNamesForAssignmentCell} from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/CellStyles.js'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid CellStyles', () => {
@@ -26,7 +26,6 @@ QUnit.module('GradebookGrid CellStyles', () => {
   QUnit.module('.classNamesForAssignmentCell', hooks => {
     hooks.beforeEach(() => {
       assignment = {
-        muted: false,
         submissionTypes: ['online_text_entry']
       }
       submissionData = {
@@ -163,25 +162,11 @@ QUnit.module('GradebookGrid CellStyles', () => {
       deepEqual(classNames, ['ungraded'])
     })
 
-    test('includes "muted" when the assignment is muted', () => {
-      assignment.muted = true
-      const classNames = classNamesForAssignmentCell(assignment, submissionData)
-      deepEqual(classNames, ['muted'])
-    })
-
-    test('assignment classNames are not exclusive', () => {
-      assignment.submissionTypes = ['not_graded']
-      assignment.muted = true
-      const classNames = classNamesForAssignmentCell(assignment, submissionData)
-      deepEqual(classNames, ['ungraded', 'muted'])
-    })
-
     test('assignment classNames are not exclusive with submission classNames', () => {
       submissionData.dropped = true
       assignment.submissionTypes = ['not_graded']
-      assignment.muted = true
       const classNames = classNamesForAssignmentCell(assignment, submissionData)
-      deepEqual(classNames, ['dropped', 'ungraded', 'muted'])
+      deepEqual(classNames, ['dropped', 'ungraded'])
     })
   })
 })

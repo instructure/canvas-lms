@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE} from '../actions/data'
+import {REQUEST_INITIAL_PAGE, REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE} from '../actions/data'
 import collectionReducer from './collection'
 import {combineReducers} from 'redux'
 
@@ -24,6 +24,7 @@ import {combineReducers} from 'redux'
 function boundCollectionReducer(key) {
   return function(state = {}, action) {
     switch (action.type) {
+      case REQUEST_INITIAL_PAGE:
       case REQUEST_PAGE:
       case RECEIVE_PAGE:
       case FAIL_PAGE:

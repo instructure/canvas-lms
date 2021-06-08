@@ -3120,6 +3120,138 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.submission_types).to eq 'not_graded'
     end
 
+    describe "annotatable attachment" do
+      before(:once) do
+        @assignment = @course.assignments.create!(name: "Some Assignment")
+        @attachment = attachment_model(content_type: "application/pdf", context: @course)
+      end
+
+      let(:endpoint_params) do
+        {
+          action: :update,
+          controller: :assignments_api,
+          course_id: @course.id,
+          format: :json,
+          id: @assignment.id
+        }
+      end
+
+      it "sets the assignment's annotatable_attachment_id when id is present and type is student_annotation" do
+        @attachment.update!(folder: @course.student_annotation_documents_folder)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be @attachment.id
+      end
+
+      it "copies the given attachment to a special folder and uses that attachment instead of the supplied one" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["student_annotation"] } }
+        )
+
+        annotation_documents_folder = @course.student_annotation_documents_folder
+        clone_attachment = annotation_documents_folder.active_file_attachments.find_by(md5: @attachment.md5)
+        expect(@assignment.reload.annotatable_attachment_id).to be clone_attachment.id
+      end
+
+      it "does not set the assignment's annotatable_attachment_id when type is not student_annotation" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "returns bad_request when the user did not include an attachment id for an student_annotation type" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { submission_types: ["student_annotation"] } }
+        )
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "returns bad_request when the user doesn't have read access to the attachment" do
+        second_course = Course.create!
+        attachment_attrs = valid_attachment_attributes.merge(context: second_course)
+        second_attachment = Attachment.create!(attachment_attrs)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: second_attachment.id, submission_types: ["student_annotation"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "returns bad_request when the attachment doesn't exist" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: Attachment.last.id + 1, submission_types: ["student_annotation"] } }
+        )
+
+        aggregate_failures do
+          expect(response).to have_http_status(:bad_request)
+          expect(@assignment.reload.annotatable_attachment_id).to be_nil
+        end
+      end
+
+      it "removes the assignment's annotatable_attachment_id when an empty string is passed" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: "" } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "removes the assignment's annotatable_attachment_id when the type is not student_annotation" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+          endpoint_params,
+          { assignment: { annotatable_attachment_id: @attachment.id, submission_types: ["online_text_entry"] } }
+        )
+        expect(@assignment.reload.annotatable_attachment_id).to be_nil
+      end
+
+      it "does not remove the assignment's annotatable_attachment_id when submission_types is not a param" do
+        @assignment.update!(annotatable_attachment: @attachment)
+
+        expect {
+          api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+            endpoint_params,
+            { assignment: { name: "unrelated change to attachment" } }
+          )
+        }.not_to change {
+          @assignment.reload.annotatable_attachment_id
+        }
+      end
+    end
+
     describe 'final_grader_id' do
       before(:once) do
         course_with_teacher(active_all: true)
@@ -4866,7 +4998,8 @@ describe AssignmentsApiController, type: :request do
             'url' => 'http://www.example.com',
             'new_tab' => false,
             'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard),
-            'external_data' => nil
+            'external_data' => nil,
+            'custom' => nil
           })
         end
 

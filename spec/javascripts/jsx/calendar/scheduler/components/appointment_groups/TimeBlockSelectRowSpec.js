@@ -18,11 +18,11 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import TimeBlockSelectRow from 'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelectRow'
+import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelectRow.js'
 import london from 'timezone/Europe/London'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import fakeENV from 'helpers/fakeENV'
-import 'jquery.instructure_date_and_time'
+import '@canvas/datetime'
 
 let props
 let tzSnapshot

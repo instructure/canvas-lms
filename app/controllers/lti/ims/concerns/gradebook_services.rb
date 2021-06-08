@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -32,7 +34,20 @@ module Lti::Ims::Concerns
       end
 
       def user
-        @_user ||= User.where(lti_id: params[:userId]).where.not(lti_id: nil).or(User.where(id: user_id)).take
+        @user ||= begin
+          active_user = User.
+            active.
+            where(lti_id: params[:userId]).
+            where.not(lti_id: nil).
+            or(User.where(id: user_id)).
+            take
+
+          # If the user is an active user, we'll use it.
+          # If the user is a deleted user, we need to check if it was a merged user.
+          # If the user was merged, we'll return the merged user, otherwise we return `nil`.
+          # So, we won't return a deleted user anymore
+          active_user || context.user_past_lti_ids.find_by(user_lti_id: params[:userId])&.user
+        end
       end
 
       def pagination_args
@@ -51,7 +66,8 @@ module Lti::Ims::Concerns
       def verify_line_item_in_context
         line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
         raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?
-        return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_id == params[:resourceLinkId]
+        return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_uuid == params[:resourceLinkId]
+
         render_error("The specified LTI link ID is not associated with the line item.")
       end
 

@@ -651,6 +651,9 @@ describe Submission do
   describe "seconds_late" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
     end
 
@@ -730,6 +733,29 @@ describe Submission do
       end
     end
 
+    context 'when the submission is for a new quiz' do
+      before do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+      end
+
+      it 'subtracts 60 seconds from the submitted_at' do
+        Timecop.freeze(@date) do
+          submission = @assignment.submissions.find_by!(user: @student)
+          submission.update!(submitted_at: Time.now.utc)
+          expect(submission.seconds_late).to eql 59.minutes.to_i
+        end
+      end
+    end
+
     it "includes seconds" do
       Timecop.freeze(30.seconds.from_now(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -748,6 +774,9 @@ describe Submission do
   describe "#apply_late_policy" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
       @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
     end
@@ -987,6 +1016,9 @@ describe Submission do
     context "assignment on paper" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1073,6 +1105,9 @@ describe Submission do
     context "assignment expecting no submission" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "none")
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1117,6 +1152,9 @@ describe Submission do
     context 'when submitting to an LTI assignment' do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: @date - 3.hours, points_possible: 1_000, submission_types: 'external_tool')
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1176,6 +1214,9 @@ describe Submission do
   describe "#apply_late_policy_before_save" do
     before(:once) do
       @date = Time.zone.local(2017, 3, 25, 11)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 4.days.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
       @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day, missing: 80.0)
     end
@@ -1352,6 +1393,8 @@ describe Submission do
   end
 
   describe "#grade_change_audit" do
+    before(:once) { Auditors::ActiveRecord::Partitioner.process }
+
     let_once(:submission) { @assignment.submissions.find_by(user: @student) }
 
     it "should log submissions with grade changes" do
@@ -1400,7 +1443,7 @@ describe Submission do
     end
 
     it "inserts a grade change audit record by default" do
-      expect(Auditors::GradeChange::Stream).to receive(:insert).once
+      expect(Auditors::GradeChange).to receive(:record).once
       submission.grade_change_audit(force_audit: true)
     end
 
@@ -1642,9 +1685,21 @@ describe Submission do
 
     context "Submission Graded" do
       before :once do
+        Auditors::ActiveRecord::Partitioner.process
         @assignment.ensure_post_policy(post_manually: false)
         Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
         submission_spec_model(submit_homework: true)
+      end
+
+      it "updates 'graded_at' on the submission when the late_policy_status is changed" do
+        now = Time.zone.now
+        Timecop.freeze(1.hour.ago(now)) do
+          @submission.update!(late_policy_status: "late")
+        end
+        Timecop.freeze(now) do
+          @submission.update!(late_policy_status: "missing")
+        end
+        expect(@submission.graded_at).to eq now
       end
 
       it "should create a message when the assignment has been graded and published" do
@@ -1803,6 +1858,7 @@ describe Submission do
 
     context "Submission Grade Changed" do
       before :once do
+        Auditors::ActiveRecord::Partitioner.process
         @assignment.ensure_post_policy(post_manually: false)
       end
 
@@ -2175,6 +2231,27 @@ describe Submission do
 
       it 'sets an appropriate error message' do
         expect(@submission.grading_error_message).to include('closed grading period')
+      end
+    end
+  end
+
+  describe "#can_read_submission_user_name?" do
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+      assignment = @course.assignments.create!(anonymous_grading: true)
+      @submission = assignment.submissions.find_by(user: @student)
+    end
+
+    context "anonymous assignments" do
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false when the user is not the submission's owner" do
+        teacher = User.create!
+        @course.enroll_teacher(teacher, enrollment_state: :active)
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
       end
     end
   end
@@ -2863,6 +2940,32 @@ describe Submission do
       expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
     end
 
+    it 'is available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for something else' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'turnitin-lti',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'turnitin.com'
+      )
+      expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
+    it 'is not available when the plagiarism data shows vericite and there is an LTI 2 assignment configuration for vericite' do
+      @submission.turnitin_data[:provider] = 'vericite'
+      AssignmentConfigurationToolLookup.create!(
+        assignment: @assignment,
+        tool_product_code: 'vericite',
+        tool_type: 'Lti::MessageHandler',
+        context_type: 'Account',
+        tool_resource_type_code: "code",
+        tool_vendor_code: 'vericite'
+      )
+      expect(@submission).not_to be_grants_right(teacher, nil, :view_turnitin_report)
+    end
+
     it { expect(@submission).to be_grants_right(student, nil, :view_turnitin_report) }
 
     context 'when originality report visibility is after_grading' do
@@ -2914,6 +3017,7 @@ describe Submission do
     end
 
     before :once do
+      Auditors::ActiveRecord::Partitioner.process
       @assignment.update!(submission_types: "online_upload,online_text_entry")
 
       @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
@@ -3177,6 +3281,7 @@ describe Submission do
 
   describe "past_due" do
     before :once do
+      Auditors::ActiveRecord::Partitioner.process
       submission_spec_model
       @submission1 = @submission
 
@@ -4138,6 +4243,43 @@ describe Submission do
     end
   end
 
+  describe "#annotation_context" do
+    before(:once) do
+      @attachment = attachment_model(context: @user)
+      @assignment.update!(annotatable_attachment_id: @attachment.id)
+      @submission = @assignment.submissions.find_by(user: @user)
+    end
+
+    it "creates a canvadocs_annotation_context if draft is true" do
+      new_student = @course.enroll_student(User.create!).user
+      new_submission = @assignment.submissions.find_by(user: new_student)
+
+      expect {
+        new_submission.annotation_context(draft: true)
+      }.to change {
+        new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
+      }.by(1)
+    end
+
+    it "returns the already existing canvadocs_annotation_context when passed draft multiple times" do
+      existing_context = @submission.annotation_context(draft: true)
+      expect(@submission.annotation_context(draft: true)).to eq existing_context
+    end
+
+    it "returns nil if a canvadocs_annotation_context does not exist" do
+      expect(@submission.annotation_context(attempt: 1)).to be_nil
+    end
+
+    it "returns the annotation_context if one exists for the attempt" do
+      @submission.update!(attempt: 1)
+      context = @submission.canvadocs_annotation_contexts.create!(
+        attachment: @attachment,
+        submission_attempt: @submission.attempt
+      )
+      expect(@submission.annotation_context(attempt: @submission.attempt)).to eq context
+    end
+  end
+
   describe '.process_bulk_update' do
     before(:once) do
       course_with_teacher active_all: true
@@ -4441,7 +4583,13 @@ describe Submission do
       expect(@submission.moderation_allow_list_for_user(other_student)).to be_empty
     end
 
-    context 'when grades are not published' do
+    it 'always includes the submission owner when the assignment is of type Student Annotation' do
+      ta = @course.enroll_ta(User.create!).user
+      @assignment.update!(grader_count: 2, submission_types: 'student_annotation')
+      expect(@submission.moderation_allow_list_for_user(ta)).to eq [@student]
+    end
+
+    context 'when the submission is not posted' do
       context 'when the user is the final grader' do
         let(:allow_list) { @submission.moderation_allow_list_for_user(@teacher) }
 
@@ -4667,13 +4815,14 @@ describe Submission do
       end
     end
 
-    context 'when grades are published' do
+    context 'when the submission is posted' do
       before(:once) do
         provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
         selection = @assignment.moderated_grading_selections.find_by(student: @student)
         selection.update!(provisional_grade: provisional_grade)
         provisional_grade.publish!
         @assignment.update!(grades_published_at: 1.hour.ago)
+        @assignment.post_submissions
         @submission.reload
       end
 
@@ -4999,6 +5148,58 @@ describe Submission do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: nil)
         ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
+    end
+  end
+
+  describe "#rubric_assessment" do
+    let(:submission) { @assignment.submission_for_student(@student) }
+
+    it "excludes non-grading assessments" do
+      grading_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      grading_assessment = grading_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: grading_rubric_association.rubric,
+        user: @student
+      )
+
+      non_grading_rubric_association = rubric_association_model(association_object: @assignment, purpose: "pleasurable event")
+      non_grading_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "pleasurable event",
+        assessor: @teacher,
+        rubric: non_grading_rubric_association.rubric,
+        user: @student
+      )
+
+      expect(submission.rubric_assessment).to eq grading_assessment
+    end
+
+    it "prioritizes assessments with a non-nil rubric_association when multiple grading assessments exist" do
+      old_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      old_assessment = old_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: old_rubric_association.rubric,
+        user: @student
+      )
+      old_rubric_association.destroy
+
+      new_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      new_assessment = new_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: new_rubric_association.rubric,
+        user: @student
+      )
+
+      aggregate_failures do
+        expect(submission.rubric_assessments).to contain_exactly(old_assessment, new_assessment)
+        expect(submission.rubric_assessment).to eq new_assessment
       end
     end
   end
@@ -5406,6 +5607,35 @@ describe Submission do
 
       sub = Submission.find(Submission.connection.create(create_sql))
       expect(sub.submission_history).to eq([sub])
+    end
+  end
+
+  describe "#comments_excluding_drafts_for" do
+    before(:each) do
+      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
+      ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
+      student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
+      assignment = @course.assignments.create!(name: "plain assignment")
+      assignment.ensure_post_policy(post_manually: true)
+      @submission = assignment.submissions.find_by(user: student)
+      @student_comment = @submission.add_comment(author: student, comment: "Student comment")
+      @teacher_comment = @submission.add_comment(author: @teacher, comment: "Teacher comment", draft_comment: true)
+      @ta_comment = @submission.add_comment(author: ta, comment: "Ta comment")
+    end
+
+    it "returns non-draft comments, filtering out draft comments" do
+      comments = @submission.comments_excluding_drafts_for(@teacher)
+      expect(comments).to include @student_comment, @ta_comment
+      expect(comments).not_to include @teacher_comment
+    end
+
+    context "when comments are preloaded" do
+      it "returns non-draft comments, filtering out draft comments" do
+        preloaded_submission = Submission.where(id: @submission.id).preload(:submission_comments).first
+        comments = preloaded_submission.comments_excluding_drafts_for(@teacher)
+        expect(comments).to include @student_comment, @ta_comment
+        expect(comments).not_to include @teacher_comment
+      end
     end
   end
 
@@ -6550,15 +6780,21 @@ describe Submission do
       let(:submission) { lti_result.submission }
 
       it 'does nothing if score has not changed' do
-        lti_result
-        expect(lti_result).not_to receive(:update)
-        submission.save!
+        expect {
+          submission.save!
+        }.to_not change { lti_result.result_score }
       end
 
       it 'updates the lti_result score_given if the score has changed' do
-        expect(lti_result.result_score).to eq submission.score
-        submission.update!(score: 1)
-        expect(lti_result.reload.result_score).to eq submission.score
+        expect {
+          submission.update!(score: 1.3)
+        }.to change { lti_result.reload.result_score }.from(nil).to(1.3)
+      end
+
+      it 'does nothing if the lti_result was updated by a tool' do
+        expect {
+          submission.update!(score: 1.3, grader_id: -123)
+        }.to_not change { lti_result.reload.result_score }
       end
     end
   end
@@ -7063,6 +7299,15 @@ describe Submission do
     it "is set to the root account ID of the owning course" do
       assignment = course.assignments.create!
       expect(assignment.submission_for_student(student).root_account_id).to eq root_account.id
+    end
+  end
+
+  describe "redo request" do
+    subject(:submission) { @assignment.submissions.new user: User.create, workflow_state: 'submitted', redo_request: true, attempt: 1 }
+
+    it "redo request is reset on an updated submission" do
+      submission.update!(attempt: 2)
+      expect(submission.redo_request).to eq false
     end
   end
 

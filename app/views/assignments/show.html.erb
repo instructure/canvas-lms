@@ -119,7 +119,7 @@
   <div class="clear"></div>
 
   <% description = !@assignment.description.blank? ? public_user_content(@assignment.description) : t('defaults.no_content', "No Content") %>
-  <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "student-version" %>"><%= description %></div>
+  <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "" %>"><%= description %></div>
 
   <% if can_do(@context, @current_user, :read_as_admin) %>
     <!--Teacher view-->
@@ -193,7 +193,7 @@
         <a
           href="<%= context_url(@context, :context_rubrics_url) %>"
           class="add_rubric_link Button icon-plus"
-          style="<%= hidden if @assignment.rubric_association %>"
+          style="<%= hidden if @assignment.active_rubric_association? %>"
         >
           <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
           <span class="screenreader-only"><%= t('Add Rubric') %></span>

@@ -22,7 +22,12 @@ import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
 import * as contentInsertion from '../../src/rce/contentInsertion'
-import RCEWrapper from '../../src/rce/RCEWrapper'
+import RCEWrapper, {
+  mergeMenuItems,
+  mergeMenu,
+  mergeToolbar,
+  mergePlugins
+} from '../../src/rce/RCEWrapper'
 
 const textareaId = 'myUniqId'
 
@@ -53,6 +58,8 @@ function createdMountedElement(additionalProps = {}) {
       textareaId,
       tinymce: fakeTinyMCE,
       editorOptions: {},
+      liveRegion: () => document.getElementById('flash_screenreader_holder'),
+      canUploadFiles: false,
       ...trayProps(),
       ...additionalProps
     })
@@ -63,8 +70,14 @@ function createdMountedElement(additionalProps = {}) {
 function trayProps() {
   return {
     trayProps: {
+      host: 'rcs.host',
+      jwt: 'donotlookatme',
       contextType: 'course',
-      contextId: '17'
+      contextId: '17',
+      containingContext: {
+        contextType: 'course',
+        contextId: '17'
+      }
     }
   }
 }
@@ -77,6 +90,7 @@ describe('RCEWrapper', () => {
   beforeEach(() => {
     jsdomify.create(`
       <!DOCTYPE html><html><head></head><body>
+      <div id="flash_screenreader_holder"/>
       <div id="app">
         <textarea id="${textareaId}" />
       </div>
@@ -126,19 +140,31 @@ describe('RCEWrapper', () => {
       getContent: () => editor.content,
       getBody: () => editor.content,
       hidden: false,
+      hide: () => (editor.hidden = true),
+      show: () => (editor.hidden = false),
       isHidden: () => {
         return editor.hidden
       },
       execCommand: editorCommandSpy,
       serializer: {serialize: sinon.stub()},
-      ui: {registry: {addIcon: () => {}}}
+      ui: {registry: {addIcon: () => {}}},
+      isDirty: () => false
     }
 
     fakeTinyMCE = {
       triggerSave: () => 'called',
       execCommand: () => 'command executed',
+      // plugins
+      create: () => {},
+      PluginManager: {
+        add: () => {}
+      },
+      plugins: {
+        AccessibilityChecker: {}
+      },
       editors: [editor]
     }
+    global.tinymce = fakeTinyMCE
 
     sinon.spy(editor, 'insertContent')
   })
@@ -314,7 +340,7 @@ describe('RCEWrapper', () => {
         // jsdom doesn't support Image
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
-        global.Image = function() {
+        global.Image = function () {
           return {
             src: null,
             width: '10',
@@ -340,10 +366,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="green_square"
-      style="width: 10px; height: 10px;"
+      style="width: 10px; height: 10px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -368,10 +394,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="filename%20%22with%22%20quotes"
-      style="width: 10px; height: 10px;"
+      style="width: 10px; height: 10px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -396,10 +422,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="green_square"
-      style="width: 500px; height: 500px;"
+      style="width: 500px; height: 500px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -419,10 +445,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.txt"
-      style="width: 8rem; height: 1rem;"
+      style="width: 8rem; height: 1rem; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -440,10 +466,10 @@ describe('RCEWrapper', () => {
           contentType: 'video/quicktime'
         }
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.mov"
-      style="width: 400px; height: 225px;"
+      style="width: 400px; height: 225px; vertical-align: bottom;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -461,10 +487,10 @@ describe('RCEWrapper', () => {
           contentType: 'audio/mp3'
         }
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.mp3"
-      style="width: 320px; height: 14.25rem;"
+      style="width: 320px; height: 14.25rem; vertical-align: bottom;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -473,6 +499,35 @@ describe('RCEWrapper', () => {
           false,
           sinon.match(imageMarkup)
         )
+      })
+
+      it('inserts a little placeholder for images displayed as links', () => {
+        mockImage()
+        const square =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'square.png',
+          domObject: {
+            preview: square
+          },
+          contentType: 'image/png',
+          displayAs: 'link'
+        }
+
+        const imageMarkup = `
+    <span
+      aria-label="Loading"
+      data-placeholder-for="square.png"
+      style="width: 10rem; height: 1rem; vertical-align: middle;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
       })
     })
 
@@ -652,7 +707,9 @@ describe('RCEWrapper', () => {
 
   describe('is_dirty()', () => {
     it('is true if not hidden and defaultContent is not equal to getConent()', () => {
-      const c = createBasicElement({defaultContent: 'different'})
+      editor.serializer.serialize.returns(editor.content)
+      const c = createBasicElement()
+      c.setCode('different')
       editor.hidden = false
       assert(c.is_dirty())
     })
@@ -674,7 +731,7 @@ describe('RCEWrapper', () => {
     it('is false if hidden and defaultContent is equal to textarea value', () => {
       const defaultContent = 'default content'
       editor.serializer.serialize.returns(defaultContent)
-      const c = createBasicElement({textareaId, defaultContent})
+      const c = createBasicElement({textareaId, defaultContent, editorView: 'RAW'})
       editor.hidden = true
       document.getElementById(textareaId).value = defaultContent
       assert(!c.is_dirty())
@@ -897,31 +954,233 @@ describe('RCEWrapper', () => {
   })
 
   describe('wrapOptions', () => {
-    it('includes instructure_record in toolbar if not instRecordDisabled', () => {
+    it('includes instructure_record in plugins if not instRecordDisabled', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
         instRecordDisabled: false
       })
       const options = wrapper.wrapOptions({})
-      const expected = [
-        'instructure_links',
-        'instructure_image',
-        'instructure_record',
-        'instructure_documents'
-      ]
-      assert.deepStrictEqual(options.toolbar[2].items, expected)
+      assert.ok(options.plugins.indexOf('instructure_record') >= 0)
     })
 
-    it('instructure_record in not toolbar if instRecordDisabled is set', () => {
+    it('instructure_record not in plugins if instRecordDisabled is set', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
         instRecordDisabled: true
       })
       const options = wrapper.wrapOptions({})
-      const expected = ['instructure_links', 'instructure_image', 'instructure_documents']
-      assert.deepStrictEqual(options.toolbar[2].items, expected)
+      assert.strictEqual(options.plugins.indexOf('instructure_record'), -1)
+    })
+  })
+
+  describe('Extending the toolbar and menus', () => {
+    const sleazyDeepCopy = a => JSON.parse(JSON.stringify(a))
+
+    describe('mergeMenuItems', () => {
+      it('returns input if no custom commands are provided', () => {
+        const a = 'foo bar | baz'
+        const c = mergeMenuItems(a)
+        assert.strictEqual(c, a)
+      })
+
+      it('merges 2 lists of commands', () => {
+        const a = 'foo bar | baz'
+        const b = 'fizz buzz'
+        const c = mergeMenuItems(a, b)
+        assert.strictEqual(c, 'foo bar | baz | fizz buzz')
+      })
+
+      it('respects the | grouping separator', () => {
+        const a = 'foo bar | baz'
+        const b = 'fizz | buzz'
+        const c = mergeMenuItems(a, b)
+        assert.strictEqual(c, 'foo bar | baz | fizz | buzz')
+      })
+
+      it('removes duplicates and strips trailing |', () => {
+        const a = 'foo bar | baz'
+        const b = 'fizz buzz | baz'
+        const c = mergeMenuItems(a, b)
+        assert.strictEqual(c, 'foo bar | baz | fizz buzz')
+      })
+
+      it('removes duplicates and strips leading |', () => {
+        const a = 'foo bar | baz'
+        const b = 'baz | fizz buzz '
+        const c = mergeMenuItems(a, b)
+        assert.strictEqual(c, 'foo bar | baz | fizz buzz')
+      })
+    })
+
+    describe('mergeMenus', () => {
+      let standardMenu
+      beforeEach(() => {
+        standardMenu = {
+          format: {
+            items: 'bold italic underline | removeformat',
+            title: 'Format'
+          },
+          insert: {
+            items: 'instructure_links | inserttable instructure_media_embed | hr',
+            title: 'Insert'
+          },
+          tools: {
+            items: 'wordcount',
+            title: 'Tools'
+          }
+        }
+      })
+      it('returns input if no custom menus are provided', () => {
+        const a = sleazyDeepCopy(standardMenu)
+        assert.deepStrictEqual(mergeMenu(a), standardMenu)
+      })
+
+      it('merges items into an existing menu', () => {
+        const a = sleazyDeepCopy(standardMenu)
+        const b = {
+          tools: {
+            items: 'foo bar'
+          }
+        }
+        const result = sleazyDeepCopy(standardMenu)
+        result.tools.items = 'wordcount | foo bar'
+        assert.deepStrictEqual(mergeMenu(a, b), result)
+      })
+
+      it('adds a new menu', () => {
+        const a = sleazyDeepCopy(standardMenu)
+        const b = {
+          new_menu: {
+            title: 'New Menu',
+            items: 'foo bar'
+          }
+        }
+        const result = sleazyDeepCopy(standardMenu)
+        result.new_menu = {
+          items: 'foo bar',
+          title: 'New Menu'
+        }
+        assert.deepStrictEqual(mergeMenu(a, b), result)
+      })
+
+      it('merges items _and_ adds a new menu', () => {
+        const a = sleazyDeepCopy(standardMenu)
+        const b = {
+          tools: {
+            items: 'foo bar'
+          },
+          new_menu: {
+            title: 'New Menu',
+            items: 'foo bar'
+          }
+        }
+        const result = sleazyDeepCopy(standardMenu)
+        result.tools.items = 'wordcount | foo bar'
+        result.new_menu = {
+          items: 'foo bar',
+          title: 'New Menu'
+        }
+        assert.deepStrictEqual(mergeMenu(a, b), result)
+      })
+    })
+
+    describe('mergeToolbar', () => {
+      let standardToolbar
+      beforeEach(() => {
+        standardToolbar = [
+          {
+            items: ['fontsizeselect', 'formatselect'],
+            name: 'Styles'
+          },
+          {
+            items: ['bold', 'italic', 'underline'],
+            name: 'Formatting'
+          }
+        ]
+      })
+
+      it('returns input if no custom toolbars are provided', () => {
+        const a = sleazyDeepCopy(standardToolbar)
+        assert.deepStrictEqual(mergeToolbar(a), standardToolbar)
+      })
+
+      it('merges items into the toolbar', () => {
+        const a = sleazyDeepCopy(standardToolbar)
+        const b = [
+          {
+            name: 'Formatting',
+            items: ['foo', 'bar']
+          }
+        ]
+        const result = sleazyDeepCopy(standardToolbar)
+        result[1].items = ['bold', 'italic', 'underline', 'foo', 'bar']
+        assert.deepStrictEqual(mergeToolbar(a, b), result)
+      })
+
+      it('adds a new toolbar if necessary', () => {
+        const a = sleazyDeepCopy(standardToolbar)
+        const b = [
+          {
+            name: 'I Am New',
+            items: ['foo', 'bar']
+          }
+        ]
+        const result = sleazyDeepCopy(standardToolbar)
+        result[2] = {
+          items: ['foo', 'bar'],
+          name: 'I Am New'
+        }
+        assert.deepStrictEqual(mergeToolbar(a, b), result)
+      })
+
+      it('merges toolbars and adds a new one', () => {
+        const a = sleazyDeepCopy(standardToolbar)
+        const b = [
+          {
+            name: 'Formatting',
+            items: ['foo', 'bar']
+          },
+          {
+            name: 'I Am New',
+            items: ['foo', 'bar']
+          }
+        ]
+        const result = sleazyDeepCopy(standardToolbar)
+        result[1].items = ['bold', 'italic', 'underline', 'foo', 'bar']
+        result[2] = {
+          items: ['foo', 'bar'],
+          name: 'I Am New'
+        }
+        assert.deepStrictEqual(mergeToolbar(a, b), result)
+      })
+    })
+
+    describe('mergePlugins', () => {
+      let standardPlugins
+      beforeEach(() => {
+        standardPlugins = ['foo', 'bar', 'baz']
+      })
+
+      it('returns input of no custom plugins are provided', () => {
+        const a = sleazyDeepCopy(standardPlugins)
+        assert.deepStrictEqual(mergePlugins(a), a)
+      })
+
+      it('merges items into the plugins', () => {
+        const a = sleazyDeepCopy(standardPlugins)
+        const b = ['fizz', 'buzz']
+        const result = standardPlugins.concat(b)
+        assert.deepStrictEqual(mergePlugins(a, b), result)
+      })
+
+      it('removes duplicates', () => {
+        const a = sleazyDeepCopy(standardPlugins)
+        const b = ['foo', 'fizz']
+        const result = standardPlugins.concat(['fizz'])
+        assert.deepStrictEqual(mergePlugins(a, b), result)
+      })
     })
   })
 })

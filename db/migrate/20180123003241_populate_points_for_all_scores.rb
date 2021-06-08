@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -20,10 +22,7 @@ class PopulatePointsForAllScores < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def change
-    DataFixup::PopulatePointsForAllScores.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup::PopulatePointsForAllScores::Migration"
-    )
+    DataFixup::PopulatePointsForAllScores.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      strand: "DataFixup::PopulatePointsForAllScores::Migration").run
   end
 end

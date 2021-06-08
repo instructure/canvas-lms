@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake/task_graph'
 require 'parallel'
 
@@ -32,6 +34,7 @@ namespace :canvas do
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
     build_css = ENV["COMPILE_ASSETS_CSS"] != "0"
     build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
+    build_i18n = ENV["RAILS_LOAD_ALL_LOCALES"] != "0"
     build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
     build_prod_js = ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
     # build dev bundles even in prod mode so you can debug with ?optimized_js=0
@@ -49,31 +52,19 @@ namespace :canvas do
       ].compact
 
       task 'i18n:generate_js' => [
-        # canvas_quizzes is quirky in that we can only extract its phrases from
-        # its build artifacts and not from its source! this is unlike other
-        # client apps
-        'js:build_client_app[canvas_quizzes]'
-      ] if build_js
-
-      task 'js:build_client_app[canvas_quizzes]' => [ 'css:compile' ] do |name|
-        {
-          name: name,
-          runner: -> { Rake::Task['js:build_client_app'].invoke('canvas_quizzes') }
-        }
-      end if build_js
+        ('js:yarn_install' if npm_install)
+      ].compact if build_i18n && build_js
 
       task 'js:webpack_development' => [
         # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
         # to exist before we run handlebars stuff, so we have to do this first
         'css:compile',
-        'i18n:generate_js',
-        'js:build_client_app[canvas_quizzes]',
+        ('i18n:generate_js' if build_i18n),
       ] if build_js && build_dev_js
 
       task 'js:webpack_production' => [
         'css:compile',
-        'i18n:generate_js',
-        'js:build_client_app[canvas_quizzes]',
+        ('i18n:generate_js' if build_i18n),
       ] if build_js && build_prod_js
     end
 
@@ -117,7 +108,7 @@ namespace :canvas do
         if Hash === subtree
           load_tree(key, subtree)
         else
-          Imperium::KV.put(key, subtree, cas: 0)
+          Diplomat::Kv.put(key, subtree.to_s, { cas: 0 })
         end
       end
     end
@@ -155,11 +146,7 @@ namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do
     migrations = ActiveRecord::Base.connection.migration_context.migrations
-    if CANVAS_RAILS5_2
-      pending_migrations = ActiveRecord::Migrator.new(:up, migrations).pending_migrations
-    else
-      pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
-    end
+    pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
     pending_migrations.each do |pending_migration|
       tags = pending_migration.tags
       tags = " (#{tags.join(', ')})" unless tags.empty?
@@ -170,11 +157,7 @@ namespace :db do
   desc "Shows skipped db migrations."
   task :skipped_migrations => :environment do
     migrations = ActiveRecord::Base.connection.migration_context.migrations
-    if CANVAS_RAILS5_2
-      skipped_migrations = ActiveRecord::Migrator.new(:up, migrations).skipped_migrations
-    else
-      skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
-    end
+    skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
     skipped_migrations.each do |skipped_migration|
       tags = skipped_migration.tags
       tags = " (#{tags.join(', ')})" unless tags.empty?
@@ -184,14 +167,14 @@ namespace :db do
 
   namespace :migrate do
     desc "Run all pending predeploy migrations"
+    # TODO: this is being replaced by outrigger
+    # rake db:migrate:tagged[predeploy].
+    # When all callsites are migrated, this task
+    # definition can be dropped.
     task :predeploy => [:environment, :load_config] do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
       migrations = migrations.select { |m| m.tags.include?(:predeploy) }
-      if CANVAS_RAILS5_2
-        ActiveRecord::Migrator.new(:up, migrations).migrate
-      else
-        ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
-      end
+      ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
     end
   end
 
@@ -203,8 +186,8 @@ namespace :db do
       queue = config['queue']
       ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
       ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
-      Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
-        db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
+      CanvasCassandra::DatabaseBuilder.config_names.each do |cass_config|
+        db = CanvasCassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
@@ -234,7 +217,7 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each do |task_name|
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
   Switchman::Rake.shardify_task(task_name, categories: ->{ Shard.categories })
 end
 

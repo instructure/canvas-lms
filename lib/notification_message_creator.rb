@@ -29,6 +29,7 @@ class NotificationMessageCreator
   include LocaleSelection
 
   attr_accessor :notification, :asset, :to_user_channels, :message_data
+  attr_reader :courses, :account
 
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
@@ -39,13 +40,12 @@ class NotificationMessageCreator
     @to_user_channels = user_channels(options[:to_list])
     @user_counts = recent_messages_for_users(@to_user_channels.keys)
     @message_data = options.delete(:data)
-    course_id = @message_data&.dig(:course_id)
+    course_ids = @message_data&.dig(:course_ids)
+    course_ids ||= [@message_data&.dig(:course_id)]
     root_account_id = @message_data&.dig(:root_account_id)
-    if course_id && root_account_id
+    if course_ids.any? && root_account_id
       @account = Account.new(id: root_account_id)
-      @course = Course.new(id: course_id)
-      @mute_notifications_by_course_enabled = @account.feature_enabled?(:mute_notifications_by_course)
-      @override_preferences_enabled = Account.site_admin.feature_enabled?(:notification_granular_course_preferences)
+      @courses = course_ids.map { |id| Course.new(id: id, root_account_id: @account&.id) }
     end
   end
 
@@ -78,7 +78,8 @@ class NotificationMessageCreator
         # dashboard message in addition to itself.
         channels.each do |channel|
           channel.set_root_account_ids(persist_changes: true, log: true)
-          next unless notifications_enabled_for_context?(user, @course)
+          next unless notifications_enabled_for_courses?(user)
+
           if immediate_policy?(user, channel)
             immediate_messages << build_immediate_message_for(user, channel)
             delayed_messages << build_fallback_for(user, channel)
@@ -105,13 +106,13 @@ class NotificationMessageCreator
   # root_account_id on the message, or look up policy overrides in the future.
   # A user can disable notifications for a course with a notification policy
   # override.
-  def notifications_enabled_for_context?(user, context)
+  def notifications_enabled_for_courses?(user)
     # if the message is not summarizable?, it is in a context that notifications
     # cannot be disabled, so return true before checking.
     return true unless @notification.summarizable?
-    if @mute_notifications_by_course_enabled
-      return NotificationPolicyOverride.enabled_for(user, context)
-    end
+
+    return NotificationPolicyOverride.enabled_for_all_contexts(user, courses) if courses&.any?
+
     true
   end
 
@@ -127,7 +128,8 @@ class NotificationMessageCreator
     return unless channel.bouncing? || too_many_messages_for?(user)
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
-      fallback_policy = channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
+      # notification_policies are already loaded, so use find instead of generating a query
+      fallback_policy = channel.notification_policies.find{ |np| np.frequency == 'daily' && np.notification_id == nil }
       fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
     end
 
@@ -151,7 +153,7 @@ class NotificationMessageCreator
   def build_summary_for(user, policy)
     user.shard.activate do
       message = user.messages.build(message_options_for(user))
-      message.parse!('summary')
+      message.parse!('summary', root_account: @account)
       delayed_message = policy.delayed_messages.build(:notification => @notification,
                                     :frequency => policy.frequency,
                                     # policy.communication_channel should
@@ -177,7 +179,7 @@ class NotificationMessageCreator
     return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
-    message&.parse!
+    message&.parse!(root_account: @account)
     message.workflow_state = 'bounced' if channel.bouncing?
     message
   end
@@ -203,7 +205,7 @@ class NotificationMessageCreator
     # if a user has never logged in, let's not spam the dashboard for no reason.
     return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
     message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
-    message.parse!
+    message.parse!(root_account: @account)
     message
   end
 
@@ -216,15 +218,22 @@ class NotificationMessageCreator
   end
 
   def effective_policy_for(user, channel)
-    # a user can override the notification preference for a context, the context
-    # needs to be provided in the notification from broadcast_policy, the lowest
-    # level override is the one that should be respected.
-    if @override_preferences_enabled
-      policy = override_policy_for(channel, @message_data&.dig(:course_id), 'Course')
-      policy ||= override_policy_for(channel, @message_data&.dig(:root_account_id), 'Account')
-    end
+    # a user can override the notification preference for a course or a
+    # root_account, the course_id needs to be provided in the notification from
+    # broadcast_policy in message_data, the lowest level override is the one
+    # that should be respected.
+    policy = override_policy_for(channel, 'Course')
+    policy ||= override_policy_for(channel, 'Account')
     if !policy && should_use_default_policy?(user, channel)
-      policy ||= channel.notification_policies.new(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+      begin
+        policy = channel.notification_policies.create!(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+      rescue ActiveRecord::RecordNotUnique => e
+        # there is a race condition here that can happen if multiple jobs are trying to create the same
+        # flavor of policy for the same user at the same time.  If we fail to save this one,
+        # we should just allow the process to continue because it will find the right policy in the
+        # next step of this method.
+        Canvas::Errors.capture_exception(:notifications, e, :info)
+      end
     end
     policy ||= channel.notification_policies.find { |np| np.notification_id == @notification.id }
     policy
@@ -241,15 +250,15 @@ class NotificationMessageCreator
     user.email_channel == channel
   end
 
-  def override_policy_for(channel, context_id, context_type)
+  def override_policy_for(channel, context_type)
     # NotificationPolicyOverrides are already loaded and this find block is on
     # an array and can only have one for a given context and channel.
-    if context_id
-      channel.notification_policy_overrides.find do |np|
-        np.notification_id == @notification.id &&
-          np.context_id == context_id &&
-          np.context_type == context_type
-      end
+    ops = channel.notification_policy_overrides.select { |np| np.notification_id == @notification.id && np.context_type == context_type }
+    case context_type
+    when 'Course'
+      ops.find { |np| courses.map(&:id).include?(np.context_id) } if courses&.any?
+    when 'Account'
+      ops.find { |np| np.context_id == account.id } if account
     end
   end
 
@@ -272,6 +281,10 @@ class NotificationMessageCreator
 
   # only send emails to active channels or registration notifications to default users' channel
   def add_channel?(user, channel)
+    if Account.site_admin.feature_enabled?(:deprecate_sms) && channel.type == CommunicationChannel::TYPE_SMS
+      return false
+    end
+
     channel.active? || (@notification.registration? && default_email?(user, channel))
   end
 
@@ -356,7 +369,6 @@ class NotificationMessageCreator
       end_partition = Message.infer_partition_table_name('created_at' => end_time)
       if first_partition == start_partition &&
         start_partition == end_partition
-        Message.infer_partition_table_name('created_at' => end_time)
         scope = scope.where(created_at: start_time..end_time)
         break_this_loop = true
       elsif start_time == first_start_time
@@ -366,7 +378,7 @@ class NotificationMessageCreator
         break_this_loop = true
       # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled')
+      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
       start_time = end_time

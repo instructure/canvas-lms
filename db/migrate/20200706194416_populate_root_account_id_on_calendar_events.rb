@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -20,11 +22,8 @@ class PopulateRootAccountIdOnCalendarEvents < ActiveRecord::Migration[5.2]
 
   def up
     CalendarEvent.find_ids_in_ranges(batch_size: 100_000) do |min, max|
-      DataFixup::PopulateRootAccountIdOnCalendarEvents.send_later_if_production_enqueue_args(
-        :run,
-        {:priority => Delayed::LOWER_PRIORITY, :n_strand => ["root_account_id_backfill_strand", Shard.current.database_server.id]},
-        min, max
-      )
+      DataFixup::PopulateRootAccountIdOnCalendarEvents.delay_if_production(priority: Delayed::LOWER_PRIORITY,
+        n_strand: ["root_account_id_backfill_strand", Shard.current.database_server.id]).run(min, max)
     end
   end
 

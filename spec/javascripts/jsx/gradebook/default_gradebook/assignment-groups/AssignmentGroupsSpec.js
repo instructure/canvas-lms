@@ -19,7 +19,7 @@
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
   let $container

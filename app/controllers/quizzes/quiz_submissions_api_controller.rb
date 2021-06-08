@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -191,7 +193,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     if quiz_submissions
       # trigger delayed grading job for all submission id's which needs grading
       quiz_submissions_ids = quiz_submissions.map(&:id).uniq
-      Quizzes::OutstandingQuizSubmissionManager.new(@quiz).send_later_if_production(:grade_by_ids, quiz_submissions_ids)
+      Quizzes::OutstandingQuizSubmissionManager.new(@quiz).delay_if_production.grade_by_ids(quiz_submissions_ids)
       serialize_and_render quiz_submissions
     else
       render_unauthorized_action

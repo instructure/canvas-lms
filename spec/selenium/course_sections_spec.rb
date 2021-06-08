@@ -31,7 +31,7 @@ describe "course sections" do
     ff('#enrollment_table tr')
   end
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @section = @course.default_section
   end
@@ -129,10 +129,8 @@ describe "course sections" do
   end
 
   context "student tray" do
-
     before(:each) do
       @account = Account.default
-      @account.enable_feature!(:student_context_cards)
     end
 
     it "course section page should display student name in tray", priority: "1", test_id: 3022068 do

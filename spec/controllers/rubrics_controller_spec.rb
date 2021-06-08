@@ -266,6 +266,7 @@ describe RubricsController do
       expect(assigns[:association]).to be_nil
       expect(response).to be_successful
     end
+
     it "should update the rubric even if it doesn't belong to the context, just an association" do
       course_model
       @course2 = @course
@@ -285,7 +286,7 @@ describe RubricsController do
 
     # this happens after a importing content into a new course, before a new
     # association is set up
-    it "should create a new rubrice (and not update the existing rubric) if it doesn't belong to the context or to an association" do
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belong to the context or to an association" do
       course_model
       @course2 = @course
       course_with_teacher_logged_in(:active_all => true)
@@ -294,6 +295,18 @@ describe RubricsController do
       @rubric.save
       @rubric_association.context = @course2
       @rubric_association.save
+      put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
+      expect(assigns[:rubric]).not_to be_nil
+      expect(assigns[:rubric]).not_to eql(@rubric)
+      expect(assigns[:rubric].title).to eql("new title")
+    end
+
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belongs to the same context" do
+      course_model
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course)
+      @rubric.context = @course.root_account
+      @rubric.save
       put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to eql(@rubric)
@@ -619,6 +632,7 @@ describe RubricsController do
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric.id}
       assert_unauthorized
     end
+
     it "should delete the rubric" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -626,6 +640,17 @@ describe RubricsController do
       expect(response).to be_successful
       expect(assigns[:rubric]).to be_deleted
     end
+
+    # This should probably be fixed, but I want to document how this currently behaves.
+    it "returns a 500 if the rubric cannot be found" do
+      course_with_teacher_logged_in(active_all: true)
+      association = rubric_association_model(user: @user, context: @course)
+      association.destroy
+      delete 'destroy', params: { course_id: @course.id, id: @rubric.id }
+
+      expect(response.status).to eq 500
+    end
+
     it "should delete the rubric if the rubric is only associated with a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)
@@ -641,6 +666,7 @@ describe RubricsController do
       @rubric.reload
       expect(@rubric.deleted?).to be_truthy
     end
+
     it "should delete the rubric association even if the rubric doesn't belong to a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)

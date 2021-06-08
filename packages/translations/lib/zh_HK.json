@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "圓形無序清單"
     },
+    "clear_2084585f": {
+        "message": "清除"
+    },
     "clear_selected_file_82388e50": {
         "message": "清除所選擇的檔案"
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "嵌入內容"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "請輸入最少 3 個字元以開始搜尋"
     },
     "equation_1c5ac93c": {
         "message": "方程式"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "正在載入手冊項目"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "正在載入，請稍候"
     },
     "location_3b6ff307": {
         "message": "位置："

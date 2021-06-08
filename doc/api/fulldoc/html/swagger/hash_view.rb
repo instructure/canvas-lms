@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -21,8 +23,8 @@ class HashView
     {}
   end
 
-protected
+  protected
   def format(str)
-    str.to_s.force_encoding('UTF-8') if str
+    str.to_s.dup.force_encoding('UTF-8') if str
   end
 end

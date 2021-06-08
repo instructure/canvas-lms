@@ -58,7 +58,7 @@ module Importers
           end
         end
 
-        outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if prevent_duplicate_guids?(context, hash)
+        outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if hash[:vendor_guid].present?
         if outcome
           # Help prevent linking to the wrong outcome if copying into a different install of canvas
           # (using older migration packages that lack the root account uuid)
@@ -135,9 +135,12 @@ module Importers
       # (blueprint migration will not undelete outcomes deleted downstream)
       return item if item.deleted?
 
-      log = hash[:learning_outcome_group] || context.root_outcome_group
-      outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
-      migration.add_imported_item(outcome_link)
+      # don't implicitly add an outcome to the root outcome group if it's already in an outcome group
+      if hash[:learning_outcome_group].present? || context.learning_outcome_links.not_deleted.where(content: item).none?
+        log = hash[:learning_outcome_group] || context.root_outcome_group
+        outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
+        migration.add_imported_item(outcome_link)
+      end
 
       if hash[:alignments] && !previously_imported
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
@@ -162,11 +165,6 @@ module Importers
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 
       item
-    end
-
-    def self.prevent_duplicate_guids?(context, hash)
-      context.root_account.feature_enabled?(:outcome_guid_course_exports) &&
-      hash[:vendor_guid].present?
     end
   end
 end

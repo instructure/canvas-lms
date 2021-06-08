@@ -28,7 +28,8 @@ class Rubric < ActiveRecord::Base
   belongs_to :user
   belongs_to :rubric # based on another rubric
   belongs_to :context, polymorphic: [:course, :account]
-  has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
+  has_many :rubric_associations, -> { where(workflow_state: "active") }, class_name: 'RubricAssociation', inverse_of: :rubric, dependent: :destroy
+  has_many :rubric_associations_with_deleted, class_name: 'RubricAssociation', inverse_of: :rubric
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
@@ -99,6 +100,7 @@ class Rubric < ActiveRecord::Base
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
       ON rubrics.id = associations_for_count.rubric_id
       AND associations_for_count.purpose = 'grading'
+      AND associations_for_count.workflow_state = 'active'
     JOINS
       group('rubrics.id').
       having('COUNT(rubrics.id) < 2')
@@ -109,6 +111,7 @@ class Rubric < ActiveRecord::Base
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
       ON rubrics.id = associations_for_unassessed.rubric_id
       AND associations_for_unassessed.purpose = 'grading'
+      AND associations_for_unassessed.workflow_state = 'active'
     JOINS
       joins(<<~JOINS).
         LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
@@ -137,14 +140,19 @@ class Rubric < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
-    self.save
+    if self.save
+      rubric_associations.in_batches.destroy_all
+      true
+    end
   end
 
   def restore
     self.workflow_state = 'active'
-    self.save
+    if self.save
+      rubric_associations_with_deleted.where(workflow_state: "deleted").find_each(&:restore)
+      true
+    end
   end
 
   # If any rubric_associations for a given context are marked as
@@ -162,9 +170,10 @@ class Rubric < ActiveRecord::Base
         association.destroy
       end
     else
-      ras.update_all(:bookmarked => false, :updated_at => Time.now.utc)
+      ras.destroy_all
     end
-    unless rubric_associations.bookmarked.exists?
+
+    if rubric_associations.bookmarked.none?
       self.destroy
     end
   end
@@ -258,23 +267,37 @@ class Rubric < ActiveRecord::Base
     self
   end
 
-  def update_mastery_scales
+  def update_mastery_scales(save = true)
     return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
 
     mastery_scale = context.resolved_outcome_proficiency
     return if mastery_scale.nil?
 
     self.data.each do |criterion|
-      update_criterion_from_mastery_scales(criterion, mastery_scale)
+      update_criterion_from_mastery_scale(criterion, mastery_scale)
     end
     if self.data_changed?
       self.points_possible = total_points_from_criteria(self.data)
-      self.save!
+      self.save! if save
     end
   end
 
-  def update_criterion_from_mastery_scales(criterion, mastery_scale)
-    return unless criterion[:learning_outcome_id].present?
+  def criterion_needs_update?(criterion, mastery_scale)
+    return false if criterion[:learning_outcome_id].blank?
+
+    return true if criterion[:points] != mastery_scale.points_possible
+    return true if criterion[:mastery_points] != mastery_scale.mastery_points
+    return true if criterion[:ratings]&.length != mastery_scale.outcome_proficiency_ratings.length
+
+    criterion[:ratings].zip(mastery_scale.outcome_proficiency_ratings).any? do |criterion_rating, proficiency_rating|
+      criterion_rating[:description] != proficiency_rating.description ||
+        criterion_rating[:long_description] != '' ||
+        criterion_rating[:points] != proficiency_rating.points
+    end
+  end
+
+  def update_criterion_from_mastery_scale(criterion, mastery_scale)
+    return unless criterion_needs_update?(criterion, mastery_scale)
 
     criterion[:points] = mastery_scale.points_possible
     criterion[:mastery_points] = mastery_scale.mastery_points

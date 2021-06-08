@@ -17,13 +17,24 @@
  */
 
 export default class FakeEditor {
-  constructor() {
+  constructor(textareaId) {
+    this.id = textareaId
     this._$container = null
     this.rceWrapper = {}
 
     this._selectedNode = null
 
     this._collapsed = false
+
+    this.execCommand = () => {}
+    this.getContainer = () => this._$container
+    this.isHidden = () => false
+    this.getContent = () => this._$container.innerHTML
+    this.setContent = content => {
+      if (this._$container) {
+        this._$container.innerHTML = content
+      }
+    }
 
     this.selection = {
       getNode: () => this._selectedNode,
@@ -83,6 +94,7 @@ export default class FakeEditor {
         return oldelem.parentNode.replaceChild(newelem, oldelem)
       }
     }
+    this.initialize()
   }
 
   get $container() {

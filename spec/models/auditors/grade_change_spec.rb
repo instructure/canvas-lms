@@ -54,7 +54,7 @@ describe Auditors::GradeChange do
   describe "with cassandra backend" do
     include_examples "cassandra audit logs"
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
       Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
     end
 
@@ -294,7 +294,7 @@ describe Auditors::GradeChange do
     end
 
     it "inserts a record" do
-      expect(Auditors::GradeChange::Stream).to receive(:insert).once
+      expect(Auditors::GradeChange::Stream).to receive(:insert).at_least(:once)
       Auditors::GradeChange.record(submission: @submission)
     end
 
@@ -335,10 +335,12 @@ describe Auditors::GradeChange do
       )
     end
 
-    let(:course_grade_changes) { Auditors::GradeChange.for_course(@course).paginate(per_page: 10) }
+    def course_grade_changes(course)
+      Auditors::GradeChange.for_course(course).paginate(per_page: 10)
+    end
 
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
     end
 
     it "inserts submission grade change records" do
@@ -358,18 +360,19 @@ describe Auditors::GradeChange do
     end
 
     it "returns submission grade changes in results" do
+      expect(course_grade_changes(@course).length).to eq 1
       Auditors::GradeChange.record(submission: @submission)
-
       aggregate_failures do
-        expect(course_grade_changes.length).to eq 1
-        expect(course_grade_changes.first.submission_id).to eq @submission.id
+        cgc = course_grade_changes(@course)
+        expect(cgc.length).to eq 2
+        expect(cgc.last.submission_id).to eq @submission.id
       end
     end
 
     it "returns override grade changes in results" do
+      expect(course_grade_changes(@course).count).to eq 1
       Auditors::GradeChange.record(override_grade_change: override_grade_change)
-
-      expect(course_grade_changes.count).to eq 1
+      expect(course_grade_changes(@course).count).to eq 2
     end
 
     it "stores override grade changes in the database" do
@@ -490,18 +493,18 @@ describe Auditors::GradeChange do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
     end
 
     it "writes to cassandra" do
       event = Auditors::GradeChange.record(submission: @submission)
-      expect(Auditors.write_to_cassandra?).to eq(true)
+      expect(Audits.write_to_cassandra?).to eq(true)
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(event)
     end
 
     it "writes to postgres" do
       event = Auditors::GradeChange.record(submission: @submission)
-      expect(Auditors.write_to_postgres?).to eq(true)
+      expect(Audits.write_to_postgres?).to eq(true)
       pg_record = Auditors::ActiveRecord::GradeChangeRecord.where(uuid: event.id).first
       expect(pg_record).to_not be_nil
       expect(pg_record.submission_id).to eq(@submission.id)

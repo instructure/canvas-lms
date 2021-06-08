@@ -17,10 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import org.jenkinsci.plugins.workflow.support.steps.build.DownstreamFailureCause
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
@@ -35,12 +34,11 @@ def ignoreBuildNeverStartedError(block) {
     else {
       echo "ignored MissingContextVariableException: \n${ex.message}"
     }
-    // we can ignore this very noisy error
+  // we can ignore this very noisy error
   }
 }
 
 def getMigrationsTag(name) {
-
   (env.GERRIT_REFSPEC.contains('master')) || !migrations.cacheLoadFailed() ? migrations.imageMergeTag(name) : migrations.imagePatchsetTag(name)
 }
 
@@ -63,9 +61,16 @@ pipeline {
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
-    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
-    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
-    POSTGRES_IMAGE_TAG=imageTag.postgres()
+    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
+    DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
+
+    IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+    RSPEC_PROCESSES = 4
+
+    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
   }
 
   stages {
@@ -79,20 +84,11 @@ pipeline {
       steps {
         script {
           def stages = [:]
-          def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
 
           distribution.stashBuildScripts()
+          rspecStage.createDistribution(stages)
 
-          distribution.addRSpecSuites(stages)
-          distribution.addSeleniumSuites(stages)
-
-          withEnv([
-            "CASSANDRA_IMAGE_TAG=${getMigrationsTag('cassandra')}",
-            "DYNAMODB_IMAGE_TAG=${getMigrationsTag('dynamodb')}",
-            "POSTGRES_IMAGE_TAG=${getMigrationsTag('postgres')}"
-          ]) {
-            parallel(stages)
-          }
+          parallel(stages)
         }
       }
     }
@@ -100,8 +96,8 @@ pipeline {
     stage('Copy Files') {
       steps {
         script {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadParallelLog()
+          reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
+          archiveArtifacts(artifacts: 'parallel_logs/**')
         }
       }
     }
@@ -121,16 +117,17 @@ pipeline {
     always {
       script {
         ignoreBuildNeverStartedError {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadSeleniumFailures()
-          rspec.uploadRSpecFailures()
-          failureReport.submit()
+          node('master') {
+            buildSummaryReport.publishReport('Build Summary Report', currentBuild.getResult() == 'SUCCESS' ? 'SUCCESS' : 'FAILURE')
+          }
         }
       }
     }
     cleanup {
-      ignoreBuildNeverStartedError {
-        execute 'bash/docker-cleanup.sh --allow-failure'
+      script {
+        ignoreBuildNeverStartedError {
+          libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+        }
       }
     }
   }

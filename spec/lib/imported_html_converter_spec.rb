@@ -149,7 +149,7 @@ describe ImportedHtmlConverter do
 
     it "should leave invalid and absolute urls alone" do
       test_string = %{<a href="stupid &^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
-      expect(convert_and_replace(test_string)).to eq %{<a href="stupid%20&amp;%5E%%24%20url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
+      expect(convert_and_replace(test_string)).to eq %{<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
     end
 
     it "should prepend course files for unrecognized relative urls" do
@@ -184,8 +184,8 @@ describe ImportedHtmlConverter do
     end
 
     it "should handle and repair half broken new RCE media iframes" do
-      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"/>}
-      repaired_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"/>}
+      test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
+      repaired_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
       expect(convert_and_replace(test_string)).to eq repaired_string
     end
 
@@ -209,7 +209,7 @@ describe ImportedHtmlConverter do
 <param name="autostart" value="false">
 <param name="loop" value="false">
 <param name="src" value="/courses/#{@course.id}/file_contents/course%20files/test.mp3">
-<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></embed></object>
+<embed name="tag" src="/courses/#{@course.id}/file_contents/course%20files/test.mp3" loop="false" autostart="false" controller="true" controls="CONSOLE"></object>
     HTML
     end
 

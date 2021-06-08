@@ -145,6 +145,15 @@ describe CanvasPartman::PartitionManager do
         expect(foreign_key.to_table).to eq("partman_zoos")
         expect(foreign_key.options.except(:name)).to eq(parent_foreign_key.options.except(:name))
       end
+
+      it "uses timeout protection" do
+        timeout_count = 0
+        allow(Trail.connection).to receive(:execute) do |statement|
+          timeout_count += 1 if statement =~ /SET LOCAL statement_timeout=90000/
+        end
+        subject.create_partition(0)
+        expect(timeout_count).to eq(1)
+      end
     end
 
     describe "#create_initial_partitions" do
@@ -189,6 +198,17 @@ describe CanvasPartman::PartitionManager do
 
         subject.ensure_partitions(2)
       end
+    end
+  end
+
+  describe '#with_timeout_protection' do
+    it 'errors if the query goes beyond the timeout' do
+      pm = CanvasPartman::PartitionManager.create(Trail)
+      expect do
+        pm.with_statement_timeout(timeout_override: 1) do
+          pm.send(:execute, "select pg_sleep(5)")
+        end
+      end.to raise_error(ActiveRecord::QueryCanceled)
     end
   end
 end

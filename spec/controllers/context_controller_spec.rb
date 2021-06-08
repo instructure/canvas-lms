@@ -103,16 +103,7 @@ describe ContextController do
     end
 
     context 'student context cards' do
-      before(:once) { @course.root_account.enable_feature! :student_context_cards }
-
-      it 'is disabled when feature_flag is off' do
-        @course.root_account.disable_feature! :student_context_cards
-        user_session(@teacher)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
-      end
-
-      it 'is enabled for teachers when feature_flag is on' do
+      it 'is always enabled for teachers' do
         %w[manage_students manage_admin_users].each do |perm|
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
@@ -176,7 +167,6 @@ describe ContextController do
 
     describe 'hide_sections_on_course_users_page setting is Off' do
       before :once do
-        @course.root_account.enable_feature!(:hide_course_sections_from_students)
         @student2 = student_in_course(course: @course, active_all: true).user
       end
 
@@ -263,10 +253,6 @@ describe ContextController do
       end
 
       context 'hide course sections from students feature enabled' do
-        before :once do
-          @course.root_account.enable_feature!(:hide_course_sections_from_students)
-        end
-
         it 'sets js_env with hide sections setting to true for roster_user' do
           @course.hide_sections_on_course_users_page = true
           @course.save!
@@ -284,6 +270,23 @@ describe ContextController do
           get 'roster_user', params: { course_id: @course.id, id: @teacher.id }
           expect(assigns['js_env'][:course][:hideSectionsOnCourseUsersPage]).to be_falsey
         end
+      end
+    end
+
+    context 'profiles enabled' do
+      it 'does not show the dummy course as common' do
+        account_admin_user
+        course_with_student(active_all: true)
+
+        account = Account.default
+        account.settings = { enable_profiles: true }
+        account.save!
+        expect(account.enable_profiles?).to be_truthy
+        Course.ensure_dummy_course
+
+        user_session(@admin)
+        get 'roster_user', params: { course_id: @course.id, id: @student.id }
+        expect(assigns['user_data'][:common_contexts]).to be_empty
       end
     end
   end
@@ -444,6 +447,39 @@ describe ContextController do
       expect(response).to be_successful
       expect(assigns[:deleted_items]).to include(g1)
     end
+
+    describe 'Rubric Associations' do
+      before(:once) do
+        assignment = assignment_model(course: @course)
+        rubric = rubric_model({
+          context: @course,
+          title: 'Test Rubric',
+          data: [{
+            description: 'Some criterion',
+            points: 10,
+            id: 'crit1',
+            ignore_for_scoring: true,
+            ratings: [
+              { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+            ]
+          }]
+        })
+        @association = rubric.associate_with(assignment, @course, purpose: 'grading')
+      end
+
+      it 'shows deleted rubric associations' do
+        @association.destroy
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to include @association
+      end
+
+      it 'does not show active rubric associations' do
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).not_to include @association
+      end
+    end
   end
 
   describe "POST 'undelete_item'" do
@@ -504,6 +540,30 @@ describe ContextController do
 
       post :undelete_item, params: { course_id: @course.id, asset_string: @attachment.asset_string }
       expect(@attachment.reload).not_to be_deleted
+    end
+
+    it 'allows undeleting rubric associations' do
+      assignment = assignment_model(course: @course)
+      rubric = rubric_model({
+        context: @course,
+        title: 'Test Rubric',
+        data: [{
+          description: 'Some criterion',
+          points: 10,
+          id: 'crit1',
+          ignore_for_scoring: true,
+          ratings: [
+            { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+          ]
+        }]
+      })
+      association = rubric.associate_with(assignment, @course, purpose: 'grading')
+      puts "association id is: #{association.id}"
+      association.destroy
+
+      user_session(@teacher)
+      post :undelete_item, params: { course_id: @course.id, asset_string: association.asset_string }
+      expect(association.reload).not_to be_deleted
     end
   end
 

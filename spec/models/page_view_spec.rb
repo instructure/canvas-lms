@@ -66,6 +66,10 @@ describe PageView do
       expect(PageView.find("abcdef")).to be_present
     end
 
+    it "logs on error without blowing up" do
+      expect{ PageView::EventStream.on_error[0].call("write", {user: @user}, StandardError.new) }.to_not raise_error
+    end
+
     describe "sharding" do
       specs_require_sharding
 

@@ -831,6 +831,78 @@ describe ContentMigration do
       end
     end
 
+    context 'lti 1.3 line items' do
+      let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
+
+      context 'with one coupled and one coupled line item' do
+        let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: developer_key}) }
+        let(:assignment) do
+          @copy_from.assignments.create!(
+            name: 'test assignment',
+            submission_types: 'external_tool',
+            points_possible: 10,
+            external_tool_tag: ContentTag.new(content: tool, url: tool.url)
+          )
+        end
+
+        before do
+          Lti::LineItem.create_line_item! assignment, nil, tool, {
+            tag: 'tag2',
+            resource_id: 'resource_id2',
+            extensions: {foo: 'bar'},
+            label: 'abc',
+            score_maximum: 123,
+          }
+        end
+
+        it 'copies both coupled and uncoupled line items' do
+          run_course_copy
+          line_items = @copy_to.assignments.last.line_items
+          expect(line_items.where(coupled: true).pluck(
+            :tag, :resource_id, :extensions, :label, :score_maximum
+          )).to eq([
+            [nil, nil, {}, 'test assignment', 10],
+          ])
+          expect(line_items.where(coupled: false).pluck(
+            :tag, :resource_id, :extensions, :label, :score_maximum
+          )).to eq([
+            ['tag2', 'resource_id2', {'foo' => 'bar'}, 'abc', 123],
+          ])
+        end
+      end
+
+      context 'with one uncoupled line item (submission_types=none)' do
+        let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
+        let(:assignment) do
+          @course.assignments.create!(
+            name: 'test assignment',
+            submission_types: 'none',
+          )
+        end
+
+        before do
+          Lti::LineItem.create_line_item! assignment, nil, nil, {
+            tag: 'tag2',
+            resource_id: 'resource_id2',
+            extensions: {foo: 'bar'},
+            label: 'abc',
+            score_maximum: 123,
+            client_id: developer_key.global_id,
+          }
+        end
+
+        it 'copies the line item' do
+          run_course_copy
+          line_items = @copy_to.assignments.last.line_items
+          expect(line_items.pluck(
+            :tag, :resource_id, :extensions, :label, :score_maximum
+          )).to eq([
+            ['tag2', 'resource_id2', {'foo' => 'bar'}, 'abc', 123],
+          ])
+        end
+      end
+    end
+
     context 'post_to_sis' do
       before :each do
         @course.root_account.enable_feature!(:new_sis_integrations)

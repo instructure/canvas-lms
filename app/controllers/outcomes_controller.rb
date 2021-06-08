@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,10 +21,13 @@
 class OutcomesController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::Role
+
   before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
   before_action :rce_js_env, only: [:show, :index]
+
+  include K5Mode
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -30,25 +35,26 @@ class OutcomesController < ApplicationController
     log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if (common_core_group_id = Shard.current.settings[:common_core_outcome_group_id])
-      common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
-    end
 
-    js_env(:ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
-           :CONTEXT_URL_ROOT => polymorphic_path([@context]),
-           :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
-           # Don't display state standards if in the context of a Course. Only at Account level.
-           :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
-           :COMMON_CORE_GROUP_ID => common_core_group_id,
-           :COMMON_CORE_GROUP_URL => common_core_group_url,
-           :PERMISSIONS => {
-             :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
-             :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),
-             :manage_courses => @context.grants_right?(@current_user, session, :manage_courses),
-             :import_outcomes => @context.grants_right?(@current_user, session, :import_outcomes),
-             :manage_proficiency_scales => @context.grants_right?(@current_user, session, :manage_proficiency_scales),
-             :manage_proficiency_calculations => @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
-           })
+    js_env(
+      ROOT_OUTCOME_GROUP: outcome_group_json(@root_outcome_group, @current_user, session),
+      CONTEXT_URL_ROOT: polymorphic_path([@context]),
+      ACCOUNT_CHAIN_URL: polymorphic_path([:api_v1, @context, :account_chain]),
+      # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
+      STATE_STANDARDS_URL: @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
+      GLOBAL_ROOT_OUTCOME_GROUP_ID:
+        @context.is_a?(Course) ? nil : LearningOutcomeGroup.global_root_outcome_group.id,
+      PERMISSIONS: {
+        manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
+        manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
+        can_manage_courses: @context.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
+        import_outcomes: @context.grants_right?(@current_user, session, :import_outcomes),
+        manage_proficiency_scales:
+          @context.grants_right?(@current_user, session, :manage_proficiency_scales),
+        manage_proficiency_calculations:
+          @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
+      }
+    )
 
     set_tutorial_js_env
     mastery_scales_js_env
@@ -77,7 +83,7 @@ class OutcomesController < ApplicationController
     end
     @alignments = @outcome.alignments.active.for_context(@context)
     add_crumb(@outcome.short_description, named_context_url(@context, :context_outcome_url, @outcome.id))
-    @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
+    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
 
     js_env({
      :PERMISSIONS => {
@@ -108,7 +114,7 @@ class OutcomesController < ApplicationController
         codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
       end
     end
-    @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort])
+    @results = @outcome.learning_outcome_results.active.for_context_codes(codes).custom_ordering(params[:sort])
     render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
   end
 
@@ -129,7 +135,7 @@ class OutcomesController < ApplicationController
     else
       @outcomes = @context.available_outcomes
     end
-    @results = LearningOutcomeResult.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
+    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) #.for_context_codes(@codes)
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
     @google_analytics_page_title = t("Outcomes for Student")
@@ -203,7 +209,7 @@ class OutcomesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_outcomes)
 
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
-    @result = @outcome.learning_outcome_results.find(params[:id])
+    @result = @outcome.learning_outcome_results.active.find(params[:id])
 
     return unless authorized_action(@result.context, @current_user, :manage_outcomes)
 

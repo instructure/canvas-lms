@@ -19,8 +19,9 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
+import {momentObj} from 'react-moment-proptypes'
 import {connect} from 'react-redux'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {arrayOf, oneOfType, shape, bool, object, string, func} from 'prop-types'
 import {userShape, sizeShape} from '../plannerPropTypes'
@@ -36,11 +37,12 @@ import {
   loadPastButtonClicked,
   loadPastUntilNewActivity,
   togglePlannerItemCompletion,
-  updateTodo
+  updateTodo,
+  scrollToToday
 } from '../../actions'
 import {notifier} from '../../dynamic-ui'
 import {daysToDaysHash} from '../../utilities/daysUtils'
-import {formatDayKey} from '../../utilities/dateUtils'
+import {formatDayKey, isThisWeek} from '../../utilities/dateUtils'
 import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
 
@@ -57,16 +59,30 @@ export class PlannerApp extends Component {
     loadPastButtonClicked: func,
     loadPastUntilNewActivity: func,
     loadFutureItems: func,
+    allWeekItemsLoaded: bool,
     changeDashboardView: func,
     togglePlannerItemCompletion: func,
     updateTodo: func,
+    scrollToToday: func,
     triggerDynamicUiUpdates: func,
     preTriggerDynamicUiUpdates: func,
     plannerActive: func,
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     appRef: func,
-    focusFallback: func
+    focusFallback: func,
+    // today, the weekly planner is used only for k5 mode, but that's not
+    // strictly necessary. And k5 mode renders different stuff, so it's unique.
+    // Let's keep them both.
+    k5Mode: bool,
+    isWeekly: bool,
+    isCompletelyEmpty: bool,
+    loadingWeek: bool,
+    thisWeek: shape({
+      weekStart: momentObj,
+      weekEnd: momentObj
+    }),
+    singleCourseView: bool
   }
 
   static defaultProps = {
@@ -79,7 +95,9 @@ export class PlannerApp extends Component {
     responsiveSize: 'large',
     appRef: () => {},
     focusFallback: () => {},
-    isCompletelyEmpty: bool
+    isCompletelyEmpty: bool,
+    k5Mode: false,
+    singleCourseView: false
   }
 
   constructor(props) {
@@ -89,12 +107,12 @@ export class PlannerApp extends Component {
     this.fixedResponsiveMemo = null
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.appRef(this)
     window.addEventListener('resize', this.onResize, false)
   }
 
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     if (this.props.allPastItemsLoaded === false && nextProps.allPastItemsLoaded === true) {
       if (this.loadPriorButton === document.activeElement) {
         this.props.focusFallback()
@@ -108,11 +126,14 @@ export class PlannerApp extends Component {
     if (this.props.responsiveSize !== prevProps.responsiveSize) {
       this.afterLayoutChange()
     }
+    if (!this.props.isLoading && prevProps.isLoading) {
+      this.props.scrollToToday({isWeekly: this.props.isWeekly})
+    }
   }
 
   componentWillUnmount() {
     this.props.appRef(null)
-    window.removeEventListenet('resize', this.onResize, false)
+    window.removeEventListener('resize', this.onResize, false)
   }
 
   fixedElementForItemScrolling() {
@@ -129,7 +150,7 @@ export class PlannerApp extends Component {
   // First, when the user starts to resize the window, call beforeLayoutChange
   resizeTimer = 0
 
-  onResize = event => {
+  onResize = () => {
     if (this.resizeTimer === 0) {
       this.resizeTimer = window.setTimeout(() => {
         this.resizeTimer = 0
@@ -174,7 +195,7 @@ export class PlannerApp extends Component {
 
   renderLoading() {
     return (
-      <View display="block" padding="xx-large medium" textAlign="center">
+      <View key="spinner" display="block" padding="xx-large medium" textAlign="center">
         <Spinner renderTitle={() => formatMessage('Loading planner items')} size="medium" />
       </View>
     )
@@ -182,6 +203,7 @@ export class PlannerApp extends Component {
 
   renderLoadingPast() {
     if (this.props.isLoading) return
+    if (this.props.isWeekly) return
     return (
       <LoadingPastIndicator
         loadingPast={this.props.loadingPast}
@@ -193,6 +215,7 @@ export class PlannerApp extends Component {
 
   renderLoadMore() {
     if (this.props.isLoading || this.props.loadingPast) return
+    if (this.props.isWeekly) return
     return (
       <LoadingFutureIndicator
         loadingFuture={this.props.loadingFuture}
@@ -206,8 +229,9 @@ export class PlannerApp extends Component {
 
   renderLoadPastButton() {
     if (this.props.allPastItemsLoaded) return
+    if (this.props.isWeekly) return
     return (
-      <View as="div" textAlign="center">
+      <View as="div" textAlign="center" margin="x-small 0 0 0">
         <ShowOnFocusButton
           buttonRef={ref => (this.loadPriorButton = ref)}
           buttonProps={{
@@ -221,12 +245,22 @@ export class PlannerApp extends Component {
   }
 
   renderNoAssignments() {
+    if (
+      this.props.isWeekly &&
+      (this.props.opportunityCount || this.props.loadingOpportunities) &&
+      isThisWeek(this.props.thisWeek.weekStart)
+    ) {
+      const today = moment.tz(this.props.timeZone).startOf('day')
+      return this.renderOneDay(today, formatDayKey(today), [], 0)
+    }
+
     return (
       <PlannerEmptyState
         changeDashboardView={this.props.changeDashboardView}
         isCompletelyEmpty={this.props.isCompletelyEmpty}
         onAddToDo={this.onAddToDo}
         responsiveSize={this.props.responsiveSize}
+        isWeekly={this.props.isWeekly}
       />
     )
   }
@@ -261,6 +295,9 @@ export class PlannerApp extends Component {
         toggleCompletion={this.props.togglePlannerItemCompletion}
         updateTodo={this.props.updateTodo}
         currentUser={this.props.currentUser}
+        simplifiedControls={this.props.k5Mode}
+        singleCourseView={this.props.singleCourseView}
+        showMissingAssignments={this.props.k5Mode}
       />
     )
     workingDay.add(1, 'days')
@@ -370,6 +407,18 @@ export class PlannerApp extends Component {
   //    if we find a string of 3 or more empty days, emit an <EmptyDays> for the interval
   renderDays() {
     const children = []
+    const dayHash = daysToDaysHash(this.props.days)
+    let dayIndex = 1
+
+    if (this.props.isWeekly) {
+      return this.renderPresent(
+        this.props.thisWeek.weekStart.clone(),
+        this.props.thisWeek.weekEnd.clone(),
+        dayHash,
+        dayIndex
+      )
+    }
+
     const today = moment.tz(this.props.timeZone).startOf('day')
     let workingDay = moment.tz(this.props.days[0][0], this.props.timeZone)
     if (workingDay.isAfter(today)) workingDay = today.clone()
@@ -380,8 +429,6 @@ export class PlannerApp extends Component {
     // We don't want to render an empty tomorrow if we don't know it's actually empty.
     // It might just not be loaded yet. If so, sneak it back to today so it isn't displayed.
     if (tomorrow.isAfter(lastDay)) tomorrow = today.clone()
-    const dayHash = daysToDaysHash(this.props.days)
-    let dayIndex = 1
 
     const pastChildren = this.renderPast(workingDay, dayBeforeYesterday, dayHash, dayIndex)
     dayIndex += pastChildren.length
@@ -393,40 +440,52 @@ export class PlannerApp extends Component {
 
     const futureChildren = this.renderFuture(workingDay, lastDay, dayHash, dayIndex)
     children.splice(children.length, 0, ...futureChildren)
+
     return children
   }
 
-  renderBody(children, classes) {
-    const loading = this.props.loadingPast || this.props.loadingFuture || this.props.isLoading
+  renderBody(children) {
+    if (this.props.isWeekly) return children
+
+    const loading =
+      this.props.loadingPast ||
+      this.props.loadingFuture ||
+      this.props.loadingWeek ||
+      this.props.isLoading
     if (children.length === 0 && !loading) {
       return (
-        <div className={classes}>
+        <>
           {this.renderLoadPastButton()}
           {this.renderNoAssignments()}
-        </div>
+        </>
       )
     }
 
     return (
-      <div className={classes} ref={el => (this._plannerElem = el)}>
+      <>
         {this.renderLoadPastButton()}
         {this.renderLoadingPast()}
         {children}
         <div id="planner-app-fixed-element" ref={this.fixedElementRef} />
         {this.renderLoadMore()}
-      </div>
+      </>
     )
   }
 
   render() {
     const clazz = classnames('PlannerApp', this.props.responsiveSize)
     let children = []
-    if (this.props.isLoading) {
-      children = this.renderLoading()
-    } else if (this.props.days.length > 0) {
+    if (this.props.isLoading || this.props.loadingWeek) {
+      children = [this.renderLoading()]
+    } else if (this.props.days.length > 0 || this.props.isWeekly) {
       children = this.renderDays()
     }
-    return this.renderBody(children, clazz)
+    children = this.renderBody(children)
+    return (
+      <div className={clazz} ref={el => (this._plannerElem = el)} data-testid="PlannerApp">
+        {children}
+      </div>
+    )
   }
 }
 
@@ -438,13 +497,23 @@ export const mapStateToProps = state => {
     allPastItemsLoaded: state.loading.allPastItemsLoaded,
     loadingFuture: state.loading.loadingFuture,
     allFutureItemsLoaded: state.loading.allFutureItemsLoaded,
+    loadingWeek: state.loading.loadingWeek,
+    allWeekItemsLoaded: state.loading.allWeekItemsLoaded,
     loadingError: state.loading.loadingError,
     timeZone: state.timeZone,
     isCompletelyEmpty:
       state.loading.hasSomeItems === false &&
       state.days.length === 0 &&
       state.loading.partialPastDays.length === 0 &&
-      state.loading.partialFutureDays.length === 0
+      state.loading.partialFutureDays.length === 0 &&
+      state.loading.partialWeekDays.length === 0,
+    thisWeek: state.weeklyDashboard && {
+      weekStart: state.weeklyDashboard.weekStart,
+      weekEnd: state.weeklyDashboard.weekEnd
+    },
+    loadingOpportunities: !!state.loading.loadingOpportunities,
+    opportunityCount: state.opportunities?.items?.length || 0,
+    singleCourseView: state.singleCourse
   }
 }
 
@@ -454,6 +523,7 @@ const mapDispatchToProps = {
   loadPastButtonClicked,
   loadPastUntilNewActivity,
   togglePlannerItemCompletion,
-  updateTodo
+  updateTodo,
+  scrollToToday
 }
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(ResponsivePlannerApp))

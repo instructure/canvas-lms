@@ -19,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../../helpers/k5_common'
 
 # FIXME: don't copy paste
 class TestUserApi
@@ -38,6 +39,8 @@ def default_avatar_url
 end
 
 describe "User Profile API", type: :request do
+  include K5Common
+
   before :once do
     @admin = account_admin_user
     @admin_lti_user_id = Lti::Asset.opaque_identifier_for(@admin)
@@ -101,7 +104,8 @@ describe "User Profile API", type: :request do
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
       'locale' => nil,
-      'effective_locale' => 'en'
+      'effective_locale' => 'en',
+      'k5_user' => false
     })
   end
 
@@ -126,7 +130,8 @@ describe "User Profile API", type: :request do
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
       'locale' => 'es',
-      'effective_locale' => 'es'
+      'effective_locale' => 'es',
+      'k5_user' => false
     })
   end
 
@@ -149,7 +154,8 @@ describe "User Profile API", type: :request do
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
       'locale' => nil,
-      'effective_locale' => 'en'
+      'effective_locale' => 'en',
+      'k5_user' => false
     })
   end
 
@@ -223,6 +229,42 @@ describe "User Profile API", type: :request do
       expect(json["links"]).to eq [
         {"url" => "http://instructure.com", "title" => "Instructure"}
       ]
+    end
+  end
+
+  context 'canvas for elementary' do
+    it 'should return k5_user false if not a k5 user' do
+      toggle_k5_setting(@course.account, false)
+
+      @user = @student
+      json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+                      controller: "profile", action: "settings",
+                      user_id: @student.to_param, format: "json")
+
+      expect(json['k5_user']).to eq(false)
+    end
+
+    context 'k5 mode on' do
+      before(:once) do
+        toggle_k5_setting(@course.account, true)
+      end
+
+      it 'should return k5_user true for current_user' do
+        @user = @student
+        json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+                        controller: "profile", action: "settings",
+                        user_id: @student.to_param, format: "json")
+        expect(json['k5_user']).to eq(true)
+      end
+
+      it 'should return k5_user nil for other users' do
+        course_with_teacher(active_all: true, course: @course)
+        @user = @teacher
+        json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+                        controller: "profile", action: "settings",
+                        user_id: @student.to_param, format: "json")
+        expect(json['k5_user']).to be_nil
+      end
     end
   end
 end

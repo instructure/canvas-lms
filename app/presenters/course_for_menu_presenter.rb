@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -49,12 +51,17 @@ class CourseForMenuPresenter
       href: course_path(course, invitation: course.read_attribute(:invitation)),
       term: term || nil,
       subtitle: subtitle,
+      enrollmentState: course.primary_enrollment_state,
       enrollmentType: course.primary_enrollment_type,
       observee: observee,
       id: course.id,
       isFavorited: course.favorite_for_user?(@user),
+      isHomeroom: course.homeroom_course,
+      canManage: course.grants_right?(@user, :manage_content),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
-      position: position.present? ? position.to_i : nil
+      color: course.elementary_enabled? ? course.course_color : nil,
+      position: position.present? ? position.to_i : nil,
+      published: course.published?
     }.tap do |hash|
       if @opts[:tabs]
         tabs = course.tabs_available(@user, {
@@ -73,8 +80,7 @@ class CourseForMenuPresenter
         end
       end
       if @context.root_account.feature_enabled?(:unpublished_courses)
-        hash[:published] = course.published?
-        hash[:canChangeCourseState] = course.grants_right?(@user, :change_course_state)
+        hash[:canChangeCoursePublishState] = course.grants_any_right?(@user, :change_course_state, :manage_courses_publish)
         hash[:defaultView] = course.default_view
         hash[:pagesUrl] = polymorphic_url([course, :wiki_pages])
         hash[:frontPageTitle] = course&.wiki&.front_page&.title

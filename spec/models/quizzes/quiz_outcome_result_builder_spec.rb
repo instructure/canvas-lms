@@ -21,39 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizOutcomeResultBuilder do
-  def question_data(reset=false, data={})
-    @qdc = (reset || !@qdc) ? 1 : @qdc + 1
-    {:name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
-      [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
-    }.merge(data)
-  end
-
-  def build_course_quiz_questions_and_a_bank(data={}, opts={})
-    scoring_policy = opts[:scoring_policy] || "keep_highest"
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
-    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
-    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
-    @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
-    @bank = @q1.assessment_question.assessment_question_bank
-    @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
-  end
-
-  def find_the_answer_from_a_question(question)
-    question.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
-  end
-
-  def answer_a_question(question, submission, correct: true)
-    return if question.question_data['answers'] == []
-    q_id = question.data[:id]
-    answer = if correct
-              find_the_answer_from_a_question(question)
-             else
-              find_the_answer_from_a_question(question) + 1
-             end
-    submission.submission_data["question_#{q_id}"] = answer
-  end
-
   describe "quiz level learning outcome results" do
     before :once do
       build_course_quiz_questions_and_a_bank
@@ -64,7 +31,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q2, @sub, correct: false)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      @quiz_results = @outcome.learning_outcome_results.where(user_id: @user).to_a
+      @quiz_results = @outcome.learning_outcome_results.active.where(user_id: @user).to_a
       @quiz_result = @quiz_results.first
       @question_results = @quiz_results.first.learning_outcome_question_results
     end
@@ -88,6 +55,25 @@ describe Quizzes::QuizOutcomeResultBuilder do
     it "shouldn't declare mastery" do
       expect(@quiz_result.mastery).to eql(false)
     end
+
+    context 'with long quiz titles' do
+      before :once do
+       @user.update!(name: 'a'*255)
+       @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q2.id}" => '0'
+      })
+      end
+
+      it "truncates result.title and question_result.title to 250 characters" do
+        expect(@quiz_result.reload.title.length).to eq 250
+        @question_results.each { |result| expect(result.title.length).to eq 250 }
+      end
+    end
+
     context 'with two outcomes' do
       before :once do
         course_with_student(active_all: true)
@@ -120,7 +106,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         Quizzes::SubmissionGrader.new(@sub).grade_submission
         @outcome.reload
         @outcome2.reload
-        @quiz_results = LearningOutcomeResult.where(user_id: @user).to_a
+        @quiz_results = LearningOutcomeResult.where(user_id: @user).sort_by(&:learning_outcome_id).to_a
         @question_results = @quiz_results.map(&:learning_outcome_question_results)
       end
       it "has valid bank data" do
@@ -147,6 +133,53 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
   end
 
+  describe "quiz level learning outcome results from out of order submission" do
+    def submission
+      sub = @quiz.generate_submission(@user)
+      sub.submission_data = {}
+      sub
+    end
+
+    def answer_and_grade(sub, correct = false)
+      answer_a_question(@q1, sub)
+      answer_a_question(@q2, sub, correct: correct)
+      Quizzes::SubmissionGrader.new(sub).grade_submission
+    end
+
+    before :once do
+      build_course_quiz_questions_and_a_bank
+      @quiz.generate_quiz_data(:persist => true)
+      @sub1 = submission
+      @sub2 = submission
+      # 2nd attempt: both questions answered correctly
+      answer_and_grade(@sub2, true)
+      # align a second outcome in-between attempts
+      @outcome2 = @course.created_learning_outcomes.create!(:short_description => 'another outcome')
+      @bank = @q1.assessment_question.assessment_question_bank
+      @outcome2.align(@bank, @bank.context, :mastery_score => 0.7)
+      # 1st attempt: only one question answered correctly
+      answer_and_grade(@sub1)
+      @quiz_results = @outcome.reload.learning_outcome_results.active.where(user_id: @user).to_a
+      @quiz_results2 = @outcome2.reload.learning_outcome_results.active.where(user_id: @user).to_a
+    end
+
+    it 'first attempt should not override results from second attempt' do
+      expect(@quiz_results.size).to eq 1
+      expect(@quiz_results.first.attempt).to eq 2
+      # full score since all questions answered correctly on second attempt
+      expect(@quiz_results.first.score).to eq 2.0
+      expect(@quiz_results.first.possible).to eq 2.0
+    end
+
+    it 'first attempt should generate a valid result' do
+      expect(@quiz_results2.size).to eq 1
+      expect(@quiz_results2.first.attempt).to eq 1
+      # partial score since the first and only attempt answered only one question correctly
+      expect(@quiz_results2.first.score).to eq 1.0
+      expect(@quiz_results2.first.possible).to eq 2.0
+    end
+  end
+
   describe "question level learning outcomes" do
     it "should create learning outcome results when aligned to assessment questions" do
       build_course_quiz_questions_and_a_bank
@@ -162,7 +195,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       expect(@sub.score).to eql(1.0)
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results
       expect(@results.length).to eql(2)
       @results = @results.sort_by(&:associated_asset_id)
@@ -184,7 +217,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       expect(@sub.score).to eql(1.0)
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results.sort_by(&:associated_asset_id)
       updated_at_times = @results.map(&:updated_at)
       expect(@results.length).to eql(2)
@@ -200,7 +233,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       expect(@sub.score).to eql(1.0)
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results.sort_by(&:associated_asset_id)
       expect(@results.length).to eql(2)
       expect(updated_at_times).not_to eql(@results.map(&:updated_at))
@@ -224,7 +257,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       expect(@sub.score).to eql(1.0)
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results.sort_by(&:associated_asset_id)
       expect(@results.length).to eql(2)
       updated_at_times = @results.map(&:updated_at)
@@ -240,7 +273,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       expect(@sub.score).to eql(1.0)
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results.sort_by(&:associated_asset_id)
       expect(updated_at_times).to eql(@results.map(&:updated_at))
       expect(@results.first.mastery).to eql(true)
@@ -262,7 +295,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
 
     it "creates an outcome result even if the total score doesn't increase after grading an essay question" do
-      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 0
       @sub.update_scores({
         'context_id' => @course.id,
         'override_scores' => true,
@@ -270,7 +303,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         'submission_version_number' => '1',
         "question_score_#{@q2.id}" => "0"
       })
-      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 1
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 1
     end
   end
 
@@ -295,7 +328,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         'submission_version_number' => '1',
         "question_score_#{@q1.id}" => "1",
       })
-      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 0
       @sub.update_scores({
         'context_id' => @course.id,
         'override_scores' => true,
@@ -303,7 +336,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         'submission_version_number' => '1',
         "question_score_#{@q2.id}" => "1"
       })
-      results = @outcome.learning_outcome_results.where(user_id: @user)
+      results = @outcome.learning_outcome_results.active.where(user_id: @user)
       expect(results.count).to equal 1
       expect(results[0].score).to equal 2.0
       @sub.update_scores({
@@ -332,21 +365,21 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @quiz.update_attribute('quiz_type', 'survey')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      expect(@outcome.learning_outcome_results.where(user_id: @user).length).to eql(0)
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).length).to eql(0)
     end
 
     it "should not create learning outcome results for a graded survey" do
       @quiz.update_attribute('quiz_type', 'graded_survey')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      expect(@outcome.learning_outcome_results.where(user_id: @user).length).to eql(0)
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).length).to eql(0)
     end
 
     it "should not create learning outcome results for a practice quiz" do
       @quiz.update_attribute('quiz_type', 'practice_quiz')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      expect(@outcome.learning_outcome_results.where(user_id: @user).length).to eql(0)
+      expect(@outcome.learning_outcome_results.active.where(user_id: @user).length).to eql(0)
     end
   end
 
@@ -367,7 +400,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q1, @sub)
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results
       expect(@results.length).to eql(1)
       @results = @results.sort_by(&:associated_asset_id)
@@ -380,7 +413,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q1, @sub)
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results
       expect(@results.length).to eql(2)
       q2_data = @q2.question_data
@@ -392,7 +425,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q1, @sub)
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       @results = @quiz_result.learning_outcome_question_results
       expect(@results.length).to eql(1)
     end
@@ -418,7 +451,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       expect(@quiz_result).to be_nil
     end
 
@@ -429,7 +462,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q1, @sub)
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       expect(@quiz_result).to be_present
       q1_data = @q1.question_data
       q1_data[:points_possible] = 0.0
@@ -443,7 +476,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q1, @sub)
       answer_a_question(@q2, @sub)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
-      @quiz_result = @outcome.learning_outcome_results.where(user_id: @user).first
+      @quiz_result = @outcome.learning_outcome_results.active.where(user_id: @user).first
       expect(@quiz_result).to be_nil
     end
   end

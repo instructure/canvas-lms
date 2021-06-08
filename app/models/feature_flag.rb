@@ -19,10 +19,21 @@
 #
 
 class FeatureFlag < ActiveRecord::Base
+  # this field is used for audit logging.
+  # if a request is changing the state of a feature
+  # flag, it should set this value before persisting
+  # the change.
+  attr_writer :current_user
+
   belongs_to :context, polymorphic: [:account, :course, :user]
+
+  self.ignored_columns = %i[visibility manipulate]
 
   validate :valid_state, :feature_applies
   before_save :check_cache
+  after_create :audit_log_create # to make sure we have an ID, must be after
+  before_update :audit_log_update
+  before_destroy :audit_log_destroy
   before_destroy :clear_cache
 
   def default?
@@ -41,15 +52,15 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def enabled?
-    state == 'on'
+    state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
   end
 
-  def allowed?
-    state == 'allowed'
+  def can_override?
+    state == Feature::STATE_DEFAULT_OFF || state == Feature::STATE_DEFAULT_ON
   end
 
   def locked?(query_context)
-    !allowed? && (context_id != query_context.id || context_type != query_context.class.name)
+    !can_override? && (context_id != query_context.id || context_type != query_context.class.name)
   end
 
   def clear_cache
@@ -70,10 +81,42 @@ class FeatureFlag < ActiveRecord::Base
     end
   end
 
+  def audit_log_update(operation: :update)
+    # kill switch in case something goes crazy in rolling this out.
+    # TODO: we can yank this guard clause once we're happy with it's stability.
+    return unless Setting.get('write_feature_flag_audit_logs', 'true') == 'true'
+
+    # User feature flags only get changed by the target user,
+    # are much higher volume than higher level flags, and are generally
+    # uninteresting from a forensics standpoint.  We can save a lot of writes
+    # by not caring about them.
+    unless context.is_a?(User)
+      # this should catch a programatic/console user if one is acting
+      # outside the request/response cycle
+      acting_user = @current_user || Canvas.infer_user
+      prior_state = if operation == :create
+        'nonexistant'
+      else
+        self.state_in_database
+      end
+      post_state = (operation == :destroy ? 'removed' : self.state)
+      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
+    end
+  end
+
+  def audit_log_create
+    audit_log_update(operation: :create)
+  end
+
+  def audit_log_destroy
+    audit_log_update(operation: :destroy)
+  end
   private
 
   def valid_state
-    errors.add(:state, "is not valid in context") unless %w(off on).include?(state) || context.is_a?(Account) && state == 'allowed'
+    unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)
+      errors.add(:state, "is not valid in context")
+    end
   end
 
   def feature_applies

@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
-import FeatureFlagCollection from 'compiled/collections/FeatureFlagCollection'
-import FeatureFlag from 'compiled/models/FeatureFlag'
+import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
+import FeatureFlagCollection from '@canvas/feature-flag-admin-view/backbone/collections/FeatureFlagCollection'
+import FeatureFlag from '@canvas/feature-flag-admin-view/backbone/models/FeatureFlag.coffee'
 
 let flags
 

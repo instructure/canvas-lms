@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,6 +24,7 @@ class RubricsController < ApplicationController
   before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
+  include K5Mode
 
   def index
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
@@ -159,10 +162,16 @@ class RubricsController < ApplicationController
       # Update the rubric if you can
       # Better specify params[:rubric_association_id] if you want it to update an existing association
 
-      # If this is a brand new rubric OR if the rubric isn't editable,
+      # If this is a brand new rubric OR if the rubric isn't editable OR if the rubric context is different than the context,
       # then create a new rubric
-      if !@rubric || (@rubric.will_change_with_update?(params[:rubric]) && !@rubric.grants_right?(@current_user, session, :update))
-        original_rubric_id = @rubric && @rubric.id
+      if !@rubric || (
+        @rubric.will_change_with_update?(params[:rubric]) && (
+          !@rubric.grants_right?(@current_user, session, :update) || (
+            @rubric.context.is_a?(Account) && @rubric.context != @context
+          )
+        )
+      )
+        original_rubric_id = @rubric&.id
         @rubric = @context.rubrics.build
         @rubric.rubric_id = original_rubric_id
         @rubric.user = @current_user
@@ -185,7 +194,7 @@ class RubricsController < ApplicationController
   #
   # @returns Rubric
   def destroy
-    @rubric = RubricAssociation.where(rubric_id: params[:id], context_id: @context, context_type: @context.class.to_s).first.rubric
+    @rubric = RubricAssociation.active.where(rubric_id: params[:id], context_id: @context, context_type: @context.class.to_s).first.rubric
     if authorized_action(@rubric, @current_user, :delete_associations) && authorized_action(@context, @current_user, :manage_rubrics)
       @rubric.destroy_for(@context, current_user: @current_user)
       render :json => @rubric

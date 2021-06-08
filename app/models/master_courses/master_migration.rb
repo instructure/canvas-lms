@@ -68,10 +68,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       master_template.lock!
       if master_template.active_migration_running?
         if opts[:retry_later]
-          self.send_later_enqueue_args(:start_new_migration!,
-            {:singleton => "retry_start_master_migration_#{master_template.global_id}",
-              :run_at => 10.minutes.from_now, :max_attempts => 1},
-            master_template, user, opts)
+          delay(singleton: "retry_start_master_migration_#{master_template.global_id}",
+              run_at: 10.minutes.from_now).
+              start_new_migration!(master_template, user, opts)
         else
           raise MigrationRunningError.new("cannot start new migration while another one is running")
         end
@@ -123,7 +122,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     }
 
     self.update_attribute(:workflow_state, 'queued')
-    self.send_later_enqueue_args(:perform_exports, queue_opts)
+    delay(**queue_opts).perform_exports
   end
 
   def fail_export_with_error!(exception_or_info)

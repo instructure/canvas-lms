@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -835,6 +837,8 @@ class CalendarEventsApiController < ApplicationController
     selected_contexts = @current_user.get_preference(:selected_calendar_contexts) || []
 
     contexts = @contexts.map do |context|
+      next if context.try(:concluded?)
+
       context_data = {
         id: context.id,
         name: context.nickname_for(@current_user),
@@ -855,7 +859,7 @@ class CalendarEventsApiController < ApplicationController
       end
 
       context_data
-    end
+    end.compact # remove any skipped contexts
 
     render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}
   end
@@ -930,7 +934,7 @@ class CalendarEventsApiController < ApplicationController
         event_hashes = builder.generate_event_hashes(timetables)
         builder.process_and_validate_event_hashes(event_hashes)
         raise "error creating timetable events #{builder.errors.join(", ")}" if builder.errors.present?
-        builder.send_later(:create_or_update_events, event_hashes) # someday we may want to make this a trackable progress job /shrug
+        builder.delay.create_or_update_events(event_hashes) # someday we may want to make this a trackable progress job /shrug
       end
 
       # delete timetable events for sections missing here
@@ -1004,7 +1008,7 @@ class CalendarEventsApiController < ApplicationController
         return render :json => {:errors => builder.errors}, :status => :bad_request
       end
 
-      builder.send_later(:create_or_update_events, event_hashes)
+      builder.delay.create_or_update_events(event_hashes)
       render json: {status: 'ok'}
     end
   end
@@ -1215,14 +1219,14 @@ class CalendarEventsApiController < ApplicationController
         relation = relation.for_user_and_context_codes(user, context_codes, user.section_context_codes(context_codes, @is_admin))
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
+        if includes.include?('web_conference')
+          relation = relation.preload(:web_conference)
+        end
         relation
       end
     else
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
-    end
-    if includes.include?('web_conference')
-      scope = scope.preload(:web_conference)
     end
     scope
   end

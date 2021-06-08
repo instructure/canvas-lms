@@ -267,6 +267,34 @@ describe MissingPolicyApplicator do
       expect { applicator.apply_missing_deductions }.not_to(change { submission.reload.score })
     end
 
+    it 'does not change the grade on missing submissions for concluded enrollments in other courses' do
+      c1 = course_with_student(active_all: true).course
+      c2 = course_with_student(user: @student, active_all: true).course
+      c1.assignments.create!(
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+      )
+      c2.assignments.create!(
+        valid_assignment_attributes.merge(grading_type: 'letter_grade', due_at: 1.hour.ago(now))
+      )
+      c2.student_enrollments.find_by(user_id: @student).conclude
+      LatePolicy.create!(
+        course_id: c1.id,
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction: 75
+      )
+      LatePolicy.create!(
+        course_id: c2.id,
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction: 75
+      )
+      s1 = c1.submissions.find_by(user_id: @student)
+      s1.update_columns(score: nil, grade: nil)
+
+      s2 = c2.submissions.find_by(user_id: @student)
+      s2.update_columns(score: nil, grade: nil)
+      expect { applicator.apply_missing_deductions }.not_to change { s2.reload.grade }
+    end
+
     it 'does not change the grade on missing submissions for concluded students' do
       create_recent_assignment
       @course.student_enrollments.find_by(user_id: @student).conclude
@@ -301,7 +329,7 @@ describe MissingPolicyApplicator do
 
     describe "grade change events" do
       before(:each) do
-        allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+        allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
         late_policy_missing_enabled
         create_recent_assignment
         @assignment = @course.assignments.last
@@ -390,15 +418,14 @@ describe MissingPolicyApplicator do
 
         it "queues a delayed job if the applicator marks any submissions as missing" do
           assignment.submissions.update_all(score: nil, grade: nil)
-          expect(Canvas::LiveEvents).to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, assignment.submissions.to_a)
+          expect(Canvas::LiveEvents).to receive(:delay_if_production).and_return(Canvas::LiveEvents)
+          expect(Canvas::LiveEvents).to receive(:submissions_bulk_updated).with(assignment.submissions.to_a)
 
           applicator.apply_missing_deductions
         end
 
         it "does not queue a delayed job if the applicator marks no submissions as missing" do
-          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, any_args)
+          expect(Canvas::LiveEvents).not_to receive(:delay_if_production)
 
           applicator.apply_missing_deductions
         end
@@ -407,8 +434,7 @@ describe MissingPolicyApplicator do
       context "when the missing_policy_applicator_emits_live_events flag is not enabled" do
         it "does not queue a delayed job when the applicator marks submissions as missing" do
           assignment.submissions.update_all(score: nil, grade: nil)
-          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, any_args)
+          expect(Canvas::LiveEvents).not_to receive(:delay)
 
           applicator.apply_missing_deductions
         end

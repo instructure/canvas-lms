@@ -72,11 +72,11 @@ module Api::V1::Submission
     end
 
     if includes.include?("has_postable_comments")
-      hash["has_postable_comments"] = submission.submission_comments.select(&:hidden?).present?
+      hash["has_postable_comments"] = submission.submission_comments.any?(&:allows_posting_submission?)
     end
 
     if includes.include?("submission_comments")
-      published_comments = submission.comments_for(@current_user).published
+      published_comments = submission.comments_excluding_drafts_for(@current_user)
       hash['submission_comments'] = submission_comments_json(published_comments, current_user)
     end
 
@@ -120,6 +120,12 @@ module Api::V1::Submission
 
     if includes.include?('grading_status')
       hash['grading_status'] = submission.grading_status
+    end
+
+    if includes.include?('read_state')
+      # Save the current read state to the hash, then mark as read
+      hash['read_state'] = submission.read_state(current_user)
+      submission.mark_read(current_user)
     end
 
     if context.account_membership_allows(current_user)
@@ -313,10 +319,7 @@ module Api::V1::Submission
       attachment.locked = anonymous
       attachment.save!
 
-      ContentZipper.send_later_enqueue_args(:process_attachment, {
-        priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1
-      }, attachment)
+      ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(attachment)
     end
 
     attachment

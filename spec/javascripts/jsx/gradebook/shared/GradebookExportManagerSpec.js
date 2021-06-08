@@ -18,7 +18,7 @@
 
 import moxios from 'moxios'
 
-import GradebookExportManager from 'jsx/gradebook/shared/GradebookExportManager'
+import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager.js'
 
 const currentUserId = 42
 const exportingUrl = 'http://exportingUrl'

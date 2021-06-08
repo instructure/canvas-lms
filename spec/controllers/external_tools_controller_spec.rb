@@ -30,6 +30,8 @@ describe ExternalToolsController do
     student_in_course(:active_all => true)
   end
 
+  before { consider_all_requests_local(false) }
+
   describe "GET 'jwt_token'" do
 
     before :each do
@@ -45,7 +47,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_id: @tool.id}
-      jwt = JSON.parse(response.body[9..-1])['jwt_token']
+      jwt = JSON.parse(response.body)['jwt_token']
       decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
@@ -71,7 +73,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       get :jwt_token, params: {course_id: @course.id, tool_launch_url: @tool.url}
-      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body[9..-1])['jwt_token'], [:skip_verification])
+      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body)['jwt_token'], [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
@@ -120,39 +122,70 @@ describe ExternalToolsController do
       let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
-      before do
-        allow(SecureRandom).to receive(:hex).and_return(verifier)
-        user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: tool.id}
+      before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+
+      context 'when the current user is nil' do
+        context 'and the context is a public course' do
+          subject do
+            get :show, params: {:course_id => @course.id, id: tool.id}
+            response
+          end
+
+          before { @course.update!(is_public: true) }
+
+          it { is_expected.to be_successful }
+
+          it 'uses the public user ID as the ISS' do
+            subject
+            expect(cached_launch['sub']).to be_nil
+          end
+        end
       end
 
-      it 'creates a login message' do
-        expect(assigns[:lti_launch].params.keys).to match_array [
-          "iss",
-          "login_hint",
-          "target_link_uri",
-          "lti_message_hint",
-          "canvas_region",
-          "client_id"
-        ]
+      context 'when current user is a teacher' do
+        before do
+          user_session(@teacher)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+        end
+
+        it 'creates a login message' do
+          expect(assigns[:lti_launch].params.keys).to match_array [
+            "iss",
+            "login_hint",
+            "target_link_uri",
+            "lti_message_hint",
+            "canvas_region",
+            "client_id"
+          ]
+        end
+
+        it 'sets the "login_hint" to the current user lti id' do
+          expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
+        end
+
+        it 'caches the the LTI 1.3 launch' do
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+        end
+
+        it 'sets the "canvas_domain" to the request domain' do
+          message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+          expect(message_hint['canvas_domain']).to eq 'localhost'
+        end
       end
 
-      it 'sets the "login_hint" to the current user lti id' do
-        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
-      end
-
-      it 'caches the the LTI 1.3 launch' do
-        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-      end
-
-      it 'sets the "canvas_domain" to the request domain' do
-        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
-        expect(message_hint['canvas_domain']).to eq 'localhost'
+      context "with a bad launch url" do
+        it "fails gracefully" do
+          user_session(@teacher)
+          allow(controller).to receive(:basic_lti_launch_request).and_raise(Lti::Errors::InvalidLaunchUrlError)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+          expect(response).to be_redirect
+        end
       end
 
       context 'current user is a student view user' do
         before do
           user_session(@course.student_view_student)
+          get :show, params: {:course_id => @course.id, id: tool.id}
         end
 
         it 'returns the TestUser claim when viewing as a student' do
@@ -696,15 +729,121 @@ describe ExternalToolsController do
         tool
       end
 
+      let(:launch_hash) {
+        lti_launch = assigns[:lti_launch]
+        decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+        cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
+        JSON.parse(cached_launch)
+      }
+
       before do
         lti_1_3_tool
         user_session(@teacher)
       end
 
-      it 'does stuff' do
-        get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/launch"}
+      it 'assigns @lti_launch.resource_url' do
+        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/launch"}
         expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
       end
+
+      context 'when resource_link_lookup_uuid is passed' do
+        include Lti::RedisMessageClient
+        let(:launch_params) do
+          JSON.parse(
+            fetch_and_delete_launch(
+              @course,
+              JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)['verifier']
+            )
+          )
+        end
+
+
+        let(:rl) {
+          Lti::ResourceLink.create!(
+            context_external_tool: lti_1_3_tool,
+            context: @course,
+            custom: {abc: 'def', expans: '$Canvas.user.id'}
+          )
+        }
+
+        let(:get_page) {
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_uuid: rl.lookup_uuid
+          }
+        }
+
+        it 'sets the custom parameters in the launch hash' do
+          get_page
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'sets the custom parameters in the launch hash when is the old parameter name `resource_link_lookup_id`' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_id: rl.lookup_uuid
+          }
+
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'errors if the resource_link_lookup_uuid cannot be found' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_uuid: 'wrong_do_it_again'
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link_lookup_uuid is for the wrong context' do
+          rl.update(context: Course.create(course_valid_attributes))
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link is inactive' do
+          rl.update(workflow_state: 'deleted')
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'does not include custom params if the resource_link is for the wrong tool' do
+          tool2 = @course.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example2.com/launch', use_1_3: true,
+            developer_key: DeveloperKey.create!
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']).to be_blank
+        end
+
+        it 'succeeds if the resource_link is for a tool with the same host' do
+          tool2 = @course.account.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example.com/launch', use_1_3: true,
+            developer_key: tool.developer_key
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(
+            launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']
+          ).to eq({"abc" => "def", "expans" => @teacher.id})
+        end
+      end
+
       context 'tool is used for assignment_selection' do
         it 'uses secure params to pass along lti_assignment_id for 1.3' do
           lti_1_3_tool.assignment_selection = { enable: true }
@@ -714,10 +853,6 @@ describe ExternalToolsController do
           lti_assignment_id = SecureRandom.uuid
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
           get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection"}
-          lti_launch = assigns[:lti_launch]
-          decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
-          cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
-          launch_hash = JSON.parse(cached_launch)
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
         end
       end
@@ -775,6 +910,15 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_collaboration_url']).to eq api_v1_collaboration_members_url(collab)
     end
 
+    it "messages appropriately when there is a launch error because of missing permissions" do
+      user_session(@teacher)
+      tool = new_valid_tool(@course)
+      tool.settings[:course_navigation] = { 'required_permissions' => 'not-real-permissions,nor-this-one' }
+      tool.save!
+      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      expect(response).to be_unauthorized
+    end
+
     it "should remove query params when post_only is set" do
       u = user_factory(active_all: true)
       account.account_users.create!(user: u)
@@ -805,6 +949,41 @@ describe ExternalToolsController do
       jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
       get :retrieve, params: {url: tool.url, account_id:account.id, secure_params: jwt}
       expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
+    end
+
+    context 'for Quizzes Next launch' do
+      let(:assignment) { assignment_model(course: @course) }
+
+      before do
+        params = {
+          :name => "Quizzes.Next",
+          :url => 'http://example.com/launch',
+          :domain => "example.com",
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :privacy_level => 'public',
+          :tool_id => 'Quizzes 2'
+        }
+        account.context_external_tools.create!(params)
+        assignment.submission_types = 'external_tool'
+        assignment.external_tool_tag_attributes = {url: "http://example.com/launch"}
+        assignment.save!
+      end
+
+      it 'sets consistent resource_link_id with that in regular lti launch' do
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        user_session(@user)
+
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id:assignment.id,
+          url: 'http://example.com/launch'
+        }
+
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq assignment.lti_resource_link_id
+        expect(assigns[:lti_launch].params['context_id']).to eq opaque_id(@course)
+      end
     end
 
     context 'collaborations' do
@@ -1615,7 +1794,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1635,7 +1814,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1658,7 +1837,7 @@ describe ExternalToolsController do
       get :generate_sessionless_launch, params: {course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id}
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1691,7 +1870,7 @@ describe ExternalToolsController do
       }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1737,7 +1916,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1765,7 +1944,7 @@ describe ExternalToolsController do
         module_item_id: @tg.id,
         content_type: 'ContextExternalTool'}
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
       redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
@@ -1810,7 +1989,7 @@ describe ExternalToolsController do
 				controller.instance_variable_set :@access_token, login_pseudonym.user.access_tokens.create(purpose: 'test')
         get :generate_sessionless_launch, params: params
         expect(response).to be_successful
-        json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+        json = JSON.parse(response.body)
         url = URI.parse(json['url'])
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
         expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
@@ -1834,6 +2013,92 @@ describe ExternalToolsController do
           )
           get :generate_sessionless_launch, params: params
           expect(response).to be_unauthorized
+        end
+      end
+
+      context 'with a cross-shard launch' do
+        specs_require_sharding
+
+        let!(:tool) do
+          t = tool_configuration.new_external_tool(course)
+          t.save!
+          t
+        end
+
+        let(:course) do
+          course = course_model(account: account)
+          course.enroll_user(user, "StudentEnrollment", { enrollment_state: 'active' })
+          course.offer!
+          course
+        end
+
+        let(:user) { @shard2.activate {user_model(name: 'cross-shard user')} }
+        let(:developer_key) { DeveloperKey.create!(account: account) }
+        let(:account) { Account.default }
+        let(:tool_root_account) { account_model }
+        let(:access_token) { pseudonym(user).user.access_tokens.create(purpose: 'test') }
+        let(:account_host) { 'canvas-test.instructure.com' }
+        let(:tool_host) { 'canvas-test-2.instructure.com' }
+        let(:params) { {course_id: course.global_id, id: tool.global_id} }
+
+        before do
+          tool.update_attribute(:root_account_id, tool_root_account.id)
+          tool_root_account.account_domains.create!(host: tool_host)
+          account.account_domains.create!(host: account_host)
+          user_session(user)
+          controller.instance_variable_set :@access_token, access_token
+          request.host = account_host
+        end
+
+        it 'returns the lti 1.3 launch url with a session token' do
+          expect(HTTParty).to receive(:get) do |url, options|
+            expect(url).to eq "http://#{tool_host}/api/v1/courses/#{course.shard.id}~#{course.local_id}/external_tools/sessionless_launch?course_id=#{course.id}&id=#{tool.id}&redirect=true"
+            expect(options[:headers].keys).to include 'Authorization'
+          end
+
+          @shard2.activate { get :generate_sessionless_launch, params: params }
+        end
+
+        context 'with a "redirect" flag' do
+          let(:params) { {course_id: course.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when the context is not a course' do
+          let!(:tool) do
+            t = tool_configuration.new_external_tool(course.account)
+            t.save!
+            t
+          end
+
+          let(:params) { {account_id: course.account.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when an API token is not used' do
+          before { controller.instance_variable_set :@access_token, nil }
+
+          it 'does not return a sessionless launch URI' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(response).to be_unauthorized
+          end
+        end
+
+        context 'when the cross-account request fails' do
+          before { allow(HTTParty).to receive(:get).and_return(double('success?' => false)) }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
         end
       end
 
@@ -1883,7 +2148,7 @@ describe ExternalToolsController do
             assignment.line_items.destroy_all
 
             Lti::ResourceLink.where(
-              resource_link_id: assignment.lti_context_id
+              resource_link_uuid: assignment.lti_context_id
             ).destroy_all
 
             get :generate_sessionless_launch, params: params
@@ -1894,7 +2159,7 @@ describe ExternalToolsController do
           end
 
           it 'creates the missing resource link' do
-            expect(Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)).to be_present
+            expect(Lti::ResourceLink.where(resource_link_uuid: assignment.lti_context_id)).to be_present
           end
         end
       end
@@ -1913,6 +2178,7 @@ describe ExternalToolsController do
           get :generate_sessionless_launch, params: params
           json_parse['url']
         end
+
 
         let(:course) { @course }
         let(:launch_url) { 'https://www.my-tool.com/login' }
@@ -1964,7 +2230,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      json = JSON.parse(response.body)
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
 
       expect(controller).to receive(:log_asset_access).once
@@ -1981,4 +2247,172 @@ describe ExternalToolsController do
     end
   end
 
+  describe "GET 'visible_course_nav_tools'" do
+    def add_tool(name, course)
+      tool = course.context_external_tools.new(
+        name: name,
+        consumer_key: "key1",
+        shared_secret: "secret1"
+      )
+      tool.url = "http://www.example.com/basic_lti"
+      tool.use_1_3 = true
+      tool.developer_key = DeveloperKey.create!
+      tool.save!
+      tool
+    end
+
+    before :once do
+      student_in_course(:active_all => true)
+      @course1 = @course
+      course_with_teacher(:active_all => true, :user => @teacher)
+      student_in_course(:active_all => true, :user => @student)
+      @course2 = @course
+
+      @tool1 = add_tool("Course nav tool 1", @course1)
+      @tool1.course_navigation = {enabled: true}
+      @tool1.save!
+      @tool2 = add_tool("Course nav tool 2", @course1)
+      @tool2.course_navigation = {enabled: true}
+      @tool2.save!
+      @tool3 = add_tool("Course nav tool 3", @course2)
+      @tool3.course_navigation = {enabled: true}
+      @tool3.save!
+    end
+
+    it "returns a 400 response if no context_codes are provided for the batch endpoint" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:course_id => @course1.id}
+
+      message = json_parse(response.body)['message']
+      expect(response.status).to be 400
+      expect(message).to eq "Missing context_codes"
+    end
+
+    it "returns a 404 response if no context could be found for the single-context endpoint" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => 'definitely_not_a_course'}
+
+      expect(response.status).to be 404
+    end
+
+    it "returns a 400 response if any context_codes besides courses are provided" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["account_#{@course.account.id}"]}
+
+      message = json_parse(response.body)['message']
+      expect(response.status).to be 400
+      expect(message).to eq "Invalid context_codes; only `course` codes are supported"
+    end
+
+    it "returns an empty array if no courses are found or the courses found have no associated tools" do
+      course_with_teacher(:active_all => true)
+      user_session(@teacher)
+
+      get :all_visible_nav_tools, params: {:context_codes => ["course_fake"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 0
+
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 0
+    end
+
+    it "returns unauthorized if the user lacks read access to any of the supplied courses for the batch endpoint" do
+      @course2.claim!
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      assert_unauthorized
+    end
+
+    it "returns unauthorized if the user lacks read access the context for the single-context endpoint" do
+      @course2.claim!
+      user_session(@student)
+      get :visible_course_nav_tools, params: {:course_id => @course2.id}
+      assert_unauthorized
+    end
+
+    it "shows course nav tools to teacher" do
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 3
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+    end
+
+    it "shows course nav tools for the single-context endpoint" do
+      user_session(@teacher)
+      get :visible_course_nav_tools, params: {:course_id => @course1.id}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 2
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2"]
+    end
+
+    it "shows course nav tools to student" do
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}", "course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to be 3
+      expect(tools.map{|t| t['name']}).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+    end
+
+    it "only returns tools with a course navigation placement" do
+      @tool2.course_navigation = {enabled: false}
+      @tool2.save!
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.none?{|t| t['name'] == "Course nav tool 2"}).to be_truthy
+    end
+
+    it "doesn't return tools to student marked with admins visibility" do
+      @tool3.course_navigation = {enabled: true, visibility: "admins"}
+      @tool3.save!
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 1
+      expect(tools.first["name"]).to eq "Course nav tool 3"
+
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+      expect(response).to be_successful
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+
+    it "returns tools in the order they are configured in the navigation settings" do
+      saved_tabs = [
+        {id: "context_external_tool_#{@tool2.id}"},
+        {id: "context_external_tool_#{@tool1.id}"}
+      ]
+      @course1.tab_configuration = saved_tabs
+      @course1.save!
+      user_session(@teacher)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course1.id}"]}
+
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 2
+      expect(tools[0]['name']).to eq "Course nav tool 2"
+      expect(tools[1]['name']).to eq "Course nav tool 1"
+    end
+
+    it "excludes hidden tools from response for students" do
+      saved_tabs = [{id: "context_external_tool_#{@tool3.id}", hidden: true}]
+      @course2.tab_configuration = saved_tabs
+      @course2.save!
+      user_session(@student)
+      get :all_visible_nav_tools, params: {:context_codes => ["course_#{@course2.id}"]}
+
+      tools = json_parse(response.body)
+      expect(tools.count).to eq 0
+    end
+  end
 end

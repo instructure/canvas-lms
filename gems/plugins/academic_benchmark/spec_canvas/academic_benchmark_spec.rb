@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe AcademicBenchmark::Converter do
+describe AcademicBenchmark do
 
   before(:each) do
     @root_account = Account.site_admin
@@ -38,9 +38,8 @@ describe AcademicBenchmark::Converter do
     new_settings = current_settings.merge(:partner_id => "instructure", :partner_key => "secret")
     allow(@plugin).to receive(:settings).and_return(new_settings)
 
-    @level_0_browse = File.join(File.dirname(__FILE__) + '/fixtures', 'api_all_standards_response.json')
-    @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list_v3.json')
-    File.open(@level_0_browse, 'r') do |file|
+    @florida_standards = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_standards.json')
+    File.open(@florida_standards, 'r') do |file|
       @att = Attachment.create!(
         :filename => 'standards.json',
         :display_name => 'standards.json',
@@ -61,85 +60,97 @@ describe AcademicBenchmark::Converter do
 
   def verify_full_import
     @root_group = LearningOutcomeGroup.global_root_outcome_group
-    expect(@root_group.child_outcome_groups.count).to eq 2
+    expect(@root_group.child_outcome_groups.count).to eq 1
     a = @root_group.child_outcome_groups.first
-    expect(a.migration_id).to eq "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
-    expect(a.title).to eq "CCSS.ELA-Literacy.CCRA.R - Reading"
+    expect(a.migration_id).to eq "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22"
+    expect(a.title).to eq "SS.912.A - American History"
     b = a.child_outcome_groups.first
-    expect(b.migration_id).to eq "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22"
-    expect(b.title).to eq "Key Ideas and Details"
-    g = LearningOutcome.global.where(migration_id: "CEB87C92-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.1"
-    expect(g.description).to eq "Read closely to determine what the text says explicitly and to make logical" \
-      " inferences from it; cite specific textual evidence when writing or speaking to support conclusions drawn" \
-      " from the text."
-    g = LearningOutcome.global.where(migration_id: "CEB8EE66-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.2"
-    expect(g.description).to eq "Determine central ideas or themes of a text and analyze their development;" \
-      " summarize the key supporting details and ideas."
-    g = LearningOutcome.global.where(migration_id: "CEB96684-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.3"
-    expect(g.description).to eq "Analyze how and why individuals, events, and ideas develop and interact over" \
-      " the course of a text."
-    g = LearningOutcome.global.where(migration_id: "CEBAB958-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.4"
-    expect(g.description).to eq "Interpret words and phrases as they are used in a text, including determining" \
-      " technical, connotative, and figurative meanings, and analyze how specific word choices shape meaning or tone."
-    g = LearningOutcome.global.where(migration_id: "CEBB9AA8-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.5"
-    expect(g.description).to eq "Analyze the structure of texts, including how specific sentences, paragraphs," \
-      " and larger portions of the text (e.g., a section, chapter, scene, or stanza) relate to each other and" \
-      " the whole."
-    g = LearningOutcome.global.where(migration_id: "CEBC89F4-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.6"
-    expect(g.description).to eq "Assess how point of view or purpose shapes the content and style of a text."
-    g = LearningOutcome.global.where(migration_id: "CEBDDCA0-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.7"
-    expect(g.description).to eq "Integrate and evaluate content presented in diverse media and formats," \
-      " including visually and quantitatively, as well as in words."
-    g = LearningOutcome.global.where(migration_id: "CEBE4D52-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.8"
-    expect(g.description).to eq "Delineate and evaluate the argument and specific claims in a text," \
-      " including the validity of the reasoning as well as the relevance and sufficiency of the evidence."
-    g = LearningOutcome.global.where(migration_id: "CEBF37B2-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.9"
-    expect(g.description).to eq "Analyze how two or more texts address similar themes or topics in order" \
-      " to build knowledge or to compare the approaches the authors take."
-    g = LearningOutcome.global.where(migration_id: "CEC08B44-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.10"
-    expect(g.description).to eq "Read and comprehend complex literary and informational texts independently" \
-      " and proficiently."
-    g = LearningOutcome.global.where(migration_id: "CEC49A36-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.1"
-    expect(g.description).to eq "Write arguments to support claims in an analysis of substantive topics or" \
-      " texts, using valid reasoning and relevant and sufficient evidence."
-    g = LearningOutcome.global.where(migration_id: "CEC57CD0-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.2"
-    expect(g.description).to eq "Write informative/explanatory texts to examine and convey complex ideas and" \
-      " information clearly and accurately through the effective selection, organization, and analysis of content."
-    g = LearningOutcome.global.where(migration_id: "CEC665B4-67AD-11DF-AB5F-995D9DFF4B22").first
-    verify_rubric_criterion(g)
-    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.3"
-    expect(g.description).to eq "Write narratives to develop real or imagined experiences or events" \
-      " using effective technique, well-chosen details, and well-structured event sequences."
+    expect(b.migration_id).to eq "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
+    expect(b.title).to eq "SS.912.A.1 - Use research and inquiry skills to analyze America"
+    {
+      "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.1",
+          :description=>"Describe the importance of historiography, which includes how historical knowledge is obtained" \
+                        " and transmitted, when interpreting events in history."
+        },
+        "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.2",
+          :description=>"Utilize a variety of primary and secondary sources to identify author, historical significance," \
+                        " audience, and authenticity to understand a historical period."
+        },
+        "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.3",
+          :description=>"Utilize timelines to identify the time sequence of historical data."
+        },
+        "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.4",
+          :description=>"Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used" \
+                        " to interpret the significance of time periods and events from the past."
+        },
+        "AF31281A-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.5",
+          :description=>"Evaluate the validity, reliability, bias, and authenticity of current events and Internet resources."
+        },
+        "AF319610-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.6",
+          :description=>"Use case studies to explore social, political, legal, and economic relationships in history."
+        },
+        "AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.1.7",
+          :description=>"Describe various socio-cultural aspects of American life including arts, artifacts, literature, education, and publications."
+        },
+        "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.2",
+          :description=>"Understand the causes, course, and consequences of the Civil War and Reconstruction and its effects on the American people."
+        },
+        "AF359634-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.3",
+          :description=>"Analyze the transformation of the American economy and the changing social and" \
+                        " political conditions in response to the Industrial Revolution."
+        },
+        "AF3B2A72-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.4",
+          :description=>"Demonstrate an understanding of the changing role of the United States in world affairs through the end of World War I."
+        },
+        "AF3FF1EC-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.5",
+          :description=>"Analyze the effects of the changing social, political, and economic conditions of the Roaring Twenties and the Great Depression."
+        },
+        "AF4522DE-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.6",
+          :description=>"Understand the causes and course of World War II, the character of the war at home and abroad," \
+                        " and its reshaping of the United States role in the post-war world."
+        },
+        "AF4B6DB0-CCB8-11DD-A7C8-69619DFF4B22"=>
+        {
+          :short_description=>"SS.912.A.7",
+          :description=>"Understand the rise and continuing international influence of the United States as a" \
+                        " world leader and the impact of contemporary social and political movements on American life."
+        }
+    }.each do |migration_id, descriptions|
+      g = LearningOutcome.global.find_by(migration_id: migration_id)
+      verify_rubric_criterion(g)
+      expect(g.short_description).to eq descriptions[:short_description]
+      expect(g.description).to eq descriptions[:description]
+    end
   end
 
   def check_for_parent_num_duplication(outcome)
     parent = outcome.instance_variable_get('@parent')
-    if outcome.number && parent && parent.build_title && outcome.number.include?(parent.build_title)
-      outcome.title == "#{parent.title}.#{outcome.number}"
+    if outcome.resolve_number && parent && parent.build_title && outcome.resolve_number.include?(parent.build_title)
+      outcome.title == "#{parent.title}.#{outcome.resolve_number}"
     else
       false
     end
@@ -217,7 +228,7 @@ describe AcademicBenchmark::Converter do
   #    LAFS.1.L.1.1.a
   #
   it "doesn't duplicate the base numbers when building a title" do
-    json_data = JSON.parse(File.read(@florida_auth_list))
+    json_data = JSON.parse(File.read(@florida_standards))
     AcademicBenchmarks::Standards::StandardsForest.new(json_data).trees.each do |tree|
       tree.children.each do |outcome|
         check_built_outcome(outcome)
@@ -226,17 +237,23 @@ describe AcademicBenchmark::Converter do
   end
 
   it "raises error with invalid user id" do
-    expect { AcademicBenchmark.ensure_real_user(user_id: 0) }.to raise_error(Canvas::Migration::Error,
-      "Not importing academic benchmark data because no user found matching id '0'")
+    expect { AcademicBenchmark.ensure_real_user(user_id: 0) }.to raise_error(
+      Canvas::Migration::Error,
+      "Not importing academic benchmark data because no user found matching id '0'"
+    )
   end
 
   it "raises error when crendentials are not set" do
     allow(AcademicBenchmark).to receive(:config).and_return({})
-    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
-      "Not importing academic benchmark data because the Academic Benchmarks Partner ID is not set")
+    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(
+      Canvas::Migration::Error,
+      "Not importing academic benchmark data because the Academic Benchmarks Partner ID is not set"
+    )
     allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "user"})
-    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
-      "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set")
+    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(
+      Canvas::Migration::Error,
+      "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set"
+    )
   end
 
   describe '.queue_migration_for' do
@@ -247,7 +264,7 @@ describe AcademicBenchmark::Converter do
     it 'sets context with user' do
       cm = AcademicBenchmark.queue_migration_for(
         authority: 'authority',
-        document: 'document',
+        publication: 'publication',
         user: @user
       )[0]
       expect(cm.root_account_id).to eq 0

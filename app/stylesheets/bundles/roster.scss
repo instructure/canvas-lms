@@ -65,3 +65,7 @@
     margin-top: $ic-sp/2;
   }
 }
+
+.ic-Table--striped tr:nth-child(odd) .roster_user_name {
+  color: var(--ic-link-color-darkened-10);
+}

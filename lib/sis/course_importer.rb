@@ -62,7 +62,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting, homeroom_course)
         state_changes = []
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
@@ -193,6 +193,10 @@ module SIS
             end
           end
 
+          if homeroom_course
+            course.homeroom_course = Canvas::Plugin.value_to_boolean(homeroom_course)
+          end
+
           if course.changed?
             course.templated_courses.each do |templated_course|
               templated_course.root_account = @root_account
@@ -267,23 +271,22 @@ module SIS
           source: :sis,
           sis_batch: @batch
         }
-
         state_changes.each do |state_change|
           case state_change
-            when :created
-              Auditors::Course.record_created(course, @batch_user, changes, options)
-            when :updated
-              Auditors::Course.record_updated(course, @batch_user, changes, options)
-            when :concluded
-              Auditors::Course.record_concluded(course, @batch_user, options)
-            when :unconcluded
-              Auditors::Course.record_unconcluded(course, @batch_user, options)
-            when :published
-              Auditors::Course.record_published(course, @batch_user, options)
-            when :deleted
-              Auditors::Course.record_deleted(course, @batch_user, options)
-            when :restored
-              Auditors::Course.record_restored(course, @batch_user, options)
+          when :created
+            Auditors::Course.record_created(course, @batch_user, changes, options)
+          when :updated
+            Auditors::Course.record_updated(course, @batch_user, changes, options)
+          when :concluded
+            Auditors::Course.record_concluded(course, @batch_user, options)
+          when :unconcluded
+            Auditors::Course.record_unconcluded(course, @batch_user, options)
+          when :published
+            Auditors::Course.record_published(course, @batch_user, options)
+          when :deleted
+            Auditors::Course.record_deleted(course, @batch_user, options)
+          when :restored
+            Auditors::Course.record_restored(course, @batch_user, options)
           end
         end
       end

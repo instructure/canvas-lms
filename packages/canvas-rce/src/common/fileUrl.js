@@ -35,7 +35,7 @@ export function downloadToWrap(url) {
   delete parsed.search
   delete parsed.query.download_frd
   parsed.query.wrap = '1'
-  parsed.pathname = parsed.pathname.replace(/\/download\/?$/, '')
+  parsed.pathname = parsed.pathname.replace(/\/(?:download|preview)\/?$/, '')
 
   return format(parsed)
 }
@@ -90,7 +90,9 @@ export function prepEmbedSrc(url) {
   if (parsed.host && window.location.host !== parsed.host) {
     return url
   }
-  parsed.pathname = parsed.pathname.replace(/(?:\/download)?\/?(\?|$)/, '/preview$1')
+  if (!/\/preview(?:\?|$)/.test(parsed.pathname)) {
+    parsed.pathname = parsed.pathname.replace(/(?:\/download)?\/?(\?|$)/, '/preview$1')
+  }
   delete parsed.search
   delete parsed.query.wrap
   return format(parsed)

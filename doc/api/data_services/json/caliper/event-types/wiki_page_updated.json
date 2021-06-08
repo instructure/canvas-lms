@@ -1,0 +1,101 @@
+{
+  "name": "wiki_page_updated",
+  "definition": "The event is emitted anytime a wiki page is altered by an end user or API request.",
+  "trigger": "Triggered when title or body of wiki page is altered.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "body": "The body of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
+      "entity_id": "Canvas global ID of the object affected by the event"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T23:47:23.652Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:3e59b9f1-426f-4b84-b18d-e984647a38d0",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000009876",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000009876"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:wikiPage:72270000000674553",
+              "type": "Page",
+              "name": "A great wiki page",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "body": "This is wiki page text",
+                  "entity_id": "72270000000674553"
+                }
+              }
+            },
+            "eventTime": "2019-11-01T19:11:17.869Z",
+            "referrer": "https://oxana.instructure.com/courses/565/pages/collaborative-project-team-sign-up/edit",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:Learner:21070000000009876",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000009876",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Learner"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/565/pages/collaborative-project-team-sign-up",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

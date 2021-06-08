@@ -18,10 +18,11 @@
 
 import React, {useState} from 'react'
 import {func, arrayOf, oneOfType, number, shape, string} from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading, List} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-heading'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -54,29 +55,28 @@ export function LtiToolsModal(props) {
       data-mce-component
       liveRegion={getLiveRegion}
       size="medium"
+      theme={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
       open
       shouldCloseOnDocumentClick
     >
-      <Modal.Header>
+      <Modal.Header theme={{padding: '0.5rem'}}>
         <CloseButton placement="end" offset="medium" onClick={props.onDismiss}>
           {formatMessage('Close')}
         </CloseButton>
-        <Heading>{formatMessage('Select App')}</Heading>
+        <Heading margin="small">{formatMessage('All Apps')}</Heading>
+        <View as="div" padding="x-small none x-small medium">
+          <TextInput
+            type="search"
+            placeholder={formatMessage('Search')}
+            renderAfterInput={<IconSearchLine inline={false} />}
+            onChange={handleFilterChange}
+          />
+        </View>
       </Modal.Header>
       <Modal.Body overflow="fit">
-        <Flex height="35rem" as="div" direction="column">
-          <Flex.Item as="div">
-            <View as="div" borderWidth="none none small none" padding="x-small">
-              <TextInput
-                type="search"
-                renderLabel={formatMessage('Search')}
-                renderAfterInput={<IconSearchLine inline={false} />}
-                onChange={handleFilterChange}
-              />
-            </View>
-          </Flex.Item>
+        <Flex as="div" direction="column">
           <Flex.Item as="div" shouldShrink shouldGrow>
             <Alert liveRegion={getLiveRegion} variant="info" screenReaderOnly={!filterEmpty}>
               {filterEmpty && formatMessage('No results found for {filterTerm}', {filterTerm})}
@@ -96,7 +96,9 @@ export function LtiToolsModal(props) {
         </Flex>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onDismiss}>{formatMessage('Cancel')}</Button>
+        <Button onClick={props.onDismiss} color="primary">
+          {formatMessage('Done')}
+        </Button>
       </Modal.Footer>
     </Modal>
   )
@@ -106,14 +108,10 @@ export function LtiToolsModal(props) {
       <List variant="unstyled">
         {ltiButtons
           .sort((a, b) => a.title.localeCompare(b.title))
-          .map((b, i) => {
+          .map(b => {
             return (
               <List.Item key={b.id}>
-                <View
-                  as="div"
-                  borderWidth={i === 0 ? 'small none' : 'none none small none'}
-                  padding="medium"
-                >
+                <View as="div" padding="medium medium small none">
                   <LtiTool
                     title={b.title}
                     image={b.image}

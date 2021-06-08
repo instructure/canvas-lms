@@ -15,77 +15,32 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
-assignment_attempts:
-  state: hidden
-  applies_to: Course
-  display_name: Assignment Allowed Attempts
-  description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
-assignment_bulk_edit:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Assignment Bulk Editing
-  description: Allow teachers to change the dates on a set of assignments in one step
-bookmarking_for_enrollments_index:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Bookmarking for Enrollments Index API
-  description: Use bookmarking for API pagination in Enrollments Index
-submission_type_tool_placement:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Submission Type LTI Placement
-  description: |-
-    If an LTI tool configured with the placement is installed, will show a new entry in the
-    assignment submission type dropdown to quickly configure the assignment for the tool
-syllabus_course_summary_option:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: Syllabus Course Summary Option
-  description: Make the Course Summary (list of assignments and events) optional in the syllabus
-uxs_4_omg_a_scary_blueprint_checkbox:
-  state: hidden
-  display_name: Allow Blueprint Publishing After Association
-  description: |-
-    Show a checkbox that optionally lets an account admin publish courses
-    automatically after associating and syncing with a blueprint course
-  applies_to: RootAccount
-enable_fullstory:
-  state: hidden
-  display_name: Enable fullstory
-  description: |-
-    Include FullStory recording of the user's session
-  applies_to: SiteAdmin
 new_math_equation_handling:
   state: hidden
-  display_name: Updated math equation display
+  display_name: 'Math: Updated equation handling'
   description: |-
-    Replaces the existing image of the math equation plus the hidden mathml
-    with a MathJax formatted version. This provides better accessibility
+    Replaces the existing image of the math equation plus its hidden mathml
+    with a MathJax processed version. This change provides better accessibility
     and many options for the reader to interact with the equation on the page.
-  applies_to: SiteAdmin
-autocreate_attachment_from_media_object:
-  state: hidden
-  display_name: Create Files After RCE Media Upload/Recording
-  description: |-
-    Creates file objects (initially hidden to students if in a Course) after
-    media is uploaded or recorded through the RCE.
   applies_to: RootAccount
-enhanced_grade_change_query:
+inline_math_everywhere:
   state: hidden
-  display_name: Enhanced grade change auditing
-  description: Allow searching grade change audit logs by multiple criteria
-  applies_to: SiteAdmin
-new_file_url_rewriting:
-  state: hidden
-  display_name: Update file links to prefer preview, not download
+  display_name: 'Math: Support LaTex math equations almost everywhere'
   description: |-
-    Canvas rewrites file URLs in user generated content. In the process, it
-    often added "/download" where it was not wanted and inappropriate. This
-    setting updates how URL rewriting takes place to facilitate previewing
-    files within Canvas and not downloading.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: on
-    ci:
-      state: on
+    With this feature, LaTex math equations entered into most
+    text entry fields in Canvas will be processed by MathJax.
+    LaTex delimited by \(...\) become inline equations, while
+    $$...$$ will be rendered as a block.  For example,
+    you could choose to title an Assignment \(\sqrt{x}\), or
+    enter $$ax^2 + by + c = 0$$ in a submission comment.
+    This feature requires that the "Math: Updated equation handling"
+    flag is also on.
+  applies_to: RootAccount
+auto_show_cc:
+  state: allowed
+  display_name: Auto Show Closed Captions
+  description: |-
+    Automatically show closed captions in the user's current
+    language (if available) when playing canvas media.
+  applies_to: User
+  autoexpand: true

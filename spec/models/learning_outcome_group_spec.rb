@@ -35,6 +35,11 @@ describe LearningOutcomeGroup do
     text
   end
 
+  describe 'associations' do
+    it { is_expected.to belong_to(:source_outcome_group).class_name('LearningOutcomeGroup').inverse_of(:destination_outcome_groups) }
+    it { is_expected.to have_many(:destination_outcome_groups).class_name('LearningOutcomeGroup').inverse_of(:source_outcome_group).dependent(:nullify) }
+  end
+
   context 'object creation' do
     it "does not create multiple default groups" do
       group = @course.root_outcome_group
@@ -178,7 +183,7 @@ describe LearningOutcomeGroup do
   end
 
   describe '#adopt_outcome_link' do
-    it 'moves an existing outcome link from to this group if groups in same context' do
+    it 'moves an existing outcome link from to this group if groups in same context and touchs parent group' do
       group1 = @course.learning_outcome_groups.create!(:title => 'group1')
       group2 = @course.learning_outcome_groups.create!(:title => 'group2')
       outcome = @course.created_learning_outcomes.create!(:title => 'o1')
@@ -186,6 +191,7 @@ describe LearningOutcomeGroup do
 
       expect(outcome_link.associated_asset).to eq(group2)
 
+      expect(group1).to receive(:touch_parent_group)
       group1.adopt_outcome_link(outcome_link)
 
       expect(outcome_link.associated_asset).to eq(group1)
@@ -200,6 +206,19 @@ describe LearningOutcomeGroup do
 
       expect{ group1.adopt_outcome_link(outcome_link) }.
         not_to change{ outcome_link.associated_asset }
+    end
+
+    it "doesn't touch parent group if skip_parent_group_touch is true" do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      outcome_link = group2.add_outcome(outcome)
+
+      expect(outcome_link.associated_asset).to eq(group2)
+
+      expect(group1).not_to receive(:touch_parent_group)
+
+      group1.adopt_outcome_link(outcome_link, skip_parent_group_touch: true)
     end
   end
 

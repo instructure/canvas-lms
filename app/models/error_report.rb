@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'iconv'
-
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
@@ -159,7 +157,9 @@ class ErrorReport < ActiveRecord::Base
         ErrorReport.log_captured(type, exception, error_report_info)
       end
     else
-      ErrorReport.log_captured(type, exception, error_report_info)
+      (exception.try(:current_shard) || Shard.current).activate do
+        ErrorReport.log_captured(type, exception, error_report_info)
+      end
     end
   end
 

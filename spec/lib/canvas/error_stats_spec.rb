@@ -21,8 +21,18 @@ require 'spec_helper'
 require_dependency "canvas/error_stats"
 
 module Canvas
+  class FakeErrorStatsError < StandardError; end
+  class OuterErrorStatsError < StandardError; end
+
   describe ErrorStats do
     describe ".capture" do
+
+      def a_regrettable_method
+        raise FakeErrorStatsError, "you asked for this"
+      rescue FakeErrorStatsError
+        raise OuterErrorStatsError, "so it's happening"
+      end
+
       before(:each) do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
@@ -42,6 +52,24 @@ module Canvas
           expect(data[:tags][:category]).to eq("StandardError")
         end
         described_class.capture(StandardError.new, data, :warn)
+      end
+
+      it "increments the inner exception too" do
+        got_inner = false
+        got_outer = false
+        allow(InstStatsd::Statsd).to receive(:increment) do |key, data|
+          cat = data[:tags][:category]
+          got_inner = true if cat == "Canvas::FakeErrorStatsError"
+          got_outer = true if cat == "Canvas::OuterErrorStatsError"
+        end
+        begin
+          a_regrettable_method
+          raise RuntimeError, "How did we get here? More regrettable than expected..."
+        rescue OuterErrorStatsError => e
+          described_class.capture(e, {}, :warn)
+        end
+        expect(got_inner).to be_truthy
+        expect(got_outer).to be_truthy
       end
     end
   end

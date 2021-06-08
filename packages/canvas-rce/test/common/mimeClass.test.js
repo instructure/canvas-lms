@@ -66,7 +66,11 @@ describe('mimeClass', () => {
 
   it('returns value corresponding to provided `content-type`', () => {
     assert.strictEqual(mimeClass({'content-type': 'video/mp4'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'video/*'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'video'}), 'video')
     assert.strictEqual(mimeClass({'content-type': 'audio/webm'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'audio/*'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'audio'}), 'audio')
     assert.strictEqual(mimeClass({'content-type': 'image/svg+xml'}), 'image')
     assert.strictEqual(mimeClass({'content-type': 'image/webp'}), 'file')
     assert.strictEqual(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')

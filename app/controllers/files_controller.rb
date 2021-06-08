@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -152,6 +154,7 @@ class FilesController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Avatar
   include AttachmentHelper
+  include K5Mode
 
   before_action { |c| c.active_tab = "files" }
 
@@ -161,7 +164,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.temp_record, @current_user, :create)
+    if authorized_action(@context.attachments.temp_record, @current_user, [:create, :update, :delete])
       h = ActiveSupport::NumberHelper
       result = {
         :quota => h.number_to_human_size(@quota),
@@ -185,7 +188,7 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, :create)
+    if authorized_action(@context.attachments.build, @current_user, [:create, :update, :delete])
       get_quota
       render json: {quota: @quota, quota_used: @quota_used}
     end
@@ -347,8 +350,13 @@ class FilesController < ApplicationController
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @images = @context.active_images.paginate :page => params[:page]
+        if @context.grants_any_right?(
+          @current_user,
+          session,
+          :manage_files,
+          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+        )
+          @images = @context.active_images.paginate page: params[:page]
         else
           @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
         end
@@ -361,7 +369,14 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
+    if !request.format.html?
+      return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
+    end
+    if authorized_action(
+      @context,
+      @current_user,
+      [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    ) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -385,7 +400,24 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files: context.grants_right?(@current_user, session, :manage_files),
+            manage_files_add: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_add
+            ),
+            manage_files_edit: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_edit
+            ),
+            manage_files_delete: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_delete
+            ),
           },
           file_menu_tools: file_menu_tools,
           file_index_menu_tools: file_index_menu_tools
@@ -394,7 +426,7 @@ class FilesController < ApplicationController
 
       @page_title = t('files_page_title', 'Files')
       @body_classes << 'full-width padless-content'
-      js_bundle :react_files
+      js_bundle :files
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
@@ -446,9 +478,9 @@ class FilesController < ApplicationController
     @submission = Submission.active.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
-    if ((@submission && authorized_action(@submission, @current_user, :read)) || 
+    if ((@submission && authorized_action(@submission, @current_user, :read)) ||
         ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
-      render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
+      render :json => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end
 
@@ -478,9 +510,8 @@ class FilesController < ApplicationController
       return
     end
     params[:include] = Array(params[:include])
-    if authorized_action(@attachment,@current_user,:read)
+    if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
-
       json.merge!(doc_preview_json(@attachment, @current_user))
       render :json => json
     end
@@ -1025,6 +1056,7 @@ class FilesController < ApplicationController
     @attachment = @context.attachments.find(params[:id])
     @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
     return unless authorized_action(@folder, @current_user, :manage_contents) if @folder
+
     @folder ||= @attachment.folder
     @folder ||= Folder.unfiled_folder(@context)
     if authorized_action(@attachment, @current_user, :update)
@@ -1069,7 +1101,7 @@ class FilesController < ApplicationController
   # Update some settings on the specified file
   #
   # @argument name [String]
-  #   The new display name of the file
+  #   The new display name of the file, with a limit of 255 characters.
   #
   # @argument parent_folder_id [String]
   #   The id of the folder to move this file into.
@@ -1106,7 +1138,7 @@ class FilesController < ApplicationController
   # @returns File
   def api_update
     @attachment = Attachment.find(params[:id])
-    if authorized_action(@attachment,@current_user,:update)
+    if authorized_action(@attachment, @current_user, :update)
       @context = @attachment.context
       if @context && params[:parent_folder_id]
         folder = @context.folders.active.find(params[:parent_folder_id])
@@ -1117,7 +1149,7 @@ class FilesController < ApplicationController
         end
       end
 
-      @attachment.display_name = params[:name] if params.key?(:name)
+      @attachment.display_name = params[:name].truncate(255) if params.key?(:name)
       @attachment.lock_at = params[:lock_at] if params.key?(:lock_at)
       @attachment.unlock_at = params[:unlock_at] if params.key?(:unlock_at)
       @attachment.locked = value_to_boolean(params[:locked]) if params.key?(:locked)
@@ -1142,7 +1174,7 @@ class FilesController < ApplicationController
 
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
-    if authorized_action(@context, @current_user, :manage_files)
+    if authorized_action(@context, @current_user, [:manage_files, :manage_files_edit])
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
@@ -1150,7 +1182,6 @@ class FilesController < ApplicationController
       render :json => @folder.subcontent.map{ |f| f.as_json(methods: :readable_size, permissions: {user: @current_user, session: session}) }
     end
   end
-
 
   # @API Delete file
   # Remove the specified file. Unlike most other DELETE endpoints, using this
@@ -1185,6 +1216,7 @@ class FilesController < ApplicationController
     end
     if can_do(@attachment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@attachment)
+
       @attachment.destroy
       respond_to do |format|
         format.html {
@@ -1240,19 +1272,26 @@ class FilesController < ApplicationController
         else
           @context.respond_to?(:context) ? @context.context : @context
         end
-      permission_context.grants_right?(@current_user, nil, :manage_files) &&
-        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+      permission_context.grants_any_right?(
+        @current_user,
+        nil,
+        :manage_files,
+        :manage_files_edit,
+        :manage_files_delete
+      ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
   end
 
   def image_thumbnail
     cancel_cache_buster
 
+    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
+
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
     cache_key = ['thumbnail_url2', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
     url, instfs = Rails.cache.read(cache_key)
-    unless url
+    if !url || no_cache
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)

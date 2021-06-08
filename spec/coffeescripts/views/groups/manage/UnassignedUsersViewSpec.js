@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import UnassignedUsersView from 'compiled/views/groups/manage/UnassignedUsersView'
-import AssignToGroupMenu from 'compiled/views/groups/manage/AssignToGroupMenu'
-import GroupCollection from 'compiled/collections/GroupCollection'
-import UnassignedGroupUserCollection from 'compiled/collections/UnassignedGroupUserCollection'
-import Group from 'compiled/models/Group'
-import GroupCategory from 'compiled/models/GroupCategory'
+import UnassignedUsersView from 'ui/features/manage_groups/backbone/views/UnassignedUsersView.js'
+import AssignToGroupMenu from 'ui/features/manage_groups/backbone/views/AssignToGroupMenu.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
+import UnassignedGroupUserCollection from '@canvas/groups/backbone/collections/UnassignedGroupUserCollection.coffee'
+import Group from '@canvas/groups/backbone/models/Group.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
 

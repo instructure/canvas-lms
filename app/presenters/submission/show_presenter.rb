@@ -1,4 +1,5 @@
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -20,17 +21,18 @@ class Submission::ShowPresenter
   include Rails.application.routes.url_helpers
   include ApplicationHelper
 
-  def initialize(submission:, current_user:, assessment_request: nil)
+  def initialize(submission:, current_user:, assessment_request: nil, current_host: nil)
     @submission = submission
     @current_user = current_user
     @assessment_request = assessment_request
 
     @assignment = @submission.assignment
     @context = @assignment.context
+    @current_host = current_host
   end
 
   def default_url_options
-    { protocol: HostUrl.protocol, host: HostUrl.context_host(@context.root_account) }
+    { protocol: HostUrl.protocol, host: find_host }
   end
 
   # NB: Currently this method assumes that the only possible source of anonymity
@@ -68,6 +70,18 @@ class Submission::ShowPresenter
     context_url(@context, submission_route, @assignment.id, anonymizable_student_id, **additional_params)
   end
 
+  def submission_details_tool_launch_url
+    params = {
+      assignment_id: @assignment.id,
+      display: 'borderless',
+      url: @submission.external_tool_url
+    }
+
+    params[:resource_link_lookup_uuid] = resource_link_lookup_uuid if resource_link_lookup_uuid
+
+    retrieve_course_external_tools_url(@context.id, params)
+  end
+
   def submission_preview_frame_url
     submission_data_url(preview: 1, rand: rand(999999))
   end
@@ -85,11 +99,22 @@ class Submission::ShowPresenter
   end
 
   private
+
   def anonymizable_student_id
     anonymize_submission_owner? ? @submission.anonymous_id : @submission.user_id
   end
 
   def viewing_as_grader?
     !currently_peer_reviewing? && @context.grants_right?(@current_user, :manage_grades)
+  end
+
+  def resource_link_lookup_uuid
+    @submission.resource_link_lookup_uuid
+  end
+
+  def find_host
+    return HostUrl.context_host(@context.root_account) unless @current_host
+
+    HostUrl.context_host(@context.root_account, @current_host)
   end
 end

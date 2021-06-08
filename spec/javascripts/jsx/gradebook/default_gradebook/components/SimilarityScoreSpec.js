@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SimilarityScore from 'jsx/gradebook/default_gradebook/components/SimilarityScore'
+import SimilarityScore from 'ui/features/gradebook/react/default_gradebook/components/SimilarityScore.js'
 
 QUnit.module('SimilarityScore', moduleHooks => {
   let $container

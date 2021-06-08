@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Canvas is Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -364,6 +366,7 @@ class SisImportsApiController < ApplicationController
   include Api::V1::SisImport
   include Api::V1::Progress
 
+
   def check_account
     return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
     return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import
@@ -375,6 +378,8 @@ class SisImportsApiController < ApplicationController
   #
   # @argument created_since [Optional, DateTime]
   #   If set, only shows imports created after the specified date (use ISO8601 format)
+  # @argument created_before [Optional, DateTime]
+  #   If set, only shows imports created before the specified date (use ISO8601 format)
   #
   # @argument workflow_state[] [String, "initializing"|"created"|"importing"|"cleanup_batch"|"imported"|"imported_with_messages"|"aborted"|"failed"|"failed_with_messages"|"restoring"|"partially_restored"|"restored"]
   #   If set, only returns imports that are in the given state.
@@ -389,6 +394,9 @@ class SisImportsApiController < ApplicationController
       scope = @account.sis_batches.order('created_at DESC')
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
+      end
+      if (created_before = CanvasTime.try_parse(params[:created_before]))
+        scope = scope.where("created_at < ?", created_before)
       end
 
       state = Array(params[:workflow_state])&['initializing', 'created', 'importing', 'cleanup_batch', 'imported', 'imported_with_messages',
@@ -521,6 +529,14 @@ class SisImportsApiController < ApplicationController
   #   If diffing_drop_status is passed, this SIS import will use this status for
   #   enrollments that are not included in the sis_batch. Defaults to 'deleted'
   #
+  # @argument batch_mode_enrollment_drop_status [String, "deleted"|"completed"|"inactive"]
+  #   If batch_mode_enrollment_drop_status is passed, this SIS import will use
+  #   this status for enrollments that are not included in the sis_batch. This
+  #   will have an effect if multi_term_batch_mode is set. Defaults to 'deleted'
+  #   This will still mark courses and sections that are not included in the
+  #   sis_batch as deleted, and subsequently enrollments in the deleted courses
+  #   and sections as deleted.
+  #
   # @argument change_threshold [Integer]
   #   If set with batch_mode, the batch cleanup process will not run if the
   #   number of items deleted is higher than the percentage set. If set to 10
@@ -637,6 +653,10 @@ class SisImportsApiController < ApplicationController
         if params[:diffing_drop_status].present?
           batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
+        end
+        if params[:batch_mode_enrollment_drop_status].present?
+          batch.options[:batch_mode_enrollment_drop_status] = (Array(params[:batch_mode_enrollment_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
+          return render json: {message: 'Invalid batch_mode_enrollment_drop_status'}, status: :bad_request unless batch.options[:batch_mode_enrollment_drop_status]
         end
       end
 

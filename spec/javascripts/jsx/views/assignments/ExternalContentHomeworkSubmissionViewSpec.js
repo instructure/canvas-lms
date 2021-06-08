@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ExternalContentHomeworkSubmissionView from 'compiled/views/assignments/ExternalContentHomeworkSubmissionView'
+import Backbone from '@canvas/backbone'
+import ExternalContentHomeworkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentHomeworkSubmissionView.coffee'
 
 function newView() {
   const view = new ExternalContentHomeworkSubmissionView()

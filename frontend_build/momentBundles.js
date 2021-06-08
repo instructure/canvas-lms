@@ -33,7 +33,7 @@ const momentLocaleBundles = glob
   }, {})
 
 customMomentLocales.forEach(locale => {
-  const filename = `custom_moment_locales/${locale.replace('-', '_')}.js`
+  const filename = path.resolve(__dirname, `../ui/ext/custom_moment_locales/${locale.replace('-', '_')}.js`)
   momentLocaleBundles[`moment/locale/${locale}`] = filename
 })
 

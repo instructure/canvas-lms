@@ -42,6 +42,7 @@ export const itemShape = {
 
 export const opportunityShape = {
   items: PropTypes.arrayOf(PropTypes.object),
+  missingItemsExpanded: PropTypes.bool,
   nextUrl: PropTypes.string
 }
 

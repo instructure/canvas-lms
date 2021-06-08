@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 class MarkDonePresenter
+  attr_reader :module, :item
 
   def initialize(ctrl, context, module_item_id, user, asset)
     @ctrl = ctrl

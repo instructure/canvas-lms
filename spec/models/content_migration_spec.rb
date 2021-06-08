@@ -768,9 +768,9 @@ describe ContentMigration do
 
   context 'Quizzes.Next CC import' do
     before do
-      allow(@cm.root_account).
+      allow(@cm.context).
         to receive(:feature_enabled?).
-        with(:import_to_quizzes_next).
+        with(:quizzes_next).
         and_return(true)
       allow(@cm.migration_settings).
         to receive(:[]).
@@ -789,6 +789,77 @@ describe ContentMigration do
         to receive(:new).and_return(importer)
       expect(importer).to receive(:import_content)
       @cm.import!({})
+    end
+  end
+
+  context "migration issues" do
+    let(:err){ StandardError.new("TestError") }
+
+    it "doesn't overreeact to todo issues" do
+      expect{
+        @cm.add_todo("test todo", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "doesn't overreeact to warning issues" do
+      expect{
+        @cm.add_warning("test warn", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "reports error issues appropriately" do
+      expect{
+        @cm.add_error("test error", {exception: err})
+      }.to change{ ErrorReport.count }.by(1)
+    end
+
+    it "accepts downgrades for real errors" do
+      expect{
+        @cm.add_error("test error", {exception: err, issue_level: :warning})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "accepts issue level option when failing a migration" do
+      expect{
+        @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
+      }.to change{ ErrorReport.count }.by(0)
+    end
+  end
+
+  describe "imported_migration_items_for_insert_type" do
+    it "does not explode if the import type isn't in the migration item hash" do
+      @cm.migration_settings[:insert_into_module_type] = "assignment"
+      output = @cm.imported_migration_items_for_insert_type
+      expect(output).to eq([])
+    end
+  end
+
+  describe "import_class_name" do
+    it "converts various forms of name to the proper AR class name" do
+      expect(ContentMigration.import_class_name('assignment')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('assignments')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('announcement')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('announcements')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('attachment')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('attachments')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('file')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('files')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('quiz')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('module_item')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('module_items')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tag')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tags')).to eq 'ContentTag'
     end
   end
 end

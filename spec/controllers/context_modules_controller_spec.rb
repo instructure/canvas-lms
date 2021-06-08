@@ -46,6 +46,47 @@ describe ContextModulesController do
       expect(response).to be_successful
     end
 
+    it "@combined_active_quizzes should return id, title, type for all classic and lti quizzes sorted by title" do
+      user_session(@teacher)
+      q1 = @course.quizzes.create!(title: 'A')
+      q2 = @course.quizzes.create!(title: 'C')
+      a1 = new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes = controller.instance_variable_get(:@combined_active_quizzes)
+      expect(combined_active_quizzes).to eq [
+        [q1.id, 'A', 'quiz'],
+        [a1.id, 'B', 'assignment'],
+        [q2.id, 'C', 'quiz']
+      ]
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return true when classic and new quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq true
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only classic quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only new quizzes are included" do
+      user_session(@teacher)
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
     it "should touch modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do
@@ -468,9 +509,9 @@ describe ContextModulesController do
       expect(tagB).to be_published
       tagA = m1.add_item({type: "wiki_page", id: pageA.id}, nil, position: 2)
       expect(tagA).to be_unpublished
-      expect(m1.reload.content_tags.order(:position).pluck(:id)).to eq [tagB.id, tagA.id]
+      expect(m1.reload.content_tags.ordered.pluck(:id)).to eq [tagB.id, tagA.id]
       post 'reorder_items', params: {course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"}
-      tags = m1.reload.content_tags.order(:position).to_a
+      tags = m1.reload.content_tags.ordered.to_a
       expect(tags.map(&:position)).to eq [1, 2]
       expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -129,6 +131,11 @@ require 'atom'
 #           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
+#         },
+#         "users": {
+#           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned).  If you need to capture all the users in a group with certainty consider using the paginated /api/v1/groups/<group_id>/memberships endpoint.",
+#           "type": "array",
+#           "items": { "$ref": "User" }
 #         }
 #       }
 #     }
@@ -141,6 +148,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
   include Context
+  include K5Mode
 
   SETTABLE_GROUP_ATTRIBUTES = %w(
     name description join_level is_public group_category avatar_attachment
@@ -201,6 +209,7 @@ class GroupsController < ApplicationController
   #
   # @returns [Group]
   def index
+
     return context_index if @context
     includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
@@ -253,6 +262,9 @@ class GroupsController < ApplicationController
                              eager_load(:group_category).preload(:root_account)
 
     unless api_request?
+      # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
+      return unless tab_enabled?(Course::TAB_PEOPLE)
+
       if @context.is_a?(Account)
         user_crumb = t('#crumbs.users', "Users")
         set_active_tab "users"
@@ -289,7 +301,8 @@ class GroupsController < ApplicationController
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
                  allow_self_signup: @allow_self_signup,
-                 group_csv_import_enabled: @domain_root_account.feature_enabled?(:import_groups_by_csv)
+                 context_class_name: @context.class.name
+
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
             js_env(:student_section_count => @context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id))
@@ -312,7 +325,7 @@ class GroupsController < ApplicationController
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
-        if value_to_boolean(params[:only_own_groups])
+        if value_to_boolean(params[:only_own_groups]) || !tab_enabled?(Course::TAB_PEOPLE, no_render: true)
           all_groups = all_groups.merge(@current_user.current_groups)
         end
         @paginated_groups = Api.paginate(all_groups, self, path)

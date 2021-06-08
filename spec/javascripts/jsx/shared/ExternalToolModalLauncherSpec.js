@@ -20,7 +20,7 @@ import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
+import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {Modal} from '@instructure/ui-modal'
 
 const defaultWidth = 700

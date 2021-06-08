@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor, cleanup} from '@testing-library/react'
-import {act} from 'react-dom/test-utils'
+import {act, render, fireEvent, waitFor, cleanup} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 
 afterEach(cleanup)
@@ -200,6 +199,66 @@ describe('UploadFile: ComputerPanel', () => {
 
       const player = await waitFor(() => getByLabelText('Video Player'))
       expect(player).toBeInTheDocument()
+    })
+
+    it('Renders a video icon if afile type is a video/avi', async () => {
+      // because avi videos won't load in the player via a blob url
+      const aFile = new File(['foo'], 'foo.avi', {
+        type: 'video/avi'
+      })
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={() => {}}
+          setError={() => {}}
+          hasUploadedFile
+          label="Upload File"
+          accept="avi"
+          languages={[{id: 'en', label: 'english'}]}
+        />
+      )
+      const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
+      expect(warningMsg).toBeInTheDocument()
+    })
+
+    it('Renders a video icon if afile type is a video/x-ms-wma', async () => {
+      // because wma videos won't load in the player via a blob url
+      const aFile = new File(['foo'], 'foo.wma', {
+        type: 'video/x-ms-wma'
+      })
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={() => {}}
+          setError={() => {}}
+          hasUploadedFile
+          label="Upload File"
+          accept="avi"
+          languages={[{id: 'en', label: 'english'}]}
+        />
+      )
+      const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
+      expect(warningMsg).toBeInTheDocument()
+    })
+
+    it('Renders a video icon if afile type is a video/x-ms-wmv', async () => {
+      // because wmv videos won't load in the player via a blob url
+      const aFile = new File(['foo'], 'foo.wmv', {
+        type: 'video/x-ms-wmv'
+      })
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={() => {}}
+          setError={() => {}}
+          hasUploadedFile
+          label="Upload File"
+          accept="avi"
+          languages={[{id: 'en', label: 'english'}]}
+        />
+      )
+      const warningMsg = await waitFor(() => getByText('No preview is available for this file.'))
+      expect(warningMsg).toBeInTheDocument()
     })
 
     it('Renders an error message when trying to upload an empty file', async () => {

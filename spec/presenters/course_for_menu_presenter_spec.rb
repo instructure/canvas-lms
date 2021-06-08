@@ -89,6 +89,23 @@ describe CourseForMenuPresenter do
       expect(h[:isFavorited]).to eq false
     end
 
+    it 'sets the published value' do
+      cs_presenter = CourseForMenuPresenter.new(course, user, account)
+      expect(cs_presenter.to_h.key?(:published)).to eq true
+    end
+
+    context 'with `homeroom_course` setting enabled' do
+      before do
+        course.update! homeroom_course: true
+      end
+
+      it 'sets `isHomeroom` to `true`' do
+        cs_presenter = CourseForMenuPresenter.new(course, user, account)
+        h = cs_presenter.to_h
+        expect(h[:isHomeroom]).to eq true
+      end
+    end
+
     context 'with the `unpublished_courses` FF enabled' do
       before(:each) do
         course.root_account.enable_feature!(:unpublished_courses)
@@ -98,10 +115,29 @@ describe CourseForMenuPresenter do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
         expect(h.key?(:published)).to eq true
-        expect(h.key?(:canChangeCourseState)).to eq true
+        expect(h.key?(:canChangeCoursePublishState)).to eq true
         expect(h.key?(:defaultView)).to eq true
         expect(h.key?(:pagesUrl)).to eq true
         expect(h.key?(:frontPageTitle)).to eq true
+      end
+    end
+
+    context 'course color' do
+      before do
+        course.update! settings: course.settings.merge(course_color: '#789')
+      end
+
+      it 'sets `color` to nil if the course is not associated with a K-5 account' do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to be_nil
+      end
+
+      it 'sets `color` if the course is associated with a K-5 account' do
+        course.account.settings[:enable_as_k5_account] = { value: true }
+        course.account.save!
+
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:color]).to eq '#789'
       end
     end
 

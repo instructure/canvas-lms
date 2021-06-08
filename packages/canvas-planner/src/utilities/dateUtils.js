@@ -32,14 +32,6 @@ function getTodaysDetails() {
   return {today, yesterday, tomorrow}
 }
 
-function isSpecialDay(date) {
-  const {today, yesterday, tomorrow} = getTodaysDetails()
-  const momentizedDate = new moment(date)
-
-  const specialDates = [today, yesterday, tomorrow]
-  return specialDates.some(sd => sd.isSame(momentizedDate, 'day'))
-}
-
 export function isToday(date, today = moment()) {
   const momentizedDate = new moment(date)
   return today.isSame(momentizedDate, 'day')
@@ -56,6 +48,18 @@ export function isTodayOrBefore(date, today = moment()) {
   // moment.isSameOrBefore isn't available until moment 2.11, but until we get off
   // all of ui-core, it ends up pulling in an earlier version.
   // return momentizedDate.isSameOrBefore(today, 'day');
+}
+
+export function isDay(date, target) {
+  const momentizedDate = new moment(date)
+  const momentizedTarget = new moment(target)
+  return momentizedDate.isSame(momentizedTarget, 'day')
+}
+
+export function isThisWeek(day) {
+  const thisWeekStart = new moment().startOf('week')
+  const thisWeekEnd = new moment().endOf('week')
+  return isInMomentRange(new moment(day), thisWeekStart, thisWeekEnd)
 }
 
 // determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
@@ -85,21 +89,43 @@ export function getFriendlyDate(date) {
   }
 }
 
+export function getDynamicFullDate(date, timeZone) {
+  const today = moment().tz(timeZone)
+  const momentizedDate = moment(date)
+  return new Intl.DateTimeFormat(moment.locale(), {
+    year: date.isSame(today, 'year') ? undefined : 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone
+  }).format(momentizedDate.toDate())
+}
+
 export function getFullDate(date) {
-  if (isSpecialDay(date)) {
-    return moment(date).format('dddd, MMMM D')
-  } else {
-    return moment(date).format('MMMM D, YYYY')
-  }
+  return moment(date).format('MMMM D, YYYY')
 }
 
 export function getShortDate(date) {
   return moment(date).format('MMMM D')
 }
 
+export function getDynamicFullDateAndTime(date, timeZone) {
+  const today = moment().tz(timeZone)
+  const momentizedDate = moment(date)
+  const dateFormatter = new Intl.DateTimeFormat(moment.locale(), {
+    year: date.isSame(today, 'year') ? undefined : 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone
+  })
+  return formatMessage('{date} at {time}', {
+    date: dateFormatter.format(momentizedDate.toDate()),
+    time: momentizedDate.format('LT')
+  })
+}
+
 export function getFullDateAndTime(date) {
   const {today, yesterday, tomorrow} = getTodaysDetails()
-  const momentizedDate = new moment(date)
+  const momentizedDate = moment(date)
 
   if (isToday(date, today)) {
     return formatMessage('Today at {date}', {date: momentizedDate.format('LT')})
@@ -160,10 +186,7 @@ export function formatDayKey(date) {
 }
 
 export function getFirstLoadedMoment(days, timeZone) {
-  if (!days.length)
-    return moment()
-      .tz(timeZone)
-      .startOf('day')
+  if (!days.length) return moment().tz(timeZone).startOf('day')
   const firstLoadedDay = days[0]
   const firstLoadedItem = firstLoadedDay[1][0]
   if (firstLoadedItem) return firstLoadedItem.dateBucketMoment.clone()
@@ -171,10 +194,7 @@ export function getFirstLoadedMoment(days, timeZone) {
 }
 
 export function getLastLoadedMoment(days, timeZone) {
-  if (!days.length)
-    return moment()
-      .tz(timeZone)
-      .startOf('day')
+  if (!days.length) return moment().tz(timeZone).startOf('day')
   const lastLoadedDay = days[days.length - 1]
   const loadedItem = lastLoadedDay[1][0]
   if (loadedItem) return loadedItem.dateBucketMoment.clone()

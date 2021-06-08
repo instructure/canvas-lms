@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -16,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :development, :test do
-  gem 'dress_code', '1.2.0'
+  gem 'dress_code', '1.2.1'
     gem 'colored', '1.2', require: false
     gem 'colorize', '0.8.1', require: false
     gem 'mustache', '1.1.1', require: false
     gem 'pygments.rb', '1.2.1', require: false
   gem 'bluecloth', '2.2.0' # for generating api docs
-  gem 'yard', '0.9.24'
+  gem 'yard', '0.9.25'
   gem 'yard-appendix', '0.1.8'
 end

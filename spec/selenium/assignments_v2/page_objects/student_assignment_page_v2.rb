@@ -35,8 +35,8 @@ class StudentAssignmentPageV2
       f("svg[name='IconLock']")
     end
 
-    def checkmark_icon
-      f('svg[name="IconCheckMark"]')
+    def submission_workflow_tracker
+      f("div[data-testid='submission-workflow-tracker']")
     end
 
     def assignment_title(title)
@@ -71,8 +71,20 @@ class StudentAssignmentPageV2
       fj('button:contains("Send Comment")')
     end
 
-    def comments_tab
-      fj('[role="tab"]:contains("Comments")')
+    def view_feedback_button
+      fj('button:contains("View Feedback")')
+    end
+
+    def view_feedback_badge
+      f('div[data-testid="unread_comments_badge"]')
+    end
+
+    def tray_close_button
+      f("span[data-testid='tray-close-button']")
+    end
+
+    def load_more_comments_button
+      f("div[class='load-more-comments-button-container']")
     end
 
     def comment_text_area
@@ -111,14 +123,26 @@ class StudentAssignmentPageV2
       f('.mce-container iframe')['id']
     end
 
+    def tiny_rce_ifr_id
+      f('.tox-editor-container iframe')['id']
+    end
+
+    def wiki_body
+      f('#tinymce')
+    end
+
     def text_draft_contents
-      in_frame mce_iframe_id do
-        f('.mce-content-body').text
+      in_frame tiny_rce_ifr_id do
+        wiki_body.text
       end
     end
 
     def record_upload_button
       f("button[data-testid='media-modal-launch-button']")
+    end
+
+    def media_comment_button
+      f("button[id='mediaCommentButton']")
     end
 
     def media_modal
@@ -137,7 +161,7 @@ class StudentAssignmentPageV2
     def create_text_entry_draft(text)
       start_text_entry_button.click
       wait_for_tiny(text_entry_area)
-      text_entry_area.send_keys(text)
+      type_in_tiny('textarea', text)
       save_text_entry_button.click
     end
 

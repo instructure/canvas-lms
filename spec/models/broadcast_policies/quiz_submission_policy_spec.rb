@@ -24,7 +24,7 @@ module BroadcastPolicies
   describe QuizSubmissionPolicy do
 
     let(:course) do
-      instance_double("Course", available?: true, id: 1, post_policies_enabled?: false)
+      instance_double("Course", available?: true, id: 1)
     end
     let(:assignment) do
       instance_double("Assignment", context: course)
@@ -81,7 +81,6 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
-      specify { wont_send_when { allow(quiz).to receive(:muted?).and_return true } }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
       specify { wont_send_when { allow(quiz_submission).to receive(:user).and_return nil } }
@@ -90,14 +89,6 @@ module BroadcastPolicies
       specify do
         wont_send_when do
           allow(quiz_submission).to receive(:changed_state_to).with(:complete).and_return false
-        end
-      end
-
-      context "with post policies" do
-        before { allow(course).to receive(:post_policies_enabled?).and_return true }
-
-        it 'is true when the dependent inputs are true' do
-          expect(policy).to be_should_dispatch_submission_graded
         end
       end
     end
@@ -150,7 +141,6 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
-      specify { wont_send_when { allow(quiz).to receive(:muted?).and_return true } }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
       specify { wont_send_when { allow(submission).to receive(:graded_at).and_return nil }}
@@ -165,8 +155,6 @@ module BroadcastPolicies
       end
 
       context "with post policies" do
-        before { allow(course).to receive(:post_policies_enabled?).and_return true }
-
         specify { wont_send_when { allow(quiz_submission).to receive(:posted?).and_return false } }
 
         it 'is true when the dependent inputs are true' do

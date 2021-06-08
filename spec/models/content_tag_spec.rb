@@ -810,4 +810,34 @@ describe ContentTag do
       end
     end
   end
+
+  describe 'quiz_lti' do
+    it 'returns true when the assignment content is quiz_lti' do
+      course_factory
+      assignment = new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      tag = ContentTag.create!(context: @course, content: assignment)
+      expect(tag.quiz_lti).to be true
+    end
+
+    it 'returns false if the assignment content is not quiz_lti' do
+      course_factory
+      assignment = course_factory.assignments.create!
+      tag = ContentTag.new(context: @course, content_type: "Assignment", content: assignment)
+      expect(tag.quiz_lti).to be false
+    end
+  end
+
+  describe 'json' do
+    it 'includes quiz_lti when running to_json' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(tag.to_json).to include('quiz_lti')
+    end
+
+    it 'includes quiz_lti when running as_json' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(tag.as_json["content_tag"]).to include('quiz_lti' => false)
+    end
+  end
 end

@@ -24,3 +24,25 @@ require_migration_to_new_quizzes:
   applies_to: RootAccount
   state: hidden
   beta: true
+new_quizzes_modules_support:
+  display_name: New Quizzes support for Modules
+  description: Improved New Quizzes support with Modules including creating New Quizzes from Modules
+  applies_to: SiteAdmin
+  state: hidden
+new_quizzes_assignment_build_button:
+  display_name: New Quizzes Assignment Build Button
+  description: Add a Build button on the Assignment edit page for New Quizzes Assignments
+  applies_to: SiteAdmin
+  state: hidden
+new_quizzes_bank_migrations:
+  display_name: New Quizzes Banks Migrations
+  description: Enable migrating item banks to New Quizzes during course import/copy
+  applies_to: SiteAdmin
+  state: hidden
+new_quizzes_account_course_level_item_banks:
+  display_name: New Quizzes Account and Course Level Item Banks
+  description: |-
+    If new quizzes is enabled, this allows for the creation and management of item
+    banks owned by specific courses and the root account in new quizzes.
+  applies_to: SiteAdmin
+  state: hidden

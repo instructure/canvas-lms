@@ -20,6 +20,7 @@ import axios from 'axios'
 import K5Uploader from '@instructure/k5uploader'
 
 export const VIDEO_SIZE_OPTIONS = {height: '432px', width: '768px'}
+const STARTING_PROGRESS_VALUE = 33
 
 function generateUploadOptions(mediatypes, sessionData) {
   const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
@@ -42,6 +43,13 @@ function addUploaderReadyEventListeners(uploader, file) {
   })
 }
 
+function addUploaderProgressEventListeners(uploader, onProgress) {
+  uploader.addEventListener('K5.progress', progress => {
+    const percentUploaded = Math.round(progress.loaded / progress.total) * STARTING_PROGRESS_VALUE
+    onProgress(STARTING_PROGRESS_VALUE + percentUploaded)
+  })
+}
+
 function addUploaderFileErrorEventListeners(uploader, done, file) {
   uploader.addEventListener('K5.fileError', error => {
     uploader.destroy()
@@ -49,7 +57,7 @@ function addUploaderFileErrorEventListeners(uploader, done, file) {
   })
 }
 
-function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
+function addUploaderFileCompleteEventListeners(uploader, context, file, done, onProgress) {
   uploader.addEventListener('K5.complete', async mediaServerMediaObject => {
     mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
     mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
@@ -67,7 +75,17 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
     }
 
     try {
-      const canvasMediaObject = await axios.post('/api/v1/media_objects', body)
+      const config = {
+        onUploadProgress: progressEvent => {
+          const startingValue = 2 * STARTING_PROGRESS_VALUE
+          const percentUploaded =
+            Math.round(progressEvent.loaded / progressEvent.total) * (STARTING_PROGRESS_VALUE + 1)
+          if (onProgress) {
+            onProgress(startingValue + percentUploaded)
+          }
+        }
+      }
+      const canvasMediaObject = await axios.post('/api/v1/media_objects', body, config)
       uploader.destroy()
       doDone(done, null, {mediaObject: canvasMediaObject.data, uploadedFile: file})
     } catch (ex) {
@@ -77,48 +95,82 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
   })
 }
 
-export default async function saveMediaRecording(file, contextId, contextType, done) {
+export default async function saveMediaRecording(file, rcsConfig, done, onProgress) {
   try {
     window.addEventListener('beforeunload', handleUnloadWhileUploading)
-    const mediaServerSession = await axios.post(
-      '/api/v1/services/kaltura_session?include_upload_config=1'
-    )
+
+    const mediaServerSession = await axios({
+      method: 'POST',
+      url: `${rcsConfig.origin}/api/v1/services/kaltura_session?include_upload_config=1`,
+      headers: rcsConfig.headers
+    })
+    if (onProgress) {
+      onProgress(STARTING_PROGRESS_VALUE)
+    }
     const session = generateUploadOptions(
       ['video', 'audio', 'webm', 'video/webm', 'audio/webm'],
       mediaServerSession.data
     )
     const k5UploaderSession = new K5Uploader(session)
     addUploaderReadyEventListeners(k5UploaderSession, file)
+    if (onProgress) {
+      addUploaderProgressEventListeners(k5UploaderSession, onProgress)
+    }
     addUploaderFileErrorEventListeners(k5UploaderSession, done, file)
-    addUploaderFileCompleteEventListeners(k5UploaderSession, {contextId, contextType}, file, done)
+    addUploaderFileCompleteEventListeners(k5UploaderSession, rcsConfig, file, done, onProgress)
     return k5UploaderSession
   } catch (err) {
     doDone(done, err, {uploadedFile: file})
   }
 }
 
-export async function saveClosedCaptions(mediaId, files) {
-  const axiosRequests = []
-  files.forEach(function(file) {
-    const p = new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = function(e) {
-        const content = e.target.result
-        const params = {
-          content,
-          locale: file.locale,
-          'exclude[]': 'sources'
+/*
+ * @media_object_id: id of the media_object we're assigning CC to
+ * @subtitles: [{locale: string locale, file: JS File object}]
+ * @rcsConfig: {origin, headers, method} where method=PUT for update or POST for create
+ */
+export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig) {
+  // read all the subtitle files' contents
+  const file_promises = []
+  subtitles.forEach(st => {
+    if (st.isNew) {
+      const p = new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = function (e) {
+          resolve({locale: st.locale, content: e.target.result})
         }
-        axios
-          .post(`/media_objects/${mediaId}/media_tracks`, params)
-          .then(resolve)
-          .catch(reject)
-      }
-      reader.readAsText(file.file)
-    })
-    axiosRequests.push(p)
+        reader.onerror = function (e) {
+          e.target.abort()
+          reject(e.target.error || e)
+        }
+        reader.readAsText(st.file)
+      })
+      file_promises.push(p)
+    } else {
+      file_promises.push(Promise.resolve({locale: st.locale}))
+    }
   })
-  return Promise.all(axiosRequests)
+
+  // once all the promises from reading the subtitles' files
+  // have resolved, PUT/POST the resulting subtitle objects to the RCS
+  // when that completes, the update_promise will resolve
+  const update_promise = new Promise((resolve, reject) => {
+    Promise.all(file_promises)
+      .then(closed_captions => {
+        axios({
+          method: rcsConfig.method || 'PUT',
+          url: `${rcsConfig.origin}/api/media_objects/${media_object_id}/media_tracks`,
+          headers: rcsConfig.headers,
+          data: closed_captions
+        })
+          .then(resolve)
+          .catch(e => {
+            reject(e)
+          })
+      })
+      .catch(e => reject(e))
+  })
+  return update_promise
 }
 
 function doDone(done, ...rest) {

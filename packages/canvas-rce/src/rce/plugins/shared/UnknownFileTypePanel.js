@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import formatMessage from '../../../format-message'
 
 export default function UnknownFileTypePanel() {

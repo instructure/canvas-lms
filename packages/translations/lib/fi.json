@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "rengasta järjestämätön luettelo"
     },
+    "clear_2084585f": {
+        "message": "Tyhjennä"
+    },
     "clear_selected_file_82388e50": {
         "message": "Tyhjennä valittu tiedosto"
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "upotettu sisältö"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Kirjoita vähintään 3 merkkiä ja tee haku"
     },
     "equation_1c5ac93c": {
         "message": "Yhtälö"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Ladataan kalenterin kohteita"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Ladataan, odota"
     },
     "location_3b6ff307": {
         "message": "Sijainti:"

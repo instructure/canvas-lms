@@ -44,6 +44,10 @@ module Lti
       )
     end
 
+    def self.deregister_expansion(name)
+      @expansions.delete "$#{name}".to_sym
+    end
+
     def self.expansions
       @expansions || {}
     end
@@ -90,8 +94,8 @@ module Lti
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
-    EDITOR_CONTENTS_GAURD = -> { @editor_contents.present? }
-    EDITOR_SELECTION_GAURD = -> { @editor_contents.present? }
+    EDITOR_GUARD = -> { @editor_contents.present? }
+    STUDENT_ASSIGNMENT_GUARD = -> { @context.is_a?(Course) && @context.user_is_student?(@current_user) && @assignment }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -176,7 +180,7 @@ module Lti
     #   [ "Section 1", "Section 5", "TA Section"]
     #   ```
     register_expansion 'com.instructure.User.sectionNames', [],
-                       -> { Enrollment.active.joins(:course_section).where(user_id: @current_user.id, course_id: @context.id).pluck(:name) },
+                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.join(',') },
                        ENROLLMENT_GUARD,
                        default_name: 'com_instructure_user_section_names'
 
@@ -211,9 +215,9 @@ module Lti
     #   "This text was in the editor"
     #   ```
     register_expansion 'com.instructure.Editor.contents', [],
-                      -> { @editor_contents},
-                      EDITOR_CONTENTS_GAURD,
-                      default_name: 'com_instructure_editor_contents'
+                       -> { @editor_contents},
+                       EDITOR_GUARD,
+                       default_name: 'com_instructure_editor_contents'
 
     # The contents the user has selected in the text editor associated
     # with the content item launch.
@@ -223,9 +227,9 @@ module Lti
     #   "this text was selected by the user"
     #   ```
     register_expansion 'com.instructure.Editor.selection', [],
-                      -> { @editor_selection },
-                      EDITOR_SELECTION_GAURD,
-                      default_name: 'com_instructure_editor_selection'
+                       -> { @editor_selection },
+                       EDITOR_GUARD,
+                       default_name: 'com_instructure_editor_selection'
 
     # A token that can be used for frontend communication between an LTI tool
     # and Canvas via the Window.postMessage API
@@ -325,6 +329,18 @@ module Lti
     #   ```
     register_expansion 'Context.sourcedId', [],
                        -> { @context.sis_source_id }
+
+    # Returns a string with a comma-separated list of the context ids of the
+    # courses in reverse chronological order from which content has been copied.
+    # Will show a limit of 1000 context ids.  When the number passes 1000,
+    # 'truncated' will show at the end of the list.
+    # @example
+    #   ```
+    #   "789,456,123"
+    #   ```
+    register_expansion 'Context.id.history', [],
+                       -> { lti_helper.recursively_fetch_previous_lti_context_ids },
+                       COURSE_GUARD
 
     # communicates the kind of browser window/frame where the Canvas has launched a tool
     # @launch_parameter launch_presentation_document_target
@@ -566,6 +582,15 @@ module Lti
                        -> { @context.sis_source_id },
                        COURSE_GUARD
 
+    # returns the current course integration id.
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'com.instructure.Course.integrationId', [],
+                       -> { @context.integration_id },
+                       COURSE_GUARD
+
     # returns the current course start date.
     # @example
     #   ```
@@ -710,6 +735,7 @@ module Lti
                        COURSE_GUARD
 
     # With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
+    # Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
     #
     # @example
     #   ```
@@ -1261,6 +1287,26 @@ module Lti
                        -> { @assignment.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false },
                        ASSIGNMENT_GUARD
 
+    # Returns the allowed number of submission attempts.
+    #
+    # @example
+    #   ```
+    #   5
+    #   ```
+    register_expansion 'Canvas.assignment.allowedAttempts', [],
+                       -> { @assignment.allowed_attempts },
+                       ASSIGNMENT_GUARD
+
+    # Returns the number of submission attempts which the student did.
+    #
+    # @example
+    #   ```
+    #   2
+    #   ```
+    register_expansion 'Canvas.assignment.submission.studentAttempts', [],
+                       -> { @assignment.submissions&.find_by(user: @current_user)&.attempt },
+                       STUDENT_ASSIGNMENT_GUARD
+
     # Returns the endpoint url for accessing link-level tool settings
     # Only available for LTI 2.0
     # @example
@@ -1383,6 +1429,9 @@ module Lti
     # Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
     # "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
     #
+    # Only functional when `com_instructure_course_accept_canvas_resource_types` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
+    #
     # @example
     #   ```
     #   "page"
@@ -1393,8 +1442,7 @@ module Lti
                        -> {
                          val = @request.parameters['com_instructure_course_accept_canvas_resource_types']
                          val.is_a?(Array) ? val.join(",") : val
-                       },
-                       default_name: 'com_instructure_course_accept_canvas_resource_types'
+                       }
 
     # Returns the target resource type for the current page, forwarded from the request.
     # Value is the largest logical unit of the page. Possible values are: ["assignment", "assignment_group",
@@ -1403,28 +1451,35 @@ module Lti
     #   on Modules -> 'module'
     #   and so on.
     #
+    # Only functional when `com_instructure_course_canvas_resource_type` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
+    #
     # @example
     #   ```
     #   page
     #   ```
     register_expansion 'com.instructure.Course.canvas_resource_type', [],
-                       -> { @request.parameters['com_instructure_course_canvas_resource_type'] },
-                       default_name: 'com_instructure_course_canvas_resource_type'
+                       -> { @request.parameters['com_instructure_course_canvas_resource_type'] }
 
     # Returns whether a content can be imported into a specific group on the page, forwarded from the request.
     # True for Modules page and Assignment Groups page. False for other content index pages.
+    #
+    # Only functional when `com_instructure_course_allow_canvas_resource_selection` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
     #
     # @example
     #   ```
     #   true
     #   ```
     register_expansion 'com.instructure.Course.allow_canvas_resource_selection', [],
-                       -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] },
-                       default_name: 'com_instructure_course_allow_canvas_resource_selection'
+                       -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] }
 
     # Returns a JSON-encoded list of content groups which can be selected, providing ID and name of each group,
     # forwarded from the request.
     # Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
+    #
+    # Only functional when `com_instructure_course_available_canvas_resources` is included as a query param
+    # in Canvas-side GET request that triggers the LTI launch.
     #
     # @example
     #   ```
@@ -1446,8 +1501,7 @@ module Lti
                            end
                          end
                          val&.to_json
-                       },
-                       default_name: 'com_instructure_course_available_canvas_resources'
+                       }
 
     private
 

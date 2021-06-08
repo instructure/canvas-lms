@@ -18,10 +18,10 @@
 
 import $ from 'jquery'
 import {isUndefined} from 'lodash'
-import Popover from 'compiled/util/Popover'
-import Outcome from 'compiled/models/grade_summary/Outcome'
-import OutcomePopoverView from 'compiled/views/grade_summary/OutcomePopoverView'
-import template from 'jst/outcomes/outcomePopover'
+import Popover from 'jquery-popover'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import OutcomePopoverView from 'ui/features/grade_summary/backbone/views/OutcomePopoverView.coffee'
+import template from '@canvas/outcomes/jst/outcomePopover.handlebars'
 
 QUnit.module('OutcomePopoverViewSpec', {
   setup() {

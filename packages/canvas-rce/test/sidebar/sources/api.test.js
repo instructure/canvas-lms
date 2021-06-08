@@ -18,7 +18,7 @@
 
 import assert from 'assert'
 import sinon from 'sinon'
-import RceApiSource from '../../../src/sidebar/sources/api'
+import RceApiSource, {headerFor, originFromHost} from '../../../src/sidebar/sources/api'
 import fetchMock from 'fetch-mock'
 import * as fileUrl from '../../../src/common/fileUrl'
 
@@ -27,7 +27,9 @@ describe('sources/api', () => {
   const props = {
     host: 'example.host',
     contextType: 'group',
-    contextId: 123
+    contextId: 123,
+    sortBy: {sort: 'date_added', dir: 'desc'},
+    searchString: ''
   }
   let apiSource
   let alertFuncSpy
@@ -72,7 +74,11 @@ describe('sources/api', () => {
     })
 
     it('creates a collection that is not initially loading', () => {
-      assert.strictEqual(collection.loading, false)
+      assert.strictEqual(collection.isLoading, false)
+    })
+
+    it('creates a collection that initially has more', () => {
+      assert.strictEqual(collection.hasMore, true)
     })
   })
 
@@ -119,8 +125,7 @@ describe('sources/api', () => {
         host: undefined,
         contextType: 'course',
         contextId: '17',
-        sort: 'alphabetical',
-        order: 'asc',
+        sortBy: {sort: 'alphabetical', dir: 'asc'},
         searchString: 'hello world'
       }
     })
@@ -150,11 +155,11 @@ describe('sources/api', () => {
       )
     })
 
-    it('gets media', () => {
+    it('gets media_objects', () => {
       const uri = apiSource.uriFor('media_objects', props)
       assert.strictEqual(
         uri,
-        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc'
+        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world'
       )
     })
   })
@@ -195,21 +200,6 @@ describe('sources/api', () => {
     it('parses server response before handing it back', () => {
       const uri = 'theURI'
       fetchMock.mock(uri, fakePageBody)
-      return apiSource.fetchPage(uri).then(page => {
-        assert.deepEqual(page, {
-          bookmark: 'newBookmark',
-          links: [
-            {href: 'link1', title: 'Link 1'},
-            {href: 'link2', title: 'Link 2'}
-          ]
-        })
-      })
-    })
-
-    it('can parse while-wrapped page data', () => {
-      const whileFakePageBody = 'while(1);' + fakePageBody
-      const uri = 'theURI'
-      fetchMock.mock(uri, whileFakePageBody)
       return apiSource.fetchPage(uri).then(page => {
         assert.deepEqual(page, {
           bookmark: 'newBookmark',
@@ -448,6 +438,21 @@ describe('sources/api', () => {
           assert.strictEqual(response.url, 'file-url')
         })
       })
+
+      it('handles inst-fs post-flight with global file id', () => {
+        preflightProps.upload_url = 'instfs-upload-url'
+        const fileId = '1023~789'
+        const response = {
+          location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
+          uuid: 'xyzzy'
+        }
+        fetchMock.mock(preflightProps.upload_url, response)
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
+          sinon.assert.calledWith(apiSource.getFile, fileId)
+          assert.strictEqual(response.uuid, 'xyzzy')
+          assert.strictEqual(response.url, 'file-url')
+        })
+      })
     })
   })
 
@@ -476,7 +481,7 @@ describe('sources/api', () => {
     it('requests images from API', () => {
       fetchMock.mock(/\/documents\?.*content_types=image/, {body})
       return apiSource.fetchImages(props).then(page => {
-        assert.deepEqual(page, {
+        assert.deepStrictEqual(page, {
           bookmark: 'mo.images',
           files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
         })
@@ -632,6 +637,42 @@ describe('sources/api', () => {
         assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
         assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
       })
+    })
+  })
+
+  describe('headerFor', () => {
+    it('returns an authorization header', () => {
+      assert.deepStrictEqual(headerFor('the_jwt'), {
+        Authorization: 'Bearer the_jwt'
+      })
+    })
+  })
+
+  describe('originFromHost', () => {
+    // this logic was factored out from baseUri, so the logic is tested
+    // there too.
+    it('uses the incoming http(s) protocol if present', () => {
+      assert.strictEqual(originFromHost('http://host:port'), 'http://host:port', 'echoes http')
+      assert.strictEqual(originFromHost('https://host:port'), 'https://host:port', 'echoes https')
+      assert.strictEqual(originFromHost('host:port', {}), '//host:port', 'no protocol')
+    })
+
+    it('uses the windowOverride protocol if present', () => {
+      const win = {
+        location: {
+          protocol: 'https:'
+        }
+      }
+      assert.strictEqual(
+        originFromHost('http://host:port', win),
+        'http://host:port',
+        'use provided protocol'
+      )
+      assert.strictEqual(
+        originFromHost('host:port', win),
+        'https://host:port',
+        'use window protocol'
+      )
     })
   })
 })

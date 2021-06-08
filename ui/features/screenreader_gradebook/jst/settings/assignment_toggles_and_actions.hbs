@@ -1,0 +1,126 @@
+<div class="row-fluid pad-box bottom-only">
+  <div class="span4">
+    {{!-- Intentionally left empty so this scales to smaller screens --}}
+  </div>
+  <div class="span8">
+    <div class="checkbox">
+      <label class="checkbox">
+      {{
+        input
+        type="checkbox"
+        id="ungraded"
+        name="ungraded"
+        checked=includeUngradedAssignments
+      }}
+      {{#t "include_ungraded_assignments"}}View Ungraded as 0{{/t}}
+      </label>
+    </div>
+    <div class="checkbox">
+      <label class="checkbox">
+        {{
+          input
+          type="checkbox"
+          id="hide_names_checkbox"
+          name="hide_names_checkbox"
+          checked=hideStudentNames
+        }}
+        {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+      </label>
+    </div>
+    <div class="checkbox">
+      <label class="checkbox">
+        {{
+          input
+          type="checkbox"
+          id="concluded_enrollments"
+          name="concluded_enrollments"
+          checked=showConcludedEnrollments
+        }}
+        {{#t 'show_concluded_enrollments_label'}}Show Concluded Enrollments{{/t}}
+      </label>
+    </div>
+    <div class="checkbox">
+      <label class="checkbox">
+      {{
+        input
+        type="checkbox"
+        id="show_notes"
+        name="show_notes"
+        checked=showNotesColumn
+      }}
+      {{#t "show_notes"}}Show Notes in Student Info{{/t}}
+      </label>
+    </div>
+    {{#if finalGradeOverrideEnabled}}
+      <div class="checkbox">
+        <label class="checkbox">
+        {{
+          input
+          type="checkbox"
+          id="allow_final_grade_override"
+          name="allow_final_grade_override"
+          checked=allowFinalGradeOverride
+        }}
+        {{#t}}Allow Final Grade Override{{/t}}
+        </label>
+      </div>
+    {{/if}}
+    {{#unless gradesAreWeighted}}
+      <div class="checkbox">
+        <label class="checkbox">
+        {{
+          input
+          type="checkbox"
+          id="show_total_as_points"
+          name="show_total_as_points"
+          checked=showTotalAsPoints
+        }}
+        {{#t "show_total_as_points"}}Show Totals as Points on Student Grade Page{{/t}}
+        </label>
+      </div>
+    {{/unless}}
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span4">
+    {{!-- Intentionally left empty so this scales to smaller screens --}}
+  </div>
+  <div class="span8">
+    <div class="pad-box bottom-only">
+      <button class="btn" {{action "exportGradebookCsv"}} id="gradebook-export">
+        <i class="icon-download"></i> {{#t 'download_current_scores'}}Download Current Scores (.csv){{/t}}
+      </button>
+      {{#if lastGeneratedCsvAttachmentUrl}}
+        <a aria-label="{{unbound lastGeneratedCsvLabel}}" href="{{unbound lastGeneratedCsvAttachmentUrl}}" id="last-exported-gradebook">
+          {{unbound lastGeneratedCsvLabel}}
+        </a>
+      {{/if}}
+    </div>
+
+    <div class="pad-box bottom-only">
+      <a
+        id="upload"
+        class="btn"
+        href="{{unbound uploadCsvUrl}}"
+      >
+        <i class="icon-upload"></i> {{#t 'upload_scores'}}Upload Scores (.csv){{/t}}
+      </a>
+    </div>
+    <iframe style="display:none" id="gradebook-export-iframe"></iframe>
+    <div class="pad-box bottom-only">
+      <div>
+        {{#if publishToSisEnabled}}
+          <a href="{{ unbound publishToSisURL }}">
+            {{#t}}Sync grades to SIS{{/t}}
+          </a>
+        {{/if}}
+      </div>
+      <div>
+        <a href="{{ unbound gradingHistoryUrl }}">
+          {{#t 'grading_history'}}View Gradebook History{{/t}}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

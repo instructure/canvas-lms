@@ -20,21 +20,23 @@
 
 require 'sharding_spec_helper'
 require 'lti2_course_spec_helper'
+require_relative '../helpers/k5_common'
 
 require 'csv'
 require 'socket'
+
 
 describe Course do
   include_examples "outcome import context examples"
 
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
 
     it { is_expected.to have_many(:post_policies).dependent(:destroy).inverse_of(:course) }
-    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
     it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
-
     it { is_expected.to have_many(:feature_flags) }
+    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
   describe 'lti2 proxies' do
@@ -158,6 +160,16 @@ describe Course do
     end
   end
 
+  describe '#membership_for_user' do
+    it 'should return active enrollments' do
+      course = Course.create!(name: 'the best')
+      user = User.create!(name: 'the best')
+      course.enroll_teacher(user, enrollment_state: :completed)
+      course.enroll_student(user, enrollment_state: :active)
+      expect(course.membership_for_user(user).active?).to eq true
+    end
+  end
+
   describe '#moderators' do
     before(:once) do
       @course = Course.create!
@@ -253,54 +265,40 @@ describe Course do
   end
 
   describe "#hide_sections_on_course_users_page?" do
-    context "FF is On" do
-      before :once do
-        course_with_student
-        @course.root_account.enable_feature!(:hide_course_sections_from_students)
+    before :once do
+      course_with_student
+    end
+
+    context "Setting is set to On" do
+      before :each do
+        @course.update!(:hide_sections_on_course_users_page => true)
       end
 
-      context "Setting is set to On" do
-        before :each do
-          @course.update!(:hide_sections_on_course_users_page => true)
-        end
-
-        it "returns true when there is more than one section" do
-          @course.course_sections.create!
-          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be true
-        end
-
-        it "returns false when there is only one section" do
-          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
-        end
-
-        it "returns false when the user has at least one non-student enrollment" do
-          teacher = User.create!
-          @course.enroll_teacher(teacher, enrollment_state: :active)
-          @course.enroll_student(teacher, enrollment_state: :active)
-          expect(@course.sections_hidden_on_roster_page?(current_user: teacher)).to be false
-        end
-
-        it "returns false when the user has no enrollments (like an admin)" do
-          admin = account_admin_user
-          expect(@course.sections_hidden_on_roster_page?(current_user: admin)).to be false
-        end
+      it "returns true when there is more than one section" do
+        @course.course_sections.create!
+        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be true
       end
 
-      context "Setting is set to Off" do
-        before :each do
-          @course.update!(:hide_sections_on_course_users_page => false)
-        end
+      it "returns false when there is only one section" do
+        expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
+      end
 
-        it "returns false" do
-          expect(@course.sections_hidden_on_roster_page?(current_user: @user)).to be false
-        end
+      it "returns false when the user has at least one non-student enrollment" do
+        teacher = User.create!
+        @course.enroll_teacher(teacher, enrollment_state: :active)
+        @course.enroll_student(teacher, enrollment_state: :active)
+        expect(@course.sections_hidden_on_roster_page?(current_user: teacher)).to be false
+      end
+
+      it "returns false when the user has no enrollments (like an admin)" do
+        admin = account_admin_user
+        expect(@course.sections_hidden_on_roster_page?(current_user: admin)).to be false
       end
     end
 
-    context "FF is off" do
-      before :once do
-        course_with_student
-        @course.root_account.disable_feature!(:hide_course_sections_from_students)
+    context "Setting is set to Off" do
+      before :each do
+        @course.update!(:hide_sections_on_course_users_page => false)
       end
 
       it "returns false" do
@@ -365,15 +363,14 @@ describe Course do
     end
 
     it "triggers a delayed job by default" do
-      expect(@course).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute_student_scores_without_send_later, any_args)
+      expect(@course).to receive(:delay_if_production).and_return(@course)
+      expect(@course).to receive(:recompute_student_scores_without_send_later)
 
       @course.recompute_student_scores
     end
 
     it "does not trigger a delayed job when passed run_immediately: true" do
-      expect(@course).not_to receive(:send_later_if_production_enqueue_args).
-        with(:recompute_student_scores_without_send_later, any_args)
+      expect(@course).not_to receive(:delay)
 
       @course.recompute_student_scores(nil, run_immediately: true)
     end
@@ -796,6 +793,7 @@ describe Course do
     # we have to reload the users after each course change here to catch the
     # enrollment changes that are applied directly to the db with update_all
     it "should grant delete to the proper individuals" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
       account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true, :change_course_state => true})
@@ -853,7 +851,75 @@ describe Course do
       expect(@course.grants_right?(@admin2, :delete)).to be_truthy
     end
 
-    it "should not grant delete to anyone without :change_course_state rights" do
+    # we have to reload the users after each course change here to catch the
+    # enrollment changes that are applied directly to the db with update_all
+    it "should grant delete to the proper individuals (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_delete: true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(role: @role2, role_changes: {manage_sis: true, manage_courses_delete: true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+      @designer = user_factory(active_all: true)
+      @course.enroll_designer(@designer).accept!
+      @ta = user_factory(active_all: true)
+      @course.enroll_ta(@ta).accept!
+
+      # active, non-sis course
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+
+      ro = Account.default.role_overrides.create!(role: teacher_role, permission: :manage_courses_delete, enabled: true)
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_truthy
+      ro.update(enabled: false)
+
+      # active, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+      @course.clear_permissions_cache(@user)
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@ta, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+    end
+
+    # :change_course_state is deprecated
+    it "should not grant delete to anyone without :change_course_state rights (non-granular)" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
       account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
@@ -909,6 +975,7 @@ describe Course do
     end
 
     it "should grant reset_content to the proper individuals" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
       account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
@@ -963,6 +1030,65 @@ describe Course do
       expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
       expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
       expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
+    end
+
+    it "should grant reset_content to the proper individuals (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_delete: true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(role: @role2, role_changes: {manage_sis: true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+      @designer = user_factory(active_all: true)
+      @course.enroll_designer(@designer).accept!
+      @ta = user_factory(active_all: true)
+      @course.enroll_ta(@ta).accept!
+
+      # active, non-sis course
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
+
+      # active, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
+      expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
     end
 
@@ -1460,14 +1586,6 @@ describe Course do
       expect(course.reload.default_post_policy).to be_post_manually
     end
   end
-
-  describe "#post_policies_enabled?" do
-    let_once(:course) { Course.create! }
-
-    it "returns true" do
-      expect(course).to be_post_policies_enabled
-    end
-  end
 end
 
 describe Course do
@@ -1582,9 +1700,9 @@ describe Course do
       expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
     end
 
-    it "returns none for a nobody" do
-      worthless_loser = User.create(:name => "Worthless Loser")
-      expect(@course.course_section_visibility(worthless_loser)).to eq []
+    it "returns none for a user with no visibility" do
+      user_with_no_visibility = User.create(:name => "Sans Connexion")
+      expect(@course.course_section_visibility(user_with_no_visibility)).to eq []
     end
   end
 
@@ -1850,11 +1968,7 @@ describe Course, "enroll" do
     @course.enroll_student(@user)
     scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
-    if CANVAS_RAILS5_2
-      expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
-    else
-      expect(sql).to match(/"enrollments"\."type" = 'TeacherEnrollment'/)
-    end
+    expect(sql).to match(/"enrollments"\."type" = 'TeacherEnrollment'/)
   end
 end
 
@@ -2522,8 +2636,12 @@ describe Course, "tabs_available" do
       available_tabs = @course.tabs_available(@user).map { |tab| tab[:id] }
       default_tabs   = Course.default_tabs.map           { |tab| tab[:id] }
       custom_tabs    = @course.tab_configuration.map     { |tab| tab[:id] }
+      expected_tabs  = (custom_tabs + default_tabs).uniq
+      # Home tab always comes first
+      home_tab = default_tabs[0]
+      expected_tabs  = expected_tabs.insert(0, expected_tabs.delete(home_tab))
 
-      expect(available_tabs).to        eq (custom_tabs + default_tabs).uniq
+      expect(available_tabs).to        eq expected_tabs
       expect(available_tabs.length).to eq default_tabs.length
     end
 
@@ -2587,10 +2705,174 @@ describe Course, "tabs_available" do
       tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map{|t| t[:id] }
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
     end
+
+    it "should show people tab with granular permissions if hidden" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      @course.tab_configuration = [{
+        id: Course::TAB_PEOPLE,
+        label: "People",
+        css_class: 'people',
+        href: :course_users_path,
+        hidden: true
+      }]
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).to be_include(Course::TAB_PEOPLE)
+    end
+
+    it "doesn't include the people tab if it's a template" do
+      admin = account_admin_user
+      course = course_factory
+      course.update!(template: true)
+      tab_ids = course.tabs_available(admin).map{|t| t[:id] }
+      expect(tab_ids).not_to include(Course::TAB_PEOPLE)
+    end
+
+    it "enables the home tab and puts it first if it was hidden" do
+      @course.tab_configuration = [
+        {id: Course::TAB_PEOPLE},
+        {id: Course::TAB_ASSIGNMENTS},
+        {id: Course::TAB_HOME, hidden: true}
+      ]
+      available_tabs = @course.tabs_available(@user)
+      expect(available_tabs.map{|tab| tab[:id]}[0]).to eq(Course::TAB_HOME)
+      expect(available_tabs.select{|t| t[:hidden]}).to be_empty
+    end
+
+    it "should include item banks tab for active external tools" do
+      @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool 1",
+        :course_navigation => {
+          :text => "Item Banks",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+
+      tabs = @course.tabs_available(@user,include_external: true).map { |tab| tab[:label] }
+
+      expect(tabs).to be_include("Item Banks")
+    end
+
+    describe "with canvas_for_elementary account setting on" do
+      include K5Common
+
+      context "homeroom course" do
+        before :once do
+          toggle_k5_setting(@course.account)
+          @course.homeroom_course = true
+          @course.save!
+        end
+
+        it 'hides most tabs for homeroom courses' do
+          tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
+        end
+
+        it 'renames the syllabus tab to important info' do
+          syllabus_tab = @course.tabs_available(@user).find{|t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq('Important Info')
+        end
+
+        it 'hides external tools in nav' do
+          @course.context_external_tools.create!(
+              :url => "http://example.com/ims/lti",
+              :consumer_key => "asdf",
+              :shared_secret => "hjkl",
+              :name => "external tool 1",
+              :course_navigation => {
+                  :text => "blah",
+                  :url =>  "http://example.com/ims/lti",
+                  :default => false,
+              }
+          )
+          @course.tab_configuration = [{:id => Course::TAB_ANNOUNCEMENTS}, {:id => 'context_external_tool_8'}]
+          tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
+        end
+      end
+
+      context "subject course" do
+        before :once do
+          toggle_k5_setting(@course.account)
+        end
+
+        it "returns default course tabs without home if course_subject_tabs option is not passed" do
+          course_elementary_nav_tabs = Course.default_tabs.reject{|tab| tab[:id] == Course::TAB_HOME}
+          length = course_elementary_nav_tabs.length
+          tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+          expect(tab_ids).to eql(course_elementary_nav_tabs.map{|t| t[:id] })
+          expect(tab_ids.length).to eql(length)
+        end
+
+        it 'renames the syllabus tab to important info' do
+          syllabus_tab = @course.tabs_available(@user).find{|t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq('Important Info')
+        end
+
+        context "with course_subject_tabs option" do
+          it "returns subject tabs only by default" do
+            length = Course.course_subject_tabs.length
+            tab_ids = @course.tabs_available(@user, course_subject_tabs: true).map{|t| t[:id] }
+            expect(tab_ids).to eql(Course.course_subject_tabs.map{|t| t[:id] })
+            expect(tab_ids.length).to eql(length)
+          end
+
+          it "respects saved tab configuration ordering" do
+            @course.tab_configuration = [
+                { id: Course::TAB_HOME },
+                { id: Course::TAB_ANNOUNCEMENTS },
+                { id: Course::TAB_MODULES },
+                { id: Course::TAB_GRADES },
+                { id: Course::TAB_SETTINGS }
+            ]
+            available_tabs = @course.tabs_available(@user, course_subject_tabs: true).map { |tab| tab[:id] }
+            expected_tabs = [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+
+            expect(available_tabs).to eq expected_tabs
+          end
+
+          it "always puts external tools last" do
+            tools = []
+            2.times do |n|
+              tools << @course.context_external_tools.create!(
+                  :url => "http://example.com/ims/lti",
+                  :consumer_key => "asdf",
+                  :shared_secret => "hjkl",
+                  :name => "external tool #{n+1}",
+                  :course_navigation => {
+                      :text => "blah",
+                      :url =>  "http://example.com/ims/lti",
+                      :default => false,
+                  }
+              )
+            end
+            t1, t2 = tools
+            @course.tab_configuration = [
+                {id: Course::TAB_HOME},
+                {id: t1.asset_string},
+                {id: Course::TAB_ANNOUNCEMENTS, hidden: true},
+                {id: t2.asset_string, hidden: true}
+            ]
+            available_tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true, for_reordering: true)
+            expected_tab_ids = Course.course_subject_tabs.map{|t| t[:id]} + [t1.asset_string, t2.asset_string]
+            expect(available_tabs.map{|t| t[:id]}).to eql(expected_tab_ids)
+          end
+
+          it "includes modules tab even if there's no modules" do
+            course_with_student_logged_in(:active_all => true)
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map{ |t| t[:id] }
+            expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+          end
+        end
+      end
+    end
   end
 
   context "students" do
-    before :once do
+    before :each do
       course_with_student(:active_all => true)
     end
 
@@ -2608,6 +2890,19 @@ describe Course, "tabs_available" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to be_include(Course::TAB_SETTINGS)
       expect(tab_ids.length).to be > 0
+    end
+
+    it "should hide people tab with granular permissions if hidden" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      @course.tab_configuration = [{
+        id: Course::TAB_PEOPLE,
+        label: "People",
+        css_class: 'people',
+        href: :course_users_path,
+        hidden: true
+      }]
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).not_to be_include(Course::TAB_PEOPLE)
     end
 
     it "should show grades tab for students" do
@@ -2639,6 +2934,24 @@ describe Course, "tabs_available" do
 
       expect(tabs).to be_include(t1.asset_string)
       expect(tabs).not_to be_include(t2.asset_string)
+    end
+
+    it "should not include item banks tab for active external tools" do
+      @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tool 1",
+        :course_navigation => {
+          :text => "Item Banks",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+
+      tabs = @course.tabs_available(@user,include_external: true).map { |tab| tab[:label] }
+
+      expect(tabs).not_to be_include("Item Banks")
     end
 
     it 'sets the target value on the tab if the external tool has a windowTarget' do
@@ -2730,6 +3043,8 @@ describe Course, "tabs_available" do
       allow(Lti::MessageHandler).to receive(:lti_apps_tabs).and_return([mock_tab])
       expect(@course.tabs_available(nil, :include_external => true)).to include(mock_tab)
     end
+
+    # no spec for student homeroom because students should never navigate to the homeroom course
   end
 
   context "observers" do
@@ -3058,7 +3373,8 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the actual grade send' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -3066,7 +3382,8 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send for a specific user' do
         make_student_enrollments
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, @student_enrollments.first.user_id).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, @student_enrollments.first.user_id)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user, @student_enrollments.first.user_id)
@@ -3074,11 +3391,13 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).with(current_time + 1.seconds, :expire_pending_grade_publishing_statuses, current_time).and_return(nil)
+        expect(@course).to receive(:delay).with(run_at: current_time + 1.seconds).and_return(@course)
+        expect(@course).to receive(:expire_pending_grade_publishing_statuses).with(current_time).and_return(nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3089,11 +3408,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3104,11 +3424,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay_if_production).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3119,11 +3440,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay_if_production).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -4570,6 +4892,11 @@ describe Course, "section_visibility" do
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
 
+    it "is safely empty for a nil user" do
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, nil)
+      expect(visible_enrollments.count).to eq(0)
+    end
+
     it "should return student view students to account admins who are also observers for some reason" do
       @course.student_view_student
       @admin = account_admin_user
@@ -4643,6 +4970,86 @@ describe Course, "enrollments" do
     @course.save!
     expect(@course.student_enrollments.reload.map(&:root_account_id)).to eq [a2.id]
     expect(@course.course_sections.reload.map(&:root_account_id)).to eq [a2.id]
+  end
+end
+
+describe Course, "#sync_homeroom_enrollments" do
+  before :once do
+    @homeroom_course = course_factory(active_course: true)
+    @homeroom_course.account.settings[:enable_as_k5_account] = {value: true}
+    @homeroom_course.homeroom_course = true
+    @homeroom_course.save!
+
+    @teacher = User.create
+    @homeroom_course.enroll_teacher(@teacher).accept
+
+    @ta = User.create
+    @homeroom_course.enroll_user(@ta, "TaEnrollment").accept
+
+    @student = User.create
+    @homeroom_course.enroll_user(@student, "StudentEnrollment").accept
+
+    @observer = User.create
+    @homeroom_course.enroll_user(@observer, "ObserverEnrollment").accept
+
+    @course = course_factory(active_course: true, account: @homeroom_course.account)
+    @course.sync_enrollments_from_homeroom = true
+    @course.homeroom_course_id = @homeroom_course.id
+    @course.save!
+  end
+
+  it "copies enrollments the homeroom course" do
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+    expect(@course.user_is_instructor?(@ta)).to eq(false)
+    expect(@course.user_is_student?(@student)).to eq(false)
+    expect(@course.user_has_been_observer?(@observer)).to eq(false)
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+    expect(@course.user_is_instructor?(@ta)).to eq(true)
+    expect(@course.user_is_student?(@student)).to eq(true)
+    expect(@course.user_has_been_observer?(@observer)).to eq(true)
+  end
+
+  it "readds enrollments deleted on subject courses" do
+    @course.sync_homeroom_enrollments
+    @course.enrollments.find_by(user: @teacher).destroy
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+  end
+
+  it "removes enrollments on subject courses when removed on the homeroom" do
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(true)
+    @homeroom_course.enrollments.find_by(user: @teacher).destroy
+    @course.sync_homeroom_enrollments
+    expect(@course.user_is_instructor?(@teacher)).to eq(false)
+  end
+
+  it "copies custom roles and enrollment dates" do
+    role = Account.default.roles.create!(name: 'Cool Student', base_role_type: 'StudentEnrollment')
+    e1 = @homeroom_course.enroll_student(@student, role: role, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
+    e1.conclude
+    @course.sync_homeroom_enrollments
+    expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
+    e2 = @course.enrollments.where(user_id: @student.id, role_id: role.id).take
+    expect(e2.role_id).to eq role.id
+    expect(e2.start_at).to eq e1.start_at
+    expect(e2.end_at).to eq e1.end_at
+    expect(e2.completed_at).to eq e1.completed_at
+  end
+
+  it "returns false unless course is an elementary subject and sync setting is on and homeroom_course_id is set" do
+    @course.sync_enrollments_from_homeroom = false
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).to eq(false)
+    @course.sync_enrollments_from_homeroom = true
+    @course.homeroom_course_id = nil
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).to eq(false)
+    @course.homeroom_course_id = @homeroom_course.id
+    @course.save!
+    expect(@course.sync_homeroom_enrollments).not_to eq(false)
   end
 end
 
@@ -4886,51 +5293,6 @@ describe Course do
     end
   end
 
-  describe "groups_visible_to" do
-    before :once do
-      @course = course_model
-      @user = user_model
-      @group = @course.groups.create!
-    end
-
-    it "should restrict to groups the user is in without course-wide permissions" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      @group.add_user(@user)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should allow course-wide visibility regardless of membership given :manage_groups permission" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course).to receive(:grants_any_right?).and_return(true)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should allow course-wide visibility regardless of membership given :view_group_pages permission" do
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course).to receive(:grants_any_right?).and_return(true)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-    end
-
-    it "should default to active groups only" do
-      expect(@course).to receive(:grants_any_right?).and_return(true).at_least(:once)
-      expect(@course.groups_visible_to(@user)).to eq [@group]
-      @group.destroy
-      expect(@course.reload.groups_visible_to(@user)).to be_empty
-    end
-
-    it "should allow overriding the scope" do
-      expect(@course).to receive(:grants_any_right?).and_return(true).at_least(:once)
-      @group.destroy
-      expect(@course.groups_visible_to(@user)).to be_empty
-      expect(@course.groups_visible_to(@user, @course.groups)).to eq [@group]
-    end
-
-    it "should return a scope" do
-      # can't use "should respond_to", because that delegates to the instantiated Array
-      expect{ @course.groups_visible_to(@user).all }.not_to raise_exception
-    end
-  end
-
   describe 'permission policies' do
     before :once do
       @course = course_model
@@ -4988,7 +5350,16 @@ describe Course do
 
         it{ is_expected.to include :read_prior_roster }
         it{ is_expected.to include :view_all_grades }
-        it{ is_expected.to include :delete }
+
+        it "without granular permissions" do
+          @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+          is_expected.to include :delete
+        end
+
+        it "with granular permissions" do
+          @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+          is_expected.not_to include :delete
+        end
       end
 
     end
@@ -5547,6 +5918,53 @@ describe Course, "default_section" do
   end
 end
 
+describe Course, "#student_annotation_documents_folder" do
+  before(:each) do
+    @course = Course.create!
+  end
+
+  it "creates a folder if not already existent" do
+    expect {
+      @course.student_annotation_documents_folder
+    }.to change {
+      Folder.where(course: @course, name: "Student Annotation Documents").count
+    }.by(1)
+  end
+
+  it "initially sets the folder workflow_state to hidden" do
+    folder = @course.student_annotation_documents_folder
+    expect(folder.workflow_state).to eq "hidden"
+  end
+
+  it "creates a folder with a unique type" do
+    folder = @course.student_annotation_documents_folder
+    expect(folder.unique_type).to eq Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
+  end
+
+  it "creates a folder with the root folder as the parent folder" do
+    folder = @course.student_annotation_documents_folder
+    root_folder = Folder.root_folders(@course).first
+    expect(folder.parent_folder).to eq root_folder
+  end
+
+  it "returns the existing folder for student annotation documents" do
+    newly_made_folder = @course.student_annotation_documents_folder
+    existing_folder = @course.student_annotation_documents_folder
+    expect(existing_folder).to eq newly_made_folder
+  end
+
+  it "creates a new folder if one was destroyed in the past" do
+    old_folder = @course.student_annotation_documents_folder
+    old_folder.destroy
+
+    expect {
+      @course.student_annotation_documents_folder
+    }.to change {
+      Folder.where(course: @course, name: "Student Annotation Documents").count
+    }.by(1)
+  end
+end
+
 describe Course, 'touch_root_folder_if_necessary' do
   before(:once) do
     course_with_student(active_all: true)
@@ -6014,6 +6432,63 @@ describe Course, "#show_total_grade_as_points?" do
 
       sub_account2.update_attribute(:parent_account, sub_account1)
       expect(cached_account_users).to eq [au]
+    end
+  end
+
+  describe "#can_become_template?" do
+    it "is true for an empty course" do
+      course = Course.create!
+      expect(course.can_become_template?).to be true
+      course.template = true
+      expect(course).to be_valid
+    end
+
+    it "is false once there's an enrollment" do
+      course_with_teacher
+      expect(@course.can_become_template?).to be false
+      @course.template = true
+      expect(@course).not_to be_valid
+    end
+  end
+
+  describe "#can_stop_being_template?" do
+    it "is false for unattached courses" do
+      course = Course.create!(template: true)
+      expect(course.can_stop_being_template?).to be true
+      course.template = false
+      expect(course).to be_valid
+    end
+
+    it "is true for courses attached to accounts" do
+      course = Course.create!(template: true)
+      course.account.update!(course_template: course)
+      expect(course.can_stop_being_template?).to be false
+      course.template = false
+      expect(course).not_to be_valid
+    end
+  end
+
+  describe "#copy_from_course_template" do
+    it "copies unpublished content" do
+      course = Course.create!(template: true)
+      course.root_account.enable_feature!(:course_templates)
+      course.account.update!(course_template: course)
+      a = course.assignments.create!(title: 'bob', workflow_state: 'unpublished')
+      expect(a).to be_unpublished
+      q = course.quizzes.create!(title: 'joe', workflow_state: 'unpublished')
+      expect(q).to be_unpublished
+      wp = course.wiki_pages.create!(title: 'george', workflow_state: 'unpublished')
+      expect(wp).to be_unpublished
+      dt = course.discussion_topics.create!(title: 'phil', workflow_state: 'unpublished')
+      expect(dt).to be_unpublished
+
+      course2 = Course.create!
+      run_jobs
+
+      expect(course2.assignments.pluck(:title)).to eq ['bob']
+      expect(course2.quizzes.pluck(:title)).to eq ['joe']
+      expect(course2.wiki_pages.pluck(:title)).to eq ['george']
+      expect(course2.discussion_topics.pluck(:title)).to eq ['phil']
     end
   end
 end

@@ -60,7 +60,7 @@ export default class VideoOptionsTrayDriver {
   }
 
   get $sizeSelect() {
-    return getByLabelText(this.$element, 'Size')
+    return getByLabelText(this.$element, /Size.*/)
   }
 
   get $doneButton() {

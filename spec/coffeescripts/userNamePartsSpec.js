@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {nameParts} from 'user_utils'
+import {nameParts} from '@canvas/user-sortable-name/jquery/user_utils'
 
 QUnit.module('UserNameParts')
 

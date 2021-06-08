@@ -19,7 +19,9 @@
 
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
-    payload.compact! if LiveEvents.get_context&.dig(:compact_live_events)&.present?
+    ctx = LiveEvents.get_context || {}
+    payload.compact! if ctx.dig(:compact_live_events)&.present?
+
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
     LiveEvents.post_event(
@@ -248,7 +250,11 @@ module Canvas::LiveEvents
         product_code: actl.tool_product_code,
         resource_type_code: actl.tool_resource_type_code
       ).first)
-        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
       end
     end
     event
@@ -354,7 +360,11 @@ module Canvas::LiveEvents
         product_code: actl.tool_product_code,
         resource_type_code: actl.tool_resource_type_code
       ).first)
-        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
       end
     end
     event
@@ -641,7 +651,10 @@ module Canvas::LiveEvents
       context_type: context.class.to_s,
       lti_context_id: context.lti_context_id,
       context_uuid: context.uuid,
-      import_quizzes_next: import_quizzes_next
+      import_quizzes_next: import_quizzes_next,
+      source_course_lti_id: content_migration.source_course&.lti_context_id,
+      destination_course_lti_id: context.lti_context_id,
+      migration_type: content_migration.migration_type
     }
 
     if context.respond_to?(:root_account)
@@ -723,12 +736,11 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.course_completed(context_module_progression, overridden_requirements_met: nil)
+  def self.course_completed(context_module_progression)
     post_event_stringified('course_completed',
       get_course_completed_data(
         context_module_progression.context_module.course,
-        context_module_progression.user,
-        overridden_requirements_met: overridden_requirements_met
+        context_module_progression.user
       ))
   end
 
@@ -736,9 +748,9 @@ module Canvas::LiveEvents
     post_event_stringified('course_progress', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
   end
 
-  def self.get_course_completed_data(course, user, overridden_requirements_met: nil)
+  def self.get_course_completed_data(course, user)
     {
-      progress: CourseProgress.new(course, user, read_only: true, overridden_requirements_met: overridden_requirements_met).to_json,
+      progress: CourseProgress.new(course, user, read_only: true).to_json,
       user: user.slice(%i[id name email]),
       course: course.slice(%i[id name account_id sis_source_id])
     }
@@ -757,7 +769,8 @@ module Canvas::LiveEvents
       original_mastery: result.original_mastery,
       assessed_at: result.assessed_at,
       title: result.title,
-      percent: result.percent
+      percent: result.percent,
+      workflow_state: result.workflow_state
     }
   end
 

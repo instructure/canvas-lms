@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -414,18 +416,18 @@ class GroupCategoriesController < ApplicationController
       if authorized_action(@context, @current_user, :manage_groups)
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
         csv_string = CSV.generate do |csv|
-          csv << export_headers(include_sis_id)
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
-          users = @context.participating_students_by_date.
+          users = @context.participating_students.
             select("users.id, users.sortable_name,
                   -- we just want any that have an sis_pseudonym_id populated
                   MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
                   -- grab all the section_ids to get the section names
                   ARRAY_AGG (enrollments.course_section_id) AS course_section_ids").
             where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
-          gms = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id)).
+          gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id)).
             joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
-          users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms, include_sis_id) }
+          csv << export_headers(include_sis_id, gms_by_user_id.any?)
+          users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
       end
       respond_to do |format|
@@ -434,7 +436,7 @@ class GroupCategoriesController < ApplicationController
     end
   end
 
-  def build_row(user, section_names, group_memberships, include_sis_id)
+  def build_row(user, section_names, gms_by_user_id, include_sis_id)
     row = []
     row << user.sortable_name
     row << user.id
@@ -446,12 +448,15 @@ class GroupCategoriesController < ApplicationController
     row << p&.sis_user_id if include_sis_id
     row << p&.unique_id
     row << section_names.values_at(*user.course_section_ids).map(&:name).to_sentence
-    row << group_memberships[user.id]&.name
-    row << group_memberships[user.id]&.group_id
-    row << group_memberships[user.id]&.sis_source_id
+    row << gms_by_user_id[user.id]&.name
+    if gms_by_user_id.any?
+      row << gms_by_user_id[user.id]&.group_id
+      row << gms_by_user_id[user.id]&.sis_source_id if include_sis_id
+    end
+    row
   end
 
-  def export_headers(include_sis_id)
+  def export_headers(include_sis_id, groups_exist = true)
     headers = []
     headers << I18n.t("name")
     headers << "canvas_user_id"
@@ -459,8 +464,11 @@ class GroupCategoriesController < ApplicationController
     headers << "login_id"
     headers << I18n.t("sections")
     headers << "group_name"
-    headers << "canvas_group_id"
-    headers << "group_id"
+    if groups_exist
+      headers << "canvas_group_id"
+      headers << "group_id" if include_sis_id
+    end
+    headers
   end
 
   include Api::V1::User
@@ -505,6 +513,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    user_json_preloads(users, false, {profile: true})
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @group_category.context_type == "Course"

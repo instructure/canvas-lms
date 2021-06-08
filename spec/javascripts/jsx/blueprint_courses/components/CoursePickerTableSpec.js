@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import CoursePickerTable from 'jsx/blueprint_courses/components/CoursePickerTable'
+import CoursePickerTable from 'ui/features/blueprint_course_master/react/components/CoursePickerTable.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('CoursePickerTable component')

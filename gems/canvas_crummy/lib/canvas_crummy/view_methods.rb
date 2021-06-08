@@ -27,11 +27,14 @@ module CanvasCrummy
     # Add a crumb to the +crumbs+ array
     def add_crumb(name, url=nil, options = {})
       raise "call add_crumb in the controller when using streaming templates" if @streaming_template
+
       crumbs.push [name, url, options]
     end
 
     # Render the list of crumbs
-    def render_crumbs(options = {})
+    def render_crumbs(_options = {})
+      return render_k5_crumbs if @k5_details_view
+
       if crumbs.length > 1
         content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
           content_tag(:ul, nil, nil, false) do
@@ -49,5 +52,20 @@ module CanvasCrummy
       url ? link_to(span, url) : span
     end
 
+    def render_k5_crumbs
+      # In K5 details view we just want to send them back to the home page. The first element in crumbs is a hidden
+      # dashboard link so we include that as well.
+      k5_crumbs = crumbs[0..1]
+      # Update the home crumb to include an open arrow and the full course name
+      home_crumb = k5_crumbs.last
+      home_crumb[0] = "<i class=\"icon-Solid icon-arrow-open-start\"></i> ".html_safe + @context.name
+      content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs', :class => 'k5-breadcrumbs') do
+        content_tag(:ul, nil, nil, false) do
+          k5_crumbs.collect do |crumb|
+            content_tag(:li, crumb_to_html(crumb), crumb[2])
+          end.join.html_safe
+        end
+      end
+    end
   end
 end

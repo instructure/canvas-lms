@@ -476,6 +476,15 @@ describe CommunicationChannelsController do
         post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         assert_status(400)
       end
+
+      it "should redirect to the confirmation_redirect url when present" do
+        @user.accept_terms
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(path: 'jt@instructure.com', confirmation_redirect: 'http://some.place/in-the-world')
+
+        post 'confirm', params: {nonce: @cc.confirmation_code, register: 1, pseudonym: {password: 'asdfasdf'}}
+        expect(response).to redirect_to("http://some.place/in-the-world?current_user_id=#{@user.id}")
+      end
     end
 
     describe "merging" do
@@ -564,6 +573,17 @@ describe CommunicationChannelsController do
         get 'confirm', params: {:nonce => @cc.confirmation_code}
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@user1.pseudonym]]]
+      end
+
+      it "does not show merge opportunities if an account has self-service merge disabled" do
+        Account.default.disable_feature!(:self_service_user_merge)
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+        @user1 = @user
+        user_with_pseudonym(:username => 'jt+1@instructure.com')
+        @cc = @user.communication_channels.create!(path: 'jt@instructure.com', workflow_state: 'active')
+
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
+        expect(response).to redirect_to dashboard_url
       end
 
       it "should not show users that can't have a pseudonym created for the correct account" do
@@ -824,10 +844,16 @@ describe CommunicationChannelsController do
         ]
       end
 
-      context 'as a site admin' do
-        before do
-          account_admin_user(account: Account.site_admin)
-          user_session(@user)
+      context 'as an account admin' do
+        before :once do
+          @account = Account.default
+          @account.settings[:admins_can_view_notifications] = true
+          @account.save!
+          account_admin_user_with_role_changes(:account => @account, :role_changes => {view_notifications: true})
+        end
+
+        before :each do
+          user_session(@admin)
         end
 
         it 'fetches communication channels in this account and orders by date' do
@@ -857,6 +883,16 @@ describe CommunicationChannelsController do
 
           csv = CSV.parse(response.body)
           expect(csv).to eq [
+            ['User ID', 'Name', 'Communication channel ID', 'Type', 'Path', 'Date of most recent bounce', 'Bounce reason'],
+            channel_csv(c2),
+            channel_csv(c1),
+            channel_csv(c3)
+          ]
+
+          # also test JSON format
+          get 'bouncing_channel_report', params: {account_id: Account.default.id, format: :json}
+          json = JSON.parse(response.body)
+          expect(json).to eq [
             ['User ID', 'Name', 'Communication channel ID', 'Type', 'Path', 'Date of most recent bounce', 'Bounce reason'],
             channel_csv(c2),
             channel_csv(c1),
@@ -905,8 +941,11 @@ describe CommunicationChannelsController do
 
         it 'uses the requested account' do
           a = account_model
-          user_with_pseudonym(account: a)
+          account_admin_user_with_role_changes(user: @admin, account: a, role_changes: {view_notifications: true})
+          a.settings[:admins_can_view_notifications] = true
+          a.save!
 
+          user_with_pseudonym(account: a)
           c = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
             cc.workflow_state = 'active'
             cc.bounce_count = 1

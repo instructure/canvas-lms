@@ -26,6 +26,29 @@ describe LearningOutcome do
     @outcome.errors[prop].map(&:to_s)
   end
 
+  context 'validations' do
+    describe 'lengths' do
+      it { is_expected.to validate_length_of(:description).is_at_most(described_class.maximum_text_length) }
+      it { is_expected.to validate_length_of(:short_description).is_at_most(described_class.maximum_string_length) }
+      it { is_expected.to validate_length_of(:vendor_guid).is_at_most(described_class.maximum_string_length) }
+      it { is_expected.to validate_length_of(:display_name).is_at_most(described_class.maximum_string_length) }
+    end
+
+    describe 'nullable' do
+      it { is_expected.to allow_value(nil).for(:description) }
+      it { is_expected.not_to allow_value(nil).for(:short_description) }
+      it { is_expected.to allow_value(nil).for(:vendor_guid) }
+      it { is_expected.to allow_value(nil).for(:display_name) }
+    end
+
+    describe 'blankable' do
+      it { is_expected.to allow_value("").for(:description) }
+      it { is_expected.not_to allow_value("").for(:short_description) }
+      it { is_expected.to allow_value("").for(:vendor_guid) }
+      it { is_expected.to allow_value("").for(:display_name) }
+    end
+  end
+
   context "outcomes" do
     before :once do
       assignment_model
@@ -89,6 +112,34 @@ describe LearningOutcome do
       })
       @result.reload
       @rubric.reload
+    end
+
+    it "adding outcomes to a rubric should increment datadog counter" do
+      expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome.align')
+      @rubric = Rubric.new(:context => @course)
+      @rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+        }
+      ]
+      @rubric.save!
     end
 
     it "should allow learning outcome rows in the rubric" do
@@ -892,6 +943,7 @@ describe LearningOutcome do
       second_root_account.root_outcome_group.add_outcome(outcome)
       outcome.update! root_account_ids: nil
       expect(outcome.root_account_ids).to match_array [root_account.id, second_root_account.id]
+      expect(outcome.global_root_account_ids).to match_array [root_account.global_id, second_root_account.global_id]
     end
 
     context 'add_root_account_id_for_context!' do
@@ -1024,19 +1076,28 @@ describe LearningOutcome do
         })
         result.reload
         rubric.reload
-        { assignment: assignment, assessment: assessment, rubric: rubric }
+        { assignment: assignment, assessment: assessment, rubric: rubric, result: result }
       end
     end
 
     context "learning outcome results" do
-      it "properly reports whether assessed in a course" do
+      before do
         add_student.call(c1, c2)
         add_or_get_rubric(outcome)
         [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
-        assess_with.call(outcome, c1)
+        @result = assess_with.call(outcome, c1)[:result]
+      end
 
+      it "properly reports whether assessed in a course" do
         expect(outcome).to be_assessed
         expect(outcome).to be_assessed(c1)
+        expect(outcome).not_to be_assessed(c2)
+      end
+
+      it 'does not include deleted results when testing assessed' do
+        @result.destroy
+        expect(outcome).not_to be_assessed
+        expect(outcome).not_to be_assessed(c1)
         expect(outcome).not_to be_assessed(c2)
       end
     end

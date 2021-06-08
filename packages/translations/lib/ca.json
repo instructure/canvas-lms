@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "marca amb un cercle la llista desordenada"
     },
+    "clear_2084585f": {
+        "message": "Suprimeix"
+    },
     "clear_selected_file_82388e50": {
         "message": "Esborra el fitxer seleccionat"
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "contingut incrustat"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Introduïu com a mínim 3 caràcters per cercar"
     },
     "equation_1c5ac93c": {
         "message": "Equació"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "S''estan carregant els elements del planificador"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "S''està carregant, espereu"
     },
     "location_3b6ff307": {
         "message": "Ubicació:"

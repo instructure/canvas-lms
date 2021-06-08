@@ -16,7 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moxios from 'moxios'
-import {initializePlanner, loadPlannerDashboard, resetPlanner, renderToDoSidebar} from '../index'
+import {findByTestId, render} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import {
+  initializePlanner,
+  loadPlannerDashboard,
+  resetPlanner,
+  renderToDoSidebar,
+  renderWeeklyPlannerHeader
+} from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
 function defaultPlannerOptions() {
@@ -31,7 +39,9 @@ function defaultPlannerOptions() {
       },
       PREFERENCES: {
         custom_colors: {}
-      }
+      },
+      K5_USER: false,
+      K5_SUBJECT_COURSE: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
@@ -66,35 +76,39 @@ describe('with mock api', () => {
   })
 
   describe('initializePlanner', () => {
-    it('cannot be called twice', () => {
-      initializePlanner(defaultPlannerOptions())
-      expect(() => initializePlanner(defaultPlannerOptions())).toThrow()
+    it('cannot be called twice', async () => {
+      await initializePlanner(defaultPlannerOptions())
+      return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
     })
 
-    it('requires flash methods', () => {
-      ;['flashError', 'flashMessage', 'srFlashMessage'].forEach(flash => {
-        const options = defaultPlannerOptions()
-        options[flash] = null
-        expect(() => initializePlanner(options)).toThrow()
-      })
+    it('requires flash methods', async () => {
+      ;(
+        await Promise.allSettled(
+          ['flashError', 'flashMessage', 'srFlashMessage'].map(flash => {
+            const options = defaultPlannerOptions()
+            options[flash] = null
+            return initializePlanner(options)
+          })
+        )
+      ).forEach(({status}) => expect(status).toBe('rejected'))
     })
 
     it('requires convertApiUserContent', () => {
       const options = defaultPlannerOptions()
       options.convertApiUserContent = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires timezone', () => {
       const options = defaultPlannerOptions()
       options.env.TIMEZONE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires locale', () => {
       const options = defaultPlannerOptions()
       options.env.MOMENT_LOCALE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
   })
 
@@ -103,8 +117,10 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided divs', () => {
+    it('renders into provided divs', async () => {
       loadPlannerDashboard()
+      await findByTestId(document.body, 'PlannerApp')
+      await findByTestId(document.body, 'PlannerHeader')
       expect(document.querySelector('.PlannerApp')).toBeTruthy()
       expect(document.querySelector('.PlannerHeader')).toBeTruthy()
     })
@@ -115,9 +131,26 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided element', () => {
+    it('renders into provided element', async () => {
       renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
+      await findByTestId(document.body, 'ToDoSidebar')
       expect(document.querySelector('.todo-list-header')).toBeTruthy()
+    })
+  })
+
+  describe('renderWeeklyPlannerHeader', () => {
+    beforeEach(() => {
+      const opts = defaultPlannerOptions()
+      opts.env.K5_USER = true
+      opts.env.K5_SUBJECT_COURSE = true
+      initializePlanner(opts)
+    })
+
+    it('renders the WeeklyPlannerHeader', async () => {
+      const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
+
+      const wph = await findByTestId('WeeklyPlannerHeader')
+      expect(wph).toBeInTheDocument()
     })
   })
 })

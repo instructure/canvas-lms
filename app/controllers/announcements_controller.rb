@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,31 +26,43 @@ class AnnouncementsController < ApplicationController
   before_action :require_context, :except => :public_feed
   before_action { |c| c.active_tab = "announcements" }
 
-  def announcements_locked?
-    return false unless @context.is_a?(Course)
-    @context.lock_all_announcements?
+  include K5Mode
+
+  module AnnouncementsIndexHelper
+    def announcements_locked?
+      return false unless @context.is_a?(Course)
+
+      @context.lock_all_announcements?
+    end
+
+    def load_announcements
+      can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
+      js_env :permissions => {
+        create: can_create,
+        manage_content: @context.grants_right?(@current_user, session, :manage_content),
+        moderate: can_create
+      }
+      js_env is_showing_announcements: true
+      js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
+      js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
+      js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
+    end
   end
+
+  include AnnouncementsIndexHelper
 
   def index
     return unless authorized_action(@context, @current_user, :read)
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+    redirect_to named_context_url(@context, :context_url) if @context.is_a?(Course) && @context.elementary_homeroom_course?
 
     log_asset_access([ "announcements", @context ], "announcements", "other")
     respond_to do |format|
       format.html do
         add_crumb(t(:announcements_crumb, "Announcements"))
-        can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
-        js_env :permissions => {
-          create: can_create,
-          manage_content: @context.grants_right?(@current_user, session, :manage_content),
-          moderate: can_create
-        }
-        js_env is_showing_announcements: true
-        js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
-        js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
-        js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
+        load_announcements
 
-        js_bundle :announcements_index_v2
+        js_bundle :announcements
         css_bundle :announcements_index
 
         set_tutorial_js_env
@@ -80,11 +94,12 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.published.order('posted_at DESC').limit(15).
+
+    announcements = @context.announcements.published.by_posted_at.limit(15).
       select{|a| a.visible_for?(@current_user) }
 
     respond_to do |format|
-      format.atom {
+      format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t(:feed_name, "%{course} Announcements Feed", :course => @context.name)
           f.links << Atom::Link.new(:href => polymorphic_url([@context, :announcements]), :rel => 'self')
@@ -95,7 +110,8 @@ class AnnouncementsController < ApplicationController
           feed.entries << e.to_atom
         end
         render :plain => feed.to_xml
-      }
+      end
+
       format.rss {
         @announcements = announcements
         require 'rss/2.0'

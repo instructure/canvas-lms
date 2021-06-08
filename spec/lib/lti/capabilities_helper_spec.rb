@@ -111,10 +111,6 @@ module Lti
          com.instructure.Course.groupIds
          com.Instructure.membership.roles
          com.instructure.Assignment.anonymous_grading
-         com.instructure.Course.accept_canvas_resource_types
-         com.instructure.Course.canvas_resource_type
-         com.instructure.Course.allow_canvas_resource_selection
-         com.instructure.Course.available_canvas_resources
          com.instructure.Person.pronouns
          com.instructure.User.observees
          com.instructure.User.sectionNames

@@ -173,7 +173,6 @@ gen: application/x-genesis-rom
 gf: application/x-tex-gf
 gg: application/x-sms-rom
 gif: image/gif
-gif: image/gif
 gl: video/gl
 glade: application/x-glade
 gmo: application/x-gettext-translation
@@ -263,8 +262,7 @@ kino: application/smil
 kne: application/vnd.Kinar
 knp: application/vnd.Kinar
 kom: application/vnd.hbci
-kon: application/x-kontour
-kon: application/vnd.kde.kontour
+kon: application/x-kontour;application/vnd.kde.kontour
 kpm: application/x-kpovmodeler
 kpr: application/x-kpresenter
 kpt: application/x-kpresenter
@@ -801,5 +799,5 @@ yaml: text/x-yaml
 yml: text/x-yaml
 z: application/x-compressed
 zabw: application/x-abiword
-zip: application/zip
+zip: application/zip;application/x-zip-compressed;application/zip-compressed
 zoo: application/x-zoo

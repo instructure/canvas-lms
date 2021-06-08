@@ -1,2 +1,0 @@
-<style>
-<STYLE>li {list-style-image: url("javascript:alert('XSS')");}</STYLE><UL><LI>XSS

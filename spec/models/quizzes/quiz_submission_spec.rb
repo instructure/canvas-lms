@@ -278,6 +278,21 @@ describe Quizzes::QuizSubmission do
         expect { qs.update_scores(:submission_version_number => 1, :fudge_points => 3) }.
           to change { qs.submission.versions.count }.by 1
       end
+
+      it "uses the grader_id parameter for the grade change event when updating a previous attempt" do
+        qs = @quiz.generate_submission(@user)
+        qs.submission_data = { "question_1" => "5124" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+
+        qs = @quiz.generate_submission(@user)
+        qs.backup_submission_data({ "question_1" => "" })
+
+        teacher_in_course(course: @course)
+        qs.update_scores(grader_id: @teacher.id, fudge_points: 100, submission_version_number: 1)
+
+        grade_change = Auditors::ActiveRecord::GradeChangeRecord.last
+        expect(grade_change.grader_id).to eq @teacher.id
+      end
     end
 
     describe '#backup_submission_data' do
@@ -904,6 +919,23 @@ describe Quizzes::QuizSubmission do
         qs = @quiz.generate_submission(@student)
         expect(qs.grants_right?(@teacher, :update_scores)).to eq true
         expect(qs.grants_right?(@teacher, :add_attempts)).to eq true
+      end
+
+      it "does not take events from an anonymous user" do
+        course_with_student(:active_all => true)
+        @quiz = @course.quizzes.create!
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, :record_events)).to be_falsey
+      end
+
+      it "can take events for any users for a ungraded quiz in a public course" do
+        course_with_student(:active_all => true)
+        @course.is_public = true
+        @course.is_public_to_auth_users = true
+        @course.save!
+        @quiz = @course.quizzes.create!(quiz_type: 'practice_quiz')
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, { user_id: nil }, :record_events)).to be_truthy
       end
     end
 
@@ -1838,6 +1870,64 @@ describe Quizzes::QuizSubmission do
 
     it "uses root_account value from account" do
       expect(@quiz_submission.root_account_id).to eq Account.default.id
+    end
+  end
+
+  describe "#filter_attributes_for_user" do
+    let(:quiz_submission) do
+      quiz_with_graded_submission([])
+      @quiz_submission
+    end
+    let(:assignment) { quiz_submission.quiz.assignment }
+    let(:student) { quiz_submission.user }
+    let(:teacher) { @course.enroll_teacher(User.create!, "workflow_state" => "active").user }
+
+    context "when the quiz is a practice quiz" do
+      let(:practice_quiz_submission) do
+        practice_quiz_with_submission
+        @qsub
+      end
+
+      it "does not remove the score or kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          practice_quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is hidden from the student" do
+      before(:each) do
+        quiz_submission.submission.update!(posted_at: nil)
+      end
+
+      it "removes the score and kept_score fields when the user cannot see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        quiz_submission.filter_attributes_for_user(json, student, nil)
+        expect(json).to eq({"id" => 1})
+      end
+
+      it "keeps the score and kept_score fields when the user can see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, teacher, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is posted to the student" do
+      it "always keeps the score and kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
     end
   end
 end

@@ -23,8 +23,12 @@ module Canvas
   class ErrorStats
     def self.capture(exception, data, level=:error)
       category = exception
+      cause_category = nil
       unless exception.is_a?(String) || exception.is_a?(Symbol)
         category = exception.class.name
+        if exception.respond_to?(:cause) && exception.cause.present?
+          cause_category = exception.cause.class.name
+        end
       end
       # careful!  adding tags is useful for finding things,
       # but every unique combination of tags gets treated
@@ -38,6 +42,11 @@ module Canvas
       stat_tags[:type] = all_tags[:type]
       stat_tags[:category] = category.to_s
       InstStatsd::Statsd.increment("errors.#{level}", tags: stat_tags)
+      if cause_category.present?
+        # if there's an inner exception, let's stat that one too.
+        cause_tags = stat_tags.merge({category: cause_category.to_s})
+        InstStatsd::Statsd.increment("errors.#{level}", tags: cause_tags)
+      end
     end
   end
 end

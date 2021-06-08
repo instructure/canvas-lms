@@ -19,7 +19,7 @@
 import React from 'react'
 
 import TestUtils from 'react-dom/test-utils'
-import StudentRange from 'jsx/conditional_release_stats/components/student-range'
+import StudentRange from '@canvas/conditional-release-stats/react/components/student-range'
 
 QUnit.module('Student Range')
 

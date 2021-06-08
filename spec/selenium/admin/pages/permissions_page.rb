@@ -28,8 +28,12 @@ class PermissionsIndex
     end
 
     # ---------------------- Controls ----------------------
-    def permission_tab(tab_name)
-      f(".#{tab_name}")
+    def course_roles_tab
+      f('#tab-course')
+    end
+
+    def account_roles_tab
+      f('#tab-account')
     end
 
     def search_box
@@ -65,6 +69,7 @@ class PermissionsIndex
     def role_header_by_id(role)
       f("#role_#{role.id}")
     end
+
     # this is the button/link that opens the tray
     def permission_link(permission_name)
       f("#permission_#{permission_name}")
@@ -77,6 +82,10 @@ class PermissionsIndex
 
     def permission_tray_button(permission_name, role_id)
       f(".ic-permissions_role_tray ##{permission_name}_#{role_id}")
+    end
+
+    def permissions_tray_viewable_permissions
+      ff(".ic-permissions__table tbody tr")
     end
 
     def permission_menu_item(item_name)
@@ -161,7 +170,9 @@ class PermissionsIndex
 
     # ---------------------- Actions ----------------------
     def choose_tab(tab_name)
-      permission_tab(tab_name).click
+      name = tab_name.to_s.downcase
+      tab = name == 'account' ? account_roles_tab : course_roles_tab
+      tab.click
     end
 
     def close_role_tray_button

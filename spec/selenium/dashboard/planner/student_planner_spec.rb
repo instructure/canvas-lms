@@ -192,7 +192,7 @@ describe "student planner" do
       go_to_list_view
       mark_peer_review_as_complete(@course.name)
 
-      expect(peer_review_item(@course.name)).to contain_jqcss("span:contains('Peer Review #{@assignment.name} is marked as done.')")
+      expect(peer_review_item(@course.name)).to contain_jqcss("label:contains('Peer Review #{@assignment.name} is marked as done.')")
     end
   end
 
@@ -447,6 +447,7 @@ describe "student planner" do
     end
 
     it "closes the opportunities dropdown.", priority: "1", test_id: 3281711 do
+      skip("Flaky: skip for now LS-2135 to fix")
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown
@@ -491,28 +492,29 @@ describe "student planner" do
     end
 
     it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
-      wait_for_spinner
       expect(items_displayed.count).to eq 1
       expect(scroll_height).to eq 0
 
       new_activity_button.click
-      wait_for_spinner
-      expect(items_displayed.count).to eq 4
-      expect{scroll_height}.to become_between 600, 620  # 609
+      expect(items_displayed.count).to eq 5
 
+      next_item_y = item_top_position(1)
       new_activity_button.click
-      wait_for_animations
-      expect{scroll_height}.to become_between 450, 470  # 457
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
+
+      next_item_y = item_top_position(0)
+      new_activity_button.click
+      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
+      skip('Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041')
       go_to_list_view
-      wait_for_spinner
 
       expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
       new_activity_button.click
-      wait_for_spinner
       scroll_page_to_top
       expect(planner_header_container).not_to contain_jqcss(new_activity_button_selector)
       scroll_page_to_bottom
@@ -521,7 +523,6 @@ describe "student planner" do
 
     it "collapses an item when marked as complete", priority: "1", test_id: 3263155 do
       go_to_list_view
-      wait_for_spinner
 
       planner_item_status_checkbox('Discussion', @future_discussion.title).click
       refresh_page
@@ -553,6 +554,7 @@ describe "student planner" do
     end
 
     it "allows account admins with content management rights to add todo dates" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
       admin = account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
       user_session(admin)
@@ -563,6 +565,22 @@ describe "student planner" do
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f('#student_planner_checkbox').click
       wait_for_ajaximations
+      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      expect_new_page_load{fj('button:contains("Save")').click}
+      expect(@wiki.reload.todo_date).to be_present
+    end
+
+    it "allows account admins with content management rights to add todo dates (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
+      admin = account_admin_user
+      user_session(admin)
+
+      expect(@course.grants_right?(admin, :manage)).to eq true
+      expect(@course.grants_right?(admin, :manage_content)).to eq true
+
+      get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+      f('#student_planner_checkbox').click
       f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
       expect_new_page_load{fj('button:contains("Save")').click}
       expect(@wiki.reload.todo_date).to be_present
@@ -607,4 +625,3 @@ describe "student planner" do
     end
   end
 end
-

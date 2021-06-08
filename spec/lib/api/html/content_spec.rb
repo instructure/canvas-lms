@@ -69,9 +69,9 @@ module Api
         end
 
         it "changes media tags into anchors" do
-          string = "<body><audio class='instructure_inline_media_comment' data-media_comment_id=123/></body>"
+          string = "<audio class='instructure_inline_media_comment' data-media_comment_id=123/>"
           html = Content.new(string).modified_html
-          expect(html).to eq(%Q{<body><a class=\"instructure_inline_media_comment audio_comment\" id=\"media_comment_123/\" href=\"/media_objects/123/\"></a></body>})
+          expect(html).to eq(%Q{<a class=\"instructure_inline_media_comment audio_comment\" id=\"media_comment_123/\" href=\"/media_objects/123/\"></a>})
         end
       end
 
@@ -83,10 +83,10 @@ module Api
                  "<li><img class='nothing_special'></li></ul></div>"
           url_helper = double(rewrite_api_urls: nil)
           html = Content.new(string).rewritten_html(url_helper)
-          expected = "<div><ul>\n"\
-              "<li><img class=\"equation_image\" data-equation-content=\"\int f(x)/g(x)\" x-canvaslms-safe-mathml=\"&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;mo&gt;/&lt;/mo&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;/math&gt;\"></li>\n"\
-              "<li><img class=\"equation_image\" data-equation-content=\"\\sum 1..n\" x-canvaslms-safe-mathml='&lt;math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"&gt;&lt;mo lspace=\"thinmathspace\" rspace=\"thinmathspace\"&gt;&amp;Sum;&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/math&gt;'></li>\n"\
-              "<li><img class=\"nothing_special\"></li>\n</ul></div>"
+          expected = "<div><ul>"\
+              "<li><img class=\"equation_image\" data-equation-content=\"\int f(x)/g(x)\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo><mo>/</mo><mi>g</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo></math>\"></li>"\
+              "<li><img class=\"equation_image\" data-equation-content=\"\\sum 1..n\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mo lspace=&quot;thinmathspace&quot; rspace=&quot;thinmathspace&quot;>&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math>\"></li>"\
+              "<li><img class=\"nothing_special\"></li></ul></div>"
           expect(html).to eq(expected)
         end
 
@@ -103,7 +103,7 @@ module Api
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p>")
         end
-      end
+    end
 
       describe "#add_css_and_js_overrides" do
 

@@ -20,7 +20,7 @@ import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -51,12 +51,9 @@ const ImageOptionsForm = ({
   handleDisplayAsChange,
   handleImageSizeChange,
   messagesForSize,
-  handleSave,
   hideDimensions,
-  flexHeight
+  id = 'image-options-form'
 }) => {
-  const imageSizeOption = {label: labelForImageSize(imageSize), value: imageSize}
-
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -80,95 +77,78 @@ const ImageOptionsForm = ({
     </Flex>
   )
 
-  const saveDisabled =
-    displayAs === 'embed' &&
-    ((!isDecorativeImage && altText === '') || (imageSize === CUSTOM && !dimensionsState?.isValid))
-
   return (
-    <Flex justifyItems="space-between" direction="column" height={flexHeight}>
-      <Flex direction="column">
-        <Flex.Item padding="small">
-          <TextArea
-            disabled={isDecorativeImage}
-            aria-describedby="alt-text-label-tooltip"
-            height="4rem"
-            label={textAreaLabel}
-            onChange={handleAltTextChange}
-            placeholder={formatMessage('(Describe the image)')}
-            resize="vertical"
-            value={altText}
-          />
-        </Flex.Item>
+    <Flex direction="column">
+      <Flex.Item padding="small">
+        <TextArea
+          disabled={isDecorativeImage}
+          aria-describedby="alt-text-label-tooltip"
+          height="4rem"
+          label={textAreaLabel}
+          onChange={handleAltTextChange}
+          placeholder={formatMessage('(Describe the image)')}
+          resize="vertical"
+          value={altText}
+        />
+      </Flex.Item>
 
-        <Flex.Item padding="small">
-          <Checkbox
-            checked={isDecorativeImage}
-            disabled={displayAs === 'link'}
-            label={formatMessage('Decorative Image')}
-            onChange={handleIsDecorativeChange}
-          />
-        </Flex.Item>
+      <Flex.Item padding="small">
+        <Checkbox
+          checked={isDecorativeImage}
+          disabled={displayAs === 'link'}
+          label={formatMessage('Decorative Image')}
+          onChange={handleIsDecorativeChange}
+        />
+      </Flex.Item>
 
-        <Flex.Item margin="small none none none" padding="small">
-          <RadioInputGroup
-            description={formatMessage('Display Options')}
-            disabled={isLinked}
-            name="display-image-as"
-            onChange={handleDisplayAsChange}
-            value={displayAs}
-          >
-            <RadioInput label={formatMessage('Embed Image')} value="embed" />
-
-            <RadioInput
-              disabled={isDecorativeImage}
-              label={formatMessage('Display Text Link (Opens in a new tab)')}
-              value="link"
-            />
-          </RadioInputGroup>
-        </Flex.Item>
-
-        {!hideDimensions && (
-          <Flex.Item margin="small none xx-small none">
-            <View as="div" padding="small small xx-small small">
-              <Select
-                disabled={displayAs !== 'embed'}
-                label={formatMessage('Size')}
-                messages={messagesForSize}
-                onChange={handleImageSizeChange}
-                selectedOption={imageSizeOption}
-              >
-                {imageSizes.map(size => (
-                  <option key={size} value={size}>
-                    {labelForImageSize(size)}
-                  </option>
-                ))}
-              </Select>
-            </View>
-
-            {imageSize === CUSTOM && (
-              <View as="div" padding="xx-small small">
-                <DimensionsInput
-                  dimensionsState={dimensionsState}
-                  disabled={displayAs !== 'embed'}
-                  minHeight={MIN_HEIGHT}
-                  minWidth={MIN_WIDTH}
-                />
-              </View>
-            )}
-          </Flex.Item>
-        )}
-      </Flex>
-
-      {handleSave && (
-        <Flex.Item
-          background="light"
-          borderWidth="small none none none"
-          padding="small medium"
-          textAlign="end"
+      <Flex.Item margin="small none none none" padding="small">
+        <RadioInputGroup
+          description={formatMessage('Display Options')}
+          disabled={isLinked}
+          name="display-image-as"
+          onChange={handleDisplayAsChange}
+          value={displayAs}
         >
-          <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
-            {formatMessage('Done')}
-          </Button>
+          <RadioInput label={formatMessage('Embed Image')} value="embed" />
+
+          <RadioInput
+            disabled={isDecorativeImage}
+            label={formatMessage('Display Text Link (Opens in a new tab)')}
+            value="link"
+          />
+        </RadioInputGroup>
+      </Flex.Item>
+
+      {!hideDimensions && (
+        <Flex.Item margin="small none xx-small none">
+          <View as="div" padding="small small xx-small small">
+            <SimpleSelect
+              id={`${id}-size`}
+              disabled={displayAs !== 'embed'}
+              renderLabel={formatMessage('Size')}
+              messages={messagesForSize}
+              assistiveText={formatMessage('Use arrow keys to navigate options.')}
+              onChange={handleImageSizeChange}
+              value={imageSize}
+            >
+              {imageSizes.map(size => (
+                <SimpleSelect.Option id={`${id}-size-${size}`} key={size} value={size}>
+                  {labelForImageSize(size)}
+                </SimpleSelect.Option>
+              ))}
+            </SimpleSelect>
+          </View>
+
+          {imageSize === CUSTOM && (
+            <View as="div" padding="xx-small small">
+              <DimensionsInput
+                dimensionsState={dimensionsState}
+                disabled={displayAs !== 'embed'}
+                minHeight={MIN_HEIGHT}
+                minWidth={MIN_WIDTH}
+              />
+            </View>
+          )}
         </Flex.Item>
       )}
     </Flex>

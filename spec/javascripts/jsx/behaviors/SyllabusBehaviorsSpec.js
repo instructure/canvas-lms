@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import SyllabusBehaviors from 'compiled/behaviors/SyllabusBehaviors'
-import Sidebar from 'jsx/shared/rce/Sidebar'
+import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
+import Sidebar from '@canvas/rce/Sidebar'
 import editorUtils from 'helpers/editorUtils'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
   setup() {
@@ -99,4 +99,22 @@ test('sets course_syllabus_body after mce destruction', () => {
   ok(RichContentEditor.destroyRCE.called)
   const body = document.getElementById('course_syllabus_body')
   ok(body !== null)
+})
+
+test('hides student view button when editing syllabus', () => {
+  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>')
+  fixtures.create('<form id="edit_course_syllabus_form"></form>')
+  fixtures.create('<a href="#" id="easy_student_view"></a>')
+  SyllabusBehaviors.bindToEditSyllabus()
+  $('#edit_course_syllabus_form').trigger('edit')
+  equal($('#easy_student_view').is(':hidden'), true)
+})
+
+test('shows student view button again after done editing', () => {
+  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>')
+  fixtures.create('<form id="edit_course_syllabus_form"></form>')
+  fixtures.create('<a href="#" id="easy_student_view" style="display: none;"></a>')
+  SyllabusBehaviors.bindToEditSyllabus()
+  $('#edit_course_syllabus_form').trigger('hide_edit')
+  equal($('#easy_student_view').is(':hidden'), false)
 })

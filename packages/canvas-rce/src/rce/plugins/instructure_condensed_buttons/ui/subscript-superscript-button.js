@@ -44,11 +44,7 @@ export default function register(editor) {
       onAction: () => editor.execCommand('mceToggleFormat', false, key),
       onItemAction: () => editor.execCommand('mceToggleFormat', false, oppositeKey),
       onSetup(api) {
-        const $button = editor.$(
-          editor.editorContainer.querySelector(
-            `.tox-split-button[aria-label="${superAndSub[key]}"]`
-          )
-        )
+        const $button = editor.$(`.tox-split-button[aria-label="${superAndSub[key]}"]`, document)
         function onNodeChange() {
           const iMatch = editor.formatter.match(key)
           const showButton =
@@ -56,6 +52,7 @@ export default function register(editor) {
           $button[showButton ? 'show' : 'hide']()
           api.setActive(iMatch)
         }
+
         onNodeChange()
         editor.on('NodeChange', onNodeChange)
         return () => editor.off('NodeChange', onNodeChange)

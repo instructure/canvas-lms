@@ -43,6 +43,60 @@ module Gradebook
       end
     end
 
+    def self.queue_bulk_update(course, current_user, override_scores, grading_period)
+      progress = Progress.create!(context: course, tag: "override_grade_update")
+      progress.process_job(self, :process_bulk_update, {}, course, current_user, override_scores, grading_period)
+      progress
+    end
+
+    def self.process_bulk_update(progress, course, updating_user, override_data, grading_period)
+      # A given student may have multiple enrollments; even if this instructor
+      # can only see a subset of those enrollments, we need to update all
+      # applicable enrollments for each student. At the same time, though, we
+      # only want to record a single grade change event for each student.
+      student_ids_updated = Set.new
+      errors = []
+
+      visible_students_scope = course.students_visible_to(updating_user, include: [:completed])
+
+      override_data.each_slice(1000) do |score_update_batch|
+        student_ids = score_update_batch.pluck(:student_id)
+        visible_students_in_batch = visible_students_scope.where(id: student_ids)
+
+        enrollments_to_update = course.student_enrollments.
+          preload(:scores).
+          where(user_id: visible_students_in_batch.select(:id)).
+          group_by(&:user_id)
+
+        score_update_batch.each do |score_update|
+          student_id = score_update[:student_id].to_i
+          if student_id <= 0
+            errors << {student_id: score_update[:student_id], error: :invalid_student_id}
+            next
+          end
+
+          next unless enrollments_to_update.key?(student_id)
+
+          enrollments_to_update[student_id].each do |enrollment|
+            enrollment.update_override_score(
+              override_score: score_update[:override_score],
+              grading_period_id: grading_period&.id,
+              updating_user: updating_user,
+              record_grade_change: !student_ids_updated.include?(student_id)
+            )
+
+            student_ids_updated.add(student_id)
+          rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid
+            # Either we couldn't find a score for the requested grading period,
+            # or there was a problem updating, maybe due to a malformed score
+            errors << {student_id: score_update[:student_id], error: :failed_to_update}
+          end
+        end
+      end
+
+      progress&.set_results({errors: errors})
+    end
+
     private
 
     def grade_info_from_score(score)

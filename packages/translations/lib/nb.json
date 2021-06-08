@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "sirkel uordnet liste"
     },
+    "clear_2084585f": {
+        "message": "Tøm"
+    },
     "clear_selected_file_82388e50": {
         "message": "Fjern valgt fil"
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "inkludert innhold"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Skriv inn minst tre tegn for å søke"
     },
     "equation_1c5ac93c": {
         "message": "Ligning"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Laster elementplanlegger"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Laster inn, vennligst vent"
     },
     "location_3b6ff307": {
         "message": "Sted:"

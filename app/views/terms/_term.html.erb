@@ -42,16 +42,16 @@
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
         <div class="control-group edit_term">
-          <label class="control-label" for="enrollment_term_name"><%= t :name, 'Term Name:' %></label>
+          <label class="control-label" for=<%= "enrollment_term_name_#{term&.id || 'new'}" %>><%= t :name, 'Term Name:' %></label>
           <div class="controls">
-            <%= f.text_field :name, :class => "input-large", :disabled => (term && term == default_term) %>
+            <%= f.text_field :name, id: "enrollment_term_name_#{term&.id || 'new'}", class: "input-large", disabled: (term && term == default_term) %>
           </div>
         </div>
       <% if can_do(@root_account, @current_user, :manage_sis) %>
         <div class="control-group edit_term">
-          <label class="control-label" for="enrollment_term_sis_source_id"><%= t :sis_source_id, 'SIS ID:' %></label>
+          <label class="control-label" for=<%= "enrollment_term_sis_source_id_#{term&.id || 'new'}" %>><%= t :sis_source_id, 'SIS ID:' %></label>
           <div class="controls">
-            <%= f.text_field :sis_source_id, :class => "input-large" %>
+            <%= f.text_field :sis_source_id, id: "enrollment_term_sis_source_id_#{term&.id || 'new'}", :class => "input-large" %>
           </div>
         </div>
       <% end %>
@@ -64,10 +64,10 @@
         <td>
           <%= mt :term_runs_from, "**Term Runs** from" %>&nbsp;
         </td>
-        <%= render :partial => 'timespan', :locals => { :object => term, :key => '', :start_tooltip => t('titles.term_starts', "Term starts"),
-                                                        :end_tooltip => t('titles.term_ends', "Term ends"), :whenever => [true, true] } %>
+        <%= render :partial => 'timespan', :locals => { object: term, key: '', idx: '1', start_tooltip: t('titles.term_starts', "Term starts"),
+                                                        end_tooltip: t('titles.term_ends', "Term ends"), whenever: [true, true] } %>
       </tr>
-    <% types.each do |type| %>
+    <% types.each_with_index do |type, idx| %>
       <% override = term.enrollment_dates_overrides.detect{|edo|
            edo.context_type == @context.class.to_s &&
              edo.context_id == @context.id &&
@@ -101,9 +101,9 @@
           <%= access_label %>
           &nbsp;
         </td>
-        <%= render :partial => 'timespan', :locals => { :object => override, :key => "[overrides][#{type_string}]",
-                                                        :start_tooltip => start_tooltip, :end_tooltip => end_tooltip,
-                                                        :date_class_prefix => "#{type_string}_", :whenever => [start_whenever, false] } %>
+        <%= render :partial => 'timespan', :locals => { object: override, key: "[overrides][#{type_string}]", idx: idx,
+                                                        start_tooltip: start_tooltip, end_tooltip: end_tooltip,
+                                                        date_class_prefix: "#{type_string}_", whenever: [start_whenever, false] } %>
       </tr>
     <% end %>
     <tr class="edit-buttons">

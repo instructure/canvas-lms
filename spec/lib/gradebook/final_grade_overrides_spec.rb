@@ -118,4 +118,216 @@ describe Gradebook::FinalGradeOverrides do
   it "returns an empty map when no students were given final grade overrides" do
     expect(final_grade_overrides).to be_empty
   end
+
+  describe "bulk updates" do
+    let(:grading_period) { @grading_period_1 }
+    let(:other_grading_period) { @grading_period_2 }
+    let(:course) { Course.create! }
+    let(:teacher) { User.create! }
+
+    let(:student) { User.create! }
+    let(:multiple_enrollment_student) { User.create! }
+    let(:unaffected_student) { User.create! }
+
+    let(:override_updates) do
+      [
+        { student_id: student.id, override_score: 70.0 },
+        { student_id: multiple_enrollment_student.id, override_score: 75.0 }
+      ]
+    end
+
+    before(:each) do
+      course.enrollment_term.grading_period_group = grading_period.grading_period_group
+      course.enable_feature!(:final_grades_override)
+      course.allow_final_grade_override = true
+      course.save!
+
+      course.enroll_teacher(teacher, enrollment_state: "active")
+      course.enroll_student(student, enrollment_state: "active")
+      course.enroll_student(unaffected_student, enrollment_state: "active")
+      course.enroll_student(multiple_enrollment_student, enrollment_state: "active")
+      course.enroll_student(multiple_enrollment_student, enrollment_state: "active")
+    end
+
+    describe ".queue_bulk_update" do
+      it "returns a progress object" do
+        progress = ::Gradebook::FinalGradeOverrides.queue_bulk_update(course, teacher, override_updates, nil)
+
+        expect(progress).to be_a(Progress)
+      end
+    end
+
+    describe ".process_bulk_update" do
+      let(:grade_change_records) { Auditors::ActiveRecord::GradeChangeRecord.where(course: course) }
+
+      def run(updates: override_updates, grading_period: nil, updating_user: teacher, progress: nil)
+        course.recompute_student_scores(run_immediately: true)
+        ::Gradebook::FinalGradeOverrides.process_bulk_update(progress, course, updating_user, updates, grading_period)
+      end
+
+      it "updates the override score for each included record" do
+        run
+
+        student1_enrollment = student.enrollments.first
+        student2_enrollment = multiple_enrollment_student.enrollments.first
+
+        aggregate_failures do
+          expect(student1_enrollment.override_score).to eq 70.0
+          expect(student2_enrollment.override_score).to eq 75.0
+
+          expect(unaffected_student.enrollments.first.override_score).to eq nil
+        end
+      end
+
+      it "updates scores for the specific grading period if one is given" do
+        run(grading_period: grading_period)
+
+        student1_enrollment = student.enrollments.first
+        student2_enrollment = multiple_enrollment_student.enrollments.first
+        unaffected_enrollment = unaffected_student.enrollments.first
+
+        aggregate_failures do
+          expect(student1_enrollment.override_score({grading_period_id: grading_period.id})).to eq 70.0
+          expect(student1_enrollment.override_score).to eq nil
+          expect(student2_enrollment.override_score({grading_period_id: grading_period.id})).to eq 75.0
+          expect(student2_enrollment.override_score).to eq nil
+
+          expect(unaffected_enrollment.override_score({grading_period_id: grading_period.id})).to eq nil
+        end
+      end
+
+      it "does not update grading periods other than the one requested" do
+        student1_enrollment = student.enrollments.first
+
+        run(grading_period: grading_period)
+        expect(student1_enrollment.override_score({grading_period_id: other_grading_period.id})).to be nil
+      end
+
+      it "updates all enrollments for students with multiple enrollments" do
+        run
+
+        student2_course_override_scores = multiple_enrollment_student.enrollments.map(&:override_score)
+        expect(student2_course_override_scores).to all eq 75.0
+      end
+
+      it "records exactly one grade change event for each student" do
+        run
+
+        aggregate_failures do
+          expect(grade_change_records.count).to eq 2
+          expect(grade_change_records.where(grader: teacher).count).to eq 2
+
+          student1_records = grade_change_records.where(student: student)
+          expect(student1_records.count).to eq 1
+          student1_course_record = student1_records.find_by(grading_period_id: nil)
+          expect(student1_course_record.score_after).to eq 70.0
+
+          student2_records = grade_change_records.where(student: multiple_enrollment_student)
+          expect(student2_records.count).to eq 1
+          student2_course_record = student2_records.find_by(grading_period_id: nil)
+          expect(student2_course_record.score_after).to eq 75.0
+        end
+      end
+
+      it "records the passed-in user as the grader for the update events" do
+        run
+
+        expect(grade_change_records.map(&:grader)).to all eq teacher
+      end
+
+      it "ignores updates referencing students not in the course" do
+        some_other_student = User.create!
+        updates = [{student_id: some_other_student.id, override_score: 100.0}]
+
+        run(updates: updates)
+        expect(grade_change_records).to be_empty
+      end
+
+      context "with visibility restricted by section" do
+        let(:section1) { course.course_sections.create! }
+        let(:section1_student) { course.enroll_student(User.create!, section: section1, enrollment_state: "active").user }
+
+        let(:section2) { course.course_sections.create! }
+        let(:section2_student) { course.enroll_student(User.create!, section: section2, enrollment_state: "active").user }
+
+        let(:section1_ta) do
+          enrollment = course.enroll_ta(
+            User.create!,
+            enrollment_state: "active",
+            section: section1,
+            limit_privileges_to_course_section: true
+          )
+          enrollment.user
+        end
+
+        it "does not update students that the teacher cannot see" do
+          updates = [
+            {student_id: section1_student.id, override_score: 50.0},
+            {student_id: section2_student.id, override_score: 70.0}
+          ]
+
+          run(updates: updates, updating_user: section1_ta)
+
+          section1_student_enrollment = section1_student.enrollments.first
+          section2_student_enrollment = section2_student.enrollments.first
+
+          aggregate_failures do
+            expect(section1_student_enrollment.override_score).to eq 50.0
+            expect(section2_student_enrollment.override_score).to eq nil
+          end
+        end
+
+        it "updates scores for all enrollments, even if not all visible, for a student that the teacher can see" do
+          course.enroll_student(
+            section2_student,
+            allow_multiple_enrollments: true,
+            enrollment_state: "active",
+            section: section1
+          )
+
+          updates = [{student_id: section2_student.id, override_score: 70.0}]
+
+          run(updates: updates, updating_user: section1_ta)
+
+          student2_enrollments = section2_student.enrollments
+          aggregate_failures do
+            expect(student2_enrollments.find_by(course_section: section1).override_score).to eq 70.0
+            expect(student2_enrollments.find_by(course_section: section2).override_score).to eq 70.0
+          end
+        end
+      end
+
+      describe "error handling" do
+        let(:progress) { Progress.create!(course: course, tag: "override_grade_update") }
+
+        it "notes an error of type invalid_student_id for invalid student IDs" do
+          updates = [{student_id: "fred", override_score: 100.0}]
+          run(updates: updates, progress: progress)
+
+          expect(progress.results[:errors]).to contain_exactly({student_id: "fred", error: :invalid_student_id})
+        end
+
+        it "notes an error of type failed_to_update when a score value cannot be saved" do
+          updates = [{student_id: student.id, override_score: "asdfasdfasdf"}]
+          run(updates: updates, progress: progress)
+
+          expect(progress.results[:errors]).to contain_exactly({student_id: student.id, error: :failed_to_update})
+        end
+
+        it "notes an error of type failed_to_update when a score object cannot be found" do
+          other_grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(course.root_account)
+          other_grading_period = other_grading_period_group.grading_periods.create!(
+            start_date: 1.month.ago,
+            end_date: 1.month.from_now,
+            title: "other grading period"
+          )
+
+          updates = [{student_id: student.id, override_score: 80.0}]
+          run(grading_period: other_grading_period, updates: updates, progress: progress)
+
+          expect(progress.results[:errors]).to contain_exactly({student_id: student.id, error: :failed_to_update})
+        end
+      end
+    end
+  end
 end

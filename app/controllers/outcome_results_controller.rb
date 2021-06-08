@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -347,8 +349,29 @@ class OutcomeResultsController < ApplicationController
 
   def user_rollups(opts = {})
     excludes = Api.value_to_array(params[:exclude]).uniq
+    filter_users_by_excludes
+
     @results = find_results(opts).preload(:user)
     outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+  end
+
+  def filter_users_by_excludes(aggregate = false)
+    excludes = Api.value_to_array(params[:exclude]).uniq
+    # exclude users with no results (if being requested) before we paginate,
+    # otherwise we end up with users in the pagination that may have no rollups,
+    # which will inflate the pagination total count
+    remove_users_with_no_results if excludes.include?('missing_user_rollups') && !aggregate
+
+    exclude_concluded = excludes.include? 'concluded_enrollments'
+    exclude_inactive = excludes.include? 'inactive_enrollments'
+    return unless exclude_concluded || exclude_inactive
+
+    filters = []
+    filters << 'completed' if exclude_concluded
+    filters << 'inactive' if exclude_inactive
+
+    ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
+    @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
   end
 
   def remove_users_with_no_results
@@ -358,13 +381,9 @@ class OutcomeResultsController < ApplicationController
 
   def user_rollups_json
     return user_rollups_sorted_by_score_json if params[:sort_by] == 'outcome' && params[:sort_outcome_id]
-    excludes = Api.value_to_array(params[:exclude]).uniq
-    # exclude users with no results (if being requested) before we paginate,
-    # otherwise we end up with users in the pagination that may have no rollups,
-    # which will inflate the pagination total count
-    remove_users_with_no_results if excludes.include? 'missing_user_rollups'
-    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+
     rollups = user_rollups
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
     rollups = @users.map {|u| rollups.find {|r| r.context.id == u.id }}.compact if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
@@ -397,7 +416,8 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
-    @results = find_results
+    filter_users_by_excludes(true)
+    @results = find_results(all_users: false).preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
@@ -419,8 +439,8 @@ class OutcomeResultsController < ApplicationController
 
   def include_outcomes
     percents = {}
-    percents = rating_percents(user_rollups(all_users: true)) if params[:rating_percents] == 'true'
-    outcome_results_include_outcomes_json(@outcomes, percents)
+    percents = rating_percents(user_rollups(all_users: true), context: @context) if params[:rating_percents] == 'true'
+    outcome_results_include_outcomes_json(@outcomes, @context, percents)
   end
 
   def include_outcome_groups
@@ -428,7 +448,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_outcome_links
-    outcome_results_include_outcome_links_json(@outcome_links)
+    outcome_results_include_outcome_links_json(@outcome_links, @context)
   end
 
   def include_outcome_paths
@@ -537,8 +557,12 @@ class OutcomeResultsController < ApplicationController
         outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
           @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
         end
+        associations = [:learning_outcome_content]
+        if Api.value_to_array(params[:include]).include? 'outcome_paths'
+          associations << { associated_asset: :learning_outcome_group }
+        end
         @outcome_links.each_slice(100) do |outcome_links_slice|
-          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, :learning_outcome_content)
+          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, associations)
         end
         @outcomes = @outcome_links.map(&:learning_outcome_content)
       end
@@ -568,7 +592,7 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = apply_sort_order(@section.students).to_a
+      @users = apply_sort_order(@section.users).to_a
     end
     @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]

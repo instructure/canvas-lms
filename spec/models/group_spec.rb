@@ -258,7 +258,9 @@ describe Group do
     expect(group.grants_right?(teacher, :manage_wiki_create)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_update)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_delete)).to be_truthy
-    expect(group.grants_right?(teacher, :manage_files)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_add)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_edit)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_delete)).to be_truthy
     expect(group.wiki.grants_right?(teacher, :update_page)).to be_truthy
     attachment = group.attachments.build
     expect(attachment.grants_right?(teacher, :create)).to be_truthy
@@ -860,9 +862,18 @@ describe Group do
   end
 
   describe 'usage_rights_required' do
-    it 'returns true' do
+    it 'returns true on course group' do
       @course.update!(usage_rights_required: true)
-      expect(@group.usage_rights_required).to be true
+      expect(@group.usage_rights_required?).to be true
+    end
+
+    it 'returns true on account group' do
+      account = account_model
+      account.settings = {'usage_rights_required' => {
+        'value' => true
+      }}
+      group = group_model(context: account)
+      expect(group.usage_rights_required?).to be true
     end
   end
 end

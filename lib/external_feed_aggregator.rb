@@ -100,9 +100,9 @@ class ExternalFeedAggregator
       CanvasHttp::InsecureUriError,
       Timeout::Error,
       SocketError,
-      SystemCallError => e
-
-      @logger.info("request error: #{e}")
+      SystemCallError,
+      OpenSSL::SSL::SSLError => e
+      Canvas::Errors.capture_exception(:external_feed, e, :info)
       handle_failure(feed)
     end
   end

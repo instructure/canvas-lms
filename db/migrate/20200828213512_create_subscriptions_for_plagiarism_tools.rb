@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -19,16 +21,10 @@ class CreateSubscriptionsForPlagiarismTools < ActiveRecord::Migration[5.2]
   tag :postdeploy
 
   def up
-    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
-      :create_subscriptions,
-      strand: "plagiarism_subscription_create_#{Shard.current.id}"
-    )
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: "plagiarism_subscription_create_#{Shard.current.id}").create_subscriptions
   end
 
   def down
-    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
-      :delete_subscriptions,
-      strand: 'plagiarism_subscription_delete'
-    )
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: 'plagiarism_subscription_delete').delete_subscriptions
   end
 end

@@ -30,9 +30,10 @@ class EventStream::Stream
   attr_config :backend_strategy, default: ->{ :cassandra } # one of [:cassandra, :active_record]
   attr_config :active_record_type, default: nil # only needed if backend_strategy evaluates to :active_record
 
-  attr_accessor :raise_on_error
+  attr_accessor :raise_on_error, :backend_override
 
   def initialize(&blk)
+    @backend_override = nil
     instance_exec(&blk) if blk
     attr_config_validate
   end
@@ -54,8 +55,9 @@ class EventStream::Stream
   end
 
   def insert(record, options={})
-    backend = backend_for(options.fetch(:backend_strategy, backend_strategy))
-    backend.execute(:insert, record)
+    backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
+      backend.execute(:insert, record)
+    end
     record
   end
 
@@ -64,8 +66,9 @@ class EventStream::Stream
   end
 
   def update(record, options={})
-    backend = backend_for(options.fetch(:backend_strategy, backend_strategy))
-    backend.execute(:update, record)
+    backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
+      backend.execute(:update, record)
+    end
     record
   end
 
@@ -78,7 +81,7 @@ class EventStream::Stream
   end
 
   def current_backend
-    backend_for(backend_strategy)
+    @backend_override || backend_for(backend_strategy)
   end
 
   def add_index(name, &blk)
@@ -137,6 +140,23 @@ class EventStream::Stream
   def backend_for(strategy)
     @backends ||= {}
     @backends[strategy] ||= EventStream::Backend.for_strategy(self, strategy)
+    to_return = @backends[strategy]
+    if block_given?
+      begin
+        # this is useful because callbacks like indexers
+        # use the "current_backend".  If we explicitly pass in a backend
+        # for an invocation, then we want that same backend to be
+        # used in the callbacks
+        restore_state, @backend_override = @backend_override, to_return
+        yield @backend_override
+      ensure
+        # restore_state will usually be nil,
+        # but if we have some insert triggered from a callback
+        # it will pop off the previous backend
+        @backend_override = restore_state
+      end
+    end
+    to_return
   end
 
   def callbacks_for(operation)

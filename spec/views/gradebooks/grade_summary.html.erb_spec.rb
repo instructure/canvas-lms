@@ -68,8 +68,24 @@ describe "/gradebooks/grade_summary" do
     sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
-    doc = Nokogiri::HTML::DocumentFragment.parse response.body
+    doc = Nokogiri::HTML5.fragment response.body
     expect(doc.at_css('.audio_comment ~ span.media_comment_id').text).to eql '0_abcdefgh'
+    expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
+  end
+
+  it "shows media comments with text included" do
+    stub_kaltura
+    course_with_teacher
+    student_in_course(active_all: true)
+    view_context
+    a = @course.assignments.create!(title: 'some assignment', submission_types: ['online_text_entry'])
+    sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
+    sub.add_comment(author: @teacher, media_comment_id: '0_ijklmnop', media_comment_type: 'video',
+                    comment: "hello")
+    assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+    render("gradebooks/grade_summary")
+    doc = Nokogiri::HTML5.fragment response.body
+    expect(doc.at_css('.comment_media > span:first-child').text).to eql 'hello'
     expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
   end
 
@@ -452,7 +468,7 @@ describe "/gradebooks/grade_summary" do
 
       it 'adds the "hidden" title to the icon' do
         render "gradebooks/grade_summary"
-        expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+        expect(response).to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
       end
 
       context "when submissions are posted" do
@@ -460,7 +476,7 @@ describe "/gradebooks/grade_summary" do
 
         it 'does not add the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+          expect(response).not_to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
         end
 
         it "does not display the 'hidden' icon" do
@@ -477,7 +493,7 @@ describe "/gradebooks/grade_summary" do
 
       it 'does not add the "hidden" title to the icon' do
         render "gradebooks/grade_summary"
-        expect(response).not_to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+        expect(response).not_to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
       end
 
       it "does not display the 'hidden' icon" do
@@ -493,7 +509,7 @@ describe "/gradebooks/grade_summary" do
 
         it 'adds the "hidden" title to the icon' do
           render "gradebooks/grade_summary"
-          expect(response).to have_tag(".assignment_score i[@title='Instructor is working on grades']")
+          expect(response).to have_tag(".assignment_score i[@title='Instructor has not posted this grade']")
         end
 
         it "displays the 'hidden' icon" do

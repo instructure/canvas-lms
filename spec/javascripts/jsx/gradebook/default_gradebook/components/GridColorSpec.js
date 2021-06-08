@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import GridColor from 'jsx/gradebook/default_gradebook/components/GridColor'
-import {darken, defaultColors, statusColors} from 'jsx/gradebook/default_gradebook/constants/colors'
+import GridColor from 'ui/features/gradebook/react/default_gradebook/components/GridColor.js'
+import {darken, defaultColors, statusColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
 
 function defaultProps(props = {}) {
   return {

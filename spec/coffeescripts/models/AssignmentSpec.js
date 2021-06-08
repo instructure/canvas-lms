@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import 'jquery.ajaxJSON'
-import Assignment from 'compiled/models/Assignment'
-import Submission from 'compiled/models/Submission'
-import DateGroup from 'compiled/models/DateGroup'
+import '@canvas/jquery/jquery.ajaxJSON'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Submission from '@canvas/assignments/backbone/models/Submission'
+import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Assignment#initialize with ENV.POST_TO_SIS set to false', {
@@ -1064,6 +1064,45 @@ test('includes htmlUrl', () => {
   equal(json.htmlUrl, 'http://example.com/assignments/1')
 })
 
+test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support enabled', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: true}
+  ENV.FLAGS = {new_quizzes_modules_support: true}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1/edit')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
+})
+
+test('uses htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support disabled', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: true}
+  ENV.FLAGS = {new_quizzes_modules_support: false}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
+})
+
+test('uses htmlUrl when not managing a quiz_lti assignment', () => {
+  const assignment = new Assignment({
+    html_url: 'http://example.com/assignments/1',
+    is_quiz_lti_assignment: true
+  })
+  ENV.PERMISSIONS = {manage: false}
+  ENV.FLAGS = {new_quizzes_modules_support: true}
+  const json = assignment.toView()
+  equal(json.htmlUrl, 'http://example.com/assignments/1')
+  ENV.PERMISSIONS = {}
+  ENV.FLAGS = {}
+})
+
 test('includes htmlEditUrl', () => {
   const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
   const json = assignment.toView()
@@ -1526,16 +1565,26 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
   })
 })
 
-QUnit.module('Assignment#externalToolData', hooks => {
+QUnit.module('Assignment#externalToolTagAttributes', hooks => {
+  const externalData = {
+    key1: 'val1'
+  }
+  const customParams = {
+    root_account_id: '$Canvas.rootAccount.id',
+    referer: 'LTI test tool example'
+  }
   let assignment
-  const ext_data = {key1: 'val1'}
 
   hooks.beforeEach(() => {
     assignment = new Assignment({
-      name: 'foo',
+      name: 'Sample Assignment',
       external_tool_tag_attributes: {
-        url: 'https://www.test.com/blti?foo',
-        external_data: ext_data
+        content_id: 999,
+        content_type: 'context_external_tool',
+        custom: customParams,
+        new_tab: '0',
+        url: 'http://lti13testtool.docker/launch',
+        external_data: externalData
       }
     })
     fakeENV.setup({current_user_roles: []})
@@ -1545,9 +1594,31 @@ QUnit.module('Assignment#externalToolData', hooks => {
     fakeENV.teardown()
   })
 
-  test('returns external data from the assignments content tag', () => {
+  test(`returns url from assignment's external tool attributtes`, () => {
+    const url = assignment.externalToolUrl()
+
+    equal(url, 'http://lti13testtool.docker/launch')
+  })
+
+  test(`returns external data from assignment's external tool attributtes`, () => {
     const data = assignment.externalToolData()
+
     equal(data.key1, 'val1')
-    ok(assignment.externalToolDataStringified())
+
+    equal(assignment.externalToolDataStringified(), JSON.stringify(externalData))
+  })
+
+  test(`returns custom params from assignment's external tool attributtes`, () => {
+    equal(assignment.externalToolCustomParams(), customParams)
+  })
+
+  test(`returns custom params stringified from assignment's external tool attributtes`, () => {
+    const data = assignment.externalToolCustomParamsStringified()
+
+    equal(data, JSON.stringify(customParams))
+  })
+
+  test(`returns new tab from assignment's external tool attributtes`, () => {
+    equal(assignment.externalToolNewTab(), '0')
   })
 })

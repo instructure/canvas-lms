@@ -16,7 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% provide :page_title, t('titles.courses', 'Courses') %>
+<%
+  if k5_user?
+    all_courses_title = t('All Subjects')
+    courses_title = t('Subjects')
+  else
+    all_courses_title = t('headings.my_courses', %{All Courses})
+    courses_title = t('titles.courses', 'Courses')
+  end
+%>
+
+<% provide :page_title, courses_title %>
 <% provide_blank :right_side %>
 
 <% load_enrollments_for_index %>
@@ -25,7 +35,7 @@
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>
   <div class="header-bar">
-    <h2><%= t('headings.my_courses', %{All Courses}) %></h2>
+    <h1><%= all_courses_title %></h1>
   </div>
 
   <div class="ic-Action-header content--hasMarginTop">

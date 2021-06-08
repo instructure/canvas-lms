@@ -48,25 +48,11 @@ class Mutations::OutcomeProficiencyBase < Mutations::BaseMutation
     error && error[0] == :context_id && error[1] == "has already been taken"
   end
 
-  def fetch_context(input)
-    return if input[:context_type].blank?
-    context = begin
-      context_type = Object.const_get(input[:context_type])
-      context_type.find_by(id: input[:context_id])
-    rescue
-      raise GraphQL::ExecutionError, "invalid context type"
-    end
-    raise GraphQL::ExecutionError, "context not found" if context.nil?
-    check_permission(context)
-    context
-  end
-
   def check_permission(context)
     raise GraphQL::ExecutionError, "insufficient permission" unless context.grants_right? current_user, :manage_proficiency_scales
   end
 
-  def upsert(input, existing_record = nil)
-    context = fetch_context(input)
+  def upsert(input, existing_record: nil, context: nil)
     record = existing_record || OutcomeProficiency.find_by(context: context)
     if record
       record.assign_attributes(workflow_state: 'active')
@@ -78,7 +64,7 @@ class Mutations::OutcomeProficiencyBase < Mutations::BaseMutation
     if record.save
       {outcome_proficiency: record}
     elsif existing_record.nil? && context_taken?(record)
-      upsert(input)
+      upsert(input, context: context)
     else
       errors_for(record)
     end

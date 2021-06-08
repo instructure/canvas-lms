@@ -18,13 +18,13 @@
 
 import $ from 'jquery'
 import {isArray, isObject, uniq} from 'lodash'
-import tz from 'timezone'
-import fcUtil from 'compiled/util/fcUtil'
+import tz from '@canvas/timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import denver from 'timezone/America/Denver'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
-import AgendaView from 'compiled/views/calendar/AgendaView'
-import EventDataSource from 'compiled/calendar/EventDataSource'
+import AgendaView from 'ui/features/calendar/backbone/views/AgendaView.coffee'
+import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import eventResponse from 'helpers/ajax_mocks/api/v1/calendarEvents'
 import plannerItemsResponse from 'helpers/ajax_mocks/api/planner/items'
 import assignmentResponse from 'helpers/ajax_mocks/api/v1/calendarAssignments'
@@ -60,9 +60,11 @@ QUnit.module('AgendaView', {
       {asset_string: 'group_3'}
     ]
     this.contextCodes = ['user_1', 'course_2', 'group_3']
-    this.startDate = fcUtil.now()
-    this.startDate.minute(1)
-    this.startDate.year(2001)
+    // with LS-1701 we're only looking a month into the future,
+    // not 1000 years, so let's just
+    // backup 15 days from the first canned event
+    this.startDate = fcUtil.wrap(new Date(JSON.parse(eventResponse)[0].start_at))
+    fcUtil.addMinuteDelta(this.startDate, -60 * 24 * 15)
     this.dataSource = new EventDataSource(this.contexts)
     this.server = sinon.fakeServer.create()
     this.snapshot = tz.snapshot()

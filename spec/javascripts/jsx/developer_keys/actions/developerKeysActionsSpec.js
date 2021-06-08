@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import store from 'jsx/developer_keys/store/store'
-import axios from 'axios'
+import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions.js'
+import store from 'ui/features/developer_keys_v2/react/store/store.js'
+import axios from '@canvas/axios'
 
 QUnit.module('Developer key actions')
 

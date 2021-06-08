@@ -304,8 +304,11 @@ describe ContextModule do
   end
 
   describe "add_item" do
-    it "should add an assignment" do
+    before :once do
       course_module
+    end
+
+    it "should add an assignment" do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
 
@@ -314,13 +317,23 @@ describe ContextModule do
     end
 
     it "should not add an invalid assignment" do
-      course_module
       @tag = @module.add_item({:id => 21, :type => 'assignment'})
       expect(@tag).to be_nil
     end
 
+    it "prefers the linked discussion topic when a graded topic's assignment is added" do
+      topic = graded_discussion_topic(context: @course)
+      tag = @module.add_item({:id => topic.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql topic
+    end
+
+    it "prefers the linked quiz when a quiz's assignment is added" do
+      quiz = quiz_model(course: @course, quiz_type: :assignment)
+      tag = @module.add_item({:id => quiz.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql quiz
+    end
+
     it "should add a wiki page" do
-      course_module
       @page = @course.wiki_pages.create!(:title => "some page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
 
@@ -329,7 +342,6 @@ describe ContextModule do
     end
 
     it "should not add invalid wiki pages" do
-      course_module
       @course.wiki
       other_course = Account.default.courses.create!
       @page = other_course.wiki_pages.create!(:title => "new page")
@@ -338,7 +350,6 @@ describe ContextModule do
     end
 
     it "should add an attachment" do
-      course_module
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
       @tag = @module.add_item({:id => @file.id, :type => 'attachment'}) #@file)
 
@@ -347,7 +358,6 @@ describe ContextModule do
     end
 
     it "should allow adding items more than once" do
-      course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag1 = @module.add_item(:id => @assignment.id, :type => "assignment")
       @tag2 = @module.add_item(:id => @assignment.id, :type => "assignment")
@@ -363,13 +373,11 @@ describe ContextModule do
     end
 
     it "should add a header as unpublished" do
-      course_module
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
 
     it "should add an external url" do
-      course_module
       @tag = @module.add_item(
         :type => 'external_url',
         :url => "http://www.instructure.com",
@@ -381,6 +389,44 @@ describe ContextModule do
       @module.save!
 
       expect(@module.content_tags).to be_include(@tag)
+    end
+
+    describe 'when adding an LTI 1.3 external tool' do
+      let(:tool) {
+        @course.context_external_tools.create!(
+          name: 'tool', consumer_key: '1', shared_secret: '1',
+          url: 'http://example.com/', developer_key: DeveloperKey.create!,
+          settings: {use_1_3: true}
+        )
+      }
+
+      let(:args) {
+        {
+          type: 'context_external_tool',
+          id: tool.id,
+          title: 'The tool',
+          url: 'http://example.com/',
+          indent: 0,
+          position: 0,
+          tag_type: 'context_module',
+        }
+      }
+
+      it 'should add an external tool with resource link and custom params' do
+        @tag = @module.add_item(args.merge(custom_params: {'foo' => 'bar'}))
+        @module.workflow_state = 'published'
+        @module.save!
+
+        expect(@module.content_tags).to be_include(@tag)
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
+
+      it 'should add an external tool with custom params in a JSON string' do
+        @tag = @module.add_item(args.merge(custom_params: '{"foo":"bar"}'))
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
     end
   end
 
@@ -400,7 +446,7 @@ describe ContextModule do
 
     it "appends items to the end of a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool])
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one two three attach assign page quiz topic tool))
     end
 
@@ -411,14 +457,14 @@ describe ContextModule do
 
     it "inserts items into a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one attach assign page quiz topic tool two three))
     end
 
     it "adds things to an empty module" do
       empty = @course.context_modules.create! name: 'empty'
       empty.insert_items([@attach, @assign])
-      expect(empty.content_tags.order(:position).pluck(:title)).to eq(%w(attach assign))
+      expect(empty.content_tags.ordered.pluck(:title)).to eq(%w(attach assign))
     end
 
     it "sets the indent to 0" do
@@ -429,7 +475,7 @@ describe ContextModule do
 
     it "doesn't add weird things to a module" do
       @module.insert_items([@attach, user_model, 'foo', @assign])
-      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+      expect(@module.content_tags.ordered.pluck(:title)).to eq(
         %w(one two three attach assign))
     end
 
@@ -1495,7 +1541,7 @@ describe ContextModule do
         @p2.save!
       end
       @module.restore
-      tags = @module.content_tags.not_deleted.order(:position).to_a
+      tags = @module.content_tags.not_deleted.ordered.to_a
       expect(tags.size).to eq 4
       expect(tags.map(&:content_id)).to eq([0, @a1.id, @a2.id, @p2.id])
       expect(tags.map(&:title)).to eq(['foo', 'a1', 'a2', 'p2-renamed'])

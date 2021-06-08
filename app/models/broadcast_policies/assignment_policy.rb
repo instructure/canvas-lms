@@ -48,7 +48,6 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submissions_posted?
-      return false unless assignment.context.post_policies_enabled?
       context_sendable? && assignment.posting_params_for_notifications.present?
     end
 

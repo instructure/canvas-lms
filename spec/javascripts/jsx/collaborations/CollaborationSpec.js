@@ -19,8 +19,8 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import Collaboration from 'jsx/collaborations/Collaboration'
-import tz from 'timezone'
+import Collaboration from 'ui/features/lti_collaborations/react/Collaboration.js'
+import tz from '@canvas/timezone'
 
 QUnit.module('Collaboration')
 

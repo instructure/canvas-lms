@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -92,7 +94,7 @@ class AccountNotificationsController < ApplicationController
   #
   # @returns [AccountNotification]
   def user_index
-    include_past = value_to_boolean(params[:include_past]) && @domain_root_account.feature_enabled?('past_announcements')
+    include_past = value_to_boolean(params[:include_past])
     notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
     render :json => account_notifications_json(notifications, @current_user, session)
   end
@@ -108,7 +110,7 @@ class AccountNotificationsController < ApplicationController
     @show_left_side = true
     @context = @current_user.profile
     set_active_tab('past_global_announcements')
-    js_bundle :past_global_notifications
+    js_bundle :past_global_announcements
     render html: '', layout: true
   end
 

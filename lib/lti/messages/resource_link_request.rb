@@ -18,6 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti::Messages
+  # A "factory" class that builds an ID Token (JWT) to be used in LTI Advantage
+  # LTI Resource Link Requests (a.k.a standard LTI 1.3 tool launches).
+  #
+  # This class relies on a another class (LtiAdvantage::Messages::ResourceLinkRequest)
+  # to model the data in the JWT body and produce a signature.
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti/v1p3/.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class ResourceLinkRequest < JwtMessage
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
@@ -53,9 +65,18 @@ module Lti::Messages
     def add_resource_link_request_claims!
       resource_link = assignment_resource_link
       assignment = line_item_for_assignment&.assignment
-      @message.resource_link.id = resource_link&.resource_link_id || context_resource_link_id
+      @message.resource_link.id = resource_link&.resource_link_uuid || context_resource_link_id
       @message.resource_link.description = resource_link && assignment&.description
       @message.resource_link.title = resource_link && assignment&.title
+    end
+
+    def unexpanded_custom_parameters
+      # Add in link-specific custom params (e.g. created by deep linking)
+      super.merge!(resource_link_for_custom_parameters&.custom || {})
+    end
+
+    def resource_link_for_custom_parameters
+      assignment_resource_link || @opts[:resource_link_for_custom_params]
     end
 
     def context_resource_link_id
@@ -64,14 +85,20 @@ module Lti::Messages
 
     def assignment_resource_link
       return if @assignment.nil?
-      launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
-      unless @assignment.external_tool?
-        raise launch_error.new(nil, api_message: 'Assignment not configured for external tool launches')
+
+      unless defined?(@assignment_resource_link)
+        launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
+        unless @assignment.external_tool?
+          raise launch_error.new(nil, api_message: 'Assignment not configured for external tool launches')
+        end
+        unless tool_from_tag(@assignment.external_tool_tag, @context) == @tool
+          raise launch_error.new(nil, api_message: 'Assignment not configured for launches with specified tool')
+        end
+
+        @assignment_resource_link = line_item_for_assignment&.resource_link
       end
-      unless tool_from_tag(@assignment.external_tool_tag, @context) == @tool
-        raise launch_error.new(nil, api_message: 'Assignment not configured for launches with specified tool')
-      end
-      resource_link = line_item_for_assignment&.resource_link
+
+      @assignment_resource_link
     end
 
     def assignment_line_item_url

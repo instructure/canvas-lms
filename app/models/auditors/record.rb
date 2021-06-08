@@ -24,6 +24,6 @@ class Auditors::Record < EventStream::Record
   def initialize(*args)
     super(*args)
 
-    self.request_id ||= RequestContextGenerator.request_id unless event_type == 'corrupted'
+    self.request_id ||= RequestContext::Generator.request_id unless event_type == 'corrupted'
   end
 end

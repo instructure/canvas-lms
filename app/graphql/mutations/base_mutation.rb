@@ -63,13 +63,16 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
   # validation errors on an attribute that match one of the mutation's input
   # fields will be returned with that attribute specified (otherwise
   # `attribute` will be null)
-  def errors_for(model)
-    # TODO - support renamed fields (e.g. workflow_state => state)
+  #
+  # `override_keys` is a hash where the key is the field at the table and the value
+  # is the alias of the field; the keys and values need to be set as symbols.
+  def errors_for(model, override_keys = {})
     input_fields = Hash[self.class.arguments.values.map { |a| [ a.keyword, a.name ] }]
 
     {
       errors: model.errors.entries.map { |attribute, message|
-        [input_fields[attribute], message]
+        key = override_keys.key?(attribute) ? override_keys[attribute] : attribute
+        [input_fields[key], message]
       }
     }
   end

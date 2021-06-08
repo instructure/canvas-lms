@@ -38,6 +38,8 @@ class Message < ActiveRecord::Base
 
   MAX_TWITTER_MESSAGE_LENGTH = 140
 
+  class QueuedNotFound < StandardError; end
+
   class Queued
     # use this to queue messages for delivery so we find them using the created_at in the scope
     # instead of using id alone when reconstituting the AR object
@@ -46,9 +48,19 @@ class Message < ActiveRecord::Base
       @id, @created_at = id, created_at
     end
 
-    delegate :deliver, :dispatch_at, :to => :message
+    delegate :dispatch_at, :to => :message
+
+    def deliver
+      message.deliver
+    rescue QueuedNotFound => e
+      raise Delayed::RetriableError, "Message does not (yet?) exist"
+    end
+
     def message
-      @message ||= Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      return @message if @message.present?
+      @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      raise QueuedNotFound if @message.nil?
+      @message
     end
   end
 
@@ -72,6 +84,7 @@ class Message < ActiveRecord::Base
   before_save :infer_defaults
   before_save :move_dashboard_messages
   before_save :move_messages_for_deleted_users
+  before_validation :truncate_invalid_message
 
   # Validations
   validate :prevent_updates
@@ -248,14 +261,20 @@ class Message < ActiveRecord::Base
 
   def author
     @_author ||= begin
-      if context.has_attribute?(:user_id)
+      if author_context.has_attribute?(:user_id)
         User.find(context.user_id)
-      elsif context.has_attribute?(:author_id)
+      elsif author_context.has_attribute?(:author_id)
         User.find(context.author_id)
       else
         nil
       end
     end
+  end
+
+  def author_context
+    # the user_id on a mention is the user that was mentioned instead of the
+    # author of the message.
+    context.is_a?(Mention) ? context.discussion_entry : context
   end
 
   def avatar_enabled?
@@ -271,7 +290,16 @@ class Message < ActiveRecord::Base
 
   def author_avatar_url
     url = author.try(:avatar_url)
-    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
+    # The User model currently supports storing either a path or full
+    # URL for an avatar. Because of this, alternatives to URI.encode
+    # such as CGI.escape end up escaping too much for full URLs. In
+    # order to escape just the path, we'd need to utilize URI.parse
+    # which can't handle URLs with spaces. As that is the root cause
+    # of this change, we'll just use the deprecated URI.encode method.
+    #
+    # rubocop:disable Lint/UriEscapeUnescape
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", URI.encode(url)).to_s if url
+    # rubocop:enable Lint/UriEscapeUnescape
   end
 
   def author_short_name
@@ -348,21 +376,29 @@ class Message < ActiveRecord::Base
   end
 
   # infer a root account associated with the context that the user can log in to
-  def link_root_account
+  def link_root_account(pre_loaded_account: nil)
+    context = pre_loaded_account
     @root_account ||= begin
-      context = self.context
+      context ||= self.context
       if context.is_a?(CommunicationChannel) && @data&.root_account_id
         root_account = Account.where(id: @data.root_account_id).first
         context = root_account if root_account
       end
 
-      context = context.assignment if context.respond_to?(:assignment) && context.assignment
+      # root_account is on lots of objects, use it when we can.
+      context = context.root_account if context.respond_to?(:root_account)
+      # some of these `context =` may not be relevant now that we have
+      # root_account on many classes, but root_account doesn't respond to them
+      # and so it's fast, and there are a lot of ways to generate a message.
+      context = context.assignment.root_account if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
       context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
       context = context.master_template.course if context.respond_to?(:master_template) && context.master_template
       context = context.context if context.respond_to?(:context)
       context = context.account if context.respond_to?(:account)
       context = context.root_account if context.respond_to?(:root_account)
+
+      # Going through SisPseudonym.for is important since the account could change
       if context && context.respond_to?(:root_account)
         p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
@@ -584,9 +620,12 @@ class Message < ActiveRecord::Base
   # path_type - The path to send the message across, e.g, 'email'.
   #
   # Returns nothing.
-  def parse!(path_type=nil)
+  def parse!(path_type=nil, root_account: nil)
     raise StandardError, "Cannot parse without a context" unless self.context
 
+    # set @root_account using our pre_loaded_account, because link_root_account
+    # is called many times.
+    link_root_account(pre_loaded_account: root_account)
     # Get the users timezone but maintain the original timezone in order to set it back at the end
     original_time_zone = Time.zone.name || "UTC"
     user_time_zone     = self.user.try(:time_zone) || root_account_time_zone || original_time_zone
@@ -651,14 +690,19 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    check_acct = root_account || user&.account || Account.site_admin
-    if path_type == 'sms' && !check_acct.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms)
-      if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
-        InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
-                                     short_stat: 'message.skip',
-                                     tags: {path_type: path_type, notification_name: notification_name})
-        self.destroy
-        return nil
+    check_acct = infer_feature_account
+
+    if path_type == 'sms'
+      if Account.site_admin.feature_enabled?(:deprecate_sms)
+        return skip_and_cancel
+      elsif Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
+        return skip_and_cancel
+      end
+    end
+
+    if path_type == "push"
+      if Notification.types_to_send_in_push.exclude?(notification_name) || !check_acct.enable_push_notifications?
+        return skip_and_cancel
       end
     end
 
@@ -681,6 +725,13 @@ class Message < ActiveRecord::Base
       end
       send(delivery_method)
     end
+  end
+
+  def skip_and_cancel
+    InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
+                                 short_stat: 'message.skip',
+                                 tags: { path_type: path_type, notification_name: notification_name })
+    self.cancel
   end
 
   # Public: Enqueues a message to the notification_service's sqs queue
@@ -790,6 +841,13 @@ class Message < ActiveRecord::Base
     message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
+  # Public: Message to use if the message is unavailable to send.
+  #
+  # Returns a string
+  def self.unavailable_message
+    I18n.t('message preview unavailable')
+  end
+
   # Public: Get the root account of this message's context.
   #
   # Returns an account.
@@ -827,6 +885,14 @@ class Message < ActiveRecord::Base
 
       current_context
     end
+  end
+
+  def media_context
+    context = self.context
+    context = context.context if context.respond_to?(:context)
+    return context if context.is_a?(Course)
+    context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
+    context
   end
 
   def notification_service_id
@@ -906,6 +972,17 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # Public: Truncate the message if it exceeds 64kb
+  #
+  # Returns nothing.
+  def truncate_invalid_message
+    [:body, :html_body].each do |attr|
+      if self.send(attr) && self.send(attr).bytesize > self.class.maximum_text_length
+        self.send("#{attr}=", Message.unavailable_message)
+      end
+    end
+  end
+
   # Public: Before save, prepare dashboard messages for display on dashboard.
   #
   # Returns nothing.
@@ -924,6 +1001,19 @@ class Message < ActiveRecord::Base
   end
 
   protected
+
+  # Internal: Choose account to check feature flags on.
+  #
+  # used to choose which account to trust for inspecting
+  # feature state to decide how to send messages.  In general
+  # the root account is a good choice, but for a user-context
+  # message (which would intentionally have a dummy root account),
+  # we want to make sure we aren't inspecting
+  # features on the dummy account
+  def infer_feature_account
+    root_account&.unless_dummy || user&.account || Account.site_admin
+  end
+
   # Internal: Deliver the message through email.
   #
   # Returns nothing.

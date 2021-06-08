@@ -178,7 +178,7 @@ module AccountReports::ReportHelper
   end
 
   def check_report_key(key)
-    AccountReports.available_reports[@account_report.report_type][:parameters].keys.include? key
+    AccountReports.available_reports[@account_report.report_type].parameters.key? key
   end
 
   def report_extra_text
@@ -223,7 +223,7 @@ module AccountReports::ReportHelper
     shards << root_account.shard
     User.preload_shard_associations(users)
     shards = shards & users.map(&:associated_shards).flatten
-    pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
+    pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users.map(&:id))
     pseudonyms = pseudonyms.active unless include_deleted
     pseudonyms.each do |p|
       p.account = root_account if p.account_id == root_account.id
@@ -253,6 +253,29 @@ module AccountReports::ReportHelper
         add_extra_text(I18n.t('Include Deleted Objects;'))
       end
     end
+  end
+
+  def include_enrollment_filter
+    if @account_report.value_for_param "enrollment_filter"
+      @enrollment_filter = Enrollment.valid_types & Api.value_to_array(@account_report.parameters["enrollment_filter"])
+      if @enrollment_filter
+        add_extra_text("Include Enrollment Roles: #{@enrollment_filter.to_sentence};")
+      end
+    end
+  end
+
+  def include_enrollment_states
+    if @account_report.value_for_param "enrollment_states"
+      @enrollment_states = valid_enrollment_workflow_states
+      if @enrollment_states
+        add_extra_text("Include Enrollment States: #{@enrollment_states.to_sentence};")
+      end
+    end
+  end
+
+  def valid_enrollment_workflow_states
+    %w(invited creation_pending active completed inactive deleted rejected).freeze &
+      Api.value_to_array(@account_report.parameters["enrollment_states"])
   end
 
   def report_title(account_report)
@@ -327,9 +350,9 @@ module AccountReports::ReportHelper
 
     @account_report.update(total_lines: total_runners)
 
-    args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
+    args = {priority: Delayed::LOW_PRIORITY, n_strand: ["account_report_runner", root_account.global_id]}
     @account_report.account_report_runners.find_each do |runner|
-      self.send_later_enqueue_args(:run_account_report_runner, args, runner, headers, files: files)
+      delay(**args).run_account_report_runner(runner, headers, files: files)
     end
   end
 
@@ -341,13 +364,15 @@ module AccountReports::ReportHelper
   end
 
   def build_report_row(row:, row_number: nil, report_runner:, file: nil)
-    # force all fields to strings
-    report_runner.account_report_rows.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
-                                          row_number: row_number,
-                                          file: file,
-                                          account_report_id: report_runner.account_report_id,
-                                          account_report_runner: report_runner,
-                                          created_at: Time.zone.now)
+    report_runner.shard.activate do
+      # force all fields to strings
+      AccountReportRow.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
+                           row_number: row_number,
+                           file: file,
+                           account_report_id: report_runner.account_report_id,
+                           account_report_runner_id: report_runner.id,
+                           created_at: Time.zone.now)
+    end
   end
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)

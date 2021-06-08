@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`can handles no items 1`] = `
-<div>
+<div
+  data-testid="ToDoSidebar"
+>
   <h2
     className="todo-list-header"
   >

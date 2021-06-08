@@ -43,7 +43,7 @@ module Services
       it "populates hosts with an error signal when consul is down" do
         allow(Canvas::DynamicSettings).to receive(:find).
           with('rich-content-service', default_ttl: 5.minutes).
-          and_raise(Imperium::UnableToConnectError, "can't talk to consul")
+          and_raise(Diplomat::KeyNotFound, "can't talk to consul")
         env = described_class.env_for
         expect(env[:RICH_CONTENT_APP_HOST]).to eq("error")
       end

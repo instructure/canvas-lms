@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -190,7 +192,7 @@ class EportfoliosController < ApplicationController
         @attachment.file_state = '0'
         @attachment.user = @current_user
         @attachment.save!
-        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
+        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
         render :json => @attachment
       else
         respond_to do |format|

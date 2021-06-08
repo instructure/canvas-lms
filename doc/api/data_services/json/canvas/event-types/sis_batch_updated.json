@@ -1,0 +1,48 @@
+{
+  "name": "sis_batch_updated",
+  "definition": "The event is emitted when a newly created SIS import status changes.",
+  "trigger": "Triggered when workflow_state state changes for a newly created SIS import.",
+  "schema": {
+    "sis_batch_id": "The internal SIS import id.",
+    "account_id": "The id of the Canvas account the SIS data is being imported to.",
+    "workflow_state": "The status of the current SIS Import."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs:canvas-lms",
+          "user_login": "mysisimporterlogin",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": null,
+          "user_id": "21070000000000109",
+          "time_zone": "America/Los_Angeles",
+          "developer_key_id": "170000000056",
+          "context_type": "Account",
+          "context_id": "21070000000000001",
+          "context_sis_source_id": null,
+          "context_account_id": "21070000000000001",
+          "context_role": "AccountAdmin",
+          "request_id": "ab398133-5324-4234-b31b-419b8d9f1209",
+          "session_id": null,
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "python-requests/2.5.1",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/accounts/1/sis_imports.json?import_type=instructure_csv&override_sis_stickiness=true&extension=csv",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "sis_batch_updated",
+          "event_time": "2020-01-15T16:20:25.548Z"
+        },
+        "body": {
+          "sis_batch_id": "1440004",
+          "account_id": "1",
+          "workflow_state": "created"
+        }
+      }
+    }
+  ]
+}

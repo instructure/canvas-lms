@@ -619,9 +619,9 @@ describe CoursesController, type: :request do
   end
 
   it "should include tabs (and precalculate stuff in theory) if requested" do
-    c1 = course_with_student(course_name: 'def', active_all: true).course
+    course_with_student(course_name: 'def', active_all: true)
 
-    json = api_call(:get, "/api/v1/courses.json?include[]=tabs", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
     expect(json.first['tabs']).to match_array([
       a_hash_including({"id" => "home"}),
       a_hash_including({"id" => "discussions"}),
@@ -629,6 +629,14 @@ describe CoursesController, type: :request do
       a_hash_including({"id" => "people"}),
       a_hash_including({"id" => "syllabus"}),
     ])
+  end
+
+  it "should include files tab if requested (granular)" do
+    course_with_teacher(active_all: true)
+    @course.root_account.enable_feature!(:granular_permissions_course_files)
+
+    json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
+    expect(json.first['tabs']).to include(a_hash_including({"id" => "files"}))
   end
 
   describe "user index" do
@@ -719,6 +727,72 @@ describe CoursesController, type: :request do
       entry = json.detect { |course| course['id'] == @course.id }
       expect(entry['name']).to eq 'meh'
     end
+
+    it "limits the response to homeroom courses if requested" do
+      c1 = course_with_teacher(course_name: 'not homeroom', active_all: true).course
+      c2 = course_with_teacher(user: @teacher, course_name: 'homeroom frd', active_all: true).course
+      c2.homeroom_course = true
+      c2.save!
+      json = api_call_as_user(@teacher, :get, "/api/v1/users/self/courses?homeroom=true",
+                              user_id: 'self', controller: 'courses', action: 'user_index', homeroom: 'true',
+                              format: 'json')
+      expect(json.map{|c|c['name']}).to eq(['homeroom frd'])
+    end
+  end
+
+  describe "user_progress" do
+    before :once do
+      account_admin_user
+      @module = @course.context_modules.create!(:name => "teh module")
+      @assignment = @course.assignments.create!(:title => "teh assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+      @module.publish
+      @module.save!
+    end
+
+    it "allows a student to query 'self'" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/self/progress",
+                              { :course_id => @course.to_param, :user_id => 'self', :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "allows an administrator to query another user" do
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "returns 404 if querying a user who isn't in the course" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{other_user.id}/progress",
+                       { :course_id => @course.to_param, :user_id => other_user.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 404 })
+    end
+
+    it "returns 400 if querying a user who isn't a student" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 400 })
+    end
+
+    it "allows a teacher to query a student in the course" do
+      json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "verifies that a user has permission" do
+      api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 401 })
+    end
+
+
   end
 
   it 'should paginate the course list' do
@@ -796,7 +870,9 @@ describe CoursesController, type: :request do
           'sis_import_id' => nil,
           'workflow_state' => 'available',
           'default_view' => 'modules',
-          'storage_quota_mb' => @account.default_storage_quota_mb
+          'storage_quota_mb' => @account.default_storage_quota_mb,
+          'homeroom_course' => false,
+          'course_color' => nil
         })
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
@@ -876,7 +952,9 @@ describe CoursesController, type: :request do
           'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid,
-          'blueprint' => false
+          'blueprint' => false,
+          'homeroom_course' => false,
+          'course_color' => nil
         )
         expect(json).to eql course_response
       end
@@ -995,6 +1073,7 @@ describe CoursesController, type: :request do
 
       context "without :manage_storage_quotas" do
         before :once do
+          @account.root_account.disable_feature!(:granular_permissions_manage_courses)
           @role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :role => @role
@@ -1019,6 +1098,58 @@ describe CoursesController, type: :request do
           new_course = Course.find(json['id'])
           expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
         end
+      end
+
+      context "without :manage_storage_quotas (granular permissions)" do
+        before :once do
+          @account.root_account.enable_feature!(:granular_permissions_manage_courses)
+          @role = custom_account_role 'lamer', :account => @account
+          @account.role_overrides.create! :permission => 'manage_courses_add', :enabled => true,
+                                          :role => @role
+          user_factory
+          @account.account_users.create!(user: @user, role: @role)
+        end
+
+        it "should ignore storage_quota" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.storage_quota).to eq @account.default_storage_quota
+        end
+
+        it "should ignore storage_quota_mb" do
+          json = api_call(:post, @resource_path,
+                          @resource_params,
+                          { :account_id => @account.id, :course => { :storage_quota_mb => 12345 } }
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.storage_quota_mb).to eq @account.default_storage_quota_mb
+        end
+      end
+
+      it "applies a course template" do
+        template = @account.courses.create!(name: 'Template', template: true)
+        template.assignments.create!(title: 'my assignment')
+
+        @account.root_account.enable_feature!(:course_templates)
+        @account.update!(course_template: template)
+
+        post_params = {
+          'account_id' => @account.id,
+          'offer'      => true,
+          'course'     => {
+            'name' => 'Test Course',
+          }
+        }
+        expect(Auditors::Course).to receive(:record_created).once
+        json = api_call(:post, @resource_path, @resource_params, post_params)
+        run_jobs
+        new_course = Course.find(json['id'])
+        expect(new_course.name).to eq 'Test Course'
+        expect(new_course.assignments.length).to eq 1
+        expect(new_course.assignments.first.title).to eq 'my assignment'
       end
     end
 
@@ -1292,9 +1423,28 @@ describe CoursesController, type: :request do
         @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
         @course.grading_standard = @standard
         @course.save!
-        json = api_call(:put, @path, @params, :course => {})
+        api_call(:put, @path, @params, :course => {})
         @course.reload
         expect(@course.grading_standard).to eq @standard
+      end
+
+      context "with course templates" do
+        before { @course.root_account.enable_feature!(:course_templates) }
+
+        it "allows setting a template" do
+          # can't do it if anyone is enrolled
+          @course.enrollments.each(&:destroy)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).to be_a_template
+        end
+
+        it "ignores setting template if it's not possible" do
+          @course.enroll_user(@user)
+          api_call(:put, @path, @params, { 'course' => { 'template' => true } })
+          @course.reload
+          expect(@course).not_to be_a_template
+        end
       end
 
       context "when an assignment is due in a closed grading period" do
@@ -1572,7 +1722,6 @@ describe CoursesController, type: :request do
         expect(JSON.parse(response.body)).to eq({
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
-
       end
 
       it "should return 400 if an unknown event type is used" do
@@ -1582,7 +1731,15 @@ describe CoursesController, type: :request do
           'message' => 'Only "delete" and "conclude" events are allowed.'
         })
       end
+
+      it "prevents deletion of template courses" do
+        @course.enrollments.each(&:destroy)
+        @course.update!(template: true)
+        raw_api_call(:delete, @path, @params, { event: 'delete' })
+        expect(response.code).to eql '401'
+      end
     end
+
     context "an unauthorized user" do
       it "should return 401" do
         @user = @student
@@ -1600,6 +1757,27 @@ describe CoursesController, type: :request do
     end
     context "an authorized user" do
       it "should be able to reset a course" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+        expect(Auditors::Course).to receive(:record_reset).once.
+          with(@course, anything, @user, anything)
+
+        json = api_call(:post, @path, @params)
+        @course.reload
+        expect(@course.workflow_state).to eql 'deleted'
+        new_course = Course.find(json['id'])
+        expect(new_course.workflow_state).to eql 'claimed'
+        expect(json['workflow_state']).to eql 'unpublished'
+      end
+    end
+
+    context "an authorized user (granular permissions)" do
+      it "should be able to reset a course" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+        @course.root_account.role_overrides.create!(
+          role: teacher_role,
+          permission: 'manage_courses_delete',
+          enabled: true
+        )
         expect(Auditors::Course).to receive(:record_reset).once.
           with(@course, anything, @user, anything)
 
@@ -3448,6 +3626,8 @@ describe CoursesController, type: :request do
         'enrollment_term_id' => @course.enrollment_term_id,
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
+        'homeroom_course' => false,
+        'course_color' => nil,
         'uuid' => @course1.uuid,
         'blueprint' => false,
         'license' => nil
@@ -3532,6 +3712,13 @@ describe CoursesController, type: :request do
         "rubrics"
       ]
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
+    end
+
+    it "includes template when feature enabled" do
+      @course1.root_account.enable_feature!(:course_templates)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
+                      { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
+      expect(json['template']).to eq false
     end
 
     context "include[]=sections" do
@@ -3713,6 +3900,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3728,6 +3916,7 @@ describe CoursesController, type: :request do
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => true,
+          'homeroom_course' => false,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3751,6 +3940,7 @@ describe CoursesController, type: :request do
           :allow_student_forum_attachments => true,
           :allow_student_discussion_editing => false,
           :allow_student_organized_groups => false,
+          :course_color => '#AABBCC',
           :filter_speed_grader_by_student_group => true,
           :hide_distribution_graphs => true,
           :hide_sections_on_course_users_page => true,
@@ -3761,13 +3951,15 @@ describe CoursesController, type: :request do
           :restrict_student_future_view => true,
           :show_announcements_on_home_page => false,
           :syllabus_course_summary => false,
-          :home_page_announcement_limit => nil
+          :home_page_announcement_limit => nil,
+          :homeroom_course => true
         })
         expect(json).to eq({
           'allow_final_grade_override' => true,
           'allow_student_discussion_topics' => false,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => false,
+          'course_color' => '#AABBCC',
           'filter_speed_grader_by_student_group' => true,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3783,6 +3975,7 @@ describe CoursesController, type: :request do
           'show_announcements_on_home_page' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => false,
+          'homeroom_course' => true,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3793,6 +3986,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_forum_attachments).to eq true
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
+        expect(@course.course_color).to eq '#AABBCC'
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_sections_on_course_users_page).to be true
         expect(@course.hide_final_grades).to eq true
@@ -3801,6 +3995,7 @@ describe CoursesController, type: :request do
         expect(@course.show_announcements_on_home_page).to eq false
         expect(@course.syllabus_course_summary?).to eq false
         expect(@course.home_page_announcement_limit).to be nil
+        expect(@course.homeroom_course?).to eq true
       end
     end
 
@@ -3821,6 +4016,7 @@ describe CoursesController, type: :request do
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => true,
+          'course_color' => nil,
           'filter_speed_grader_by_student_group' => false,
           'grading_standard_enabled' => false,
           'grading_standard_id' => nil,
@@ -3836,6 +4032,7 @@ describe CoursesController, type: :request do
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => true,
+          'homeroom_course' => false,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3961,6 +4158,40 @@ describe CoursesController, type: :request do
     it "returns unauthorized if the caller does not have permission to use the student view" do
       response = api_call_as_user(student, :get, path, request_params)
       expect(response["status"]).to eq "unauthorized"
+    end
+  end
+
+  describe "grading periods" do
+    before :once do
+      student_in_course :active_all => true
+    end
+
+    let_once(:grading_periods) do
+      group = Account.default.grading_period_groups.create!(title: "Score Test Group")
+      group.enrollment_terms << @course.enrollment_term
+      Factories::GradingPeriodHelper.new.create_presets_for_group(group, :past, :current, :future)
+      group.grading_periods
+    end
+
+    let_once(:expected_common_fields) do
+      {
+          "id" => be,
+          "start_date" => be,
+          "end_date" => be,
+          "workflow_state" => "active"
+      }
+    end
+
+    it "returns all associated grading periods when requested" do
+      results = api_call_as_user(@student, :get, "/api/v1/courses.json",
+                                 { :controller => 'courses', :action => 'index', :format => 'json' },
+                                 { :include => ['grading_periods'] })
+      expect(results[0]["grading_periods"]).to all(include(expected_common_fields))
+      expect(results[0]["grading_periods"]).to match [
+        a_hash_including("title" => "Period 1: past period"),
+        a_hash_including("title" => "Period 2: current period"),
+        a_hash_including("title" => "Period 3: future period"),
+      ]
     end
   end
 end

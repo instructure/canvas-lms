@@ -69,6 +69,12 @@ describe Types::GroupType do
       ).to eq @membership.id.to_s
     end
 
+    it "returns nil if membership not found in group" do
+      expect(
+        group_type.resolve(%|member(userId: "#{@student_not_in_group.id}") { _id }|)
+      ).to be_nil
+    end
+
     it "requires permission" do
       expect(
         group_type.resolve(%|member(userId: "#{@student_in_group.id}") { _id }|,

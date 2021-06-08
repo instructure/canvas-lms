@@ -20,13 +20,15 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 import {themeable} from '@instructure/ui-themeable'
-import {Heading, Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
-import {shape, string, number, arrayOf, func} from 'prop-types'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {bool, shape, string, number, arrayOf, func} from 'prop-types'
 import {userShape, itemShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
-import {getFriendlyDate, getFullDate, isToday} from '../../utilities/dateUtils'
+import theme from './theme'
+import {getFriendlyDate, getDynamicFullDate, isToday} from '../../utilities/dateUtils'
+import MissingAssignments from '../MissingAssignments'
 import Grouping from '../Grouping'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
@@ -41,11 +43,17 @@ export class Day extends Component {
     updateTodo: func,
     registerAnimatable: func.isRequired,
     deregisterAnimatable: func.isRequired,
-    currentUser: shape(userShape)
+    currentUser: shape(userShape),
+    simplifiedControls: bool,
+    singleCourseView: bool,
+    showMissingAssignments: bool
   }
 
   static defaultProps = {
-    animatableIndex: 0
+    animatableIndex: 0,
+    simplifiedControls: false,
+    singleCourseView: false,
+    showMissingAssignments: false
   }
 
   constructor(props) {
@@ -53,14 +61,14 @@ export class Day extends Component {
 
     const tzMomentizedDate = moment.tz(props.day, props.timeZone)
     this.friendlyName = getFriendlyDate(tzMomentizedDate)
-    this.fullDate = getFullDate(tzMomentizedDate)
+    this.date = getDynamicFullDate(tzMomentizedDate, props.timeZone)
   }
 
   componentDidMount() {
     this.props.registerAnimatable('day', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.props.deregisterAnimatable('day', this, this.itemUniqueIds())
     this.props.registerAnimatable(
       'day',
@@ -102,6 +110,8 @@ export class Day extends Component {
         }}
         toggleCompletion={this.props.toggleCompletion}
         currentUser={this.props.currentUser}
+        simplifiedControls={this.props.simplifiedControls}
+        singleCourseView={this.props.singleCourseView}
       />
     )
   }
@@ -139,17 +149,18 @@ export class Day extends Component {
     return (
       <div className={classnames(styles.root, 'planner-day', {'planner-today': thisIsToday})}>
         <Heading border={this.hasItems() ? 'none' : 'bottom'}>
-          <Text
-            as="div"
-            transform="uppercase"
-            lineHeight="condensed"
-            size={thisIsToday ? 'large' : 'medium'}
-          >
-            {this.friendlyName}
-          </Text>
-          <Text as="div" lineHeight="condensed">
-            {this.fullDate}
-          </Text>
+          {thisIsToday ? (
+            <>
+              <Text as="div" size="large" weight="bold">
+                {this.friendlyName}
+              </Text>
+              <div className={styles.secondary}>{this.date}</div>
+            </>
+          ) : (
+            <div className={styles.secondary}>
+              {this.friendlyName}, {this.date}
+            </div>
+          )}
         </Heading>
 
         <div>
@@ -161,9 +172,15 @@ export class Day extends Component {
             </View>
           )}
         </div>
+        {thisIsToday && this.props.showMissingAssignments && (
+          <MissingAssignments timeZone={this.props.timeZone} />
+        )}
       </div>
     )
   }
 }
 
-export default animatable(themeable(theme, styles)(Day))
+const ThemeableDay = themeable(theme, styles)(Day)
+const AnimatableDay = animatable(ThemeableDay)
+AnimatableDay.theme = ThemeableDay.theme
+export default AnimatableDay

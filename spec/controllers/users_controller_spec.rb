@@ -20,8 +20,11 @@
 
 require_relative '../sharding_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe UsersController do
+  include K5Common
+
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
   describe "external_tool" do
@@ -231,6 +234,23 @@ describe UsersController do
       expect(session[:oauth_gdrive_access_token]).to be_nil
       expect(session[:oauth_gdrive_refresh_token]).to be_nil
     end
+
+    it "handles auth failure gracefully" do
+      authorization_mock = double('authorization')
+      allow(authorization_mock).to receive_messages(:code= => nil)
+      allow(authorization_mock).to receive(:fetch_access_token!) do
+        raise Signet::AuthorizationError, "{\"error\": \"invalid_grant\", \"error_description\": \"Bad Request\"}"
+      end
+      drive_mock = Google::APIClient::API.new('mock', {})
+      allow(drive_mock).to receive(:about).and_return(double(get: nil))
+      client_mock = double("client")
+      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
+      state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
+      get :oauth_success, params: {state: state, service: "google_drive", code: "some_code"}
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "Google Drive failed authorization for current user!"
+    end
   end
 
   context "manageable_courses" do
@@ -250,8 +270,9 @@ describe UsersController do
 
     it "should not include future teacher term courses in manageable courses" do
       course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
-      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
-        :start_at => 1.week.from_now, :end_at => 2.weeks.from_now)
+      term = @course.enrollment_term
+      term.enrollment_dates_overrides.create!(
+        enrollment_type: "TeacherEnrollment", start_at: 1.week.from_now, end_at: 2.weeks.from_now, context: term.root_account)
 
       get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
       expect(response).to be_successful
@@ -271,6 +292,27 @@ describe UsersController do
 
       courses = json_parse
       expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
+    end
+
+    it "should sort the results of manageable_courses by term with default term first then alphabetically" do
+      # Default term
+      course_with_teacher_logged_in(:course_name => "E", :active_all => 1)
+      future_term = EnrollmentTerm.create(start_at: 1.day.from_now, root_account: @teacher.account)
+      past_term = EnrollmentTerm.create(start_at: 1.day.ago, root_account: @teacher.account)
+      # Future terms
+      %w(b a).each do |name|
+        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => future_term.id)
+      end
+      # Past terms
+      %w(d c).each do |name|
+        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+      end
+
+      get 'manageable_courses', params: {:user_id => @teacher.id}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses.map { |c| c['label'] }).to eq %w(E c d a b)
     end
 
     it "should not include courses that an admin doesn't have rights to see" do
@@ -322,11 +364,10 @@ describe UsersController do
         course1.workflow_state = 'completed'
         course1.save!
 
-        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
-        course2 = @course
-        course2.start_at = 7.days.ago
-        course2.conclude_at = 1.day.ago
-        course2.save!
+        past_term = EnrollmentTerm.create(start_at: 14.days.ago, end_at:7.days.ago, root_account: @teacher.account)
+        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+
+        course_with_teacher(:course_name => "MyOldCourse", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
 
         course_with_teacher(:course_name => "MyCourse3", :user => @teacher, :active_all => 1)
       end
@@ -347,6 +388,55 @@ describe UsersController do
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
       end
+
+      it "should include concluded courses for teachers when passing include = 'concluded'" do
+        get 'manageable_courses', params: {:user_id => @teacher.id, :include => 'concluded'}
+        expect(response).to be_successful
+        courses = json_parse
+
+        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1','MyCourse2','MyCourse3',"MyOldCourse"].sort
+      end
+
+      it "should include concluded courses for admins when passing include = 'concluded'" do
+        account_admin_user
+        user_session(@admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id, :include => 'concluded'}
+        expect(response).to be_successful
+        courses = json_parse
+
+        expect(courses.map { |c| c['course_code'] }.sort).to eq ['MyCourse1','MyCourse2','MyCourse3',"MyOldCourse"].sort
+      end
+
+      it "should include courses with overridden dates as not concluded for teachers if the course period is active" do
+        my_old_course = Course.find_by(course_code: 'MyOldCourse')
+        my_old_course.restrict_enrollments_to_course_dates = true
+        my_old_course.start_at = 2.weeks.ago
+        my_old_course.conclude_at = 2.weeks.from_now
+        my_old_course.save!
+
+        get 'manageable_courses', params: {:user_id => @teacher.id}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
+      end
+
+      it "should include courses with overridden dates as not concluded for admins if the course period is active" do
+        my_old_course = Course.find_by(course_code: 'MyOldCourse')
+        my_old_course.restrict_enrollments_to_course_dates = true
+        my_old_course.start_at = 2.weeks.ago
+        my_old_course.conclude_at = 2.weeks.from_now
+        my_old_course.save!
+
+        account_admin_user
+        user_session(@admin)
+
+        get 'manageable_courses', params: {:user_id => @admin.id}
+        expect(response).to be_successful
+        courses = json_parse
+        expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
+      end
+
     end
 
     context "sharding" do
@@ -409,6 +499,11 @@ describe UsersController do
           oe = new_user.observer_enrollments.first
           expect(oe.course).to eq @course
           expect(oe.associated_user).to eq @user
+        end
+
+        it "should not 500 when paring code is not in request" do
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com' }, user: { name: 'Jane Observer', terms_of_use: '1', initial_enrollment_type: 'observer' } }, format: 'json'
+          assert_status(400)
         end
 
         it "should allow observers to self register with a pairing code" do
@@ -540,6 +635,34 @@ describe UsersController do
         expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
 
+      it "should store a confirmation_redirect url if it's trusted" do
+        allow(CommunicationChannel).to receive(:trusted_confirmation_redirect?).
+          with(Account.default, 'https://benevolent.place').
+          and_return(true)
+
+        post 'create', params: {
+          :pseudonym => { :unique_id => 'jacob@instructure.com' },
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
+          :communication_channel => { :confirmation_redirect => 'https://benevolent.place' }
+        }
+        expect(response).to be_successful
+        expect(CommunicationChannel.last.confirmation_redirect).to eq('https://benevolent.place')
+      end
+
+      it "should not store a confirmation_redirect url if it's not trusted" do
+        allow(CommunicationChannel).to receive(:trusted_confirmation_redirect?).
+          with(Account.default, 'https://nasty.place').
+          and_return(false)
+
+        post 'create', params: {
+          :pseudonym => { :unique_id => 'jacob@instructure.com' },
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
+          :communication_channel => { :confirmation_redirect => 'https://nasty.place' }
+        }
+        expect(response).to be_successful
+        expect(CommunicationChannel.last.confirmation_redirect).to be_nil
+      end
+
       it "should create a registered user if the skip_registration flag is passed in" do
         post('create', params: {
           :pseudonym => { :unique_id => 'jacob@instructure.com'},
@@ -669,6 +792,15 @@ describe UsersController do
           expect(response).to be_successful
         end
 
+        it "should set root_account_ids" do
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' },
+                                   user: { name: 'happy gilmore', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code + ' ', initial_enrollment_type: 'student' },
+                                   self_enrollment: '1' }
+          expect(response).to be_successful
+          u = User.where(name: 'happy gilmore').take
+          expect(u.root_account_ids).to eq [Account.default.id]
+        end
+
         it "should ignore the password if self enrolling with an email pseudonym" do
           post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1'}
           expect(response).to be_successful
@@ -737,6 +869,19 @@ describe UsersController do
           expect(p).to be_active
           expect(p.sis_user_id).to eq 'testsisid'
           expect(p.integration_id).to eq 'abc'
+          expect(p.user).to be_pre_registered
+        end
+
+        it "should reassign null values when passing empty strings for pseudonym[integration_id]" do
+          post 'create', params: {account_id: account.id,
+                                  pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', integration_id: '', path: '' },
+                                  user: { name: 'Jacob Fugal' }}, format: 'json'
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: 'jacob').first
+          expect(p.account_id).to eq account.id
+          expect(p).to be_active
+          expect(p.sis_user_id).to eq 'testsisid'
+          expect(p.integration_id).to be_nil
           expect(p.user).to be_pre_registered
         end
 
@@ -1885,6 +2030,23 @@ describe UsersController do
     end
   end
 
+  describe "GET 'admin_split'" do
+    before :once do
+      account_admin_user
+    end
+
+    it 'sets the env' do
+      user1 = user_with_pseudonym
+      user2 = user_with_pseudonym
+      UserMerge.from(user2).into user1
+      user_session(@admin)
+      get 'admin_split', params: {:user_id => user1.id}
+      expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
+      expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
+      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].map { |user| user[:id] }).to eq([user2.id])
+    end
+  end
+
   describe "GET 'show'" do
     context "sharding" do
       specs_require_sharding
@@ -1934,6 +2096,30 @@ describe UsersController do
       get 'show', params: {:id => @teacher.id}
       expect(response).to be_successful
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
+    end
+
+    it "404s on a deleted user" do
+      course_with_teacher(:active_all => 1)
+
+      account_admin_user
+      user_session(@admin)
+      @teacher.destroy
+
+      get 'show', params: { id: @teacher.id }
+      expect(response.status).to eq 404
+      expect(response).not_to render_template('users/show')
+    end
+
+    it "404s, but still shows, on a deleted user for site admins" do
+      course_with_teacher(:active_all => 1)
+
+      account_admin_user(account: Account.site_admin)
+      user_session(@admin)
+      @teacher.destroy
+
+      get 'show', params: { id: @teacher.id }
+      expect(response.status).to eq 404
+      expect(response).to render_template('users/show')
     end
 
     it "should respond to JSON request" do
@@ -2236,6 +2422,7 @@ describe UsersController do
 
       new_user1 = User.where(:name => 'example1@example.com').first
       new_user2 = User.where(:name => 'Hurp Durp').first
+      expect([new_user1, new_user2].map(&:root_account_ids)).to match_array([[@course.root_account_id], [@course.root_account_id]])
       expect(json['invited_users'].map{|u| u['id']}).to match_array([new_user1.id, new_user2.id])
       expect(json['invited_users'].map{|u| u['user_token']}).to match_array([new_user1.token, new_user2.token])
     end
@@ -2323,6 +2510,120 @@ describe UsersController do
         expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "some nickname or whatever"
         expect(course_data.detect{|h| h[:id] == @course2.id}[:shortName]).to eq @course2.name
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should load nicknames for a cross-shard user" do
+          @shard1.activate do
+            xs_user = user_factory(active_all: true)
+            @course1.enroll_student(xs_user, enrollment_state: 'active')
+            xs_user.set_preference(:course_nicknames, @course1.id, "worst class")
+            user_session(xs_user)
+          end
+          get 'user_dashboard'
+          course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+          expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "worst class"
+        end
+      end
+    end
+
+    context "with canvas for elementary feature account setting" do
+      before(:once) do
+        @account = Account.default
+      end
+
+      before(:each) do
+        course_with_student_logged_in(active_all: true)
+      end
+
+      context "disabled" do
+        before(:once) do
+          toggle_k5_setting(@account, false)
+        end
+
+        it "only returns classic dashboard bundles" do
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:js_env][:K5_USER]).to be_falsy
+        end
+      end
+
+      context "enabled" do
+        before(:once) do
+          toggle_k5_setting(@account, true)
+        end
+
+        it "returns K-5 dashboard bundles" do
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :dashboard
+          expect(assigns[:js_env][:K5_USER]).to be_truthy
+        end
+      end
+    end
+
+    context "ENV.INITIAL_NUM_K5_CARDS" do
+      before :once do
+        course_with_student
+      end
+
+      before :each do
+        user_session @student
+      end
+
+      it "is set to cached count" do
+        enable_cache do
+          Rails.cache.write(['last_known_k5_cards_count', @student.global_id].cache_key, 3)
+          get 'user_dashboard'
+          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 3
+          Rails.cache.delete(['last_known_k5_cards_count', @student.global_id].cache_key)
+        end
+      end
+
+      it "is set to 5 if not cached" do
+        enable_cache do
+          get 'user_dashboard'
+          expect(assigns[:js_env][:INITIAL_NUM_K5_CARDS]).to eq 5
+        end
+      end
+    end
+
+    context "ENV.PERMISSIONS" do
+      it "sets :create_courses_as_admin to true if user is admin" do
+        account_admin_user
+        user_session @user
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
+      end
+
+      it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
+        Account.default.settings[:teachers_can_create_courses] = true
+        course_with_teacher_logged_in
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
+      end
+
+      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
+        course_with_teacher_logged_in
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+      end
+
+      it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
+        course_with_student_logged_in
+        get 'user_dashboard'
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+      end
     end
   end
 
@@ -2332,7 +2633,7 @@ describe UsersController do
       user_session(@user)
       get 'pandata_events_token'
       assert_status(400)
-      json = JSON.parse(response.body.gsub("while(1);", ""))
+      json = JSON.parse(response.body)
       expect(json['message']).to eq "Access token required"
     end
   end

@@ -138,6 +138,11 @@ module ActionView::TestCase::Behavior
   end
 end
 
+if ENV['ENABLE_AXE_SELENIUM'] == '1'
+  require_relative './axe_selenium_helper'
+  AxeSelenium.install!
+end
+
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
@@ -147,7 +152,7 @@ module RSpec::Rails
 
   RSpec::Matchers.define :have_tag do |expected|
     match do |actual|
-      !!Nokogiri::HTML(actual).at_css(expected)
+      !!Nokogiri::HTML5(actual).at_css(expected)
     end
   end
 
@@ -330,7 +335,8 @@ RSpec::Expectations.configuration.on_potential_false_positives = :raise
 require 'rspec_junit_formatter'
 
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = Rails.root.join('tmp', 'rspec')
+  config.example_status_persistence_file_path = Rails.root.join('tmp', "rspec#{ENV.fetch('PARALLEL_INDEX', '0').to_i}")
+  config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root.join('spec', 'fixtures')
@@ -349,14 +355,15 @@ RSpec.configure do |config|
   config.include PGCollkeyHelper
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
-  # DOCKER_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV['DOCKER_PROCESSES']
+  # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
+  if ENV['RSPEC_PROCESSES']
+    file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
-    config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
+    config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
   end
 
   if ENV['RSPEC_LOG']
-    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime_rspec_tests.log"
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.log"
   end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
@@ -465,15 +472,15 @@ RSpec.configure do |config|
       super
     end
   end
-  Canvas.singleton_class.prepend(TrackRedisUsage)
-  Canvas.redis_used = true
+  Canvas::Redis.singleton_class.prepend(TrackRedisUsage)
+  Canvas::Redis.redis_used = true
 
   config.before :each do
-    if Canvas.redis_enabled? && Canvas.redis_used
+    if Canvas::Redis.redis_enabled? && Canvas::Redis.redis_used
       # yes, we really mean to run this dangerous redis command
-      GuardRail.activate(:deploy) { Canvas.redis.flushdb }
+      GuardRail.activate(:deploy) { Canvas::Redis.redis.flushdb }
     end
-    Canvas.redis_used = false
+    Canvas::Redis.redis_used = false
   end
 
   #****************************************************************
@@ -544,7 +551,8 @@ RSpec.configure do |config|
     opts = lines.extract_options!
     opts.reverse_merge!(allow_printing: false)
     account = opts[:account] || @account || account_model
-    opts[:batch] ||= account.sis_batches.create!
+    user = opts[:user] || @user || user_model
+    opts[:batch] ||= account.sis_batches.create!(user_id: user.id)
 
     path = generate_csv_file(lines)
     opts[:files] = [path]
@@ -566,8 +574,8 @@ RSpec.configure do |config|
   def set_cache(new_cache)
     cache_opts = {}
     if new_cache == :redis_cache_store
-      if Canvas.redis_enabled?
-        cache_opts[:redis] = Canvas.redis
+      if Canvas::Redis.redis_enabled?
+        cache_opts[:redis] = Canvas::Redis.redis
       else
         skip "redis required"
       end
@@ -579,7 +587,7 @@ RSpec.configure do |config|
     allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
     allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
-    MultiCache.reset
+    allow(MultiCache).to receive(:cache).and_return(new_cache)
   end
 
   def specs_require_cache(new_cache=:memory_store)
@@ -591,6 +599,7 @@ RSpec.configure do |config|
   def enable_cache(new_cache=:memory_store)
     previous_cache = Rails.cache
     previous_perform_caching = ActionController::Base.perform_caching
+    previous_multicache = MultiCache.cache
     set_cache(new_cache)
     if block_given?
       begin
@@ -601,6 +610,7 @@ RSpec.configure do |config|
         allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
         allow(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
+        allow(MultiCache).to receive(:cache).and_return(previous_multicache)
       end
     end
   end
@@ -622,9 +632,10 @@ RSpec.configure do |config|
 
   def stub_kaltura
     # trick kaltura into being activated
-    allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
+    allow(CanvasKaltura::plugin_settings).to receive(:settings).and_return({
                                                  'domain' => 'kaltura.example.com',
-                                                 'resource_domain' => 'kaltura.example.com',
+                                                 'resource_domain' => 'cdn.kaltura.example.com',
+                                                 'rtmp_domain' => 'rtmp.kaltura.example.com',
                                                  'partner_id' => '100',
                                                  'subpartner_id' => '10000',
                                                  'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
@@ -644,7 +655,7 @@ RSpec.configure do |config|
   end
 
   def json_parse(json_string = response.body)
-    JSON.parse(json_string.sub(%r{^while\(1\);}, ''))
+    JSON.parse(json_string)
   end
 
   # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
@@ -852,7 +863,9 @@ RSpec.configure do |config|
   end
 end
 
-class I18n::Backend::Simple
+require 'lazy_presumptuous_i18n_backend'
+
+class LazyPresumptuousI18nBackend
   def stub(translations)
     @stubs = translations.with_indifferent_access
     singleton_class.instance_eval do
@@ -869,7 +882,7 @@ class I18n::Backend::Simple
   end
 
   def lookup_with_stubs(locale, key, scope = [], options = {})
-    init_translations unless initialized?
+    ensure_initialized
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
     keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
   end

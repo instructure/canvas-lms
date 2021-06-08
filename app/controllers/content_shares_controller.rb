@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -89,15 +91,10 @@ class ContentSharesController < ApplicationController
   include ContentExportApiHelper
   include Api::V1::ContentShare
 
-  before_action :require_direct_share_enabled
   before_action :require_user
   before_action :get_user_param
   before_action :require_current_user, :except => %w(show index unread_count)
   before_action :get_receivers, :only => %w(create add_users)
-
-  def require_direct_share_enabled
-    render json: { message: "Feature disabled" }, status: :forbidden unless @domain_root_account.feature_enabled?(:direct_share)
-  end
 
   def get_user_param
     @user = api_find(User, params[:user_id])
@@ -279,11 +276,6 @@ class ContentSharesController < ApplicationController
 
     unless @receivers.any?
       render(json: { message: 'No valid receiving users found' }, status: :bad_request)
-      return false
-    end
-
-    if @receivers.include?(@current_user)
-      render(json: { message: 'You cannot share with yourself' }, status: :bad_request)
       return false
     end
 

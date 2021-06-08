@@ -40,3 +40,29 @@ RSpec.shared_context "JWT setup" do
     Timecop.freeze(Time.utc(2013,3,13,9,12), &example)
   end
 end
+
+RSpec.shared_context "JWT setup with deprecated secret" do
+  let(:fake_signing_secret){ "abcdefghijklmnopabcdefghijklmnop" }
+  let(:fake_encryption_secret){ "qrstuvwxyzqrstuvwxyzqrstuvwxyzqr" }
+  let(:fake_deprecated_signing_secret){ "nowiknowmyabcsnexttimewontyou..." }
+  let(:fake_secrets){
+    {
+      "signing-secret" => fake_signing_secret,
+      "encryption-secret" => fake_encryption_secret,
+      "signing-secret-deprecated" => fake_deprecated_signing_secret
+    }
+  }
+
+  before do
+    allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(Canvas::DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
+  end
+
+  after do
+    Timecop.return
+  end
+
+  around do |example|
+    Timecop.freeze(Time.utc(2021,1,11,13,21), &example)
+  end
+end

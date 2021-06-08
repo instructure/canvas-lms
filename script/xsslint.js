@@ -99,16 +99,16 @@ let warningCount = 0
 
 const allPaths = [
   {
-    paths: ['app/coffeescripts'].concat(glob.sync('gems/plugins/*/app/coffeescripts')),
+    paths: ['ui'].concat(glob.sync('gems/plugins/*/app/coffeescripts')),
     glob: '*.coffee',
     transform: source => CoffeeScript.compile(source, {})
   },
   {
-    paths: ['app/jsx', 'app/coffeescripts'].concat(glob.sync('gems/plugins/*/app/jsx')),
+    paths: ['ui'].concat(glob.sync('gems/plugins/*/app/jsx')),
     glob: '*.js'
   },
   {
-    paths: ['public/javascripts'].concat(glob.sync('gems/plugins/*/public/javascripts')),
+    paths: glob.sync('gems/plugins/*/public/javascripts'),
     defaultIgnores: ['/compiled', '/jst', '/vendor'],
     glob: '*.js'
   }

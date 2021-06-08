@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/due-dates",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./backbone/views/DueDateOverride.coffee"
+}

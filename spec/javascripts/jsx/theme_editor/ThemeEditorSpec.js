@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ThemeEditor from 'jsx/theme_editor/ThemeEditor'
+import ThemeEditor from 'ui/features/theme_editor/react/ThemeEditor.js'
 import {shallow} from 'enzyme'
 import {fromPairs} from 'lodash'
 

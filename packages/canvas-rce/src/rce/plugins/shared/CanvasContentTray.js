@@ -18,17 +18,18 @@
 
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
+import {getTrayHeight} from './trayUtils'
 
 /**
  * Returns the translated tray label
@@ -191,6 +192,24 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   }
 }
 
+function isLoading(cprops) {
+  return (
+    cprops.collections.announcements?.isLoading ||
+    cprops.collections.assignments?.isLoading ||
+    cprops.collections.discussions?.isLoading ||
+    cprops.collections.modules?.isLoading ||
+    cprops.collections.quizzes?.isLoading ||
+    cprops.collections.wikiPages?.isLoading ||
+    cprops.documents.course?.isLoading ||
+    cprops.documents.user?.isLoading ||
+    cprops.documents.group?.isLoading ||
+    cprops.media.course?.isLoading ||
+    cprops.media.user?.isLoading ||
+    cprops.media.group?.isLoading ||
+    cprops.all_files?.isLoading
+  )
+}
+
 /**
  * This component is used within various plugins to handle loading in content
  * from Canvas.  It is essentially the main component.
@@ -205,14 +224,20 @@ export default function CanvasContentTray(props) {
   const [hidingTrayOnAction, setHidingTrayOnAction] = useState(true)
 
   const trayRef = useRef(null)
+  const scrollingAreaRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
 
   const {bridge, editor, onTrayClosing} = {...props}
 
   const handleDismissTray = useCallback(() => {
+    // return focus to the RCE if focus was on this tray
+    if (trayRef.current && trayRef.current.contains(document.activeElement)) {
+      bridge.focusActiveEditor(false)
+    }
+
     onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
-  }, [onTrayClosing])
+  }, [bridge, onTrayClosing])
 
   useEffect(() => {
     const controller = {
@@ -240,25 +265,45 @@ export default function CanvasContentTray(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.id, bridge, handleDismissTray, hidingTrayOnAction])
 
+  useEffect(() => {
+    if (
+      hasOpened &&
+      scrollingAreaRef.current &&
+      !scrollingAreaRef.current.style.overscrollBehaviorY
+    ) {
+      scrollingAreaRef.current.style.overscrollBehaviorY = 'contain'
+    }
+  }, [hasOpened])
+
+  function handleOpenTray() {
+    bridge.focusEditor(editor)
+    setHasOpened(true)
+  }
+
   function handleExitTray() {
     onTrayClosing && onTrayClosing(true) // tell RCEWrapper we're closing
   }
 
   function handleCloseTray() {
-    // return focus to the RCE
-    bridge.focusActiveEditor(false)
-
     setHasOpened(false)
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
-  function handleFilterChange(newFilter, onChangeContext) {
+  function handleFilterChange(newFilter, onChangeContext, onChangeSearchString, onChangeSortBy) {
     const newFilterSettings = {...newFilter}
     if (newFilterSettings.sortValue) {
       newFilterSettings.sortDir = newFilterSettings.sortValue === 'alphabetical' ? 'asc' : 'desc'
+      onChangeSortBy({sort: newFilterSettings.sortValue, dir: newFilterSettings.sortDir})
     }
-    setFilterSettings(newFilterSettings)
 
+    if (
+      'searchString' in newFilterSettings &&
+      filterSettings.searchString !== newFilterSettings.searchString
+    ) {
+      onChangeSearchString(newFilterSettings.searchString)
+    }
+
+    setFilterSettings(newFilterSettings)
     if (newFilterSettings.contentType) {
       let contextType, contextId
       switch (newFilterSettings.contentType) {
@@ -271,8 +316,11 @@ export default function CanvasContentTray(props) {
           contextId = props.containingContext.contextId
           break
         case 'course_files':
-        case 'links':
           contextType = props.contextType
+          contextId = props.containingContext.contextId
+          break
+        case 'links':
+          contextType = props.containingContext.contextType
           contextId = props.containingContext.contextId
       }
       onChangeContext({contextType, contextId})
@@ -302,16 +350,22 @@ export default function CanvasContentTray(props) {
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
           onExit={handleExitTray}
-          onOpen={() => {
-            bridge.focusEditor(editor)
-            setHasOpened(true)
-          }}
+          onOpen={handleOpenTray}
           onEntered={() => {
             const c = document.querySelector('[role="main"]')
-            const target_w = c ? c.offsetWidth - trayRef.current?.offsetWidth : 0
-            if (target_w >= 320) {
-              c.style.boxSizing = 'border-box'
-              c.style.width = `${target_w}px`
+            let target_w = 0
+            if (c) {
+              const margin =
+                window.getComputedStyle(c).direction === 'ltr'
+                  ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
+                  : c.getBoundingClientRect().left
+
+              target_w = c.offsetWidth - trayRef.current?.offsetWidth + margin
+
+              if (target_w >= 320 && target_w < c.offsetWidth) {
+                c.style.boxSizing = 'border-box'
+                c.style.width = `${target_w}px`
+              }
             }
             setHidingTrayOnAction(target_w < 320)
           }}
@@ -324,8 +378,8 @@ export default function CanvasContentTray(props) {
           {isOpen && hasOpened ? (
             <Flex
               direction="column"
-              display="block"
-              height="100vh"
+              as="div"
+              height={getTrayHeight()}
               overflowY="hidden"
               tabIndex="-1"
               data-canvascontenttray-content
@@ -351,13 +405,25 @@ export default function CanvasContentTray(props) {
                 <Filter
                   {...filterSettings}
                   userContextType={props.contextType}
+                  containingContextType={props.containingContext.contextType}
                   onChange={newFilter => {
-                    handleFilterChange(newFilter, contentProps.onChangeContext)
+                    handleFilterChange(
+                      newFilter,
+                      contentProps.onChangeContext,
+                      contentProps.onChangeSearchString,
+                      contentProps.onChangeSortBy
+                    )
                   }}
+                  isContentLoading={isLoading(contentProps)}
                 />
               </Flex.Item>
 
-              <Flex.Item grow shrink margin="xx-small xxx-small 0">
+              <Flex.Item
+                grow
+                shrink
+                margin="xx-small xxx-small 0"
+                elementRef={el => (scrollingAreaRef.current = el)}
+              >
                 <ErrorBoundary>
                   <DynamicPanel
                     contentType={filterSettings.contentType}
@@ -390,6 +456,11 @@ const trayPropsMap = {
   canUploadFiles: bool.isRequired,
   contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's
   contextType: string.isRequired, // initial value indicating the user's context, not the tray's
+  containingContext: shape({
+    contextType: string.isRequired,
+    contextId: string.isRequired,
+    userId: string.isRequired
+  }),
   filesTabDisabled: bool,
   host: requiredWithoutSource,
   jwt: requiredWithoutSource,
@@ -400,7 +471,7 @@ const trayPropsMap = {
   themeUrl: string
 }
 
-export const trayProps = shape(trayPropsMap)
+export const trayPropTypes = shape(trayPropsMap)
 
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,

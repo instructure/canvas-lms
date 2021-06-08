@@ -124,7 +124,7 @@ class EpubExport < ActiveRecord::Base
     content_export.export
     true
   end
-  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
+  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, on_permanent_failure: :mark_as_failed
 
   def mark_exported
     if content_export.failed?
@@ -135,14 +135,14 @@ class EpubExport < ActiveRecord::Base
       generate
     end
   end
-  handle_asynchronously :mark_exported, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :mark_exported, priority: Delayed::LOW_PRIORITY
 
   def generate
     job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:generating])
     update_attribute(:workflow_state, 'generating')
     convert_to_epub
   end
-  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :mark_as_failed
+  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, on_permanent_failure: :mark_as_failed
 
   def mark_as_generated
     job_progress.complete! if job_progress.running?
@@ -184,7 +184,7 @@ class EpubExport < ActiveRecord::Base
     mark_as_generated
     file_paths.each {|file_path| cleanup_file_path!(file_path) }
   end
-  handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY
 
   def create_attachment_from_path!(file_path)
     begin

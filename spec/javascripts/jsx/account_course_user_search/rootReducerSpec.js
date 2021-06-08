@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'jsx/account_course_user_search/reducers/rootReducer'
+import reducer from 'ui/features/account_course_user_search/react/reducers/rootReducer.js'
 
 QUnit.module('Account Course User Search Reducer')
 

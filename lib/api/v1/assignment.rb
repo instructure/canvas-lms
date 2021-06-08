@@ -226,6 +226,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
+      tool_attributes.merge!('custom' => assignment.primary_resource_link&.custom)
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -266,7 +267,7 @@ module Api::V1::Assignment
     end
 
     unless opts[:exclude_response_fields].include?('rubric')
-      if assignment.rubric_association
+      if assignment.active_rubric_association?
         hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
         if assignment.rubric_association.rubric
           hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
@@ -359,13 +360,13 @@ module Api::V1::Assignment
 
       if submission.is_a?(Array)
         ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
-        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params) }
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params[:include], params) }
         should_show_statistics = should_show_statistics && submission.any? do |s|
           s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
           s.eligible_for_showing_score_statistics?
         end
       else
-        hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params)
+        hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params[:include], params)
         submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
         should_show_statistics = should_show_statistics && submission.eligible_for_showing_score_statistics?
       end
@@ -398,10 +399,7 @@ module Api::V1::Assignment
       hash['planner_override'] = planner_override_json(override, user, session)
     end
 
-    if assignment.course.post_policies_enabled?
-      hash['post_manually'] = assignment.post_manually?
-    end
-
+    hash['post_manually'] = assignment.post_manually?
     hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
     hash['anonymize_students'] = assignment.anonymize_students?
 
@@ -502,12 +500,13 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+
     return false unless prepared_create[:valid]
 
     response = :created
 
     Assignment.suspend_due_date_caching do
-      assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
+      assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       response = if prepared_create[:overrides].present?
         create_api_assignment_with_overrides(prepared_create, user)
@@ -575,6 +574,7 @@ module Api::V1::Assignment
     "media_recording",
     "not_graded",
     "wiki_page",
+    "student_annotation",
     ""
   ].freeze
 
@@ -654,7 +654,7 @@ module Api::V1::Assignment
   end
 
   def update_from_params(assignment, assignment_params, user, context = assignment.context)
-    update_params = assignment_params.permit(allowed_assignment_input_fields)
+    update_params = assignment_params.permit(allowed_assignment_input_fields(assignment))
 
     if update_params.key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
@@ -791,6 +791,17 @@ module Api::V1::Assignment
       end
     end
 
+    if update_params.key?(:submission_types)
+      if update_params[:submission_types].include?('student_annotation')
+        if assignment_params.key?(:annotatable_attachment_id)
+          attachment = Attachment.find(assignment_params.delete(:annotatable_attachment_id))
+          assignment.annotatable_attachment = attachment.copy_to_student_annotation_documents_folder(assignment.course)
+        end
+      else
+        assignment.annotatable_attachment_id = nil
+      end
+    end
+
     if update_lockdown_browser?(assignment_params)
       update_lockdown_browser_settings(assignment, assignment_params)
     end
@@ -911,11 +922,14 @@ module Api::V1::Assignment
     apply_external_tool_settings(assignment, assignment_params)
     overrides = pull_overrides_from_params(assignment_params)
     invalid = { valid: false }
-    return invalid unless update_parameters_valid?(assignment, assignment_params, overrides)
+    return invalid unless update_parameters_valid?(assignment, assignment_params, user, overrides)
 
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
+
+    custom_params = assignment_params.dig(:external_tool_tag_attributes, :custom_params)
+    assignment.lti_resource_link_custom_params = custom_params if custom_params.present?
 
     {
       assignment: assignment,
@@ -969,11 +983,19 @@ module Api::V1::Assignment
     overrides
   end
 
-  def update_parameters_valid?(assignment, assignment_params, overrides)
+  def update_parameters_valid?(assignment, assignment_params, user, overrides)
     return false unless !overrides || overrides.is_a?(Array)
     return false unless assignment_group_id_valid?(assignment, assignment_params)
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
+
+    if assignment_params[:submission_types]&.include?("student_annotation")
+      return false unless assignment_params.key?(:annotatable_attachment_id)
+
+      attachment = Attachment.find_by(id: assignment_params[:annotatable_attachment_id])
+      return false unless attachment&.grants_right?(user, :read)
+    end
+
     true
   end
 
@@ -983,7 +1005,7 @@ module Api::V1::Assignment
       assignment.tool_settings_tool = tool
     elsif assignment.persisted? && clear_tool_settings_tools?(assignment, assignment_params)
       # Destroy subscriptions and tool associations
-      assignment.send_later_if_production(:clear_tool_settings_tools)
+      assignment.delay_if_production.clear_tool_settings_tools
     end
   end
 
@@ -1024,15 +1046,16 @@ module Api::V1::Assignment
     end
   end
 
-  def allowed_assignment_input_fields
+  def allowed_assignment_input_fields(assignment)
     API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
-      'turnitin_settings' => strong_anything,
-      'vericite_settings' => strong_anything,
-      'allowed_extensions' => strong_anything,
-      'integration_data' => strong_anything,
-      'external_tool_tag_attributes' => strong_anything,
-      'submission_types' => strong_anything
-    ]
+      {'turnitin_settings' => strong_anything},
+      {'vericite_settings' => strong_anything},
+      {'allowed_extensions' => strong_anything},
+      {'integration_data' => strong_anything},
+      {'external_tool_tag_attributes' => strong_anything},
+      # prevent editing submission_types via the REST API if the assignment has submissions
+      ({'submission_types' => strong_anything} if assignment.submissions.having_submission.empty?)
+    ].compact
   end
 
   def update_lockdown_browser?(assignment_params)

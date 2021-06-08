@@ -45,6 +45,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :course_nicknames, use_sub_keys: true
   add_user_preference :custom_colors
   add_user_preference :dashboard_positions
+  add_user_preference :gradebook_version
   add_user_preference :gradebook_column_order, use_sub_keys: true
   add_user_preference :gradebook_column_size, use_sub_keys: true
   add_user_preference :gradebook_settings, use_sub_keys: true

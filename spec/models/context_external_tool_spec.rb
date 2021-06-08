@@ -278,6 +278,79 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#matches_host?' do
+    subject { tool.matches_host?(given_url) }
+
+    let(:tool) { external_tool_model }
+    let(:given_url) { 'https://www.given-url.com/test?foo=bar' }
+
+    context 'when the tool has a url and no domain' do
+      let(:url) { 'https://app.test.com/foo' }
+
+      before do
+        tool.update!(
+          domain: nil,
+          url: url
+        )
+      end
+
+      context 'and the tool url host does not match that of the given url host' do
+        it { is_expected.to eq false }
+      end
+
+      context 'and the tool url host matches that of the given url host' do
+        let(:url) { 'https://www.given-url.com/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool url host matches except for case' do
+        let(:url) { 'https://www.GiveN-url.cOm/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+    end
+
+    context 'when the tool has a domain and no url' do
+      let(:domain) { 'app.test.com' }
+
+      before do
+        tool.update!(
+          url: nil,
+          domain: domain
+        )
+      end
+
+      context 'and the tool domain host does not match that of the given url host' do
+        it { is_expected.to eq false }
+
+        context 'and the tool url and given url are both nil' do
+          let(:given_url) { nil }
+
+          it { is_expected.to eq false }
+        end
+      end
+
+      context 'and the tool domain host matches that of the given url host' do
+        let(:domain) { 'www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain matches except for case' do
+        let(:domain) { 'www.gIvEn-URL.cOm' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain contains the protocol' do
+        let(:domain) { 'https://www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       subject { second_tool.duplicated_in_context? }
@@ -898,6 +971,29 @@ describe ContextExternalTool do
         preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
       end
+
+      it "should not return preferred tool if it is 1.1 and there is a matching 1.3 tool" do
+        @tool1_1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.save!
+
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @tool1_1.destroy
+        @tool1_3.destroy
+
+        @tool1_1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.save!
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        expect(@found_tool).to eql(@tool1_3)
+      end
     end
 
     context 'when multiple ContextExternalTools have domain/url conflict' do
@@ -1198,6 +1294,18 @@ describe ContextExternalTool do
       it 'keeps already active placement data when enabled again' do
         tool.homework_submission = {enabled: true}
         expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
+      end
+
+      it 'toggles not_selectable when placement is resource_selection' do
+        tool.resource_selection = {enabled: true}
+
+        tool.resource_selection = {enabled: false}
+        tool.save
+        expect(tool.not_selectable).to be_truthy
+
+        tool.resource_selection = {enabled: true}
+        tool.save
+        expect(tool.not_selectable).to be_falsy
       end
     end
   end
@@ -1752,6 +1860,12 @@ describe ContextExternalTool do
   end
 
   describe "opaque_identifier_for" do
+    context 'when the asset is nil' do
+      subject { ContextExternalTool.opaque_identifier_for(nil, Shard.first) }
+
+      it { is_expected.to be_nil }
+    end
+
     it "should create lti_context_id for asset" do
       expect(@course.lti_context_id).to eq nil
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -1799,7 +1913,8 @@ describe ContextExternalTool do
 
     it "should not let concluded teachers see admin tools" do
       course_with_teacher(:account => @account, :active_all => true)
-      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment", :end_at => 1.week.ago)
+      term = @course.enrollment_term
+      term.enrollment_dates_overrides.create!(enrollment_type: "TeacherEnrollment", end_at: 1.week.ago, context: term.root_account)
       expect(ContextExternalTool.global_navigation_granted_permissions(
         root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
     end
@@ -2162,6 +2277,90 @@ describe ContextExternalTool do
       sub_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
       sub_account.save!
       expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
+    end
+  end
+
+  describe 'upgrading from 1.1 to 1.3' do
+    let(:old_tool) { external_tool_model(opts: { url: "https://special.url"}) }
+    let(:tool) do
+      t = old_tool.dup
+      t.use_1_3 = true
+      t.save!
+      t
+    end
+
+    context 'prechecks' do
+      it 'ignores 1.1 tools' do
+        expect(old_tool).not_to receive(:prepare_for_ags)
+        old_tool.prepare_for_ags_if_needed!
+      end
+
+      it 'ignores 1.3 tools without matching 1.1 tool' do
+        other_tool = external_tool_model(opts: { url: "http://other.url" })
+        expect(other_tool).not_to receive(:prepare_for_ags)
+        other_tool.prepare_for_ags_if_needed!
+      end
+
+      it 'starts process when needed' do
+        expect(tool).to receive(:prepare_for_ags)
+        tool.prepare_for_ags_if_needed!
+      end
+    end
+
+    context '#related_assignments' do
+      let(:course) { course_model(account: account) }
+      let(:account) { account_model }
+
+      shared_examples_for 'finds related assignments' do
+        before :each do
+          # assignments that should never get returned
+          diff_context = assignment_model(context: course_model)
+          ContentTag.create!(context: diff_context, content: old_tool)
+          diff_account = assignment_model(context: course_model(account: account_model))
+          ContentTag.create!(context: diff_account, content: old_tool)
+          invalid_url = assignment_model(context: course)
+          ContentTag.create!(context: invalid_url, url: "https://invalid.url")
+          other_tool = external_tool_model(opts: { url: "https://different.url"})
+          diff_url = assignment_model(context: course)
+          ContentTag.create!(context: diff_url, url: other_tool.url)
+        end
+
+        it 'finds assignments using tool id' do
+          direct = assignment_model(context: course, title: "direct")
+          ContentTag.create!(context: direct, content: old_tool)
+          expect(tool.related_assignments(old_tool.id)).to eq([direct])
+        end
+
+        it 'finds assignments using tool url' do
+          indirect = assignment_model(context: course, title: "indirect")
+          ContentTag.create!(context: indirect, url: old_tool.url)
+          expect(tool.related_assignments(old_tool.id)).to eq([indirect])
+        end
+      end
+
+      context 'when installed in a course' do
+        let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url"}) }
+        let(:tool) do
+          t = old_tool.dup
+          t.use_1_3 = true
+          t.save!
+          t
+        end
+
+        it_behaves_like 'finds related assignments'
+      end
+
+      context 'when installed in an account' do
+        let(:old_tool) { external_tool_model(context: account, opts: { url: "https://special.url"}) }
+        let(:tool) do
+          t = old_tool.dup
+          t.use_1_3 = true
+          t.save!
+          t
+        end
+
+        it_behaves_like 'finds related assignments'
+      end
     end
   end
 end

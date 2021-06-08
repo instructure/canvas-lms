@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Avatar from 'jsx/context_cards/Avatar'
-import {Avatar as InstUIAvatar} from '@instructure/ui-elements'
+import Avatar from '@canvas/context-cards/react/Avatar'
+import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
 
 QUnit.module('StudentContextTray/Avatar', hooks => {
   let subject

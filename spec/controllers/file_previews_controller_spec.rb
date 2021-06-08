@@ -38,6 +38,20 @@ describe FilePreviewsController do
     expect(response.status).to eq 401
   end
 
+  it 'should accept a valid verifier token' do
+    course_model
+    attachment_model
+    get :show, params: {course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid}
+    expect(response.status).to eq 200
+  end
+
+  it 'should not accept an invalid verifier token' do
+    course_model
+    attachment_model
+    get :show, params: {course_id: @course.id, file_id: @attachment.id, verifier: 'nope'}
+    expect(response.status).to eq 401
+  end
+
   it "should render lock information for the file" do
     attachment_model locked: true
     get :show, params: {course_id: @course.id, file_id: @attachment.id}

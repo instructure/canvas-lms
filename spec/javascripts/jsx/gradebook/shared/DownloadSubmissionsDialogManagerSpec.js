@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DownloadSubmissionsDialogManager from 'jsx/gradebook/shared/DownloadSubmissionsDialogManager'
+import DownloadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/DownloadSubmissionsDialogManager.js'
 
-import INST from 'INST'
-import 'submission_download'
+import INST from 'browser-sniffer'
+import 'ui/features/submission_download/jquery/index.js'
 
 QUnit.module('DownloadSubmissionsDialogManager#constructor')
 

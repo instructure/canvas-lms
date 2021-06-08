@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
+import ConfigurationFormManual from 'ui/features/external_apps/react/components/ConfigurationFormManual.js'
 
 QUnit.module('External Apps Manual Configuration Form')
 

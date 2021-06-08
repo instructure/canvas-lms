@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import PeopleSearch from 'jsx/add_people/components/people_search'
+import PeopleSearch from '@canvas/add-people/react/components/people_search'
 
 QUnit.module('PeopleSearch')
 

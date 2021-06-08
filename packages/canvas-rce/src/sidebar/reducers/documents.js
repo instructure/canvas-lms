@@ -17,7 +17,7 @@
  */
 
 import {REQUEST_INITIAL_DOCS, REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS} from '../actions/documents'
-import {CHANGE_CONTEXT} from '../actions/context'
+import {CHANGE_CONTEXT, CHANGE_SEARCH_STRING} from '../actions/filter'
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
@@ -68,6 +68,10 @@ export default function documentsReducer(prevState = {}, action) {
     }
 
     case CHANGE_CONTEXT: {
+      return state
+    }
+
+    case CHANGE_SEARCH_STRING: {
       return state
     }
 

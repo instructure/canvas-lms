@@ -344,7 +344,7 @@ This text has a http://www.google.com link in it...
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
       expect {
         comment.reply_from(:user => @observer, :text => "some reply")
-      }.to raise_error("Only comment participants may reply to messages")
+      }.to raise_error(IncomingMail::Errors::InvalidParticipant)
     end
 
     it "should create reply in the same provisional grade" do
@@ -353,6 +353,18 @@ This text has a http://www.google.com link in it...
       expect(reply.provisional_grade).to eq(comment.provisional_grade)
       expect(reply.provisional_grade.scorer).to eq @teacher
     end
+
+    it "posts submissions for auto-posted assignments" do
+      assignment = @course.assignments.create!
+      submission = assignment.submission_for_student(@student)
+      comment = submission.add_comment(user: @student, comment: "student")
+      expect {
+        comment.reply_from(user: @teacher, text: "teacher")
+      }.to change {
+        submission.reload.posted?
+      }.from(false).to(true)
+    end
+
   end
 
   describe "read/unread state" do
@@ -543,17 +555,25 @@ This text has a http://www.google.com link in it...
       end
 
       it 'can be updated by the teacher who created it' do
-        expect(@submission_comment.grants_any_right?(@teacher, {}, :update)).to be_truthy
+        expect(@submission_comment).to be_grants_any_right(@teacher, :update)
       end
 
       it 'cannot be updated by a different teacher on the same course' do
-        expect(@submission_comment.grants_any_right?(@second_teacher, {}, :update)).to be_falsey
+        expect(@submission_comment).not_to be_grants_any_right(@second_teacher, :update)
       end
 
       it 'cannot be read by a student if it would otherwise be readable by them' do
         @submission_comment.teacher_only_comment = false
 
-        expect(@submission_comment.grants_any_right?(@student, {}, :read)).to be_falsey
+        expect(@submission_comment).not_to be_grants_any_right(@student, :read)
+      end
+
+      it "cannot be read by an observer of the receiving student if it would otherwise be readable by the student" do
+        @submission_comment.teacher_only_comment = false
+
+        observer = User.create!
+        @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student.id)
+        expect(@submission_comment).not_to be_grants_any_right(observer, :read)
       end
     end
 
@@ -562,7 +582,7 @@ This text has a http://www.google.com link in it...
         let(:course) { Course.create! }
         let(:assignment) { course.assignments.create!(title: "hi") }
         let(:ta) { course.enroll_ta(User.create!, active_all: true).user }
-        let(:student) { course.enroll_student(User.create!, active_all: true).user }
+        let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
         let(:submission) { assignment.submission_for_student(student) }
         let(:comment) do
           assignment.update_submission(student, commenter: student, comment: 'ok')
@@ -576,6 +596,18 @@ This text has a http://www.google.com link in it...
         it "submitter comments can be read by an instructor who cannot manage assignments but can view the submitter's grades" do
           RoleOverride.create!(context: course.account, permission: :manage_assignments, role: ta_role, enabled: false)
           expect(comment.grants_right?(ta, :read)).to be true
+        end
+
+        it "does not allow author to be read if current_user is not present" do
+          expect(comment.grants_right?(nil, :read_author)).to be false
+        end
+
+        describe "anonymous assignments" do
+          let(:assignment) { course.assignments.create!(title: "hi", anonymous_grading: true) }
+
+          it "allows students to read the author of their own comments" do
+            expect(comment.grants_right?(student, :read_author)).to be true
+          end
         end
       end
     end
@@ -763,6 +795,23 @@ This text has a http://www.google.com link in it...
     it "is set to active by default" do
       comment = @submission.add_comment(author: @teacher, comment: ":|")
       expect(comment).to be_active
+    end
+  end
+
+  describe "#allows_posting_submission?" do
+    it "returns true if the comment is hidden and published" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: true, draft_comment: false)
+      expect(comment).to be_allows_posting_submission
+    end
+
+    it "returns false if the comment is not hidden" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: false, draft_comment: false)
+      expect(comment).not_to be_allows_posting_submission
+    end
+
+    it "returns false if the comment is a draft" do
+      comment = @submission.add_comment(author: @teacher, comment: "hi", hidden: true, draft_comment: true)
+      expect(comment).not_to be_allows_posting_submission
     end
   end
 end

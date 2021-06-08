@@ -31,12 +31,14 @@ describe CourseLinkValidator do
 
     bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
     bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
+    bad_media_object_url = "/media_objects_iframe/junk"
     html = %{
       <a href="#{bad_url}">Bad absolute link</a>
       <img src="#{bad_url2}">Bad file link</a>
       <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
       <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
       <a href="/courses/#{@course.id}/assignments/#{@ua.id}">Unpublished thing</a>
+      <iframe src="#{bad_media_object_url}">
     }
     @course.image_url = bad_url
     @course.syllabus_body = html
@@ -71,6 +73,7 @@ describe CourseLinkValidator do
         expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link'})
         expect(issue[:invalid_links]).to include({:reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing"})
         expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_url2, :image => true})
+        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_media_object_url})
       end
     end
 
@@ -162,31 +165,6 @@ describe CourseLinkValidator do
       expect(link_validator.whitelisted?('http://foo.com/foo')).to eq true
       expect(link_validator.whitelisted?('http://bar.com/bar')).to eq true
       expect(link_validator.whitelisted?('http://baz.com/baz')).to eq false
-    end
-  end
-  
-  describe "insecure hosts" do
-    def test_url(url)
-      course_factory
-      topic = @course.discussion_topics.create!(:message => %{<a href="#{url}">kekeke</a>}, :title => "title")
-
-      expect(CanvasHttp).to_not receive(:connection_for_uri) # don't try to continue after failing validation
-      CourseLinkValidator.queue_course(@course)
-      run_jobs
-
-      issues = CourseLinkValidator.current_progress(@course).results[:issues]
-      expect(issues.first[:invalid_links].first[:reason]).to eq :unreachable
-    end
-
-    it "should not try to access local ips" do
-      test_url("http://localhost:3000/haxxed")
-      test_url("http://127.0.0.1/haxxedagain")
-    end
-
-    it "should be able to set the ip filter" do
-      Setting.set('http_blocked_ip_ranges', '42.42.42.42/8,24.24.24.24')
-      test_url("http://42.42.0.1/haxxedtheplanet")
-      test_url("http://24.24.24.24/haxxedforever")
     end
   end
 
@@ -424,6 +402,10 @@ describe CourseLinkValidator do
 
     it "should return :missing_item if the link doesn't point to course content" do
       expect(@course_link_validator.check_object_status("/test_error")).to eq :missing_item
+    end
+
+    it "should return :missing_item if the referenced media_object doesn't exist" do
+      expect(@course_link_validator.check_object_status("/media_objects_iframe/junk")).to eq :missing_item
     end
 
     it 'should return :unpublished_item for unpublished content' do

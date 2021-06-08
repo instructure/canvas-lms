@@ -35,7 +35,6 @@ describe "site-wide" do
   let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
 
   it "should render 404 when user isn't logged in" do
-    Setting.set 'show_feedback_link', 'true'
     get "/dashbo"
     assert_status(404)
   end
@@ -71,6 +70,15 @@ describe "site-wide" do
       course_with_teacher_logged_in
       get "/api/v1/courses/#{@course.id}"
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+    end
+
+    it "should set controller#action information in API requests on 500" do
+      course_with_teacher_logged_in
+      allow_any_instance_of(CoursesController).to receive(:index).and_raise(ArgumentError)
+      get "/api/v1/courses"
+
+      assert_status(500)
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=index;})
     end
 
     it "should set page view information in user requests" do

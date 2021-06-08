@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -72,7 +74,7 @@ class GradeSummaryPresenter
   end
 
   def observed_students
-    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user)
+    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user, include_restricted_access: false)
   end
 
   def observed_student
@@ -145,7 +147,7 @@ class GradeSummaryPresenter
     includes = [:assignment_overrides, :post_policy]
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup.
-      visible_assignments(student, @context, all_groups, includes).
+      visible_assignments(student, @context, all_groups, includes: includes).
       where.not(submission_types: %w(not_graded wiki_page)).
       except(:order)
   end
@@ -236,14 +238,12 @@ class GradeSummaryPresenter
     end
   end
 
-  def hidden_submissions?
-    if @context.post_policies_enabled?
-      submissions.any? do |sub|
-        return !sub.posted? if sub.assignment.post_manually?
-        sub.graded? && !sub.posted?
-      end
-    else
-      assignments.any?(&:muted?)
+  def hidden_submissions_for_published_assignments?
+    submissions_with_published_assignment = submissions.select { |submission| submission.assignment.published? }
+    submissions_with_published_assignment.any? do |sub|
+      return !sub.posted? if sub.assignment.post_manually?
+
+      sub.graded? && !sub.posted?
     end
   end
 

@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mockFilesEnv from '../mockFilesENV'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
 import wait from 'waait'
-import PublishCloud from 'jsx/shared/PublishCloud'
-import FilesystemObject from 'compiled/models/FilesystemObject'
+import PublishCloud from '@canvas/files/react/components/PublishCloud'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
 
 QUnit.module('PublishCloud', {
   setup() {
@@ -37,7 +36,7 @@ QUnit.module('PublishCloud', {
     }
     const props = {
       model: this.model,
-      userCanManageFilesForContext: true
+      userCanEditFilesForContext: true
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -73,7 +72,7 @@ QUnit.module('PublishCloud Student View', {
     }
     const props = {
       model: this.model,
-      userCanManageFilesForContext: false
+      userCanEditFilesForContext: false
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -97,7 +96,7 @@ QUnit.module('PublishCloud#togglePublishedState', {
         hidden: false,
         id: 42
       }),
-      userCanManageFilesForContext: true
+      userCanEditFilesForContext: true
     }
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
@@ -141,7 +140,7 @@ test('sets published initial state based on params model hidden property', funct
   })
   const props = {
     model,
-    userCanManageFilesForContext: true
+    userCanEditFilesForContext: true
   }
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   equal(this.publishCloud.state.published, !model.get('locked'), 'not locked is published')

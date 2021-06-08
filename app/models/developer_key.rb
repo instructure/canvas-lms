@@ -24,7 +24,7 @@ class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target
       DeveloperKey.find_cached(owner._read_attribute(reflection.foreign_key))
-    end  
+    end
   end
 
   include CustomValidations
@@ -120,7 +120,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_redirect_uris
-    uris = redirect_uris.map do |value|
+    uris = redirect_uris&.map do |value|
       value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)
       value
     end
@@ -249,9 +249,13 @@ class DeveloperKey < ActiveRecord::Base
     return true if redirect_uris.include?(redirect_uri)
 
     # legacy deprecated
-    self_domain = URI.parse(self.redirect_uri).host
-    other_domain = URI.parse(redirect_uri).host
-    result = self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    self_uri = URI.parse(self.redirect_uri)
+    self_domain = self_uri.host
+    other_uri = URI.parse(redirect_uri)
+    other_domain = other_uri.host
+    result = self_domain.present? && other_domain.present? &&
+       self_uri.scheme == other_uri.scheme &&
+       (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
     if result && redirect_uri != self.redirect_uri
       Rails.logger.info("Allowed lenient OAuth redirect uri #{redirect_uri} on developer key #{global_id}")
     end
@@ -352,29 +356,16 @@ class DeveloperKey < ActiveRecord::Base
 
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
-      send_later_enqueue_args(
-        :manage_external_tools_multi_shard,
-        enqueue_args,
-        enqueue_args,
-        method,
-        affected_account
-      )
+      delay(**enqueue_args).
+        manage_external_tools_multi_shard(enqueue_args, method, affected_account)
     else
-      send_later_enqueue_args(
-        method,
-        enqueue_args,
-        affected_account
-      )
+      delay(**enqueue_args).__send__(method, affected_account)
     end
   end
 
   def manage_external_tools_multi_shard(enqueue_args, method, affected_account)
     Shard.with_each_shard do
-      send_later_enqueue_args(
-        method,
-        enqueue_args,
-        affected_account
-      )
+      delay(**enqueue_args).__send__(method, affected_account)
     end
   end
 
@@ -485,7 +476,7 @@ class DeveloperKey < ActiveRecord::Base
   def invalidate_access_tokens_if_scopes_removed!
     return unless saved_change_to_scopes?
     return if (scopes_before_last_save - scopes).blank?
-    send_later_if_production(:invalidate_access_tokens!)
+    delay_if_production.invalidate_access_tokens!
   end
 
   def invalidate_access_tokens!

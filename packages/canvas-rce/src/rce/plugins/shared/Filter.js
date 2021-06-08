@@ -16,20 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {bool, useEffect, useState} from 'react'
 import {func, oneOf, string} from 'prop-types'
 import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
-import {Select} from '@instructure/ui-forms'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {IconButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   IconLinkLine,
   IconFolderLine,
   IconImageLine,
   IconDocumentLine,
-  IconAttachMediaLine
+  IconAttachMediaLine,
+  IconSearchLine,
+  IconXLine
 } from '@instructure/ui-icons'
 
 const DEFAULT_FILTER_SETTINGS = {
@@ -65,37 +68,54 @@ function fileLabelFromContext(contextType) {
 
 function renderTypeOptions(contentType, contentSubtype, userContextType) {
   const options = [
-    <option key="links" value="links" icon={IconLinkLine}>
+    <SimpleSelect.Option key="links" id="links" value="links" renderBeforeLabel={IconLinkLine}>
       {formatMessage('Links')}
-    </option>
+    </SimpleSelect.Option>
   ]
   if (userContextType === 'course' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
-      <option key="course_files" value="course_files" icon={IconFolderLine}>
+      <SimpleSelect.Option
+        key="course_files"
+        id="course_files"
+        value="course_files"
+        renderBeforeLabel={IconFolderLine}
+      >
         {fileLabelFromContext('course')}
-      </option>
+      </SimpleSelect.Option>
     )
   }
   if (userContextType === 'group' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
-      <option key="group_files" value="group_files" icon={IconFolderLine}>
+      <SimpleSelect.Option
+        key="group_files"
+        id="group_files"
+        value="group_files"
+        renderBeforeLabel={IconFolderLine}
+      >
         {fileLabelFromContext('group')}
-      </option>
+      </SimpleSelect.Option>
     )
   }
   options.push(
-    <option key="user_files" value="user_files" icon={IconFolderLine}>
+    <SimpleSelect.Option
+      key="user_files"
+      id="user_files"
+      value="user_files"
+      renderBeforeLabel={IconFolderLine}
+    >
       {fileLabelFromContext(contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user')}
-    </option>
+    </SimpleSelect.Option>
   )
   return options
 }
 
-function renderType(contentType, contentSubtype, onChange, userContextType) {
-  if (userContextType === 'course' || userContextType === 'group') {
+function renderType(contentType, contentSubtype, onChange, userContextType, containingContextType) {
+  // Check containingContextType so that we always show context links
+  if (containingContextType === 'course' || containingContextType === 'group') {
     return (
-      <Select
-        label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
+      <SimpleSelect
+        renderLabel={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
+        assistiveText={formatMessage('Use arrow keys to navigate options.')}
         onChange={(e, selection) => {
           const changed = {contentType: selection.value}
           if (contentType === 'links') {
@@ -104,10 +124,10 @@ function renderType(contentType, contentSubtype, onChange, userContextType) {
           }
           onChange(changed)
         }}
-        selectedOption={contentType}
+        value={contentType}
       >
         {renderTypeOptions(contentType, contentSubtype, userContextType)}
-      </Select>
+      </SimpleSelect>
     )
   } else {
     return (
@@ -123,10 +143,17 @@ function shouldSearch(searchString) {
   return searchString.length === 0 || searchString.length >= 3
 }
 
-const searchMessage = formatMessage('Enter at least 3 characters to search')
-
 export default function Filter(props) {
-  const {contentType, contentSubtype, onChange, sortValue, searchString, userContextType} = props
+  const {
+    contentType,
+    contentSubtype,
+    onChange,
+    sortValue,
+    searchString,
+    userContextType,
+    isContentLoading,
+    containingContextType
+  } = props
   const [pendingSearchString, setPendingSearchString] = useState(searchString)
   const [searchInputTimer, setSearchInputTimer] = useState(0)
 
@@ -154,77 +181,111 @@ export default function Filter(props) {
     setSearchInputTimer(tid)
   }
 
+  function handleClear() {
+    handleChangeSearch('')
+  }
+
+  function renderClearButton() {
+    if (pendingSearchString) {
+      return (
+        <IconButton
+          screenReaderLabel={formatMessage('Clear')}
+          onClick={handleClear}
+          interaction={isContentLoading ? 'disabled' : 'enabled'}
+          withBorder={false}
+          withBackground={false}
+          size="small"
+        >
+          <IconXLine />
+        </IconButton>
+      )
+    }
+    return undefined
+  }
+  const searchMessage = formatMessage('Enter at least 3 characters to search')
+  const loadingMessage = formatMessage('Loading, please wait')
+  const msg = isContentLoading ? loadingMessage : searchMessage
   return (
     <View display="block" direction="column">
-      {renderType(contentType, contentSubtype, onChange, userContextType)}
+      {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
       {contentType !== 'links' && (
-        <>
-          <Flex margin="small none none none">
-            <Flex.Item grow shrink margin="none xx-small none none">
-              <Select
-                label={
-                  <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
+        <Flex margin="small none none none">
+          <Flex.Item grow shrink margin="none xx-small none none">
+            <SimpleSelect
+              renderLabel={
+                <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
+              }
+              assistiveText={formatMessage('Use arrow keys to navigate options.')}
+              onChange={(e, selection) => {
+                const changed = {contentSubtype: selection.value}
+                if (changed.contentSubtype === 'all') {
+                  // when flipped to All, the context needs to be user
+                  // so we can get media_objects, which are all returned in the user context
+                  changed.contentType = 'user_files'
                 }
-                onChange={(e, selection) => {
-                  const changed = {contentSubtype: selection.value}
-                  if (changed.contentSubtype === 'all') {
-                    // when flipped to All, the context needs to be user
-                    // so we can get media_objects, which are all returned in the user context
-                    changed.contentType = 'user_files'
-                  }
-                  onChange(changed)
-                }}
-                selectedOption={contentSubtype}
+                onChange(changed)
+              }}
+              value={contentSubtype}
+            >
+              <SimpleSelect.Option id="images" value="images" renderBeforeLabel={IconImageLine}>
+                {formatMessage('Images')}
+              </SimpleSelect.Option>
+
+              <SimpleSelect.Option
+                id="documents"
+                value="documents"
+                renderBeforeLabel={IconDocumentLine}
               >
-                <option value="images" icon={IconImageLine}>
-                  {formatMessage('Images')}
-                </option>
+                {formatMessage('Documents')}
+              </SimpleSelect.Option>
 
-                <option value="documents" icon={IconDocumentLine}>
-                  {formatMessage('Documents')}
-                </option>
+              <SimpleSelect.Option id="media" value="media" renderBeforeLabel={IconAttachMediaLine}>
+                {formatMessage('Media')}
+              </SimpleSelect.Option>
 
-                <option value="media" icon={IconAttachMediaLine}>
-                  {formatMessage('Media')}
-                </option>
-
-                <option value="all">{formatMessage('All')}</option>
-              </Select>
-            </Flex.Item>
-
-            {contentSubtype !== 'all' && (
-              <Flex.Item grow shrink margin="none none none xx-small">
-                <Select
-                  label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
-                  onChange={(e, selection) => {
-                    onChange({sortValue: selection.value})
-                  }}
-                  selectedOption={sortValue}
-                >
-                  <option value="date_added">{formatMessage('Date Added')}</option>
-                  <option value="alphabetical">{formatMessage('Alphabetical')}</option>
-                </Select>
-              </Flex.Item>
-            )}
-          </Flex>
-          {['images', 'documents'].indexOf(contentSubtype) >= 0 && (
-            <View as="div" margin="small none none none">
-              <TextInput
-                renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
-                messages={searchMessage ? [{type: 'hint', text: searchMessage}] : []}
-                placeholder={formatMessage('Search')}
-                value={pendingSearchString}
-                onChange={(e, value) => handleChangeSearch(value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    doSearch(pendingSearchString)
-                  }
+              <SimpleSelect.Option id="all" value="all">
+                {formatMessage('All')}
+              </SimpleSelect.Option>
+            </SimpleSelect>
+          </Flex.Item>
+          {contentSubtype !== 'all' && (
+            <Flex.Item grow shrink margin="none none none xx-small">
+              <SimpleSelect
+                renderLabel={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
+                assistiveText={formatMessage('Use arrow keys to navigate options.')}
+                onChange={(e, selection) => {
+                  onChange({sortValue: selection.value})
                 }}
-              />
-            </View>
+                value={sortValue}
+              >
+                <SimpleSelect.Option id="date_added" value="date_added">
+                  {formatMessage('Date Added')}
+                </SimpleSelect.Option>
+                <SimpleSelect.Option id="alphabetical" value="alphabetical">
+                  {formatMessage('Alphabetical')}
+                </SimpleSelect.Option>
+              </SimpleSelect>
+            </Flex.Item>
           )}
-        </>
+        </Flex>
       )}
+      <View as="div" margin="small none none none">
+        <TextInput
+          renderLabel={<ScreenReaderContent>{formatMessage('Search')}</ScreenReaderContent>}
+          renderBeforeInput={<IconSearchLine inline={false} />}
+          renderAfterInput={renderClearButton()}
+          messages={[{type: 'hint', text: msg}]}
+          placeholder={formatMessage('Search')}
+          value={pendingSearchString}
+          onChange={(e, value) => handleChangeSearch(value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              doSearch(pendingSearchString)
+            }
+          }}
+          interaction={isContentLoading ? 'readonly' : 'enabled'}
+        />
+      </View>
     </View>
   )
 }
@@ -259,5 +320,15 @@ Filter.propTypes = {
   /**
    * The user's context
    */
-  userContextType: oneOf(['user', 'course', 'group'])
+  userContextType: oneOf(['user', 'course', 'group']),
+
+  /**
+   * Is my content currently loading?
+   */
+  isContentLoading: bool,
+
+  /**
+   * The page context
+   */
+  containingContextType: oneOf(['user', 'course', 'group'])
 }

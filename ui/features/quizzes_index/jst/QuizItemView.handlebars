@@ -1,0 +1,160 @@
+<div id="summary_quiz_{{id}}"
+  {{#if can_update}}
+    class="
+    ig-row
+    {{#if publishable}}ig-publishable{{/if}}
+    {{#if published}}ig-published{{/if}}
+    ig-editable"
+  {{else}}
+    class="ig-row"
+  {{/if}}
+>
+{{#if isMigrating}}
+  <div class="ig-row__layout">
+    {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Migrating "{{name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToMigrate}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with migrating "{{name}}"{{/t}}</span>
+  <div class="migrate-failed-actions">
+    <button class="migrate-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    <button class="duplicate-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}} {{#if isDuplicating}}
+  <div class="ig-row__layout">
+    {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Making a copy of "{{original_assignment_name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToDuplicate}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with making a copy of "{{original_assignment_name}}"{{/t}}</span>
+  <div class="duplicate-failed-actions">
+    <button class="duplicate-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    <button class="duplicate-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}} {{#if isImporting}}
+  <div class="ig-row__layout">
+    {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Importing "{{name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToImport}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong importing "{{name}}"{{/t}}</span>
+  <div class="import-failed-actions">
+    <button class="import-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel importing "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}}
+  <div class="ig-row__layout">
+
+    <div class="ig-type-icon">
+      <i class="icon-quiz{{#if useQuizzesNextIcon}} icon-Solid{{/if}}" aria-hidden="true"></i>
+      {{#if isQuizzesNextAndNotStudent}}
+        <span class="screenreader-only">{{#t}}New Quiz{{/t}}</span>
+      {{else}}
+        <span class="screenreader-only">{{#t}}Quiz{{/t}}</span>
+      {{/if}}
+    </div>
+
+    <div class="ig-info">
+      <a href="{{url}}" {{#if quizzesRespondusEnabled}}target="_blank"{{/if}} class="ig-title">
+        {{title_label}}
+      </a>
+      <div class="ig-details">
+        {{#if showAvailability }}
+        <div class="ig-details__item date-available" data-view="date-available"></div>
+        {{/if}}
+        {{#if showDueDate }}
+        <div class="ig-details__item date-due" data-view="date-due"></div>
+        {{/if}}
+        {{#if possible_points_label}}
+          <div class="ig-details__item">{{possible_points_label}}</div>
+        {{/if}}
+        {{#if question_count_label}}
+          <div class="ig-details__item">{{question_count_label}}</div>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#if canOpenManageOptions}}
+        <div class="ig-admin">
+          {{#if cyoe.isTrigger}}
+          <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+          {{/if}}
+          {{#if cyoe.isReleased}}
+          <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
+            <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
+          </span>
+          <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
+          {{/if}}
+          {{#if can_update}}
+              <span class="sis-button" data-view="sis-button"></span>
+              <span data-view="lock-icon" class="lock-icon"></span>
+              <span data-view="publish-icon" class="publish-icon"></span>
+          {{/if}}
+          <div class="inline-block">
+            <button class="al-trigger al-trigger-gray Button--icon-action" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" role="button">
+              <i class="icon-more" aria-hidden="true"></i>
+              <span class="screenreader-only">{{#t}}Options for {{title_label}}{{/t}}</span>
+            </button>
+
+            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+                {{#if can_update}}
+                  <li role="presentation">
+                    <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
+                  </li>
+                  {{#if canDuplicate}}
+                  <li>
+                    <a
+                      class="duplicate_assignment icon-copy-course"
+                      id="assignment_{{id}}_settings_duplicate_item"
+                      aria-label="{{#t}}Duplicate Quiz {{name}}{{/t}}"
+                      data-focus-returns-to"assign_{{id}}_manage_link"
+                    >{{#t}}Duplicate{{/t}}</a>
+                  </li>
+                  {{/if}}
+                  {{#if cyoe.isCyoeAble}}
+                  <li role="presentation">
+                      <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+                  </li>
+                  {{/if}}
+                  {{#unless is_locked}}
+                    <li role="presentation">
+                    {{#if permissions.delete}}
+                      <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+                    {{else}}
+                      <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+                    {{/if}}
+                    </li>
+                  {{/unless}}
+                  {{#if migrateQuizEnabled}}
+                    <li role="presentation">
+                      <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>
+                    </li>
+                  {{/if}}
+                {{/if}}
+              {{#if DIRECT_SHARE_ENABLED}}
+                <li role="presentation">
+                  <a href="#" class="icon-user quiz-send-to" role="menuitem" title="{{#t}}Send Quiz to User{{/t}}">{{#t}}Send to...{{/t}}</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-duplicate quiz-copy-to" role="menuitem" title="{{#t}}Copy Quiz to Course{{/t}}">{{#t}}Copy to...{{/t}}</a>
+                </li>
+              {{/if}}
+              {{#if can_update}}{{>ui/shared/external-tools/jst/_external_tools_menu.handlebars quiz_menu_tools}}{{/if}}
+            </ul>
+          </div>
+        </div>
+    {{/if}}
+  </div>
+{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+</div>

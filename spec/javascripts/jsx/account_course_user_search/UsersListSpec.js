@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import UsersList from 'jsx/account_course_user_search/components/UsersList'
-import UsersListRow from 'jsx/account_course_user_search/components/UsersListRow'
+import UsersList from 'ui/features/account_course_user_search/react/components/UsersList.js'
+import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow.js'
 
 QUnit.module('Account Course User Search UsersList View')
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -17,6 +19,10 @@
 
 module Lti
   module Ims
+    class InvalidLaunch < StandardError; end
+
+    # Contains actions to handle the second step of an LTI 1.3
+    # Launch: The authentication request
     class AuthenticationController < ApplicationController
       include Lti::RedisMessageClient
 
@@ -39,14 +45,36 @@ module Lti
 
       # Redirect the "authorize" action for the domain specified
       # in the lti_message_hint
+      #
+      # This means that tools can simply use the canvas.instructure.com
+      # domain in the authentication requests rather than keeping
+      # track of institution-specific domain.
       def authorize_redirect
         redirect_to authorize_redirect_url
       end
 
+      # Handles the authentication response from an LTI tool. This
+      # is the second step in an LTI 1.3 launch.
+      #
+      # Please refer to the following specification sections:
+      # - https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request
+      # - http://www.imsglobal.org/spec/lti/v1p3/
+      #
+      # If the authentication validations described in the specifications
+      # succeed, this action uses the "lti_message_hint" parameter
+      # to retrieve a cached ID token (LTI launch) and sends it to the
+      # tool.
+      #
+      # The cached ID Token is generated at the time Canvas makes
+      # the login request to the tool.
+      #
+      # For more details on how the cached ID token is generated,
+      # please refer to the inline documentation of "app/models/lti/lti_advantage_adapter.rb"
       def authorize
         validate_oidc_params!
         validate_current_user!
         validate_client_id!
+        validate_launch_eligibility!
 
         render(
           'lti/ims/authentication/authorize.html.erb',
@@ -69,6 +97,8 @@ module Lti
       end
 
       def validate_current_user!
+        return if public_course? && @current_user.blank?
+
         if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context: context) != oidc_params[:login_hint]
           set_oidc_error!('login_required', 'Must have an active user session')
         end
@@ -82,12 +112,25 @@ module Lti
         set_oidc_error!('invalid_request_object', "The 'scope' must be '#{SCOPE}'") if oidc_params[:scope] != SCOPE
       end
 
+      def validate_launch_eligibility!
+        return if @oidc_error
+        id_token
+      rescue InvalidLaunch => e
+        Canvas::Errors.capture_exception(:lti, e, :info)
+        set_oidc_error!('launch_no_longer_valid', "The launch has either expired or already been consumed")
+      end
+
       def set_oidc_error!(error, error_description)
         @oidc_error = {
           error: error,
           error_description: error_description,
           state: oidc_params[:state]
         }
+      end
+
+      def public_course?
+        # Is the context published and public?
+        context&.is_a?(Course) && context&.available? && context&.is_public?
       end
 
       def verifier
@@ -107,12 +150,9 @@ module Lti
 
       def cached_launch_with_nonce
         @cached_launch_with_nonce ||= begin
-          JSON.parse(
-            fetch_and_delete_launch(
-              context,
-              verifier
-            )
-          ).merge({nonce: oidc_params[:nonce]})
+          launch_payload = fetch_and_delete_launch(context,verifier)
+          raise InvalidLaunch, "no payload found in cache" if launch_payload.nil?
+          JSON.parse(launch_payload).merge({nonce: oidc_params[:nonce]})
         end
       end
 

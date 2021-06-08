@@ -80,8 +80,11 @@ class Account::HelpLinks
 
   # do not return the covid help link unless the featured_help_links FF is enabled
   def filtered_links(links)
+    show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
     links.select do |link|
       link[:id].to_s == 'covid' ? Account.site_admin.feature_enabled?(:featured_help_links) : true
+    end.select do |link|
+      link[:id].to_s == 'report_a_problem' || link[:id].to_s == 'instructor_question' ? show_feedback_link : true
     end
   end
 

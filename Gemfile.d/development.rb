@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -17,13 +19,16 @@
 
 group :development do
   gem 'letter_opener', '1.7.0'
-  gem 'spring', '2.1.0'
+  gem 'spring', '2.1.1'
+  gem 'spring-commands-parallel-rspec', '1.1.0'
   gem 'spring-commands-rspec', '1.0.4'
+  gem 'spring-commands-rubocop', '0.2.0'
+
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '11.1.1', platform: :mri
+    gem 'byebug', '11.1.3', platform: :mri
   end
 end

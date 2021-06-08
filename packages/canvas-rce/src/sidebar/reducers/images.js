@@ -23,7 +23,7 @@ import {
   RECEIVE_IMAGES,
   FAIL_IMAGES_LOAD
 } from '../actions/images'
-import {CHANGE_CONTEXT} from '../actions/context'
+import {CHANGE_CONTEXT, CHANGE_SEARCH_STRING} from '../actions/filter'
 
 export default function imagesReducer(prevState = {}, action) {
   const ctxt = action.payload && action.payload.contextType
@@ -87,6 +87,10 @@ export default function imagesReducer(prevState = {}, action) {
       return state
 
     case CHANGE_CONTEXT: {
+      return state
+    }
+
+    case CHANGE_SEARCH_STRING: {
       return state
     }
 

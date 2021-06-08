@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import select from 'jsx/shared/select'
+import select from 'obj-select'
 
 QUnit.module('Select function')
 

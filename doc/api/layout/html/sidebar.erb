@@ -37,6 +37,7 @@
       <a href="<%= url_for("file.content_item.html") %>" class="<%= 'current' if options[:object] == 'file.content_item.html' %>">Deep Linking</a>
       <a href="<%= url_for("file.assignment_tools.html") %>" class="<%= 'current' if options[:object] == 'file.assignment_tools.html' %>">Grading</a>
       <a href="<%= url_for("file.provisioning.html") %>" class="<%= 'current' if options[:object] == 'file.provisioning.html' %>">Provisioning</a>
+      <a href="<%= url_for("file.lti_window_post_message.html") %>" class="<%= 'current' if options[:object] == 'file.lti_window_post_message.html' %>">window.PostMessage</a>
         <ul><h4>Placements</h4>
                 <a href="<%= url_for("file.navigation_tools.html") %>" class="<%= 'current' if options[:object] == 'file.navigation_tools.html' %>">Navigation</a>
                 <a href="<%= url_for("file.homework_submission_placement.html") %>" class="<%= 'current' if options[:object] == 'file.homework_submission_placement.html' %>">Homework Submission</a>
@@ -44,6 +45,7 @@
                 <a href="<%= url_for("file.migration_selection_placement.html") %>" class="<%= 'current' if options[:object] == 'file.migration_selection_placement.html' %>">Migration Selection</a>
                 <a href="<%= url_for("file.link_selection_placement.html") %>" class="<%= 'current' if options[:object] == 'file.link_selection_placement.html' %>">Link Selection (Modules)</a>
                 <a href="<%= url_for("file.assignment_selection_placement.html") %>" class="<%= 'current' if options[:object] == 'file.assignment_selection_placement.html' %>">Assignment Selection</a>
+                <a href="<%= url_for("file.collaborations_placement.html") %>" class="<%= 'current' if options[:object] == 'file.collaborations_placement.html' %>">Collaborations</a>
         </ul >
       <a href="<%= url_for("file.xapi.html") %>" class="<%= 'current' if options[:object] == 'file.xapi.html' %>">xAPI</a>
     </li >
@@ -58,5 +60,32 @@
       <a href="<%= url_for("file.jwt_access_tokens.html") %>" class="<%= 'current' if options[:object] == 'file.jwt_access_tokens.html' %>">JWT Access Tokens</a>
     </li >
   </td>
+  <h2>Data Services</h2>
+  <td>
+    <li>
+      <h4>Live Events</h4>
+      <ul>
+        <h4>Overview</h4>
+        <a href="<%= url_for("file.data_service_introduction.html") %>" class="<%= 'current' if options[:object] == 'file.data_service_introduction.html' %>">Introduction</a>
+        <a href="<%= url_for("file.data_service_setup.html") %>" class="<%= 'current' if options[:object] == 'file.data_service_setup.html' %>">Setup</a>
+        <a href="<%= url_for("file.data_service_canvas_event_metadata.html") %>" class="<%= 'current' if options[:object] == 'file.data_service_canvas_event_metadata.html' %>">Metadata</a>
+      </ul>
 
+      <ul>
+        <h4>Event Format</h4>
+        <li>
+          <h4>Canvas</h4>
+          <% DataServicesCanvasLoader.data.each do |content| %>
+            <a href="<%= url_for("file.data_service_canvas_#{content[:event_category]}.html") %>" class="<%= 'current' if options[:object] == "file.data_service_canvas_#{content[:event_category]}.html" %>"><%= content[:page_title] %></a>
+          <% end %>
+        </li>
+        <li>
+          <h4>Caliper IMS 1.1</h4>
+          <% DataServicesCaliperLoader.data.each do |content| %>
+            <a href="<%= url_for("file.data_service_caliper_#{content[:event_category]}.html") %>" class="<%= 'current' if options[:object] == "file.data_service_caliper_#{content[:event_category]}.html" %>"><%= content[:page_title] %></a>
+          <% end %>
+        </li>
+      </ul>
+    </li>
+  </td>
 </nav>

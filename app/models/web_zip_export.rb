@@ -39,7 +39,7 @@ class WebZipExport < EpubExport
     update_attribute(:workflow_state, 'generating')
     convert_to_offline_web_zip
   end
-  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY
 
   # WebZip Exportable overrides
   def content_cartridge
@@ -61,7 +61,7 @@ class WebZipExport < EpubExport
     mark_as_generated
     cleanup_file_path!(file_path)
   end
-  handle_asynchronously :convert_to_offline_web_zip, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+  handle_asynchronously :convert_to_offline_web_zip, priority: Delayed::LOW_PRIORITY
 
   def cache_key
     "web_zip_export_user_progress_#{global_id}"

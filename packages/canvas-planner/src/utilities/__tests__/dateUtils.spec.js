@@ -21,13 +21,15 @@ import {
   isToday,
   isInFuture,
   getFriendlyDate,
-  getFullDate,
+  getDynamicFullDate,
+  getDynamicFullDateAndTime,
   getFirstLoadedMoment,
   getLastLoadedMoment,
   getFullDateAndTime,
   dateRangeString,
   timeString,
-  dateTimeString
+  dateTimeString,
+  isThisWeek
 } from '../dateUtils'
 
 const TZ = 'Asia/Tokyo'
@@ -72,15 +74,43 @@ describe('getFriendlyDate', () => {
   })
 })
 
-describe('getFullDate', () => {
-  it('returns the day of the week month and day for special days', () => {
-    const date = moment()
-    expect(getFullDate(date)).toEqual(date.format('dddd, MMMM D'))
+describe('getDynamicFullDate', () => {
+  it('returns the format month day if in the current year', () => {
+    const date = moment().tz(TZ)
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D'))
   })
 
-  it('returns the format month day year when not a special day', () => {
-    const date = moment().add(3, 'days')
-    expect(getFullDate(date)).toEqual(date.format('MMMM D, YYYY'))
+  it('returns the format month day year if in a past year', () => {
+    const date = moment().tz(TZ).subtract(1, 'years')
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D, YYYY'))
+  })
+
+  it('returns the format month day year if in a future year', () => {
+    const date = moment().tz(TZ).add(1, 'years')
+    expect(getDynamicFullDate(date, TZ)).toEqual(date.format('MMMM D, YYYY'))
+  })
+})
+
+describe('getDynamicFullDateAndTime', () => {
+  it('returns the format month day time if in the current year', () => {
+    const date = moment().tz(TZ)
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D')} at ${date.format('LT')}`
+    )
+  })
+
+  it('returns the format month day year time if in a past year', () => {
+    const date = moment().tz(TZ).subtract(1, 'years')
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+    )
+  })
+
+  it('returns the format month day year time if in a future year', () => {
+    const date = moment().tz(TZ).add(1, 'years')
+    expect(getDynamicFullDateAndTime(date, TZ)).toEqual(
+      `${date.format('MMM D, YYYY')} at ${date.format('LT')}`
+    )
   })
 })
 
@@ -114,74 +144,54 @@ describe('isInFuture', () => {
 
 describe('getFirstLoadedMoment', () => {
   it('returns today when there are no days loaded', () => {
-    const today = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getFirstLoadedMoment([], 'Asia/Tokyo')
+    const today = moment.tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([], TZ)
     expect(result.isSame(today)).toBeTruthy()
   })
 
   it('returns the dateBucketMoment of the first time of the first day', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
-    const result = getFirstLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment().tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('uses the day key if the first day has no items', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
+    const expected = moment().tz(TZ).startOf('day')
     const formattedDate = formatDayKey(expected)
-    const result = getFirstLoadedMoment([[formattedDate, []]], 'Asia/Tokyo')
+    const result = getFirstLoadedMoment([[formattedDate, []]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('returns a clone', () => {
-    const expected = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getFirstLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment.tz(TZ).startOf('day')
+    const result = getFirstLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result === expected).toBeFalsy()
   })
 })
 
 describe('getLastLoadedMoment', () => {
   it('returns today when there are no days loaded', () => {
-    const today = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getLastLoadedMoment([], 'Asia/Tokyo')
+    const today = moment.tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([], TZ)
     expect(result.isSame(today)).toBeTruthy()
   })
 
   it('returns the dateBucketMoment of the first time of the last day', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
-    const result = getLastLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment().tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('uses the day key if the last day has no items', () => {
-    const expected = moment()
-      .tz('Asia/Tokyo')
-      .startOf('day')
+    const expected = moment().tz(TZ).startOf('day')
     const formattedDate = formatDayKey(expected)
-    const result = getLastLoadedMoment([[formattedDate, []]], 'Asia/Tokyo')
+    const result = getLastLoadedMoment([[formattedDate, []]], TZ)
     expect(result.isSame(expected)).toBeTruthy()
   })
 
   it('returns a clone', () => {
-    const expected = moment.tz('Asia/Tokyo').startOf('day')
-    const result = getLastLoadedMoment(
-      [['some date', [{dateBucketMoment: expected}]]],
-      'Asia/Tokyo'
-    )
+    const expected = moment.tz(TZ).startOf('day')
+    const result = getLastLoadedMoment([['some date', [{dateBucketMoment: expected}]]], TZ)
     expect(result === expected).toBeFalsy()
   })
 })
@@ -205,5 +215,16 @@ describe('dateRangeString', () => {
     const end = start.clone().add(1, 'day')
     const result = dateRangeString(start, end, 'UTC')
     expect(result).toBe(`${dateTimeString(start)} - ${dateTimeString(end)}`)
+  })
+})
+
+describe('isThisWeek', () => {
+  it('returns true when given day is during this week', () => {
+    const wednesday = new moment().startOf('week').add(3, 'days')
+    expect(isThisWeek(wednesday)).toEqual(true)
+  })
+  it('return false when given day is not during this week', () => {
+    const lastFriday = new moment().startOf('week').add(-2, 'days')
+    expect(isThisWeek(lastFriday)).toEqual(false)
   })
 })

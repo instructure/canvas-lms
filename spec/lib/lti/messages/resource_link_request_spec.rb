@@ -42,6 +42,30 @@ describe Lti::Messages::ResourceLinkRequest do
       expect_course_resource_link_id(jws)
     end
 
+    describe 'custom parameters' do
+      let(:link_for_params) {
+        Lti::ResourceLink.new(
+          context_external_tool: tool_override || tool,
+          context: course,
+          custom: {
+            link_has_expansion2: "$Canvas.assignment.id",
+            no_expansion: "overrides tool param!"
+          }
+        )
+      }
+      let(:opts) { super().merge(resource_link_for_custom_params: link_for_params) }
+
+      context 'when link-level custom params are given in resource_link_for_custom_params' do
+        it 'merges them in with tool/placement parameters' do
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'link_has_expansion2' => assignment.id,
+            'has_expansion' => user.id,
+            'no_expansion' => 'overrides tool param!'
+          )
+        end
+      end
+    end
+
     it_behaves_like 'disabled rlid claim group check'
 
     it_behaves_like 'lti 1.3 message initialization'
@@ -70,6 +94,37 @@ describe Lti::Messages::ResourceLinkRequest do
 
     it 'sets the assignment title' do
       expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title')).to eq assignment.title
+    end
+
+    describe 'custom parameters' do
+      context 'when link-level custom params are given' do
+        it 'merges them in with tool/placement parameters' do
+          expected_assignment_line_item.resource_link.update(
+            custom: {
+              link_has_expansion: "$Canvas.assignment.id",
+              no_expansion: "overrides tool param"
+            }
+          )
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'link_has_expansion' => assignment.id,
+            'has_expansion' => user.id,
+            'no_expansion' => 'overrides tool param'
+          )
+        end
+      end
+
+      context 'when the link-level params are null' do
+        it 'gives only the tool/placement custom params' do
+          expected_assignment_line_item.resource_link.update(
+            custom: nil
+          )
+
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'has_expansion' => user.id,
+            'no_expansion' => 'foo'
+          )
+        end
+      end
     end
 
     context 'when assignment and grade service enabled' do
@@ -133,7 +188,7 @@ describe Lti::Messages::ResourceLinkRequest do
       end
     end
 
-    context 'when assignment not configured for external tool lauch' do
+    context 'when assignment not configured for external tool launch' do
       let(:api_message) { 'Assignment not configured for external tool launches' }
 
       before do
@@ -256,7 +311,7 @@ describe Lti::Messages::ResourceLinkRequest do
   # these take `claims` as a method arg b/c we sometimes need to test two different jws structs in the same example where
   # it is not practical to define one or both with `let`
   def expect_assignment_resource_link_id(claims)
-    rlid = expected_assignment_line_item.resource_link.resource_link_id
+    rlid = expected_assignment_line_item.resource_link.resource_link_uuid
     expect(claims.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq rlid
   end
 

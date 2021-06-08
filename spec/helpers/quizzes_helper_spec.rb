@@ -276,7 +276,7 @@ describe QuizzesHelper do
         answer_list: ['val'],
         editable: true
       })
-      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected>val</option></select>' # rubocop:disable Metrics/LineLength
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>' # rubocop:disable Metrics/LineLength
       expect(html).to be_html_safe
     end
 
@@ -546,7 +546,17 @@ describe QuizzesHelper do
         foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
       }, 'foo')
       expect(comment).to match(/MathML/)
-      expect(comment).to match(/&amp;coprod/)
+      expect(comment).to match(/∐/)
+    end
+
+    it 'does not add MathML if new math handling feature is active' do
+      def controller.use_new_math_equation_handling?
+        true
+      end
+      comment = comment_get({
+        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+      }, 'foo')
+      expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end
 end

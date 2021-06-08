@@ -86,7 +86,8 @@ class Lti::LineItem < ApplicationRecord
       end
 
       line_item ||= self.new(assignment: assignment, root_account_id: assignment.root_account_id)
-      attrs = params.to_h.merge(client_id: tool.developer_key.global_id, coupled: false).compact
+      attrs = params.to_h.merge(coupled: false).compact
+      attrs[:client_id] = tool.global_developer_key_id if tool
       line_item.update!(attrs)
       line_item
     end

@@ -1,0 +1,394 @@
+{
+  "name": "metadata",
+  "definition": "Metadata included in each event. Exact fields vary by event type and whether the event is system- or user- generated.",
+  "trigger": null,
+  "schema": {
+    "root_account_uuid": "The Canvas uuid of the root account associated with the context of the job.",
+    "root_account_id": "The Canvas id of the root account associated with the context of the job.",
+    "root_account_lti_guid": "The Canvas lti_guid of the root account associated with the context of the job.",
+    "event_name": "The event type.",
+    "event_time": "The time that Canvas emitted the event, in ISO 8601 format with millisecond precision.",
+    "job_id": "The identifier for the asynchronous job. Only present in system-generated events (events emitted in an asynchronous job, not an HTTP request).",
+    "job_tag": "A string identifying the type of job being performed. Only present in system-generated events (events emitted in an asynchronous job, not an HTTP request).",
+    "producer": "Always \"canvas\".",
+    "user_login": "The login of the current user. Only present in user-generated events (events emitted directly from an HTTP request).",
+    "user_account_id": "The Canvas id of the account that the current user belongs to. Only present in user-generated events (events emitted directly from an HTTP request).",
+    "user_sis_id": "The SIS id of the user. Only present in user-generated events (events emitted directly from an HTTP request).",
+    "user_id": "The Canvas id of the currently logged in user.",
+    "time_zone": "Time zone of the currently logged in user. Only present in user-generated events (events emitted directly from an HTTP request).",
+    "developer_key_id": "The id of the Developer Key used to create the access token for user. Only available for events triggered by an external tool.",
+    "context_type": "The type of context where the event happened.",
+    "context_id": "The Canvas id of the current context.",
+    "context_sis_source_id": "SIS source id of the current context.",
+    "context_account_id": "The account id of the current context. This is the actual account the context is attached to.",
+    "context_role": "The role of the current user in the current context.",
+    "request_id": "The identifier for this request. Correlates to Canvas Data table Requests.id. Only present in user-generated events.",
+    "session_id": "The session identifier for this request. Can be used to correlate events in the same session for a user. Only present in user-generated events.",
+    "hostname": "The domain of the Canvas instance for the request. Only present in user-generated events.",
+    "http_method": "HTTP method/verb (GET, PUT, POST etc.) that the request was sent with. Only present in user-generated events.",
+    "user_agent": "The User-Agent sent by the browser making the request. Only present in user-generated events.",
+    "client_ip": "The client IP address of the request that triggered the event. Only present in user-generated events.",
+    "url": "The URL of the request that triggered the event. Only present in user-generated events.",
+    "referrer": "URL of the page the user clicked to get to the current page. Only present in user-generated events.",
+    "real_user_id": "If the current user is being masqueraded, this is the Canvas id of the masquerading user. Only present in user-generated events."
+  },
+  "examples": [
+    {
+      "description": "system-generated, Course context",
+      "payload": {
+        "metadata": {
+          "job_id": "1020020528469291",
+          "job_tag": "Assignment#post_submissions",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "context_type": "Course",
+          "context_id": "21070000000000565",
+          "event_name": "grade_change",
+          "event_time": "2019-11-01T00:07:59.125Z"
+        },
+        "body": {
+          "submission_id": "21070000000001234",
+          "assignment_id": "21070000000000371",
+          "grade": "7",
+          "old_grade": null,
+          "score": 7,
+          "old_score": null,
+          "points_possible": 20,
+          "old_points_possible": 20,
+          "grader_id": "20170000000012345",
+          "student_id": "21070000000000048",
+          "student_sis_id": "Test2",
+          "user_id": "21070000000000001",
+          "grading_complete": true,
+          "muted": false
+        }
+      }
+    },
+    {
+      "description": "system-generated, no context",
+      "payload": {
+        "metadata": {
+          "job_id": "1230020528123123",
+          "job_tag": "EnrollmentState.invalidate_states_for_course_or_section",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "event_name": "enrollment_state_updated",
+          "event_time": "2019-11-01T00:07:59.565Z"
+        },
+        "body": {
+          "enrollment_id": "21070000000046827",
+          "state": "active",
+          "state_started_at": "2019-08-15T00:00:00Z",
+          "state_is_current": true,
+          "state_valid_until": "2020-01-11T06:00:00Z",
+          "restricted_access": false,
+          "access_is_current": true
+        }
+      }
+    },
+    {
+      "description": "user-generated, Account context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000001",
+          "time_zone": "America/Chicago",
+          "developer_key_id": "170000000056",
+          "context_type": "Account",
+          "context_id": "21070000000000001",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_account_id": "21070000000000001",
+          "context_role": "AccountAdmin",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/accounts/1/users?access_token=123~2xEyz13b0mOyqi3111cbfS2P43DfmJBfot3W2gg7CB1d11X25wHk4e8W5PFtturV",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "user_created",
+          "event_time": "2019-11-01T15:22:34.811Z"
+        },
+        "body": {
+          "user_id": "21070000000001234",
+          "uuid": "7CGV0SxY8DkslTomd4MTqkcbQbcTGuZ6Jg96XnLY",
+          "name": "Sally Student",
+          "short_name": "Sally Student",
+          "workflow_state": "pre_registered",
+          "created_at": "2019-11-01T15:22:34Z",
+          "updated_at": "2019-11-01T15:22:34Z",
+          "user_login": "salstudent",
+          "user_sis_id": "456-T45"
+        }
+      }
+    },
+    {
+      "description": "user-generated, AssessmentQuestion context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzAD:canvas-lms",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000002",
+          "time_zone": "America/New_York",
+          "context_type": "AssessmentQuestion",
+          "context_id": "21070000000000565",
+          "context_account_id": "21070000000000079",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/assessment_questions/565/files/113711/download?verifier=wvTPigGj3XhMVg20wn5DitqRoFES4HDKIUuK8Nwj",
+          "referrer": "https://oxana.instructure.com/courses/23825/quizzes/229552/take",
+          "producer": "canvas",
+          "event_name": "asset_accessed",
+          "event_time": "2019-11-01T00:08:09.726Z"
+        },
+        "body": {
+          "asset_name": "Some diagram",
+          "asset_type": "attachment",
+          "asset_id": "21070000000113711",
+          "asset_subtype": null,
+          "category": "files",
+          "role": null,
+          "level": null,
+          "filename": "diagram.png",
+          "display_name": "diagram.png"
+        }
+      }
+    },
+    {
+      "description": "user-generated, Course context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000002",
+          "time_zone": "America/Los_Angeles",
+          "developer_key_id": "170000000056",
+          "real_user_id": "21070000000000001",
+          "context_type": "Course",
+          "context_id": "21070000000000565",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_account_id": "21070000000000079",
+          "context_role": "StudentEnrollment",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/discussion_topics?access_token=187~tD3nCQJ6g13krmjBifJwn7AT2hbBHnIXvTlVrC1nbEH2lQAHuS9EAmTffoXuA9h&per_page=33&as_user_id=sis_login_id%3Ajcollins2",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "asset_accessed",
+          "event_time": "2019-11-01T00:07:59.476Z"
+        },
+        "body": {
+          "asset_name": "LTI Placement Test",
+          "asset_type": "course",
+          "asset_id": "21070000000000565",
+          "asset_subtype": "topics",
+          "category": "topics",
+          "role": "StudentEnrollment",
+          "level": null
+        }
+      }
+    },
+    {
+      "description": "user-generated, CourseSection context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000002",
+          "time_zone": "America/Denver",
+          "developer_key_id": "170000000056",
+          "context_type": "CourseSection",
+          "context_id": "21070000000000565",
+          "context_sis_source_id": "12345.678912",
+          "context_account_id": "21070000000000079",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/sections/sis_section_id:12345.678912/crosslist/sis_course_id:ABHX176020",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "course_section_updated",
+          "event_time": "2019-11-01T19:11:17.512Z"
+        },
+        "body": {
+          "course_section_id": "7972",
+          "sis_source_id": "12345.678912",
+          "sis_batch_id": null,
+          "course_id": "565",
+          "root_account_id": "1",
+          "enrollment_term_id": null,
+          "name": "test_assignment_group1",
+          "default_section": false,
+          "accepting_enrollments": null,
+          "can_manually_enroll": null,
+          "start_at": "2020-01-06T07:00:00Z",
+          "end_at": "2020-04-30T05:59:59Z",
+          "workflow_state": "active",
+          "restrict_enrollments_to_section_dates": null,
+          "nonxlist_course_id": "456",
+          "stuck_sis_fields": [
+            "course_id",
+            "end_at",
+            "name",
+            "start_at"
+          ],
+          "integration_id": "12345"
+        }
+      }
+    },
+    {
+      "description": "user-generated, Group context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "111111111111111",
+          "time_zone": "America/New_York",
+          "developer_key_id": "170000000056",
+          "context_type": "Group",
+          "context_id": "21070000000000565",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_account_id": "21070000000000079",
+          "context_role": "GroupMembership",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/groups/565/discussion_topics/1996?include[]=sections",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "asset_accessed",
+          "event_time": "2019-11-01T00:08:03.957Z"
+        },
+        "body": {
+          "asset_name": "LTI Placement Test",
+          "asset_type": "discussion_topic",
+          "asset_id": "21070000000001996",
+          "asset_subtype": null,
+          "category": "topics",
+          "role": "GroupMembership",
+          "level": null
+        }
+      }
+    },
+    {
+      "description": "user-generated, no context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000002",
+          "time_zone": "America/New_York",
+          "developer_key_id": "170000000056",
+          "real_user_id": "11111111111111111",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/v1/courses/sis_course_id:25de654b-bf56-19b7-b9cd-28b5deeedbe4?as_user_id=sis_user_id:48ea16e-8a9b-4ff7-bd4-0adcf7be50&include=permissions",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "asset_accessed",
+          "event_time": "2019-11-05T10:58:41.969Z"
+        },
+        "body": {
+          "asset_name": "Linguistics 101",
+          "asset_type": "course",
+          "asset_id": "21070000000000144",
+          "asset_subtype": "home",
+          "category": "home",
+          "role": "StudentEnrollment",
+          "level": null
+        }
+      }
+    },
+    {
+      "description": "user-generated, User context",
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000565",
+          "time_zone": "America/Los_Angeles",
+          "real_user_id": "11111111111111111",
+          "context_type": "User",
+          "context_id": "21070000000000565",
+          "context_account_id": null,
+          "context_role": "User",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "GET",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/files/45159801/download?download_frd=1&verifier=O2rxkk4BuQUIA46ESCJ2a3KHWuN6ZDloBDVKv2E2",
+          "referrer": "https://oxana.instructure.com/courses/544364/gradebook",
+          "producer": "canvas",
+          "event_name": "asset_accessed",
+          "event_time": "2019-11-06T04:02:01.499Z"
+        },
+        "body": {
+          "asset_name": "profilepicture.jpg",
+          "asset_type": "attachment",
+          "asset_id": "2107000045159801",
+          "asset_subtype": null,
+          "category": "files",
+          "role": "User",
+          "level": null,
+          "filename": "profilepicture.jpg",
+          "display_name": "profilepicture.jpg"
+        }
+      }
+    }
+  ]
+}

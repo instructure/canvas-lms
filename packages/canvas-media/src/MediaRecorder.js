@@ -28,7 +28,7 @@ export default function MediaRecorder(props) {
       {canUseMediaCapture() ? (
         <MediaCapture translations={props.MediaCaptureStrings} onCompleted={props.onSave} />
       ) : (
-        <Alert variant="error" margin="small">
+        <Alert variant="info" margin="small">
           {props.errorMessage}
         </Alert>
       )}

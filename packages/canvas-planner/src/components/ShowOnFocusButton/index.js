@@ -21,10 +21,10 @@ import {node, object, func} from 'prop-types'
 
 import {themeable} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 class ShowOnFocusButton extends Component {
   static propTypes = {

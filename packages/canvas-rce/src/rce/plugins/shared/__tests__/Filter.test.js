@@ -44,7 +44,7 @@ describe('RCE Plugins > Filter', () => {
   }
 
   function renderComponent(props) {
-    component = render(<FilterWithHooks {...props} />)
+    component = render(<FilterWithHooks containingContextType="course" {...props} />)
   }
 
   function selectContentType(contentTypeLabel) {
@@ -161,7 +161,7 @@ describe('RCE Plugins > Filter', () => {
     })
 
     it('includes only User option in user context', () => {
-      renderComponent({userContextType: 'user'})
+      renderComponent({userContextType: 'user', containingContextType: 'user'})
       const contentTypeField = component.queryByLabelText('Content Type')
       expect(contentTypeField).toBeNull() // we replaced the Select with a View
       expect(component.queryByText('Links')).toBeNull()
@@ -317,24 +317,33 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('is not visible when the contentSubtype is media', () => {
+    it('is visible when the contentSubtype is media', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
         contentSubtype: 'media'
       })
-      expect(component.queryByPlaceholderText('Search')).toBe(null)
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('is not visible when the contentType is links', () => {
+    it('is visible when the contentType is links', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'links'
       })
-      expect(component.queryByPlaceholderText('Search')).toBe(null)
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('updates filter ssettings when the search string is > 3 chars long', async () => {
+    it('is visible when the contentSubtype is all', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'all'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('updates filter settings when the search string is > 3 chars long', async () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
@@ -346,6 +355,50 @@ describe('RCE Plugins > Filter', () => {
       await waitFor(() => {
         expect(currentFilterSettings.searchString).toBe('abc')
       })
+    })
+
+    it('clears search when clear button is clicked', async () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(currentFilterSettings.searchString).toBe('')
+      fireEvent.change(searchInput, {target: {value: 'abc'}})
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('abc')
+      })
+      fireEvent.click(component.getByText('Clear'))
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('')
+      })
+    })
+
+    it('is readonly while content is loading', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents',
+        isContentLoading: true,
+        searchString: 'abc'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(searchInput.hasAttribute('readonly')).toBe(true)
+
+      const clearBtn = component.getByText('Clear').closest('button')
+      expect(clearBtn.hasAttribute('disabled')).toBe(true)
+    })
+
+    it('shows the search message when not loading', () => {
+      renderComponent()
+      expect(component.getByText('Enter at least 3 characters to search')).toBeInTheDocument()
+    })
+
+    it('shows the loading message when loading', () => {
+      renderComponent({isContentLoading: true})
+      // screenreader message + hint under the search input box
+      expect(component.getByText('Loading, please wait')).toBeInTheDocument()
     })
   })
 })

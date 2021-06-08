@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -426,7 +428,7 @@ class EnrollmentsApiController < ApplicationController
       # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
       pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
       use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
-      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index) && !use_numeric_pagination_override
+      use_bookmarking = !use_numeric_pagination_override
       enrollments = use_bookmarking ?
         enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
         enrollments.joins(:user).select("enrollments.*").
@@ -586,8 +588,7 @@ class EnrollmentsApiController < ApplicationController
   #   students the ability to drop the course if desired. Defaults to false.
   #
   # @argument enrollment[associated_user_id] [Integer]
-  #   For an observer enrollment, the ID of a student to observe. The
-  #   caller must have +manage_students+ permission in the course.
+  #   For an observer enrollment, the ID of a student to observe.
   #   This is a one-off operation; to automatically observe all a
   #   student's enrollments (for example, as a parent), please use
   #   the {api:UserObserveesController#create User Observees API}.

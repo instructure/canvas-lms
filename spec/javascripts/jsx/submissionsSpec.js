@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 
-import {setup, teardown} from 'submissions'
+import {setup, teardown} from 'ui/features/submissions/jquery/index.js'
 import fakeENV from 'helpers/fakeENV'
-import 'jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('submissions', {
   setup() {

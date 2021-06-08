@@ -25,7 +25,9 @@ module CC
       FileUtils::mkdir_p wiki_folder
 
       scope = @course.wiki_pages.not_deleted
-      WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
+      # @user is nil if it's kicked off by the system, like a course template
+      scope = WikiPages::ScopedToUser.new(@course, @user, scope).scope if @user
+      scope.each do |page|
         next unless export_object?(page)
         next if @user && page.locked_for?(@user)
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import Assignment from 'jsx/choose_mastery_path/components/assignment'
+import Assignment from 'ui/features/choose_mastery_path/react/components/assignment.js'
 
 QUnit.module('Assignment')
 

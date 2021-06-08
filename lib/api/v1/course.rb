@@ -48,9 +48,11 @@ module Api::V1::Course
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:syllabus_course_summary] = course.syllabus_course_summary?
+    settings[:homeroom_course] = course.homeroom_course?
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
+    settings[:course_color] = course.course_color
 
     settings
   end
@@ -97,6 +99,11 @@ module Api::V1::Course
         precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
+      if includes.include?('grading_periods')
+        hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
+           api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+        end
+      end
       if includes.include?('course_progress')
         hash['course_progress'] = CourseProgress.new(course,
                                                      subject_user,
@@ -120,6 +127,15 @@ module Api::V1::Course
           hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
         end
       end
+      # undocumented; used in AccountCourseUserSearch
+      if includes.include?('active_teachers')
+        course.shard.activate do
+          scope =
+            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
+          hash['teachers'] =
+            User.where(id: scope).map { |teacher| user_display_json(teacher) }
+        end
+      end
       hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
       hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')
@@ -131,6 +147,12 @@ module Api::V1::Course
       hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
+      if course.root_account.feature_enabled?(:course_templates)
+        hash['template'] = course.template?
+        if course.template? && includes.include?('templated_accounts')
+          hash['templated_accounts'] = course.templated_accounts.map { |a| {id: a.id, name: a.name} }
+        end
+      end
 
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash

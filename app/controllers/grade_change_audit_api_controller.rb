@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -363,7 +365,7 @@ class GradeChangeAuditApiController < AuditorApiController
     assignments_anonymous_and_muted = anonymous_and_muted(events)
 
     events.reject do |event|
-      assignment_id = event["attributes"].fetch("assignment_id")
+      assignment_id = Shard.global_id_for(event["attributes"].fetch("assignment_id"))
       assignments_anonymous_and_muted[assignment_id]
     end
   end
@@ -373,7 +375,7 @@ class GradeChangeAuditApiController < AuditorApiController
 
     events.each do |event|
       attributes = event["attributes"]
-      assignment_id = attributes.fetch("assignment_id")
+      assignment_id = Shard.global_id_for(attributes.fetch("assignment_id"))
       attributes["student_id"] = nil if assignments_anonymous_and_muted[assignment_id]
     end
   end

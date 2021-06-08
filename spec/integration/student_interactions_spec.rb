@@ -94,7 +94,7 @@ describe "student interactions links" do
     it "should show mail link for teachers" do
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
       expect(response).to be_successful
-      html = Nokogiri::HTML(response.body)
+      html = Nokogiri::HTML5(response.body)
       expect(html.css('.message_student_link')).not_to be_nil
     end
 
@@ -104,7 +104,7 @@ describe "student interactions links" do
       user_session(@user)
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
       expect(response).to be_successful
-      html = Nokogiri::HTML(response.body)
+      html = Nokogiri::HTML5(response.body)
       expect(html.css('.message_student_link')).to be_empty
     end
   end

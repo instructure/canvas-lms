@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,7 +28,8 @@ Delayed::Backend::Base.class_eval do
 
   def root_account_id
     return nil if account.nil?
-    account.root_account_id.nil? ? account.id : account.root_account_id
+
+    account.resolved_root_account_id
   end
 
   def to_log_format
@@ -122,13 +125,12 @@ end
 
 ### lifecycle callbacks
 
-Delayed::Pool.on_fork = ->{
-  Canvas.reconnect_redis
-}
-
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
   Canvas::Redis.clear_idle_connections
+  job.current_shard.activate do
+    LoadAccount.check_schema_cache
+  end
 
   # context for our custom logger
   Thread.current[:context] = {
@@ -178,69 +180,51 @@ Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|
   Canvas::Errors.capture(exception, info.to_h)
 end
 
-Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
+Delayed::Worker.lifecycle.before(:retry) do |worker, job, exception|
+  # any job that fails with a RetriableError gets routed
+  # here if it has any retries left.  We just want the stats
   info = Canvas::Errors::JobInfo.new(job, worker)
   begin
     (job.current_shard || Shard.default).activate do
-      Canvas::Errors.capture(exception, info.to_h)
+      Canvas::Errors.capture(exception, info.to_h, :info)
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:jobs_lifecycle, e)
+    Canvas::Errors.capture(exception, info.to_h, :info)
+  end
+end
+
+# Delayed::Backend::RecordNotFound happens when a job is queued and then the thing that
+# it's queued on gets deleted.  It happens all the time for stuff
+# like test students (we delete their stuff immediately), and
+# we don't need detailed exception reports for those.
+#
+# Delayed::RetriableError is thrown by any job to indicate the thing
+# that's failing is "kind of expected".  Upstream service backpressure,
+# etc.
+WARNABLE_DELAYED_EXCEPTIONS = [
+  Delayed::Backend::RecordNotFound,
+  Delayed::RetriableError,
+].freeze
+
+Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
+  is_warnable = WARNABLE_DELAYED_EXCEPTIONS.any?{|klass| exception.is_a?(klass) }
+  error_level = is_warnable ? :warn : :error
+  info = Canvas::Errors::JobInfo.new(job, worker)
+  begin
+    (job.current_shard || Shard.default).activate do
+      Canvas::Errors.capture(exception, info.to_h, error_level)
     end
   rescue
-    Canvas::Errors.capture(exception, info.to_h)
+    Canvas::Errors.capture(exception, info.to_h, error_level)
   end
 end
 
 # syntactic sugar and compatibility shims
 module CanvasDelayedMessageSending
-  def delay_if_production(**kwargs)
-    delay(**kwargs.merge(synchronous: !Rails.env.production?))
-  end
-
-  def send_later(method, *args, **kwargs)
-    # in ruby 2.6, an empty **kwargs being passed to a method that
-    # does not accept kwargs will be transformed into a literal positional
-    # `{}`, which the method likely doesn't accept; just drop it here
-    if kwargs.empty?
-      delay.__send__(method, *args)
-    else
-      delay.__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_enqueue_args(method, enqueue_args, *args, **kwargs)
-    if kwargs.empty?
-      delay(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args)
-    else
-      delay(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_if_production(method, *args, **kwargs)
-    if kwargs.empty?
-      delay_if_production.__send__(method, *args)
-    else
-      delay_if_production.__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_if_production_enqueue_args(method, enqueue_args, *args, **kwargs)
-    if kwargs.empty?
-      delay_if_production(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args)
-    else
-      delay_if_production(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_at(run_at, method, *args, **kwargs)
-    if kwargs.empty?
-      delay(run_at: run_at).__send__(method, *args)
-    else
-      delay(run_at: run_at).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def translate_legacy_enqueue_args(**enqueue_args)
-    enqueue_args[:ignore_transaction] = true if enqueue_args.delete(:no_delay)
-    enqueue_args
+  def delay_if_production(sender: nil, **kwargs)
+    sender ||= __calculate_sender_for_delay
+    delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
   end
 end
 Object.send(:include, CanvasDelayedMessageSending)

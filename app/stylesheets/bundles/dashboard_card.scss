@@ -48,6 +48,10 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   }
 }
 
+.ic-DashboardCard__box__container {
+  margin: direction-sides($ic-sp*-3 0 0 $ic-sp*-3);
+}
+
 @supports (position: sticky) or (position: -webkit-sticky) {
   .ic-DashboardCard__box {
     padding-top: $ic-sp * 2;
@@ -84,18 +88,22 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   width: $ic-DashboardCard-width;
   display: inline-block;
   vertical-align: top;
-  margin: direction-sides(0 $ic-sp*3 $ic-sp*3 0);
-
-  // if there is not enough screen width to fit 2 whole cards (like on a phone) then just have one card fill the whole width
-  @media only screen and (max-width: $ic-DashboardCard-width*2 + $ic-sp*8) {
-    & { width: 100%; }
-    body.responsive_awareness & {
-      margin-#{direction(right)}: 0;
-    }
-  }
+  margin: direction-sides($ic-sp*3 0 0 $ic-sp*3);
 
   .no-touch & {
     &:hover { box-shadow: 0 4px 10px rgba(black, 0.35); }
+  }
+}
+
+// if there is not enough screen width to fit 2 whole cards (like on a phone) then just have one card fill the whole width
+@media only screen and (max-width: $ic-DashboardCard-width*2 + $ic-sp*8) {
+  .ic-DashboardCard {
+    width: 100%;
+    margin-#{direction(left)}: 0;
+  }
+
+  .ic-DashboardCard__box__container {
+    margin-#{direction(left)}: 0;
   }
 }
 

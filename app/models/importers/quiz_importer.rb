@@ -278,13 +278,14 @@ module Importers
       end
 
       if hash[:available]
-        item.generate_quiz_data
         item.workflow_state = 'available'
         item.published_at = Time.now
       elsif item.can_unpublish? && (new_record || master_migration)
         item.workflow_state = 'unpublished'
         item.assignment.workflow_state = 'unpublished' if item.assignment
       end
+
+      item.generate_quiz_data if item.published?
 
       if hash[:assignment_group_migration_id]
         if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
@@ -325,7 +326,7 @@ module Importers
             q[:questions].map{|qq| qq[:quiz_question_migration_id] || qq[:migration_id]} :
             q[:quiz_question_migration_id] || q[:migration_id]
           }.flatten
-          item.quiz_questions.active.where.not(:migration_id => importing_question_mig_ids).update_all(:workflow_state => 'deleted')
+          item.quiz_questions.not_deleted.where.not(migration_id: importing_question_mig_ids).update_all(workflow_state: 'deleted')
 
           # remove the quiz groups afterwards so any of their dependent quiz questions are deleted first and we don't run into any Restrictor errors
           importing_qgroup_mig_ids = hash[:questions].select{|q| q[:question_type] == "question_group"}.map{|qg| qg[:migration_id]}

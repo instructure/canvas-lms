@@ -106,6 +106,17 @@ describe PlannerOverridesController do
         json = json_parse(response.body)
         expect(json["plannable_type"]).to eq 'announcement'
       end
+
+      it "gracefully handles duplicate request race condition" do
+        ovr = PlannerOverride.new
+        allow(PlannerOverride).to receive(:new).and_return(ovr)
+        expect(ovr).to receive(:save) do
+          raise ActiveRecord::RecordNotUnique, "PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint..."
+        end
+        post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
+        expect(response).to have_http_status(:bad_request)
+        expect(PlannerOverride.where(user_id: @student.id).count).to be 1
+      end
     end
 
     describe "DELETE #destroy" do

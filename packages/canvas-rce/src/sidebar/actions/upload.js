@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {saveMediaRecording} from '@instructure/canvas-media'
+import {headerFor, originFromHost} from '../sources/api'
 import * as files from './files'
 import * as images from './images'
 import bridge from '../../bridge'
@@ -134,10 +136,7 @@ export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
   if (selectedTabType === 'images' && isImage(embedData.type) && results.displayAs !== 'link') {
     // embed the image after any current selection rather than link to it or replace it
-    bridge
-      .activeEditor()
-      ?.mceInstance()
-      ?.selection.collapse()
+    bridge.activeEditor()?.mceInstance()?.selection.collapse()
     const file_props = {
       href: results.href || results.url,
       title: results.title,
@@ -152,10 +151,7 @@ export function embedUploadResult(results, selectedTabType) {
     bridge.insertImage(file_props)
   } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
     // embed media after any current selection rather than link to it or replace it
-    bridge
-      .activeEditor()
-      ?.mceInstance()
-      ?.selection.collapse()
+    bridge.activeEditor()?.mceInstance()?.selection.collapse()
 
     // when we record audio, notorious thinks it's a video. use the content type we got
     // from the recoreded file, not the returned media object.
@@ -182,7 +178,7 @@ export function embedUploadResult(results, selectedTabType) {
           results.title ||
           results.filename,
         content_type: results['content-type'],
-        embed: embedData,
+        embed: {...embedData, disablePreview: true},
         target: '_blank',
         contextType: results.contextType,
         contextId: results.contextId,
@@ -221,7 +217,7 @@ export function fetchFolders(bookmark) {
 
 // uploads handled via canvas-media
 export function mediaUploadComplete(error, uploadData) {
-  const {mediaObject, uploadedFile} = uploadData
+  const {mediaObject, uploadedFile} = uploadData || {}
   return (dispatch, _getState) => {
     if (error) {
       dispatch(failMediaUpload(error))
@@ -258,6 +254,22 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
 
     dispatch(activateMediaUpload(fileMetaProps))
     const {source, jwt, host, contextId, contextType} = getState()
+
+    if (tabContext === 'media' && fileMetaProps.domObject) {
+      return saveMediaRecording(
+        fileMetaProps.domObject,
+        {
+          contextId,
+          contextType,
+          origin: originFromHost(host),
+          headers: headerFor(jwt)
+        },
+        (err, uploadData) => {
+          dispatch(mediaUploadComplete(err, uploadData))
+        }
+      )
+    }
+
     return source
       .fetchMediaFolder({jwt, host, contextId, contextType})
       .then(({folders}) => {

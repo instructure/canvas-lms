@@ -19,7 +19,7 @@ import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
 import moment from 'moment-timezone'
 import {Button} from '@instructure/ui-buttons'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconXLine} from '@instructure/ui-icons'
 import {bool, string, number, func, object} from 'prop-types'
@@ -27,7 +27,7 @@ import {getFullDateAndTime} from '../../utilities/dateUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 export class Opportunity extends Component {
   static propTypes = {
@@ -62,7 +62,7 @@ export class Opportunity extends Component {
     this.props.registerAnimatable('opportunity', this, this.props.animatableIndex, [this.props.id])
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.props.deregisterAnimatable('opportunity', this, [this.props.id])
     this.props.registerAnimatable('opportunity', this, newProps.animatableIndex, [newProps.id])
   }

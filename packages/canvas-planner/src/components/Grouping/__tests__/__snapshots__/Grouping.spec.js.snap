@@ -55,11 +55,7 @@ exports[`grouping contains link pointing to course url 1`] = `
         date={"2017-04-25T13:06:07.000Z"}
         id="5"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": "#5678",
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="San Juan"
         toggleCompletion={[Function]}
@@ -83,11 +79,7 @@ exports[`grouping contains link pointing to course url 1`] = `
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": "#5678",
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
@@ -153,11 +145,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": "#5678",
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
@@ -247,11 +235,7 @@ exports[`renders the base component with required props 1`] = `
         date={"2017-04-25T13:06:07.000Z"}
         id="5"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": "#5678",
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="San Juan"
         toggleCompletion={[Function]}
@@ -275,11 +259,7 @@ exports[`renders the base component with required props 1`] = `
         date={"2017-04-25T13:06:07.000Z"}
         id="6"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": "#5678",
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="Roll for the Galaxy"
         toggleCompletion={[Function]}
@@ -334,11 +314,7 @@ exports[`renders to do items correctly 1`] = `
         date={"2017-06-16T11:06:07.000Z"}
         id="700"
         showNotificationBadge={false}
-        theme={
-          Object {
-            "iconColor": null,
-          }
-        }
+        simplifiedControls={false}
         timeZone="America/Denver"
         title="To Do 700"
         toggleCompletion={[Function]}

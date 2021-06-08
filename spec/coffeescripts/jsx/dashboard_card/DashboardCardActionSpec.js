@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import _ from 'underscore'
-import DashboardCardAction from 'jsx/dashboard_card/DashboardCardAction'
+import DashboardCardAction from '@canvas/dashboard-card/react/DashboardCardAction'
 
 QUnit.module('DashboardCardAction', {
   setup() {

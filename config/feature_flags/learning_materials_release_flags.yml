@@ -1,0 +1,7 @@
+---
+rce_buttons_and_icons:
+  state: hidden
+  display_name: RCE Buttons & Icons
+  description: |-
+    Manage a library of custom buttons and icons from the RCE.
+  applies_to: SiteAdmin

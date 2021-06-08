@@ -8,12 +8,6 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-outcome_guid_course_exports:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Reduce outcome duplication on course import"
-  description: "Ensures that outcomes that have already been imported
-    into a course are not duplicated if they are imported again"
 selectable_outcomes_in_course_copy:
   state: hidden
   applies_to: RootAccount
@@ -31,18 +25,13 @@ outcome_alignments_course_migration:
   display_name: Outcomes Service Alignment Migration
   description: Includes Outcomes Service alignments when exporting and importing
     course content
-bulk_delete_pages:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Page Bulk Deleting
-  description: Allow pages to be deleted in bulk
 account_level_mastery_scales:
   state: hidden
-  applies_to: RootAccount
-  display_name: Account and Course Level Outcome Proficiencies
-  description: Allows Account & Course Level mastery scales and calculation,
+  display_name: Account and Course Level Outcome Mastery Scales
+  description: Allows setting Account & Course Level mastery scales and calculation methods,
     replacing per-outcome criterion ratings & calculation methods
   after_state_change_proc: mastery_scales_after_change_hook
+  applies_to: RootAccount
 usage_rights_discussion_topics:
   state: hidden
   applies_to: RootAccount
@@ -55,3 +44,19 @@ improved_outcomes_management:
   display_name: Improved Outcomes Management
   description: Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
+assignment_comment_library:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Comment Library
+  description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
+improved_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Learning Mastery Gradebook Redesign
+  description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
+outcomes_friendly_description:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Outcomes Friendly Description
+  description: Allows users to add a friendly description to outcomes for student and parent view
+    in the Student Learning Mastery Gradebook.

@@ -18,76 +18,84 @@
 
 import assert from 'assert'
 import * as actions from '../../../src/sidebar/actions/data'
+import RceApiSource from '../../../src/sidebar/sources/api'
 import sinon from 'sinon'
 import {spiedStore} from './utils'
 
 describe('Sidebar data actions', () => {
   // collection key to use in testing
   const collectionKey = 'theCollection'
+  const searchString = 'search-string'
+  const uriFor = () => 'uriFor/bookmark'
 
   // trivial "always succeeds" source
   const successPage = {links: 'successLinks', bookmark: 'successBookmark'}
   const successSource = {
-    fetchPage() {
+    fetchLinks(key) {
+      return this.fetchPage(key)
+    },
+    fetchPage(_uri) {
       return new Promise(resolve => {
         resolve(successPage)
       })
-    }
+    },
+    uriFor
   }
 
   // trivial "always fails" source
   const brokenError = new Error('broken')
   const brokenSource = {
-    fetchPage() {
+    fetchLinks(key) {
+      return this.fetchPage(key)
+    },
+    fetchPage(_uri) {
       return new Promise(() => {
         throw brokenError
       })
-    }
+    },
+    uriFor
   }
 
-  // returns a "black hole" source that spies fetchPage
+  // returns a "black hole" source that spies fetchLinks
   function stubbedSource() {
-    return {
-      fetchPage: sinon.stub().returns(new Promise(() => {}))
-    }
+    const source = new RceApiSource()
+    sinon.stub(source, 'fetchPage').returns(new Promise(resolve => resolve(successPage)))
+    sinon.stub(source, 'uriFor').returns('uriFor/bookmark')
+    return source
   }
 
   // constants for testing that can be overridden in props to storeState (see
   // below)
+  const defaultCollection = {
+    links: [],
+    bookmark: 'bookmark',
+    isLoading: false,
+    searchString
+  }
   const defaults = {
     jwt: 'theJWT',
     source: successSource,
-    links: [],
-    bookmark: 'bookmark',
-    loading: false
+    searchString,
+    collections: {
+      [`${collectionKey}`]: defaultCollection
+    }
   }
 
   // defaults and reshapes the given props into the shape needed by the store
-  function setupState(props) {
-    const {jwt, source, links, bookmark, loading} = {
-      ...defaults,
-      ...props
-    }
-    const collection = {links, bookmark, loading}
-    const collections = {[collectionKey]: collection}
-    return {jwt, source, collections}
+  function setupState(props = {}, collectionProps = {}) {
+    const retval = {...defaults, ...props}
+    const collection = {...defaultCollection, ...collectionProps}
+    retval.collections[collectionKey] = collection
+    return retval
   }
 
   describe('fetchPage', () => {
-    it('dispatches requestPage first', () => {
-      const store = spiedStore(setupState())
-      store.dispatch(actions.fetchPage(collectionKey))
-      const callArgs = store.spy.getCall(1).args[0]
-      assert.equal(callArgs.type, actions.REQUEST_PAGE)
-      assert.equal(callArgs.key, collectionKey)
-    })
-
     it('uses bookmark from store to call source.fetchPage', () => {
       const source = stubbedSource()
       const state = setupState({source})
       const store = spiedStore(state)
       store.dispatch(actions.fetchPage(collectionKey))
-      assert.ok(source.fetchPage.calledWith(defaults.bookmark))
+      sinon.assert.calledWith(source.fetchPage, defaultCollection.bookmark)
     })
 
     it('dispatches receivePage with page retrieved from source', done => {
@@ -96,10 +104,10 @@ describe('Sidebar data actions', () => {
         .dispatch(actions.fetchPage(collectionKey))
         .then(() => {
           const callArgs = store.spy.lastCall.args[0]
-          assert.equal(callArgs.type, actions.RECEIVE_PAGE)
-          assert.equal(callArgs.key, collectionKey)
-          assert.equal(callArgs.links, successPage.links)
-          assert.equal(callArgs.bookmark, successPage.bookmark)
+          assert.strictEqual(callArgs.type, actions.RECEIVE_PAGE)
+          assert.strictEqual(callArgs.key, collectionKey)
+          assert.strictEqual(callArgs.links, successPage.links)
+          assert.strictEqual(callArgs.bookmark, successPage.bookmark)
           done()
         })
         .catch(done)
@@ -111,9 +119,9 @@ describe('Sidebar data actions', () => {
         .dispatch(actions.fetchPage(collectionKey))
         .then(() => {
           const callArgs = store.spy.lastCall.args[0]
-          assert.equal(callArgs.type, actions.FAIL_PAGE)
-          assert.equal(callArgs.key, collectionKey)
-          assert.equal(callArgs.error, brokenError)
+          assert.strictEqual(callArgs.type, actions.FAIL_PAGE)
+          assert.strictEqual(callArgs.key, collectionKey)
+          assert.strictEqual(callArgs.error, brokenError)
           done()
         })
         .catch(done)
@@ -121,32 +129,30 @@ describe('Sidebar data actions', () => {
   })
 
   describe('fetchNextPage', () => {
+    it('dispatches requestPage first', () => {
+      const store = spiedStore(setupState())
+      store.dispatch(actions.fetchNextPage(collectionKey))
+      const callArgs = store.spy.getCall(1).args[0]
+      assert.strictEqual(callArgs.type, actions.REQUEST_PAGE)
+      assert.strictEqual(callArgs.key, collectionKey)
+    })
+
     it('fetches next page if collection has bookmark and is not loading', () => {
       const store = spiedStore(setupState())
       store.dispatch(actions.fetchNextPage(collectionKey))
-      assert.ok(store.spy.calledWith({type: actions.REQUEST_PAGE, key: collectionKey}))
-    })
-
-    it('skips fetching next page if collection has no bookmark', () => {
-      const store = spiedStore(setupState({bookmark: null}))
-      store.dispatch(actions.fetchNextPage(collectionKey))
-      assert.ok(
-        store.spy.neverCalledWith({
-          type: actions.REQUEST_PAGE,
-          key: collectionKey
-        })
-      )
+      sinon.assert.calledWith(store.spy, {
+        type: actions.REQUEST_PAGE,
+        key: collectionKey
+      })
     })
 
     it('skips fetching next page if collection is already loading', () => {
-      const store = spiedStore(setupState({loading: true}))
+      const store = spiedStore(setupState({}, {isLoading: true}))
       store.dispatch(actions.fetchNextPage(collectionKey))
-      assert.ok(
-        store.spy.neverCalledWith({
-          type: actions.REQUEST_PAGE,
-          key: collectionKey
-        })
-      )
+      sinon.assert.neverCalledWith(store.spy, {
+        type: actions.REQUEST_PAGE,
+        key: collectionKey
+      })
     })
   })
 
@@ -154,40 +160,38 @@ describe('Sidebar data actions', () => {
     it('fetches initial page if collection is empty, has bookmark, and is not loading', () => {
       const store = spiedStore(setupState())
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      assert.ok(store.spy.calledWith({type: actions.REQUEST_PAGE, key: collectionKey}))
+      sinon.assert.calledWith(store.spy, {
+        type: actions.REQUEST_INITIAL_PAGE,
+        key: collectionKey,
+        searchString
+      })
     })
 
     it('skips fetching initial page if collection is not empty', () => {
-      const store = spiedStore(setupState({links: [{href: 'link', title: 'A Link'}]}))
+      const store = spiedStore(setupState({}, {links: [{href: 'link', title: 'A Link'}]}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      assert.ok(
-        store.spy.neverCalledWith({
-          type: actions.REQUEST_PAGE,
-          key: collectionKey
-        })
-      )
+      sinon.assert.neverCalledWith(store.spy, {
+        type: actions.REQUEST_INITIAL_PAGE,
+        key: collectionKey,
+        searchString
+      })
     })
 
-    it('skips fetching initial page if collection has no bookmark', () => {
-      const store = spiedStore(setupState({bookmark: null}))
+    it('creates the URL if collection has no bookmark', () => {
+      const source = stubbedSource()
+      const store = spiedStore(setupState({source}, {bookmark: null}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      assert.ok(
-        store.spy.neverCalledWith({
-          type: actions.REQUEST_PAGE,
-          key: collectionKey
-        })
-      )
+      sinon.assert.calledWith(source.fetchPage, 'uriFor/bookmark')
     })
 
-    it('skips fetching initial page if collection is already loading', () => {
-      const store = spiedStore(setupState({loading: true}))
+    it('fetching initial page if collection is already loading', () => {
+      const store = spiedStore(setupState({}, {isLoading: true}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      assert.ok(
-        store.spy.neverCalledWith({
-          type: actions.REQUEST_PAGE,
-          key: collectionKey
-        })
-      )
+      sinon.assert.neverCalledWith(store.spy, {
+        type: actions.REQUEST_INITIAL_PAGE,
+        key: collectionKey,
+        searchString
+      })
     })
   })
 })

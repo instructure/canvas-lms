@@ -39,7 +39,7 @@ module Types
 
     field :description, String, null: true
 
-    field :outcome, OutcomeType, null: true
+    field :outcome, LearningOutcomeType, null: true
     def outcome
       return nil unless object[:learning_outcome_id]
       Loaders::IDLoader.for(LearningOutcome).load(object[:learning_outcome_id])

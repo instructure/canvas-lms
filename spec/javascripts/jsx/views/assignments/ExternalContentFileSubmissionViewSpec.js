@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import ExternalContentFileSubmissionView from 'compiled/views/assignments/ExternalContentFileSubmissionView'
+import Backbone from '@canvas/backbone'
+import ExternalContentFileSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentFileSubmissionView.coffee'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import axios from 'axios'
+import axios from '@canvas/axios'
 
 const contentItem = {
   '@type': 'FileItem',

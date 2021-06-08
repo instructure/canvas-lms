@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Lti2Edit from 'jsx/external_apps/components/Lti2Edit'
+import Lti2Edit from 'ui/features/external_apps/react/components/Lti2Edit.js'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')

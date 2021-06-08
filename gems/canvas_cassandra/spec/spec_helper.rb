@@ -32,8 +32,12 @@ rescue LoadError => e
   puts "Error: #{e}"
 end
 
+require "rails"
+Rails.env = 'test'
+
 require "canvas_cassandra"
 require "yaml"
+require "byebug"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

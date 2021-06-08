@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import OutcomeGroup from 'compiled/models/OutcomeGroup'
-import OutcomeGroupView from 'compiled/views/outcomes/OutcomeGroupView'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
+import OutcomeGroupView from '@canvas/outcome-content-view/backbone/views/OutcomeGroupView'
 import fixtures from 'helpers/fixtures'
 
 const createView = function(opts) {

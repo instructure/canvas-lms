@@ -20,9 +20,9 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
-import * as AssignmentActions from 'jsx/assignments/GradeSummary/assignment/AssignmentActions'
-import Header from 'jsx/assignments/GradeSummary/components/Header'
-import configureStore from 'jsx/assignments/GradeSummary/configureStore'
+import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
+import Header from 'ui/features/assignment_grade_summary/react/components/Header.js'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
 
 QUnit.module('GradeSummary Header', suiteHooks => {
   let store

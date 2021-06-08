@@ -175,6 +175,20 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be false
     end
 
+    it "js_env FLAGS/new_quizzes_modules_support is true if new_quizzes_modules_support enabled" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be true
+    end
+
+    it "js_env FLAGS/new_quizzes_modules_support is false if new_quizzes_modules_support disabled" do
+      user_session(@teacher)
+      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be false
+    end
+
     it "js_env quiz_lti_enabled is false when quizzes_next is disabled" do
       user_session(@teacher)
       @course.context_external_tools.create!(
@@ -254,21 +268,13 @@ describe Quizzes::QuizzesController do
         course_quiz()
       end
 
-      it "js_env DIRECT_SHARE_ENABLED is true when feature flag is on" do
-        Account.default.enable_feature!(:direct_share)
+      it "js_env DIRECT_SHARE_ENABLED is true when user can manage" do
         user_session(@teacher)
         get 'index', params: {course_id: @course.id}
         expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(true)
       end
 
-      it "js_env DIRECT_SHARE_ENABLED is false when feature flag is off" do
-        user_session(@teacher)
-        get 'index', params: {:course_id => @course.id}
-        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
-      end
-
       it "js_env DIRECT_SHARE_ENABLED is false when user does not have manage" do
-        Account.default.enable_feature!(:direct_share)
         user_session(@student)
         get 'index', params: {:course_id => @course.id}
         expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
@@ -520,6 +526,13 @@ describe Quizzes::QuizzesController do
       get 'show', params: {:course_id => @course.id, :id => @quiz.id, :force_user => 1}
       expect(response).to be_redirect
       expect(response.location).to match /login/
+    end
+
+    it "renders the show page for public courses" do
+      @course.update_attribute :is_public, true
+      course_quiz !!:active
+      get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1'}
+      expect(response).to be_successful
     end
 
     it "should set session[headless_quiz] if persist_headless param is sent" do
@@ -886,6 +899,93 @@ describe Quizzes::QuizzesController do
 
       expect(assigns[:students].sort_by(&:id)).to eq [@student, @student2].sort_by(&:id)
     end
+
+    context "for a differentiated quiz" do
+      let(:students) do
+        (1..3).map do |i|
+          user_with_pseudonym(active_all: true, name: "Student#{i}", :username => "student#{i}@instructure.com")
+        end
+      end
+
+      let(:assignments) do
+        (1..3).map do |i|
+          @course.assignments.create(
+            title: "Test Assignment#{i}",
+            workflow_state: 'available',
+            submission_types: 'online_quiz'
+          )
+        end
+      end
+
+      let(:quizzes) do
+        (1..3).map do |i|
+          questions = [{ question_data: { name: "test #{i}" } }]
+
+          quiz = Quizzes::Quiz.where(assignment_id: assignments[i-1].id).first
+
+          quiz.quiz_type = 'assignment'
+          quiz.only_visible_to_overrides = true
+
+          questions.each { |q| quiz.quiz_questions.create!(q) }
+          quiz.generate_quiz_data
+          quiz.save!
+          quiz
+        end
+      end
+
+      let(:sections) do
+        (0..1).map do
+          @course.course_sections.create!
+        end
+      end
+
+      before do
+        (0..2).each do |i|
+          @course.enroll_student(students[i])
+        end
+
+        (0..1).each do |i|
+          quizzes[i].assignment_overrides.create!(
+            set: sections[i]
+          )
+        end
+
+        # make quizzes[2] available to everyone
+        quizzes[2].only_visible_to_overrides = false
+        quizzes[2].save!
+
+        students[0].enrollments.update_all(course_section_id: sections[0].id)
+        students[1].enrollments.update_all(course_section_id: sections[1].id)
+        # make an inactive enrollment
+        students[2].enrollments.update_all(course_section_id: sections[1].id, workflow_state: 'inactive')
+      end
+
+      it "only returns students in the assigned course sections" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[0].id}
+
+        expect(assigns[:students].count).to eq 1
+        expect(assigns[:students].first).to eq students[0]
+      end
+
+      it "does not includes inactive enrollments" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[1].id}
+
+        expect(assigns[:students].count).to eq 1
+        expect(assigns[:students]).to contain_exactly(students[1])
+      end
+
+      it "return every active enrollments in the course for a non-differentiated quiz" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[2].id}
+
+        expect(assigns[:students].count).to eq @course.student_enrollments.count
+      end
+    end
   end
 
   describe "POST 'take'" do
@@ -1097,6 +1197,15 @@ describe Quizzes::QuizzesController do
 
       get 'show', params: {:course_id => @course, :quiz_id => @quiz.id, :take => '1'}
       expect(response).to render_template('invalid_ip')
+    end
+
+    it "checks for the right access code" do
+      user_session(@student)
+      @quiz.access_code = "trust me. *winks*"
+      @quiz.save!
+      @quiz.generate_submission(@student)
+      get 'show', params: {course_id: @course, quiz_id: @quiz.id, take: '1', access_code: "NOT THE CODE"}
+      expect(response).to render_template('access_code')
     end
 
     it "should allow taking the quiz" do
@@ -2639,10 +2748,16 @@ describe Quizzes::QuizzesController do
     # When possible I recommend extracting this into a PORO or Quizzes::Quiz.
 
     before do
-      allow(subject).to receive(:authorized_action).and_return(true)
       course_with_teacher
       course_quiz(active=true)
       @quiz.save!
+      allow(@quiz).to receive(:grants_right?) do |user, sess, rights|
+        if rights.nil?
+          rights = sess
+        end
+        next true if rights == :submit
+        false
+      end
       subject.instance_variable_set(:@quiz, @quiz)
       allow(@quiz).to receive(:require_lockdown_browser?).and_return(false)
       allow(@quiz).to receive(:ip_filter).and_return(false)
@@ -2653,61 +2768,29 @@ describe Quizzes::QuizzesController do
     let(:return_value) { subject.send :can_take_quiz? }
 
     it "returns false when locked" do
-      subject.instance_variable_set(:@locked, true)
+      allow(@quiz).to receive(:locked_for?).and_return(true)
       expect(return_value).to eq false
     end
 
     it "returns false when unauthorized" do
-      allow(subject).to receive(:authorized_action).and_return(false)
+      allow(@quiz).to receive(:grants_right?).and_return(false)
       expect(return_value).to eq false
     end
 
-    it "returns false when a lockdown browser is required and the lockdown browser is false" do
-      allow(@quiz).to receive(:require_lockdown_browser?).and_return(true)
-
-      allow(subject).to receive(:named_context_url).and_return("some string")
-      allow(subject).to receive(:check_lockdown_browser).and_return(false)
-
+    it "is false with wrong access code" do
+      allow(@quiz).to receive(:access_code).and_return("trust me. *winks*")
+      allow(subject).to receive(:params).and_return({
+        :access_code => "Don't trust me. *tips hat*",
+        :take => 1
+      })
       expect(return_value).to eq false
     end
 
-    context "when access code is required but does not match" do
-      before do
-        allow(@quiz).to receive(:access_code).and_return("trust me. *winks*")
-        allow(subject).to receive(:params).and_return({
-          :access_code => "Don't trust me. *tips hat*",
-          :take => 1
-        })
-      end
-
-      it "renders access_code template" do
-        expect(subject).to receive(:render).with(:access_code)
-        subject.send(:can_take_quiz?)
-      end
-
-      it "returns false" do
-        allow(subject).to receive(:render)
-
-        expect(return_value).to eq false
-      end
-    end
-
-    context "when the ip address is invalid" do
-      before do
-        allow(@quiz).to receive(:ip_filter).and_return(true)
-        allow(@quiz).to receive(:valid_ip?).and_return(false)
-        allow(subject).to receive(:params).and_return({:take => 1})
-      end
-
-      it "renders invalid_ip" do
-        expect(subject).to receive(:render).with(:invalid_ip)
-        subject.send(:can_take_quiz?)
-      end
-
-      it "returns false" do
-        allow(subject).to receive(:render)
-        expect(return_value).to eq false
-      end
+    it "false with wrong IP address" do
+      allow(@quiz).to receive(:ip_filter).and_return(true)
+      allow(@quiz).to receive(:valid_ip?).and_return(false)
+      allow(subject).to receive(:params).and_return({:take => 1})
+      expect(return_value).to eq false
     end
   end
 end

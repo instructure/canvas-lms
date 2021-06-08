@@ -317,16 +317,21 @@ describe ConversationParticipant do
     end
 
     it "should move a group conversation to the new user" do
-      c = @user1.initiate_conversation([user_factory, user_factory])
-      c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      enable_cache do
+        c = @user1.initiate_conversation([user_factory, user_factory])
+        c.add_message("hello")
+        c.update_attribute(:workflow_state, 'unread')
 
-      c.move_to_user @user2
+        # populates the cache
+        expect(c.participants.map(&:id)).to include(@user1.id)
 
-      expect(c.reload.user_id).to eql @user2.id
-      expect(c.conversation.participants.map(&:id)).not_to include(@user1.id)
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+        c.move_to_user @user2
+
+        expect(c.reload.user_id).to eql @user2.id
+        expect(c.participants.map(&:id)).not_to include(@user1.id)
+        expect(@user1.reload.unread_conversations_count).to eql 0
+        expect(@user2.reload.unread_conversations_count).to eql 1
+      end
     end
 
     it "should clean up group conversations having both users" do

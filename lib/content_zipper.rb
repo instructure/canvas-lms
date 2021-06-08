@@ -56,7 +56,7 @@ class ContentZipper
       when Quizzes::Quiz then zip_quiz(attachment, attachment.context)
       end
     rescue => e
-      Canvas::Errors.capture(e, message: "Content zipping failed")
+      Canvas::Errors.capture(e, { message: "Content zipping failed" }, :warn)
       attachment.update_attribute(:workflow_state, 'to_be_zipped')
     end
   end
@@ -189,12 +189,7 @@ class ContentZipper
     @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
-    if CANVAS_RAILS5_2
-      av = ActionView::Base.new()
-      av.view_paths = ActionController::Base.view_paths
-    else
-      av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
-    end
+    av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res
@@ -253,11 +248,17 @@ class ContentZipper
     # not logged in - OR -
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
-    attachments = if !@check_user || folder.context.grants_right?(@user, :manage_files)
-                    folder.active_file_attachments
-                  else
-                    folder.visible_file_attachments
-                  end
+    attachments =
+      if !@check_user ||
+           folder.context.grants_any_right?(
+             @user,
+             :manage_files,
+             *RoleOverride::GRANULAR_FILE_PERMISSIONS
+           )
+        folder.active_file_attachments
+      else
+        folder.visible_file_attachments
+      end
 
     attachments = attachments.select{|a| opts[:exporter].export_object?(a)} if opts[:exporter]
     attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|
@@ -317,7 +318,12 @@ class ContentZipper
     begin
       handle = attachment.open(:need_local_file => true)
       zipfile.get_output_stream(filename){|zos| Zip::IOExtras.copy_stream(zos, handle)}
+    rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
+      Canvas::Errors.capture_exception(:content_export, e, :warn)
+      @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
+      return false
     rescue => e
+      Canvas::Errors.capture_exception(:content_export, e, :error)
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false
     ensure

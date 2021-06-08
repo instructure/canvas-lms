@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "nerazvrščeni seznam s krogi"
     },
+    "clear_2084585f": {
+        "message": "Počisti"
+    },
     "clear_selected_file_82388e50": {
         "message": "Počisti izbrano datoteko."
     },
@@ -412,6 +415,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "vdelano vsebino"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Za iskanje vnesite vsaj 3 znake"
     },
     "equation_1c5ac93c": {
         "message": "Enačba"
@@ -688,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Nalaganje elementov orodja Planner"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Nalaganje, počakajte"
     },
     "location_3b6ff307": {
         "message": "Mesto:"

@@ -257,12 +257,35 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       image_element = f('#iframe_holder img')
-
       if Attachment.local_storage?
         expect(image_element.attribute('src')).to include('download')
       else
         expect(image_element.attribute('src')).to include('amazonaws')
       end
+
+      download_link = f('#submission_files_list .submission-file-download')
+      expect(download_link).to be_displayed
+      expect(download_link['href']).to include "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}?download=#{@students[0].attachments.last.id}"
+
+      delete_link = f('#submission_files_list .submission-file-delete')
+      expect(delete_link).not_to be_displayed
+    end
+
+    it "deletes an attachment" do
+      filename, fullpath, _data = get_file("graded.png")
+      student_in_course(:user => user_with_pseudonym)
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      add_attachment_student_assignment(filename, @student, fullpath)
+
+      user_session(account_admin_user)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      delete_link = f('#submission_files_list .submission-file-delete')
+      expect(delete_link).to be_displayed
+      delete_link.click
+      driver.switch_to.alert.accept
+      wait_for_ajax_requests
+      expect(@student.attachments.last.filename).to eq 'file_removed.pdf'
     end
 
     context "turnitin" do

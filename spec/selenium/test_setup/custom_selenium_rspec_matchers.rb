@@ -417,10 +417,33 @@ RSpec::Matchers.define :become do |size|
     true
   end
 
+  [:==, :<, :<=, :>=, :>, :===, :=~].each do |operator|
+    chain operator do |value|
+      @operator = operator
+      @value = value
+    end
+  end
+
+  failure_message do |actual|
+    actual_value = actual.call
+
+    unless defined? @operator
+      "expected #{actual_value} to become #{expected}"
+    else
+      "expected #{actual_value} to become #{@operator} #{@value}"
+    end
+  end
+
   match do |actual|
     raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
     wait_for(method: :become) do
-      disable_implicit_wait { actual.call == expected }
+      disable_implicit_wait do
+        unless defined? @operator
+          actual.call == expected
+        else
+          actual.call.__send__ @operator, @value
+        end
+      end
     end
   end
 end

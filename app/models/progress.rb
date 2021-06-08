@@ -30,6 +30,7 @@ class Progress < ActiveRecord::Base
   validates_presence_of :tag
 
   serialize :results
+  attr_reader :total
 
   include Workflow
   workflow do
@@ -62,14 +63,29 @@ class Progress < ActiveRecord::Base
   end
 
   def calculate_completion!(current_value, total)
-    update_completion!(100.0 * current_value / total)
+    @total = total
+    @current_value = current_value
+    update_completion!(100.0 * @current_value / @total)
+  end
+
+  def increment_completion!(increment)
+    raise "`increment_completion!` can only be invoked after a total has been set with `calculate_completion!`" if @total.nil?
+
+    @current_value += increment
+    new_value = 100.0 * @current_value / @total
+    # only update the db if we're at a different integral percentage point or it's been > 15s
+    if new_value.to_i != completion.to_i || (Time.now.utc - updated_at) > 15
+      update_completion!(new_value)
+    else
+      self.completion = new_value
+    end
   end
 
   def pending?
     queued? || running?
   end
 
-  # Tie this Progress model to a delayed job. Rather than `obj.send_later(:long_method)`, use:
+  # Tie this Progress model to a delayed job. Rather than `obj.delay.long_method`, use:
   # `progress.process_job(obj, :long_method)`. This will transition from queued
   # => running when the job starts, from running => completed when the job
   # finishes, and from running => failed if the job fails.
@@ -109,6 +125,7 @@ class Progress < ActiveRecord::Base
       @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
       @progress.save
       @progress.fail
+      @context.fail_with_error!(error) if @context.respond_to?(:fail_with_error!)
     end
   end
 end

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -86,6 +85,10 @@ module Factories
     ]
   end
 
+  def test_submission_data
+    [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+  end
+
   def generate_quiz(course)
     quiz = course.quizzes.create(workflow_state: 'available')
     quiz.quiz_questions.create!(question_data: test_quiz_data().first)
@@ -103,7 +106,7 @@ module Factories
     if finished_at.nil?
       qsub.submission_data = {}
     else
-      qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
+      qsub.submission_data = test_submission_data
       qsub.score = 0
       qsub.finished_at = finished_at || Time.now.utc
       qsub.workflow_state = 'complete'
@@ -119,16 +122,87 @@ module Factories
     qsub
   end
 
+  def multiple_choice_multiple_question_data(count=1, opts={})
+    Array.new(count, multiple_choice_question_data.merge(opts))
+  end
+
   def multiple_choice_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"multiple_choice_question", "assessment_question_id"=>4, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>50.0, "answers"=>[{"comments"=>"", "weight"=>0, "text"=>"a", "id"=>2405}, {"comments"=>"", "weight"=>0, "text"=>"b", "id"=>8544}, {"comments"=>"", "weight"=>100, "text"=>"c", "id"=>1658}, {"comments"=>"", "weight"=>0, "text"=>"d", "id"=>2903}], "question_text"=>"<p>test</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"multiple_choice_question",
+      "assessment_question_id"=>4,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>50.0,
+      "answers"=>[
+        {"comments"=>"", "weight"=>0, "text"=>"a", "id"=>2405},
+        {"comments"=>"", "weight"=>0, "text"=>"b", "id"=>8544},
+        {"comments"=>"", "weight"=>100, "text"=>"c", "id"=>1658},
+        {"comments"=>"", "weight"=>0, "text"=>"d", "id"=>2903}
+      ],
+      "question_text"=>"<p>test</p>",
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def true_false_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"true_false_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>45, "answers"=>[{"comments"=>"", "weight"=>0, "text"=>"True", "id"=>8403}, {"comments"=>"", "weight"=>100, "text"=>"False", "id"=>8950}], "question_text"=>"<p>test</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"true_false_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>45,
+      "answers"=>[
+        {
+          "comments"=>"",
+          "weight"=>0,
+          "text"=>"True",
+          "id"=>8403
+        },
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"False",
+          "id"=>8950
+        }
+      ],
+      "question_text"=>"<p>test</p>",
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def short_answer_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"short_answer_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>16.5, "answers"=>[{"comments"=>"", "weight"=>100, "text"=>"stupid", "id"=>7100}, {"comments"=>"", "weight"=>100, "text"=>"dumb", "id"=>2159}], "question_text"=>"<p>there's no such thing as a _____ question</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"short_answer_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>16.5,
+      "answers"=>[
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"stupid",
+          "id"=>7100
+        },
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"dumb",
+          "id"=>2159
+        }
+      ],
+      "question_text"=>"<p>there's no such thing as a _____ question</p>",
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def short_answer_question_data_one_blank
@@ -144,7 +218,7 @@ module Factories
   end
 
   def multiple_dropdowns_question_data
-    {"position"=>3, "correct_comments"=>"", "name"=>"Question 3", "question_type"=>"multiple_dropdowns_question", "assessment_question_id"=>1695442, "neutral_comments"=>"", "incorrect_comments"=>"", "id"=>1630873, "question_name"=>"Question 3", "points_possible"=>0.5, "original_question_text"=>"[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]",  "answers"=>[
+    {"position"=>3, "correct_comments"=>"", "name"=>"Question 3", "question_type"=>"multiple_dropdowns_question", "assessment_question_id"=>1695442, "neutral_comments"=>"", "incorrect_comments"=>"", "id"=>1630873, "question_name"=>"Question 3", "points_possible"=>0.5, "original_question_text"=>"[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]", "answers"=>[
       {"comments"=>"", "weight"=>100, "text"=>"y", "id"=>4390, "blank_id"=>"structure1"},
       {"comments"=>"", "weight"=>0, "text"=>"n", "id"=>1522, "blank_id"=>"structure1"},
       {"comments"=>"", "weight"=>0, "text"=>"n", "id"=>7446, "blank_id"=>"structure1"},
@@ -199,7 +273,7 @@ module Factories
         record['answer_match_right'] = record['right']
         record['answer_comments'] = record['comments']
 
-        %w[ left text right comments ].each { |k| record.delete k }
+        %w[left text right comments].each { |k| record.delete k }
       end
 
       # match#1397 has a duplicate text with #7396 that needs to be adjusted
@@ -222,6 +296,22 @@ module Factories
     ], "question_text"=>"<p>abs(x) = 4</p>", "id" => 1}.with_indifferent_access
   end
 
+  def numerical_without_precision_question_data
+    {"name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"numerical_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>26.2,
+      "answers"=>[
+        {"exact"=>4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>9333},
+      ],
+      "question_text"=>"<p>Numerical without precision answers</p>",
+      "id" => 1}.with_indifferent_access
+  end
+
   def calculated_question_data
     {"name"=>"Question",
      "correct_comments"=>"",
@@ -242,7 +332,7 @@ module Factories
         "weight"=>100,
         "id"=>6396,
         "answer"=>-11.7},
-      ],
+     ],
      "question_text"=>"<p>What is 5 plus [x] - [y]</p>",
      "id" => 1}.with_indifferent_access
   end
@@ -335,7 +425,7 @@ module Factories
     quiz_submission
   end
 
-  def survey_with_submission(questions, &block)
+  def survey_with_submission(questions)
     course_with_student(:active_all => true)
     @assignment = @course.assignments.create(:title => "Test Assignment")
     @assignment.workflow_state = "published"
@@ -381,5 +471,40 @@ module Factories
     @quiz.workflow_state = "available" if active
     @quiz.save!
     @quiz
+  end
+
+  def question_data(reset=false, data={})
+    @qdc = reset || !@qdc ? 1 : @qdc + 1
+    {
+      :name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
+      [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
+    }.merge(data)
+  end
+
+  def find_the_answer_from_a_question(question)
+    question.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+  end
+
+  def answer_a_question(question, submission, correct: true)
+    return if question.question_data['answers'] == []
+
+    q_id = question.data[:id]
+    answer = if correct
+              find_the_answer_from_a_question(question)
+             else
+              find_the_answer_from_a_question(question) + 1
+    end
+    submission.submission_data["question_#{q_id}"] = answer
+  end
+
+  def build_course_quiz_questions_and_a_bank(data={}, opts={})
+    scoring_policy = opts[:scoring_policy] || "keep_highest"
+    course_with_student(:active_all => true)
+    @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
+    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
+    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
+    @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+    @bank = @q1.assessment_question.assessment_question_bank
+    @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
   end
 end

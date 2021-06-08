@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import SyncHistoryItem from 'jsx/blueprint_courses/components/SyncHistoryItem'
+import SyncHistoryItem from '@canvas/blueprint-courses/react/components/SyncHistoryItem'
 import getSampleData from '../getSampleData'
 
 QUnit.module('SyncHistoryItem component')

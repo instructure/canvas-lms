@@ -33,6 +33,73 @@ describe "course settings" do
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
+  context "k5 courses" do
+    before(:each) do
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+    end
+
+    it "should show a Back to Subject button that sends the user to the course home path" do
+      get "/courses/#{@course.id}/settings"
+      expect(f('#back_to_subject')).to be_displayed
+      expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
+    end
+
+    it 'should provide sync to homeroom and homeroom selection' do
+      @course.update!(homeroom_course: true, name: 'homeroom1')
+      orig_teacher = @teacher
+      course_with_teacher(user: orig_teacher, course_name: 'homeroom2')
+      @course.update!(homeroom_course: true)
+      course_with_teacher_logged_in(user: orig_teacher)
+
+      get "/courses/#{@course.id}/settings"
+
+      sync_checkbox = f(".sync_enrollments_from_homeroom_checkbox")
+      expect(sync_checkbox).to be_displayed
+
+      sync_checkbox.click
+
+      homeroom_selection = f("#course_homeroom_course_id")
+      expect(homeroom_selection).not_to be_nil
+      expect(homeroom_selection).to be_displayed
+
+      homeroom_selection.click
+      options = ff("#course_homeroom_course_id option").map(&:text).map(&:strip)
+      expect(options).to include 'homeroom1'
+      expect(options).to include 'homeroom2'
+    end
+
+  end
+
+  context "considering homeroom courses" do
+    before(:each) do
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      @course.homeroom_course = true
+      @course.save!
+    end
+
+    it 'hides most tabs if set' do
+      get "/courses/#{@course.id}/settings"
+      expect(ff('#course_details_tabs > ul li').length).to eq 2
+      expect(f('#course_details_tab')).to be_displayed
+      expect(f('#sections_tab')).to be_displayed
+    end
+  end
+
+  describe('Integrations tab') do
+    let(:course) { @course }
+
+    context 'with the MSFT sync flag on' do
+      before { course.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+
+      it 'displays the course settings tab' do
+        get "/courses/#{course.id}/settings"
+        expect(f('#integrations_tab')).to be_displayed
+      end
+    end
+  end
+
   describe "course details" do
     def test_select_standard_for(context)
       grading_standard_for context
@@ -146,13 +213,36 @@ describe "course settings" do
       # Show announcements and limit setting elements
       show_announcements_on_home_page = f('#course_show_announcements_on_home_page')
       home_page_announcement_limit = f('#course_home_page_announcement_limit')
-
       expect(is_checked(show_announcements_on_home_page)).not_to be_truthy
       expect(home_page_announcement_limit).to be_disabled
 
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+
+    it "should show participation by default" do
+      get "/courses/#{@course.id}/settings"
+
+      expect(element_exists?('.course-participation-row')).to be_truthy
+      expect(element_exists?('#availability_options_container')).to be_truthy
+    end
+
+    it "should check if it is a k5 course should not show the fields" do
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      get "/courses/#{@course.id}/settings"
+
+      more_options_link = f('.course_form_more_options_link')
+      more_options_link.click
+      wait_for_ajaximations
+
+      expect(element_exists?('#course_show_announcements_on_home_page')).to be_falsey
+      expect(element_exists?('#course_allow_student_discussion_topics')).to be_falsey
+      expect(element_exists?('#course_allow_student_organized_groups')).to be_falsey
+      expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
+      expect(element_exists?('#course_lock_all_announcements')).to be_falsey
+    end
+
   end
 
   describe "course items" do
@@ -209,9 +299,11 @@ describe "course settings" do
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click
       wait_for_ajaximations
-      f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
+      f('#nav_form button.btn.btn-primary').click
       wait_for_ajaximations
-      f('.student_view_button').click
+      enter_student_view
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_link("Home")
     end
@@ -276,13 +368,6 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow entering student view from the right sidebar" do
-      @fake_student = @course.student_view_student
-      get "/courses/#{@course.id}/settings"
-      f(".student_view_button").click
-      expect(displayed_username).to include(@fake_student.name)
-    end
-
     it "should allow leaving student view" do
       enter_student_view
       stop_link = f("#masquerade_bar .leave_student_view")
@@ -321,18 +406,25 @@ describe "course settings" do
       expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
     end
+
+    it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
+      @account.settings[:enable_as_k5_account] = {value: true}
+      @account.save!
+      course_with_teacher_logged_in(:active_all => true)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#course_status_form")).to be_present
+      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
+    end
   end
 
-  it "should disable inherited settings if locked by the account" do
+  it "should restrict student access inputs be hidden" do
     @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
     @account.save!
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view')).not_to be_disabled
-    expect(f('#course_restrict_student_future_view')).to be_disabled
-
-    expect(is_checked('#course_restrict_student_future_view')).to be_truthy
+    expect(f('#course_restrict_student_past_view')).to_not be_displayed
+    expect(f('#course_restrict_student_future_view')).to_not be_displayed
   end
 
   it "should disable editing settings if :manage rights are not granted" do
@@ -368,6 +460,11 @@ describe "course settings" do
   end
 
   context "link validator" do
+    before (:each) do
+      Setting.set('link_validator_poll_timeout', 100)
+      Setting.set('link_validator_poll_timeout_initial', 100)
+    end
+
     it "should validate all the links" do
       allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 

@@ -62,7 +62,7 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcomes in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcomes.
-  def outcome_results_include_outcomes_json(outcomes, percents = {})
+  def outcome_results_include_outcomes_json(outcomes, context, percents = {})
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
@@ -73,13 +73,16 @@ module Api::V1::OutcomeResults
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
-      assessed_outcomes += LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+      assessed_outcomes += LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
     outcomes.map do |o|
-      hash = outcome_json(o,
+      hash = outcome_json(
+        o,
         @current_user, session,
         assessed_outcomes: assessed_outcomes,
-        rating_percents: percents[o.id])
+        rating_percents: percents[o.id],
+        context: context
+      )
       hash.merge!(alignments: alignment_asset_string_map[o.id])
       hash
     end
@@ -95,8 +98,8 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcome links in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcome links.
-  def outcome_results_include_outcome_links_json(outcome_links)
-    ols_json = outcome_links_json(outcome_links, @current_user, session)
+  def outcome_results_include_outcome_links_json(outcome_links, context)
+    outcome_links_json(outcome_links, @current_user, session, {context: context})
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.
@@ -186,7 +189,7 @@ module Api::V1::OutcomeResults
     section_ids_func = if @section
                          ->(user) { [@section.id] }
                        else
-                         enrollments = @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                        enrollments = @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
                          ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
                        end
 

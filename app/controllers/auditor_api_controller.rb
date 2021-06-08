@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,8 +24,8 @@ class AuditorApiController < ApplicationController
   private
 
   def check_configured
-    return if Auditors.configured?
-    render json: { message: "Auditors are not configured" }, status: :not_found
+    return if Audits.configured?
+    render json: { message: "Audits module is not configured" }, status: :not_found
   end
 
   def query_options

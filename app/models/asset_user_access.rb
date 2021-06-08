@@ -30,6 +30,7 @@ class AssetUserAccess < ActiveRecord::Base
 
   # if you add any more callbacks, be sure to update #log
   before_save :infer_defaults
+  before_save :infer_root_account_id
   resolves_root_account through: ->(instance){ instance.infer_root_account_id }
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
@@ -38,16 +39,18 @@ class AssetUserAccess < ActiveRecord::Base
   scope :most_recent, -> { order('updated_at DESC') }
 
   def infer_root_account_id(asset_for_root_account_id=nil)
-    if context_type != 'User'
-      context&.resolved_root_account_id
-    elsif asset_for_root_account_id.is_a?(User)
-      # Unfillable. Point to the dummy root account with id=0.
-      0
-    else
-      asset_for_root_account_id.try(:resolved_root_account_id) ||
-        asset_for_root_account_id.try(:root_account_id)
-      # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
-      # ever be created outside of .log(), and calling `asset` would add a DB hit
+    self.root_account_id ||= begin
+      if context_type != 'User'
+        context&.resolved_root_account_id || 0
+      elsif asset_for_root_account_id.is_a?(User)
+        # Unfillable. Point to the dummy root account with id=0.
+        0
+      else
+        asset_for_root_account_id.try(:resolved_root_account_id) ||
+          asset_for_root_account_id.try(:root_account_id) || 0
+        # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
+        # ever be created outside of .log(), and calling `asset` would add a DB hit
+      end
     end
   end
 
@@ -222,7 +225,7 @@ class AssetUserAccess < ActiveRecord::Base
 
     # manually call callbacks to avoid transactions. this saves a BEGIN/COMMIT per request
     infer_defaults
-    self.root_account_id ||= infer_root_account_id(accessed[:asset_for_root_account_id])
+    infer_root_account_id(accessed[:asset_for_root_account_id])
 
     if self.class.use_log_compaction_for_views? && self.eligible_for_log_path?
       # Since this is JUST a view bump, we'll write it to the

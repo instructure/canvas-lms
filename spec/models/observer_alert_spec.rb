@@ -23,10 +23,6 @@ describe ObserverAlert do
   include Api
   include Api::V1::ObserverAlertThreshold
 
-  before(:each) do
-    Account.site_admin.enable_feature!(:grade_calculator_performance_improvements)
-  end
-
   describe 'validations' do
     before :once do
       @student = user_model
@@ -409,6 +405,14 @@ describe ObserverAlert do
 
       expect(alert.first.context).to eq notification
       expect(alert.first.title).to include('Institution announcement:')
+    end
+
+    it 'does not duplicate alerts' do
+      notification = account_notification(account: @account)
+      alert = ObserverAlert.where(context: notification)
+      expect(alert.count).to eq 1
+      notification.save!
+      expect(alert.count).to eq 1
     end
 
     it 'creates an alert if student role is selected but not observer' do

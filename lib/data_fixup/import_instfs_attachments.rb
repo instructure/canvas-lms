@@ -113,7 +113,7 @@ module DataFixup
     end
 
     def reenqueue_job(queue)
-      self.class.send_later_enqueue_args(:run, { run_at: @next_options[:run_at] }, queue, @next_options)
+      self.class.delay(run_at: @next_options[:run_at]).run(queue, @next_options)
     end
   end
 end

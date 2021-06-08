@@ -40,7 +40,7 @@ describe Auditors::Course do
 
   describe "with cassandra backend" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
     end
 
     include_examples "cassandra audit logs"
@@ -200,19 +200,19 @@ describe Auditors::Course do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Auditors).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
     end
 
     it "writes to cassandra" do
       event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
-      expect(Auditors.write_to_cassandra?).to eq(true)
+      expect(Audits.write_to_cassandra?).to eq(true)
       expect(Auditors::Course.for_course(@course).paginate(:per_page => 5)).to include(event)
     end
 
     it "writes to postgres" do
       sis_batch = @account.root_account.sis_batches.create
       event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
-      expect(Auditors.write_to_postgres?).to eq(true)
+      expect(Audits.write_to_postgres?).to eq(true)
       pg_record = Auditors::ActiveRecord::CourseRecord.where(uuid: event.id).first
       expect(pg_record).to_not be_nil
       expect(pg_record.course_id).to eq(@course.id)

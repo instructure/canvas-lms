@@ -200,13 +200,10 @@ describe EportfolioEntriesController do
       assert_unauthorized
     end
 
-    it "should redirect to page" do
+    it "will 404 for bad IDs" do
       user_session(@user)
-      begin
-        get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
-      rescue => e
-        expect(e.to_s).to eql("Not Found")
-      end
+      get 'attachment', params: {:eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid}
+      expect(response.status).to eq(404)
     end
 
     describe "with sharding" do

@@ -77,9 +77,10 @@ module Messages
     ].freeze
 
     SOURCE_USER_NOTIFICATIONS = [
-      "New Discussion Entry",
       "Assignment Submitted",
-      "Assignment Resubmitted"
+      "Assignment Resubmitted",
+      "Discussion Mention",
+      "New Discussion Entry"
     ].freeze
 
     ANONYMIZED_NOTIFICATIONS = [

@@ -50,8 +50,10 @@ describe ConversationsController, type: :request do
 
   def observer_in_course(options = {})
     section = options.delete(:section)
+    associated_user = options.delete(:associated_user)
     u = User.create(options)
     enrollment = @course.enroll_user(u, 'ObserverEnrollment', :section => section)
+    enrollment.associated_user = associated_user
     enrollment.workflow_state = 'active'
     enrollment.save
     u
@@ -760,6 +762,25 @@ describe ConversationsController, type: :request do
                     { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
             assert_status(400)
           end
+
+          context "cross-shard" do
+            specs_require_sharding
+
+            it 'should find valid context for user on other shard' do
+              @shard1.activate do
+                new_root = Account.create!(name: 'shard2 account')
+                sub_account = new_root.sub_accounts.create!(name: 'sub dept')
+                course_with_student(account: sub_account, name: "sub student", active_all: true)
+                # @admin is defined above and is from the default shard.
+                account_admin_user(user: @admin, account: sub_account, name: "sub admin", active_all: true)
+                json = api_call(:post, "/api/v1/conversations",
+                                { controller: 'conversations', action: 'create', format: 'json' },
+                                { recipients: [@student.id], body: "test", context_code: "account_#{new_root.id}" })
+                conv = Conversation.find(json.first['id'])
+                expect(conv.context).to eq new_root
+              end
+            end
+          end
         end
       end
 
@@ -1338,6 +1359,43 @@ describe ConversationsController, type: :request do
         { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
 
       expect(json["cannot_reply"]).to eq true
+    end
+
+    context "as an observer" do
+      before :once do
+        @bobs_mom = observer_in_course(:name => "bob's mom", :associated_user => @bob)
+        @user = @bobs_mom
+      end
+
+      it "should not set cannot_reply for observer observee relationship" do
+        conversation = conversation(@bobs_mom, :sender => @bob, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to be_nil
+      end
+
+      it "should set cannot_reply to true if non-observed student" do
+        conversation = conversation(@bobs_mom, :sender => @billy, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to eq true
+      end
     end
 
     it "should not explode on account group conversations" do

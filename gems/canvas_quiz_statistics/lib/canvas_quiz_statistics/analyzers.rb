@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'time' # https://github.com/rails/rails/pull/40859
 require 'active_support/core_ext'
 
 module CanvasQuizStatistics::Analyzers

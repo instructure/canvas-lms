@@ -43,7 +43,7 @@ describe SubAccountsController do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
-      
+
       sub_account = root_account.sub_accounts.create(:name => 'sub account')
 
       post 'create', params: {:account_id => sub_account.id, :account => { :parent_account_id => sub_account.id, :name => 'sub sub account 2' }}
@@ -150,6 +150,43 @@ describe SubAccountsController do
       expect(res.count).to eq 2
       expect(res.map{|r| r["id"]}).to match_array [root_account.id, sub_account.id]
     end
+
+    describe "permissions" do
+      before :once do
+        @root_account = Account.create!(name: 'root')
+        @sub_account = @root_account.sub_accounts.create!(name: 'sub')
+      end
+
+      it "accepts :manage_courses permission" do
+        @root_account.disable_feature!(:granular_permissions_manage_courses)
+        admin = account_admin_user_with_role_changes(role_changes: {manage_account_settings: false, manage_courses: true}, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
+        user_session(admin)
+        get 'index', params: {account_id: @root_account.id}
+        expect(response.status).to eq 200
+      end
+
+      it 'accepts :manage_courses_admin permission (granular permissions)' do
+        @root_account.enable_feature!(:granular_permissions_manage_courses)
+        admin =
+          account_admin_user_with_role_changes(
+            role_changes: {
+              manage_account_settings: false,
+              manage_courses_admin: true
+            },
+            account: @root_account,
+            role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account)
+          )
+        user_session(admin)
+        get 'index', params: { account_id: @root_account.id }
+        expect(response.status).to eq 200
+      end
+
+      it "requires account credentials" do
+        course_with_teacher_logged_in(active_all: true)
+        get 'index', params: {account_id: @root_account.id}
+        expect(response.status).to eq 401
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do
@@ -157,6 +194,13 @@ describe SubAccountsController do
       @root_account = Account.create(name: 'new account')
       account_admin_user(active_all: true, account: @root_account)
       @sub_account = @root_account.sub_accounts.create!
+    end
+
+    it "requires :manage_account_settings permission" do
+      lame_admin = account_admin_user_with_role_changes(role_changes: {manage_account_settings: false, manage_courses: true}, account: @root_account, role: Role.get_built_in_role('AccountMembership', root_account_id: @root_account))
+      user_session(lame_admin)
+      delete 'destroy', params: {account_id: @root_account, id: @sub_account}
+      expect(response.status).to eq 401
     end
 
     it "should delete a sub-account" do
@@ -217,7 +261,7 @@ describe SubAccountsController do
       names.each {|name| Account.create!(name: name, parent_account: @sub_account)}
       get 'show', params: {account_id: @root_account, id: @sub_account}
       expect(response.status).to eq 200
-      json = JSON.parse(response.body.sub("while(1)\;",''))
+      json = JSON.parse(response.body)
       expect(json["account"]["sub_accounts"].map{|sub| sub["account"]["name"]}).to eq names.sort
     end
   end

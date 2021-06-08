@@ -406,6 +406,8 @@ class CalendarEvent < ActiveRecord::Base
   has_a_broadcast_policy
 
   def course_broadcast_data
+    return appointment_group.broadcast_data if appointment_group
+
     if context.respond_to?(:broadcast_data)
       context.broadcast_data
     else

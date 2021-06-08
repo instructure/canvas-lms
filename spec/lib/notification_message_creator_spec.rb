@@ -30,7 +30,7 @@ def notification_set(opts = {})
   user_model({:workflow_state => 'registered'}.merge(user_opts))
   communication_channel_model.confirm!
   notification_policy_model(:notification => @notification,
-                            :communication_channel => @communication_channel)
+                            :communication_channel => @communication_channel) unless opts[:no_policy]
 
   @notification.reload
 end
@@ -128,7 +128,6 @@ describe NotificationMessageCreator do
 
     it 'does not send a notification when policy override is disabled for a course' do
       notification_set(notification_opts: { :category => "Announcement" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -137,7 +136,6 @@ describe NotificationMessageCreator do
 
     it 'does send a notification when course_id is not passed in' do
       notification_set(notification_opts: { :category => "Announcement" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -154,7 +152,6 @@ describe NotificationMessageCreator do
 
     it 'does send other notifications when policy override is in effect' do
       notification_set(notification_opts: { :category => "Registration" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -406,6 +403,17 @@ describe NotificationMessageCreator do
       expect(NotificationPolicy.count).to eq 2
     end
 
+    it "doesn't crash when multiple jobs are trying to find an effective policy" do
+      notification_set(no_policy: true)
+      nmc = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user)
+      channels = nmc.to_user_channels[@user]
+      expect(channels.size).to eq(1)
+      policy = nmc.send(:effective_policy_for, @user, channels.first)
+      policy2 = nmc.send(:effective_policy_for, @user, channels.first)
+      expect(policy2.id).to_not be_nil
+      expect(policy2.id).to eq(policy.id)
+    end
+
     it "should not send to bouncing channels" do
       notification_set
       @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD - 1
@@ -488,11 +496,7 @@ describe NotificationMessageCreator do
     end
 
     context "notification policy overrides" do
-      before(:each) do
-        notification_set({notification_opts: {category: 'PandaExpressTime'}})
-        @course.root_account.enable_feature!(:mute_notifications_by_course)
-        Account.site_admin.enable_feature!(:notification_granular_course_preferences)
-      end
+      before(:each) { notification_set({ notification_opts: { category: 'PandaExpressTime' } }) }
 
       it 'uses the policy override if available for immediate messages' do
         @notification_policy.frequency = 'daily'
@@ -552,26 +556,6 @@ describe NotificationMessageCreator do
         @notification_policy.frequency = 'weekly'
         @notification_policy.save!
         NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'immediately', @user.account)
-
-        messages = NotificationMessageCreator.new(
-          @notification,
-          @assignment,
-          to_list: @user,
-          data: {
-            course_id: @course.id,
-            root_account_id: @user.account.id
-          }
-        ).create_message
-        expect(messages).not_to be_empty
-        expect(DelayedMessage.count).to be 0
-      end
-
-      it 'ignores overrides if the feature is not enabled' do
-        Account.site_admin.disable_feature!(:notification_granular_course_preferences)
-        @notification_policy.frequency = 'immediately'
-        @notification_policy.save!
-        NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'weekly', @course)
-        NotificationPolicyOverride.create_or_update_for(@user.email_channel, @notification.category, 'daily', @user.account)
 
         messages = NotificationMessageCreator.new(
           @notification,
@@ -736,6 +720,7 @@ describe NotificationMessageCreator do
         unless conditions.empty?
           expect(scope).to receive(:where).with(*conditions).ordered.and_return(scope)
         end
+        allow(Message.connection).to receive(:table_exists?).and_return(true)
         expect(scope).to receive(:update_all).ordered
       end
 

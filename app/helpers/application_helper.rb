@@ -247,7 +247,7 @@ module ApplicationHelper
     capture do
       preload_chunks.each { |url| concat preload_link_tag("#{js_base_url}/#{url}") }
 
-      # if you look the app/jsx/main.js, there is a function there that will
+      # if you look the ui/main.js, there is a function there that will
       # process anything on window.bundles and knows how to load everything it needs
       # to load that "js_bundle". And by the time that runs, the browser will have already
       # started downloading those script urls because of those preload tags above,
@@ -294,7 +294,10 @@ module ApplicationHelper
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
-    bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
+    bundle_path = plugin ?
+      "../../gems/plugins/#{plugin}/app/stylesheets/#{bundle_name}" :
+      "bundles/#{bundle_name}"
+
     cache = BrandableCSS.cache_for(bundle_path, css_variant(opts))
     base_dir = cache[:includesNoVariables] ? 'no_variables' : css_variant(opts)
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
@@ -330,7 +333,7 @@ module ApplicationHelper
   end
 
   def sortable_tabs
-    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
+    tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account, :course_subject_tabs => @context.try(:elementary_subject_course?))
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
@@ -430,8 +433,9 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user, account=nil)
-    return true if account && account.grants_any_right?(user, session, :create_courses, :manage_courses)
-    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
+    return true if account&.grants_any_right?(user, session, :manage_courses, :create_courses)
+
+    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :manage_courses, :create_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.
@@ -520,7 +524,7 @@ module ApplicationHelper
 
   def dataify(obj, *attributes)
     hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = ""
+    res = +""
     if !attributes.empty?
       attributes.each do |attribute|
         res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
@@ -630,14 +634,10 @@ module ApplicationHelper
     support_url || '#'
   end
 
-  def show_help_link?
-    show_feedback_link? || support_url.present?
-  end
-
   def help_link_classes(additional_classes = [])
     css_classes = []
     css_classes << "support_url" if support_url
-    css_classes << "help_dialog_trigger" if show_feedback_link?
+    css_classes << "help_dialog_trigger"
     css_classes.concat(additional_classes) if additional_classes
     css_classes.join(" ")
   end
@@ -662,12 +662,10 @@ module ApplicationHelper
   end
 
   def help_link
-    if show_help_link?
-      link_content = help_link_name
-      link_to link_content.html_safe, help_link_url,
-        :class => help_link_classes,
-        :data => help_link_data
-    end
+    link_content = help_link_name
+    link_to link_content.html_safe, help_link_url,
+      :class => help_link_classes,
+      :data => help_link_data
   end
 
   def active_brand_config_cache
@@ -731,10 +729,18 @@ module ApplicationHelper
     end
     @brand_account
   end
-  private :brand_config_account
+
+  def pseudonym_can_see_custom_assets
+    # custom JS could be used to hijack user stuff.  Let's not allow
+    # it to be rendered unless the pseudonym is really
+    # from this account (or trusts, etc).
+    return true unless @current_pseudonym
+    @current_pseudonym.works_for_account?(brand_config_account, ignore_types: [:site_admin])
+  end
 
   def include_account_js
     return if params[:global_includes] == '0' || !@domain_root_account
+    return unless pseudonym_can_see_custom_assets
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:js_overrides]
@@ -761,6 +767,7 @@ module ApplicationHelper
 
   def include_account_css
     return if disable_account_css?
+    return unless pseudonym_can_see_custom_assets
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:css_overrides]
@@ -848,22 +855,6 @@ module ApplicationHelper
   def collection_cache_key(collection)
     keys = collection.map { |element| element.cache_key }
     Digest::MD5.hexdigest(keys.join('/'))
-  end
-
-  def translated_due_date(assignment)
-    if assignment.multiple_due_dates_apply_to?(@current_user)
-      t('Due: Multiple Due Dates')
-    else
-      assignment = assignment.overridden_for(@current_user)
-
-      if assignment.due_at
-        t('Due: %{assignment_due_date_time}',
-          assignment_due_date_time: datetime_string(force_zone(assignment.due_at))
-        )
-      else
-        t('Due: No Due Date')
-      end
-    end
   end
 
   def add_uri_scheme_name(uri)
@@ -995,7 +986,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
-    return unless request.format.html? || request.format == "*/*"
+    return unless response.media_type == 'text/html'
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 
@@ -1244,14 +1235,15 @@ module ApplicationHelper
   end
 
   def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment)
+    file_authenticator.download_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment)
+    file_authenticator.inline_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_thumbnail_url(attachment, options={})
+    options[:original_url] = request.original_url
     file_authenticator.thumbnail_url(attachment, options)
   end
 
@@ -1286,6 +1278,7 @@ module ApplicationHelper
     if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
       js_env(
         ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management),
         MASTERY_SCALE: {
           outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
           outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json

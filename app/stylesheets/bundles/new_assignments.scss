@@ -69,14 +69,6 @@
   .default-dates .status-description { font-weight: bold; }
 }
 
-@media screen and (max-width: 1280px) {
-  #course_home_content {
-    .assignment-date-available {
-      visibility: hidden;
-    }
-  }
-}
-
 .form-dialog-content.ag-weights-content {
   bottom: 59px;
   display: flex;

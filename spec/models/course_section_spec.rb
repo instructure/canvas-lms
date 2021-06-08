@@ -318,7 +318,7 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
-  it 'should call DueDateCacher.recompute_users_for_course with run_immediately true if :run_jobs_immediately' do
+  it 'should call DueDateCacher.recompute_users_for_course' do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -332,25 +332,7 @@ describe CourseSection, "moving to new course" do
     course1.reload
 
     expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([u.id], course2, nil, run_immediately: true, update_grades: true, executing_user: nil)
-    cs.move_to_course(course2, run_jobs_immediately: true)
-  end
-
-  it 'should call DueDateCacher.recompute_users_for_course with run_immediately false if without :run_jobs_immediately' do
-    account1 = Account.create!(:name => "1")
-    account2 = Account.create!(:name => "2")
-    course1 = account1.courses.create!
-    course2 = account2.courses.create!
-    cs = course1.course_sections.create!
-    u = User.create!
-    u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
-    e.workflow_state = 'active'
-    e.save!
-    course1.reload
-
-    expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([u.id], course2, nil, run_immediately: false, update_grades: true, executing_user: nil)
+      with([u.id], course2, nil, update_grades: true, executing_user: nil)
     cs.move_to_course(course2)
   end
 
@@ -474,8 +456,8 @@ describe CourseSection, "moving to new course" do
   end
 
   context 'permissions' do
-    context ':read and section_visibilities' do
-      before :once do
+    context ":read and section_visibilities" do
+      before do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',
@@ -491,7 +473,9 @@ describe CourseSection, "moving to new course" do
         @ta.reload
 
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_falsey
@@ -499,7 +483,9 @@ describe CourseSection, "moving to new course" do
 
       it "should work with section_limited false" do
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_truthy
@@ -552,5 +538,11 @@ describe CourseSection, "moving to new course" do
 
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq false
     end
+  end
+
+  it "delegates account to course" do
+    course = course_model(account_id: Account.default)
+    section = course.course_sections.create!
+    expect(section.account).to eq(Account.default)
   end
 end

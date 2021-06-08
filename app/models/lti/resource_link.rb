@@ -21,12 +21,17 @@
 class Lti::ResourceLink < ApplicationRecord
   include Canvas::SoftDeletable
 
-  validates :resource_link_id, presence: true
-  validates :context_external_tool_id, presence: true
+  self.ignored_columns = %i[lookup_id resource_link_id]
+
+  validates :context_external_tool_id, :context_id, :context_type, :lookup_uuid,
+            :resource_link_uuid, presence: true
+  validates :lookup_uuid, uniqueness: { scope: [:context_id, :context_type] }
 
   belongs_to :context_external_tool
-  alias_method :original_context_external_tool, :context_external_tool
+  belongs_to :context, polymorphic: [:account, :assignment, :course]
   belongs_to :root_account, class_name: 'Account'
+
+  alias_method :original_context_external_tool, :context_external_tool
 
   has_many :line_items,
             inverse_of: :resource_link,
@@ -34,8 +39,18 @@ class Lti::ResourceLink < ApplicationRecord
             dependent: :destroy,
             foreign_key: :lti_resource_link_id
 
-  before_validation :generate_resource_link_id, on: :create
+  before_validation :generate_resource_link_uuid, on: :create
+  before_validation :generate_lookup_uuid, on: :create
   before_save :set_root_account
+
+  def self.create_with(context, tool, custom_params = nil)
+    return if context.nil? || tool.nil?
+
+    context.lti_resource_links.create!(
+      custom: Lti::DeepLinkingUtil.validate_custom_params(custom_params),
+      context_external_tool: tool
+    )
+  end
 
   def context_external_tool
     # Use 'current_external_tool' to lookup the tool in a way that is safe with
@@ -45,7 +60,7 @@ class Lti::ResourceLink < ApplicationRecord
 
   def current_external_tool(context)
     ContextExternalTool.find_external_tool(
-      original_context_external_tool.url,
+      original_context_external_tool.url || original_context_external_tool.domain,
       context,
       original_context_external_tool.id
     )
@@ -53,8 +68,12 @@ class Lti::ResourceLink < ApplicationRecord
 
   private
 
-  def generate_resource_link_id
-    self.resource_link_id ||= SecureRandom.uuid
+  def generate_lookup_uuid
+    self.lookup_uuid ||= SecureRandom.uuid
+  end
+
+  def generate_resource_link_uuid
+    self.resource_link_uuid ||= SecureRandom.uuid
   end
 
   def set_root_account

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -35,8 +37,50 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
+# Zeitwerk does not HAVE to be enabled with rails 6
+# Use this environment variable (which may have other file-based ways
+# to trigger it later) in order to determine which autoloader we should
+# use.  The goal is to move to zeitwerk over time.
+# https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
+# One way to set this in development would be to use your docker-compose.override.yml
+# file to pass an env var to the web container:
+#
+#  web:
+#    <<: *BASE
+#    environment:
+#      <<: *BASE-ENV
+#      VIRTUAL_HOST: .canvas.docker
+#      ...
+#      CANVAS_ZEITWERK: 1
+unless defined?(CANVAS_ZEITWERK)
+  CANVAS_ZEITWERK = (ENV['CANVAS_ZEITWERK'] == '1')
+end
+
 module CanvasRails
   class Application < Rails::Application
+
+    # this CANVAS_ZEITWERK constant flag is defined above in this file.
+    # It should be temporary,
+    # and removed once we've fully upgraded to zeitwerk autoloading,
+    # at which point the stuff inside this conditional block should remain.
+    if CANVAS_ZEITWERK
+      config.autoloader = :zeitwerk
+      # TODO: when we aren't finding copious errors
+      # anymore we can stop logging the autoloading paths.
+      # For now, this lets us figure out why constant loading
+      # is not behaving as expected quickly and easily:
+      Rails.autoloaders.logger = Logger.new("#{Rails.root}/log/autoloading.log")
+      #Rails.autoloaders.log!
+
+      # TODO: someday we can use this line, which will NOT
+      # add anything on the autoload paths the actual ruby
+      # $LOAD_PATH because zeitwerk will take care of anything
+      # we autolaod.  This will make ACTUAL require statements
+      # that are necessary work faster because they'll have a smaller
+      # load path to scan.
+      # config.add_autoload_paths_to_load_path = false
+    end
+
     $LOAD_PATH << config.root.to_s
     config.encoding = 'utf-8'
     require 'logging_filter'
@@ -44,8 +88,9 @@ module CanvasRails
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenScopeError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
+    config.action_dispatch.rescue_responses['CanvasHttp::CircuitBreakerError'] = 502
     config.action_dispatch.default_headers.delete('X-Frame-Options')
-    config.action_dispatch.default_headers.delete('Referrer-Policy')
+    config.action_dispatch.default_headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     config.action_controller.forgery_protection_origin_check = true
     ActiveSupport.to_time_preserves_timezone = true
 
@@ -65,7 +110,7 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+    log_config = File.exist?(Rails.root + 'config/logging.yml') && Rails.application.config_for(:logging).with_indifferent_access
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
@@ -109,11 +154,15 @@ module CanvasRails
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
     config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
-                                  #{Rails.root}/app/stylesheets)
+                                  #{Rails.root}/app/stylesheets
+                                  #{Rails.root}/ui)
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: -> (*) {
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation"]
+    }
+    config.middleware.use Rack::Brotli, if: -> (*) {
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli"]
     }
 
     config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
@@ -124,6 +173,27 @@ module CanvasRails
     end
 
     module PostgreSQLEarlyExtensions
+      module ConnectionHandling
+        def postgresql_connection(config)
+          conn_params = config.symbolize_keys
+
+          hosts = Array(conn_params[:host]).presence || [nil]
+          hosts.each_with_index do |host, index|
+            begin
+              conn_params[:host] = host
+              return super(conn_params)
+              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+              # for an error where the database name is in the message (i.e. a hostname lookup failure)
+              # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
+              # for any other error
+            rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
+              raise if index == hosts.length - 1
+              # else try next host
+            end
+          end
+        end
+      end
+
       def initialize(connection, logger, connection_parameters, config)
         unless config.key?(:prepared_statements)
           config = config.dup
@@ -167,6 +237,9 @@ module CanvasRails
       end
     end
 
+    Autoextend.hook(:"ActiveRecord::Base",
+      PostgreSQLEarlyExtensions::ConnectionHandling,
+        singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
@@ -217,22 +290,6 @@ module CanvasRails
     class NotImplemented < StandardError; end
 
     if defined?(PhusionPassenger)
-      PhusionPassenger.on_event(:starting_worker_process) do |forked|
-        if forked
-          # We're in smart spawning mode, and need to make unique connections for this fork.
-          Canvas.reconnect_redis
-          # if redis failed, we would have established a connection to the
-          # database (trying to read the ignore_redis_failures setting), but
-          # we're running in the main passenger thread, and Rails will get mad
-          # at us if we try to use that connection in a different thread (the
-          # worker thread that actually processes requests). So just always
-          # close the connections again
-          ActiveRecord::Base.clear_all_connections!
-        end
-      end
-    end
-
-    if defined?(PhusionPassenger)
       PhusionPassenger.on_event(:after_installing_signal_handlers) do
         Canvas::Reloader.trap_signal
       end
@@ -242,11 +299,10 @@ module CanvasRails
       end
     end
 
-    if defined?(Spring)
-      Spring.after_fork do
-        Canvas.reconnect_redis
-      end
-    end
+    # Ensure that the automatic redis reconnection on fork works
+    # This is the default in redis-rb, but for some reason rails overrides it
+    # See e.g. https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22704
+    ActiveSupport::Cache::RedisCacheStore::DEFAULT_REDIS_OPTIONS[:reconnect_attempts] = 1
 
     # don't wrap fields with errors with a <div class="fieldWithErrors" />,
     # since that could leak information (e.g. valid vs invalid username on
@@ -272,20 +328,36 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
-    def validate_secret_key_config!
+    def validate_secret_key_base(_)
       # no validation; we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
+    end
+
+    class DummyKeyGenerator
+      def self.generate_key(*)
+      end
+    end
+
+    def key_generator
+      DummyKeyGenerator
     end
 
     initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do
       settings = ConfigFile.load("consul")
       if settings.present?
-        begin
-          Canvas::DynamicSettings.config = settings
-        rescue Imperium::UnableToConnectError
-          Rails.logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
-        end
+        # this is not just for speed in non-consul installations^
+        # We also do things like building javascript assets with the base
+        # container that only has as many ruby assets as strictly necessary,
+        # and these resources actually aren't even on disk in those cases.
+        # do not remove this conditional until the asset build no longer
+        # needs the rails app for anything.
+        require_dependency 'canvas/dynamic_settings'
+        Canvas::DynamicSettingsInitializer.bootstrap!
       end
+    end
+
+    initializer "canvas.cache_config", before: "canvas.extend_shard" do
+      CanvasCacheInit.apply!
     end
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
@@ -294,12 +366,19 @@ module CanvasRails
       Switchman.cache = -> { MultiCache.cache }
     end
 
+    # Newer rails has this in rails proper
+    attr_writer :credentials
+
+    initializer "canvas.init_credentials", before: "active_record.initialize_database" do
+      self.credentials = Canvas::Credentials.new(credentials)
+    end
+
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: :load_config_initializers) do |app|
       app.config.middleware.insert_before(config.session_store, LoadAccount)
-      app.config.middleware.swap(ActionDispatch::RequestId, RequestContextGenerator)
-      app.config.middleware.insert_after(config.session_store, RequestContextSession)
+      app.config.middleware.swap(ActionDispatch::RequestId, RequestContext::Generator)
+      app.config.middleware.insert_after(config.session_store, RequestContext::Session)
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
     end

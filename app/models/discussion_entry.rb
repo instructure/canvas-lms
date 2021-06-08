@@ -31,14 +31,17 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: 'DiscussionEntry', foreign_key: 'root_entry_id'
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
   belongs_to :parent_entry, :class_name => 'DiscussionEntry', :foreign_key => :parent_id
   # also null if a root entry
   belongs_to :root_entry, :class_name => 'DiscussionEntry', :foreign_key => :root_entry_id
   belongs_to :user
+  has_many :mentions, inverse_of: :discussion_entry
   belongs_to :attachment
   belongs_to :editor, :class_name => 'User'
+  belongs_to :root_account, class_name: 'Account'
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
@@ -56,6 +59,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
+  # parse_and_create_mentions has to run before has_a_broadcast_policy and the
+  # after_save hook it adds.
+  after_save :parse_and_create_mentions
   has_a_broadcast_policy
   attr_accessor :new_record_header
 
@@ -64,13 +70,25 @@ class DiscussionEntry < ActiveRecord::Base
     state :deleted
   end
 
+  def parse_and_create_mentions
+    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]').map(&:values)
+    user_ids = mention_data.map(&:first)
+    User.where(id: user_ids).each do |u|
+      mentions.create!(user: u, root_account_id: root_account_id)
+    end
+  end
+
+  def mentioned_users
+    User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+  end
+
   def course_broadcast_data
     discussion_topic.context&.broadcast_data
   end
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
-    p.to { subscribers - [user] }
+    p.to { discussion_topic.subscribers - [user] - mentioned_users }
     p.whenever { |record|
       record.just_created && record.active?
     }
@@ -144,9 +162,9 @@ class DiscussionEntry < ActiveRecord::Base
     end
     user = nil unless user && self.context.users.include?(user)
     if !user
-      raise "Only context participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif !message || message.empty?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       self.shard.activate do
         entry = discussion_topic.discussion_entries.new(message: message,
@@ -160,14 +178,6 @@ class DiscussionEntry < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def posters
-    self.discussion_topic.posters rescue [self.user]
-  end
-
-  def subscribers
-    subscribed_users = self.discussion_topic.subscribers
   end
 
   def plaintext_message=(val)
@@ -360,10 +370,12 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def context_module_action_later
-    self.send_later_if_production(:context_module_action)
+    delay_if_production.context_module_action
   end
   protected :context_module_action_later
 
+  # If this discussion topic is part of an assignment this method is what
+  # submits the assignment or updates the submission for the user
   def context_module_action
     if self.discussion_topic && self.user
       action = self.deleted? ? :deleted : :contributed
@@ -449,7 +461,7 @@ class DiscussionEntry < ActiveRecord::Base
   # opts         - Additional named arguments (default: {})
   #                :forced - Also set the forced_read_state to this value.
   #
-  # Returns nil if current_user is nil, the DiscussionEntryParticipent if the
+  # Returns nil if current_user is nil, the DiscussionEntryParticipant if the
   # read_state was changed, or true if the read_state was not changed. If the
   # read_state is not changed, a participant record will not be created.
   def change_read_state(new_state, current_user = nil, opts = {})
@@ -458,6 +470,7 @@ class DiscussionEntry < ActiveRecord::Base
 
     if new_state != self.read_state(current_user)
       entry_participant = self.update_or_create_participant(opts.merge(:current_user => current_user, :new_state => new_state))
+      StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
       if entry_participant.present? && entry_participant.valid?
         self.discussion_topic.update_or_create_participant(opts.merge(:current_user => current_user, :offset => (new_state == "unread" ? 1 : -1)))
       end
@@ -542,16 +555,17 @@ class DiscussionEntry < ActiveRecord::Base
   # Public: Find the existing DiscussionEntryParticipant, or create a default
   # participant, for the specified user.
   #
-  # user - The User to lookup the participant for.
+  # user - The User or user_id to lookup the participant for.
   #
   # Returns the DiscussionEntryParticipant for the user, or a participant with
   # default values set. The returned record is marked as readonly! If you need
   # to update a participant, use the #update_or_create_participant method
   # instead.
   def find_existing_participant(user)
+    user_id = user.is_a?(User) ? user.id : user
     participant = discussion_entry_participants.loaded? ?
-      discussion_entry_participants.detect{|dep| dep.user_id == user.id} :
-      discussion_entry_participants.where(:user_id => user).first
+      discussion_entry_participants.detect{|dep| dep.user_id == user_id} :
+      discussion_entry_participants.where(:user_id => user_id).first
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({
@@ -559,7 +573,7 @@ class DiscussionEntry < ActiveRecord::Base
         :forced_read_state => false,
         })
       participant.discussion_entry = self
-      participant.user = user
+      participant.user_id = user_id
     end
 
     # Do not save this record. Use update_or_create_participant instead if you need to save it

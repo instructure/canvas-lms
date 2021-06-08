@@ -112,12 +112,48 @@ describe Login::CanvasController do
     expect(session[:sentinel]).to be_nil
   end
 
+  it "persists the auth provider if the feature flag is enabled" do
+    Account.default.enable_feature!(:persist_inferred_authentication_providers)
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    expect(assigns[:pseudonym_session].record.authentication_provider).to eq Account.default.canvas_authentication_provider
+    
+    # the auth provider got set on the pseudonym
+    expect(@pseudonym.reload.authentication_provider).to eq Account.default.canvas_authentication_provider
+  end
+
+  it "sets, but does not persist, the auth provider if the feature flag is not enabled" do
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    expect(assigns[:pseudonym_session].record.authentication_provider).to eq Account.default.canvas_authentication_provider
+    
+    # the auth provider did not get set on the pseudonym
+    expect(@pseudonym.reload.authentication_provider).to be_nil
+  end
+
   it "password auth should work for an explicit Canvas pseudonym" do
     @pseudonym.update_attribute(:authentication_provider, Account.default.canvas_authentication_provider)
     post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
+  end
+
+  it "does not get tripped up by explicit and implicit pseudonyms" do
+    pseudonym2 = @user.pseudonyms.create!(
+      unique_id: 'jtfrd@instructure.com',
+      password: 'qwertyuiop',
+      password_confirmation: 'qwertyuiop',
+      authentication_provider: Account.default.canvas_authentication_provider)
+
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq pseudonym2
   end
 
   it "password auth should work with extra whitespace around unique id " do
@@ -178,6 +214,9 @@ describe Login::CanvasController do
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
+      # the auth provider got set on the pseudonym
+      expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac
+      expect(@pseudonym.reload.authentication_provider).to be_nil
     end
 
     it "works for a pseudonym explicitly linked to LDAP" do
@@ -254,6 +293,7 @@ describe Login::CanvasController do
 
         post 'create', params: {:pseudonym_session => {:unique_id => 'username', :password => 'password'}}
         expect(session[:login_aac]).to eq aac2.id
+        expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac2
       end
 
       it 'when an ldap authentication provider was used without an identifier_format' do
@@ -265,10 +305,11 @@ describe Login::CanvasController do
         aac2 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: nil)
         expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
           with('username', 'password').
-          and_return([true])
+          and_return([{}])
 
         post 'create', params: {pseudonym_session: {unique_id: 'username', password: 'password'}}
         expect(session[:login_aac]).to eq aac2.id
+        expect(assigns[:pseudonym_session].record.authentication_provider).to eq aac2
       end
 
       it 'when canvas authentication was used' do

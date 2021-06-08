@@ -411,7 +411,7 @@ module QuizzesHelper
     html = hash_get(hash, "#{field}_html".to_sym)
 
     if html
-      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE))
+      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, controller.try(:use_new_math_equation_handling?))
     else
       hash_get(hash, field)
     end
@@ -466,7 +466,7 @@ module QuizzesHelper
     editable = hash_get(options, :editable)
     res      = user_content hash_get(question, :question_text)
     index  = 0
-    doc = Nokogiri::HTML.fragment(res)
+    doc = Nokogiri::HTML5.fragment(res)
     selects = doc.css(".question_input")
     selects.each do |s|
       if answer_list && !answer_list.empty?
@@ -485,9 +485,9 @@ module QuizzesHelper
       else
         # If existing answer is one of the options, replace it with a span
         if (opt_tag = s.children.css("option[value='#{a}']").first)
-          s.replace(<<-HTML)
-            <span>#{opt_tag.content}</span>
-          HTML
+          span = doc.fragment("<span />").children.first
+          span.children = opt_tag.children
+          s.swap(span)
         end
       end
 

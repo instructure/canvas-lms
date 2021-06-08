@@ -75,7 +75,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :clear_availability_cache
   after_save :touch_context
   after_save :regrade_if_published
-
+  # We currently only create LORs for quizzes that are assignments. If we change the quiz_type,
+  # we should destroy or restore the results appropriately
+  after_save :destroy_learning_outcome_results, if: -> { saved_change_to_quiz_type?(from: 'assignment') }
+  after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: 'assignment') }
   serialize :quiz_data
 
   simply_versioned
@@ -407,6 +410,18 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.quiz_submissions.each { |s| s.save! }
   end
 
+  def update_learning_outcome_results(state)
+    LearningOutcomeResult.for_associated_asset(self).update_all(workflow_state: state, updated_at: Time.zone.now)
+  end
+
+  def destroy_learning_outcome_results
+    delay_if_production.update_learning_outcome_results('deleted')
+  end
+
+  def restore_learning_outcome_results
+    delay_if_production.update_learning_outcome_results('active')
+  end
+
   def destroy_related_submissions
     self.quiz_submissions.each do |qs|
       submission = qs.submission
@@ -419,7 +434,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_accessor :saved_by
 
   def update_assignment
-    send_later_if_production(:set_unpublished_question_count) if self.id
+    delay_if_production.set_unpublished_question_count if self.id
     if !self.assignment_id && @old_assignment_id
       self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
     end
@@ -429,12 +444,12 @@ class Quizzes::Quiz < ActiveRecord::Base
         submission_types: 'online_quiz'
       ).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       self.course.recompute_student_scores
-      send_later_if_production_enqueue_args(:destroy_related_submissions, priority: Delayed::HIGH_PRIORITY)
+      delay_if_production(priority: Delayed::HIGH_PRIORITY).destroy_related_submissions
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
       ::ContentTag.delete_for(::Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
 
-    send_later_if_production(:update_existing_submissions) if @update_existing_submissions
+    delay_if_production.update_existing_submissions if @update_existing_submissions
     if (self.assignment || @assignment_to_set) && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       unless !self.graded? && @old_assignment_id
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
@@ -1342,11 +1357,8 @@ class Quizzes::Quiz < ActiveRecord::Base
         version_number: self.version_number
       }
       if current_quiz_question_regrades.present?
-        Quizzes::QuizRegrader::Regrader.send_later_enqueue_args(
-          :regrade!,
-          { strand: "quiz:#{self.global_id}:regrading"},
-          options
-        )
+        Quizzes::QuizRegrader::Regrader.delay(strand: "quiz:#{self.global_id}:regrading").
+          regrade!(options)
       end
     end
     true
@@ -1459,10 +1471,18 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Assignment#run_if_overrides_changed_later! uses its keyword arguments, but
   # this method does not
   def run_if_overrides_changed_later!(**)
-    self.send_later_if_production_enqueue_args(
-      :run_if_overrides_changed!,
-      {:singleton => "quiz_overrides_changed_#{self.global_id}"}
-    )
+    delay_if_production(singleton: "quiz_overrides_changed_#{self.global_id}").run_if_overrides_changed!
+  end
+
+  # returns visible students for differentiated assignments
+  def visible_students_with_da(context_students)
+    quiz_students = context_students.joins(:quiz_student_visibilities).
+      where('quiz_id = ?', self.id)
+
+    # empty quiz_students means the quiz is for everyone
+    return quiz_students if quiz_students.present?
+
+    context_students
   end
 
   # This alias exists to handle cases where a method that expects an

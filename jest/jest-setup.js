@@ -39,7 +39,7 @@ if (!Array.prototype.flat) {
     configurable: true,
     value: function flat(depth = 1) {
       if (depth === 0) return this.slice()
-      return this.reduce(function(acc, cur) {
+      return this.reduce(function (acc, cur) {
         if (Array.isArray(cur)) {
           acc.push(...flat.call(cur, depth - 1))
         } else {
@@ -85,4 +85,57 @@ if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
     value: require('@sheerun/mutationobserver-shim')
   })
+}
+
+if (!('IntersectionObserver' in window)) {
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      disconnect() {
+        return null
+      }
+
+      observe() {
+        return null
+      }
+
+      takeRecords() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    }
+  })
+}
+
+if (!('ResizeObserver' in window)) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      observe() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    }
+  })
+}
+
+if (!('matchMedia' in window)) {
+  window.matchMedia = () => ({
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {}
+  })
+  window.matchMedia._mocked = true
+}
+
+if (!('scrollIntoView' in window.HTMLElement.prototype)) {
+  window.HTMLElement.prototype.scrollIntoView = () => {}
 }

@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DueDateRow from 'jsx/due_dates/DueDateRow'
+import DueDateRow from '@canvas/due-dates/react/DueDateRow'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateRow with empty props and canDelete true', {

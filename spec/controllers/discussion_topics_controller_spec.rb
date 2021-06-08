@@ -163,6 +163,28 @@ describe DiscussionTopicsController do
     context "cross-sharding" do
       specs_require_sharding
 
+      it "should mark as read when viewed" do
+        @shard1.activate do
+          account = Account.create!(name: 'Shard2 account')
+          @course = account.courses.create!(name: 'new_course', workflow_state: 'available')
+          # @student is defined outside and lives on the default shard.
+          @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+          user_session(@student)
+          course_topic(:skip_set_user => true)
+          @topic.publish!
+
+          expect(@student.stream_item_instances.count).to eq 1
+          sii = @student.stream_item_instances.take
+          expect(sii.workflow_state).to eq 'unread'
+          expect(@topic.read_state(@student)).to eq 'unread'
+
+          get 'show', params: { course_id: @course.id, id: @topic.id }
+
+          expect(sii.reload.workflow_state).to eq 'read'
+          expect(@topic.reload.read_state(@student)).to eq 'read'
+        end
+      end
+
       it 'returns the topic across shards' do
         @topic = @course.discussion_topics.create!(title: 'student topic', message: 'Hello', user: @student)
         user_session(@student)
@@ -217,8 +239,7 @@ describe DiscussionTopicsController do
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
     end
 
-    it "sets DIRECT_SHARE_ENABLED when enabled" do
-      @course.account.enable_feature!(:direct_share)
+    it "sets DIRECT_SHARE_ENABLED when allowed" do
       user_session(@teacher)
       get 'index', params: {course_id: @course.id}
       expect(response).to be_successful
@@ -226,22 +247,13 @@ describe DiscussionTopicsController do
     end
 
     it "does not set DIRECT_SHARE_ENABLED if the user does not have manage_content" do
-      @course.account.enable_feature!(:direct_share)
       user_session(@student)
       get 'index', params: {course_id: @course.id}
       expect(response).to be_successful
       expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
     end
 
-    it "does not set DIRECT_SHARE_ENABLED when disabled" do
-      user_session(@teacher)
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-
     it "does not set DIRECT_SHARE_ENABLED when viewing a group" do
-      @course.account.enable_feature!(:direct_share)
       user_session(@teacher)
       group = @course.groups.create!
       get 'index', params: {group_id: group.id}
@@ -317,6 +329,24 @@ describe DiscussionTopicsController do
       @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello')
       get 'show', params: {:course_id => @course.id, :id => @discussion.id}
       expect(assigns[:js_env][:disable_keyboard_shortcuts]).to be_truthy
+    end
+
+    it "js_bundles includes discussion_topics_post when ff is on" do
+      commons_hash = {
+        base_url: '/testing-url',
+        canvas_icon_class: 'icon-commons',
+        icon_url: 'http://example.com/icon.png',
+        id: '1',
+        title: 'Share to Commons'
+      }
+      allow(controller).to receive(:external_tools_display_hashes).and_return([commons_hash])
+      @course.enable_feature!(:react_discussions_post)
+      user_session(@teacher)
+      @discussion = @course.discussion_topics.create!(:user => @teacher, title: 'Greetings' ,message: 'Hello, and good morning!')
+      get 'show', params: {:course_id => @course.id, :id => @discussion.id}
+      expect(assigns[:js_bundles].first).to include(:discussion_topics_post)
+      expect(assigns[:_crumbs]).to include(['Discussions', "/courses/#{@course.id}/discussion_topics", {}])
+      expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
     end
 
     it "should not work for announcements in a public course" do
@@ -507,7 +537,7 @@ describe DiscussionTopicsController do
       course_topic(user: @teacher, with_assignment: true)
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
 
-      # this is essentially a unit test for app/coffeescripts/models/Entry.coffee,
+      # this is essentially a unit test for ui/features/discussion_topic/backbone/models/Entry.coffee,
       # making sure that we get back the expected format for this url template
       template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
       url = template.gsub(/%3Astudent_id/, '123')
@@ -688,6 +718,17 @@ describe DiscussionTopicsController do
         expect(response.location).to include "/groups/#{@group1.id}/discussion_topics/#{@topic.child_topic_for(@student).id}?"
         expect(response.location).to include "module_item_id=789"
       end
+
+      it "should exclude locked modules" do
+        user_session(@student)
+        course_topic(skip_set_user: true)
+        mod = @course.context_modules.create! name: 'no soup for you', unlock_at: 1.year.from_now
+        mod.add_item(type: 'discussion_topic', id: @topic.id)
+        mod.save!
+        expect(@topic.read_state(@student)).to eq 'unread'
+        get 'index', params: { course_id: @course.id, exclude_context_module_locked_topics: true}, format: 'json'
+        expect(response.parsed_body.map{ |t| t['id'] }).to_not include @topic.id
+      end
     end
 
     context 'publishing' do
@@ -756,7 +797,6 @@ describe DiscussionTopicsController do
     context "student context cards" do
       before(:once) do
         course_topic user: @teacher
-        @course.root_account.enable_feature! :student_context_cards
       end
 
       it "is disabed for students" do
@@ -765,14 +805,7 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
       end
 
-      it "is disabled for teachers when feature_flag is off" do
-        @course.root_account.disable_feature! :student_context_cards
-        user_session(@teacher)
-        get :show, params: {course_id: @course.id, id: @topic.id}
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
-      end
-
-      it "is enabled for teachers when feature_flag is on" do
+      it "is enabled for teachers" do
         user_session(@teacher)
         get :show, params: {course_id: @course.id, id: @topic.id}
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
@@ -785,6 +818,24 @@ describe DiscussionTopicsController do
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
       expect(response.code).to eq "302"
       expect(ErrorReport.last).to be_nil
+    end
+
+    context "in a homeroom course" do
+      before(:each) do
+        @course.account.settings[:enable_as_k5_account] = {value: true}
+        @course.account.save!
+      end
+
+      it "does not permit replies to assignments" do
+        @course.homeroom_course = true
+        @course.save!
+        user_session(@teacher)
+        topic = Announcement.create!(context: @course, title: 'Test Announcement', message: 'hello world')
+
+        get 'show', params: {:course_id => @course.id, :id => topic.id}
+        expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_REPLY]).to be_falsey
+        expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_READ_REPLIES]).to be_falsey
+      end
     end
   end
 
@@ -836,13 +887,6 @@ describe DiscussionTopicsController do
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
-    end
-
-    it "js_bundles includes discussion_topics_edit_react when ff is on" do
-      user_session(@teacher)
-      @course.account.enable_feature!(:react_announcement_discussion_edit)
-      get 'new', params: {:course_id => @course.id}
-      expect(assigns[:js_bundles].first).to include(:discussion_topics_edit_react)
     end
   end
 

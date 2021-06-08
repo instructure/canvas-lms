@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import DashboardCardMovementMenu from 'jsx/dashboard_card/DashboardCardMovementMenu'
+import DashboardCardMovementMenu from '@canvas/dashboard-card/react/DashboardCardMovementMenu'
 
 QUnit.module('DashboardCardMovementMenu', suiteHooks => {
   let $container

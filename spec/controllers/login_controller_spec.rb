@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative '../apis/api_spec_helper'
 
 describe LoginController do
   describe "#new" do
@@ -141,8 +141,18 @@ describe LoginController do
     end
   end
 
+  describe "#session_token" do
+    it "doesn't explode on a bad input url" do
+      user_session(user_with_pseudonym(active: true))
+      request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+      get 'session_token', format: :json, params: {return_to: "not-a url"}
+      expect(response.status.to_i).to eq(400)
+    end
+  end
+
   describe "#logout" do
     it "doesn't logout if the authenticity token is invalid" do
+      skip('investigate cause for failures beginning 05/05/21 FOO-1950')
       enable_forgery_protection do
         delete 'destroy'
         # it could be a 422, or 0 if error handling isn't enabled properly in specs

@@ -1,2 +1,5 @@
 --color
 --format progress
+--format doc
+--format html
+--out ../../tmp/spec_results/incoming_mail_processor_results.html

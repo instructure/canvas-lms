@@ -54,32 +54,49 @@ class NotificationPolicyOverride < ActiveRecord::Base
         ]
         "(#{vals.join(',')})"
       end
-
-      connection.execute(<<~SQL)
-        INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
-          (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
-          VALUES #{values.join(",")}
-          ON CONFLICT (context_id, context_type, communication_channel_id) WHERE notification_id IS NULL
-          DO UPDATE SET
-            workflow_state = excluded.workflow_state,
-            updated_at = excluded.updated_at
-          WHERE notification_policy_overrides.workflow_state<>excluded.workflow_state;
-      SQL
+      if values.size > 0
+        # if the user has no communication channels, there really isn't anything
+        # to do here for them.
+        connection.execute(<<~SQL)
+          INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
+            (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
+            VALUES #{sanitize_sql(values.join(","))}
+            ON CONFLICT (context_id, context_type, communication_channel_id) WHERE notification_id IS NULL
+            DO UPDATE SET
+              workflow_state = excluded.workflow_state,
+              updated_at = excluded.updated_at
+            WHERE notification_policy_overrides.workflow_state<>excluded.workflow_state;
+        SQL
+      end
     end
   end
 
   def self.enabled_for(user, context, channel: nil)
-    !(find_all_for(user, context, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == 'disabled' })
+    enabled_for_all_contexts(user, [context], channel: channel)
   end
 
-  def self.find_all_for(user, context, channel: nil)
+  def self.enabled_for_all_contexts(user, contexts, channel: nil)
+    !(find_all_for(user, contexts, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == 'disabled' })
+  end
+
+  def self.find_all_for(user, contexts, channel: nil)
+    raise ArgumentError, "can only pass one type of context" if contexts.map(&:class).map(&:name).uniq.length > 1
+
     if channel&.notification_policy_overrides&.loaded?
-      channel.notification_policy_overrides.select { |npo| npo.context_id == context.id && npo.context_type == context.class.name }
+      loaded_policies_for(contexts, channel)
     elsif channel
-      channel.notification_policy_overrides.where(context_id: context.id, context_type: context.class.name)
+      channel.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
+    elsif user.notification_policy_overrides.loaded?
+      loaded_policies_for(contexts, user)
     else
-      user.notification_policy_overrides.where(context_id: context.id, context_type: context.class.name)
+      user.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
     end
+  end
+
+  def self.loaded_policies_for(contexts, object)
+    contexts.map do |context|
+      object.notification_policy_overrides.select { |npo| npo.in_context?(context) }
+    end.flatten
   end
 
   def self.create_or_update_for(communication_channel, notification_category, frequency, context)
@@ -94,5 +111,9 @@ class NotificationPolicyOverride < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def in_context?(context)
+    context_id == context.id && context_type == context.class.name
   end
 end

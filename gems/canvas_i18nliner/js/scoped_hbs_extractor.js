@@ -16,13 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var HbsExtractor = require("i18nliner-handlebars/dist/lib/extractor").default;
+var HbsExtractor = require("@instructure/i18nliner-handlebars/dist/lib/extractor").default;
 
-var HbsTranslateCall = require("i18nliner-handlebars/dist/lib/t_call").default;
+var HbsTranslateCall = require("@instructure/i18nliner-handlebars/dist/lib/t_call").default;
 var ScopedHbsTranslateCall = require("./scoped_translate_call")(HbsTranslateCall);
+var path = require('path')
+var fs = require('fs')
 
 function ScopedHbsExtractor(ast, options) {
-  this.inferI18nScope(options.path);
+  // read the scope from the i18nScope property in the accompanying .json file:
+  this.scope = ScopedHbsExtractor.readI18nScopeFromJSONFile(
+    // resolve relative to process.cwd() in case it's not absolute
+    path.resolve(options.path)
+  )
+
+  this.path = options.path // need this for error reporting
+
   HbsExtractor.apply(this, arguments);
 };
 
@@ -33,21 +42,37 @@ ScopedHbsExtractor.prototype.normalizePath = function(path) {
   return path;
 };
 
-ScopedHbsExtractor.prototype.inferI18nScope = function(path) {
-  if (this.normalizePath)
-    path = this.normalizePath(path);
-  var scope = path.replace(/\.[^\.]+/, '') // remove extension
-                  .replace(/^_/, '')       // some hbs files have a leading _
-                  .replace(/([A-Z]+)([A-Z][a-z])/g,'$1_$2') // camel -> underscore
-                  .replace(/([a-z\d])([A-Z])/g, '$1_$2')    // ditto
-                  .replace(/-/g, "_")
-                  .replace(/\/_?/g, '.')
-                  .toLowerCase();
-  this.scope = scope;
+ScopedHbsExtractor.prototype.buildTranslateCall = function(sexpr) {
+  if (!this.scope) {
+    const friendlyFile = path.relative(process.cwd(), this.path)
+
+    throw new Error(`
+canvas_i18nliner: expected i18nScope for Handlebars template to be specified in
+the accompanying .json file, but found none:
+
+    ${friendlyFile}
+
+To fix this, create the following JSON file with the "i18nScope" property set to
+the i18n scope to use for the template (e.g. similar to what you'd do in
+JavaScript, like \`import I18n from "i18n!foo.bar"\`):
+                                         ^^^^^^^
+
+    // file: ${friendlyFile + '.json'}
+    {
+      "i18nScope": "..."
+    }
+`)
+  }
+
+  return new ScopedHbsTranslateCall(sexpr, this.scope);
 };
 
-ScopedHbsExtractor.prototype.buildTranslateCall = function(sexpr) {
-  return new ScopedHbsTranslateCall(sexpr, this.scope);
+ScopedHbsExtractor.readI18nScopeFromJSONFile = function(filepath) {
+  const metadataFilepath = `${filepath}.json`
+
+  if (fs.existsSync(metadataFilepath)) {
+    return require(metadataFilepath).i18nScope
+  }
 };
 
 module.exports = ScopedHbsExtractor;

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CourseRestore from 'compiled/models/CourseRestore'
-import CourseSearchFormView from 'compiled/views/accounts/admin_tools/CourseSearchFormView'
+import Backbone from '@canvas/backbone'
+import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
+import CourseSearchFormView from 'ui/features/account_admin_tools/backbone/views/CourseSearchFormView.js'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
 

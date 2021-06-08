@@ -20,8 +20,9 @@ import UploadMedia from './UploadMedia'
 import ClosedCaptionPanel from './ClosedCaptionCreator'
 import RocketSVG from './RocketSVG'
 import useComputerPanelFocus from './useComputerPanelFocus'
-import {isAudio, sizeMediaPlayer} from './shared/utils'
+import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 import LoadingIndicator from './shared/LoadingIndicator'
+import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 
 export {
   UploadMedia as default,
@@ -29,6 +30,10 @@ export {
   RocketSVG,
   useComputerPanelFocus,
   isAudio,
+  isVideo,
+  isPreviewable,
   sizeMediaPlayer,
-  LoadingIndicator
+  LoadingIndicator,
+  saveMediaRecording,
+  saveClosedCaptions
 }

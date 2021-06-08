@@ -18,18 +18,18 @@
 
 import _ from 'underscore'
 
-import {underscore} from 'convert_case'
+import {underscore} from 'convert-case'
 import FakeServer, {
   jsonBodyFromRequest,
   pathFromRequest
-} from 'jsx/shared/network/__tests__/FakeServer'
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {
   DEFAULT_LATE_POLICY_DATA,
   fetchLatePolicy,
   createLatePolicy,
   updateCourseSettings,
   updateLatePolicy
-} from 'jsx/gradebook/default_gradebook/apis/GradebookSettingsModalApi'
+} from 'ui/features/gradebook/react/default_gradebook/apis/GradebookSettingsModalApi.js'
 
 const latePolicyData = {
   id: '15',

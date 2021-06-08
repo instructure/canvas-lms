@@ -7,7 +7,6 @@ exports[`renders the component 1`] = `
   <Heading
     border="bottom"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text
@@ -57,7 +56,6 @@ exports[`renders the today className when surrounds Today 1`] = `
   <Heading
     border="bottom"
     color="inherit"
-    ellipsis={false}
     level="h2"
   >
     <Text

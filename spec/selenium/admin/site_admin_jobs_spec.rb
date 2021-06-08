@@ -83,9 +83,9 @@ describe "site admin jobs ui" do
   before(:each) do
     site_admin_logged_in
     track_jobs do
-      2.times { "present".send_later :reverse }
-      "future".send_at Time.now + 30.days, :capitalize
-      job = "failure".send_later_enqueue_args :downcase, no_delay: true
+      2.times { "present".delay.reverse }
+      "future".delay(run_at: Time.now + 30.days).capitalize
+      job = "failure".delay(ignore_transaction: true).downcase
       @failed_job = job.fail!
     end
     @all_jobs = created_jobs.dup
@@ -108,7 +108,7 @@ describe "site admin jobs ui" do
 
     it "should load handler via ajax" do
       Delayed::Job.delete_all
-      job = "test".send_later_enqueue_args :to_s, no_delay: true
+      job = "test".delay(ignore_transaction: true).to_s
       load_jobs_page
       ff("#jobs-grid .slick-row .b0.f0").find do |element|
         element.click if element.text == job.id.to_s
@@ -186,7 +186,7 @@ describe "site admin jobs ui" do
       end
 
       it "should confirm that clicking on delete button should delete all future jobs" do
-        2.times { "test".send_at 2.hours.from_now, :to_s }
+        2.times { "test".delay(run_at: 2.hours.from_now).to_s }
         filter_jobs(FlavorTags::FUTURE)
         validate_all_jobs_selected
         expect(f("#jobs-grid .odd")).to be_displayed

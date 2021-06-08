@@ -27,13 +27,14 @@ module.exports = {
       'jest-junit',
       {
         suiteName: 'Canvas Planner Jest Tests',
-        outputDirectory: './coverage',
+        outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
         outputName: 'canvas-planner-junit.xml'
       }
     ]
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-canvas-mock', './jest-env.js'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testPathIgnorePatterns: ['<rootDir>/node_modues', '<rootDir>/lib'],
   testRegex: '/__tests__/.*\\.(test|spec)\\.js$',
   coverageReporters: ['html', 'text', 'json'],

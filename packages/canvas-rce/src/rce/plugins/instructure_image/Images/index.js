@@ -19,8 +19,9 @@
 import React, {useRef} from 'react'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
-import {Flex, View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 
 import {
   LoadMoreButton,

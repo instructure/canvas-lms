@@ -11,7 +11,7 @@
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for mor
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
@@ -57,10 +57,8 @@ describe KalturaMediaFileHandler do
       end
 
       it "queues a job to check on the bulk upload later" do
-        expect(MediaObject).to receive(:send_later_enqueue_args) do |method, _config, *args|
-          expect(method).to eq :refresh_media_files
-          expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
-        end
+        expect(MediaObject).to receive(:delay).and_return(MediaObject)
+        expect(MediaObject).to receive(:refresh_media_files).with('someBulkUploadId', [attachment.id], attachment.root_account_id)
 
         KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       end
@@ -87,10 +85,8 @@ describe KalturaMediaFileHandler do
 
           Setting.set('media_bulk_upload_timeout', 0)
 
-          expect(MediaObject).to receive(:send_later_enqueue_args) do |method, _config, *args|
-            expect(method).to eq :refresh_media_files
-            expect(args).to eq ['someBulkUploadId', [attachment.id], attachment.root_account_id]
-          end
+          expect(MediaObject).to receive(:delay).and_return(MediaObject)
+          expect(MediaObject).to receive(:refresh_media_files).with('someBulkUploadId', [attachment.id], attachment.root_account_id)
 
           media_file_handler.add_media_files(attachment, wait_for_completion)
         end

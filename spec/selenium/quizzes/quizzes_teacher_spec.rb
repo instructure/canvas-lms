@@ -79,7 +79,6 @@ describe "quizzes" do
     end
 
     it "should open and close the send to dialog" do
-      Account.default.enable_feature!(:direct_share)
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -92,7 +91,6 @@ describe "quizzes" do
     end
 
     it "should open and close the copy to tray" do
-      Account.default.enable_feature!(:direct_share)
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -276,23 +274,6 @@ describe "quizzes" do
         expect(f('#extension_extra_time')).to have_value '13'
       end
 
-    end
-
-    it "should indicate when it was last saved", priority: "1", test_id: 210065 do
-      skip_if_safari(:alert)
-      user_session(@student)
-      take_quiz do
-        indicator = f('#last_saved_indicator')
-        expect(indicator.text).to eq 'Not saved'
-        f('.answer .question_input').click
-
-        # too fast, this always fails
-        # indicator.text.should == 'Saving...'
-
-        wait_for_ajax_requests
-        expect(indicator.text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
-      end
-      user_session(@user)
     end
 
     it "should validate numerical input data", priority: "1", test_id: 210066 do

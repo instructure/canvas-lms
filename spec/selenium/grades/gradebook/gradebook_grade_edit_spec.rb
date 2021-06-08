@@ -305,7 +305,7 @@ describe "Gradebook editing grades" do
       @moderated_assignment.unmute!
       refresh_page
       Gradebook::Cells.edit_grade(@student_1, @moderated_assignment, "20,000")
-      expect(Gradebook::Cells.get_grade(@student_1, @moderated_assignment)).to eq '20000'
+      expect { Gradebook::Cells.get_grade(@student_1, @moderated_assignment) }.to become '20,000'
     end
   end
 

@@ -66,7 +66,7 @@ describe AccountsController do
         Timecop.freeze(61.minutes.ago) do
           get "/accounts/#{@account.id}"
           expect(response).to be_ok
-          doc = Nokogiri::HTML(response.body)
+          doc = Nokogiri::HTML5(response.body)
           expect(doc.at_css('#section-tabs .section .outcomes')).not_to be_nil
         end
 
@@ -77,7 +77,7 @@ describe AccountsController do
         # ensure the change is reflected once the user's cached permissions expire
         get "/accounts/#{@account.id}"
         expect(response).to be_ok
-        doc = Nokogiri::HTML(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css('#section-tabs .section .outcomes')).to be_nil
       end
     end

@@ -132,7 +132,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_content_shares_tab(tabs, user, opts)
-    if user && opts[:root_account]&.feature_enabled?(:direct_share) && user.can_content_share?
+    if user && user.can_content_share?
       tabs <<
         {
           id: TAB_CONTENT_SHARES,
@@ -185,7 +185,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_past_global_announcements(tabs, user, opts)
-    if user && opts[:root_account]&.feature_enabled?(:past_announcements)
+    if user
       tabs <<
         {
           id: TAB_PAST_GLOBAL_ANNOUNCEMENTS,

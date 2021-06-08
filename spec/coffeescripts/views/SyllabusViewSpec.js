@@ -18,15 +18,15 @@
 
 import $ from 'jquery'
 import _ from 'lodash'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'
-import SyllabusBehaviors from 'compiled/behaviors/SyllabusBehaviors'
-import SyllabusCollection from 'compiled/collections/SyllabusCollection'
-import SyllabusCalendarEventsCollection from 'compiled/collections/SyllabusCalendarEventsCollection'
-import SyllabusAppointmentGroupsCollection from 'compiled/collections/SyllabusAppointmentGroupsCollection'
-import SyllabusPlannerCollection from '../../../app/coffeescripts/collections/SyllabusPlannerCollection'
-import SyllabusView from 'compiled/views/courses/SyllabusView'
+import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
+import SyllabusCollection from 'ui/features/syllabus/backbone/collections/SyllabusCollection.js'
+import SyllabusCalendarEventsCollection from 'ui/features/syllabus/backbone/collections/SyllabusCalendarEventsCollection.js'
+import SyllabusAppointmentGroupsCollection from 'ui/features/syllabus/backbone/collections/SyllabusAppointmentGroupsCollection.js'
+import SyllabusPlannerCollection from 'ui/features/syllabus/backbone/collections/SyllabusPlannerCollection.js'
+import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView.js'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
@@ -179,7 +179,7 @@ QUnit.module('Syllabus', {
 
     // Render and bind behaviors
     this.view = new SyllabusView({
-      el: '#syllabusContainer',
+      el: '#syllabusTableBody',
       collection: acollection
     })
   },
@@ -205,7 +205,7 @@ QUnit.module('Syllabus', {
   renderAssertions() {
     expect(24)
     // rendering
-    const syllabus = $('#syllabus')
+    const syllabus = $('#syllabusTableBody')
     ok(syllabus.length, 'syllabus - syllabus added to the dom')
     ok(syllabus.is(':visible'), 'syllabus - syllabus visible')
 

@@ -175,6 +175,10 @@ describe OutcomeProficiencyApiController, type: :request do
     end
   end
 
+  def revoke_manage_proficiency_scales
+    RoleOverride.manage_role_override(@account, @account_user.role, 'manage_proficiency_scales', :override => false)
+  end
+
   context "for course" do
     before :once do
       @account = Account.default
@@ -183,13 +187,9 @@ describe OutcomeProficiencyApiController, type: :request do
       @context = @course
     end
 
-    def revoke_manage_outcomes
-      RoleOverride.manage_role_override(@account, @account_user.role, 'manage_outcomes', :override => false)
-    end
-
     context "create" do
       before do
-        revoke_manage_outcomes if revoke_permissions
+        revoke_manage_proficiency_scales if revoke_permissions
 
         @json = api_call(
           :post,
@@ -317,13 +317,9 @@ describe OutcomeProficiencyApiController, type: :request do
       @context = @account
     end
 
-    def revoke_manage_outcomes
-      RoleOverride.manage_role_override(@account, @account_user.role, 'manage_outcomes', :override => false)
-    end
-
     context "create" do
       before do
-        revoke_manage_outcomes if revoke_permissions
+        revoke_manage_proficiency_scales if revoke_permissions
 
         @json = api_call(
           :post,

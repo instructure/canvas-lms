@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Course from 'compiled/models/Course'
-import CourseSelectionView from 'compiled/views/conversations/CourseSelectionView'
-import CourseCollection from 'compiled/collections/CourseCollection'
-import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
-import GroupCollection from 'compiled/collections/GroupCollection'
+import Course from '@canvas/courses/backbone/models/Course.coffee'
+import CourseSelectionView from 'ui/features/conversations/backbone/views/CourseSelectionView.js'
+import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection.js'
+import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection.js'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

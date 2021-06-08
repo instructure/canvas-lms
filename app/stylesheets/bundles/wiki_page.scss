@@ -31,7 +31,7 @@
     padding-#{direction(left)}: 4px;
     padding-#{direction(right)}: 4px;
   }
-  .hide-overflow, .hide-overflow span {
+  .hide-overflow, .hide-overflow a {
     max-width: 40vw;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -46,6 +46,10 @@
       display: none;
     }
   }
+}
+
+.ic-Table--striped tr:nth-child(odd) .wiki-page-link {
+  color: var(--ic-link-color-darkened-10);
 }
 
 .ic-Table.wiki-page-table .header-row th {

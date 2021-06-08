@@ -136,34 +136,6 @@ describe "course copy" do
     expect(@new_course.syllabus_body).to eq @course.syllabus_body
   end
 
-  it "should create the new course with the default enrollment term if needed" do
-    account_model
-    @account.settings[:teachers_can_create_courses] = true
-    @account.save!
-
-    term = @account.enrollment_terms.create!
-    term.set_overrides(@account, 'TeacherEnrollment' => {:end_at => 3.days.ago})
-
-    course_with_teacher_logged_in(:account => @account, :active_all => true)
-    @course.enrollment_term = term
-    @course.syllabus_body = "<p>haha</p>"
-    @course.save!
-
-    get "/courses/#{@course.id}/settings"
-    link = f('.copy_course_link')
-    expect(link).to be_displayed
-
-    expect_new_page_load { link.click }
-
-    expect_new_page_load { f('button[type="submit"]').click }
-    run_jobs
-    expect(f('div.progressStatus span')).to include_text 'Completed'
-
-    @new_course = @account.courses.where("id <>?", @course.id).last
-    expect(@new_course.enrollment_term).to eq @account.default_enrollment_term
-    expect(@new_course.syllabus_body).to eq @course.syllabus_body
-  end
-
   it "should not be able to submit invalid course dates" do
     course_with_admin_logged_in
 
@@ -182,7 +154,10 @@ describe "course copy" do
 
   context "with calendar events" do
     around do |example|
-      Timecop.freeze(Time.zone.local(2016, 5, 1, 10, 5, 0), &example)
+      Timecop.freeze(Time.zone.local(2016, 5, 1, 10, 5, 0)) do
+        Auditors::ActiveRecord::Partitioner.process
+        example.call
+      end
     end
 
     before(:each) do
@@ -190,7 +165,9 @@ describe "course copy" do
       @date_to_use = 2.weeks.from_now.monday.strftime("%Y-%m-%d")
     end
 
-    it "shifts the dates a week later", priority: "2", test_id: 2953906 do
+    # this test requires jobs to run in the middle of it and course_copys
+    # need to check a lot of things, a longer timeout is reasonable.
+    it "shifts the dates a week later", priority: "2", test_id: 2953906, custom_timeout: 30 do
       get "/calendar"
       quick_jump_to_date(@date_to_use)
       create_calendar_event('Monday Event', true, false, false, @date_to_use, true)

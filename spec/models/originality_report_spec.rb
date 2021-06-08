@@ -306,6 +306,20 @@ describe OriginalityReport do
       end.to change(OriginalityReport, :count).from(1).to(2)
     end
 
+    it 'works through class method as well' do
+      expect do
+        OriginalityReport.copy_to_group_submissions!(report_id: originality_report.id, user_id: user_one.id)
+      end.to change(OriginalityReport, :count).from(1).to(2)
+    end
+
+    it 'does not explode if the report for a TEST STUDENT is gone' do
+      expect do
+        # because if the user doesn't exist anymore, it was a test student
+        # that got destroyed.
+        OriginalityReport.copy_to_group_submissions!(report_id: -1, user_id: -1)
+      end.to_not raise_error
+    end
+
     it 'replaces originality reports that have the same attachment/submission combo' do
       originality_report.copy_to_group_submissions!
       expect do

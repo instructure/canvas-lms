@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import GroupCategoryView from 'compiled/views/groups/manage/GroupCategoryView'
-import RandomlyAssignMembersView from 'compiled/views/groups/manage/RandomlyAssignMembersView'
-import GroupCategory from 'compiled/models/GroupCategory'
+import GroupCategoryView from 'ui/features/manage_groups/backbone/views/GroupCategoryView.js'
+import RandomlyAssignMembersView from 'ui/features/manage_groups/backbone/views/RandomlyAssignMembersView.js'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import 'helpers/fakeENV'
 
 let server = null

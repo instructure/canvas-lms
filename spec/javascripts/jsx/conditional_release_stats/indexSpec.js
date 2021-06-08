@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import fakeENV from 'helpers/fakeENV'
-import CyoeStats from 'jsx/conditional_release_stats/index'
+import CyoeStats from '@canvas/conditional-release-stats/react/index'
 
 const defaultEnv = () => ({
   ranges: [

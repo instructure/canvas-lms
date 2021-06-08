@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import TruncateWithTooltip from 'jsx/shared/components/TruncateWithTooltip'
+import TruncateWithTooltip from '@canvas/grade-summary/react/TruncateWithTooltip'
 
 let componentHost
 let tooltipHost

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FileOptionsCollection from 'compiled/react_files/modules/FileOptionsCollection'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 
 const mockFile = (name, type = 'application/image') => ({
   get(attr) {

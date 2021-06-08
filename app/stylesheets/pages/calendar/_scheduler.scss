@@ -33,50 +33,9 @@
   padding-bottom: 25px;
 }
 
-.showing-single {
-  .appointment-group-item {
-    display: none;
-  }
-  .appointment-group-item.active {
-    display: flex;
-  }
-  .appointment-group-item {
-    border-top: none;
-  }
-}
-
 #scheduler-loading {
   position: relative;
   min-height: 400px;
-}
-
-#appointment-group-list {
-  list-style: none;
-}
-
-.appointment-group-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-top: 1px solid #ccc;
-  min-height: 68px;
-  padding: 6px 0 26px;
-  clear: both;
-  h3, .h3 {
-    margin-bottom: 0;
-  }
-  .alert {
-    float: direction(right);
-    width: auto;
-    padding: 4px 10px;
-    margin-#{direction(right)}: 5px;
-    a {
-      text-decoration: underline;
-    }
-  }
-  &:first-child {
-    border-top: none;
-  }
 }
 
 .unpublished-ag {

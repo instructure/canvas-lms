@@ -41,7 +41,11 @@ class Enrollment::BatchStateUpdater
   # after_commit :update_cached_due_dates - handled in update_cached_due_dates
   # after_save :update_assignment_overrides_if_needed - handled in update_assignment_overrides
   # after_save :needs_grading_count_updated -handled in needs_grading_count_updated
-  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
+  # after_commit :sync_microsoft_group - handled in sync_microsoft_group
+  #
+  # ignore_due_date_caching_for: optional hash of (course_id => user_ids_array) of users to _not_
+  # re-cache their scores for (presumably the caller already queued one of their own)
+  def self.destroy_batch(batch, sis_batch: nil, batch_mode: false, ignore_due_date_caching_for: {})
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1000
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
@@ -65,20 +69,30 @@ class Enrollment::BatchStateUpdater
     clear_email_caches(@invited_user_ids) unless @invited_user_ids.empty?
     needs_grading_count_updated(@courses)
     recache_all_course_grade_distribution(@courses)
-    update_cached_due_dates(@students, @root_account)
+    update_cached_due_dates(@students, ignore_due_date_caching_for)
     reset_notifications_cache(@user_course_tuples)
     touch_all_graders_if_needed(@students)
+    sync_microsoft_group(@courses, @root_account)
     sis_batch ? @data : batch.count
   end
 
   # bulk version of Enrollment.destroy
-  def self.mark_enrollments_as_deleted(batch, sis_batch: nil, batch_mode: false)
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: 'deleted', batch_mode_delete: batch_mode)
-    updates = {workflow_state: 'deleted', updated_at: Time.now.utc}
+  def self.mark_enrollments_as_deleted(batch, **kwargs)
+    data = mark_enrollments_as_state(batch, workflow_state: 'deleted', **kwargs)
+    EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
+    # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
+    # _and_ the fact that the former runs first
+    Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).update_all_locked_in_order(workflow_state: 'deleted', updated_at: Time.zone.now)
+    data
+  end
+
+  # updates enrollment objects to a workflow_state and generates sis_batch_data
+  # and assigns sis_batch_id if there is a sis_batch.
+  def self.mark_enrollments_as_state(batch, workflow_state:, sis_batch: nil, batch_mode: false)
+    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
+    updates = {workflow_state: workflow_state, updated_at: Time.now.utc}
     updates[:sis_batch_id] = sis_batch.id if sis_batch
-    Enrollment.where(id: batch).update_all(updates)
-    EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil, updated_at: Time.now.utc)
-    Score.where(enrollment_id: batch).order(:id).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    Enrollment.where(id: batch).update_all_locked_in_order(updates)
     data
   end
 
@@ -175,42 +189,58 @@ class Enrollment::BatchStateUpdater
     end
   end
 
-  def self.update_cached_due_dates(students, root_account, updating_user: nil)
+  def self.update_cached_due_dates(students, ignore_due_date_caching_for = {})
     students.group_by(&:course_id).each do |course, studs|
+      user_ids = studs.map(&:user_id)
+      user_ids -= ignore_due_date_caching_for[course] || []
+      next if user_ids.empty?
+
       DueDateCacher.recompute_users_for_course(
         studs.map(&:user_id),
-        course,
-        nil,
-        singleton: ('EnrollmentBatchStateUpdater_' + root_account.global_id.to_s),
-        executing_user: updating_user
+        course
       )
     end
   end
 
+  def self.sync_microsoft_group(courses, root_account)
+    return unless root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
+    return unless root_account.settings[:microsoft_sync_enabled]
+
+    MicrosoftSync::Group.not_deleted.where(course: courses).each(&:enqueue_future_sync)
+  end
+
   # this is to be used for enrollments that just changed workflow_states but are
   # not deleted. This also skips notifying users.
-  def self.run_call_backs_for(batch, root_account=nil)
+  def self.run_call_backs_for(batch, root_account:, n_strand_root: "restore_states_enrollment_states")
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     return if batch.empty?
-    root_account ||= Enrollment.where(id: batch).take&.root_account
-    return unless root_account
-    EnrollmentState.send_later_if_production_enqueue_args(
-      :force_recalculation,
-      {run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
-       n_strand: ["restore_states_enrollment_states", root_account.global_id],
-       max_attempts: 2},
-      batch
-    )
+    EnrollmentState.delay_if_production(run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
+       n_strand: [n_strand_root, root_account.global_id],
+       max_attempts: 2).
+      force_recalculation(batch)
     students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
     user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
     courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
-    root_account ||= courses.first.root_account
-    return unless root_account
     touch_and_update_associations(user_ids)
     update_linked_enrollments(students, restore: true)
     needs_grading_count_updated(courses)
     recache_all_course_grade_distribution(courses)
-    update_cached_due_dates(students, root_account)
+    update_cached_due_dates(students)
     touch_all_graders_if_needed(students)
+    sync_microsoft_group(courses, root_account)
+  end
+
+  def self.update_batch_state(batch, root_account:, **kwargs)
+    data = mark_enrollments_as_state(batch, **kwargs)
+    run_call_backs_for(batch, root_account: root_account, n_strand_root: 'batch_mode_for')
+    data
+  end
+
+  def self.complete_batch(batch, **kwargs)
+    update_batch_state(batch, workflow_state: 'completed', **kwargs)
+  end
+
+  def self.inactivate_batch(batch, **kwargs)
+    update_batch_state(batch, workflow_state: 'inactive', **kwargs)
   end
 end

@@ -32,13 +32,13 @@ export default function CollectionPanel(props) {
 
   function fetchInitialPage() {
     if (props.fetchInitialPage) {
-      props.fetchInitialPage(props.collection)
+      props.fetchInitialPage(props.collection, props.searchString)
     }
   }
 
   function fetchNextPage() {
     if (props.fetchNextPage) {
-      props.fetchNextPage(props.collection)
+      props.fetchNextPage(props.collection, props.searchString)
     }
   }
   return (
@@ -52,6 +52,7 @@ export default function CollectionPanel(props) {
           onLinkClick={props.onLinkClick}
           suppressRenderEmpty={props.suppressRenderEmpty}
           contextType={props.contextType}
+          searchString={props.searchString}
         />
       </AccordionSection>
     </div>
@@ -61,6 +62,7 @@ export default function CollectionPanel(props) {
 CollectionPanel.propTypes = {
   contextId: string.isRequired,
   contextType: string.isRequired,
+  searchString: string,
   collections: collectionsShape.isRequired,
   collection: string.isRequired,
   label: string.isRequired,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,6 +20,8 @@
 
 class Login::Oauth2Controller < Login::OauthBaseController
   skip_before_action :verify_authenticity_token
+
+  rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
 
   def new
     super
@@ -72,6 +76,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
 
   protected
 
+  def handle_expired_token
+    flash[:delegated_message] = t("It took too long to login. Please try again")
+    redirect_to login_url
+  end
+
   def validate_request
     if params[:error_description]
       flash[:delegated_message] = Sanitize.clean(params[:error_description])
@@ -84,8 +93,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
         raise ActionController::InvalidAuthenticityToken
       end
     rescue Canvas::Security::TokenExpired
-      flash[:delegated_message] = t("It took too long to login. Please try again")
-      redirect_to login_url
+      handle_expired_token
       return false
     end
 

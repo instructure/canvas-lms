@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconLockLine} from '@instructure/ui-icons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 import formatMessage from '../../../../format-message'
 import DimensionInput from './DimensionInput'

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-import UserApi from 'jsx/gradebook-history/api/UserApi'
+import axios from '@canvas/axios'
+import UserApi from 'ui/features/gradebook_history/react/api/UserApi.js'
 
 QUnit.module('UserApi', {
   setup() {

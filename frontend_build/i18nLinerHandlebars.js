@@ -26,7 +26,8 @@ const {pick} = require('lodash')
 const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
 const {allFingerprintsFor} = require('brandable_css/lib/main')
-const PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor').default
+const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
+const nodePath = require('path')
 require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 
 // In this main file, we do a bunch of stuff to monkey-patch the default behavior of
@@ -35,6 +36,7 @@ require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 // By requiring it here the code here will use that monkeypatched behavior.
 require('i18nliner-canvas/js/main')
 
+const rootDir = nodePath.resolve(__dirname, '..')
 const compileHandlebars = data => {
   const path = data.path
   const source = data.source
@@ -51,9 +53,8 @@ const compileHandlebars = data => {
     const template = precompiler.precompile(ast).toString()
     return {template, scope, translationCount}
   } catch (e) {
-    e = e.message || e
-    console.log(e)
-    throw {error: e}
+    console.error(e.message || e)
+    throw e
   }
 }
 
@@ -85,12 +86,27 @@ const getCombinedChecksums = obj =>
     return accumulator
   }, {})
 
-const buildCssReference = name => {
-  const bundle = `jst/${name}`
+// inject the template with the css file specified in the "brandableCSSBundle"
+// property of the accompanying .json metadata file, if any
+const buildCssReference = (path, name) => {
+  let bundle
+
+  try {
+    bundle = require(`${path}.json`).brandableCSSBundle
+  }
+  catch (_) {
+    bundle = null
+  }
+
+  if (!bundle) {
+    // no css file specified in json, just return a blank string
+    return ''
+  }
+
   const cached = allFingerprintsFor(`${bundle}.scss`)
   const firstVariant = Object.keys(cached)[0]
+
   if (!firstVariant) {
-    // no matching css file, just return a blank string
     return ''
   }
 
@@ -103,7 +119,7 @@ const buildCssReference = name => {
       `${JSON.stringify(getCombinedChecksums(cached))}[brandableCss.getCssVariant()]`
 
   return `
-    import brandableCss from 'compiled/util/brandableCss';
+    import brandableCss from '@canvas/brandable-css';
     brandableCss.loadStylesheet('${bundle}', ${options});
   `
 }
@@ -124,26 +140,12 @@ const findReferencedPartials = source => {
 const emitPartialRegistration = (path, resourceName) => {
   const baseName = path.split('/').pop()
   if (baseName.startsWith('_')) {
-    const partialName = baseName.replace(/^_/, '')
-    const partialPath = path
-      .replace(baseName, partialName)
-      .replace(/.*\/\jst\//, '')
-      .replace(/\.handlebars/, '')
+    const virtualPath = path.slice(rootDir.length + 1)
     return `
-      Handlebars.registerPartial('${partialPath}', templates['${resourceName}']);
+      Handlebars.registerPartial('${virtualPath}', templates['${resourceName}']);
     `
   }
   return ''
-}
-
-const buildPartialRequirements = partialPaths => {
-  const requirements = partialPaths.map(partial => {
-    const partialParts = partial.split('/')
-    partialParts[partialParts.length - 1] = `_${partialParts[partialParts.length - 1]}`
-    const requirePath = partialParts.join('/')
-    return `jst/${requirePath}`
-  })
-  return requirements
 }
 
 function i18nLinerHandlebarsLoader(source) {
@@ -153,10 +155,10 @@ function i18nLinerHandlebarsLoader(source) {
 
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  const cssRegistration = buildCssReference(name)
+  const cssRegistration = buildCssReference(this.resourcePath, name)
 
   const partials = findReferencedPartials(source)
-  const partialRequirements = buildPartialRequirements(partials)
+  const partialRequirements = partials.map(x => nodePath.resolve(rootDir, x))
   partialRequirements.forEach(requirement => dependencies.push(requirement))
 
   const result = compileHandlebars({path: this.resourcePath, source})
@@ -170,7 +172,7 @@ function i18nLinerHandlebarsLoader(source) {
   }
 
   // make sure the template has access to all our handlebars helpers
-  dependencies.push('coffeescripts/handlebars_helpers.coffee')
+  dependencies.push('@canvas/handlebars-helpers/index.coffee')
 
   const compiledTemplate = emitTemplate(
     this.resourcePath,

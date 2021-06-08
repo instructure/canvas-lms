@@ -168,6 +168,10 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on deactivation, make sure placement data is kept
     if settings[type].key?(:enabled) && !settings[type][:enabled]
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = true if type == :resource_selection
+
       settings[:inactive_placements] ||= {}.with_indifferent_access
       settings[:inactive_placements][type] ||= {}.with_indifferent_access
       settings[:inactive_placements][type].merge!(settings[type])
@@ -177,6 +181,10 @@ class ContextExternalTool < ActiveRecord::Base
 
     # on reactivation, use the old placement data
     if settings[type][:enabled] && settings.dig(:inactive_placements, type)
+      # resource_selection is a default placement, which can only be overridden
+      # by not_selectable, see scope :placements on line 826
+      self.not_selectable = false if type == :resource_selection
+
       settings[type] = settings.dig(:inactive_placements, type).merge(settings[type])
       settings[:inactive_placements].delete(type)
       settings.delete(:inactive_placements) if settings[:inactive_placements].empty?
@@ -594,6 +602,24 @@ class ContextExternalTool < ActiveRecord::Base
     @standard_url
   end
 
+  # Does the tool match the host of the given url?
+  # Checks for batches on both domain and url
+  #
+  # This method checks both the domain and url
+  # host when attempting to match host.
+  #
+  # This method was added becauase #matches_domain?
+  # cares about the presence or absence of a protocol
+  # in the domain. Rather than changing that method and
+  # risking breaking Canvas flows, we introduced this
+  # new method.
+  def matches_host?(url)
+    matches_tool_domain?(url) ||
+      (self.url.present? &&
+        Addressable::URI.parse(self.url)&.normalize&.host ==
+          Addressable::URI.parse(url).normalize.host)
+  end
+
   def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
@@ -615,7 +641,7 @@ class ContextExternalTool < ActiveRecord::Base
     return false if domain.blank?
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).normalize.host rescue nil
-    d = domain.gsub(/http[s]?\:\/\//, '')
+    d = domain.downcase.gsub(/http[s]?\:\/\//, '')
     !!(host && ('.' + host).match(/\.#{d}\z/))
 end
 
@@ -705,6 +731,10 @@ end
     self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
   end
 
+  def self.find_active_external_tool_by_client_id(client_id, context)
+    self.active.where(developer_key_id: client_id).polymorphic_where(context: contexts_to_search(context)).first
+  end
+
   def self.find_external_tool_by_id(id, context)
     self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
   end
@@ -727,11 +757,10 @@ end
     GuardRail.activate(:secondary) do
       contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
+      can_use_preferred_tool = preferred_tool && contexts.member?(preferred_tool.context)
 
-      if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
-        return preferred_tool
-      end
-
+      # always use the preferred_tool_id if url isn't provided
+      return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
       query = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
@@ -770,6 +799,16 @@ end
         -> (t) { t.domain.present? },
         search_options
       )
+
+      # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
+      # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
+      if can_use_preferred_tool && preferred_tool.matches_domain?(url)
+        if match&.use_1_3? && !preferred_tool.use_1_3?
+          return match
+        end
+
+        return preferred_tool
+      end
 
       match
     end
@@ -918,6 +957,8 @@ end
   end
 
   def self.opaque_identifier_for(asset, shard, context: nil)
+    return if asset.blank?
+
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
@@ -967,6 +1008,62 @@ end
   def feature_flag_enabled?(context = nil)
     feature = TOOL_FEATURE_MAPPING[tool_id]
     !feature || (context || self.context).feature_enabled?(feature)
+  end
+
+  # for helping tool providers upgrade from 1.1 to 1.3.
+  # this method will upgrade all related assignments to 1.3,
+  # only if this is a 1.3 tool and has a matching 1.1 tool.
+  # since finding all assignments related to this tool is an
+  # expensive operation (unavoidable N+1 for indirectly
+  # related assignments, which are more rare), this is done
+  # in a delayed job.
+  def prepare_for_ags_if_needed!
+    return unless use_1_3?
+
+    # is there a 1.1 tool that matches this one?
+    matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id)
+    return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
+
+    delay_if_production(priority: Delayed::LOW_PRIORITY).prepare_for_ags(matching_1_1_tool.id)
+  end
+
+  def prepare_for_ags(matching_1_1_tool_id)
+    related_assignments(matching_1_1_tool_id).each do |a|
+      a.prepare_for_ags_if_needed!(self)
+    end
+  end
+
+  # finds all assignments related to a tool, whether directly through a
+  # ContentTag with a ContextExternalTool as its `content`, or indirectly
+  # through a ContentTag with a `url` that matches a ContextExternalTool.
+  # accepts a `tool_id` parameter that specifies the tool to search for.
+  # if this isn't provided, searches for self.
+  def related_assignments(tool_id = nil)
+    tool_id ||= id
+    scope = Assignment.active.joins(:external_tool_tag)
+
+    # limit to assignments in the tool's context
+    if context.is_a? Course
+      scope = scope.where(context_id: context.id)
+    elsif context.is_a? Account
+      scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
+    end
+
+    directly_associated = scope.where(content_tags: { content_id: tool_id })
+    indirectly_associated = []
+    scope.
+      where(content_tags: { content_id: nil}).
+      select("assignments.*", "content_tags.url as tool_url").
+      each do |a|
+        # again, look for the 1.1 tool by excluding self from this query.
+        # an unavoidable N+1, sadly
+        a_tool = self.class.find_external_tool(a.tool_url, a, nil, id)
+        next if a_tool.nil? || a_tool.id != tool_id
+
+        indirectly_associated << a
+      end
+
+    directly_associated + indirectly_associated
   end
 
   private

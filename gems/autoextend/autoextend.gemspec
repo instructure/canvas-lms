@@ -1,4 +1,6 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -13,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.test_files    = spec.files.grep(%r{^spec/})
 
-  spec.required_ruby_version = '~> 2.0'
+  spec.required_ruby_version = '>= 2.0'
 
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "activesupport"

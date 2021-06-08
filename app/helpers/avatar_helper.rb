@@ -85,8 +85,8 @@ module AvatarHelper
     end
   end
 
-  def avatar_url_for_group
-    request.base_url + "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
+  def avatar_url_for_group(base_url: nil)
+    (base_url || request.base_url) + "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
   end
 
   def self.avatars_enabled_for_user?(user, root_account: nil)

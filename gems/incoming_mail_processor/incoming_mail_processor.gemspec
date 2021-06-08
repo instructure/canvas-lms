@@ -1,4 +1,6 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -23,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-s3"
   spec.add_dependency "aws-sdk-sqs"
 
-  spec.add_development_dependency "bundler", "~> 1.5"
+  spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency 'timecop'

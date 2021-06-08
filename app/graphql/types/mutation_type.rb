@@ -38,6 +38,8 @@ class Types::MutationType < Types::ApplicationObjectType
     super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
+  field :add_conversation_message, mutation: Mutations::AddConversationMessage
+  field :create_conversation, mutation: Mutations::CreateConversation
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
   field :hide_assignment_grades, mutation: Mutations::HideAssignmentGrades
   field :hide_assignment_grades_for_sections, mutation: Mutations::HideAssignmentGradesForSections
@@ -54,6 +56,8 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   DESC
+  field :create_learning_outcome, mutation: Mutations::CreateLearningOutcome
+  field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome
   field :create_outcome_proficiency, mutation: Mutations::CreateOutcomeProficiency
   field :update_outcome_proficiency, mutation: Mutations::UpdateOutcomeProficiency
   field :delete_outcome_proficiency, mutation: Mutations::DeleteOutcomeProficiency
@@ -65,8 +69,28 @@ class Types::MutationType < Types::ApplicationObjectType
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
+  field :delete_submission_draft, mutation: Mutations::DeleteSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
+  field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
+  field :delete_conversations, mutation: Mutations::DeleteConversations
+  field :delete_discussion_entry, mutation: Mutations::DeleteDiscussionEntry
+  field :delete_discussion_topic, mutation: Mutations::DeleteDiscussionTopic
+  field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
+  field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
+  field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
+  field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
+  field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
+  field :update_discussion_entries_read_state, mutation: Mutations::UpdateDiscussionEntriesReadState
+  field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
+  field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
+  field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant
+  field :import_outcomes, mutation: Mutations::ImportOutcomes
+  field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
+  field :create_comment_bank_item, mutation: Mutations::CreateCommentBankItem
+  field :delete_comment_bank_item, mutation: Mutations::DeleteCommentBankItem
+  field :update_comment_bank_item, mutation: Mutations::UpdateCommentBankItem
+  field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -491,7 +493,11 @@ class ContextModuleItemsApiController < ApplicationController
 
       if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
-          @tag.publish
+          if module_item_publishable?(@tag)
+            @tag.publish
+          else
+            return render json: {message: "item can't be published"}, status: :unprocessable_entity
+          end
         else
           if module_item_unpublishable?(@tag)
             @tag.unpublish
@@ -622,7 +628,7 @@ class ContextModuleItemsApiController < ApplicationController
     user = @student || @current_user
     @module = @context.modules_visible_to(user).find(params[:module_id])
     @item = @module.content_tags.find(params[:id])
-    raise ActiveRecord::RecordNotFound unless @item && @item.visible_to_user?(user)
+    raise ActiveRecord::RecordNotFound unless @item&.visible_to_user?(user, nil, session)
   end
 
   # @API Get module item sequence

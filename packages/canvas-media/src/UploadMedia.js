@@ -21,9 +21,11 @@ import ReactDOM from 'react-dom'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {Tabs} from '@instructure/ui-tabs'
 import {px} from '@instructure/ui-utils'
+import {ProgressBar} from '@instructure/ui-progress'
+import {Text} from '@instructure/ui-text'
 
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
@@ -40,6 +42,7 @@ export const PANELS = {
 
 export default class UploadMedia extends React.Component {
   static propTypes = {
+    disableSubmitWhileUploading: bool,
     languages: arrayOf(
       shape({
         id: string,
@@ -47,8 +50,12 @@ export default class UploadMedia extends React.Component {
       })
     ),
     liveRegion: func,
-    contextId: string,
-    contextType: string,
+    rcsConfig: shape({
+      contextId: string,
+      contextType: string,
+      origin: string.isRequired,
+      headers: shape({Authorization: string.isRequired})
+    }),
     onStartUpload: func,
     onUploadComplete: func,
     onDismiss: func,
@@ -60,6 +67,10 @@ export default class UploadMedia extends React.Component {
     uploadMediaTranslations: translationShape,
     // for testing
     computerFile: instanceOf(File)
+  }
+
+  static defaultProps = {
+    disableSubmitWhileUploading: false
   }
 
   constructor(props) {
@@ -74,6 +85,8 @@ export default class UploadMedia extends React.Component {
 
     this.state = {
       hasUploadedFile: false,
+      uploading: false,
+      progress: 0,
       selectedPanel: defaultSelectedPanel,
       computerFile: props.computerFile || null,
       subtitles: [],
@@ -85,6 +98,10 @@ export default class UploadMedia extends React.Component {
   }
 
   isReady = () => {
+    if (this.props.disableSubmitWhileUploading && this.state.uploading) {
+      return false
+    }
+
     switch (this.state.selectedPanel) {
       case PANELS.COMPUTER:
         return !!this.state.computerFile
@@ -109,8 +126,19 @@ export default class UploadMedia extends React.Component {
   }
 
   uploadFile(file) {
-    this.props.onStartUpload && this.props.onStartUpload(file)
-    saveMediaRecording(file, this.props.contextId, this.props.contextType, this.saveMediaCallback)
+    this.setState({uploading: true}, () => {
+      this.props.onStartUpload && this.props.onStartUpload(file)
+      saveMediaRecording(
+        file,
+        this.props.rcsConfig,
+        this.saveMediaCallback,
+        this.onSaveMediaProgress
+      )
+    })
+  }
+
+  onSaveMediaProgress = progress => {
+    this.setState({progress})
   }
 
   saveMediaCallback = async (err, data) => {
@@ -119,7 +147,11 @@ export default class UploadMedia extends React.Component {
     } else {
       try {
         if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
-          await saveClosedCaptions(data.mediaObject.media_object.media_id, this.state.subtitles)
+          await saveClosedCaptions(
+            data.mediaObject.media_object.media_id,
+            this.state.subtitles,
+            this.props.rcsConfig
+          )
         }
         this.props.onUploadComplete && this.props.onUploadComplete(null, data)
       } catch (ex) {
@@ -139,8 +171,10 @@ export default class UploadMedia extends React.Component {
         modalBodySize.width !== prevState.modalBodySize.width ||
         modalBodySize.height !== prevState.modalBodySize.height
       ) {
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({modalBodySize})
+        if (modalBodySize.width > 0 && modalBodySize.height > 0) {
+          // eslint-disable-next-line react/no-did-update-set-state
+          this.setState({modalBodySize})
+        }
       }
     }
   }
@@ -221,9 +255,21 @@ export default class UploadMedia extends React.Component {
       return null
     }
 
-    const {CLOSE_TEXT, SUBMIT_TEXT} = this.props.uploadMediaTranslations.UploadMediaStrings
+    const {CLOSE_TEXT, SUBMIT_TEXT, PROGRESS_LABEL} =
+      this.props.uploadMediaTranslations.UploadMediaStrings
     return (
       <Modal.Footer>
+        {this.state.uploading && (
+          <ProgressBar
+            screenReaderLabel={PROGRESS_LABEL}
+            valueNow={this.state.progress}
+            valueMax={100}
+            renderValue={({valueNow}) => {
+              return <Text>{valueNow}%</Text>
+            }}
+          />
+        )}
+        &nbsp;
         <Button onClick={this.onModalClose}> {CLOSE_TEXT} </Button>
         &nbsp;
         <Button

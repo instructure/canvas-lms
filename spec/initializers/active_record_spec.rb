@@ -433,8 +433,12 @@ module ActiveRecord
         expect { User.connection.remove_foreign_key(:discussion_topics, :conversations, if_exists: true) }.not_to raise_exception
       end
 
+      it "remove_foreign_key allows column and if_exists" do
+        expect { User.connection.remove_foreign_key(:enrollments, column: :associated_user_id, if_exists: true) }.not_to raise_exception
+      end
+
       it "foreign_key_for prefers a 'bare' FK first" do
-        expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+        expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
       end
 
       it "remove_index allows if_exists" do
@@ -446,5 +450,56 @@ module ActiveRecord
       end
 
     end
+  end
+
+  describe 'with_statement_timeout' do
+    it 'stops long-running queries' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ActiveRecord::QueryTimeout)
+    end
+
+    it 'only accepts an integer timeout' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout("1_000") do
+          ActiveRecord::Base.connection.execute("SELECT pg_sleep(3)")
+        end
+      }.to raise_error(ArgumentError)
+    end
+
+    it 're-raises other errors' do
+      expect {
+        ActiveRecord::Base.with_statement_timeout(1_000) do
+          ActiveRecord::Base.connection.execute("bad sql")
+        end
+      }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
+end
+
+describe ActiveRecord::Migration::CommandRecorder do
+  it "reverses if_exists/if_not_exists" do
+    recorder = ActiveRecord::Migration::CommandRecorder.new
+    r = recorder
+    recorder.revert do
+      r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
+      r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
+      r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true
+
+      r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
+      r.remove_foreign_key :enrollments, :users, if_exists: true
+      r.remove_index :accounts, :id, if_exists: true
+    end
+    expect(recorder.commands).to eq([
+      [:add_index, [:accounts, :id, { if_not_exists: true }]],
+      [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
+      [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
+
+      [:remove_index, [:accounts, { column: :course_template_id, algorithm: :concurrently, if_exists: true }]],
+      [:remove_foreign_key, [:accounts, :courses, { column: :course_template_id, if_exists: true }], nil],
+      [:remove_column, [:accounts, :course_template_id, :integer, { limit: 8, if_exists: true }], nil],
+    ])
   end
 end

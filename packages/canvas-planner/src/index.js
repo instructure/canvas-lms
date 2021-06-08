@@ -16,16 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import moment from 'moment-timezone'
-import PlannerApp from './components/PlannerApp'
-import PlannerHeader from './components/PlannerHeader'
-import ToDoSidebar from './components/ToDoSidebar'
+import {Spinner} from '@instructure/ui-spinner'
 import i18n from './i18n'
 import configureStore from './store/configureStore'
-import {initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems} from './actions'
+import {
+  initialOptions,
+  getPlannerItems,
+  getWeeklyPlannerItems,
+  scrollIntoPast,
+  loadFutureItems,
+  loadThisWeekItems,
+  startLoadingAllOpportunities,
+  toggleMissingItems
+} from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
 import {initializeContent} from './utilities/contentUtils'
@@ -33,7 +40,25 @@ import {initializeDateTimeFormatters} from './utilities/dateUtils'
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
 import responsiviser from './components/responsiviser'
 
+const PlannerPreview = React.lazy(() => import('./components/PlannerPreview'))
+const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
+const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
+const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
+const WeeklyPlannerHeader = React.lazy(() => import('./components/WeeklyPlannerHeader'))
+
+export * from './components'
+
+export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
+
 export {responsiviser}
+
+export function createPlannerPreview(timeZone) {
+  return (
+    <Suspense fallback={loading()}>
+      <PlannerPreview timeZone={timeZone} />
+    </Suspense>
+  )
+}
 
 let externalPlannerActive
 const plannerActive = () => (externalPlannerActive ? externalPlannerActive() : false)
@@ -83,6 +108,7 @@ const defaultEnv = {}
 
 const plannerHeaderId = 'dashboard_header_container'
 const plannerNewActivityButtonId = 'new_activity_button'
+const weeklyPlannerHeaderId = 'weekly_planner_header'
 
 function mergeDefaultOptions(options) {
   const newOpts = {...defaultOptions, ...options}
@@ -95,11 +121,22 @@ function mergeDefaultOptions(options) {
   return newOpts
 }
 
+function getCourseColor(
+  {assetString, color},
+  {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}}
+) {
+  if (K5_USER || K5_SUBJECT_COURSE) {
+    return color || '#394B58'
+  } else {
+    return custom_colors[assetString]
+  }
+}
+
 function initializeCourseAndGroupColors(options) {
   if (!options.env.PREFERENCES) return
   options.env.STUDENT_PLANNER_COURSES = options.env.STUDENT_PLANNER_COURSES.map(dc => ({
     ...dc,
-    color: options.env.PREFERENCES.custom_colors[dc.assetString]
+    color: getCourseColor(dc, options.env)
   }))
   options.env.STUDENT_PLANNER_GROUPS = options.env.STUDENT_PLANNER_GROUPS.map(dg => ({
     ...dg,
@@ -138,81 +175,106 @@ function initializeCourseAndGroupColors(options) {
 // forCourse,                   <optional - course id if this is a sidebar for a specific course page>
 let initializedOptions = null
 export function initializePlanner(options) {
-  if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
+  return new Promise(resolve => {
+    if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
 
-  options = mergeDefaultOptions(options)
+    options = mergeDefaultOptions(options)
 
-  if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
-    throw new Error('env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner')
-  }
+    if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
+      throw new Error(
+        'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
+      )
+    }
 
-  const {flashError, flashMessage, srFlashMessage} = options
-  if (!(flashError && flashMessage && srFlashMessage)) {
-    throw new Error('flash message callbacks are required options for initializePlanner')
-  }
+    const {flashError, flashMessage, srFlashMessage} = options
+    if (!(flashError && flashMessage && srFlashMessage)) {
+      throw new Error('flash message callbacks are required options for initializePlanner')
+    }
 
-  if (!options.convertApiUserContent) {
-    throw new Error('convertApiUserContent is a required option for initializePlanner')
-  }
+    if (!options.convertApiUserContent) {
+      throw new Error('convertApiUserContent is a required option for initializePlanner')
+    }
 
-  externalPlannerActive = () => options.getActiveApp() === 'planner'
+    externalPlannerActive = () => options.getActiveApp() === 'planner'
 
-  i18n.init(options.env.MOMENT_LOCALE)
-  moment.locale(options.env.MOMENT_LOCALE)
-  moment.tz.setDefault(options.env.TIMEZONE)
-  initializeAlerts({
-    visualSuccessCallback: flashMessage,
-    visualErrorCallback: flashError,
-    srAlertCallback: srFlashMessage
+    i18n.init(options.env.MOMENT_LOCALE)
+    moment.locale(options.env.MOMENT_LOCALE)
+    moment.tz.setDefault(options.env.TIMEZONE)
+    initializeAlerts({
+      visualSuccessCallback: flashMessage,
+      visualErrorCallback: flashError,
+      srAlertCallback: srFlashMessage
+    })
+    initializeContent(options)
+    initializeDateTimeFormatters(options.dateTimeFormatters)
+
+    options.plannerNewActivityButtonId = plannerNewActivityButtonId
+    if (options.env.K5_USER || options.env.K5_SUBJECT_COURSE) {
+      dynamicUiManager.setOffsetElementIds(weeklyPlannerHeaderId, null)
+    } else {
+      dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+    }
+
+    if (options.externalFallbackFocusable) {
+      dynamicUiManager.registerAnimatable(
+        'item',
+        externalFocusableWrapper(options.externalFallbackFocusable),
+        -1,
+        [specialFallbackFocusId('item')]
+      )
+    }
+
+    initializeCourseAndGroupColors(options)
+
+    initializedOptions = options
+    store.dispatch(initialOptions(options))
+    resolve(initializedOptions)
   })
-  initializeContent(options)
-  initializeDateTimeFormatters(options.dateTimeFormatters)
-
-  options.plannerNewActivityButtonId = plannerNewActivityButtonId
-  dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
-
-  if (options.externalFallbackFocusable) {
-    dynamicUiManager.registerAnimatable(
-      'item',
-      externalFocusableWrapper(options.externalFallbackFocusable),
-      -1,
-      [specialFallbackFocusId('item')]
-    )
-  }
-
-  initializeCourseAndGroupColors(options)
-
-  initializedOptions = options
-  store.dispatch(initialOptions(options))
 }
 
 export function resetPlanner() {
   initializedOptions = null
 }
 
-function render(element) {
-  registerScrollEvents({
-    scrollIntoPast: handleScrollIntoPastAttempt,
-    scrollIntoFuture: handleScrollIntoFutureAttempt,
-    scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
-  })
+function loading() {
+  return <Spinner renderTitle="Loading..." size="small" />
+}
 
-  ReactDOM.render(
+export function createPlannerApp() {
+  if (!store.getState().weeklyDashboard) {
+    // disable load on scroll for weekly dashboard
+    registerScrollEvents({
+      scrollIntoPast: handleScrollIntoPastAttempt,
+      scrollIntoFuture: handleScrollIntoFutureAttempt,
+      scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
+    })
+
+    store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+  } else {
+    store.dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+  }
+
+  return (
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
-        <PlannerApp
-          appRef={app => dynamicUiManager.setApp(app)}
-          changeDashboardView={initializedOptions.changeDashboardView}
-          plannerActive={plannerActive}
-          currentUser={store.getState().currentUser}
-          focusFallback={() => dynamicUiManager.focusFallback('item')}
-        />
+        <Suspense fallback={loading()}>
+          <PlannerApp
+            appRef={app => dynamicUiManager.setApp(app)}
+            changeDashboardView={initializedOptions.changeDashboardView}
+            plannerActive={plannerActive}
+            currentUser={store.getState().currentUser}
+            focusFallback={() => dynamicUiManager.focusFallback('item')}
+            k5Mode={initializedOptions.env.K5_USER || initializedOptions.env.K5_SUBJECT_COURSE}
+            isWeekly={initializedOptions.env.K5_USER || initializedOptions.env.K5_SUBJECT_COURSE}
+          />
+        </Suspense>
       </Provider>
-    </DynamicUiProvider>,
-    element
+    </DynamicUiProvider>
   )
+}
 
-  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+function renderApp(element) {
+  ReactDOM.render(createPlannerApp(), element)
 }
 
 // This method allows you to render the header items into a separate DOM node
@@ -223,14 +285,16 @@ function renderHeader(element, auxElement) {
   ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
-        <PlannerHeader
-          stickyZIndex={initializedOptions.stickyZIndex}
-          stickyButtonId={initializedOptions.plannerNewActivityButtonId}
-          timeZone={initializedOptions.env.TIMEZONE}
-          locale={initializedOptions.env.MOMENT_LOCALE}
-          ariaHideElement={ariaHideElement}
-          auxElement={auxElement}
-        />
+        <Suspense fallback={loading()}>
+          <PlannerHeader
+            stickyZIndex={initializedOptions.stickyZIndex}
+            stickyButtonId={initializedOptions.plannerNewActivityButtonId}
+            timeZone={initializedOptions.env.TIMEZONE}
+            locale={initializedOptions.env.MOMENT_LOCALE}
+            ariaHideElement={ariaHideElement}
+            auxElement={auxElement}
+          />
+        </Suspense>
       </Provider>
     </DynamicUiProvider>,
     element
@@ -246,15 +310,29 @@ export function renderToDoSidebar(element) {
 
   ReactDOM.render(
     <Provider store={store}>
-      <ToDoSidebar
-        courses={env.STUDENT_PLANNER_COURSES}
-        timeZone={env.TIMEZONE}
-        locale={env.MOMENT_LOCALE}
-        changeDashboardView={initializedOptions.changeDashboardView}
-        forCourse={initializedOptions.forCourse}
-      />
+      <Suspense fallback={loading()}>
+        <ToDoSidebar
+          courses={env.STUDENT_PLANNER_COURSES}
+          timeZone={env.TIMEZONE}
+          locale={env.MOMENT_LOCALE}
+          changeDashboardView={initializedOptions.changeDashboardView}
+          forCourse={initializedOptions.forCourse}
+        />
+      </Suspense>
     </Provider>,
     element
+  )
+}
+
+export function renderWeeklyPlannerHeader(props) {
+  return (
+    <DynamicUiProvider manager={dynamicUiManager}>
+      <Provider store={store}>
+        <Suspense fallback={loading()}>
+          <WeeklyPlannerHeader {...props} />
+        </Suspense>
+      </Provider>
+    </DynamicUiProvider>
   )
 }
 
@@ -267,7 +345,7 @@ export function loadPlannerDashboard() {
   const headerAuxElement = document.getElementById('dashboard-planner-header-aux')
 
   if (element) {
-    render(element)
+    renderApp(element)
   }
 
   if (headerElement) {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -470,7 +472,7 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    sql = ary.each_with_index.inject('CASE '){ |string, (values, i)|
+    sql = ary.each_with_index.inject(+'CASE '){ |string, (values, i)|
       string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
     } << "ELSE #{ary.size} END"
     Arel.sql(sql)
@@ -487,7 +489,7 @@ class ActiveRecord::Base
     column = column.to_s
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      sql = ''
+      sql = +''
       sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
       sql << <<~SQL
         WITH RECURSIVE t AS (
@@ -516,6 +518,7 @@ class ActiveRecord::Base
                elsif first_or_last == :last && direction == :desc
                  " NULLS LAST"
                end
+      
       Arel.sql("#{column} #{direction.to_s.upcase}#{clause}".strip)
     else
       Arel.sql("#{column} IS#{" NOT" unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip)
@@ -650,10 +653,8 @@ class ActiveRecord::Base
       GuardRail.activate(:primary) do
         if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
-        elsif connection.send(:postgresql_version) >= 100000
-          connection.select_value("SELECT pg_current_wal_lsn()")
         else
-          connection.select_value("SELECT pg_current_xlog_location()")
+          connection.current_wal_lsn
         end
       end
     end
@@ -741,13 +742,30 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      self.id = self.class._insert_record(attributes_with_values(changed_attribute_names_to_save))
+      self.id = self.class._insert_record(attributes_with_values(attribute_names_for_partial_writes))
       @new_record = false
     else
-      update_columns(attributes_with_values(changed_attribute_names_to_save))
+      update_columns(attributes_with_values(attribute_names_for_partial_writes))
     end
     changes_applied
   end
+
+  def self.with_statement_timeout(timeout = 30_000)
+    raise ArgumentError.new("timeout must be an integer") unless timeout.is_a? Integer
+
+    transaction do
+      connection.execute "SET LOCAL statement_timeout = #{timeout}"
+      yield
+    rescue ActiveRecord::StatementInvalid => e
+      raise ActiveRecord::QueryTimeout if e.cause.is_a? PG::QueryCanceled
+
+      raise e
+    end
+  end
+end
+
+module ActiveRecord
+  class QueryTimeout < ActiveRecord::StatementInvalid; end
 end
 
 module UsefulFindInBatches
@@ -1070,13 +1088,13 @@ ActiveRecord::Relation.class_eval do
   end
 
   def update_all_locked_in_order(updates)
-    locked_scope = lock(:no_key_update).order(:id)
+    locked_scope = lock(:no_key_update).order(primary_key.to_sym)
     if Setting.get("update_all_locked_in_order_subquery", "true") == "true"
-      unscoped.where(id: locked_scope).update_all(updates)
+      unscoped.where(primary_key => locked_scope).update_all(updates)
     else
       transaction do
-        ids = locked_scope.pluck(:id)
-        unscoped.where(id: ids).update_all(updates) unless ids.empty?
+        ids = locked_scope.pluck(primary_key)
+        unscoped.where(primary_key => ids).update_all(updates) unless ids.empty?
       end
     end
   end
@@ -1098,14 +1116,10 @@ ActiveRecord::Relation.class_eval do
 
     relation = clone
     old_select = relation.select_values
-    relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
+    relation.select_values = [+"DISTINCT ON (#{args.join(', ')}) "]
     relation.distinct_value = false
 
-    if old_select.empty?
-      relation.select_values.first << "*"
-    else
-      relation.select_values.first << old_select.uniq.join(', ')
-    end
+    relation.select_values.first << (old_select.empty? ? "*" : old_select.uniq.join(', '))
 
     relation
   end
@@ -1239,7 +1253,7 @@ module UpdateAndDeleteWithJoins
   def delete_all
     return super if joins_values.empty?
 
-    sql = "DELETE FROM #{quoted_table_name} "
+    sql = +"DELETE FROM #{quoted_table_name} "
 
     join_sql = arel.join_sources.map(&:to_sql).join(" ")
     tables, join_conditions = deconstruct_joins(join_sql)
@@ -1362,20 +1376,10 @@ ActiveRecord::Associations::HasOneAssociation.class_eval do
 end
 
 class ActiveRecord::Migration
-  VALID_TAGS = [:predeploy, :postdeploy, :cassandra, :dynamodb]
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
-    def tag(*tags)
-      raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
-      (@tags ||= []).concat(tags).uniq!
-    end
-
-    def tags
-      @tags ||= []
-    end
-
     def is_postgres?
       connection.adapter_name == 'PostgreSQL'
     end
@@ -1399,7 +1403,7 @@ class ActiveRecord::Migration
 end
 
 class ActiveRecord::MigrationProxy
-  delegate :connection, :tags, :cassandra_cluster, to: :migration
+  delegate :connection, :cassandra_cluster, to: :migration
 
   def initialize(*)
     super
@@ -1496,49 +1500,25 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  def foreign_key_for(from_table, options_or_to_table = {})
+  def foreign_key_for(from_table, **options)
     return unless supports_foreign_keys?
-    fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
+    fks = foreign_keys(from_table).select { |fk| fk.defined_for?(options) }
     # prefer a FK on a column named after the table
-    unless options_or_to_table.is_a?(Hash)
-      column = foreign_key_column_for(options_or_to_table) if options_or_to_table
-      return fks.find { |fk| fk.column == column} || fks.first
+    if options[:to_table]
+      column = foreign_key_column_for(options[:to_table])
+      return fks.find { |fk| fk.column == column } || fks.first
     end
     fks.first
   end
 
-  def remove_foreign_key(from_table, *args)
+  def remove_foreign_key(from_table, to_table = nil, **options)
     return unless supports_foreign_keys?
 
-    raise ArgumentError if args.length > 2
-
-    # support remove_foreign_key :table, :table, if_exists: stuff
-    # OR
-    # remove_foreign_key :table, column: :stuff
-    # OR
-    # remove_foreign_key :table, column: :stuff, if_exists: stuff
-    options = args.last
-    options = {} unless options.is_a?(Hash)
-
-    if CANVAS_RAILS5_2
-      # when removing this, simplify the whole method signature to `to_table = nil, **options`
-      options_or_to_table = args.first || {}
-
-      if options.delete(:if_exists)
-        fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
-        return if fk_name_to_delete.nil?
-      else
-        fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
-      end
+    if options.delete(:if_exists)
+      fk_name_to_delete = foreign_key_for(from_table, to_table: to_table, **options)&.name
+      return if fk_name_to_delete.nil?
     else
-      options[:to_table] = args.first unless args.first.is_a?(Hash)
-
-      if options.delete(:if_exists)
-        fk_name_to_delete = foreign_key_for(from_table, **options)&.name
-        return if fk_name_to_delete.nil?
-      else
-        fk_name_to_delete = foreign_key_for!(from_table, **options).name        
-      end
+      fk_name_to_delete = foreign_key_for!(from_table, to_table: to_table, **options).name
     end
 
     at = create_alter_table from_table
@@ -1546,7 +1526,62 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
     execute schema_creation.accept(at)
   end
+
+  def add_replica_identity(model_name, column_name, default_value)
+    klass = model_name.constantize
+    if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
+      DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
+    end
+    change_column_null klass.table_name, column_name, false
+    primary_column = klass.primary_key
+    index_name = "index_#{klass.table_name}_replica_identity"
+    add_index klass.table_name, [column_name, primary_column], name: index_name, algorithm: :concurrently, unique: true, if_not_exists: true
+    set_replica_identity klass.table_name, index_name
+  end
+
+  def remove_replica_identity(model_name)
+    klass = model_name.constantize
+    set_replica_identity klass.table_name, :default
+    remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
+  end
 end
+
+# yes, various versions of rails supports various if_exists/if_not_exists options,
+# but _none_ of them (as of writing) will invert them on reversion. Some will
+# purposely strip the option, but most don't do anything.
+module ExistenceInversions
+  %w{index foreign_key column}.each do |type|
+    # these methods purposely pull the flag from the incoming args,
+    # and assign to the outgoing args, not relying on it getting
+    # passed through. and sometimes they even modify args.
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def invert_add_#{type}(args)
+        orig_args = args.dup
+        result = super
+        if orig_args.last.is_a?(Hash) && orig_args.last[:if_not_exists]
+          result[1] << {} unless result[1].last.is_a?(Hash)
+          result[1].last[:if_exists] = orig_args.last[:if_not_exists]
+          result[1].last.delete(:if_not_exists)
+        end
+        result
+      end
+
+      def invert_remove_#{type}(args)
+        orig_args = args.dup
+        result = super
+        if orig_args.last.is_a?(Hash) && orig_args.last[:if_exists]
+          result[1] << {} unless result[1].last.is_a?(Hash)
+          result[1].last[:if_not_exists] = orig_args.last[:if_exists]
+          result[1].last.delete(:if_exists)
+        end
+        result
+      end
+    RUBY
+  end
+end
+
+ActiveRecord::Migration::CommandRecorder.prepend(ExistenceInversions)
+
 
 ActiveRecord::Associations::CollectionAssociation.class_eval do
   # CollectionAssociation implements uniq for :uniq option, in its
@@ -1556,19 +1591,17 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   end
 end
 
-module UnscopeCallbacks
-  def run_callbacks(*args)
-    unless CANVAS_RAILS5_2
+if CANVAS_RAILS6_0
+  module UnscopeCallbacks
+    def run_callbacks(*args)
       # in rails 6.1, we can get rid of this entire monkeypatch
       scope = self.class.current_scope&.clone || self.class.default_scoped
       scope = scope.klass.unscoped
-    else
-      scope = self.class.all.klass.unscoped
+      scope.scoping { super }
     end
-    scope.scoping { super }
   end
+  ActiveRecord::Base.send(:include, UnscopeCallbacks)
 end
-ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
 module MatchWithDiscard
   def match(model, name)
@@ -1727,7 +1760,7 @@ module TableRename
 
   def columns(table_name)
     if (old_name = RENAMES[table_name])
-      table_name = old_name if connection.table_exists?(old_name)
+      table_name = old_name if data_source_exists?(old_name)
     end
     super
   end
@@ -1749,9 +1782,9 @@ end
 ActiveRecord::ConnectionAdapters::SchemaCache.prepend(TableRename)
 
 ActiveRecord::Base.prepend(DefeatInspectionFilterMarshalling)
-ActiveRecord::Base.prepend(Canvas::CacheRegister::ActiveRecord::Base)
-ActiveRecord::Base.singleton_class.prepend(Canvas::CacheRegister::ActiveRecord::Base::ClassMethods)
-ActiveRecord::Relation.prepend(Canvas::CacheRegister::ActiveRecord::Relation)
+ActiveRecord::Base.prepend(ActiveRecord::CacheRegister::Base)
+ActiveRecord::Base.singleton_class.prepend(ActiveRecord::CacheRegister::Base::ClassMethods)
+ActiveRecord::Relation.prepend(ActiveRecord::CacheRegister::Relation)
 
 # see https://github.com/rails/rails/issues/37745
 module DontExplicitlyNameColumnsBecauseOfIgnores
@@ -1775,3 +1808,79 @@ module PreserveShardAfterTransaction
   end
 end
 ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransaction)
+
+module ConnectionWithMaxRuntime
+  def initialize(*)
+    super
+    @created_at = Concurrent.monotonic_time
+  end
+
+  def runtime
+    Concurrent.monotonic_time - @created_at
+  end
+end
+ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)
+
+module MaxRuntimeConnectionPool
+  def max_runtime
+    # TODO: Rails 6.1 uses a PoolConfig object instead
+    if CANVAS_RAILS6_0
+      @spec.config[:max_runtime]
+    else
+      db_config.configuration_hash[:max_runtime]
+    end
+  end
+
+  def acquire_connection(*)
+    loop do
+      conn = super
+      return conn unless max_runtime && conn.runtime >= max_runtime
+
+      @connections.delete(conn)
+      conn.disconnect!
+    end
+  end
+
+  def checkin(conn)
+    return super unless max_runtime && conn.runtime >= max_runtime
+
+    conn.lock.synchronize do
+      synchronize do
+        remove_connection_from_thread_cache conn
+
+        @connections.delete(conn)
+        conn.disconnect!
+      end
+    end
+  end
+
+  def flush(*)
+    super
+    return unless max_runtime
+
+    old_connections = synchronize do
+      # TODO: Rails 6.1 adds a `discarded?` method instead of checking this directly
+      return unless @connections
+      @connections.select do |conn|
+        !conn.in_use? && conn.runtime >= max_runtime
+      end.each do |conn|
+        conn.lease
+        @available.delete conn
+        @connections.delete conn
+      end
+    end
+
+    old_connections.each(&:disconnect!)
+  end
+end
+ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
+
+Rails.application.config.after_initialize do
+  ActiveSupport.on_load(:active_record) do
+    cache = MultiCache.fetch("schema_cache")
+    next if cache.nil?
+
+    connection_pool.set_schema_cache(cache)
+    LoadAccount.schema_cache_loaded!
+  end
+end

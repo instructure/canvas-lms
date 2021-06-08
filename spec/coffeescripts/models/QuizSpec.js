@@ -17,11 +17,12 @@
  */
 
 import $ from 'jquery'
-import Quiz from 'compiled/models/Quiz'
-import Assignment from 'compiled/models/Assignment'
-import DateGroup from 'compiled/models/DateGroup'
-import AssignmentOverrideCollection from 'compiled/collections/AssignmentOverrideCollection'
-import 'jquery.ajaxJSON'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
+import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
+import fakeENV from 'helpers/fakeENV'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('Quiz', {
   setup() {
@@ -70,6 +71,10 @@ test('#initialize should set publish_url from html url', function() {
 
 test('#initialize should set unpublish_url from html url', function() {
   equal(this.quiz.get('unpublish_url'), 'http://localhost:3000/courses/1/quizzes/unpublish')
+})
+
+test('#initialize should set deletion_url from html url', function() {
+  equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/quizzes/1')
 })
 
 test('#initialize should set title_label from title', function() {
@@ -216,6 +221,33 @@ test('#initialize should set unpublish_url from html url', function() {
     this.quiz.get('unpublish_url'),
     'http://localhost:3000/courses/1/assignments/unpublish/quiz'
   )
+})
+
+test('#initialize should set deletion_url from html url', function() {
+  equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/assignments/7')
+})
+
+QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {
+  setup() {
+    fakeENV.setup({
+      PERMISSIONS: {manage: true},
+      FLAGS: {new_quizzes_modules_support: true}
+    })
+    this.quiz = new Quiz({
+      id: 7,
+      html_url: 'http://localhost:3000/courses/1/assignments/7',
+      assignment_id: 7,
+      quiz_type: 'quizzes.next'
+    })
+    this.ajaxStub = sandbox.stub($, 'ajaxJSON')
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('#initialize should set url as edit_url', function() {
+  equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
 })
 
 QUnit.module('Quiz#allDates')

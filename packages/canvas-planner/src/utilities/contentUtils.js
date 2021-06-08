@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import formatMessage from '../format-message'
+
 let externalConversion
 
 export function initializeContent(options) {
@@ -28,4 +30,27 @@ export function convertApiUserContent(content) {
     return content
   }
   return externalConversion(content)
+}
+
+export function assignmentType(itemType) {
+  switch (itemType) {
+    case 'Quiz':
+      return formatMessage('Quiz')
+    case 'Discussion':
+      return formatMessage('Discussion')
+    case 'Assignment':
+      return formatMessage('Assignment')
+    case 'Page':
+      return formatMessage('Page')
+    case 'Announcement':
+      return formatMessage('Announcement')
+    case 'To Do':
+      return formatMessage('To Do')
+    case 'Calendar Event':
+      return formatMessage('Calendar Event')
+    case 'Peer Review':
+      return formatMessage('Peer Review')
+    default:
+      return formatMessage('Task')
+  }
 }

@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -48,7 +48,9 @@ pipeline {
 
   post {
     cleanup {
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      script {
+        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+      }
     }
   }
 }

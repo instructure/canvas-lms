@@ -19,7 +19,7 @@
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
   let $container
@@ -43,7 +43,7 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
     })
 
     test('sets assignments as "not loaded"', () => {
-      strictEqual(gradebook.contentLoadStates.assignmentsLoaded, false)
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.all, false)
     })
 
     test('sets assignment groups as "not loaded"', () => {
@@ -77,14 +77,8 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
 
   QUnit.module('#setAssignmentsLoaded()', () => {
     test('optionally sets assignments as "loaded"', () => {
-      gradebook.setAssignmentsLoaded(true)
-      strictEqual(gradebook.contentLoadStates.assignmentsLoaded, true)
-    })
-
-    test('optionally sets assignments as "not loaded"', () => {
-      gradebook.setAssignmentsLoaded(true)
-      gradebook.setAssignmentsLoaded(false)
-      strictEqual(gradebook.contentLoadStates.assignmentsLoaded, false)
+      gradebook.setAssignmentsLoaded()
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.all, true)
     })
   })
 

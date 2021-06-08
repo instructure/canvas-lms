@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -85,7 +87,7 @@
 #           "items": { "$ref": "SubmissionComment" }
 #         },
 #         "submission_type": {
-#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
 #           "example": "online_text_entry",
 #           "type": "string",
 #           "allowableValues": {
@@ -93,7 +95,8 @@
 #               "online_text_entry",
 #               "online_url",
 #               "online_upload",
-#               "media_recording"
+#               "media_recording",
+#               "student_annotation"
 #             ]
 #           }
 #         },
@@ -186,6 +189,17 @@
 #           "description": "The date this submission was posted to the student, or nil if it has not been posted.",
 #           "example": "2020-01-02T11:10:30Z",
 #           "type": "datetime"
+#         },
+#         "read_status" : {
+#           "description": "The read status of this submission for the given user (optional). Including read_status will mark submission(s) as read.",
+#           "example": "read",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "read",
+#               "unread"
+#             ]
+#           }
 #         }
 #       }
 #     }
@@ -202,7 +216,7 @@ class SubmissionsApiController < ApplicationController
   #
   # A paginated list of all existing submissions for an assignment.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"|"read_status"]
   #   Associations to include with the group.  "group" will add group_id and group_name.
   #
   # @argument grouped [Boolean]
@@ -484,15 +498,9 @@ class SubmissionsApiController < ApplicationController
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
 
-      submission_preloads = [:originality_reports, {:quiz_submission => :versions}]
+      submission_preloads = [:originality_reports, {:quiz_submission => :versions}, :submission_comments]
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
-
-      ActiveRecord::Associations::Preloader.new.preload(
-        submissions,
-        :submission_comments,
-        SubmissionComment.select(:hidden, :submission_id)
-      )
 
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -557,6 +565,9 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, {:quiz_submission => :versions})
       submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
+      if includes.include?("has_postable_comments") || includes.include?("submission_comments")
+        submissions = submissions.preload(:submission_comments)
+      end
 
       # this will speed up pagination for large collections when order_direction is asc
       if order_by == 'graded_at' && order_direction == 'asc'
@@ -585,7 +596,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
   #   Associations to include with the group.
   def show
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
@@ -620,8 +631,9 @@ class SubmissionsApiController < ApplicationController
   def create_file
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
+
     if @assignment.allowed_extensions.any?
-      extension = infer_upload_filename(params).split('.').last&.downcase || File.mime_types[infer_upload_content_type(params)]
+      extension = infer_file_extension(params)
       reject!(t('unable to find extension')) unless extension
       reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
     end
@@ -807,9 +819,11 @@ class SubmissionsApiController < ApplicationController
           submission[:url] = params[:submission][:url]
         end
       end
+
       if submission[:grade] || submission[:excuse]
         begin
           @submissions = @assignment.grade_student(@user, submission)
+          graded_just_now = true
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           return render json: { error: e.to_s }, status: 400
@@ -833,12 +847,16 @@ class SubmissionsApiController < ApplicationController
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
-          sub.save!
+          sub.grader = @current_user
+          # If we've called Assignment#grade_student, it has already created a
+          # new submission version on this request.
+          previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
+          previously_graded ? sub.save! : sub.with_versioning(explicit: true) { sub.save! }
         end
       end
 
       assessment = params[:rubric_assessment]
-      if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
+      if assessment.is_a?(ActionController::Parameters) && @assignment.active_rubric_association?
         if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map{|c| c.id.to_s}).empty?
           return render :json => {:message => "invalid rubric_assessment"}, :status => :bad_request
         end

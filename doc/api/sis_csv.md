@@ -265,15 +265,16 @@ user's name, but you can customize it here.</td>
 <td>text</td>
 <td></td>
 <td></td>
-<td>The email address of the user. This might be the same as login_id, but should
-still be provided.</td>
+<td>The email address of the user. This might be the same as login_id but would
+be used to set email for user and will tie the email to the login. It is
+recommended to omit this field over using fake email addresses for testing.</td>
 </tr>
 <tr>
 <td>pronouns</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns.</td>
+<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
 </tr>
 <tr>
 <td>status</td>
@@ -546,6 +547,20 @@ Requires Blueprint Courses feature.
 To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
 </td>
 </tr>
+<tr>
+<td>grade_passback_setting</td>
+<td>text</td>
+<td></td>
+<td>✓</td>
+<td>nightly_sync, not_set</td>
+</tr>
+<tr>
+<td>homeroom_course</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>Whether the course is a homeroom course. Requires the courses to be associated with a "Canvas for Elementary"-enabled account.</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will
@@ -717,7 +732,7 @@ is specified the default section for the course will be used</td>
 <td>enum</td>
 <td>✓</td>
 <td></td>
-<td>active, deleted, completed, inactive</td>
+<td>active, deleted, completed, inactive, deleted_last_completed&#42;&#42;</td>
 </tr>
 <tr>
 <td>associated_user_id</td>
@@ -748,6 +763,14 @@ Ignored for any role other than observer</td>
 
 &#42; course_id or section_id is required, role or role_id is required, and
  user_id or user_integration_id is required.
+
+&#42;&#42; deleted_last_completed is not a state, but it combines the deleted
+ and completed states in a function that will delete an enrollment from a course
+ if there are at least one other active enrollment in the course. If it is the
+ last enrollment in the course it will complete it. This may be useful for when
+ a user moves to a different section of a course in which there are section
+ specific assignments. It offloads the logic required to determine if the
+ enrollment is the users last enrollment in the given course or not.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.

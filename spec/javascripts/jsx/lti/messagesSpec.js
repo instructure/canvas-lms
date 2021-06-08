@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import sinon from 'sinon'
-import {ltiMessageHandler} from 'lti/messages'
+import {ltiMessageHandler} from '@canvas/lti/jquery/messages'
 
 const intialHeight = 100
 const finalHeight = 800

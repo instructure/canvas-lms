@@ -26,7 +26,7 @@ describe Lti::Ims::AuthenticationController do
   let(:developer_key) {
     key = DeveloperKey.create!(
       redirect_uris: redirect_uris,
-      account: context
+      account: context.root_account
     )
     enable_developer_key_account_binding!(key)
     key
@@ -178,10 +178,18 @@ describe Lti::Ims::AuthenticationController do
 
       subject do
         get :authorize, params: params
-        JSON::JWT.decode(assigns.dig(:id_token, :id_token), :skip_verification)
       end
 
-      let(:account) { context }
+      let(:id_token) do
+        token = assigns.dig(:id_token, :id_token)
+        if token.present?
+          JSON::JWT.decode(token, :skip_verification)
+        else
+          token
+        end
+      end
+
+      let(:account) { context.root_account }
       let(:lti_launch) do
         {
           "aud" => developer_key.global_id,
@@ -203,11 +211,13 @@ describe Lti::Ims::AuthenticationController do
       end
 
       it 'correctly sets the nonce of the launch' do
-        expect(subject['nonce']).to eq nonce
+        subject
+        expect(id_token['nonce']).to eq nonce
       end
 
       it 'generates an id token' do
-        expect(subject.except('nonce')).to eq lti_launch.except('nonce')
+        subject
+        expect(id_token.except('nonce')).to eq lti_launch.except('nonce')
       end
 
       it 'sends the state' do
@@ -224,7 +234,44 @@ describe Lti::Ims::AuthenticationController do
         end
 
         it 'launches succesfully' do
-          expect(subject['nonce']).to eq nonce
+          subject
+          expect(id_token['nonce']).to eq nonce
+        end
+      end
+
+      context "when cached launch has expired" do
+        before do
+          fetch_and_delete_launch(context, verifier)
+        end
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "The launch has either expired or already been consumed" }
+          let(:expected_error) { "launch_no_longer_valid" }
+        end
+      end
+
+      context 'when there there is no current user' do
+        before { remove_user_session }
+
+        it_behaves_like 'non redirect_uri errors' do
+          subject { get :authorize, params: params }
+
+          let(:expected_message) { "Must have an active user session" }
+          let(:expected_error) { "login_required" }
+        end
+
+        context 'and the context is public' do
+          let(:context) do
+            course = course_model
+            course.update!(is_public: true)
+            course.offer
+            course
+          end
+
+          it 'generates an id token' do
+            subject
+            expect(id_token.except('nonce')).to eq lti_launch.except('nonce')
+          end
         end
       end
     end

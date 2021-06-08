@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import Quiz from 'compiled/models/Quiz'
-import QuizItemView from 'compiled/views/quizzes/QuizItemView'
-import PublishIconView from 'compiled/views/PublishIconView'
+import Backbone from '@canvas/backbone'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import QuizItemView from 'ui/features/quizzes_index/backbone/views/QuizItemView.js'
+import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
 import ReactDOM from 'react-dom'

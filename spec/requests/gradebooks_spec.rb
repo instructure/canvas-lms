@@ -64,23 +64,6 @@ describe 'Access Different Gradebooks Environments', type: :request do
         end
       end
 
-      describe 'show_help_menu_item' do
-        it 'is false when the root account does not have a support URL configured' do
-          get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
-          js_env = js_env_from_response(response)
-
-          expect(js_env.fetch('show_help_menu_item')).to be false
-        end
-
-        it 'is true when the root account has a support URL configured' do
-          root_account = @course.root_account
-          root_account.update!(settings: root_account.settings.merge(support_url: 'url'))
-          get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
-          js_env = js_env_from_response(response)
-          expect(js_env.fetch('show_help_menu_item')).to be true
-        end
-      end
-
       it 'includes the "Help" URL' do
         get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
         js_env = js_env_from_response(response)

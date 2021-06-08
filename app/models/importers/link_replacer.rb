@@ -127,14 +127,25 @@ module Importers
         end
         if item_updates.present?
           item.class.where(:id => item.id).update_all(item_updates)
-            if version = (item.current_version rescue nil)
-              replace_item_placeholders!({:type => :version, :item => version}, {:yaml => field_links.values.flatten})
-            end
+          # we don't want the placeholders sticking around in any
+          # version we've created.
+          rewrite_item_version!(item)
         end
 
         unless skip_associations
           process_assignment_types!(item, field_links.values.flatten)
         end
+      end
+    end
+
+    def rewrite_item_version!(item)
+      if version = (item.current_version rescue nil)
+        # if there's a current version of this thing, it has placeholders
+        # in it.  rather than replace them in the yaml, which is finnicky, let's just
+        # make sure the current version is represented by the current model state
+        # by overwritting it
+        version.model = item.reload
+        version.save
       end
     end
 

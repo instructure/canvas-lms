@@ -68,5 +68,12 @@ module Types
         account.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :root_outcome_group, LearningOutcomeGroupType, null: false
+
+    field :parent_accounts_connection, AccountType.connection_type, null: false
+    def parent_accounts_connection
+      account.account_chain - [account]
+    end
   end
 end

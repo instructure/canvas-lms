@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -88,9 +90,21 @@ class RubricAssociationsController < ApplicationController
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
     return unless can_manage_rubrics_or_association_object?(@assocation, @association_object)
     return unless can_update_association?(@association)
-    if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
+
+    # create a new rubric if associating in a different course
+    rubric_context = @rubric.context
+    if rubric_context != @context && rubric_context.is_a?(Course)
+      @rubric = @rubric.dup
+      @rubric.rubric_id = rubric_id
+      @rubric.update_criteria(params[:rubric]) if params[:rubric]
+      @rubric.user = @current_user
+      @rubric.context = @context
+      @rubric.update_mastery_scales(false)
+      @rubric.save!
+    elsif params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
       @rubric.update_criteria(params[:rubric])
     end
+
     association_params[:association_object] = @association.association_object if @association
     association_params[:association_object] ||= @association_object
     association_params[:id] = @association.id if @association
@@ -119,8 +133,8 @@ class RubricAssociationsController < ApplicationController
       # If the rubric wasn't created as a general course rubric,
       # and this was the last place it was being used in the course,
       # go ahead and delete the rubric from the course.
-      association_count = RubricAssociation.where(:context_id => @context, :context_type => @context.class.to_s, :rubric_id => @rubric).for_grading.count
-      if !RubricAssociation.for_purpose('bookmark').where(rubric_id: @rubric).first && association_count == 0
+      association_count = RubricAssociation.active.where(:context_id => @context, :context_type => @context.class.to_s, :rubric_id => @rubric).for_grading.count
+      if !RubricAssociation.active.for_purpose('bookmark').where(rubric_id: @rubric).first && association_count == 0
         @rubric.destroy_for(@context, current_user: @current_user)
       end
       render :json => @association

@@ -37,12 +37,12 @@ describe('Collection reducer', () => {
     }
 
     it('sets the loading flag', () => {
-      assert.equal(collection(state, action).loading, true)
+      assert.strictEqual(collection(state, action).isLoading, true)
     })
 
     it('preserves existing state', () => {
       state.arbitrary = 'data'
-      assert.equal(collection(state, action).arbitrary, 'data')
+      assert.strictEqual(collection(state, action).arbitrary, 'data')
     })
   })
 
@@ -59,21 +59,21 @@ describe('Collection reducer', () => {
     })
 
     it('deactivates loading', () => {
-      state.loading = true
-      assert.equal(collection(state, action).loading, false)
+      state.isLoading = true
+      assert.strictEqual(collection(state, action).isLoading, false)
     })
 
     it('includes the error in state', () => {
-      assert.equal(collection(state, action).error, 'somethingBad')
+      assert.strictEqual(collection(state, action).error, 'somethingBad')
     })
 
     it('blanks the bookmark if there are no links', () => {
-      assert.equal(collection(state, action).bookmark, null)
+      assert.strictEqual(collection(state, action).bookmark, null)
     })
 
     it('leaves the bookmark when links are present', () => {
       state.links = [{}, {}, {}]
-      assert.equal(collection(state, action).bookmark, 'someBookmark')
+      assert.strictEqual(collection(state, action).bookmark, 'someBookmark')
     })
   })
 })

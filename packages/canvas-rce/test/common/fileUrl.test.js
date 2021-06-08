@@ -53,6 +53,12 @@ describe('Common file url utils', () => {
       url = downloadToWrap(testurl)
       strictEqual(url, testurl)
     })
+
+    it('strips "preview" too', () => {
+      const testurl = '/some/path/preview'
+      url = downloadToWrap(testurl)
+      strictEqual(url, '/some/path?wrap=1')
+    })
   })
 
   describe('fixupFileUrl', () => {
@@ -127,6 +133,11 @@ describe('Common file url utils', () => {
 
     it('replaces /download and no params with /preview ', () => {
       const url = '/users/2/files/17/download'
+      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
+    })
+
+    it('does not mess with a /preview URL', () => {
+      const url = '/users/2/files/17/preview'
       strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
     })
 

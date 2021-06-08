@@ -185,7 +185,7 @@ class CourseLinkValidator
   # pretty much copied from ImportedHtmlConverter
   def find_invalid_links(html)
     links = []
-    doc = Nokogiri::HTML(html || "")
+    doc = Nokogiri::HTML5(html || "")
     attrs = ['href', 'src', 'data', 'value']
 
     doc.search("*").each do |node|
@@ -257,6 +257,7 @@ class CourseLinkValidator
     object ||= Context.find_asset_by_url(url)
     unless object
       return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return :missing_item if url =~ /\/media_objects_iframe\//
       return nil
     end
     if object.deleted?

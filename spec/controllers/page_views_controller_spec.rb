@@ -121,6 +121,23 @@ describe PageViewsController do
             end_time: "2016-03-15T00:00:00Z", per_page: 25}, format: :json
         expect(response).to be_successful
       end
+
+      it "plumbs through time restrictions in csv also" do
+        account_admin_user
+        user_session(@user)
+        Setting.set('page_views_csv_export_rows', '99')
+        expect_any_instance_of(PageView::Pv4Client).to receive(:fetch).
+          with(
+            @user.global_id,
+            start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
+            end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
+            last_page_view_id: nil,
+            limit: 99).
+          and_return([])
+        get 'index', params: {user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
+            end_time: "2016-03-15T00:00:00Z"}, format: :csv
+        expect(response).to be_successful
+      end
     end
   end
 end

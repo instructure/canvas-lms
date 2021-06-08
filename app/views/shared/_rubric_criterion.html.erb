@@ -122,7 +122,7 @@
                   <div class="clear"></div>
                 <% end %>
                 <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
-                  <span class="points"><%= n(rating.points) %></span>
+                  <span class="points"><%= n(round_if_whole(rating.points)) %></span>
                   <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
                 </span>
                 <div class="description rating_description_value"><%= rating.description %></div>
@@ -148,9 +148,9 @@
       <span style="white-space: nowrap; font-size: 0.8em">
         <%
           if assessing
-            points_value = (n(assessment_rating.points) rescue "")
+            points_value = (n(round_if_whole(assessment_rating.points)) rescue "")
           else
-            points_value = n((criterion.points rescue 5))
+            points_value = n(round_if_whole((criterion.points rescue 5)))
           end
 
           rating_points = %{
@@ -174,7 +174,7 @@
         <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
           <span class="criterion_rating_points"><%= assessment_rating ? n(round_if_whole(assessment_rating[:points])) : nbsp %></span> /
         </span>
-        <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ n((criterion.points rescue 5)) }</span>}.html_safe %><br />
+        <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ n(round_if_whole((criterion.points rescue 5))) }</span>}.html_safe %><br />
       </span>
     </div>
     <div class="ignoring">

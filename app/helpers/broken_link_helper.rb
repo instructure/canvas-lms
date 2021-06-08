@@ -26,7 +26,7 @@ module BrokenLinkHelper
     record = Context.find_asset_by_url(from_url)
     record ||= Context.get_front_wiki_page_for_course_from_url(from_url)
     return false unless record
-    body = Nokogiri::HTML(Context.asset_body(record))
+    body = Nokogiri::HTML5(Context.asset_body(record))
     anchor = body.css("a[href$='#{request.fullpath}']").text
     return false if anchor.blank?
 
@@ -36,8 +36,8 @@ module BrokenLinkHelper
     notification = BroadcastPolicy.notification_finder.by_name('Content Link Error')
     error_type = error_type(record.context, request.url)
     data = {location: request.referer, url: request.url, anchor: anchor, error_type: error_type}
-    DelayedNotification.send_later_if_production_enqueue_args(:process, { priority: Delayed::LOW_PRIORITY },
-      record, notification, recipient_keys, data)
+    DelayedNotification.delay_if_production(priority: Delayed::LOW_PRIORITY).
+      process(record, notification, recipient_keys, data)
     true
   rescue
     false

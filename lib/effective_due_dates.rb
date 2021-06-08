@@ -62,11 +62,7 @@ class EffectiveDueDates
       hsh[assignment_id] ||= {}
       attributes = {}
       if include?(included, :due_at)
-        if CANVAS_RAILS5_2
-          attributes[:due_at] = row["due_at"] && DateTime.parse(row["due_at"])
-        else
-          attributes[:due_at] = row["due_at"]
-        end
+        attributes[:due_at] = row["due_at"]
       end
       if include?(included, :grading_period_id)
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
@@ -276,7 +272,7 @@ class EffectiveDueDates
             WHERE
               o.set_type = 'CourseSection' AND
               s.workflow_state <> 'deleted' AND
-              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive', 'completed') AND
+              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
               #{filter_students_sql('e')}
           ),

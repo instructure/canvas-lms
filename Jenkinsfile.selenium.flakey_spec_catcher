@@ -18,52 +18,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 @groovy.transform.Field
 def partitions = []
 @groovy.transform.Field
-def changed_tests = ''
+def changedTests = ''
 @groovy.transform.Field
-def fsc_status = null
+def fscStatus = null
+final static FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
 
 def isPlugin() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '0' : '1'
 }
 
 def getDockerWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def getLocalWorkDir() {
-  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
 def setupNode() {
-  cleanAndSetup()
   sh 'rm -vrf ./tmp'
-  checkout scm
-  if (env.IS_PLUGIN == "1") {
+  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+  checkoutRepo('canvas-lms', refspecToCheckout, 2)
+
+  if (env.IS_PLUGIN == '1') {
     dir(env.LOCAL_WORKDIR) {
-      checkout([
-        $class: 'GitSCM',
-        branches: [[name: 'FETCH_HEAD']],
-        doGenerateSubmoduleConfigurations: false,
-        extensions: [],
-        submoduleCfg: [],
-        userRemoteConfigs: [[
-          credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
-          name: 'origin',
-          refspec: "$env.GERRIT_REFSPEC",
-          url: "ssh://$GERRIT_URL/${GERRIT_PROJECT}.git"
-        ]]
-      ])
+      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
     }
   }
 
-  sh 'build/new-jenkins/docker-compose-pull.sh'
-  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-  sh 'build/new-jenkins/docker-compose-build-up.sh'
+  credentials.withStarlordDockerLogin { ->
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+  }
+  sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }
 
 def computeTestCount() {
@@ -73,7 +65,7 @@ def computeTestCount() {
   sh 'chmod -vv 777 $LOCAL_WORKDIR/tmp'
 
   if (FORCE_FAILURE == '1') {
-    changed_tests = 'spec/force_failure_spec.rb'
+    changedTests = 'spec/force_failure_spec.rb'
   } else {
     sh '''
       docker run --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
@@ -84,114 +76,104 @@ def computeTestCount() {
           bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
     '''
 
-    changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
+    changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
   }
 
-  echo "raw result from catcher: \n====\n$changed_tests\n===="
+  echo "raw result from catcher: \n====\n$changedTests\n===="
 
-  if(changed_tests.length() == 0) {
-    echo "no tests found to execute"
+  if (changedTests.length() == 0) {
+    echo 'no tests found to execute'
 
     return
   }
 
-  def changed_tests_arr = changed_tests.split('\n').collect {
-    "$DOCKER_WORKDIR/$it"
+  def changedTestsArr = changedTests.split('\n').collect { changedTest ->
+    "$DOCKER_WORKDIR/$changedTest"
   }
 
   sh """
-    docker-compose --project-name canvas-lms0 run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
+    docker-compose run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
       canvas \
-      bash -c "bundle exec rspec --dry-run ${changed_tests_arr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
+      bash -c "bundle exec rspec --dry-run ${changedTestsArr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
   """
 
-  changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
-  changed_tests_arr = changed_tests.split('\n')
+  changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
+  changedTestsArr = changedTests.split('\n')
 
-  echo "raw result from splitter: \n====\n$changed_tests\n===="
+  echo "raw result from splitter: \n====\n$changedTests\n===="
 
-  if(changed_tests.length() == 0) {
-    echo "no tests found to execute"
+  if (changedTests.length() == 0) {
+    echo 'no tests found to execute'
 
     return
   }
 
-  def test_count = changed_tests_arr.size()
-  def weighted_values = changed_tests_arr.collect {
-    it.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
+  def testCount = changedTestsArr.size()
+  def weightedValues = changedTestsArr.collect { changedTest ->
+    changedTest.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
   }
 
-  def distributed_factor = env.TESTS_PER_NODE.toInteger()
+  def distributedFactor = env.TESTS_PER_NODE.toInteger()
 
   def i = 0
-  def cur_partition = []
-  def cur_weight = 0
+  def curPartition = []
+  def curWeight = 0
 
-  while(i < test_count) {
-    cur_partition.add(changed_tests_arr[i])
-    cur_weight += weighted_values[i]
+  while (i < testCount) {
+    curPartition.add(changedTestsArr[i])
+    curWeight += weightedValues[i]
 
-    if(cur_weight >= distributed_factor) {
-      partitions.add(cur_partition)
+    if (curWeight >= distributedFactor) {
+      partitions.add(curPartition)
 
-      cur_partition = []
-      cur_weight = 0
+      curPartition = []
+      curWeight = 0
     }
 
     i++
   }
 
-  if(cur_partition.size() > 0) {
-    partitions.add(cur_partition)
+  if (curPartition.size() > 0) {
+    partitions.add(curPartition)
   }
 
-  echo "expected nodes to run on for $test_count tests: ${partitions.size()}"
+  echo "expected nodes to run on for $testCount tests: ${partitions.size()}"
 }
 
-def executeFlakeySpecCatcher(prefix = 'main') {
+def executeFlakeySpecCatcher() {
   sh 'rm -vrf tmp'
   try {
-    timeout(30) {
-      sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
-    }
+    sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      echo "Not failing the build due to timeouts"
-      fsc_status = 'timeout'
-    } else if(e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
-      echo "Build aborted"
-      fsc_status = 'aborted'
+      echo 'Failing the build due to timeouts'
+      fscStatus = 'timeout'
+      throw e
+    } else if (e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
+      echo 'Build aborted'
+      fscStatus = 'aborted'
     } else {
       throw e
     }
   } finally {
-    sh "mkdir -vp tmp/$prefix"
-    sh(
-      script: "docker cp \$(docker ps -q --filter 'name=canvas_'):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
-      returnStatus: true
-    )
-    archiveArtifacts(artifacts: "tmp/$prefix/fsc.out", allowEmptyArchive: true)
+    sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/tmp/fsc.out tmp/${env.NODE_NUMBER} canvas_ --allow-error --clean-dir"
+    archiveArtifacts artifacts: "tmp/${env.NODE_NUMBER}/**/fsc.out", allowEmptyArchive: true
   }
 }
 
 def sendSlack(success) {
-  def color = fsc_status == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
+  def color = fscStatus == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
-  def message = "$jobInfo\n$changed_tests"
-  if (fsc_status == 'timeout') {
+  def message = "$jobInfo\n$changedTests"
+  if (fscStatus == 'timeout') {
     message = "Timeout Occurred!\n$message"
   }
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
 }
 
 def cleanupFn(status) {
-  try {
-    if(fsc_status != 'aborted') {
-      sendSlack(status == 'SUCCESS')
-    }
-  } finally {
-    sh 'rm -vrf ./tmp/'
-    execute 'bash/docker-cleanup.sh --allow-failure'
+  if (fscStatus != 'aborted') {
+    sendSlack(status == 'SUCCESS')
   }
 }
 
@@ -199,6 +181,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: FSC_TIMEOUT)
     timestamps()
   }
 
@@ -213,17 +196,17 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureFSC()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
-    FSC_IGNORE_FILES = "gems/.*/spec/"
+    FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = "3.141.59-20200719"
+    SELENIUM_VERSION = '3.141.59-20201119'
 
-    // Targeting 10 minutes / node, each node runs DOCKER_PROCESSES threads and
+    // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and
     // repeats each test FSC_REPEAT_FACTOR times.
     // Assumption: non-selenium tests take 500ms / test
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
-    DOCKER_PROCESSES = 3
     FSC_REPEAT_FACTOR = 10
-    MAX_NODES = 10
+    MAX_NODES = configuration.getString('fsc-max-nodes', '10')
+    RSPEC_PROCESSES = 3
     SELENIUM_RATIO = 20
     TESTS_PER_NODE = 200
   }
@@ -232,54 +215,62 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
-            stage('Setup') {
-              setupNode()
-            }
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
+            def postBuildHandler = [
+              onStageEnded: { stageName, stageConfig ->
+                cleanupFn(stageConfig.status())
+              }
+            ]
 
-            stage("Compute Build Distribution") {
-              computeTestCount()
-            }
-
-            stage("Run Flakey Spec Catcher") {
-              if(partitions.size() == 0) {
-                return
-              } else if(partitions.size() >= env.MAX_NODES.toInteger()) {
-                error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
-
-                return
+            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
+              stage('Setup') {
+                setupNode()
               }
 
-              def stages = [:]
+              stage('Compute Build Distribution') {
+                computeTestCount()
+              }
 
-              stages["flakey set 00"] = {
-                withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
-                  executeFlakeySpecCatcher()
+              stage('Run Flakey Spec Catcher') {
+                if (partitions.size() == 0) {
+                  return
+                } else if (partitions.size() > env.MAX_NODES.toInteger()) {
+                  error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+
+                  return
                 }
-              }
 
-              for(int i = 1; i < partitions.size(); i++) {
-                // make sure to create a new index variable so this value gets
-                // captured by the lambda
-                def index = i
-                def node_number = (index).toString().padLeft(2, '0')
+                def stages = [:]
 
-                stages["flakey set $node_number"] = {
-                  protectedNode('canvas-docker') {
-                    withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
-                      try {
+                stages['flakey set 00'] = {
+                  withEnv([
+                    "FSC_TESTS=${partitions[0].join(',')}",
+                    'NODE_NUMBER=00'
+                  ]) {
+                    executeFlakeySpecCatcher()
+                  }
+                }
+
+                for (int i = 1; i < partitions.size(); i++) {
+                  // make sure to create a new index variable so this value gets
+                  // captured by the lambda
+                  def index = i
+                  def nodeNumber = (index).toString().padLeft(2, '0')
+
+                  stages["flakey set $nodeNumber"] = {
+                    protectedNode('canvas-docker') {
+                      withEnv([
+                        "FSC_TESTS=${partitions[index].join(',')}",
+                        "NODE_NUMBER=$nodeNumber"
+                      ]) {
                         setupNode()
-                        executeFlakeySpecCatcher("node$node_number")
-                      }
-                      finally {
-                        sh 'rm -vrf ./tmp'
-                        execute 'bash/docker-cleanup.sh --allow-failure'
+                        executeFlakeySpecCatcher()
                       }
                     }
                   }
                 }
+                parallel(stages)
               }
-              parallel(stages)
             }
           }
         }

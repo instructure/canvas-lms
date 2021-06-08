@@ -53,10 +53,21 @@ describe "courses/_settings_sidebar.html.erb" do
 
   describe "Reset course content" do
     it "should not display the dialog contents under the button" do
+      @course.account.disable_feature!(:granular_permissions_manage_courses)
       view_context(@course, @user)
       assign(:current_user, @user)
       render
-      doc = Nokogiri::HTML.parse(response.body)
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
+    end
+
+    it "should not display the dialog contents under the button (granular permissions)" do
+      @course.account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(permission: 'manage_courses_delete', role: teacher_role, enabled: true)
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
     end
   end
@@ -87,7 +98,7 @@ describe "courses/_settings_sidebar.html.erb" do
         end
         assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
       end
 
@@ -95,7 +106,7 @@ describe "courses/_settings_sidebar.html.erb" do
         create_course_settings_sub_navigation_tool
         assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
-        doc = Nokogiri::HTML.parse(response.body)
+        doc = Nokogiri::HTML5(response.body)
         tool_link = doc.at_css('.course-settings-sub-navigation-lti')
         expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
       end

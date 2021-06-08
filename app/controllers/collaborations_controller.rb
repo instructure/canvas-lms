@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -132,6 +134,7 @@ class CollaborationsController < ApplicationController
   include Api::V1::Collaborator
   include Api::V1::Collaboration
   include Api::V1::User
+  include K5Mode
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -207,10 +210,14 @@ class CollaborationsController < ApplicationController
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
           if @collaboration.is_a? ExternalToolCollaboration
-            url = external_tool_launch_url(@collaboration.url)
+            url = external_tool_launch_url(
+              @collaboration.url,
+              @collaboration.resource_link_lookup_uuid
+            )
           else
             url = @collaboration.url
           end
+
           redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
           redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
@@ -232,7 +239,7 @@ class CollaborationsController < ApplicationController
 
     @page_title = t('lti_collaborations', 'LTICollaborations')
     @body_classes << 'full-width padless-content'
-    js_bundle :react_collaborations
+    js_bundle :lti_collaborations
     css_bundle :react_collaborations
 
     add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))
@@ -281,6 +288,8 @@ class CollaborationsController < ApplicationController
         format.json { render :json => @collaboration.errors, :status => :bad_request }
       end
     end
+  rescue Collaboration::InvalidCollaborationType
+    head :bad_request
   end
 
   def update
@@ -411,21 +420,45 @@ class CollaborationsController < ApplicationController
     }
     collaboration.data = content_item
     collaboration.url = content_item['url']
+    collaboration.resource_link_lookup_uuid = content_item['lookup_uuid']
     collaboration
   end
 
-  def external_tool_launch_url(url)
-    polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  def external_tool_launch_url(url, resource_link_lookup_uuid)
+    polymorphic_url(
+      [:retrieve, @context, :external_tools],
+      url: url,
+      display: 'borderless',
+      resource_link_lookup_id: resource_link_lookup_uuid
+    )
   end
 
   def content_item_visibility(content_item)
-    visibility = content_item['ext_canvas_visibility']
-    lti_user_ids = visibility && visibility['users'] || []
-    lti_group_ids = visibility && visibility['groups'] || []
+    visibility = content_item['ext_canvas_visibility'] ||
+      content_item[Collaboration::DEEP_LINKING_EXTENSION]
 
-    users = User.active.joins(:past_lti_ids).where(user_past_lti_ids: {user_lti_context_id: lti_user_ids}).distinct.to_a
-    users += User.active.where(lti_context_id: lti_user_ids).to_a
+    lti_user_ids = visibility&.dig('users') || []
+    lti_group_ids = visibility&.dig('groups') || []
+
+    # Past user IDs, both 1.3 IDs (lti_id) and legacy LTI IDs (lti_context_id)
+    users = User.active.
+      joins(:past_lti_ids).
+      where(
+        user_past_lti_ids: { user_lti_context_id: lti_user_ids }
+      ).
+      distinct.
+      to_a.
+      uniq
+
+    # Add any users by legacy LTI IDs
+    users += User.active.where(lti_context_id: lti_user_ids).to_a.uniq
+
+    # Add any users by LTI 1.3 IDs
+    users += User.active.where(lti_id: lti_user_ids).to_a.uniq
+
+    # Add groups by lti_context_id
     group_ids = Group.where(lti_context_id: lti_group_ids).map(&:id)
+
     [users, group_ids]
   end
 

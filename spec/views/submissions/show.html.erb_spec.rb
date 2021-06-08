@@ -58,7 +58,7 @@ describe "/submissions/show" do
 
     it 'shows radio buttons for an individually graded group assignment' do
       render "submissions/show"
-      @html = Nokogiri::HTML.fragment(response.body)
+      @html = Nokogiri::HTML5.fragment(response.body)
       expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 2
       expect(@html.css('#submission_group_comment').size).to eq 1
     end
@@ -67,10 +67,10 @@ describe "/submissions/show" do
       @assignment.grade_group_students_individually = false
       @assignment.save!
       render "submissions/show"
-      @html = Nokogiri::HTML.fragment(response.body)
+      @html = Nokogiri::HTML5.fragment(response.body)
       expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
       checkbox = @html.css('#submission_group_comment')
-      expect(checkbox.attr('checked').value).to eq 'checked'
+      expect(checkbox.attr('checked')).to_not be_nil
       expect(checkbox.attr('style').value).to include('display:none')
     end
 
@@ -83,8 +83,8 @@ describe "/submissions/show" do
       assign(:assignment, @assignment)
       assign(:submission, @submission)
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
-      expect(html.css("#submission_group_comment").attr("checked").value).to eq "checked"
+      html = Nokogiri::HTML5.fragment(response.body)
+      expect(html.css("#submission_group_comment").attr("checked")).to_not be_nil
     end
 
     it "students that are not peer reviewers are not allowed to make group comments" do
@@ -94,7 +94,7 @@ describe "/submissions/show" do
       assign(:assignment, @assignment)
       assign(:submission, @submission)
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("#submission_group_comment")).to be_empty
     end
   end
@@ -108,7 +108,7 @@ describe "/submissions/show" do
       @submission.update(grade: 7, points_deducted: 2)
       assign(:submission, @submission)
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
 
       expect(html.css('.late_penalty').text).to include('-2')
       expect(html.css('.published_grade').text).to include('7')
@@ -122,7 +122,7 @@ describe "/submissions/show" do
       @submission.update(grade: '7', points_deducted: 2, published_grade: '6')
       assign(:submission, @submission)
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
 
       expect(html.css('.late_penalty').text).to include('-2')
       expect(html.css('.grade').text).to include('6')
@@ -137,7 +137,7 @@ describe "/submissions/show" do
         @submission.update(grade: 7, points_deducted: 2, excused: true)
         assign(:submission, @submission)
         render "submissions/show"
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
 
         deduction_elements = html.css('.late-penalty-display')
 
@@ -158,7 +158,7 @@ describe "/submissions/show" do
 
     let(:html) do
       render "submissions/show"
-      Nokogiri::HTML.fragment(response.body)
+      Nokogiri::HTML5.fragment(response.body)
     end
 
     before :once do
@@ -250,7 +250,7 @@ describe "/submissions/show" do
   end
 
   describe "Grade" do
-    let(:html) { Nokogiri::HTML.fragment(response.body) }
+    let(:html) { Nokogiri::HTML5.fragment(response.body) }
 
     before(:once) do
       @course = Course.create!
@@ -362,7 +362,7 @@ describe "/submissions/show" do
       let(:unmuted_submission) { unmuted_assignment.submission_for_student(student) }
 
       let(:comment_contents) do
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         comment_list = html.css('.submission-details-comments .comment_list')
 
         # Comments are structured as:
@@ -507,7 +507,7 @@ describe "/submissions/show" do
         assign(:assignment, @assignment)
         assign(:submission, @submission)
         render 'submissions/show'
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).not_to include('assessing')
       end
@@ -519,7 +519,7 @@ describe "/submissions/show" do
         assign(:assignment, @assignment)
         assign(:submission, @submission)
         render 'submissions/show'
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).to include('assessing')
       end
@@ -535,7 +535,7 @@ describe "/submissions/show" do
         assign(:assignment, @assignment)
         assign(:submission, @submission)
         render 'submissions/show'
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).not_to include('assessing')
       end
@@ -562,7 +562,7 @@ describe "/submissions/show" do
         assign(:rubric_association, @assignment.rubric_association)
 
         render 'submissions/show'
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         rubric_link_text = html.css('.assess_submission_link')[0].text
         expect(rubric_link_text).to match(/Show Rubric/)
       end
@@ -573,7 +573,7 @@ describe "/submissions/show" do
         assign(:submission, @submission)
         assign(:assessment_request, @assessment_request)
         render 'submissions/show'
-        html = Nokogiri::HTML.fragment(response.body)
+        html = Nokogiri::HTML5.fragment(response.body)
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).to include('assessing')
       end
@@ -599,7 +599,7 @@ describe "/submissions/show" do
 
     it "passes comment author for the thumbnail" do
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       anchor = html.at_css("div#submission_comment_#{@comment.id} div.comment_media a")
       author = anchor.attributes.fetch("data-author").value
       expect(author).to eq "Tom"
@@ -607,7 +607,7 @@ describe "/submissions/show" do
 
     it "passes comment creation time for the thumbnail" do
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       anchor = html.at_css("div#submission_comment_#{@comment.id} div.comment_media a")
       created_at = anchor.attributes.fetch("data-created_at").value
       expect(created_at).to eq datetime_string(@comment.created_at)
@@ -615,7 +615,7 @@ describe "/submissions/show" do
 
     it "renders the comment text" do
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css('.submission-details-comments .comment_list')
       comment_contents = comment_list.css('.comment .comment').map { |comment| comment.text.strip }
       expect(comment_contents.find { |c| c.include?("good job!") }).not_to be nil
@@ -623,7 +623,7 @@ describe "/submissions/show" do
 
     it "comment text includes boilerplate about being a media comment" do
       render "submissions/show"
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css('.submission-details-comments .comment_list')
       comment_contents = comment_list.css('.comment .comment').map { |comment| comment.text.strip }
       comment = comment_contents.find { |c| c.include?("good job!") }

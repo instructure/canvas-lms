@@ -156,7 +156,7 @@ module Lti
         {}
       else
         # TODO: we _could_, if configured, have any other placements return to the content migration page...
-        raise "Content-Item not supported at this placement"
+        raise ::Lti::Errors::UnsupportedPlacement, "Content-Item not supported at this placement"
       end
     end
 

@@ -55,7 +55,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
             INNER JOIN #{Role.quoted_table_name} AS new_roles
             ON new_roles.base_role_type=roles.base_role_type
             AND new_roles.workflow_state='built_in'
-            AND new_roles.root_account_id=COALESCE(accounts.root_account_id, accounts.id)
+            AND new_roles.root_account_id=#{Account.resolved_root_account_id_sql}
           JOIN_SQL
       end
 

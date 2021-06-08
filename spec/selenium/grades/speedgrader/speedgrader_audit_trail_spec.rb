@@ -30,9 +30,9 @@ describe 'Audit Trail' do
     @account.role_overrides.create!(role: role1, permission: :view_audit_trail, enabled: true)
 
     # a course with 3 teachers, 1 auditor
-    @teacher1 = course_with_teacher(name: 'Teacher Boss1', active_user: true, active_enrollment: true).user
-    @teacher2 = course_with_teacher(course: @course, name: 'Teacher Boss2', active_user: true, active_enrollment: true).user
-    @teacher3 = course_with_teacher(course: @course, name: 'Teacher Boss3', active_user: true, active_enrollment: true).user
+    @teacher1 = course_with_teacher(name: 'Dedicated Teacher1', active_user: true, active_enrollment: true).user
+    @teacher2 = course_with_teacher(course: @course, name: 'Dedicated Teacher2', active_user: true, active_enrollment: true).user
+    @teacher3 = course_with_teacher(course: @course, name: 'Dedicated Teacher3', active_user: true, active_enrollment: true).user
     @auditor = course_with_user('TeacherEnrollment', course: @course, role: role1, name: "Auditor Person", active_course: true, active_enrollment: true).user
 
     # enroll two students

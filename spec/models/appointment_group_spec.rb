@@ -84,7 +84,36 @@ describe AppointmentGroup do
       group.contexts = [@course]
       group.save!
 
-      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_id: @course.id})
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+    end
+
+    it 'should include all course_ids' do
+      course_with_student(:active_all => true)
+      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course, course2]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+    end
+
+    it 'should include course_id if the context is a section' do
+      course_with_student(:active_all => true)
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course.default_section]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+    end
+
+    it 'should include mixed contexts course_ids' do
+      course_with_student(:active_all => true)
+      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course.default_section, course2]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
     end
   end
 

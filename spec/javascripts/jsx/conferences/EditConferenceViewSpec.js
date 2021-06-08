@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditConferenceView from 'compiled/views/conferences/EditConferenceView'
-import Conference from 'compiled/models/Conference'
-import tz from 'timezone'
+import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView.coffee'
+import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import tz from '@canvas/timezone'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'

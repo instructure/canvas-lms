@@ -35,6 +35,11 @@ module Turnitin
     end
 
     def process
+      submission = @assignment.submissions.find_by(user: @user, submitted_at: (turnitin_client.uploaded_at || Time.zone.now))
+      submission.nil? ? new_submission : submission.retrieve_lti_tii_score
+    end
+
+    def new_submission
       # Create an attachment for the file submitted via the TII tool.
       # If the score is still pending, this will raise
       # `Errors::ScoreStillPendingError`
@@ -58,31 +63,22 @@ module Turnitin
       # will terminate and retry up to
       # the max_attempts limit
       #
-      # TODO: This job does not use any kind of
-      # exponential backoff. We should add
-      # one to give TII more time to process
-      # attachments.
-      self.send_later_enqueue_args(
-        :update_originality_data,
-        {max_attempts: self.class.max_attempts},
-        submission,
-        asset_string
-      )
+      stash_turnitin_client do
+        delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      end
     rescue Errors::ScoreStillPendingError
       if attempt_number == self.class.max_attempts
         create_error_attachment
         raise
       else
         turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
-        turnitin_processor.send_later_enqueue_args(
-          :process,
-          {
-            max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+        stash_turnitin_client do
+          turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
             priority: Delayed::LOW_PRIORITY,
             attempts: attempt_number,
-            run_at: Time.now.utc + (attempt_number ** 4) + 5
-          }
-        )
+            run_at: Time.now.utc + (attempt_number ** 4) + 5).
+            new_submission
+        end
       end
     rescue StandardError
       if attempt_number == self.class.max_attempts
@@ -92,12 +88,9 @@ module Turnitin
     end
 
     def resubmit(submission, asset_string)
-      self.send_later_enqueue_args(
-        :update_originality_data,
-        {max_attempts: self.class.max_attempts},
-        submission,
-        asset_string
-      )
+      stash_turnitin_client do
+        delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      end
     end
 
     def turnitin_client
@@ -126,11 +119,6 @@ module Turnitin
       end
     end
 
-    # dont try and recreate the turnitin client in a delayed job. bad things happen
-    def send_later_enqueue_args(*args)
-      stash_turnitin_client { super(*args) }
-    end
-
     private
 
     def create_error_attachment
@@ -142,11 +130,19 @@ module Turnitin
       )
     end
 
+    # the turnitin client has a proc embedded
+    # in it's faraday connection.  If you try to serialize it,
+    # it will fail to deserialize (for good reason, closures can't
+    # take the whole state of the system with them when written
+    # as yaml).  This method un-sets the ivar long enough to
+    # serialize the object for job processing (a turnitin client
+    # will be created in the job when necessary).
     def stash_turnitin_client
-      old_turnit_client = @_turnitin_client
+      old_turnitin_client = @_turnitin_client
       @_turnitin_client = nil
-      yield
-      @_turnitin_client = old_turnit_client
+      result = yield
+      @_turnitin_client = old_turnitin_client
+      result
     end
 
     def attempt_number
@@ -163,9 +159,7 @@ module Turnitin
     end
 
     def submit_homework(attachment)
-      submission = @assignment.submit_homework(@user, attachments: [attachment], submission_type: 'online_upload')
-      submission.submitted_at = turnitin_client.uploaded_at if turnitin_client.uploaded_at
-      submission
+      @assignment.submit_homework(@user, attachments: [attachment], submission_type: 'online_upload', submitted_at: turnitin_client.uploaded_at)
     end
 
   end

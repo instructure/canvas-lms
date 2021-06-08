@@ -28,15 +28,10 @@ class ScoreStatisticsGenerator
     # term or all courses in a grading period at the same time.
     min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
     max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
-    send_later_if_production_enqueue_args(
-      :update_score_statistics,
-      {
-        singleton: "ScoreStatisticsGenerator:#{course_id}",
+    delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_id}",
         run_at: rand(min..max).seconds.from_now,
-        on_conflict: :loose
-      },
-      course_id
-    )
+        on_conflict: :loose).
+      update_score_statistics(course_id)
   end
 
   def self.update_score_statistics(course_id)

@@ -36,6 +36,8 @@ module Types
     #
     graphql_name "User"
 
+    include SearchHelper
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
@@ -144,6 +146,89 @@ module Types
       end
     end
 
+    field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true do
+      argument :scope, String, required: false
+      argument :filter, String, required: false
+    end
+    def conversations_connection(scope: nil, filter: nil)
+      if object == context[:current_user]
+        load_association(:all_conversations).then do
+          conversations_scope = case scope
+          when 'unread'
+            object.conversations.unread
+          when 'starred'
+            object.starred_conversations
+          when 'sent'
+            object.all_conversations.sent
+          when 'archived'
+            object.conversations.archived
+          else
+            object.conversations.default
+          end
+
+          filter_mode = :or
+          filters = Array(filter || [])
+          conversations_scope = conversations_scope.tagged(*filters, :mode => filter_mode) if filters.present?
+          conversations_scope
+        end
+      end
+    end
+
+    field :recipients, RecipientsType, null: true do
+      argument :search, String, required: false
+      argument :context, String, required: false
+    end
+    def recipients(search: nil, context: nil)
+      return nil unless object == self.context[:current_user]
+
+      @current_user = object
+      search_context = AddressBook.load_context(context)
+
+      load_all_contexts(
+        context: search_context,
+        permissions: [:send_messages, :send_messages_all],
+        base_url: self.context[:request].base_url
+      )
+
+      collections = search_contexts_and_users(
+        search: search,
+        context: context,
+        synthetic_contexts: true,
+        messageable_only: true,
+        base_url: self.context[:request].base_url
+      )
+
+      per_page = 100
+      contexts_collection = collections.select { |c| c[0] == 'contexts' }
+      contexts = []
+      if contexts_collection.count > 0
+        batch = contexts_collection[0][1].paginate(per_page: per_page)
+        contexts += batch
+        while batch.next_page
+          batch = contexts_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
+          contexts += batch
+        end
+      end
+
+      users_collection = collections.select { |c| c[0] == 'participants' }
+      users = []
+      if users_collection.count > 0
+        batch = users_collection[0][1].paginate(per_page: per_page)
+        users += batch
+        while batch.next_page
+          batch = users_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
+          users += batch
+        end
+      end
+
+      {
+        contexts_connection: contexts,
+        users_connection: users
+      }
+    rescue ActiveRecord::RecordNotFound
+      nil
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or
@@ -160,7 +245,7 @@ module Types
       if object == current_user
         # FIXME: this only returns groups on the current shard.  it should
         # behave like the REST API (see GroupsController#index)
-        load_association(:current_groups)
+        current_user.visible_groups
       end
     end
 
@@ -177,6 +262,55 @@ module Types
         current_user: context[:current_user], session: context[:session]
       ).load(object)
     end
+
+    field :favorite_courses_connection, Types::CourseType.connection_type, null: true
+    def favorite_courses_connection
+      return unless object == current_user
+
+      load_association(:enrollments).then do |enrollments|
+        Promise.all([
+          Loaders::AssociationLoader.for(Enrollment, :course).load_many(enrollments),
+          load_association(:favorites)
+        ]).then do
+          object.menu_courses
+        end
+      end
+    end
+
+    field :favorite_groups_connection, Types::GroupType.connection_type, null: true
+    def favorite_groups_connection
+      return unless object == current_user
+
+      load_association(:groups).then do |groups|
+        load_association(:favorites).then do
+          favorite_groups = groups.active.shard(object).where(id: object.favorite_context_ids("Group"))
+          favorite_groups.any? ? favorite_groups : object.groups.active.shard(object)
+        end
+      end
+    end
+
+    field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
+      argument :query, String, <<~DOC, required: false
+        Only include comments that match the query string.
+      DOC
+      argument :limit, Integer, required: false
+    end
+    def comment_bank_items_connection(query: nil, limit: nil)
+      return unless object == current_user
+
+      comments = current_user.comment_bank_items.shard(object)
+
+      comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
+      # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
+      # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
+      # and use the 'first' argument on the connection instead of 'limit'.
+      # Note that limit: 5 is currently being used by the Comment Library.
+      if limit.present?
+        comments = comments.limit(limit).to_a.first(limit)
+      end
+
+      comments
+    end
   end
 end
 
@@ -184,8 +318,8 @@ module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
     def initialize(course_ids:)
       scope = Enrollment.joins(:course).
-        where.not(enrollments: {workflow_state: "deleted"},
-                  courses: {workflow_state: "deleted"})
+        where.not(enrollments: {workflow_state: "deleted"}).
+        where.not(courses: {workflow_state: "deleted"})
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
 

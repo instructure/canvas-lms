@@ -466,6 +466,11 @@ describe EventStream::Stream do
           expect(@index_strategy).to receive(:insert).once.with(anything, @key)
           @stream.insert(@record)
         end
+
+        it "does not index in cassandra if a backend override is supplied" do
+          expect(@index_strategy).to_not receive(:insert)
+          @stream.insert(@record, backend_strategy: :active_record)
+        end
       end
 
       describe "generated for_thing method" do

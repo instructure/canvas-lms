@@ -25,30 +25,30 @@ import moxios from 'moxios'
 import qs from 'qs'
 
 import fakeENV from 'helpers/fakeENV'
-import UserSettings from 'compiled/userSettings'
-import natcompare from 'compiled/util/natcompare'
-import round from 'compiled/util/round'
-import * as FlashAlert from 'jsx/shared/FlashAlert'
-import AsyncComponents from 'jsx/gradebook/default_gradebook/AsyncComponents'
-import ActionMenu from 'jsx/gradebook/default_gradebook/components/ActionMenu'
-import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
-import AnonymousSpeedGraderAlert from 'jsx/gradebook/default_gradebook/components/AnonymousSpeedGraderAlert'
-import GradebookApi from 'jsx/gradebook/default_gradebook/apis/GradebookApi'
-import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
-import SubmissionCommentApi from 'jsx/gradebook/default_gradebook/apis/SubmissionCommentApi'
-import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
-import studentRowHeaderConstants from 'jsx/gradebook/default_gradebook/constants/studentRowHeaderConstants'
-import {darken, statusColors, defaultColors} from 'jsx/gradebook/default_gradebook/constants/colors'
-import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOptionsMenu'
+import UserSettings from '@canvas/user-settings'
+import natcompare from '@canvas/util/natcompare'
+import round from 'round'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents.js'
+import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu.js'
+import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
+import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert.js'
+import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi.js'
+import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator.js'
+import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi.js'
+import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
+import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants.js'
+import {darken, statusColors, defaultColors} from 'ui/features/gradebook/react/default_gradebook/constants/colors.js'
+import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu.js'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
 
-import {compareAssignmentDueDates} from 'jsx/gradebook/default_gradebook/Gradebook.utils'
+import {compareAssignmentDueDates} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils.js'
 
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -147,12 +147,16 @@ test('sets the submission state map .hasGradingPeriods to true when a grading pe
   strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true)
 })
 
-test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', () => {
-  const gradebook = createGradebook()
-  strictEqual(
-    gradebook.submissionStateMap.selectedGradingPeriodID,
-    gradebook.getGradingPeriodToShow()
-  )
+test('sets the submission state map .selectedGradingPeriodID to the current grading period', () => {
+  const grading_period_set = {
+    id: '1501',
+    grading_periods: [
+      {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
+      {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
+    ]
+  }
+  const gradebook = createGradebook({current_grading_period_id: '701', grading_period_set})
+  strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '701')
 })
 
 test('adds teacher notes to custom columns when provided', () => {
@@ -296,23 +300,6 @@ QUnit.module('Gradebook#initialize', () => {
   })
 })
 
-QUnit.module('Gradebook', () => {
-  QUnit.module('#dataLoader', () => {
-    // TODO: remove this entire module with TALLY-831
-
-    test('is the new DataLoader when `dataloader_improvements` is true', () => {
-      // `dataloader_improvements` should default to enabled except in beta and production
-      const gradebook = createGradebook()
-      strictEqual(gradebook.dataLoader.constructor.name, 'DataLoader')
-    })
-
-    test('is the old DataLoader when `dataloader_improvements` is false', () => {
-      const gradebook = createGradebook({dataloader_improvements: false})
-      strictEqual(gradebook.dataLoader.constructor.name, 'OldDataLoader')
-    })
-  })
-})
-
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({
@@ -363,7 +350,7 @@ test('calculates grades using properties from the gradebook', function() {
   equal(args[0], this.submissions)
   equal(args[1], gradebook.assignmentGroups)
   equal(args[2], gradebook.options.group_weighting_scheme)
-  equal(args[3], gradebook.gradingPeriodSet)
+  equal(args[4], gradebook.gradingPeriodSet)
 })
 
 test('scopes effective due dates to the user', function() {
@@ -374,7 +361,7 @@ test('scopes effective due dates to the user', function() {
     loaded: true,
     initialized: true
   })
-  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
   deepEqual(dueDates, {
     201: {
       grading_period_id: '701'
@@ -414,8 +401,8 @@ test('calculates grades without grading period data when effective due dates are
   equal(args[0], this.submissions)
   equal(args[1], gradebook.assignmentGroups)
   equal(args[2], gradebook.options.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
 test('stores the current grade on the student if not viewing ungraded as zero', function() {
@@ -446,6 +433,7 @@ test('stores the final grade on the student if viewing ungraded as zero', functi
 
 test('stores the current grade from the selected grading period if not viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
+  gradebook.gradingPeriodId = '701'
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -459,6 +447,7 @@ test('stores the current grade from the selected grading period if not viewing u
 
 test('stores the final grade from the selected grading period if viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
+  gradebook.gradingPeriodId = '701'
   gradebook.courseFeatures.allowViewUngradedAsZero = true
   gradebook.gridDisplaySettings.viewUngradedAsZero = true
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
@@ -730,6 +719,7 @@ test('returns false if there are no grading periods, even if isAllGradingPeriods
 
 test('returns false if "All Grading Periods" is not selected', function() {
   const gradebook = this.createGradebook()
+  gradebook.gradingPeriodId = '701'
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   notOk(gradebook.hideAggregateColumns())
 })
@@ -1726,38 +1716,6 @@ test('disables the input when submissions are not loaded', function() {
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
 })
 
-QUnit.module('Gradebook#studentsParams', {
-  setup() {
-    this.gradebook = createGradebook()
-  }
-})
-
-test('enrollment_state includes "completed" when concluded filter is on', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: true, inactive: false})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('completed'))
-})
-
-test('enrollment_state excludes "completed" when concluded filter is off', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  notOk(this.gradebook.studentsParams().enrollment_state.includes('completed'))
-})
-
-test('enrollment_state includes "inactive" when inactive filter is on', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: true})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('inactive'))
-})
-
-test('enrollment_state excludes "inactive" when inactive filter is off', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  notOk(this.gradebook.studentsParams().enrollment_state.includes('inactive'))
-})
-
-test('enrollment_state includes "active" and "invited" by default', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('active'))
-  ok(this.gradebook.studentsParams().enrollment_state.includes('invited'))
-})
-
 QUnit.module('Gradebook#weightedGroups', {
   setup() {
     this.gradebook = createGradebook()
@@ -2021,7 +1979,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
         user_id: '1101'
       }
     ]
-    gradebook = createGradebook({post_policies_enabled: true})
+    gradebook = createGradebook()
     gradebook.assignments = {
       2301: gradedAssignment,
       2302: notGradedAssignment
@@ -2049,7 +2007,17 @@ QUnit.module('#listHiddenAssignments', hooks => {
       }
     }
     gradebook.gotSubmissionsChunk(submissionsChunk)
-    gradebook.setAssignmentsLoaded(true)
+    gradebook.setAssignmentGroups([
+      {
+        id: '1',
+        assignments: [gradedAssignment]
+      },
+      {
+        id: '2',
+        assignments: [notGradedAssignment]
+      }
+    ])
+    gradebook.setAssignmentsLoaded()
     gradebook.setSubmissionsLoaded(true)
   })
 
@@ -2061,6 +2029,13 @@ QUnit.module('#listHiddenAssignments', hooks => {
   test('excludes "not_graded" assignments even when submission is postable', function() {
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
     notOk(hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id))
+  })
+
+  test('ignores assignments excluded by the current set of filters', function() {
+    gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
+
+    const hiddenAssignments = gradebook.listHiddenAssignments('1101')
+    notOk(hiddenAssignments.find(assignment => assignment.id === gradedAssignment.id))
   })
 })
 
@@ -2243,13 +2218,11 @@ test('sets the direction', function() {
 })
 
 test('sets disabled to true when assignments have not been loaded yet', function() {
-  this.gradebook.setAssignmentsLoaded(false)
-
   strictEqual(this.getProps().disabled, true)
 })
 
 test('sets disabled to false when assignments have been loaded', function() {
-  this.gradebook.setAssignmentsLoaded(true)
+  this.gradebook.setAssignmentsLoaded()
 
   strictEqual(this.getProps().disabled, false)
 })
@@ -2988,6 +2961,23 @@ test('reloads student data after saving settings', function() {
   strictEqual(this.gradebook.dataLoader.reloadStudentDataForSectionFilterChange.callCount, 1)
 })
 
+QUnit.module('Gradebook#getGradingPeriodAssignments', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+    gradebook.gotGradingPeriodAssignments({grading_period_assignments: {14: ['3', '92', '11']}})
+  })
+
+  test('returns the assignments for the given grading period', () => {
+    deepEqual(gradebook.getGradingPeriodAssignments(14), ['3', '92', '11'])
+  })
+
+  test('returns an empty array if there are no assignments in the given period', () => {
+    deepEqual(gradebook.getGradingPeriodAssignments(23), [])
+  })
+})
+
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   setup() {
     const sectionsFilterContainerSelector = 'grading-periods-filter-container'
@@ -3036,6 +3026,7 @@ test('renders the filter with a list of grading periods', function() {
 
 test('sets the filter to show the selected grading period', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
+  this.gradebook.setCurrentGradingPeriod()
   this.gradebook.updateGradingPeriodFilterVisibility()
   const filter = ContentFilterDriver.findWithLabelText('Grading Period Filter', this.container)
   filter.clickToExpand()
@@ -3866,6 +3857,10 @@ QUnit.module('Gradebook#filterAssignments', {
       1401: ['2301', '2303'],
       1402: ['2302', '2304']
     }
+    this.gradebook.courseContent.contextModules = [
+      {id: '1', name: 'Algebra', position: 1},
+      {id: '2', name: 'English', position: 2}
+    ]
     this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '1401'}, {id: '1402'}]}
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
@@ -3924,6 +3919,7 @@ test('includes assignments from all grading periods when not filtering by gradin
 
 test('excludes assignments from other grading periods when filtering by a grading period', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
+  this.gradebook.setCurrentGradingPeriod()
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301'])
 })
@@ -3945,6 +3941,13 @@ test('excludes assignments from other modules when filtering by a module', funct
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301'])
+})
+
+test('does not filter assignments when filtering by a module that was deleted', function() {
+  this.gradebook.courseContent.contextModules = []
+  this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
+  const assignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('includes assignments from all assignment groups when not filtering by assignment group', function() {
@@ -4549,8 +4552,9 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     allStudents = [
       {
         id: '1101',
-        name: 'Adam Jones',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        name: "Adam Jone's",
+        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+        sortable_name: "Jone's, Adam"
       },
       {
         id: '1102',
@@ -4593,6 +4597,18 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       gradebook.gotChunkOfStudents(allStudents)
       const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
       strictEqual(student.enrollments[0].grades.html_url, 'http://example.url/')
+    })
+
+    test('does not escape the name of the student', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.name, "Adam Jone's")
+    })
+
+    test('does not escape the sortable name of the student', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.sortable_name, "Jone's, Adam")
     })
 
     test('returns all students when the assignment is visible to everyone', () => {
@@ -5909,7 +5925,7 @@ test('sets the submission state map .hasGradingPeriods to false when no grading 
 
 test('sets the submission state map .selectedGradingPeriodID to the "grading period to show"', () => {
   const gradebook = createGradebook()
-  sandbox.stub(gradebook, 'getGradingPeriodToShow').returns('1401')
+  gradebook.gradingPeriodId = '1401'
   gradebook.initSubmissionStateMap()
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '1401')
 })
@@ -6253,6 +6269,7 @@ QUnit.module('Gradebook#isFilteringColumnsByGradingPeriod', {
     this.gradebook = createGradebook()
     this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '701'}, {id: '702'}]}
     this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
+    this.gradebook.setCurrentGradingPeriod()
   }
 })
 
@@ -6262,66 +6279,33 @@ test('returns true when the "filter columns by" setting includes a grading perio
 
 test('returns false when the "filter columns by" setting includes the "all grading periods" value ("0")', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+  this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
 test('returns false when the "filter columns by" setting does not include a grading period', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
+  this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
 test('returns false when the "filter columns by" setting does not include a valid grading period', function() {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '799')
+  this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
 test('returns false when no grading period set exists', function() {
   this.gradebook.gradingPeriodSet = null
+  this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), false)
 })
 
 test('returns true when the "filter columns by" setting is null and the current_grading_period_id is set', function() {
   this.gradebook.options.current_grading_period_id = '701'
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
+  this.gradebook.setCurrentGradingPeriod()
   strictEqual(this.gradebook.isFilteringColumnsByGradingPeriod(), true)
-})
-
-QUnit.module('Gradebook#getGradingPeriodToShow', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '701'}, {id: '702'}]}
-    this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
-  }
-})
-
-test('returns the "filter columns by" setting when it includes a grading period', function() {
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '702')
-})
-
-test('returns "0" when the "filter columns by" setting includes the "all grading periods" value ("0")', function() {
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '0')
-})
-
-test('returns "0" when the "filter columns by" setting does not include a grading period', function() {
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '0')
-})
-
-test('returns "0" when the "filter columns by" setting does not include a valid grading period', function() {
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '799')
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '0')
-})
-
-test('returns "0" when no grading period set exists', function() {
-  this.gradebook.gradingPeriodSet = null
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '0')
-})
-
-test('returns the current_grading_period_id when set and the "filter columns by" setting is null', function() {
-  this.gradebook.options.current_grading_period_id = '701'
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', null)
-  strictEqual(this.gradebook.getGradingPeriodToShow(), '701')
 })
 
 QUnit.module('Gradebook#setSelectedPrimaryInfo', {
@@ -6927,13 +6911,6 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
 
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     notOk(props.pendingGradeInfo)
-  })
-
-  test('sets postPoliciesEnabled to true when post_policies_enabled is true', () => {
-    gradebook.options.post_policies_enabled = true
-    gradebook.setSubmissionTrayState(true, '1101', '2301')
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
-    strictEqual(props.postPoliciesEnabled, true)
   })
 
   QUnit.module('requireStudentGroupForSpeedGrader', requireStudentGroupHooks => {
@@ -9413,6 +9390,46 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', hooks => {
     gradebook.gotAllAssignmentGroups([])
     strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
   })
+
+  test('adds the assignment group to the group definitions if it is new', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    deepEqual(gradebook.assignmentGroups['12'], assignmentGroup)
+  })
+
+  test('adds new assignments to existing assignment groups', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.assignmentGroups['12'] = {
+      id: '12',
+      assignments: [{id: '22', name: 'Some Other Assignment', due_at: null}]
+    }
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
+    deepEqual(assignmentIds, ['22', '35'])
+  })
+
+  test('does not add duplicate assignments to assignment groups', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.assignmentGroups['12'] = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
+    deepEqual(assignmentIds, ['35'])
+  })
 })
 
 QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
@@ -9515,6 +9532,163 @@ QUnit.module('Gradebook#getSubmission', hooks => {
   })
 })
 
+QUnit.module('Gradebook#addAssignmentColumnDefinition', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('adds a column definition for the given assignment', () => {
+    const assignment = {id: 12, name: 'Some Assignment'}
+    gradebook.addAssignmentColumnDefinition(assignment)
+    const definitions = gradebook.gridData.columns.definitions
+    ok(definitions.assignment_12)
+  })
+
+  test('ignores the assignment if a column definition already exists for it', () => {
+    const assignment = {id: 12, name: 'Some Assignment'}
+    gradebook.addAssignmentColumnDefinition(assignment)
+    gradebook.addAssignmentColumnDefinition(assignment)
+    const definitions = gradebook.gridData.columns.definitions
+    strictEqual(Object.keys(definitions).length, 1)
+  })
+})
+
+QUnit.module('Gradebook#assignmentsLoadedForCurrentView', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+  })
+
+  test('returns false when assignments are not loaded', () => {
+    strictEqual(gradebook.assignmentsLoadedForCurrentView(), false)
+  })
+
+  test('returns true when assignments are loaded', () => {
+    gradebook.setAssignmentsLoaded()
+    strictEqual(gradebook.assignmentsLoadedForCurrentView(), true)
+  })
+
+  QUnit.module('when grading periods are used', contextHooks => {
+    contextHooks.beforeEach(() => {
+      gradebook.contentLoadStates.assignmentsLoaded = {
+        all: false,
+        gradingPeriod: {2: false, 14: false}
+      }
+      gradebook.gradingPeriodId = '14'
+    })
+
+    test('returns true when assignments are loaded for the current grading period', () => {
+      gradebook.setAssignmentsLoaded(['14'])
+      strictEqual(gradebook.assignmentsLoadedForCurrentView(), true)
+    })
+
+    test('returns false when assignments are not loaded', () => {
+      strictEqual(gradebook.assignmentsLoadedForCurrentView(), false)
+    })
+
+    test('returns false when assignments are loaded, but not for the current grading period', () => {
+      gradebook.setAssignmentsLoaded(['2'])
+      strictEqual(gradebook.assignmentsLoadedForCurrentView(), false)
+    })
+  })
+})
+
+QUnit.module('Gradebook#setAssignmentsLoaded', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook()
+    gradebook.contentLoadStates.assignmentsLoaded.gradingPeriod = {2: false, 59: false}
+  })
+
+  test('sets all assignments as loaded', () => {
+    gradebook.setAssignmentsLoaded()
+    strictEqual(gradebook.contentLoadStates.assignmentsLoaded.all, true)
+  })
+
+  test('sets all grading periods as loaded', () => {
+    gradebook.setAssignmentsLoaded()
+    const gpLoadStates = Object.values(gradebook.contentLoadStates.assignmentsLoaded.gradingPeriod)
+    strictEqual(
+      gpLoadStates.every(loaded => loaded),
+      true
+    )
+  })
+
+  QUnit.module('when assignments are loaded for particular grading periods', () => {
+    test('sets assignments loaded for the expected grading period', () => {
+      gradebook.setAssignmentsLoaded(['59'])
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.gradingPeriod[59], true)
+    })
+
+    test('does not set assignments loaded for excluded grading periods', () => {
+      gradebook.setAssignmentsLoaded(['59'])
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.gradingPeriod[2], false)
+    })
+
+    test('sets all assignments loaded if all grading periods are loaded', () => {
+      gradebook.setAssignmentsLoaded(['59', '2'])
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.all, true)
+    })
+
+    test('does not set all assignments loaded if not all grading periods are loaded', () => {
+      gradebook.setAssignmentsLoaded(['59'])
+      strictEqual(gradebook.contentLoadStates.assignmentsLoaded.all, false)
+    })
+  })
+})
+
+QUnit.module('Gradebook#setCurrentGradingPeriod', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      grading_period_set: {
+        id: '1501',
+        grading_periods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
+        weighted: true
+      }
+    })
+  })
+
+  test('sets grading period id to "0" if no grading period set exists', () => {
+    gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
+    gradebook.gradingPeriodSet = null
+    gradebook.setCurrentGradingPeriod()
+    strictEqual(gradebook.gradingPeriodId, '0')
+  })
+
+  test('sets grading period id to "0" if "All Grading Periods" is selected', () => {
+    gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+    gradebook.setCurrentGradingPeriod()
+    strictEqual(gradebook.gradingPeriodId, '0')
+  })
+
+  test('sets grading period id to the grading period being filtered by', () => {
+    gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
+    gradebook.setCurrentGradingPeriod()
+    strictEqual(gradebook.gradingPeriodId, '702')
+  })
+
+  test('if not filtered, sets grading period id to the current_grading_period_id', () => {
+    gradebook.options.current_grading_period_id = '702'
+    gradebook.setCurrentGradingPeriod()
+    strictEqual(gradebook.gradingPeriodId, '702')
+  })
+
+  test('if the saved grading period id is not in the set, sets period id to "0"', () => {
+    gradebook.options.current_grading_period_id = '1000'
+    gradebook.setCurrentGradingPeriod()
+    strictEqual(gradebook.gradingPeriodId, '0')
+  })
+})
+
 QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   let gradebook
 
@@ -9601,6 +9775,80 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   })
 })
 
+QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
+  let gradebook
+
+  const confirmationDialog = () =>
+    document.querySelector('span[role=dialog][aria-label="View Ungraded as Zero"]')
+  const acceptConfirmation = () => {
+    const okButton = [...confirmationDialog().querySelectorAll('button')].find(
+      button => button.textContent === 'OK'
+    )
+    okButton.click()
+  }
+  const denyConfirmation = () => {
+    const cancelButton = [...confirmationDialog().querySelectorAll('button')].find(
+      button => button.textContent === 'Cancel'
+    )
+    cancelButton.click()
+  }
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      },
+      settings: {
+        allow_view_ungraded_as_zero: 'true'
+      }
+    })
+    sinon.stub(gradebook, 'toggleViewUngradedAsZero')
+  })
+
+  test('shows a confirmation dialog if not viewing ungraded as zero', async () => {
+    const promise = gradebook.confirmViewUngradedAsZero()
+
+    ok(confirmationDialog())
+    acceptConfirmation()
+    await promise
+  })
+
+  test('does not show a confirmation dialog if already viewing ungraded as zero', async () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
+    const promise = gradebook.confirmViewUngradedAsZero()
+
+    notOk(confirmationDialog())
+    await promise
+  })
+
+  QUnit.module('when the confirmation is requested and accepted', () => {
+    const confirmAndAccept = async () => {
+      const promise = gradebook.confirmViewUngradedAsZero()
+      acceptConfirmation()
+      await promise
+    }
+
+    test('calls toggleViewUngradedAsZero', async () => {
+      await confirmAndAccept()
+      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 1)
+    })
+  })
+
+  QUnit.module('when the confirmation is requested and denied', () => {
+    const confirmAndDeny = async () => {
+      const promise = gradebook.confirmViewUngradedAsZero()
+      denyConfirmation()
+      await promise
+    }
+
+    test('does not call toggleViewUngradedAsZero', async () => {
+      await confirmAndDeny()
+      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 0)
+    })
+  })
+})
+
 QUnit.module('Gradebook', suiteHooks => {
   let $container
   let gradebook
@@ -9627,6 +9875,7 @@ QUnit.module('Gradebook', suiteHooks => {
 
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setContextModulesLoaded(true)
       gradebook.setCustomColumnsLoaded(true)
     }
@@ -9640,14 +9889,6 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook._updateEssentialDataLoaded()
       await waitForTick()
       strictEqual(gradebook.finishRenderingUI.callCount, 1)
-    })
-
-    test('does not finish rendering the UI when dataloader performance improvements is disabled', async () => {
-      options.dataloader_improvements = false
-      createInitializedGradebook()
-      gradebook._updateEssentialDataLoaded()
-      await waitForTick()
-      strictEqual(gradebook.finishRenderingUI.callCount, 0)
     })
 
     test('does not finish rendering the UI when student ids are not loaded', async () => {

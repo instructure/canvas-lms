@@ -94,7 +94,8 @@ module ContextModulesHelper
   end
 
   def module_item_publishable?(item)
-    true
+    return true if item.nil? || !item.content || !item.content.respond_to?(:can_publish?)
+    item.content.can_publish?
   end
 
   def prerequisite_list(prerequisites)

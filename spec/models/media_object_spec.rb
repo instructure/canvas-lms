@@ -30,6 +30,12 @@ describe MediaObject do
       expect(MediaObject.by_media_id('1_01234567').first).to eq mo
     end
 
+    it "should not find an arbitrary MediaObject when given a nil id" do
+      course_factory
+      mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
+      expect(MediaObject.by_media_id(nil).first).to be_nil
+    end
+
     it "should raise an error if someone tries to use find_by_media_id" do
       expect { MediaObject.find_by_media_id('fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
     end
@@ -122,7 +128,9 @@ describe MediaObject do
       Timecop.freeze do
         mo = MediaObject.create!(:context => user_factory, :media_id => "test")
         expect(mo).to receive(:retrieve_details)
-        expect(mo).to receive(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        expect(mo).to receive(:delay).with(run_at: 5.minutes.from_now).and_return(mo)
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(1).and_call_original
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(2)
         mo.retrieve_details_ensure_codecs(1)
       end
     end
@@ -131,7 +139,7 @@ describe MediaObject do
       mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo).to receive(:retrieve_details)
-      expect(mo).to receive(:send_at).never
+      expect(mo).to receive(:delay).never
       mo.retrieve_details_ensure_codecs(1)
     end
   end
@@ -280,20 +288,13 @@ describe MediaObject do
       expect(att).to be_empty
     end
 
-    it "creates the corresponding attachment if the feature is enabled" do
-      @course.root_account.enable_feature!(:autocreate_attachment_from_media_object)
+    it "creates the corresponding attachment" do
       mo = @media_object
       mo.process_retrieved_details(@mock_entry, @media_type, @assets)
       att = Attachment.find(mo[:attachment_id])
       expect(att).to be_hidden
       expect(att.folder.name).to eq "Uploaded Media"
       expect(att[:media_entry_id]).to eql mo[:media_id]
-    end
-
-    it "doesn't create the corresponding attachment if the feature is not enabled" do
-      mo = @media_object
-      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-      expect(mo.attachment_id).to be_nil
     end
   end
 

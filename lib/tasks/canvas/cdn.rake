@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :canvas do
   namespace :cdn do
     desc 'Push static assets to s3'

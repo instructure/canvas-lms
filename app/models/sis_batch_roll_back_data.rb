@@ -42,26 +42,32 @@ class SisBatchRollBackData < ActiveRecord::Base
   def self.build_data(sis_batch:, context:, batch_mode_delete: false)
     return unless SisBatchRollBackData.should_create_roll_back?(context, sis_batch)
     old_state = (context.id_before_last_save.nil? ? 'non-existent' : context.workflow_state_before_last_save)
-    sis_batch.roll_back_data.build(context: context,
-                                   previous_workflow_state: old_state,
-                                   updated_workflow_state: context.workflow_state,
-                                   created_at: Time.zone.now,
-                                   updated_at: Time.zone.now,
-                                   batch_mode_delete: batch_mode_delete,
-                                   workflow_state: 'active')
+    sis_batch.shard.activate do
+      SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
+                               context: context,
+                               previous_workflow_state: old_state,
+                               updated_workflow_state: context.workflow_state,
+                               created_at: Time.zone.now,
+                               updated_at: Time.zone.now,
+                               batch_mode_delete: batch_mode_delete,
+                               workflow_state: 'active')
+    end
   end
 
   def self.build_dependent_data(sis_batch:, contexts:, updated_state:, batch_mode_delete: false)
     return unless sis_batch
     data = []
     contexts.each do |context|
-      data << sis_batch.roll_back_data.build(context: context,
-                                             previous_workflow_state: context.workflow_state,
-                                             updated_workflow_state: updated_state,
-                                             created_at: Time.zone.now,
-                                             updated_at: Time.zone.now,
-                                             batch_mode_delete: batch_mode_delete,
-                                             workflow_state: 'active')
+      sis_batch.shard.activate do
+        data << SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
+                                         context: context,
+                                         previous_workflow_state: context.workflow_state,
+                                         updated_workflow_state: updated_state,
+                                         created_at: Time.zone.now,
+                                         updated_at: Time.zone.now,
+                                         batch_mode_delete: batch_mode_delete,
+                                         workflow_state: 'active')
+      end
     end
     data
   end

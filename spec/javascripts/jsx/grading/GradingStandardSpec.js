@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import fakeENV from 'helpers/fakeENV'
-import GradingStandard from 'jsx/grading/gradingStandard'
+import GradingStandard from '@canvas/grading-standard-collection/react/gradingStandard'
 
 QUnit.module('GradingStandard', suiteHooks => {
   let props

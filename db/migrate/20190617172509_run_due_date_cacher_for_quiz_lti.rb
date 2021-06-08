@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -22,15 +24,8 @@ class RunDueDateCacherForQuizLti < ActiveRecord::Migration[5.1]
 
   def change
     Course.find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-      DataFixup::RunDueDateCacherForQuizLTI.send_later_if_production_enqueue_args(
-        :run,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::RunDueDateCacherForQuizLti", Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::RunDueDateCacherForQuizLTI.delay_if_production(priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::RunDueDateCacherForQuizLti", Shard.current.database_server.id]).run(start_at, end_at)
     end
   end
 end

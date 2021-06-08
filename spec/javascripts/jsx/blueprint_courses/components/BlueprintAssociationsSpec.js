@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintAssociations from 'jsx/blueprint_courses/components/BlueprintAssociations'
+import BlueprintAssociations from 'ui/features/blueprint_course_master/react/components/BlueprintAssociations.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('BlueprintAssociations component')

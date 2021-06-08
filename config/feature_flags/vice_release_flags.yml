@@ -15,66 +15,17 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
-deprecate_sms:
+react_discussions_post:
   state: hidden
-  display_name: Restrict SMS to Select Types
+  beta: true
+  display_name: Discussions Redesign
   description: |-
-    Disables SMS notifications for all types except announcements and
-    grade changes.
-  applies_to: SiteAdmin
-
-hide_course_sections_from_students:
-  state: hidden
-  display_name: Hide Course Sections from Students
-  description: |-
-    Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
-  applies_to: RootAccount
-
-import_groups_by_csv:
-  state: hidden
-  display_name: Import course student groups by csv
-  description: |-
-    Allows course student groups to be created by csv upload
-  applies_to: RootAccount
-
-mute_notifications_by_course:
-  state: hidden
-  display_name: Mute notifications by course
-  description: |-
-    Allows users to mute notifications on a course level granularity.
-  applies_to: RootAccount
-
-notification_granular_course_preferences:
-  state: hidden
-  display_name: Course level overrides for notification preferences
-  description: |-
-    Allows users to override specific notification preferences on a
-    course by course basis.
-  applies_to: SiteAdmin
-
-notification_update_account_ui:
-  state: hidden
-  display_name: Account level notification preferences UI update
-  description: |-
-    Updates account notification preferences UI to be a more current
-    and updated user experience
-  applies_to: SiteAdmin
-
-past_announcements:
-  state: hidden
-  display_name: Show past account level announcements to users
-  description: |-
-    Show past account level announcements to users. Allows
-    a user to view announcemnts that have ended or been dismissed.
-  applies_to: RootAccount
-
-react_announcement_discussion_edit:
-  state: hidden
-  display_name: Update announcement/discussion edit page to use react/instui
-  description: |-
-    This refactor will make this page more maintainable and easily
-    allow us to make the page more accessible
-  applies_to: RootAccount
+    This feature enhances the Canvas experience within Discussions.
+    When this flag is enabled, early access to ongoing improvements
+    will be displayed automatically with every release.
+    For full details, please see the Discussions Redesign user group
+    in the Canvas Community.
+  applies_to: Course
 
 react_inbox:
   state: hidden
@@ -95,4 +46,18 @@ trophy_case:
   display_name: Trophy case
   description: |-
     Display historical view of achievements of users
+  applies_to: SiteAdmin
+
+show_push_notification_account_setting:
+  state: hidden
+  display_name: Allow push notification opt-out
+  description: |-
+    Enable an account setting which toggles push notifications for that account
+  applies_to: SiteAdmin
+
+deprecate_sms:
+  state: hidden
+  display_name: Deprecate SMS
+  description: |-
+    When enabled it deprecates the Short Message Service (SMS).
   applies_to: SiteAdmin

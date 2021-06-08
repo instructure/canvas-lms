@@ -68,6 +68,16 @@ describe LiveAssessments::Submission do
       expect(result.reload.percent).to eq 0.8
     end
 
+    it 'restores a deleted outcome result' do
+      submission.create_outcome_result(alignment)
+      result = alignment.learning_outcome_results.first
+      result.destroy
+      submission.score = 80
+      submission.possible = 100
+      submission.create_outcome_result(alignment)
+      expect(result.reload).to be_active
+    end
+
     it "scales the score to the outcome rubric criterion if present" do
       outcome.data = {rubric_criterion: {mastery_points: 3, points_possible: 5}}
       outcome.save!

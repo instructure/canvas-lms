@@ -37,36 +37,13 @@ end
 class NotificationCategoryType < Types::BaseEnum
   graphql_name 'NotificationCategoryType'
   description 'The categories that a notification can belong to'
-  value 'Account_Notification'
-  value 'Added_To_Conversation'
-  value 'All_Submissions'
-  value 'Announcement'
-  value 'Announcement_Created_By_You'
-  value 'Appointment_Availability'
-  value 'Appointment_Cancelations'
-  value 'Appointment_Signups'
-  value 'Blueprint'
-  value 'Calendar'
-  value 'Content_Link_Error'
-  value 'Conversation_Created'
-  value 'Conversation_Message'
-  value 'Course_Content'
-  value 'Discussion'
-  value 'DiscussionEntry'
-  value 'Due_Date'
-  value 'Files'
-  value 'Grading'
-  value 'Grading_Policies'
-  value 'Invitation'
-  value 'Late_Grading'
-  value 'Membership_Update'
-  value 'Other'
-  value 'Recording_Ready'
-  value 'Student_Appointment_Signups'
-  value 'Submission_Comment'
+  Notification.valid_configurable_types.each do |type|
+    value type
+  end
 end
 
 class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
+  ValidationError = Class.new(StandardError)
   graphql_name 'UpdateNotificationPreferences'
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
@@ -74,7 +51,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   argument :context_type, NotificationPreferencesContextType, required: true
 
   argument :enabled, Boolean, required: false
-
+  argument :has_read_privacy_notice, Boolean, required: false
   argument :send_scores_in_emails, Boolean, required: false
   argument :send_observed_names_in_notifications, Boolean, required: false
 
@@ -101,6 +78,11 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
       end
     end
 
+    if input[:has_read_privacy_notice]
+      current_user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
+      current_user.save!
+    end
+
     if !input[:send_observed_names_in_notifications].nil?
       current_user.preferences[:send_observed_names_in_notifications] = input[:send_observed_names_in_notifications]
       current_user.save!
@@ -124,15 +106,16 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)
-  rescue => error
+  rescue ::Mutations::UpdateNotificationPreferences::ValidationError => error
     return validation_error(error.message)
   end
 
   def validate_input(input)
-    if input[:context_type] == 'Course'
-      raise I18n.t('Course level notification preferences require a course_id to update') unless input[:course_id]
-    elsif input[:context_type] == 'Account'
-      raise I18n.t('Account level notification preferences require an account_id to update') unless input[:account_id]
+    err_klass = ::Mutations::UpdateNotificationPreferences::ValidationError
+    if input[:context_type] == 'Course' && !input[:course_id]
+      raise err_klass, I18n.t('Course level notification preferences require a course_id to update')
+    elsif input[:context_type] == 'Account' && !input[:account_id]
+      raise err_klass, I18n.t('Account level notification preferences require an account_id to update')
     end
 
     validate_policy_update_input(input)
@@ -147,7 +130,8 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     # We require that the 4 arguments listed above be present in order
     # to update notification policies or policy overrides
     if !policy_update_input.all? && !policy_update_input.none?
-      raise I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
+      err_klass = ::Mutations::UpdateNotificationPreferences::ValidationError
+      raise err_klass, I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
     end
   end
 

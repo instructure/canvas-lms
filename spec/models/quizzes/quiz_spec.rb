@@ -715,6 +715,35 @@ describe Quizzes::Quiz do
     expect(possible).to eq 9.9
   end
 
+  describe "learning outcome results" do
+    before :once do
+      build_course_quiz_questions_and_a_bank
+      @quiz.generate_quiz_data(persist: true)
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      answer_a_question(@q1, @sub)
+      answer_a_question(@q2, @sub, correct: false)
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
+      @quiz.reload
+    end
+
+    it "should destroy results if the quiz_type becomes practice_quiz" do
+      @quiz.quiz_type = "practice_quiz"
+      expect {
+        @quiz.save!
+      }.to change { LearningOutcomeResult.active.count }.by(-1)
+    end
+
+    it "should restore results if the quiz_type changes from practice_quiz" do
+      @quiz.quiz_type = "practice_quiz"
+      @quiz.save!
+      @quiz.quiz_type = "assignment"
+      expect {
+        @quiz.save!
+      }.to change { LearningOutcomeResult.active.count }.by(1)
+    end
+  end
+
   describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
@@ -1544,18 +1573,14 @@ describe Quizzes::Quiz do
         quiz_question_id: q.id,
         regrade_option: 'current_correct_only'
       )
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).once.
-        with(
-          :regrade!,
-          { strand: "quiz:#{quiz.global_id}:regrading"},
-          quiz: quiz, version_number: quiz.version_number
-        )
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).with(strand: "quiz:#{quiz.global_id}:regrading").once.and_return(Quizzes::QuizRegrader::Regrader)
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with(quiz: quiz, version_number: quiz.version_number)
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).never
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).never
       quiz = @course.quizzes.create!
       quiz.save!
     end

@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative '../helpers/k5_common'
 
 describe 'Global Navigation' do
   include_context 'in-process server selenium tests'
+  include K5Common
 
   context 'As a Teacher' do
     before do
@@ -113,7 +115,6 @@ describe 'Global Navigation' do
     describe 'Recent History' do
       before do
         Setting.set('enable_page_views', 'db')
-        Account.default.enable_feature!(:recent_history)
         @assignment = @course.assignments.create(:name => "another assessment")
         @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
         page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}", context: @course,
@@ -124,14 +125,14 @@ describe 'Global Navigation' do
                       asset_code: @quiz.asset_string
       end
 
-      it 'should show the Recent History tray upon clicking', ignore_js_errors: true do
+      it 'should show the Recent History tray upon clicking' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
         expect(f("[aria-label='Recent History tray']")).to be_displayed
       end
 
-      it 'should show recent history items on Recent History tray', ignore_js_errors: true do
+      it 'should show recent history items on Recent History tray' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
@@ -140,12 +141,27 @@ describe 'Global Navigation' do
         expect(navigation_element_list[1].attribute('aria-label')).to eq('another assessment, Assignment')
       end
 
-      it 'should include recent history assignment link', ignore_js_errors: true do
+      it 'should include recent history assignment link' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
         navigation_elements = ffxpath("//*[@id = 'nav-tray-portal']//li//a")
         expect(navigation_elements[1].attribute('href')).to eq(app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}")
+      end
+    end
+
+    describe 'dashboard and courses links' do
+      it 'should be called dashboard and courses with k5 off' do
+        get "/courses/#{@course.id}"
+        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Dashboard'
+        expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Courses'
+      end
+
+      it 'should be called homeroom and subjects with k5 on' do
+        toggle_k5_setting(@course.account)
+        get "/courses/#{@course.id}"
+        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Homeroom'
+        expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Subjects'
       end
     end
   end

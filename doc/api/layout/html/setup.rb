@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -31,6 +33,7 @@ def init
       @contents = @file.contents
       @file = File.basename(@file.path)
     end
+    @object = @object.dup if @object.frozen?
     def @object.source_type; nil; end
     sections :layout, [:diskfile]
   elsif options[:all_resources]

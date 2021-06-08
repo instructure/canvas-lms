@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,17 +24,21 @@
 #
 # NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
-  before_action :require_context
+  class InvalidSettingsError < StandardError; end
+
+  before_action :require_context, except: [:all_visible_nav_tools]
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
-  before_action :require_access_to_context, except: [:index, :sessionless_launch]
+  before_action :require_access_to_context, except: [:index, :sessionless_launch, :all_visible_nav_tools]
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
+  before_action :parse_context_codes, :only => [:all_visible_nav_tools]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
   include Api::V1::ExternalTools
   include Lti::RedisMessageClient
   include Lti::Concerns::SessionlessLaunches
+  include K5Mode
 
   WHITELISTED_QUERY_PARAMS = [
     :platform
@@ -145,9 +151,7 @@ class ExternalToolsController < ApplicationController
   def retrieve
     @tool = ContextExternalTool.find_external_tool(params[:url], @context, nil, nil, params[:client_id])
     if !@tool
-      flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-      redirect_to named_context_url(@context, :context_url)
-      return
+      raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
     placement = placement_from_params
     add_crumb(@context.name, named_context_url(@context, :context_url))
@@ -159,8 +163,12 @@ class ExternalToolsController < ApplicationController
       secure_params: params[:secure_params],
       post_live_event: true
     )
+    return unless @lti_launch
     display_override = params['borderless'] ? 'borderless' : params[:display]
     render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: display_override)
+  rescue InvalidSettingsError => e
+    flash[:error] = e.message
+    redirect_to named_context_url(@context, :context_url)
   end
 
   # @API Get a sessionless launch url for an external tool.
@@ -481,10 +489,15 @@ class ExternalToolsController < ApplicationController
       else
         basic_lti_launch_request(tool, selection_type, opts)
     end
-  rescue Lti::Errors::UnauthorizedError
+  rescue Lti::Errors::UnauthorizedError => e
+    Canvas::Errors.capture_exception(:lti_launch, e, :info)
     render_unauthorized_action
     nil
-  rescue Lti::Errors::UnsupportedExportTypeError, Lti::Errors::InvalidMediaTypeError
+  rescue Lti::Errors::UnsupportedExportTypeError,
+         Lti::Errors::InvalidLaunchUrlError,
+         Lti::Errors::InvalidMediaTypeError,
+         Lti::Errors::UnsupportedPlacement => e
+    Canvas::Errors.capture_exception(:lti_launch, e, :info)
     respond_to do |format|
       err = t('There was an error generating the tool launch')
       format.html do
@@ -497,6 +510,41 @@ class ExternalToolsController < ApplicationController
   end
   protected :lti_launch
 
+  # As `resource_link_lookup_id` was renamed to `resource_link_lookup_uuid` we
+  # have to support both names because, there are cases like RCE editor, that a
+  # resource link was previously-created and the genererated links couldn't stop
+  # working.
+  def resource_link_lookup_uuid
+    params[:resource_link_lookup_id] || params[:resource_link_lookup_uuid]
+  end
+  protected :resource_link_lookup_uuid
+
+  # Get resource link from `resource_link_lookup_id` or `resource_link_lookup_uuid`
+  # query param, and ensure the tool matches the resource link.
+  # Used for link-level custom params, but may in the future be used to
+  # determine resource_link_id to send to tool.
+  def lookup_resource_link(tool)
+    return nil unless resource_link_lookup_uuid
+    return nil unless params[:url]
+
+    resource_link = Lti::ResourceLink.where(
+      lookup_uuid: resource_link_lookup_uuid,
+      context: @context,
+      root_account_id: tool.root_account_id
+    ).active.take.tap do |resource_link|
+      if resource_link.nil?
+        raise InvalidSettingsError, t(
+          "Couldn't find valid settings for this link: Resource link not found"
+        )
+      end
+    end
+
+    # Verify the resource link was intended for the domain it's being
+    # launched from
+    resource_link if resource_link&.current_external_tool(@context)&.
+      matches_host?(params[:url])
+  end
+
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
     lti_launch = tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     default_opts = {
@@ -504,9 +552,15 @@ class ExternalToolsController < ApplicationController
         selected_html: params[:selection],
         domain: HostUrl.context_host(@domain_root_account, request.host)
     }
+
     opts = default_opts.merge(opts)
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
+
+    # from specs, seems this is only a fix for Quizzes Next
+    # resource_link_id in regular QN launches is assignment.lti_resource_link_id
+    opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
+
     expander = variable_expander(assignment: assignment,
       tool: tool, launch: lti_launch,
       post_message_token: opts[:launch_token],
@@ -519,7 +573,9 @@ class ExternalToolsController < ApplicationController
         context: @context,
         return_url: @return_url,
         expander: expander,
-        opts: opts
+        opts: opts.merge(
+          resource_link_for_custom_params: lookup_resource_link(tool)
+        )
       )
 
       # Prevent attempting OIDC login flow with the target link uri
@@ -921,6 +977,7 @@ class ExternalToolsController < ApplicationController
     end
     @tool.check_for_duplication(params.dig(:external_tool, :verify_uniqueness).present?)
     if @tool.errors.blank? && @tool.save
+      @tool.prepare_for_ags_if_needed!
       invalidate_nav_tabs_cache(@tool)
       if api_request?
         render :json => external_tool_json(@tool, @context, @current_user, session)
@@ -1093,7 +1150,98 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  # @API Get visible course navigation tools
+  # Get a list of external tools with the course_navigation placement that have not been hidden in
+  # course settings and whose visibility settings apply to the requesting user. These tools are the
+  # same that appear in the course navigation.
+  #
+  # The response format is the same as for List external tools, but with additional context_id and
+  # context_name fields on each element in the array.
+  #
+  # @argument context_codes[] [Required]
+  #   List of context_codes to retrieve visible course nav tools for (for example, +course_123+). Only
+  #   courses are presently supported.
+  #
+  # @example_request
+  #   curl 'https://<canvas>/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_5' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @response_field context_id The unique identifier of the associated context
+  # @response_field context_name The name of the associated context
+  #
+  # @example_response
+  #      [{
+  #        "id": 1,
+  #        "domain": "domain.example.com",
+  #        "url": "http://www.example.com/ims/lti",
+  #        "context_id": 5,
+  #        "context_name": "Example Course",
+  #        ...
+  #      },
+  #      { ...  }]
+  #
+  def all_visible_nav_tools
+    courses = api_find_all(Course, @course_ids)
+    return unless courses.all? { |course| authorized_action(course, @current_user, :read) }
+
+    render :json => external_tools_json_for_courses(courses)
+  end
+
+  # @API Get visible course navigation tools for a single course
+  # Get a list of external tools with the course_navigation placement that have not been hidden in
+  # course settings and whose visibility settings apply to the requesting user. These tools are the
+  # same that appear in the course navigation.
+  #
+  # The response format is the same as Get visible course navigation tools.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/visible_course_nav_tools' \
+  #        -H "Authorization: Bearer <token>"
+  def visible_course_nav_tools
+    return unless authorized_action(@context, @current_user, :read)
+    return render :json => { :message => 'Only course context is supported' }, :status => :bad_request unless context.is_a?(Course)
+
+    render :json => external_tools_json_for_courses([@context])
+  end
+
   private
+
+  def external_tools_json_for_courses(courses)
+    json = courses.reduce([]) do |all_results, course|
+      tabs = course.tabs_available(@current_user, course_subject_tabs: true)
+      tool_ids = []
+      tabs.select{ |t| t[:external] }.each do |t|
+        tool_ids << t[:args][1] if t[:args] && t[:args][1]
+      end
+      @tools = ContextExternalTool.where(:id => tool_ids)
+      @tools = tool_ids.map{ |id| @tools.find{ |t| t[:id] == id }}.compact
+      results = external_tools_json(@tools, course, @current_user, session).map do |result|
+        # add some identifying information here to simplify grouping by context for the consumer
+        result['context_id'] = course.id
+        result['context_name'] = course.name
+        result
+      end
+      all_results.push(*results)
+    end
+
+    json
+  end
+
+  def parse_context_codes
+    context_codes = Array(params[:context_codes])
+    if context_codes.empty?
+      return render :json => { :message => 'Missing context_codes' }, :status => :bad_request
+    end
+    @course_ids = context_codes.inject([]) do |ids, context_code|
+      klass, id = ActiveRecord::Base.parse_asset_string(context_code)
+      unless klass == 'Course'
+        return render :json => { :message => 'Invalid context_codes; only `course` codes are supported' },
+                      :status => :bad_request
+      end
+      ids << id
+    end
+  end
 
   def generate_module_item_sessionless_launch
     module_item_id = params[:module_item_id]
@@ -1171,6 +1319,11 @@ class ExternalToolsController < ApplicationController
         format.json { render json: {errors: {external_tool: "Unable to find a matching external tool"}} and return }
       end
     end
+
+    # In the case of cross-shard launches, direct the request to the
+    # tool's shard.
+    tool_account_res = direct_to_tool_account(@tool, @context) if @tool.shard != Shard.current
+    return render json: tool_account_res.body, status: tool_account_res.code if tool_account_res&.success?
 
     if @tool.use_1_3?
       # Create a launch URL that uses a session token to

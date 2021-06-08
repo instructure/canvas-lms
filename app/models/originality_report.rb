@@ -82,6 +82,22 @@ class OriginalityReport < ActiveRecord::Base
     end
   end
 
+  def self.copy_to_group_submissions!(report_id: , user_id: )
+    report = self.find(report_id)
+    report.copy_to_group_submissions!
+  rescue ActiveRecord::RecordNotFound => e
+    user = User.where(id: user_id).first
+    if user.nil? || user.fake_student?
+      # Test students get reset frequently, which wipes out their originality
+      # reports, so if we can't find a report but the user is also
+      # gone or is known to be a fake_student, we can ignore this and not
+      # continue with the job
+      Canvas::Errors.capture(e, { report_id: report_id, user_id: user_id }, :info)
+    else
+      raise e
+    end
+  end
+
   def copy_to_group_submissions!
     return if submission.group_id.blank?
     group_submissions = assignment.submissions.where.not(id: submission.id).where(group: submission.group)

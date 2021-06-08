@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import classnames from 'classnames'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
 
@@ -28,19 +28,22 @@ import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
 import {isPreviewable} from './Previewable'
 
 RceFileBrowser.propTypes = {
-  onFileSelect: func.isRequired
+  onFileSelect: func.isRequired,
+  onAllFilesLoading: func.isRequired,
+  searchString: string.isRequired
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect} = props
+  const {onFileSelect, searchString, onAllFilesLoading} = props
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api['content-type']
     const canPreview = isPreviewable(content_type)
     const clazz = classnames('instructure_file_link', {
-      instructure_scribd_file: canPreview
+      instructure_scribd_file: canPreview,
+      inline_disabled: true
     })
-    const url = downloadToWrap(fileInfo.api.url)
+    const url = downloadToWrap(fileInfo.src)
     const embedded_iframe_url = mediaPlayerURLFromFile(fileInfo.api)
 
     onFileSelect({
@@ -48,6 +51,7 @@ export default function RceFileBrowser(props) {
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
+      media_id: fileInfo.api.media_entry_id,
       target: '_blank',
       class: clazz,
       content_type
@@ -56,7 +60,13 @@ export default function RceFileBrowser(props) {
 
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser allowUpload={false} selectFile={handleFileSelect} contentTypes={['**']} />
+      <FileBrowser
+        allowUpload={false}
+        selectFile={handleFileSelect}
+        contentTypes={['**']}
+        searchString={searchString}
+        onLoading={onAllFilesLoading}
+      />
     </View>
   )
 }

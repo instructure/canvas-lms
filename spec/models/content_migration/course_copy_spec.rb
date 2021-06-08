@@ -231,11 +231,11 @@ describe ContentMigration do
       ['A', 'B'].map { |name| @copy_to.context_modules.create!(:name => name) }
       ['C', 'D'].map { |name| @copy_from.context_modules.create!(:name => name) }
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
 
       @copy_to.context_modules.where(name: ['C', 'D']).map(&:destroy)
       run_course_copy
-      expect(@copy_to.context_modules.order(:position).pluck(:name)).to eq(['A', 'B', 'C', 'D'])
+      expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(['A', 'B', 'C', 'D'])
     end
 
     it "should be able to copy links to files in folders with html entities and unicode in path" do
@@ -459,7 +459,15 @@ describe ContentMigration do
       @copy_from.enable_offline_web_export = true
       @copy_from.is_public_to_auth_users = true
       @copy_from.syllabus_course_summary = false
+      @copy_from.homeroom_course = true
+      @copy_from.course_color = '#123456'
       @copy_from.save!
+
+      @copy_from.lti_resource_links.create!(
+        context_external_tool: external_tool_model(context: @copy_from),
+        custom: nil,
+        lookup_uuid: '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
+      )
 
       run_course_copy
 
@@ -476,6 +484,8 @@ describe ContentMigration do
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
       expect(@copy_to.syllabus_course_summary).to eq false
+      expect(@copy_to.homeroom_course).to eq true
+      expect(@copy_to.course_color).to eq "#123456"
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
@@ -483,6 +493,9 @@ describe ContentMigration do
         expect(@copy_to.send(att)).to eq(@copy_from.send(att)), "@copy_to.#{att}: expected #{@copy_from.send(att)}, got #{@copy_to.send(att)}"
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
+
+      expect(@copy_to.lti_resource_links.size).to eq 1
+      expect(@copy_to.lti_resource_links.first.lookup_uuid).to eq '1b302c1e-c0a2-42dc-88b6-c029699a7c7a'
     end
 
     it "should copy the overridable course visibility setting" do
@@ -633,7 +646,7 @@ describe ContentMigration do
 
     it "should copy weird longdesc things" do
       page = @copy_from.wiki_pages.create!(:title => "page")
-      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/>"
+      @copy_from.syllabus_body = "<img longdesc=\"/courses/#{@copy_from.id}/pages/#{page.url}/\">"
       @copy_from.save!
 
       run_course_copy

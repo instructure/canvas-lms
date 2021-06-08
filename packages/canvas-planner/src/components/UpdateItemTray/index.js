@@ -18,16 +18,16 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
 import {themeable} from '@instructure/ui-themeable'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
 import {DateTimeInput} from '@instructure/ui-forms'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import moment from 'moment-timezone'
-import CanvasSelect from '../../CanvasSelect'
 import formatMessage from '../../format-message'
 
 import {courseShape} from '../plannerPropTypes'
@@ -101,7 +101,7 @@ export class UpdateItemTray extends Component {
     this.setState(state => ({updates: {...state.updates, [field]: value}}), this.updateMessages)
   }
 
-  handleCourseIdChange = (e, value) => {
+  handleCourseIdChange = (e, {value}) => {
     if (!value) return
     if (value === 'none') value = undefined
     this.handleChange('courseId', value)
@@ -225,28 +225,29 @@ export class UpdateItemTray extends Component {
       label: formatMessage('Optional: Add Course')
     }
     const courseOptions = (this.props.courses || [])
-      .filter(course => course.enrollmentType === 'StudentEnrollment')
+      .filter(course => course.enrollmentType === 'StudentEnrollment' || course.is_student)
       .map(course => ({
         value: course.id,
-        label: course.longName
+        label: course.longName || course.long_name
       }))
 
     const courseId = this.findCurrentValue('courseId')
     const selectedOption = courseId ? courseOptions.find(o => o.value === courseId) : noneOption
 
     return (
-      <CanvasSelect
-        label={formatMessage('Course')}
+      <SimpleSelect
+        renderLabel={formatMessage('Course')}
+        assistiveText={formatMessage('Use arrow keys to navigate options.')}
         id="to-do-item-course-select"
         value={selectedOption.value}
         onChange={this.handleCourseIdChange}
       >
         {[noneOption, ...courseOptions].map(props => (
-          <CanvasSelect.Option key={props.value} id={props.value} value={props.value}>
+          <SimpleSelect.Option key={props.value} id={props.value} value={props.value}>
             {props.label}
-          </CanvasSelect.Option>
+          </SimpleSelect.Option>
         ))}
-      </CanvasSelect>
+      </SimpleSelect>
     )
   }
 

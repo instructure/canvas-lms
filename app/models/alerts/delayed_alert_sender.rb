@@ -23,9 +23,8 @@ module Alerts
       Account.root_accounts.active.non_shadow.find_each do |account|
         next unless account.settings[:enable_alerts]
         account.all_courses.active.find_ids_in_batches(batch_size: 200) do |batch|
-          self.send_later_if_production_enqueue_args(:evaluate_courses,
-                                                     {n_strand: ['delayed_alert_sender_evaluate_courses', account.global_id],
-                                                      priority: Delayed::LOW_PRIORITY}, batch)
+          delay_if_production(n_strand: ['delayed_alert_sender_evaluate_courses', account.global_id], priority: Delayed::LOW_PRIORITY).
+            evaluate_courses(batch)
         end
       end
     end

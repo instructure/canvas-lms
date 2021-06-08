@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -16,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.13.3', '<= 2.1.4'
+gem 'bundler', '>= 2.2.17', '<= 2.2.19'
 
 if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')
@@ -24,22 +26,28 @@ if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
 end
 
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-if RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+if RUBY_ENGINE == 'truffleruby' && RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
+  $stderr.puts "TruffleRuby support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
+  ruby RUBY_VERSION, :engine => RUBY_ENGINE, :engine_version => RUBY_ENGINE_VERSION
+elsif RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
 elsif RUBY_VERSION >= "2.7.0" && RUBY_VERSION < "2.8"
   $stderr.puts "Ruby 2.7+ support is untested" unless ENV['SUPPRESS_RUBY_WARNING']
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
+elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
+  $stderr.puts "Ruby 3.0+ support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
 else
   ruby '2.6.5', :engine => 'ruby', :engine_version => '2.6.0'
 end
 
 # force a different lockfile for next rails
-unless CANVAS_RAILS5_2
+unless CANVAS_RAILS6_0
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
-        lockfile = "#{Bundler.default_gemfile}.lock"
-        lockfile << ".next" unless CANVAS_RAILS5_2
+        lockfile = +"#{Bundler.default_gemfile}.lock"
+        lockfile << ".next" unless CANVAS_RAILS6_0
         Pathname.new(lockfile)
       end
     end

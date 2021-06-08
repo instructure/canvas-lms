@@ -80,15 +80,15 @@ module BasicLTI
       end
 
       def sourcedid
-        @lti_request.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
+        @lti_request&.at_css('imsx_POXBody sourcedGUID > sourcedId').try(:content)
       end
 
       def message_ref_identifier
-        @lti_request.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
+        @lti_request&.at_css('imsx_POXHeader imsx_messageIdentifier').try(:content)
       end
 
       def operation_ref_identifier
-        tag = @lti_request.at_css('imsx_POXBody *:first').try(:name)
+        tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
         tag && tag.sub(%r{Request$}, '')
       end
 
@@ -120,6 +120,10 @@ module BasicLTI
 
       def result_data_launch_url
         @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
+      end
+
+      def user_enrollment_active?(assignment, user)
+        user.student_enrollments.active_or_pending_by_date.where(course_id: assignment.context_id).any?
       end
 
       def to_xml
@@ -176,7 +180,13 @@ module BasicLTI
         end
 
         op = self.operation_ref_identifier.underscore
-        if self.respond_to?("handle_#{op}", true)
+        # Write results are disabled for concluded users, read results are still allowed
+        if op != 'read_result' && !user_enrollment_active?(assignment, user)
+          self.code_major = 'failure'
+          self.description = 'Course not available for student'
+          self.body = "<#{operation_ref_identifier}Response />"
+          return true
+        elsif self.respond_to?("handle_#{op}", true)
           return self.send("handle_#{op}", tool, assignment, user)
         end
 
@@ -280,9 +290,7 @@ to because the assignment has no points possible.
               :n_strand => Attachment.clone_url_strand(url)
             }
 
-            send_later_enqueue_args(
-              :fetch_attachment_and_save_submission,
-              job_options,
+            delay(**job_options).fetch_attachment_and_save_submission(
               url,
               attachment,
               tool,
@@ -310,7 +318,7 @@ to because the assignment has no points possible.
         end
 
         if new_score || raw_score
-          submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+          submission_hash[:grade] = (new_score > 0 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -tool.id
           @submission = assignment.grade_student(user, submission_hash).first
           if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?

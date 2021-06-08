@@ -96,7 +96,7 @@ module DataFixup::ReclaimInstfsAttachments
       Attachment.joins(context_folder: :account),
       Attachment.joins(context_sis_batch: :account),
       Attachment.joins(context_outcome_import: :account),
-    ].map{ |scope| scope.where("COALESCE(accounts.root_account_id, accounts.id) IN (?)", root_account_ids) }
+    ].map{ |scope| scope.where("#{Account.resolved_root_account_id_sql} IN (?)", root_account_ids) }
 
     (course_queries + group_queries + account_queries).
       map{ |q| q.where("instfs_uuid IS NOT NULL") }.

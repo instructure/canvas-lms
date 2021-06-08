@@ -151,6 +151,10 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_prevent_course_renaming_by_teachers", :prevent_course_renaming_by_teachers)
     end
 
+    it "should click on don't let teachers change availability on their courses" do
+      check_box_verifier("#account_settings_prevent_course_availability_editing_by_teachers", :prevent_course_availability_editing_by_teachers)
+    end
+
     it "should uncheck 'students can opt-in to receiving scores in email notifications' " do
       check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
     end
@@ -348,6 +352,7 @@ describe "admin settings tab" do
 
   context "who can create new courses" do
     before :each do
+      Account.default.disable_feature!(:granular_permissions_manage_courses)
       get "/accounts/#{Account.default.id}/settings"
     end
 
@@ -359,16 +364,17 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
     end
 
+    it "should check on users with no enrollments (granular permissions)" do
+      Account.default.enable_feature!(:granular_permissions_manage_courses)
+      check_box_verifier("#account_settings_no_enrollments_can_create_courses", :no_enrollments_can_create_courses)
+    end
+
     it "should check on students" do
       check_box_verifier("#account_settings_students_can_create_courses", :students_can_create_courses)
     end
   end
 
   context "custom help links" do
-    before :once do
-      Setting.set('show_feedback_link', 'true')
-    end
-
     def set_checkbox(checkbox, checked)
       selector = "##{checkbox['id']}"
       checkbox.click if is_checked(selector) != checked
@@ -499,6 +505,8 @@ describe "admin settings tab" do
     end
 
     it "edits a default link" do
+      Setting.set('show_feedback_link', 'true')
+
       get "/accounts/#{Account.default.id}/settings"
       fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
@@ -589,6 +597,25 @@ describe "admin settings tab" do
       else
         expect(f(".feature.#{feature.feature}")).to be_displayed
       end
+    end
+  end
+
+  context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
+    before :once do
+      @account = Account.default
+      @subaccount = Account.create!(name: "subaccount1", parent_account_id: @account.id)
+    end
+
+    it "is locked and enabled for subaccounts of an account where setting is enabled" do
+      account_admin_user(:account => @account)
+      user_session(@admin)
+      get "/accounts/#{@account.id}/settings"
+      checkbox = "#account_settings_enable_as_k5_account_value"
+      f(checkbox).click
+      click_submit
+      get "/accounts/#{@subaccount.id}/settings"
+      expect(is_checked(checkbox)).to be_truthy
+      expect(f(checkbox)).to be_disabled
     end
   end
 end

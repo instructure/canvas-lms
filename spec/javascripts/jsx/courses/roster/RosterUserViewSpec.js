@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 
-import RosterUserView from 'compiled/views/courses/roster/RosterUserView'
-import RosterUser from 'compiled/models/RosterUser'
+import RosterUserView from 'ui/features/roster/backbone/views/RosterUserView.js'
+import RosterUser from 'ui/features/roster/backbone/models/RosterUser.coffee'
 
 let rosterViewOne
 let rosterViewTwo
@@ -31,7 +31,7 @@ QUnit.module('RosterUserViewSpec', {
     window.ENV = window.ENV || {}
     existingENV = window.ENV
     window.ENV.permissions = {
-      manage_admin_users: true,
+      can_allow_course_admin_actions: true,
       manage_students: true
     }
     window.ENV.course = {id: 1}

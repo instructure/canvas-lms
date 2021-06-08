@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -149,6 +151,7 @@ class MediaObjectsController < ApplicationController
       order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)')
     end
     scope = scope.order(order_by => order_dir)
+    scope = MediaObject.search_by_attribute(scope, :title, params[:search_term])
 
     exclude = params[:exclude] || []
     media_objects =
@@ -192,7 +195,7 @@ class MediaObjectsController < ApplicationController
     # Exclude all global includes from this page
     @exclude_account_js = true
 
-    js_env media_object: media_object_api_json(@media_object, @current_user, session)
+    js_env media_object: media_object_api_json(@media_object, @current_user, session) if @media_object
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t('Loading...')}</div>".html_safe,
@@ -202,15 +205,14 @@ class MediaObjectsController < ApplicationController
   private
 
   def load_media_object
+    return nil unless params[:media_object_id].present?
     @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
       @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
-      @media_object.send_later_enqueue_args(
-        :retrieve_details,
-        { singleton: "retrieve_media_details:#{@media_object.media_id}" }
-      )
+      raise ActiveRecord::RecordNotFound, "invalid media_object_id" unless @media_object
+      @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
       increment_request_cost(Setting.get('missed_media_additional_request_cost', '200').to_i)
     end
 

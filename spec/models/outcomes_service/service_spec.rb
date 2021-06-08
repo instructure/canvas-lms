@@ -51,6 +51,7 @@ describe OutcomesService::Service do
     before do
       root_account.settings[:provision] = { 'outcomes' => {
         domain: 'canvas.test',
+        beta_domain: 'canvas.beta',
         consumer_key: 'blah',
         jwt_secret: 'woo'
       }}
@@ -60,6 +61,16 @@ describe OutcomesService::Service do
     describe '.url' do
       it 'returns url' do
         expect(Service.url(course)).to eq 'http://canvas.test'
+      end
+
+      describe 'if ApplicationController.test_cluster_name is specified' do
+        it 'returns a url using the test_cluster_name domain' do
+          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+          allow(ApplicationController).to receive(:test_cluster_name).and_return('beta')
+          expect(Service.url(course)).to eq 'http://canvas.beta'
+          allow(ApplicationController).to receive(:test_cluster_name).and_return('invalid')
+          expect(Service.url(course)).to eq nil
+        end
       end
     end
 

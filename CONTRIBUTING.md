@@ -35,7 +35,7 @@ In order to log in and participate in the community you will need a Canvas accou
 the easiest way to get one is to go to http://www.canvaslms.com/try-canvas, and click “Build It” and register as a teacher for a free account.
 
 **Configuration Issues** are generally best answered either on our user group mailing list or
-in #canvas-lms on Freenode.  See https://github.com/instructure/canvas-lms/wiki#getting-help
+in #canvas-lms on libera.chat.  See https://github.com/instructure/canvas-lms/wiki#getting-help
 for a full list of options for getting help.
 
 ## Submitting Pull Requests
@@ -93,7 +93,7 @@ for you and for us:
 Guidelines
 ----------
 
-- All new UI should be built in [React](https://github.com/instructure/canvas-lms/tree/stable/app/jsx) using the documented [API](https://canvas.instructure.com/doc/api/).
+- All new UI should be built in [React](https://github.com/instructure/canvas-lms/tree/stable/ui) using the documented [API](https://canvas.instructure.com/doc/api/).
 - Contributed code should pass our linters, but sweeping changes solely to correct lint errors in existing code should be avoided. The following scripts can be used to run the linters against changes in your code: `script/eslint` for JavaScript code, `script/rlint` for Ruby code, and `script/stylelint` for (S)CSS code.
 
 ## CLA

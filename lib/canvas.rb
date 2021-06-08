@@ -33,58 +33,19 @@ module Canvas
   end
 
   def self.redis
-    raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
-    if redis_config == 'cache_store' || redis_config.is_a?(Hash) && redis_config['servers'] == 'cache_store'
-      return Rails.cache.redis
-    end
-    @redis ||= begin
-      Canvas::Redis.patch
-      settings = ConfigFile.load('redis').dup
-      settings['url'] = settings['servers'] if settings['servers']
-      ActiveSupport::Cache::RedisCacheStore.build_redis(**settings.to_h.symbolize_keys)
-    end
+    CanvasCache::Redis.redis
   end
 
   def self.redis_config
-    @redis_config ||= ConfigFile.load('redis')
+    CanvasCache::Redis.config
   end
 
   def self.redis_enabled?
-    @redis_enabled ||= redis_config.present?
+    CanvasCache::Redis.enabled?
   end
 
-  # technically this is just disconnect_redis, because new connections are created lazily,
-  # but I didn't want to rename it when there are several uses of it
   def self.reconnect_redis
-    if Rails.cache &&
-      defined?(ActiveSupport::Cache::RedisCacheStore) &&
-      Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
-      Canvas::Redis.handle_redis_failure(nil, "none") do
-        redis = Rails.cache.redis
-        if redis.respond_to?(:nodes)
-          redis.nodes.each(&:disconnect!)
-        else
-          redis.disconnect!
-        end
-      end
-    end
-
-    if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore)
-      Canvas::Redis.handle_redis_failure(nil, "none") do
-        redis = MultiCache.cache.redis
-        if redis.respond_to?(:nodes)
-          redis.nodes.each(&:disconnect!)
-        else
-          redis.disconnect!
-        end
-      end
-    end
-
-    return unless @redis
-    # We're sharing redis connections between Canvas.redis and Rails.cache,
-    # so don't call reconnect on the cache too.
-    return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
-    @redis = nil
+    Canvas::Redis.reconnect_redis
   end
 
   def self.cache_store_config_for(cluster)
@@ -107,12 +68,14 @@ module Canvas
     when 'redis_cache_store'
       Canvas::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
-      if config == {} && cluster == Rails.env && Canvas.redis_enabled?
+      if config.except('expires_in') == {} && cluster == Rails.env && Canvas.redis_enabled?
         ActiveSupport::Cache.lookup_store(:redis_cache_store, redis: Canvas.redis)
       else
         # merge in redis.yml, but give precedence to cache_store.yml
         redis_config = (ConfigFile.load('redis', cluster) || {})
         config = redis_config.merge(config) if redis_config.is_a?(Hash)
+        # back compat
+        config[:url] = config[:servers] if config[:servers]
         # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
@@ -331,5 +294,19 @@ module Canvas
 
   def self.cluster
     nil
+  end
+
+  def self.environment
+    Rails.env
+  end
+
+  # for use in cases where you want to tie an action
+  # to the "current" user in situations like console invocation.
+  # As long as all authorized console users are provisioned with siteadmin
+  # pseudonyms that share their username, this will look up their associated user record.
+  # Otherwise it's still safe, it will just return a nil user.
+  def self.infer_user(username=nil)
+    unix_user = username || ENV['SUDO_USER'] || ENV['USER']
+    Account.site_admin.pseudonyms.active.by_unique_id(unix_user).first&.user
   end
 end

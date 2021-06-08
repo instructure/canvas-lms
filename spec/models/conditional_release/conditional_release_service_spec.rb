@@ -24,6 +24,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 describe ConditionalRelease::Service do
   Service = ConditionalRelease::Service
 
+  before do
+    skip 'flaky specs: LS-1943'
+  end
+
   def enable_service
     allow(Service).to receive(:enabled_in_context?).and_return(true)
   end

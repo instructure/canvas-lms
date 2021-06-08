@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import unflatten from 'compiled/object/unflatten'
+import unflatten from 'obj-unflatten'
 
 QUnit.module('unflatten')
 
@@ -54,4 +54,21 @@ test('nested params', () => {
     i: 7
   }
   deepEqual(unflatten(input), expected)
+})
+
+test('prototype pollution protection', () => {
+  const dangerous_input = {
+    '__proto__[admin]': true
+  }
+
+  const safe_result = Object.create(null)
+  // eslint-disable-next-line no-proto
+  safe_result.__proto__ = {admin: true}
+
+  const user = {name: 'Dale'}
+  deepEqual(user.admin, undefined)
+  const result = unflatten(dangerous_input)
+  deepEqual(result, safe_result, 'unflatten works')
+  deepEqual(result.admin, undefined, '__proto__ is just an object property')
+  deepEqual(user.admin, undefined, 'Object.prototype is not polluted')
 })

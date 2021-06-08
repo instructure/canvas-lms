@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'jsx/developer_keys/actions/developerKeysActions'
-import reducer from 'jsx/developer_keys/reducers/deleteReducer'
+import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions.js'
+import reducer from 'ui/features/developer_keys_v2/react/reducers/deleteReducer.js'
 
 QUnit.module('deleteDeveloperKeyReducer')
 

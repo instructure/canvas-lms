@@ -32,7 +32,10 @@ class GradebookGradingPeriodAssignments
 
   def to_h
     return {} unless @course.grading_periods?
-    the_query.transform_values {|list| list.map(&:to_s)}
+
+    the_query.each_with_object({}) do |(period_id, list), hash|
+      hash[period_id || :none] = list.map(&:to_s)
+    end
   end
 
   private
@@ -53,7 +56,7 @@ class GradebookGradingPeriodAssignments
         joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON enrollments.user_id = submissions.user_id").
         merge(Assignment.for_course(@course).active).
         where(enrollments: { course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'] }).
-        where.not(grading_period_id: nil).where.not(enrollments: { workflow_state: excluded_workflow_states })
+        where.not(enrollments: { workflow_state: excluded_workflow_states })
 
       scope = scope.where(user: @student) if @student
       scope.

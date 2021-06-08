@@ -329,7 +329,7 @@ module SIS
           raise "state mismatch error queuing parallel import jobs"
         end
         importers_to_queue.each do |pi|
-          self.send_later_enqueue_args(:run_parallel_importer, enqueue_args, pi)
+          delay(**enqueue_args).run_parallel_importer(pi)
         end
       end
 

@@ -37,6 +37,10 @@ module Types
       context[:session]
     end
 
+    def request
+      context[:request]
+    end
+
     def load_association(assoc)
       Loaders::AssociationLoader.for(object.class, assoc).load(object)
     end

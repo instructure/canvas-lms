@@ -4,54 +4,24 @@ analytics2_api_access:
   applies_to: RootAccount
   display_name: New Analytics API Access
   description: Enables new API endpoints for the course and user data provided by New Analytics.
-gradebook_export_sort_order_bugfix:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Gradebook Export Sort Order Bugfix (Tally-219)
-  description: Changes the sort order of the gradebook export to more closely match the canvas documentation
-include_speed_grader_in_assignment_header_menu:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Include SpeedGrader in Assignment Header Menu
-  description: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
-prefetch_gradebook_user_ids:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Prefetch User IDs in Gradebook
-  description: Load user ids upon page load so that Gradebook loads more quickly.
 datadog_rum_js:
   state: hidden
   applies_to: SiteAdmin
   display_name: Datadog RUM JS Agent
   description: Include the Datadog RUM JS Agent in the document HEAD.
-grade_calculator_performance_improvements:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Grade Calculator Performance Improvements
-  description: Performance improvements for the grade calculation process.
-gradebook_dataloader_improvements:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Gradebook Data Loading Performance Improvements
-  description: Performance improvements for loading data into Gradebook.
-  environments:
-    ci:
-      state: on
-    development:
-      state: on
-    test:
-      state: on
 missing_policy_applicator_emits_live_events:
   state: hidden
   applies_to: RootAccount
   display_name: Missing Policy Applicator Emits Live Events
-  description: Allows the missing policy applicator to emit submission_updated live events for each submission
+  description:
+    Allows the missing policy applicator to emit submission_updated live events for each submission
     marked as missing.
 disable_post_to_sis_when_grading_period_closed:
   state: hidden
   applies_to: RootAccount
   display_name: Disable Post to SIS for Assignment in Closed Grading Periods
-  description: If set, turns off post-to-SIS functionality for assignments when their grading period closes.
+  description:
+    If set, turns off post-to-SIS functionality for assignments when their grading period closes.
     Only applies if the "Enable new SIS integration settings" feature is enabled.
 final_grade_override_in_gradebook_history:
   state: hidden
@@ -65,12 +35,55 @@ responsive_student_grades_page:
   description: Makes the student grades page responsive.
 view_ungraded_as_zero:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: Account
   display_name: View Ungraded as Zero View in Gradebook
-  description: The Gradebook will factor in ungraded submissions as if they were given a score of zero for
+  description:
+    The Gradebook will factor in ungraded submissions as if they were given a score of zero for
     calculations. This is just a view for the teacher, and does not affect actual scoring.
 fix_missing_policy_grade_change_records:
   state: hidden
   applies_to: SiteAdmin
   display_name: Fix Missing Policy Grade Change Records
   description: Insert a grade change record when the periodic MissingPolicyApplicator job runs on a submission.
+import_override_scores_in_gradebook:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Import Override Scores in Gradebook
+  description: Allows the Gradebook importer to recognize and apply changes to override scores.
+gradebook_csv_headers_include_grading_period:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Gradebook CSV Headers Include Grading Period
+  description: If set, the Gradebook CSV exporter will append the title of the selected grading
+    period to column headers whose values vary based on grading period.
+gradebook_load_assignments_by_grading_period:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Load Gradebook Assignments by Grading Period
+  description:
+    If set, the Gradebook will chunk out loading of assignments, loading those for the selected
+    grading period first.
+grade_calc_ignore_unposted_anonymous:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Ignore Unposted Anonymous Assignments in Grade Calculation
+  description:
+    If set, the grade calculator will ignore unposted anonymous assignments when calculating
+    totals.
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
+use_cloudfront_for_docviewer:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use CloudFront for DocViewer
+  description: Request that DocViewer use CloudFront for serving pdf assets.
+annotated_document_submissions:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Student Annotation submissions
+  description: Ability to submit student annotation assignments.

@@ -119,8 +119,10 @@
 <% end %>
 
 <h1><%= @user.name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h1>
+
+<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
-<% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
+<% can_manage_admins = can_do(@context, @current_user, manage_perm) %>
 
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
 <%= render :partial => 'users/name' %>
@@ -173,7 +175,7 @@
               <% end %>
             </tr>
           <% end %>
-          <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+          <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
             <tr>
               <td>
                 <%= before_label('user_privileges', %{Privileges}) %>
@@ -195,7 +197,7 @@
             </tr>
           <% end %>
         </table>
-        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
           <div id="student_last_attended__component"></div>
         <% end %>
       </fieldset>

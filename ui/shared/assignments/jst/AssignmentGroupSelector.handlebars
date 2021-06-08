@@ -1,0 +1,30 @@
+<div class="form-column-left no-group">
+  <label for="assignment_group_id">
+    {{#t "assignment_group"}}Assignment Group{{/t}}
+  </label>
+</div>
+
+<div class="form-column-right">
+  <select id="assignment_group_id"
+    name="{{#if nested}}assignment[assignment_group_id]{{else}}assignment_group_id{{/if}}"
+    {{#if inClosedGradingPeriod}}
+      readonly
+      aria-readonly="true"
+    {{/if}}
+    {{disabledIfIncludes frozenAttributes "assignment_group_id"}}
+  >
+    {{#each assignmentGroups}}
+      <option value="{{id}}" {{selectedIf ../assignmentGroupId this.id}}>
+        {{name}}
+      </option>
+    {{/each}}
+    <option value="new">
+      {{#if new_quizzes_modules_support}}
+        [ {{#t "assignment_group_options.create_group"}}Create Group{{/t}} ]
+      {{else}}
+        [ {{#t "assignment_group_options.new_group"}}New Group{{/t}} ]
+      {{/if}}
+    </option>
+  </select>
+</div>
+

@@ -18,30 +18,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn(status) {
-  try {
-    junit "tmp/spec_results/**/*.xml"
+  junit 'tmp/spec_results/**/*.xml'
 
-    if(status == 'SUCCESS' && configuration.isChangeMerged()) {
-      sh 'build/new-jenkins/pact/contracts-publish-api.sh'
-    }
-  } finally {
-    sh 'rm -vrf tmp/spec_results'
-    execute 'bash/docker-cleanup.sh --allow-failure'
+  if (status == 'SUCCESS' && configuration.isChangeMerged()) {
+    sh 'build/new-jenkins/pact/contracts-publish-api.sh'
   }
 }
 
-def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenkins/pact/contracts-verify-api.sh') {
+def runAndCopyResults(databaseName, consumerName, scriptName='build/new-jenkins/pact/contracts-verify-api.sh') {
   withEnv([
-    "DATABASE_NAME=${database_name}",
-    "PACT_API_CONSUMER=${consumer_name}",
+    "DATABASE_NAME=${databaseName}",
+    "PACT_API_CONSUMER=${consumerName}",
   ]) {
     try {
-      sh script_name
+      sh scriptName
     } finally {
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+      sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir"
     }
   }
 }
@@ -50,76 +45,79 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(15)
     timestamps()
   }
 
   environment {
+    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-contract-tests.yml'
-    DOCKER_PROCESSES = '7'
     POSTGRES_PASSWORD = 'sekret'
     PACT_BROKER = credentials('PACT_BROKER')
-    PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}"
-    PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}"
+    PACT_BROKER_USERNAME = "${env.PACT_BROKER_USR}"
+    PACT_BROKER_PASSWORD = "${env.PACT_BROKER_PSW}"
+    RSPEC_PROCESSES = '7'
   }
 
   stages {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
-            stage ('Pre-Cleanup') {
-              cleanAndSetup()
-            }
-
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
             stage('Start Docker Images') {
-              timeout(time: 10) {
-                checkout scm
-                sh 'build/new-jenkins/docker-compose-pull.sh'
+              timeout(3) {
+                def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                checkoutRepo('canvas-lms', refspecToCheckout, 1)
+
+                credentials.withStarlordDockerLogin { ->
+                  sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+                }
                 sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
               }
             }
 
-            stage('Provider Verification for API and Live Event Consumers') {
+            def postBuildHandler = [
+              onStageEnded: { stageName, stageConfig ->
+                cleanupFn(stageConfig.status())
+              }
+            ]
+
+            extendedStage('Provider Verification for API and Live Event Consumers').hooks(postBuildHandler).obeysAllowStages(false).execute {
               def stages = [:]
 
               stages['Android'] = {
-                timeout(time: 10) {
+                timeout(5) {
                   runAndCopyResults('pact_test1', 'android')
                 }
               }
 
               stages['Canvas iOS'] = {
-                timeout(time: 10) {
+                timeout(5) {
                   runAndCopyResults('pact_test2', 'canvas-ios')
                 }
               }
 
-              stages['Generic'] = {
-                timeout(time: 10) {
-                  runAndCopyResults('pact_test3', 'Generic Consumer')
-                }
-              }
-
               stages['Quiz LTI'] = {
-                timeout(time: 10) {
-                  runAndCopyResults('pact_test4', 'Quiz LTI')
+                timeout(10) {
+                  runAndCopyResults('pact_test3', 'Quiz LTI')
                 }
               }
 
               stages['Sistemic'] = {
-                timeout(time: 10) {
-                  runAndCopyResults('pact_test5', 'Sistemic')
+                timeout(5) {
+                  runAndCopyResults('pact_test4', 'Sistemic')
                 }
               }
 
               stages['Live Events'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('live_events', '', 'build/new-jenkins/pact/contracts-verify-live-events.sh')
                 }
               }
 
               stages['Outcomes'] = {
-                timeout(time: 5) {
+                timeout(5) {
                   runAndCopyResults('pact_test6', '', 'build/new-jenkins/pact/contracts-generate-api.sh')
                 }
               }

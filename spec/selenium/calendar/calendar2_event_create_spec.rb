@@ -142,7 +142,7 @@ describe "calendar2" do
         replace_content(f("input[type=text][name= 'end_time']"), "6:00pm")
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
-        wait_for_tiny(f(".mce-edit-area"))
+        wait_for_tiny(f('iframe', f('.ic-RichContentEditor')))
         expect(f('.title')).to have_value "Test Event"
         move_to_click('#duplicate_event')
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
@@ -206,7 +206,7 @@ describe "calendar2" do
 
         get "/courses/#{@course.id}/calendar_events/new"
         wait_for_ajaximations
-        wait_for_tiny(f(".mce-edit-area"))
+        wait_for_tiny(f('iframe', f('.ic-RichContentEditor')))
         f('#use_section_dates').click
 
         num_rows = ff(".show_if_using_sections .row_header").length

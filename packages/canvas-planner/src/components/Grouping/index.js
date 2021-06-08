@@ -19,11 +19,11 @@ import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
 import classnames from 'classnames'
 import {partition} from 'lodash'
-import {arrayOf, string, number, shape, func} from 'prop-types'
+import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 import PlannerItem from '../PlannerItem'
 import CompletedItemsFacade from '../CompletedItemsFacade'
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
@@ -50,13 +50,17 @@ export class Grouping extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
-    responsiveSize: sizeShape
+    responsiveSize: sizeShape,
+    simplifiedControls: bool,
+    singleCourseView: bool
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-    responsiveSize: 'large'
+    responsiveSize: 'large',
+    simplifiedControls: false,
+    singleCourseView: false
   }
 
   constructor(props) {
@@ -72,7 +76,7 @@ export class Grouping extends Component {
     this.props.registerAnimatable('group', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
     this.props.registerAnimatable(
       'group',
@@ -129,6 +133,10 @@ export class Grouping extends Component {
     return this.props.responsiveSize
   }
 
+  showNotificationBadgeOnItem() {
+    return this.getLayout() !== 'large' && !this.props.simplifiedControls
+  }
+
   renderItemsAndFacade(items) {
     const [completedItems, otherItems] = partition(items, item => item.completed && !item.show)
     let itemsToRender = otherItems
@@ -144,13 +152,9 @@ export class Grouping extends Component {
   }
 
   renderItems(items) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     return items.map((item, itemIndex) => (
       <li className={styles.item} key={item.uniqueId}>
         <PlannerItem
-          theme={{
-            iconColor: this.props.color
-          }}
           color={this.props.color}
           completed={item.completed}
           overrideId={item.overrideId}
@@ -172,7 +176,7 @@ export class Grouping extends Component {
           status={item.status}
           newActivity={item.newActivity}
           allDay={item.allDay}
-          showNotificationBadge={showNotificationBadgeOnItem}
+          showNotificationBadge={this.showNotificationBadgeOnItem()}
           currentUser={this.props.currentUser}
           feedback={item.feedback}
           location={item.location}
@@ -180,13 +184,13 @@ export class Grouping extends Component {
           endTime={item.endTime}
           dateStyle={item.dateStyle}
           timeZone={this.props.timeZone}
+          simplifiedControls={this.props.simplifiedControls}
         />
       </li>
     ))
   }
 
   renderFacade(completedItems, animatableIndex) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     if (!this.state.showCompletedItems && completedItems.length > 0) {
       const theDay = completedItems[0].date.clone()
       theDay.startOf('day')
@@ -198,7 +202,7 @@ export class Grouping extends Component {
         return item.uniqueId
       })
       let notificationBadge = 'none'
-      if (showNotificationBadgeOnItem) {
+      if (this.showNotificationBadgeOnItem()) {
         if (newActivity) {
           notificationBadge = 'newActivity'
         } else if (missing) {
@@ -216,7 +220,7 @@ export class Grouping extends Component {
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
             theme={{
-              labelColor: this.props.color
+              labelColor: this.props.simplifiedControls ? undefined : this.props.color
             }}
             date={theDay}
             responsiveSize={this.props.responsiveSize}
@@ -233,7 +237,7 @@ export class Grouping extends Component {
 
   renderNotificationBadge() {
     // narrower layout puts the indicator next to the actual items
-    if (this.getLayout() !== 'large') {
+    if (this.getLayout() !== 'large' || this.props.simplifiedControls) {
       return null
     }
 
@@ -275,6 +279,7 @@ export class Grouping extends Component {
   }
 
   renderGroupLink() {
+    if (this.props.singleCourseView) return null
     if (!this.props.title) {
       return (
         <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>
@@ -312,5 +317,7 @@ export class Grouping extends Component {
 }
 
 const ResponsiveGrouping = responsiviser()(Grouping)
-
-export default animatable(themeable(theme, styles)(ResponsiveGrouping))
+const ThemeableGrouping = themeable(theme, styles)(ResponsiveGrouping)
+const AnimatableGrouping = animatable(ThemeableGrouping)
+AnimatableGrouping.theme = ThemeableGrouping.theme
+export default AnimatableGrouping

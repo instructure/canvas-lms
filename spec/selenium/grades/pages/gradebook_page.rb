@@ -193,6 +193,10 @@ module Gradebook
     fj('li li:contains("Unpublished Assignments")')
   end
 
+  def self.view_ungraded_as_zero
+    fj('li li:contains("View Ungraded as 0")')
+  end
+
   def self.body
     f('body')
   end
@@ -408,6 +412,16 @@ module Gradebook
     view_menu = open_gradebook_menu('View')
     hover(view_menu_item("Arrange By"))
     view_menu
+  end
+
+  def self.select_view_ungraded_as_zero(confirm: true)
+    view_ungraded_as_zero.click
+
+    if confirm
+      confirmation_dialog = f("span[role=dialog][aria-label='View Ungraded as Zero']")
+      ok_button = fj("button:contains('OK')", confirmation_dialog)
+      ok_button.click
+    end
   end
 
   def self.select_view_dropdown

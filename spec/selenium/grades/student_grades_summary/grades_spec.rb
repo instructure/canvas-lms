@@ -25,7 +25,7 @@ describe "grades" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    @teacher1 = course_with_teacher(name: 'Teacher Boss1', active_user: true, active_enrollment: true, active_course: true).user
+    @teacher1 = course_with_teacher(name: 'Dedicated Teacher1', active_user: true, active_enrollment: true, active_course: true).user
     @student_1 = course_with_student(course: @course, name: "Student 1", active_all:true).user
     @student_2 = course_with_student(course: @course, name: "Student 2", active_all:true).user
 
@@ -482,21 +482,21 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
 
       click_option("#student_select_menu", "Student 2")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 2"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 2"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
 
       click_option("#student_select_menu", "Student 1")
       expect_new_page_load { f('#apply_select_menus').click }
 
       expect(f("#student_select_menu")).to be_displayed
-      expect(fj("#student_select_menu option:selected")).to include_text "Student 1"
+      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
       expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end

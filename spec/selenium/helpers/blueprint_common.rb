@@ -71,7 +71,7 @@ module BlueprintCourseCommon
 
     def update_child_discussion(minion)
       child_discussion = minion.discussion_topics.where(title: @discussion1.title).first
-      child_discussion.update(delayed_post_at: Time.zone.now+3.days)
+      child_discussion.update(require_initial_post: true)
     end
 
     def update_master_discussion_and_migrate(master)

@@ -19,8 +19,8 @@
 import I18n from 'i18n!shared.flash_notices'
 
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
-import NotificationsHelper from 'jsx/railsFlashNotificationsHelper'
+import htmlEscape from 'html-escape'
+import NotificationsHelper from '@canvas/rails-flash-notifications/jquery/helper'
 
 let helper
 let fixtures

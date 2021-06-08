@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
-import CourseFindSelectView from 'compiled/views/content_migrations/subviews/CourseFindSelectView'
+import Backbone from '@canvas/backbone'
+import CourseFindSelectView from 'ui/features/content_migrations/backbone/views/subviews/CourseFindSelectView.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

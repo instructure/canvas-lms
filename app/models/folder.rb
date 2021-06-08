@@ -33,6 +33,7 @@ class Folder < ActiveRecord::Base
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
+  STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE = "student annotation documents"
 
   belongs_to :context, polymorphic: [:user, :group, :account, :course], optional: false
   belongs_to :cloned_item
@@ -56,9 +57,13 @@ class Folder < ActiveRecord::Base
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
+  after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
 
   def file_attachments_visible_to(user)
-    if self.context.grants_right?(user, :manage_files)
+    if context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+        self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+      self.active_file_attachments
+    elsif self.context.grants_right?(user, :manage_files)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
@@ -73,6 +78,19 @@ class Folder < ActiveRecord::Base
     else
       self.root_account_id = self.context.root_account_id
     end
+  end
+
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
   end
 
   def protect_root_folder_name
@@ -130,7 +148,7 @@ class Folder < ActiveRecord::Base
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
   scope :not_locked, -> { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
-  scope :by_position, -> { order(:position) }
+  scope :by_position, -> { ordered }
   scope :by_name, -> { order(name_order_by_clause('folders')) }
 
   def display_name
@@ -332,8 +350,11 @@ class Folder < ActiveRecord::Base
     folder = nil
     context.shard.activate do
       Folder.unique_constraint_retry do
-        folder = context.folders.active.where(:unique_type => unique_type).take
-        folder ||= context.folders.create!(:unique_type => unique_type, :name => default_name_proc.call, :parent_folder_id => Folder.root_folders(context).first)
+        folder = context.folders.active.where(unique_type: unique_type).take
+        folder ||= context.folders.create!(unique_type: unique_type,
+                                           name: default_name_proc.call,
+                                           parent_folder_id: Folder.root_folders(context).first,
+                                           workflow_state: 'hidden')
       end
     end
     folder
@@ -426,6 +447,7 @@ class Folder < ActiveRecord::Base
 
   def get_folders_by_component(components, include_hidden_and_locked)
     return [self] if components.empty?
+
     components = components.dup
     subfolder_name = components.shift
     # search all subfolders with the given name (yes, there can be duplicates)
@@ -439,7 +461,16 @@ class Folder < ActiveRecord::Base
   end
 
   def self.resolve_path(context, path, include_hidden_and_locked = true)
-    path_components = path ? (path.is_a?(Array) ? path : path.split('/')) : []
+    path_components =
+      case path
+      when Array
+        path
+      when String
+        path.split('/')
+      else
+        []
+      end
+
     Folder.root_folders(context).each do |root_folder|
       folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
       return folders if folders
@@ -449,10 +480,15 @@ class Folder < ActiveRecord::Base
 
   def locked?
     return @locked if defined?(@locked)
+
     @locked = self.locked ||
-      (self.lock_at && Time.now > self.lock_at) ||
-      (self.unlock_at && Time.now < self.unlock_at) ||
-      (self.parent_folder && self.parent_folder.locked?)
+      (self.lock_at && Time.zone.now > self.lock_at) ||
+      (self.unlock_at && Time.zone.now < self.unlock_at) ||
+      self.parent_folder&.locked?
+  end
+
+  def for_student_annotation_documents?
+    self.unique_type == Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE
   end
 
   def for_submissions?
@@ -465,13 +501,33 @@ class Folder < ActiveRecord::Base
   alias currently_locked? currently_locked
 
   set_policy do
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
+    can :read and can :read_contents
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
+    can :create and can :update and can :delete and can :manage_contents
+
+    ##################### End legacy permission block ##########################
+
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin, :read_contents, :read_contents_for_export
 
-    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }
+    given do |user, session|
+      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) &&
+        !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES))
+    end
     can :read_contents, :read_contents_for_export
 
     given do |user, session|
@@ -479,11 +535,32 @@ class Folder < ActiveRecord::Base
     end
     can :read_contents_for_export
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_any_right?(user, session, :manage_files_add, :manage_files_delete, :manage_files_edit)
+    end
     can :read and can :read_contents
 
-    given { |user, session| !self.for_submissions? && self.context.grants_right?(user, session, :manage_files) }
-    can :update and can :delete and can :create and can :manage_contents
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_add)
+    end
+    can :create and can :manage_contents
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_edit)
+    end
+    can :update and can :manage_contents
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_delete)
+    end
+    can :delete and can :manage_contents
   end
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root
@@ -513,4 +590,23 @@ class Folder < ActiveRecord::Base
     nil
   end
   private_class_method :find_visible_folders
+
+  def clear_permissions_cache
+    GuardRail.activate(:primary) do
+      delay_if_production(singleton: "clear_downstream_permissions_#{global_id}").clear_downstream_permissions
+      next_clear_cache = next_lock_change
+      if next_clear_cache.present? && next_clear_cache < (Time.zone.now + AdheresToPolicy::Cache::CACHE_EXPIRES_IN)
+        delay(run_at: next_clear_cache, singleton: "clear_permissions_cache_#{global_id}").clear_permissions_cache
+      end
+    end
+  end
+
+  def clear_downstream_permissions
+    active_file_attachments.touch_all
+    active_sub_folders.each(&:clear_permissions_cache)
+  end
+
+  def next_lock_change
+    [lock_at, unlock_at].compact.select {|t| t > Time.zone.now}.min
+  end
 end

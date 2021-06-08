@@ -30,7 +30,9 @@ class GradebookExporter
   BUFFER_COLUMN_DEFINITIONS = {
     grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
     override_score: ['Override Score'].freeze,
-    override_grade: ['Override Grade'].freeze
+    override_grade: ['Override Grade'].freeze,
+    points: ['Current Points', 'Final Points'].freeze,
+    total_scores: ['Current Score', 'Unposted Current Score', 'Final Score', 'Unposted Final Score'].freeze
   }.freeze
 
   def initialize(course, user, options = {})
@@ -52,8 +54,21 @@ class GradebookExporter
 
   private
 
-  def buffer_column_headers(column_name)
-    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).dup
+  def buffer_column_headers(column_name, assignment_group: nil)
+    append_grading_period = grading_period.present? && include_grading_period_in_headers?
+
+    # Possible output formats:
+    #  Current Score [no assignment group and no grading period]
+    #  Assignment Group 1 Current Score [assignment group, no grading period]
+    #  Current Score (Fall 2020) [grading period, no assignment group]
+    #  Assignment Group 1 Current Score (Fall 2020) [both assignment group and grading period]
+    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).map do |column|
+      name_tokens = [column]
+      name_tokens.prepend(assignment_group.name) if assignment_group.present?
+      name_tokens.append("(#{grading_period.title})") if append_grading_period
+
+      name_tokens.join(" ")
+    end
   end
 
   def buffer_columns(column_name, buffer_value=nil)
@@ -93,17 +108,12 @@ class GradebookExporter
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = select_in_grading_period calc.assignments
+    assignments = select_in_grading_period calc.gradable_assignments
+    Assignment.preload_unposted_anonymous_submissions(assignments)
 
-    if Account.site_admin.feature_enabled?(:gradebook_export_sort_order_bugfix)
-      ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
-      assignments.sort_by! do |a|
-        [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
-      end
-    else
-      assignments.sort_by! do |a|
-        [a.assignment_group_id, a.position || 0, a.due_at || CanvasSort::Last, a.title]
-      end
+    ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
+    assignments.sort_by! do |a|
+      [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
     end
 
     groups = calc.groups
@@ -130,17 +140,14 @@ class GradebookExporter
 
       if should_show_totals
         groups.each do |group|
-          if include_points?
-            header << "#{group.name} Current Points" << "#{group.name} Final Points"
-          end
-          header << "#{group.name} Current Score"
-          header << "#{group.name} Unposted Current Score"
-          header << "#{group.name} Final Score"
-          header << "#{group.name} Unposted Final Score"
+          header.concat(buffer_column_headers(:points, assignment_group: group)) if include_points?
+          header.concat(buffer_column_headers(:total_scores, assignment_group: group))
         end
-        header << "Current Points" << "Final Points" if include_points?
-        header << "Current Score" << "Unposted Current Score" << "Final Score" << "Unposted Final Score"
+
+        header.concat(buffer_column_headers(:points)) if include_points?
+        header.concat(buffer_column_headers(:total_scores))
         header.concat(buffer_column_headers(:grading_standard)) if @course.grading_standard_enabled?
+
         if include_final_grade_override?
           header.concat(buffer_column_headers(:override_score))
           header.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
@@ -164,13 +171,13 @@ class GradebookExporter
           row << nil
         end
 
-        # This is not translated since we look for this exact string when we upload to gradebook.
-        row.concat(assignments.map { |assignment| show_as_hidden?(assignment) ? hidden_assignment_text : nil })
+        hidden_assignments_text = assignments.map { |assignment| hidden_assignment_text(assignment) }
+        row.concat(hidden_assignments_text)
 
         if should_show_totals
           row.concat([nil] * group_filler_length)
-          row << nil << nil if include_points?
-          row << nil << nil << nil << nil
+          row.concat(buffer_columns(:points)) if include_points?
+          row.concat(buffer_columns(:total_scores))
         end
 
         row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
@@ -205,7 +212,11 @@ class GradebookExporter
         row << read_only << read_only << read_only << read_only
         row.concat(buffer_columns(:grading_standard, read_only)) if @course.grading_standard_enabled?
         if include_final_grade_override?
-          row.concat(buffer_columns(:override_score, read_only))
+          allow_importing = Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+          # Override Score is not read-only if the user can import changes
+          row.concat(buffer_columns(:override_score, allow_importing ? nil : read_only))
+
+          # Override Grade is always read-only
           row.concat(buffer_columns(:override_grade, read_only)) if @course.grading_standard_enabled?
         end
       end
@@ -240,7 +251,7 @@ class GradebookExporter
           student = student_enrollment.user
           student_sections = student_section_names[student.id].sort.to_sentence
           student_submissions = assignments.map do |a|
-            if visible_assignments[a.id].include? student.id
+            if visible_assignments[a.id].include?(student.id) && !a.unposted_anonymous_submissions?
               submission = submissions[[student.id, a.id]]
               if submission.try(:excused?)
                 "EX"
@@ -403,14 +414,21 @@ class GradebookExporter
   end
 
   def show_as_hidden?(assignment)
-    if @course.post_policies_enabled?
-      assignment.post_manually?
+    assignment.post_manually?
+  end
+
+  def hidden_assignment_text(assignment)
+    return nil unless show_as_hidden?(assignment)
+
+    # We don't translate "Manual Posting" since we look for this exact string when we upload to gradebook.
+    if assignment.unposted_anonymous_submissions?
+      I18n.t("%{manual_posting} (scores hidden from instructors)", { manual_posting: "Manual Posting" })
     else
-      assignment.muted?
+      "Manual Posting"
     end
   end
 
-  def hidden_assignment_text
-    @course.post_policies_enabled? ? "Manual Posting" : "Muted"
+  def include_grading_period_in_headers?
+    Account.site_admin.feature_enabled?(:gradebook_csv_headers_include_grading_period)
   end
 end

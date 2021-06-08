@@ -19,6 +19,7 @@
 <%
   provide :page_title, join_title( t(:topic, "Topic"), @topic.title)
   @discussion_presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+  @no_reply = @topic.homeroom_announcement?(@context)
 %>
 
 <% if (@headers || !@locked) && ((show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) || !@context.try(:feature_enabled?, :rce_enhancements)) %>
@@ -178,7 +179,7 @@
 
   <div id="discussion_container">
     <article id="discussion_topic" class="admin-link-hover-area topic discussion_entry <%= @topic.class.to_s.underscore %> <%= 'has_podcast' if @topic.podcast_enabled %> <%= 'has_unread_entries' if @topic.unread_count(@current_user) > 0 %> can_be_marked_as_read <%= @topic.read_state(@current_user) %>" data-mark-read-url="<%= context_url(@topic.context, :api_v1_context_discussion_topic_mark_read_url, @topic) %>">
-      <div class="entry-content">
+      <div class="entry-content <%= 'no-reply' if @no_reply %>">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
           <%= render :partial => 'peer_reviews' %>
@@ -230,13 +231,15 @@
             </div>
           <% end %>
           <% if @locked %>
-            <div class="discussion-fyi">
-              <% if @topic.is_a? Announcement %>
-                <%= t 'announcement_closed', 'This announcement is closed for comments' %>
-              <% elsif @locked.is_a?(Hash) %>
-                <%= lock_explanation(@locked, 'topic', @context) %>
-              <% end %>
-            </div>
+            <% unless @no_reply %>
+              <div class="discussion-fyi">
+                <% if @topic.is_a? Announcement %>
+                  <%= t 'announcement_closed', 'This announcement is closed for comments' %>
+                <% elsif @locked.is_a?(Hash) %>
+                  <%= lock_explanation(@locked, 'topic', @context) %>
+                <% end %>
+              </div>
+            <% end %>
           <% end %>
 
           <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
@@ -270,73 +273,76 @@
           <% end %>
         </div>
       </div>
-      <div id="discussion-toolbar" class="toolbarView">
-        <div class="headerBar" data-sticky>
-          <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-          <div class="form-inline headerBar__layout">
-            <div class="headerBar__controls">
-          <% else %>
-          <div class="row-fluid form-inline" style="overflow: visible;">
-            <div class="span9">
-          <% end %>
-              <label class="screenreader-only" for="discussion-search">
-                <%= t("Search entries or author") %>
-              </label>
-              <input
-                id               = "discussion-search"
-                type             = "search"
-                placeholder      = "<%= t("Search entries or author") %>"
-                size             = 50
-              >
-
-              <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
-              <input
-                type    = "checkbox"
-                id      = "onlyUnread"
-                aria-labelledby="onlyUnreadAccessibleLabel"/>
-              <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
-
-              <% if can_do(@context, @current_user, :moderate_forum) %>
-                <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
-                <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
-                <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
-              <% end %>
-
-              &nbsp; &nbsp;
-              <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
-                <i class="icon-expand" aria-hidden="true"> </i>
-                <span class="screenreader-only">Collapse replies</span>
-              </button>
-              <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
-                <i class="icon-collapse" aria-hidden="true"></i>
-                <span class="screenreader-only">Expand replies</span>
-              </button>
-            </div>
+      <% unless  @no_reply %>
+        <div id="discussion-toolbar" class="toolbarView">
+          <div class="headerBar" data-sticky>
             <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
-            <div class="discussion_subscribe headerBar__subscribe">
+            <div class="form-inline headerBar__layout">
+              <div class="headerBar__controls">
             <% else %>
-            <div class="span3 right-align discussion_subscribe">
+            <div class="row-fluid form-inline" style="overflow: visible;">
+              <div class="span9">
             <% end %>
-              <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
-                 title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
-                 role="button"
-                 aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="true"></i>
-                <%= t(:topic_subscribe, 'Subscribe') %>
-              </a>
-              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
-                 title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
-                 role="button"
-                 aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="true"></i>
-                <%= t(:topic_unsubscribe, 'Subscribed') %>
-              </a>
+                <label class="screenreader-only" for="discussion-search">
+                  <%= t("Search entries or author") %>
+                </label>
+                <input
+                  id               = "discussion-search"
+                  type             = "search"
+                  placeholder      = "<%= t("Search entries or author") %>"
+                  size             = 50
+                >
+
+                <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
+                <input
+                  type    = "checkbox"
+                  id      = "onlyUnread"
+                  aria-labelledby="onlyUnreadAccessibleLabel"/>
+                <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
+
+                <% if can_do(@context, @current_user, :moderate_forum) %>
+                  <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                  <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
+                  <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                <% end %>
+
+                &nbsp; &nbsp;
+                <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
+                  <i class="icon-expand" aria-hidden="true"> </i>
+                  <span class="screenreader-only">Collapse replies</span>
+                </button>
+                <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
+                  <i class="icon-collapse" aria-hidden="true"></i>
+                  <span class="screenreader-only">Expand replies</span>
+                </button>
+              </div>
+              <% if @domain_root_account.feature_enabled?(:responsive_awareness) %>
+              <div class="discussion_subscribe headerBar__subscribe">
+              <% else %>
+              <div class="span3 right-align discussion_subscribe">
+              <% end %>
+                <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
+                  role="button"
+                  aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
+                  <i class='icon-discussion-check' aria-hidden="true"></i>
+                  <%= t(:topic_subscribe, 'Subscribe') %>
+                </a>
+                <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
+                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
+                  role="button"
+                  aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
+                  <i class='icon-discussion-check' aria-hidden="true"></i>
+                  <%= t(:topic_unsubscribe, 'Subscribed') %>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      <% end %>
     </article>
 
+    <% unless @no_reply %>
     <div id="discussion_subentries" class="discussion_subentries">
       <% if @initial_post_required %>
         <span><%= t :initial_post_required, "Replies are only visible to those who have posted at least one reply." %></span>
@@ -344,6 +350,7 @@
         <span><%= t :loading_replies, "Loading replies..." %></span>
       <% end %>
     </div>
+    <% end %>
 
     <div id="filterResults" class="discussion_subentries hidden"></div>
 

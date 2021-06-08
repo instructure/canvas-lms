@@ -35,49 +35,75 @@ describe ExternalContentController do
   end
 
   describe "POST success/external_tool_dialog" do
-    it "js env is set correctly" do
-
-      c = course_factory
-      params = {
-        service: 'external_tool_dialog',
-        course_id: c.id,
-        lti_message_type: 'ContentItemSelection',
-        lti_version: 'LTI-1p0',
-        data: '',
-        content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
-        lti_msg: 'some lti message',
-        lti_log: 'some lti log',
-        lti_errormsg: 'some lti error message',
-        lti_errorlog: 'some lti error log'
+    describe 'js_env setting' do
+      let(:params) {
+        {
+          service: 'external_tool_dialog',
+          course_id: c.id,
+          lti_message_type: 'ContentItemSelection',
+          lti_version: 'LTI-1p0',
+          data: '',
+          content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
+          lti_msg: 'some lti message',
+          lti_log: 'some lti log',
+          lti_errormsg: 'some lti error message',
+          lti_errorlog: 'some lti error log'
+        }
       }
-      post(:success, params: params)
 
-      data = controller.js_env[:retrieved_data]
-      expect(data).to_not be_nil
-      expect(data.first.is_a?(IMS::LTI::Models::ContentItems::ContentItem)).to be_truthy
+      let!(:c) { course_factory }
 
-      expect(data.first.id).to eq("http://lti-tool-provider-example.dev/messages/blti")
-      expect(data.first.url).to eq("http://lti-tool-provider-example.dev/messages/blti")
-      expect(data.first.text).to eq("Arch Linux")
-      expect(data.first.title).to eq("Its your computer")
-      expect(data.first.placement_advice.presentation_document_target).to eq("iframe")
-      expect(data.first.placement_advice.display_height).to eq(600)
-      expect(data.first.placement_advice.display_width).to eq(800)
-      expect(data.first.media_type).to eq("application/vnd.ims.lti.v1.ltilink")
-      expect(data.first.type).to eq("LtiLinkItem")
-      expect(data.first.thumbnail.height).to eq(128)
-      expect(data.first.thumbnail.width).to eq(128)
-      expect(data.first.thumbnail.id).to eq("http://www.runeaudio.com/assets/img/banner-archlinux.png")
+      it "js env is set correctly" do
+        post(:success, params: params)
 
-      e = "external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti"
-      expect(data.first.canvas_url).to end_with(e)
+        data = controller.js_env[:retrieved_data]
+        expect(data).to_not be_nil
+        expect(data.first).to be_a(IMS::LTI::Models::ContentItems::ContentItem)
 
-      env = controller.js_env
-      expect(env[:service]).to eq(params[:service])
-      expect(env[:message]).to eq(params[:lti_msg])
-      expect(env[:log]).to eq(params[:lti_log])
-      expect(env[:error_message]).to eq(params[:lti_errormsg])
-      expect(env[:error_log]).to eq(params[:lti_errorlog])
+        expect(data.first.id).to eq("http://lti-tool-provider-example.dev/messages/blti")
+        expect(data.first.url).to eq("http://lti-tool-provider-example.dev/messages/blti")
+        expect(data.first.text).to eq("Arch Linux")
+        expect(data.first.title).to eq("Its your computer")
+        expect(data.first.placement_advice.presentation_document_target).to eq("iframe")
+        expect(data.first.placement_advice.display_height).to eq(600)
+        expect(data.first.placement_advice.display_width).to eq(800)
+        expect(data.first.media_type).to eq("application/vnd.ims.lti.v1.ltilink")
+        expect(data.first.type).to eq("LtiLinkItem")
+        expect(data.first.thumbnail.height).to eq(128)
+        expect(data.first.thumbnail.width).to eq(128)
+        expect(data.first.thumbnail.id).to eq("http://www.runeaudio.com/assets/img/banner-archlinux.png")
+
+        e = "external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti"
+        expect(data.first.canvas_url).to end_with(e)
+
+        env = controller.js_env
+        expect(env[:service]).to eq(params[:service])
+        expect(env[:message]).to eq(params[:lti_msg])
+        expect(env[:log]).to eq(params[:lti_log])
+        expect(env[:error_message]).to eq(params[:lti_errormsg])
+        expect(env[:error_log]).to eq(params[:lti_errorlog])
+      end
+
+      it 'turns the messages/logs into strings to prevent HTML injection' do
+        params[:lti_msg] = {html: 'msg somehtml'}
+        params[:lti_log] = {html: 'log somehtml'}
+        params[:lti_errormsg] = {html: 'errormsg somehtml'}
+        params[:lti_errorlog] = {html: 'errorlog somehtml'}
+
+        post(:success, params: params)
+        env = controller.js_env
+
+        expect(env[:message]).to eq('{"html"=>"msg somehtml"}')
+        expect(env[:log]).to eq('{"html"=>"log somehtml"}')
+        expect(env[:error_message]).to eq('{"html"=>"errormsg somehtml"}')
+        expect(env[:error_log]).to eq('{"html"=>"errorlog somehtml"}')
+        expect(env[:lti_response_messages]).to eq(
+          lti_msg: '{"html"=>"msg somehtml"}',
+          lti_log: '{"html"=>"log somehtml"}',
+          lti_errormsg: '{"html"=>"errormsg somehtml"}',
+          lti_errorlog: '{"html"=>"errorlog somehtml"}'
+        )
+      end
     end
 
     context 'external_tool service_id' do

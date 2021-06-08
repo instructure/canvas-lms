@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
+import axios from '@canvas/axios'
 import Fixtures from '../Fixtures'
-import HistoryApi from 'jsx/gradebook-history/api/HistoryApi'
+import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi.js'
 
 QUnit.module('HistoryApi', {
   setup() {

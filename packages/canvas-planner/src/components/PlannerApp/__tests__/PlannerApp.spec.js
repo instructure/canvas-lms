@@ -33,6 +33,7 @@ const getDefaultValues = overrides => {
     days: days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     timeZone: TZ,
     changeDashboardView() {},
+    scrollToToday() {},
     isCompletelyEmpty: false,
     ...overrides
   }
@@ -220,7 +221,8 @@ describe('mapStateToProps', () => {
         isLoading: true,
         hasSomeItems: false,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }
@@ -234,7 +236,8 @@ describe('mapStateToProps', () => {
         isLoading: false,
         hasSomeItems: null,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }
@@ -248,7 +251,8 @@ describe('mapStateToProps', () => {
         isLoading: false,
         hasSomeItems: false,
         partialPastDays: [],
-        partialFutureDays: []
+        partialFutureDays: [],
+        partialWeekDays: []
       },
       days: []
     }

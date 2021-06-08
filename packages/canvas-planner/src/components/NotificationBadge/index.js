@@ -24,7 +24,7 @@ import MissingIndicator from './MissingIndicator'
 import NewActivityIndicator from './NewActivityIndicator'
 import {sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 class NotificationBadge extends React.Component {
   static propTypes = {

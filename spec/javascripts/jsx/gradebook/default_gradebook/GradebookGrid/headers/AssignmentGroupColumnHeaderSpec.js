@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AssignmentGroupColumnHeader from 'jsx/gradebook/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeader'
+import AssignmentGroupColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeader.js'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */

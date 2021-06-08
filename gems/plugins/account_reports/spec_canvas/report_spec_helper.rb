@@ -43,10 +43,11 @@ module ReportSpecHelper
     account_report = AccountReport.new(:user => @admin || user_factory,
                                        :account => account,
                                        :report_type => type)
-    account_report.parameters = parameters
+    parameters ||= {}
+    account_report.parameters = parameters.merge({'skip_message' => true})
     account_report.save!
     if AccountReport.available_reports[type]
-      AccountReports.generate_report(account_report, send_message: false)
+      AccountReports.generate_report(account_report)
     else
       raise ReportSpecHelperError.new("report is not properly configured in engine.")
     end

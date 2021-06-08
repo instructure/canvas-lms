@@ -2,22 +2,30 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-# pull docker images (or build them if missing)
+# Pull all docker images that are used for rspec / selenium in advance of
+# running docker-compose up for protection against flakey network requests.
+# Always pull all images, even if the rspec job does not use them, so that
+# the image cache is completely fulfilled and subsequent builds don't need
+# to load them. This helps our build times to remain more consistent.
 
 REGISTRY_BASE=starlord.inscloudgate.net/jenkins
-POSTGIS=${POSTGIS:-2.5}
 
-# canvas-lms
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG
+DOCKER_IMAGES=(
+  $PATCHSET_TAG
+  $CASSANDRA_IMAGE_TAG
+  $DYNAMODB_IMAGE_TAG
+  $POSTGRES_IMAGE_TAG
+  $REGISTRY_BASE/canvas-rce-api
+  $REGISTRY_BASE/redis:alpine
+  $REGISTRY_BASE/selenium-chrome:"${SELENIUM_VERSION:-3.141.59-20201119}"
+)
 
-# redis
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine
+echo "${DOCKER_IMAGES[@]}" | xargs -P0 -n1 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull &
+wait
 
-# postgres database with postgis preinstalled
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $POSTGRES_IMAGE_TAG
-
-# cassandra:2:2
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $CASSANDRA_IMAGE_TAG
-
-# dynamodb-local
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $DYNAMODB_IMAGE_TAG
+# When this build finishes, the docker clean-up script will remove the $PATCHSET_TAG
+# because it is unlikely that another build that runs on the node will need it, saving
+# disk space. The dependency image(s) will not be cleared however, so tag them to avoid
+# future builds on this node from downloading the layers again.
+WEBPACK_CACHE_SELECTED_TAG=$(docker image inspect -f "{{.Config.Labels.WEBPACK_CACHE_SELECTED_TAG}}" $PATCHSET_TAG)
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SELECTED_TAG

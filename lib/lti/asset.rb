@@ -20,6 +20,8 @@
 module Lti
   class Asset
     def self.opaque_identifier_for(asset, context: nil)
+      return if asset.blank?
+
       shard = asset.shard
       shard.activate do
         lti_context_id = context_id_for(asset, shard)

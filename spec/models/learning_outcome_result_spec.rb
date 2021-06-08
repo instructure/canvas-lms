@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
@@ -60,6 +59,12 @@ describe LearningOutcomeResult do
     end
   end
 
+  it_behaves_like 'soft deletion' do
+    let(:first) { learning_outcome_result }
+    let(:second) { create_and_associate_lor(course.assignments.create!) }
+    subject { LearningOutcomeResult.all }
+  end
+
   describe '#submitted_or_assessed_at' do
     let_once(:submitted_at) { 1.month.ago }
     let_once(:assessed_at) { 2.weeks.ago }
@@ -94,14 +99,34 @@ describe LearningOutcomeResult do
         end
       end
 
-      context 'assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          # By default, an automatic post policy (post_manually: false) is associated to
+          # an assignment.  Now that post policy is included in exclude_muted_associations
+          # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
+          # post policy assignment until the submission is posted.  See "manual posting
+          # policy" test cases below.
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'not graded assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          assignment.update!(grading_type: 'not_graded')
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'graded assignment with unposted submissions with manual posting policy' do
+        it 'excludes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
         end
       end
 
-      context 'not graded assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'not graded assignment with unposted submissions with manual posting policy' do
+        it 'includes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           assignment.update!(grading_type: 'not_graded')
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
@@ -142,12 +167,12 @@ describe LearningOutcomeResult do
     end
   end
 
-  describe "active scope" do
+  describe "with_active_link scope" do
     it "doesn't return deleted outcomes" do
-      expect(LearningOutcomeResult.active.count).to eq(1), "precondition"
+      expect(LearningOutcomeResult.with_active_link.count).to eq(1), "precondition"
       learning_outcome_result.alignment.workflow_state = 'deleted'
       learning_outcome_result.alignment.save!
-      expect(LearningOutcomeResult.active.count).to eq 0
+      expect(LearningOutcomeResult.with_active_link.count).to eq 0
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -269,31 +271,35 @@ class CommunicationChannelsController < ApplicationController
       end
 
       # load merge opportunities
-      merge_users = cc.merge_candidates
-      merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
-      observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
-      merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
-      # remove users that don't have a pseudonym for this account, or one can't be created
-      merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
-      @merge_opportunities = []
-      merge_users.each do |user|
-        account_to_pseudonyms_hash = {}
-        root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
-        if root_account_pseudonym
-          @merge_opportunities << [user, [root_account_pseudonym]]
-        else
-          user.all_active_pseudonyms.each do |p|
-            # populate reverse association
-            p.user = user
-            (account_to_pseudonyms_hash[p.account] ||= []) << p
+      if @domain_root_account.feature_enabled?(:self_service_user_merge)
+        merge_users = cc.merge_candidates
+        merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
+        observer_links = UserObservationLink.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
+        merge_users = merge_users.reject { |u| observer_links.any?{|uo| uo.user == u || uo.observer == u} }
+        # remove users that don't have a pseudonym for this account, or one can't be created
+        merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
+        @merge_opportunities = []
+        merge_users.each do |user|
+          account_to_pseudonyms_hash = {}
+          root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
+          if root_account_pseudonym
+            @merge_opportunities << [user, [root_account_pseudonym]]
+          else
+            user.all_active_pseudonyms.each do |p|
+              # populate reverse association
+              p.user = user
+              (account_to_pseudonyms_hash[p.account] ||= []) << p
+            end
+            @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
+              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
+            end]
+            @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
-          @merge_opportunities << [user, account_to_pseudonyms_hash.map do |(account, pseudonyms)|
-            pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
-          end]
-          @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
+        @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
+      else
+        @merge_opportunities = []
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 
@@ -475,10 +481,26 @@ class CommunicationChannelsController < ApplicationController
   def redirect_with_success_flash
     flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
     @current_user ||= @user # since dashboard_url may need it
+    default_url = confirmation_redirect_url(@communication_channel) || dashboard_url
     respond_to do |format|
-      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(dashboard_url)) }
-      format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }
+      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(default_url)) }
+      format.json { render :json => {:url => @enrollment ? course_url(@course) : default_url} }
     end
+  end
+
+  def confirmation_redirect_url(communication_channel)
+    uri = begin
+            URI.parse(communication_channel.confirmation_redirect)
+          rescue URI::InvalidURIError
+            nil
+          end
+    return nil unless uri
+
+    if @current_user
+      query_params = URI.decode_www_form(uri.query || '') << ['current_user_id', @current_user.id.to_s]
+      uri.query = URI.encode_www_form(query_params)
+    end
+    uri.to_s
   end
 
   # @API Delete a communication channel
@@ -564,16 +586,25 @@ class CommunicationChannelsController < ApplicationController
   end
 
   protected
+
+  def account
+    @account ||= params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
+  end
+
   def bulk_action_args
-    account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type).to_unsafe_h.symbolize_keys
+    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type, :order).to_unsafe_h.symbolize_keys
     args.merge!({account: account})
   end
 
   def generate_bulk_report
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
+    if account.grants_right?(@current_user, session, :view_bounced_emails)
       action = yield
-      send_data(action.report, type: 'text/csv')
+      respond_to do |format|
+        format.csv { send_data(action.csv_report, type: 'text/csv') }
+        format.json { send_data(action.json_report, type: 'application/json') }
+      end
+    else
+      render_unauthorized_action
     end
   end
 

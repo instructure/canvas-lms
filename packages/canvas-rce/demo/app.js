@@ -16,190 +16,261 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
+import CanvasRce from '../src/rce/CanvasRce'
+import DemoOptions from './DemoOptions'
 import {Button} from '@instructure/ui-buttons'
-import {RadioInput, RadioInputGroup, Select} from '@instructure/ui-forms'
-import {TextInput} from '@instructure/ui-text-input'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-view'
 import '@instructure/canvas-theme'
 
-import {renderIntoDiv, renderSidebarIntoDiv} from '../src/async'
-import locales from '../src/locales'
-import CanvasRce from '../src/rce/CanvasRce'
 import * as fakeSource from '../src/sidebar/sources/fake'
 
-function getProps(textareaId, state) {
-  return {
-    language: state.lang,
-
-    editorOptions: () => {
-      return {
-        directionality: state.dir,
-        height: '250px',
-        plugins:
-          'instructure-context-bindings, instructure-embeds, instructure-ui-icons, instructure_equation, ' +
-          'instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, ' +
-          'instructure_links, table, lists, instructure_condensed_buttons, instructure_documents',
-        // todo: add "instructure_embed" when the wiki sidebar work is done
-        external_plugins: {},
-        menubar: true
-      }
-    },
-
-    textareaClassName: 'exampleClassOne',
-    textareaId,
-    onFocus: () => console.log('rce focused'), // eslint-disable-line no-console
-    onBlur: () => console.log('rce blurred'), // eslint-disable-line no-console
-
-    trayProps: {
-      canUploadFiles: true,
-      contextId: state.contextId,
-      contextType: state.contextType,
-      host: state.host,
-      jwt: state.jwt,
-      source: state.jwt && state.sourceType === 'real' ? undefined : fakeSource
-    }
-  }
-}
-
-function renderDemos(state) {
-  const {host, jwt, contextType, contextId, sourceType} = state
-
-  renderIntoDiv(document.getElementById('editor1'), getProps('textarea1', state))
-
-  renderIntoDiv(document.getElementById('editor2'), getProps('textarea2', state))
-
-  ReactDOM.render(
-    <CanvasRce rceProps={getProps('textarea3', state)} />,
-    document.getElementById('editor3')
-  )
-
-  const parsedUrl = new URL(window.location.href)
-  if (parsedUrl.searchParams.get('sidebar') === 'no') {
-    return
-  }
-
-  const sidebarEl = document.getElementById('sidebar')
-  ReactDOM.render(<div />, sidebarEl)
-  renderSidebarIntoDiv(sidebarEl, {
-    source: jwt && sourceType === 'real' ? undefined : fakeSource,
-    host,
-    jwt,
-    contextType,
-    contextId,
-    canUploadFiles: true
-  })
-}
+import './test-plugin/plugin'
 
 function getSetting(settingKey, defaultValue) {
-  return localStorage.getItem(settingKey) || defaultValue
+  let val = localStorage.getItem(settingKey) || defaultValue
+  if (typeof defaultValue === 'boolean') {
+    val = val === 'true'
+  }
+  return val
+}
+
+function saveSetting(settingKey, settingValue) {
+  localStorage.setItem(settingKey, settingValue)
 }
 
 function saveSettings(state) {
-  ;['dir', 'sourceType', 'lang', 'host', 'jwt', 'contextType', 'contextId'].forEach(settingKey => {
-    localStorage.setItem(settingKey, state[settingKey])
+  ;[
+    'canvas_exists',
+    'dir',
+    'sourceType',
+    'lang',
+    'host',
+    'jwt',
+    'contextType',
+    'contextId',
+    'userId',
+    'include_test_plugin',
+    'test_plugin_toolbar',
+    'test_plugin_menu'
+  ].forEach(settingKey => {
+    saveSetting(settingKey, state[settingKey])
   })
 }
 
-class DemoOptions extends Component {
-  state = {
-    dir: getSetting('dir', 'ltr'),
-    sourceType: getSetting('sourceType', 'fake'),
-    lang: getSetting('lang', 'en'),
-    host: getSetting('host', 'https://rich-content-iad.inscloudgate.net'),
-    jwt: getSetting('jwt', ''),
-    contextType: getSetting('contextType', 'course'),
-    contextId: getSetting('contextId', '1')
+function Demo() {
+  const [canvas_exists, set_canvas_exists] = useState(() => getSetting('canvas_exists', false))
+  const [canvas_origin, set_canvas_origin] = useState(() =>
+    getSetting('canvas_origin', 'http://localhost:3000')
+  )
+  const [dir, set_dir] = useState(() => getSetting('dir', 'ltr'))
+  const [host, set_host] = useState(() => getSetting('host', 'http:/who.cares')) // 'https://rich-content-iad.inscloudgate.net'
+  const [jwt, set_jwt] = useState(() => getSetting('jwt', 'doesnotmatteriffake'))
+  const [contextType, set_contextType] = useState(() => getSetting('contextType', 'course'))
+  const [contextId, set_contextId] = useState(() => getSetting('contextId', '1'))
+  const [userId, set_userId] = useState(() => getSetting('userId', '1'))
+  const [sourceType, set_sourceType] = useState(() => getSetting('sourceType', 'fake'))
+  const [lang, set_lang] = useState(() => getSetting('lang', 'en'))
+  const [include_test_plugin, set_include_test_plugin] = useState(
+    getSetting('include_test_plugin', false)
+  )
+  const [test_plugin_toolbar, set_test_plugin_toolbar] = useState(
+    getSetting('test_plugin_toolbar', '__none__')
+  )
+  const [test_plugin_menu, set_test_plugin_menu] = useState(
+    getSetting('test_plugin_menu', '__none__')
+  )
+  const [trayProps, set_trayProps] = useState(() => getTrayPropsFromOpts())
+  const [toolbar, set_toolbar] = useState(() => updateToolbar())
+  const [menu, set_menu] = useState(() => updateMenu())
+  const [plugins, set_plugins] = useState(() => updatePlugins())
+  const [tinymce_editor, set_tinymce_editor] = useState(null)
+  const [currentContent, setCurrentContent] = useState('')
+
+  const rceRef = useRef(null)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('dir', dir)
+  }, [dir])
+  useEffect(() => {
+    document.documentElement.setAttribute('lang', lang)
+  }, [lang])
+
+  function handleOptionsChange(newOpts) {
+    const refresh =
+      canvas_exists !== newOpts.canvas_exists ||
+      lang !== newOpts.lang ||
+      include_test_plugin !== newOpts.include_test_plugin ||
+      test_plugin_toolbar !== newOpts.test_plugin_toolbar ||
+      test_plugin_menu !== newOpts.test_plugin_menu
+
+    set_canvas_exists(newOpts.canvas_exists)
+    set_canvas_origin(newOpts.canvas_origin)
+    set_dir(newOpts.dir)
+    set_host(newOpts.host)
+    set_jwt(newOpts.jwt)
+    set_contextType(newOpts.contextType)
+    set_contextId(newOpts.contextId)
+    set_userId(newOpts.userId)
+    set_sourceType(newOpts.sourceType)
+    set_lang(newOpts.lang)
+    set_include_test_plugin(newOpts.include_test_plugin)
+    set_test_plugin_toolbar(newOpts.test_plugin_toolbar)
+    set_test_plugin_menu(newOpts.test_plugin_menu)
+    set_trayProps(getTrayPropsFromOpts())
+    set_toolbar(updateToolbar())
+    set_menu(updateMenu())
+    set_plugins(updatePlugins())
+
+    saveSettings(newOpts)
+
+    if (refresh) {
+      window.location.reload()
+    }
   }
 
-  handleChange = () => {
-    document.documentElement.setAttribute('dir', this.state.dir)
-    saveSettings(this.state)
-    renderDemos(this.state)
+  function getTrayPropsFromOpts() {
+    return canvas_exists
+      ? {
+          canUploadFiles: true,
+          contextId,
+          contextType,
+          containingContext: {
+            contextType,
+            contextId,
+            userId
+          },
+          filesTabDisabled: false,
+          host,
+          jwt,
+          refreshToken:
+            sourceType === 'real'
+              ? refreshCanvasToken.bind(null, canvas_origin)
+              : () => {
+                  Promise.resolve({jwt})
+                },
+          source: jwt && sourceType === 'real' ? undefined : fakeSource,
+          themeUrl: ''
+        }
+      : undefined
   }
 
-  componentDidMount() {
-    this.handleChange()
+  function updateToolbar() {
+    return include_test_plugin && test_plugin_toolbar !== '__none__'
+      ? [
+          {
+            name: test_plugin_toolbar,
+            items: ['rce_demo_test']
+          }
+        ]
+      : undefined
+  }
+  function updateMenu() {
+    return include_test_plugin && test_plugin_menu !== '__none__'
+      ? {
+          [test_plugin_menu]: {title: 'Test Plugin', items: 'rce_demo_test'}
+        }
+      : undefined
   }
 
-  render() {
-    return (
-      <ToggleDetails expanded summary="Configuration Options">
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            this.handleChange()
+  function updatePlugins() {
+    return include_test_plugin ? ['rce_demo_test'] : undefined
+  }
+
+  return (
+    <>
+      <main className="main" id="content">
+        <CanvasRce
+          ref={rceRef}
+          language={lang}
+          textareaId="textarea3"
+          defaultContent="hello RCE"
+          height={350}
+          highContrastCSS={[]}
+          trayProps={trayProps}
+          toolbar={toolbar}
+          menu={menu}
+          plugins={plugins}
+          onInitted={editor => {
+            set_tinymce_editor(editor)
+            setCurrentContent(editor.getContent())
           }}
-        >
-          <RadioInputGroup
-            description="Source Type"
-            variant="toggle"
-            name="source"
-            onChange={(event, value) => this.setState({sourceType: value})}
-            value={this.state.sourceType}
+          onContentChange={value => {
+            setCurrentContent(value)
+          }}
+        />
+        <View margin="small 0 0 0">
+          <pre>{currentContent}</pre>
+        </View>
+        <View margin="small 0 0 0">
+          <Button
+            interaction={rceRef.current ? 'enabled' : 'disabled'}
+            onClick={() => {
+              alert(rceRef.current.getCode())
+            }}
           >
-            <RadioInput label="Fake" value="fake" />
-
-            <RadioInput label="Real" value="real" />
-          </RadioInputGroup>
-
-          <RadioInputGroup
-            description="Text Direction"
-            variant="toggle"
-            name="dir"
-            value={this.state.dir}
-            onChange={(event, value) => this.setState({dir: value})}
+            Get Code
+          </Button>
+          &nbsp;&nbsp;
+          <Button
+            interaction={rceRef.current ? 'enabled' : 'disabled'}
+            onClick={() => {
+              rceRef.current.setCode('<p>Hello world</p>')
+            }}
           >
-            <RadioInput label="LTR" value="ltr" />
-            <RadioInput label="RTL" value="rtl" />
-          </RadioInputGroup>
-
-          <Select
-            label="Language"
-            value={this.state.lang}
-            onChange={(_e, option) => this.setState({lang: option.value})}
-          >
-            {['en', ...Object.keys(locales)].map(locale => (
-              <option key={locale} value={locale}>
-                {locale}
-              </option>
-            ))}
-          </Select>
-
-          <TextInput
-            renderLabel="API Host"
-            value={this.state.host}
-            onChange={e => this.setState({host: e.target.value})}
+            Set Code
+          </Button>
+        </View>
+      </main>
+      <div className="sidebar">
+        <div id="options">
+          <DemoOptions
+            canvas_exists={canvas_exists}
+            canvas_origin={canvas_origin}
+            host={host}
+            jwt={jwt}
+            contextType={contextType}
+            contextId={contextId}
+            userId={userId}
+            sourceType={sourceType}
+            lang={lang}
+            dir={dir}
+            include_test_plugin={include_test_plugin}
+            test_plugin_toolbar={test_plugin_toolbar}
+            test_plugin_menu={test_plugin_menu}
+            onChange={handleOptionsChange}
           />
+        </div>
+      </div>
+    </>
+  )
+}
 
-          <TextInput
-            renderLabel="Canvas JWT"
-            value={this.state.jwt}
-            onChange={e => this.setState({jwt: e.target.value})}
-          />
+// adapted from canvas-lms/ui/shared/rce/jwt.js
+function refreshCanvasToken(canvas_origin, initialToken) {
+  let token = initialToken
+  let promise = null
 
-          <Select
-            label="Context Type"
-            selectedOption={this.state.contextType}
-            onChange={(_e, option) => this.setState({contextType: option.value})}
-          >
-            <option value="course">Course</option>
-            <option value="group">Group</option>
-            <option value="user">User</option>
-          </Select>
+  return done => {
+    if (promise === null) {
+      promise = fetch(`${canvas_origin}/api/v1/jwts/refresh`, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({jwt: token})
+      }).then(resp => {
+        promise = null
+        token = resp.data.token
+        return token
+      })
+    }
 
-          <TextInput
-            renderLabel="Context ID"
-            value={this.state.contextId}
-            onChange={e => this.setState({contextId: e.target.value})}
-          />
+    if (typeof done === 'function') {
+      promise.then(done)
+    }
 
-          <Button type="submit">Update</Button>
-        </form>
-      </ToggleDetails>
-    )
+    return promise
   }
 }
 
-ReactDOM.render(<DemoOptions />, document.getElementById('options'))
+ReactDOM.render(<Demo />, document.getElementById('demo'))

@@ -103,15 +103,18 @@ RSpec.describe "Api::V1::Outcome" do
         describe "enabled" do
           before do
             @course.root_account.enable_feature!(:account_level_mastery_scales)
-            @proficiency = outcome_proficiency_model(@course)
-            @calculation_method = outcome_calculation_method_model(@course)
+            @course_proficiency = outcome_proficiency_model(@course)
+            @course_calculation_method = outcome_calculation_method_model(@course)
+            @account = @course.root_account
+            @account_proficiency = outcome_proficiency_model(@account)
+            @account_calculation_method = outcome_calculation_method_model(@account)
           end
 
-          it "returns the outcome proficiency and calculation method values" do
-            json = lib.outcome_json(new_outcome(({**outcome_params, :context => @course})), nil, nil)
-            expect(json['calculation_method']).to eq(@calculation_method.calculation_method)
-            expect(json['calculation_int']).to eq(@calculation_method.calculation_int)
-            expect(json['ratings']).to eq(@proficiency.ratings_hash.map(&:stringify_keys))
+          it "returns the outcome proficiency and calculation method values of the provided context" do
+            json = lib.outcome_json(new_outcome({**outcome_params, :context => @account}), nil, nil, context: @course)
+            expect(json['calculation_method']).to eq(@course_calculation_method.calculation_method)
+            expect(json['calculation_int']).to eq(@course_calculation_method.calculation_int)
+            expect(json['ratings']).to eq(@course_proficiency.ratings_hash.map(&:stringify_keys))
           end
         end
 
@@ -122,7 +125,8 @@ RSpec.describe "Api::V1::Outcome" do
             @calculation_method = outcome_calculation_method_model(@course)
           end
 
-          it "ignores the resolved_outcome_proficiency and resolved_calculation_method" do
+          it "ignores the resolved_outcome_proficiency and resolved_calculation_method of the provided context" do
+            opts.merge!(context: @course)
             check_outcome_json.call(lib.outcome_json(new_outcome(({**outcome_params, :context => @course})), nil, nil, opts))
           end
         end

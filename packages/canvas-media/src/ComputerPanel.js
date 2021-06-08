@@ -18,14 +18,17 @@
 
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
+import formatMessage from 'format-message'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox, FileDrop} from '@instructure/ui-forms'
-import {Flex, View} from '@instructure/ui-layout'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {IconTrashLine, IconVideoLine} from '@instructure/ui-icons'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import {px} from '@instructure/ui-utils'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
@@ -33,7 +36,7 @@ import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
 import translationShape from './translationShape'
 import useComputerPanelFocus from './useComputerPanelFocus'
-import {isAudio, isVideo, sizeMediaPlayer} from './shared/utils'
+import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 
 const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionCreator'))
 
@@ -138,9 +141,14 @@ export default function ComputerPanel({
           </Flex.Item>
         </Flex>
         <View as="div" textAlign="center" margin="0 auto">
-          {/* video/avi files won't load from a blob URL */}
-          {theFile.type === 'video/avi' || theFile.type === 'video/x-msvideo' ? (
-            <IconVideoLine size="medium" data-testid="preview-video-icon" />
+          {/* avi, wma, and wmv files won't load from a blob URL */}
+          {!isPreviewable(theFile.type) ? (
+            <>
+              <IconVideoLine size="medium" data-testid="preview-video-icon" />
+              <Text as="p" weight="normal">
+                {formatMessage('No preview is available for this file.')}
+              </Text>
+            </>
           ) : (
             <MediaPlayer
               sources={[{label: theFile.name, src: previewURL, type: theFile.type}]}

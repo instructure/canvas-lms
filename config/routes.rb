@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -107,8 +109,8 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#react_files', format: false
-        get "search" => 'files#react_files', format: false
+        get "folder#{full_path_glob}" => 'files#react_files', format: false, defaults: {format: 'html'}
+        get "search" => 'files#react_files', format: false, defaults: {format: 'html'}
         get :quota
         post :reorder
       end
@@ -279,6 +281,7 @@ CanvasRails::Application.routes.draw do
         end
 
       put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
+      put 'anonymous_submissions/:anonymous_id/reassign', to: 'anonymous_submissions#redo_submission'
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
@@ -286,6 +289,7 @@ CanvasRails::Application.routes.draw do
         post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
         get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
         get 'audit_events' => 'submissions#audit_events', as: :audit_events
+        put 'reassign' => 'submissions#redo_submission', as: :reassign
       end
 
       get 'anonymous_submissions/:anonymous_id/originality_report/:asset_string',
@@ -474,7 +478,7 @@ CanvasRails::Application.routes.draw do
 
     post 'reset' => 'courses#reset_content'
     resources :alerts
-    post :student_view
+    post 'student_view(/:redirect_to_referer)' => 'courses#student_view', as: :student_view
     delete 'student_view' => 'courses#leave_student_view'
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'
@@ -728,6 +732,8 @@ CanvasRails::Application.routes.draw do
       get :statistics
     end
     resources :developer_keys, only: :index
+
+    get 'release_notes' => 'release_notes#manage', as: :release_notes_manage
   end
 
   get 'images/users/:user_id' => 'users#avatar_image', as: :avatar_image
@@ -833,6 +839,7 @@ CanvasRails::Application.routes.draw do
     resources :pseudonyms, except: :index
     resources :question_banks, only: :index
     get :admin_merge
+    get :admin_split
     post :merge
     get :grades
     resources :user_notes
@@ -907,8 +914,8 @@ CanvasRails::Application.routes.draw do
   get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
-  get "files/search", controller: 'files', action: 'react_files', format: false
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
+  get "files/search", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
@@ -994,6 +1001,7 @@ CanvasRails::Application.routes.draw do
       # we keep it around for backward compatibility though
       get 'courses/:course_id/search_users', action: :users
       get 'courses/:course_id/users/:id', action: :user, as: 'course_user'
+      get 'courses/:course_id/users/:user_id/progress', action: :user_progress
       get 'courses/:course_id/content_share_users', action: :content_share_users, as: 'course_content_share_users'
       get 'courses/:course_id/activity_stream', action: :activity_stream, as: 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', action: :activity_stream_summary, as: 'course_activity_stream_summary'
@@ -1284,15 +1292,30 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :discussion_topic_users) do
+      get "courses/:course_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "course_discussion_messageable_users"
+      get "groups/:group_id/discussion_topics/:topic_id/messageable_users", action: :search, as: "group_discussion_messageable_users"
+    end
+
     scope(controller: :collaborations) do
       get 'collaborations/:id/members', action: :members, as: 'collaboration_members'
       get 'courses/:course_id/potential_collaborators', action: :potential_collaborators, as: 'course_potential_collaborators'
       get 'groups/:group_id/potential_collaborators', action: :potential_collaborators, as: 'group_potential_collaborators'
     end
 
+    scope(controller: 'microsoft_sync/groups') do
+      post "courses/:course_id/microsoft_sync/group", action: :create
+      get "courses/:course_id/microsoft_sync/group", action: :show
+      delete "courses/:course_id/microsoft_sync/group", action: :destroy
+      post "courses/:course_id/microsoft_sync/schedule_sync", action: :sync
+    end
+
     scope(controller: :external_tools) do
       post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
       delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
+
+      get "/courses/:course_id/external_tools/visible_course_nav_tools", action: :visible_course_nav_tools, as: :visible_course_nav_tools
+      get "/external_tools/visible_course_nav_tools", action: :all_visible_nav_tools, as: :all_visible_nav_tools
 
       %w(course account).each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
@@ -1390,6 +1413,7 @@ CanvasRails::Application.routes.draw do
 
       get 'users/:id', action: :api_show
       put 'users/:id', action: :update
+      delete 'users/:id', action: :destroy, as: 'destroy_user'
       post 'users/:user_id/files', action: :create_file
 
       get  'users/:user_id/files', controller: :files, action: :api_index, as: 'user_files'
@@ -1414,7 +1438,7 @@ CanvasRails::Application.routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
-      post 'users/:id/split', controller: 'users', action: 'split'
+      post 'users/:id/split', controller: 'users', action: 'split', as: 'split'
 
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
@@ -1471,6 +1495,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :accounts) do
       get 'accounts', action: :index, as: :accounts
       get 'course_accounts', :action => :course_accounts, :as => :course_accounts
+      get 'manageable_accounts', :action => :manageable_accounts, :as => :manageable_accounts
       get 'accounts/:id', action: :show, as: :account
       put 'accounts/:id', action: :update
       get 'accounts/:account_id/terms_of_service', action: :terms_of_service
@@ -1479,6 +1504,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/sub_accounts', action: :sub_accounts, as: 'sub_accounts'
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
       get 'accounts/:account_id/permissions', action: :permissions
+      get 'accounts/:account_id/settings', action: :show_settings
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
       put 'accounts/:account_id/users/:user_id/restore', action: :restore_user
     end
@@ -1553,9 +1579,11 @@ CanvasRails::Application.routes.draw do
       get 'users/:user_id/communication_channels', action: :index, as: 'communication_channels'
       post 'users/:user_id/communication_channels', action: :create
       post 'users/:user_id/communication_channels/:id', action: :reset_bounce_count, as: 'reset_bounce_count'
-      get 'accounts/:account_id/bounced_communication_channels.csv', action: :bouncing_channel_report
+      get 'accounts/:account_id/bounced_communication_channels.csv', action: :bouncing_channel_report, defaults: { format: :csv }
+      get 'accounts/:account_id/bounced_communication_channels', action: :bouncing_channel_report
       post 'accounts/:account_id/bounced_communication_channels/reset', action: :bulk_reset_bounce_counts
-      get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report
+      get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report, defaults: { format: :csv }
+      get 'accounts/:account_id/unconfirmed_communication_channels', action: :unconfirmed_channel_report
       post 'accounts/:account_id/unconfirmed_communication_channels/confirm', action: :bulk_confirm
       delete 'users/self/communication_channels/push', action: :delete_push_token
       delete 'users/:user_id/communication_channels/:id', action: :destroy
@@ -1870,6 +1898,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', action: :index, as: 'quiz_submission_questions'
       post '/quiz_submissions/:quiz_submission_id/questions', action: :answer, as: 'quiz_submission_question_answer'
+      get '/quiz_submissions/:quiz_submission_id/questions/:id/formatted_answer', action: :formatted_answer, as: 'quiz_submission_question_formatted_answer'
       get '/quiz_submissions/:quiz_submission_id/questions/:id', action: :show, as: 'quiz_submission_question'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/flag', action: :flag, as: 'quiz_submission_question_flag'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/unflag', action: :unflag, as: 'quiz_submission_question_unflag'
@@ -2034,6 +2063,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/flags/:feature", action: :update
         delete "#{prefix}/flags/:feature", action: :delete
       end
+      get "features/environment", action: :environment
     end
 
     scope(controller: :conferences) do
@@ -2070,6 +2100,7 @@ CanvasRails::Application.routes.draw do
         get prefix, action: :index, as: "#{context}_content_exports"
         post prefix, action: :create
         get "#{prefix}/:id", action: :show
+        put "#{prefix}/:id/fail", action: :fail
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
     end
@@ -2102,6 +2133,7 @@ CanvasRails::Application.routes.draw do
 
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
+    post '/canvadoc_session', controller: 'canvadoc_sessions', action: 'create'
 
     scope(controller: :grading_period_sets) do
       get 'accounts/:account_id/grading_period_sets', action: :index, as: :account_grading_period_sets
@@ -2172,6 +2204,17 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get 'announcements', action: :index, as: :announcements
+    end
+
+    scope(controller: :release_notes) do
+      get 'release_notes', action: :index, as: :release_notes
+      post 'release_notes', action: :create
+      get 'release_notes/latest', action: :latest
+      get 'release_notes/unread_count', action: :unread_count
+      put 'release_notes/:id', action: :update
+      delete 'release_notes/:id', action: :destroy
+      put 'release_notes/:id/published', action: :publish
+      delete 'release_notes/:id/published', action: :unpublish
     end
 
     scope(controller: :rubrics_api) do
@@ -2295,6 +2338,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :history) do
       get 'users/:user_id/history', action: 'index', as: :user_history
+    end
+
+    scope(controller: :gradebooks) do
+      put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
     end
   end
 
@@ -2427,10 +2474,15 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/line_items/:line_item_id/scores", action: :create, as: :lti_result_create
     end
 
-    # Result Service
+    # Result Service (LTI AGS)
     scope(controller: 'lti/ims/results') do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
+
+    # Progress Service (LTI AGS)
+    scope(controller: 'lti/ims/progress') do
+      get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
     end
 
     # Public JWK Service

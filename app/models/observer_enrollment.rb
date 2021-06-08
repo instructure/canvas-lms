@@ -55,13 +55,17 @@ class ObserverEnrollment < Enrollment
   end
 
   # returns a hash mapping students to arrays of enrollments
-  def self.observed_students(context, current_user)
+  def self.observed_students(context, current_user, include_restricted_access: true)
     RequestCache.cache(:observed_students, context, current_user) do
       context.shard.activate do
         associated_user_ids = context.observer_enrollments.where(user_id: current_user).
           where("associated_user_id IS NOT NULL").select(:associated_user_id)
-        context.student_enrollments.
-          where(user_id: associated_user_ids).group_by(&:user)
+        students = context.student_enrollments.
+          where(user_id: associated_user_ids)
+        unless include_restricted_access
+          students = students.joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
+        end
+        students.group_by(&:user)
       end
     end
   end

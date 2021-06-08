@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Submission from 'compiled/models/Submission'
+import Submission from '@canvas/assignments/backbone/models/Submission'
 
 QUnit.module('Submission')
 

@@ -21,10 +21,17 @@ require 'vault'
 
 module Canvas::Vault
   CACHE_KEY_PREFIX = 'vault/'.freeze
-  class MissingVaultProfile < StandardError; end
+  class MissingVaultSecret < StandardError; end
 
   class << self
-    def read(path)
+    def read(path, required: true, cache: true)
+      Rails.logger.info("Reading #{path} from vault")
+      unless cache
+        vault_resp = api_client.logical.read(path)
+        raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+        return vault_resp&.data
+      end
+
       # we're going to override this anyway, just want it to use the fetch path.
       default_expiry = 30.minutes
       default_race_condition_ttl = Setting.get("vault_cache_race_condition_ttl", 60).to_i.seconds
@@ -32,9 +39,11 @@ module Canvas::Vault
       fetched_lease_value = nil
       cached_data = LocalCache.fetch(cache_key, expires_in: default_expiry, race_condition_ttl: default_race_condition_ttl) do
         vault_resp = api_client.logical.read(path)
-        raise(MissingVaultProfile, "nil credentials found for #{path}") if vault_resp.nil?
-        fetched_lease_value = vault_resp.lease_duration || vault_resp.data[:ttl] || 10.minutes
-        vault_resp.data
+        raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+        fetched_lease_value = vault_resp&.lease_duration
+        fetched_lease_value = vault_resp&.data&.[](:ttl) unless fetched_lease_value&.positive?
+        fetched_lease_value = 10.minutes unless fetched_lease_value&.positive?
+        vault_resp&.data
       end
       unless fetched_lease_value.nil?
         # we actually talked to vault and got a new record, let's update the expiration information
@@ -52,12 +61,14 @@ module Canvas::Vault
     end
 
     def api_client
-      return Canvas::Vault::FileClient.get_client if addr == "file"
+      # Default to flat file if vault is unconfigured
+      return Canvas::Vault::FileClient.get_client if addr.nil? || addr == "file"
+
       Vault::Client.new(address: addr, token: token)
     end
 
     def kv_mount
-      config[:kv_mount]
+      config[:kv_mount] || 'app-canvas'
     end
 
     private

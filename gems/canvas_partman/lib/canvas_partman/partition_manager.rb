@@ -71,11 +71,14 @@ See CanvasPartman::Concerns::Partitioned.
 
     # Create a new partition table.
     #
-    # @param [Integer] graceful
+    # @param [Time/Integer] value
+    #   The time or sequencial value to use in generating the table name.
+    #
+    # @param [Boolean] graceful
     #   Do nothing if the partition table already exists.
     #
     # @return [String]
-    #  The name of the newly created partition table.
+    #   The name of the newly created partition table.
     def create_partition(value, graceful: false)
       partition_table = generate_name_for_partition(value)
 
@@ -85,7 +88,7 @@ See CanvasPartman::Concerns::Partitioned.
 
       constraint_check = generate_check_constraint(value)
 
-      base_class.transaction do
+      with_statement_timeout do
         execute(<<SQL)
         CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
           LIKE #{base_class.quoted_table_name} INCLUDING ALL,
@@ -115,17 +118,29 @@ SQL
       drop_partition_table(partition_table)
     end
 
+    def with_statement_timeout(timeout_override: nil)
+      tv = timeout_override || ::CanvasPartman.timeout_value
+      base_class.transaction do
+        execute("SET LOCAL statement_timeout=#{tv}")
+        yield
+      end
+    end
+
     protected
 
     def drop_partition_constraints(table_name)
       base_class.connection.foreign_keys(table_name).each do |fk|
-        base_class.connection.remove_foreign_key table_name, name: fk.name
+        with_statement_timeout do
+          base_class.connection.remove_foreign_key table_name, name: fk.name
+        end
       end
     end
 
     def drop_partition_table(table_name)
       drop_partition_constraints(table_name)
-      base_class.connection.drop_table(table_name)
+      with_statement_timeout do
+        base_class.connection.drop_table(table_name)
+      end
     end
 
     def initialize(base_class)

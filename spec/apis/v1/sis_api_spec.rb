@@ -21,9 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe SisApiController, type: :request do
-  def enable_bulk_grade_export
-    context.root_account.enable_feature!(:bulk_sis_grade_export)
-  end
 
   def install_post_grades_tool
     context.context_external_tools.create!(
@@ -67,6 +64,9 @@ describe SisApiController, type: :request do
       let(:context) { @account }
 
       before do
+        course1.enable_feature!(:post_grades)
+        course2.enable_feature!(:post_grades)
+        course3.enable_feature!(:post_grades)
         user_session(@user)
       end
 
@@ -76,7 +76,11 @@ describe SisApiController, type: :request do
         expect(json_parse).to include('code' => 'not_enabled')
       end
 
-      shared_examples 'account sis assignments api' do
+      context 'with a post_grades tool installed' do
+        before do
+          install_post_grades_tool
+        end
+
         it 'requires :view_all_grades permission' do
           context.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
           get "/api/sis/accounts/#{context.id}/assignments", params: {account_id: context.id}
@@ -170,27 +174,12 @@ describe SisApiController, type: :request do
           expect(assignment_ids).to include assignment11.id
         end
       end
-
-      context 'with :bulk_sis_grade_export feature enabled' do
-        before do
-          enable_bulk_grade_export
-        end
-
-        include_examples 'account sis assignments api'
-      end
-
-      context 'with a post_grades tool installed' do
-        before do
-          install_post_grades_tool
-        end
-
-        include_examples 'account sis assignments api'
-      end
     end
 
-    context 'for an unpublished course' do
+    context 'for an unpublished course with a post_grades tool installed' do
       before :once do
         course_factory
+        @course.enable_feature!(:post_grades)
         account_admin_user(account: @course.root_account, active_all: true)
       end
 
@@ -198,36 +187,20 @@ describe SisApiController, type: :request do
 
       before do
         user_session(@user)
+        install_post_grades_tool
       end
 
-      shared_examples 'unpublished course sis assignments api' do
-        it 'requires the course to be published' do
-          get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
-          expect(response.status).to eq 400
-          expect(json_parse).to include('code' => 'unpublished_course')
-        end
-      end
-
-      context 'with :bulk_sis_grade_export feature enabled' do
-        before do
-          enable_bulk_grade_export
-        end
-
-        include_examples 'unpublished course sis assignments api'
-      end
-
-      context 'with a post_grades tool installed' do
-        before do
-          install_post_grades_tool
-        end
-
-        include_examples 'unpublished course sis assignments api'
+      it 'requires the course to be published' do
+        get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
+        expect(response.status).to eq 400
+        expect(json_parse).to include('code' => 'unpublished_course')
       end
     end
 
     context 'for a published course' do
       before :once do
         course_factory(active_all: true)
+        @course.enable_feature!(:post_grades)
         account_admin_user(account: @course.root_account, active_all: true)
       end
 
@@ -271,15 +244,14 @@ describe SisApiController, type: :request do
 
       before do
         user_session(@user)
+        @course.enable_feature!(:post_grades)
       end
 
-      it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
-        get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
-        expect(response.status).to eq 400
-        expect(json_parse).to include('code' => 'not_enabled')
-      end
+      context 'with a post_grades tool installed' do
+        before do
+          install_post_grades_tool
+        end
 
-      shared_examples 'course sis assignments api' do
         it 'requires :view_all_grades permission' do
           @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
           get "/api/sis/courses/#{@course.id}/assignments", params: {course_id: @course.id}
@@ -349,22 +321,6 @@ describe SisApiController, type: :request do
           expect(assignment_ids).to include assignment7.id
           expect(assignment_ids).to include assignment8.id
         end
-      end
-
-      context 'with :bulk_sis_grade_export feature enabled' do
-        before do
-          enable_bulk_grade_export
-        end
-
-        include_examples 'course sis assignments api'
-      end
-
-      context 'with a post_grades tool installed' do
-        before do
-          install_post_grades_tool
-        end
-
-        include_examples 'course sis assignments api'
       end
     end
   end

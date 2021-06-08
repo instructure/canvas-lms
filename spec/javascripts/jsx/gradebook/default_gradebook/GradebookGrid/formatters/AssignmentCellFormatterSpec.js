@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellFormatter from 'jsx/gradebook/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter'
+import AssignmentCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter.js'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   let $fixture
@@ -303,12 +303,6 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
     test('includes the "ungraded" class when the assignment is not graded', () => {
       gradebook.getAssignment('2301').submission_types = ['not_graded']
       ok(renderCell().classList.contains('ungraded'))
-    })
-
-    test('does not include the "muted" class when post policies are enabled', () => {
-      gradebook.options.post_policies_enabled = true
-      gradebook.getAssignment('2301').muted = true
-      notOk(renderCell().classList.contains('muted'))
     })
 
     test('escapes html in the grade', () => {

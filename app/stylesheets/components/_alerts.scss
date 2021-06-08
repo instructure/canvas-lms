@@ -262,7 +262,7 @@ $ic-notification-border-thickness: 2px;
       display: flex;
       @include breakpoint(desktop) { align-items: flex-start; }
     }
-    .ic-notification__message { flex: 1; }
+    .ic-notification__message { flex: 1; overflow-wrap: anywhere;}
     .ic-notification__actions {
       margin-#{direction(left)}: $ic-sp*2;
       @include breakpoint(desktop) { margin-#{direction(left)}: $ic-sp*3; }

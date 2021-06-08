@@ -54,6 +54,12 @@ export default class TrayController {
     this._editor = editor
     this.$videoContainer = findVideoPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
+
+    if (bridge.focusedEditor) {
+      // Dismiss any content trays that may already be open
+      bridge.hideTrays()
+    }
+
     const trayProps = bridge.trayProps.get(editor)
     this._renderTray(trayProps)
   }
@@ -158,6 +164,7 @@ export default class TrayController {
 
     const element = (
       <VideoOptionsTray
+        id="video-options-tray"
         key={this._renderId}
         videoOptions={vo}
         onEntered={() => {

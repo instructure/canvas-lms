@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -64,6 +66,11 @@ class TabsController < ApplicationController
   # @API List available tabs for a course or group
   #
   # Returns a paginated list of navigation tabs available in the current context.
+  #
+  # @argument include[] [String, "course_subject_tabs"]
+  #   - "course_subject_tabs": Optional flag to return the tabs associated with a canvas_for_elementary subject course's
+  #     home page instead of the typical sidebar navigation. Only takes effect if this request is for a course context
+  #     in a canvas_for_elementary-enabled account or sub-account.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \

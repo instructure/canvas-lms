@@ -35,6 +35,7 @@ class Group < ActiveRecord::Base
 
   has_many :group_memberships, -> { where("group_memberships.workflow_state<>'deleted'") }, dependent: :destroy
   has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
+  has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]
@@ -79,7 +80,7 @@ class Group < ActiveRecord::Base
   after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   delegate :time_zone, :to => :context
-  delegate :usage_rights_required, to: :context
+  delegate :usage_rights_required?, to: :context
 
   include StickySisFields
   are_sis_sticky :name
@@ -388,13 +389,13 @@ class Group < ActiveRecord::Base
       notification = BroadcastPolicy.notification_finder.by_name(notification_name)
 
       users.each_with_index do |user, index|
-        BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
-                                                         { :priority => Delayed::LOW_PRIORITY },
-                                                         new_group_memberships[index],
-                                                         notification_name.parameterize.underscore.to_sym,
-                                                         notification,
-                                                         [user],
-                                                         broadcast_data)
+        BroadcastPolicy.notifier.delay(priority: Delayed::LOW_PRIORITY).
+          send_notification(
+            new_group_memberships[index],
+            notification_name.parameterize.underscore.to_sym,
+            notification,
+            [user],
+            broadcast_data)
       end
     end
     new_group_memberships
@@ -503,6 +504,9 @@ class Group < ActiveRecord::Base
     can :manage_calendar and
     can :manage_content and
     can :manage_files and
+    can :manage_files_add and
+    can :manage_files_edit and
+    can :manage_files_delete and
     can :manage_wiki_create and
     can :manage_wiki_delete and
     can :manage_wiki_update and
@@ -537,6 +541,7 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :allow_course_admin_actions and
       can :manage_students and
       can :moderate_forum and
       can :update
@@ -559,9 +564,13 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :allow_course_admin_actions and
       can :manage_calendar and
       can :manage_content and
       can :manage_files and
+      can :manage_files_add and
+      can :manage_files_edit and
+      can :manage_files_delete and
       can :manage_students and
       can :manage_wiki_create and
       can :manage_wiki_delete and

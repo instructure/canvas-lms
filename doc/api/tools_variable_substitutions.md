@@ -209,7 +209,7 @@ The title of the context.
 ## com.instructure.Editor.contents
 The contents of the text editor associated with the content item launch.
 
-**Availability**: *always*  
+**Availability**: *when the tool is launched from the editor_button placement*  
 **Launch Parameter**: *com_instructure_editor_contents*  
 
 ```
@@ -219,7 +219,7 @@ The contents of the text editor associated with the content item launch.
 The contents the user has selected in the text editor associated
 with the content item launch.
 
-**Availability**: *always*  
+**Availability**: *when the tool is launched from the editor_button placement*  
 **Launch Parameter**: *com_instructure_editor_selection*  
 
 ```
@@ -301,6 +301,18 @@ The sourced Id of the context.
 
 ```
 1234
+```
+## Context.id.history
+Returns a string with a comma-separated list of the context ids of the
+courses in reverse chronological order from which content has been copied.
+Will show a limit of 1000 context ids.  When the number passes 1000,
+'truncated' will show at the end of the list.
+
+**Availability**: *when launched in a course*  
+
+
+```
+"789,456,123"
 ```
 ## Message.documentTarget
 communicates the kind of browser window/frame where the Canvas has launched a tool.
@@ -541,6 +553,15 @@ returns the current course sis source id.
 ```
 1234
 ```
+## com.instructure.Course.integrationId
+returns the current course integration id.
+
+**Availability**: *when launched in a course*  
+
+
+```
+1234
+```
 ## Canvas.course.startAt
 returns the current course start date.
 
@@ -655,6 +676,7 @@ With respect to the current course, returns the context ids of the courses from 
 ```
 ## Canvas.course.previousContextIds.recursive
 With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
+Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
 
 **Availability**: *when launched in a course*  
 
@@ -1152,6 +1174,24 @@ Only available when launched as an assignment.
 ```
 true
 ```
+## Canvas.assignment.allowedAttempts
+Returns the allowed number of submission attempts.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+5
+```
+## Canvas.assignment.submission.studentAttempts
+Returns the number of submission attempts which the student did.
+
+**Availability**: *when launched as an assignment by a student*  
+
+
+```
+2
+```
 ## LtiLink.custom.url
 Returns the endpoint url for accessing link-level tool settings
 Only available for LTI 2.0.
@@ -1279,10 +1319,13 @@ The submission history LTI2 service endpoint.
 ## com.instructure.Course.accept_canvas_resource_types
 Returns the types of resources that can be imported to the current page, forwarded from the request.
 Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
-"discussion_topic", "document", "image", "module", "quiz", "page", "video"].
+"discussion_topic", "document", "image", "module", "quiz", "page", "video"]
+
+Only functional when `com_instructure_course_accept_canvas_resource_types` is included as a query param
+in Canvas-side GET request that triggers the LTI launch.
 
 **Availability**: *always*  
-**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*  
+
 
 ```
 "page"
@@ -1297,8 +1340,11 @@ Value is the largest logical unit of the page. Possible values are: ["assignment
   on Modules -> 'module'
   and so on.
 
+Only functional when `com_instructure_course_canvas_resource_type` is included as a query param
+in Canvas-side GET request that triggers the LTI launch.
+
 **Availability**: *always*  
-**Launch Parameter**: *com_instructure_course_canvas_resource_type*  
+
 
 ```
 page
@@ -1307,8 +1353,11 @@ page
 Returns whether a content can be imported into a specific group on the page, forwarded from the request.
 True for Modules page and Assignment Groups page. False for other content index pages.
 
+Only functional when `com_instructure_course_allow_canvas_resource_selection` is included as a query param
+in Canvas-side GET request that triggers the LTI launch.
+
 **Availability**: *always*  
-**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*  
+
 
 ```
 true
@@ -1318,8 +1367,11 @@ Returns a JSON-encoded list of content groups which can be selected, providing I
 forwarded from the request.
 Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
 
+Only functional when `com_instructure_course_available_canvas_resources` is included as a query param
+in Canvas-side GET request that triggers the LTI launch.
+
 **Availability**: *always*  
-**Launch Parameter**: *com_instructure_course_available_canvas_resources*  
+
 
 ```
 [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]

@@ -32,7 +32,7 @@ module DataFixup::MoveFeatureFlagsToSettings
         end
         Rails.cache.delete([feature_flag_name, root_account.global_id].cache_key)
         # queue one job on the root account to clear all the caches recursively
-        Account.send_later_if_production(:invalidate_inherited_caches, root_account, [feature_flag_name])
+        Account.delay_if_production.invalidate_inherited_caches(root_account, [feature_flag_name])
       end
     else
       raise "invalid setting level"

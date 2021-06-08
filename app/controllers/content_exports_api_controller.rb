@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -156,6 +158,14 @@ class ContentExportsApiController < ApplicationController
       else
         render json: export.errors, status: :bad_request
       end
+    end
+  end
+
+  def fail
+    if authorized_action(Account.site_admin, @current_user, :read)
+      export = @context.content_exports.find(params[:id])
+      export.fail_with_error! @current_user.global_id, error_message: 'manually marked failed by a site administrator'
+      render json: content_export_json(export, @current_user, session)
     end
   end
 

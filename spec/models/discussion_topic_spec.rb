@@ -80,9 +80,13 @@ describe DiscussionTopic do
 
     context 'when the DiscussionTopic belongs to a Group' do
       before(:once) do
-        group = @course.groups.create!
-        @topic = group.discussion_topics.create!
+        @group = @course.groups.create!
+        @topic = @group.discussion_topics.create!
         @grading_standard = grading_standard_for(@course)
+      end
+
+      it 'should return the group for the address_book_context' do
+        expect(@topic.address_book_context_for(double)).to be @group
       end
 
       it 'returns the grading scheme used by the course, if one exists' do
@@ -170,6 +174,28 @@ describe DiscussionTopic do
     end
   end
 
+  describe 'default values' do
+    subject(:discussion_topic) { @course.discussion_topics.create!(title: title) }
+
+    let(:default_title) { I18n.t('#discussion_topic.default_title', "No Title") }
+
+    context 'when the title is an empty string' do
+      let(:title) { '' }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
+    end
+
+    context 'when the title is nil' do
+      let(:title) { nil }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
+    end
+  end
+
   it "should santize message" do
     @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>")
     expect(@course.discussion_topics.first.message).to eql("<a href=\"#\">only this should stay</a>")
@@ -240,7 +266,7 @@ describe DiscussionTopic do
 
     it "should not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :attach]
+      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach]
     end
 
     it "should grant permissions if it not locked" do
@@ -285,6 +311,10 @@ describe DiscussionTopic do
     it "should be visible to author when unpublished" do
       @topic.unpublish!
       expect(@topic.visible_for?(@teacher)).to be_truthy
+    end
+
+    it 'should return the course for the address_book_context' do
+      expect(@topic.address_book_context_for(double)).to be @course
     end
 
     it "should be visible when published even when for delayed posting" do
@@ -1162,7 +1192,7 @@ describe DiscussionTopic do
       expect(@student.stream_item_instances.count).to eq 0
     end
 
-    it "should not attempt to clear stream items if a discussion topic was not secton specific before last save" do
+    it "should not attempt to clear stream items if a discussion topic was not section specific before last save" do
       topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
       expect(topic.stream_item).to receive(:stream_item_instances).never
       topic.update!(title: "Lemon Loves Panda")
@@ -2236,6 +2266,33 @@ describe DiscussionTopic do
       expect(errors).to eq ["Section specific topics must have sections"]
     end
 
+    it 'should return the sections for the address_book_context relative to the student' do
+      topic = DiscussionTopic.create!(title: "some title", context: @course, user: @teacher)
+      section2 = @course.course_sections.create!(name: 'no students')
+      user = student_in_course(course: @course, active_enrollment: true, section: @section).user
+      add_section_to_topic(topic, @section)
+      add_section_to_topic(topic, section2)
+      expect(topic.address_book_context_for(user).to_a).to eq [@section]
+    end
+
+    it 'should return no sections for the address_book_context when student has none' do
+      topic = DiscussionTopic.create!(title: "some title", context: @course, user: @teacher)
+      section2 = @course.course_sections.create!(name: 'no topics')
+      user = student_in_course(course: @course, active_enrollment: true, section: section2).user
+      add_section_to_topic(topic, @section)
+      expect(topic.address_book_context_for(user).to_a).to eq []
+    end
+
+    it 'should return all sections for the address_book_context when student has 2' do
+      topic = DiscussionTopic.create!(title: "some title", context: @course, user: @teacher)
+      section2 = @course.course_sections.create!(name: 'no topics')
+      user = student_in_course(course: @course, active_enrollment: true, section: @section).user
+      @course.enroll_student(user, allow_multiple_enrollments: true, section: section2, enrollment_state: 'active')
+      add_section_to_topic(topic, @section)
+      add_section_to_topic(topic, section2)
+      expect(topic.address_book_context_for(user).to_a.sort).to eq [@section, section2].sort
+    end
+
     it "group topics cannot be section specific" do
       group_category = @course.group_categories.create(:name => "new category")
       @group = @course.groups.create(:name => "group", :group_category => group_category)
@@ -2455,6 +2512,26 @@ describe DiscussionTopic do
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)
       expect(@topic.entries_for_feed(@student, true)).to_not be_empty
+    end
+  end
+
+  describe 'reply_from' do
+    before(:once) do
+      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
+    end
+
+    it 'returns entry for valid arguments' do
+      val = @topic.reply_from(:user => @teacher, :text => "entry 1")
+      expect(val).to be_a_kind_of DiscussionEntry
+    end
+
+    it 'raises InvalidParticipant for invalid participants' do
+      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
+    end
+
+    it 'raises BlankMessage for empty message' do
+      expect { @topic.reply_from(user: @teacher, text: '') }.to raise_error IncomingMail::Errors::BlankMessage
     end
   end
 

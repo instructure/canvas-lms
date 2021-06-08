@@ -85,7 +85,7 @@ module Context
   end
 
   def self.sorted_rubrics(user, context)
-    associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
+    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
@@ -102,7 +102,7 @@ module Context
           context_codes << context.asset_string if context
         end
       end
-      associations += RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
+      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
     end
 
     associations = associations.select(&:rubric).uniq{|a| [a.rubric_id, a.context.asset_string] }
@@ -255,11 +255,15 @@ module Context
 
   def self.find_asset_by_url(url)
     object = nil
-    params = Rails.application.routes.recognize_path(url)
+    uri = URI.parse(url)
+    params = Rails.application.routes.recognize_path(uri.path)
     course = Course.find(params[:course_id]) if params[:course_id]
     group = Group.find(params[:group_id]) if params[:group_id]
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
+
+    media_obj = MediaObject.where(:media_id => params[:media_object_id]).first if params[:media_object_id]
+    context = media_obj.context if media_obj
 
     return nil unless context
     case params[:controller]
@@ -267,8 +271,7 @@ module Context
       rel_path = params[:file_path]
       object = rel_path && Folder.find_attachment_in_context_with_path(course, CGI.unescape(rel_path))
       file_id = params[:file_id] || params[:id]
-      query = URI.parse(url)&.query
-      file_id ||= query && CGI.parse(URI.parse(url)&.query)&.send(:[], "preview")&.first
+      file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
       object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
@@ -277,7 +280,7 @@ module Context
       end
     when 'external_tools'
       if params[:action] == "retrieve"
-        tool_url = CGI.parse(URI.parse(url).query)["url"].first rescue nil
+        tool_url = CGI.parse(uri.query)["url"].first rescue nil
         object = ContextExternalTool.find_external_tool(tool_url, context) if tool_url
       elsif params[:id]
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
@@ -288,6 +291,8 @@ module Context
       else
         object = context.context_modules.find_by(id: params[:id])
       end
+    when 'media_objects'
+      object = media_obj
     else
       object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end

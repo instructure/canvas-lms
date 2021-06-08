@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -36,6 +38,11 @@ class Login::SamlController < ApplicationController
                             institution: @domain_root_account.display_name)
 
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    unless response.is_a?(SAML2::Response)
+      # something confusing and wrong has happened
+      logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{response.class.name}"
+      return render status: :bad_request, plain: "Invalid SAML operation for this endpoint: #{response.class.name}"
+    end
 
     issuer = response.issuer&.id || response.assertions.first&.issuer&.id
 
@@ -164,6 +171,7 @@ class Login::SamlController < ApplicationController
           session[:return_to] = relay_state
         end
       end
+      pseudonym.infer_auth_provider(aac)
       successful_login(user, pseudonym)
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
@@ -177,9 +185,16 @@ class Login::SamlController < ApplicationController
   end
 
   rescue_from SAML2::InvalidMessage, with: :saml_error
+  rescue_from SAML2::InvalidSignature, with: :saml_error
+  rescue_from OpenSSL::X509::CertificateError, with: :saml_config_error
   def saml_error(error)
     Canvas::Errors.capture_exception(:saml, error, :warn)
     render status: :bad_request, plain: error.to_s
+  end
+
+  def saml_config_error(error)
+    Canvas::Errors.capture_exception(:saml, error, :warn)
+    render status: :unprocessable_entity, plain: error.to_s
   end
 
   def destroy
@@ -287,7 +302,10 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:idp_logout_request_destination, message.destination)
         aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
       end
-
+      sso_idp = aac.idp_metadata.identity_providers.first
+      if sso_idp.single_logout_services.empty?
+        return render status: :bad_request, plain: "IDP Metadata contains no destination to send a logout response"
+      end
       logout_response = SAML2::LogoutResponse.respond_to(message,
                                                          aac.idp_metadata.identity_providers.first,
                                                          SAML2::NameID.new(aac.entity_id))
@@ -328,8 +346,8 @@ class Login::SamlController < ApplicationController
 
   def observee_validation
     redirect_to
-      @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                   parent_registration: session[:parent_registration])
+      @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                  parent_registration: session[:parent_registration])
   end
 
   protected

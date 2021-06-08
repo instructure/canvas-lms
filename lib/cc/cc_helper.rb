@@ -19,6 +19,7 @@
 #
 
 require 'nokogiri'
+require 'nokogumbo'
 
 module CC
 module CCHelper
@@ -48,6 +49,7 @@ module CCHelper
   WEB_LINK = "imswl_xmlv1p1"
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
+  BASIC_LTI_1_DOT_3 = 'imsbasiclti_xmlv1p3'
   BLTI_NAMESPACE = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
 
   # Common Cartridge 1.2
@@ -97,6 +99,7 @@ module CCHelper
   MEDIA_TRACKS = 'media_tracks.xml'
   ASSIGNMENT_XML = 'assignment.xml'
   EXTERNAL_CONTENT_FOLDER = 'external_content'
+  RESOURCE_LINK_FOLDER = 'lti_resource_links'
 
   def ims_date(date=nil,default=Time.now)
     CCHelper.ims_date(date, default)
@@ -151,20 +154,32 @@ module CCHelper
     [title, body]
   end
 
+  SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
+  WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
+    Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
+    Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN)))
+  )
+
   def self.map_linked_objects(content)
     linked_objects = []
-    html = Nokogiri::HTML.fragment(content)
-    html.css('a, img').each do |atag|
-      source = atag['href'] || atag['src']
-      next unless source =~ /%24[^%]*%24/
-      if source.include?(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))
-        attachment_key = source.sub(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN), '')
-        attachment_key = attachment_key.split('?').first
-        attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+    doc = Nokogiri::XML.fragment(content)
+    doc.css('a, img', 'iframe').each do |node|
+      source = node['href'] || node['src']
+      next unless source =~ SPECIAL_REFERENCE_REGEX
+
+      if source =~ WEB_CONTENT_REFERENCE_REGEX
+        attachment_key = source.sub(WEB_CONTENT_REFERENCE_REGEX, '')
+        if node['data-media-type']
+          attachment_key = attachment_key.split('?').second
+          attachment_key = "/" + CGI.unescape(attachment_key.split('/').second)
+        else
+          attachment_key = attachment_key.split('?').first
+          attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+        end
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
         type, object_key = source.split('/').last 2
-        if type =~ /%24[^%]*%24/
+        if type =~ SPECIAL_REFERENCE_REGEX
           type = object_key
           object_key = nil
         end
@@ -310,16 +325,16 @@ module CCHelper
       # keep track of found media comments, and translate them into links into the files tree
       # if imported back into canvas, they'll get uploaded to the media server
       # and translated back into media comments
-      doc = Nokogiri::HTML::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5.fragment(html)
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
         obj = MediaObject.by_media_id(media_id).first
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          anchor['href'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+          anchor['href'] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
       end
 
@@ -329,9 +344,9 @@ module CCHelper
         obj = MediaObject.by_media_id(media_id).take
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          iframe['src'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+          iframe['src'] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
       end
 
@@ -359,7 +374,7 @@ module CCHelper
     end
   end
 
-  def self.media_object_info(obj, client = nil, flavor = nil)
+  def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
     unless client
       client = CanvasKaltura::ClientV3.new
       client.startSession(CanvasKaltura::SessionType::ADMIN)
@@ -371,10 +386,17 @@ module CCHelper
     else
       asset = client.flavorAssetGetOriginalAsset(obj.media_id)
     end
-    # we use the media_id as the export filename, since it is guaranteed to
-    # be unique
-    filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset
-    { :asset => asset, :filename => filename }
+    attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by_id(obj.attachment_id)
+    path = if attachment
+      # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
+      attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, '')
+    else
+      # otherwise export to a file named after the media id
+      filename = obj.media_id
+      filename += ".#{asset[:fileExt]}" if asset
+      File.join(MEDIA_OBJECTS_FOLDER, filename)
+    end
+    { :asset => asset, :path => path }
   end
 
   # sub_path is the last part of a file url: /courses/1/files/1(/download)

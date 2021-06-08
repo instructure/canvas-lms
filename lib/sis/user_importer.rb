@@ -215,7 +215,9 @@ module SIS
           should_add_account_associations = false
           should_update_account_associations = false
 
-          user.pronouns = user_row.pronouns if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns)
+          if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns)
+            user.pronouns = (user_row.pronouns == '<delete>') ? nil : user_row.pronouns
+          end
 
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
@@ -308,7 +310,6 @@ module SIS
           @users_to_add_account_associations << user.id if should_add_account_associations
           @users_to_update_account_associations << user.id if should_update_account_associations
 
-          limit = nil
           if user_row.email.present? && EmailAddressValidator.valid?(user_row.email)
             # find all CCs for this user, and active conflicting CCs for all users
             # unless we're deleting this user, then only find CCs for this user
@@ -325,9 +326,9 @@ module SIS
               cc_scope = cc_scope.email.by_path(user_row.email)
               limit = Setting.get("merge_candidate_search_limit", "100").to_i
               ccs = cc_scope.limit(limit + 1).to_a
-            end
-            if ccs.count > limit
-              ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+              if ccs.count > limit
+                ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+              end
             end
 
             # sis_cc could be set from the previous user, if we're not on a transaction boundary,
@@ -367,7 +368,7 @@ module SIS
             end
             pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
-            if newly_active
+            if newly_active && @root_account.feature_enabled?(:self_service_user_merge)
               user_ids = ccs.map(&:user_id)
               pseudo_scope = Pseudonym.active.where(user_id: user_ids).group(:user_id)
               active_pseudo_counts = pseudo_scope.count

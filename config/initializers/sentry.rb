@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -30,6 +32,7 @@ if settings.present?
     config.logger = Rails.logger
     config.silence_ready = true
     config.dsn = settings[:dsn]
+    config.current_environment = Canvas.environment
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
@@ -45,6 +48,7 @@ if settings.present?
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
+      Rack::QueryParser::InvalidParameterError
     }
   end
 
@@ -56,7 +60,7 @@ if settings.present?
     # This error can be caused by LTI tools.
     SentryProxy.register_ignorable_error("Grade pass back failure")
 
-    Canvas::Errors.register!(:sentry_notification) do |exception, data, level|
+    CanvasErrors.register!(:sentry_notification) do |exception, data, level|
       setting = Setting.get("sentry_error_logging_enabled", 'true')
       SentryProxy.capture(exception, data, level) if setting == 'true'
     end

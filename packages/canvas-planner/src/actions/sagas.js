@@ -20,17 +20,29 @@ import axios from 'axios'
 import parseLinkHeader from 'parse-link-header'
 import {put, select, call, all, takeEvery} from 'redux-saga/effects'
 import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
-import {transformApiToInternalGrade} from '../utilities/apiUtils'
+import {getContextCodesFromState, transformApiToInternalGrade} from '../utilities/apiUtils'
+import {alert} from '../utilities/alertUtils'
+import formatMessage from '../format-message'
 
-import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from './loading-actions'
+import {
+  gotItemsError,
+  sendBasicFetchRequest,
+  sendFetchRequest,
+  gotGradesSuccess,
+  gotGradesError
+} from './loading-actions'
+import {addOpportunities, allOpportunitiesLoaded} from './index'
 
 import {
   mergeFutureItems,
   mergePastItems,
   mergePastItemsForNewActivity,
   mergePastItemsForToday,
+  mergeWeekItems,
   consumePeekIntoPast
 } from './saga-actions'
+
+const MAX_PAGE_SIZE = 100
 
 export default function* allSagas() {
   yield all([call(watchForSagas)])
@@ -43,6 +55,8 @@ function* watchForSagas() {
   yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga)
   yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga)
   yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga)
+  yield takeEvery('START_LOADING_WEEK_SAGA', loadWeekSaga)
+  yield takeEvery('START_LOADING_ALL_OPPORTUNITIES', loadAllOpportunitiesSaga)
 }
 
 // fromMomentFunction: function
@@ -57,13 +71,19 @@ function* watchForSagas() {
 //        false if the new items did not meet the conditions and we should load more items
 // opts: for sendFetchRequest
 //   intoThePast
-function* loadingLoop(fromMomentFunction, actionCreator, opts) {
+function* loadingLoop(fromMomentFunction, actionCreator, opts = {}) {
   try {
     let currentState = null
     const getState = () => currentState // don't want create a new function inside a loop
     let continueLoading = true
     while (continueLoading) {
       currentState = yield select()
+      if (currentState.singleCourse) {
+        const context_codes = getContextCodesFromState(currentState)
+        if (context_codes) {
+          opts.extraParams = {...(opts.extraParams || {}), context_codes}
+        }
+      }
       const fromMoment = fromMomentFunction(currentState)
       const loadingOptions = {fromMoment, getState, ...opts}
       const {transformedItems, response} = yield call(sendFetchRequest, loadingOptions)
@@ -84,19 +104,19 @@ function* loadingLoop(fromMomentFunction, actionCreator, opts) {
 }
 
 export function* loadPastSaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItems, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItems, {mode: 'past'})
 }
 
 export function* loadFutureSaga() {
-  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {intoThePast: false})
+  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {mode: 'future'})
 }
 
 export function* loadPastUntilNewActivitySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {mode: 'past'})
 }
 
 export function* peekIntoPastSaga() {
-  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1})
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 1})
 }
 
 export function* loadGradesSaga() {
@@ -128,8 +148,43 @@ export function* loadGradesSaga() {
   }
 }
 
+export function* loadAllOpportunitiesSaga() {
+  try {
+    let loadingUrl = '/api/v1/users/self/missing_submissions'
+    const items = []
+    const {courses, singleCourse} = yield select()
+    const course_ids = singleCourse ? courses.map(({id}) => id) : undefined
+    while (loadingUrl != null) {
+      const response = yield call(sendBasicFetchRequest, loadingUrl, {
+        course_ids,
+        include: ['planner_overrides'],
+        filter: ['submittable'],
+        per_page: MAX_PAGE_SIZE
+      })
+      items.push(...response.data)
+
+      const links = parseLinkHeader(response.headers.link)
+      loadingUrl = links?.next ? links.next.url : null
+    }
+    yield put(addOpportunities({items, nextUrl: null}))
+    yield put(allOpportunitiesLoaded())
+  } catch (err) {
+    alert(formatMessage('Failed to load opportunities'), true)
+  }
+}
+
 export function* loadPastUntilTodaySaga() {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true})
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {mode: 'past'})
+}
+
+export function* loadWeekSaga({payload: {weekStart, weekEnd, isPreload}}) {
+  yield* loadingLoop(() => weekStart, mergeWeekItems(weekStart, isPreload), {
+    mode: 'week',
+    extraParams: {
+      end_date: weekEnd.toISOString(),
+      per_page: MAX_PAGE_SIZE
+    }
+  })
 }
 
 function fromMomentPast(state) {

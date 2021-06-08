@@ -618,7 +618,35 @@ describe Canvas::LiveEvents do
           expect_event(
             event_name,
             hash_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
+              associated_integration_id: tool_proxy.guid
+            ),
+            course_context
+          )
+          Canvas::LiveEvents.send(event_name.to_sym, submission)
+        end
+
+        it 'should temporarily include multiple associated_integration_ids if there is an installed tool proxy' do
+          submission.assignment.assignment_configuration_tool_lookups.create!(
+            tool_product_code: 'turnitin-lti',
+            tool_vendor_code: 'turnitin.com',
+            tool_resource_type_code: 'resource-type-code',
+            tool_type: 'Lti::MessageHandler'
+          )
+
+          tool_proxy = create_tool_proxy(submission.assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
+
+          Lti::ResourceHandler.create!(
+            tool_proxy: tool_proxy,
+            name: 'resource_handler',
+            resource_type_code: 'resource-type-code'
+          )
+
+          expect_event(
+            event_name,
+            hash_including(
+              associated_integration_ids: [tool_proxy.guid, "turnitin.com_turnitin-lti_test.com/submission"]
             ),
             course_context
           )
@@ -632,7 +660,7 @@ describe Canvas::LiveEvents do
           expect_event(
             event_name,
             hash_not_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
+              :associated_integration_id
             ),
             course_context
           )
@@ -911,10 +939,34 @@ describe Canvas::LiveEvents do
           resource_type_code: 'resource-type-code'
         )
 
-        expect_event('assignment_created',
-          hash_including(
-            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-          ))
+        expect_event(
+          'assignment_created',
+          hash_including(associated_integration_id: tool_proxy.guid)
+        )
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+
+      it 'should temporarily include multiple associated_integration_ids if there is an installed tool proxy' do
+        @assignment.assignment_configuration_tool_lookups.create!(
+          tool_product_code: 'turnitin-lti',
+          tool_vendor_code: 'turnitin.com',
+          tool_resource_type_code: 'resource-type-code',
+          tool_type: 'Lti::MessageHandler'
+        )
+        tool_proxy = create_tool_proxy(@assignment.course)
+        tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+        tool_proxy.save!
+
+        Lti::ResourceHandler.create!(
+          tool_proxy: tool_proxy,
+          name: 'resource_handler',
+          resource_type_code: 'resource-type-code'
+        )
+
+        expect_event(
+          'assignment_created',
+          hash_including(associated_integration_ids: [tool_proxy.guid, "turnitin.com_turnitin-lti_test.com/submission"])
+        )
         Canvas::LiveEvents.assignment_created(@assignment)
       end
 
@@ -926,10 +978,10 @@ describe Canvas::LiveEvents do
           tool_type: 'Lti::MessageHandler'
         )
 
-        expect_event('assignment_created',
-          hash_not_including(
-            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-          ))
+        expect_event(
+          'assignment_created',
+          hash_not_including(:associated_integration_id)
+        )
         Canvas::LiveEvents.assignment_created(@assignment)
       end
     end
@@ -995,10 +1047,10 @@ describe Canvas::LiveEvents do
           resource_type_code: 'resource-type-code'
         )
 
-        expect_event('assignment_updated',
-          hash_including(
-            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-          ))
+        expect_event(
+          'assignment_updated',
+          hash_including(associated_integration_id: tool_proxy.guid)
+        )
         Canvas::LiveEvents.assignment_updated(@assignment)
       end
 
@@ -1006,10 +1058,10 @@ describe Canvas::LiveEvents do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
-        expect_event('assignment_updated',
-          hash_not_including(
-            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-          ))
+        expect_event(
+          'assignment_updated',
+          hash_not_including(:associated_integration_id)
+        )
         Canvas::LiveEvents.assignment_updated(@assignment)
       end
     end
@@ -1150,10 +1202,13 @@ describe Canvas::LiveEvents do
 
   describe '.content_migration_completed' do
     let(:course) { course_factory() }
-    let(:migration) { ContentMigration.create!(:context => course) }
+    let(:source_course) { course_factory() }
+    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: 'some_type') }
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
+      course.lti_context_id = 'abc'
+      source_course.lti_context_id = 'def'
     end
 
     it 'sent events with expected payload' do
@@ -1165,7 +1220,10 @@ describe Canvas::LiveEvents do
           context_type: course.class.to_s,
           context_uuid: course.uuid,
           import_quizzes_next: true,
-          domain: course.root_account.domain
+          domain: course.root_account.domain,
+          source_course_lti_id: migration.source_course.lti_context_id,
+          destination_course_lti_id: course.lti_context_id,
+          migration_type: migration.migration_type
         ),
         hash_including(
           context_type: course.class.to_s,
@@ -1410,6 +1468,28 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'ContextModuleProgression LiveEventsCallback' do
+    it "queues a job to dispatch .course_completed" do
+      course = course_model(sis_source_id: "abc123")
+      user = user_model
+      context_module = course.context_modules.create!
+      context_module_progression = context_module.context_module_progressions.create!(user_id: user.id)
+      context_module_progression.workflow_state = 'completed'
+      context_module_progression.completed_at = Time.now
+
+      allow(Rails.env).to receive(:production?).and_return(true)
+
+      # post-transaction callbacks won't happen in specs, so do this manually
+      Canvas::LiveEventsCallbacks.after_update(context_module_progression, context_module_progression.changes)
+
+      job = Delayed::Job.where(strand: "course_progress_#{context_module_progression.global_id}").take
+      expect(job).not_to be_nil
+      expect(job.run_at).to be > Time.now
+      expect(job.max_concurrent).to eq 1
+      expect(job.tag).to eq 'CourseProgress.dispatch_live_event'
+    end
+  end
+
   describe '.discussion_topic_created' do
     it 'should trigger a discussion topic created live event' do
       course = course_model
@@ -1533,7 +1613,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1556,7 +1637,8 @@ describe Canvas::LiveEvents do
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
           title: result.title,
-          percent: result.percent
+          percent: result.percent,
+          workflow_state: result.workflow_state
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)

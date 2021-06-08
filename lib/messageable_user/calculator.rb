@@ -22,7 +22,7 @@ require_dependency 'messageable_user'
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group)_(\d+)(_([a-z]+))?\z/
+    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
     INDIVIDUAL_RECIPIENT = /\A\d+\z/
 
     # all work is done within the context of a user. avoid passing it around in
@@ -381,11 +381,19 @@ class MessageableUser
     # |  top-level query construction methods  |
     # ==========================================
 
-    def messageable_users_in_context_scope(asset_string, options={})
-      return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
+    def messageable_users_in_context_scope(asset_string_or_asset, options={})
+      if asset_string_or_asset.is_a?(String)
+        asset_string = asset_string_or_asset
+        return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
 
-      context_type = $1
-      context_id = $2.to_i
+        context_type = $1
+        context_id_or_object = $2.to_i
+      else
+        context_type = asset_string_or_asset.class_name.underscore
+        context_type = 'section' if context_type == 'course_section'
+        context_id_or_object = asset_string_or_asset
+      end
+
       enrollment_type = $4
       if enrollment_type == 'admins'
         enrollment_types = ['TeacherEnrollment','TaEnrollment']
@@ -394,9 +402,10 @@ class MessageableUser
       end
 
       case context_type
-      when 'course' then messageable_users_in_course_scope(context_id, enrollment_types, options)
-      when 'section' then messageable_users_in_section_scope(context_id, enrollment_types, options)
-      when 'group' then messageable_users_in_group_scope(context_id, options)
+      when 'course' then messageable_users_in_course_scope(context_id_or_object, enrollment_types, options)
+      when 'section' then messageable_users_in_section_scope(context_id_or_object, enrollment_types, options)
+      when 'group' then messageable_users_in_group_scope(context_id_or_object, options)
+      when 'announcement', 'discussion_topic' then messageable_users_in_discussion_scope(context_id_or_object, options)
       end
     end
 
@@ -437,6 +446,14 @@ class MessageableUser
     # populated only with the course of the given section.
     def messageable_users_in_section_scope(section_or_id, enrollment_types=nil, options={})
       return unless section_or_id
+
+      # Discussion Topics could be assigned to multiple sections so this allows
+      # supporting multiple sections through this method.
+      sections = nil
+      if section_or_id.is_a?(Array)
+        sections = section_or_id
+        section_or_id = sections.first
+      end
       section = section_or_id.is_a?(CourseSection) ? section_or_id : CourseSection.where(id: section_or_id).first
       return unless section
 
@@ -450,10 +467,8 @@ class MessageableUser
           section_visible_courses.include?(course) &&
           visible_section_ids_in_courses([course]).include?(section.id)
 
-        scope = enrollment_scope(options.merge(
-          :include_concluded_students => false,
-          :course_workflow_state => course.workflow_state)).
-          where('enrollments.course_section_id' => section.id)
+        scope = enrollment_scope(options.merge(include_concluded_students: false, course_workflow_state: course.workflow_state))
+          .where(enrollments: { course_section_id: sections || section })
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
         scope
@@ -467,6 +482,7 @@ class MessageableUser
     # populated only with the group given.
     def messageable_users_in_group_scope(group_or_id, options={})
       return unless group_or_id
+
       group = group_or_id.is_a?(Group) ? group_or_id : Group.where(id: group_or_id).first
       return unless group
 
@@ -490,6 +506,26 @@ class MessageableUser
           scope = scope.where(observer_restriction_clause) if student_courses.present?
           scope
         end
+      end
+    end
+
+    # find and return all the messageable users in a particular discussion (see
+    # messageable_users_in_context). This is used for mentioning a person.
+    #
+    # NOTE: the common_courses of the returned MessageableUser will not be
+    # populated
+    def messageable_users_in_discussion_scope(discussion_or_id, options={})
+      return unless discussion_or_id
+
+      discussion = discussion_or_id.is_a?(DiscussionTopic) ? discussion_or_id : DiscussionTopic.where(id: discussion_or_id).first
+      context = discussion.address_book_context_for(@user)
+
+      if context.is_a?(Course)
+        messageable_users_in_course_scope(context, nil, options)
+      elsif context.is_a?(Group)
+        messageable_users_in_group_scope(context, options)
+      else
+        messageable_users_in_section_scope(context, nil, options)
       end
     end
 

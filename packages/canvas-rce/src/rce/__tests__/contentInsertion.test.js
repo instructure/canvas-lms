@@ -138,7 +138,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link instructure_image_thumbnail" href="/some/path" title="Here Be Links">Click On Me</a> '
+        '<a class="instructure_file_link instructure_image_thumbnail" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -146,7 +146,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link instructure_scribd_file" href="/some/path" title="Here Be Links">Click On Me</a> '
+        '<a class="instructure_file_link instructure_scribd_file" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -155,7 +155,7 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link foo" data-canvas-previewable="true" href="/some/path" title="Here Be Links">Click On Me</a> '
+        '<a class="instructure_file_link foo" data-canvas-previewable="true" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -195,14 +195,14 @@ describe('contentInsertion', () => {
       link.href = undefined
       link.url = '/other/path'
       contentInsertion.insertLink(editor, link)
-      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a> ')
+      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
     })
 
     it('cleans a url with no protocol', () => {
       link.href = 'www.google.com'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a> '
+        '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>'
       )
     })
 
@@ -224,7 +224,7 @@ describe('contentInsertion', () => {
       link.text = '3 < 4'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a> '
+        '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>'
       )
     })
   })
@@ -233,7 +233,7 @@ describe('contentInsertion', () => {
     it('accepts string content', () => {
       const content = 'Some Chunk Of Content'
       contentInsertion.insertContent(editor, content)
-      expect(editor.content).toEqual('Some Chunk Of Content ')
+      expect(editor.content).toEqual('Some Chunk Of Content')
     })
 
     it('calls replaceTextareaSelection() when editor is hidden', () => {
@@ -262,13 +262,13 @@ describe('contentInsertion', () => {
 
     it('builds image html from image data', () => {
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/> ')
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
     })
 
     it('uses url if no href', () => {
       image.href = undefined
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/other/path"/> ')
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/other/path"/>')
     })
 
     it('builds linked image html from linked image data', () => {
@@ -287,7 +287,7 @@ describe('contentInsertion', () => {
       })
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
-        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a> '
+        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>'
       )
     })
   })
@@ -361,7 +361,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe> ',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')
@@ -374,7 +374,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe> ',
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')
@@ -410,7 +410,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe> ',
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')
@@ -422,7 +422,7 @@ describe('contentInsertion', () => {
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe> ',
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')

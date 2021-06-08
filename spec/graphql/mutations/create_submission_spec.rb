@@ -34,6 +34,7 @@ RSpec.describe Mutations::CreateSubmission do
   end
 
   def mutation_str(
+    annotatable_attachment_id: nil,
     assignment_id: @assignment.id,
     submission_type: 'online_upload',
     body: nil,
@@ -44,6 +45,7 @@ RSpec.describe Mutations::CreateSubmission do
     <<~GQL
       mutation {
         createSubmission(input: {
+          #{"annotatableAttachmentId: \"#{annotatable_attachment_id}\"" if annotatable_attachment_id}
           assignmentId: "#{assignment_id}"
           submissionType: #{submission_type}
           #{"body: \"#{body}\"" if body}
@@ -108,6 +110,27 @@ RSpec.describe Mutations::CreateSubmission do
     end
   end
 
+  context 'when the submission_type is student_annotation' do
+    it 'requires annotatable_attachment_id to be present' do
+      result = run_mutation(submission_type: 'student_annotation')
+      error_message = 'Student Annotation submissions require an annotatable_attachment_id to submit'
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq error_message
+    end
+
+    it 'changes a CanvadocsAnnotationContext from draft attempt to the current attempt' do
+      @assignment.update!(annotatable_attachment: @attachment, submission_types: 'student_annotation')
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.update!(attempt: 7)
+      annotation_context = submission.annotation_context(draft: true)
+      result = run_mutation(annotatable_attachment_id: @attachment.id, submission_type: 'student_annotation')
+
+      aggregate_failures do
+        expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to be_nil
+        expect(annotation_context.reload.submission_attempt).to be 8
+      end
+    end
+  end
+
   context 'when the submission_type is a media_recording' do
     it 'returns an error if there is no media_id' do
       @assignment.update(submission_types: 'media_recording')
@@ -142,8 +165,11 @@ RSpec.describe Mutations::CreateSubmission do
 
     it 'returns an error if any of the file_ids are not found' do
       @assignment.update!(submission_types: 'online_upload')
-      result = run_mutation(submission_type: 'online_upload', file_ids: [1,2,3])
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq 'No attachments found for the following ids: ["1", "2", "3"]'
+      id_offset = [@attachment1.id, @attachment2.id].max
+      unaffiliated_ids = [id_offset + 1, id_offset + 2, id_offset + 3]
+      result = run_mutation(submission_type: 'online_upload', file_ids: unaffiliated_ids)
+      expected_message = "No attachments found for the following ids: [#{unaffiliated_ids.map{|i| "\"#{i}\""}.join(", ")}]"
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq expected_message
     end
 
     it 'returns an error if the returned attachment does not have an allowed file extension' do

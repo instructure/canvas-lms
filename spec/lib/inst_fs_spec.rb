@@ -136,27 +136,11 @@ describe InstFS do
         end
       end
 
-      it "generates the same url within a cache window of time so it's not unique every time" do
-        url1 = InstFS.authenticated_url(@attachment)
-        url2 = InstFS.authenticated_url(@attachment)
-        expect(url1).to eq(url2)
-
-        Timecop.freeze(1.day.from_now) do
-          url3 = InstFS.authenticated_url(@attachment)
-          expect(url1).to_not eq(url3)
-
-          first_token = url1.split(/token=/).last
-          expect(->{
-            Canvas::Security.decode_jwt(first_token, [ secret ])
-          }).to raise_error(Canvas::Security::TokenExpired)
-        end
-      end
-
-      it "retries if imperium is timing out" do
+      it "retries if consul is erroring out" do
         times_called = 0
         allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs", default_ttl: 5.minutes) do
           times_called += 1
-          raise Imperium::SendTimeout if times_called < 2
+          raise Diplomat::KeyNotFound if times_called < 2
           settings_hash
         end
         expect(InstFS.authenticated_url(@attachment, {}))
@@ -165,9 +149,9 @@ describe InstFS do
 
       it "actually fails with a config error if can't find config" do
         allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs", default_ttl: 5.minutes) do
-          raise Imperium::SendTimeout
+          raise Diplomat::KeyNotFound
         end
-        expect{ InstFS.authenticated_url(@attachment, {}) }.to raise_error(Imperium::TimeoutError)
+        expect{ InstFS.authenticated_url(@attachment, {}) }.to raise_error(Diplomat::KeyNotFound)
       end
 
       describe "jwt claims" do
@@ -210,6 +194,26 @@ describe InstFS do
         it "omits user_id claim in the token if no user provided" do
           claims = claims_for(user: nil)
           expect(claims[:user_id]).to be_nil
+        end
+
+        it "includes a jti in the token" do
+          url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
+        end
+
+        it "includes the original_url claim with the redirect and no_cache param" do
+          original_url = "https://example.test/preview"
+          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
+        end
+
+        it "doesn't include the original_url claim if already redirected" do
+          original_url = "https://example.test/preview?redirect=true"
+          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])).not_to have_key(:original_url)
         end
 
         describe "legacy api claims" do
@@ -283,6 +287,13 @@ describe InstFS do
           }).to raise_error(Canvas::Security::TokenExpired)
         end
       end
+
+      it "includes a jti in the token" do
+        url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
+        token = url.split(/token=/).last
+        expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
+      end
+
     end
 
     context "upload_preflight_json" do
@@ -533,6 +544,14 @@ describe InstFS do
           file_name: "a.png",
           file_object: File.open("public/images/a.png")
         )
+      end
+
+      it "wraps network errors in a service exception" do
+        instfs_uuid = "1234-abcd"
+        allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
+        expect do
+          InstFS.direct_upload(file_name: "a.png", file_object: File.open("public/images/a.png"))
+        end.to raise_error(InstFS::ServiceError)
       end
     end
 

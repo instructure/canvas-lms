@@ -20,12 +20,9 @@
 module DataFixup::CleanupCrossShardDeveloperKeys
   def self.run
     DeveloperKey.find_ids_in_ranges(batch_size: 100_000) do |min, max|
-      self.send_later_if_production_enqueue_args(:delete_developer_keys_with_cross_shard_account_ids,
-      {
-        priority: Delayed::MAX_PRIORITY,
-        n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
-      },
-      min, max)
+      delay_if_production(priority: Delayed::MAX_PRIORITY,
+        n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
+        delete_developer_keys_with_cross_shard_account_ids(min, max)
     end
   end
 

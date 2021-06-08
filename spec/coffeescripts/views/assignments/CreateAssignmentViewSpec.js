@@ -16,22 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroupCollection from 'compiled/collections/AssignmentGroupCollection'
-import AssignmentGroup from 'compiled/models/AssignmentGroup'
-import Assignment from 'compiled/models/Assignment'
-import CreateAssignmentView from 'compiled/views/assignments/CreateAssignmentView'
-import DialogFormView from 'compiled/views/DialogFormView'
+import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import $ from 'jquery'
-import tz from 'timezone'
+import tz from '@canvas/timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
-import 'compiled/behaviors/tooltip'
-
-const fixtures = $('#fixtures')
+import '../../../../ui/boot/initializers/activateTooltips.js'
 
 function buildAssignment1() {
   const date1 = {
@@ -323,6 +321,46 @@ test('openAgain adds datetime picker', function() {
   const view = createView(this.assignment2)
   view.openAgain()
   ok($.fn.datetime_field.called)
+})
+
+test('adjust datetime to the end of a day for midnight time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.setLocale('fr_FR')
+  // tz use the key/values to get formats for different locale
+  I18nStubber.stub('fr_FR', {
+    'date.formats.short': '%b %-d',
+    'time.formats.tiny': '%l:%M%P'
+  })
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('.datetime_field')
+    .val('Feb 2, 2021')
+    .trigger('change')
+  equal(view.$el.find('.datetime_field').val(), 'Feb 2 11:59pm')
+  $.screenReaderFlashMessageExclusive = tmp
+})
+
+test('it does not adjust datetime for other date time', function() {
+  sandbox.stub(DialogFormView.prototype, 'openAgain')
+  I18nStubber.setLocale('fr_FR')
+  // tz use the key/values to get formats for different locale
+  I18nStubber.stub('fr_FR', {
+    'date.formats.short': '%b %-d',
+    'time.formats.tiny': '%l:%M%P'
+  })
+  const tmp = $.screenReaderFlashMessageExclusive
+  $.screenReaderFlashMessageExclusive = sinon.spy()
+  const view = createView(this.assignment2)
+  view.openAgain()
+  view.$el
+    .find('#assign_3_assignment_due_at')
+    .val('Feb 2, 2021, 1:27pm')
+    .trigger('change')
+  equal(view.$el.find('#assign_3_assignment_due_at').val(), 'Feb 2 1:27pm')
+  $.screenReaderFlashMessageExclusive = tmp
 })
 
 test("openAgain doesn't add datetime picker if disableDueAt is true", function() {

@@ -1,0 +1,41 @@
+{
+  "name": "learning_outcome_group_created",
+  "definition": "The event is emitted anytime a new outcome group is created in the account by an end user or API request.",
+  "trigger": "Triggered when a new group of learning outcomes is created.",
+  "schema": {
+    "context_id": "The ID of the context the learning outcome is used in.",
+    "context_type": "The type of context the learning outcome is used in, usually Course.",
+    "description": "Description of the learnning outcome group.",
+    "learning_outcome_group_id": "The local Canvas ID of the learning outcome group.",
+    "parent_outcome_group_id": "The local Canvas ID of the group's parent outcome group.",
+    "title": "Title of the learning outcome group.",
+    "vendor_guid": "A custom GUID for the learning standard.",
+    "workflow_state": "Workflow status of the learning outcome group, defaults to active."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "learning_outcome_group_created",
+          "event_time": "2019-11-01T18:42:34.373Z",
+          "job_id": "1020020528469291",
+          "job_tag": "OutcomeImport#run",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "context_id": "32054",
+          "context_type": "Course",
+          "description": "<h3>Outcome</h3>Hello outcome",
+          "learning_outcome_group_id": "75033",
+          "parent_outcome_group_id": "75032",
+          "title": "Official Standards for K-12 Math Education",
+          "vendor_guid": "123",
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

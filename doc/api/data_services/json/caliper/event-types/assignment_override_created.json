@@ -1,0 +1,114 @@
+{
+  "name": "assignment_override_created",
+  "definition": "The event is emitted anytime an assignment override is created by an end user or API request.",
+  "trigger": "Triggered when an assignment override is created.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "assignment_id": "The Canvas id of the assignment linked to the override.",
+      "all_day": "The overridden all_day flag, or nil if not overridden.",
+      "all_day_date": "The overridden all_day_date, or nil if not overridden.",
+      "lock_at": "The overridden lock_at timestamp, or nil if not overridden.",
+      "type": "Override type - `ADHOC` (list of Students), `CourseSection`, or `Group`.",
+      "course_section_id": "(if `type='CourseSection'`) Canvas section id that this override applies to.",
+      "group_id": "(if `type='Group'`) Canvas group id that this override applies to.",
+      "workflow_state": "Workflow state of the override. (active, deleted)"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:08:59.579Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:3f672715-6aa8-4293-b62a-3b3319ff5701",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000001",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000001"
+                }
+              }
+            },
+            "action": "Created",
+            "object": {
+              "id": "urn:instructure:canvas:assignment_override:21070000000000371",
+              "type": "Entity",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "lock_at": "2018-10-01T05:59:59.000Z",
+                  "entity_id": "21070000000000371",
+                  "assignment_id": "1035",
+                  "all_day": false,
+                  "all_day_date": "2018-10-01T05:59:59.000Z",
+                  "type": "ADHOC",
+                  "workflow_state": "active"
+                }
+              },
+              "dateToShow": "2018-09-24T06:00:00.000Z",
+              "dateToSubmit": "2018-10-01T05:59:59.000Z"
+            },
+            "eventTime": "2019-11-01T19:11:11.323Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:Instructor:21070000000000001",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000001",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/565/assignments",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

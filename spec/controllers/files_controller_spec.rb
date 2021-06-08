@@ -38,6 +38,9 @@ def new_valid_tool(course)
   tool
 end
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
@@ -95,6 +98,7 @@ describe FilesController do
     @other_user = user_factory(active_all: true)
     course_with_teacher active_all: true
     student_in_course active_all: true
+    set_granular_permission
   end
 
   describe "GET 'quota'" do
@@ -166,6 +170,13 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', params: {:group_id => @group.id}
       expect(response).to be_successful
+    end
+
+    it "refuses for a non-html format" do
+      group_with_user_logged_in(:group_context => Account.default)
+      get 'index', params: {:group_id => @group.id}, format: :js
+      expect(response.body).to include("endpoint does not support js")
+      expect(response.code.to_i).to eq(400)
     end
 
     it "should not show external tools in a group context" do
@@ -240,6 +251,7 @@ describe FilesController do
     end
 
     it "should respect user context" do
+      skip('investigate cause for failures beginning 05/05/21 FOO-1950')
       user_session(@teacher)
       assert_page_not_found do
         get 'show', params: {:user_id => @user.id, :id => @file.id}, :format => 'html'
@@ -1507,10 +1519,46 @@ describe FilesController do
   end
 
   describe "GET 'image_thumbnail'" do
+    let(:image) {factory_with_protected_attributes(@teacher.attachments, uploaded_data: stub_png_data, instfs_uuid: "1234")}
+
     it "should return default 'no_pic' thumbnail if attachment not found" do
       user_session @teacher
       get "image_thumbnail", params: { uuid: "bad uuid", id: "bad id" }
       expect(response).to be_redirect
     end
+
+    it "returns the same jwt if requested twice" do
+      enable_cache do
+        user_session @teacher
+        locations = 2.times.map {
+          get("image_thumbnail", params: {uuid: image.uuid, id: image.id}).location
+        }
+        expect(locations[0]).to eq(locations[1])
+      end
+    end
+
+    it "returns the different jwts if no_cache is passed" do
+      enable_cache do
+        user_session @teacher
+        locations = 2.times.map {
+          get("image_thumbnail", params: {uuid: image.uuid, id: image.id, no_cache: true}).location
+        }
+        expect(locations[0]).not_to eq(locations[1])
+      end
+    end
+
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -24,6 +26,10 @@ class LtiApiController < ApplicationController
   skip_before_action :load_user
   skip_before_action :verify_authenticity_token
 
+  # these exceptions will happen on bad external requests,
+  # we don't need to tell sentry about every one of them
+  rescue_from BasicLTI::BasicOutcomes::Unauthorized, BasicLTI::BasicOutcomes::InvalidRequest, with: :rescue_expected_error_type
+
   # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
   def grade_passback
     verify_oauth
@@ -34,8 +40,8 @@ class LtiApiController < ApplicationController
 
     @xml = Nokogiri::XML.parse(request.body)
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+    render body: lti_response.to_xml, content_type: 'application/xml', status: status
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome
@@ -44,8 +50,8 @@ class LtiApiController < ApplicationController
   def legacy_grade_passback
     verify_oauth
 
-    lti_response = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
-    render :body => lti_response.to_xml, :content_type => 'application/xml'
+    lti_response, = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
+    render body: lti_response.to_xml, content_type: 'application/xml'
   end
 
   # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
@@ -136,13 +142,8 @@ class LtiApiController < ApplicationController
     assignment.update_attribute(:turnitin_enabled, false) if assignment.turnitin_enabled?
     request.body.rewind
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
-    turnitin_processor.send_later_enqueue_args(
-      :process,
-      {
-        max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-        priority: Delayed::LOW_PRIORITY
-      }
-    )
+    turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+        priority: Delayed::LOW_PRIORITY).process
     render json: {}, status: 200
   end
 
@@ -156,7 +157,10 @@ class LtiApiController < ApplicationController
     # verify the request oauth signature, timestamp and nonce
     begin
       @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
-      @signature.verify() or raise OAuth::Unauthorized.new(request)
+      unless @signature.verify
+        Lti::Logging.lti_1_api_signature_verification_failed(@signature.signature_base_string)
+        raise OAuth::Unauthorized.new, request
+      end
 
     rescue OAuth::Signature::UnknownSignatureMethod, OAuth::Unauthorized => e
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({error_class: e.class.name}))
@@ -183,14 +187,19 @@ class LtiApiController < ApplicationController
   end
 
   def check_outcome(outcome)
-    if ['unsupported', 'failure'].include? outcome.code_major
-      opts = {type: :grade_passback}
-      error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    return outcome, 200 unless ['unsupported', 'failure'].include? outcome.code_major
+
+    opts = {type: :grade_passback}
+    error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+
+    begin
       error_info[:extra][:xml] = @xml.to_s if @xml
-      capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
-      outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
+    rescue => e
+      outcome.description += "\nInvalid XML: #{e.message}"
     end
 
-    outcome
+    capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
+    outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
+    [outcome, 422]
   end
 end

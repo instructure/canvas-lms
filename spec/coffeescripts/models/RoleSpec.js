@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Role from 'compiled/models/Role'
-import Account from 'compiled/models/Account'
+import Role from 'ui/features/roster/backbone/models/Role.js'
+import Account from 'ui/features/account_settings/backbone/models/Account.coffee'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('RoleModel', {

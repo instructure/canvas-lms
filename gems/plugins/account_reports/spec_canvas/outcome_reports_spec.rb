@@ -116,7 +116,7 @@ describe "Outcome Reports" do
   def verify(row, values, row_index: nil)
     user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
       values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
-      :quiz_outcome_result, :quiz_submission, :pseudonym)
+                       :quiz_outcome_result, :quiz_submission, :pseudonym)
     result = quiz.nil? ? outcome_result : quiz_outcome_result
     rating = if outcome.present? && result&.score&.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
@@ -170,11 +170,10 @@ describe "Outcome Reports" do
       "enrollment state" => user&.enrollments&.find_by(course: course, course_section: section)&.workflow_state
     }
     expect(row.headers).to eq row.headers & expectations.keys
-
     row.headers.each do |key|
       expect(row[key].to_s).to eq(expectations[key].to_s),
-        (row_index.present? ? "for row #{row_index}, " : '') +
-        "for column '#{key}': expected '#{expectations[key]}', received '#{row[key]}'"
+                               (row_index.present? ? "for row #{row_index}, " : '') +
+                               "for column '#{key}': expected '#{expectations[key]}', received '#{row[key]}'"
     end
   end
 
@@ -228,6 +227,7 @@ describe "Outcome Reports" do
           sis_source_id: 'fall12'
         )
       end
+
       let(:report_params) { { params: { 'enrollment_term' => @term1.id } } }
 
       it "should filter out courses not in term" do
@@ -245,6 +245,7 @@ describe "Outcome Reports" do
       before(:once) do
         @sub_account = Account.create(:parent_account => @root_account, :name => 'English')
       end
+
       let(:report_params) { { account: @sub_account } }
 
       it "should filter courses in a sub account" do
@@ -463,6 +464,7 @@ describe "Outcome Reports" do
 
       context 'With Account Level Mastery' do
         before(:once) do
+          user1_values[:outcome_result]
           @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Account", context: @root_account,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
                                                           id: 1, points: 5, color: '3ADF00', description: "High Rating",
@@ -483,6 +485,7 @@ describe "Outcome Reports" do
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'off')
           expect(report[0]['assessment type']).to eq 'quiz'
           expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
         end
 
         it 'should run the report and use the outcome proficiencies' do
@@ -512,6 +515,8 @@ describe "Outcome Reports" do
           expect(report[0]['learning outcome rating']).to eq 'Low Rating'
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
           expect(report[2]['learning outcome rating']).to eq 'High Rating'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
+          expect(report[2]['learning outcome points possible']).to eq '50.0'
         end
 
         it 'should have no rating if the score and total_percent are nil' do
@@ -549,6 +554,8 @@ describe "Outcome Reports" do
           expect(report[0]['learning outcome rating']).to eq 'Low Rating'
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
           expect(report[2]['learning outcome rating']).to eq 'Mastery Rating'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
+          expect(report[2]['learning outcome points possible']).to eq '5.0'
         end
 
       end

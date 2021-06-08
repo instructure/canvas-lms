@@ -18,10 +18,10 @@
 
 import sinon from 'sinon'
 
-import waitForCondition from 'jsx/shared/__tests__/waitForCondition'
-import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
-import * as FinalGradeOverrideApi from 'jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import waitForCondition from '@canvas/network/NetworkFake/waitForCondition'
+import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 
 QUnit.module('Gradebook > DataLoader', suiteHooks => {
   const urls = {

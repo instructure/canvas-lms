@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class UserListV2
+  class ParameterError < StandardError
+    def response_status
+      400
+    end
+  end
+
   # not really much better than the first one
   # stealing some things from it because I don't feel like reinventing the whole wheel
   # but with some key differences that would make it difficult to keep in one class
@@ -40,7 +46,9 @@ class UserListV2
     @root_account = root_account
     @current_user = current_user
     @can_read_sis = can_read_sis
-    raise "search_type must be one of #{SEARCH_TYPES}" unless SEARCH_TYPES.include?(search_type)
+    unless SEARCH_TYPES.include?(search_type)
+      raise ParameterError, "search_type must be one of #{SEARCH_TYPES}"
+    end
 
     parse_list(list_in)
 
@@ -222,22 +230,23 @@ class UserListV2
     search_for_results(restricted_shards) do
       ccs = []
       if sms_paths.any?
-        ccs = CommunicationChannel.
-          sms.
-          unretired.
-          preload(user: :pseudonyms).
-          where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths).
-          to_a
+        ccs = CommunicationChannel
+          .sms
+          .active
+          .preload(user: :pseudonyms)
+          .where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths)
+          .to_a
       end
-      ccs += CommunicationChannel.
-        email.
-        unretired.
-        preload(user: :pseudonyms).
-        where("LOWER(path) IN (?)", email_paths).
-        to_a
+      ccs += CommunicationChannel
+        .email
+        .active
+        .preload(user: :pseudonyms)
+        .where("LOWER(path) IN (?)", email_paths)
+        .to_a
 
       ccs.map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
+
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'

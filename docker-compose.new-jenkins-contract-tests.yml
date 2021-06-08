@@ -1,6 +1,11 @@
 version: "2.3"
 services:
   canvas:
+    build:
+      context: .
+      dockerfile: ./build/new-jenkins/pact/Dockerfile
+      args:
+        PATCHSET_TAG: $PATCHSET_TAG
     volumes:
       - pacts:/usr/src/app/pacts
 

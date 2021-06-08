@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -19,11 +21,7 @@ class PopulateMediaTracksWebVttContent < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def change
-    DataFixup::PopulateMediaTracksWebVttContent.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      max_attempts: 1,
-      n_strand: "DataFixup::PopulateMediaTracksWebVttContent:#{Shard.current.database_server.id}"
-    )
+    DataFixup::PopulateMediaTracksWebVttContent.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      n_strand: "DataFixup::PopulateMediaTracksWebVttContent:#{Shard.current.database_server.id}").run
   end
 end

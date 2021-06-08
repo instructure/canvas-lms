@@ -19,11 +19,11 @@
 import React, {useState} from 'react'
 import {bool, func, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Heading} from '@instructure/ui-elements'
-import {Modal} from '@instructure/ui-overlays'
+import {Heading} from '@instructure/ui-heading'
+import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import formatMessage from '../format-message'
 
 export default function RestoreAutoSaveModal(props) {

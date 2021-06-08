@@ -18,7 +18,7 @@
 
 import {fromJS} from 'immutable'
 import moment from 'moment'
-import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
+import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 
 const studentWithoutSubmission = {
   id: '1',

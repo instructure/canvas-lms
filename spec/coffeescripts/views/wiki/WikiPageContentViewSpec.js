@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageContentView from 'compiled/views/wiki/WikiPageContentView'
-import {subscribe} from 'vendor/jquery.ba-tinypubsub'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView.js'
+import {subscribe} from 'jquery-tinypubsub'
 
 QUnit.module('WikiPageContentView')
 

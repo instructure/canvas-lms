@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import MessageStudentsWhoHelper from 'jsx/gradebook/shared/helpers/messageStudentsWhoHelper'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
 QUnit.module('messageStudentsWhoHelper#options', function(hooks) {
   hooks.beforeEach(function() {

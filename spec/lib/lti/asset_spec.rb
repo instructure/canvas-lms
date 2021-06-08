@@ -28,6 +28,14 @@ describe Lti::Asset do
 
 
   describe "opaque_identifier_for" do
+    context 'when the asset is nil' do
+      subject { described_class.opaque_identifier_for asset }
+
+      let(:asset) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
     it "should create lti_context_id for asset" do
       expect(@course.lti_context_id).to eq nil
       context_id = described_class.opaque_identifier_for(@course)

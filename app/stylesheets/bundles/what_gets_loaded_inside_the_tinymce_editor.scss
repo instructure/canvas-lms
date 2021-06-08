@@ -81,7 +81,7 @@ table td[data-mce-selected] {
 
 body#tinymce,
 body#tinyrce {
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .Underline-All-Links__enabled
@@ -92,7 +92,8 @@ body#tinyrce {
 /* the span tinymce puts around the media player's iframe */
 .mce-content-body .mce-preview-object {
   border-style: none;
-  display: block;
+  display: inline;
+  font-size: 0;
 }
 
 [data-mce-p-data-media-id],
@@ -100,11 +101,11 @@ iframe[data-media-id] {
   background-color: #eee;
 }
 
-/* the svg and keyframe stuyles are lifted from instui spinner */
-div[data-placeholder-for] {
+/* the svg and keyframe styles are lifted from instui spinner */
+span[data-placeholder-for] {
   border: solid 1px #8b969e;
   background-color: #ccc;
-  display: block;
+  display: inline-block;
   max-width: 100%;
   svg {
     max-height: 90%;

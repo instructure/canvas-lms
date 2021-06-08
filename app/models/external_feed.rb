@@ -101,9 +101,9 @@ class ExternalFeed < ActiveRecord::Base
     if feed_type == :rss
       uuid = item.respond_to?(:guid) && item.guid && item.guid.content.to_s
       if uuid && uuid.length > 255
-        uuid = Digest::MD5.hexdigest(uuid)
+        uuid = Digest::SHA256.hexdigest(uuid)
       end
-      uuid ||= Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+      uuid ||= Digest::SHA256.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
 
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.link).first
@@ -137,7 +137,7 @@ class ExternalFeed < ActiveRecord::Base
       )
       return entry if entry.save
     elsif feed_type == :atom
-      uuid = item.id || Digest::MD5.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
+      uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new

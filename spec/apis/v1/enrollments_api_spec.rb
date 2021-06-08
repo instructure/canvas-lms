@@ -116,7 +116,8 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "should be unauthorized for users without manage_students permission" do
+      it "should be unauthorized for users without manage_students permission (non-granular)" do
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         json = api_call :post, @path, @path_options,
                         {
@@ -131,6 +132,24 @@ describe EnrollmentsApiController, type: :request do
                             }
                         }, {}, {:expected_status => 401}
       end
+
+      it "should be unauthorized for users without add_student_to_course permission (granular)" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
+        json = api_call :post, @path, @path_options,
+                        {
+                            :enrollment => {
+                                :user_id                            => @unenrolled_user.id,
+                                :type                               => 'StudentEnrollment',
+                                :enrollment_state                   => 'active',
+                                :course_section_id                  => @section.id,
+                                :limit_privileges_to_course_section => true,
+                                :start_at                           => nil,
+                                :end_at                             => nil
+                            }
+                        }, {}, {:expected_status => 401}
+      end
+
 
       it "should create a new teacher enrollment" do
         json = api_call :post, @path, @path_options,
@@ -431,7 +450,13 @@ describe EnrollmentsApiController, type: :request do
       it "should not enroll a user lacking a pseudonym on the course's account" do
         foreign_user = user_factory
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
-                 { expected_status: 404 }
+                         { expected_status: 404 }
+      end
+
+      it "does not allow adding users to a template course" do
+        @course.update!(template: true)
+        api_call :post, @path, @path_options, { :enrollment => { :user_id => @unenrolled_user.id } }, {},
+                 { expected_status: 401 }
       end
 
       context "custom course-level roles" do
@@ -788,7 +813,6 @@ describe EnrollmentsApiController, type: :request do
     end
 
     it "should deterministically order enrollments for pagination" do
-      Account.default.enable_feature!(:bookmarking_for_enrollments_index)
       enrollment_num = 10
       enrollment_num.times do
         u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
@@ -1529,9 +1553,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1552,6 +1573,11 @@ describe EnrollmentsApiController, type: :request do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user)
           } if e.student? && e.user_id != @user.id
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
 
           h
         }
@@ -1815,7 +1841,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should show enrollments for courses with future start dates if state[]=current_and_future" do
         course_factory
-        @course.update_attributes(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
+        @course.update(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
         enrollment = @course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
         expect(enrollment.enrollment_state.state).to eq "pending_active"
@@ -2229,9 +2255,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2240,8 +2263,14 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
+
           link_header = response.headers['Link'].split(',')
           expect(link_header[0]).to match /page=1&per_page=1/ # current page
           expect(link_header[1]).to match /page=2&per_page=1/ # next page
@@ -2289,9 +2318,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2300,6 +2326,11 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
           link_header = response.headers['Link'].split(',')
@@ -2320,21 +2351,6 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context 'with normal settings' do
-        it_behaves_like 'numeric pagination'
-
-        context 'with developer key pagination override' do
-          before do
-            global_id = Shard.global_id_for(DeveloperKey.default.id)
-            Setting.set("pagination_override_key_list", global_id.to_s)
-          end
-
-          it_behaves_like 'numeric pagination'
-        end
-      end
-
-      context 'with bookmark flag enabled' do
-        before { Account.default.enable_feature!(:bookmarking_for_enrollments_index) }
-
         it_behaves_like 'bookmarked pagination'
 
         context 'with developer key pagination override' do
@@ -2691,9 +2707,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at'   => nil,
             'end_at'     => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -2709,6 +2722,11 @@ describe EnrollmentsApiController, type: :request do
             'final_grade' => nil,
             'current_grade' => nil,
           } if e.student?
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
           h
         }
       end

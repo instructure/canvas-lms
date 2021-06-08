@@ -20,6 +20,22 @@
 require 'lti_advantage'
 
 module Lti::Messages
+
+  # Base class for all LTI Message "factory" classes.
+  #
+  # This class, and it's child classes, are responsible
+  # for constructing and ID token suitable for LTI 1.3
+  # authentication responses (LTI launches).
+  #
+  # These class have counterparts for simply modeling the
+  # data  at "gems/lti-advantage/lib/lti_advantage/messages".
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti/v1p3/.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
     EXTENSION_PREFIX = 'https://www.instructure.com/'.freeze
 
@@ -55,6 +71,8 @@ module Lti::Messages
       add_custom_params_claims! if include_claims?(:custom_params)
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
       add_lti11_legacy_user_id!
+      add_lti1p1_claims! if include_lti1p1_claims?
+      add_extension("placement", @opts[:resource_type])
 
       @expander.expand_variables!(@message.extensions)
       @message.validate! if validate_launch
@@ -75,8 +93,12 @@ module Lti::Messages
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = @user.lookup_lti_id(@context)
+      @message.sub = @user&.lookup_lti_id(@context) if include_sub_claim?
       @message.target_link_uri = target_link_uri
+    end
+
+    def include_sub_claim?
+      @user.present?
     end
 
     def target_link_uri
@@ -122,19 +144,19 @@ module Lti::Messages
     end
 
     def add_include_name_claims!
-      @message.name = @user.name
-      @message.given_name = @user.first_name
-      @message.family_name = @user.last_name
+      @message.name = @user&.name
+      @message.given_name = @user&.first_name
+      @message.family_name = @user&.last_name
       @message.lis.person_sourcedid = expand_variable('$Person.sourcedId')
       @message.lis.course_offering_sourcedid = expand_variable('$CourseSection.sourcedId')
     end
 
     def add_include_email_claims!
-      @message.email = @user.email
+      @message.email = @user&.email
     end
 
     def add_public_claims!
-      @message.picture = @user.avatar_url
+      @message.picture = @user&.avatar_url
     end
 
     def add_mentorship_claims!
@@ -142,7 +164,19 @@ module Lti::Messages
     end
 
     def add_lti11_legacy_user_id!
-      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user)
+      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || ''
+    end
+
+    def add_lti1p1_claims!
+      @message.lti1p1.user_id = @user&.lti_context_id
+    end
+
+    # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters
+    # If the parameter's value is not the same as its LTI 1.3 equivalent, the
+    # platform MUST include the parameter and its LTI 1.1 value. Otherwise the
+    # platform MAY omit that attribute.
+    def include_lti1p1_claims?
+      @user&.lti_context_id && @user.lti_context_id != @user.lti_id
     end
 
     def include_names_and_roles_service_claims?
@@ -163,21 +197,26 @@ module Lti::Messages
 
     def current_observee_list
       return nil unless @context.is_a?(Course)
+      return nil if @user.blank?
+
       @_current_observee_list ||= begin
         @user.observer_enrollments.current.
           where(course_id: @context.id).
           preload(:associated_user).
-          map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+          map { |e| e.try(:associated_user).try(:lti_id) }.compact
       end
     end
 
     def custom_parameters
-      custom_params_hash = @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
+      @expander.expand_variables!(unexpanded_custom_parameters)
+    end
+
+    def unexpanded_custom_parameters
+      @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
         key = k.dup
         key.slice! 'custom_'
         key
       end
-      @expander.expand_variables!(custom_params_hash)
     end
 
     def include_claims?(claim_group)

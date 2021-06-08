@@ -55,7 +55,10 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
     })
 
     function isEquationImage(node) {
-      return node.tagName === 'IMG' && node.classList.contains('equation_image')
+      return (
+        (node.tagName === 'IMG' && node.classList.contains('equation_image')) ||
+        node.classList.contains('math_equation_latex')
+      )
     }
 
     ed.ui.registry.addButton('instructure-equation-options', {

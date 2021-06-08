@@ -21,6 +21,8 @@
 # This model is used internally by DiscussionTopic, it's not intended to be
 # queried directly by other code.
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
+  class ReplicationTimeoutError < StandardError; end
+
   include Api::V1::DiscussionTopics
   include Api
   include Rails.application.routes.url_helpers
@@ -141,9 +143,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       if !self.class.wait_for_replication(start: xlog_location, timeout: timeout)
         # failed to replicate - requeue later
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
-        self.delay(singleton: "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", run_at: run_at).
+        delay(singleton: "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", run_at: run_at).
           update_materialized_view(synchronous: true, xlog_location: xlog_location, use_master: use_master)
-        raise "timed out waiting for replication"
+        raise ReplicationTimeoutError, "timed out waiting for replication"
       end
     end
     self.generation_started_at = Time.zone.now
@@ -153,10 +155,13 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     self.participants_array = user_ids
     self.entry_ids_array = entry_lookup
     self.save!
+  rescue ReplicationTimeoutError => e
+    Canvas::Errors.capture_exception(:discussion_materialization, e, :warn)
+    raise Delayed::RetriableError, e.message
   end
 
   handle_asynchronously :update_materialized_view,
-    :singleton => proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
+    singleton: proc { |o| "materialized_discussion:#{ Shard.birth.activate { o.discussion_topic_id } }" }
 
   def build_materialized_view(use_master: false)
     entry_lookup = {}
@@ -194,7 +199,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   def self.include_mobile_overrides(entries, overrides)
     entries.each do |entry|
       if entry["message"]
-        parsed_html = Nokogiri::HTML::DocumentFragment.parse(entry["message"])
+        parsed_html = Nokogiri::HTML5.fragment(entry["message"])
         Api::Html::Content.add_overrides_to_html(parsed_html, overrides)
         entry["message"] = parsed_html.to_s
       end

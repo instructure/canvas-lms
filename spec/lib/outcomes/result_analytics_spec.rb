@@ -108,8 +108,22 @@ describe Outcomes::ResultAnalytics do
       expect(results.length).to eq 2
     end
 
-    it 'does not return muted assignment results' do
+    it 'does return deleted results' do
+      LearningOutcomeResult.last.destroy
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'does return muted assignment results with auto post policy' do
       @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: false)
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'does not return muted assignment results with manual post policy' do
+      @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: true)
       results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 0
     end
@@ -257,6 +271,19 @@ describe Outcomes::ResultAnalytics do
       rollups.each.with_index do |rollup, _|
         expect(rollup.scores.map(&:outcome_results).flatten).to eq rollup_scores.find_all {|score| score.user.id == rollup.context.id}
       end
+    end
+
+    it 'correctly handles users with the same name' do
+      results = [
+        outcome_from_score(5.0, {method: 'decaying_average', user: User.new(id: 20, name: 'b')}),
+        outcome_from_score(3.0, {method: 'decaying_average', user: User.new(id: 30, name: 'b')}),
+        outcome_from_score(2.0, {method: 'decaying_average', user: User.new(id: 30, name: 'b')}),
+        outcome_from_score(4.0, {method: 'decaying_average', user: User.new(id: 20, name: 'b')})
+      ]
+      users = [User.new(id: 20, name:'b'), User.new(id: 30, name: 'b')]
+      rollups = ra.outcome_results_rollups(results: results, users: users)
+      scores_by_user = [4.35, 2.35]
+      expect(rollups.flat_map(&:scores).map(&:score)).to eq scores_by_user
     end
 
     it 'excludes missing user rollups' do
@@ -455,6 +482,48 @@ describe Outcomes::ResultAnalytics do
       rollups = ra.outcome_results_rollups(results: results, users: users)
       percents = ra.rating_percents(rollups)
       expect(percents).to eq({80 => [50, 50, 0]})
+    end
+
+    describe 'with the account_level_mastery_scales FF' do
+      before do
+        @course = course_factory
+      end
+
+      describe 'enabled' do
+        before do
+          @course.account.enable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'uses the context resolved_outcome_proficiency if a context is provided' do
+          results = [
+            outcome_from_score(4.0, {}),
+            outcome_from_score(5.0, {user: User.new(id: 20,name: 'b')}),
+            outcome_from_score(2.0, {user: User.new(id: 21,name: 'c')})
+          ]
+          users = [User.new(id: 10, name:'a'), User.new(id: 30, name: 'c')]
+          rollups = ra.outcome_results_rollups(results: results, users: users)
+          percents = ra.rating_percents(rollups, context: @course)
+          expect(percents).to eq({80 => [67, 0, 33, 0, 0]})
+        end
+      end
+
+      describe 'disabled' do
+        before do
+          @course.account.disable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'does not use the context resolved_outcome_proficiency if a context is provided' do
+          results = [
+            outcome_from_score(4.0, {}),
+            outcome_from_score(5.0, {user: User.new(id: 20,name: 'b')}),
+            outcome_from_score(2.0, {user: User.new(id: 21,name: 'c')})
+          ]
+          users = [User.new(id: 10, name:'a'), User.new(id: 30, name: 'c')]
+          rollups = ra.outcome_results_rollups(results: results, users: users)
+          percents = ra.rating_percents(rollups, context: @course)
+          expect(percents).to eq({80 => [33, 33, 33]})
+        end
+      end
     end
   end
 

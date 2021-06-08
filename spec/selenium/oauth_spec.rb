@@ -61,9 +61,15 @@ describe "oauth2 flow" do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
       end
 
-      it "should show the confirmation dialog after logging in" do
+      it "should show the terms of use and then confirmation dialog after logging in" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         oauth_login_fill_out_form
+        form = f('.reaccept_terms')
+        expect(form).to be_present
+        expect_new_page_load {
+          f('[name="user[terms_of_use]"]').click
+          submit_form form
+        }
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})

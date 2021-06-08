@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,6 +29,8 @@ class WikiPagesController < ApplicationController
   before_action :set_js_rights
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: [:edit, :index]
+
+  include K5Mode
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')

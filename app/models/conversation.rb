@@ -289,7 +289,7 @@ class Conversation < ActiveRecord::Base
 
     # now that the message participants are all saved, we can properly broadcast to recipients
     message.after_participants_created_broadcast
-    send_later_if_production(:reset_unread_counts) if options[:reset_unread_counts]
+    delay_if_production.reset_unread_counts if options[:reset_unread_counts]
     message
   end
 
@@ -515,12 +515,21 @@ class Conversation < ActiveRecord::Base
     participant = self.conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if !user
-      raise "Only message participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif message.blank?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
+      message = truncate_message(message)
       add_message(user, message, opts)
+    end
+  end
+
+  def truncate_message(message)
+    if message.length < 64.kilobytes - 1
+      message
+    else
+      message[0..64.kilobytes-100] + I18n.t("... This message was truncated.")
     end
   end
 
@@ -751,9 +760,18 @@ class Conversation < ActiveRecord::Base
     # can still reply if a teacher is involved
     if course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?
       false
+    # can still reply if observing all the other participants
+    elsif course.is_a?(Course) && observing_all_other_participants(user, self.conversation_participants, course)
+      false
     else
       !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
     end
+  end
+
+  def observing_all_other_participants(user, participants, course)
+    observee_ids = user.observer_enrollments.active.where(course: course).pluck(:associated_user_id)
+    return false if observee_ids.empty?
+    (conversation_participants.pluck(:user_id) - observee_ids - [user.id]).empty?
   end
 
   protected

@@ -21,7 +21,7 @@ import {mount, ReactWrapper, shallow} from 'enzyme'
 import merge from 'lodash/merge'
 import $ from 'jquery'
 
-import DiscussionSettings from 'jsx/discussions/components/DiscussionSettings'
+import DiscussionSettings from 'ui/features/discussion_topics_index/react/components/DiscussionSettings.js'
 
 QUnit.module('DiscussionSettings component', suiteHooks => {
   let tree

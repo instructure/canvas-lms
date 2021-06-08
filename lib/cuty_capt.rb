@@ -20,16 +20,23 @@
 
 # A small wrapper around the CutyCapt binary.
 # 
-# Requires a config file in RAILS_ROOT/config/cutycapt.yml that looks like this:
+# Requires a config in dynamic settings private/canvas/cutycapt.yml that looks like this:
 # 
 # production:
 #   path: /usr/bin/cutycapt
 #   delay: 3000
 #   timeout: 30000
 #   display: ':0'
+#   screencap_service:
+#     url: https://foo.bar/baz
+#     key: abcdefg
 #
 # delay is how many ms to wait before taking the snapshot (to let the page finish rendering)
 # display is whatever display cutycapt should use. (You should probably use Xvfb.)
+#
+# The `screencap_service` will bypass using the Cuty binary altogether, and send a request
+# to the given url with a query param of `url=` and the website to snapshot, and a header
+# X-API-Key with the given key.
 
 require 'resolv'
 require 'ipaddr'
@@ -49,11 +56,22 @@ class CutyCapt
 
   def self.config
     return @@config if defined?(@@config) && @@config
-    setting = (ConfigFile.load('cutycapt') || {}).symbolize_keys
+    setting = begin
+      consul_config = Canvas::DynamicSettings.find(tree: :private)['cutycapt.yml']
+      (consul_config && YAML.load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
+    end
+    setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
     self.process_config
-    @@config = nil unless @@config[:path]
+    @@config = nil unless @@config[:path] || @@config[:screencap_service]
     @@config
+  end
+
+  def self.screencap_service
+    return @@screencap_service if defined?(@@screencap_service) && @@screencap_service
+    return nil unless @@config[:screencap_service]
+    @@screencap_service = Services::ScreencapService.new(@@config[:screencap_service])
+    @@screencap_service
   end
 
   def self.process_config
@@ -98,38 +116,46 @@ class CutyCapt
     [ path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}", "--header=Accept-Language:#{lang}" ]
   end
 
-  def self.snapshot_url(url, format = "png", &block)
+  def self.snapshot_url(url, &block)
     return nil unless config = self.config
     return nil unless self.verify_url(url)
 
-    tmp_file = Tempfile.new(['websnappr', ".#{format}"])
+    format = "png"
+
+    tmp_file = Tempfile.new(['websnappr', ".#{format}"], :encoding => 'ascii-8bit')
     img_file = tmp_file.path
-    # We need to finalize the tmp_file now, because if we don't then it will get closed
-    # in the child process below, deleting it. This does introduce a potential race condition
-    # but in practice shouldn't be a problem since Tempfiles normally include the process pid.
-    tmp_file.close!
     success = true
 
     start = Time.now
     logger.info("Starting web capture of #{url}")
 
-    if (pid = fork).nil?
-      ENV["DISPLAY"] = config[:display] if config[:display]
-      Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
+    if screencap_service
+      success = screencap_service.snapshot_url_to_file(url, tmp_file)
     else
-      begin
-        Timeout::timeout(config[:timeout].to_i / 1000) do
-          Process.waitpid(pid)
-          unless $?.success?
-            logger.error("Capture failed with code: #{$?.exitstatus}")
-            success = false
+      # It is less secure to take screenshots from application servers, so we strongly reccomend using
+      # a separate snapshot service (e.g. https://github.com/instructure/screencap) .  Local snapshotting
+      # is only reccomended for development.
+
+      tmp_file.close!
+
+      if (pid = fork).nil?
+        ENV["DISPLAY"] = config[:display] if config[:display]
+        Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
+      else
+        begin
+          Timeout::timeout(config[:timeout].to_i / 1000) do
+            Process.waitpid(pid)
+            unless $?.success?
+              logger.error("Capture failed with code: #{$?.exitstatus}")
+              success = false
+            end
           end
+        rescue Timeout::Error
+          logger.error("Capture timed out")
+          Process.kill("KILL", pid)
+          Process.waitpid(pid)
+          success = false
         end
-      rescue Timeout::Error
-        logger.error("Capture timed out")
-        Process.kill("KILL", pid)
-        Process.waitpid(pid)
-        success = false
       end
     end
 
@@ -151,7 +177,7 @@ class CutyCapt
 
   def self.snapshot_attachment_for_url(url)
     attachment = nil
-    self.snapshot_url(url, "png") do |file_path|
+    self.snapshot_url(url) do |file_path|
       # this is a really odd way to get Attachment the data it needs, which
       # should probably be remedied at some point
       attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))

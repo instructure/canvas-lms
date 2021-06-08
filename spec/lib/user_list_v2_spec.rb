@@ -34,6 +34,11 @@ describe UserListV2 do
     expect(ul.errors).to eq [{:address => "i\x01nstructure", :details => :unparseable}]
   end
 
+  it "responds responsibly to incorrect search type" do
+    expect { UserListV2.new "instructure", search_type: 'tarnation_declaration' }.
+      to raise_error(UserListV2::ParameterError)
+  end
+
   it "should not fail with unicode names" do
     ul = UserListV2.new '"senor molé" <blah@instructure.com>', search_type: 'unique_id'
     expect(ul.missing_results.map{|x| [x[:user_name], x[:address]]}).to eq [["senor molé", "blah@instructure.com"]]
@@ -67,7 +72,7 @@ describe UserListV2 do
     expect(ul.duplicate_results.first.map{|r| r[:user_token]}).to match_array([@user1.token, @user.token])
   end
 
-  it "should include in duplicates if there is 1 active CC and 1 unconfirmed" do
+  it "ignores unconfirmed emails" do
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
     communication_channel(@user, {username: 'jt+2@instructure.com', active_cc: true})
@@ -75,10 +80,9 @@ describe UserListV2 do
     user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
     communication_channel(@user, {username: 'jt+2@instructure.com'})
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
-    expect(ul.resolved_results).to be_empty
-    expect(ul.duplicate_results.count).to eq 1
-    expect(ul.duplicate_results.first.map{|r| r[:user_id]}).to match_array([@user1.id, @user.id])
-    expect(ul.duplicate_results.first.map{|r| r[:user_token]}).to match_array([@user1.token, @user.token])
+    expect(ul.resolved_results.length).to eq 1
+    expect(ul.resolved_results.first[:user_id]).to eq @user1.id
+    expect(ul.duplicate_results).to be_empty
   end
 
   it "should not find users from untrusted accounts" do

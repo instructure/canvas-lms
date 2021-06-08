@@ -33,7 +33,13 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
   end
 
   let(:tool_proxy) do
-    allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return(nil)
+    test_tool_proxy
+  end
+
+  def test_tool_proxy
+    psh = double('PlagiarismSubscriptionsHelper')
+    allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
+    allow(psh).to receive(:create_subscription).and_return(nil)
     tool = create_tool_proxy(account)
     tool.update(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
     tool
@@ -46,13 +52,17 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.save!
 
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('subscription_id')
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
+      expect(psh).to receive(:create_subscription).and_return('subscription_id')
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to eq 'subscription_id'
     end
 
     it 'should not add subscriptions to non-plagiarism tool proxies' do
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).not_to receive(:new)
+      expect(psh).not_to receive(:create_subscription)
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to be_nil
     end
@@ -76,7 +86,9 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.save!
 
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).once.and_return('id2')
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
+      expect(psh).to receive(:create_subscription).once.and_return('id2')
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to eq('id2')
       expect(tool_proxy2.reload.subscription_id).to eq('id2')
@@ -100,7 +112,9 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.save!
 
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).not_to receive(:new)
+      expect(psh).not_to receive(:create_subscription)
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to eq('id3')
       expect(tool_proxy2.reload.subscription_id).to eq('id3')
@@ -124,7 +138,9 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.save!
 
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('id4')
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
+      expect(psh).to receive(:create_subscription).and_return('id4')
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to eq('id4')
     end
@@ -136,9 +152,44 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       tool_proxy.subscription_id = 'subscription_id'
       tool_proxy.save!
 
-      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
+      psh = double('PlagiarismSubscriptionsHelper')
+      expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
+      expect(psh).to receive(:destroy_subscription)
       DataFixup::CreateSubscriptionsForPlagiarismTools.delete_subscriptions
       expect(tool_proxy.reload.subscription_id).to be_nil
+    end
+  end
+
+  context '#recreate_subscriptions' do
+    it 'should delete and recreate subscriptions properly' do
+      tool_proxy.raw_data['enabled_capability'] = [placement]
+      tool_proxy.subscription_id = 'subscription_id'
+      tool_proxy.save!
+
+      tp2 = test_tool_proxy
+      tp2.raw_data['enabled_capability'] = [placement]
+      tp2.subscription_id = 'subscription_id'
+      tp2.save!
+
+      tp3 = test_tool_proxy
+      tp3.raw_data['enabled_capability'] = [placement]
+      tp3.subscription_id = 'subscription_id3'
+      tp3.save!
+
+      psh1 = double('PlagiarismSubscriptionsHelper1')
+      psh2 = double('PlagiarismSubscriptionsHelper2')
+      psh3 = double('PlagiarismSubscriptionsHelper3')
+      allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).with(tool_proxy).and_return(psh1)
+      allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).with(tp2).and_return(psh2)
+      allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).with(tp3).and_return(psh3)
+      expect(psh1).to receive(:create_subscription).once.and_return('id1')
+      expect(psh2).to receive(:create_subscription).once.and_return('id2')
+      expect(psh3).to receive(:create_subscription).once.and_return('id3')
+      expect(psh1).to receive(:destroy_subscription).with('subscription_id').once
+      expect(psh3).to receive(:destroy_subscription).with('subscription_id3').once
+      DataFixup::CreateSubscriptionsForPlagiarismTools.recreate_subscriptions
+
+      expect([tool_proxy.reload.subscription_id, tp2.reload.subscription_id, tp3.reload.subscription_id]).to eq(['id1', 'id2', 'id3'])
     end
   end
 end

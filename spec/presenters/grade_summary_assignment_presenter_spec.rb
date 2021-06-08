@@ -135,6 +135,28 @@ describe GradeSummaryAssignmentPresenter do
       it "returns nil when a summary's assignment_stats is empty" do
         expect(presenter.grade_distribution).to be_nil
       end
+
+    end
+
+    context "when summary stats exist" do
+      it "rounds values to 2 decimal places" do
+        @assignment.create_score_statistic!(
+          count: 3,
+          minimum: 1.3333333,
+          maximum: 2.6666666,
+          mean: 2
+        )
+        presenter = GradeSummaryPresenter.new(@course, @student, @student.id)
+        assignment_presenter = GradeSummaryAssignmentPresenter.new(presenter, @student, @assignment, @submission)
+
+        maximum, minimum, mean = assignment_presenter.grade_distribution
+
+        aggregate_failures do
+          expect(minimum).to eq 1.33
+          expect(maximum).to eq 2.67
+          expect(mean).to eq 2
+        end
+      end
     end
   end
 

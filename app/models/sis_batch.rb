@@ -173,9 +173,8 @@ class SisBatch < ActiveRecord::Base
       job_args = {
         singleton: "account:update_account_associations:#{Shard.birth.activate { account.id }}",
         priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1,
       }
-      account.send_later_enqueue_args(:update_account_associations, job_args)
+      account.delay(**job_args).update_account_associations
     end
   end
 
@@ -384,7 +383,7 @@ class SisBatch < ActiveRecord::Base
     @has_errors = self.sis_batch_errors.exists?
     import_finished = !(@has_errors && self.sis_batch_errors.failed.exists?) if import_finished
     finalize_workflow_state(import_finished)
-    self.send_later_if_production_enqueue_args(:write_errors_to_file, {max_attempts: 5}) if @has_errors
+    delay_if_production(max_attempts: 5).write_errors_to_file if @has_errors
     populate_old_warnings_and_errors
     statistics
     self.progress = 100 if import_finished
@@ -581,9 +580,21 @@ class SisBatch < ActiveRecord::Base
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
     current_row ||= 0
-    # delete enrollments for courses that weren't in this batch, in the selected term
+    batch_mode_drop_status = options[:batch_mode_enrollment_drop_status] || 'deleted'
+    # delete or update enrollments to batch_mode_drop_status for enrollments
+    # that weren't in this batch in the batch_mode_term
     enrollments.find_in_batches do |batch|
-      data = Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+      data = case batch_mode_drop_status
+             when 'deleted'
+              Enrollment::BatchStateUpdater.destroy_batch(batch, sis_batch: self, batch_mode: true)
+             when 'completed'
+              Enrollment::BatchStateUpdater.complete_batch(batch, sis_batch: self, batch_mode: true, root_account: account)
+             when 'inactive'
+              Enrollment::BatchStateUpdater.inactivate_batch(batch, sis_batch: self, batch_mode: true, root_account: account)
+             else
+                raise NotImplementedError
+      end
+
       SisBatchRollBackData.bulk_insert_roll_back_data(data)
       batch_count = data.count{|d| d.context_type == "Enrollment"} # data can include group membership deletions
       enrollment_count += batch_count
@@ -832,7 +843,8 @@ class SisBatch < ActiveRecord::Base
 
   def finalize_enrollments(ids)
     ids.each_slice(1000) do |slice|
-      Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, { n_strand: ["restore_states_batch_updater", account.global_id] }, slice, self.account)
+      Enrollment::BatchStateUpdater.delay(n_strand: ["restore_states_batch_updater", account.global_id]).
+        run_call_backs_for(slice, root_account: account)
     end
     # we know enrollments are not deleted, but we don't know what the previous
     # state was, we will assume deleted and restore the scores and submissions

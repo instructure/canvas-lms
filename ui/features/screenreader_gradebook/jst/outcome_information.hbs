@@ -1,0 +1,78 @@
+<div id="outcome_information">
+  <div class="row-fluid">
+    <div class="span4">
+      <h2>{{#t 'outcome_info'}}Outcome Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedOutcome}}
+        <h3 class="outcome_selection">
+          {{selectedOutcome.title}}
+        </h3>
+        {{#if calculationDetails}}
+          {{#with calculationDetails }}
+            <div class="method-details content-box pad-box-mini border border-trbl border-round">
+              <div>
+                {{#t}}Calculation Method{{/t}}:
+                <span class="right-content">{{calculation_method}}</span>
+              </div>
+              <div class="example">
+                <span class="left-content">{{#t}}Example{{/t}}: </span>
+                <span class="right-content method-description">{{exampleText}}</span>
+              </div>
+              <div class="example">
+                <span aria-hidden="true">{{#t}}1- Item scores{{/t}}: </span>
+                <span class="screenreader-only">{{#t}}Example item scores{{/t}}: </span>
+                <span class="right-content">{{exampleScores}}</span>
+              </div>
+              <div class="example">
+                <span aria-hidden="true">{{#t}}2- Final score{{/t}}: </span>
+                <span class="screenreader-only">{{#t}}Example final score{{/t}}</span>
+                <span class="right-content">{{exampleResult}}</span>
+              </div>
+            </div>
+          {{/with}}
+        {{/if}}
+        <div class="pad-box no-sides">
+          <p><strong>
+            {{#t}}Total results: {{outcomeDetails.cnt}}{{/t}}
+          </strong></p>
+        </div>
+
+        <div class="pad-box bottom-only">
+          <table class="ic-Table">
+            <thead>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <th scope="col">{{#t 'avg_score'}}Average Score{{/t}}</th>
+                      <th scope="col">{{#t 'high_score'}}High Score{{/t}}</th>
+                      <th scope="col">{{#t 'low_score'}}Low Score{{/t}}</th>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <td>{{nf average format="outcomeScore"}}</td>
+                      <td>{{nf max format="outcomeScore"}}</td>
+                      <td>{{nf min format="outcomeScore"}}</td>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="outcome_selection pad-box top-only">
+          {{#t 'empty_outcome_selection'}}Select an outcome to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

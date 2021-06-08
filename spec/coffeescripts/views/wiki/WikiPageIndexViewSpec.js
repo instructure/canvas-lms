@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from 'compiled/models/WikiPage'
-import WikiPageCollection from 'compiled/collections/WikiPageCollection'
-import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection.js'
+import WikiPageIndexView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexView.js'
 import $ from 'jquery'
-import 'jquery.disableWhileLoading'
+import '@canvas/jquery/jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
-import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
-import * as ConfirmDeleteModal from 'jsx/wiki_pages/components/ConfirmDeleteModal'
+import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import * as ConfirmDeleteModal from 'ui/features/wiki_page_index/react/ConfirmDeleteModal.js'
 
 const indexMenuLtiTool = {
   id: '18',
@@ -53,7 +53,7 @@ QUnit.module('WikiPageIndexView:confirmDeletePages not checked', {
   }
 })
 
-test('does not call showConfirmDelete when no pages are checked', function() {
+test('does not call showConfirmDelete when no pages are checked', function () {
   const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
   this.view.confirmDeletePages(null)
   notOk(showConfirmDelete.called)
@@ -67,7 +67,7 @@ QUnit.module('WikiPageIndexView:confirmDeletePages checked', {
     this.collection = new WikiPageCollection([this.model])
     this.view = new WikiPageIndexView({
       collection: this.collection,
-      selectedPages: {'42': this.model}
+      selectedPages: {42: this.model}
     })
   },
 
@@ -76,7 +76,7 @@ QUnit.module('WikiPageIndexView:confirmDeletePages checked', {
     fakeENV.teardown()
   }
 })
-test('calls showConfirmDelete when pages are checked', function() {
+test('calls showConfirmDelete when pages are checked', function () {
   const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
   this.view.confirmDeletePages(null)
   ok(
@@ -107,7 +107,7 @@ QUnit.module('WikiPageIndexView:direct_share', {
   }
 })
 
-test('opens and closes the direct share course tray', function() {
+test('opens and closes the direct share course tray', function () {
   const trayComponent = sandbox.stub(this.view, 'DirectShareCourseTray').returns(null)
   this.collection.trigger('fetch')
   this.view.$el.find('.copy-wiki-page-to').click()
@@ -122,7 +122,7 @@ test('opens and closes the direct share course tray', function() {
   ok(trayComponent.secondCall.calledWithMatch({open: false}))
 })
 
-test('opens and closes the direct share user modal', function() {
+test('opens and closes the direct share user modal', function () {
   const userModal = sandbox.stub(this.view, 'DirectShareUserModal').returns(null)
   this.collection.trigger('fetch')
   this.view.$el.find('.send-wiki-page-to').click()
@@ -162,7 +162,7 @@ QUnit.module('WikiPageIndexView:open_external_tool', {
   }
 })
 
-test('opens and closes the lti tray and returns focus', function() {
+test('opens and closes the lti tray and returns focus', function () {
   const trayComponent = sandbox.stub(this.view, 'ContentTypeExternalToolTray').returns(null)
   this.collection.trigger('fetch')
   const toolbarKabobMenu = this.view.$el.find('.al-trigger')[0]
@@ -182,7 +182,7 @@ test('opens and closes the lti tray and returns focus', function() {
   ok(trayComponent.secondCall.calledWithMatch({open: false}))
 })
 
-test('reloads page when closing tray if needed', function() {
+test('reloads page when closing tray if needed', function () {
   const trayComponent = sandbox.stub(this.view, 'ContentTypeExternalToolTray').returns(null)
   const pageReload = sandbox.stub(this.view, 'reloadPage').returns(null)
   this.collection.trigger('fetch')
@@ -216,13 +216,13 @@ QUnit.module('WikiPageIndexView:sort', {
   }
 })
 
-test('sort delegates to the collection sortByField', function() {
+test('sort delegates to the collection sortByField', function () {
   const sortByFieldStub = sandbox.stub(this.collection, 'sortByField')
   this.view.sort(this.ev)
   ok(sortByFieldStub.calledOnce, 'collection sortByField called once')
 })
 
-test('view disabled while sorting', function() {
+test('view disabled while sorting', function () {
   const dfd = $.Deferred()
   sandbox.stub(this.collection, 'fetch').returns(dfd)
   const disableWhileLoadingStub = sandbox.stub(this.view.$el, 'disableWhileLoading')
@@ -234,7 +234,7 @@ test('view disabled while sorting', function() {
   )
 })
 
-test('view disabled while sorting again', function() {
+test('view disabled while sorting again', function () {
   const dfd = $.Deferred()
   sandbox.stub(this.collection, 'fetch').returns(dfd)
   const disableWhileLoadingStub = sandbox.stub(this.view.$el, 'disableWhileLoading')
@@ -246,7 +246,7 @@ test('view disabled while sorting again', function() {
   )
 })
 
-test('renderSortHeaders called when sorting changes', function() {
+test('renderSortHeaders called when sorting changes', function () {
   const renderSortHeadersStub = sandbox.stub(this.view, 'renderSortHeaders')
   this.collection.trigger('sortChanged', 'created_at')
   ok(renderSortHeadersStub.calledOnce, 'renderSortHeaders called once')
@@ -340,13 +340,13 @@ testRights('CAN (read)', {
   }
 })
 
-test('includes bulk_delete_pages feature flag', () => {
-  ENV.FEATURES = {bulk_delete_pages: true}
-  const model = new WikiPage({page_id: '42'})
-  const collection = new WikiPageCollection([model])
-  const view = new WikiPageIndexView({
-    collection,
-    WIKI_RIGHTS: {}
-  })
-  strictEqual(view.toJSON().BULK_DELETE_ENABLED, true)
+testRights('CAN (view toolbar)', {
+  contextAssetString: 'course_73',
+  WIKI_RIGHTS: {delete_page: true},
+  CAN: {
+    CREATE: false,
+    MANAGE: true,
+    PUBLISH: false,
+    VIEW_TOOLBAR: true
+  }
 })

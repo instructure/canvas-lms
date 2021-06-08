@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// New fonts added here also need to be added to app/stylesheets/bundles/lato.scss
+// Either lato.scss or lato_extended.scss is loaded depending on the value of the 'disable_lato_extended' setting
+
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+
 @font-face {
   font-family: 'Lato Extended';
   font-style: normal;

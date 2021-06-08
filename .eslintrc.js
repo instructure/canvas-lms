@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2017 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 const path = require('path')
 
 module.exports = {
@@ -15,7 +33,7 @@ module.exports = {
     'plugin:promise/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     ecmaFeatures: {
       jsx: true
     },
@@ -50,6 +68,7 @@ module.exports = {
 
     // These come from our extended configurations, but we don't care about them
     camelcase: 'off', // because we have a ton of `const $user_name = $('#user_name')`
+    'comma-dangle': 'off',
     'class-methods-use-this': 'off',
     'consistent-return': 'off',
     'default-case': 'off',
@@ -97,6 +116,56 @@ module.exports = {
     'react/no-render-return-value': 'warn', // In future versions of react this will fail
     'react/state-in-constructor': 'off',
     'react/static-property-placement': 'off',
+
+    // don't restrict Math.pow for ** operator
+    // ref: https://github.com/airbnb/javascript/blob/1f786e154f6c32385607e1688370d7f2d053f88f/packages/eslint-config-airbnb-base/rules/best-practices.js#L225
+    'no-restricted-properties': [
+      'error',
+      {
+        object: 'arguments',
+        property: 'callee',
+        message: 'arguments.callee is deprecated'
+      },
+      {
+        object: 'global',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead'
+      },
+      {
+        object: 'self',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead'
+      },
+      {
+        object: 'window',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead'
+      },
+      {
+        object: 'global',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead'
+      },
+      {
+        object: 'self',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead'
+      },
+      {
+        object: 'window',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead'
+      },
+      {
+        property: '__defineGetter__',
+        message: 'Please use Object.defineProperty instead.'
+      },
+      {
+        property: '__defineSetter__',
+        message: 'Please use Object.defineProperty instead.'
+      }
+    ],
+
     'no-restricted-syntax': [
       // This is here because we are turning off 2 items from what AirBnB cares about.
       'error',
@@ -169,7 +238,7 @@ module.exports = {
       }
     },
     {
-      files: ['app/**/*', 'spec/**/*', 'public/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
@@ -182,6 +251,20 @@ module.exports = {
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off'
+      }
+    },
+    {
+      files: [
+        'ui/features/quiz_log_auditing/**/*',
+        'ui/features/quiz_statistics/**/*',
+        'ui/shared/quiz-legacy-client-apps/**/*',
+        'ui/shared/quiz-log-auditing/**/*'
+      ],
+      rules: {
+        'react/prop-types': 'off',
+        'prefer-const': 'warn',
+        'prettier/prettier': 'off',
+        'react/no-string-refs': 'warn'
       }
     }
   ]
