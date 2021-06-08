@@ -51,6 +51,7 @@ const TreeBrowser = ({
       )}
       rootId={rootId}
       showRootCollection={showRootCollection}
+      variant="indent"
     />
   )
 }
