@@ -19,8 +19,10 @@
 
 require_relative './page_objects/student_assignment_page_v2'
 require_relative '../common'
+require_relative '../rcs/pages/rce_next_page'
 
 describe 'as a student' do
+  include RCENextPage
   include_context "in-process server selenium tests"
 
   context 'on assignments 2 page' do
@@ -93,9 +95,10 @@ describe 'as a student' do
           name: 'assignment',
           due_at: 5.days.ago,
           points_possible: 10,
-          submission_types: 'online_text_entry'
+          submission_types: 'online_upload'
         )
-        @assignment.submit_homework(@student, { body: "blah" })
+        @file_attachment = attachment_model(content_type: 'application/pdf', context: @student)
+        @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@file_attachment])
       end
 
       before(:each) do
@@ -115,13 +118,18 @@ describe 'as a student' do
       it 'shows submission workflow tracker status as submitted after the student submits' do
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("SUBMITTED")
       end
+
+      it 'shows the file name of the submitted file and an option to download' do
+        expect(StudentAssignmentPageV2.attempt_tab).to include_text(@file_attachment.filename)
+        expect(StudentAssignmentPageV2.attempt_tab).to include_text("Download")
+      end
     end
 
     context 'graded assignments' do
       before(:once) do
         @assignment = @course.assignments.create!(
           name: 'assignment',
-          due_at: 5.days.ago,
+          due_at: 5.days.from_now,
           points_possible: 10,
           submission_types: 'online_text_entry'
         )
@@ -170,21 +178,33 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'should be able to be submitted', custom_timeout: 30 do
-        skip("Skip for now and fix with LS-2164")
+      it 'can be submitted', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
+
+        StudentAssignmentPageV2.submit_button
         StudentAssignmentPageV2.submit_assignment
         wait_for_ajaximations
-        expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+
+        in_frame tiny_rce_ifr_id do
+          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+        end
       end
 
-      it 'should be able to be saved as a draft' do
-        skip("Skip for now and fix with LS-2164")
+      it 'should be able to be saved as a draft', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_ajaximations
-        StudentAssignmentPageV2.edit_text_entry_button.click
-        expect(StudentAssignmentPageV2.text_draft_contents).to include("Hello")
+
+        in_frame tiny_rce_ifr_id do
+          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+        end
+
+        expect(StudentAssignmentPageV2.footer).to include_text("Draft Saved")
+        refresh_page
+
+        in_frame tiny_rce_ifr_id do
+          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+        end
       end
     end
 
@@ -204,14 +224,15 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it 'should be able to be submitted' do
+      it 'can to be submitted' do
         url_text = "www.google.com"
         StudentAssignmentPageV2.create_url_draft(url_text)
         StudentAssignmentPageV2.submit_assignment
-        expect(StudentAssignmentPageV2.url_submission_link).to include_text url_text
+
+        expect(StudentAssignmentPageV2.url_submission_link).to include_text(url_text)
       end
 
-      it 'should be able to be saved as a draft' do
+      it 'can be saved as a draft' do
         url_text = "www.google.com"
         StudentAssignmentPageV2.create_url_draft(url_text)
 
@@ -220,7 +241,7 @@ describe 'as a student' do
         StudentAssignmentPageV2.submit_button
 
         refresh_page
-        expect(StudentAssignmentPageV2.url_text_box.attribute('value')).to include url_text
+        expect(StudentAssignmentPageV2.url_text_box.attribute('value')).to include(url_text)
       end
     end
 
@@ -229,10 +250,10 @@ describe 'as a student' do
         @assignment = @course.assignments.create!(submission_types: 'online_upload')
 
         # add items to module
-        @module = @course.context_modules.create!(:name => "My Module")
-        @item_before = @module.add_item :type => 'assignment', :id => @course.assignments.create!(:title => 'assignment BEFORE this one').id
-        @module.add_item :type => 'assignment', :id => @assignment.id
-        @item_after = @module.add_item :type => 'assignment', :id => @course.assignments.create!(:title => 'assignment AFTER this one').id
+        @module = @course.context_modules.create!(name: "My Module")
+        @item_before = @module.add_item(type: 'assignment', id: @course.assignments.create!(title: 'assignment BEFORE this one').id)
+        @module.add_item(type: 'assignment', id: @assignment.id)
+        @item_after = @module.add_item(type: 'assignment', id: @course.assignments.create!(title: 'assignment AFTER this one').id)
 
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
@@ -262,10 +283,47 @@ describe 'as a student' do
         wait_for_ajaximations
       end
 
-      it "should be able to open the media modal" do
-        skip 'LS-1514 10/5/2020'
+      it "can open the media modal for submission" do
+        scroll_to(StudentAssignmentPageV2.record_upload_button)
         StudentAssignmentPageV2.record_upload_button.click
+
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
+      end
+    end
+
+    context 'file upload assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'file upload assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_upload'
+        )
+      end
+
+      before(:each) do
+        @filename, @fullpath, @data = get_file("testfile1.txt")
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it "can be saved as a draft with attached files" do
+        StudentAssignmentPageV2.file_input.send_keys(@fullpath)
+
+        expect(StudentAssignmentPageV2.uploaded_files_table).to include_text(@filename)
+        refresh_page
+        wait_for_ajaximations
+
+        expect(StudentAssignmentPageV2.uploaded_files_table).to include_text(@filename)
+      end
+
+      it "can be submitted with a file attached" do
+        StudentAssignmentPageV2.file_input.send_keys(@fullpath)
+        StudentAssignmentPageV2.submit_assignment
+        wait_for_ajaximations
+
+        expect(StudentAssignmentPageV2.attempt_tab).to include_text(@filename)
       end
     end
 
@@ -317,6 +375,11 @@ describe 'as a student' do
 
         expect(StudentAssignmentPageV2.similarity_pledge).to include_text("This assignment submission is my own, original work")
         expect(StudentAssignmentPageV2.submit_button).to be_disabled
+
+        scroll_to(StudentAssignmentPageV2.similarity_pledge)
+        StudentAssignmentPageV2.similarity_pledge.click
+
+        expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
       end
     end
   end

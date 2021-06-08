@@ -35,6 +35,18 @@ class StudentAssignmentPageV2
       f("input[data-testid='attemptSelect']")
     end
 
+    def attempt_tab
+      f("div[data-testid='attempt-tab']")
+    end
+
+    def file_input
+      f('input[data-testid="input-file-drop"]')
+    end
+
+    def uploaded_files_table
+      f('table[data-testid="uploaded_files_table"]')
+    end
+
     def lock_icon
       f("svg[name='IconLock']")
     end
@@ -103,16 +115,8 @@ class StudentAssignmentPageV2
       f("button[data-testid='start-text-entry']")
     end
 
-    def save_text_entry_button
-      f("button[data-testid='save-text-entry']")
-    end
-
-    def edit_text_entry_button
-      f("button[data-testid='edit-text-draft']")
-    end
-
     def text_display_area
-      f("div[data-testid='attempt-tab']")
+      f('body[id="tinymce"]')
     end
 
     def text_entry_area
@@ -125,10 +129,6 @@ class StudentAssignmentPageV2
 
     def tiny_rce_ifr_id
       f('.tox-editor-container iframe')['id']
-    end
-
-    def wiki_body
-      f('#tinymce')
     end
 
     def text_draft_contents
@@ -177,6 +177,10 @@ class StudentAssignmentPageV2
       f('#submit-button')
     end
 
+    def text_entry_submission_button
+      f("div[data-testid='online_text_entry']")
+    end
+
     def try_again_button
       f("button[data-testid='try-again-button']")
     end
@@ -199,10 +203,8 @@ class StudentAssignmentPageV2
     end
 
     def create_text_entry_draft(text)
-      start_text_entry_button.click
       wait_for_tiny(text_entry_area)
       type_in_tiny('textarea', text)
-      save_text_entry_button.click
     end
 
     def create_url_draft(url)
