@@ -73,6 +73,24 @@ describe "profile communication settings" do
       expect(fxpath("//span[contains(text(),'8011235555@vtext')]")).to be
     end
 
+    context 'deprecate_sms is enabled' do
+      before do
+        Account.site_admin.enable_feature!(:deprecate_sms)
+      end
+
+      after do
+        Account.site_admin.disable_feature!(:deprecate_sms)
+      end
+
+      it "shouldn't display a SMS number as channel" do
+        communication_channel(@user, {username: '8011235555@vtext.com', path_type: 'sms', active_cc: true})
+
+        get "/profile/communication"
+        expect(f("thead")).not_to contain_jqcss("span:contains('sms')")
+        expect(f("thead")).not_to contain_jqcss("span:contains('8011235555@vtext.com')")
+      end
+    end
+
     it "should save a user-pref checkbox change" do
       Account.default.settings[:allow_sending_scores_in_emails] = true
       Account.default.save!
