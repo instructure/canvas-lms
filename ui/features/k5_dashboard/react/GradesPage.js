@@ -137,6 +137,7 @@ export const GradesPage = ({visible, currentUserRoles}) => {
       {hasStudentRole && (
         <>
           <LoadingWrapper
+            id="grading-periods"
             isLoading={loading && gradingPeriods.length === 0}
             width="20rem"
             height="4.4rem"
@@ -166,6 +167,7 @@ export const GradesPage = ({visible, currentUserRoles}) => {
         </>
       )}
       <LoadingWrapper
+        id="grades"
         isLoading={loading}
         skeletonsCount={selectedCourses?.length || 3}
         width="100%"

@@ -29,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
@@ -65,9 +66,9 @@ DashboardCardHeaderHero.propTypes = {
   image: PropTypes.string
 }
 
-export const LatestAnnouncementLink = ({color, loading, title, html_url}) =>
-  loading ? (
-    <Flex alignItems="start" margin="xx-small small xx-small small">
+export const LatestAnnouncementLink = ({courseId, color, loading, title, html_url}) => {
+  const customSkeleton = props => (
+    <Flex alignItems="start" margin="xx-small small xx-small small" {...props}>
       <Flex.Item shouldGrow shouldShrink>
         <LoadingSkeleton
           screenReaderLabel={I18n.t('Loading latest announcement link')}
@@ -76,30 +77,45 @@ export const LatestAnnouncementLink = ({color, loading, title, html_url}) =>
         />
       </Flex.Item>
     </Flex>
-  ) : title && html_url ? (
-    <Link
-      href={html_url}
-      display="block"
-      isWithinText={false}
-      margin="xx-small small xx-small small"
+  )
+
+  return (
+    <LoadingWrapper
+      id={`course-announcements-${courseId}`}
+      isLoading={loading}
+      width="100%"
+      height="4em"
+      margin="small 0"
+      renderCustomSkeleton={customSkeleton}
     >
-      <Flex alignItems="start">
-        <Flex.Item margin="0 small 0 0">
-          <IconAnnouncementLine style={{color}} size="x-small" />
-        </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink>
-          <AccessibleContent alt={I18n.t('New announcement: %{title}', {title})}>
-            <Text color="primary">
-              <TruncateText maxLines={2}>{title}</TruncateText>
-            </Text>
-          </AccessibleContent>
-        </Flex.Item>
-      </Flex>
-    </Link>
-  ) : null
+      {title && html_url ? (
+        <Link
+          href={html_url}
+          display="block"
+          isWithinText={false}
+          margin="xx-small small xx-small small"
+        >
+          <Flex alignItems="start">
+            <Flex.Item margin="0 small 0 0">
+              <IconAnnouncementLine style={{color}} size="x-small" />
+            </Flex.Item>
+            <Flex.Item shouldGrow shouldShrink>
+              <AccessibleContent alt={I18n.t('New announcement: %{title}', {title})}>
+                <Text color="primary">
+                  <TruncateText maxLines={2}>{title}</TruncateText>
+                </Text>
+              </AccessibleContent>
+            </Flex.Item>
+          </Flex>
+        </Link>
+      ) : null}
+    </LoadingWrapper>
+  )
+}
 
 LatestAnnouncementLink.displayName = 'LatestAnnouncementLink'
 LatestAnnouncementLink.propTypes = {
+  courseId: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   loading: PropTypes.bool.isRequired,
   html_url: PropTypes.string,
@@ -317,6 +333,7 @@ const K5DashboardCard = ({
           />
         )}
         <LatestAnnouncementLink
+          courseId={id}
           color={backgroundColor}
           loading={loadingAnnouncements}
           {...latestAnnouncement}

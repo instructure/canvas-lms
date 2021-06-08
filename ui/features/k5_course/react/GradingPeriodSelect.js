@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {GradingPeriodShape} from '@canvas/k5/react/utils'
-import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 const GradingPeriodSelect = ({
   loadingGradingPeriods,
@@ -45,46 +45,53 @@ const GradingPeriodSelect = ({
     setSelectedValue(currentGradingPeriodId || ALL_PERIODS_VALUE)
   }, [currentGradingPeriodId, ALL_PERIODS_VALUE])
 
-  return loadingGradingPeriods ? (
-    <LoadingSkeleton
+  return (
+    <LoadingWrapper
+      id="grading-periods"
+      isLoading={loadingGradingPeriods}
+      display="block"
       height="2.2em"
       width="20rem"
       margin="medium 0"
       screenReaderLabel={I18n.t('Loading grading periods for %{courseName}', {courseName})}
-    />
-  ) : (
-    <View as="div" margin="medium 0">
-      <SimpleSelect
-        data-testid="select-course-grading-period"
-        renderLabel={<ScreenReaderContent>{I18n.t('Select Grading Period')}</ScreenReaderContent>}
-        assistiveText={I18n.t('Use arrow keys to navigate options.')}
-        isInline
-        onChange={(_e, data) => setSelectedValue(data.value)}
-        width="20rem"
-        value={selectedValue}
-      >
-        {gradingPeriods
-          .filter(gp => gp.workflow_state === 'active')
-          .map(gp => (
+    >
+      {gradingPeriods && (
+        <View as="div" margin="medium 0">
+          <SimpleSelect
+            data-testid="select-course-grading-period"
+            renderLabel={
+              <ScreenReaderContent>{I18n.t('Select Grading Period')}</ScreenReaderContent>
+            }
+            assistiveText={I18n.t('Use arrow keys to navigate options.')}
+            isInline
+            onChange={(_e, data) => setSelectedValue(data.value)}
+            width="20rem"
+            value={selectedValue}
+          >
+            {gradingPeriods
+              .filter(gp => gp.workflow_state === 'active')
+              .map(gp => (
+                <SimpleSelect.Option
+                  id={`grading-period-${gp.id}`}
+                  key={`grading-period-${gp.id}`}
+                  value={gp.id}
+                >
+                  {gp.id === currentGradingPeriodId
+                    ? I18n.t('%{title} (Current)', {title: gp.title})
+                    : gp.title}
+                </SimpleSelect.Option>
+              ))}
             <SimpleSelect.Option
-              id={`grading-period-${gp.id}`}
-              key={`grading-period-${gp.id}`}
-              value={gp.id}
+              id="grading-period-all"
+              key="grading-period-all"
+              value={ALL_PERIODS_VALUE}
             >
-              {gp.id === currentGradingPeriodId
-                ? I18n.t('%{title} (Current)', {title: gp.title})
-                : gp.title}
+              {I18n.t('All Grading Periods')}
             </SimpleSelect.Option>
-          ))}
-        <SimpleSelect.Option
-          id="grading-period-all"
-          key="grading-period-all"
-          value={ALL_PERIODS_VALUE}
-        >
-          {I18n.t('All Grading Periods')}
-        </SimpleSelect.Option>
-      </SimpleSelect>
-    </View>
+          </SimpleSelect>
+        </View>
+      )}
+    </LoadingWrapper>
   )
 }
 
