@@ -1962,6 +1962,13 @@ describe DiscussionTopic do
       expect(@topic.subscription_hold(@student, nil, nil)).to eql(:not_in_group_set)
     end
 
+    it "should not fail for group discussion" do
+      group = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
+      topic = group.discussion_topics.create!(title: 'hi', message: 'hey')
+      expect(topic.subscription_hold(@student, nil, nil)).to eql(:not_in_group)
+      expect(topic.child_topic_for(@student)).to be_nil
+    end
+
     it "should hold when the user is not in a group" do
       group_discussion_assignment
       expect(@topic.child_topics.first.subscription_hold(@student, nil, nil)).to eql(:not_in_group)

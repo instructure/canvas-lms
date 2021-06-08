@@ -648,6 +648,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def child_topic_for(user)
+    return unless context.is_a?(Course)
+
     group_ids = user.group_memberships.active.pluck(:group_id) &
       context.groups.active.pluck(:id)
     child_topics.active.where(context_id: group_ids, context_type: 'Group').first
