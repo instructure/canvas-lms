@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -28,6 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckMarkSolid, IconEndSolid} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
 
 export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
@@ -39,16 +39,8 @@ export default class ExternalToolPlacementButton extends React.Component {
 
   state = {
     tool: this.props.tool,
-    modalIsOpen: false
-  }
-
-  componentDidUpdate() {
-    const _this = this
-    window.requestAnimationFrame(() => {
-      if (_this.refs.closex) {
-        _this.refs.closex.focus()
-      }
-    })
+    modalIsOpen: false,
+    isRetrievingTool: false
   }
 
   openModal = e => {
@@ -59,20 +51,17 @@ export default class ExternalToolPlacementButton extends React.Component {
       return
     }
 
-    if (this.props.tool.app_type === 'ContextExternalTool') {
-      store.fetchWithDetails(this.props.tool).then(data => {
-        const tool = _.extend(data, this.props.tool)
-        this.setState({
-          tool,
-          modalIsOpen: true
-        })
-      })
-    } else {
+    this.setState({
+      isRetrievingTool: true,
+      modalIsOpen: true
+    })
+
+    store.fetchWithDetails(this.props.tool).then(data => {
       this.setState({
-        tool: this.props.tool,
-        modalIsOpen: true
+        tool: {...data, ...this.props.tool},
+        isRetrievingTool: false
       })
-    }
+    })
   }
 
   closeModal = () => {
@@ -215,7 +204,7 @@ export default class ExternalToolPlacementButton extends React.Component {
     const placements = this.placements()
 
     if (!placements || placements.length === 0) {
-      return
+      return I18n.t('No Placements Enabled')
     }
 
     if (!this.shouldShowToggleButtons()) {
@@ -246,42 +235,64 @@ export default class ExternalToolPlacementButton extends React.Component {
     )
   }
 
-  placementToggle = (key, value, enabled) => (
-    <Flex justifyItems="space-between" key={key}>
-      <Flex.Item>{value}</Flex.Item>
+  placementToggle = (key, value, enabled) => {
+    const props = enabled
+      ? {
+          status: 'unpressed',
+          color: 'success',
+          renderIcon: IconCheckMarkSolid,
+          screenReaderLabel: I18n.t('Placement active; click to deactivate'),
+          renderTooltipContent: I18n.t('Active')
+        }
+      : {
+          status: 'pressed',
+          color: 'secondary',
+          renderIcon: IconEndSolid,
+          screenReaderLabel: I18n.t('Placement inactive; click to activate'),
+          renderTooltipContent: I18n.t('Inactive')
+        }
+
+    return (
+      <Flex justifyItems="space-between" key={key}>
+        <Flex.Item>{value}</Flex.Item>
+        <Flex.Item>
+          <ToggleButton
+            status={props.status}
+            color={props.color}
+            renderIcon={props.renderIcon}
+            screenReaderLabel={props.screenReaderLabel}
+            renderTooltipContent={props.renderTooltipContent}
+            onClick={() => this.handleTogglePlacement(key)}
+          />
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
+  spinner = () => (
+    <Flex justifyItems="center">
       <Flex.Item>
-        <ToggleButton
-          status={enabled ? 'unpressed' : 'pressed'}
-          color={enabled ? 'success' : 'secondary'}
-          renderIcon={enabled ? IconCheckMarkSolid : IconEndSolid}
-          screenReaderLabel={
-            enabled
-              ? I18n.t('Placement active; click to deactivate')
-              : I18n.t('Placement inactive; click to activate')
-          }
-          renderTooltipContent={enabled ? I18n.t('Active') : I18n.t('Inactive')}
-          onClick={() => this.handleTogglePlacement(key)}
-        />
+        <Spinner renderTitle={() => I18n.t('Retrieving Tool')} />
       </Flex.Item>
     </Flex>
   )
 
-  getModal = () => (
+  modal = () => (
     <Modal
-      // eslint-disable-next-line react/no-string-refs
-      ref="reactModal"
       open={this.state.modalIsOpen}
       onDismiss={this.closeModal}
       label={I18n.t('App Placements')}
     >
-      <Modal.Body>{this.placementsWithNotice() || I18n.t('No Placements Enabled')}</Modal.Body>
+      <Modal.Body>
+        {this.state.isRetrievingTool ? this.spinner() : this.placementsWithNotice()}
+      </Modal.Body>
       <Modal.Footer>
         <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
       </Modal.Footer>
     </Modal>
   )
 
-  getButton = () => {
+  button = () => {
     const editAriaLabel = I18n.t('View %{toolName} Placements', {toolName: this.state.tool.name})
 
     if (this.props.type === 'button') {
@@ -290,15 +301,13 @@ export default class ExternalToolPlacementButton extends React.Component {
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
-            // eslint-disable-next-line react/no-string-refs
-            ref="placementButton"
             role="button"
             aria-label={editAriaLabel}
             className="btn long"
             onClick={this.openModal}
           >
             <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')} />
-            {this.getModal()}
+            {this.modal()}
           </a>
         </>
       )
@@ -309,8 +318,6 @@ export default class ExternalToolPlacementButton extends React.Component {
           <a
             href="#"
             tabIndex="-1"
-            // eslint-disable-next-line react/no-string-refs
-            ref="placementButton"
             role="menuitem"
             aria-label={editAriaLabel}
             className="icon-info"
@@ -318,7 +325,7 @@ export default class ExternalToolPlacementButton extends React.Component {
           >
             {I18n.t('Placements')}
           </a>
-          {this.getModal()}
+          {this.modal()}
         </li>
       )
     }
@@ -326,7 +333,7 @@ export default class ExternalToolPlacementButton extends React.Component {
 
   render() {
     if (this.state.tool.app_type === 'ContextExternalTool') {
-      return this.getButton()
+      return this.button()
     }
     return false
   }
