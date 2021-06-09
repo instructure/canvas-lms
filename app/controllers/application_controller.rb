@@ -2832,9 +2832,9 @@ class ApplicationController < ActionController::Base
     can_disable && @current_user.elementary_dashboard_disabled?
   end
 
-  def k5_user?
+  def k5_user?(check_disabled = true)
     if @current_user
-      return false if k5_disabled?
+      return false if check_disabled && k5_disabled?
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
       Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
         uncached_k5_user?

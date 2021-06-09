@@ -24,7 +24,7 @@ import moxios from 'moxios'
 import {moxiosWait} from 'jest-moxios-utils'
 import sinon from 'sinon'
 import $ from 'jquery'
-import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader.js'
+import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader'
 import {resetPlanner} from '@instructure/canvas-planner'
 
 const container = document.getElementById('fixtures')
@@ -309,7 +309,7 @@ test('it should allow switching back to the Elementary dashboard if it was disab
         dashboardHeader = c
       }}
       dashboard_view="activity"
-      elementaryDashboardDisabled
+      canEnableElementaryDashboard
     />,
     container
   )

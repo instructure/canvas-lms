@@ -32,14 +32,14 @@ export default class DashboardOptionsMenu extends React.Component {
     planner_enabled: PropTypes.bool,
     onDashboardChange: PropTypes.func.isRequired,
     menuButtonRef: PropTypes.func,
-    elementaryDashboardDisabled: PropTypes.bool
+    canEnableElementaryDashboard: PropTypes.bool
   }
 
   static defaultProps = {
     planner_enabled: false,
     view: 'cards',
     menuButtonRef: () => {},
-    elementaryDashboardDisabled: false
+    canEnableElementaryDashboard: false
   }
 
   state = {
@@ -99,7 +99,7 @@ export default class DashboardOptionsMenu extends React.Component {
             <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>
           )}
           <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
-          {this.props.elementaryDashboardDisabled && (
+          {this.props.canEnableElementaryDashboard && (
             <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
           )}
         </Menu.Group>

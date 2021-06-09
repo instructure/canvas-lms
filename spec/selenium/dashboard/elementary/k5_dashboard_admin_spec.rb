@@ -52,10 +52,10 @@ describe "admin k5 dashboard" do
 
       options = dashboard_options
       expect(options.length).to be 2
-      expect(options[0].text).to eq('Elementary View')
-      expect(options[1].text).to eq('Classic View')
+      expect(options[0].text).to eq('Classic View')
+      expect(options[1].text).to eq('Elementary View')
 
-      options[1].click
+      options[0].click
       wait_for_ajaximations
 
       expect(classic_dashboard_header).to be_displayed

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {shallow, mount} from 'enzyme'
-import DashboardOptionsMenu from 'ui/features/dashboard/react/DashboardOptionsMenu.js'
+import DashboardOptionsMenu from 'ui/features/dashboard/react/DashboardOptionsMenu'
 import sinon from 'sinon'
 
 const container = document.getElementById('fixtures')
@@ -122,7 +122,7 @@ test('it should include a List View menu item when Student Planner is enabled', 
 
 test('it should include an Elementary View option when the Elementary dashboard is disabled', () => {
   const wrapper = mount(
-    <DashboardOptionsMenu elementaryDashboardDisabled onDashboardChange={() => {}} />
+    <DashboardOptionsMenu canEnableElementaryDashboard onDashboardChange={() => {}} />
   )
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))

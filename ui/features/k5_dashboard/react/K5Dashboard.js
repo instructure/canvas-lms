@@ -99,8 +99,8 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
         onSelect={onDisableK5Dashboard}
         selected={['elementary']}
       >
-        <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
         <Menu.Item value="classic">{I18n.t('Classic View')}</Menu.Item>
+        <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
       </Menu.Group>
     </Menu>
   )

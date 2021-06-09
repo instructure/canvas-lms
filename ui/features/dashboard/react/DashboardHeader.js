@@ -48,7 +48,7 @@ class DashboardHeader extends React.Component {
     dashboard_view: string,
     planner_enabled: bool.isRequired,
     screenReaderFlashMessage: func,
-    elementaryDashboardDisabled: bool,
+    canEnableElementaryDashboard: bool,
     env: object,
     showTodoList: func,
     responsiveSize: oneOf(['small', 'medium', 'large'])
@@ -232,7 +232,7 @@ class DashboardHeader extends React.Component {
               menuButtonRef={ref => {
                 this.menuButtonFocusable = ref
               }}
-              elementaryDashboardDisabled={this.props.elementaryDashboardDisabled}
+              canEnableElementaryDashboard={this.props.canEnableElementaryDashboard}
             />
           </div>
           {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}

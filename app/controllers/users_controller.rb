@@ -484,15 +484,16 @@ class UsersController < ApplicationController
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
     @current_user.reload
-    js_env({K5_USER: k5_user?}, true)
+    k5_disabled = k5_disabled?
+    k5_user = k5_user?(false)
+    js_env({K5_USER: k5_user && !k5_disabled}, true)
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
-        :custom_colors => @current_user.custom_colors,
-        :elementary_dashboard_disabled => k5_disabled?
+        :custom_colors => @current_user.custom_colors
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
       :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
@@ -502,6 +503,7 @@ class UsersController < ApplicationController
         :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
         :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
       },
+      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
