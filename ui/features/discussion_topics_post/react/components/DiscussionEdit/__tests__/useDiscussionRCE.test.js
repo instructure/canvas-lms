@@ -19,14 +19,29 @@
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {useDiscussionRCE} from '../useDiscussionRCE'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
+import {waitFor} from '@testing-library/dom'
+
+jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
+  create: () => {},
+  PluginManager: {
+    add: () => {}
+  },
+  plugins: {
+    CanvasMentionsPlugin: {}
+  }
+}))
+
+let useRceMentions
 
 const setup = () => {
-  const {result} = renderHook(() => useDiscussionRCE())
+  const {result} = renderHook(() => useDiscussionRCE(useRceMentions))
   return result
 }
 
 describe('useRCE - Discussions', () => {
   beforeEach(() => {
+    useRceMentions = false
+
     RichContentEditor.loadNewEditor = jest.fn()
     RichContentEditor.callOnRCE = jest.fn()
     RichContentEditor.closeRCE = jest.fn()
@@ -37,12 +52,30 @@ describe('useRCE - Discussions', () => {
     jest.clearAllMocks()
   })
 
-  it('should setup RCE when ref is change', () => {
+  it('should setup RCE when ref is change', async () => {
     const result = setup()
     act(() => {
       result.current[0]('mockElm')
     })
-    expect(RichContentEditor.loadNewEditor.mock.calls.length).toBe(1)
+    await waitFor(() => expect(RichContentEditor.loadNewEditor.mock.calls.length).toBe(1))
+  })
+
+  it('should not include the "mentions" plugin', async () => {
+    const result = setup()
+    act(() => {
+      result.current[0]('mockElm')
+    })
+
+    await waitFor(() => {
+      expect(RichContentEditor.loadNewEditor).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          focus: false,
+          manageParent: false
+        },
+        expect.anything()
+      )
+    })
   })
 
   it('should destroy RCE when ref is changed', () => {
@@ -80,5 +113,31 @@ describe('useRCE - Discussions', () => {
     })
     expect(RichContentEditor.callOnRCE).toHaveBeenCalledTimes(1)
     expect(RichContentEditor.callOnRCE.mock.calls[0][1]).toEqual('set_code')
+  })
+
+  describe('when "useRceMentions" is true', () => {
+    beforeEach(() => (useRceMentions = true))
+
+    it('should include "canvas_mentions" plugin in rce options', async () => {
+      const result = setup()
+      act(() => {
+        result.current[0]('mockElm')
+      })
+
+      await waitFor(() => {
+        expect(RichContentEditor.loadNewEditor).toHaveBeenCalledWith(
+          expect.anything(),
+          {
+            focus: false,
+            manageParent: false,
+            tinyOptions: {
+              plugins: ['canvas_mentions']
+            },
+            optionsToMerge: ['plugins']
+          },
+          expect.anything()
+        )
+      })
+    })
   })
 })

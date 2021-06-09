@@ -707,7 +707,8 @@ class DiscussionTopicsController < ApplicationController
       env_hash = {
         discussion_topic_id: params[:id],
         manual_mark_as_read: @current_user&.manual_mark_as_read?,
-        discussion_topic_menu_tools: @discussion_topic_menu_tools
+        discussion_topic_menu_tools: @discussion_topic_menu_tools,
+        rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions)
       }
 
       if @context.is_a?(Course)
