@@ -34,6 +34,8 @@ module AccountReports
       I18n.t('eportfolio_id'),
       I18n.t('author_name'),
       I18n.t('author_id'),
+      I18n.t('author_sis_id'),
+      I18n.t('author_login_id'),
       I18n.t('created_at'),
       I18n.t('updated_at'),
       I18n.t('is_public'),
@@ -46,18 +48,30 @@ module AccountReports
       end
 
       write_report EPORTFOLIO_REPORT_HEADERS do |csv|
-        eportfolio_scope.find_each do |e|
-          csv <<
-            [
-              e.name,
-              e.id,
-              e.user.name,
-              e.user_id,
-              e.created_at.to_s,
-              e.updated_at.to_s,
-              e.public.to_s,
-              e.workflow_state
-            ]
+        eportfolio_scope.find_in_batches do |batch|
+          users = batch.map {|e| User.new(id: e.user_id)}.compact
+          users.uniq!
+          users_by_id = users.index_by(&:id)
+          pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
+
+          batch.each do |e|
+            pseudonym = loaded_pseudonym(pseudonyms,
+                                         users_by_id[e.user_id],
+                                         include_deleted: @include_deleted)
+            csv <<
+              [
+                e.name,
+                e.id,
+                e.user.name,
+                e.user_id,
+                pseudonym.sis_user_id,
+                pseudonym.unique_id,
+                e.created_at.to_s,
+                e.updated_at.to_s,
+                e.public.to_s,
+                e.workflow_state
+              ]
+          end
         end
       end
     end
