@@ -1265,10 +1265,13 @@ module ApplicationHelper
 
   def prefetch_xhr(url, id: nil, options: {})
     id ||= url
+    # these are the same defaults set in js-utils/src/prefetched_xhrs.js as "defaultFetchOptions"
+    # and it would be nice to combine them so that they don't have to be copied here.
     opts = {
       credentials: 'same-origin',
       headers: {
-        Accept: 'application/json+canvas-string-ids, application/json'
+        Accept: 'application/json+canvas-string-ids, application/json',
+        'X-Requested-With' => 'XMLHttpRequest'
       }
     }.deep_merge(options)
     javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"
