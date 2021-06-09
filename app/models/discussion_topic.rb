@@ -54,6 +54,10 @@ class DiscussionTopic < ActiveRecord::Base
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
   end
 
+  module Errors
+    class LockBeforeDueDate < StandardError; end
+  end
+
   attr_readonly :context_id, :context_type, :user_id
 
   has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy, inverse_of: :discussion_topic
@@ -868,7 +872,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def lock(opts = {})
-    raise "cannot lock before due date" unless can_lock?
+    raise Errors::LockBeforeDueDate unless can_lock?
+
     self.locked = true
     save! unless opts[:without_save]
   end

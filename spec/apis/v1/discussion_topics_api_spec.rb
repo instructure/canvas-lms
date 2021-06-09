@@ -527,6 +527,19 @@ describe DiscussionTopicsController, type: :request do
         expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
+      it "should raise error when trying to lock before Due Date" do
+        @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
+
+        @assignment = @topic2.context.assignments.build
+        @assignment.due_at = 3.days.from_now
+        @topic2.assignment = @assignment
+        @topic2.save!
+
+        expect {
+          @topic2.lock
+        }.to raise_error DiscussionTopic::Errors::LockBeforeDueDate
+      end
+
       it "should only include topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
