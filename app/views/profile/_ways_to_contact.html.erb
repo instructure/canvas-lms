@@ -114,7 +114,13 @@
     <tbody>
     <% @other_channels.each do |c| %>
       <tr class="channel <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym_id %>" id="channel_<%= c.id %>">
-        <td><a href="#" class="path contact_channel_path ellipsis"><%= c.path_description %></a></td>
+        <td>
+          <% if c.path_type == 'push' || (c.path_type == 'sms' && c.state != :unconfirmed) %>
+            <div class="path contact_channel_path ellipsis"><%= c.path_description %></div>
+          <% else %>
+            <a href="#" class="path contact_channel_path ellipsis"><%= c.path_description %></a>
+          <% end %>
+        </td>
         <td><%= c.path_type %></td>
         <td style="padding: 0; text-align: center;">
           <% if c.bouncing? %>
