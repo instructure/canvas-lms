@@ -20,7 +20,6 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
@@ -52,7 +51,16 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
       {truncated && textDescription && (
         <View as="div" padding="0 small 0 0" data-testid="description-truncated">
           <PresentationContent>
-            <TruncateText>{textDescription}</TruncateText>
+            <div
+              data-testid="description-truncated-content"
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {textDescription}
+            </div>
           </PresentationContent>
           <ScreenReaderContent>{textDescription}</ScreenReaderContent>
         </View>

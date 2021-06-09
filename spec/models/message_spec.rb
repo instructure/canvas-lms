@@ -117,8 +117,10 @@ describe Message do
       allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
       assignment_model(title: 'this is a message')
       msg = generate_message(:assignment_created, :email, @assignment)
-      msg.save!
+      msg.body = msg.body + "1"* 64.kilobyte
+      expect(msg.valid?).to be_truthy
       expect(msg.body).to eq 'message preview unavailable'
+      msg.save!
       expect(msg.html_body).to eq 'message preview unavailable'
     end
 

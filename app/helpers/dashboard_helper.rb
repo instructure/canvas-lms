@@ -30,7 +30,7 @@ module DashboardHelper
   end
 
   def show_planner?
-    user_dashboard_view == 'planner' || @k5_mode
+    user_dashboard_view == 'planner' || k5_user?
   end
 
   def show_recent_activity?

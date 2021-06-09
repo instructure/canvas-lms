@@ -27,6 +27,7 @@ import ManageOutcomeItem from './ManageOutcomeItem'
 import OutcomeSearchBar from './OutcomeSearchBar'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import InfiniteScroll from '@canvas/infinite-scroll'
+import {Flex} from '@instructure/ui-flex'
 
 const ManageOutcomesView = ({
   outcomeGroup,
@@ -72,7 +73,7 @@ const ManageOutcomesView = ({
         />
         <View as="div" padding="medium 0 xx-small" margin="x-small 0 0">
           <OutcomeSearchBar
-            enabled={numOutcomes > 0}
+            enabled={numOutcomes > 0 || searchString.length > 0}
             placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
             searchString={searchString}
             onChangeHandler={onSearchChangeHandler}
@@ -81,18 +82,34 @@ const ManageOutcomesView = ({
         </View>
         <View as="div" padding="small 0">
           <Heading level="h4">
-            <div style={{overflowWrap: 'break-word'}}>
-              {I18n.t(
-                {
-                  one: '1 "%{groupTitle}" Outcome',
-                  other: '%{count} "%{groupTitle}" Outcomes'
-                },
-                {
-                  count: numOutcomes,
-                  groupTitle: addZeroWidthSpace(groupTitle)
-                }
-              )}
-            </div>
+            <Flex>
+              <Flex.Item shouldShrink>
+                <div style={{overflowWrap: 'break-word'}}>
+                  {I18n.t(
+                    {
+                      one: '1 "%{groupTitle}" Outcome',
+                      other: '%{count} "%{groupTitle}" Outcomes'
+                    },
+                    {
+                      count: numOutcomes,
+                      groupTitle: addZeroWidthSpace(groupTitle)
+                    }
+                  )}
+                </div>
+              </Flex.Item>
+              <Flex.Item>
+                {searchString && loading ? (
+                  <Spinner
+                    renderTitle={I18n.t('Loading')}
+                    size="x-small"
+                    margin="0 0 0 small"
+                    data-testid="search-loading"
+                  />
+                ) : (
+                  ''
+                )}
+              </Flex.Item>
+            </Flex>
           </Heading>
         </View>
         <View as="div" data-testid="outcome-items-list">

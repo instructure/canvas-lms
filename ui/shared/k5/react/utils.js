@@ -237,6 +237,24 @@ export const getTotalGradeStringFromEnrollments = (enrollments, userId) => {
     : I18n.t('%{score} (%{grade})', {score, grade: grades.current_grade})
 }
 
+/* Takes an array of courses and returns an array of ImportantInfoShapes */
+export const fetchImportantInfos = courses =>
+  Promise.all(
+    courses.map(c =>
+      doFetchApi({
+        path: `/api/v1/courses/${c.id}`,
+        params: {
+          include: ['syllabus_body']
+        }
+      }).then(data => ({
+        courseId: c.id,
+        courseName: c.shortName,
+        canEdit: c.canManage,
+        content: data.json.syllabus_body
+      }))
+    )
+  ).then(infos => infos.filter(info => info.content))
+
 /* Turns raw announcement data from API into usable object */
 export const parseAnnouncementDetails = (announcement, course) => {
   if (!announcement) {

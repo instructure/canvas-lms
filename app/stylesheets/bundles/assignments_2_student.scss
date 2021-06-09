@@ -25,7 +25,7 @@
 @import "components/_rubric.scss";
 @import "components/_ic-code.scss";
 
-$student-footer-height: 75px;
+$student-footer-height: 60px;
 $student-view-banner-height: 50px;
 
 #assignments_2 {
@@ -39,7 +39,7 @@ $student-view-banner-height: 50px;
   #{direction(right)}: 0;
   width: 100%;
   box-sizing: border-box;
-  padding: .75rem;
+  padding: 0;
   border-top: 1px solid gray;
   text-align: #{direction(right)};
   z-index: 999;

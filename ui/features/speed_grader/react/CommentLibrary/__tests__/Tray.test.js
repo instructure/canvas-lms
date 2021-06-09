@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import Tray from '../Tray'
 
 describe('Tray', () => {
-  let setIsOpenMock
+  let setIsOpenMock, setShowSuggestionsMock
   const defaultProps = (props = {}) => {
     return {
       isOpen: true,
@@ -31,12 +31,16 @@ describe('Tray', () => {
       onDeleteComment: () => {},
       onAddComment: () => {},
       isAddingComment: false,
+      showSuggestions: false,
+      setShowSuggestions: setShowSuggestionsMock,
+      updateComment: () => {},
       ...props
     }
   }
 
   beforeEach(() => {
     setIsOpenMock = jest.fn()
+    setShowSuggestionsMock = jest.fn()
   })
 
   afterEach(() => {
@@ -78,5 +82,23 @@ describe('Tray', () => {
     const {rerender, getByText} = render(<Tray {...defaultProps()} />)
     rerender(<Tray {...defaultProps({removedItemIndex: 0, comments: []})} />)
     expect(getByText('Close comment library').closest('button')).toHaveFocus()
+  })
+
+  describe('checkbox', () => {
+    it('renders a checkbox as unchecked when showSuggestions is false', () => {
+      const {getByLabelText} = render(<Tray {...defaultProps()} />)
+      expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
+    })
+
+    it('renders a checkbox as checked when showSuggestions is true', () => {
+      const {getByLabelText} = render(<Tray {...defaultProps({showSuggestions: true})} />)
+      expect(getByLabelText('Show suggestions when typing')).toBeChecked()
+    })
+
+    it('calls setShowSuggestions when clicked', () => {
+      const {getByLabelText} = render(<Tray {...defaultProps({showSuggestions: true})} />)
+      fireEvent.click(getByLabelText('Show suggestions when typing'))
+      expect(setShowSuggestionsMock).toHaveBeenCalled()
+    })
   })
 })

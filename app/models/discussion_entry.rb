@@ -95,13 +95,6 @@ class DiscussionEntry < ActiveRecord::Base
     }
     p.data { course_broadcast_data }
 
-    p.dispatch :new_discussion_mention
-    p.to { mentioned_users - [user] }
-    p.whenever { |record|
-      record.just_created && record.active?
-    }
-    p.data { course_broadcast_data }
-
     p.dispatch :announcement_reply
     p.to { discussion_topic.user }
     p.whenever { |record|

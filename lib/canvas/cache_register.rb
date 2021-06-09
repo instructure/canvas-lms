@@ -32,7 +32,7 @@ module Canvas
       'Account' => %w{account_chain role_overrides global_navigation feature_flags brand_config default_locale
                       resolved_outcome_proficiency resolved_outcome_calculation_method},
       'Course' => %w{account_associations conditional_release},
-      'User' => %w{enrollments groups account_users todo_list submissions user_services},
+      'User' => %w{enrollments groups account_users todo_list submissions user_services k5_user},
       'Assignment' => %w{availability conditional_release needs_grading},
       'Quizzes::Quiz' => %w{availability}
     }.freeze

@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library 'canvas-builds-library'
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -31,8 +31,8 @@ pipeline {
   environment {
     // we only use this
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
-    GERRIT_BRANCH = "master"
-    GERGICH_REVIEW_LABEL = "Lint-Review"
+    GERRIT_BRANCH = 'master'
+    GERGICH_REVIEW_LABEL = 'Lint-Review'
   }
 
   stages {

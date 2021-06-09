@@ -45,6 +45,7 @@ module Api::V1::UserProfile
     if user == current_user
       json[:calendar] = {:ics => "#{feeds_calendar_url(user.feed_code)}.ics"}
       json[:lti_user_id] = user.lti_context_id if user.lti_context_id.present?
+      json[:k5_user] = k5_user?
     end
 
     if includes.include? 'user_services'

@@ -18,6 +18,11 @@
 
 import moment from 'moment-timezone'
 
+export const MOCK_COURSE_SYLLABUS = {
+  id: '30',
+  syllabus_body: '<p>This is really important.</p>'
+}
+
 export const MOCK_COURSE_APPS = [
   {
     id: '7',

@@ -23,7 +23,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
   describe('doUpdateSettings', () => {
     const enabled = true
     const tenant = 'testtenant.com'
-    const loginAttr = 'oid'
+    const loginAttr = 'email'
 
     let oldEnv
     beforeAll(() => {
@@ -96,6 +96,18 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     it('validates a valid tenant', () => {
       const result = validateTenant(createState('canvastest2.onmicrosoft.com'))
       expect(result.tenantErrorMessages.length).toBe(0)
+    })
+  })
+
+  describe('clearMessages', () => {
+    it('clears messages', () => {
+      const updatedState = clearMessages({
+        errorMessage: "I'm an error message",
+        successMessage: "I'm a success message!"
+      })
+
+      expect(updatedState.errorMessage).toBeFalsy()
+      expect(updatedState.successMessage).toBeFalsy()
     })
   })
 })

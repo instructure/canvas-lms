@@ -39,7 +39,7 @@ pipeline {
     stage('Pull Redis Image') {
       steps {
         script {
-          sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull redis:alpine"
+          sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull redis:alpine'
         }
       }
     }

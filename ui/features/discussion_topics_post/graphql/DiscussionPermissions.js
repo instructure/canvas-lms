@@ -29,6 +29,7 @@ export const DiscussionPermissions = {
       rate
       read
       readAsAdmin
+      manageContent
       readReplies
       reply
       update
@@ -51,6 +52,7 @@ export const DiscussionPermissions = {
     rate: bool,
     read: bool,
     readAsAdmin: bool,
+    manageContent: bool,
     readReplies: bool,
     reply: bool,
     update: bool,
@@ -72,6 +74,7 @@ export const DiscussionPermissions = {
     rate = true,
     read = true,
     readAsAdmin = true,
+    manageContent = true,
     readReplies = true,
     reply = true,
     update = true,
@@ -80,7 +83,7 @@ export const DiscussionPermissions = {
     showRubric = true,
     addRubric = true,
     openForComments = true,
-    closeForComment = false,
+    closeForComments = false,
     copyAndSendTo = true,
     moderateForum = true
   } = {}) => ({
@@ -91,6 +94,7 @@ export const DiscussionPermissions = {
     rate,
     read,
     readAsAdmin,
+    manageContent,
     readReplies,
     reply,
     update,
@@ -99,7 +103,7 @@ export const DiscussionPermissions = {
     showRubric,
     addRubric,
     openForComments,
-    closeForComment,
+    closeForComments,
     copyAndSendTo,
     moderateForum,
     __typename: 'DiscussionPermissions'

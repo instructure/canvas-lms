@@ -35,6 +35,7 @@ export const MessageListItem = ({...props}) => {
   const [isStarred, setIsStarred] = useState(props.isStarred)
 
   const handleMessageClick = e => {
+    e.nativeEvent.stopImmediatePropagation()
     e.stopPropagation()
 
     // Kind of a hack since our Checkbox doesn't support onChange or swallowing
@@ -52,7 +53,14 @@ export const MessageListItem = ({...props}) => {
   }
 
   const handleMessageStarClick = e => {
+    e.nativeEvent.stopImmediatePropagation()
     e.stopPropagation()
+
+    // Kind of a hack since our Checkbox doesn't support onChange or swallowing
+    // events with ease. Removing aria-hidden elemnts from sending click events
+    if (e.target.getAttribute('aria-hidden') === 'true') {
+      return
+    }
     props.onStar(!isStarred)
     setIsStarred(!isStarred)
   }
@@ -106,7 +114,7 @@ export const MessageListItem = ({...props}) => {
           onMouseLeave={() => {
             setIsHovering(false)
           }}
-          onMouseDown={handleMessageClick}
+          onClick={handleMessageClick}
         >
           <Grid.Row>
             <Grid.Col width="auto">
@@ -127,9 +135,7 @@ export const MessageListItem = ({...props}) => {
                   }
                   checked={props.isSelected}
                   onChange={e => {
-                    e.preventDefault()
                     e.stopPropagation()
-                    props.onSelect(e, props.id, props.conversation, true)
                   }}
                 />
               </View>

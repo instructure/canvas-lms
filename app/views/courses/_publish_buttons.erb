@@ -22,7 +22,7 @@
       <%= hidden_field_tag :continue_to, course_settings_url(@context) %>
     <% end %>
     <% if @context.created? || @context.claimed? %>
-      <button type="button" class='ui-button btn-unpublish disabled' disabled>
+      <button type="button" class='ui-button btn-unpublished disabled' disabled>
         <i class="icon-unpublish"></i><%= t('#buttons.unpublished', %{Unpublished}) %>
       </button>
       <button type='submit' class="ui-button btn-publish">
@@ -30,10 +30,10 @@
       </button>
       <input type='hidden' name='course[event]' value='offer' />
     <% else %>
-      <button type='submit' class="ui-button">
+      <button type='submit' class="ui-button btn-unpublish">
         <i class="icon-unpublish"></i>&nbsp;<%= t('#buttons.unpublish', %{Unpublish}) %>
       </button>
-      <button type="button" class="ui-button disabled btn-published" disabled>
+      <button type="button" class="ui-button btn-published disabled" disabled>
         <i class="icon-publish icon-Solid"></i><%= t('#buttons.published', %{Published}) %>
       </button>
       <input type='hidden' name='course[event]' value='claim' />

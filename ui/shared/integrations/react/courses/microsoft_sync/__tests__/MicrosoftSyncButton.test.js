@@ -140,9 +140,17 @@ describe('MicrosoftSyncButton', () => {
   })
 
   describe('when the sync request succeeds', () => {
-    beforeEach(() =>
+    const oldEnv = window.ENV
+    beforeEach(() => {
       doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
-    )
+      window.ENV = {
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
 
     it('shows a success message and disables the sync button', async () => {
       const onSuccess = jest.fn()
@@ -176,7 +184,8 @@ describe('MicrosoftSyncButton', () => {
 
     beforeEach(() => {
       window.ENV = {
-        MANUAL_MSFT_SYNC_COOLDOWN: 5400 // 90 minutes
+        MANUAL_MSFT_SYNC_COOLDOWN: 5400, // 90 minutes
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false
       }
     })
     afterEach(() => (window.ENV = oldENV))
@@ -197,6 +206,26 @@ describe('MicrosoftSyncButton', () => {
       await waitFor(() =>
         expect(component.getByText('Sync Now').closest('button').disabled).toBeTruthy()
       )
+    })
+
+    describe('and the user is a site admin', () => {
+      const oldEnv = window.ENV
+      beforeEach(() => {
+        window.ENV = {
+          MSFT_SYNC_CAN_BYPASS_COOLDOWN: true,
+          MANUAL_MSFT_SYNC_COOLDOWN: 5400 // 90 minutes
+        }
+      })
+
+      afterEach(() => {
+        window.ENV = oldEnv
+      })
+
+      it('ignores the cooldown period', () => {
+        const container = subject(overrides)
+
+        expect(container.getByText(/sync now/i).closest('button')).not.toBeDisabled()
+      })
     })
 
     describe('and the group is in an error state', () => {

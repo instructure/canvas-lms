@@ -28,25 +28,19 @@ export const DISCUSSION_QUERY = gql`
     $perPage: Int!
     $searchTerm: String
     $rootEntries: Boolean
+    $filter: DiscussionFilterType
+    $sort: DiscussionSortOrderType
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
-        rootDiscussionEntriesConnection(after: $page, first: $perPage) {
-          nodes {
-            ...DiscussionEntry
-          }
-          pageInfo {
-            ...PageInfo
-          }
-        }
-        rootEntriesTotalPages(perPage: $perPage)
-
         discussionEntriesConnection(
           after: $page
           first: $perPage
           searchTerm: $searchTerm
           rootEntries: $rootEntries
+          filter: $filter
+          sortOrder: $sort
         ) {
           nodes {
             ...DiscussionEntry
@@ -55,7 +49,12 @@ export const DISCUSSION_QUERY = gql`
             ...PageInfo
           }
         }
-        entriesTotalPages(perPage: $perPage, rootEntries: $rootEntries)
+        entriesTotalPages(
+          perPage: $perPage
+          rootEntries: $rootEntries
+          filter: $filter
+          searchTerm: $searchTerm
+        )
       }
     }
   }
@@ -65,11 +64,16 @@ export const DISCUSSION_QUERY = gql`
 `
 
 export const DISCUSSION_SUBENTRIES_QUERY = gql`
-  query GetDiscussionSubentriesQuery($discussionEntryID: ID!, $page: String, $perPage: Int) {
+  query GetDiscussionSubentriesQuery(
+    $discussionEntryID: ID!
+    $page: String
+    $perPage: Int
+    $sort: DiscussionSortOrderType
+  ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
         ...DiscussionEntry
-        discussionSubentriesConnection(after: $page, first: $perPage) {
+        discussionSubentriesConnection(after: $page, first: $perPage, sortOrder: $sort) {
           nodes {
             ...DiscussionEntry
           }

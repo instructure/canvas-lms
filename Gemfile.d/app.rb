@@ -21,18 +21,27 @@
 
 if CANVAS_RAILS6_0
   gem 'rails', '6.0.3.7'
+    gem 'tzinfo', '1.2.7'
+  gem 'switchman', '2.0.9'
+    gem 'guardrail', '2.0.1'
+  gem 'switchman-inst-jobs', '3.1.2'
 else
   gem 'rails', '6.1.3.2'
+    gem 'tzinfo', '2.0.4'
+  gem 'switchman', '3.0.1'
+    gem 'guardrail', '3.0.0'
+  gem 'switchman-inst-jobs', '4.0.0'
 end
   gem 'irb', '1.3.5'
+  gem 'open4', '1.3.4', require: false
 
-gem 'academic_benchmarks', '1.1.0', require: false
+gem 'academic_benchmarks', '1.1.1', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
-gem 'after_transaction_commit', '2.2.1'
-gem 'authlogic', '6.2.0'
+gem 'after_transaction_commit', '2.2.2'
+gem 'authlogic', '6.4.1'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.109.2', require: false
   gem 'aws-partitions', '1.393.0', require: false
@@ -55,7 +64,7 @@ gem 'canvas_connect', '0.3.11'
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.42.0', require: false
-gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.11', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.13.1', require: false
 gem 'gepub', '1.0.13'
@@ -75,7 +84,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '2.2.1'
+gem 'inst-jobs', '2.3.1'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.0'
@@ -86,6 +95,7 @@ gem 'inst-jobs-statsd', '2.1.0'
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem 'json', '2.5.1'
 gem 'json_schemer', '0.2.16', github: 'robotdana/json_schemer', ref: '0d2ac359a87964f74c07a14cafeb98cfcae4e29f'
+  gem 'ecma-re-validator', '0.2.1'
 gem 'json-jwt', '1.13.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
@@ -95,12 +105,12 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.11.0'
 gem 'multi_json', '1.15.0'
 gem 'net-ldap', '0.16.3', require: false
-gem 'nokogiri', '1.11.3', require: false
+gem 'nokogiri', '1.11.5', require: false
 gem 'nokogumbo', '2.0.4'
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.16'
-gem 'outrigger', '2.1.0'
+gem 'outrigger', '2.1.1'
 gem 'parallel', '1.20.0', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
@@ -123,18 +133,17 @@ gem 'saml2', '3.0.11'
   gem 'nokogiri-xmlsec-instructure', '0.10.1', require: false
 gem 'sanitize', '5.2.3', require: false
 gem 'sentry-raven', '2.13.0', require: false
-gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '2.0.9'
-  gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '3.1.2'
 gem 'twilio-ruby', '5.36.0', require: false
-gem 'tzinfo', '1.2.7'
 gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'week_of_month', '1.2.5',
   github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
+
+# needs pin to satisfy varying requirements of google_drive and another gem
+gem 'faraday', '0.17.4'
+  gem 'faraday_middleware', '0.14.0'
 
 path 'engines' do
   gem 'audits'

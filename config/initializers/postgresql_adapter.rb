@@ -569,7 +569,11 @@ module SchemaStatementsExtensions
   end
 end
 
-ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::SchemaCreation.prepend(SchemaCreationExtensions)
+if CANVAS_RAILS6_0
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::SchemaCreation.prepend(SchemaCreationExtensions)
+else
+  ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)
+end
 ActiveRecord::ConnectionAdapters::ColumnDefinition.prepend(ColumnDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(ReferenceDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(SchemaStatementsExtensions)

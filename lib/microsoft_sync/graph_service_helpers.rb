@@ -34,6 +34,7 @@ module MicrosoftSync
     end
 
     MAX_MAIL_NICKNAME_LENGTH = 64
+    GET_GROUP_USERS_BATCH_SIZE = 999 # Max batch size to minimize API calls
 
     def initialize(tenant)
       @graph_service = GraphService.new(tenant)
@@ -70,7 +71,7 @@ module MicrosoftSync
       )
     end
 
-    USERS_UPNS_TO_AADS_BATCH_SIZE = 15 # According to Microsoft
+    USERS_UPNS_TO_AADS_BATCH_SIZE = 15 # Max number of "OR"s in filter clause
 
     # Returns a hash from UPN -> AAD. Accepts 15 at a time.
     # A UPN (userPrincipalName) is en email address, username, or other
@@ -118,7 +119,9 @@ module MicrosoftSync
     def get_group_users_aad_ids(group_id, owners: false)
       method = owners ? :list_group_owners : :list_group_members
       [].tap do |aad_ids|
-        graph_service.send(method, group_id, select: ['id']) do |users|
+        graph_service.send(
+          method, group_id, select: ['id'], top: GET_GROUP_USERS_BATCH_SIZE
+        ) do |users|
           aad_ids.concat(users.map{|user| user['id']})
         end
       end

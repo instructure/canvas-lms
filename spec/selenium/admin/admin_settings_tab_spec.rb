@@ -603,7 +603,6 @@ describe "admin settings tab" do
   context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
     before :once do
       @account = Account.default
-      @account.enable_feature! :canvas_for_elementary
       @subaccount = Account.create!(name: "subaccount1", parent_account_id: @account.id)
     end
 

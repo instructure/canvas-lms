@@ -41,7 +41,7 @@ Default.args = {}
 
 export const AuthorPost = Template.bind({})
 AuthorPost.args = {
-  pillText: 'Author'
+  discussionRoles: ['Author']
 }
 
 export const LargePost = Template.bind({})
@@ -57,6 +57,23 @@ AvatarPost.args = {
 export const UnreadPost = Template.bind({})
 UnreadPost.args = {
   isUnread: true
+}
+
+export const AuthorAndTeacherRoles = Template.bind({})
+AuthorAndTeacherRoles.args = {
+  discussionRoles: ['Author', 'TeacherEnrollment']
+}
+
+export const AllRoles = Template.bind({})
+AllRoles.args = {
+  discussionRoles: ['Author', 'TeacherEnrollment', 'TaEnrollment']
+}
+
+export const AllRolesAndLongName = Template.bind({})
+AllRolesAndLongName.args = {
+  discussionRoles: ['Author', 'TeacherEnrollment', 'TaEnrollment'],
+  authorName: 'Bernd Clemens Diedrich Emmerich Ottovordemgentschenfelde',
+  lastReplyAtDisplayText: 'May 17 11:18am'
 }
 
 export const WithChildren = Template.bind({})

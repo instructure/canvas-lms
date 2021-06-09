@@ -62,7 +62,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -226,7 +226,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -390,7 +390,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -550,7 +550,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -773,7 +773,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -996,7 +996,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1161,7 +1161,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1364,7 +1364,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1567,7 +1567,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -1753,7 +1753,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -2015,7 +2015,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={
@@ -2277,7 +2277,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
       letterSpacing="normal"
       lineHeight="double"
       size="medium"
-      wrap="normal"
+      wrap="break-word"
     >
       <div
         dangerouslySetInnerHTML={

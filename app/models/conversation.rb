@@ -515,12 +515,21 @@ class Conversation < ActiveRecord::Base
     participant = self.conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if !user
-      raise "Only message participants may reply to messages"
+      raise IncomingMail::Errors::InvalidParticipant
     elsif message.blank?
-      raise "Message body cannot be blank"
+      raise IncomingMail::Errors::BlankMessage
     else
       participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
+      message = truncate_message(message)
       add_message(user, message, opts)
+    end
+  end
+
+  def truncate_message(message)
+    if message.length < 64.kilobytes - 1
+      message
+    else
+      message[0..64.kilobytes-100] + I18n.t("... This message was truncated.")
     end
   end
 

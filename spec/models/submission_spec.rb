@@ -4583,6 +4583,12 @@ describe Submission do
       expect(@submission.moderation_allow_list_for_user(other_student)).to be_empty
     end
 
+    it 'always includes the submission owner when the assignment is of type Student Annotation' do
+      ta = @course.enroll_ta(User.create!).user
+      @assignment.update!(grader_count: 2, submission_types: 'student_annotation')
+      expect(@submission.moderation_allow_list_for_user(ta)).to eq [@student]
+    end
+
     context 'when the submission is not posted' do
       context 'when the user is the final grader' do
         let(:allow_list) { @submission.moderation_allow_list_for_user(@teacher) }

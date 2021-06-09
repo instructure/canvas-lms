@@ -27,7 +27,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
 import {IconChatLine} from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_student_header'
-import LatePolicyStatusDisplay from './LatePolicyStatusDisplay/index'
+import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
 import {arrayOf, func} from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -36,6 +36,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionStatusPill from '@canvas/assignments/react/SubmissionStatusPill'
 import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
 
@@ -77,14 +78,39 @@ class Header extends React.Component {
     <StudentViewContext.Consumer>
       {context => {
         const submission = context.lastSubmittedSubmission || {grade: null, gradingStatus: null}
-        return (
+        const {assignment} = this.props
+        const gradeDisplay = (
           <GradeDisplay
             gradingStatus={submission.gradingStatus}
-            gradingType={this.props.assignment.gradingType}
+            gradingType={assignment.gradingType}
             receivedGrade={submission.grade}
-            pointsPossible={this.props.assignment.pointsPossible}
+            pointsPossible={assignment.pointsPossible}
           />
         )
+
+        if (this.isSubmissionLate(submission)) {
+          return (
+            <Tooltip
+              as="div"
+              tip={
+                <LatePolicyToolTipContent
+                  attempt={submission.attempt}
+                  grade={submission.grade}
+                  gradingType={assignment.gradingType}
+                  originalGrade={submission.enteredGrade}
+                  pointsDeducted={submission.deductedPoints}
+                  pointsPossible={assignment.pointsPossible}
+                />
+              }
+              on={['hover', 'focus']}
+              placement="bottom"
+            >
+              {gradeDisplay}
+            </Tooltip>
+          )
+        }
+
+        return gradeDisplay
       }}
     </StudentViewContext.Consumer>
   )
@@ -159,48 +185,33 @@ class Header extends React.Component {
             <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
           </Heading>
 
-          <Flex margin="0" wrap="wrap" wrapItems>
-            <Flex.Item shrink>
+          <Flex as="div" margin="0" wrap="wrap" alignItems="start">
+            <Flex.Item shouldShrink>
               <AssignmentDetails assignment={this.props.assignment} />
             </Flex.Item>
-            <Flex.Item grow align="start">
-              {this.renderLatestGrade()}
-              {this.props.submission && (
-                <Flex.Item as="div" align="end" textAlign="end">
-                  <Flex direction="column">
-                    {this.isSubmissionLate() && (
-                      <Flex.Item grow>
-                        <LatePolicyStatusDisplay
-                          attempt={this.props.submission.attempt}
-                          gradingType={this.props.assignment.gradingType}
-                          pointsPossible={this.props.assignment.pointsPossible}
-                          originalGrade={this.props.submission.enteredGrade}
-                          pointsDeducted={this.props.submission.deductedPoints}
-                          grade={this.props.submission.grade}
-                        />
-                      </Flex.Item>
-                    )}
-                    <Flex.Item padding="xx-small" grow>
-                      <SubmissionStatusPill
-                        submissionStatus={this.props.submission.submissionStatus}
-                      />
-                    </Flex.Item>
-                    <Flex.Item grow>
-                      <CommentsTray
-                        submission={this.props.submission}
-                        assignment={this.props.assignment}
-                        open={this.state.commentsTrayOpen}
-                        closeTray={this.closeCommentsTray}
-                      />
-                    </Flex.Item>
-                  </Flex>
-                </Flex.Item>
-              )}
-            </Flex.Item>
+            {this.props.submission && (
+              <Flex.Item shouldGrow>
+                <Flex as="div" justifyItems="end" alignItems="center">
+                  <Flex.Item margin="0 x-small 0 0">
+                    <SubmissionStatusPill
+                      submissionStatus={this.props.submission.submissionStatus}
+                    />
+                  </Flex.Item>
+                  <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
+                </Flex>
+
+                <CommentsTray
+                  submission={this.props.submission}
+                  assignment={this.props.assignment}
+                  open={this.state.commentsTrayOpen}
+                  closeTray={this.closeCommentsTray}
+                />
+              </Flex.Item>
+            )}
           </Flex>
           {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
             <Flex alignItems="center">
-              <Flex.Item grow>
+              <Flex.Item shouldGrow>
                 <Flex>
                   {this.props.allSubmissions && (
                     <Flex.Item>
@@ -220,7 +231,7 @@ class Header extends React.Component {
                 </Flex>
               </Flex.Item>
 
-              <Flex.Item shrink>
+              <Flex.Item shouldShrink>
                 <Flex as="div">
                   {(this.props.submission.state === 'graded' ||
                     this.props.submission.state === 'submitted') && (

@@ -22,7 +22,7 @@ import {array, bool} from 'prop-types'
 
 import {View} from '@instructure/ui-view'
 
-import HomeroomAnnouncement from './HomeroomAnnouncement'
+import K5Announcement from '@canvas/k5/react/K5Announcement'
 import EmptyHomeroomAnnouncement from './EmptyHomeroomAnnouncement'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 
@@ -57,7 +57,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
               if (homeroom.announcement) {
                 return (
                   <View key={homeroom.courseId}>
-                    <HomeroomAnnouncement
+                    <K5Announcement
                       courseName={homeroom.courseName}
                       courseUrl={homeroom.courseUrl}
                       canEdit={homeroom.canEdit}
@@ -66,6 +66,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
                       url={homeroom.announcement.url}
                       attachment={homeroom.announcement.attachment}
                       published={homeroom.published}
+                      showCourseDetails
                     />
                   </View>
                 )

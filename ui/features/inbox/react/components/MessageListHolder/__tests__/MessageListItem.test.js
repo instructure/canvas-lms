@@ -93,7 +93,7 @@ describe('MessageListItem', () => {
     const {getByText} = render(<MessageListItem {...props} />)
 
     const subjectLine = getByText('This is the subject line')
-    fireEvent.mouseDown(subjectLine)
+    fireEvent.click(subjectLine)
     expect(onOpenMock).toHaveBeenCalled()
   })
 

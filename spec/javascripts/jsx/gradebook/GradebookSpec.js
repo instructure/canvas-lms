@@ -300,23 +300,6 @@ QUnit.module('Gradebook#initialize', () => {
   })
 })
 
-QUnit.module('Gradebook', () => {
-  QUnit.module('#dataLoader', () => {
-    // TODO: remove this entire module with TALLY-831
-
-    test('is the new DataLoader when `dataloader_improvements` is true', () => {
-      // `dataloader_improvements` should default to enabled except in beta and production
-      const gradebook = createGradebook()
-      strictEqual(gradebook.dataLoader.constructor.name, 'DataLoader')
-    })
-
-    test('is the old DataLoader when `dataloader_improvements` is false', () => {
-      const gradebook = createGradebook({dataloader_improvements: false})
-      strictEqual(gradebook.dataLoader.constructor.name, 'OldDataLoader')
-    })
-  })
-})
-
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({
@@ -1731,38 +1714,6 @@ test('disables the input when submissions are not loaded', function() {
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, true, 'input is disabled')
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
-})
-
-QUnit.module('Gradebook#studentsParams', {
-  setup() {
-    this.gradebook = createGradebook()
-  }
-})
-
-test('enrollment_state includes "completed" when concluded filter is on', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: true, inactive: false})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('completed'))
-})
-
-test('enrollment_state excludes "completed" when concluded filter is off', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  notOk(this.gradebook.studentsParams().enrollment_state.includes('completed'))
-})
-
-test('enrollment_state includes "inactive" when inactive filter is on', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: true})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('inactive'))
-})
-
-test('enrollment_state excludes "inactive" when inactive filter is off', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  notOk(this.gradebook.studentsParams().enrollment_state.includes('inactive'))
-})
-
-test('enrollment_state includes "active" and "invited" by default', function() {
-  sandbox.stub(this.gradebook, 'getEnrollmentFilters').returns({concluded: false, inactive: false})
-  ok(this.gradebook.studentsParams().enrollment_state.includes('active'))
-  ok(this.gradebook.studentsParams().enrollment_state.includes('invited'))
 })
 
 QUnit.module('Gradebook#weightedGroups', {
@@ -9938,14 +9889,6 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook._updateEssentialDataLoaded()
       await waitForTick()
       strictEqual(gradebook.finishRenderingUI.callCount, 1)
-    })
-
-    test('does not finish rendering the UI when dataloader performance improvements is disabled', async () => {
-      options.dataloader_improvements = false
-      createInitializedGradebook()
-      gradebook._updateEssentialDataLoaded()
-      await waitForTick()
-      strictEqual(gradebook.finishRenderingUI.callCount, 0)
     })
 
     test('does not finish rendering the UI when student ids are not loaded', async () => {

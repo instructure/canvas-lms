@@ -19,7 +19,7 @@
 import Header from '../Header'
 import {mockAssignmentAndSubmission, mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
@@ -44,32 +44,82 @@ it('does not render a "View Feedback" button when no submission is present', asy
   expect(queryByText('View Feedback')).not.toBeInTheDocument()
 })
 
-it('will not render LatePolicyStatusDisplay if the submission is not late', async () => {
-  const props = await mockAssignmentAndSubmission()
-  const {queryByTestId} = render(<Header {...props} />)
-  expect(queryByTestId('late-policy-container')).not.toBeInTheDocument()
-})
-
-it('will render LatePolicyStatusDisplay if the submission status is late', async () => {
+it('renders a "late" status pill if the last graded submission is late', async () => {
   const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10
+    },
     Submission: {
       ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
       submissionStatus: 'late'
     }
   })
-  const {getByTestId} = render(<Header {...props} />)
-  expect(getByTestId('late-policy-container')).toBeInTheDocument()
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByText('Late')).toBeInTheDocument()
 })
 
-it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async () => {
+it('shows the number of points deducted in the tooltip when the current grade is focused', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10
+    },
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
+      submissionStatus: 'late'
+    }
+  })
+
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  const pointsDisplay = getByText('6/10 Points')
+  fireEvent.focus(pointsDisplay)
+  expect(getByText('Late Penalty')).toBeInTheDocument()
+  expect(getByText('-4')).toBeInTheDocument()
+})
+
+it('renders a "missing" status pill if the last graded submission is missing', async () => {
   const props = await mockAssignmentAndSubmission({
     Submission: {
       ...SubmissionMocks.graded,
-      latePolicyStatus: 'late'
+      submissionStatus: 'missing'
     }
   })
-  const {getByTestId} = render(<Header {...props} />)
-  expect(getByTestId('late-policy-container')).toBeInTheDocument()
+  const {getByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(getByText('Missing')).toBeInTheDocument()
+})
+
+it('does not render a status pill if the last graded submission is not late or missing', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: SubmissionMocks.graded
+  })
+  const {queryByText} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  expect(queryByText('Late')).not.toBeInTheDocument()
+  expect(queryByText('Missing')).not.toBeInTheDocument()
 })
 
 it('shows the most recently received grade as the "canonical" score', async () => {

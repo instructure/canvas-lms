@@ -13,6 +13,7 @@ LTI stands for Learning Tools Interoperability and is a standard developed by IM
 - **Tool Consumer/Platform:** an LMS like Canvas, who consumes external content from tools. "Tool Consumer" is from earlier iterations of the standard, and has since been simplified to "Platform".
 - **Tool Provider:** External content that provides a tool. From earlier iterations of the standard, and is now discouraged in favor of "Tool".
 - **Launch:** The act of loading a tool, usually within an iframe set in a Canvas page. The main way of interacting with LTI tools. Data in this case is flowing from Canvas to the LTI tool, in the form of an HTTP POST request.
+- **Placement:** The place in the Canvas UI where an LTI link should be displayed. For example, the `course_navigation` placement indicates to Canvas that a link to the tool should be placed in the course navigation.
 
 ## Intro to Spec Versions
 

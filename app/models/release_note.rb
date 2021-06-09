@@ -202,7 +202,7 @@ class ReleaseNote
         delete_request: {
           key: {
             "PartitionKey" => "#{env[0]}_release|#{role}",
-            "RangeKey" => "#{env[1]}|#{id}"
+            "RangeKey" => "#{env[1].iso8601}|#{id}"
           }
         }
       }

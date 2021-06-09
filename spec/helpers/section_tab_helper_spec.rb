@@ -20,6 +20,50 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+shared_examples 'allow Quiz LTI placement when the correct Feature Flags are enabled' do
+  let(:available_section_tabs) do
+    SectionTabHelperSpec::AvailableSectionTabs.new(
+      context, current_user, domain_root_account, session
+    )
+  end
+
+  it 'should include Quiz LTI placement if new_quizzes_account_course_level_item_banks and quizzes_next are enabled' do
+    Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
+    allow(context).to receive(:feature_enabled?).and_call_original
+    allow(context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+
+    expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(true)
+    expect(context.feature_enabled?(:quizzes_next)).to eq(true)
+    expect(quiz_lti_tool.quiz_lti?).to eq(true)
+    expect(available_section_tabs.to_a.map do |tab|
+      tab[:id]
+    end).to include("context_external_tool_#{quiz_lti_tool.id}")
+  end
+
+  it 'should not include Quiz LTI placement if new_quizzes_account_course_level_item_banks is not enabled' do
+    allow(context).to receive(:feature_enabled?).and_call_original
+    allow(context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+
+    expect(context.feature_enabled?(:quizzes_next)).to eq(true)
+    expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(false)
+    expect(quiz_lti_tool.quiz_lti?).to eq(true)
+    expect(available_section_tabs.to_a.map do |tab|
+      tab[:id]
+    end).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+  end
+
+  it 'should not include Quiz LTI placement if next_quizzes is not enabled' do
+    Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
+
+    expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(true)
+    expect(domain_root_account.feature_enabled?(:quizzes_next)).to eq(false)
+    expect(quiz_lti_tool.quiz_lti?).to eq(true)
+    expect(available_section_tabs.to_a.map do |tab|
+      tab[:id]
+    end).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+  end
+end
+
 describe SectionTabHelper do
   class SectionTabHelperSpec
     include SectionTabHelper
@@ -30,6 +74,18 @@ describe SectionTabHelper do
     let_once(:current_user) { course.users.first }
     let_once(:domain_root_account) { LoadAccount.default_domain_root_account }
     let(:session) { user_session(current_user) }
+    let_once(:quiz_lti_tool) do
+      ContextExternalTool.create!(
+        context: domain_root_account,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'Quizzes 2',
+        tool_id: 'Quizzes 2',
+        url: 'http://www.tool.com/launch',
+        developer_key: DeveloperKey.create!,
+        root_account: domain_root_account
+      )
+    end
 
     describe '#to_a' do
       context 'when context !tabs_available' do
@@ -114,6 +170,86 @@ describe SectionTabHelper do
           it 'should not include TAB_COLLABORATIONS if new_collaborations feature flas has been disabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "off")
             expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS_NEW)
+          end
+        end
+
+        context 'the root account has an account_navigation Quiz LTI placement and @context is an Account' do
+          let_once(:context) { domain_root_account }
+
+          before do
+            tabs = [
+              {
+                :id=>"context_external_tool_#{quiz_lti_tool.id}",
+                :label=>"Quizzes 2",
+                :css_class=>"context_external_tool_#{quiz_lti_tool.id}",
+                :visibility=>nil,
+                :href=>:account_external_tool_path,
+                :external=>true,
+                :hidden=>false,
+                :args=>[context.id, quiz_lti_tool.id]
+              },
+              {
+                :id=>9,
+                :label=>"Settings",
+                :css_class=>"settings",
+                :href=>:account_settings_path
+              }
+            ]
+            allow(context).to receive(:tabs_available).and_return(tabs)
+          end
+
+          include_examples 'allow Quiz LTI placement when the correct Feature Flags are enabled'
+        end
+
+        context 'the root account has a course_navigation Quiz LTI placement and @context is a Course' do
+          let_once(:context) { course }
+
+          before do
+            course_placement = {
+              :id=>"context_external_tool_#{quiz_lti_tool.id}",
+              :label=>"Item Banks",
+              :css_class=>"context_external_tool_#{quiz_lti_tool.id}",
+              :visibility=>nil,
+              :href=>:course_external_tool_path,
+              :external=>true,
+              :hidden=>false,
+              :args=>[context.id, quiz_lti_tool.id]
+            }
+            tabs = Course.default_tabs + [course_placement]
+            allow(context).to receive(:tabs_available).and_return(tabs)
+          end
+
+          include_examples 'allow Quiz LTI placement when the correct Feature Flags are enabled'
+        end
+
+        context 'the root account has non-Quiz_LTI navigation placements' do
+          before do
+            non_quiz_lti_course_placement = {
+              :id=>"context_external_tool_0",
+              :label=>"Other LTI",
+              :css_class=>"context_external_tool_0",
+              :visibility=>nil,
+              :href=>:some_path,
+              :external=>true,
+              :hidden=>false,
+              :args=>[course.id, 0]
+            }
+            tabs = Course.default_tabs + [non_quiz_lti_course_placement]
+            allow(course).to receive(:tabs_available).and_return(tabs)
+          end
+
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, current_user, domain_root_account, session
+            )
+          end
+
+          it 'should include non-Quiz_LTI placement ignoring quizzes FFs' do
+            expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(false)
+            expect(domain_root_account.feature_enabled?(:quizzes_next)).to eq(false)
+            expect(available_section_tabs.to_a.map do |tab|
+              tab[:id]
+            end).to include("context_external_tool_0")
           end
         end
       end

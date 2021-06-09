@@ -96,6 +96,7 @@ const MoveModal = ({
       size="medium"
       overflow="scroll"
       label={I18n.t('Move "%{title}"', {title})}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Body>
         <View as="div" maxHeight="450px" height="450px" position="static">

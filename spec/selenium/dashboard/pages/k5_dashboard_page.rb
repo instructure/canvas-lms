@@ -356,6 +356,34 @@ module K5PageObject
     ".Grouping-styles__overlay"
   end
 
+  def new_grade_badge_selector
+    "[data-testid='new-grade-indicator']"
+  end
+
+  def assignment_group_totals_selector
+    "[data-testid='assignment-group-totals']"
+  end
+
+  def course_grading_period_selector
+    "[data-testid='select-course-grading-period']"
+  end
+
+  def navigation_item_selector
+    ".navitem"
+  end
+
+  def k5_tablist_selector
+    "[role='tablist']"
+  end
+
+  def important_info_link_selector
+    ".syllabus"
+  end
+
+  def important_info_content_selector
+    ".user_content"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -707,6 +735,38 @@ module K5PageObject
     f(planner_assignment_header_selector)
   end
 
+  def new_grade_badge
+    f(new_grade_badge_selector)
+  end
+
+  def assignment_group_toggle
+    f(assignment_group_toggle_selector)
+  end
+
+  def assignment_group_totals
+    ff(assignment_group_totals_selector)
+  end
+
+  def course_grading_period
+    f(course_grading_period_selector)
+  end
+
+  def navigation_items
+    ff(navigation_item_selector)
+  end
+
+  def k5_tablist
+    f(k5_tablist_selector)
+  end
+
+  def important_info_link
+    f(important_info_link_selector)
+  end
+
+  def important_info_content
+    f(important_info_content_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -840,6 +900,10 @@ module K5PageObject
 
   def click_pink_color_button
     pink_color_button.click
+  end
+
+  def click_assignment_group_toggle
+    assignment_group_toggle.click
   end
 
   #------------------------------Retrieve Text----------------------#
@@ -986,7 +1050,6 @@ module K5PageObject
 
   def feature_setup
     @account = Account.default
-    @account.enable_feature!(:canvas_for_elementary)
     toggle_k5_setting(@account)
   end
 
@@ -1087,5 +1150,10 @@ module K5PageObject
 
   def hex_value_for_color(element)
     '#' + ColorCommon.rgba_to_hex(element.style('background-color'))
+  end
+
+  def create_important_info_content(course, info_text)
+    course.syllabus_body = "<p>#{info_text}</p>"
+    course.save!
   end
 end

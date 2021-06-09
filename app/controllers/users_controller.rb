@@ -476,7 +476,6 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
-    @k5_mode = use_k5?
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -485,7 +484,6 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :K5_MODE => @k5_mode,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
@@ -508,7 +506,7 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
-    if @k5_mode
+    if k5_user?
       css_bundle :k5_dashboard
       css_bundle :dashboard_card
       js_bundle :k5_dashboard
@@ -1530,7 +1528,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled).freeze
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled).freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1548,6 +1546,9 @@ class UsersController < ApplicationController
   # @argument hide_dashcard_color_overlays [Boolean]
   #   If true, images on course cards will be presented without being tinted
   #   to match the course color.
+  #
+  # @argument comment_library_suggestions_enabled [Boolean]
+  #   If true, suggestions within the comment library will be shown.
   #
   # @example_request
   #
@@ -3005,13 +3006,5 @@ class UsersController < ApplicationController
     else
       raise "Error connecting to recaptcha #{response}"
     end
-  end
-
-  def use_k5?
-    k5_accounts = @domain_root_account.settings[:k5_accounts]
-    return false if k5_accounts.blank?
-
-    @domain_root_account.feature_enabled?(:canvas_for_elementary) &&
-      @current_user.user_account_associations.where(account_id: k5_accounts).exists?
   end
 end

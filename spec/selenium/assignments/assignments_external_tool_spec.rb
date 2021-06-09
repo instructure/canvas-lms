@@ -131,7 +131,6 @@ describe "external tool assignments" do
         tool.submission_type_selection = {:text => "link to #{tool.name} or whatever"}
         tool.save!
       end
-      Account.default.enable_feature!(:submission_type_tool_placement)
     end
 
     it "should be able to select the tool directly from the submission type drop-down" do
@@ -139,6 +138,7 @@ describe "external tool assignments" do
 
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
       button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
 

@@ -95,6 +95,8 @@ class SubmissionsController < SubmissionsBaseController
   before_action :get_course_from_section, :only => :create
   before_action :require_context
 
+  include K5Mode
+
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)

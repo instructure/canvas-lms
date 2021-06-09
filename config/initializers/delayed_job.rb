@@ -28,7 +28,8 @@ Delayed::Backend::Base.class_eval do
 
   def root_account_id
     return nil if account.nil?
-    account.root_account_id.nil? ? account.id : account.root_account_id
+
+    account.resolved_root_account_id
   end
 
   def to_log_format

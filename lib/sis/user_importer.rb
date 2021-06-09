@@ -368,7 +368,7 @@ module SIS
             end
             pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
-            if newly_active
+            if newly_active && @root_account.feature_enabled?(:self_service_user_merge)
               user_ids = ccs.map(&:user_id)
               pseudo_scope = Pseudonym.active.where(user_id: user_ids).group(:user_id)
               active_pseudo_counts = pseudo_scope.count

@@ -135,14 +135,14 @@
         </label>
         <% if announcement.start_at < Date.today %>
           <%= f.text_field :start_at,
-                           :value => announcement.start_at.strftime('%b %d, %Y %-I:%M%P'),
+                           :value => datetime_string(announcement.start_at),
                            :id => "account_notification_start_at_#{announcement.id}",
                            "aria-labelledby" => "announcement_starts_at_label",
                            :title => accessible_date_format,
                            :readonly => true %>
         <% else %>
           <%= f.text_field :start_at,
-                           :value => announcement.start_at.strftime('%b %d, %Y %-I:%M%P'),
+                           :value => datetime_string(announcement.start_at),
                            :id => "account_notification_start_at_#{announcement.id}",
                            :class => 'datetime_field',
                            "aria-labelledby" => "announcement_starts_at_label",
@@ -161,14 +161,14 @@
         </label>
         <% if announcement.end_at < Date.today %>
           <%= f.text_field :end_at,
-                           :value => announcement.end_at.strftime('%b %d, %Y %-I:%M%P'),
+                           :value => datetime_string(announcement.end_at),
                            :id => "account_notification_end_at_#{announcement.id}",
                            "aria-labelledby" => "announcement_ends_at_label",
                            :title => accessible_date_format,
                            :readonly => true %>
         <% else %>
           <%= f.text_field :end_at,
-                           :value => announcement.end_at.strftime('%b %d, %Y %-I:%M%P'),
+                           :value => datetime_string(announcement.end_at),
                            :id => "account_notification_end_at_#{announcement.id}",
                            :class => 'datetime_field',
                            "aria-labelledby" => "announcement_ends_at_label",

@@ -45,7 +45,7 @@ import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
-import ResourcesPage from './ResourcesPage'
+import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import {groupAnnouncementsByHomeroom, FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
@@ -133,7 +133,14 @@ export const K5Dashboard = ({
       },
       [cards]
     ),
-    error: useCallback(showFlashError(I18n.t('Failed to load announcements.')), []),
+    error: useCallback(err => {
+      // Don't show an error if user doesn't have permission to read announcements - this is a
+      // permission that can be set.
+      if (err?.response?.status === 401) {
+        return
+      }
+      showFlashError(I18n.t('Failed to load announcements.'))(err)
+    }, []),
     // This is a bit hacky, but we need to wait to fetch the announcements until the cards have
     // settled and there is at least 1 card because the announcements API requires context_codes.
     // Setting forceResult skips the fetch until it changes to undefined.
@@ -158,6 +165,12 @@ export const K5Dashboard = ({
     switchToToday()
   }
 
+  const dashboardHeader = (sticky, name) => (
+    <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
+      {I18n.t('Welcome, %{name}!', {name})}
+    </Heading>
+  )
+
   return (
     <View as="section">
       <K5DashboardContext.Provider
@@ -177,11 +190,12 @@ export const K5Dashboard = ({
         {currentTab && (
           <K5Tabs
             currentTab={currentTab}
-            name={display_name}
             onTabChange={handleTabChange}
             tabs={DASHBOARD_TABS}
             tabsRef={setTabsRef}
-          />
+          >
+            {sticky => dashboardHeader(sticky, display_name)}
+          </K5Tabs>
         )}
         <HomeroomPage
           cards={cards}
@@ -198,6 +212,8 @@ export const K5Dashboard = ({
             cards={cards}
             cardsSettled={cardsSettled}
             visible={currentTab === TAB_IDS.RESOURCES}
+            showStaff
+            filterToHomerooms
           />
         )}
       </K5DashboardContext.Provider>

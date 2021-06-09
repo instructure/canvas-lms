@@ -1087,4 +1087,15 @@ describe "new groups" do
       end
     end
   end
+
+  context "as a teacher without editing groups permissions" do
+    it "shouldn't allow teachers to add a group set if they don't have the permission" do
+      course_with_teacher_logged_in
+      @course.account.role_overrides.create!(permission: :manage_groups, role: teacher_role, enabled: false)
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f('.ic-Layout-contentMain')).not_to contain_css("button[title='Add Group Set']")
+    end
+  end
 end

@@ -39,6 +39,6 @@
 // Balsamiq Sans is slightly bigger than Lato Extended, which causes the
 // publish/unpublish buttons to wrap. This trims their horizontal padding
 // slightly to prevent that
-#course_status_actions button.ui-button {
-  padding: 8px 12px;
+.btn-published, .btn-unpublish {
+  padding-#{direction(right)}: 12px;
 }

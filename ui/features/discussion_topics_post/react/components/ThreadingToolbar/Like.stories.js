@@ -27,7 +27,7 @@ export default {
 }
 
 const Template = args => (
-  <ThreadingToolbar.Like isLiked likeCount={1} delimiterKey="like" {...args} />
+  <ThreadingToolbar.Like isLiked likeCount={1} delimiterKey="like" authorName="Rex" {...args} />
 )
 
 export const Liked = Template.bind({})

@@ -16,10 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validateTenant, doUpdateSettings, clearMessages} from '../lib/settingsHelper'
+import {validateTenant, doUpdateSettings} from '../lib/settingsHelper'
 import {defaultState, settingsReducer, reducerActions} from '../lib/settingsReducer'
 
-jest.mock('../lib/settingsHelper')
+jest.mock('../lib/settingsHelper', () => {
+  return {
+    ...jest.requireActual('../lib/settingsHelper'),
+    validateTenant: jest.fn(),
+    doUpdateSettings: jest.fn()
+  }
+})
 
 const flushPromises = () => new Promise(setImmediate)
 
@@ -30,6 +36,11 @@ const expectedSettings = {
 }
 
 describe('settingsReducer', () => {
+  beforeAll(() => {
+    doUpdateSettings.mockImplementation(async state => state)
+    validateTenant.mockImplementation(state => state)
+  })
+
   describe('basic state updates', () => {
     it('updates the tenant', () => {
       const result = settingsReducer(defaultState, {
@@ -53,7 +64,7 @@ describe('settingsReducer', () => {
       )
     })
 
-    it('tries to clear errorMessages', () => {
+    it('clears errorMessages', () => {
       const state = settingsReducer(defaultState, {
         type: reducerActions.removeAlerts
       })
@@ -100,25 +111,20 @@ describe('settingsReducer', () => {
   describe('updating settings', () => {
     const dispatchMock = jest.fn()
 
-    beforeEach(() => {
-      doUpdateSettings.mockImplementation(async state => state)
-      validateTenant.mockImplementation(state => state)
-    })
-
     afterEach(() => {
       dispatchMock.mockClear()
       doUpdateSettings.mockClear()
       validateTenant.mockClear()
     })
 
-    it('tries to validate the tenant and stops if there are errors', async () => {
+    it('tries to validate the tenant, stops if there are errors, and keeps the UI enabled', async () => {
       validateTenant.mockImplementationOnce(state => {
         return {
           ...state,
           tenantErrorMessages: ['error!']
         }
       })
-      settingsReducer(defaultState, {
+      const state = settingsReducer(defaultState, {
         type: reducerActions.updateSettings,
         dispatch: dispatchMock
       })
@@ -128,6 +134,7 @@ describe('settingsReducer', () => {
       expect(validateTenant).toHaveBeenCalledTimes(1)
       expect(doUpdateSettings).toHaveBeenCalledTimes(0)
       expect(dispatchMock).toHaveBeenCalledTimes(0)
+      expect(state.uiEnabled).toBeTruthy()
     })
 
     it('tries to update settings and indicates success', async () => {
@@ -215,10 +222,33 @@ describe('settingsReducer', () => {
         expect(dispatchMock).toHaveBeenCalledTimes(1)
         expect(dispatchMock).toHaveBeenLastCalledWith({type: reducerActions.toggleError})
       })
+
+      it('disables the UI while trying to update or toggle sync', () => {
+        for (const type of [reducerActions.updateSettings, reducerActions.toggleSync]) {
+          const {uiEnabled} = settingsReducer(defaultState, {
+            type
+          })
+
+          expect(uiEnabled).toBeFalsy()
+        }
+      })
     })
   })
 
-  describe('update and toggle failures', () => {
+  describe('update and toggle callbacks', () => {
+    it('reenables the UI after success or failure', () => {
+      for (const type of [
+        reducerActions.updateSuccess,
+        reducerActions.updateError,
+        reducerActions.toggleError
+      ]) {
+        const {uiEnabled} = settingsReducer(defaultState, {
+          type
+        })
+        expect(uiEnabled).toBeTruthy()
+      }
+    })
+
     it('adds a success message on success', () => {
       const result = settingsReducer(defaultState, {
         type: reducerActions.updateSuccess

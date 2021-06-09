@@ -184,6 +184,20 @@ describe('Criterion', () => {
       ])
     })
 
+    it('can be selected and deselected', () => {
+      const onAssessmentChange = sinon.spy()
+      const el = points({criterion, onAssessmentChange})
+      const onPointChange = el.find('Points').prop('onPointChange')
+
+      onPointChange({points: '10', description: 'good', id: '1'}, false)
+      onPointChange({points: '10', description: 'good', id: '1'}, true)
+
+      expect(onAssessmentChange.args).toEqual([
+        [{description: 'good', id: '1', points: {text: '10', valid: true, value: 10}}],
+        [{points: {text: '', valid: true}}]
+      ])
+    })
+
     it('are hidden when hidePoints is true', () => {
       expect(points({criterion, hidePoints: true})).toHaveLength(0)
     })

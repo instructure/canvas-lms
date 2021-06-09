@@ -35,7 +35,6 @@ namespace :css do
     rescue => e
       puts "WARN: failed to load rails environment before compiling: #{e}"
     end
-    require 'config/initializers/plugin_symlinks'
     require 'config/initializers/revved_asset_urls'
     require 'lib/brandable_css'
     puts "--> Starting: 'css:compile'"

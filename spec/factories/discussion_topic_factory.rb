@@ -101,6 +101,7 @@ module Factories
   end
 
   def graded_discussion_topic(opts = {})
+    @context = opts[:context] || @context || course_factory(active_all: true)
     @topic = discussion_topic_model(opts)
     @assignment = @topic.context.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
     @assignment.infer_times

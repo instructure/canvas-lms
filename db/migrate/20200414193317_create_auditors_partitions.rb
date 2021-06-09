@@ -33,7 +33,7 @@ class CreateAuditorsPartitions < ActiveRecord::Migration[5.2]
       Auditors::ActiveRecord::Partitioner.retention_months.times do
         # we're going to backfill these from cassandra, so let's create them now
         current_partition_time -= 1.send(auditor_cls.partitioning_interval)
-        partman.create_partition(current_partition_time)
+        partman.create_partition(current_partition_time, graceful: true)
       end
     end
   end

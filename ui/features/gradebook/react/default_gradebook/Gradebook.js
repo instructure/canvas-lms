@@ -449,16 +449,11 @@ class Gradebook {
     this.courseSettings = new CourseSettings(this, {
       allowFinalGradeOverride: this.options.course_settings.allow_final_grade_override
     })
-    // TODO: remove conditional and OldDataLoader with TALLY-831
-    if (this.options.dataloader_improvements) {
-      this.dataLoader = new DataLoader({
-        gradebook: this,
-        performanceControls: new PerformanceControls(camelize(this.options.performance_controls)),
-        loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
-      })
-    } else {
-      this.dataLoader = new OldDataLoader(this)
-    }
+    this.dataLoader = new DataLoader({
+      gradebook: this,
+      performanceControls: new PerformanceControls(camelize(this.options.performance_controls)),
+      loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
+    })
     this.gridData = {
       columns: {
         definitions: {},
@@ -2952,20 +2947,6 @@ class Gradebook {
     return !this.isFilteringColumnsByGradingPeriod()
   }
 
-  // TODO: remove this method with TALLY-831
-  studentsParams() {
-    const enrollmentStates = ['invited', 'active']
-    if (this.getEnrollmentFilters().concluded) {
-      enrollmentStates.push('completed')
-    }
-    if (this.getEnrollmentFilters().inactive) {
-      enrollmentStates.push('inactive')
-    }
-    return {
-      enrollment_state: enrollmentStates
-    }
-  }
-
   getCustomColumnId(customColumnId) {
     return `custom_col_${customColumnId}`
   }
@@ -4337,10 +4318,6 @@ class Gradebook {
   }
 
   _updateEssentialDataLoaded() {
-    // TODO: remove this early return with TALLY-831
-    if (!this.options.dataloader_improvements) {
-      return
-    }
     if (
       this.contentLoadStates.studentIdsLoaded &&
       this.contentLoadStates.contextModulesLoaded &&

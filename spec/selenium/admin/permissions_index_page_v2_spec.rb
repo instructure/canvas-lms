@@ -187,10 +187,21 @@ describe "permissions index" do
       expect(f('#content')).not_to contain_css(PermissionsIndex.role_link_css("Teacher"))
     end
 
-    it "search by permission name works correctly ()" do
-      PermissionsIndex.enter_search("Manage Pages")
-      expect(PermissionsIndex.permission_link("manage_wiki")).to be_displayed
-      expect(f('#content')).not_to contain_css("#permission_manage_interaction_alerts")
+    it 'search by permission name works correctly' do
+      PermissionsIndex.enter_search('Manage Pages')
+      expect(PermissionsIndex.permission_link('manage_wiki')).to be_displayed
+      expect(f('#content')).not_to contain_css('#permission_manage_interaction_alerts')
+    end
+
+    it 'search by permission filters according to course / account context type' do
+      PermissionsIndex.enter_search('SIS Data')
+      expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become 1
+      PermissionsIndex.choose_tab('account')
+      wait_for_ajaximations
+      PermissionsIndex.enter_search('SIS Data')
+      expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become 3
+      PermissionsIndex.enter_search('')
+      expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become > 3
     end
   end
 end

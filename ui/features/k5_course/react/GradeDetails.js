@@ -70,6 +70,8 @@ const GradeDetails = ({
       [selectedGradingPeriodId]
     ),
     error: setError,
+    // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
+    forceResult: loadingGradingPeriods ? [] : undefined,
     fetchAllPages: true,
     params: {
       include: ['assignments', 'submission', 'read_state'],
@@ -87,6 +89,8 @@ const GradeDetails = ({
       [currentUser]
     ),
     error: setError,
+    // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
+    forceResult: loadingGradingPeriods ? [] : undefined,
     params: {
       user_id: currentUser.id,
       ...gradingPeriodParam
@@ -145,7 +149,12 @@ const GradeDetails = ({
               summary={I18n.t('View Assignment Group Totals')}
             >
               {assignmentGroupTotals.map(group => (
-                <Text as="div" margin="small 0" key={group.id}>
+                <Text
+                  data-testid="assignment-group-totals"
+                  as="div"
+                  margin="small 0"
+                  key={group.id}
+                >
                   {I18n.t('%{groupName}: %{score}', {groupName: group.name, score: group.score})}
                 </Text>
               ))}

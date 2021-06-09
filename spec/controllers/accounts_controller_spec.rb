@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe AccountsController do
+  include K5Common
+
   def account_with_admin_logged_in(opts = {})
     account_with_admin(opts)
     user_session(@admin)
@@ -235,13 +238,8 @@ describe AccountsController do
       user_to_remove = account_admin_user(account: a1)
       au_id = user_to_remove.account_users.first.id
       account_with_admin_logged_in(account: a2)
-      begin
-        post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
-        # rails3 returns 404 status
-        expect(response).to be_not_found
-      rescue ActiveRecord::RecordNotFound
-        # rails2 passes the exception through here
-      end
+      post 'remove_account_user', params: {:account_id => a2.id, :id => au_id}
+      expect(response).to be_not_found
       expect(AccountUser.where(id: au_id).first).not_to be_nil
     end
   end
@@ -581,11 +579,19 @@ describe AccountsController do
         end
 
         it "contains nothing once disabled" do
-          @root_account.settings[:k5_accounts] = [@root_account.id]
-          @root_account.save!
+          toggle_k5_setting(@root_account)
           post 'update', params: toggle_k5_params(@root_account.id, false)
           @root_account.reload
           expect(@root_account.settings[:k5_accounts]).to be_empty
+        end
+
+        it "is not changed unless enable_as_k5_account is modified" do
+          @root_account.settings[:k5_accounts] = [@root_account.id] # in reality this wouldn't ever contain the account if enable_as_k5_account is off
+          @root_account.save!
+          post 'update', params: toggle_k5_params(@root_account.id, false) # already set to false, so shouldn't touch k5_accounts
+          @root_account.reload
+          expect(@root_account.settings[:k5_accounts][0]).to be @root_account.id
+          expect(@root_account.settings[:k5_accounts].length).to be 1
         end
       end
     end
@@ -905,6 +911,13 @@ describe AccountsController do
           BASE_URL: 'https://login.microsoftonline.com'
         )
       end
+    end
+
+    it "should not be accessible to teachers" do
+      course_with_teacher
+      user_session(@teacher)
+      get 'settings', params: {account_id: @course.root_account.id}
+      expect(response).to be_unauthorized
     end
 
     it "should load account report details" do

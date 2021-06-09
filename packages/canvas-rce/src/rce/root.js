@@ -31,28 +31,33 @@ if (!process?.env?.BUILD_LOCALE) {
 }
 
 export function renderIntoDiv(target, props, renderCallback) {
-  import('./tinyRCE').then(module => {
-    const tinyRCE = module.default
+  import('./tinyRCE')
+    .then(module => {
+      const tinyRCE = module.default
 
-    // normalize props
-    props = normalizeProps(props, tinyRCE)
+      // normalize props
+      props = normalizeProps(props, tinyRCE)
 
-    formatMessage.setup({locale: props.language})
-    // render the editor to the target element
-    const renderedComponent = createRef()
-    render(
-      <RCEWrapper
-        ref={renderedComponent}
-        {...props}
-        handleUnmount={() => unmountComponentAtNode(target)}
-      />,
-      target,
-      () => {
-        // pass it back
-        renderCallback && renderCallback(renderedComponent.current)
-      }
-    )
-  })
+      formatMessage.setup({locale: props.language})
+      // render the editor to the target element
+      const renderedComponent = createRef()
+      render(
+        <RCEWrapper
+          ref={renderedComponent}
+          {...props}
+          handleUnmount={() => unmountComponentAtNode(target)}
+        />,
+        target,
+        () => {
+          // pass it back
+          renderCallback && renderCallback(renderedComponent.current)
+        }
+      )
+    })
+    .catch(err => {
+      // eslint-disable-next-line no-console
+      console.error('Failed loading RCE', err)
+    })
 }
 
 // Adding this event listener fixes LA-212. I have no idea why. In Safari it

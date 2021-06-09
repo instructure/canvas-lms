@@ -74,8 +74,7 @@ var pathRegex = new RegExp(
     '|ui/features/screenreader_gradebook/jst' +
     '|packages/[^/]+/src/jst' +
     '|gems/plugins/[^/]+/app/views/jst' +
-  ')' +
-  '(/plugins/[^/]+)?/' // remove plugins bit once we drop requirejs/handlebars_tasks/plugin symlinks
+  ')'
 )
 
 ScopedHbsExtractor.prototype.normalizePath = function(path) {

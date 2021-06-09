@@ -1,9 +1,9 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_entry.discussion_topic_id, anchor: "entry-#{asset.discussion_entry_id}") %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "You have been mentioned in %{discussion_topic}: %{course}", discussion_topic: asset.title, course: asset.context.name %>
+  <%= t :subject, "You have been mentioned in %{discussion_topic}: %{course}", discussion_topic: asset.discussion_entry.title, course: asset.context.name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -12,7 +12,7 @@
   </a>
 <% end %>
 
-<%= t :body, "%{user} mentioned you in a new comment on the thread %{discussion_topic} for %{course}:", user: asset.user.short_name, discussion_topic: asset.title, course: asset.context.name %>
+<%= t :body, "%{user} mentioned you in a new comment on the thread %{discussion_topic} for %{course}:", user: asset.discussion_entry.user.short_name, discussion_topic: asset.discussion_entry.title, course: asset.context.name %>
 
 <p>
 <%= html_to_simple_html(asset.message, base_url: dashboard_url) %>

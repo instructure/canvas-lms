@@ -38,6 +38,14 @@ describe('PostMessage', () => {
     expect(queryByText('Thoughts')).toBeTruthy()
   })
 
+  it('displays the title h1', () => {
+    const {queryByText} = setup()
+    const screenReaderText = queryByText('Discussion Topic: Thoughts')
+
+    expect(screenReaderText).toBeTruthy()
+    expect(screenReaderText.parentElement.tagName).toBe('H1')
+  })
+
   it('displays the message', () => {
     const {queryByText} = setup()
     expect(queryByText('Posts are fun')).toBeTruthy()
@@ -69,13 +77,21 @@ describe('PostMessage', () => {
       expect(queryByText('Author Name')).toBeTruthy()
       expect(queryByText('Timing Display')).toBeTruthy()
       expect(queryByText(', last reply Apr 12 2:35pm')).toBeTruthy()
-      expect(queryByTestId('post-pill')).toBeFalsy()
+      expect(queryByTestId('pill-container')).toBeFalsy()
     })
 
     it('renders the correct pill if provided', () => {
-      const {queryByText, queryByTestId} = setup({pillText: 'pill text'})
-      expect(queryByTestId('post-pill')).toBeTruthy()
-      expect(queryByText('pill text')).toBeTruthy()
+      const {queryByText, queryByTestId} = setup({discussionRoles: ['Author']})
+      expect(queryByTestId('pill-container')).toBeTruthy()
+      expect(queryByText('Author')).toBeTruthy()
+    })
+
+    it('renders all default pills if provided', () => {
+      const {queryByText, queryByTestId} = setup({
+        discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment']
+      })
+      expect(queryByTestId('pill-container')).toBeTruthy()
+      expect(queryByText('Author') && queryByText('Teacher') && queryByText('TA')).toBeTruthy()
     })
   })
 })

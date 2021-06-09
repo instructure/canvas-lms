@@ -23,18 +23,11 @@ import {Pill} from '@instructure/ui-pill'
 
 export default function SubmissionStatusPill(props) {
   if (props.excused) {
-    return <Pill data-test-id="excused-pill" text={I18n.t('Excused')} margin="x-small 0 0 0" />
+    return <Pill data-test-id="excused-pill" text={I18n.t('Excused')} />
   } else if (props.submissionStatus === 'missing') {
-    return (
-      <Pill
-        data-test-id="missing-pill"
-        variant="danger"
-        text={I18n.t('Missing')}
-        margin="x-small 0 0 0"
-      />
-    )
+    return <Pill data-test-id="missing-pill" variant="danger" text={I18n.t('Missing')} />
   } else if (props.submissionStatus === 'late') {
-    return <Pill data-test-id="late-pill" text={I18n.t('Late')} margin="x-small 0 0 0" />
+    return <Pill data-test-id="late-pill" text={I18n.t('Late')} />
   } else {
     return null
   }

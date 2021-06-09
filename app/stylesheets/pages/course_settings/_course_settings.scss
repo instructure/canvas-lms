@@ -203,7 +203,6 @@ ul.user_list div.enrollment_type.pending {
 
 .nav_list {
   @include reset-list;
-  border-top: 1px solid $section_tabs_border_top_color;
   width: 400px;
   max-width: calc(100vw - 22px);
   margin: 20px 0;
@@ -235,14 +234,13 @@ ul.user_list div.enrollment_type.pending {
       display: none;
     }
   }
-}
-
-#nav_disabled_list {
-  border-top: 0;
   li.disabled {
     padding: direction-sides(4px 0 4px 0px);
     border-bottom: 1px solid $section_tabs_border_top_color;
   }
+}
+
+#nav_disabled_list {
   li.navitem {
     color: $section_tabs_to_be_hidden_color;
     .disabled_message {

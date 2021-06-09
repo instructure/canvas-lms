@@ -187,4 +187,24 @@ describe MicrosoftSync::Group do
       expect(syncer_job.steps_object.group).to eq(subject)
     end
   end
+
+  describe '#enqueue_future_sync' do
+    let(:delay_double) { double(:delay) }
+    let(:syncer_job) { double(:syncer_job) }
+
+    it 'enqueues a debounced (singleton and on_conflict=overwrite) job' do
+      Timecop.freeze do
+        expect(subject).to receive(:syncer_job).and_return(syncer_job)
+        expect(syncer_job).to receive(:delay).with(
+          singleton: "#{described_class.name}:#{subject.global_id}:enqueue_future_sync",
+          run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', 10)
+                  .to_i.minutes.from_now,
+          on_conflict: :overwrite
+        ).and_return(delay_double)
+        expect(delay_double).to receive(:run_later).with(no_args)
+
+        subject.enqueue_future_sync
+      end
+    end
+  end
 end

@@ -645,6 +645,7 @@ class DiscussionTopicsController < ApplicationController
       js_env({
                course_id: params[:course_id],
                discussion_topic_id: params[:id],
+               manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
              })
       js_bundle :discussion_topics_post

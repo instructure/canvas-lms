@@ -105,6 +105,11 @@ duplicate_modules:
   description: Allows the duplicating of modules in Canvas
   applies_to: Account
   root_opt_in: true
+embedded_release_notes:
+  state: allowed_on
+  display_name: Embedded Release Notes
+  description: Shows Instructure-provided release notes in the help menu for all users (filtered by user role)
+  applies_to: Account
 encrypted_sourcedids:
   state: allowed
   display_name: Encrypted Sourcedids for Basic Outcomes
@@ -359,6 +364,11 @@ rubric_criterion_range:
     rating.
   applies_to: RootAccount
   root_opt_in: true
+self_service_user_merge:
+  state: allowed_on
+  applies_to: RootAccount
+  display_name: Self Service User Merge
+  description: Allows users to merge multiple accounts together (given proper credentials).
 slack_notifications:
   state: hidden
   display_name: Slack Notifications
@@ -372,12 +382,6 @@ strip_origin_from_quiz_answer_file_references:
     This was already happening for images in the question, but not answers
     causing CORS failures when a quiz is created in one domain and
     taken in another (like a vanity domain).
-student_context_cards:
-  state: allowed
-  display_name: Student Context Card
-  description: Enable student context card links
-  applies_to: RootAccount
-  root_opt_in: true
 student_outcome_gradebook:
   state: allowed
   display_name:

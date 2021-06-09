@@ -47,6 +47,8 @@ ready(() => {
         showStudentView={ENV.COURSE.show_student_view}
         studentViewPath={ENV.COURSE.student_view_path}
         tabs={ENV.TABS}
+        settingsPath={ENV.COURSE.settings_path}
+        latestAnnouncement={ENV.COURSE.latest_announcement}
       />,
       courseContainer
     )

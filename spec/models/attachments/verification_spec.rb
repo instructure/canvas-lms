@@ -77,6 +77,15 @@ describe Attachments::Verification do
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
     end
 
+    it "accepts the uuid of another copy of the file" do
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.related_verifier_success").twice
+      clone = attachment.clone_for(course_factory)
+      clone.save!
+      v2 = Attachments::Verification.new(clone)
+      expect(v2.valid_verifier_for_permission?(attachment.uuid, :read)).to eq true
+      expect(v2.valid_verifier_for_permission?(attachment.uuid, :download)).to eq true
+    end
+
     it "should return false on an expired verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::TokenExpired)
       expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_expired")

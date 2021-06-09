@@ -209,9 +209,9 @@ const Ratings = props => {
     }
   }
 
-  const handleClick = tier => {
-    onPointChange(tier)
-    $.screenReaderFlashMessage(I18n.t('Rating selected'))
+  const handleClick = (tier, selected) => {
+    onPointChange(tier, selected)
+    $.screenReaderFlashMessage(selected ? I18n.t('Rating selected') : I18n.t('Rating unselected'))
   }
 
   const selectedIndex = points !== undefined ? currentIndex() : null
@@ -241,7 +241,7 @@ const Ratings = props => {
             classes={classes}
             endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
             footer={isSummary ? footer : null}
-            onClick={() => handleClick(tier)}
+            onClick={() => handleClick(tier, selected)}
             shaderClass={getShaderClass(selected)}
             tierColor={getTierColor(selected)}
             hidePoints={isSummary || hidePoints}

@@ -236,7 +236,12 @@ export const useFindOutcomeModal = open => {
     setRootId,
     rootId
   } = useTreeBrowser()
-  const [searchString, updateSearch, clearSearch] = useSearch()
+  const {
+    search: searchString,
+    debouncedSearch: debouncedSearchString,
+    onChangeHandler: updateSearch,
+    onClearHandler: clearSearch
+  } = useSearch()
 
   const toggleGroupId = props => {
     if (props?.id !== selectedGroupId) clearSearch()
@@ -323,6 +328,7 @@ export const useFindOutcomeModal = open => {
     toggleGroupId,
     rootId,
     searchString,
+    debouncedSearchString,
     updateSearch,
     clearSearch
   }

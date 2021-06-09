@@ -207,7 +207,7 @@ class AccountNotification < ActiveRecord::Base
             preload({:account => :root_account}, account_notification_roles: :role)
           if Shard.current == root_account.shard
             if slice_account_ids != [root_account.id]
-              scope = scope.joins(:account).where("domain_specific=? OR COALESCE(accounts.root_account_id, accounts.id)=?", false, root_account.id)
+              scope = scope.joins(:account).where("domain_specific=? OR #{Account.resolved_root_account_id_sql}=?", false, root_account.id)
             end
           else
             scope = scope.where(domain_specific: false)

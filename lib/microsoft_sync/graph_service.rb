@@ -24,8 +24,8 @@
 # a new client with `GraphService.new(tenant_name)`
 #
 # This class is a lower-level interface, akin to what a Microsoft API gem which
-# provide, which has no knowledge of Canvas models, so should be mainly used
-# via CanvasGraphService, which does.
+# provide, which has no knowledge of Canvas models. So many operations will be
+# used via GraphServiceHelpers, which does have knowledge of Canvas models.
 #
 module MicrosoftSync
   class GraphService
@@ -39,6 +39,18 @@ module MicrosoftSync
     end
 
     class BatchRequestFailed < StandardError; end
+    class BatchRequestThrottled < StandardError
+      include Errors::Throttled
+
+      def initialize(msg, responses)
+        super(msg)
+
+        @retry_after_seconds = responses.map do |resp|
+          headers = resp['headers']&.transform_keys(&:downcase) || {}
+          headers['retry-after'].presence&.to_f
+        end.compact.max
+      end
+    end
 
     attr_reader :tenant
 
@@ -105,7 +117,7 @@ module MicrosoftSync
       reqs =
         group_remove_user_requests(group_id, members, 'members') +
         group_remove_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch(reqs) do |resp|
+      failed_req_ids = run_batch('group_remove_users', reqs) do |resp|
         (
           resp['status'] == 404 && resp['body'].to_s =~
             /does not exist or one of its queried reference-property objects are not present/i
@@ -124,7 +136,7 @@ module MicrosoftSync
       reqs =
         group_add_user_requests(group_id, members, 'members') +
         group_add_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch(reqs) do |r|
+      failed_req_ids = run_batch('group_add_users', reqs) do |r|
         r['status'] == 400 && r['body'].to_s =~ /One or more added object references already exist/i
       end
       split_request_ids_to_hash(failed_req_ids)
@@ -137,7 +149,7 @@ module MicrosoftSync
 
       nil
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response_body =~ /One or more added object references already exist/i
+      raise unless e.response.body =~ /One or more added object references already exist/i
 
       add_users_to_group_via_batch(group_id, members, owners)
     end
@@ -163,11 +175,11 @@ module MicrosoftSync
       }
       request(:post, 'teams', body: body)
     rescue MicrosoftSync::Errors::HTTPBadRequest => e
-      raise unless e.response_body =~ /must have one or more owners in order to create a Team/i
+      raise unless e.response.body =~ /must have one or more owners in order to create a Team/i
 
       raise MicrosoftSync::Errors::GroupHasNoOwners
     rescue MicrosoftSync::Errors::HTTPConflict => e
-      raise unless e.response_body =~ /group is already provisioned/i
+      raise unless e.response.body =~ /group is already provisioned/i
 
       raise MicrosoftSync::Errors::TeamAlreadyExists
     end
@@ -260,10 +272,11 @@ module MicrosoftSync
     end
 
     # Builds a query string (hash) from options used by get or list endpoints
-    def expand_options(filter: {}, select: [])
+    def expand_options(filter: {}, select: [], top: nil)
       {}.tap do |query|
         query['$filter'] = filter_clause(filter) unless filter.empty?
         query['$select'] = select.join(',') unless select.empty?
+        query['$top'] = top if top
       end
     end
 
@@ -293,31 +306,63 @@ module MicrosoftSync
       end
     end
 
+    # Returns a hash with possible keys (:ignored, :throttled, :success:, :error) and values
+    # being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
+    def group_batch_subresponses_by_type(responses, &response_should_be_ignored)
+      responses.group_by do |subresponse|
+        if response_should_be_ignored[subresponse]
+          :ignored
+        elsif subresponse['status'] == 429
+          :throttled
+        elsif (200..299).cover?(subresponse['status'])
+          :success
+        else
+          :error
+        end
+      end
+    end
+
+    def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
+      responses_grouped_by_type.each do |type, responses|
+        responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
+          tags = {msft_endpoint: endpoint_name, status: code}
+          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+        end
+      end
+    end
+
     # Uses Microsoft API's JSON batching to run requests in parallel with one
     # HTTP request. Expected failures can be ignored by passing in a block which checks
     # the response. Other non-2xx responses cause a BatchRequestFailed error.
     # Returns a list of ids of the requests that were ignored.
-    def run_batch(requests, &response_should_be_ignored)
-      ignored_request_ids = []
-      failed = []
+    def run_batch(endpoint_name, requests, &response_should_be_ignored)
+      Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
 
-      response = request(:post, '$batch', body: { requests: requests })
-      response['responses'].each do |subresponse|
-        if response_should_be_ignored[subresponse]
-          ignored_request_ids << subresponse['id']
-        elsif subresponse['status'] < 200 || subresponse['status'] >= 300
-          failed << subresponse
+      response =
+        begin
+          request(:post, '$batch', body: { requests: requests })
+        rescue Errors::HTTPFailedDependency => e
+          # The main request may return a 424 if any subrequests fail (esp. if throttled).
+          # Regardless, we handle subrequests failures below.
+          e.response.parsed_response
         end
-      end
 
-      if failed.any?
+      grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
+
+      increment_batch_statsd_counters(endpoint_name, grouped)
+
+      failed = (grouped[:error] || []) + (grouped[:throttled] || [])
+      if failed.present?
         codes = failed.map{|resp| resp['status']}
         bodies = failed.map{|resp| resp['body'].to_s.truncate(500)}
         msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
+
+        raise BatchRequestThrottled.new(msg, grouped[:throttled]) if grouped[:throttled]
+
         raise BatchRequestFailed, msg
       end
 
-      ignored_request_ids
+      grouped[:ignored]&.map{|r| r['id']} || []
     end
 
     # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]

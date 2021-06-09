@@ -31,6 +31,7 @@ import {
   getAssignmentGrades,
   getAccountsFromEnrollments,
   getTotalGradeStringFromEnrollments,
+  fetchImportantInfos,
   parseAnnouncementDetails,
   groupAnnouncementsByHomeroom
 } from '../utils'
@@ -44,6 +45,7 @@ const USERS_URL =
 const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_test'
 const CONVERSATIONS_URL = '/api/v1/conversations'
 const NEW_COURSE_URL = '/api/v1/accounts/15/courses?course[name]=Science&enroll_me=true'
+const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
 afterEach(() => {
   fetchMock.restore()
@@ -535,6 +537,47 @@ describe('getTotalGradeStringFromEnrollments', () => {
       }
     ]
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('2.00%')
+  })
+})
+
+describe('fetchImportantInfos', () => {
+  it('returns syllabus objects for each homeroom course', async () => {
+    fetchMock.get(getSyllabusUrl('32'), {syllabus_body: 'Hello!'})
+    fetchMock.get(getSyllabusUrl('35'), {syllabus_body: 'Welcome'})
+    const response = await fetchImportantInfos([
+      {
+        id: '32',
+        shortName: 'Course 1',
+        canManage: true
+      },
+      {
+        id: '35',
+        shortName: 'Course 2',
+        canManage: false
+      }
+    ])
+
+    expect(response[0].courseId).toBe('32')
+    expect(response[0].courseName).toBe('Course 1')
+    expect(response[0].canEdit).toBe(true)
+    expect(response[0].content).toBe('Hello!')
+
+    expect(response[1].courseId).toBe('35')
+    expect(response[1].courseName).toBe('Course 2')
+    expect(response[1].canEdit).toBe(false)
+    expect(response[1].content).toBe('Welcome')
+  })
+
+  it("doesn't return data for homerooms with no syllabus content", async () => {
+    fetchMock.get(getSyllabusUrl('32'), {syllabus_body: null})
+    const response = await fetchImportantInfos([
+      {
+        id: '32',
+        shortName: 'Course 1',
+        canManage: true
+      }
+    ])
+    expect(response.length).toBe(0)
   })
 })
 

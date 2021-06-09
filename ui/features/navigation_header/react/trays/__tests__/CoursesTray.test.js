@@ -43,6 +43,7 @@ describe('CoursesTray', () => {
     return {
       courses,
       hasLoaded: true,
+      k5User: false,
       ...overrides
     }
   }
@@ -107,5 +108,12 @@ describe('CoursesTray', () => {
       expect(queryByText('Published Courses')).not.toBeInTheDocument()
       expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
     })
+  })
+
+  it('changes `Courses` to `Subjects` if k5User is set', () => {
+    const {getByText, queryByText} = render(<CoursesTray {...makeProps({k5User: true})} />)
+    expect(getByText('Subjects')).toBeInTheDocument()
+    expect(getByText('All Subjects')).toBeInTheDocument()
+    expect(queryByText('Courses')).not.toBeInTheDocument()
   })
 })

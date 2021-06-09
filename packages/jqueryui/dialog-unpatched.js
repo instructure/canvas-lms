@@ -120,6 +120,8 @@ $.widget("ui.dialog", {
 				.show()
 				.removeAttr( "title" )
 				.addClass( "ui-dialog-content ui-widget-content" )
+				// INSTRUCTURE: allow it to scroll horizontally using kc_{left,right}
+				.attr("tabIndex", "0")
 				.appendTo( uiDialog ),
 
 			uiDialogTitlebar = ( this.uiDialogTitlebar = $( "<div>" ) )

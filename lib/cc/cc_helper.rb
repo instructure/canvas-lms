@@ -154,20 +154,28 @@ module CCHelper
     [title, body]
   end
 
-  SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/
-  WEB_CONTENT_REFERENCE_REGEX = Regexp.union(Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
-    Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN))))
+  SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
+  WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
+    Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
+    Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN)))
+  )
 
   def self.map_linked_objects(content)
     linked_objects = []
-    html = Nokogiri::HTML5.fragment(content)
-    html.css('a, img').each do |atag|
-      source = atag['href'] || atag['src']
+    doc = Nokogiri::XML.fragment(content)
+    doc.css('a, img', 'iframe').each do |node|
+      source = node['href'] || node['src']
       next unless source =~ SPECIAL_REFERENCE_REGEX
+
       if source =~ WEB_CONTENT_REFERENCE_REGEX
         attachment_key = source.sub(WEB_CONTENT_REFERENCE_REGEX, '')
-        attachment_key = attachment_key.split('?').first
-        attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+        if node['data-media-type']
+          attachment_key = attachment_key.split('?').second
+          attachment_key = "/" + CGI.unescape(attachment_key.split('/').second)
+        else
+          attachment_key = attachment_key.split('?').first
+          attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+        end
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
         type, object_key = source.split('/').last 2

@@ -55,6 +55,7 @@ const GradingPeriodSelect = ({
   ) : (
     <View as="div" margin="medium 0">
       <SimpleSelect
+        data-testid="select-course-grading-period"
         renderLabel={<ScreenReaderContent>{I18n.t('Select Grading Period')}</ScreenReaderContent>}
         assistiveText={I18n.t('Use arrow keys to navigate options.')}
         isInline

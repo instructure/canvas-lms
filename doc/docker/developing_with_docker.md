@@ -14,8 +14,7 @@ The easiest way to get a working development environment is to run:
 ./script/docker_dev_setup.sh
 ```
 
-This will guide you through the process of installing docker, dinghy/dory,
-building the docker images, and setting up Canvas.
+This will guide you through the process of building the docker images and setting up Canvas.
 
 If you would rather do things manually, read on! And be sure to check the [Troubleshooting](#Troubleshooting) section below.
 

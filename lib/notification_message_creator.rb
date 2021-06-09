@@ -365,7 +365,6 @@ class NotificationMessageCreator
       end_partition = Message.infer_partition_table_name('created_at' => end_time)
       if first_partition == start_partition &&
         start_partition == end_partition
-        Message.infer_partition_table_name('created_at' => end_time)
         scope = scope.where(created_at: start_time..end_time)
         break_this_loop = true
       elsif start_time == first_start_time
@@ -375,7 +374,7 @@ class NotificationMessageCreator
         break_this_loop = true
       # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled')
+      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
       start_time = end_time

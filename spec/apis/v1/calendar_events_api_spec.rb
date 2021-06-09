@@ -2741,6 +2741,29 @@ describe CalendarEventsApiController, type: :request do
       end
       expect(context).not_to be_nil
     end
+
+    it 'excludes concluded courses' do
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+      context = json['contexts'].find do |c|
+        c['id'] == @course.id.to_s
+      end
+      expect(context).to be_present
+
+      @course.complete!
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+      context = json['contexts'].find do |c|
+        c['id'] == @course.id.to_s
+      end
+      expect(context).not_to be_present
+    end
   end
 
   describe '#set_course_timetable' do

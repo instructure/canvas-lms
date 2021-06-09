@@ -28,14 +28,7 @@ export default {
   argTypes: {}
 }
 
-const Template = args => (
-  <Alert
-    contextDisplayText="Section 2"
-    pointsPossible="5"
-    dueAtDisplayText="Jan 26 11:49pm"
-    {...args}
-  />
-)
+const Template = args => <Alert pointsPossible="5" dueAtDisplayText="Jan 26 11:49pm" {...args} />
 
 export const Default = Template.bind({})
 Default.args = {}

@@ -38,7 +38,7 @@ module Users
 
     describe "#dispatch!" do
       let(:user){ double() }
-      let(:pseudonym) { double() }
+      let(:pseudonym) { double(account: Account.default) }
       let(:channel){ double() }
 
       context "for self_registration" do
@@ -74,7 +74,8 @@ module Users
       end
 
       context "when the user is registered" do
-        before{ allow(user).to receive_messages(registered?: true) }
+        before { allow(user).to receive_messages(registered?: true) }
+
         let(:policy){ CreationNotifyPolicy.new(true, {}) }
 
         it "sends the merge notification if there are merge candidates" do
@@ -86,10 +87,19 @@ module Users
 
         it "does nothing without merge candidates" do
           allow(channel).to receive_messages(has_merge_candidates?: false)
-          expect(channel).to receive(:send_merge_notification!).never
+          expect(channel).not_to receive(:send_merge_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end
+
+        it "does nothing when self service merge is disabled" do
+          pseudonym.account.disable_feature!(:self_service_user_merge)
+          expect(channel).not_to receive(:has_merge_candidates?)
+          expect(channel).not_to receive(:send_merge_notification!)
+          result = policy.dispatch!(user, pseudonym, channel)
+          expect(result).to be(false)
+        end
+
       end
 
     end

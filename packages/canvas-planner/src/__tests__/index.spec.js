@@ -40,7 +40,8 @@ function defaultPlannerOptions() {
       PREFERENCES: {
         custom_colors: {}
       },
-      K5_MODE: false
+      K5_USER: false,
+      K5_SUBJECT_COURSE: false
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
@@ -48,14 +49,6 @@ function defaultPlannerOptions() {
     convertApiUserContent: jest.fn()
   }
 }
-
-beforeAll(() => {
-  window.ENV = {
-    FEATURES: {
-      canvas_for_elementary: false
-    }
-  }
-})
 
 afterEach(() => {
   resetPlanner()
@@ -146,12 +139,10 @@ describe('with mock api', () => {
   })
 
   describe('renderWeeklyPlannerHeader', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES.canvas_for_elementary = true
-    })
     beforeEach(() => {
       const opts = defaultPlannerOptions()
-      opts.env.K5_MODE = true
+      opts.env.K5_USER = true
+      opts.env.K5_SUBJECT_COURSE = true
       initializePlanner(opts)
     })
 

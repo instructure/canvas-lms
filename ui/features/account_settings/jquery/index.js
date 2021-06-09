@@ -41,13 +41,8 @@ const _settings_desktop = window.matchMedia('(min-width: 992px)').matches
 
 export function openReportDescriptionLink(event) {
   event.preventDefault()
-  const title = $(this)
-    .parents('.title')
-    .find('span.title')
-    .text()
-  const $desc = $(this)
-    .parent('.reports')
-    .find('.report_description')
+  const title = $(this).parents('.title').find('span.title').text()
+  const $desc = $(this).parent('.reports').find('.report_description')
   const responsiveWidth = _settings_desktop ? 800 : _settings_smallTablet ? 550 : 320
   $desc.clone().dialog({
     title,
@@ -61,13 +56,10 @@ export function addUsersLink(event) {
   $(this).hide()
   $enroll_users_form.show()
   $('html,body').scrollTo($enroll_users_form)
-  $enroll_users_form
-    .find('#admin_role_id')
-    .focus()
-    .select()
+  $enroll_users_form.find('#admin_role_id').focus().select()
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   function checkFutureListingSetting() {
     if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
       $('.future_listing').show()
@@ -78,21 +70,17 @@ $(document).ready(function() {
   checkFutureListingSetting()
   $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting)
 
-  $('#account_settings').submit(function() {
+  $('#account_settings').submit(function () {
     const $this = $(this)
     let remove_ip_filters = true
     $('.ip_filter .value')
-      .each(function() {
+      .each(function () {
         $(this).removeAttr('name')
       })
       .filter(':not(.blank)')
-      .each(function() {
+      .each(function () {
         const name = $.trim(
-          $(this)
-            .parents('.ip_filter')
-            .find('.name')
-            .val()
-            .replace(/\[|\]/g, '_')
+          $(this).parents('.ip_filter').find('.name').val().replace(/\[|\]/g, '_')
         )
         if (name) {
           remove_ip_filters = false
@@ -171,11 +159,9 @@ $(document).ready(function() {
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 
-            $('.run_report_link').click(function(event) {
+            $('.run_report_link').click(function (event) {
               event.preventDefault()
-              $(this)
-                .parent('form')
-                .submit()
+              $(this).parent('form').submit()
             })
 
             $('.run_report_form').formSubmit({
@@ -186,9 +172,7 @@ $(document).ready(function() {
               },
               success(data) {
                 $(this).loadingImage('remove')
-                const report = $(this)
-                  .attr('id')
-                  .replace('_form', '')
+                const report = $(this).attr('id').replace('_form', '')
                 $('#' + report)
                   .find('.run_report_link')
                   .hide()
@@ -198,19 +182,15 @@ $(document).ready(function() {
                   .end()
                   .find('.running_report_message')
                   .show()
-                $(this)
-                  .parent('.report_dialog')
-                  .dialog('close')
+                $(this).parent('.report_dialog').dialog('close')
               },
               error(data) {
                 $(this).loadingImage('remove')
-                $(this)
-                  .parent('.report_dialog')
-                  .dialog('close')
+                $(this).parent('.report_dialog').dialog('close')
               }
             })
 
-            $('.configure_report_link').click(function(event) {
+            $('.configure_report_link').click(function (event) {
               event.preventDefault()
               let data = $(this).data(),
                 $dialog = data.$report_dialog
@@ -280,16 +260,12 @@ $(document).ready(function() {
 
   $('.add_ip_filter_link').click(event => {
     event.preventDefault()
-    const $filter = $('.ip_filter.blank:first')
-      .clone(true)
-      .removeClass('blank')
+    const $filter = $('.ip_filter.blank:first').clone(true).removeClass('blank')
     $('#ip_filters').append($filter.show())
   })
-  $('.delete_filter_link').click(function(event) {
+  $('.delete_filter_link').click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.ip_filter')
-      .remove()
+    $(this).parents('.ip_filter').remove()
   })
   if ($('.ip_filter:not(.blank)').length == 0) {
     $('.add_ip_filter_link').click()
@@ -313,31 +289,21 @@ $(document).ready(function() {
     })
   })
 
-  $('#account_settings_external_notification_warning_checkbox').on('change', function(e) {
+  $('#account_settings_external_notification_warning_checkbox').on('change', function (e) {
     $('#account_settings_external_notification_warning').val($(this).prop('checked') ? 1 : 0)
   })
 
-  $('.custom_help_link .delete').click(function(event) {
+  $('.custom_help_link .delete').click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.custom_help_link')
-      .find('.custom_help_link_state')
-      .val('deleted')
-    $(this)
-      .parents('.custom_help_link')
-      .hide()
+    $(this).parents('.custom_help_link').find('.custom_help_link_state').val('deleted')
+    $(this).parents('.custom_help_link').hide()
   })
 
-  let $blankCustomHelpLink = $('.custom_help_link.blank')
-      .detach()
-      .removeClass('blank'),
+  let $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
     uniqueCounter = 1000
   $('.add_custom_help_link').click(event => {
     event.preventDefault()
-    const $newContainer = $blankCustomHelpLink
-        .clone(true)
-        .appendTo('#custom_help_links')
-        .show(),
+    const $newContainer = $blankCustomHelpLink.clone(true).appendTo('#custom_help_links').show(),
       newId = uniqueCounter++
     // need to replace the unique id in the inputs so they get sent back to rails right,
     // chage the 'for' on the lables to match.
@@ -348,7 +314,7 @@ $(document).ready(function() {
     })
   })
 
-  $('.remove_account_user_link').click(function(event) {
+  $('.remove_account_user_link').click(function (event) {
     event.preventDefault()
     const $item = $(this).parent('li')
     $item.confirmDelete({
@@ -358,7 +324,7 @@ $(document).ready(function() {
       ),
       url: $(this).attr('href'),
       success() {
-        $item.slideUp(function() {
+        $item.slideUp(function () {
           $(this).remove()
         })
       }
@@ -370,7 +336,7 @@ $(document).ready(function() {
       '#account_settings_sis_syncing_value, ' +
       '#account_settings_sis_default_grade_export_value'
   )
-    .change(function() {
+    .change(function () {
       const $myFieldset = $('#' + $(this).attr('id') + '_settings')
       const iAmChecked = $(this).prop('checked')
       $myFieldset.showIf(iAmChecked)
@@ -386,7 +352,7 @@ $(document).ready(function() {
       '#account_settings_sis_default_grade_export_value,' +
       '#account_settings_sis_assignment_name_length_value'
   )
-    .change(function() {
+    .change(function () {
       const attr_id = $(this).attr('id')
       const $myFieldset = $('#' + attr_id + '_settings')
       const iAmChecked = $(this).attr('checked')
@@ -401,7 +367,7 @@ $(document).ready(function() {
   })
 
   $("input[name='account[services][avatars]']")
-    .change(function() {
+    .change(function () {
       if (this.checked) {
         $('#account_settings_gravatar_checkbox').show()
       } else {
@@ -410,7 +376,7 @@ $(document).ready(function() {
     })
     .change()
 
-  $('.confirm_turnitin_settings_link').click(function(event) {
+  $('.confirm_turnitin_settings_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     const url = $link.attr('href')
@@ -450,7 +416,7 @@ $(document).ready(function() {
   // Admins tab
   $('.add_users_link').click(addUsersLink)
 
-  $('.service_help_dialog').each(function(index) {
+  $('.service_help_dialog').each(function (index) {
     const $dialog = $(this),
       serviceName = $dialog.attr('id').replace('_help_dialog', '')
 
@@ -495,14 +461,20 @@ $(document).ready(function() {
   $('.notification_from_name_option').trigger('change')
 
   $('#account_settings_self_registration')
-    .change(function() {
+    .change(function () {
       $('#self_registration_type_radios').toggle(this.checked)
     })
     .trigger('change')
 
   $('#account_settings_global_includes')
-    .change(function() {
+    .change(function () {
       $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked)
+    })
+    .trigger('change')
+
+  $('#account_settings_enable_as_k5_account_value')
+    .change(function () {
+      $('#k5_account_warning_message').toggleClass('shown', this.checked)
     })
     .trigger('change')
 

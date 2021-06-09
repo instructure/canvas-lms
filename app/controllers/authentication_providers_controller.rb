@@ -112,6 +112,10 @@
 #         },
 #         "federated_attributes": {
 #           "$ref": "FederatedAttributesConfig"
+#         },
+#         "mfa_required": {
+#           "description": "If multi-factor authentication is required when logging in with this authentication provider. The account must not have MFA disabled.",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -252,9 +256,9 @@ class AuthenticationProvidersController < ApplicationController
   # auth_type; unrecognized parameters are discarded. Provider specifications
   # not specifying a valid auth_type are ignored.
   #
-  # You can set the 'position' for any configuration. The config in the 1st position
-  # is considered the default. You can set 'jit_provisioning' for any configuration
-  # besides Canvas.
+  # You can set the 'position' for any provider. The config in the 1st position
+  # is considered the default. You can set 'jit_provisioning' for any provider
+  # besides Canvas. You can set 'mfa_required' for any provider.
   #
   # For Apple, the additional recognized parameters are:
   #
@@ -669,7 +673,9 @@ class AuthenticationProvidersController < ApplicationController
     end
 
     position = aac_data.delete(:position)
-    data = filter_data(aac_data)
+    # this may seem odd, but we need to ensure that account is set before
+    # mfa_required might be set, and ruby maintains insertion order in hashes
+    data = { account: @account }.merge(filter_data(aac_data))
     deselect_parent_registration(data)
     account_config = @account.authentication_providers.build(data)
     if account_config.class.singleton? && @account.authentication_providers.active.where(auth_type: account_config.auth_type).exists?

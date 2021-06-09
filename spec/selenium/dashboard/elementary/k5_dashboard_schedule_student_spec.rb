@@ -19,7 +19,7 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
-require_relative '../../helpers/k5_common'
+require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 dashboard schedule" do
@@ -70,7 +70,7 @@ describe "student k5 dashboard schedule" do
       expect(end_of_week_date).to include(ending_weekday_calculation(@now))
     end
 
-    it 'navigates to previous week with previous button' do
+    it 'navigates to previous week with previous button', custom_timeout: 30 do
 
       get "/#schedule"
 
@@ -81,7 +81,7 @@ describe "student k5 dashboard schedule" do
       expect(end_of_week_date).to include(ending_weekday_calculation(1.week.ago(@now)))
     end
 
-    it 'navigates to next week with the forward button' do
+    it 'navigates to next week with the forward button', custom_timeout: 30 do
 
       get "/#schedule"
 
@@ -92,7 +92,7 @@ describe "student k5 dashboard schedule" do
       expect(end_of_week_date).to include(ending_weekday_calculation(1.week.from_now(@now)))
     end
 
-    it 'navigates back to current week with today button' do
+    it 'navigates back to current week with today button', custom_timeout: 30 do
 
       get "/#schedule"
 

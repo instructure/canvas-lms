@@ -74,24 +74,48 @@ describe('Upload Media', () => {
   })
 
   describe('only enable Submit button when ready', () => {
-    it('is disabled before ComputerPanel gets a file', () => {
-      const {getByText} = renderComponent({
-        tabs: {upload: true}
+    let computerFile
+
+    beforeEach(() => {
+      computerFile = new File(['bits'], 'dummy-video.mp4', {
+        lastModifiedDate: 1568991600840,
+        type: 'video/mp4'
       })
+    })
+
+    it('is disabled before ComputerPanel gets a file', () => {
+      const {getByText} = renderComponent({tabs: {upload: true}})
       expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
     })
 
     it('is enabled once ComputerPanel has a file', () => {
-      const {getByText} = renderComponent({
-        tabs: {upload: true},
-        computerFile: new File(['bits'], 'dummy-video.mp4', {
-          lastModifiedDate: 1568991600840,
-          type: 'video/mp4'
-        })
-      })
+      const {getByText} = renderComponent({tabs: {upload: true}, computerFile})
       expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
     })
 
+    it('is enabled while uploading if disableSubmitWhileUploading is false', () => {
+      const {getByText} = renderComponent({
+        disableSubmitWhileUploading: false,
+        onStartUpload: jest.fn(),
+        tabs: {upload: true},
+        computerFile
+      })
+
+      fireEvent.click(getByText('Submit'))
+      expect(getByText('Submit').closest('button')).not.toBeDisabled()
+    })
+
+    it('is disabled while uploading if disableSubmitWhileUploading is true', () => {
+      const {getByText} = renderComponent({
+        disableSubmitWhileUploading: true,
+        onStartUpload: jest.fn(),
+        tabs: {upload: true},
+        computerFile
+      })
+
+      fireEvent.click(getByText('Submit'))
+      expect(getByText('Submit').closest('button')).toBeDisabled()
+    })
     // the submit button is not rendered for the record tab
   })
 

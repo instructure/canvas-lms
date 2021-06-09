@@ -31,11 +31,8 @@ export function handleNothingToday(manager, todayElem, focusTarget) {
   // In the weekly planner the missing assignments will be under Today
   // if there are any.
   const missingAssignments = manager.getDocument().getElementById('MissingAssignments')
-  const headerActiveButton = manager.getDocument().getElementById('weekly-header-active-button')
   if (focusTarget === 'missing-items' && missingAssignments) {
     manager.getAnimator().focusElement(missingAssignments)
-  } else if (headerActiveButton) {
-    manager.getAnimator().focusElement(headerActiveButton)
   }
 
   if (todayElem) {

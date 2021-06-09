@@ -10,6 +10,9 @@
     "CompileStatic": {
       "enabled": false
     },
+    "CouldBeSwitchStatement": {
+      "enabled": false
+    },
     "DuplicateNumberLiteral": {
       "enabled": false
     },

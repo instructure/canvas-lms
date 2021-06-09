@@ -35,12 +35,13 @@ export default function MicrosoftSyncTitle(props) {
           size="medium"
           variant="toggle"
           id="microsoft_sync_toggle_button"
-          checked={props.isEnabled}
+          checked={props.syncEnabled}
           label={
             <ScreenReaderContent>{I18n.t('Microsoft Sync Toggle Button')}</ScreenReaderContent>
           }
           labelPlacement="start"
           onChange={props.handleClick}
+          disabled={props.interactionDisabled}
         />
       </Flex.Item>
     </Flex>
@@ -48,6 +49,7 @@ export default function MicrosoftSyncTitle(props) {
 }
 
 MicrosoftSyncTitle.propTypes = {
-  isEnabled: PropTypes.bool,
+  syncEnabled: PropTypes.bool,
+  interactionDisabled: PropTypes.bool,
   handleClick: PropTypes.func
 }

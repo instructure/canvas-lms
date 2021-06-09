@@ -20,6 +20,7 @@ import {Button} from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
 import I18n from 'i18n!discussions_posts'
 import {
   IconArrowDownLine,
@@ -69,6 +70,7 @@ export const DiscussionPostToolbar = props => {
             vAlign="middle"
             layout="columns"
           >
+            {props.childTopics && <GroupsMenu width="10px" childTopics={props.childTopics} />}
             <TextInput
               onChange={handleChange}
               renderLabel={
@@ -97,7 +99,7 @@ export const DiscussionPostToolbar = props => {
 
             <Tooltip
               renderTip={
-                props.sortDirection === 'asc' ? I18n.t('Newest First') : I18n.t('Oldest First')
+                props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')
               }
               width="78px"
               data-testid="sortButtonTooltip"
@@ -105,7 +107,7 @@ export const DiscussionPostToolbar = props => {
               <Button
                 onClick={props.onSortClick}
                 renderIcon={
-                  props.sortDirection === 'asc' ? (
+                  props.sortDirection === 'desc' ? (
                     <IconArrowDownLine data-testid="DownArrow" />
                   ) : (
                     <IconArrowUpLine data-testid="UpArrow" />
@@ -130,7 +132,9 @@ export const DiscussionPostToolbar = props => {
             layout="columns"
           >
             <Button
-              onClick={props.onTopClick}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
               renderIcon={<IconCircleArrowUpLine />}
               data-testid="topButton"
             >
@@ -146,15 +150,14 @@ export const DiscussionPostToolbar = props => {
 export default DiscussionPostToolbar
 
 DiscussionPostToolbar.propTypes = {
+  childTopics: PropTypes.array,
   selectedView: PropTypes.string,
   sortDirection: PropTypes.string,
-  isCollapsedReplies: PropTypes.bool,
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
-  onSortClick: PropTypes.func,
-  onTopClick: PropTypes.func
+  onSortClick: PropTypes.func
 }
 
 DiscussionPostToolbar.defaultProps = {
-  sortDirection: 'asc'
+  sortDirection: 'desc'
 }

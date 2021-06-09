@@ -25,6 +25,15 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/outcomes/graphql/Management')
 
+class CustomError extends Error {
+  constructor(message) {
+    super()
+    this.response = {
+      data: message
+    }
+  }
+}
+
 describe('GroupRemoveModal', () => {
   let onCloseHandlerMock
   const defaultProps = (props = {}) => ({
@@ -138,6 +147,23 @@ describe('GroupRemoveModal', () => {
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this group: Network error',
+        type: 'error'
+      })
+    })
+  })
+
+  it('displays proper flash error message if delete request fails due to aligned outcome', async () => {
+    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    removeOutcomeGroup.mockReturnValue(
+      Promise.reject(new CustomError('cannot be deleted because it is aligned to contents'))
+    )
+    const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
+    fireEvent.click(getByText('Remove Group'))
+    expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
+    await waitFor(() => {
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message:
+          'An error occurred while removing this group: Outcome Group contains one or more Outcomes that are currently aligned to content.',
         type: 'error'
       })
     })

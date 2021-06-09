@@ -1554,9 +1554,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1577,6 +1574,11 @@ describe EnrollmentsApiController, type: :request do
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user)
           } if e.student? && e.user_id != @user.id
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
 
           h
         }
@@ -1840,7 +1842,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should show enrollments for courses with future start dates if state[]=current_and_future" do
         course_factory
-        @course.update_attributes(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
+        @course.update(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
         enrollment = @course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
         expect(enrollment.enrollment_state.state).to eq "pending_active"
@@ -2254,9 +2256,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2265,6 +2264,11 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
           link_header = response.headers['Link'].split(',')
@@ -2314,9 +2318,6 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.created_at.xmlschema,
               'start_at' => nil,
               'end_at' => nil,
-              'last_activity_at' => nil,
-              'last_attended_at' => nil,
-              'total_activity_time' => 0
             }
             h['grades'] = {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -2325,6 +2326,11 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             } if e.student?
+            h.merge!(
+              'last_activity_at' => nil,
+              'last_attended_at' => nil,
+              'total_activity_time' => 0
+            ) if e.user == @user
             h
           end
           link_header = response.headers['Link'].split(',')
@@ -2716,9 +2722,6 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at'   => nil,
             'end_at'     => nil,
-            'last_activity_at' => nil,
-            'last_attended_at' => nil,
-            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -2734,6 +2737,11 @@ describe EnrollmentsApiController, type: :request do
             'final_grade' => nil,
             'current_grade' => nil,
           } if e.student?
+          h.merge!(
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          ) if e.user == @user
           h
         }
       end

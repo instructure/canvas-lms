@@ -1087,15 +1087,22 @@ class AccountsController < ApplicationController
         k5_settings = params.dig(:account, :settings, :enable_as_k5_account)
         unless k5_settings.nil?
           enable_as_k5 = value_to_boolean(k5_settings[:value])
-          # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
-          # This is important in determining whether k5 mode dashboard is shown to a user
-          params[:account][:settings][:enable_as_k5_account][:locked] = enable_as_k5
-          # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
-          k5_accounts = @account.root_account.settings[:k5_accounts] || []
-          k5_accounts = Set.new(k5_accounts)
-          enable_as_k5 ? k5_accounts.add(@account.id) : k5_accounts.delete(@account.id)
-          @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
-          @account.root_account.save!
+          # Only tweak stuff if the k5 setting has changed
+          unless enable_as_k5 == @account.enable_as_k5_account?
+            # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
+            # This is important in determining whether k5 mode dashboard is shown to a user
+            params[:account][:settings][:enable_as_k5_account][:locked] = enable_as_k5
+            # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
+            k5_accounts = @account.root_account.settings[:k5_accounts] || []
+            k5_accounts = Set.new(k5_accounts)
+            enable_as_k5 ? k5_accounts.add(@account.id) : k5_accounts.delete(@account.id)
+            @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
+            @account.root_account.save!
+            # Invalidate the cached k5 settings for all users in the account
+            User.of_account(@account.root_account).find_in_batches do |users|
+              User.clear_cache_keys(users.pluck(:id), :k5_user)
+            end
+          end
         end
 
         # Set default Dashboard view
@@ -1141,7 +1148,7 @@ class AccountsController < ApplicationController
   end
 
   def settings
-    if authorized_action(@account, @current_user, :read)
+    if authorized_action(@account, @current_user, :read_as_admin)
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)

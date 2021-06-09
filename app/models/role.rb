@@ -98,7 +98,7 @@ class Role < ActiveRecord::Base
       self.errors.add(:account_id)
       throw :abort
     end
-    self.root_account_id = self.account.root_account_id || self.account.id
+    self.root_account_id = self.account.resolved_root_account_id
   end
 
   include Workflow

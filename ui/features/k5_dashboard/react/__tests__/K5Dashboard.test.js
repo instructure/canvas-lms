@@ -147,6 +147,21 @@ const opportunities = [
     submission_types: ['online_url']
   }
 ]
+const syllabus = {
+  id: '2',
+  syllabus_body: "<p>Here's the grading scheme for this class.</p>"
+}
+const apps = [
+  {
+    id: '17',
+    course_navigation: {
+      text: 'Google Apps',
+      icon_url: 'google.png'
+    },
+    context_id: '1',
+    context_name: 'Economics 101'
+  }
+]
 const staff = [
   {
     id: '1',
@@ -171,23 +186,11 @@ const staff = [
     ]
   }
 ]
-const apps = [
-  {
-    id: '17',
-    course_navigation: {
-      text: 'Google Apps',
-      icon_url: 'google.png'
-    },
-    context_id: '1',
-    context_name: 'Economics 101'
-  }
-]
 const defaultEnv = {
   current_user: currentUser,
   current_user_id: '1',
-  K5_MODE: true,
+  K5_USER: true,
   FEATURES: {
-    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {
@@ -301,9 +304,9 @@ beforeEach(() => {
   fetchMock.get('/api/v1/courses/1/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
+  fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
   fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
-  fetchMock.get('/api/v1/courses/1/external_tools/visible_course_nav_tools', JSON.stringify(apps))
   global.ENV = defaultEnv
 })
 
@@ -318,9 +321,9 @@ afterEach(() => {
 })
 
 describe('K-5 Dashboard', () => {
-  it('displays a welcome message to the logged-in user', async () => {
-    const {findByText} = render(<K5Dashboard {...defaultProps} />)
-    expect(await findByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
+  it('displays a welcome message to the logged-in user', () => {
+    const {getByText} = render(<K5Dashboard {...defaultProps} />)
+    expect(getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
   })
 
   describe('Tabs', () => {
@@ -504,12 +507,16 @@ describe('K-5 Dashboard', () => {
       // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
     })
 
-    it('displays a list of missing assignments if there are any', async () => {
+    // Skipping for flakiness. See https://instructure.atlassian.net/browse/LS-2243.
+    it.skip('displays a list of missing assignments if there are any', async () => {
       const {findByRole, getByRole, getByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
 
-      const missingAssignments = await findByRole('button', {name: 'Show 2 missing items'})
+      const missingAssignments = await findByRole('button', {
+        name: 'Show 2 missing items',
+        timeout: 5000
+      })
       expect(missingAssignments).toBeInTheDocument()
 
       act(() => missingAssignments.click())
@@ -584,13 +591,12 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Resources Section', () => {
-    it('shows the staff contact info for each staff member in all homeroom courses', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
-      expect(await wrapper.findByText('Mrs. Thompson')).toBeInTheDocument()
-      expect(wrapper.getByText('Office Hours: 1-3pm W')).toBeInTheDocument()
-      expect(wrapper.getByText('Teacher')).toBeInTheDocument()
-      expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
-      expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
+    it('displays syllabus content for homeroom under important info section', async () => {
+      const {getByText, findByText} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-resources" />
+      )
+      expect(await findByText("Here's the grading scheme for this class.")).toBeInTheDocument()
+      expect(getByText('Important Info')).toBeInTheDocument()
     })
 
     it("shows apps installed in the user's courses", async () => {
@@ -599,6 +605,15 @@ describe('K-5 Dashboard', () => {
       const icon = wrapper.getByTestId('renderedIcon')
       expect(icon).toBeInTheDocument()
       expect(icon.src).toContain('google.png')
+    })
+
+    it('shows the staff contact info for each staff member in all homeroom courses', async () => {
+      const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
+      expect(await wrapper.findByText('Mrs. Thompson')).toBeInTheDocument()
+      expect(wrapper.getByText('Office Hours: 1-3pm W')).toBeInTheDocument()
+      expect(wrapper.getByText('Teacher')).toBeInTheDocument()
+      expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
+      expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
     })
   })
 })

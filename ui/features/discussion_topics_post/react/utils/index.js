@@ -22,7 +22,7 @@ import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {PER_PAGE} from './constants'
 
 export const isGraded = (assignment = null) => {
-  return assignment !== null && (assignment?.dueAt || assignment?.pointsPossible)
+  return assignment !== null
 }
 
 export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {
@@ -37,6 +37,14 @@ export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {
 
 export const getEditUrl = (courseId, discussionTopicId) => {
   return `/courses/${courseId}/discussion_topics/${discussionTopicId}/edit`
+}
+
+export const getPeerReviewsUrl = (courseId, assignmentId) => {
+  return `/courses/${courseId}/assignments/${assignmentId}/peer_reviews`
+}
+
+export const getGroupDiscussionUrl = (groupId, childDiscussionId) => {
+  return `/groups/${groupId}/discussion_topics/${childDiscussionId}`
 }
 
 export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
@@ -84,13 +92,14 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
     })
   }
 }
-export const addReplyToSubentries = (cache, discussionEntryId, newDiscussionEntry) => {
+export const addReplyToSubentries = (cache, discussionEntryId, sort, newDiscussionEntry) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: discussionEntryId,
-        perPage: PER_PAGE
+        perPage: PER_PAGE,
+        sort
       }
     }
     const currentSubentries = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -99,7 +108,6 @@ export const addReplyToSubentries = (cache, discussionEntryId, newDiscussionEntr
       const subentriesLegacyNode = currentSubentries.legacyNode
       subentriesLegacyNode.subentriesCount += 1
 
-      // TODO: Handle sorting.
       subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
 
       cache.writeQuery({...options, data: currentSubentries})

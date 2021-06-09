@@ -524,6 +524,14 @@ class SisImportsApiController < ApplicationController
   #   If diffing_drop_status is passed, this SIS import will use this status for
   #   enrollments that are not included in the sis_batch. Defaults to 'deleted'
   #
+  # @argument batch_mode_enrollment_drop_status [String, "deleted"|"completed"|"inactive"]
+  #   If batch_mode_enrollment_drop_status is passed, this SIS import will use
+  #   this status for enrollments that are not included in the sis_batch. This
+  #   will have an effect if multi_term_batch_mode is set. Defaults to 'deleted'
+  #   This will still mark courses and sections that are not included in the
+  #   sis_batch as deleted, and subsequently enrollments in the deleted courses
+  #   and sections as deleted.
+  #
   # @argument change_threshold [Integer]
   #   If set with batch_mode, the batch cleanup process will not run if the
   #   number of items deleted is higher than the percentage set. If set to 10
@@ -640,6 +648,10 @@ class SisImportsApiController < ApplicationController
         if params[:diffing_drop_status].present?
           batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
+        end
+        if params[:batch_mode_enrollment_drop_status].present?
+          batch.options[:batch_mode_enrollment_drop_status] = (Array(params[:batch_mode_enrollment_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
+          return render json: {message: 'Invalid batch_mode_enrollment_drop_status'}, status: :bad_request unless batch.options[:batch_mode_enrollment_drop_status]
         end
       end
 

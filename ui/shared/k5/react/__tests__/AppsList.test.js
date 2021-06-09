@@ -70,9 +70,10 @@ describe('AppsList', () => {
     expect(queryByText('Student Applications')).not.toBeInTheDocument()
   })
 
-  it('renders a loading indicator if isLoading set', () => {
-    const {getByText} = render(<AppsList {...getProps({isLoading: true})} />)
-    expect(getByText('Loading apps...')).toBeInTheDocument()
+  it('renders 3 loading skeletons if isLoading set', () => {
+    const {getAllByText} = render(<AppsList {...getProps({isLoading: true})} />)
+    const skeletons = getAllByText('Loading apps...')
+    expect(skeletons.length).toBe(3)
   })
 
   it('renders no loading indicator if isLoading not set', () => {

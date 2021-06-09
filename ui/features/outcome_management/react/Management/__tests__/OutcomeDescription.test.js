@@ -24,6 +24,7 @@ describe('OutcomeDescription', () => {
   let onClickHandlerMock
   const empty = ''
   const truncatedTestId = 'description-truncated'
+  const truncatedTestContentId = 'description-truncated-content'
   const expandedTestId = 'description-expanded'
   const defaultProps = (props = {}) => ({
     withExternalControl: true,
@@ -45,6 +46,7 @@ describe('OutcomeDescription', () => {
     it('renders truncated Description when description prop provided and truncate prop true', () => {
       const {queryByTestId} = render(<OutcomeDescription {...defaultProps()} />)
       expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
+      expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
     })
 
     it('renders expanded Description when description prop provided and truncate prop false', () => {
@@ -83,6 +85,7 @@ describe('OutcomeDescription', () => {
         <OutcomeDescription {...defaultProps({withExternalControl: false})} />
       )
       expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
+      expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
     })
 
     it('does not render Description when description prop not provided/null', () => {

@@ -575,6 +575,17 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@user1.pseudonym]]]
       end
 
+      it "does not show merge opportunities if an account has self-service merge disabled" do
+        Account.default.disable_feature!(:self_service_user_merge)
+        user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
+        @user1 = @user
+        user_with_pseudonym(:username => 'jt+1@instructure.com')
+        @cc = @user.communication_channels.create!(path: 'jt@instructure.com', workflow_state: 'active')
+
+        get 'confirm', params: {:nonce => @cc.confirmation_code}
+        expect(response).to redirect_to dashboard_url
+      end
+
       it "should not show users that can't have a pseudonym created for the correct account" do
         @account1.authentication_providers.scope.delete_all
         @account1.authentication_providers.create!(:auth_type => 'cas')

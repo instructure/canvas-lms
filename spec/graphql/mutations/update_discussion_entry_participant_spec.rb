@@ -29,7 +29,8 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
   def mutation_str(
     id: nil,
     read: nil,
-    rating: nil
+    rating: nil,
+    forcedReadState: nil
   )
     <<~GQL
       mutation {
@@ -37,11 +38,13 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
           discussionEntryId: #{id}
           #{"read: #{read}" unless read.nil?}
           #{"rating: #{rating}" if rating}
+          #{"forcedReadState: #{forcedReadState}" unless forcedReadState.nil?}
         }) {
           discussionEntry {
             read
             rating
             ratingSum
+            forcedReadState
           }
         }
       }
@@ -78,5 +81,56 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'rating')).to be true
     expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'ratingSum')).to eq 1
     expect(@discussion_entry.rating(@discussion_entry.user)).to be_equal 1
+  end
+
+  describe "forcedReadState attribute mutations" do
+    context "force setting read to false" do
+      it 'updates the forcedReadState to true' do
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be true
+        result = run_mutation({id: @discussion_entry.id, read: false, forcedReadState:true})
+        expect(result.dig('errors')).to be nil
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be false
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be true
+        @discussion_entry.reload
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be false
+        expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
+      end
+      it 'updates the forcedReadState to false' do
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be true
+        result = run_mutation({id: @discussion_entry.id, read: false, forcedReadState:false})
+        expect(result.dig('errors')).to be nil
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be false
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be false
+        @discussion_entry.reload
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be false
+        expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be false
+      end
+    end
+
+    context "force setting read to true" do
+      before do
+        @discussion_entry.change_read_state('unread', @discussion_entry.user)
+      end
+      it 'updates the forcedReadState to true' do
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be false
+        result = run_mutation({id: @discussion_entry.id, read: true, forcedReadState:true})
+        expect(result.dig('errors')).to be nil
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be true
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be true
+        @discussion_entry.reload
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be true
+        expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
+      end
+      it 'updates the forcedReadState to false' do
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be false
+        result = run_mutation({id: @discussion_entry.id, read: true, forcedReadState:false})
+        expect(result.dig('errors')).to be nil
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'read')).to be true
+        expect(result.dig('data', 'updateDiscussionEntryParticipant', 'discussionEntry', 'forcedReadState')).to be false
+        @discussion_entry.reload
+        expect(@discussion_entry.read?(@discussion_entry.user)).to be true
+        expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be false
+      end
+    end
   end
 end

@@ -32,6 +32,7 @@ import FindOutcomesView from './FindOutcomesView'
 import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
+import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {contextType} = useCanvasContext()
@@ -42,11 +43,18 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     selectedGroupId,
     toggleGroupId,
     searchString,
+    debouncedSearchString,
     updateSearch,
     clearSearch,
     error
   } = useFindOutcomeModal(open)
-  const {group, loading, loadMore} = useGroupDetail(selectedGroupId, true)
+
+  const {group, loading, loadMore} = useGroupDetail({
+    id: selectedGroupId,
+    query: FIND_GROUP_OUTCOMES,
+    loadOutcomesIsImported: true,
+    searchString: debouncedSearchString
+  })
 
   return (
     <Modal
@@ -118,6 +126,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
               <FindOutcomesView
                 collection={collections[selectedGroupId]}
+                outcomesCount={group?.outcomesCount || 0}
                 outcomes={group?.outcomes}
                 searchString={searchString}
                 onChangeHandler={updateSearch}

@@ -93,7 +93,7 @@ describe('The Ratings component', () => {
       .first()
       .prop('onClick')
       .call()
-    expect(onPointChange.args[0]).toEqual([{id: '1', description: 'Superb', points: 10}])
+    expect(onPointChange.args[0]).toEqual([{id: '1', description: 'Superb', points: 10}, false])
     expect(flashMock).toHaveBeenCalledTimes(1)
     flashMock.mockRestore()
   })

@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative '../helpers/k5_common'
 
 describe 'Global Navigation' do
   include_context 'in-process server selenium tests'
+  include K5Common
 
   context 'As a Teacher' do
     before do
@@ -145,6 +147,21 @@ describe 'Global Navigation' do
         wait_for_ajaximations
         navigation_elements = ffxpath("//*[@id = 'nav-tray-portal']//li//a")
         expect(navigation_elements[1].attribute('href')).to eq(app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}")
+      end
+    end
+
+    describe 'dashboard and courses links' do
+      it 'should be called dashboard and courses with k5 off' do
+        get "/courses/#{@course.id}"
+        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Dashboard'
+        expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Courses'
+      end
+
+      it 'should be called homeroom and subjects with k5 on' do
+        toggle_k5_setting(@course.account)
+        get "/courses/#{@course.id}"
+        expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Homeroom'
+        expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Subjects'
       end
     end
   end

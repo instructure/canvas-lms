@@ -39,21 +39,15 @@ export default class PronounsInput extends React.Component {
   }
 
   createNewTag = value => (
-    <>
+    <span key={`pronoun_tag_container_${value}`}>
       <Tag
         dismissible
-        key={`pronoun_${value}`}
         text={value}
         margin="0 small 0 0"
         onClick={() => this.deletePronoun(value)}
       />
-      <input
-        key={`pronoun_input_holder_${value}`}
-        name="account[pronouns][]"
-        type="hidden"
-        value={value}
-      />
-    </>
+      <input name="account[pronouns][]" type="hidden" value={value} />
+    </span>
   )
 
   handleChange = (e, value) => {

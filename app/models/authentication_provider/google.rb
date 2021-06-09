@@ -28,7 +28,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_params
-    [ :login_attribute, :jit_provisioning, :hosted_domain ].freeze
+    super + [ :login_attribute, :jit_provisioning, :hosted_domain ].freeze
   end
 
   # Rename db field

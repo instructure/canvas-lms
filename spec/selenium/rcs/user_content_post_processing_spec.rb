@@ -184,6 +184,22 @@ describe 'user_content post processing' do
       expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
     end
 
+    it 'previews files in the FilePreview overlay with style nodes inside anchor tag' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='thelink' class='instructure_file_link instructure_scribd_file inline_disabled'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'><em><b>file<b/></em></a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a#thelink')
+      expect(file_link.attribute('class')).to include('preview_in_overlay')
+
+      bold_text = f('a#thelink > em > b')
+      bold_text.click
+      expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
+    end
+
     it 'previews other user files in the FilePreview overlay' do
       # create a file in the teacher's user files
       file =
