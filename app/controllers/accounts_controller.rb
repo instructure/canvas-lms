@@ -323,7 +323,7 @@ class AccountsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @accounts = @current_user ? @current_user.adminable_accounts : []
+        @accounts = (@current_user&.all_paginatable_accounts || []).paginate
       end
       format.json do
         if @current_user
@@ -372,7 +372,7 @@ class AccountsController < ApplicationController
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map{|id| Shard.global_id_for(id)}
       end
-      course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))
+      course_accounts = ShardedBookmarkedCollection.build(Account::Bookmarker, Account.where(id: account_ids))
       @accounts = Api.paginate(course_accounts, self, api_v1_course_accounts_url)
     else
       @accounts = []
