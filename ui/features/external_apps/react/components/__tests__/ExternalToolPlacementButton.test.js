@@ -35,7 +35,7 @@ describe('ExternalToolPlacementButton', () => {
       <ExternalToolPlacementButton
         tool={tool}
         returnFocus={() => {}}
-        onSuccess={jest.fn()}
+        onToggleSuccess={jest.fn()}
         {...overrides}
       />
     )

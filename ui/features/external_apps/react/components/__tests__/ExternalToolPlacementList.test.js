@@ -15,162 +15,332 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {fireEvent, render, waitForElementToBeRemoved} from '@testing-library/react'
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolPlacementList from '../ExternalToolPlacementList'
 
 jest.mock('../../lib/ExternalAppsStore')
 
 describe('ExternalToolPlacementList', () => {
-  let wrapper
-  let instance
-  let tool
-
-  const render = (overrides = {}) => {
-    tool = {
-      name: 'test',
-      app_type: 'ContextExternalTool',
-      editor_button: {
-        enabled: true
-      },
-      account_navigation: null,
-      version: '1.1',
-      context: 'account',
-      ...overrides
-    }
-    wrapper = mount(<ExternalToolPlacementList tool={tool} onSuccess={jest.fn()} />)
-    instance = wrapper.instance()
-  }
-
-  beforeEach(() => {
-    render()
+  const tool = (overrides = {}) => ({
+    name: 'test',
+    app_type: 'ContextExternalTool',
+    version: '1.3',
+    context: 'account',
+    ...overrides
   })
 
+  const renderComponent = (overrides = {}) => {
+    return render(
+      <ExternalToolPlacementList tool={tool()} onToggleSuccess={() => {}} {...overrides} />
+    )
+  }
+
   afterEach(() => {
-    wrapper.unmount()
     jest.clearAllMocks()
   })
 
-  describe('#handleTogglePlacement', () => {
-    it('toggles placement status in tool', () => {
-      instance.handleTogglePlacement('editor_button')
-      expect(instance.state.tool.editor_button.enabled).toBeFalsy()
-      instance.handleTogglePlacement('editor_button')
-      expect(instance.state.tool.editor_button.enabled).toBeTruthy()
-    })
-
-    it('sends new placement status to api', () => {
-      instance.handleTogglePlacement('editor_button')
-      expect(store.togglePlacement).toHaveBeenCalled()
-      expect(store.togglePlacement.mock.calls[0][0].tool.editor_button.enabled).toBeFalsy()
-    })
-
-    it('resets placement status on api fail', () => {
-      store.togglePlacement.mockImplementation(({onError}) => onError())
-      instance.handleTogglePlacement('editor_button')
-      expect(instance.state.tool.editor_button.enabled).toBeTruthy()
-    })
-
-    it('executes onSuccess callback from props on api success', () => {
-      store.togglePlacement.mockImplementation(({onSuccess}) => onSuccess())
-
-      instance.handleTogglePlacement('editor_button')
-      expect(store.togglePlacement).toHaveBeenCalled()
-      expect(instance.props.onSuccess).toHaveBeenCalled()
+  describe('with 1.3 tool with no placements', () => {
+    it('tells user no placements are enabled', () => {
+      const {queryByText} = renderComponent()
+      expect(queryByText(/No Placements Enabled/)).toBeInTheDocument()
     })
   })
 
-  describe('#placements', () => {
-    const expectAllPlacements = cb => {
-      instance
-        .placements()
-        .filter(p => p != null)
-        .forEach(p => cb(p))
-    }
+  describe('with 1.3 tool', () => {
+    it('lists enabled placements', () => {
+      const {queryByText} = renderComponent({
+        tool: tool({homework_submission: {enabled: true}, editor_button: {enabled: false}})
+      })
+      expect(queryByText(/Homework Submission/)).toBeInTheDocument()
+      expect(queryByText(/Editor Button/)).not.toBeInTheDocument()
+    })
 
-    beforeEach(() => {
-      global.ENV = {
-        CONTEXT_BASE_URL: '/accounts/1',
-        PERMISSIONS: {
-          create_tool_manually: true
-        }
+    it('shows assignment_ and link_selection if tool has resource_selection enabled', () => {
+      const {queryByText} = renderComponent({
+        tool: tool({resource_selection: {enabled: true}, assignment_selection: {enabled: true}})
+      })
+      expect(queryByText(/Assignment Selection/)).toBeInTheDocument()
+      expect(queryByText(/Link Selection/)).toBeInTheDocument()
+    })
+  })
+
+  describe('with 1.1 tool with no configured placements', () => {
+    describe('when not_selectable is false', () => {
+      it('shows default placement text', () => {
+        const {queryByText} = renderComponent({tool: tool({version: '1.1', not_selectable: false})})
+        expect(queryByText(/Assignment and Link Selection/)).toBeInTheDocument()
+      })
+    })
+
+    describe('when not_selectable is true', () => {
+      it('shows no placements', () => {
+        const {queryByText} = renderComponent({tool: tool({version: '1.1', not_selectable: true})})
+        expect(queryByText(/No Placements Enabled/)).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('with 1.1 tool', () => {
+    describe('if any default placements are enabled', () => {
+      const toolOverrides = {
+        version: '1.1',
+        not_selectable: false,
+        assignment_selection: {enabled: true}
       }
-    })
-    it('omits toggle buttons if tool is 1.3', () => {
-      render({version: '1.3'})
-      expectAllPlacements(p => expect(p.type).toBe('div'))
+
+      it('shows default placement text', () => {
+        const {queryByText} = renderComponent({
+          tool: tool(toolOverrides)
+        })
+        expect(queryByText(/Assignment and Link Selection/)).toBeInTheDocument()
+      })
+
+      it('does not show text for specific default placements', () => {
+        const {queryByText} = renderComponent({
+          tool: tool(toolOverrides)
+        })
+        expect(queryByText(/Assignment Selection/)).not.toBeInTheDocument()
+      })
     })
 
-    it('omits toggle buttons if page context does not match tool installation context', () => {
-      global.ENV.CONTEXT_BASE_URL = '/courses/1'
-      render()
-      expectAllPlacements(p => expect(p.type).toBe('div'))
+    it('lists enabled placements', () => {
+      const {queryByText} = renderComponent({
+        tool: tool({
+          version: '1.1',
+          not_selectable: true,
+          homework_submission: {enabled: true},
+          editor_button: {enabled: false}
+        })
+      })
+      expect(queryByText(/Homework Submission/)).toBeInTheDocument()
+      expect(queryByText(/Editor Button/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('with 1.1 tool in an editable context', () => {
+    let oldEnv
+
+    beforeAll(() => {
+      oldEnv = window.ENV
+      window.ENV = {
+        PERMISSIONS: {create_tool_manually: true},
+        CONTEXT_BASE_URL: '/accounts/1'
+      }
+      store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())
     })
 
-    it('omits toggle buttons if user does not have permission to edit the tool', () => {
-      global.ENV.PERMISSIONS.create_tool_manually = false
-      render()
-      expectAllPlacements(p => expect(p.type).toBe('div'))
+    afterAll(() => {
+      window.ENV = oldEnv
     })
 
-    it('does not show deactivated placements when toggle buttons omitted', () => {
-      global.ENV.PERMISSIONS.create_tool_manually = false
-      render({homework_submission: {enabled: false}})
-      expect(instance.placements().map(p => p != null && p.key)).toEqual(['editor_button'])
+    it('shows notice about caching', () => {
+      const {getByText} = renderComponent({
+        tool: tool({
+          version: '1.1',
+          not_selectable: false
+        })
+      })
+      expect(getByText(/It may take some time/)).toBeInTheDocument()
     })
 
-    it('does show deactivated placements with toggle buttons', () => {
-      render({homework_submission: {enabled: false}})
-      expect(instance.placements().map(p => p != null && p.key)).toEqual([
-        'editor_button',
-        'homework_submission'
-      ])
+    it('shows toggle buttons along with placement names', () => {
+      const {getByRole} = renderComponent({
+        tool: tool({
+          version: '1.1',
+          not_selectable: false
+        })
+      })
+      expect(getByRole('button', {name: /Placement active/})).toBeInTheDocument()
     })
 
-    it('renders toggle buttons for each placement', () => {
-      expectAllPlacements(p => expect(p.type.displayName).toBe('Flex'))
+    describe('when placement is active', () => {
+      it('shows checkmark', () => {
+        renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: false
+          })
+        })
+        expect(document.querySelector('svg').getAttribute('name')).toBe('IconCheckMark')
+      })
+
+      it('shows Active tooltip', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: false
+          })
+        })
+        expect(getByRole('tooltip', {name: /Active/})).toBeInTheDocument()
+      })
     })
 
-    it('renders special placements for resource_selection when toggle buttons omitted', () => {
-      global.ENV.CONTEXT_BASE_URL = '/courses/1'
-      render({resource_selection: {enabled: true}})
-      const placements = mount(<div>{instance.placements()}</div>)
-      const assignmentSelection = placements.findWhere(p => p.key() === 'assignment_selection')
-      const linkSelection = placements.findWhere(p => p.key() === 'link_selection')
-      expect(assignmentSelection.text()).toMatch('Assignment Selection')
-      expect(linkSelection.text()).toMatch('Link Selection')
+    describe('when placement is inactive', () => {
+      it('shows X', () => {
+        renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: true
+          })
+        })
+        expect(document.querySelector('svg').getAttribute('name')).toBe('IconEnd')
+      })
+
+      it('shows Inactive tooltip', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: true
+          })
+        })
+        expect(getByRole('tooltip', {name: /Inactive/})).toBeInTheDocument()
+      })
     })
 
-    it('omits both placements for resource_selection when toggle buttons omitted', () => {
-      global.ENV.CONTEXT_BASE_URL = '/courses/1'
-      render({resource_selection: {enabled: false}})
-      expect(instance.placements().map(p => p != null && p.key)).toEqual(['editor_button'])
+    describe('when clicking toggle', () => {
+      it('toggles placement that was clicked', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: false,
+            homework_submission: {enabled: false}
+          })
+        })
+        fireEvent.click(getByRole('button', {name: /Placement inactive/}))
+        expect(store.togglePlacements).toHaveBeenCalledWith(
+          expect.objectContaining({
+            tool: expect.objectContaining({homework_submission: {enabled: true}}),
+            placements: ['homework_submission']
+          })
+        )
+      })
+
+      it('shows spinner during API request', async () => {
+        store.togglePlacements.mockImplementationOnce(async ({onSuccess}) => {
+          await new Promise(resolve => setTimeout(resolve, 500))
+          onSuccess()
+        })
+
+        const {findByTitle, getByRole, queryByTitle} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: false
+          })
+        })
+        fireEvent.click(getByRole('button', {name: /Placement active/}))
+
+        const spinnerTitle = 'Toggling Placement'
+        // spinner is rendered while waiting
+        expect(await findByTitle(spinnerTitle)).toBeInTheDocument()
+        // and is removed after API request resolves
+        await waitForElementToBeRemoved(() => queryByTitle(spinnerTitle))
+        expect(queryByTitle(spinnerTitle)).not.toBeInTheDocument()
+      })
+
+      describe('when default placement is clicked', () => {
+        it('toggles not_selectable', () => {
+          const {getByRole} = renderComponent({
+            tool: tool({
+              version: '1.1',
+              not_selectable: false
+            })
+          })
+          fireEvent.click(getByRole('button', {name: /Placement active/}))
+          expect(store.togglePlacements).toHaveBeenCalledWith(
+            expect.objectContaining({
+              tool: expect.objectContaining({not_selectable: true}),
+              placements: []
+            })
+          )
+        })
+
+        it('toggles included default placements', () => {
+          const {getByRole} = renderComponent({
+            tool: tool({
+              version: '1.1',
+              not_selectable: false,
+              assignment_selection: {enabled: true}
+            })
+          })
+          fireEvent.click(getByRole('button', {name: /Placement active/}))
+          expect(store.togglePlacements).toHaveBeenCalledWith(
+            expect.objectContaining({
+              tool: expect.objectContaining({not_selectable: true}),
+              placements: ['assignment_selection']
+            })
+          )
+        })
+      })
+
+      it('changes enabled to false for placement that does not have enabled defined', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: true,
+            homework_submission: {}
+          })
+        })
+        fireEvent.click(getByRole('button', {name: /Placement active/}))
+        expect(store.togglePlacements).toHaveBeenCalledWith(
+          expect.objectContaining({
+            tool: expect.objectContaining({homework_submission: {enabled: false}}),
+            placements: ['homework_submission']
+          })
+        )
+      })
+
+      it('calls props.onToggleSuccess', () => {
+        const onToggleSuccess = jest.fn()
+        const {getByRole} = renderComponent({
+          onToggleSuccess,
+          tool: tool({
+            version: '1.1',
+            not_selectable: false,
+            homework_submission: {enabled: false}
+          })
+        })
+        fireEvent.click(getByRole('button', {name: /Placement inactive/}))
+        expect(onToggleSuccess).toHaveBeenCalled()
+      })
+
+      describe('when API request fails', () => {
+        it('reverts toggle', async () => {
+          store.togglePlacements.mockImplementationOnce(async ({onError}) => {
+            await new Promise(resolve => setTimeout(resolve, 500))
+            onError()
+          })
+
+          const {getByRole, queryByTitle} = renderComponent({
+            tool: tool({
+              version: '1.1',
+              not_selectable: false
+            })
+          })
+          fireEvent.click(getByRole('button', {name: /Placement active/}))
+
+          // button turns into spinner during request
+          await waitForElementToBeRemoved(() => queryByTitle('Toggling Placement'))
+          // and then turns back to enabled when the request fails
+          expect(document.querySelector('svg').getAttribute('name')).toBe('IconCheckMark')
+        })
+      })
     })
 
-    it('renders assignment_ and link_selection normally when toggle buttons omitted', () => {
-      global.ENV.CONTEXT_BASE_URL = '/courses/1'
-      render({assignment_selection: {enabled: true}, link_selection: {enabled: true}})
-      expect(instance.placements().map(p => p != null && p.key)).toEqual([
-        'assignment_selection',
-        'editor_button',
-        'link_selection'
-      ])
-    })
-
-    it('renders special text for resource_selection toggle button', () => {
-      render({resource_selection: {enabled: true}})
-      const placements = mount(<div>{instance.placements()}</div>)
-      const resourceSelection = placements.findWhere(p => p.key() === 'resource_selection')
-      expect(resourceSelection.text()).toMatch('Assignment and Link Selection')
-    })
-
-    it('renders assignment_ and link_selection normally with toggle buttons', () => {
-      render({assignment_selection: {enabled: true}, link_selection: {enabled: true}})
-      const placements = mount(<div>{instance.placements()}</div>)
-      const assignmentSelection = placements.findWhere(p => p.key() === 'assignment_selection')
-      const linkSelection = placements.findWhere(p => p.key() === 'link_selection')
-      expect(assignmentSelection.text()).toMatch('Assignment Selection')
-      expect(linkSelection.text()).toMatch('Link Selection')
+    describe('when clicking toggle for default placements', () => {
+      it('includes default placements that the tool has configured', () => {
+        const {getByRole} = renderComponent({
+          tool: tool({
+            version: '1.1',
+            not_selectable: false,
+            assignment_selection: {enabled: true}
+          })
+        })
+        fireEvent.click(getByRole('button', {name: /Placement active/}))
+        expect(store.togglePlacements).toHaveBeenCalledWith(
+          expect.objectContaining({placements: ['assignment_selection']})
+        )
+      })
     })
   })
 })

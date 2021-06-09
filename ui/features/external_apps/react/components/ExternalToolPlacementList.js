@@ -26,19 +26,79 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckMarkSolid, IconEndSolid} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
+
+const ALL_PLACEMENTS = {
+  account_navigation: I18n.t('Account Navigation'),
+  assignment_edit: I18n.t('Assignment Edit'),
+  assignment_selection: I18n.t('Assignment Selection'),
+  assignment_view: I18n.t('Assignment View'),
+  similarity_detection: I18n.t('Similarity Detection'),
+  assignment_menu: I18n.t('Assignment Menu'),
+  assignment_index_menu: I18n.t('Assignments Index Menu'),
+  assignment_group_menu: I18n.t('Assignments Group Menu'),
+  collaboration: I18n.t('Collaboration'),
+  conference_selection: I18n.t('Conference Selection'),
+  course_assignments_menu: I18n.t('Course Assignments Menu'),
+  course_home_sub_navigation: I18n.t('Course Home Sub Navigation'),
+  course_navigation: I18n.t('Course Navigation'),
+  course_settings_sub_navigation: I18n.t('Course Settings Sub Navigation'),
+  discussion_topic_menu: I18n.t('Discussion Topic Menu'),
+  discussion_topic_index_menu: I18n.t('Discussions Index Menu'),
+  editor_button: I18n.t('Editor Button'),
+  file_menu: I18n.t('File Menu'),
+  file_index_menu: I18n.t('Files Index Menu'),
+  global_navigation: I18n.t('Global Navigation'),
+  homework_submission: I18n.t('Homework Submission'),
+  link_selection: I18n.t('Link Selection'),
+  migration_selection: I18n.t('Migration Selection'),
+  module_menu: I18n.t('Module Menu'),
+  module_index_menu: I18n.t('Modules Index Menu'),
+  module_group_menu: I18n.t('Modules Group Menu'),
+  post_grades: I18n.t('Sync Grades'),
+  quiz_menu: I18n.t('Quiz Menu'),
+  quiz_index_menu: I18n.t('Quizzes Index Menu'),
+  submission_type_selection: I18n.t('Submission Type Selection'),
+  student_context_card: I18n.t('Student Context Card'),
+  tool_configuration: I18n.t('Tool Configuration'),
+  user_navigation: I18n.t('User Navigation'),
+  wiki_page_menu: I18n.t('Page Menu'),
+  wiki_index_menu: I18n.t('Pages Index Menu'),
+  default_placements: I18n.t('Assignment and Link Selection')
+}
+
+const DEFAULT_1_1_PLACEMENTS = ['assignment_selection', 'link_selection', 'resource_selection']
+
+const presentDefaultPlacements = tool => DEFAULT_1_1_PLACEMENTS.filter(p => tool[p])
 
 export default class ExternalToolPlacementList extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    onSuccess: PropTypes.func.isRequired
+    onToggleSuccess: PropTypes.func.isRequired
   }
 
   state = {
-    tool: this.props.tool
+    tool: this.props.tool,
+    currentlyLoadingPlacements: {}
   }
 
+  hideLoadingSpinner = placement =>
+    this.setState(state => {
+      delete state.currentlyLoadingPlacements[placement]
+      return state
+    })
+
+  showLoadingSpinner = placement =>
+    this.setState(state => {
+      state.currentlyLoadingPlacements[placement] = true
+      return state
+    })
+
   /**
-   * toggle the status of a given placement in the tool
+   * toggle the status of a given placement in the tool.
+   * if placement config does not have `enabled`, treat it
+   * like enabled is present and true, and toggle it to false.
+   *
    * cb will be called after state has been updated,
    * and can use this.state.tool
    * @param {String} placement required
@@ -46,116 +106,80 @@ export default class ExternalToolPlacementList extends React.Component {
    */
   togglePlacement = (placement, cb = () => {}) => {
     this.setState(({tool}) => {
-      tool[placement].enabled = !tool[placement].enabled
+      tool[placement].enabled = tool[placement].hasOwnProperty('enabled')
+        ? !tool[placement].enabled // toggle it normally
+        : false // placement does not have enabled defined, treat it as true and toggle to false
+
       return {tool}
     }, cb)
   }
 
-  handleTogglePlacement = placement => {
-    this.togglePlacement(placement, () => {
-      store.togglePlacement({
-        tool: this.state.tool,
-        placement,
-        onError: () => {
-          $.flashError(I18n.t('Unable to toggle placement'))
-          this.togglePlacement(placement)
-        },
-        onSuccess: r => {
-          this.props.onSuccess(r, placement)
-        }
+  /**
+   * toggle the 1.1 default placements and the tool's
+   * not_selectable attribute.
+   *
+   * cb will be called after state has been updated,
+   * and can use this.state.tool
+   * @param {Function} cb optional
+   */
+  toggleDefaultPlacements = (cb = () => {}) => {
+    this.setState(({tool}) => {
+      presentDefaultPlacements(tool).forEach(p => {
+        tool[p].enabled = !tool[p].enabled
       })
-    })
+      tool.not_selectable = !tool.not_selectable
+      return {tool}
+    }, cb)
   }
 
-  placements = () => {
-    const allPlacements = {
-      account_navigation: I18n.t('Account Navigation'),
-      assignment_edit: I18n.t('Assignment Edit'),
-      assignment_selection: I18n.t('Assignment Selection'),
-      assignment_view: I18n.t('Assignment View'),
-      similarity_detection: I18n.t('Similarity Detection'),
-      assignment_menu: I18n.t('Assignment Menu'),
-      assignment_index_menu: I18n.t('Assignments Index Menu'),
-      assignment_group_menu: I18n.t('Assignments Group Menu'),
-      collaboration: I18n.t('Collaboration'),
-      conference_selection: I18n.t('Conference Selection'),
-      course_assignments_menu: I18n.t('Course Assignments Menu'),
-      course_home_sub_navigation: I18n.t('Course Home Sub Navigation'),
-      course_navigation: I18n.t('Course Navigation'),
-      course_settings_sub_navigation: I18n.t('Course Settings Sub Navigation'),
-      discussion_topic_menu: I18n.t('Discussion Topic Menu'),
-      discussion_topic_index_menu: I18n.t('Discussions Index Menu'),
-      editor_button: I18n.t('Editor Button'),
-      file_menu: I18n.t('File Menu'),
-      file_index_menu: I18n.t('Files Index Menu'),
-      global_navigation: I18n.t('Global Navigation'),
-      homework_submission: I18n.t('Homework Submission'),
-      link_selection: I18n.t('Link Selection'),
-      migration_selection: I18n.t('Migration Selection'),
-      module_menu: I18n.t('Module Menu'),
-      module_index_menu: I18n.t('Modules Index Menu'),
-      module_group_menu: I18n.t('Modules Group Menu'),
-      post_grades: I18n.t('Sync Grades'),
-      quiz_menu: I18n.t('Quiz Menu'),
-      quiz_index_menu: I18n.t('Quizzes Index Menu'),
-      submission_type_selection: I18n.t('Submission Type Selection'),
-      student_context_card: I18n.t('Student Context Card'),
-      tool_configuration: I18n.t('Tool Configuration'),
-      user_navigation: I18n.t('User Navigation'),
-      wiki_page_menu: I18n.t('Page Menu'),
-      wiki_index_menu: I18n.t('Pages Index Menu')
+  /**
+   * Toggles given placement first in the local tool state, and then in an API
+   * request. Handles 1.1 default placement separately.
+   *
+   * Flashes error message and reverts toggle if API request fails.
+   * Calls props.onToggleSuccess if API request succeeds.
+   * @param {*} placement
+   */
+  handleTogglePlacement = placement => {
+    const onSuccess = response => {
+      this.props.onToggleSuccess(response, placement)
+      this.hideLoadingSpinner(placement)
     }
+    const onError = () => {
+      $.flashError(I18n.t('Unable to toggle placement'))
+      this.hideLoadingSpinner(placement)
+    }
+    this.showLoadingSpinner(placement)
 
     const tool = this.state.tool
-    const appliedPlacements = Object.keys(allPlacements).filter(
-      placement =>
-        tool[placement] ||
-        (tool.resource_selection && placement === 'assignment_selection') ||
-        (tool.resource_selection && placement === 'link_selection')
-    )
-    if (appliedPlacements.length === 0) {
-      return
+    if (placement === 'default_placements') {
+      this.toggleDefaultPlacements(() => {
+        store.togglePlacements({
+          tool,
+          placements: presentDefaultPlacements(tool),
+          onSuccess,
+          onError: () => this.toggleDefaultPlacements(onError)
+        })
+      })
+    } else {
+      this.togglePlacement(placement, () => {
+        store.togglePlacements({
+          tool,
+          placements: [placement],
+          onSuccess,
+          onError: () => this.togglePlacement(placement, onError)
+        })
+      })
     }
-
-    // keep the old behavior of only displaying active placements when
-    // toggles aren't present
-    if (!this.shouldShowToggleButtons()) {
-      return appliedPlacements
-        .filter(key =>
-          tool.resource_selection && (key === 'assignment_selection' || key === 'link_selection')
-            ? tool.resource_selection.enabled
-            : tool[key].enabled
-        )
-        .map(key => <div key={key}>{allPlacements[key]}</div>)
-    }
-
-    // temporary fix:
-    // the `resource_selection` placment is deprecated, and will be removed.
-    // the `assignment_selection` and `link_selection` placements together
-    // serve the same purpose, so that's what is normally displayed. When
-    // toggling placements, the tool still has only `resource_selection`,
-    // so add and display that while hiding the "real" placements.
-    // Goal: remove `resource_selection` entirely from the tool model,
-    // then remove this code and the filter on `resource_selection` above.
-    if (tool.resource_selection) {
-      return [...appliedPlacements, 'resource_selection']
-        .filter(key => key !== 'assignment_selection' && key !== 'link_selection')
-        .map(key =>
-          this.placementToggle(
-            key,
-            key === 'resource_selection'
-              ? I18n.t('Assignment and Link Selection')
-              : allPlacements[key],
-            tool[key].enabled
-          )
-        )
-    }
-
-    return appliedPlacements.map(key =>
-      this.placementToggle(key, allPlacements[key], tool[key].enabled)
-    )
   }
 
+  /**
+   * Placements should only be allowed to be toggled when:
+   * 1. the tool is a 1.1 tool, since toggling is a 1.1 to 1.3 migration feature,
+   * 2. the user has permission to update the tool (teacher in a course view or admin),
+   * 3. the tool is being viewed in the context in which it was installed (no
+   *  toggling an account-level tool from a course).
+   */
   shouldShowToggleButtons = () => {
     const tool = this.state.tool
     const is_1_1_tool = tool.version === '1.1'
@@ -166,6 +190,78 @@ export default class ExternalToolPlacementList extends React.Component {
       ENV.CONTEXT_BASE_URL.includes(tool.context.toLowerCase())
 
     return is_1_1_tool && canUpdateTool && isEditableContext
+  }
+
+  /**
+   * Returns placements that are defined by a 1.1 tool.
+   *
+   * Always shows the default 1.1 placements, assignment_ and link_selection,
+   * as a single toggle or text line.
+   *
+   * The `resource_selection` placement is deprecated, and includes the
+   * default 1.1 placements. If it's enabled on the tool config, show the
+   * default_placements toggle or the default text line.
+   * @returns array of placements, either as a div or a text line with a toggle
+   */
+  placementsFor1_1 = () => {
+    const tool = this.state.tool
+    const placements = Object.keys(ALL_PLACEMENTS)
+      // always show default_placements in favor of specifics below
+      .filter(p => tool[p] || p === 'default_placements')
+      // exclude specific default placements
+      .filter(p => !DEFAULT_1_1_PLACEMENTS.includes(p))
+
+    // keep the old behavior of only displaying active placements when
+    // toggles aren't present
+    if (!this.shouldShowToggleButtons()) {
+      return placements
+        .filter(key => this.isPlacementEnabled(tool, key))
+        .map(key => <div key={key}>{ALL_PLACEMENTS[key]}</div>)
+    }
+
+    return placements.map(key =>
+      this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key))
+    )
+  }
+
+  /**
+   * Returns placements that are defined by a 1.3 tool.
+   *
+   * The `resource_selection` placement is deprecated and includes both
+   * assignment_ and link_selection. If it's present in the tool config,
+   * show both of those if the tool doesn't have them enabled.
+   *
+   * @returns array of divs, each with placement text
+   */
+  placementsFor1_3 = () => {
+    const tool = this.state.tool
+    return Object.keys(ALL_PLACEMENTS)
+      .filter(
+        key =>
+          // include placements that tool has defined and enabled
+          this.isPlacementEnabled(tool, key) ||
+          // always include both assignment and link selection for 1.3 tools with resource_selection
+          // note that resource_selection is deprecated!
+          (DEFAULT_1_1_PLACEMENTS.includes(key) && !tool[key] && tool.resource_selection?.enabled)
+      )
+      .map(key => <div key={key}>{ALL_PLACEMENTS[key]}</div>)
+  }
+
+  /**
+   * A placement without `enabled` should still be considered on by default.
+   *
+   * Default 1.1 placements use `not_selectable` regardless of `enabled`.
+   *
+   * @param {Object} tool - the tool configuration
+   * @param {String} placement - the placement key
+   * @returns true if placement.enabled is true, or if is not present
+   */
+  isPlacementEnabled(tool, placement) {
+    if (tool.version === '1.1' && placement === 'default_placements') {
+      return !tool.not_selectable
+    }
+
+    return tool[placement] && tool[placement].enabled !== false
   }
 
   placementToggle = (key, value, enabled) => {
@@ -189,21 +285,55 @@ export default class ExternalToolPlacementList extends React.Component {
       <Flex justifyItems="space-between" key={key}>
         <Flex.Item>{value}</Flex.Item>
         <Flex.Item>
-          <ToggleButton
-            status={props.status}
-            color={props.color}
-            renderIcon={props.renderIcon}
-            screenReaderLabel={props.screenReaderLabel}
-            renderTooltipContent={props.renderTooltipContent}
-            onClick={() => this.handleTogglePlacement(key)}
-          />
+          {this.state.currentlyLoadingPlacements[key] ? (
+            <Spinner
+              renderTitle={() => I18n.t('Toggling Placement')}
+              size="x-small"
+              margin="x-small x-small xx-small 0" // to match the height and position of the toggle button
+            />
+          ) : (
+            <ToggleButton
+              status={props.status}
+              color={props.color}
+              renderIcon={props.renderIcon}
+              screenReaderLabel={props.screenReaderLabel}
+              renderTooltipContent={props.renderTooltipContent}
+              onClick={() => this.handleTogglePlacement(key)}
+            />
+          )}
         </Flex.Item>
       </Flex>
     )
   }
 
+  /**
+   * Display this notice when toggles are available, since the `launch_definitions` API request
+   * that gets tools available for a given placement is super-cached (because it gets loaded
+   * on almost every page).
+   */
+  notice = () => (
+    <View
+      display="inline-block"
+      padding="none small"
+      margin="small none"
+      borderWidth="none none none large"
+      borderColor="info"
+      maxWidth="24rem"
+    >
+      <Text size="small" lineHeight="condensed">
+        <p style={{margin: 0}}>
+          {I18n.t(
+            'It may take some time for placement availability to reflect any changes made here. ' +
+              'You can also clear your cache and hard refresh on pages where you expect placements to change.'
+          )}
+        </p>
+      </Text>
+    </View>
+  )
+
   render = () => {
-    const placements = this.placements()
+    const placements =
+      this.state.tool.version === '1.1' ? this.placementsFor1_1() : this.placementsFor1_3()
 
     if (!placements || placements.length === 0) {
       return I18n.t('No Placements Enabled')
@@ -216,23 +346,7 @@ export default class ExternalToolPlacementList extends React.Component {
     return (
       <>
         {placements}
-        <View
-          display="inline-block"
-          padding="none small"
-          margin="small none"
-          borderWidth="none none none large"
-          borderColor="info"
-          maxWidth="24rem"
-        >
-          <Text size="small" lineHeight="condensed">
-            <p style={{margin: 0}}>
-              {I18n.t(
-                'It may take some time for placement availability to reflect any changes made here. ' +
-                  'You can also clear your cache and hard refresh on pages where you expect placements to change.'
-              )}
-            </p>
-          </Text>
-        </View>
+        {this.notice()}
       </>
     )
   }

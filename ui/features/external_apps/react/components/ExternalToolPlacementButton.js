@@ -31,7 +31,7 @@ export default class ExternalToolPlacementButton extends React.Component {
     tool: PropTypes.object.isRequired,
     type: PropTypes.string, // specify "button" if this is not a menu item
     returnFocus: PropTypes.func.isRequired,
-    onSuccess: PropTypes.func.isRequired
+    onToggleSuccess: PropTypes.func.isRequired
   }
 
   state = {
@@ -84,7 +84,10 @@ export default class ExternalToolPlacementButton extends React.Component {
         {this.state.isRetrievingTool ? (
           this.spinner()
         ) : (
-          <ExternalToolPlacementList tool={this.state.tool} onSuccess={this.props.onSuccess} />
+          <ExternalToolPlacementList
+            tool={this.state.tool}
+            onToggleSuccess={this.props.onToggleSuccess}
+          />
         )}
       </Modal.Body>
       <Modal.Footer>
