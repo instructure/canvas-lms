@@ -1415,11 +1415,8 @@ class CoursesController < ApplicationController
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
         can_do(@context, @current_user, :manage_grades)
 
-      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
-        @context.account.courses.active.select(&:homeroom_course)
-      else
-        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).select(&:homeroom_course)
-      end
+      # Temporarily disable querying homeroom_courses until it can be made more performant
+      @homeroom_courses = []
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
