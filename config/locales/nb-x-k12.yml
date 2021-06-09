@@ -2428,7 +2428,7 @@ nb-x-k12:
   an_error_occurred_making_a_network_request_d1bda348: "Det oppstod en feil ved utførelse av en nettverksforespørsel"
   an_error_occurred_moving_group_title_24fd7fb4: "Den oppsto en feil under flytting av gruppen «%{title}»\""
   an_error_occurred_moving_group_title_message_f8428b66: "Den oppsto en feil under flytting av gruppen «%{title}»: %{message}"
-  an_error_occurred_moving_outcome_title_4e616ce1: "Det oppsto en feil under flytting av målet «%{title}»\""
+  an_error_occurred_moving_outcome_title_4e616ce1: "Det oppsto en feil under flytting av målet «%{title}»"
   an_error_occurred_moving_outcome_title_message_39fff0d1: "Det oppsto en feil under flytting av målet «%{title}»: %{message}"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod et avvik*, vennligst publiser svaret ditt senere"
   an_error_occurred_please_try_again_95361e05: "Det oppstod en feil. Vennligst prøv igjen."
