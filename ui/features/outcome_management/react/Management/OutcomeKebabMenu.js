@@ -21,11 +21,19 @@ import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
-import {IconMoreLine, IconEditLine, IconTrashLine, IconMoveEndLine} from '@instructure/ui-icons'
+import {
+  IconMoreLine,
+  IconEditLine,
+  IconTrashLine,
+  IconMoveEndLine,
+  IconInfoLine
+} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 
-const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy}) => {
+const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescription}) => {
+  const isGroup = groupDescription !== undefined
+  const hasDescription = groupDescription !== ''
   return (
     <Menu
       trigger={
@@ -47,6 +55,13 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy}) => {
         <IconMoveEndLine size="x-small" />
         <View padding="0 small">{I18n.t('Move')}</View>
       </Menu.Item>
+      {isGroup && <Menu.Separator />}
+      {isGroup && (
+        <Menu.Item value="description" disabled={!hasDescription}>
+          <IconInfoLine size="x-small" />
+          <View padding="0 small">{I18n.t('View Description')}</View>
+        </Menu.Item>
+      )}
     </Menu>
   )
 }
@@ -54,7 +69,8 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy}) => {
 OutcomeKebabMenu.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
   menuTitle: PropTypes.string,
-  canDestroy: PropTypes.bool.isRequired
+  canDestroy: PropTypes.bool.isRequired,
+  groupDescription: PropTypes.string
 }
 
 OutcomeKebabMenu.defaultProps = {

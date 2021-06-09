@@ -36,6 +36,7 @@ import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
+import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
@@ -112,6 +113,8 @@ const OutcomeManagementPanel = () => {
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
   const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
+  const [isGroupDescriptionModalOpen, openGroupDescriptionModal, closeGroupDescriptionModal] =
+    useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
@@ -135,6 +138,8 @@ const OutcomeManagementPanel = () => {
       openGroupRemoveModal()
     } else if (action === 'edit') {
       openEditGroupModal()
+    } else if (action === 'description') {
+      openGroupDescriptionModal()
     }
   }
   const outcomeMenuHandler = useCallback(
@@ -342,11 +347,18 @@ const OutcomeManagementPanel = () => {
             </>
           )}
           {group && (
-            <EditGroupModal
-              outcomeGroup={group}
-              isOpen={isEditGroupModalOpen}
-              onCloseHandler={onCloseEditGroupModal}
-            />
+            <>
+              <EditGroupModal
+                outcomeGroup={group}
+                isOpen={isEditGroupModalOpen}
+                onCloseHandler={onCloseEditGroupModal}
+              />
+              <GroupDescriptionModal
+                outcomeGroup={group}
+                isOpen={isGroupDescriptionModalOpen}
+                onCloseHandler={closeGroupDescriptionModal}
+              />
+            </>
           )}
         </>
       )}
