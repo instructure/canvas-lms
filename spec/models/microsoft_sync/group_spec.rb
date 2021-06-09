@@ -207,6 +207,14 @@ describe MicrosoftSync::Group do
         subject.enqueue_future_sync
       end
     end
+
+    context 'when the MicrosoftSync::Group is in the deleted state' do
+      it 'does not enqueue a job' do
+        subject.destroy
+        expect(subject).to_not receive(:syncer_job)
+        subject.enqueue_future_sync
+      end
+    end
   end
 
   describe '#enqueue_future_partial_sync' do
@@ -228,6 +236,15 @@ describe MicrosoftSync::Group do
         expect(delay_double).to receive(:run_later).with(:partial)
 
         subject.enqueue_future_partial_sync(enrollment)
+      end
+    end
+
+    context 'when the MicrosoftSync::Group is in the deleted state' do
+      it 'does not upsert a sync change or enqueue a job' do
+        subject.destroy
+        expect(MicrosoftSync::PartialSyncChange).to_not receive(:upsert_for_enrollment)
+        expect(subject).to_not receive(:syncer_job)
+        subject.enqueue_future_partial_sync(double(:enrollment))
       end
     end
   end

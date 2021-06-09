@@ -117,8 +117,10 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  shared_examples_for 'a step that returns retry on intermittent error' do |retry_args|
+  shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
+    # use actual graph service instead of double and intercept calls to "request":
     let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
+    let(:retry_args) { {delay_amount: [5, 20, 100]}.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
@@ -137,31 +139,43 @@ describe MicrosoftSync::SyncerSteps do
       end
     end
 
-    context 'when the Microsoft API returns a 429 with a retry-after header' do
-      it 'returns a Retry object with that retry-after time' do
-        expect(graph_service).to receive(:request).and_raise(
-          new_http_error(429, 'retry-after' => '3.14')
-        )
-        expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
-                     **retry_args.merge(delay_amount: 3.14))
+    unless options[:except_404]
+      context 'on 404' do
+        it 'goes back to step_generate_diff with a delay' do
+          expect(graph_service).to receive(:request).and_raise(new_http_error(404))
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
+        end
       end
     end
 
-    context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
-      it 'returns a Retry object with that retry-after time' do
-        err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
-        expect(err).to receive(:retry_after_seconds).and_return(1.23)
-        expect(graph_service).to receive(:request).and_raise(err)
-        expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
+    unless options[:except_throttled]
+      context 'when the Microsoft API returns a 429 with a retry-after header' do
+        it 'returns a Retry object with that retry-after time' do
+          expect(graph_service).to receive(:request).and_raise(
+            new_http_error(429, 'retry-after' => '3.14')
+          )
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
+                       **retry_args.merge(delay_amount: 3.14))
+        end
       end
-    end
 
-    context 'when the Microsoft API returns a 429 with no retry-after header' do
-      it 'returns a Retry object with our default retry times' do
-        expect(graph_service).to receive(:request).and_raise(new_http_error(429))
-        expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+      context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
+        it 'returns a Retry object with that retry-after time' do
+          err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
+          expect(err).to receive(:retry_after_seconds).and_return(1.23)
+          expect(graph_service).to receive(:request).and_raise(err)
+          expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
+        end
+      end
+
+      context 'when the Microsoft API returns a 429 with no retry-after header' do
+        it 'returns a Retry object with our default retry times' do
+          expect(graph_service).to receive(:request).and_raise(new_http_error(429))
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+        end
       end
     end
   end
@@ -250,7 +264,7 @@ describe MicrosoftSync::SyncerSteps do
     shared_examples_for 'a group record which requires a new or updated MS group' do
       let(:education_class_ids) { [] }
 
-      it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+      it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
       context 'when no remote MS group exists for the course' do
         # admin deleted the MS group we created, or a group never existed
@@ -340,7 +354,7 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it_behaves_like 'a step that returns retry on intermittent error',
-                    delay_amount: [5, 20, 100], job_state_data: 'newid'
+                    retry_args: {job_state_data: 'newid'}
 
     context 'on success' do
       it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
@@ -349,19 +363,6 @@ describe MicrosoftSync::SyncerSteps do
 
         expect { subject }.to change { group.reload.ms_group_id }.to('newid')
         expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
-      end
-    end
-
-    context 'on 404' do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to \
-          receive(:update_group_with_course_data).with('newid', course)
-          .and_raise(new_http_error(404))
-        expect { subject }.to_not change { group.reload.ms_group_id }
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100], job_state_data: 'newid'
-        )
       end
     end
 
@@ -403,17 +404,7 @@ describe MicrosoftSync::SyncerSteps do
       end
     end
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
-
-    context "when Microsoft's API returns 404" do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).and_raise(new_http_error(404))
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100]
-        )
-      end
-    end
+    it_behaves_like 'a step that returns retry on intermittent error'
 
     context "when Microsoft's API returns success" do
       before do
@@ -474,7 +465,7 @@ describe MicrosoftSync::SyncerSteps do
   describe '#step_generate_diff' do
     subject { syncer_steps.step_generate_diff(nil, nil) }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error'
 
     before do
       course.enrollments.to_a.each_with_index do |enrollment, i|
@@ -505,17 +496,6 @@ describe MicrosoftSync::SyncerSteps do
 
       expect_next_step(subject, :step_execute_diff, diff)
       expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
-    end
-
-    context 'on 404' do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
-          .and_raise(new_http_error(404))
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100]
-        )
-      end
     end
   end
 
@@ -602,23 +582,12 @@ describe MicrosoftSync::SyncerSteps do
 
     it_behaves_like 'a step that executes a diff' do
       it_behaves_like 'a step that returns retry on intermittent error',
-                      delay_amount: [5, 20, 100], step: :step_generate_diff
+                      retry_args: {step: :step_generate_diff}
 
       it 'goes to the step_check_team_exists on success' do
         allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
         allow(graph_service).to receive(:remove_group_users_ignore_missing)
         expect_next_step(subject, :step_check_team_exists)
-      end
-
-      context 'on 404' do
-        it 'goes back to step_generate_diff with a delay' do
-          expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-            .and_raise(new_http_error(404))
-          expect_retry(
-            subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-            delay_amount: [5, 20, 100], step: :step_generate_diff
-          )
-        end
       end
     end
 
@@ -657,7 +626,7 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update!(ms_group_id: 'mygroupid') }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
@@ -689,7 +658,7 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update!(ms_group_id: 'mygroupid') }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
     it 'creates the team' do
       expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
@@ -844,7 +813,20 @@ describe MicrosoftSync::SyncerSteps do
           # that executes a diff' makes the diff return actions. We need actions
           # to trigger requests that can cause an intermittent error
 
-          it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+          it_behaves_like 'a step that returns retry on intermittent error',
+                          except_throttled: true do
+            context 'when a request is throttled' do
+              it 'turns into a full sync job with the delay given in the retry-after header' do
+                expect(graph_service).to receive(:request).and_raise(
+                  new_http_error(429, 'retry-after' => '3.14')
+                )
+                expect_delayed_next_step(
+                  subject,
+                  :step_full_sync_prerequisites, 3.14
+                )
+              end
+            end
+          end
         end
 
         it 'deletes the partial sync changes' do

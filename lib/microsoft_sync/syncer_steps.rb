@@ -123,10 +123,6 @@ module MicrosoftSync
 
     # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
-      # TODO: as we continue building the job we could possibly just use the
-      # group.ms_group_id and if we get an error know we have to create it.
-      # That will save us a API call. But we won't be able to detect if there
-      # are multiple; and it makes handling the 404s soon after a creation trickier.
       remote_ids = graph_service_helpers.list_education_classes_for_course(course).map{|c| c['id']}
 
       # If we've created the group previously, we're good to go
@@ -348,15 +344,17 @@ module MicrosoftSync
         .delete_all
 
       StateMachineJob::COMPLETE
-    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
-      # TODO: a NotFound error happens it means the API has not settled
-      # even after a full sync (very rare) or user has deleted the group on the
-      # MS side. In the latter case it may be better to trigger a full sync so
-      # we don't keep retrying 3 times on every enrollment change?
-      # TODO: if throttled, it's likely due to adds/removes. the fact we didn't
+    rescue Errors::Throttled => e
+      # If throttled, it's likely due to adds/removes. the fact we didn't
       # delete changes will mean retrying will cause us to fail more and probably
-      # get throttled more. It's safer to do a full sync, even if it means incurring
-      # more read quota from getting the list of users in a group (generally, cheaper)
+      # get throttled more. It will save quota to do a full sync, even if it means
+      # incurring more read quota from getting the list of users in a group
+      # (generally, cheaper).
+      full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
+      Rails.logger.info 'MicrosoftSync::SyncerSteps: partial sync throttled, ' \
+        "full sync in #{full_sync_after}"
+      StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e)
     end
 
