@@ -26,7 +26,6 @@ def jestNodeRequirementsTemplate() {
     image: env.KARMA_RUNNER_IMAGE,
     command: 'cat',
     ttyEnabled: true,
-    runAsUser: '0',
     resourceRequestCpu: '6.8',
     resourceLimitCpu: '8'
   ]
@@ -41,7 +40,6 @@ def coffeeNodeRequirementsTemplate() {
     image: env.KARMA_RUNNER_IMAGE,
     command: 'cat',
     ttyEnabled: true,
-    runAsUser: '0',
     resourceRequestCpu: '1',
     resourceLimitCpu: '8'
   ]
@@ -56,7 +54,6 @@ def karmaNodeRequirementsTemplate() {
     image: env.KARMA_RUNNER_IMAGE,
     command: 'cat',
     ttyEnabled: true,
-    runAsUser: '0',
     resourceRequestCpu: '0.75',
     resourceLimitCpu: '8'
   ]
@@ -73,9 +70,7 @@ def karmaNodeRequirementsTemplate() {
 
 def tearDownNode() {
   return {
-    sh "mkdir -p ${WORKSPACE}/${env.TEST_RESULT_OUTPUT_DIR}"
-    sh "cp -rf /usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${WORKSPACE}/${env.TEST_RESULT_OUTPUT_DIR}"
-
+    copyToWorkspace srcBaseDir: '/usr/src/app', path: env.TEST_RESULT_OUTPUT_DIR
     archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
     junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
   }
