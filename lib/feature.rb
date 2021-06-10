@@ -240,7 +240,7 @@ class Feature
     valid_features = self.definitions.keys
     cutoff = Setting.get('obsolete_feature_flag_cutoff_days', 60).to_i.days.ago
     delete_scope = FeatureFlag.where('updated_at<?', cutoff).where.not(feature: valid_features)
-    while delete_scope.limit(1000).delete_all > 0; end
+    delete_scope.in_batches.delete_all
   end
 end
 
