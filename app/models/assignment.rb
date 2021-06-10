@@ -2901,6 +2901,14 @@ class Assignment < ActiveRecord::Base
     type_quiz_lti.where(submission_types: "external_tool")
   }
 
+  scope :with_important_dates, -> {
+    joins("LEFT JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.assignment_id=assignments.id")
+      .where(important_dates: true)
+      .where(
+        'assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)'
+      )
+  }
+
   def overdue?
     due_at && due_at <= Time.zone.now
   end

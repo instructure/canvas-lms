@@ -176,6 +176,7 @@ module Api::V1::CalendarEvent
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
     hash['html_url'] = calendar_url_for(options[:effective_context] || event.effective_context, :event => event)
     hash['duplicates'] = duplicates
+    hash['important_dates'] = event.important_dates if Account.site_admin.feature_enabled?(:important_dates)
     hash
   end
 
@@ -202,6 +203,7 @@ module Api::V1::CalendarEvent
     if assignment.applied_overrides.present?
       hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
     end
+    hash['important_dates'] = assignment.important_dates if Account.site_admin.feature_enabled?(:important_dates)
     hash
   end
 
