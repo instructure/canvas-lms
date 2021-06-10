@@ -764,7 +764,7 @@ export const findOutcomesMocks = ({
 ]
 
 export const setFriendlyDescriptionOutcomeMock = ({
-  inputDescription = 'Updated alternate description',
+  inputDescription = 'Updated friendly description',
   failResponse = false
 } = {}) => {
   const successfulResponse = {
@@ -772,7 +772,7 @@ export const setFriendlyDescriptionOutcomeMock = ({
       setFriendlyDescription: {
         outcomeFriendlyDescription: {
           _id: '1',
-          description: 'Updated alternate description',
+          description: 'Updated friendly description',
           __typename: 'OutcomeFriendlyDescription'
         },
         __typename: 'SetFriendlyDescriptionPayload',

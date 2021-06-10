@@ -46,11 +46,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
     outcome.displayName || ''
   )
   const [description] = useInput(outcome.description || '')
-  const [
-    alternateDescription,
-    alternateDescriptionChangeHandler,
-    alternateDescriptionChanged
-  ] = useInput(outcome.friendlyDescription?.description || '')
+  const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
+    useInput(outcome.friendlyDescription?.description || '')
   const [setRCERef, getRCECode] = useRCE()
 
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
@@ -58,7 +55,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
 
   const canvasContext = useCanvasContext()
   let attributesEditable = {
-    alternativeDescription: true
+    friendlyDescription: true
   }
   if (
     outcome.contextType === canvasContext.contextType &&
@@ -75,18 +72,14 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
 
-  const alternativeDescriptionMessages = []
-  if (alternateDescriptionChanged && alternateDescription.length > 255) {
-    alternativeDescriptionMessages.push({
+  const friendlyDescriptionMessages = []
+  if (friendlyDescriptionChanged && friendlyDescription.length > 255) {
+    friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
       type: 'error'
     })
   }
-  const formValid = !(
-    invalidTitle ||
-    invalidDisplayName ||
-    alternativeDescriptionMessages.length > 0
-  )
+  const formValid = !(invalidTitle || invalidDisplayName || friendlyDescriptionMessages.length > 0)
 
   const onUpdateOutcomeHandler = () => {
     ;(async () => {
@@ -112,12 +105,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
             })
           )
         }
-        if (alternateDescriptionChanged) {
+        if (friendlyDescriptionChanged) {
           promises.push(
             setOutcomeFriendlyDescription({
               variables: {
                 input: {
-                  description: alternateDescription,
+                  description: friendlyDescription,
                   contextId: canvasContext.contextId,
                   contextType: canvasContext.contextType,
                   outcomeId: outcome._id
@@ -225,12 +218,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
               size="medium"
               height="8rem"
               maxHeight="8rem"
-              value={alternateDescription}
-              label={I18n.t('Alternative description (for parent/student display)')}
-              placeholder={I18n.t('Enter your alternate description here')}
-              onChange={alternateDescriptionChangeHandler}
-              messages={alternativeDescriptionMessages}
-              data-testid="alternate-description-input"
+              value={friendlyDescription}
+              label={I18n.t('Friendly description (for parent/student display)')}
+              placeholder={I18n.t('Enter your friendly description here')}
+              onChange={friendlyDescriptionChangeHandler}
+              messages={friendlyDescriptionMessages}
+              data-testid="friendly-description-input"
             />
           </View>
         </Modal.Body>

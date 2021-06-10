@@ -213,7 +213,7 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
+    fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
       target: {value: 'Friendly Description value'}
     })
     fireEvent.click(getByText('Root account folder'))
@@ -281,7 +281,7 @@ describe('CreateOutcomeModal', () => {
     })
   })
 
-  it('handles create outcome failure due to alternate description', async () => {
+  it('handles create outcome failure due to friendly description', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [
@@ -293,7 +293,7 @@ describe('CreateOutcomeModal', () => {
           groupId: 100
         }),
         setFriendlyDescriptionOutcomeMock({
-          inputDescription: 'Alternate description',
+          inputDescription: 'Friendly description',
           failResponse: true
         })
       ]
@@ -301,8 +301,8 @@ describe('CreateOutcomeModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
-      target: {value: 'Alternate description'}
+    fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
+      target: {value: 'Friendly description'}
     })
     fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -317,7 +317,7 @@ describe('CreateOutcomeModal', () => {
     })
   })
 
-  it('does not throw error if alternate description mutation succeeds', async () => {
+  it('does not throw error if friendly description mutation succeeds', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
       mocks: [
@@ -329,15 +329,15 @@ describe('CreateOutcomeModal', () => {
           groupId: 100
         }),
         setFriendlyDescriptionOutcomeMock({
-          inputDescription: 'Alternate description'
+          inputDescription: 'Friendly description'
         })
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-    fireEvent.change(getByLabelText('Alternate description (for parent/student display)'), {
-      target: {value: 'Alternate description'}
+    fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
+      target: {value: 'Friendly description'}
     })
     fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runOnlyPendingTimers())

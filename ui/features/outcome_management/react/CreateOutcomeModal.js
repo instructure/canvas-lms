@@ -47,19 +47,13 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const {contextType, contextId} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
-  const [altDescription, altDescriptionChangeHandler] = useInput()
+  const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
   const [setRCERef, getRCECode, setRCECode] = useRCE()
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
-  const {
-    error,
-    isLoading,
-    collections,
-    queryCollections,
-    rootId,
-    selectedGroupId
-  } = useManageOutcomes()
+  const {error, isLoading, collections, queryCollections, rootId, selectedGroupId} =
+    useManageOutcomes()
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -98,12 +92,12 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
 
         if (!outcomeId) throw new Error(errorMessage)
 
-        if (altDescription) {
+        if (friendlyDescription) {
           await setOutcomeFriendlyDescription({
             variables: {
               input: {
                 outcomeId,
-                description: altDescription,
+                description: friendlyDescription,
                 contextId,
                 contextType
               }
@@ -174,10 +168,10 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
               size="medium"
               height="8rem"
               maxHeight="10rem"
-              value={altDescription}
-              placeholder={I18n.t('Enter your alternate description here')}
-              label={I18n.t('Alternate description (for parent/student display)')}
-              onChange={altDescriptionChangeHandler}
+              value={friendlyDescription}
+              placeholder={I18n.t('Enter your friendly description here')}
+              label={I18n.t('Friendly description (for parent/student display)')}
+              onChange={friendlyDescriptionChangeHandler}
             />
           </View>
           <View as="div" padding="x-small 0 0">
