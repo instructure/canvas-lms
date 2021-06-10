@@ -2429,7 +2429,7 @@ class Assignment < ActiveRecord::Base
 
       if section_id.present?
         students = students.joins(:enrollments).
-          where(enrollments: {course_section_id: section_id, workflow_state: :active})
+          where(enrollments: {course_section_id: section_id, workflow_state: includes + [:active]})
       end
       students.to_a
     end
