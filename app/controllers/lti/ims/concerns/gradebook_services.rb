@@ -73,7 +73,7 @@ module Lti::Ims::Concerns
 
       def user_id
         id = params.fetch(:userId, params[:user_id])
-        id == id.to_i.to_s ? id : nil
+        [id.to_i, id.to_i.to_s].include?(id) ? id : nil
       end
 
       def prepare_line_item_for_ags!
