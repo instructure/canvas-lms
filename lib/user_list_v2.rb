@@ -229,17 +229,21 @@ class UserListV2
 
     search_for_results(restricted_shards) do
       ccs = []
+      scope = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
+        CommunicationChannel.unretired
+      else
+        CommunicationChannel.active
+      end
+      
       if sms_paths.any?
-        ccs = CommunicationChannel
+        ccs = scope
           .sms
-          .active
           .preload(user: :pseudonyms)
           .where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths)
           .to_a
       end
-      ccs += CommunicationChannel
+      ccs += scope
         .email
-        .active
         .preload(user: :pseudonyms)
         .where("LOWER(path) IN (?)", email_paths)
         .to_a
