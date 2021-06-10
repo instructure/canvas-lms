@@ -30,6 +30,10 @@ describe DataFixup::MigrateHomeroomSettingsToColumns do
     @c2.settings_frd[:sync_enrollments_from_homeroom] = true
     @c2.settings_frd[:homeroom_course_id] = @c1.id
     @c2.save!
+
+    @c3 = course_factory
+    @c3.settings_frd[:homeroom_course_id] = 'null'
+    @c3.save!
   end
 
   it "migrates settings to columns" do
@@ -37,5 +41,10 @@ describe DataFixup::MigrateHomeroomSettingsToColumns do
     expect(Course.homeroom).to eq([@c1])
     expect(Course.sync_homeroom_enrollments_enabled).to eq([@c2])
     expect(@c2.reload.linked_homeroom_course).to eq @c1
+  end
+
+  it "cleans strings that aren't ints" do
+    DataFixup::MigrateHomeroomSettingsToColumns.run
+    expect(@c3.reload.linked_homeroom_course).to eq(nil)
   end
 end
