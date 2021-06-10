@@ -159,9 +159,10 @@ export const groupMocks = ({
 export const outcomeGroup = {
   _id: '0',
   title: 'Grade.2.Math.3A.Elementary.CCSS.Calculus.1',
-  description: '<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
-    2
-  ),
+  description:
+    '<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
+      2
+    ),
   outcomesCount: 15,
   canEdit: true,
   outcomes: {
@@ -172,12 +173,14 @@ export const outcomeGroup = {
     edges: [
       {
         canUnlink: true,
+        id: '1',
         node: {
           _id: '1',
           title: 'CCSS.Math.Content.2.MD.A.1 - Outcome with regular length title and description',
-          description: '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
-            2
-          ),
+          description:
+            '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
+              2
+            ),
           contextType: null,
           contextId: null,
           canEdit: true
@@ -185,13 +188,15 @@ export const outcomeGroup = {
       },
       {
         canUnlink: true,
+        id: '2',
         node: {
           _id: '2',
           title:
             'CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.Outcome.with.long.title.and.description',
-          description: '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
-            2
-          ),
+          description:
+            '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
+              2
+            ),
           contextType: null,
           contextId: null,
           canEdit: true
@@ -199,6 +204,7 @@ export const outcomeGroup = {
       },
       {
         canUnlink: true,
+        id: '3',
         node: {
           _id: '3',
           title: 'CCSS.Math.Content.2.G.A.3 - Outcome with regular length title and no description',
@@ -210,13 +216,15 @@ export const outcomeGroup = {
       },
       {
         canUnlink: true,
+        id: '4',
         node: {
           _id: '4',
           title:
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
-          description: '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
-            2
-          ),
+          description:
+            '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
+              2
+            ),
           contextType: null,
           contextId: null,
           canEdit: true
@@ -224,13 +232,15 @@ export const outcomeGroup = {
       },
       {
         canUnlink: true,
+        id: '5',
         node: {
           _id: '5',
           title:
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
-          description: '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
-            2
-          ),
+          description:
+            '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
+              2
+            ),
           contextType: null,
           contextId: null,
           canEdit: true
@@ -238,12 +248,14 @@ export const outcomeGroup = {
       },
       {
         canUnlink: true,
+        id: '6',
         node: {
           _id: '6',
           title: 'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3',
-          description: '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
-            2
-          ),
+          description:
+            '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
+              2
+            ),
           contextType: null,
           contextId: null,
           canEdit: true
@@ -288,6 +300,8 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
+                canUnlink: true,
+                id: '1',
                 node: {
                   _id: '1',
                   description: '',
@@ -298,6 +312,8 @@ export const groupDetailMocks = ({
                 __typename: 'ContentTag'
               },
               {
+                canUnlink: true,
+                id: '2',
                 node: {
                   _id: '2',
                   description: '',
@@ -342,6 +358,8 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
+                canUnlink: true,
+                id: '1',
                 node: {
                   _id: '1',
                   description: '',
@@ -352,6 +370,8 @@ export const groupDetailMocks = ({
                 __typename: 'ContentTag'
               },
               {
+                canUnlink: true,
+                id: '3',
                 node: {
                   _id: '3',
                   description: '',
@@ -397,6 +417,8 @@ export const groupDetailMocks = ({
             },
             edges: [
               {
+                canUnlink: true,
+                id: '5',
                 node: {
                   _id: '5',
                   description: '',
@@ -409,6 +431,8 @@ export const groupDetailMocks = ({
                 __typename: 'ContentTag'
               },
               {
+                canUnlink: true,
+                id: '6',
                 node: {
                   _id: '6',
                   description: '',
@@ -453,6 +477,7 @@ export const groupDetailMocks = ({
             edges: [
               {
                 canUnlink,
+                id: '1',
                 node: {
                   _id: '1',
                   description: '',
@@ -468,6 +493,7 @@ export const groupDetailMocks = ({
               },
               {
                 canUnlink,
+                id: '2',
                 node: {
                   _id: '2',
                   description: '',
@@ -517,6 +543,7 @@ export const groupDetailMocks = ({
             edges: [
               {
                 canUnlink,
+                id: '3',
                 node: {
                   _id: '3',
                   description: '',
@@ -532,6 +559,7 @@ export const groupDetailMocks = ({
               },
               {
                 canUnlink,
+                id: '4',
                 node: {
                   _id: '4',
                   description: '',
@@ -581,6 +609,7 @@ export const groupDetailMocks = ({
             edges: [
               {
                 canUnlink,
+                id: '1',
                 node: {
                   _id: '1',
                   description: '',
@@ -639,6 +668,8 @@ export const findOutcomesMocks = ({
             },
             edges: [
               {
+                canUnlink: true,
+                id: '5',
                 node: {
                   _id: '5',
                   description: '',
@@ -650,6 +681,8 @@ export const findOutcomesMocks = ({
                 __typename: 'ContentTag'
               },
               {
+                canUnlink: true,
+                id: '6',
                 node: {
                   _id: '6',
                   description: '',
@@ -695,6 +728,8 @@ export const findOutcomesMocks = ({
             },
             edges: [
               {
+                canUnlink: true,
+                id: '5',
                 node: {
                   _id: '5',
                   description: '',
@@ -706,6 +741,8 @@ export const findOutcomesMocks = ({
                 __typename: 'ContentTag'
               },
               {
+                canUnlink: true,
+                id: '6',
                 node: {
                   _id: '6',
                   description: '',
