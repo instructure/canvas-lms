@@ -84,6 +84,10 @@ $.fn.moduleSequenceFooter = function(options = {}) {
       }
       this.show()
       $(window).triggerHandler('resize')
+
+      if (options.onFetchSuccess) {
+        options.onFetchSuccess()
+      }
     })
   }
   return this

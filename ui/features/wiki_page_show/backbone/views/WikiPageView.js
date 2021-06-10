@@ -130,7 +130,11 @@ export default class WikiPageView extends Backbone.View {
       this.$sequenceFooter.moduleSequenceFooter({
         courseID: this.course_id,
         assetType: 'Page',
-        assetID: this.model.get('url')
+        assetID: this.model.get('url'),
+        onFetchSuccess: () => {
+          $('.module-sequence-footer-content').append($('#mark-as-done-container'))
+          $('#mark-as-done-container').css({'float': 'right', 'margin-right': '4px'})
+        }
       })
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
@@ -153,7 +157,6 @@ export default class WikiPageView extends Backbone.View {
 
   afterRender() {
     super.afterRender(...arguments)
-    $('.page-toolbar .page-toolbar-end .buttons').append($('#mark-as-done-checkbox'))
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
