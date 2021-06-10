@@ -338,6 +338,7 @@ describe RubricAssessment do
       end
 
       it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
         expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome_result.create')
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym

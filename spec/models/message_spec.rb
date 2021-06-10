@@ -324,6 +324,7 @@ describe Message do
                                root_account: account)
 
 
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
       expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
                                                              {short_stat: "message.deliver",
                                                               tags: {path_type: "email", notification_name: 'my_name'}})
