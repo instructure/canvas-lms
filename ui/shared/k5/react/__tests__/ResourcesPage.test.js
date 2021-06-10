@@ -139,6 +139,20 @@ describe('ResourcesPage', () => {
       window.location.assign = assign
     })
 
+    it('does not fetch apps without subject courses', async () => {
+      const props = getProps({
+        cards: [
+          {
+            id: '2',
+            isHomeroom: true,
+            originalName: 'Homeroom A'
+          }
+        ]
+      })
+      render(<ResourcesPage {...props} />)
+      expect(utils.fetchCourseApps).not.toHaveBeenCalled()
+    })
+
     it('falls back to use app.icon_url if an icon is not defined in course_navigation', async () => {
       const response = [
         {

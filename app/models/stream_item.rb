@@ -55,16 +55,16 @@ class StreamItem < ActiveRecord::Base
     res = type.constantize.new
 
     case type
-    when 'DiscussionTopic', 'Announcement'
+    when 'Announcement', 'DiscussionTopic'
       root_discussion_entries = data.delete(:root_discussion_entries)
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
       res.association(:root_discussion_entries).target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
       res.total_root_discussion_entries = data.delete(:total_root_discussion_entries)
-    when 'Submission'
-      data['body'] = nil
     when 'Conversation'
       res.latest_messages_from_stream_item = data.delete(:latest_messages)
+    when 'Submission'
+      data['body'] = nil
     end
     if data.has_key?('users')
       users = data.delete('users')
@@ -173,6 +173,12 @@ class StreamItem < ActiveRecord::Base
     self.context ||= object.try(:context) unless object.is_a?(Message)
 
     case object
+    when DiscussionEntry
+      res = object.attributes
+      res['user_ids_that_can_see_responses'] = object.discussion_topic.user_ids_who_have_posted_and_admins if object.discussion_topic.require_initial_post?
+      res['title'] = object.discussion_topic.title
+      res['message'] = object['message'][0, 4.kilobytes] if object['message'].present?
+      res['user_short_name'] = object.user.short_name if object.user
     when DiscussionTopic
       res = object.attributes
       res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
@@ -184,8 +190,7 @@ class StreamItem < ActiveRecord::Base
         hash
       end
       if object.attachment
-        hash = object.attachment.attributes.slice('id', 'display_name')
-        res[:attachment] = hash
+        res[:attachment] = object.attachment.attributes.slice('id', 'display_name')
       end
     when Conversation
       res = prepare_conversation(object)
@@ -316,6 +321,8 @@ class StreamItem < ActiveRecord::Base
     case object
     when DiscussionEntry
       object.discussion_topic
+    when Mention
+      object.discussion_entry
     when SubmissionComment
       object.submission
     when ConversationMessage
@@ -327,6 +334,8 @@ class StreamItem < ActiveRecord::Base
 
   def self.prepare_object_for_unread(object)
     case object
+      when DiscussionEntry
+        ActiveRecord::Associations::Preloader.new.preload(object, :discussion_entry_participants)
       when DiscussionTopic
         ActiveRecord::Associations::Preloader.new.preload(object, :discussion_topic_participants)
     end
@@ -334,9 +343,7 @@ class StreamItem < ActiveRecord::Base
 
   def self.object_unread_for_user(object, user_id)
     case object
-    when DiscussionTopic
-      object.read_state(user_id)
-    when Submission
+    when DiscussionEntry, DiscussionTopic, Submission
       object.read_state(user_id)
     else
       nil
@@ -429,7 +436,7 @@ class StreamItem < ActiveRecord::Base
   # Returns the stream item asset minus any hidden data.
   def post_process(res, viewing_user_id)
     case res
-    when DiscussionTopic, Announcement
+    when Announcement, DiscussionTopic
       if res.require_initial_post
         res.user_has_posted = true
         if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
@@ -439,6 +446,17 @@ class StreamItem < ActiveRecord::Base
           res.association(:root_discussion_entries).target = []
           res.user_has_posted = false
           res.total_root_discussion_entries = original_res.total_root_discussion_entries
+          res.readonly!
+        end
+      end
+    when DiscussionEntry
+      if res.discussion_topic.require_initial_post
+        res.discussion_topic.user_has_posted = true
+        if res.user_ids_that_can_see_responses && !res.user_ids_that_can_see_responses.member?(viewing_user_id)
+          original_res = res
+          res = original_res.clone
+          res.id = original_res.id
+          res.message = ""
           res.readonly!
         end
       end

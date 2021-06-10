@@ -17,13 +17,15 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import I18n from 'i18n!k5_course_GradeDetails'
+import I18n from 'i18n!grade_details'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -129,14 +131,25 @@ const GradeDetails = ({
             <LoadingSkeleton
               height="1.8em"
               width="10em"
-              margin="medium 0 small"
+              margin="medium 0 0"
               screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
             />
           ) : (
-            <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
-              {totalGrade && I18n.t('Total: %{grade}', {grade: totalGrade})}
-            </Heading>
+            totalGrade && (
+              <Heading data-testid="grades-total" level="h2" margin="medium 0 0">
+                <AccessibleContent
+                  alt={I18n.t('%{courseName} Total: %{grade}', {courseName, grade: totalGrade})}
+                >
+                  {I18n.t('Total: %{grade}', {grade: totalGrade})}
+                </AccessibleContent>
+              </Heading>
+            )
           )}
+          <View as="div" margin="x-small 0">
+            <Text as="div" size="small">
+              {I18n.t('Totals are calculated based only on graded assignments.')}
+            </Text>
+          </View>
           {loadingAssignmentGroups || loadingGradingPeriods ? (
             <LoadingSkeleton
               height="1.5em"
@@ -146,7 +159,13 @@ const GradeDetails = ({
           ) : (
             <ToggleDetails
               data-testid="assignment-group-toggle"
-              summary={I18n.t('View Assignment Group Totals')}
+              summary={
+                <AccessibleContent
+                  alt={I18n.t("View %{courseName}'s Assignment Group Totals", {courseName})}
+                >
+                  {I18n.t('View Assignment Group Totals')}
+                </AccessibleContent>
+              }
             >
               {assignmentGroupTotals.map(group => (
                 <Text

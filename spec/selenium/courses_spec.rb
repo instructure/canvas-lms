@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative "../helpers/k5_common"
 
 describe "courses" do
   include_context "in-process server selenium tests"
+  include K5Common
 
   context "as a teacher" do
 
@@ -374,26 +376,41 @@ describe "courses" do
     end
   end
 
-  it "should display announcements on course home page if enabled and is wiki" do
-    course_with_teacher_logged_in :active_all => true
+  context "announcements on course home" do
+    before :once do
+      course_with_teacher :active_all => true
 
-    text = "here's some html or whatever"
-    html = "<p>#{text}</p>"
-    @course.announcements.create!(:title => "something", :message => html)
+      @text = "here's some html or whatever"
+      @html = "<p>#{@text}</p>"
+      @course.announcements.create!(:title => "something", :message => @html)
 
-    @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
 
-    @course.reload
-    @course.default_view = "wiki"
-    @course.show_announcements_on_home_page = true
-    @course.home_page_announcement_limit = 5
-    @course.save!
+      @course.reload
+      @course.default_view = "wiki"
+      @course.show_announcements_on_home_page = true
+      @course.home_page_announcement_limit = 5
+      @course.save!
+    end
 
-    get "/courses/#{@course.id}"
+    before :each do
+      user_session @teacher
+    end
 
-    expect(f('#announcements_on_home_page')).to be_displayed
-    expect(f('#announcements_on_home_page')).to include_text(text)
-    expect(f('#announcements_on_home_page')).to_not include_text(html)
+    it "should be displayed if enabled and is wiki" do
+      get "/courses/#{@course.id}"
+
+      expect(f('#announcements_on_home_page')).to be_displayed
+      expect(f('#announcements_on_home_page')).to include_text(@text)
+      expect(f('#announcements_on_home_page')).to_not include_text(@html)
+    end
+
+    it "should not show on k5 subject even with setting on" do
+      toggle_k5_setting(@course.account)
+      get "/courses/#{@course.id}"
+
+      expect(f("#content")).not_to contain_css("#announcements_on_home_page")
+    end
   end
 
   it "should properly apply visible sections to announcement limit" do

@@ -122,3 +122,11 @@
 .ic-discussion-row {
   background-color: $ic-color-light;
 }
+
+span .mention {
+  background: rgba(102, 24, 157, 0.1);
+  color: #66189D;
+  border-radius: 0.25rem;
+  height: 1.5rem;
+  padding: 0.125rem;
+}

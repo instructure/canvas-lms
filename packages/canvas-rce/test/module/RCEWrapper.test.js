@@ -212,11 +212,6 @@ describe('RCEWrapper', () => {
       assert(editorCommandSpy.withArgs('mceFocus', false, 'myOtherUniqId', undefined).called)
     })
 
-    it('resets the doc of the editor on removal', () => {
-      element.destroy()
-      assert(editorCommandSpy.calledWith('mceNewDocument'))
-    })
-
     it('calls handleUnmount when destroyed', () => {
       const handleUnmount = sinon.spy()
       element = createBasicElement({handleUnmount})

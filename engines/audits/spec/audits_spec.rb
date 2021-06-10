@@ -39,10 +39,10 @@ RSpec.describe Audits do
   end
 
   describe "settings parsing" do
-    it "parses pre-change write paths" do
+    it "parses pre-change write paths, but WILL NOT allow not writing to postgres" do
       inject_auditors_settings("write_paths:\n  - cassandra\nread_path: cassandra")
       expect(Audits.write_to_cassandra?).to eq(true)
-      expect(Audits.write_to_postgres?).to eq(false)
+      expect(Audits.write_to_postgres?).to eq(true)
       expect(Audits.read_from_cassandra?).to eq(true)
       expect(Audits.read_from_postgres?).to eq(false)
     end

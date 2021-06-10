@@ -236,7 +236,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         expect(displayAs).toEqual('link')
       })
 
-      it('includes the size to be applied', async () => {
+      it.skip('includes the size to be applied', async () => {
         await tray.setSize('Large')
         tray.$doneButton.click()
         const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]

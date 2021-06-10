@@ -18,7 +18,7 @@
 
 <div id="pageviews_datefilter">
   <div class="nobr">
-    <label class="ic-Label for="page_view_date"><%= t('Filter by date') %></label>
+    <label class="ic-Label" for="page_view_date"><%= t('Filter by date') %></label>
     <input type="datetime" class="ic-Input" id="page_view_date"/>
   </div>
 </div>
@@ -33,7 +33,12 @@
         <th><%= t('headers.time', "Time") %></th>
         <th>
           <div style="float:<%= direction('right') %>; margin-<%= direction('right') %>: 4px">
-            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'icon-ms-excel', :id => 'page_views_csv_link') %>
+            <%= link_to(t('page views csv'),
+                user_page_views_path(@user, :format => :csv),
+                class: 'icon-ms-excel',
+                id: 'page_views_csv_link',
+                'aria-label' => t('Download Page Views CSV'))
+            %>
           </div>
           <%= t('headers.user_agent', "User Agent") %>
         </th>

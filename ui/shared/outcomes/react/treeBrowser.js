@@ -84,7 +84,7 @@ const getCounts = rootGroups => {
   )
 }
 
-const useTreeBrowser = () => {
+const useTreeBrowser = (srOnlyAlert = false) => {
   const {contextType} = useCanvasContext()
   const client = useApolloClient()
   const [collections, setCollections] = useState({})
@@ -133,11 +133,13 @@ const useTreeBrowser = () => {
       contextType === 'Course'
         ? showFlashAlert({
             message: I18n.t('An error occurred while loading course outcomes.'),
-            type: 'error'
+            type: 'error',
+            srOnly: srOnlyAlert
           })
         : showFlashAlert({
             message: I18n.t('An error occurred while loading account outcomes.'),
-            type: 'error'
+            type: 'error',
+            srOnly: srOnlyAlert
           })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,7 +176,7 @@ export const useManageOutcomes = () => {
     setIsLoading,
     setRootId,
     rootId
-  } = useTreeBrowser()
+  } = useTreeBrowser(true)
 
   const queryCollections = ({id}) => {
     setSelectedGroupId(id)

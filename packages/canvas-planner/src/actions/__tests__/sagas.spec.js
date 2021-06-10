@@ -262,9 +262,9 @@ describe('loadWeekSaga', () => {
         }
       })
     )
-    expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
-      call(mergeWeekItems, 'some items', 'response')
-    )
+    expect(
+      JSON.stringify(generator.next({transformedItems: 'some items', response: 'response'}).value)
+    ).toEqual(JSON.stringify(call(mergeWeekItems(), 'some items', 'response')))
   })
   // We're not testing all the scenarios, like multiple pages of items in a week
 })

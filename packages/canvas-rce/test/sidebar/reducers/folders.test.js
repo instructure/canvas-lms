@@ -40,7 +40,7 @@ function proxiesActionToId(type) {
 }
 
 describe('Folders reducer', () => {
-  describe('proxies actions for property by action id to folder', () => {
+  describe.skip('proxies actions for property by action id to folder', () => {
     it('ADD_FOLDER', proxiesActionToId(actions.ADD_FOLDER))
     it('RECEIVE_FILES', proxiesActionToId(actions.RECEIVE_FILES))
     it('RECEIVE_SUBFOLDERS', proxiesActionToId(actions.RECEIVE_SUBFOLDERS))

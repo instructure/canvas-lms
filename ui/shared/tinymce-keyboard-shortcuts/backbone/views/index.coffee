@@ -90,7 +90,7 @@ KeyboardShortcuts = Backbone.View.extend
     unless ENV.use_rce_enhancements
       $(document).on('keyup.tinymce_keyboard_shortcuts', @openDialogByKeybinding.bind(this))
 
-      #special event for keyups in the editor iframe, fired from "setupAndFocusTinyMCEConfig.js"
+      #special event for keyups in the editor iframe, fired from "wrapInitCb.js"
       $(document).on('editorKeyUp', ((e, originalEvent)->
         @openDialogByKeybinding(originalEvent)
       ).bind(this))

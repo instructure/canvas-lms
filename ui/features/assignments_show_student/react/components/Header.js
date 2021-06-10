@@ -161,9 +161,11 @@ class Header extends React.Component {
     }
 
     return (
-      <Badge margin="x-small" count={this.props.submission.unreadCommentCount} countUntil={100}>
-        {button}
-      </Badge>
+      <div data-testid="unread_comments_badge">
+        <Badge margin="x-small" count={this.props.submission.unreadCommentCount} countUntil={100}>
+          {button}
+        </Badge>
+      </div>
     )
   }
 

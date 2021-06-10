@@ -813,7 +813,6 @@ describe EnrollmentsApiController, type: :request do
     end
 
     it "should deterministically order enrollments for pagination" do
-      Account.default.enable_feature!(:bookmarking_for_enrollments_index)
       enrollment_num = 10
       enrollment_num.times do
         u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
@@ -2271,6 +2270,7 @@ describe EnrollmentsApiController, type: :request do
             ) if e.user == @user
             h
           end
+
           link_header = response.headers['Link'].split(',')
           expect(link_header[0]).to match /page=1&per_page=1/ # current page
           expect(link_header[1]).to match /page=2&per_page=1/ # next page
@@ -2351,21 +2351,6 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context 'with normal settings' do
-        it_behaves_like 'numeric pagination'
-
-        context 'with developer key pagination override' do
-          before do
-            global_id = Shard.global_id_for(DeveloperKey.default.id)
-            Setting.set("pagination_override_key_list", global_id.to_s)
-          end
-
-          it_behaves_like 'numeric pagination'
-        end
-      end
-
-      context 'with bookmark flag enabled' do
-        before { Account.default.enable_feature!(:bookmarking_for_enrollments_index) }
-
         it_behaves_like 'bookmarked pagination'
 
         context 'with developer key pagination override' do

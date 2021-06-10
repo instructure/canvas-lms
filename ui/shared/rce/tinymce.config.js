@@ -64,6 +64,11 @@ export default class EditorConfig {
    * @return {Hash}
    */
   defaultConfig() {
+    const new_rce_plugins = ['instructure_equation']
+    if (this.extraButtons?.length) {
+      new_rce_plugins.push('instructure_external_tools')
+    }
+
     return {
       ...defaultTinymceConfig,
 
@@ -79,7 +84,7 @@ export default class EditorConfig {
       [!new_rce && 'skin']: false,
       directionality: getDirection(),
       plugins: new_rce
-        ? ['instructure_equation']
+        ? new_rce_plugins
         : 'autolink,media,paste,table,lists,textcolor,link,directionality,a11y_checker,wordcount,' +
           'instructure_image,instructure_links,instructure_equation,instructure_external_tools,instructure_record',
 

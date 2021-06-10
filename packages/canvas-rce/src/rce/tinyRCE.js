@@ -50,6 +50,7 @@ import './plugins/instructure_links/plugin'
 import './plugins/instructure_documents/plugin'
 import './plugins/instructure_html_view/plugin'
 import './plugins/instructure_media_embed/plugin'
+import './plugins/instructure_buttons/plugin'
 
 import 'tinymce-a11y-checker'
 

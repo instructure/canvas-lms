@@ -74,11 +74,12 @@ module.exports = {
         maxAssetSize: 1400000,
         assetFilter: assetFilename => {
           const thingsWeKnowAreWayTooBig = [
+            'assignment_edit',
             'canvas-rce-async-chunk',
             'canvas-rce-old-async-chunk',
+            'discussion_topics_edit',
+            'k5_dashboard',
             'permissions',
-            'assignment_edit',
-            'discussion_topics_edit'
           ]
           return (
             assetFilename.endsWith('.js') &&

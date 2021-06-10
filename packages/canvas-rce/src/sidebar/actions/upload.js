@@ -178,7 +178,7 @@ export function embedUploadResult(results, selectedTabType) {
           results.title ||
           results.filename,
         content_type: results['content-type'],
-        embed: embedData,
+        embed: {...embedData, disablePreview: true},
         target: '_blank',
         contextType: results.contextType,
         contextId: results.contextId,

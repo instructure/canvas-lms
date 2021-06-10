@@ -85,7 +85,8 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
     }
   }, [commentAreaText]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [queryComments, {data: searchResults}] = useLazyQuery(COMMENTS_QUERY)
+  const [queryComments, {data: searchResults, loading: isSearchLoading}] =
+    useLazyQuery(COMMENTS_QUERY)
 
   useEffect(() => {
     if (searchTerm.length >= 3 && showSuggestions) {
@@ -194,7 +195,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
       showSuggestions={showSuggestions}
       setShowSuggestions={checked => handleShowSuggestions(checked)}
       searchResults={
-        searchTerm.length >= 3
+        searchTerm.length >= 3 && !isSearchLoading
           ? searchResults?.legacyNode?.commentBankItemsConnection?.nodes || []
           : []
       }

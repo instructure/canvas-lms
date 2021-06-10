@@ -591,6 +591,9 @@ class AccountsController < ApplicationController
   #   or both the course's end_at and the enrollment term's end_at are set to null.
   #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #
+  # @argument homeroom [Optional, Boolean]
+  #   If set, only return homeroom courses.
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read_course_list)
@@ -664,6 +667,10 @@ class AccountsController < ApplicationController
       @courses = @courses.associated_courses
     elsif !params[:blueprint_associated].nil?
       @courses = @courses.not_associated_courses
+    end
+
+    if value_to_boolean(params[:homeroom])
+      @courses = @courses.homeroom
     end
 
     if starts_before || ends_after

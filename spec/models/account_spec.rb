@@ -1746,6 +1746,7 @@ describe Account do
 
         # should clear caches
         to_be_subaccount.parent_account = account
+        to_be_subaccount.root_account = account
         to_be_subaccount.save!
         expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
       end

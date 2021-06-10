@@ -49,9 +49,9 @@ describe MicrosoftSync::SyncerSteps do
     expect(result).to be_a(MicrosoftSync::StateMachineJob::Retry)
     expect(result.error.class).to eq(error_class)
     expect(result.delay_amount).to eq(delay_amount)
-    # Check that we haven't specified any delays to big for our restart_job_after_inactivity
+    # Check that we haven't specified any delays too big for our max_delay
     [result.delay_amount].flatten.each do |delay|
-      expect(delay.to_i).to be < syncer_steps.restart_job_after_inactivity.to_i
+      expect(delay.to_i).to be < syncer_steps.max_delay.to_i
     end
     expect(result.job_state_data).to eq(job_state_data)
     expect(result.step).to eq(step)
@@ -694,5 +694,9 @@ describe MicrosoftSync::SyncerSteps do
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
+  end
+
+  describe '#max_delay' do
+    it { expect(syncer_steps.max_delay).to eq 6.hours }
   end
 end

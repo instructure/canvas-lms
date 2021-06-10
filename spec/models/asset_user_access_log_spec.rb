@@ -31,11 +31,13 @@ describe AssetUserAccessLog do
       @asset.save!
     end
 
-    it "inserts to correct tables" do
-      dt = DateTime.civil(2020, 9, 4, 12, 0, 0) # a friday, index 5
-      AssetUserAccessLog::AuaLog5.delete_all
-      AssetUserAccessLog.put_view(@asset, timestamp: dt)
-      expect(AssetUserAccessLog::AuaLog5.count).to eq(1)
+    describe "via postgres" do
+      it "inserts to correct tables" do
+        dt = DateTime.civil(2020, 9, 4, 12, 0, 0) # a friday, index 5
+        AssetUserAccessLog::AuaLog5.delete_all
+        AssetUserAccessLog.put_view(@asset, timestamp: dt)
+        expect(AssetUserAccessLog::AuaLog5.count).to eq(1)
+      end
     end
 
     describe "via message bus" do
@@ -141,7 +143,7 @@ describe AssetUserAccessLog do
       expect{ AssetUserAccessLog.compact }.to_not raise_error
     end
 
-    describe "with data" do
+    describe "with data via postgres" do
 
       it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
         expect(@asset_1.view_score).to be_nil
@@ -226,6 +228,98 @@ describe AssetUserAccessLog do
           generate_log([@asset_1, @asset_4, @asset_5], 8)
           AssetUserAccessLog.compact
           advance_sequence(model, 200)
+          generate_log([@asset_1, @asset_4], 16)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(30.0)
+          expect(@asset_2.reload.view_score).to eq(2.0)
+          expect(@asset_3.reload.view_score).to eq(6.0)
+          expect(@asset_4.reload.view_score).to eq(28.0)
+          expect(@asset_5.reload.view_score).to eq(8.0)
+        end
+      end
+
+      it "does not override updates from requests unless it's bigger" do
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 2)
+          update_ts = Time.now.utc + 2.minutes
+          @asset_1.last_access = update_ts
+          @asset_1.updated_at = update_ts
+          @asset_1.save!
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(2.0)
+          expect(@asset_1.reload.last_access).to eq(update_ts)
+          Timecop.travel(10.minutes.from_now) do
+            generate_log([@asset_1, @asset_2, @asset_3], 9)
+            AssetUserAccessLog.compact
+            expect(@asset_1.reload.view_score).to eq(11.0)
+            expect(@asset_1.reload.last_access > update_ts).to be_truthy
+          end
+        end
+      end
+    end
+
+    describe "via message bus" do
+      before(:each) do
+        skip("pulsar config required to test") unless MessageBus.enabled?
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return({
+          "pulsar_writes_enabled" => true,
+          "pulsar_reads_enabled" => true
+        })
+      end
+
+      it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
+        expect(@asset_1.view_score).to be_nil
+        expect(@asset_5.view_score).to be_nil
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 100)
+          generate_log([@asset_1, @asset_3, @asset_4], 100)
+          generate_log([@asset_1, @asset_4, @asset_5], 100)
+          generate_log([@asset_1, @asset_4], 100)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(400.0)
+          expect(@asset_2.reload.view_score).to eq(100.0)
+          expect(@asset_3.reload.view_score).to eq(200.0)
+          expect(@asset_4.reload.view_score).to eq(300.0)
+          expect(@asset_5.reload.view_score).to eq(100.0)
+        end
+      end
+
+      it "writes iterator state properly" do
+        expect(@asset_1.view_score).to be_nil
+        partition_id = "-1" # safe assumption in dev/test
+        # because data won't be big enough to partition a topic.
+        prior_state = AssetUserAccessLog.metadatum_payload
+        checkpoint_iterator_state = nil
+        final_iterator_state = nil
+        expect(prior_state[:pulsar_partition_iterators][partition_id]).to be_nil
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 100)
+          AssetUserAccessLog.compact
+          checkpoint_state = AssetUserAccessLog.metadatum_payload
+          checkpoint_iterator_state = checkpoint_state[:pulsar_partition_iterators][partition_id]
+          expect(checkpoint_iterator_state).to_not be_nil
+        end
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 100)
+          AssetUserAccessLog.compact
+          final_state = AssetUserAccessLog.metadatum_payload
+          final_iterator_state = final_state[:pulsar_partition_iterators][partition_id]
+          expect(final_iterator_state).to_not be_nil
+        end
+        checkpoint_id = MessageBus::MessageId.from_string(checkpoint_iterator_state)
+        final_id = MessageBus::MessageId.from_string(final_iterator_state)
+        expect(final_id).to be > checkpoint_id
+        expect(@asset_1.reload.view_score).to eq(200.0)
+      end
+
+      it "chomps small batches correctly" do
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 2)
+          AssetUserAccessLog.compact
+          generate_log([@asset_1, @asset_3, @asset_4], 4)
+          AssetUserAccessLog.compact
+          generate_log([@asset_1, @asset_4, @asset_5], 8)
+          AssetUserAccessLog.compact
           generate_log([@asset_1, @asset_4], 16)
           AssetUserAccessLog.compact
           expect(@asset_1.reload.view_score).to eq(30.0)

@@ -22,45 +22,49 @@ import wrapInitCb from './wrapInitCb'
 import normalizeLocale from './normalizeLocale'
 import editorLanguage from './editorLanguage'
 
-export default function(props, tinymce, MutationObserver) {
-  const initialEditorOptions = props.editorOptions(tinymce),
-    sanitizedEditorOptions = sanitizeEditorOptions(initialEditorOptions),
-    editorOptions = wrapInitCb(props.mirroredAttrs, sanitizedEditorOptions, MutationObserver)
+export default function (props, tinymce, MutationObserver) {
+  const initialEditorOptions = props.editorOptions(tinymce)
+  const sanitizedEditorOptions = window.ENV?.use_rce_enhancements
+    ? initialEditorOptions
+    : sanitizeEditorOptions(initialEditorOptions)
+  const editorOptions = wrapInitCb(props.mirroredAttrs, sanitizedEditorOptions, MutationObserver)
 
-  // propagate localization prop to appropriate parameter/value on the
-  // editor configuration
-  props.language = normalizeLocale(props.language)
-  const language = editorLanguage(props.language)
-  if (language !== undefined) {
-    editorOptions.language = language
-    editorOptions.language_url = 'none'
+  if (!window.ENV?.use_rce_enhancements) {
+    // propagate localization prop to appropriate parameter/value on the
+    // editor configuration
+    props.language = normalizeLocale(props.language)
+    const language = editorLanguage(props.language)
+    if (language !== undefined) {
+      editorOptions.language = language
+      editorOptions.language_url = 'none'
+    }
+
+    // It is expected that consumers provide their own content_css so that the
+    // styles inside the editor match the styles of the site it is going to be
+    // displayed in.
+    if (props.editorOptions.content_css) {
+      editorOptions.content_css = props.editorOptions.content_css
+    }
+
+    // tell tinymce that we're handling the skin
+    editorOptions.skin = false
+
+    // when tiny formats menuitems with a style attribute, don't let it set the color so they get properly themed
+    editorOptions.preview_styles =
+      'font-family font-size font-weight font-style text-decoration text-transform border border-radius outline text-shadow'
+
+    // force tinyMCE to NOT use the "mobile" theme,
+    // see: https://stackoverflow.com/questions/54579110/is-it-possible-to-disable-the-mobile-ui-features-in-tinymce-5
+    editorOptions.mobile = {theme: 'silver'}
+
+    // tell tinyMCE not to put its own branding in the footer of the editor
+    editorOptions.branding = false
+
+    // we provide our own statusbar
+    editorOptions.statusbar = false
+
+    configureMenus(editorOptions, props.instRecordDisabled)
   }
-
-  // It is expected that consumers provide their own content_css so that the
-  // styles inside the editor match the styles of the site it is going to be
-  // displayed in.
-  if (props.editorOptions.content_css) {
-    editorOptions.content_css = props.editorOptions.content_css
-  }
-
-  // tell tinymce that we're handling the skin
-  editorOptions.skin = false
-
-  // when tiny formats menuitems with a style attribute, don't let it set the color so they get properly themed
-  editorOptions.preview_styles =
-    'font-family font-size font-weight font-style text-decoration text-transform border border-radius outline text-shadow'
-
-  // force tinyMCE to NOT use the "mobile" theme,
-  // see: https://stackoverflow.com/questions/54579110/is-it-possible-to-disable-the-mobile-ui-features-in-tinymce-5
-  editorOptions.mobile = {theme: 'silver'}
-
-  // tell tinyMCE not to put its own branding in the footer of the editor
-  editorOptions.branding = false
-
-  // we provide our own statusbar
-  editorOptions.statusbar = false
-
-  configureMenus(editorOptions, props.instRecordDisabled)
 
   return {
     // other props, including overrides

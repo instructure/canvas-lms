@@ -44,6 +44,22 @@ describe "admin k5 dashboard" do
       expect(grades_tab).to be_displayed
       expect(resources_tab).to be_displayed
     end
+
+    it 'allows admins to switch back to the classic dashboard' do
+      get "/"
+
+      expect(dashboard_options_button).to be_displayed
+
+      options = dashboard_options
+      expect(options.length).to be 2
+      expect(options[0].text).to eq('Classic View')
+      expect(options[1].text).to eq('Elementary View')
+
+      options[0].click
+      wait_for_ajaximations
+
+      expect(classic_dashboard_header).to be_displayed
+    end
   end
 
   context 'new course creation' do
@@ -110,10 +126,10 @@ describe "admin k5 dashboard" do
   end
 
   context 'admin schedule' do
-    it 'shows a sample preview for admin (teacher) view of the schedule tab' do
+    it 'shows an empty state for the admin (teacher) view of the course schedule tab with no enrollments' do
       get "/#schedule"
 
-      expect(teacher_preview).to be_displayed
+      expect(empty_dashboard).to be_displayed
     end
 
     it 'shows a sample preview for admin (teacher) view of the course schedule tab' do

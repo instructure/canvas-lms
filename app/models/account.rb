@@ -106,6 +106,11 @@ class Account < ActiveRecord::Base
            class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
            dependent: :destroy,
            inverse_of: :root_account
+  has_many :auditor_feature_flag_records,
+           foreign_key: 'root_account_id',
+           class_name: 'Auditors::ActiveRecord::FeatureFlagRecord',
+           dependent: :destroy,
+           inverse_of: :root_account
   has_many :lti_resource_links,
            as: :context,
            inverse_of: :context,
@@ -515,6 +520,10 @@ class Account < ActiveRecord::Base
     self.root_account_id ||= parent_account.root_account_id if parent_account && !parent_account.root_account?
     self.root_account_id ||= parent_account_id
     self.parent_account_id ||= self.root_account_id unless root_account?
+    unless root_account_id
+      Account.ensure_dummy_root_account
+      self.root_account_id = 0
+    end
     true
   end
 
@@ -546,6 +555,10 @@ class Account < ActiveRecord::Base
   end
 
   def check_downstream_caches
+    # dummy account has no downstream
+    return if dummy?
+    return if ActiveRecord::Base.in_migration
+
     keys_to_clear = []
     keys_to_clear << :account_chain if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
     if self.saved_change_to_brand_config_md5? || (@old_settings && @old_settings[:sub_account_includes] != settings[:sub_account_includes])
@@ -1443,7 +1456,7 @@ class Account < ActiveRecord::Base
     self.course_template_id = nil if course_template_id == 0 && root_account?
     return if [nil, 0].include?(course_template_id)
 
-    unless course_template.root_account_id == [root_account_id, id].compact.first
+    unless course_template.root_account_id == resolved_root_account_id
       errors.add(:course_template_id, t('Course template must be in the same root account'))
     end
     unless course_template.template?
@@ -1965,6 +1978,7 @@ class Account < ActiveRecord::Base
   end
 
   scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
+  scope :non_root_accounts, -> { where.not(root_account_id: [0, nil]) }
   scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
@@ -2156,7 +2170,18 @@ class Account < ActiveRecord::Base
   relation_delegate_class(ActiveRecord::AssociationRelation).prepend(DomainRootAccountCache)
 
   def self.ensure_dummy_root_account
-    Account.find_or_create_by!(id: 0) if Rails.env.test?
+    return unless Rails.env.test?
+
+    dummy = Account.find_by(id: 0)
+    return if dummy
+
+    # this needs to be thread safe because parallel specs might all try to create at once
+    transaction(requires_new: true) do
+      Account.create!(id: 0, workflow_state: 'deleted', name: "Dummy Root Account", root_account_id: 0)
+    rescue ActiveRecord::UniqueConstraintViolation
+      # somebody else created it. we don't even need to return it, just clean up the transaction
+      raise ActiveRecord::Rollback
+    end
   end
 
   def roles_with_enabled_permission(permission)

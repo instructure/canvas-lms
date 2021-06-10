@@ -2047,7 +2047,8 @@ describe ApplicationController do
 
   describe "k5_user? helper" do
     before :once do
-      course_with_student :active_all => true
+      course_with_teacher :active_all => true
+      student_in_course :context => @course
       toggle_k5_setting(@course.account)
     end
 
@@ -2076,6 +2077,28 @@ describe ApplicationController do
       @course.root_account.settings[:k5_accounts] = []
       @course.root_account.save!
       expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns false if a teacher or admin has opted-out of the k5 dashboard" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "ignores the disabled preference if check_disabled = false" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?, false)).to be_truthy
+    end
+
+    it "returns true even if a student has opted-out of the k5 dashboard" do
+      @student.preferences[:elementary_dashboard_disabled] = true
+      @student.save!
+      expect(@controller.send(:k5_user?)).to be_truthy
     end
 
     it "returns false if no current user" do

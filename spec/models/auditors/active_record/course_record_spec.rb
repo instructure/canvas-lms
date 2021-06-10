@@ -23,6 +23,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helpe
 describe Auditors::ActiveRecord::CourseRecord do
   let(:request_id){ 'abcde-12345'}
 
+  before(:once) do
+    Auditors::ActiveRecord::Partitioner.process
+  end
+
   it "it appropriately connected to a table" do
     expect(Auditors::ActiveRecord::CourseRecord.count).to eq(0)
   end

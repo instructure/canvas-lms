@@ -450,7 +450,7 @@ module CustomSeleniumActions
       cselect.click
       option_list_id = cselect.attribute('aria-controls')
     end
-    
+
     if select_by == :text
       fj("##{option_list_id} [role='option']:contains(#{option_text})").click
     else
@@ -463,6 +463,12 @@ module CustomSeleniumActions
     cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
     ff("##{option_list_id} [role='option']")
+  end
+
+  def INSTUI_Menu_options(menu)
+    menu = INSTUI_select(menu)
+    menu.click # option the options list
+    ff("[aria-labelledby='#{menu.attribute('id')}'] [role='menuitemradio']")
   end
 
   def close_visible_dialog

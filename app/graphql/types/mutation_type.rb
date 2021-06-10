@@ -91,6 +91,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_comment_bank_item, mutation: Mutations::DeleteCommentBankItem
   field :update_comment_bank_item, mutation: Mutations::UpdateCommentBankItem
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
+  field :delete_outcome_links, mutation: Mutations::DeleteOutcomeLinks
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

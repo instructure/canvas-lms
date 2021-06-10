@@ -127,6 +127,7 @@ describe User do
 
     account2 = account_model
     account1.parent_account = account2
+    account1.root_account = account2
     account1.save!
     @course.reload
     @user.reload
@@ -159,6 +160,7 @@ describe User do
     expect(user.associated_accounts.first).to eql(account1)
 
     account1.parent_account = account2
+    account1.root_account = account2
     account1.save!
 
     user.reload

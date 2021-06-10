@@ -119,4 +119,73 @@ describe FeatureFlag do
       expect(t_course.feature_flag(:hidden_root_opt_in_feature)).to be_unhides_feature
     end
   end
+
+  describe "audit log" do
+    let_once(:acting_user) { user_model }
+
+    before(:each) do
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+    end
+
+    it "logs account feature creation" do
+      flag = t_root_account.feature_flags.build(feature: 'root_account_feature')
+      flag.current_user = acting_user
+      flag.save!
+      log = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1).first
+      expect(log.feature_flag_id).to eq(flag.id)
+      expect(log.state_before).to eq("nonexistant")
+      expect(log.state_after).to eq(flag.state)
+      expect(log.context_type).to eq("Account")
+      expect(log.context_id).to eq(t_root_account.id)
+    end
+
+    it "logs course feature creation" do
+      flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on')
+      flag.current_user = acting_user
+      flag.save!
+      log = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1).first
+      expect(log.feature_flag_id).to eq(flag.id)
+      expect(log.state_before).to eq("nonexistant")
+      expect(log.state_after).to eq("on")
+      expect(log.context_type).to eq("Course")
+      expect(log.context_id).to eq(t_course.id)
+    end
+
+    it "does not log user feature creation" do
+      flag = acting_user.feature_flags.build(feature: 'user_feature', state: 'on')
+      flag.current_user = acting_user
+      flag.save!
+      logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 1)
+      expect(logs).to be_empty
+    end
+
+    it "logs feature state changes" do
+      flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'allowed')
+      flag.current_user = acting_user
+      flag.save!
+      flag.state = 'off'
+      flag.save!
+      logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
+      log = logs.detect{|l| l.state_after == 'off' }
+      expect(log.feature_flag_id).to eq(flag.id)
+      expect(log.state_before).to eq("allowed")
+      expect(log.state_after).to eq('off')
+      expect(log.context_type).to eq("Account")
+      expect(log.context_id).to eq(t_root_account.id)
+    end
+
+    it "logs feature destruction" do
+      flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'allowed')
+      flag.current_user = acting_user
+      flag.save!
+      flag.destroy
+      logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
+      log = logs.detect{|l| l.state_after == 'removed' }
+      expect(log.feature_flag_id).to eq(flag.id)
+      expect(log.state_after).to eq("removed")
+      expect(log.state_before).to eq("allowed")
+      expect(log.context_type).to eq("Account")
+      expect(log.context_id).to eq(t_root_account.id)
+    end
+  end
 end

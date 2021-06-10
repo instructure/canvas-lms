@@ -21,10 +21,6 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-final COFFEE_NODE_COUNT = 4
-final DEFAULT_NODE_COUNT = 1
-final JSG_NODE_COUNT = 3
-
 def getLoadAllLocales() {
   return configuration.isChangeMerged() ? 1 : 0
 }
@@ -52,43 +48,27 @@ pipeline {
       steps {
         script {
           def runnerStages = [:]
-          def stageHooks = [
-            onNodeAcquired: jsStage.&setupNode,
-          ]
 
-          extendedStage('Runner - Jest').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
+          extendedStage('Runner - Jest').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
-            jsStage.queueJestStage(tests, delegate)
+            callableWithDelegate(jsStage.queueJestDistribution())(tests)
 
             parallel(tests)
           }
 
-          extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
+          extendedStage('Runner - Coffee').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
-            for (int i = 0; i < COFFEE_NODE_COUNT; i++) {
-              jsStage.queueKarmaStage(tests, delegate, 'coffee', i, COFFEE_NODE_COUNT)
-            }
+            callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
 
             parallel(tests)
           }
 
-          extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def delegate = getDelegate()
+          extendedStage('Runner - Karma').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
             def tests = [:]
 
-            jsStage.queuePackagesStage(tests, delegate)
-
-            for (int i = 0; i < JSG_NODE_COUNT; i++) {
-              jsStage.queueKarmaStage(tests, delegate, 'jsg', i, JSG_NODE_COUNT)
-            }
-
-            ['jsa', 'jsh'].each { group ->
-              jsStage.queueKarmaStage(tests, delegate, group, 0, DEFAULT_NODE_COUNT)
-            }
+            callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
 
             parallel(tests)
           }

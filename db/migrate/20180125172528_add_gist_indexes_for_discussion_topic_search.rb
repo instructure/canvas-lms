@@ -21,7 +21,7 @@ class AddGistIndexesForDiscussionTopicSearch < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
   tag :predeploy
   def self.up
-    if (schema = connection.extension_installed?(:pg_trgm))
+    if (schema = connection.extension(:pg_trgm)&.schema)
       add_index :discussion_topics, "LOWER(title) #{schema}.gist_trgm_ops", name: "index_trgm_discussion_topics_title", using: :gist, algorithm: :concurrently
     end
   end

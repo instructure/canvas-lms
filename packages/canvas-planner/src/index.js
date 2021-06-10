@@ -40,7 +40,7 @@ import {initializeDateTimeFormatters} from './utilities/dateUtils'
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
 import responsiviser from './components/responsiviser'
 
-const TeacherPreview = React.lazy(() => import('./components/TeacherPreview'))
+const PlannerPreview = React.lazy(() => import('./components/PlannerPreview'))
 const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
 const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
 const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
@@ -52,10 +52,10 @@ export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 
-export function createTeacherPreview(timeZone) {
+export function createPlannerPreview(timeZone) {
   return (
     <Suspense fallback={loading()}>
-      <TeacherPreview timeZone={timeZone} />
+      <PlannerPreview timeZone={timeZone} />
     </Suspense>
   )
 }

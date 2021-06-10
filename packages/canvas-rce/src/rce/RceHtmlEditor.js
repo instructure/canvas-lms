@@ -63,6 +63,10 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
 
   useEffect(() => {
+    setCode(beautify.html(props.code, {inline: inline_elems}))
+  }, [])
+
+  useEffect(() => {
     // INSTUI sets the CodeEditor's surrounding label's
     // display inline-block so it doesn't fill the width
     // of its container unless there's wide content.
@@ -96,10 +100,6 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
     editor.style.margin = '0'
     editor.style.border = '0'
   }, [props.height, editorRef])
-
-  useEffect(() => {
-    setCode(beautify.html(props.code, {inline: inline_elems}))
-  }, [props.code])
 
   const isFocused = useRef(false)
 

@@ -145,6 +145,18 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
   describe('when saving image options', () => {
     let tray
 
+    describe('when the image url text is changing', () => {
+      it('updates the image element url', () => {
+        trayController.showTrayForEditor(editors[0])
+        tray = getTray()
+        tray.setUrl('https://www.fillmurray.com/140/100')
+        tray.$doneButton.click()
+        expect(editors[0].$container.querySelector('img').getAttribute('src')).toEqual(
+          'https://www.fillmurray.com/140/100'
+        )
+      })
+    })
+
     describe('when the image alt text is changing', () => {
       it('updates the image element alt text', () => {
         trayController.showTrayForEditor(editors[0])

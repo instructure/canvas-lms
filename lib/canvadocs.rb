@@ -314,7 +314,7 @@ module Canvadocs
           assessor,
           submission,
           role: canvadocs_user_role(submission.assignment.course, assessor, enrollments),
-          anonymize: false
+          anonymize: submission.assignment.anonymous_peer_reviews?
         )
       end
     end

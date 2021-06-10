@@ -46,6 +46,13 @@ $student-view-banner-height: 50px;
   background: blue;
 }
 
+#comments-tray {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
 #content-wrapper {
   padding-bottom: $student-footer-height;
 }
@@ -56,6 +63,10 @@ body.is-masquerading-or-student-view {
     bottom: $student-view-banner-height;
     // don't obstruct the "border" of the student view
     #{direction(right)}: 3px;
+  }
+
+  #comments-tray {
+    bottom: $student-view-banner-height;
   }
 
   #content-wrapper {

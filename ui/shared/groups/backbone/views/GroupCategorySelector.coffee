@@ -101,13 +101,19 @@ export default class GroupCategorySelector extends Backbone.View
   enableGroupDiscussionCheckbox: =>
     @$hasGroupCategory.prop('disabled', false)
 
+  canManageGroups: =>
+    if ENV.PERMISSIONS?.hasOwnProperty('can_manage_groups')
+      ENV.PERMISSIONS.can_manage_groups
+    else
+      true
+
   toggleGroupCategoryOptions: =>
     isGrouped = @groupDiscussionChecked()
     @$groupCategoryOptions.toggleAccessibly isGrouped
 
     selectedGroupSetId = if isGrouped then @$groupCategoryID.val() else null
     StudentGroupStore.setSelectedGroupSet(selectedGroupSetId)
-    if isGrouped and _.isEmpty(@groupCategories)
+    if isGrouped and _.isEmpty(@groupCategories) and @canManageGroups()
       @showGroupCategoryCreateDialog()
 
     @renderSectionsAutocomplete() if @renderSectionsAutocomplete?
@@ -143,6 +149,7 @@ export default class GroupCategorySelector extends Backbone.View
     nested: @nested
     prefix: 'assignment' if @nested
     inClosedGradingPeriod: @inClosedGradingPeriod
+    cannotManageGroups: !@canManageGroups()
 
   filterFormData: (data) =>
     hasGroupCategory = data.has_group_category
@@ -170,9 +177,14 @@ export default class GroupCategorySelector extends Backbone.View
 
     if gcid == "blank"
       if _.isEmpty(@groupCategories)
-        errors["newGroupCategory"] = [
-          message: I18n.t 'Please create a group set'
-        ]
+        if @canManageGroups()
+          errors["newGroupCategory"] = [
+            message: I18n.t 'Please create a group set'
+          ]
+        else
+          errors["newGroupCategory"] = [
+            message: I18n.t 'Group Add permission is needed to create a New Group Category'
+          ]
       else
         errors["groupCategorySelector"] = [
           message: I18n.t 'Please select a group set for this assignment'

@@ -15,11 +15,6 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
-bookmarking_for_enrollments_index:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Bookmarking for Enrollments Index API
-  description: Use bookmarking for API pagination in Enrollments Index
 new_math_equation_handling:
   state: hidden
   display_name: 'Math: Updated equation handling'

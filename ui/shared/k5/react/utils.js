@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!k5_utils'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
@@ -135,12 +135,19 @@ export const sendMessage = (recipientId, message, subject) =>
   })
 
 /* Creates a new course with name in provided account, and enrolls the user as a teacher */
-export const createNewCourse = (accountId, courseName) =>
+export const createNewCourse = (
+  accountId,
+  courseName,
+  syncHomeroomEnrollments = null,
+  homeroomCourseId = null
+) =>
   doFetchApi({
     path: `/api/v1/accounts/${accountId}/courses`,
     method: 'POST',
     params: {
       'course[name]': courseName,
+      'course[sync_enrollments_from_homeroom]': syncHomeroomEnrollments,
+      'course[homeroom_course_id]': homeroomCourseId,
       enroll_me: true
     }
   }).then(data => data.json)
@@ -305,6 +312,13 @@ export const groupAnnouncementsByHomeroom = (announcements = [], courses = []) =
     },
     {true: [], false: []}
   )
+
+export const saveElementaryDashboardPreference = disabled =>
+  doFetchApi({
+    path: '/api/v1/users/self/settings',
+    method: 'PUT',
+    body: {elementary_dashboard_disabled: disabled}
+  })
 
 export const TAB_IDS = {
   HOME: 'tab-home',

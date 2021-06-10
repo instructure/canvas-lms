@@ -2316,6 +2316,10 @@ const setExpandAllButton = function() {
     }
   })
   $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  $('#expand_collapse_all').attr(
+    'aria-label',
+    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+  )
   $('#expand_collapse_all').data('expand', !someVisible)
   $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
 }
@@ -2633,6 +2637,10 @@ $(document).ready(function() {
     const shouldExpand = $(this).data('expand')
 
     $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+    $(this).attr(
+      'aria-label',
+      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+    )
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
 

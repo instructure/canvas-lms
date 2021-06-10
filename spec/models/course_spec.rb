@@ -20,6 +20,7 @@
 
 require 'sharding_spec_helper'
 require 'lti2_course_spec_helper'
+require_relative '../helpers/k5_common'
 
 require 'csv'
 require 'socket'
@@ -2756,16 +2757,18 @@ describe Course, "tabs_available" do
     end
 
     describe "with canvas_for_elementary account setting on" do
+      include K5Common
+
       context "homeroom course" do
         before :once do
-          @course.account.settings[:enable_as_k5_account] = {value: true}
+          toggle_k5_setting(@course.account)
           @course.homeroom_course = true
           @course.save!
         end
 
         it 'hides most tabs for homeroom courses' do
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
         end
 
         it 'renames the syllabus tab to important info' do
@@ -2787,14 +2790,13 @@ describe Course, "tabs_available" do
           )
           @course.tab_configuration = [{:id => Course::TAB_ANNOUNCEMENTS}, {:id => 'context_external_tool_8'}]
           tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_SETTINGS]
+          expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
         end
       end
 
       context "subject course" do
         before :once do
-          @course.account.settings[:enable_as_k5_account] = {value: true}
-          @course.save!
+          toggle_k5_setting(@course.account)
         end
 
         it "returns default course tabs without home if course_subject_tabs option is not passed" do
@@ -2857,6 +2859,12 @@ describe Course, "tabs_available" do
             available_tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true, for_reordering: true)
             expected_tab_ids = Course.course_subject_tabs.map{|t| t[:id]} + [t1.asset_string, t2.asset_string]
             expect(available_tabs.map{|t| t[:id]}).to eql(expected_tab_ids)
+          end
+
+          it "includes modules tab even if there's no modules" do
+            course_with_student_logged_in(:active_all => true)
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map{ |t| t[:id] }
+            expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
           end
         end
       end
@@ -5042,12 +5050,6 @@ describe Course, "#sync_homeroom_enrollments" do
     @course.homeroom_course_id = @homeroom_course.id
     @course.save!
     expect(@course.sync_homeroom_enrollments).not_to eq(false)
-  end
-
-  it "returns false unless the homeroom_course_id is accessible within the account" do
-    @course.homeroom_course_id = 0
-    @course.save!
-    expect(@course.sync_homeroom_enrollments).to eq(false)
   end
 end
 

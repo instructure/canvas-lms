@@ -35,6 +35,9 @@ class Notification < Switchman::UnshardedRecord
     "Grade Weight Changed",
     "Group Assignment Submitted Late",
 
+    # Mentions
+    "Discussion Mention",
+
     # Testing
     "Show In Feed",
   ].freeze
@@ -257,10 +260,12 @@ class Notification < Switchman::UnshardedRecord
      TYPES_TO_SHOW_IN_FEED
   end
 
+  # TODO: Remove after deprecate_sms occurs.
   def self.categories_to_send_in_sms(root_account)
     root_account.settings[:allowed_sms_notification_categories] || Setting.get('allowed_sms_notification_categories', ALLOWED_SMS_NOTIFICATION_CATEGORIES.join(',')).split(',')
   end
 
+  # TODO: Remove after deprecate_sms occurs.
   def self.types_to_send_in_sms(root_account)
     root_account.settings[:allowed_sms_notification_types] || Setting.get('allowed_sms_notification_types', ALLOWED_SMS_NOTIFICATION_TYPES.join(',')).split(',')
   end

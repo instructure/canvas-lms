@@ -15,16 +15,20 @@ DOCKER_COMMAND=${DOCKER_COMMAND:-"docker-compose"}
 
 function trap_result {
   exit_code=$?
+  last_command=$BASH_COMMAND
   set +e
   stop_spinner $exit_code
   if [ "${exit_code}" == "0" ]; then
     echo ""
     echo_console_and_log "  \o/ Success!"
     _canvas_lms_telemetry_report_status $exit_code
+  elif [ "${exit_code}" == "130" ]; then
+    echo_console_and_log "  /o\ Script interrupted. Check ${LOG} for details."
+    _canvas_lms_telemetry_report_status $exit_code
   else
     echo ""
     echo_console_and_log "  /o\ Something went wrong. Check ${LOG} for details."
-    _canvas_lms_telemetry_report_status $exit_code
+    _canvas_lms_telemetry_report_status $exit_code "$last_command" "$ERROR_LOG_FILE"
   fi
   trap - EXIT
   exit ${exit_code}
@@ -79,12 +83,16 @@ function _canvas_lms_opt_in_telemetry() {
   fi
   SCRIPT_NAME=$1
   LOG_FILE=$2
+  export ERROR_LOG_FILE=$LOG_FILE.error
   if installed _canvas_lms_activate_telemetry; then
     _canvas_lms_activate_telemetry
     if installed _inst_setup_telemetry && _inst_setup_telemetry "canvas-lms:$SCRIPT_NAME"; then
       _inst_track_os
       if [[ ! -z "${LOG_FILE-}" ]]; then
         _inst_set_redirect_log_file "$LOG_FILE"
+        > $ERROR_LOG_FILE
+        # duplicate stderr on a log file for untracked commands
+        exec 2>  >(tee  $ERROR_LOG_FILE)
       fi
     fi
   fi
@@ -101,6 +109,11 @@ function _canvas_lms_telemetry_report_status() {
   fi
   stop_spinner $exit_status
   if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
+    failed_command=${2-}
+    error_file=${3-}
+    if [ -s "$error_file" ]; then
+      _inst_untracked_failure $exit_status "$failed_command" "$error_file"
+    fi
     _inst_report_status $exit_status
   fi
 }

@@ -201,7 +201,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}"
 
-      expect(k5_tablist).to include_text("Schedule\nHome\nGrades\nModules\nResources")
+      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
     end
 
     it 'has tabs that are hidden from the subject page' do
@@ -211,7 +211,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}"
 
-      expect(k5_tablist).to include_text("Schedule\nGrades\nModules\nResources")
+      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
     end
 
     it 'has ltis that are rearranged in new order on the resources page' do
@@ -243,7 +243,7 @@ describe "teacher k5 course dashboard" do
       create_important_info_content(@subject_course, important_info_text)
       create_lti_resource("fake LTI")
       get "/courses/#{@subject_course.id}#resources"
-      
+
       expect(important_info_content).to include_text(important_info_text)
     end
   end

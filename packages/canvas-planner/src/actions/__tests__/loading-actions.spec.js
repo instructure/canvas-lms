@@ -286,7 +286,24 @@ describe('api actions', () => {
         expect(mockDispatch).toHaveBeenCalledWith(
           Actions.startLoadingWeekSaga({
             weekStart: weeklyState.weekStart,
-            weekEnd: weeklyState.weekEnd
+            weekEnd: weeklyState.weekEnd,
+            isPreload: false
+          })
+        )
+        // Pre-loading previous week
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({
+            weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
+            weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
+            isPreload: true
+          })
+        )
+        // Pre-loading next week
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({
+            weekStart: weeklyState.weekStart.clone().add(7, 'days'),
+            weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
+            isPreload: true
           })
         )
         const getWayFutureItemThunk = mockDispatch.mock.calls[2][0] // the function returned by getWayFutureItem()
@@ -315,10 +332,14 @@ describe('api actions', () => {
           weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(-7, 'days')
         }
+        const twoWeeksAgo = {
+          weekStart: weeklyState.weekStart.clone().add(-14, 'days'),
+          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days')
+        }
         const getStateMock = jest
           .fn()
           .mockImplementationOnce(getBasicState) // loadPastWeekItems call
-          .mockImplementationOnce(() => {
+          .mockImplementation(() => {
             // loadWeekItems call
             const st = getBasicState()
             st.weeklyDashboard.weekStart = lastWeek.weekStart
@@ -327,13 +348,23 @@ describe('api actions', () => {
           })
         Actions.loadPastWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(lastWeek))
-        expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingWeekSaga(lastWeek))
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...lastWeek, isPreload: false})
+        )
+        // Pre-loading an additional week previous
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true})
+        )
       })
 
       it('gets previous week from state if available', () => {
         const lastWeek = {
           weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(-7, 'days')
+        }
+        const twoWeeksAgo = {
+          weekStart: weeklyState.weekStart.clone().add(-14, 'days'),
+          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days')
         }
         const key = lastWeek.weekStart.format()
         const sunday = lastWeek.weekStart.format('YYYY-MM-DD')
@@ -348,6 +379,10 @@ describe('api actions', () => {
         Actions.loadPastWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(lastWeek))
         expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: lastWeekItems}))
+        // Doesn't pre-load an additional week if we already had the previous week in state
+        expect(mockDispatch).not.toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true})
+        )
       })
     })
 
@@ -357,10 +392,14 @@ describe('api actions', () => {
           weekStart: weeklyState.weekStart.clone().add(7, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(7, 'days')
         }
+        const twoWeeksHence = {
+          weekStart: weeklyState.weekStart.clone().add(14, 'days'),
+          weekEnd: weeklyState.weekEnd.clone().add(14, 'days')
+        }
         const getStateMock = jest
           .fn()
           .mockImplementationOnce(getBasicState) // loadPastWeekItems call
-          .mockImplementationOnce(() => {
+          .mockImplementation(() => {
             // loadWeekItems call
             const st = getBasicState()
             st.weeklyDashboard.weekStart = nextWeek.weekStart
@@ -369,13 +408,23 @@ describe('api actions', () => {
           })
         Actions.loadNextWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(nextWeek))
-        expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingWeekSaga(nextWeek))
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...nextWeek, isPreload: false})
+        )
+        // Pre-loading an additional week hence
+        expect(mockDispatch).toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true})
+        )
       })
 
       it('gets next week from state if available', () => {
         const nextWeek = {
           weekStart: weeklyState.weekStart.clone().add(7, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(7, 'days')
+        }
+        const twoWeeksHence = {
+          weekStart: weeklyState.weekStart.clone().add(14, 'days'),
+          weekEnd: weeklyState.weekEnd.clone().add(14, 'days')
         }
         const key = nextWeek.weekStart.format()
         const sunday = nextWeek.weekStart.format('YYYY-MM-DD')
@@ -390,6 +439,10 @@ describe('api actions', () => {
         Actions.loadNextWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(nextWeek))
         expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: nextWeekItems}))
+        // Doesn't pre-load an additional week if we already had the next week in state
+        expect(mockDispatch).not.toHaveBeenCalledWith(
+          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true})
+        )
       })
     })
 
@@ -441,10 +494,12 @@ describe('api actions', () => {
       const expectedContextCodes = /context_codes\[]=course_7/
       moxios.wait(() => {
         // Fetching current week, far future date, and far past date should all be filtered by context_codes
-        expect(moxios.requests.count()).toBe(3)
+        expect(moxios.requests.count()).toBe(5)
         expect(moxios.requests.at(0).url).toMatch(expectedContextCodes)
         expect(moxios.requests.at(1).url).toMatch(expectedContextCodes)
         expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
+        expect(moxios.requests.at(3).url).toMatch(expectedContextCodes)
+        expect(moxios.requests.at(4).url).toMatch(expectedContextCodes)
         done()
       })
     })

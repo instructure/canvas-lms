@@ -90,7 +90,12 @@ module Audits
       # default to both for now.
       # after a year we will have hit our retention period
       # and can safely de-comission all auditors cassandra code.
-      paths.empty? ? ['cassandra', 'active_record'] : paths
+      return_paths = paths.empty? ? ['cassandra', 'active_record'] : paths
+      unless return_paths.include?('active_record')
+        logger.warn("[Auditors | DEPRECATION] Your auditors config attempts to not write to the relational db: #{paths}.  This is deprecated, the intended future target for these audit records is postgres.  Configuring to write to the db anyway.")
+        return_paths.unshift('active_record')
+      end
+      return_paths
     end
 
     def config(shard=::Switchman::Shard.current)

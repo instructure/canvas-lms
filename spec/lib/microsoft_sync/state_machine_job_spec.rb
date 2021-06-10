@@ -24,7 +24,7 @@ require_dependency "microsoft_sync/errors"
 
 module MicrosoftSync
   class StateMachineJobTestStepsBase
-    RESTART_JOB_AFTER_INACTIVITY = 6.hours
+    MAX_DELAY = 6.hours
 
     def steps_run
       # For spec expectations
@@ -39,8 +39,8 @@ module MicrosoftSync
       4
     end
 
-    def restart_job_after_inactivity
-      RESTART_JOB_AFTER_INACTIVITY
+    def max_delay
+      MAX_DELAY
     end
 
     def after_failure
@@ -119,6 +119,13 @@ module MicrosoftSync
       steps_object.steps_run << [:sleep, amt]
     end
 
+    # Used as a helper to enqueue actual delayed jobs
+    def direct_enqueue_run(run_at, step, initial_mem_state)
+      StateMachineJob.instance_method(:delay).bind(self)
+        .call(sender: self, strand: strand, run_at: run_at)
+        .run(step, initial_mem_state)
+    end
+
     def delay(*args)
       so = steps_object
       Object.new.tap do |mock_delay_object|
@@ -155,6 +162,15 @@ module MicrosoftSync
           [:step_second, 'first_data', nil],
           [:after_complete],
         ])
+      end
+
+      context 'when there is a job currently retrying' do
+        it 'raises an error' do
+          subject.send(:run, nil, nil)
+          subject.direct_enqueue_run(10.minutes.from_now, :step_first, nil)
+          expect { subject.run_synchronously }.to \
+            raise_error(described_class::InternalError, /A job is waiting to be retried/)
+        end
       end
     end
 
@@ -350,18 +366,15 @@ module MicrosoftSync
             end
           end
 
-          context 'when a delay is greater than restart_job_after_inactivity (minus a buffer)' do
+          context 'when a delay is greater than max_delay' do
             let(:max_delay) do
-              StateMachineJobTestStepsBase::RESTART_JOB_AFTER_INACTIVITY -
-                described_class::RETRY_DELAY_INACTIVITY_BUFFER
+              StateMachineJobTestStepsBase::MAX_DELAY
             end
 
             let(:run_ats) do
               delays = steps_object.steps_run.select{|step| step.is_a?(Array)}
               delays.map{|d| d[1][0][:run_at]}
             end
-
-            it { expect(described_class::RETRY_DELAY_INACTIVITY_BUFFER).to eq(5.minutes) }
 
             context 'when delay is a single duration value' do
               let(:steps_object) { StateMachineJobTestSteps2.new(2, max_delay + 3.minutes) }
@@ -452,13 +465,12 @@ module MicrosoftSync
           ])
         end
 
-        context 'the delay_amount is greater than restart_job_after_inactivity' do
+        context 'the delay_amount is greater than max_delay' do
           let(:delay_amount) { 100.days }
 
-          it 'clips the delay_amount to restart_job_after_inactivity minus a buffer' do
+          it 'clips the delay_amount to max_delay' do
             subject.send(:run, :step_first, nil)
-            run_at = Time.zone.now + StateMachineJobTestStepsBase::RESTART_JOB_AFTER_INACTIVITY -
-              described_class::RETRY_DELAY_INACTIVITY_BUFFER
+            run_at = Time.zone.now + StateMachineJobTestStepsBase::MAX_DELAY
 
             expect(steps_object.steps_run).to eq([
               [:delay_run, [{run_at: run_at, strand: strand}], [:step_second, nil]],
@@ -631,11 +643,7 @@ module MicrosoftSync
             subject.send(:run, :step_first, nil)
           end
 
-          context 'when the updated_at is before restart_job_after_inactivity' do
-            before do
-              Timecop.travel((6.hours + 1.second).from_now)
-            end
-
+          shared_examples_for 'restarting when a retrying job has stalled' do
             it 'restarts the job (in-progress job has stalled)' do
               expect(state_record.job_state[:step]).to eq(:step_first)
               expect(state_record.job_state[:retries_by_step]['step_first']).to eq(2)
@@ -644,7 +652,7 @@ module MicrosoftSync
                 expect(state_record.workflow_state).to eq('running')
                 described_class::Retry.new(error: StandardError.new)
               end
-              expect { subject.send(:run, nil, nil) }.to change{ state_record.job_state[:updated_at] }
+              subject.send(:run, nil, nil)
               expect(state_record.job_state[:retries_by_step]['step_first']).to eq(1)
             end
 
@@ -658,12 +666,90 @@ module MicrosoftSync
             end
           end
 
-          context 'when the updated_at is not before restart_job_after_inactivity (in-progress job)' do
-            it 'does nothing (ignores/drops the job)' do
-              Timecop.travel((5.hours + 59.minutes).from_now)
-              expect(state_record.job_state[:step]).to eq(:step_first)
-              expect(steps_object).not_to receive(:step_first)
-              expect { subject.send(:run, nil, nil) }.to_not change{ state_record.reload.attributes }
+          let(:retrying_job_run_at) { 1.minute.from_now }
+
+          context 'when there is no job with that state' do
+            it_behaves_like 'restarting when a retrying job has stalled'
+          end
+
+          context 'when there is a job with that state' do
+            before do
+              # Currently retrying job:
+              subject.direct_enqueue_run(retrying_job_run_at, :step_first, nil)
+            end
+
+            context "when the retrying job's run_at is before than 1 day in the past" do
+              let(:retrying_job_run_at) { (1.day + 1.second).ago }
+
+              it_behaves_like 'restarting when a retrying job has stalled'
+            end
+
+            context "when the retrying job's run_at > max_delay in the future" do
+              let(:retrying_job_run_at) do
+                (steps_object.max_delay + 1.second).from_now
+              end
+
+              it_behaves_like 'restarting when a retrying job has stalled'
+            end
+
+            context "when the retrying job's run_at is after 1 day in the past " do
+              let(:retrying_job_run_at) { (1.day - 1.second).ago }
+
+              it 'enqueues a new job' do
+                steps_object.steps_run.clear
+                subject.send(:run, nil, nil)
+                expect(steps_object.steps_run).to eq([
+                  [:delay_run, [{strand: strand, run_at: retrying_job_run_at + 1.second}], [nil, nil]]
+                ])
+              end
+            end
+
+            context "when the retrying job's run_at < max_delay" do
+              let(:retrying_job_run_at) do
+                (steps_object.max_delay - 1.second).from_now
+              end
+
+              it 'enqueues a new job' do
+                steps_object.steps_run.clear
+                subject.send(:run, nil, nil)
+                expect(steps_object.steps_run).to eq([
+                  [:delay_run, [{strand: strand, run_at: retrying_job_run_at + 1.second}], [nil, nil]]
+                ])
+              end
+            end
+
+            [[nil, :my_mem_state], [:my_mem_state, nil]].each do |mem_state1, mem_state2|
+              context "when there is another initial job with the same " \
+                "initial_mem_state (#{mem_state1.inspect}) enqueued" do
+                it 'does nothing (ignores/drops the job)' do
+                  subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
+
+                  allow(Delayed::Worker).to receive(:current_job).and_return(Delayed::Job.last)
+                  # Backlog job with the same initial_mem_state:
+                  subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
+                  expect(state_record.job_state[:step]).to eq(:step_first)
+                  expect(steps_object).not_to receive(:step_first)
+                  expect { subject.send(:run, nil, mem_state1) }.to_not \
+                    change{ state_record.reload.attributes }
+                end
+              end
+
+              context "when there are other jobs but none with the same initial_mem_state " \
+                "(#{mem_state1.inspect})" do
+                it 'enqueues another job one second after the currently retrying one' do
+                  subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
+                  allow(Delayed::Worker).to receive(:current_job).and_return(Delayed::Job.last)
+
+                  subject.direct_enqueue_run(30.seconds.from_now, nil, 'some_initial_mem_state')
+                  subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state2)
+                  expect(steps_object).not_to receive(:step_first)
+                  steps_object.steps_run.clear
+                  expect { subject.send(:run, nil, mem_state1) }.to_not change{ state_record.reload.attributes }
+                  expect(steps_object.steps_run).to eq([
+                    [:delay_run, [{strand: strand, run_at: 61.seconds.from_now}], [nil, mem_state1]]
+                  ])
+                end
+              end
             end
           end
         end

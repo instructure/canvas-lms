@@ -20,10 +20,7 @@
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 
-import GradesPage, {
-  getGradingPeriodsFromCourses,
-  overrideCourseGradingPeriods
-} from '../GradesPage'
+import GradesPage, {getGradingPeriodsFromCourses, overrideCourseGradingPeriods} from '../GradesPage'
 
 jest.mock('@canvas/k5/react/utils')
 const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
@@ -117,10 +114,10 @@ const defaultSpecificPeriodGrades = [
 ]
 
 describe('GradesPage', () => {
-  it('displays a loading spinner when grades are loading', async () => {
+  it('displays loading skeletons when grades are loading', async () => {
     utils.fetchGrades.mockReturnValueOnce(Promise.resolve([]))
-    const {getByText} = render(<GradesPage visible />)
-    expect(getByText('Loading grades...')).toBeInTheDocument()
+    const {getAllByText} = render(<GradesPage visible />)
+    expect(getAllByText('Loading grades...')[0]).toBeInTheDocument()
   })
 
   it('displays an error message if there was an error fetching grades', async () => {
@@ -140,13 +137,19 @@ describe('GradesPage', () => {
     expect(queryByText('Invisible Homeroom')).not.toBeInTheDocument()
   })
 
-  it('renders a grading period drop-down if the user has any student enrollments', async () => {
+  it('renders a grading period drop-down if the user has student role', async () => {
     utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
-    const {findByText} = render(<GradesPage visible />)
+    const {findByText} = render(<GradesPage visible currentUserRoles={['student', 'user']} />)
     expect(await findByText('Select Grading Period')).toBeInTheDocument()
   })
 
-  it('does not render a grading period drop-down if the user has no student enrollments', async () => {
+  it('displays a loading skeleton when the grading period drop-down is loading', () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
+    const {getByText} = render(<GradesPage visible currentUserRoles={['student', 'user']} />)
+    expect(getByText('Loading grading periods...')).toBeInTheDocument()
+  })
+
+  it('does not render a grading period drop-down if the user does not have student role', async () => {
     utils.fetchGrades.mockReturnValueOnce(
       Promise.resolve([
         {
@@ -167,7 +170,9 @@ describe('GradesPage', () => {
         }
       ])
     )
-    const {getByText, queryByText} = render(<GradesPage visible />)
+    const {getByText, queryByText} = render(
+      <GradesPage visible currentUserRoles={['admin', 'teacher']} />
+    )
     await waitFor(() => getByText('For Teachers Only'))
     expect(queryByText('Select Grading Period')).not.toBeInTheDocument()
   })
@@ -178,7 +183,9 @@ describe('GradesPage', () => {
       Promise.resolve(defaultSpecificPeriodGrades)
     )
 
-    const {getByRole, getByText, queryByText} = render(<GradesPage visible />)
+    const {getByRole, getByText, queryByText} = render(
+      <GradesPage visible currentUserRoles={['student', 'user']} />
+    )
     await waitFor(() => getByText('Testing 4 Dummies'))
     expect(getByText('F')).toBeInTheDocument()
     expect(getByText('A-')).toBeInTheDocument()
@@ -216,6 +223,12 @@ describe('GradesPage', () => {
 
     await waitFor(() => expect(getByText('76%')).toBeInTheDocument())
     expect(queryByText('C')).not.toBeInTheDocument()
+  })
+
+  it('displays some text indicating how grades are calculated', () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
+    const {getByText} = render(<GradesPage visible currentUserRoles={['student', 'user']} />)
+    expect(getByText('Totals are calculated based only on graded assignments.')).toBeInTheDocument()
   })
 })
 

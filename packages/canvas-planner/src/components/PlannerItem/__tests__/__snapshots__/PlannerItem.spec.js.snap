@@ -21,11 +21,17 @@ exports[`does not render end time if the same as start time 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -182,11 +188,17 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -354,11 +366,17 @@ exports[`renders Announcement correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Announcement I am an Announcement is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am an Announcement is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -517,11 +535,17 @@ exports[`renders Announcement correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Announcement I am an Announcement is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am an Announcement is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -659,11 +683,17 @@ exports[`renders Announcement correctly with just points 1`] = `
       }
     >
       <Checkbox
-        aria-label="Announcement I am an Announcement is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am an Announcement is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -822,11 +852,17 @@ exports[`renders Announcement correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Announcement I am an Announcement is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Announcement I am an Announcement is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -964,11 +1000,17 @@ exports[`renders Assignment correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment I am an Assignment is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am an Assignment is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1127,11 +1169,17 @@ exports[`renders Assignment correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment I am an Assignment is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am an Assignment is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1269,11 +1317,17 @@ exports[`renders Assignment correctly with just points 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment I am an Assignment is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am an Assignment is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1432,11 +1486,17 @@ exports[`renders Assignment correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment I am an Assignment is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment I am an Assignment is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1574,11 +1634,17 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event I am a Calendar Event is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1734,11 +1800,17 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event I am a Calendar Event is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -1915,11 +1987,17 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event I am a Calendar Event is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2075,11 +2153,17 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event I am a Calendar Event is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2236,11 +2320,17 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event I am a Calendar Event is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event I am a Calendar Event is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2396,11 +2486,17 @@ exports[`renders Discussion correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Discussion I am a Discussion is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2559,11 +2655,17 @@ exports[`renders Discussion correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Discussion I am a Discussion is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2701,11 +2803,17 @@ exports[`renders Discussion correctly with just points 1`] = `
       }
     >
       <Checkbox
-        aria-label="Discussion I am a Discussion is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -2864,11 +2972,17 @@ exports[`renders Discussion correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Discussion I am a Discussion is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Discussion I am a Discussion is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3006,11 +3120,17 @@ exports[`renders Note correctly with Group 1`] = `
       }
     >
       <Checkbox
-        aria-label="Page this is an account-level group page is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Page this is an account-level group page is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3148,11 +3268,17 @@ exports[`renders Note correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="To Do I am a Note is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            To Do I am a Note is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3333,11 +3459,17 @@ exports[`renders Note correctly without Course 1`] = `
       }
     >
       <Checkbox
-        aria-label="To Do I am a Note is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            To Do I am a Note is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3518,11 +3650,17 @@ exports[`renders Page correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Page I am a Page is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3681,11 +3819,17 @@ exports[`renders Page correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Page I am a Page is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3823,11 +3967,17 @@ exports[`renders Page correctly with just points 1`] = `
       }
     >
       <Checkbox
-        aria-label="Page I am a Page is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -3986,11 +4136,17 @@ exports[`renders Page correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Page I am a Page is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Page I am a Page is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4128,11 +4284,17 @@ exports[`renders Quiz correctly with everything 1`] = `
       }
     >
       <Checkbox
-        aria-label="Quiz I am a Quiz is marked as done."
         checked={true}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz is marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4291,11 +4453,17 @@ exports[`renders Quiz correctly with just date 1`] = `
       }
     >
       <Checkbox
-        aria-label="Quiz I am a Quiz is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4433,11 +4601,17 @@ exports[`renders Quiz correctly with just points 1`] = `
       }
     >
       <Checkbox
-        aria-label="Quiz I am a Quiz is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4596,11 +4770,17 @@ exports[`renders Quiz correctly without right side content 1`] = `
       }
     >
       <Checkbox
-        aria-label="Quiz I am a Quiz is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Quiz I am a Quiz is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4738,11 +4918,17 @@ exports[`renders assignment peer reviews correctly 1`] = `
       }
     >
       <Checkbox
-        aria-label="Peer Review some reviewable assignment is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Peer Review some reviewable assignment is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -4880,11 +5066,17 @@ exports[`renders correctly 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5043,11 +5235,17 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5214,11 +5412,17 @@ exports[`renders feedback if available 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5386,11 +5590,17 @@ exports[`renders media feedback if available 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5558,11 +5768,17 @@ exports[`renders the end time if available 1`] = `
       }
     >
       <Checkbox
-        aria-label="Calendar Event This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Calendar Event This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5719,11 +5935,17 @@ exports[`renders the location if available 1`] = `
       }
     >
       <Checkbox
-        aria-label="Assignment This Assignment is about awesome stuff is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}
@@ -5873,11 +6095,17 @@ exports[`renders user-created Todo correctly 1`] = `
       }
     >
       <Checkbox
-        aria-label="Task do that one thing is not marked as done."
         checked={false}
         disabled={false}
         indeterminate={false}
         inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Task do that one thing is not marked as done.
+          </ScreenReaderContent>
+        }
         labelPlacement="end"
         onChange={[Function]}
         readOnly={false}

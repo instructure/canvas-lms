@@ -225,10 +225,10 @@ export class UpdateItemTray extends Component {
       label: formatMessage('Optional: Add Course')
     }
     const courseOptions = (this.props.courses || [])
-      .filter(course => course.enrollmentType === 'StudentEnrollment')
+      .filter(course => course.enrollmentType === 'StudentEnrollment' || course.is_student)
       .map(course => ({
         value: course.id,
-        label: course.longName
+        label: course.longName || course.long_name
       }))
 
     const courseId = this.findCurrentValue('courseId')

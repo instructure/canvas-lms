@@ -58,7 +58,7 @@ class FileBrowser extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      collections: {0: {collections: []}},
+      collections: {0: {id: 0, collections: []}},
       items: {},
       openFolders: [],
       uploadFolder: null,

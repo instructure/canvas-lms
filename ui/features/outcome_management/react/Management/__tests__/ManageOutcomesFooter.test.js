@@ -54,14 +54,14 @@ describe('ManageOutcomesFooter', () => {
     expect(queryByText('Outcomes Selected')).not.toBeInTheDocument()
   })
 
-  it('renders # selected outcomes in brand color when selected props provided and gt 0 ', () => {
+  it('renders # selected outcomes when selected props provided and gt 0', () => {
     const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
-    expect(getByText('2 Outcomes Selected')).toHaveStyle('color: brand')
+    expect(getByText('2 Outcomes Selected').hasAttribute('aria-disabled')).toBe(false)
   })
 
-  it('renders # selected outcomes in secondary color when selected props provided and eq 0 ', () => {
+  it('renders # selected outcomes when selected props provided and eq 0', () => {
     const {getByText} = render(<ManageOutcomesFooter {...defaultProps({selected: 0})} />)
-    expect(getByText(`0 Outcomes Selected`)).toHaveStyle('color: secondary')
+    expect(getByText(`0 Outcomes Selected`).hasAttribute('aria-disabled')).toBe(true)
   })
 
   describe('Buttons and click handlers', () => {

@@ -21,11 +21,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
 
-import {
-  createTeacherPreview,
-  startLoadingAllOpportunities,
-  store
-} from '@instructure/canvas-planner'
+import {startLoadingAllOpportunities, store} from '@instructure/canvas-planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -41,6 +37,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs from '@canvas/k5/react/K5Tabs'
@@ -56,6 +53,7 @@ import {GradesPage} from './GradesPage'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
+import EmptyModules from './EmptyModules'
 
 const HERO_HEIGHT_PX = 400
 
@@ -144,7 +142,13 @@ export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   )
 }
 
-export function CourseHeaderOptions({settingsPath, showStudentView, studentViewPath, canManage}) {
+export function CourseHeaderOptions({
+  settingsPath,
+  showStudentView,
+  studentViewPath,
+  canManage,
+  courseContext
+}) {
   return (
     <View
       id="k5-course-header-options"
@@ -162,7 +166,9 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
               href={settingsPath}
               renderIcon={<IconEditSolid />}
             >
-              {I18n.t('Manage Subject')}
+              <AccessibleContent alt={I18n.t('Manage Subject: %{courseContext}', {courseContext})}>
+                {I18n.t('Manage Subject')}
+              </AccessibleContent>
             </Button>
           </Flex.Item>
         )}
@@ -183,6 +189,14 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
   )
 }
 
+CourseHeaderOptions.propTypes = {
+  settingsPath: PropTypes.string.isRequired,
+  showStudentView: PropTypes.bool.isRequired,
+  studentViewPath: PropTypes.string.isRequired,
+  canManage: PropTypes.bool.isRequired,
+  courseContext: PropTypes.string.isRequired
+}
+
 export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
@@ -195,6 +209,7 @@ export function K5Course({
   loadAllOpportunities,
   name,
   timeZone,
+  locale,
   canManage = false,
   plannerEnabled = false,
   hideFinalGrades,
@@ -221,38 +236,52 @@ export function K5Course({
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
-     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it based off currentTab */
+     move it into the main <View> of K5Course so the sticky tabs stick. Then show/hide it (if there's at least one
+     module) based off currentTab */
   const modulesRef = useRef(null)
   const contentRef = useRef(null)
+  const [modulesExist, setModulesExist] = useState(true)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
+    setModulesExist(document.getElementById('context_modules').childElementCount > 0)
   }, [])
 
   useEffect(() => {
     if (modulesRef.current) {
-      modulesRef.current.style.display = currentTab === TAB_IDS.MODULES ? 'block' : 'none'
+      modulesRef.current.style.display =
+        currentTab === TAB_IDS.MODULES && (modulesExist || canManage) ? 'block' : 'none'
     }
-  }, [currentTab])
+  }, [currentTab, modulesExist, canManage])
 
-  const courseHeader = shouldShrink => (
-    <View id="k5-course-header" as="div" padding={shouldShrink ? 'medium 0 0 0' : '0'}>
-      {(canManage || showStudentView) && (
-        <CourseHeaderOptions
-          canManage={canManage}
-          settingsPath={settingsPath}
-          showStudentView={showStudentView}
-          studentViewPath={studentViewPath}
+  const courseHeader = sticky => {
+    const extendedViewport = window.innerHeight + 180
+    const contentHeight = document.body.scrollHeight
+    // makes sure that there is at least 180px of overflow, before shrinking the hero image
+    // this cancels the intermittent effect in the sticky prop when the window is almost
+    // the same size of the content
+    const shouldShrink =
+      sticky && activeTab.current === currentTab && contentHeight > extendedViewport
+    return (
+      <View id="k5-course-header" as="div" padding={sticky ? 'medium 0 0 0' : '0'}>
+        {(canManage || showStudentView) && (
+          <CourseHeaderOptions
+            canManage={canManage}
+            settingsPath={settingsPath}
+            showStudentView={showStudentView}
+            studentViewPath={studentViewPath}
+            courseContext={name}
+          />
+        )}
+        <CourseHeaderHero
+          name={name}
+          image={imageUrl}
+          backgroundColor={color || DEFAULT_COURSE_COLOR}
+          shouldShrink={shouldShrink}
         />
-      )}
-      <CourseHeaderHero
-        name={name}
-        image={imageUrl}
-        backgroundColor={color || DEFAULT_COURSE_COLOR}
-        shouldShrink={shouldShrink}
-      />
-    </View>
-  )
+      </View>
+    )
+  }
 
   // Only render the K5Tabs component if we actually have any visible tabs
   const courseTabs = renderTabs?.length ? (
@@ -261,6 +290,7 @@ export function K5Course({
       onTabChange={handleTabChange}
       tabs={renderTabs}
       tabsRef={setTabsRef}
+      courseContext={name}
     >
       {sticky => courseHeader(sticky)}
     </K5Tabs>
@@ -295,8 +325,14 @@ export function K5Course({
           />
         )}
         {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
-        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-        {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
+        <SchedulePage
+          plannerEnabled={plannerEnabled}
+          plannerInitialized={plannerInitialized}
+          timeZone={timeZone}
+          locale={locale}
+          userHasEnrollments
+          visible={currentTab === TAB_IDS.SCHEDULE}
+        />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage
             courseId={id}
@@ -318,6 +354,7 @@ export function K5Course({
             filterToHomerooms={false}
           />
         )}
+        {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
       </View>
     </K5DashboardContext.Provider>
   )
@@ -331,6 +368,7 @@ K5Course.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
   color: PropTypes.string,
   defaultTab: PropTypes.string,

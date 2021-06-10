@@ -160,6 +160,14 @@ describe('WEEK_LOADED', () => {
     const newState = daysReducer(initialState, weekLoadedAction)
     expect(newState).toMatchObject(weekData)
   })
+
+  it("doesn't update state with the week's days if isPreload is true", () => {
+    const initialState = []
+    const weekData = [{'2021-03-14': [{id: '1'}, {id: '2'}]}]
+    const weekLoadedAction = weekLoaded({weekDays: weekData, isPreload: true})
+    const newState = daysReducer(initialState, weekLoadedAction)
+    expect(newState).toMatchObject(initialState)
+  })
 })
 
 describe('JUMP_TO_WEEK', () => {

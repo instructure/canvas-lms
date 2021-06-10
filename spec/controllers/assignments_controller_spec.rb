@@ -1246,7 +1246,21 @@ describe AssignmentsController do
             expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
           end
 
-          it "is not included if neither turnitin nor vericite is enabled" do
+          it "is included if tool_settings_tool returns a valid tool" do
+            tool = course.context_external_tools.create!(
+              name: "a",
+              url: "http://www.google.com",
+              consumer_key: '12345',
+              shared_secret: 'secret'
+            )
+            assignment.tool_settings_tool = tool
+            assignment.save!
+
+            get :show, params: {course_id: course.id, id: assignment.id}
+            expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "is not included if neither turnitin nor vericite is enabled and no appropriate tool exists" do
             get :show, params: {course_id: course.id, id: assignment.id}
             expect(assigns[:js_env]).not_to have_key(:SIMILARITY_PLEDGE)
           end
@@ -1283,6 +1297,11 @@ describe AssignmentsController do
             end
           end
         end
+      end
+
+      it "sets can_manage_groups permissions in the ENV" do
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PERMISSIONS]).to include can_manage_groups: true
       end
     end
   end
@@ -1646,6 +1665,12 @@ describe AssignmentsController do
       root_folder = Folder.root_folders(@course).first
       get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_FOLDER_ID]).to eq root_folder.id
+    end
+
+    it "sets can_manage_groups permissions in the ENV" do
+      user_session(@teacher)
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:PERMISSIONS]).to eq can_manage_groups: true
     end
 
     it "should require authorization" do

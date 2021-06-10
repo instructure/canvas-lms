@@ -157,6 +157,7 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading course outcomes.',
+      srOnly: true,
       type: 'error'
     })
   })
@@ -168,6 +169,7 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading account outcomes.',
+      srOnly: true,
       type: 'error'
     })
   })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!staff_info'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 

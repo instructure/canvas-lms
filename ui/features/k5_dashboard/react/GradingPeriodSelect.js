@@ -19,11 +19,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!dashboard_grading_period_select'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
-import {PresentationContent} from '@instructure/ui-a11y-content'
 
 import {GradingPeriodShape} from '@canvas/k5/react/utils'
 
@@ -32,7 +31,7 @@ const GradingPeriodSelect = ({
   handleSelectGradingPeriod,
   selectedGradingPeriodId
 }) => (
-  <View as="div" margin="medium 0">
+  <View as="div">
     <SimpleSelect
       id="grading-period-select"
       renderLabel={I18n.t('Select Grading Period')}
@@ -53,9 +52,6 @@ const GradingPeriodSelect = ({
           </SimpleSelect.Option>
         ))}
     </SimpleSelect>
-    <PresentationContent>
-      <hr />
-    </PresentationContent>
   </View>
 )
 

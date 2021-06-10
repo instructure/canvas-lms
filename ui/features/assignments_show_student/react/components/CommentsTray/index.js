@@ -19,12 +19,13 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import React, {Suspense, lazy} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import {Heading} from '@instructure/ui-heading'
 import {bool, func} from 'prop-types'
 
@@ -67,7 +68,7 @@ export default function CommentsTray(props) {
       size="regular"
       placement="end"
     >
-      <div style={{position: 'absolute', top: 0, bottom: 0, width: '100%'}}>
+      <div id="comments-tray">
         <Flex direction="column" height="100%">
           <Flex.Item>
             <View as="div" padding="medium">
