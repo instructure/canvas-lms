@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { configure } from '@canvas/timezone'
+import { configure } from 'datetime'
 import timezone from 'timezone'
 import en_US from 'timezone/en_US'
+import I18n from '@canvas/i18n'
 
 export function up() {
   const tzData = window.__PRELOADED_TIMEZONE_DATA__ || {}
@@ -39,9 +40,24 @@ export function up() {
     tz: userTZ,
     tzData,
     momentLocale: window.ENV && ENV.MOMENT_LOCALE || 'en',
+    formats: getI18nFormats()
   })
 }
 
 export function down() {
   configure({})
+}
+
+export function getI18nFormats() {
+  const phrases = I18n.translations[I18n.locale || 'en']
+
+  return ['date','time'].reduce((acc, target) => {
+    const formats = phrases && phrases[target] && phrases[target].formats || {}
+
+    for (const [format, v] of Object.entries(formats)) {
+      acc[`${target}.formats.${format}`] = v
+    }
+
+    return acc
+  }, {})
 }

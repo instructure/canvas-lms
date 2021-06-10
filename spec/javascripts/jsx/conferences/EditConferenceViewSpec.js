@@ -17,16 +17,15 @@
  */
 
 import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView.coffee'
-import Conference from 'ui/features/conferences/backbone/models/Conference'
-import tz from '@canvas/timezone'
+import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import timezone from 'timezone'
+import tzInTest from '@canvas/timezone/specHelpers'
 import french from 'timezone/fr_FR'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('EditConferenceView', {
   setup() {
     this.view = new EditConferenceView()
-    this.snapshot = tz.snapshot()
     this.datepickerSetting = {field: 'datepickerSetting', type: 'date_picker'}
     fakeENV.setup({
       conference_type_details: [{settings: [this.datepickerSetting]}],
@@ -50,16 +49,16 @@ QUnit.module('EditConferenceView', {
   teardown() {
     this.view.$el.remove()
     fakeENV.teardown()
-    tz.restore(this.snapshot)
-    I18nStubber.clear()
+    tzInTest.restore()
   }
 })
 
 test('updateConferenceUserSettingDetailsForConference localizes values for datepicker settings', function () {
-  tz.changeLocale(french, 'fr_FR', 'fr')
-  I18nStubber.pushFrame()
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {'date.formats.full_with_weekday': '%a %-d %b, %Y %-k:%M'})
+  tzInTest.configureAndRestoreLater({
+    tz: timezone(french, 'fr_FR'),
+    momentLocale: 'fr',
+    formats: {'date.formats.full_with_weekday': '%a %-d %b, %Y %-k:%M'}
+  })
 
   const conferenceData = {user_settings: {datepickerSetting: '2015-08-07T17:00:00Z'}}
   this.view.updateConferenceUserSettingDetailsForConference(conferenceData)

@@ -16,25 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'translations/_core_en'
-import I18nStubber from '../../../../spec/coffeescripts/helpers/I18nStubber'
-import tz from 'timezone/index'
-import { configure } from '../'
+import { configure } from './'
+import timezone from 'timezone'
 
-export function setup() {
-  beforeEach(() => {
-    configure({ tz, tzData: {} })
-    I18nStubber.pushFrame()
-  })
+const snapshots = []
 
-  afterEach(() => {
-    I18nStubber.popFrame()
-    configure({})
+export const configureAndRestoreLater = config => snapshots.push(configure(config))
+export const restore = () => snapshots.splice(0).reverse().forEach(configure)
+export const changeZone = (zoneData, zoneName) => configureAndRestoreLater({
+  tz: timezone(zoneData, zoneName),
+  tzData: {
+    [zoneName]: zoneData
+  }
+})
+
+export const changeLocale = (localeData, bigeasyLocale, momentLocale) => (
+  configureAndRestoreLater({
+    tz: timezone(localeData, bigeasyLocale),
+    momentLocale
   })
-}
+)
 
 export const moonwalk = new Date(Date.UTC(1969, 6, 21, 2, 56))
 export const epoch = new Date(Date.UTC(1970, 0, 1, 0, 0))
-export const equal = (a, b) => expect(a).toEqual(b)
-export const ok = a => expect(a).toBeTruthy()
-export { I18nStubber }
+
+export default {
+  configureAndRestoreLater,
+  changeLocale,
+  changeZone,
+  restore
+}

@@ -16,5 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from 'datetime/specHelpers'
-export { default as default } from 'datetime/specHelpers'
+import { configure } from '../'
+
+export { moonwalk, epoch } from '../specHelpers'
+export function setup() {
+  beforeEach(() => {
+    configure({})
+  })
+
+  afterEach(() => {
+    configure({})
+  })
+}
+
+export const equal = (a, b) => expect(a).toEqual(b)
+export const ok = a => expect(a).toBeTruthy()

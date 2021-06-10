@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz, { configure } from '../'
+import * as tz from '../'
+import { configure } from '../'
 import timezone from 'timezone/index'
 import french from 'timezone/fr_FR'
 import AmericaDenver from 'timezone/America/Denver'
 import AmericaChicago from 'timezone/America/Chicago'
-import { setup, I18nStubber, moonwalk, epoch, equal } from './helpers'
+import { setup, moonwalk, epoch, equal } from './helpers'
 
 setup(this)
 
@@ -75,37 +76,63 @@ test("format() should use a specific timezone when asked", () => {
 })
 
 test('format() should recognize date.formats.*', () => {
-  I18nStubber.stub('en', {'date.formats.short': '%b %-d'})
+  configure({
+    formats: {
+      'date.formats.short': '%b %-d'
+    }
+  })
+
   equal(tz.format(moonwalk, 'date.formats.short'), 'Jul 21')
 })
 
 test('format() should recognize time.formats.*', () => {
-  I18nStubber.stub('en', {'time.formats.tiny': '%-l:%M%P'})
+  configure({
+    formats: {
+      'time.formats.tiny': '%-l:%M%P'
+    }
+  })
+
   equal(tz.format(epoch, 'time.formats.tiny'), '12:00am')
 })
 
 test('format() should localize when given a localization key', () => {
   configure({
     tz: timezone('fr_FR', french),
-    momentLocale: 'fr'
+    momentLocale: 'fr',
+    formats: {
+      'date.formats.full': '%-d %b %Y %-l:%M%P'
+    }
   })
 
-  I18nStubber.setLocale('fr_FR')
-  I18nStubber.stub('fr_FR', {'date.formats.full': '%-d %b %Y %-l:%M%P'})
   equal(tz.format(moonwalk, 'date.formats.full'), '21 juil. 1969 2:56')
 })
 
 test('format() should automatically convert %l to %-l when given a localization key', () => {
-  I18nStubber.stub('en', {'time.formats.tiny': '%l:%M%P'})
+  configure({
+    formats: {
+      'time.formats.tiny': '%l:%M%P'
+    }
+  })
+
   equal(tz.format(moonwalk, 'time.formats.tiny'), '2:56am')
 })
 
 test('format() should automatically convert %k to %-k when given a localization key', () => {
-  I18nStubber.stub('en', {'time.formats.tiny': '%k:%M'})
+  configure({
+    formats: {
+      'time.formats.tiny': '%k:%M'
+    }
+  })
+
   equal(tz.format(moonwalk, 'time.formats.tiny'), '2:56')
 })
 
 test('format() should automatically convert %e to %-e when given a localization key', () => {
-  I18nStubber.stub('en', {'date.formats.short': '%b %e'})
+  configure({
+    formats: {
+      'date.formats.short': '%b %e'
+    }
+  })
+
   equal(tz.format(epoch, 'date.formats.short'), 'Jan 1')
 })

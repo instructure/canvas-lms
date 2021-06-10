@@ -25,6 +25,7 @@ import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import timezone from 'timezone'
 import fakeENV from 'helpers/fakeENV'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 QUnit.module('GradingPeriodForm', suiteHooks => {
   let gradingPeriod
@@ -129,7 +130,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tz: timezone('UTC'),
           tzData: {
             'America/Chicago': chicago
-          }
+          },
+          formats: getI18nFormats(),
         })
         mountComponent()
       })
@@ -181,7 +183,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tz: timezone('UTC'),
           tzData: {
             'America/Chicago': chicago
-          }
+          },
+          formats: getI18nFormats(),
         })
         mountComponent()
       })
@@ -233,7 +236,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tz: timezone('UTC'),
           tzData: {
             'America/Chicago': chicago
-          }
+          },
+          formats: getI18nFormats(),
         })
         mountComponent()
       })

@@ -16,17 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz, { configure } from '../'
+import { parse, format } from 'datetime'
 import timezone from 'timezone'
-import french from 'timezone/fr_FR'
-import chinese from 'timezone/zh_CN'
+import fr_FR from 'timezone/fr_FR'
+import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'
 import MockDate from 'mockdate'
-import { I18nStubber, equal, epoch, ok, moonwalk } from './helpers'
-import {
-  up as configureDateTimeMomentParser,
-  down as resetDateTimeMomentParser
-} from '../../../../ui/boot/initializers/configureDateTimeMomentParser'
+import I18nStubber from '../../../../spec/coffeescripts/helpers/I18nStubber'
+import { up as configureDateTime, down as resetDateTime } from '../configureDateTime'
+import { up as configureDateTimeMomentParser, down as resetDateTimeMomentParser } from '../configureDateTimeMomentParser'
+
+const equal = (a,b,message) => expect(a).toEqual(b)
+
+let TIMEZONE, BIGEASY_LOCALE, MOMENT_LOCALE, __PRELOADED_TIMEZONE_DATA__
+
+beforeAll(() => {
+  if (!window.ENV) {
+    window.ENV = {}
+  }
+
+  __PRELOADED_TIMEZONE_DATA__ = window.__PRELOADED_TIMEZONE_DATA__
+  TIMEZONE = window.ENV.TIMEZONE
+  BIGEASY_LOCALE = window.ENV.BIGEASY_LOCALE
+  MOMENT_LOCALE = window.ENV.MOMENT_LOCALE
+})
+
+afterAll(() => {
+  window.__PRELOADED_TIMEZONE_DATA__ = __PRELOADED_TIMEZONE_DATA__
+  window.ENV.TIMEZONE = TIMEZONE
+  window.ENV.BIGEASY_LOCALE = BIGEASY_LOCALE
+  window.ENV.MOMENT_LOCALE = MOMENT_LOCALE
+})
 
 describe('english tz', () => {
   beforeAll(() => {
@@ -56,16 +76,17 @@ describe('english tz', () => {
       'time.formats.tiny_on_the_hour': '%l%P'
     })
 
-    configure({
-      tz: timezone('en_US', en_US),
-      momentLocale: 'en',
-    })
+    window.__PRELOADED_TIMEZONE_DATA__ = { en_US }
+    window.ENV.BIGEASY_LOCALE = 'en_US'
+    window.ENV.MOMENT_LOCALE = 'en'
 
+    configureDateTime()
     configureDateTimeMomentParser()
   })
 
   afterAll(() => {
     resetDateTimeMomentParser()
+    resetDateTime()
     MockDate.reset()
     I18nStubber.clear()
   })
@@ -87,8 +108,8 @@ describe('english tz', () => {
     ]
 
     engDates.forEach(date => {
-      const d = tz.parse(date)
-      equal(tz.format(d, '%d'), '03', `this works: ${date}`)
+      const d = parse(date)
+      equal(format(d, '%d'), '03', `this works: ${date}`)
     })
   })
 
@@ -96,8 +117,8 @@ describe('english tz', () => {
     const engTimes = ['6:06 PM', '6:06:22 PM', '6:06pm', '6pm']
 
     engTimes.forEach(time => {
-      const d = tz.parse(time)
-      equal(tz.format(d, '%H'), '18', `this works: ${time}`)
+      const d = parse(time)
+      equal(format(d, '%H'), '18', `this works: ${time}`)
     })
   })
 
@@ -115,14 +136,14 @@ describe('english tz', () => {
     ]
 
     engDateTimes.forEach(dateTime => {
-      const d = tz.parse(dateTime)
-      equal(tz.format(d, '%d %H'), '03 18', `this works: ${dateTime}`)
+      const d = parse(dateTime)
+      equal(format(d, '%d %H'), '03 18', `this works: ${dateTime}`)
     })
   })
 
   test('parses 24hr times even if the locale lacks them', () => {
-    const d = tz.parse('18:06')
-    equal(tz.format(d, '%H:%M'), '18:06')
+    const d = parse('18:06')
+    equal(format(d, '%H:%M'), '18:06')
   })
 })
 
@@ -154,16 +175,17 @@ describe('french tz', () => {
       'time.formats.tiny_on_the_hour': '%k:%M'
     })
 
-    configure({
-      tz: timezone('fr_FR', french),
-      momentLocale: 'fr'
-    })
+    window.__PRELOADED_TIMEZONE_DATA__ = { fr_FR }
+    window.ENV.BIGEASY_LOCALE = 'fr_FR'
+    window.ENV.MOMENT_LOCALE = 'fr'
 
+    configureDateTime()
     configureDateTimeMomentParser()
   })
 
   afterAll(() => {
     resetDateTimeMomentParser()
+    resetDateTime()
     MockDate.reset()
     I18nStubber.clear()
   })
@@ -184,7 +206,7 @@ describe('french tz', () => {
 
   for (const date of frenchDates) {
     test(`parses french date "${date}"`, () => {
-      equal(tz.format(tz.parse(date), '%d'), '03')
+      equal(format(parse(date), '%d'), '03')
     })
   }
 
@@ -192,7 +214,7 @@ describe('french tz', () => {
 
   for (const time of frenchTimes) {
     test(`parses french time "${time}"`, () => {
-      equal(tz.format(tz.parse(time), '%H'), '18')
+      equal(format(parse(time), '%H'), '18')
     })
   }
 
@@ -208,7 +230,7 @@ describe('french tz', () => {
 
   for (const dateTime of frenchDateTimes) {
     test(`parses french date time "${dateTime}"`, () => {
-      equal(tz.format(tz.parse(dateTime), '%d %H'), '03 18')
+      equal(format(parse(dateTime), '%d %H'), '03 18')
     })
   }
 })
@@ -242,16 +264,17 @@ describe('chinese tz', () => {
       'time.formats.tiny_on_the_hour': '%k:%M'
     })
 
-    configure({
-      tz: timezone(chinese, 'zh_CN'),
-      momentLocale: 'zh-cn'
-    })
+    window.__PRELOADED_TIMEZONE_DATA__ = { zh_CN }
+    window.ENV.BIGEASY_LOCALE = 'zh_CN'
+    window.ENV.MOMENT_LOCALE = 'zh-cn'
 
+    configureDateTime()
     configureDateTimeMomentParser()
   })
 
   afterAll(() => {
     resetDateTimeMomentParser()
+    resetDateTime()
     MockDate.reset()
     I18nStubber.clear()
   })
@@ -269,7 +292,7 @@ describe('chinese tz', () => {
     ]
 
     chineseDates.forEach(date => {
-      expect(tz.format(tz.parse(date), '%d')).toEqual('03')
+      expect(format(parse(date), '%d')).toEqual('03')
     })
   })
 
@@ -284,7 +307,7 @@ describe('chinese tz', () => {
     ]
 
     chineseDateTimes.forEach(dateTime => {
-      equal(tz.format(tz.parse(dateTime), '%d %H'), '03 06')
+      equal(format(parse(dateTime), '%d %H'), '03 06')
     })
   })
 
@@ -299,7 +322,7 @@ describe('chinese tz', () => {
     ]
 
     chineseDateTimes.forEach(dateTime => {
-      equal(tz.format(tz.parse(dateTime), '%d %H'), '03 18')
+      equal(format(parse(dateTime), '%d %H'), '03 18')
     })
   })
 })

@@ -16,5 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from 'datetime/specHelpers'
-export { default as default } from 'datetime/specHelpers'
+import { changeToTheSecondBeforeMidnight as subject } from '../'
+import { epoch } from 'datetime/specHelpers'
+
+describe('changeToTheSecondBeforeMidnight', () => {
+  it('returns null when no argument given.', () => {
+    expect(subject()).toEqual(null)
+  })
+
+  it('returns null when invalid date is given.', () => {
+    const date = new Date('invalid date')
+    expect(subject(date)).toEqual(null)
+  })
+
+  it('returns fancy midnight when a valid date is given.', () => {
+    const fancyMidnight = subject(epoch)
+    expect(fancyMidnight.toGMTString()).toEqual('Thu, 01 Jan 1970 23:59:59 GMT')
+  })
+})

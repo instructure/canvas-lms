@@ -16,28 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// =~*~=~=*!=~=~!!~=+!+!11212121+!+!+@!@=+!!@+!@=~*~=~=*!=~=~!!~=+!+!13333333333
 //
 // this is only meant for use by maintainers and is not actually exercised in
 // the build mainly because the locale files aren't available to the runner
 //
-// use this only if you're doing something substantial to tz/moment/i18n
+// you can use this if you're doing something substantial to tz/moment/i18n
 //
+// =~*~=~=*!=~=~!!~=+!+!fv....................................~=+!+!13333333333.
 
-import 'translations/_core'
-import 'translations/_core_en'
-
-import tz, { configure } from '../'
-import timezone from 'timezone'
-import $ from '@canvas/datetime'
-import I18n from '@canvas/i18n'
-import {
-  up as configureDateTimeMomentParser,
-  down as resetDateTimeMomentParser
-} from '../../../boot/initializers/configureDateTimeMomentParser'
-import tzLocales from './bigeasyLocales'
-import fs from 'fs'
-import path from 'path'
-import YAML from 'yaml'
+import '../../../../public/javascripts/translations/_core'
+import '../../../../public/javascripts/translations/_core_en'
 
 import '../../../ext/custom_moment_locales/ca'
 import '../../../ext/custom_moment_locales/de'
@@ -51,52 +40,105 @@ import '../../../ext/custom_moment_locales/mi_nz'
 import '../../../ext/custom_moment_locales/hy_am'
 import '../../../ext/custom_moment_locales/sl'
 
+import $ from '@canvas/datetime'
+import * as configureDateTime from '../configureDateTime'
+import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
+import fs from 'fs'
+import I18n from '@canvas/i18n'
+import path from 'path'
+import timezone from 'timezone'
+import YAML from 'yaml'
+import { parse, format, hasMeridiem } from 'datetime'
+
+import defaultTZLocaleData from 'timezone/locales'
+import ar_SA from '../../../ext/custom_timezone_locales/ar_SA'
+import ca_ES from '../../../ext/custom_timezone_locales/ca_ES'
+import cy_GB from '../../../ext/custom_timezone_locales/cy_GB'
+import da_DK from '../../../ext/custom_timezone_locales/da_DK'
+import de_DE from '../../../ext/custom_timezone_locales/de_DE'
+import el_GR from '../../../ext/custom_timezone_locales/el_GR'
+import fa_IR from '../../../ext/custom_timezone_locales/fa_IR'
+import fr_CA from '../../../ext/custom_timezone_locales/fr_CA'
+import fr_FR from '../../../ext/custom_timezone_locales/fr_FR'
+import he_IL from '../../../ext/custom_timezone_locales/he_IL'
+import ht_HT from '../../../ext/custom_timezone_locales/ht_HT'
+import hy_AM from '../../../ext/custom_timezone_locales/hy_AM'
+import is_IS from '../../../ext/custom_timezone_locales/is_IS'
+import mi_NZ from '../../../ext/custom_timezone_locales/mi_NZ'
+import nn_NO from '../../../ext/custom_timezone_locales/nn_NO'
+import pl_PL from '../../../ext/custom_timezone_locales/pl_PL'
+import tr_TR from '../../../ext/custom_timezone_locales/tr_TR'
+import uk_UA from '../../../ext/custom_timezone_locales/uk_UA'
+
+const tzLocales = [
+  ...defaultTZLocaleData,
+  ar_SA,
+  ca_ES,
+  cy_GB,
+  da_DK,
+  de_DE,
+  el_GR,
+  fa_IR,
+  fr_CA,
+  fr_FR,
+  he_IL,
+  ht_HT,
+  hy_AM,
+  is_IS,
+  mi_NZ,
+  nn_NO,
+  pl_PL,
+  tr_TR,
+  uk_UA,
+]
+
 const locales = loadAvailableLocales()
 const tzLocaleData = tzLocales.reduce((acc, locale) => {
   acc[locale.name] = locale
   return acc
 }, {})
 
-describe('english tz', () => {
-  const dates = createDateSamples()
+const dates = createDateSamples()
 
-  beforeEach(configureDateTimeMomentParser)
-
-  afterEach(resetDateTimeMomentParser)
-
-  for (const locale of locales) {
-    test(`timezone -> moment for ${locale.key}`, () => {
+for (const locale of locales) {
+  describe(locale.key, () => {
+    beforeAll(() => {
       I18n.locale = locale.key
 
-      configure({
-        tz: timezone(locale.bigeasy, tzLocaleData[locale.bigeasy]),
-        momentLocale: locale.moment
-      })
+      window.ENV = window.ENV || {}
+      window.ENV.BIGEASY_LOCALE = locale.bigeasy
+      window.ENV.MOMENT_LOCALE = locale.moment
+      window.__PRELOADED_TIMEZONE_DATA__ = {
+        [locale.bigeasy]: tzLocaleData[locale.bigeasy]
+      }
 
+      configureDateTimeMomentParser.up()
+      configureDateTime.up()
+    })
+
+    afterAll(() => {
+      configureDateTimeMomentParser.down()
+      configureDateTime.down()
+    })
+
+    test(`timezone -> moment`, () => {
       for (const date of dates) {
         const formattedDate = $.dateString(date)
-        const formattedTime = tz.format(date, 'time.formats.tiny')
+        const formattedTime = format(date, 'time.formats.tiny')
         const formatted = `${formattedDate} ${formattedTime}`
 
         expect(
-          tz.parse(formatted).getTime()
+          parse(formatted).getTime()
         ).toEqual(
           date.getTime()
         )
       }
     })
 
-    test(`hour format matches timezone locale for ${locale.key}`, () => {
+    test(`hour format matches timezone locale`, () => {
       if (locale.key === 'ca') {
         pending("it's broken for ca, needs investigation")
       }
-
-      I18n.locale = locale.key
-
-      configure({
-        tz: timezone(locale.bigeasy, tzLocaleData[locale.bigeasy]),
-        momentLocale: locale.moment
-      })
 
       const formats = [
         'date.formats.date_at_time',
@@ -107,21 +149,11 @@ describe('english tz', () => {
       ]
 
       for (const format of formats) {
-        // expect(tz.hasMeridian()).toEqual(/%p/i.test(I18n.lookup(format)))
-        expect(tz.hasMeridian() || !/%p/i.test(I18n.lookup(format))).toBeTruthy()
+        expect(hasMeridiem() || !/%p/i.test(I18n.lookup(format))).toBeTruthy()
       }
-      // const invalid = key => {
-      //   const format = I18n.lookup(key)
-      //   // ok(/%p/i.test(format) === tz.hasMeridian(), `format: ${format}, hasMeridian: ${tz.hasMeridian()}`)
-      //   ok(
-      //     tz.hasMeridian() || !/%p/i.test(format),
-      //     `format: ${format}, hasMeridian: ${tz.hasMeridian()}`
-      //   )
-      // }
-      // ok(!formats.forEach(invalid))
     })
-  }
-})
+  })
+}
 
 function createDateSamples() {
   const dates = []

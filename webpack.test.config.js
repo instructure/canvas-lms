@@ -254,6 +254,7 @@ testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONT
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 testWebpackConfig.resolve.alias['ui/features'] = path.resolve(__dirname, 'ui/features')
 testWebpackConfig.resolve.alias['ui/ext'] = path.resolve(__dirname, 'ui/ext')
+testWebpackConfig.resolve.alias['ui/boot/initializers'] = path.resolve(__dirname, 'ui/boot/initializers')
 testWebpackConfig.resolve.extensions.push('.coffee')
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.mode = 'development'

@@ -16,5 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from 'datetime/specHelpers'
-export { default as default } from 'datetime/specHelpers'
+import { mergeTimeAndDate as subject } from '../'
+import { moonwalk, epoch } from 'datetime/specHelpers'
+
+test('mergeTimeAndDate() finds the given time of day on the given date.', () => {
+  expect(
+    +subject(moonwalk, epoch)
+  ).toEqual(
+    +Date.UTC(1970, 0, 1, 2, 56)
+  )
+})

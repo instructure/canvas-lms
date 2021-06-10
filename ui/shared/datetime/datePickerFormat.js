@@ -21,11 +21,10 @@
 // %a %b %-d, %Y %-l:%M%P
 // %a %b %-d, %Y %-k:%M
 // %b %-d, %Y
-import tz from '@canvas/timezone'
+import { adjustFormat } from 'datetime'
 
 export default function datePickerFormat(format) {
-  return tz
-    .adjustFormat(quoteLiteralStrings(format))
+  return adjustFormat(quoteLiteralStrings(format))
     .replace(/%Y/, 'yy') // Year (eg. 2017)
     .replace(/%b/, 'M') // Month (eg. May)
     .replace(/%m/, 'm') // Month (eg. 3)

@@ -16,10 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz from '../'
-import { equal, moonwalk, epoch, setup } from './helpers'
+import { shift } from '../'
+import { moonwalk, setup } from './helpers'
 
 setup(this)
 
-test('mergeTimeAndDate() finds the given time of day on the given date.', () =>
-  equal(+tz.mergeTimeAndDate(moonwalk, epoch), +new Date(Date.UTC(1970, 0, 1, 2, 56))))
+test('shift() should add days', () => {
+  expect(shift(moonwalk, '+1 days')).toEqual(new Date(+moonwalk + 86400000))
+})
+
+test('shift() should subtract days', () => {
+  expect(shift(moonwalk, '-1 days')).toEqual(new Date(+moonwalk - 86400000))
+})
+
+test('shift() should add minutes', () => {
+  expect(shift(moonwalk, '+1 minutes')).toEqual(new Date(+moonwalk + 60000))
+})
+
+test('shift() should subtract minutes', () => {
+  expect(shift(moonwalk, '-1 minutes')).toEqual(new Date(+moonwalk - 60000))
+})

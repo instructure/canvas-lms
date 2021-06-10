@@ -1,5 +1,5 @@
 {
-  "name": "date-time-moment-parser",
+  "name": "datetime-moment-parser",
   "version": "1.0.0",
   "description": "parse DateTime strings into Date objects using moment.js",
   "main": "index.js",

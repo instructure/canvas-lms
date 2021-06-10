@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tz, { configure } from '../'
+import * as tz from '../'
+import { configure } from '../'
 import timezone from 'timezone'
 import { moonwalk, epoch, equal, setup } from './helpers'
 

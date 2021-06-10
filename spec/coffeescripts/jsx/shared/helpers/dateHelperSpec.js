@@ -23,6 +23,7 @@ import tzInTest from '@canvas/timezone/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
+import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const defaultAssignment = () => ({
   title: 'assignment',
@@ -73,7 +74,8 @@ test('formats the date for display, adjusted for the timezone', () => {
     tz: timezone(detroit, 'America/Detroit'),
     tzData: {
       'America/Detroit': detroit
-    }
+    },
+    formats: getI18nFormats()
   })
   let formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015 at 2:35pm')
@@ -81,7 +83,8 @@ test('formats the date for display, adjusted for the timezone', () => {
     tz: timezone(juneau, 'America/Juneau'),
     tzData: {
       'America/Juneau': juneau
-    }
+    },
+    formats: getI18nFormats()
   })
   formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015 at 10:35am')
@@ -115,7 +118,8 @@ test('formats the date for display, adjusted for the timezone, excluding the tim
     tz: timezone(detroit, 'America/Detroit'),
     tzData: {
       'America/Detroit': detroit
-    }
+    },
+    formats: getI18nFormats()
   })
   let formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015')
@@ -123,7 +127,8 @@ test('formats the date for display, adjusted for the timezone, excluding the tim
     tz: timezone(juneau, 'America/Juneau'),
     tzData: {
       'America/Juneau': juneau
-    }
+    },
+    formats: getI18nFormats()
   })
   formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015')
