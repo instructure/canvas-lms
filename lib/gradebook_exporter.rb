@@ -55,8 +55,6 @@ class GradebookExporter
   private
 
   def buffer_column_headers(column_name, assignment_group: nil)
-    append_grading_period = grading_period.present? && include_grading_period_in_headers?
-
     # Possible output formats:
     #  Current Score [no assignment group and no grading period]
     #  Assignment Group 1 Current Score [assignment group, no grading period]
@@ -65,7 +63,7 @@ class GradebookExporter
     BUFFER_COLUMN_DEFINITIONS.fetch(column_name).map do |column|
       name_tokens = [column]
       name_tokens.prepend(assignment_group.name) if assignment_group.present?
-      name_tokens.append("(#{grading_period.title})") if append_grading_period
+      name_tokens.append("(#{grading_period.title})") if grading_period.present?
 
       name_tokens.join(" ")
     end
@@ -464,9 +462,5 @@ class GradebookExporter
     else
       "Manual Posting"
     end
-  end
-
-  def include_grading_period_in_headers?
-    Account.site_admin.feature_enabled?(:gradebook_csv_headers_include_grading_period)
   end
 end

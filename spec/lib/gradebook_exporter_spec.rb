@@ -32,10 +32,6 @@ describe GradebookExporter do
     @course.update!(allow_final_grade_override: true)
   end
 
-  def enable_grading_period_in_column_headers!
-    Account.site_admin.enable_feature!(:gradebook_csv_headers_include_grading_period)
-  end
-
   describe "#to_csv" do
     def exporter(opts = {})
       GradebookExporter.new(@course, @teacher, opts)
@@ -542,24 +538,14 @@ describe GradebookExporter do
           it "exports selected grading period's assignments" do
             expect(@headers).to include @no_due_date_assignment.title_with_id,
                                        @current_assignment.title_with_id
-            final_grade = @rows[1]["Final Score"].try(:to_f)
+            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
 
           it "exports assignments without due dates if exporting last grading period" do
             expect(@headers).to include @current_assignment.title_with_id,
                                        @no_due_date_assignment.title_with_id
-            final_grade = @rows[1]["Final Score"].try(:to_f)
-            expect(final_grade).to eq 20
-          end
-
-          it "includes the grading period in column headers when the relevant feature flag is enabled" do
-            enable_grading_period_in_column_headers!
-
-            csv = exporter(grading_period_id: @last_period.id).to_csv
-            rows = CSV.parse(csv, headers: true)
-
-            final_grade = rows[1]["Final Score (present day, present time)"].try(:to_f)
+            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
             expect(final_grade).to eq 20
           end
 
@@ -692,28 +678,18 @@ describe GradebookExporter do
       end
       let(:total_and_override_columns) { total_columns + ["Override Score", "Override Grade"] }
 
-      context "when adding grading periods to headers" do
-        before(:each) { enable_grading_period_in_column_headers! }
-
-        it "appends the grading period to overall total and override columns" do
-          columns_with_grading_period = total_and_override_columns.map do |column|
-            "#{column} (present day, present time)"
-          end
-
-          expect(exported_headers).to include(*columns_with_grading_period)
+      it "appends the grading period to overall total and override columns" do
+        columns_with_grading_period = total_and_override_columns.map do |column|
+          "#{column} (present day, present time)"
         end
 
-        it "appends the grading period to assignment group total columns" do
-          aggregate_failures do
-            expect(exported_headers).to include("my group Current Score (present day, present time)")
-            expect(exported_headers).not_to include("my group Current Score")
-          end
-        end
+        expect(exported_headers).to include(*columns_with_grading_period)
       end
 
-      context "when not adding grading periods to headers" do
-        it "does not append the grading period to column headers" do
-          expect(exported_headers).not_to include(a_string_including("(present day, present time)"))
+      it "appends the grading period to assignment group total columns" do
+        aggregate_failures do
+          expect(exported_headers).to include("my group Current Score (present day, present time)")
+          expect(exported_headers).not_to include("my group Current Score")
         end
       end
     end
@@ -912,14 +888,14 @@ describe GradebookExporter do
         it "includes the overridden score for the current grading period" do
           aggregate_failures do
             expect(enrollment).to receive(:override_score).with({ grading_period_id: grading_period.id }).and_return(64)
-            expect(parsed_csv[1]["Override Score"]).to eq("64")
+            expect(parsed_csv[1]["Override Score (#{grading_period.title})"]).to eq("64")
           end
         end
 
         it "includes the overridden grade for the current grading period if the course has a grading standard" do
           aggregate_failures do
             expect(enrollment).to receive(:override_grade).with({ grading_period_id: grading_period.id }).and_return("D")
-            expect(parsed_csv[1]["Override Grade"]).to eq("D")
+            expect(parsed_csv[1]["Override Grade (#{grading_period.title})"]).to eq("D")
           end
         end
 
