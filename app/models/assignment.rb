@@ -3420,6 +3420,10 @@ class Assignment < ActiveRecord::Base
     @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
   end
 
+  def instructor_selectable_states_by_provisional_grade_id
+    @instructor_selectable_states_by_provisional_grade_id ||= instructor_selectable_states
+  end
+
   def moderated_grader_limit_reached?
     moderated_grading? && provisional_moderation_graders.count >= grader_count
   end
@@ -3829,5 +3833,15 @@ class Assignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+  end
+
+  def instructor_selectable_states
+    return {} unless moderated_grading?
+
+    states = ['inactive', 'completed', 'deleted', 'invited']
+    active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
+    provisional_grades.each_with_object({}) do |provisional_grade, hash|
+      hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
+    end
   end
 end

@@ -639,6 +639,32 @@ describe Assignment do
     end
   end
 
+  describe '#instructor_states_by_provisional_grade_id' do
+    before(:once) do
+      @teacher1 = User.create!
+      @teacher2 = User.create!
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2)
+      @course.enroll_teacher(@teacher1, enrollment_state: :active)
+      @course.enroll_teacher(@teacher2, enrollment_state: :active)
+      @assignment.create_moderation_grader(@teacher1, occupy_slot: true)
+      @assignment.create_moderation_grader(@teacher2, occupy_slot: true)
+      @submission = @assignment.submissions.first
+      @provisional_grade1 = @submission.find_or_create_provisional_grade!(@teacher1, score: 1)
+      @provisional_grade2 = @submission.find_or_create_provisional_grade!(@teacher2, score: 2)
+      @teacher2.enrollments.first.destroy
+    end
+
+    it 'sets active to a provisional grade from an user with active enrollment' do
+      key = @provisional_grade1.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq true
+    end
+
+    it 'sets deleted to a provisional grade from an user with inactive enrollment' do
+      key = @provisional_grade2.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq false
+    end
+  end
+
   describe '#permits_moderation?' do
     before(:once) do
       @assignment = @course.assignments.create!(
