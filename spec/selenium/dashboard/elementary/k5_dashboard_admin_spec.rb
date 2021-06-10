@@ -19,11 +19,15 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_schedule_tab_page'
 require_relative '../../../helpers/k5_common'
 
 describe "admin k5 dashboard" do
   include_context "in-process server selenium tests"
-  include K5PageObject
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5ScheduleTabPageObject
   include K5Common
 
   before :once do
@@ -106,10 +110,11 @@ describe "admin k5 dashboard" do
       expect(latest_course.name).not_to eq(course_name)
     end
 
-    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 25 do
+    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 30 do
       get "/"
 
       click_new_course_button
+      expect(new_course_modal_exists?).to be_truthy
 
       course_name = "Awesome Course"
 
