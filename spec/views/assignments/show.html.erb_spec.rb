@@ -38,6 +38,8 @@ describe "/assignments/show" do
     allow(view).to receive(:show_moderation_link).and_return(true)
     render 'assignments/show'
     expect(response).not_to be_nil # have_tag()
+    # for an assignment with no content
+    expect(rendered).to include "No additional details were added for this assignment."
   end
 
   it "should render webcam wrapper" do
