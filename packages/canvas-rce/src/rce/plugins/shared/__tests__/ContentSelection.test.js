@@ -199,11 +199,6 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         })
 
         describe('when "role" is not "presentation" on the image element', () => {
-          it('is false when the image has no alt text', () => {
-            $element.alt = ''
-            expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(false)
-          })
-
           it('is false when the image has alt text', () => {
             expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(false)
           })
@@ -211,7 +206,7 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
 
         it('is blank when absent on the image', () => {
           $element.alt = ''
-          expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(false)
+          expect(getContentFromElement($element, editor).isDecorativeImage).toEqual(true)
         })
       })
 

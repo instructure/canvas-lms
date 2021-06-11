@@ -66,19 +66,12 @@ export function renderLinkedImage(linkElem, image) {
 }
 
 export function constructJSXImageElement(image, opts = {}) {
-  const {
-    href,
-    url,
-    title,
-    display_name,
-    alt_text,
-    isDecorativeImage,
-    link,
-    ...otherAttributes
-  } = image
+  const {href, url, title, display_name, alt_text, isDecorativeImage, link, ...otherAttributes} =
+    image
   const src = href || url
-  const altText = alt_text || title || display_name || ''
+  let altText = alt_text || title || display_name || ''
   if (isDecorativeImage) {
+    altText = ''
     otherAttributes.role = 'presentation'
   }
 
