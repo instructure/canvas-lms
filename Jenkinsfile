@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-final static FILES_CHANGED_STAGE = 'Detect Files Changed'
 final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
 final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
 final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
@@ -35,16 +34,6 @@ def buildParameters = [
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
   string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}"),
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
-]
-
-def dockerDevFiles = [
-  '^docker-compose/',
-  '^script/common/',
-  '^script/canvas_update',
-  '^docker-compose.yml',
-  '^Dockerfile$',
-  '^lib/tasks/',
-  'Jenkinsfile.docker-smoke'
 ]
 
 def getSummaryUrl() {
@@ -379,27 +368,10 @@ pipeline {
                 .timeout(2)
                 .execute { rebaseStage() }
 
-              extendedStage(FILES_CHANGED_STAGE)
+              extendedStage(filesChangedStage.STAGE_NAME)
                 .obeysAllowStages(false)
                 .timeout(2)
-                .execute { stageConfig ->
-                  stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
-                  stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
-                  stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
-                  stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
-
-                  dir(env.LOCAL_WORKDIR) {
-                    stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
-                  }
-
-                  // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
-                  // https://issues.jenkins.io/browse/JENKINS-52750
-                  if (env.GERRIT_PROJECT != 'canvas-lms') {
-                    sh "rm -vrf $LOCAL_WORKDIR@tmp"
-                  }
-
-                  distribution.stashBuildScripts()
-                }
+                .execute(filesChangedStage.&call)
 
               extendedStage('Build Docker Image (Pre-Merge)')
                 .obeysAllowStages(false)
@@ -434,12 +406,12 @@ pipeline {
               }
             }
 
-            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
+            extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('Local Docker Dev Build')
                 .hooks(buildSummaryReportHooks)
-                .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
+                .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasDockerDevFiles(buildConfig))
                 .queue(nestedStages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
 
               parallel(nestedStages)
@@ -482,11 +454,11 @@ pipeline {
                     .queue(nestedStages, lintersStage.&webpackStage)
 
                   extendedStage('Linters - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('yarnFiles'))
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasYarnFiles(buildConfig))
                     .queue(nestedStages, lintersStage.&yarnStage)
 
                   extendedStage('Linters - Groovy')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('groovyFiles'))
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig))
                     .queue(nestedStages, lintersStage.&groovyStage)
 
                   parallel(nestedStages)
@@ -498,7 +470,7 @@ pipeline {
 
               extendedStage('CDC Schema Check')
                 .hooks(buildSummaryReportHooks)
-                .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
+                .required(filesChangedStage.hasMigrationFiles(buildConfig))
                 .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
                   string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                 ])
@@ -513,7 +485,7 @@ pipeline {
 
               extendedStage('Flakey Spec Catcher')
                 .hooks(buildSummaryReportHooks)
-                .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
+                .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
                 .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                   string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                   string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
