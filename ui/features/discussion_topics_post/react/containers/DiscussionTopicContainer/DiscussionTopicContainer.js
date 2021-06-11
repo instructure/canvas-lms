@@ -70,6 +70,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   }
 
   // TODO: Change this to the new canGrade permission.
+  const hasAuthor = !!props.discussionTopic?.author
   const canGrade = discussionTopicData?.permissions?.speedGrader || false
   const canDelete = discussionTopicData?.permissions?.delete || false
   const canReply = discussionTopicData?.permissions?.reply
@@ -340,6 +341,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 >
                   <Flex.Item shouldShrink shouldGrow>
                     <PostMessage
+                      hasAuthor={hasAuthor}
                       authorName={discussionTopicData.authorName}
                       avatarUrl={discussionTopicData.avatarUrl}
                       timingDisplay={discussionTopicData.postedAt}
