@@ -107,10 +107,9 @@ LatestAnnouncementLink.propTypes = {
 }
 
 export const AssignmentLinks = ({
+  id,
   color,
   courseName,
-  switchToMissingItems,
-  switchToToday,
   numDueToday = 0,
   numMissing = 0,
   numSubmittedToday = 0,
@@ -133,11 +132,7 @@ export const AssignmentLinks = ({
       {numDueToday > 0 ? (
         <Flex.Item>
           <Link
-            href={`/?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
-            onClick={e => {
-              e.preventDefault()
-              switchToToday()
-            }}
+            href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
             display="block"
             isWithinText={false}
             theme={{
@@ -167,11 +162,7 @@ export const AssignmentLinks = ({
           </Flex.Item>
           <Flex.Item>
             <Link
-              href={`/?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
-              onClick={e => {
-                e.preventDefault()
-                switchToMissingItems()
-              }}
+              href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
               display="block"
               isWithinText={false}
               theme={{
@@ -217,10 +208,9 @@ export const AssignmentLinks = ({
 
 AssignmentLinks.displayName = 'AssignmentLinks'
 AssignmentLinks.propTypes = {
+  id: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired,
-  switchToMissingItems: PropTypes.func.isRequired,
-  switchToToday: PropTypes.func.isRequired,
   numDueToday: PropTypes.number,
   numMissing: PropTypes.number,
   numSubmittedToday: PropTypes.number,
@@ -253,8 +243,6 @@ const K5DashboardCard = ({
   const latestAnnouncement = k5Context.subjectAnnouncements.find(
     a => a.context_code === `course_${id}`
   )
-  const switchToMissingItems = k5Context?.switchToMissingItems
-  const switchToToday = k5Context?.switchToToday
 
   const handleHeaderClick = e => {
     if (e) {
@@ -319,14 +307,13 @@ const K5DashboardCard = ({
         </Heading>
         {isStudent && (
           <AssignmentLinks
+            id={id}
             color={backgroundColor}
             courseName={originalName}
             numDueToday={assignmentsDueToday}
             numMissing={assignmentsMissing}
             numSubmittedToday={assignmentsCompletedForToday}
             loading={loadingOpportunities}
-            switchToMissingItems={switchToMissingItems}
-            switchToToday={switchToToday}
           />
         )}
         <LatestAnnouncementLink

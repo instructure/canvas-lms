@@ -209,7 +209,6 @@ export function K5Course({
   loadAllOpportunities,
   name,
   timeZone,
-  locale,
   canManage = false,
   plannerEnabled = false,
   hideFinalGrades,
@@ -329,7 +328,6 @@ export function K5Course({
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
-          locale={locale}
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
@@ -368,7 +366,6 @@ K5Course.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
-  locale: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
   color: PropTypes.string,
   defaultTab: PropTypes.string,

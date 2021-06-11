@@ -36,7 +36,6 @@ ready(() => {
         name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
-        locale={ENV.LOCALE}
         courseOverview={ENV.COURSE.course_overview}
         userIsStudent={ENV.COURSE.is_student}
         userIsInstructor={ENV.COURSE.is_instructor}

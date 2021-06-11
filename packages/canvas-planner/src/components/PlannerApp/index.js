@@ -23,7 +23,7 @@ import {momentObj} from 'react-moment-proptypes'
 import {connect} from 'react-redux'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {arrayOf, oneOfType, shape, bool, object, string, func} from 'prop-types'
+import {arrayOf, oneOfType, shape, bool, number, object, string, func} from 'prop-types'
 import {userShape, sizeShape} from '../plannerPropTypes'
 import Day from '../Day'
 import EmptyDays from '../EmptyDays'
@@ -35,7 +35,6 @@ import formatMessage from '../../format-message'
 import {
   loadFutureItems,
   loadPastButtonClicked,
-  loadPastUntilNewActivity,
   togglePlannerItemCompletion,
   updateTodo,
   scrollToToday
@@ -57,9 +56,7 @@ export class PlannerApp extends Component {
     loadingFuture: bool,
     allFutureItemsLoaded: bool,
     loadPastButtonClicked: func,
-    loadPastUntilNewActivity: func,
     loadFutureItems: func,
-    allWeekItemsLoaded: bool,
     changeDashboardView: func,
     togglePlannerItemCompletion: func,
     updateTodo: func,
@@ -82,6 +79,9 @@ export class PlannerApp extends Component {
       weekStart: momentObj,
       weekEnd: momentObj
     }),
+    weekLoaded: bool,
+    loadingOpportunities: bool,
+    opportunityCount: number,
     singleCourseView: bool
   }
 
@@ -475,7 +475,10 @@ export class PlannerApp extends Component {
   render() {
     const clazz = classnames('PlannerApp', this.props.responsiveSize)
     let children = []
-    if (this.props.isLoading || this.props.loadingWeek) {
+    if (
+      (this.props.isWeekly && !this.props.weekLoaded) ||
+      (!this.props.isWeekly && this.props.isLoading)
+    ) {
       children = [this.renderLoading()]
     } else if (this.props.days.length > 0 || this.props.isWeekly) {
       children = this.renderDays()
@@ -490,6 +493,7 @@ export class PlannerApp extends Component {
 }
 
 export const mapStateToProps = state => {
+  const weeks = state.weeklyDashboard?.weeks
   return {
     days: state.days,
     isLoading: state.loading.isLoading || state.loading.hasSomeItems === null,
@@ -498,7 +502,6 @@ export const mapStateToProps = state => {
     loadingFuture: state.loading.loadingFuture,
     allFutureItemsLoaded: state.loading.allFutureItemsLoaded,
     loadingWeek: state.loading.loadingWeek,
-    allWeekItemsLoaded: state.loading.allWeekItemsLoaded,
     loadingError: state.loading.loadingError,
     timeZone: state.timeZone,
     isCompletelyEmpty:
@@ -511,6 +514,7 @@ export const mapStateToProps = state => {
       weekStart: state.weeklyDashboard.weekStart,
       weekEnd: state.weeklyDashboard.weekEnd
     },
+    weekLoaded: weeks ? !!weeks[state.weeklyDashboard.weekStart.format()] : false,
     loadingOpportunities: !!state.loading.loadingOpportunities,
     opportunityCount: state.opportunities?.items?.length || 0,
     singleCourseView: state.singleCourse
@@ -521,7 +525,6 @@ const ResponsivePlannerApp = responsiviser()(PlannerApp)
 const mapDispatchToProps = {
   loadFutureItems,
   loadPastButtonClicked,
-  loadPastUntilNewActivity,
   togglePlannerItemCompletion,
   updateTodo,
   scrollToToday

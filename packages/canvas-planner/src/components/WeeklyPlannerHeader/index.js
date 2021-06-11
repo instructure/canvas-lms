@@ -35,7 +35,8 @@ import {
   savePlannerItem,
   deletePlannerItem,
   cancelEditingPlannerItem,
-  openEditingPlannerItem
+  openEditingPlannerItem,
+  toggleMissingItems
 } from '../../actions'
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
@@ -75,6 +76,7 @@ export class WeeklyPlannerHeader extends Component {
     loadPastWeekItems: PropTypes.func.isRequired,
     loadThisWeekItems: PropTypes.func.isRequired,
     scrollToToday: PropTypes.func.isRequired,
+    toggleMissing: PropTypes.func.isRequired,
     loading: PropTypes.shape({
       isLoading: PropTypes.bool,
       loadingWeek: PropTypes.bool,
@@ -86,6 +88,7 @@ export class WeeklyPlannerHeader extends Component {
     weekEndMoment: momentObj,
     wayPastItemDate: PropTypes.string,
     wayFutureItemDate: PropTypes.string,
+    weekLoaded: PropTypes.bool,
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     todo: PropTypes.shape({
@@ -185,11 +188,38 @@ export class WeeklyPlannerHeader extends Component {
     return buttons
   }
 
-  componentDidMount() {
+  handleFocusTarget() {
+    const focusTarget = processFocusTarget()
+    // Only scroll / focus if we're on the current week
+    if (
+      isInMomentRange(this.props.todayMoment, this.props.weekStartMoment, this.props.weekEndMoment)
+    ) {
+      window.setTimeout(() => {
+        if (focusTarget === 'missing-items') {
+          this.props.toggleMissing({forceExpanded: true})
+        }
+        this.props.scrollToToday({focusTarget, isWeekly: true})
+      }, 0) // need to wait until the k5Dashboard tab is active
+    }
+  }
+
+  componentChangedVisibility(finishedLoading) {
     if (this.props.visible) {
       this.handleStickyOffset()
       document.addEventListener('scroll', this.handleStickyOffset)
       window.addEventListener('resize', this.handleStickyOffset)
+      if (finishedLoading) {
+        this.handleFocusTarget()
+      }
+    } else {
+      document.removeEventListener('scroll', this.handleStickyOffset)
+      window.removeEventListener('resize', this.handleStickyOffset)
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.visible) {
+      this.componentChangedVisibility(this.props.weekLoaded)
     }
     this.updateButtons()
   }
@@ -201,24 +231,10 @@ export class WeeklyPlannerHeader extends Component {
     // We need to relocate the WeeklyPlannerHeader so it sticks
     // to the bottom of the tabs panel.
     if (this.props.visible !== prevProps.visible) {
-      if (this.props.visible) {
-        const focusTarget = processFocusTarget()
-        this.handleStickyOffset()
-        document.addEventListener('scroll', this.handleStickyOffset)
-        window.addEventListener('resize', this.handleStickyOffset)
-        if (
-          isInMomentRange(
-            this.props.todayMoment,
-            this.props.weekStartMoment,
-            this.props.weekEndMoment
-          )
-        ) {
-          window.setTimeout(() => this.props.scrollToToday({focusTarget, isWeekly: true}), 0) // need to wait until the k5Dashboard tab is active
-        }
-      } else {
-        document.removeEventListener('scroll', this.handleStickyOffset)
-        window.removeEventListener('resize', this.handleStickyOffset)
-      }
+      this.componentChangedVisibility(this.props.weekLoaded)
+    }
+    if (!prevProps.weekLoaded && this.props.weekLoaded && this.props.visible) {
+      this.handleFocusTarget()
     }
     if (
       this.props.wayPastItemDate !== prevProps.wayPastItemDate ||
@@ -328,13 +344,17 @@ export class WeeklyPlannerHeader extends Component {
 export const ThemedWeeklyPlannerHeader = themeable(theme, styles)(WeeklyPlannerHeader)
 
 const mapStateToProps = state => {
+  const weeks = state.weeklyDashboard?.weeks
   return {
     loading: state.loading,
+    locale: state.locale,
     todayMoment: state.today,
     weekStartMoment: state.weeklyDashboard.weekStart,
     weekEndMoment: state.weeklyDashboard.weekEnd,
     wayPastItemDate: state.weeklyDashboard.wayPastItemDate,
     wayFutureItemDate: state.weeklyDashboard.wayFutureItemDate,
+    weekLoaded: weeks ? !!weeks[state.weeklyDashboard.weekStart.format()] : false,
+    timeZone: state.timeZone,
     todo: state.todo,
     courses: state.courses
   }
@@ -348,7 +368,8 @@ const mapDispatchToProps = {
   savePlannerItem,
   deletePlannerItem,
   cancelEditingPlannerItem,
-  openEditingPlannerItem
+  openEditingPlannerItem,
+  toggleMissing: toggleMissingItems
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ThemedWeeklyPlannerHeader)
