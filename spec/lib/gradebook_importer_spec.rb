@@ -471,6 +471,21 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
+  GradebookImporter::NON_ASSIGNMENT_COLUMN_HEADERS.each do |header|
+    it "does not parse assignments with name that matches #{header}" do
+      course = course_model
+      @assignment1 = course.assignments.create!(name: 'Assignment 1')
+      @assignment2 = course.assignments.create!(name: header)
+
+      importer_with_rows(
+        "Student,ID,Section,Assignment 1,#{header}",
+        'Some Student,,,,10'
+      )
+
+      expect(@gi.assignments).to eq [@assignment1]
+    end
+  end
+
   it "parses assignments correctly with existing custom columns" do
     course_model
     @assignment1 = @course.assignments.create! name: 'Assignment 1'
