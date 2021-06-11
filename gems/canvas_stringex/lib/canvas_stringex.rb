@@ -25,6 +25,9 @@ module CanvasStringex
   String.send :include, LuckySneaks::StringExtensions
 
   if defined?(ActiveRecord)
+    # Prevents uninitialized constant ActiveRecord::DatabaseConfigurations::ConnectionUrlResolver::URI
+    # (probably only relevant for specs in practice)
+    require 'uri'
     ActiveRecord::Base.send :include, LuckySneaks::ActsAsUrl
   end
 end

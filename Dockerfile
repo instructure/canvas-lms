@@ -34,6 +34,7 @@ ARG USER_ID
 RUN if [ -n "$USER_ID" ]; then usermod -u "${USER_ID}" docker \
         && chown --from=9999 docker /usr/src/nginx /usr/src/app -R; fi
 
+# When removing bionic/18.04/ruby 2.6 support remove the conditional package installs
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
@@ -54,6 +55,11 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        autoconf \
        automake \
+       git \
+       build-essential \
+  && ([ $(lsb_release -rs) = "18.04" ] || apt-get install -qqy --no-install-recommends \
+       python2 \
+       python-is-python2) \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
