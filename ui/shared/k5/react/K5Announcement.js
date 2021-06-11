@@ -74,7 +74,7 @@ export default function K5Announcement({
     <View>
       {showCourseDetails &&
         renderWithEditButton(
-          <Heading level="h3" as="h2">
+          <Heading level="h2">
             {canEdit ? (
               <Link href={courseUrl} isWithinText={false}>
                 {courseName}
