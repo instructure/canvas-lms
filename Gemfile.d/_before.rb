@@ -25,21 +25,12 @@ if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   raise "Please run `gem update --system` to bring RubyGems to 2.6.9 or newer for use with Bundler 1.14 or newer."
 end
 
-# NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-if RUBY_ENGINE == 'truffleruby' && RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
+if RUBY_ENGINE == 'truffleruby'
   $stderr.puts "TruffleRuby support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
-  ruby RUBY_VERSION, :engine => RUBY_ENGINE, :engine_version => RUBY_ENGINE_VERSION
-elsif RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
-elsif RUBY_VERSION >= "2.7.0" && RUBY_VERSION < "2.8"
-  $stderr.puts "Ruby 2.7+ support is untested" unless ENV['SUPPRESS_RUBY_WARNING']
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
 elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
   $stderr.puts "Ruby 3.0+ support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
-else
-  ruby '2.6.5', :engine => 'ruby', :engine_version => '2.6.0'
 end
+ruby '>= 2.6.0', '< 3.1'
 
 # force a different lockfile for next rails
 unless CANVAS_RAILS6_0
@@ -61,9 +52,3 @@ unless CANVAS_RAILS6_0
   end
 end
 
-if Bundler::VERSION < '2'
-  git_source(:github) do |repo_name|
-    repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-    "https://github.com/#{repo_name}.git"
-  end
-end

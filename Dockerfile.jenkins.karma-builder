@@ -2,10 +2,12 @@ FROM local/webpack-builder
 
 ENV APP_HOME /usr/src/app/
 ENV NODE_ENV test
-ENV CHROME_BIN /usr/bin/chromium-browser
+# Use real chrome because chromium became a snap in focal
+ENV CHROME_BIN /usr/bin/google-chrome
 
 USER root
 RUN apt-get update --quiet=2 \
- && apt-get install --quiet=2 chromium-browser > /dev/null \
+ && curl -LOs https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+ && apt-get install --quiet=2 -y ./google-chrome-stable_current_amd64.deb \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ./google-chrome-stable_current_amd64.deb
