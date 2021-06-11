@@ -151,7 +151,7 @@ describe('StaffInfo', () => {
         )
       })
 
-      it('clears inputs after a successful send', async () => {
+      it.skip('clears inputs after a successful send', async () => {
         fetchMock.post(CONVERSATIONS_URL, 200)
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
