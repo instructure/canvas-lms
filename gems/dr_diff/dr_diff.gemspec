@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "gergich", "0.1.15"
+  spec.add_dependency "gergich", "1.2.1"
   spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency "rspec-mocks"
   spec.add_development_dependency "pry"
