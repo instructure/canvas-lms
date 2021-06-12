@@ -179,6 +179,17 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
   end
 
+  it "orders root_entries by last_reply_at" do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    de2 = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    de3 = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de2.id)
+    expect(discussion_type.resolve('rootDiscussionEntriesConnection(sortOrder: asc) { nodes { _id } }')).to eq [de.id, de3.id, de2.id].map(&:to_s)
+    expect(discussion_type.resolve('rootDiscussionEntriesConnection(sortOrder: desc) { nodes { _id } }')).to eq [de2.id, de3.id, de.id].map(&:to_s)
+    discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de3.id)
+    expect(discussion_type.resolve('rootDiscussionEntriesConnection(sortOrder: desc) { nodes { _id } }')).to eq [de3.id, de2.id, de.id].map(&:to_s)
+  end
+
   it "allows querying root discussion entries (via rootEntries param)" do
     de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
     discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de.id)
