@@ -286,6 +286,7 @@ export default class WikiPageView extends Backbone.View {
     _.each(json.wiki_page_menu_tools, tool => {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
+    json.frontPageText = ENV.K5_SUBJECT_COURSE ? 'Subject Home' : 'Front Page'
     return json
   }
 }

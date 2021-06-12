@@ -81,7 +81,9 @@ const defaultProps = {
       update: true
     },
     posted_at: '2021-05-14T17:06:21-06:00'
-  }
+  },
+  pagesPath: '/courses/30/pages',
+  hasWikiPages: true
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -283,6 +285,62 @@ describe('K-5 Subject Course', () => {
     it('shows front page content if a front page is set', () => {
       const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
       expect(getByText('Time to learn!')).toBeInTheDocument()
+    })
+
+    it('shows an empty home state if the front page is not set', () => {
+      const {getByText, getByTestId} = render(
+        <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} />
+      )
+      expect(getByTestId('empty-home-panda')).toBeInTheDocument()
+      expect(getByText('This is where you’ll land when your home is complete.')).toBeInTheDocument()
+    })
+
+    describe('manage home button', () => {
+      it('shows the home manage button to teachers when the front page is not set ', () => {
+        const {getByTestId} = render(
+          <K5Course
+            {...defaultProps}
+            courseOverview={null}
+            defaultTab={TAB_IDS.HOME}
+            userIsInstructor
+          />
+        )
+        expect(getByTestId('manage-home-button')).toBeInTheDocument()
+      })
+
+      it('does not show the home manage button to students', () => {
+        const {queryByTestId} = render(
+          <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} />
+        )
+        expect(queryByTestId('manage-home-button')).not.toBeInTheDocument()
+      })
+
+      it('sends the user to the course pages list if the course has wiki pages', () => {
+        const {getByTestId} = render(
+          <K5Course
+            {...defaultProps}
+            courseOverview={null}
+            defaultTab={TAB_IDS.HOME}
+            userIsInstructor
+          />
+        )
+        const manageHomeLink = getByTestId('manage-home-button')
+        expect(manageHomeLink.href).toMatch('/courses/30/pages')
+      })
+
+      it('sends the user to create a new page if the course does not have any wiki page', () => {
+        const {getByTestId} = render(
+          <K5Course
+            {...defaultProps}
+            hasWikiPages={false}
+            courseOverview={null}
+            defaultTab={TAB_IDS.HOME}
+            userIsInstructor
+          />
+        )
+        const manageHomeLink = getByTestId('manage-home-button')
+        expect(manageHomeLink.href).toMatch('/courses/30/pages/home')
+      })
     })
   })
 
