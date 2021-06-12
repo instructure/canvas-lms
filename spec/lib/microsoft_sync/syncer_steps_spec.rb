@@ -449,6 +449,45 @@ describe MicrosoftSync::SyncerSteps do
           expect(upns_looked_up).to include("student1@example.com")
         end
       end
+
+      context 'when the Account tenant changes while the job is running' do
+        before do
+          orig_root_account_method = syncer_steps.group.method(:root_account)
+
+          allow(syncer_steps.group).to receive(:root_account) do
+            result = orig_root_account_method.call
+            # Change account settings right after we have used them.
+            # This tests that we are using the same root_account for the GraphService tenant
+            # as we are passing into UserMapping.bulk_insert_for_root_account
+            acct = Account.find(result.id)
+            acct.settings[:microsoft_sync_tenant] = "EXTRA" + acct.settings[:microsoft_sync_tenant]
+            acct.save
+            result
+          end
+        end
+
+        it 'raises a UserMapping::AccountSettingsChanged error' do
+          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+        end
+      end
+
+      context 'when the Account login attribute changes while the job is running' do
+        before do
+          orig_root_account_method = MicrosoftSync::UsersUpnsFinder.method(:new)
+
+          allow(MicrosoftSync::UsersUpnsFinder).to receive(:new) do |user_ids, root_account|
+            result = orig_root_account_method.call(user_ids, root_account)
+            acct = Account.find(root_account.id)
+            acct.settings[:microsoft_sync_login_attribute] = 'somethingelse'
+            acct.save
+            result
+          end
+        end
+
+        it 'raises a UserMapping::AccountSettingsChanged error' do
+          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+        end
+      end
     end
   end
 

@@ -182,7 +182,10 @@ module MicrosoftSync
       users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
         upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
         user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
-        UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
+        # NOTE: root_account here must be the same (values loaded into memory at the same time)
+        # as passed into UsersUpnsFinder AND as used in #tenant, for the "have settings changed?"
+        # check to work. For example, using course.root_account here would NOT be correct.
+        UserMapping.bulk_insert_for_root_account(group.root_account, user_id_to_aad)
       end
     end
 
