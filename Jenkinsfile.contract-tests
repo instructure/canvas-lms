@@ -36,6 +36,7 @@ pipeline {
     PACT_BROKER = credentials('PACT_BROKER')
     PACT_BROKER_USERNAME = "${env.PACT_BROKER_USR}"
     PACT_BROKER_PASSWORD = "${env.PACT_BROKER_PSW}"
+    RAILS_DB_HOST = 'localhost'
     RSPEC_PROCESSES = '7'
   }
 
@@ -43,48 +44,54 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          def stageHooks = [
-            onNodeAcquired: contractTestsStage.&setupNode,
-          ]
-
-          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: contractTestsStage.nodeRequirementsTemplate()).obeysAllowStages(false).execute {
             def stages = [:]
+
+            def consumerEnvVars = [
+              'DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true',
+              'RUN_API_CONTRACT_TESTS=1',
+            ]
 
             callableWithDelegate(contractTestsStage.queueTestStage('Android'))(stages,
               databaseName: 'pact_test1',
               consumerName: 'android',
-              command: 'build/new-jenkins/pact/contracts-verify-api.sh'
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
             )
 
             callableWithDelegate(contractTestsStage.queueTestStage('Canvas iOS'))(stages,
               databaseName: 'pact_test2',
               consumerName: 'canvas-ios',
-              command: 'build/new-jenkins/pact/contracts-verify-api.sh'
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
             )
 
             callableWithDelegate(contractTestsStage.queueTestStage('Quiz LTI'))(stages,
               databaseName: 'pact_test3',
               consumerName: 'Quiz LTI',
-              command: 'build/new-jenkins/pact/contracts-verify-api.sh'
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
             )
 
             callableWithDelegate(contractTestsStage.queueTestStage('Sistemic'))(stages,
               databaseName: 'pact_test4',
               consumerName: 'Sistemic',
-              command: 'build/new-jenkins/pact/contracts-verify-api.sh'
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
             )
 
             callableWithDelegate(contractTestsStage.queueTestStage('Live Events'))(stages,
-              databaseName: 'live_events',
-              command: 'build/new-jenkins/pact/contracts-verify-live-events.sh'
+              databaseName: 'pact_test5',
+              command: 'cd /usr/src/app && bin/rspec spec/contracts/service_consumers/live_events --tag pact_live_events --format doc'
             )
 
             callableWithDelegate(contractTestsStage.queueTestStage('Outcomes'))(stages,
               databaseName: 'pact_test6',
               envVars: [
-                "PUBLISH_API=${configuration.isChangeMerged() ? '1' : '0'}"
+                "PUBLISH_API=${configuration.isChangeMerged() ? '1' : '0'}",
+                "SHA=${env.GERRIT_PATCHSET_REVISION}"
               ],
-              command: 'build/new-jenkins/pact/contracts-generate-api.sh'
+              command: 'cd /usr/src/app && build/new-jenkins/pact/contracts-generate-api.sh'
             )
 
             parallel(stages)

@@ -86,15 +86,8 @@ module PactConfig
       ENV.fetch('PACT_BROKER_USERNAME', 'pact')
     end
 
-    def jenkins_build?
-      !ENV['JENKINS_URL'].nil?
-    end
-
-    private
-
     def protocol
-      protocol = jenkins_build? ? 'https' : 'http'
-      ENV.fetch('PACT_BROKER_PROTOCOL', protocol)
+      ENV.fetch('PACT_BROKER_PROTOCOL', 'http')
     end
   end
 end
