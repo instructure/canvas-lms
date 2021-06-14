@@ -18,6 +18,11 @@
 
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
+import TestEditor from './TestEditor'
+
+let mockAnchorOffset = 2
+const mockAnchorWholeText = ''
+const mockAnchorNode = {wholeText: mockAnchorWholeText}
 
 jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   create: jest.fn(),
@@ -26,6 +31,14 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   },
   plugins: {
     CanvasMentionsPlugin: {}
+  },
+  activeEditor: {
+    selection: {
+      getSel: () => ({
+        anchorOffset: mockAnchorOffset,
+        anchorNode: mockAnchorNode
+      })
+    }
   }
 }))
 
@@ -43,5 +56,65 @@ describe('plugin', () => {
 
   it('registers the plugin', () => {
     expect(tinymce.PluginManager.add).toHaveBeenCalledWith('canvas_mentions', expect.anything())
+  })
+})
+
+describe('on input', () => {
+  let editor
+
+  beforeEach(() => {
+    editor = new TestEditor()
+    plugin.pluginDefinition.init(editor)
+  })
+})
+
+describe('pluginDefinition', () => {
+  let editor
+
+  beforeEach(() => {
+    editor = new TestEditor()
+    plugin.pluginDefinition.init(editor)
+  })
+
+  describe('onInput', () => {
+    let logSpy
+
+    beforeEach(() => {
+      logSpy = jest.spyOn(console, 'log')
+    })
+
+    afterEach(() => {
+      logSpy.mockRestore()
+    })
+
+    describe('when no mention is triggered', () => {
+      it('does not render the mentions component', () => {
+        editor.trigger('input')
+        expect(logSpy).not.toHaveBeenCalledWith('Mount the mentions component!')
+      })
+    })
+
+    describe('when an "inline" mention is triggered', () => {
+      beforeEach(() => {
+        mockAnchorNode.wholeText = ' @'
+      })
+
+      it('renders the mentions component', () => {
+        editor.trigger('input')
+        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
+      })
+    })
+
+    describe('when a "starting" mention is triggered', () => {
+      beforeEach(() => {
+        mockAnchorOffset = 1
+        mockAnchorNode.wholeText = '@'
+      })
+
+      it('renders the mentions component', () => {
+        editor.trigger('input')
+        expect(logSpy).toHaveBeenCalledWith('Mount the mentions component!')
+      })
+    })
   })
 })

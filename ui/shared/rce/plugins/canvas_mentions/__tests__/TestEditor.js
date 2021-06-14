@@ -16,27 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// To get the right "tinymce" global object
-import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
-import mentionWasInitiated from './mentionWasInitiated'
+class TestEditor {
+  constructor() {
+    this.callbacks = {}
+  }
 
-export const name = 'canvas_mentions'
+  on(eventName, callback) {
+    this.callbacks[eventName] = callback
+  }
 
-function onInputChange() {
-  const tinySelection = tinymce.activeEditor.selection
-
-  if (mentionWasInitiated(tinySelection.getSel())) {
-    console.log('Mount the mentions component!')
+  trigger(eventName, args) {
+    this.callbacks[eventName](args)
   }
 }
 
-export const pluginDefinition = {
-  init(editor) {
-    // TODO: Remove console log
-    console.log('@mentions plugin loaded')
-    editor.on('input', onInputChange)
-  }
-}
-
-tinymce.create('tinymce.plugins.CanvasMentionsPlugin', pluginDefinition)
-tinymce.PluginManager.add(name, tinymce.plugins.CanvasMentionsPlugin)
+export default TestEditor
