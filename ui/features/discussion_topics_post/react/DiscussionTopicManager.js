@@ -70,7 +70,6 @@ const getOptimisticResponse = text => {
           reply: false,
           update: false,
           viewRating: false,
-          speedGrader: false,
           __typename: 'DiscussionEntryPermissions'
         },
         __typename: 'DiscussionEntry'
