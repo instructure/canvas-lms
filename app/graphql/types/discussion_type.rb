@@ -57,6 +57,7 @@ module Types
     field :allow_rating, Boolean, null: true
     field :only_graders_can_rate, Boolean, null: true
     field :sort_by_rating, Boolean, null: true
+    field :is_announcement, Boolean, null: false
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true
 

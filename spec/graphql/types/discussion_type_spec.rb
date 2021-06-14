@@ -327,4 +327,14 @@ describe Types::DiscussionType do
     let_once(:discussion) { group_discussion_assignment.child_topics.take }
     include_examples "DiscussionType"
   end
+
+  context "announcement" do
+    let(:discussion) { announcement_model(delayed_post_at: 1.day.from_now) }
+    let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
+
+    it 'allows querying for is_announcement and delayed_post_at' do
+      expect(discussion_type.resolve('isAnnouncement')).to eq discussion.is_announcement
+      expect(discussion_type.resolve('delayedPostAt')).to eq discussion.delayed_post_at&.iso8601
+    end
+  end
 end
