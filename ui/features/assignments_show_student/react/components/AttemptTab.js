@@ -180,7 +180,7 @@ export default class AttemptTab extends Component {
   renderStudentAnnotationAttempt = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
-        <StudentAnnotationAttempt />
+        <StudentAnnotationAttempt submission={this.props.submission} />
       </Suspense>
     )
   }
