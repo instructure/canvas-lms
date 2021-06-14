@@ -29,3 +29,8 @@ persist_inferred_authentication_providers:
   applies_to: RootAccount
   display_name: Require Authentication Provider on Logins
   description: Persists the used authentication provider when logging in, and defaults new logins to the default provider
+allow_unconfirmed_users_in_user_list:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Allow Unconfirmed E-mail Addresses When Adding Users
+  description: This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while.
