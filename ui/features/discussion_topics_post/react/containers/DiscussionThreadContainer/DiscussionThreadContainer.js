@@ -17,7 +17,6 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {Assignment} from '../../../graphql/Assignment'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
@@ -27,6 +26,7 @@ import {
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
+import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
@@ -89,7 +89,7 @@ export const DiscussionThreadContainer = props => {
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
-    addReplyToDiscussion(cache, props.discussionTopicGraphQLId)
+    addReplyToDiscussion(cache, props.discussionTopic.id)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
     addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry)
   }
@@ -309,12 +309,12 @@ export const DiscussionThreadContainer = props => {
                     : null
                 }
                 onOpenInSpeedGrader={
-                  props.discussionEntry.permissions?.speedGrader
+                  props.discussionTopic.permissions?.speedGrader
                     ? () => {
                         window.location.assign(
                           getSpeedGraderUrl(
                             ENV.course_id,
-                            props.assignment._id,
+                            props.discussionTopic.assignment._id,
                             props.discussionEntry.author._id
                           )
                         )
@@ -366,7 +366,7 @@ export const DiscussionThreadContainer = props => {
       </div>
       {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
         <DiscussionSubentries
-          discussionTopicGraphQLId={props.discussionTopicGraphQLId}
+          discussionTopic={props.discussionTopic}
           discussionEntryId={props.discussionEntry._id}
           depth={props.depth + 1}
           markAsRead={props.markAsRead}
@@ -397,17 +397,15 @@ export const DiscussionThreadContainer = props => {
 }
 
 DiscussionThreadContainer.propTypes = {
-  discussionTopicGraphQLId: PropTypes.string,
+  discussionTopic: Discussion.shape,
   discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
-  assignment: Assignment.shape,
   markAsRead: PropTypes.func,
   parentRef: PropTypes.object
 }
 
 DiscussionThreadContainer.defaultProps = {
-  depth: 0,
-  assignment: {}
+  depth: 0
 }
 
 export default DiscussionThreadContainer
@@ -433,15 +431,12 @@ const DiscussionSubentries = props => {
     return <LoadingIndicator />
   }
 
-  const discussionTopic = subentries.data.legacyNode
-
-  return discussionTopic.discussionSubentriesConnection.nodes.map(entry => (
+  return subentries.data.legacyNode.discussionSubentriesConnection.nodes.map(entry => (
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
-      assignment={discussionTopic?.assignment}
       discussionEntry={entry}
-      discussionTopicGraphQLId={props.discussionTopicGraphQLId}
+      discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
       parentRef={props.parentRef}
     />
@@ -449,7 +444,7 @@ const DiscussionSubentries = props => {
 }
 
 DiscussionSubentries.propTypes = {
-  discussionTopicGraphQLId: PropTypes.string,
+  discussionTopic: Discussion.shape,
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
