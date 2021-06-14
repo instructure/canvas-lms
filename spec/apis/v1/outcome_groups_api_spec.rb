@@ -36,6 +36,18 @@ describe "Outcome Groups API", type: :request do
     group.add_outcome(@outcome)
   end
 
+  def create_subgroup(opts={})
+    group = opts.delete(:group) || @group
+    group.child_outcome_groups.create!({:title => 'subgroup', :vendor_guid => 'blahblah'}.merge(opts))
+  end
+
+  def add_outcome_to_group(group)
+    group.add_outcome(@outcome)
+    expect(group.child_outcome_links.reload.size).to eq 1
+    expect(group.child_outcome_links.first.content).to eq @outcome
+    group
+  end
+
   def add_or_get_rubric(outcome)
     # This is horribly inefficient, but there's not a good
     # way to query by learning outcome id because it's stored
@@ -1139,10 +1151,7 @@ describe "Outcome Groups API", type: :request do
         def sub_group_with_outcome
           expect(@group.child_outcome_links).to be_empty
           sub_group = @account.learning_outcome_groups.create!(title: 'some lonely sub group')
-          sub_group.add_outcome(@outcome)
-          expect(sub_group.child_outcome_links.reload.size).to eq 1
-          expect(sub_group.child_outcome_links.first.content).to eq @outcome
-          sub_group
+          add_outcome_to_group(sub_group)
         end
 
         it "should re-use an old link if move_from is included" do
@@ -1158,6 +1167,24 @@ describe "Outcome Groups API", type: :request do
           expect(@group.child_outcome_links.reload.size).to eq 1
           expect(@group.child_outcome_links.first.content).to eq @outcome
           expect(sub_group.child_outcome_links.reload).to be_empty
+        end
+
+        it "should be allowed for global level" do
+          @account_user = @user.account_users.create(:account => Account.site_admin)
+          global_group = LearningOutcomeGroup.global_root_outcome_group
+          add_outcome_to_group(global_group)
+          global_sub_group = create_subgroup(:group => global_group)
+          api_call(:put, "/api/v1/global/outcome_groups/#{global_sub_group.id}/outcomes/#{@outcome.id}",
+                       controller: 'outcome_groups_api',
+                       action: 'link',
+                       id: global_sub_group.id.to_s,
+                       outcome_id: @outcome.id.to_s,
+                       move_from: global_group.id.to_s,
+                       format: 'json')
+          expect(global_sub_group.child_outcome_links.reload.size).to eq 1
+          expect(global_sub_group.child_outcome_links.first.content).to eq @outcome
+          expect(global_sub_group.child_outcome_links.first.context_id).to eq global_sub_group.id
+          expect(global_group.child_outcome_links.reload).to be_empty
         end
 
         it "should not re-use an old link if move_from is omitted" do
@@ -1578,11 +1605,6 @@ describe "Outcome Groups API", type: :request do
                    :id => @group.id.to_s,
                    :format => 'json')
       expect(response).to be_successful
-    end
-
-    def create_subgroup(opts={})
-      group = opts.delete(:group) || @group
-      group.child_outcome_groups.create!({:title => 'subgroup', :vendor_guid => 'blahblah'}.merge(opts))
     end
 
     it "should return the subgroups under the group" do
