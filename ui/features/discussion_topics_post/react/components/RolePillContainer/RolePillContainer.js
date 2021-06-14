@@ -38,7 +38,7 @@ export function RolePillContainer({...props}) {
           {baseRolesToDisplay.map(baseRole => {
             return (
               <Flex padding="none small none none" key={baseRole}>
-                <Pill>{roleName(baseRole)}</Pill>
+                <Pill data-testid={`pill-${roleName(baseRole)}`}>{roleName(baseRole)}</Pill>
               </Flex>
             )
           })}

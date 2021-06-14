@@ -20,6 +20,7 @@ import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import gql from 'graphql-tag'
 import {PageInfo} from './PageInfo'
+import {User} from './User'
 
 export const DISCUSSION_QUERY = gql`
   query GetDiscussionQuery(
@@ -30,10 +31,20 @@ export const DISCUSSION_QUERY = gql`
     $rootEntries: Boolean
     $filter: DiscussionFilterType
     $sort: DiscussionSortOrderType
+    $courseID: Int!
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
+        editor {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        author {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
         discussionEntriesConnection(
           after: $page
           first: $perPage
@@ -44,6 +55,14 @@ export const DISCUSSION_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
+            editor {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            author {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
           }
           pageInfo {
             ...PageInfo
@@ -58,6 +77,7 @@ export const DISCUSSION_QUERY = gql`
       }
     }
   }
+  ${User.fragment}
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
@@ -69,13 +89,31 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     $page: String
     $perPage: Int
     $sort: DiscussionSortOrderType
+    $courseID: Int!
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
   ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
         ...DiscussionEntry
+        editor {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        author {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
         discussionSubentriesConnection(after: $page, first: $perPage, sortOrder: $sort) {
           nodes {
             ...DiscussionEntry
+            editor {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            author {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
           }
           pageInfo {
             ...PageInfo
@@ -84,6 +122,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
 `

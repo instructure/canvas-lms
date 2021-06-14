@@ -41,12 +41,6 @@ export const DiscussionEntry = {
         unreadCount
         repliesCount
       }
-      author {
-        ...User
-      }
-      editor {
-        ...User
-      }
       lastReply {
         createdAt
       }
@@ -54,7 +48,6 @@ export const DiscussionEntry = {
         ...DiscussionEntryPermissions
       }
     }
-    ${User.fragment}
     ${DiscussionEntryPermissions.fragment}
   `,
 

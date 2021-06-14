@@ -66,7 +66,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     assignmentOverrides: props.discussionTopic?.assignment?.assignmentOverrides?.nodes || [],
     childTopics: props.discussionTopic?.childTopics || [],
     groupSet: props.discussionTopic?.groupSet || false,
-    siblingTopics: props.discussionTopic?.rootTopic?.childTopics || []
+    siblingTopics: props.discussionTopic?.rootTopic?.childTopics || [],
+    authorRoles: props.discussionTopic?.author?.courseRoles || []
   }
 
   // TODO: Change this to the new canGrade permission.
@@ -347,6 +348,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       timingDisplay={discussionTopicData.postedAt}
                       title={discussionTopicData.title}
                       message={discussionTopicData.message}
+                      discussionRoles={discussionTopicData.authorRoles}
                     >
                       {canReply && (
                         <Button

@@ -51,12 +51,6 @@ export const Discussion = {
         unreadCount
         repliesCount
       }
-      author {
-        ...User
-      }
-      editor {
-        ...User
-      }
       assignment {
         ...Assignment
       }
@@ -76,7 +70,6 @@ export const Discussion = {
         ...RootTopic
       }
     }
-    ${User.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
     ${Section.fragment}
