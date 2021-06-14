@@ -69,6 +69,7 @@ class SubmissionComment < ActiveRecord::Base
   after_save :update_participation
   after_save :check_for_media_object
   after_update :publish_other_comments_in_this_group
+  after_update :post_submission_for_finalized_draft, if: -> { saved_change_to_draft?(from: true, to: false) }
   after_destroy :delete_other_comments_in_this_group
   after_commit :update_submission
 
@@ -120,6 +121,15 @@ class SubmissionComment < ActiveRecord::Base
     SubmissionComment.find(comment_ids).each do |comment|
       comment.skip_group_callbacks!
       yield comment
+    end
+  end
+
+  def post_submission_for_finalized_draft
+    return if author_id.blank? || submission.posted? || submission.assignment.post_manually?
+
+    course = submission.assignment.course
+    if course.instructor_ids.include?(author.id) || course.account_membership_allows(author)
+      submission.update!(posted_at: Time.zone.now)
     end
   end
 
