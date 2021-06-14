@@ -77,6 +77,10 @@ module K5DashboardPageObject
     'h1'
   end
 
+  def course_homeroom_option_selector(option_text)
+    "#course_homeroom_course_id option:contains('#{option_text}')"
+  end
+
   def course_name_input_selector
     "[placeholder='Name...']"
   end
@@ -125,6 +129,10 @@ module K5DashboardPageObject
     "h2:contains('#{title}')"
   end
 
+  def homeroom_select_selector
+    "[data-testid='homeroom-select']"
+  end
+
   def homeroom_tab_selector
     '#tab-tab-homeroom'
   end
@@ -139,6 +147,10 @@ module K5DashboardPageObject
 
   def k5_tablist_selector
     "[role='tablist']"
+  end
+
+  def leave_student_view_selector
+    "#masquerade_bar .leave_student_view"
   end
 
   def manage_button_selector
@@ -197,8 +209,16 @@ module K5DashboardPageObject
     '#tab-tab-schedule'
   end
 
+  def student_view_button_selector
+    "#student-view-btn"
+  end
+
   def subject_link_selector(subject_title)
     "//a[div[@title = '#{subject_title}']]"
+  end
+
+  def sync_enrollments_checkbox_selector
+    "input + label:contains('Sync enrollments from homeroom')"
   end
 
   def welcome_title_selector
@@ -263,6 +283,10 @@ module K5DashboardPageObject
     f(course_dashboard_title_selector)
   end
 
+  def course_homeroom_option(option_text)
+    fj(course_homeroom_option_selector(option_text))
+  end
+
   def course_name_input
     f(course_name_input_selector)
   end
@@ -319,12 +343,20 @@ module K5DashboardPageObject
     fln(title)
   end
 
+  def homeroom_select
+    f(homeroom_select_selector)
+  end
+
   def homeroom_tab
     f(homeroom_tab_selector)
   end
 
   def k5_tablist
     f(k5_tablist_selector)
+  end
+
+  def leave_student_view
+    f(leave_student_view_selector)
   end
 
   def manage_button
@@ -375,6 +407,10 @@ module K5DashboardPageObject
     f(schedule_tab_selector)
   end
 
+  def student_view_button
+    f(student_view_button_selector)
+  end
+
   def subject_items_due(subject_title, due_today_text)
     fxpath(items_due_selector(subject_title, due_today_text))
   end
@@ -385,6 +421,10 @@ module K5DashboardPageObject
 
   def subject_title_link(subject_title)
     fxpath(subject_link_selector(subject_title))
+  end
+
+  def sync_enrollments_checkbox
+    fj(sync_enrollments_checkbox_selector)
   end
 
   def welcome_title
@@ -446,6 +486,14 @@ module K5DashboardPageObject
 
   def click_pink_color_button
     pink_color_button.click
+  end
+
+  def click_student_view_button
+    student_view_button.click
+  end
+
+  def click_sync_enrollments_checkbox
+    sync_enrollments_checkbox.click
   end
 
   def check_enable_homeroom_checkbox
@@ -513,9 +561,9 @@ module K5DashboardPageObject
     driver.action.send_keys(:enter).perform
   end
 
-  def fill_out_course_modal(course_name)
-    enter_account_search_data(@account.name[0...3])
-    select_account_from_list(@account.name)
+  def fill_out_course_modal(account, course_name)
+    enter_account_search_data(account.name[0...3])
+    select_account_from_list(account.name)
     enter_course_name(course_name)
   end
 

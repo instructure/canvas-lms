@@ -99,6 +99,16 @@ describe "teacher k5 course dashboard" do
 
       expect(important_info_link).to include_text("Important Info")
     end
+
+    it 'goes to acting student course home when student view button is clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(student_view_button).to be_displayed
+
+      click_student_view_button
+
+      expect(leave_student_view).to include_text("Leave Student View")
+    end
   end
 
   context 'course modules tab' do
@@ -242,6 +252,15 @@ describe "teacher k5 course dashboard" do
 
       expect(k5_app_buttons.count).to eq 1
       expect(k5_app_buttons[0].text).to eq lti_b
+    end
+  end
+
+  context 'course grades tab' do
+    it 'shows image and view grades button for teacher' do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(empty_grades_image).to be_displayed
+      expect(view_grades_button(@subject_course.id)).to be_displayed
     end
   end
 

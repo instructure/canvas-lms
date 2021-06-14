@@ -101,7 +101,7 @@ describe "admin k5 dashboard" do
       expect(new_course_modal_close_button).to be_displayed
 
       course_name = "Awesome Course"
-      fill_out_course_modal(course_name)
+      fill_out_course_modal(@account, course_name)
 
       click_new_course_cancel
 
@@ -118,7 +118,7 @@ describe "admin k5 dashboard" do
 
       course_name = "Awesome Course"
 
-      fill_out_course_modal(course_name)
+      fill_out_course_modal(@account, course_name)
       click_new_course_create
       wait_for_ajaximations
 
@@ -127,6 +127,31 @@ describe "admin k5 dashboard" do
       latest_course = Course.last
       expect(latest_course.name).to eq(course_name)
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
+    end
+
+    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout:30 do
+      second_homeroom_course_name = "Second homeroom course"
+
+      new_course = course_with_teacher(
+        account: @account,
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_homeroom_course_name,
+        user: @homeroom_teacher
+      )
+      Course.last.update!(homeroom_course: true)
+
+      get "/"
+      click_new_course_button
+
+      new_course_name = "Amazing Course One"
+      fill_out_course_modal(@account, new_course_name)
+      click_sync_enrollments_checkbox
+      click_option(homeroom_select_selector, second_homeroom_course_name)
+      click_new_course_create
+      
+      expect(new_course_modal_exists?).to be_falsey
+      expect(course_homeroom_option(second_homeroom_course_name)).to have_attribute("selected", "true")
     end
   end
 

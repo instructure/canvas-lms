@@ -379,7 +379,7 @@ describe "teacher k5 dashboard" do
       expect(latest_course.name).not_to eq(course_name)
     end
 
-    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 25 do
+    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 30 do
       @sub_account = @account.sub_accounts.create!(name: 'test')
       course_with_teacher(
         account: @sub_account,
@@ -391,13 +391,38 @@ describe "teacher k5 dashboard" do
 
       get "/"
       click_new_course_button
-      course_name = "Amazing course"
-      fill_out_course_modal(course_name)
+
+      course_name = "Amazing course 1"
+      fill_out_course_modal(@sub_account, course_name)
       click_new_course_create
       wait_for_ajaximations
       latest_course = Course.last
       expect(latest_course.name).to eq(course_name)
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
+    end
+
+    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout:30 do
+      second_homeroom_course_name = "Second homeroom course"
+
+      new_course = course_with_teacher(
+        account: @account,
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_homeroom_course_name,
+        user: @homeroom_teacher
+      )
+      Course.last.update!(homeroom_course: true)
+
+      get "/"
+      click_new_course_button
+      new_course_name = "Amazing Course One"
+      enter_course_name(new_course_name)
+      click_sync_enrollments_checkbox
+      click_option(homeroom_select_selector, second_homeroom_course_name)
+      click_new_course_create
+
+      expect(new_course_modal_exists?).to be_falsey
+      expect(course_homeroom_option(second_homeroom_course_name)).to have_attribute("selected", "true")
     end
   end
 end
