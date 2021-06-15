@@ -44,7 +44,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
-  const {contextType, contextId} = useCanvasContext()
+  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
@@ -92,7 +92,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
 
         if (!outcomeId) throw new Error(errorMessage)
 
-        if (friendlyDescription) {
+        if (friendlyDescriptionFF && friendlyDescription) {
           await setOutcomeFriendlyDescription({
             variables: {
               input: {
@@ -163,17 +163,19 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
           <View as="div" padding="small 0 0">
             <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
           </View>
-          <View as="div" padding="small 0">
-            <TextArea
-              size="medium"
-              height="8rem"
-              maxHeight="10rem"
-              value={friendlyDescription}
-              placeholder={I18n.t('Enter your friendly description here')}
-              label={I18n.t('Friendly description (for parent/student display)')}
-              onChange={friendlyDescriptionChangeHandler}
-            />
-          </View>
+          {friendlyDescriptionFF && (
+            <View as="div" padding="small 0">
+              <TextArea
+                size="medium"
+                height="8rem"
+                maxHeight="10rem"
+                value={friendlyDescription}
+                placeholder={I18n.t('Enter your friendly description here')}
+                label={I18n.t('Friendly description (for parent/student display)')}
+                onChange={friendlyDescriptionChangeHandler}
+              />
+            </View>
+          )}
           <View as="div" padding="x-small 0 0">
             <Text size="medium" weight="bold">
               {I18n.t('Location')}

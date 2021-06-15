@@ -37,7 +37,6 @@ jest.useFakeTimers()
 describe('CreateOutcomeModal', () => {
   let onCloseHandlerMock
   let cache
-
   const defaultProps = (props = {}) => ({
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
@@ -46,10 +45,15 @@ describe('CreateOutcomeModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      friendlyDescriptionFF = true,
+      mocks = accountMocks({childGroupsCount: 0})
+    } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, friendlyDescriptionFF}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -348,6 +352,49 @@ describe('CreateOutcomeModal', () => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Outcome "Outcome 123" was successfully created',
         type: 'success'
+      })
+    })
+  })
+
+  describe('with Friendly Description Feature Flag disabled', () => {
+    it('does not display Friendly Description field in modal', async () => {
+      const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+        friendlyDescriptionFF: false
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(
+        queryByLabelText('Friendly description (for parent/student display)')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not call friendly description mutation when creating outcome', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
+        friendlyDescriptionFF: false,
+        mocks: [
+          ...smallOutcomeTree('Account'),
+          createLearningOutcomeMock({
+            title: 'Outcome 123',
+            displayName: 'Display name',
+            description: '',
+            groupId: 100
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
+      fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
+      fireEvent.click(getByText('Root account folder'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Account folder 0'))
+      fireEvent.click(getByText('Create'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // if setFriendlyDescription mutation is called the expectation below will fail
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message: 'Outcome "Outcome 123" was successfully created',
+          type: 'success'
+        })
       })
     })
   })

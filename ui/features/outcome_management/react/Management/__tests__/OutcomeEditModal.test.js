@@ -64,7 +64,8 @@ describe('OutcomeEditModal', () => {
     failMutation = false.message,
     env = {
       contextType: 'Account',
-      contextId: '1'
+      contextId: '1',
+      friendlyDescriptionFF: true
     }
   } = {}) => {
     const mocks = [
@@ -159,7 +160,9 @@ describe('OutcomeEditModal', () => {
   })
 
   it('Hides forms elements when editing in different context', () => {
-    const {queryByTestId} = renderWithProvider({env: {contextType: 'Course', contextId: '1'}})
+    const {queryByTestId} = renderWithProvider({
+      env: {contextType: 'Course', contextId: '1', friendlyDescriptionFF: true}
+    })
     expect(queryByTestId('name-input')).not.toBeInTheDocument()
     expect(queryByTestId('display-name-input')).not.toBeInTheDocument()
     expect(queryByTestId('description-input')).not.toBeInTheDocument()
@@ -229,6 +232,35 @@ describe('OutcomeEditModal', () => {
         target: {value: 'a'.repeat(256)}
       })
       expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+    })
+  })
+
+  describe('with Friendly Description Feature Flag disabled', () => {
+    it('does not display Friendly Description field in modal', async () => {
+      const {queryByLabelText} = renderWithProvider({
+        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false}
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(
+        queryByLabelText('Friendly description (for parent/student display)')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not call friendly description mutation when updating outcome', async () => {
+      RichContentEditor.callOnRCE.mockReturnValue('Updated description')
+      const {getByText, getByLabelText} = renderWithProvider({
+        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
+        // mock setFriendlyDescription mutation to throw an error
+        failResponse: true
+      })
+      fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
+      fireEvent.click(getByText('Save'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // if setFriendlyDescription mutation is called the expectation below will fail
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'This outcome was successfully updated.',
+        type: 'success'
+      })
     })
   })
 })
