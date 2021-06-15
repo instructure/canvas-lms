@@ -50,6 +50,7 @@ describe('Library', () => {
       setFocusToTextArea: setFocusToTextAreaMock,
       updateComment: () => {},
       suggestionsRef: document.body,
+      setRemovedItemIndex: () => {},
       ...props
     }
   }
