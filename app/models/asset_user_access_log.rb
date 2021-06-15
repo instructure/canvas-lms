@@ -195,7 +195,11 @@ class AssetUserAccessLog
         # e.g. 42 => (10668,7,42,0)
       }
     }
-    CanvasMetadatum.get(METADATUM_KEY, default_metadatum)
+    output_metadatum = CanvasMetadatum.get(METADATUM_KEY, default_metadatum)
+    # make sure if we have prior storage without this key that
+    # we get a default value populated
+    output_metadatum[:pulsar_partition_iterators] ||= default_metadatum[:pulsar_partition_iterators]
+    output_metadatum
   end
 
   def self.update_metadatum(compaction_state)
@@ -304,7 +308,7 @@ class AssetUserAccessLog
         log_entry_id = message_hash[:log_entry_id]
 
         max_postgres_partition_id = compaction_state[:max_log_ids][message_partition_index]
-        max_pulsar_partition_message_id = compaction_state[:pulsar_partition_iterators][pulsar_partition_id]
+        max_pulsar_partition_message_id = compaction_state[:pulsar_partition_iterators][pulsar_partition_id.to_s]
         should_process_message = (
           log_entry_id > max_postgres_partition_id ||
           max_pulsar_partition_message_id.nil? ||
@@ -319,8 +323,8 @@ class AssetUserAccessLog
         # our iterator is advanced as far as possible.
         new_iterator_state[message_partition_index] = [new_iterator_state[message_partition_index], log_entry_id].max
         # always hold on to the largest message ID we've seen for this pulsar partition.
-        new_message_bus_iterator_state[pulsar_partition_id] = [
-          new_message_bus_iterator_state[pulsar_partition_id], # might be nil if this is the first one
+        new_message_bus_iterator_state[pulsar_partition_id.to_s] = [
+          new_message_bus_iterator_state[pulsar_partition_id.to_s], # might be nil if this is the first one
           pulsar_message_id.to_s
         ].compact.map{|mids| MessageBus::MessageId.from_string(mids) }.max.to_s
 
