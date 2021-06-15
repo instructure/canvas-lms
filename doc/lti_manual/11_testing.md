@@ -34,7 +34,7 @@ For testing new features that may not have been added to the test tool, or for m
 2. In a course with at least one student, create an assignment that launches this tool.
 3. In a shell in the test tool repository, run this command: (note that both ids are integers)
   ```
-  docker-compose run --rm web jwt:access_token['https://canvas.instructure.com',<credential id>,<platform id>,'all']
+  docker-compose run --rm web jwt:access_token CLIENT_ID=<global DeveloperKey id>
   ```
 4. This command returns a blob of JSON that includes an access token, which is a JWT. Include that token on all requests you make in an `Authentication: Bearer <jwt>` header.
 5. Include a request body, which could look like something like this:
