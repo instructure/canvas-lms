@@ -24,7 +24,7 @@ describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
   let onCheckboxHandlerMock
   const defaultProps = (props = {}) => ({
-    id: '1',
+    _id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
     isFirst: false,
@@ -62,11 +62,15 @@ describe('ManageOutcomeItem', () => {
     expect(onCheckboxHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('passes item id to checkbox onClick handler', () => {
+  it('passes selected outcome obj to checkbox onClick handler', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     const checkbox = getByText('Select outcome')
     fireEvent.click(checkbox)
-    expect(onCheckboxHandlerMock).toHaveBeenCalledWith('1')
+    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({
+      canUnlink: true,
+      _id: '1',
+      title: 'Outcome Title'
+    })
   })
 
   it('displays right pointing caret when description is truncated', () => {

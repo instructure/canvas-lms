@@ -41,7 +41,7 @@ const allowAdminEdit = () => {
 }
 
 const ManageOutcomeItem = ({
-  id,
+  _id,
   title,
   description,
   canManageOutcome,
@@ -53,8 +53,8 @@ const ManageOutcomeItem = ({
 }) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => setTruncate(prevState => !prevState)
-  const onChangeHandler = () => onCheckboxHandler(id)
-  const onMenuHandlerWrapper = (_, action) => onMenuHandler(id, action)
+  const onChangeHandler = () => onCheckboxHandler({_id, title, canUnlink})
+  const onMenuHandlerWrapper = (_, action) => onMenuHandler(_id, action)
 
   if (!title) return null
 
@@ -143,7 +143,7 @@ ManageOutcomeItem.defaultProps = {
 }
 
 ManageOutcomeItem.propTypes = {
-  id: PropTypes.string.isRequired,
+  _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   isFirst: PropTypes.bool,

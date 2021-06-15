@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useReducer, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
@@ -34,11 +34,13 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
+import useSelectedOutcomes from '@canvas/outcomes/react/hooks/useSelectedOutcomes'
 import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
 import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
+import OutcomeRemoveMultiModal from './OutcomeRemoveMultiModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -83,15 +85,10 @@ const OutcomeManagementPanel = () => {
     onChangeHandler: onSearchChangeHandler,
     onClearHandler: onSearchClearHandler
   } = useSearch()
-  const [selectedOutcomes, toggleSelectedOutcomes] = useReducer((prevState, id) => {
-    const updatedState = {...prevState}
-    prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
-    return updatedState
-  }, {})
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
-
-  const selected = Object.keys(selectedOutcomes).length
+  const {selectedOutcomes, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
+    useSelectedOutcomes()
   const noop = () => {}
   const {
     error,
@@ -112,13 +109,20 @@ const OutcomeManagementPanel = () => {
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [isOutcomeRemoveMultiModalOpen, openOutcomeRemoveMultiModal, closeOutcomeRemoveMultiModal] =
+    useModal()
   const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
   const [isGroupDescriptionModalOpen, openGroupDescriptionModal, closeGroupDescriptionModal] =
     useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
+
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
+  }
+  const onCloseOutcomeRemoveMultiModal = () => {
+    closeOutcomeRemoveMultiModal()
+    clearSelectedOutcomes()
   }
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
@@ -189,6 +193,11 @@ const OutcomeManagementPanel = () => {
   const onMoveOutcomeHandler = newParentGroup => {
     startMoveOutcome(contextType, contextId, selectedOutcome, selectedGroupId, newParentGroup)
     onCloseOutcomeMoveModal()
+  }
+  const onRemoveOutcomesHandler = () => {
+    // TODO: update backend via GraphQL mutation
+    // Depends on: OUT-4499
+    onCloseOutcomeRemoveMultiModal()
   }
 
   if (isLoading) {
@@ -300,8 +309,8 @@ const OutcomeManagementPanel = () => {
           {selectedGroupId && (
             <>
               <ManageOutcomesFooter
-                selected={selected}
-                onRemoveHandler={noop}
+                selected={selectedOutcomesCount}
+                onRemoveHandler={openOutcomeRemoveMultiModal}
                 onMoveHandler={noop}
               />
 
@@ -359,6 +368,14 @@ const OutcomeManagementPanel = () => {
                 onCloseHandler={closeGroupDescriptionModal}
               />
             </>
+          )}
+          {selectedOutcomesCount > 0 && (
+            <OutcomeRemoveMultiModal
+              outcomes={selectedOutcomes}
+              isOpen={isOutcomeRemoveMultiModalOpen}
+              onCloseHandler={closeOutcomeRemoveMultiModal}
+              onRemoveHandler={onRemoveOutcomesHandler}
+            />
           )}
         </>
       )}

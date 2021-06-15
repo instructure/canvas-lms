@@ -118,7 +118,7 @@ const ManageOutcomesView = ({
           {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}, index) => (
             <ManageOutcomeItem
               key={_id}
-              id={_id}
+              _id={_id}
               title={title}
               description={description}
               canManageOutcome={canEdit}
