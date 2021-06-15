@@ -48,3 +48,17 @@ it('renders normally', () => {
   const element = $('[data-test-id="assignments-2-assignment-toggle-details-text"]')
   expect(element.text()).toEqual(assignment.description)
 })
+
+it('renders normally an assignment with no content', () => {
+  const assignment = {
+    name: 'an assignment',
+    pointsPossible: 42,
+    dueAt: 'some time'
+  }
+  ReactDOM.render(
+    <AssignmentToggleDetails description={assignment.description} />,
+    document.getElementById('fixtures')
+  )
+  const element = $('[data-test-id="assignments-2-assignment-toggle-details-text"]')
+  expect(element.text()).toEqual('No additional details were added for this assignment.')
+})
