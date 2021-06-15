@@ -358,4 +358,34 @@ describe AssetUserAccessLog do
     end
   end
 
+  describe ".metadatum_payload" do
+    it "has a reasonable default" do
+      CanvasMetadatum.delete_all
+      default_metadatum = AssetUserAccessLog.metadatum_payload
+      expect(default_metadatum[:max_log_ids]).to eq([0,0,0,0,0,0,0])
+      expect(default_metadatum[:pulsar_partition_iterators]).to eq({})
+    end
+
+    it "faithfully returns existing state" do
+      AssetUserAccessLog.update_metadatum({
+        max_log_ids: [1,2,3,4,5,6,7],
+        pulsar_partition_iterators: {
+          42 => "(10668,7,42,0)"
+        }
+      })
+      stored_metadatum = AssetUserAccessLog.metadatum_payload
+      expect(stored_metadatum[:max_log_ids]).to eq([1,2,3,4,5,6,7])
+      expect(stored_metadatum[:pulsar_partition_iterators]["42"]).to eq("(10668,7,42,0)")
+    end
+
+    it "defaults MISSING state during transition to message bus" do
+      AssetUserAccessLog.update_metadatum({
+        max_log_ids: [1,2,3,4,5,6,7]
+      })
+      stored_metadatum = AssetUserAccessLog.metadatum_payload
+      expect(stored_metadatum[:max_log_ids]).to eq([1,2,3,4,5,6,7])
+      default_pulsar_state = stored_metadatum[:pulsar_partition_iterators]
+      expect(default_pulsar_state).to eq({})
+    end
+  end
 end
