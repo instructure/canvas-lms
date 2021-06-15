@@ -20,10 +20,6 @@ def nodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.LINTERS_RUNNER_IMAGE,
     command: 'cat',
-    ttyEnabled: true,
-    resourceRequestCpu: '1',
-    resourceLimitCpu: '8',
-
     envVars: [
       GERGICH_DB_PATH: '/home/docker/gergich',
       GERGICH_GIT_PATH: env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/$GERRIT_PROJECT",
@@ -45,7 +41,7 @@ def nodeRequirementsTemplate() {
 def tearDownNode() {
   { ->
     container('code') {
-      sh 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-publish.sh'
+      sh './build/new-jenkins/linters/run-gergich-publish.sh'
     }
   }
 }
@@ -59,7 +55,7 @@ def codeStage(stages) {
     callableWithDelegate(queueTestStage())(stages,
       name: 'code',
       envVars: codeEnvVars,
-      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-linters.sh'
+      command: './build/new-jenkins/linters/run-gergich-linters.sh'
     )
   }
 }
@@ -76,7 +72,7 @@ def masterBouncerStage(stages) {
         name: 'master-bouncer',
         envVars: masterBouncerEnvVars,
         required: env.MASTER_BOUNCER_RUN == '1',
-        command: 'cd /usr/src/app && master_bouncer check'
+        command: 'master_bouncer check'
       )
     }
   }
@@ -86,7 +82,7 @@ def webpackStage(stages) {
   { ->
     callableWithDelegate(queueTestStage())(stages,
       name: 'webpack',
-      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-webpack.sh'
+      command: './build/new-jenkins/linters/run-gergich-webpack.sh'
     )
   }
 }
@@ -101,7 +97,7 @@ def yarnStage(stages, buildConfig) {
       name: 'yarn',
       envVars: yarnEnvVars,
       required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasYarnFiles(buildConfig),
-      command: 'cd /usr/src/app && ./build/new-jenkins/linters/run-gergich-yarn.sh',
+      command: './build/new-jenkins/linters/run-gergich-yarn.sh',
     )
   }
 }
@@ -111,7 +107,7 @@ def groovyStage(stages, buildConfig) {
     callableWithDelegate(queueTestStage())(stages,
       name: 'groovy',
       required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig),
-      command: 'cd /usr/src/app && npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon info',
+      command: 'npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon info',
     )
   }
 }

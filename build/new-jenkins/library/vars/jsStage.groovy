@@ -24,10 +24,7 @@ import groovy.transform.Field
 def jestNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
-    command: 'cat',
-    ttyEnabled: true,
-    resourceRequestCpu: '6.8',
-    resourceLimitCpu: '8'
+    command: 'cat'
   ]
 
   return [
@@ -38,10 +35,7 @@ def jestNodeRequirementsTemplate() {
 def coffeeNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
-    command: 'cat',
-    ttyEnabled: true,
-    resourceRequestCpu: '1',
-    resourceLimitCpu: '8'
+    command: 'cat'
   ]
 
   return [
@@ -52,10 +46,7 @@ def coffeeNodeRequirementsTemplate() {
 def karmaNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
-    command: 'cat',
-    ttyEnabled: true,
-    resourceRequestCpu: '0.75',
-    resourceLimitCpu: '8'
+    command: 'cat'
   ]
 
   def karmaContainers = []
@@ -85,14 +76,14 @@ def queueCoffeeDistribution() {
         'JSPEC_GROUP=coffee',
       ]
 
-      callableWithDelegate(queueTestStage())(stages, "coffee${index}", coffeeEnvVars, 'cd /usr/src/app && yarn test:karma:headless')
+      callableWithDelegate(queueTestStage())(stages, "coffee${index}", coffeeEnvVars, 'yarn test:karma:headless')
     }
   }
 }
 
 def queueJestDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'jest', [], 'cd /usr/src/app && bundle exec rails graphql:schema && yarn test:jest')
+    callableWithDelegate(queueTestStage())(stages, 'jest', [], 'bundle exec rails graphql:schema && yarn test:jest')
   }
 }
 
@@ -105,14 +96,14 @@ def queueKarmaDistribution() {
         'JSPEC_GROUP=jsg',
       ]
 
-      callableWithDelegate(queueTestStage())(stages, "jsg${index}", jsgEnvVars, 'cd /usr/src/app && yarn test:karma:headless')
+      callableWithDelegate(queueTestStage())(stages, "jsg${index}", jsgEnvVars, 'yarn test:karma:headless')
     }
 
     ['jsa', 'jsh'].each { group ->
-      callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'cd /usr/src/app && yarn test:karma:headless')
+      callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'yarn test:karma:headless')
     }
 
-    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'cd /usr/src/app && TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
+    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
   }
 }
 

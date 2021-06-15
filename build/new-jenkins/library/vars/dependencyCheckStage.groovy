@@ -19,10 +19,7 @@
 def nodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.LINTERS_RUNNER_IMAGE,
-    command: 'cat',
-    ttyEnabled: true,
-    resourceRequestCpu: '1',
-    resourceLimitCpu: '8',
+    command: 'cat'
   ]
 
   return [
@@ -33,7 +30,7 @@ def nodeRequirementsTemplate() {
 def queueTestStage() {
   { ->
     credentials.withSnykCredentials {
-      sh 'cd /usr/src/app && ./build/new-jenkins/linters/run-snyk.sh'
+      sh './build/new-jenkins/linters/run-snyk.sh'
     }
   }
 }
