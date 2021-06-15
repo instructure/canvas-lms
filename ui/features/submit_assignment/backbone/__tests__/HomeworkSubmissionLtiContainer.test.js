@@ -25,6 +25,7 @@ jest.mock('../environment')
 describe('HomeworkSubmissionLtiContainer', () => {
   afterEach(() => {
     getEnv.mockReset()
+    findContentExtension.mockReset()
   })
 
   describe('#isValidFileSubmission', () => {
@@ -37,13 +38,30 @@ describe('HomeworkSubmissionLtiContainer', () => {
     })
 
     describe('when there are no configured allowed extensions', () => {
-      it('returns true', () => {
+      beforeEach(() => {
         getEnv.mockReturnValue({
           SUBMIT_ASSIGNMENT: {
             ALLOWED_EXTENSIONS: []
           }
         })
-        expect(isValidFileSubmission({})).toBeTruthy()
+      })
+
+      describe('when the content contains no extension', () => {
+        beforeEach(() => {
+          findContentExtension.mockReturnValue(null)
+        })
+        it('returns true', () => {
+          expect(isValidFileSubmission({})).toBeTruthy()
+        })
+      })
+
+      describe('when the content contains an extension', () => {
+        beforeEach(() => {
+          findContentExtension.mockReturnValue('txt')
+        })
+        it('returns true', () => {
+          expect(isValidFileSubmission({})).toBeTruthy()
+        })
       })
     })
 
