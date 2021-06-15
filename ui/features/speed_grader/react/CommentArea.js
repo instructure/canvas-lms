@@ -34,6 +34,7 @@ const textAreaProps = {
 export default function CommentArea({getTextAreaRef, courseId, userId}) {
   const [comment, setComment] = useState('')
   const textAreaRef = useRef()
+  const [suggestionsRef, setSuggestionsRef] = useState(null)
   const showCommentLibrary = ENV.assignment_comment_library_feature_enabled
 
   const setTextAreaRef = el => {
@@ -45,6 +46,10 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
     textAreaRef.current.focus()
   }, [textAreaRef])
 
+  const onSetSuggestionsRef = useCallback(node => {
+    setSuggestionsRef(node)
+  }, [])
+
   return (
     <>
       {showCommentLibrary && (
@@ -54,6 +59,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
           courseId={courseId}
           userId={userId}
           commentAreaText={comment}
+          suggestionsRef={suggestionsRef}
         />
       )}
       <TextArea
@@ -62,7 +68,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
         textareaRef={setTextAreaRef}
         {...textAreaProps}
       />
-      {showCommentLibrary && <div id="library-suggestions" />}
+      {showCommentLibrary && <div ref={onSetSuggestionsRef} id="library-suggestions" />}
     </>
   )
 }

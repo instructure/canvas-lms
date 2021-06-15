@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {memo, useEffect} from 'react'
+import React, {memo, useEffect, useCallback, useState} from 'react'
 import PropTypes from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
@@ -39,22 +39,29 @@ const themeOverride = {
   }
 }
 
-const Suggestions = ({searchResults, showResults, setComment, closeSuggestions}) => {
+const Suggestions = ({
+  searchResults,
+  showResults,
+  setComment,
+  closeSuggestions,
+  suggestionsRef
+}) => {
+  const [mountRef, setMountRef] = useState(null)
   useEffect(() => {
     // Hide/show suggestions div when showResults changes
     // There is an arrow that appears from the popover that needs to be hidden
     // when not showing results.
-    const suggestions = document.getElementById('library-suggestions')
-    if (suggestions) {
-      suggestions.style.visibility = showResults ? 'visible' : 'hidden'
+    if (suggestionsRef) {
+      suggestionsRef.style.visibility = showResults ? 'visible' : 'hidden'
     }
-  }, [showResults])
+  }, [showResults, suggestionsRef])
 
-  const suggestionsPosition = document
-    .getElementById('library-suggestions')
-    ?.getBoundingClientRect()
+  const onSetMountRef = useCallback(node => {
+    setMountRef(node)
+  }, [])
 
-  const inlinePosition = document.getElementById('inline-mount')?.getBoundingClientRect()
+  const suggestionsPosition = suggestionsRef?.getBoundingClientRect()
+  const inlinePosition = mountRef?.getBoundingClientRect()
 
   const header = () => (
     <>
@@ -73,7 +80,7 @@ const Suggestions = ({searchResults, showResults, setComment, closeSuggestions})
         shouldRenderOffscreen
         isShowingContent
         offsetY={suggestionsPosition?.y - inlinePosition?.y || 0}
-        mountNode={() => document.getElementById('library-suggestions')}
+        mountNode={() => suggestionsRef}
         onHideContent={() => showResults && closeSuggestions()}
       >
         {showResults && (
@@ -97,7 +104,7 @@ const Suggestions = ({searchResults, showResults, setComment, closeSuggestions})
           </ApplyTheme>
         )}
       </Popover>
-      <div id="inline-mount" />
+      <div ref={onSetMountRef} />
     </>
   )
 }
@@ -111,7 +118,8 @@ Suggestions.propTypes = {
   ).isRequired,
   showResults: PropTypes.bool.isRequired,
   setComment: PropTypes.func.isRequired,
-  closeSuggestions: PropTypes.func.isRequired
+  closeSuggestions: PropTypes.func.isRequired,
+  suggestionsRef: PropTypes.object
 }
 
 export default memo(Suggestions)
