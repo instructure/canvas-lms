@@ -46,13 +46,14 @@ const Library = ({
   setShowSuggestions,
   searchResults,
   setFocusToTextArea,
-  updateComment
+  updateComment,
+  suggestionsRef
 }) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [showResults, setShowResults] = useState(false)
 
   useEffect(() => {
-    const parent = document.getElementById('library-suggestions')?.parentNode
+    const parent = suggestionsRef?.parentNode
     const handleBlur = event => {
       if (!parent.contains(event.relatedTarget)) {
         setShowResults(false)
@@ -64,7 +65,7 @@ const Library = ({
         parent.removeEventListener('focusout', handleBlur)
       }
     }
-  }, [])
+  }, [suggestionsRef])
 
   useEffect(() => {
     if (showResults && searchResults.length === 0) {
@@ -115,12 +116,13 @@ const Library = ({
               <ScreenReaderContent>{I18n.t('Open Comment Library')}</ScreenReaderContent>
               <PresentationContent>{I18n.n(comments.length)}</PresentationContent>
             </Link>
-            {showSuggestions && (
+            {showSuggestions && suggestionsRef && (
               <Suggestions
                 searchResults={searchResults}
                 setComment={setCommentFromSuggestion}
                 closeSuggestions={closeSuggestions}
                 showResults={showResults}
+                suggestionsRef={suggestionsRef}
               />
             )}
           </View>
@@ -159,7 +161,8 @@ Library.propTypes = {
   setShowSuggestions: PropTypes.func.isRequired,
   searchResults: PropTypes.array.isRequired,
   setFocusToTextArea: PropTypes.func.isRequired,
-  updateComment: PropTypes.func.isRequired
+  updateComment: PropTypes.func.isRequired,
+  suggestionsRef: PropTypes.object
 }
 
 export default Library
