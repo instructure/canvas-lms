@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import Tray from '../Tray'
 
 describe('Tray', () => {
-  let setIsOpenMock, setShowSuggestionsMock
+  let setIsOpenMock, setShowSuggestionsMock, setRemovedItemIndexMock
   const defaultProps = (props = {}) => {
     return {
       isOpen: true,
@@ -34,6 +34,7 @@ describe('Tray', () => {
       showSuggestions: false,
       setShowSuggestions: setShowSuggestionsMock,
       updateComment: () => {},
+      setRemovedItemIndex: setRemovedItemIndexMock,
       ...props
     }
   }
@@ -41,6 +42,7 @@ describe('Tray', () => {
   beforeEach(() => {
     setIsOpenMock = jest.fn()
     setShowSuggestionsMock = jest.fn()
+    setRemovedItemIndexMock = jest.fn()
   })
 
   afterEach(() => {
@@ -100,5 +102,10 @@ describe('Tray', () => {
       fireEvent.click(getByLabelText('Show suggestions when typing'))
       expect(setShowSuggestionsMock).toHaveBeenCalled()
     })
+  })
+
+  it('calls setRemovedItemIndexMock after focus is set', () => {
+    render(<Tray {...defaultProps({removedItemIndex: 0, comments: []})} />)
+    expect(setRemovedItemIndexMock).toHaveBeenCalledWith(null)
   })
 })
