@@ -85,13 +85,57 @@ module Lti::Ims
         ]
       end
 
+      def post_instfs_progress(url, params)
+        jwt = CGI::parse(URI(url).query)['token'].first
+        jwt_params = Canvas::Security.decode_jwt(jwt, ["jwt signing key"])
+        form_data = params[:form_data]
+        instfs_params = { name: form_data[:filename], instfs_uuid: 1, content_type: form_data[:content_type], token: @token }
+        file_params = jwt_params[:capture_params].merge(instfs_params)
+
+        post '/api/v1/files/capture', params: file_params
+        run_jobs
+      end
+
+      context 'when line_item is an assignment and instfs is enabled' do
+        let(:folder) { Folder.create!(name: "test", context: user) }
+        let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url)}
+
+        before :each do
+          allow(InstFS).to receive(:enabled?).and_return(true)
+          allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+          @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
+        end
+
+        it 'creates a new submission' do
+          submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+          attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+          expect(result.submission.attachments.count).to eq 0
+
+          line_item_params.merge!(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
+          upload_url = nil
+          upload_params = nil
+          # get params sent to instfs for easier mocking of the instfs return request
+          expect(CanvasHttp).to receive(:post) do |*args|
+            upload_url, upload_params, _ = args
+          end
+          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
+          # instfs return url posting
+          post_instfs_progress(upload_url, upload_params)
+
+          expect(result.submission.reload.attempt).to eq attempt + 1
+          expect(result.submission.attachments.count).to eq 1
+        end
+      end
+
       context 'when submitting after a previous submission' do
         it 'submits a file, and then can submit something else' do
           expect(result.submission.attachments.count).to eq 0
           line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
+
           post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
           run_jobs
           expect(result.reload.submission.attachments.count).to eq 1
+
           line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = {submission_type: 'external_tool'}
           post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
           run_jobs
