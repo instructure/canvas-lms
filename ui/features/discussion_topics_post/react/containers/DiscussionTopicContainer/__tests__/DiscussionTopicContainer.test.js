@@ -231,10 +231,23 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should not be able to delete the topic if does not have permission', async () => {
     const {getByTestId, queryByTestId} = setup({
-      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {delete: false}}
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {copyAndSendTo: true, delete: false}
+      }
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(queryByTestId('delete')).toBeNull()
+  })
+
+  it('Should not show discussion topic menu if no appropriate permissions', async () => {
+    const {queryByTestId} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {}
+      }
+    })
+    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
   })
 
   it('Should be able to open SpeedGrader', async () => {
@@ -254,13 +267,12 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
   })
 
-  it('Should not be able to open SpeedGrader if the user does not have permission', () => {
-    const {getByTestId, queryByTestId} = setup({
+  it('Should not be able to see post menu if no permissions', () => {
+    const {queryByTestId} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
     })
 
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(queryByTestId('speedGrader')).toBeNull()
+    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
   })
 
   it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {

@@ -100,6 +100,10 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
 }
 
 const ToolbarMenu = props => {
+  const menuConfigs = getMenuConfigs(props)
+  if (menuConfigs.length === 0) {
+    return null
+  }
   return (
     <Menu
       trigger={
@@ -113,7 +117,7 @@ const ToolbarMenu = props => {
         />
       }
     >
-      {getMenuConfigs(props).map(config => (
+      {menuConfigs.map(config => (
         <MenuItem {...config} />
       ))}
     </Menu>
