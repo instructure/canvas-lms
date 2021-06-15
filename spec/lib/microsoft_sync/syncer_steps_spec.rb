@@ -84,16 +84,6 @@ describe MicrosoftSync::SyncerSteps do
       receive(:new).with(tenant).and_return(graph_service_helpers)
   end
 
-  describe '#initial_step' do
-    subject { syncer_steps.initial_step }
-
-    it { is_expected.to eq(:step_initial) }
-
-    it 'references an existing method' do
-      expect { syncer_steps.method(subject.to_sym) }.to_not raise_error
-    end
-  end
-
   describe '#max_retries' do
     subject { syncer_steps.max_retries }
 

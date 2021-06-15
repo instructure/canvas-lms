@@ -73,10 +73,6 @@ module MicrosoftSync
       @group = group
     end
 
-    def initial_step
-      :step_initial
-    end
-
     def max_retries
       3
     end
