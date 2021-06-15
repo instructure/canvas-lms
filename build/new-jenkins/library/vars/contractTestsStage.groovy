@@ -32,7 +32,6 @@ def nodeRequirementsTemplate() {
       PACT_BROKER_PROTOCOL: 'https',
       POSTGRES_PASSWORD: env.POSTGRES_PASSWORD,
       RAILS_ENV: 'test',
-      RAILS_DB_HOST: env.RAILS_DB_HOST,
       RANDOMIZE_SEQUENCES: 1,
     ]
   ]
@@ -55,9 +54,7 @@ def nodeRequirementsTemplate() {
           PGDATA: '/data',
           POSTGRES_PASSWORD: env.POSTGRES_PASSWORD,
         ],
-        ports: [
-          postgres: 5432,
-        ]
+        ports: [5432],
       ]
     ],
   ]
@@ -82,7 +79,7 @@ def queueTestStage(stageName) {
   { opts, stages ->
     def baseEnvVars = [
       "DATABASE_NAME=${opts.databaseName}",
-      "DATABASE_URL=postgres://postgres:${env.POSTGRES_PASSWORD}@${env.RAILS_DB_HOST}:5432/${opts.databaseName}",
+      "DATABASE_URL=postgres://postgres:${env.POSTGRES_PASSWORD}@postgres:5432/${opts.databaseName}",
       "PACT_API_CONSUMER=${opts.containsKey('consumerName') ? opts.consumerName : ''}",
     ]
 
