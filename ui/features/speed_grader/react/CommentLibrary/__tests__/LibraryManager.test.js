@@ -43,6 +43,7 @@ describe('LibraryManager', () => {
       setFocusToTextArea: setFocusToTextAreaMock,
       userId: '1',
       commentAreaText: '',
+      suggestionsRef: document.body,
       ...props
     }
   }
