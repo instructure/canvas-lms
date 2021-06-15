@@ -120,7 +120,7 @@ const LibraryManager = ({
     [setComment, setFocusToTextArea]
   )
 
-  const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
+  const [deleteComment, {loading: isDeletingComment}] = useMutation(DELETE_COMMENT_MUTATION, {
     update: (cache, result) => {
       const removedIndex = removeDeletedCommentFromCache(cache, result, userId)
       setRemovedItemIndex(removedIndex)
@@ -198,7 +198,7 @@ const LibraryManager = ({
       onAddComment={handleAddComment}
       onDeleteComment={id => deleteComment({variables: {id}})}
       isAddingComment={isAddingComment}
-      removedItemIndex={removedItemIndex}
+      removedItemIndex={isDeletingComment ? null : removedItemIndex}
       showSuggestions={showSuggestions}
       setShowSuggestions={checked => handleShowSuggestions(checked)}
       searchResults={
@@ -209,6 +209,7 @@ const LibraryManager = ({
       setFocusToTextArea={setFocusToTextArea}
       updateComment={updateComment}
       suggestionsRef={suggestionsRef}
+      setRemovedItemIndex={setRemovedItemIndex}
     />
   )
 }

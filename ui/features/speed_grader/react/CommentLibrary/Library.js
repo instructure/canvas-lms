@@ -47,7 +47,8 @@ const Library = ({
   searchResults,
   setFocusToTextArea,
   updateComment,
-  suggestionsRef
+  suggestionsRef,
+  setRemovedItemIndex
 }) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [showResults, setShowResults] = useState(false)
@@ -140,6 +141,7 @@ const Library = ({
         showSuggestions={showSuggestions}
         setShowSuggestions={setShowSuggestions}
         updateComment={updateComment}
+        setRemovedItemIndex={setRemovedItemIndex}
       />
     </>
   )
@@ -162,7 +164,8 @@ Library.propTypes = {
   searchResults: PropTypes.array.isRequired,
   setFocusToTextArea: PropTypes.func.isRequired,
   updateComment: PropTypes.func.isRequired,
-  suggestionsRef: PropTypes.object
+  suggestionsRef: PropTypes.object,
+  setRemovedItemIndex: PropTypes.func.isRequired
 }
 
 export default Library
