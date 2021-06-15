@@ -20,26 +20,6 @@
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
-def cleanupFn() {
-  def htmlFiles
-
-  sh 'docker cp $(docker ps -f "ancestor"="$PATCHSET_TAG" -q):/usr/src/app/tmp/spec_results/. ./spec_results/'
-
-  dir ('spec_results') {
-    sh 'mv report.html canvas_i18nliner_results.html'
-    htmlFiles = findFiles glob: '*results.html'
-  }
-
-  publishHTML target: [
-    allowMissing: false,
-    alwaysLinkToLastBuild: false,
-    keepAll: true,
-    reportDir: 'spec_results',
-    reportFiles: htmlFiles.join(','),
-    reportName: 'Test Results'
-  ]
-}
-
 pipeline {
   agent none
   options {
@@ -60,13 +40,7 @@ pipeline {
       steps {
         script {
           extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
-            def postBuildHandler = [
-              onStageEnded: { stageName ->
-                cleanupFn()
-              }
-            ]
-
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).execute {
+            extendedStage('Builder').obeysAllowStages(false).execute {
               stage ('Setup') {
                 timeout(2) {
                   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
