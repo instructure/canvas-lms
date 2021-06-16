@@ -17,16 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
-require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
-require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
+require 'spec_helper'
+require 'apis/api_spec_helper'
+require_relative './concerns/advantage_services_shared_context'
+require_relative './concerns/advantage_services_shared_examples'
+require_relative './concerns/lti_services_shared_examples'
 require_dependency 'lti/ims/scores_controller'
 
 module Lti::Ims
   RSpec.describe ScoresController do
     include_context 'advantage services context'
 
+    let(:admin) { account_admin_user }
     let(:context) { course }
     let(:assignment) do
       opts = { course: course }
@@ -169,19 +171,22 @@ module Lti::Ims
 
           shared_examples_for 'creates a new submission' do
             it 'increments attempt' do
-              send_request
-              attempt = result.submission.reload.attempt
+              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
               send_request
               expect(result.submission.reload.attempt).to eq attempt + 1
             end
           end
 
           shared_examples_for 'updates existing submission' do
-            it 'does not increment attempt' do
-              send_request
-              attempt = result.submission.reload.attempt
+            it 'does not increment attempt or change submitted_at' do
+              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              submission = result.submission.assignment.submit_homework(user, submission_body)
+              attempt = submission.attempt
+              submitted_at = submission.submitted_at
               send_request
               expect(result.submission.reload.attempt).to eq attempt
+              expect(result.submission.reload.submitted_at).to eq submitted_at
             end
           end
 
@@ -226,8 +231,7 @@ module Lti::Ims
               it 'does not decrement attempt' do
                 # starting at attempt 0 doesn't work since it always goes back to 1 on save
                 result.submission.update!(attempt: 4)
-                send_request
-                attempt = result.submission.reload.attempt
+                attempt = result.submission.attempt
                 send_request
                 expect(result.submission.reload.attempt).to eq attempt
               end
@@ -364,7 +368,6 @@ module Lti::Ims
                 )
               end
 
-              it_behaves_like 'updates submission time'
               it_behaves_like 'updates existing submission'
             end
           end
@@ -402,12 +405,10 @@ module Lti::Ims
             end
 
             it 'only submits assignment once' do
+              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
               send_request
-              attempt = result.submission.reload.attempt + 1
-              send_request
-              expect(result.submission.reload.attempt).to eq attempt
-              run_jobs # process the file upload
-              expect(result.submission.reload.attempt).to eq attempt
+              expect(result.submission.reload.attempt).to eq attempt + 1
             end
 
             shared_examples_for 'a file submission' do
@@ -416,6 +417,7 @@ module Lti::Ims
                 attachment = Attachment.last
                 expect(attachment.user).to eq user
                 expect(attachment.display_name).to eq content_items.first[:title]
+                expect(result.submission.attachments).to include attachment
               end
 
               it 'returns a progress url' do
@@ -454,7 +456,10 @@ module Lti::Ims
                 )
               end
 
-              it_behaves_like 'creates a new submission'
+              # it_behaves_like 'creates a new submission'
+              # See spec/integration/scores_controller_spec.rb
+              # for Instfs, we have to mock a request to the files capture API
+              # that doesn't work well in a controller spec for this controller
 
               it 'returns a progress url' do
                 send_request

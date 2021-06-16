@@ -183,13 +183,14 @@ module Lti::Ims
     #         }
     #   }
     def create
+      submit_homework if new_submission? && !has_content_items?
       update_or_create_result
       json = { resultUrl: result_url }
 
       if has_content_items?
         begin
           content_items = upload_submission_files
-          json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items } unless content_items.empty?
+          json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
         rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
           return render_error('failed to communicate with file service', :gateway_timeout)
         rescue CanvasHttp::InvalidResponseCodeError => err
@@ -281,45 +282,34 @@ module Lti::Ims
     def score_submission
       return unless line_item.assignment_line_item?
 
-      submission = if new_submission?
-        line_item.assignment.submit_homework(user)
-      else
-        line_item.assignment.find_or_create_submission(user)
-      end
-
       if ignore_score?
-        submission.score = nil
+        submission = line_item.assignment.find_or_create_submission(user)
+        submission.update(score: nil)
       else
         submission = line_item.assignment.grade_student(
           user,
           {score: submission_score, grader_id: -tool.id}
         ).first
       end
+      submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
+      submission
+    end
 
+    def submit_homework
+      return unless line_item.assignment_line_item?
+
+      submission_opts = {submitted_at: submitted_at}
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
-        submission.submission_type = submission_type
+        submission_opts[:submission_type] = submission_type
         case submission_type
-        when 'none', 'external_tool', 'online_upload'
-          submission.body = nil
-          submission.url = nil
         when 'basic_lti_launch', 'online_url'
-          submission.body = nil
-          submission.url = submission_data
+          submission_opts[:url] = submission_data
         when 'online_text_entry'
-          submission.url = nil
-          submission.body = submission_data
+          submission_opts[:body] = submission_data
         end
       end
 
-      # change submission time without making it a "new" submission
-      if submitted_at.present? && submission.submitted_at != submitted_at
-        submission.submitted_at = submitted_at
-        submission.attempt -= 1 if submission.attempt.try(:'>', 0)
-      end
-
-      submission.save!
-      submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
-      submission
+      line_item.assignment.submit_homework(user, submission_opts)
     end
 
     def update_or_create_result
@@ -347,7 +337,7 @@ module Lti::Ims
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment: false, # AGS is already submitting the assignment
+          submit_assignment: true,
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,
