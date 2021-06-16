@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import Comment from '../Comment'
 
 describe('Comment', () => {
-  let onClickMock, onDeleteMock
+  let onClickMock, onDeleteMock, setRemovedItemIndexMock
 
   const defaultProps = (props = {}) => {
     return {
@@ -31,6 +31,7 @@ describe('Comment', () => {
       shouldFocus: false,
       id: '1',
       updateComment: () => {},
+      setRemovedItemIndex: setRemovedItemIndexMock,
       ...props
     }
   }
@@ -40,6 +41,7 @@ describe('Comment', () => {
   beforeEach(() => {
     onDeleteMock = jest.fn()
     onClickMock = jest.fn()
+    setRemovedItemIndexMock = jest.fn()
     window.confirm = jest.fn()
     window.confirm.mockImplementation(() => true)
   })
@@ -93,5 +95,10 @@ describe('Comment', () => {
     fireEvent.click(getByText('Edit comment: My assignment comment').closest('button'))
     fireEvent.click(getByText('Cancel'))
     expect(getByText('Edit comment: My assignment comment').closest('button')).toHaveFocus()
+  })
+
+  it('calls setRemovedItemIndexMock after focus is set', () => {
+    render(<Comment {...defaultProps({shouldFocus: true})} />)
+    expect(setRemovedItemIndexMock).toHaveBeenCalledWith(null)
   })
 })
