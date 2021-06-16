@@ -28,11 +28,13 @@ describe('Suggestions', () => {
       showResults: true,
       setComment: setCommentMock,
       closeSuggestions: closeSuggestionsMock,
+      suggestionsRef: document.getElementById('suggestions'),
       ...props
     }
   }
 
   beforeEach(() => {
+    document.body.innerHTML = '<div id="suggestions"/>'
     setCommentMock = jest.fn()
     closeSuggestionsMock = jest.fn()
   })
@@ -64,17 +66,15 @@ describe('Suggestions', () => {
     expect(closeSuggestionsMock).toHaveBeenCalled()
   })
 
-  it('renders suggestions within the library-suggestions div', () => {
-    document.body.innerHTML = '<div id="library-suggestions"></div>'
+  it('renders suggestions within the suggestionsRef element', () => {
     render(<Suggestions {...defaultProps()} />)
-    const div = document.getElementById('library-suggestions')
+    const div = document.getElementById('suggestions')
     expect(div.textContent).toMatch(/Insert Comment/)
   })
 
-  it('changes the library-suggestions div visibility based on showResults', () => {
-    document.body.innerHTML = '<div id="library-suggestions"/>'
+  it('changes the suggestionsRef element visibility based on showResults', () => {
     const {rerender} = render(<Suggestions {...defaultProps({showResults: false})} />)
-    const div = document.getElementById('library-suggestions')
+    const div = document.getElementById('suggestions')
     expect(div.style.visibility).toBe('hidden')
     rerender(<Suggestions {...defaultProps()} />)
     expect(div.style.visibility).toBe('visible')

@@ -29,7 +29,15 @@ import {Text} from '@instructure/ui-text'
 import I18n from 'i18n!CommentLibrary'
 import CommentEditView from './CommentEditView'
 
-const Comment = ({comment, onClick, onDelete, shouldFocus, id, updateComment}) => {
+const Comment = ({
+  comment,
+  onClick,
+  onDelete,
+  shouldFocus,
+  id,
+  updateComment,
+  setRemovedItemIndex
+}) => {
   const deleteButtonRef = useRef(null)
   const editButtonRef = useRef(null)
   const [hasMounted, setHasMounted] = useState(false)
@@ -58,8 +66,9 @@ const Comment = ({comment, onClick, onDelete, shouldFocus, id, updateComment}) =
   useEffect(() => {
     if (shouldFocus) {
       deleteButtonRef.current.focus()
+      setRemovedItemIndex(null)
     }
-  }, [shouldFocus])
+  }, [setRemovedItemIndex, shouldFocus])
 
   useEffect(() => {
     if (hasMounted && !isEditing) {
@@ -170,7 +179,8 @@ Comment.propTypes = {
   onDelete: PropTypes.func.isRequired,
   shouldFocus: PropTypes.bool.isRequired,
   id: PropTypes.string.isRequired,
-  updateComment: PropTypes.func.isRequired
+  updateComment: PropTypes.func.isRequired,
+  setRemovedItemIndex: PropTypes.func.isRequired
 }
 
 export default Comment

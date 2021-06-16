@@ -49,6 +49,8 @@ describe('Library', () => {
       setShowSuggestions: () => {},
       setFocusToTextArea: setFocusToTextAreaMock,
       updateComment: () => {},
+      suggestionsRef: document.body,
+      setRemovedItemIndex: () => {},
       ...props
     }
   }
@@ -141,32 +143,51 @@ describe('Library', () => {
       expect(queryByText('great comment')).not.toBeInTheDocument()
     })
 
+    it('does not render suggestions if suggestionsRef is not provided', () => {
+      const {queryByText} = render(
+        <Library {...defaultProps({searchResults: comments, suggestionsRef: null})} />
+      )
+      expect(queryByText('Insert Comment from Library')).not.toBeInTheDocument()
+    })
+
     it('calls setFocusToTextArea when suggestions are closed', () => {
       const {getByText} = render(<Library {...defaultProps({searchResults: comments})} />)
       fireEvent.click(getByText('Close suggestions'))
       expect(setFocusToTextAreaMock).toHaveBeenCalled()
     })
 
-    it('calls addEventListener to the library-suggestions.parentNode on mount', () => {
+    it('calls addEventListener to the suggestionsRef.parentNode on mount', () => {
       document.body.innerHTML = '<div id="parent"><div id="library-suggestions"/></div>'
       const spy = jest.spyOn(document.getElementById('parent'), 'addEventListener')
-      render(<Library {...defaultProps({searchResults: comments})} />)
+      render(
+        <Library
+          {...defaultProps({
+            searchResults: comments,
+            suggestionsRef: document.getElementById('library-suggestions')
+          })}
+        />
+      )
       expect(spy).toHaveBeenCalled()
     })
 
     it('calls removeEventListener on library-suggestions.parentNode on unmount', () => {
       document.body.innerHTML = '<div id="parent"><div id="library-suggestions"/></div>'
       const spy = jest.spyOn(document.getElementById('parent'), 'removeEventListener')
-      const {unmount} = render(<Library {...defaultProps({searchResults: comments})} />)
+      const {unmount} = render(
+        <Library
+          {...defaultProps({
+            searchResults: comments,
+            suggestionsRef: document.getElementById('library-suggestions')
+          })}
+        />
+      )
       unmount()
       expect(spy).toHaveBeenCalled()
     })
 
-    it('hides results if the library-suggestions.parentNode loses focus', () => {
+    it('hides results if the suggestionsRef.parentNode lose focus', () => {
       const {getByText, queryByText} = render(
-        <div id="library-suggestions">
-          <Library {...defaultProps({searchResults: comments})} />
-        </div>
+        <Library {...defaultProps({searchResults: comments})} />
       )
       expect(getByText('Insert Comment from Library')).toBeInTheDocument()
       getByText('Close suggestions').closest('button').focus()
