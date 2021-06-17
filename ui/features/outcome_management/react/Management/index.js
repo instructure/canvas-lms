@@ -305,15 +305,13 @@ const OutcomeManagementPanel = () => {
               </View>
             </Flex.Item>
           </Flex>
-          <hr />
-          <>
-            <ManageOutcomesFooter
-              selected={selectedOutcomes}
-              selectedCount={selectedOutcomesCount}
-              onRemoveHandler={openOutcomeRemoveMultiModal}
-              onMoveHandler={noop}
-            />
-          </>
+          <hr style={{margin: '0 0 7px'}} />
+          <ManageOutcomesFooter
+            selected={selectedOutcomes}
+            selectedCount={selectedOutcomesCount}
+            onRemoveHandler={openOutcomeRemoveMultiModal}
+            onMoveHandler={noop}
+          />
           {selectedGroupId && (
             <>
               <MoveModal
