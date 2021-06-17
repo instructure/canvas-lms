@@ -71,7 +71,8 @@ $.fn.moduleSequenceFooter = function (options = {}) {
 
       
       if (currentItem) {
-        const lessons = _.where(items, {indent: 0})
+        let lessons = _.where(items, {indent: 0})
+        if (!lessons.length) lessons = _.where(items, {indent: currentItem.indent})
         var nextLesson, previousLesson
   
         var lessonBookendStart = _.last(lessons.filter((l) => {
