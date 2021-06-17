@@ -42,8 +42,9 @@ import TreeBrowser from './Management/TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
+const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
   const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
@@ -58,6 +59,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
 
+  const isDesktop = breakpoints?.tablet
   const changeTitle = event => {
     if (!showTitleError) setShowTitleError(true)
     titleChangeHandler(event)
@@ -123,10 +125,34 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     closeModal()
   }
 
+  const titleInput = (
+    <TextInput
+      type="text"
+      size="medium"
+      value={title}
+      placeholder={I18n.t('Enter name or code')}
+      messages={invalidTitle && showTitleError ? [{text: invalidTitle, type: 'error'}] : []}
+      renderLabel={I18n.t('Name')}
+      onChange={changeTitle}
+    />
+  )
+
+  const displayNameInput = (
+    <TextInput
+      type="text"
+      size="medium"
+      value={displayName}
+      placeholder={I18n.t('Create a friendly display name')}
+      messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+      renderLabel={I18n.t('Friendly Name')}
+      onChange={displayNameChangeHandler}
+    />
+  )
+
   return (
     <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
       <Modal
-        size="large"
+        size={isDesktop ? 'large' : 'fullscreen'}
         label={I18n.t('Create Outcome')}
         open={isOpen}
         shouldReturnFocus
@@ -134,32 +160,25 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
         shouldCloseOnDocumentClick={false}
       >
         <Modal.Body>
-          <Flex as="div" alignItems="start" padding="small 0" height="7rem">
-            <Flex.Item size="50%" padding="0 xx-small 0 0">
-              <TextInput
-                type="text"
-                size="medium"
-                value={title}
-                placeholder={I18n.t('Enter name or code')}
-                messages={
-                  invalidTitle && showTitleError ? [{text: invalidTitle, type: 'error'}] : []
-                }
-                renderLabel={I18n.t('Name')}
-                onChange={changeTitle}
-              />
-            </Flex.Item>
-            <Flex.Item size="50%" padding="0 0 0 xx-small">
-              <TextInput
-                type="text"
-                size="medium"
-                value={displayName}
-                placeholder={I18n.t('Create a friendly display name')}
-                messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
-                renderLabel={I18n.t('Friendly Name')}
-                onChange={displayNameChangeHandler}
-              />
-            </Flex.Item>
-          </Flex>
+          {isDesktop ? (
+            <Flex as="div" alignItems="start" padding="small 0" height="7rem">
+              <Flex.Item size="50%" padding="0 xx-small 0 0">
+                {titleInput}
+              </Flex.Item>
+              <Flex.Item size="50%" padding="0 0 0 xx-small">
+                {displayNameInput}
+              </Flex.Item>
+            </Flex>
+          ) : (
+            <>
+              <View as="div" padding="small 0">
+                {titleInput}
+              </View>
+              <View as="div" padding="small 0">
+                {displayNameInput}
+              </View>
+            </>
+          )}
           <View as="div" padding="small 0 0">
             <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
           </View>
@@ -180,33 +199,37 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             <Text size="medium" weight="bold">
               {I18n.t('Location')}
             </Text>
-            <View as="div" padding="small 0">
-              {isLoading ? (
-                <View
-                  as="div"
-                  textAlign="center"
-                  padding="medium 0"
-                  margin="0 auto"
-                  data-testid="loading"
-                >
-                  <Spinner renderTitle={I18n.t('Loading')} size="medium" />
-                </View>
-              ) : error ? (
-                <Text color="danger" data-testid="loading-error">
-                  {contextType === 'Course'
-                    ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
-                    : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
-                </Text>
-              ) : (
-                <TreeBrowser
-                  selectionType="single"
-                  onCollectionToggle={queryCollections}
-                  collections={collections}
-                  rootId={rootId}
-                  showRootCollection
-                />
-              )}
-            </View>
+            {isDesktop && (
+              <View as="div" padding="small 0">
+                {isLoading ? (
+                  <View
+                    as="div"
+                    textAlign="center"
+                    padding="medium 0"
+                    margin="0 auto"
+                    data-testid="loading"
+                  >
+                    <Spinner renderTitle={I18n.t('Loading')} size="medium" />
+                  </View>
+                ) : error ? (
+                  <Text color="danger" data-testid="loading-error">
+                    {contextType === 'Course'
+                      ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
+                      : I18n.t('An error occurred while loading account outcomes: %{error}', {
+                          error
+                        })}
+                  </Text>
+                ) : (
+                  <TreeBrowser
+                    selectionType="single"
+                    onCollectionToggle={queryCollections}
+                    collections={collections}
+                    rootId={rootId}
+                    showRootCollection
+                  />
+                )}
+              </View>
+            )}
           </View>
         </Modal.Body>
         <Modal.Footer>
@@ -232,7 +255,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
 
 CreateOutcomeModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  breakpoints: breakpointsShape
 }
 
-export default CreateOutcomeModal
+export default WithBreakpoints(CreateOutcomeModal)
