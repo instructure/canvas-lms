@@ -19,12 +19,19 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {string} from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 
 import locked1SVG from '../../images/Locked1.svg'
+
+function modulesPage(moduleUrl) {
+  const encodedUrl = encodeURI(moduleUrl)
+
+  // xsslint safeString.identifier encodedUrl
+  return I18n.t('Please visit your *modules page* for more information.', {
+    wrappers: [`<a target="_blank" href="${encodedUrl}">$1</a>`]
+  })
+}
 
 export default function MissingPrereqs(props) {
   return (
@@ -35,17 +42,17 @@ export default function MissingPrereqs(props) {
       <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
           <Flex.Item>
-            <Heading size="large" data-test-id="assignments-2-pre-req-title" margin="small">
-              {I18n.t('Prerequisite Completion Period')}
-            </Heading>
+            <Text weight="normal" data-test-id="assignments-2-pre-req-title" margin="small">
+              {I18n.t(
+                'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.'
+              )}
+            </Text>
           </Flex.Item>
           <Flex.Item>
-            <Text size="medium">{props.preReqTitle}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <Button variant="primary" margin="small" href={props.preReqLink}>
-              {I18n.t('Go to Prerequisite')}
-            </Button>
+            <Text
+              weight="normal"
+              dangerouslySetInnerHTML={{__html: modulesPage(props.moduleUrl)}}
+            />
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -54,6 +61,5 @@ export default function MissingPrereqs(props) {
 }
 
 MissingPrereqs.propTypes = {
-  preReqTitle: string.isRequired,
-  preReqLink: string.isRequired
+  moduleUrl: string.isRequired
 }
