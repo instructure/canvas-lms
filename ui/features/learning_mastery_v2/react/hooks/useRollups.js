@@ -17,22 +17,57 @@
  */
 
 import {useState, useEffect} from 'react'
+import {groupBy} from 'lodash'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {loadRollups} from '../apiClient'
 import I18n from 'i18n!OutcomeManagement'
+
+const getRow = (studentRollups, outcomes) =>
+  studentRollups[0].scores.map(score => {
+    const outcome = outcomes.find(o => o.id === score.links.outcome)
+    const rating = findRating(outcome.ratings, score.score)
+    return {
+      outcomeId: outcome.id,
+      rating: {
+        ...rating,
+        color: `#` + rating.color
+      }
+    }
+  })
+
+const findRating = (ratings, score) => {
+  const rating = ratings.find(
+    (r, i) =>
+      r.points === score ||
+      (i === 0 && score > r.points) ||
+      (score > r.points && ratings[i - 1].points > score)
+  )
+  return rating || ratings[ratings.length - 1]
+}
+
+const rollupsByUser = (rollups, outcomes) => {
+  const rollupsByUserId = groupBy(rollups, rollup => rollup.links.user)
+  return Object.entries(rollupsByUserId).map(([studentId, studentRollups]) => ({
+    studentId,
+    outcomeRollups: getRow(studentRollups, outcomes)
+  }))
+}
 
 export default function useRollups({courseId}) {
   const [isLoading, setIsLoading] = useState(true)
   const [students, setStudents] = useState([])
   const [outcomes, setOutcomes] = useState([])
+  const [rollups, setRollups] = useState([])
   useEffect(() => {
     ;(async () => {
       try {
         const {data} = await loadRollups(courseId)
-        setStudents(data.linked.users)
-        setOutcomes(data.linked.outcomes)
+        const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
+        setStudents(fetchedUsers)
+        setOutcomes(fetchedOutcomes)
+        setRollups(rollupsByUser(data.rollups, fetchedOutcomes))
         setIsLoading(false)
-      } catch (e) {
+      } catch (_e) {
         showFlashAlert({
           message: I18n.t('Error loading rollups'),
           type: 'error'
@@ -44,6 +79,7 @@ export default function useRollups({courseId}) {
   return {
     isLoading,
     students,
-    outcomes
+    outcomes,
+    rollups
   }
 }

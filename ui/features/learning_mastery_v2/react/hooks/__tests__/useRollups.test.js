@@ -34,10 +34,42 @@ describe('useRollups', () => {
     }
   ]
 
+  const mockedRatings = [
+    {
+      color: 'green',
+      description: 'mastery!',
+      mastery: true,
+      points: 3
+    },
+    {
+      color: 'red',
+      description: 'not great',
+      mastery: false,
+      points: 0
+    }
+  ]
+
   const mockedOutcomes = [
     {
       id: '1',
-      title: 'outcome 1'
+      title: 'outcome 1',
+      ratings: mockedRatings
+    }
+  ]
+
+  const mockedRollups = [
+    {
+      links: {
+        user: '1'
+      },
+      scores: [
+        {
+          score: 4,
+          links: {
+            outcome: '1'
+          }
+        }
+      ]
     }
   ]
 
@@ -48,25 +80,40 @@ describe('useRollups', () => {
         linked: {
           users: mockedUsers,
           outcomes: mockedOutcomes
-        }
+        },
+        rollups: mockedRollups
       }
     })
     fetchMock = jest.spyOn(axios, 'get').mockResolvedValue(promise)
   })
 
   describe('useRollups hook', () => {
-    it('should return defaults until rollups are fetched', async () => {
+    it('returns defaults until the request finishes loading', async () => {
       const {result} = renderHook(() => useRollups({courseId: '1'}))
-      let {isLoading, students, outcomes} = result.current
+      const {isLoading, students, outcomes, rollups} = result.current
       expect(isLoading).toEqual(true)
       expect(students).toEqual([])
       expect(outcomes).toEqual([])
+      expect(rollups).toEqual([])
       await act(async () => jest.runAllTimers())
-      ;({isLoading, students, outcomes} = result.current)
+      expect(result.current.isLoading).toEqual(false)
+    })
+
+    it('returns the response after the request finishes', async () => {
+      const {result} = renderHook(() => useRollups({courseId: '1'}))
+      await act(async () => jest.runAllTimers())
+      const {students, outcomes, rollups} = result.current
       expect(fetchMock).toHaveBeenCalled()
-      expect(isLoading).toEqual(false)
       expect(students).toEqual(mockedUsers)
       expect(outcomes).toEqual(mockedOutcomes)
+      expect(rollups).toStrictEqual([
+        {
+          studentId: '1',
+          outcomeRollups: [
+            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}}
+          ]
+        }
+      ])
     })
 
     it('calls the /rollups URL with the right parameters', async () => {
@@ -77,6 +124,7 @@ describe('useRollups', () => {
           rating_percents: true,
           per_page: 20,
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+          sort_by: 'student',
           page: 1
         }
       }

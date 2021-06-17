@@ -46,7 +46,7 @@ const renderLoader = () => (
 )
 
 const LearningMastery = ({courseId}) => {
-  const {isLoading, students, outcomes} = useRollups({courseId})
+  const {isLoading, students, outcomes, rollups} = useRollups({courseId})
 
   return (
     <>
@@ -54,7 +54,7 @@ const LearningMastery = ({courseId}) => {
       {isLoading ? (
         renderLoader()
       ) : (
-        <Gradebook courseId={courseId} outcomes={outcomes} students={students} />
+        <Gradebook courseId={courseId} outcomes={outcomes} students={students} rollups={rollups} />
       )}
     </>
   )

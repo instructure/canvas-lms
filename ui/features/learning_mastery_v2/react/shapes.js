@@ -32,7 +32,26 @@ export const studentShape = {
   avatar_url: PropTypes.string
 }
 
+export const outcomeRatingShape = {
+  points: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  mastery: PropTypes.bool.isRequired
+}
+
 export const outcomeShape = {
   title: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
+  mastery_points: PropTypes.number.isRequired,
+  ratings: PropTypes.arrayOf(PropTypes.shape(outcomeRatingShape)).isRequired
+}
+
+export const outcomeRollupShape = {
+  outcomeId: PropTypes.string.isRequired,
+  rating: PropTypes.shape(outcomeRatingShape).isRequired
+}
+
+export const studentRollupsShape = {
+  studentId: PropTypes.string.isRequired,
+  outcomeRollups: PropTypes.arrayOf(PropTypes.shape(outcomeRollupShape)).isRequired
 }

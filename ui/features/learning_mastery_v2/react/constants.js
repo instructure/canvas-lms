@@ -15,17 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import axios from '@canvas/axios'
 
-export const loadRollups = (courseId, page = 1) => {
-  const params = {
-    params: {
-      rating_percents: true,
-      per_page: 20,
-      include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
-      sort_by: 'student',
-      page
-    }
-  }
-  return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)
-}
+export const MAX_GRID_WIDTH = 1440
+export const COLUMN_WIDTH = 185
+export const STUDENT_COLUMN_RIGHT_PADDING = 15
+export const COLUMN_PADDING = 5
+export const CELL_HEIGHT = 50

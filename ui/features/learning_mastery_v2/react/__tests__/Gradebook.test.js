@@ -49,6 +49,16 @@ describe('Gradebook', () => {
           title: 'outcome 2'
         }
       ],
+      rollups: [
+        {
+          studentId: '1',
+          outcomeRollups: []
+        },
+        {
+          studentId: '2',
+          outcomeRollups: []
+        }
+      ],
       courseId: '100',
       ...props
     }

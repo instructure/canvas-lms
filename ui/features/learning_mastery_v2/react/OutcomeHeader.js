@@ -25,10 +25,11 @@ import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import I18n from 'i18n!learning_mastery_gradebook'
+import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
 
 const OutcomeHeader = ({title}) => (
-  <View background="secondary" as="div">
-    <Flex height="50px" alignItems="center" justifyItems="space-between">
+  <View background="secondary" as="div" width={COLUMN_WIDTH} borderWidth="large 0 medium 0">
+    <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
       <Flex.Item size="120px" padding="0 0 0 small">
         <TruncateText>
           <Text weight="bold">{title}</Text>

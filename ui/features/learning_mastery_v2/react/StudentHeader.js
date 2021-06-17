@@ -23,10 +23,11 @@ import I18n from 'i18n!learning_mastery_gradebook'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
+import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
 
 const StudentHeader = () => (
-  <View background="secondary" as="div">
-    <Flex height="50px" alignItems="center" justifyItems="space-between">
+  <View background="secondary" as="div" width={COLUMN_WIDTH}>
+    <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
       <Flex.Item padding="0 0 0 small">
         <Text weight="bold">{I18n.t('Students')}</Text>
       </Flex.Item>
