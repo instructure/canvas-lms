@@ -148,7 +148,8 @@ const OutcomeManagementPanel = () => {
   }
   const outcomeMenuHandler = useCallback(
     (id, action) => {
-      setSelectedOutcome(group.outcomes.edges.find(edge => edge.node._id === id)?.node)
+      const link = group.outcomes.edges.find(edge => edge.node._id === id)
+      setSelectedOutcome({linkId: link?.id, ...link?.node})
       if (action === 'remove') {
         openOutcomeRemoveModal()
       } else if (action === 'edit') {
@@ -334,8 +335,7 @@ const OutcomeManagementPanel = () => {
           {selectedGroupId && selectedOutcome && (
             <>
               <OutcomeRemoveModal
-                groupId={selectedGroupId}
-                outcomeId={selectedOutcome._id}
+                outcomeLinkId={selectedOutcome.linkId}
                 isOpen={isOutcomeRemoveModalOpen}
                 onCloseHandler={onCloseOutcomeRemoveModal}
               />

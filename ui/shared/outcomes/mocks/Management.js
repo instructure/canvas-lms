@@ -21,7 +21,8 @@ import {
   FIND_GROUP_OUTCOMES,
   SEARCH_GROUP_OUTCOMES,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
-  UPDATE_LEARNING_OUTCOME
+  UPDATE_LEARNING_OUTCOME,
+  DELETE_OUTCOME_LINKS
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -941,6 +942,104 @@ export const updateOutcomeMocks = ({
     }
   }
 ]
+
+export const deleteOutcomeMock = ({
+  ids = ['1'],
+  failResponse = false,
+  failAlignedContentMutation = false,
+  failMutation = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      deleteOutcomeLinks: {
+        deletedOutcomeLinkIds: ids[0],
+        __typename: 'DeleteOutcomeLinksPayload',
+        errors: []
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: ids[0],
+        message: 'Could not find associated outcome in this context',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedAlignedContentMutation = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: [],
+            message: 'cannot be deleted because it is aligned to content',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+  const failedMutation = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failAlignedContentMutation) {
+    result = failedAlignedContentMutation
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  return {
+    request: {
+      query: DELETE_OUTCOME_LINKS,
+      variables: {
+        ids
+      }
+    },
+    result
+  }
+}
 
 export const smallOutcomeTree = () => [
   ...accountMocks({childGroupsCount: 2}),

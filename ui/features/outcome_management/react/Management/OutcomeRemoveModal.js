@@ -18,6 +18,7 @@
  */
 
 import React from 'react'
+import {useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {Text} from '@instructure/ui-text'
@@ -26,41 +27,43 @@ import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {removeOutcome} from '@canvas/outcomes/graphql/Management'
+import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 
-const OutcomeRemoveModal = ({groupId, outcomeId, isOpen, onCloseHandler}) => {
-  const {contextType, contextId} = useCanvasContext()
+const OutcomeRemoveModal = ({outcomeLinkId, isOpen, onCloseHandler}) => {
+  const {contextType} = useCanvasContext()
   const isAccount = contextType === 'Account'
+  const [deleteOutcomeLinks] = useMutation(DELETE_OUTCOME_LINKS, {
+    onCompleted: _data => {
+      if (_data.deleteOutcomeLinks?.deletedOutcomeLinkIds.length === 0)
+        throw new Error(_data.deleteOutcomeLinks?.errors?.[0]?.message)
+
+      showFlashAlert({
+        message: isAccount
+          ? I18n.t('This outcome was successfully removed from this account.')
+          : I18n.t('This outcome was successfully removed from this course.'),
+        type: 'success'
+      })
+    },
+    onError: _err => {
+      _err.message = _err.message.match(/cannot be deleted because it is aligned to content/)
+        ? I18n.t('Outcome cannot be removed because it is aligned to content')
+        : _err.message
+      showFlashAlert({
+        message: _err.message
+          ? I18n.t('An error occurred while removing the outcome: %{message}', {
+              message: _err.message
+            })
+          : I18n.t('An error occurred while removing the outcome.'),
+        type: 'error'
+      })
+    },
+    variables: {
+      ids: [outcomeLinkId]
+    }
+  })
+
   const onRemoveOutcomeHandler = () => {
-    ;(async () => {
-      try {
-        const result = await removeOutcome(contextType, contextId, groupId, outcomeId)
-        if (result?.status === 200) {
-          showFlashAlert({
-            message: isAccount
-              ? I18n.t('This outcome was successfully removed from this account.')
-              : I18n.t('This outcome was successfully removed from this course.'),
-            type: 'success'
-          })
-        } else {
-          throw Error()
-        }
-      } catch (err) {
-        err.message =
-          err?.response?.data?.message &&
-          err?.response?.data?.message.match(/cannot be deleted because it is aligned to content/)
-            ? I18n.t('Outcome cannot be removed because it is aligned to content')
-            : err.message
-        showFlashAlert({
-          message: err.message
-            ? I18n.t('An error occurred while removing the outcome: %{message}', {
-                message: err.message
-              })
-            : I18n.t('An error occurred while removing the outcome.'),
-          type: 'error'
-        })
-      }
-    })()
+    deleteOutcomeLinks()
     onCloseHandler()
   }
 
@@ -100,8 +103,7 @@ const OutcomeRemoveModal = ({groupId, outcomeId, isOpen, onCloseHandler}) => {
 }
 
 OutcomeRemoveModal.propTypes = {
-  groupId: PropTypes.string.isRequired,
-  outcomeId: PropTypes.string.isRequired,
+  outcomeLinkId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired
 }

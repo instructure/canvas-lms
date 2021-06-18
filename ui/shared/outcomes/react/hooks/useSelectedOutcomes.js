@@ -25,9 +25,9 @@ const useSelectedOutcomes = (initialValue = {}) => {
         return {}
       }
       case 'toggle': {
-        const {_id, title, canUnlink} = action.payload
+        const {_id, title, linkId, canUnlink} = action.payload
         const newState = {...prevState}
-        prevState[_id] ? delete newState[_id] : (newState[_id] = {_id, title, canUnlink})
+        prevState[_id] ? delete newState[_id] : (newState[_id] = {_id, title, linkId, canUnlink})
         return newState
       }
       default:

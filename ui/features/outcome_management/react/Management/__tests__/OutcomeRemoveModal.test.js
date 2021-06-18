@@ -17,35 +17,27 @@
  */
 
 import React from 'react'
-import {render as rawRender, fireEvent, waitFor} from '@testing-library/react'
+import {createCache} from '@canvas/apollo'
+import {MockedProvider} from '@apollo/react-testing'
+import {render as realRender, fireEvent, waitFor} from '@testing-library/react'
 import OutcomeRemoveModal from '../OutcomeRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {removeOutcome} from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-
-jest.mock('@canvas/outcomes/graphql/Management')
-class CustomError extends Error {
-  constructor(message) {
-    super()
-    this.response = {
-      data: {
-        message
-      }
-    }
-  }
-}
+import {accountMocks, deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
 describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
+  let cache
+
   const defaultProps = (props = {}) => ({
-    groupId: '123',
-    outcomeId: '12',
+    outcomeLinkId: '1',
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     ...props
   })
 
   beforeEach(() => {
+    cache = createCache()
     onCloseHandlerMock = jest.fn()
   })
 
@@ -53,10 +45,15 @@ describe('OutcomeRemoveModal', () => {
     jest.clearAllMocks()
   })
 
-  const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {
-    return rawRender(
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '1', mocks = accountMocks()} = {}
+  ) => {
+    return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
-        {children}
+        <MockedProvider cache={cache} mocks={mocks}>
+          {children}
+        </MockedProvider>
       </OutcomesContext.Provider>
     )
   }
@@ -71,8 +68,10 @@ describe('OutcomeRemoveModal', () => {
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
   })
 
-  it('calls onCloseHandler on Remove button click', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+  it('calls onCloseHandler on Remove button click', async () => {
+    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+      mocks: [deleteOutcomeMock()]
+    })
     fireEvent.click(getByText('Remove Outcome'))
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
@@ -106,49 +105,91 @@ describe('OutcomeRemoveModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Account context', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(Promise.resolve({status: 200}))
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Account', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'This outcome was successfully removed from this account.',
-        type: 'success'
+  describe('deletes the outcome', () => {
+    it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock()]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message: 'This outcome was successfully removed from this account.',
+          type: 'success'
+        })
       })
     })
-  })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Course context', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(Promise.resolve({status: 200}))
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-      contextType: 'Course'
-    })
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Course', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'This outcome was successfully removed from this course.',
-        type: 'success'
+    it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        contextType: 'Course',
+        mocks: [deleteOutcomeMock()]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message: 'This outcome was successfully removed from this course.',
+          type: 'success'
+        })
       })
     })
-  })
 
-  it('displays flash error with proper message if delete request fails due to outcome being aligned to content', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(
-      Promise.reject(new CustomError('Outcome cannot be deleted because it is aligned to content'))
-    )
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Account', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message:
-          'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
-        type: 'error'
+    it('displays flash confirmation with proper message if delete request fails', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock({failResponse: true})]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message:
+            'An error occurred while removing the outcome: GraphQL error: Could not find associated outcome in this context',
+          type: 'error'
+        })
+      })
+    })
+
+    it('displays flash confirmation with proper message if delete request fails because it is aligned with content', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock({failAlignedContentMutation: true})]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message:
+            'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
+          type: 'error'
+        })
+      })
+    })
+
+    it('displays flash confirmation with proper message if delete mutation fails', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock({failMutation: true})]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message: 'An error occurred while removing the outcome.',
+          type: 'error'
+        })
+      })
+    })
+
+    it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
+      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock({failMutationNoErrMsg: true})]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      await waitFor(() => {
+        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          message: 'An error occurred while removing the outcome.',
+          type: 'error'
+        })
       })
     })
   })

@@ -48,6 +48,7 @@ describe('OutcomeManagementPanel', () => {
     contextType: 'Course',
     description: '',
     displayName: '',
+    linkId: '1',
     friendlyDescription: null,
     title: 'Outcome 1 - Group 200'
   }

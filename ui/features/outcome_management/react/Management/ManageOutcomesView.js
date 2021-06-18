@@ -122,11 +122,11 @@ const ManageOutcomesView = ({
               <Text color="secondary">{I18n.t('The search returned no results')}</Text>
             </View>
           )}
-
-          {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}) => (
+          {outcomes?.edges?.map(({canUnlink, id, node: {_id, title, description, canEdit}}) => (
             <ManageOutcomeItem
               key={_id}
               _id={_id}
+              linkId={id}
               title={title}
               description={description}
               canManageOutcome={canEdit}
