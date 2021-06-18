@@ -109,7 +109,7 @@ export default function PermissionsIndex(props) {
 
   function onTabChanged(_e, {id}) {
     if (id === selectedTabId) return
-    const newContextType = id === 'course' ? COURSE : ACCOUNT
+    const newContextType = id === 'tab-panel-course' ? COURSE : ACCOUNT
     props.filterRoles({
       selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
       contextType
