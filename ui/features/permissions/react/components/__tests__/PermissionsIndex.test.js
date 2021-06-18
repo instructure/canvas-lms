@@ -50,6 +50,17 @@ it('switches to account roles when tab is clicked on', () => {
   })
 })
 
+it('switches back to course roles tab with proper context from account roles tab', () => {
+  const data = DEFAULT_PROPS()
+  const {getAllByText, getByText, queryByText} = renderWithRedux(<Subject />, {data})
+  fireEvent.click(getByText('Account Roles'))
+  fireEvent.click(getByText('Course Roles'))
+  data.roles.forEach(role => {
+    if (role.contextType === ACCOUNT) expect(queryByText(role.label)).toBeNull()
+    if (role.contextType === COURSE) expect(getAllByText(role.label)).toHaveLength(2) // Text label + tooltip
+  })
+})
+
 it('filters roles properly', () => {
   const data = DEFAULT_PROPS()
   const roleSelect = data.roles.filter(role => role.contextType === COURSE)[0]
