@@ -73,6 +73,12 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
     end
 
     def add_new_role_override(base_override, enabled)
+      existing_ro =
+        RoleOverride.where(
+          permission: 'manage_courses_delete',
+          context: base_override.context,
+          role: base_override.role
+        ).exists?
       new_ro = RoleOverride.new
       new_ro.permission = 'manage_courses_delete'
       attrs =
@@ -91,7 +97,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
         )
       new_ro.assign_attributes(attrs)
       new_ro.enabled = enabled
-      new_ro.save!
+      new_ro.save! unless existing_ro
     end
   end
 end
