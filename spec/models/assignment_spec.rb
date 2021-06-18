@@ -3247,6 +3247,13 @@ describe Assignment do
       expect(@assignment.interpret_grade("88.75%")).to eq 13.3125
     end
 
+    it "should not return more than 3 decimal digits" do
+      @assignment.points_possible = 100
+      score = @assignment.interpret_grade("55%")
+      decimal_part = score.to_s.split('.')[1]
+      expect(decimal_part.length).to be <= 3
+    end
+
     context "with alphanumeric grades" do
       before(:once) do
         @assignment.update!(grading_type: 'letter_grade', points_possible: 10.0)
