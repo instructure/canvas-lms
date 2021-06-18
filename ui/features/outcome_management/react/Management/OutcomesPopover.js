@@ -31,7 +31,6 @@ import {outcomeShape} from './shapes'
 
 const OutcomesPopover = ({outcomes, outcomeCount}) => {
   const [showOutcomesList, setShowOutcomesList] = useState(false)
-
   const closeOutcomeList = () => {
     setShowOutcomesList(false)
   }
@@ -91,13 +90,15 @@ const OutcomesPopover = ({outcomes, outcomeCount}) => {
               overflowX="hidden"
             >
               <List isUnstyled size="small" margin="none small none none">
-                {Object.values(outcomes).map(({_id, title}, idx) => (
-                  // its ok to use index in the key as the list is static
-                  // eslint-disable-next-line react/no-array-index-key
-                  <List.Item key={`${_id}_${idx}`}>
-                    <TruncateText position="middle">{title}</TruncateText>
-                  </List.Item>
-                ))}
+                {Object.values(outcomes)
+                  .sort((a, b) => a.title.localeCompare(b.title, ENV.LOCALE, {numeric: true}))
+                  .map(({_id, title}, idx) => (
+                    // its ok to use index in the key as the list is static
+                    // eslint-disable-next-line react/no-array-index-key
+                    <List.Item key={`${_id}_${idx}`}>
+                      <TruncateText position="middle">{title}</TruncateText>
+                    </List.Item>
+                  ))}
               </List>
             </View>
           </View>

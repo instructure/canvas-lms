@@ -17,23 +17,32 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import OutcomesPopover from '../OutcomesPopover'
+
+jest.useFakeTimers()
 
 describe('OutcomesPopover', () => {
   const generateOutcomes = (num, canUnlink) =>
     new Array(num).fill(0).reduce(
-      (_val, idx) => ({
-        [idx + 1]: {_id: `idx + 1`, title: `Outcome ${idx + 1}`, canUnlink}
+      (acc, _curr, idx) => ({
+        ...acc,
+        [idx + 1]: {_id: `${idx + 1}`, title: `Outcome ${idx + 1}`, canUnlink}
       }),
       {}
     )
-  const defaultProps = (numberToGenerate, canUnlink = true) => ({
+
+  const defaultProps = (numberToGenerate = 2, canUnlink = true) => ({
     outcomes: generateOutcomes(numberToGenerate, canUnlink),
     outcomeCount: numberToGenerate
   })
 
+  beforeAll(() => {
+    window.ENV.LOCALE = 'en'
+  })
+
   afterEach(() => {
+    window.ENV = {}
     jest.clearAllMocks()
   })
 
@@ -64,5 +73,26 @@ describe('OutcomesPopover', () => {
     const closeButton = getByText('Close')
     fireEvent.click(closeButton)
     expect(button.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('shows outcomes in alphanumerical order', async () => {
+    const props = {
+      outcomes: {
+        22: {_id: '22', title: 'Outcome 22', canUnlink: true},
+        1: {_id: '1', title: 'Outcome 1', canUnlink: true},
+        2: {_id: '2', title: 'Outcome 2', canUnlink: true},
+        12: {_id: '12', title: 'Outcome 12', canUnlink: true}
+      },
+      outcomeCount: 4
+    }
+    const {findAllByText, getByRole} = render(<OutcomesPopover {...props} />)
+    const button = getByRole('button')
+    fireEvent.click(button)
+    await act(async () => jest.runOnlyPendingTimers())
+    const outcomes = await findAllByText(/Outcome /)
+    expect(outcomes[0]).toContainHTML('Outcome 1')
+    expect(outcomes[1]).toContainHTML('Outcome 2')
+    expect(outcomes[2]).toContainHTML('Outcome 12')
+    expect(outcomes[3]).toContainHTML('Outcome 22')
   })
 })
