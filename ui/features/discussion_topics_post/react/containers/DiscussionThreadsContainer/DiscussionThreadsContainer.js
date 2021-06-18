@@ -93,9 +93,8 @@ export const DiscussionThreadsContainer = props => {
         return (
           <DiscussionThreadContainer
             key={`discussion-thread-${thread.id}`}
-            assignment={discussionTopic?.assignment}
             discussionEntry={thread}
-            discussionTopicGraphQLId={discussionTopic.id}
+            discussionTopic={discussionTopic}
             markAsRead={markAsRead}
           />
         )
