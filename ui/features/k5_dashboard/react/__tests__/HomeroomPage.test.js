@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-import {HomeroomPage} from '../HomeroomPage'
+import HomeroomPage from '../HomeroomPage'
 
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({

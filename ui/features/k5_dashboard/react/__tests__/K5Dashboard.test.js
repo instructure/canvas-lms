@@ -20,10 +20,12 @@ import React from 'react'
 import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, screen, waitFor} from '@testing-library/react'
-import K5Dashboard from '../K5Dashboard'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
+
+import {MOCK_TODOS} from './mocks'
+import K5Dashboard from '../K5Dashboard'
 
 const currentUser = {
   id: '1',
@@ -309,6 +311,7 @@ beforeEach(() => {
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
   fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
+  fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
   fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
   global.ENV = defaultEnv
 })
@@ -658,6 +661,26 @@ describe('K-5 Dashboard', () => {
       expect(wrapper.getByText('Teacher')).toBeInTheDocument()
       expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
       expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
+    })
+  })
+
+  describe('Todos Section', () => {
+    it('displays todo tab to teachers', async () => {
+      const {findByRole} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
+      const todoTab = await findByRole('tab', {name: 'To Do'})
+      expect(todoTab).toBeInTheDocument()
+
+      act(() => todoTab.click())
+
+      expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
+    })
+
+    it('does not show the todos tab to students or admins', async () => {
+      const {findByRole, queryByRole} = render(
+        <K5Dashboard {...defaultProps} currentUserRoles={['admin', 'student']} />
+      )
+      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
+      expect(queryByRole('tab', {name: 'To Do'})).not.toBeInTheDocument()
     })
   })
 })

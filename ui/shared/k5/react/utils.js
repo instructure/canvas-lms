@@ -320,13 +320,20 @@ export const saveElementaryDashboardPreference = disabled =>
     body: {elementary_dashboard_disabled: disabled}
   })
 
+export const ignoreTodo = ignoreUrl =>
+  doFetchApi({
+    path: ignoreUrl,
+    method: 'DELETE'
+  })
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',
   SCHEDULE: 'tab-schedule',
   GRADES: 'tab-grades',
   RESOURCES: 'tab-resources',
-  MODULES: 'tab-modules'
+  MODULES: 'tab-modules',
+  TODO: 'tab-todo'
 }
 
 export const FOCUS_TARGETS = {

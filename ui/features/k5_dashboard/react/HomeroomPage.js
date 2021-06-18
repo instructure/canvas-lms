@@ -36,7 +36,7 @@ import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import {CreateCourseModal} from './CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
-export const HomeroomPage = ({
+const HomeroomPage = ({
   cards,
   createPermissions,
   homeroomAnnouncements,

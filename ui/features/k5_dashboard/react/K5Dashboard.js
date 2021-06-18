@@ -24,6 +24,7 @@ import {startLoadingAllOpportunities, responsiviser, store} from '@instructure/c
 import {
   IconBankLine,
   IconCalendarMonthLine,
+  IconCheckDarkSolid,
   IconHomeLine,
   IconMoreLine,
   IconStarLightLine
@@ -39,6 +40,7 @@ import {View} from '@instructure/ui-view'
 import K5Tabs from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
+import TodosPage from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
@@ -75,6 +77,11 @@ const DASHBOARD_TABS = [
     id: TAB_IDS.RESOURCES,
     icon: IconBankLine,
     label: I18n.t('Resources')
+  },
+  {
+    id: TAB_IDS.TODO,
+    icon: IconCheckDarkSolid,
+    label: I18n.t('To Do')
   }
 ]
 
@@ -127,6 +134,9 @@ export const K5Dashboard = ({
     callback: () => loadAllOpportunities()
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
+  const availableTabs = DASHBOARD_TABS.filter(
+    ({id}) => id !== TAB_IDS.TODO || currentUserRoles.includes('teacher')
+  )
 
   useEffect(() => {
     if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
@@ -218,7 +228,7 @@ export const K5Dashboard = ({
           <K5Tabs
             currentTab={currentTab}
             onTabChange={handleTabChange}
-            tabs={DASHBOARD_TABS}
+            tabs={availableTabs}
             tabsRef={setTabsRef}
           >
             {renderDashboardHeader}
@@ -247,6 +257,9 @@ export const K5Dashboard = ({
             showStaff
             filterToHomerooms
           />
+        )}
+        {currentUserRoles.includes('teacher') && (
+          <TodosPage timeZone={timeZone} visible={currentTab === TAB_IDS.TODO} />
         )}
       </K5DashboardContext.Provider>
     </View>
