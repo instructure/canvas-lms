@@ -30,6 +30,7 @@ export function Expansion({...props}) {
       withBackground={false}
       color="primary"
       data-testid="expand-button"
+      interaction={props.isReadOnly ? 'disabled' : 'enabled'}
     >
       <ScreenReaderContent>
         {props.isExpanded
@@ -57,5 +58,13 @@ Expansion.propTypes = {
   /**
    * Key consumed by ThreadingToolbar's InlineList
    */
-  delimiterKey: PropTypes.string.isRequired
+  delimiterKey: PropTypes.string.isRequired,
+  /**
+   * Disable/Enable for the button
+   */
+  isReadOnly: PropTypes.bool
+}
+
+Expansion.defaultPropTypes = {
+  isReadOnly: true
 }
