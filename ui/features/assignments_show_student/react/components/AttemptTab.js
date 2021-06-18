@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
@@ -86,6 +87,16 @@ function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
         </View>
       </Button>
     </View>
+  )
+}
+
+function GroupSubmissionReminder({groupSet}) {
+  return (
+    <Alert variant="warning" margin="medium 0">
+      {I18n.t('Keep in mind, this submission will count for everyone in your %{groupName} group.', {
+        groupName: groupSet.name
+      })}
+    </Alert>
   )
 }
 
@@ -253,10 +264,19 @@ export default class AttemptTab extends Component {
       selectedType = assignment.submissionTypes[0]
     }
 
+    const submittingForGroup =
+      assignment.groupSet != null &&
+      !assignment.gradeGroupStudentsIndividually &&
+      !isSubmitted(submission)
+
     return (
       <StudentViewContext.Consumer>
         {context => (
           <div data-testid="attempt-tab">
+            {submittingForGroup && context.allowChangesToSubmission && (
+              <GroupSubmissionReminder groupSet={assignment.groupSet} />
+            )}
+
             {multipleSubmissionTypes &&
               context.allowChangesToSubmission &&
               this.renderSubmissionTypeSelector()}
