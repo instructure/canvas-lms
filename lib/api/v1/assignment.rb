@@ -188,6 +188,7 @@ module Api::V1::Assignment
     hash['original_assignment_name'] = assignment.duplicate_of&.name
     hash['original_quiz_id'] = assignment.migrate_from_id
     hash['workflow_state'] = assignment.workflow_state
+    hash['important_dates'] = assignment.important_dates
 
     if assignment.quiz_lti?
       hash['is_quiz_lti_assignment'] = true
@@ -475,6 +476,7 @@ module Api::V1::Assignment
     omit_from_final_grade
     anonymous_instructor_annotations
     allowed_attempts
+    important_dates
   ).freeze
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
@@ -810,6 +812,10 @@ module Api::V1::Assignment
       # if allowed_attempts is nil, the api json will replace it with -1 for some reason
       # so if it's included in the json to update, we should just ignore it
       update_params.delete('allowed_attempts')
+    end
+
+    if update_params.key?('important_dates') && Account.site_admin.feature_enabled?(:important_dates)
+      update_params['important_dates'] = value_to_boolean(update_params['important_dates'])
     end
 
     apply_report_visibility_options!(assignment_params, assignment)

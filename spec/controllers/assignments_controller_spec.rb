@@ -1588,6 +1588,11 @@ describe AssignmentsController do
       post 'create', params: {:course_id => @course.id, :assignment => {:title => "some assignment"}}
       expect(assigns[:assignment]).to be_post_to_sis
     end
+
+    it "sets important_dates if provided" do
+      post 'create', params: {:course_id => @course.id, :assignment => {:important_dates => true}}
+      expect(assigns[:assignment].important_dates).to be true
+    end
   end
 
   describe "GET 'edit'" do
