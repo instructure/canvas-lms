@@ -400,8 +400,12 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def update_associated_rubrics
-    updateable_rubrics.find_each do |rubric|
-      rubric.update_learning_outcome_criteria(self)
+    updateable_rubrics.in_batches(of: 100).each do |relation|
+      relation.transaction do
+        relation.lock('FOR UPDATE OF rubrics').each do |rubric|
+          rubric.update_learning_outcome_criteria(self)
+        end
+      end
     end
   end
 
