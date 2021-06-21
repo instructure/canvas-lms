@@ -50,7 +50,8 @@ class PeriodicJobs
   end
 
   def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false)
-    Shard.with_each_shard(Shard.in_current_region) do
+    callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
+    Shard.with_each_shard(Shard.in_current_region, exception: callback) do
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
