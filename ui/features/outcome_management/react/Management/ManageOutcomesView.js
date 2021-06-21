@@ -40,7 +40,8 @@ const ManageOutcomesView = ({
   onSearchClearHandler,
   loading,
   loadMore,
-  scrollContainer
+  scrollContainer,
+  isRootGroup
 }) => {
   const groupTitle = outcomeGroup?.title
   const groupDescription = outcomeGroup?.description
@@ -69,7 +70,7 @@ const ManageOutcomesView = ({
         <OutcomeGroupHeader
           title={groupTitle}
           description={groupDescription}
-          canManage={canManageGroup}
+          canManage={isRootGroup ? false : canManageGroup}
           minWidth="calc(50% + 4.125rem)"
           onMenuHandler={onOutcomeGroupMenuHandler}
         />
@@ -171,7 +172,8 @@ ManageOutcomesView.propTypes = {
   onSearchChangeHandler: PropTypes.func.isRequired,
   onSearchClearHandler: PropTypes.func.isRequired,
   loadMore: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.instanceOf(Element)
+  scrollContainer: PropTypes.instanceOf(Element),
+  isRootGroup: PropTypes.bool.isRequired
 }
 
 export default ManageOutcomesView

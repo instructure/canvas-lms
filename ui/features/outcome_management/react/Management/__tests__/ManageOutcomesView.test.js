@@ -40,6 +40,7 @@ describe('ManageOutcomesView', () => {
     onSearchChangeHandler,
     onSearchClearHandler,
     loadMore,
+    isRootGroup: false,
     ...props
   })
 
@@ -105,27 +106,35 @@ describe('ManageOutcomesView', () => {
     expect(queryByTestId('outcome-group-container')).not.toBeInTheDocument()
   })
 
-  it('does not render the kebab menu if the group isnt editable', () => {
-    const {queryByText} = render(
-      <ManageOutcomesView
-        {...defaultProps({
-          outcomeGroup: {
-            _id: '1',
-            title: 'Group Title',
-            outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
-            canEdit: false
-          }
-        })}
-      />
-    )
-    expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+  describe('kebab menu', () => {
+    it('is not rendered if canEdit is false', () => {
+      const {queryByText} = render(
+        <ManageOutcomesView
+          {...defaultProps({
+            outcomeGroup: {
+              _id: '1',
+              title: 'Group Title',
+              outcomesCount: 0,
+              outcomes: {edges: [], pageInfo: {hasNextPage: false}},
+              canEdit: false
+            }
+          })}
+        />
+      )
+      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered if isRootGroup is true', () => {
+      const {queryByText} = render(<ManageOutcomesView {...defaultProps({isRootGroup: true})} />)
+      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+    })
+
+    it('rendered if canEdit is true', () => {
+      const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
+      expect(getByText('Outcome Group Menu')).toBeInTheDocument()
+    })
   })
 
-  it('renders the kebab menu if the group is editable', () => {
-    const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
-    expect(getByText('Outcome Group Menu')).toBeInTheDocument()
-  })
 
   it('shows small loader when searching for outcomes', () => {
     const {getByTestId} = render(

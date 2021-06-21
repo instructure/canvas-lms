@@ -218,10 +218,7 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  // Currently we're checking the presence of outcomes by checking the presence of folders
-  // we need to implement the correct behavior later
-  // https://gerrit.instructure.com/c/canvas-lms/+/255898/8/app/jsx/outcomes/Management/index.js#235
-  const hasOutcomes = Object.keys(collections).length > 1
+  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -248,6 +245,8 @@ const OutcomeManagementPanel = () => {
                   onCollectionToggle={queryCollections}
                   collections={collections}
                   rootId={rootId}
+                  showRootCollection
+                  defaultExpandedIds={[rootId]}
                 />
               </View>
             </Flex.Item>
@@ -300,6 +299,7 @@ const OutcomeManagementPanel = () => {
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
                     scrollContainer={scrollContainer}
+                    isRootGroup={selectedGroupId === rootId}
                   />
                 )}
               </View>
