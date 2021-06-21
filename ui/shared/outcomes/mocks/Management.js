@@ -50,13 +50,13 @@ export const accountMocks = ({
             title: `Root account folder`,
             canEdit,
             __typename: 'LearningOutcomeGroup',
-            _id: 1,
+            _id: '1',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 description: `Account folder description ${i}`,
-                _id: 100 + i,
+                _id: (100 + i).toString(),
                 outcomesCount,
                 childGroupsCount,
                 title: `Account folder ${i}`,
@@ -96,13 +96,13 @@ export const courseMocks = ({
             title: `Root course folder`,
             canEdit,
             __typename: 'LearningOutcomeGroup',
-            _id: 2,
+            _id: '2',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 description: `Course folder description ${i}`,
-                _id: 200 + i,
+                _id: (200 + i).toString(),
                 outcomesCount: 2,
                 childGroupsCount: 10,
                 title: `Course folder ${i}`,
@@ -143,7 +143,7 @@ export const groupMocks = ({
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               description: `Group ${groupId} folder description ${i}`,
-              _id: childGroupOffset + i,
+              _id: (childGroupOffset + i).toString(),
               outcomesCount: 2,
               childGroupsCount: 5,
               title: `Group ${groupId} folder ${i}`,
@@ -634,7 +634,7 @@ export const groupDetailMocks = ({
 ]
 
 export const findOutcomesMocks = ({
-  groupId = 100,
+  groupId = '100',
   canEdit = true,
   isImported = true,
   outcomeIsImported = true,
@@ -816,7 +816,7 @@ export const createLearningOutcomeMock = ({
   title = 'Outcome title',
   description = 'description',
   displayName = 'display name',
-  groupId = 1,
+  groupId = '1',
   failResponse = false,
   failMutation = false
 } = {}) => {
@@ -944,10 +944,10 @@ export const updateOutcomeMocks = ({
 
 export const smallOutcomeTree = () => [
   ...accountMocks({childGroupsCount: 2}),
-  ...groupMocks({groupId: 100, childGroupOffset: 400}),
-  ...groupMocks({groupId: 101, childGroupsCount: 0}),
-  ...groupMocks({groupId: 400, childGroupsCount: 0}),
-  ...groupDetailMocks({groupId: 100}),
-  ...groupDetailMocks({groupId: 101}),
-  ...groupDetailMocks({groupId: 400})
+  ...groupMocks({groupId: '100', childGroupOffset: 400}),
+  ...groupMocks({groupId: '101', childGroupsCount: 0}),
+  ...groupMocks({groupId: '400', childGroupsCount: 0}),
+  ...groupDetailMocks({groupId: '100'}),
+  ...groupDetailMocks({groupId: '101'}),
+  ...groupDetailMocks({groupId: '400'})
 ]

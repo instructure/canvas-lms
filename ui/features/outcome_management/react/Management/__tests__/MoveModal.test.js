@@ -45,7 +45,7 @@ describe('MoveModal', () => {
     title: 'Account folder 0',
     type: 'group',
     groupId: '100',
-    parentGroupId: 0,
+    parentGroupId: '0',
     ...props
   })
 
@@ -123,7 +123,7 @@ describe('MoveModal', () => {
 
   it('disables the move button when the selected group is equal to the group to be moved', async () => {
     // Once TreeBrowser is updated to the latest version, groupId can go back to being a string
-    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
+    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: '100'})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
@@ -138,7 +138,7 @@ describe('MoveModal', () => {
 
   it('disables the move button when the selected parent group is equal to the parent of the group to be moved', async () => {
     const {getByText, getByRole} = render(
-      <MoveModal {...defaultProps({groupId: 400, parentGroupId: 100})} />,
+      <MoveModal {...defaultProps({groupId: '400', parentGroupId: '100'})} />,
       {
         mocks: [...smallOutcomeTree('Account')]
       }
@@ -154,7 +154,7 @@ describe('MoveModal', () => {
   })
 
   it('enables the move button when a valid group is selected', async () => {
-    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: 100})} />, {
+    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: '100'})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())

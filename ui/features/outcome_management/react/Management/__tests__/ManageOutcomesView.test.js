@@ -135,7 +135,6 @@ describe('ManageOutcomesView', () => {
     })
   })
 
-
   it('shows small loader when searching for outcomes', () => {
     const {getByTestId} = render(
       <ManageOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />

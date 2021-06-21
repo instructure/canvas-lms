@@ -53,13 +53,13 @@ describe('OutcomeManagementPanel', () => {
   }
   const newParentGroup = {
     canEdit: true,
-    collections: [200, 201],
+    collections: ['200', '201'],
     descriptor: '2 Groups | 2 Outcomes',
-    id: 2,
+    id: '2',
     loadInfo: 'loaded',
     name: 'Root course folder',
     outcomesCount: 2,
-    parentGroupId: 0
+    parentGroupId: '0'
   }
 
   beforeEach(() => {
@@ -76,8 +76,8 @@ describe('OutcomeManagementPanel', () => {
     contextId: '2',
     mocks: [
       ...courseMocks({childGroupsCount: 2}),
-      ...groupMocks({groupId: 200}),
-      ...groupDetailMocks({groupId: 200, contextType: 'Course', contextId: '2'})
+      ...groupMocks({groupId: '200'}),
+      ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2'})
     ]
   }
 
@@ -152,8 +152,8 @@ describe('OutcomeManagementPanel', () => {
     const {getByText} = render(<OutcomeManagementPanel />, {
       mocks: [
         ...accountMocks({childGroupsCount: 2}),
-        ...groupMocks({groupId: 100}),
-        ...groupDetailMocks({groupId: 100, contextType: 'Account', contextId: '1'})
+        ...groupMocks({groupId: '100'}),
+        ...groupDetailMocks({groupId: '100', contextType: 'Account', contextId: '1'})
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
@@ -250,7 +250,7 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
       await act(async () => jest.runOnlyPendingTimers())
       // moveOutcomeGroup API call & success flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', 200, 201)
+      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Group 200" has been moved to "Course folder 1".',
@@ -283,7 +283,7 @@ describe('OutcomeManagementPanel', () => {
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
       await act(async () => jest.runOnlyPendingTimers())
       // moveOutcomeGroup API call & error flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', 200, 201)
+      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred moving group "Group 200": Network error',
@@ -392,8 +392,8 @@ describe('OutcomeManagementPanel', () => {
       contextId: '2',
       mocks: [
         ...courseMocks({childGroupsCount: 2, canEdit: false}),
-        ...groupMocks({groupId: 200, canEdit: false}),
-        ...groupDetailMocks({groupId: 200, contextType: 'Course', contextId: '2', canEdit: false})
+        ...groupMocks({groupId: '200', canEdit: false}),
+        ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2', canEdit: false})
       ]
     })
     await act(async () => jest.runOnlyPendingTimers())
@@ -419,7 +419,7 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(within(getByRole('dialog')).getByText('Move'))
     await act(async () => jest.runAllTimers())
-    expect(startMoveOutcome).toHaveBeenCalledWith('Course', '2', outcome, 200, newParentGroup)
+    expect(startMoveOutcome).toHaveBeenCalledWith('Course', '2', outcome, '200', newParentGroup)
     expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
   })
 
@@ -442,9 +442,9 @@ describe('OutcomeManagementPanel', () => {
       ...groupDetailDefaultProps,
       mocks: [
         ...courseMocks({childGroupsCount: 2}),
-        ...groupMocks({groupId: 200}),
+        ...groupMocks({groupId: '200'}),
         ...groupDetailMocks({
-          groupId: 200,
+          groupId: '200',
           contextType: 'Course',
           contextId: '2',
           searchQuery: 'Outcome 1'

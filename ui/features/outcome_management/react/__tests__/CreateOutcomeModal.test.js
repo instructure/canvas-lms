@@ -288,7 +288,7 @@ describe('CreateOutcomeModal', () => {
             title: 'Outcome 123',
             displayName: 'Display name',
             description: '',
-            groupId: 100
+            groupId: '100'
           }),
           setFriendlyDescriptionOutcomeMock({
             inputDescription: 'Friendly description',
@@ -344,7 +344,7 @@ describe('CreateOutcomeModal', () => {
             title: 'Outcome 123',
             displayName: 'Display name',
             description: '',
-            groupId: 100
+            groupId: '100'
           }),
           setFriendlyDescriptionOutcomeMock({
             inputDescription: 'Friendly description'
@@ -391,7 +391,7 @@ describe('CreateOutcomeModal', () => {
               title: 'Outcome 123',
               displayName: 'Display name',
               description: '',
-              groupId: 100
+              groupId: '100'
             })
           ]
         })

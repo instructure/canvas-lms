@@ -62,7 +62,7 @@ TreeBrowser.defaultProps = {
   onCollectionToggle: () => {},
   onCollectionClick: () => {},
   collections: {},
-  rootId: 0,
+  rootId: '0',
   selectionType: 'none',
   showRootCollection: false
 }
@@ -71,7 +71,7 @@ TreeBrowser.propTypes = {
   onCollectionToggle: PropTypes.func.isRequired,
   onCollectionClick: PropTypes.func,
   collections: PropTypes.object.isRequired,
-  rootId: PropTypes.number.isRequired,
+  rootId: PropTypes.string.isRequired,
   selectionType: PropTypes.string,
   showRootCollection: PropTypes.bool,
   defaultExpandedIds: PropTypes.arrayOf(PropTypes.string)

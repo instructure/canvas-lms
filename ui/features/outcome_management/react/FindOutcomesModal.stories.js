@@ -43,7 +43,7 @@ const Template = args => {
   // we only show the global root group for the account context
   if (args.includeGlobalRootGroup && !args.isCourse) {
     window.ENV = {
-      GLOBAL_ROOT_OUTCOME_GROUP_ID: 1
+      GLOBAL_ROOT_OUTCOME_GROUP_ID: '1'
     }
   }
   const response = findModalMocks(args)
