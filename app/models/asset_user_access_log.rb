@@ -89,7 +89,9 @@ class AssetUserAccessLog
     ts = timestamp || Time.now.utc
     log_values = { asset_user_access_id: asset_user_access.id, created_at: ts }
     log_entry = log_model(ts).new(log_values)
-    log_entry.save_without_transaction(touch: false)
+    if write_to_db_partition?(::Switchman::Shard.current)
+      log_entry.save_without_transaction(touch: false)
+    end
 
     # make sure that any message bus config is relative to the shard
     # the actual AUA record lives on.  The topic name
@@ -149,6 +151,14 @@ class AssetUserAccessLog
   # code paths, once that transition is complete.
   def self.write_to_message_bus?(shard)
     self.channel_config(shard).fetch("pulsar_writes_enabled", false)
+  end
+
+  # TODO: these config predicate methods should only exist while we are
+  # transitioning log compaction from postgres to pulsar.
+  # We can remove them entirely, along with the postgres read/write
+  # code paths, once that transition is complete.
+  def self.write_to_db_partition?(shard)
+    self.channel_config(shard).fetch("db_writes_enabled", true)
   end
 
   # TODO: these config predicate methods should only exist while we are
