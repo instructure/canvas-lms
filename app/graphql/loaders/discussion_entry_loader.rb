@@ -47,7 +47,14 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
     if object.is_a?(DiscussionTopic)
       object.discussion_entries
     elsif object.is_a?(DiscussionEntry)
-      object.discussion_subentries
+      if object.root_entry_id.nil?
+        object.root_discussion_replies
+      elsif object.legacy?
+        object.legacy_subentries
+      else
+        DiscussionEntry.none
+      end
     end
   end
+
 end
