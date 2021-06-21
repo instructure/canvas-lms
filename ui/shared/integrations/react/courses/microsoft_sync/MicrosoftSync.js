@@ -49,6 +49,12 @@ const MicrosoftSync = ({group, loading, children}) => {
   return (
     <>
       <Text>{I18n.t('Sync and Provision Microsoft Teams with your Canvas Course')}</Text>
+      <br />
+      <Text>
+        {I18n.t(
+          'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.'
+        )}
+      </Text>
       <Flex margin="small 0 0 0">
         <Flex.Item size="8rem" margin="0 medium 0 0">
           {children}
