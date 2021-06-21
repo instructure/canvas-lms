@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// TODO: rename Alert component
 import {Alert} from '../../components/Alert/Alert'
-import {Alert as DifferentiatedGroupAssignmentAlert} from '@instructure/ui-alerts'
+import {Alert as AlertFRD} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
@@ -299,15 +300,20 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           />
         </View>
       </div>
+      {props.discussionTopic.initialPostRequiredForCurrentUser && (
+        <AlertFRD renderCloseButtonLabel="Close">
+          {I18n.t('You must post before seeing replies.')}
+        </AlertFRD>
+      )}
       {discussionTopicData?.permissions?.readAsAdmin &&
         discussionTopicData.groupSet &&
         discussionTopicData.assignment?.onlyVisibleToOverrides && (
           <View as="div" margin="none none small" width="80%" data-testid="differentiated-alert">
-            <DifferentiatedGroupAssignmentAlert renderCloseButtonLabel="Close">
+            <AlertFRD renderCloseButtonLabel="Close">
               {I18n.t(
                 'Note: for differentiated group topics, some threads may not have any students assigned.'
               )}
-            </DifferentiatedGroupAssignmentAlert>
+            </AlertFRD>
           </View>
         )}
       <Flex as="div" direction="column">

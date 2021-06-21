@@ -39,6 +39,7 @@ export const Discussion = {
       updatedAt
       postedAt
       requireInitialPost
+      initialPostRequiredForCurrentUser
       isSectionSpecific
       discussionType
       allowRating
@@ -87,6 +88,7 @@ export const Discussion = {
     updatedAt: string,
     postedAt: string,
     requireInitialPost: bool,
+    initialPostRequiredForCurrentUser: bool,
     isSectionSpecific: bool,
     discussionType: string,
     allowRating: bool,
@@ -120,6 +122,7 @@ export const Discussion = {
     updatedAt = '2021-04-22T12:41:56-06:00',
     postedAt = '2020-11-23T11:40:44-07:00',
     requireInitialPost = false,
+    initialPostRequiredForCurrentUser = false,
     isSectionSpecific = false,
     discussionType = 'threaded',
     allowRating = true,
@@ -156,6 +159,7 @@ export const Discussion = {
     updatedAt,
     postedAt,
     requireInitialPost,
+    initialPostRequiredForCurrentUser,
     isSectionSpecific,
     discussionType,
     allowRating,

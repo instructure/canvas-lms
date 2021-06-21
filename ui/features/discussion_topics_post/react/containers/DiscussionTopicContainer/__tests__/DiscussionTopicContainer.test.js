@@ -503,4 +503,10 @@ describe('DiscussionTopicContainer', () => {
     const container = setup(props)
     expect(await container.findByText('assignment override 3: No Due Date')).toBeTruthy()
   })
+
+  it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
+    const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
+    const container = setup(props)
+    expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
+  })
 })
