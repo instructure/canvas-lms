@@ -112,7 +112,7 @@ module SectionTabHelper
           elsif tab_is?(tab, 'TAB_CONFERENCES')
             !WebConference.config(context: @context)
           elsif quiz_lti_tab?(tab)
-            !new_quizzes_navigation_placements_enabled?
+            !new_quizzes_navigation_placements_enabled?(context)
           end
         end
       end

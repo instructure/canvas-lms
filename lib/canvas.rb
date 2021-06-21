@@ -292,7 +292,19 @@ module Canvas
     end
   end
 
+  # these methods are expected to be empty
+  # for open source canvas, but are useful
+  # hooks for overriding in very large deployments
+  # of the lms.
   def self.cluster
+    nil
+  end
+
+  def self.region
+    nil
+  end
+
+  def self.region_code
     nil
   end
 

@@ -347,7 +347,7 @@ module ApplicationHelper
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
       elsif (quiz_lti_tab?(tab) rescue false)
-        new_quizzes_navigation_placements_enabled?
+        new_quizzes_navigation_placements_enabled?(@context)
       elsif (tab[:id] == @context.class::TAB_COLLABORATIONS_NEW rescue false)
         @context.feature_enabled?(:new_collaborations)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)

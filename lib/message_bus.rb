@@ -55,10 +55,11 @@ module MessageBus
   # and build a new producer rather than using a process-cached one,
   # even if such a producer is available.
   def self.producer_for(namespace, topic_name, force_fresh: false)
-    check_conn_pool(["producers", namespace, topic_name], force_fresh: force_fresh) do
+    ns = MessageBus::Namespace.build(namespace)
+    check_conn_pool(["producers", ns.to_s, topic_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
       ::MessageBus::CaCert.ensure_presence!(self.config)
-      topic = self.topic_url(namespace, topic_name)
+      topic = self.topic_url(ns, topic_name)
       self.client.create_producer(topic)
     end
   end
@@ -73,10 +74,11 @@ module MessageBus
   # and build a new consumer rather than using a process-cached one,
   # even if such a consumer is available.
   def self.consumer_for(namespace, topic_name, subscription_name, force_fresh: false)
-    check_conn_pool(["consumers", namespace, topic_name, subscription_name], force_fresh: force_fresh) do
+    ns = MessageBus::Namespace.build(namespace)
+    check_conn_pool(["consumers", ns.to_s, topic_name, subscription_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
       ::MessageBus::CaCert.ensure_presence!(self.config)
-      topic = topic_url(namespace, topic_name)
+      topic = topic_url(ns, topic_name)
       consumer_config = Pulsar::ConsumerConfiguration.new({})
       consumer_config.subscription_initial_position = :earliest
       self.client.subscribe(topic, subscription_name, consumer_config)
@@ -84,6 +86,7 @@ module MessageBus
   end
 
   def self.topic_url(namespace, topic_name, app_env=Canvas.environment)
+    ns = MessageBus::Namespace.build(namespace)
     app_env = (app_env || "development").downcase
     conf_hash = self.config
     # by using the application env in the topic name, we can
@@ -91,7 +94,7 @@ module MessageBus
     # like test/beta/edge whatever and not have to provision
     # other overhead to separate them or deal with the confusion of shared
     # data in a single topic.
-    "persistent://#{conf_hash['PULSAR_TENANT']}/#{namespace}/#{app_env}-#{topic_name}"
+    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns.to_s}/#{app_env}-#{topic_name}"
   end
 
   ##
@@ -155,7 +158,11 @@ module MessageBus
 
         # if we're forcing fresh, we want to close our existing
         # connections as politely as possible
-        cached_object.close()
+        begin
+          cached_object.close()
+        rescue Pulsar::Error::AlreadyClosed
+          Rails.logger.warn("evicting an already-closed pulsar topic client for #{path}")
+        end
       end
       object_to_cache = yield
       current_level = @connection_pool
@@ -232,17 +239,23 @@ module MessageBus
       @connection_pool.each do |_thread_id, thread_conn_pool|
         if thread_conn_pool['producers'].present?
           thread_conn_pool['producers'].each do |_namespace, topic_map|
-            topic_map.each do |_topic, producer|
+            topic_map.each do |topic, producer|
               producer.close()
+            rescue Pulsar::Error::AlreadyClosed
+              Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
             end
           end
         end
 
         if thread_conn_pool['consumers'].present?
           thread_conn_pool['consumers'].each do |_namespace, topic_map|
-            topic_map.each do |_topic, subscription_map|
-              subscription_map.each do |_sub_name, consumer|
-                consumer.close()
+            topic_map.each do |topic, subscription_map|
+              subscription_map.each do |sub_name, consumer|
+                begin
+                  consumer.close()
+                rescue Pulsar::Error::AlreadyClosed
+                  Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
+                end
               end
             end
           end
