@@ -143,6 +143,41 @@ describe('ManageOutcomesView', () => {
     expect(getByTestId('search-loading')).toBeInTheDocument()
   })
 
+  it('render a message when search does not return any result', () => {
+    const {queryByText} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
+            canEdit: false
+          }
+        })}
+      />
+    )
+    expect(queryByText('The search returned no results')).toBeInTheDocument()
+  })
+
+  it('does not render a message when does not have search when group does not have outcome', () => {
+    const {queryByText} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          searchString: '',
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}},
+            canEdit: false
+          }
+        })}
+      />
+    )
+    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+  })
+
   it('calls load more when hasNextPage is true and scroll reaches the infinite scroll threshold', () => {
     const scrollContainer = document.createElement('div')
     mockContainer(scrollContainer, 'scrollHeight', 1000)

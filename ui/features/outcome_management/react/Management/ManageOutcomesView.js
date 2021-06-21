@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!OutcomeManagement'
+import {Text} from '@instructure/ui-text'
 import OutcomeGroupHeader from './OutcomeGroupHeader'
 import {Spinner} from '@instructure/ui-spinner'
 import ManageOutcomeItem from './ManageOutcomeItem'
@@ -83,7 +84,7 @@ const ManageOutcomesView = ({
             onClearHandler={onSearchClearHandler}
           />
         </View>
-        <View as="div" padding="small 0">
+        <View as="div" padding="small 0" borderWidth="0 0 small">
           <Heading level="h4">
             <Flex>
               <Flex.Item shouldShrink>
@@ -116,7 +117,13 @@ const ManageOutcomesView = ({
           </Heading>
         </View>
         <View as="div" data-testid="outcome-items-list">
-          {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}, index) => (
+          {outcomes?.edges?.length === 0 && searchString && !loading && (
+            <View as="div" textAlign="center" margin="small 0 0">
+              <Text color="secondary">{I18n.t('The search returned no results')}</Text>
+            </View>
+          )}
+
+          {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}) => (
             <ManageOutcomeItem
               key={_id}
               _id={_id}
@@ -124,7 +131,6 @@ const ManageOutcomesView = ({
               description={description}
               canManageOutcome={canEdit}
               canUnlink={canUnlink}
-              isFirst={index === 0}
               isChecked={!!selectedOutcomes[_id]}
               onMenuHandler={onOutcomeMenuHandler}
               onCheckboxHandler={onSelectOutcomesHandler}

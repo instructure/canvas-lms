@@ -27,7 +27,6 @@ describe('ManageOutcomeItem', () => {
     _id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
-    isFirst: false,
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,
@@ -52,7 +51,7 @@ describe('ManageOutcomeItem', () => {
 
   it('does not render component if title prop not passed', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({title: null})} />)
-    expect(queryByTestId('outcome-with-bottom-border')).not.toBeInTheDocument()
+    expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
   it('handles click on checkbox', () => {
@@ -99,16 +98,6 @@ describe('ManageOutcomeItem', () => {
     const caretDownBtn = getByText('Collapse outcome description')
     fireEvent.click(caretDownBtn)
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
-  })
-
-  it('displays bottom border when isFirst prop is false', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps()} />)
-    expect(queryByTestId('outcome-with-bottom-border')).toBeInTheDocument()
-  })
-
-  it('displays both top and bottom border when isFirst prop is true', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({isFirst: true})} />)
-    expect(queryByTestId('outcome-with-top-bottom-border')).toBeInTheDocument()
   })
 
   it('displays disabled caret button with "not-allowed" cursor if no description', () => {
