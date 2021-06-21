@@ -156,8 +156,8 @@ module ActiveRecord
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches_with_temp_table {}
-            User.all.find_in_batches_with_temp_table {}
+            User.all.find_in_batches(strategy: :temp_table) {}
+            User.all.find_in_batches(strategy: :temp_table) {}
           end.to_not raise_error
         end
 
@@ -165,12 +165,12 @@ module ActiveRecord
           User.create!
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches_with_temp_table do
+            User.all.find_in_batches(strategy: :temp_table) do
               raise ArgumentError
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_in_batches_with_temp_table {}
+          User.all.find_in_batches(strategy: :temp_table) {}
         end
 
         it "does not die with index error when table size is exactly batch size" do
@@ -178,7 +178,7 @@ module ActiveRecord
           User.delete_all
           user_count.times{ user_model }
           expect(User.count).to eq(user_count)
-          User.all.find_in_batches_with_temp_table(batch_size: user_count) {}
+          User.all.find_in_batches(strategy: :temp_table, batch_size: user_count) {}
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -187,7 +187,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_in_batches_with_temp_table do |batch|
+              User.all.find_in_batches(strategy: :temp_table) do |batch|
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
