@@ -662,6 +662,8 @@ class RCEWrapper extends React.Component {
 
   focus() {
     this.onTinyMCEInstance('mceFocus')
+    // tinymce doesn't always call the focus handler.
+    this.handleFocusEditor(new Event('focus', {target: this.mceInstance()}))
   }
 
   focusCurrentView() {
@@ -1125,7 +1127,7 @@ class RCEWrapper extends React.Component {
     // If the editor is invisible for some reason, don't show the autosave modal
     // This doesn't apply if the editor is off-screen or has visibility:hidden;
     // only if it isn't rendered or has display:none;
-    const editorVisible = this.editor.container.offsetParent
+    const editorVisible = this.editor.getContainer().offsetParent
 
     return (
       this.props.autosave.enabled &&
@@ -1489,7 +1491,7 @@ class RCEWrapper extends React.Component {
       this.observer = new MutationObserver((mutationList, _observer) => {
         mutationList.forEach(mutation => {
           if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
+            this.handleFocusEditor(new Event('focus', {target: mutation.target}))
           }
         })
       })

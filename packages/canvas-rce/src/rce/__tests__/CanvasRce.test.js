@@ -20,25 +20,6 @@ import React, {createRef} from 'react'
 import {render, waitFor} from '@testing-library/react'
 import CanvasRce from '../CanvasRce'
 import bridge from '../../bridge'
-// even though CanvasRce imports tinymce, it doesn't get
-// properly initialized. I'm thinking jsdom doesn't have
-// enough juice for that to happen.
-import FakeEditor from '../plugins/shared/__tests__/FakeEditor'
-
-const fakeTinyMCE = {
-  init: () => {},
-  triggerSave: () => 'called',
-  execCommand: () => 'command executed',
-  // plugins
-  create: () => {},
-  PluginManager: {
-    add: () => {}
-  },
-  plugins: {
-    AccessibilityChecker: {}
-  },
-  editors: [new FakeEditor('textarea3')]
-}
 
 describe('CanvasRce', () => {
   let target
@@ -50,7 +31,6 @@ describe('CanvasRce', () => {
     document.body.appendChild(div)
 
     target = document.getElementById('target')
-    global.tinymce = fakeTinyMCE
   })
   afterEach(() => {
     document.body.removeChild(document.getElementById('fixture'))
@@ -58,22 +38,13 @@ describe('CanvasRce', () => {
   })
 
   it('bridges newly rendered editors', async () => {
-    render(<CanvasRce textareaId="textarea3" tinymce={fakeTinyMCE.editors[0]} />, target)
+    render(<CanvasRce textareaId="textarea3" />, target)
     await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
   })
 
   it('supports getCode() and setCode() on its ref', async () => {
     const rceRef = createRef(null)
-    fakeTinyMCE.editors[0].$container.innerHTML = 'Hello RCE!' // because it won't happen organically
-    render(
-      <CanvasRce
-        ref={rceRef}
-        textareaId="textarea3"
-        tinymce={fakeTinyMCE}
-        defaultContent="Hello RCE!"
-      />,
-      target
-    )
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" />, target)
 
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 

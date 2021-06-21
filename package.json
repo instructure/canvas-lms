@@ -258,6 +258,7 @@
     "jest-localstorage-mock": "^2",
     "jest-moxios-utils": "^1",
     "jest-raw-loader": "^1",
+    "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.7",
     "karma": "^3",
     "karma-chrome-launcher": "^2",
