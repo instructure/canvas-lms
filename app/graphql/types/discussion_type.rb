@@ -61,6 +61,11 @@ module Types
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true
 
+    field :initial_post_required_for_current_user, Boolean, null: false
+    def initial_post_required_for_current_user
+      object.initial_post_required?(current_user, session)
+    end
+
     field :published, Boolean, null: false
     def published
       object.published?
@@ -120,7 +125,6 @@ module Types
 
     field :context_name, String, null: true
     def context_name
-      # load_association(:context).then(&:name)
       load_association(:context).then do |context|
         context&.name
       end
@@ -186,6 +190,7 @@ module Types
     end
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
+      return [] if object.initial_post_required?(current_user, session)
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         search_term: search_term,

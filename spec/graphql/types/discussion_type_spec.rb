@@ -134,6 +134,22 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  it "returns if the current user requires an inital post" do
+    discussion.update!(require_initial_post: true)
+    student_in_course(active_all: true)
+    discussion.discussion_entries.create!(message: 'other student entry', user: @student)
+
+    student_in_course(active_all: true)
+    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
+
+    expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq true
+    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 0
+
+    discussion.discussion_entries.create!(message: 'Here is my entry', user: @student)
+    expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq false
+    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 2
+  end
+
   it 'allows querying for entry counts' do
     3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
     discussion.discussion_entries.take.destroy
