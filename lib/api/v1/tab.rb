@@ -118,7 +118,7 @@ module Api::V1::Tab
       elsif (tab[:id] == context.class::TAB_CONFERENCES rescue false)
         tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
       elsif (quiz_lti_tab?(tab) rescue false)
-        tab[:href] && tab[:label] && new_quizzes_navigation_placements_enabled?
+        tab[:href] && tab[:label] && new_quizzes_navigation_placements_enabled?(context)
       else
         tab[:href] && tab[:label]
       end

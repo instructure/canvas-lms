@@ -126,4 +126,31 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_require_migration?).to eq true
     end
   end
+
+  describe "#new_quizzes_navigation_placements_enabled" do
+    before(:each) do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
+    end
+
+    it 'should be true when new_quizzes_account_course_level_item_banks and quizzes_next are true' do
+      expect(new_quizzes_navigation_placements_enabled?).to eq true
+    end
+
+    it 'should be false when new_quizzes_account_course_level_item_banks is disabled' do
+      Account.site_admin.disable_feature!(:new_quizzes_account_course_level_item_banks)
+      expect(new_quizzes_navigation_placements_enabled?).to eq false
+    end
+
+    it 'should be false when quizzes_next is disabled' do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_navigation_placements_enabled?).to eq false
+    end
+
+    it 'should accept a context' do
+      fake_context = Course.create(name: 'fake context')
+      fake_context.disable_feature!(:quizzes_next)
+      expect(new_quizzes_navigation_placements_enabled?(fake_context)).to eq false
+    end
+  end
 end
