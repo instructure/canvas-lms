@@ -44,10 +44,12 @@ describe AssetUserAccessLog do
 
       before(:each) do
         skip("pulsar config required to test") unless MessageBus.enabled?
-        allow(AssetUserAccessLog).to receive(:channel_config).and_return({
+        MessageBus.reset!
+        @channel_config = {
           "pulsar_writes_enabled" => true,
           "pulsar_reads_enabled" => false
-        })
+        }
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return(@channel_config)
       end
 
       after(:each) do
@@ -85,6 +87,39 @@ describe AssetUserAccessLog do
         expect(data["asset_user_access_id"]).to eq(record.asset_user_access_id)
         expect(data["log_entry_id"]).to eq(record.id)
         expect(data["partition_index"]).to eq(4)
+      end
+
+      it "can be configured to ONLY write to the message bus" do
+        @channel_config["db_writes_enabled"] = false
+        dt = DateTime.civil(2021, 6, 21, 12, 0, 0) # a monday, index 1
+        AssetUserAccessLog::AuaLog1.delete_all
+        subscription_name = "test"
+        # clear mb topic
+        pre_consumer = MessageBus.consumer_for(
+          AssetUserAccessLog::PULSAR_NAMESPACE,
+          AssetUserAccessLog.message_bus_topic_name(Shard.current),
+          subscription_name
+        )
+        begin
+          while (message = pre_consumer.receive(200)) do
+            pre_consumer.acknowledge(message)
+          end
+        rescue Pulsar::Error::Timeout
+          # subscription is caught up
+          MessageBus.reset!
+        end
+        AssetUserAccessLog.put_view(@asset, timestamp: dt)
+        expect(AssetUserAccessLog::AuaLog1.count).to eq(0)
+        consumer = MessageBus.consumer_for(
+          AssetUserAccessLog::PULSAR_NAMESPACE,
+          AssetUserAccessLog.message_bus_topic_name(Shard.current),
+          subscription_name
+        )
+        message = consumer.receive(1000)
+        data = JSON.parse(message.data)
+        expect(data["asset_user_access_id"]).to eq(@asset.id)
+        expect(data["log_entry_id"]).to be_nil
+        expect(data["partition_index"]).to eq(1)
       end
     end
   end
@@ -263,8 +298,29 @@ describe AssetUserAccessLog do
         skip("pulsar config required to test") unless MessageBus.enabled?
         allow(AssetUserAccessLog).to receive(:channel_config).and_return({
           "pulsar_writes_enabled" => true,
-          "pulsar_reads_enabled" => true
+          "pulsar_reads_enabled" => true,
+          "db_writes_enabled" => true
         })
+
+        subscription_name = "test"
+        # clear mb topic
+        pre_consumer = MessageBus.consumer_for(
+          AssetUserAccessLog::PULSAR_NAMESPACE,
+          AssetUserAccessLog.message_bus_topic_name(Shard.current),
+          AssetUserAccessLog::PULSAR_SUBSCRIPTION
+        )
+        begin
+          while (message = pre_consumer.receive(200)) do
+            pre_consumer.acknowledge(message)
+          end
+        rescue Pulsar::Error::Timeout
+          # subscription is caught up
+          MessageBus.reset!
+        end
+      end
+
+      after(:each) do
+        MessageBus.reset!
       end
 
       it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
