@@ -698,6 +698,16 @@ describe Course do
       expect{course_model}.not_to raise_error
     end
 
+    it 'should not allow creating on site_admin' do
+      expect{course_model(account: Account.site_admin)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'should not allow updating account to site_admin' do
+      course = course_model
+      course.root_account = Account.site_admin
+      expect(course).to_not be_valid
+    end
+
     it "should require unique sis_source_id" do
       other_course = course_factory
       other_course.sis_source_id = "sisid"

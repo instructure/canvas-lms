@@ -262,6 +262,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_image
   validate :validate_default_view
   validate :validate_template
+  validate :validate_not_on_siteadmin
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -497,6 +498,12 @@ class Course < ActiveRecord::Base
       errors.add(:template, t("Courses with enrollments can't become templates"))
     elsif !template? && !can_stop_being_template?
       errors.add(:template, t("Courses that are set as a template in any account can't stop being templates"))
+    end
+  end
+
+  def validate_not_on_siteadmin
+    if root_account_id_changed? && root_account_id == Account.site_admin.id
+      self.errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
   end
 
