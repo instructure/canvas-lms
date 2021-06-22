@@ -29,6 +29,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
 
@@ -92,6 +93,10 @@ export const theme = {
   },
   [IconButton.theme]: {
     iconSizeMedium: '1.5rem'
+  },
+  [ToggleDetails.theme]: {
+    iconColor: colors.brand,
+    textColor: colors.textBrand
   }
 }
 
