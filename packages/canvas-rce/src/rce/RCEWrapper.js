@@ -70,6 +70,12 @@ const menuPropType = PropTypes.arrayOf(
     items: PropTypes.arrayOf(PropTypes.string).isRequired
   })
 )
+const ltiToolsPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    favorite: PropTypes.bool
+  })
+)
 
 // we  `require` instead of `import` because the ui-themeable babel require hook only works with `require`
 // 2021-04-21: This is no longer true, but I didn't want to make a gratutious change when I found this out.
@@ -204,6 +210,7 @@ class RCEWrapper extends React.Component {
     id: PropTypes.string,
     language: PropTypes.string,
     liveRegion: PropTypes.func.isRequired,
+    ltiTools: ltiToolsPropType,
     onContentChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -233,7 +240,8 @@ class RCEWrapper extends React.Component {
     trayProps: null,
     languages: [{id: 'en', label: 'English'}],
     autosave: {enabled: false},
-    highContrastCSS: []
+    highContrastCSS: [],
+    ltiTools: []
   }
 
   static skinCssInjected = false
@@ -279,6 +287,13 @@ class RCEWrapper extends React.Component {
         isTinyFullscreen: false
       }
     }
+
+    // Get top 2 favorited LTI Tools
+    this.ltiToolFavorites =
+      this.props.ltiTools
+        .filter(e => e.favorite)
+        .map(e => `instructure_external_button_${e.id}`)
+        .slice(0, 2) || []
 
     this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
 
@@ -1254,13 +1269,6 @@ class RCEWrapper extends React.Component {
     this.observer?.disconnect()
   }
 
-  // Get top 2 favorited LTI Tools
-  ltiToolFavorites =
-    window.INST?.editorButtons
-      .filter(e => e.favorite)
-      .map(e => `instructure_external_button_${e.id}`)
-      .slice(0, 2) || []
-
   wrapOptions(options = {}) {
     const rcsExists = !!(this.props.trayProps?.host && this.props.trayProps?.jwt)
 
@@ -1759,4 +1767,12 @@ function mergePlugins(standard, custom) {
 }
 
 export default RCEWrapper
-export {toolbarPropType, menuPropType, mergeMenuItems, mergeMenu, mergeToolbar, mergePlugins}
+export {
+  toolbarPropType,
+  menuPropType,
+  ltiToolsPropType,
+  mergeMenuItems,
+  mergeMenu,
+  mergeToolbar,
+  mergePlugins
+}

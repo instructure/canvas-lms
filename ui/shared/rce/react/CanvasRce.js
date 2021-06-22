@@ -93,6 +93,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       language={window.ENV?.LOCALE || 'en'}
       languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      ltiTools={window.INST?.editorButtons}
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
