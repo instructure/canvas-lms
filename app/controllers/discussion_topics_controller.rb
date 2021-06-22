@@ -637,14 +637,33 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def show
+    # Render updated Post UI if feature flag is enabled
+    if @context.feature_enabled?(:react_discussions_post)
+      @topic = @context.all_discussion_topics.find(params[:id])
+      add_discussion_or_announcement_crumb
+      add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      js_env({
+               course_id: params[:course_id],
+               discussion_topic_id: params[:id],
+               manual_mark_as_read: @current_user&.manual_mark_as_read?,
+               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+               rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions)
+             })
+      js_bundle :discussion_topics_post
+      css_bundle :discussions_index
+      render html: '', layout: true
+      return
+    end
+
+    parent_id = params[:parent_id]
     @topic = @context.all_discussion_topics.find(params[:id])
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
     @assignment = if @topic.for_assignment?
       AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
+    else
+      nil
     end
-
-    @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
-
+    @context.require_assignment_group rescue nil
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
@@ -665,195 +684,176 @@ class DiscussionTopicsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
         end
       end
-      return
-    end
+    else
+      @headers = !params[:headless]
+      # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
+      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+      @unlock_at = @topic.available_from_for(@current_user)
+      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
+      if @topic.for_group_discussion?
+        @groups = @topic.group_category.groups.active
+        if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
+          override_groups = @groups.joins("INNER JOIN #{AssignmentOverride.quoted_table_name}
+            ON assignment_overrides.set_type = 'Group' AND assignment_overrides.set_id = groups.id").
+            merge(AssignmentOverride.active).
+            where(assignment_overrides: {assignment_id: @topic.assignment_id})
+          if override_groups.present?
+            @groups = override_groups
+          end
+        end
+        topics = @topic.child_topics
+        unless @context.grants_right?(@current_user, session, :read_as_admin)
+          @groups = @groups.joins(:group_memberships).merge(GroupMembership.active).where(group_memberships: {user_id: @current_user})
+          topics = topics.where(context_type: 'Group', context_id: @groups)
+        end
 
-    if @topic.for_group_discussion?
-      @groups = @topic.group_category.groups.active
-      if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
-        override_groups = @groups
-          .joins("INNER JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.set_type = 'Group'
-                  AND assignment_overrides.set_id = groups.id")
-          .merge(AssignmentOverride.active)
-          .where(assignment_overrides: {assignment_id: @topic.assignment_id})
-        if override_groups.present?
-          @groups = override_groups
+        @group_topics = @groups.order(:id).map do |group|
+          {:group => group, :topic => topics.find{|t| t.context == group} }
         end
       end
-      topics = @topic.child_topics
-      unless @context.grants_right?(@current_user, session, :read_as_admin)
-        @groups = @groups.joins(:group_memberships).merge(GroupMembership.active).where(group_memberships: {user_id: @current_user})
-        topics = topics.where(context_type: 'Group', context_id: @groups)
-      end
 
-      @group_topics = @groups.order(:id).map do |group|
-        { :group => group, :topic => topics.find { |t| t.context == group } }
-      end
+      @initial_post_required = @topic.initial_post_required?(@current_user, session)
 
-      if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-        redirect_params = { :root_discussion_topic_id => @topic.id }
-        redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
-        respond_to do |format|
+      @padless = true
+
+      log_asset_access(@topic, 'topics', 'topics')
+      respond_to do |format|
+        if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
+          redirect_params = { :root_discussion_topic_id => @topic.id }
+          redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params) }
-        end
-      end
-      return
-    end
+        else
+          format.html do
 
-    @initial_post_required = @topic.initial_post_required?(@current_user, session)
-    log_asset_access(@topic, 'topics', 'topics')
-    @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
-    # Render updated Post UI if feature flag is enabled
+            @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
+            @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
+            @sequence_asset = @context_module_tag.try(:content)
 
-    if @context.feature_enabled?(:react_discussions_post)
-      env_hash = {
-        discussion_topic_id: params[:id],
-        manual_mark_as_read: @current_user&.manual_mark_as_read?,
-        discussion_topic_menu_tools: @discussion_topic_menu_tools
-      }
+            if @context.is_a?(Course) && @topic.is_section_specific
+              user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
+                                             course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
+                group(:course_section_id).count
+              section_data = @topic.course_sections.map do |cs|
+                cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
+              end
+            end
+            api_url = lambda do |endpoint, *params|
+              endpoint = "api_v1_context_discussion_#{endpoint}_url"
+              named_context_url(@context, endpoint, @topic, *params)
+            end
 
-      if @context.is_a?(Course)
-        env_hash[:course_id] = @context.id
-        set_student_context_cards_js_env if @context.grants_right?(@current_user, session, :manage)
-      elsif @context.is_a?(Group)
-        env_hash[:group_id] = @context.id
-        env_hash[:course_id] = @context.context_id if @context.context_type == 'Course'
-      end
+            env_hash = {
+              :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
+              :TOPIC => {
+                :ID => @topic.id,
+                :TITLE => @topic.title,
+                :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
+                :IS_PUBLISHED  => @topic.published?,
+                :CAN_UNPUBLISH => @topic.can_unpublish?,
+                :IS_ANNOUNCEMENT => @topic.is_announcement,
+                :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
+              },
+              :PERMISSIONS => {
+                # Can reply
+                :CAN_REPLY =>
+                  @topic.grants_right?(@current_user, session, :reply) &&
+                    !@topic.homeroom_announcement?(@context),
+                # Can attach files on replies
+                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),
+                :CAN_RATE         => @topic.grants_right?(@current_user, session, :rate),
+                :CAN_READ_REPLIES =>
+                  @topic.grants_right?(@current_user, :read_replies)  &&
+                    !@topic.homeroom_announcement?(@context),
+                # Can moderate their own topics
+                :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                  !@topic.locked_for?(@current_user, :check_policies => true),
+                # Can moderate any topic
+                :MODERATE         => user_can_moderate
+              },
+              :ROOT_URL => "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
+              :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
+              :REPLY_URL => api_url.call('add_reply', ':entry_id'),
+              :ROOT_REPLY_URL => api_url.call('add_entry'),
+              :DELETE_URL => api_url.call('delete_reply', ':id'),
+              :UPDATE_URL => api_url.call('update_reply', ':id'),
+              :MARK_READ_URL => api_url.call('topic_discussion_entry_mark_read', ':id'),
+              :MARK_UNREAD_URL => api_url.call('topic_discussion_entry_mark_unread', ':id'),
+              :RATE_URL => api_url.call('topic_discussion_entry_rate', ':id'),
+              :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
+              :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
+              :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
+              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
+              :CURRENT_USER => user_display_json(@current_user),
+              :INITIAL_POST_REQUIRED => @initial_post_required,
+              :THREADED => @topic.threaded?,
+              :ALLOW_RATING => @topic.allow_rating,
+              :SORT_BY_RATING => @topic.sort_by_rating,
+              :TODO_DATE => @topic.todo_date,
+              :IS_ASSIGNMENT => @topic.assignment_id?,
+              :ASSIGNMENT_ID => @topic.assignment_id,
+              :IS_GROUP => @topic.group_category_id?,
+            }
+            # will fire off the xhr for this as soon as the page comes back.
+            # see ui/features/discussion_topic/backbone/models/Topic#fetch for where it is consumed
+            prefetch_xhr(env_hash[:ROOT_URL])
 
-      js_env(env_hash)
-      js_bundle :discussion_topics_post
-      css_bundle :discussions_index
-      render html: '', layout: true
-      return
-    end
+            env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
+            if params[:hide_student_names]
+              env_hash[:HIDE_STUDENT_NAMES] = true
+              env_hash[:STUDENT_ID] = params[:student_id]
+            end
+            if @sequence_asset
+              env_hash[:SEQUENCE] = {
+                :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
+                :ASSET_ID => @sequence_asset.id,
+                :COURSE_ID => @sequence_asset.context.id,
+              }
+            end
+            @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
+            if @topic.for_assignment? && @presenter.allows_speed_grader? &&
+              @assignment_presenter.can_view_speed_grader_link?(@current_user)
+              env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
+                                                                      :speed_grader_context_gradebook_url,
+                                                                      assignment_id: @topic.assignment.id,
+                                                                      student_id: ":student_id")
+            end
 
-    @context.require_assignment_group rescue nil
+            js_hash = {:DISCUSSION => env_hash}
+            if @context.is_a?(Course)
+              GuardRail.activate(:secondary) do
+                js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.
+                  active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
+              end
+            end
+            js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
+            js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+              set_student_context_cards_js_env
+            end
 
-    @headers = !params[:headless]
-    # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-    @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-    @unlock_at = @topic.available_from_for(@current_user)
-    @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
-    @padless = true
+            append_sis_data(js_hash)
+            js_env(js_hash)
+            set_master_course_js_env_data(@topic, @context)
+            conditional_release_js_env(@topic.assignment, includes: [:rule])
+            js_bundle :discussion_topic
+            css_bundle :tinymce, :discussions, :learning_outcomes
 
-    respond_to do |format|
-      format.html do
-        @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
-        @sequence_asset = @context_module_tag.try(:content)
+            if @context_enrollment
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            elsif @context.available?
+              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
+              if @topic.podcast_enabled
+                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
+              end
+            end
 
-        if @context.is_a?(Course) && @topic.is_section_specific
-          user_counts = Enrollment.where(course_section_id: @topic.course_sections, course_id: @context)
-            .not_fake.active_or_pending_by_date_ignoring_access.group(:course_section_id).count
-          section_data = @topic.course_sections.map do |cs|
-            cs.attributes.slice('id', 'name').merge(:user_count => user_counts[cs.id] || 0)
+
+            render stream: can_stream_template?
           end
         end
-        api_url = lambda do |endpoint, *params|
-          endpoint = "api_v1_context_discussion_#{endpoint}_url"
-          named_context_url(@context, endpoint, @topic, *params)
-        end
-
-        env_hash = {
-          :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
-          :TOPIC => {
-            :ID => @topic.id,
-            :TITLE => @topic.title,
-            :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
-            :IS_PUBLISHED => @topic.published?,
-            :CAN_UNPUBLISH => @topic.can_unpublish?,
-            :IS_ANNOUNCEMENT => @topic.is_announcement,
-            :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
-          },
-          :PERMISSIONS => {
-            :CAN_REPLY => @topic.grants_right?(@current_user, session, :reply) && !@topic.homeroom_announcement?(@context),
-            # Can attach files on replies
-            :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-            :CAN_RATE => @topic.grants_right?(@current_user, session, :rate),
-            :CAN_READ_REPLIES => @topic.grants_right?(@current_user, :read_replies) && !@topic.homeroom_announcement?(@context),
-            # Can moderate their own topics
-            :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) && !@topic.locked_for?(@current_user, :check_policies => true),
-            # Can moderate any topic
-            :MODERATE => user_can_moderate
-          },
-          :ROOT_URL => "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
-          :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
-          :REPLY_URL => api_url.call('add_reply', ':entry_id'),
-          :ROOT_REPLY_URL => api_url.call('add_entry'),
-          :DELETE_URL => api_url.call('delete_reply', ':id'),
-          :UPDATE_URL => api_url.call('update_reply', ':id'),
-          :MARK_READ_URL => api_url.call('topic_discussion_entry_mark_read', ':id'),
-          :MARK_UNREAD_URL => api_url.call('topic_discussion_entry_mark_unread', ':id'),
-          :RATE_URL => api_url.call('topic_discussion_entry_rate', ':id'),
-          :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
-          :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
-          :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-          :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
-          :CURRENT_USER => user_display_json(@current_user),
-          :INITIAL_POST_REQUIRED => @initial_post_required,
-          :THREADED => @topic.threaded?,
-          :ALLOW_RATING => @topic.allow_rating,
-          :SORT_BY_RATING => @topic.sort_by_rating,
-          :TODO_DATE => @topic.todo_date,
-          :IS_ASSIGNMENT => @topic.assignment_id?,
-          :ASSIGNMENT_ID => @topic.assignment_id,
-          :IS_GROUP => @topic.group_category_id?,
-        }
-        # will fire off the xhr for this as soon as the page comes back.
-        # see ui/features/discussion_topic/backbone/models/Topic#fetch for where it is consumed
-        prefetch_xhr(env_hash[:ROOT_URL])
-
-        env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
-        if params[:hide_student_names]
-          env_hash[:HIDE_STUDENT_NAMES] = true
-          env_hash[:STUDENT_ID] = params[:student_id]
-        end
-        if @sequence_asset
-          env_hash[:SEQUENCE] = {
-            :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
-            :ASSET_ID => @sequence_asset.id,
-            :COURSE_ID => @sequence_asset.context.id,
-          }
-        end
-        if @topic.for_assignment? && @presenter.allows_speed_grader? &&
-          @assignment_presenter.can_view_speed_grader_link?(@current_user)
-          env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
-                                                                  :speed_grader_context_gradebook_url,
-                                                                  assignment_id: @topic.assignment.id,
-                                                                  student_id: ":student_id")
-        end
-
-        js_hash = {:DISCUSSION => env_hash}
-        if @context.is_a?(Course)
-          GuardRail.activate(:secondary) do
-            js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id)
-          end
-        end
-        js_hash[:COURSE_ID] = @context.id if @context.is_a?(Course)
-        js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
-        if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
-          set_student_context_cards_js_env
-        end
-
-        append_sis_data(js_hash)
-        js_env(js_hash)
-        set_master_course_js_env_data(@topic, @context)
-        conditional_release_js_env(@topic.assignment, includes: [:rule])
-        js_bundle :discussion_topic
-        css_bundle :tinymce, :discussions, :learning_outcomes
-
-        if @context_enrollment
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
-          if @topic.podcast_enabled
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
-          end
-        elsif @context.available?
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), {:title => t(:discussion_atom_feed_title, "Discussion Atom Feed")})
-          if @topic.podcast_enabled
-            content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
-          end
-        end
-
-        render stream: can_stream_template?
       end
     end
   end
