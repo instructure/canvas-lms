@@ -57,6 +57,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     rcsProps,
     use_rce_pretty_html_editor,
     use_rce_buttons_and_icons,
+    use_rce_a11y_checker_notifications,
     onFocus,
     onBlur,
     onInit,
@@ -98,6 +99,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       trayProps: rcsProps,
       use_rce_pretty_html_editor,
       use_rce_buttons_and_icons,
+      use_rce_a11y_checker_notifications,
       editorOptions: Object.assign(editorOptions, editorOptions, {
         selector: `#${textareaId}`,
         height,
@@ -182,6 +184,8 @@ RCE.propTypes = {
   use_rce_pretty_html_editor: bool,
   // enable the custom buttons feature (temporary until the feature is forced on)
   use_rce_buttons_and_icons: bool,
+  // enable the a11y checker notifications (temporary until the feature is forced on)
+  use_rce_a11y_checker_notifications: bool,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
@@ -201,6 +205,7 @@ RCE.defaultProps = {
   readOnly: false,
   use_rce_pretty_html_editor: true,
   use_rce_buttons_and_icons: true,
+  use_rce_a11y_checker_notifications: true,
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},

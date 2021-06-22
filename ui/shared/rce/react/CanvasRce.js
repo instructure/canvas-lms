@@ -111,6 +111,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onInit={onInit}
       use_rce_pretty_html_editor={!!window.ENV?.FEATURES?.rce_pretty_html_editor}
       use_rce_buttons_and_icons={!!window.ENV?.FEATURES?.rce_buttons_and_icons}
+      use_rce_a11y_checker_notifications={!!window.ENV?.use_rce_a11y_checker_notifications}
       {...rest}
     />
   )

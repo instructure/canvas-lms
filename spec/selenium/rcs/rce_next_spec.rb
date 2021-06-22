@@ -917,6 +917,47 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(a11y_checker_tray).to be_displayed
       end
 
+      it 'with the rce_a11y_checker_notifications flag on should show notification badge' do
+        Account.site_admin.enable_feature! :rce_a11y_checker_notifications
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
+        switch_to_editor_view
+
+        wait_for(method: nil, timeout: 5) {
+          badge_element = fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+          expect(badge_element.text).to eq '1'
+        }
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.clear
+        html_view.send_keys('test text')
+        switch_to_editor_view
+
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
+      end
+
+      it 'with the rce_a11y_checker_notifications flag off should show not notification badge' do
+        Account.site_admin.disable_feature! :rce_a11y_checker_notifications
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
+        switch_to_editor_view
+
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
+      end
+
       it 'should open keyboard shortcut modal when clicking button in status bar' do
         visit_front_page_edit(@course)
 

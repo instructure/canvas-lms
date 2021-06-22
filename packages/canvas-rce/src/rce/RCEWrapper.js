@@ -19,13 +19,14 @@
 import PropTypes from 'prop-types'
 import React, {Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
-import uniqBy from 'lodash/uniqBy'
+import _ from 'lodash'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {debounce} from '@instructure/debounce'
 import getCookie from 'get-cookie'
 
 import formatMessage from '../format-message'
@@ -270,7 +271,8 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     use_rce_pretty_html_editor: PropTypes.bool,
-    use_rce_buttons_and_icons: PropTypes.bool
+    use_rce_buttons_and_icons: PropTypes.bool,
+    use_rce_a11y_checker_notifications: PropTypes.bool
   }
 
   static defaultProps = {
@@ -322,7 +324,8 @@ class RCEWrapper extends React.Component {
       fullscreenState: {
         headerDisp: 'static',
         isTinyFullscreen: false
-      }
+      },
+      a11yErrorsCount: 0
     }
 
     // Get top 2 favorited LTI Tools
@@ -664,6 +667,7 @@ class RCEWrapper extends React.Component {
         }, 200) // due to the animation it takes some time for fullscreen to complete
       }
     })
+    this.checkAccessibility()
     if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
       document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
     }
@@ -917,6 +921,11 @@ class RCEWrapper extends React.Component {
 
   handleExternalClick = () => {
     this._forceCloseFloatingToolbar()
+    debounce(this.checkAccessibility, 1000)()
+  }
+
+  handleInputChange = () => {
+    this.checkAccessibility()
   }
 
   onInit = (_event, editor) => {
@@ -956,7 +965,10 @@ class RCEWrapper extends React.Component {
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.top.document.body.click(), true)
-
+    if (this.props.use_rce_a11y_checker_notifications) {
+      editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
+    }
+    this.checkAccessibility()
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
@@ -1086,7 +1098,7 @@ class RCEWrapper extends React.Component {
   initAutoSave = editor => {
     this.storage = window.localStorage
     if (this.storage) {
-      editor.on('change', this.doAutoSave)
+      editor.on('change Undo Redo', this.doAutoSave)
       editor.on('blur', this.doAutoSave)
 
       this.cleanupAutoSave()
@@ -1146,6 +1158,7 @@ class RCEWrapper extends React.Component {
       }
       this.storage.removeItem(this.autoSaveKey)
     })
+    this.checkAccessibility()
   }
 
   // if a placeholder image shows up in autosaved content, we have to remove it
@@ -1273,6 +1286,18 @@ class RCEWrapper extends React.Component {
     this.a11yCheckerReady.then(() => {
       this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
     })
+  }
+
+  checkAccessibility = () => {
+    if (!this.props.use_rce_a11y_checker_notifications) {
+      return
+    }
+    const editor = this.mceInstance()
+    editor.execCommand('checkAccessibility', false, {
+      done: errors => {
+        this.setState({a11yErrorsCount: errors.length})
+      }
+    }, {skip_focus: true})
   }
 
   openKBShortcutModal = () => {
@@ -1586,7 +1611,7 @@ class RCEWrapper extends React.Component {
     alert.id = alertIdValue++
     this.setState(state => {
       let messages = state.messages.concat(alert)
-      messages = uniqBy(messages, 'text') // Don't show the same message twice
+      messages = _.uniqBy(messages, 'text') // Don't show the same message twice
       return {messages}
     })
   }
@@ -1699,6 +1724,9 @@ class RCEWrapper extends React.Component {
           onA11yChecker={this.onA11yChecker}
           onFullscreen={this.handleClickFullscreen}
           use_rce_pretty_html_editor={this.props.use_rce_pretty_html_editor}
+          use_rce_a11y_checker_notifications={this.props.use_rce_a11y_checker_notifications}
+          a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
+          a11yErrorsCount={this.state.a11yErrorsCount}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray

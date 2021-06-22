@@ -168,6 +168,7 @@ class ApplicationController < ActionController::Base
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.blank? || @context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
+          use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user&.prefers_high_contrast?,

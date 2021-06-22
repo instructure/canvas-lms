@@ -64,6 +64,7 @@
     "@instructure/ui-a11y-content": "7",
     "@instructure/ui-alerts": "7",
     "@instructure/ui-avatar": "7",
+    "@instructure/ui-badge": "7",
     "@instructure/ui-billboard": "7",
     "@instructure/ui-buttons": "7",
     "@instructure/ui-checkbox": "7",
