@@ -34,7 +34,8 @@ import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
-  SUBSCRIBE_TO_DISCUSSION_TOPIC
+  SUBSCRIBE_TO_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_READ_STATE
 } from '../../../graphql/Mutations'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -85,7 +86,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish
-
+  const requiresInitialPost = props.discussionTopic.initialPostRequiredForCurrentUser
   const canSeeCommons =
     discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
 
@@ -229,6 +230,28 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     })
   }
 
+  const [updateDiscussionReadState] = useMutation(UPDATE_DISCUSSION_READ_STATE, {
+    onCompleted: data => {
+      if (!data.updateDiscussionReadState.errors) {
+        setOnSuccess(I18n.t('You have successfully marked all as read.'))
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
+    }
+  })
+
+  const onMarkAllAsRead = () => {
+    updateDiscussionReadState({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        read: true
+      }
+    })
+  }
+
   const [subscribeToDiscussionTopic] = useMutation(SUBSCRIBE_TO_DISCUSSION_TOPIC, {
     onCompleted: data => {
       if (!data.subscribeToDiscussionTopic.errors) {
@@ -300,7 +323,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           />
         </View>
       </div>
-      {props.discussionTopic.initialPostRequiredForCurrentUser && (
+      {requiresInitialPost && (
         <AlertFRD renderCloseButtonLabel="Close">
           {I18n.t('You must post before seeing replies.')}
         </AlertFRD>
@@ -371,6 +394,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                   </Flex.Item>
                   <Flex.Item>
                     <PostToolbar
+                      onReadAll={!requiresInitialPost ? onMarkAllAsRead : null}
                       onDelete={
                         canDelete
                           ? () => {

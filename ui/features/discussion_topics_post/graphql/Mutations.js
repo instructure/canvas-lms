@@ -199,3 +199,14 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
   ${User.fragment}
   ${DiscussionEntry.fragment}
 `
+
+export const UPDATE_DISCUSSION_READ_STATE = gql`
+  mutation UpdateDiscussionReadState($discussionTopicId: ID!, $read: Boolean!) {
+    updateDiscussionReadState(input: {discussionTopicId: $discussionTopicId, read: $read}) {
+      discussionTopic {
+        ...Discussion
+      }
+    }
+  }
+  ${Discussion.fragment}
+`

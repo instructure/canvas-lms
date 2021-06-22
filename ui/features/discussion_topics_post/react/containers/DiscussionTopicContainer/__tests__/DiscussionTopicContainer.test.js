@@ -240,16 +240,6 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('delete')).toBeNull()
   })
 
-  it('Should not show discussion topic menu if no appropriate permissions', async () => {
-    const {queryByTestId} = setup({
-      discussionTopic: {
-        ...discussionTopicMock.discussionTopic,
-        permissions: {}
-      }
-    })
-    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
-  })
-
   it('Should be able to open SpeedGrader', async () => {
     const {getByTestId, getByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -267,12 +257,26 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
   })
 
-  it('Should not be able to see post menu if no permissions', () => {
+  it('Should not be able to see post menu if no permissions and initialPostRequiredForCurrentUser', () => {
     const {queryByTestId} = setup({
-      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{initialPostRequiredForCurrentUser: true, permissions: {speedGrader: false}}
+      }
     })
 
     expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
+  })
+
+  it('Should show Mark All as Read discussion topic menu if initialPostRequiredForCurrentUser = false ', async () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{initialPostRequiredForCurrentUser: false, permissions: {}}
+      }
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Mark All as Read')).toBeInTheDocument()
   })
 
   it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
