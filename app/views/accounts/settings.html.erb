@@ -140,7 +140,7 @@
               <% if @account.shard.database_server.maintenance_window_start_hour %>
               <tr>
                 <td></td>
-                <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @account.shard.database_server } %> </td>
+                <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @account.shard.database_server, local_zone: @account.default_time_zone } %> </td>
               </tr>
               <% end %>
               <%= f.fields_for :settings do |settings| %>
