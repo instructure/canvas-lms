@@ -261,6 +261,11 @@ class SubmissionsController < SubmissionsBaseController
         flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
         return redirect_to(course_assignment_url(@context, @assignment))
       end
+
+      unless @assignment.accepts_submission_type?(params[:submission][:submission_type])
+        flash[:error] = t("Assignment does not accept this submission type")
+        return redirect_to(course_assignment_url(@context, @assignment))
+      end
     end
 
     # When the `resource_link_lookup_uuid` is given, we need to validate if it exists,
@@ -434,10 +439,7 @@ class SubmissionsController < SubmissionsBaseController
   private :verify_api_call_has_attachment
 
   def allowed_api_submission_type?(submission_type)
-    valid_for_api = API_SUBMISSION_TYPES.key?(submission_type)
-    allowed_for_assignment = @assignment.submission_types_array.include?(submission_type)
-    basic_lti_launch = (@assignment.submission_types =~ /online|external_tool/ && submission_type == 'basic_lti_launch')
-    valid_for_api && (allowed_for_assignment || basic_lti_launch)
+    API_SUBMISSION_TYPES.key?(submission_type) && @assignment.accepts_submission_type?(submission_type)
   end
   private :allowed_api_submission_type?
 
