@@ -145,89 +145,20 @@ module ResolveClasses
 end
 SafeYAML::Resolver.prepend(ResolveClasses)
 
-module FloatScannerFix
-  def tokenize string
-    return nil if string.empty?
-    return string if @string_cache.key?(string)
-    return @symbol_cache[string] if @symbol_cache.key?(string)
-
-    case string
-      # Check for a String type, being careful not to get caught by hash keys, hex values, and
-      # special floats (e.g., -.inf).
-    when /^[^\d\.:-]?[A-Za-z_\s!@#\$%\^&\*\(\)\{\}\<\>\|\/\\~;=]+/
-      if string.length > 5
-        @string_cache[string] = true
-        return string
-      end
-
-      case string
-      when /^[^ytonf~]/i
-        @string_cache[string] = true
-        string
-      when '~', /^null$/i
-        nil
-      when /^(yes|true|on)$/i
-        true
-      when /^(no|false|off)$/i
-        false
-      else
-        @string_cache[string] = true
-        string
-      end
-    when Psych::ScalarScanner::TIME
-      begin
-        parse_time string
-      rescue ArgumentError
-        string
-      end
-    when /^\d{4}-(?:1[012]|0\d|\d)-(?:[12]\d|3[01]|0\d|\d)$/
-      require 'date'
-      begin
-        class_loader.date.strptime(string, '%Y-%m-%d')
-      rescue ArgumentError
-        string
-      end
-    when /^\.inf$/i
-      Float::INFINITY
-    when /^-\.inf$/i
-      -Float::INFINITY
-    when /^\.nan$/i
-      Float::NAN
-    when /^:./
-      if string =~ /^:(["'])(.*)\1/
-        @symbol_cache[string] = class_loader.symbolize($2.sub(/^:/, ''))
-      else
-        @symbol_cache[string] = class_loader.symbolize(string.sub(/^:/, ''))
-      end
-    when /^[-+]?[0-9][0-9_]*(:[0-5]?[0-9])+$/
-      i = 0
-      string.split(':').each_with_index do |n,e|
-        i += (n.to_i * 60 ** (e - 2).abs)
-      end
-      i
-    when /^[-+]?[0-9][0-9_]*(:[0-5]?[0-9])+\.[0-9_]*$/
-      i = 0
-      string.split(':').each_with_index do |n,e|
-        i += (n.to_f * 60 ** (e - 2).abs)
-      end
-      i
-    when Psych::ScalarScanner::FLOAT
-      if string =~ /\A[-+]?\.\Z/
-        @string_cache[string] = true
-        string
-      else
-        Float(string.gsub(/[,_:]|\.([Ee]|$)/, '\1')) # TODO: Remove when https://github.com/tenderlove/psych/pull/276 is merged
-      end
-    else
-      int = parse_int string.gsub(/[,_]/, '')
-      return int if int
-
-      @string_cache[string] = true
-      string
-    end
+module ScalarScannerFix
+  # in rubies < 2.7, Psych uses a regex to identify an integer, then strips commas and underscores,
+  # then checks _again_ against the regex. In 2.7, the second check was eliminated because the
+  # stripping was inlined in the name of optimization to avoid a string allocation. unfortunately
+  # this means something like 0x_ which passes the first check is not a valid number, and will
+  # throw an exception. this is the simplest way to catch that case without completely reverting
+  # the optimization
+  def parse_int(string)
+    super
+  rescue ArgumentError
+    string
   end
 end
-Psych::ScalarScanner.prepend(FloatScannerFix) unless RUBY_VERSION >= '2.5' # got pulled into psych for later rubies
+Psych::ScalarScanner.prepend(ScalarScannerFix)
 
 module ScalarTransformFix
   def to_guessed_type(value, quoted=false, options=nil)
