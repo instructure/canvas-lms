@@ -806,12 +806,6 @@ class CoursesController < ApplicationController
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
-     if params_for_create.key?(:grade_passback_setting)
-       grade_passback_setting = params_for_create.delete(:grade_passback_setting)
-       return unless authorized_action?(@course, @current_user, :manage_grades)
-       update_grade_passback_setting(grade_passback_setting)
-     end
-
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id)
       end
@@ -864,6 +858,11 @@ class CoursesController < ApplicationController
 
       if apply_assignment_group_weights
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
+      end
+
+      if params_for_create.key?(:grade_passback_setting)
+        grade_passback_setting = params_for_create.delete(:grade_passback_setting)
+        update_grade_passback_setting(grade_passback_setting)
       end
 
       changes = changed_settings(@course.changes, @course.settings)

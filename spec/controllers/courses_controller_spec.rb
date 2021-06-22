@@ -1958,6 +1958,18 @@ describe CoursesController do
       expect(json['public_syllabus_to_auth']).to be true
     end
 
+    it "should set grade_passback_setting" do
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          grade_passback_setting: 'nightly_sync',
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(Course.find(json['id']).grade_passback_setting).to eq 'nightly_sync'
+    end
+
     it "should NOT allow visibility to be set when we don't have permission" do
       @visperm.enabled = false
       @visperm.save
