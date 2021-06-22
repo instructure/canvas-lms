@@ -2091,11 +2091,16 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
-        if @context.grants_right?(@current_user, session, :read_announcements)
+        # Only compute all this for k5 subjects
+        if @context.elementary_subject_course? && @context.grants_right?(@current_user, session, :read_announcements)
           start_date = 14.days.ago.beginning_of_day
           end_date = start_date + 28.days
-          latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
-            .ordered_between(start_date, end_date).limit(1).first
+          scope = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+            .ordered_between(start_date, end_date)
+          unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+            scope = scope.visible_to_student_sections(@current_user)
+          end
+          latest_announcement = scope.limit(1).first
         end
 
         js_env({
