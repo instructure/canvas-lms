@@ -31,6 +31,8 @@ module Utils
     def as_string(style=:normal)
       if style == :full
         return i18n_date(:full)
+      elsif style == :weekday
+        return i18n_date(:weekday)
       elsif style != :long
         if style != :no_words && special_value_type != :none
           string = special_string(special_value_type)

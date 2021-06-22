@@ -104,7 +104,14 @@ module Utils
     end
 
     def date_style
-      datetime_type == :verbose ? :long : :no_words
+      case datetime_type
+      when :verbose
+        :long
+      when :weekday_only
+        :weekday
+      else
+        :no_words
+      end
     end
 
     def datetime_type
