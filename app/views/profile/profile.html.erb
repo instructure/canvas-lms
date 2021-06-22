@@ -160,7 +160,7 @@
   <% if @user.shard.database_server.maintenance_window_start_hour %>
   <tr>
     <td></td>
-    <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @user.shard.database_server } %> </td>
+    <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @user.shard.database_server, local_zone: ::Time.zone } %> </td>
   </tr>
   <% end %>
   <% if @domain_root_account == Account.default %>
