@@ -2060,17 +2060,7 @@ describe ApplicationController do
       controller.instance_variable_set(:@current_user, @student)
     end
 
-    it "is false when no immersive reader flags are enabled, even on supported pages" do
-      controller.params[:controller] = "wiki_pages"
-      controller.params[:action] = "show"
-      expect(controller.send(:show_immersive_reader?)).to be false
-    end
-
-    context "when root account has immersive reader flag enabled" do
-      before(:once) do
-        @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
-      end
-
+    shared_examples_for "pages with an immersive reader flag enabled" do
       it "is true for wiki_pages#show" do
         controller.params[:controller] = "wiki_pages"
         controller.params[:action] = "show"
@@ -2078,8 +2068,8 @@ describe ApplicationController do
       end
 
       it "is false on pages where immersive reader is not supported" do
-        controller.params[:controller] = "courses"
-        controller.params[:action] = "show"
+        controller.params[:controller] = "discussion_topics"
+        controller.params[:action] = "index"
         expect(controller.send(:show_immersive_reader?)).to be false
       end
 
@@ -2118,6 +2108,28 @@ describe ApplicationController do
           expect(controller.send(:show_immersive_reader?)).to be false
         end
       end
+    end
+
+    it "is false when no immersive reader flags are enabled, even on supported pages" do
+      controller.params[:controller] = "wiki_pages"
+      controller.params[:action] = "show"
+      expect(controller.send(:show_immersive_reader?)).to be false
+    end
+
+    context "when root account has immersive reader flag enabled" do
+      before(:once) do
+        @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
+      end
+
+      it_behaves_like "pages with an immersive reader flag enabled"
+    end
+
+    context "when user has immersive reader flag enabled" do
+      before(:each) do
+        @student.enable_feature!(:user_immersive_reader_wiki_pages)
+      end
+
+      it_behaves_like "pages with an immersive reader flag enabled"
     end
   end
 
