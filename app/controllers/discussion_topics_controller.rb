@@ -643,6 +643,8 @@ class DiscussionTopicsController < ApplicationController
       AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
     end
 
+    @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
+
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
@@ -813,7 +815,6 @@ class DiscussionTopicsController < ApplicationController
             :COURSE_ID => @sequence_asset.context.id,
           }
         end
-        @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
         if @topic.for_assignment? && @presenter.allows_speed_grader? &&
           @assignment_presenter.can_view_speed_grader_link?(@current_user)
           env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
