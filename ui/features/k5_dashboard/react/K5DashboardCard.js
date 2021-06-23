@@ -18,7 +18,7 @@
 
 import React, {useContext} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!k5_dashboard_card'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'

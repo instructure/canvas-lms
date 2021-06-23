@@ -75,7 +75,13 @@ it('adds new week data to state', () => {
   const newState = weeklyReducer(initState, Actions.gettingWeekItems(nextWeek))
 
   // next week is loaded
-  const newerState = weeklyReducer(newState, Actions.weekLoaded({weekDays: ['next week data']}))
+  const newerState = weeklyReducer(
+    newState,
+    Actions.weekLoaded({
+      weekDays: ['next week data'],
+      weekStart: initState.weekStart.clone().add(7, 'days')
+    })
+  )
 
   expect(newerState.weeks).toMatchObject({
     ...initState.weeks,

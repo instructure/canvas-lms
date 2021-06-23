@@ -23,3 +23,8 @@ export const outcomeGroupShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
   description: PropTypes.string
 })
+
+export const outcomeShape = PropTypes.shape({
+  _id: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired
+})

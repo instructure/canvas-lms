@@ -83,7 +83,7 @@ module DashboardHelper
       return I18n.t('helpers.dashboard_helper.conversation_label', "Visit Conversations")
     when "Assignment"
       return I18n.t('helpers.dashboard_helper.assignment_label', "Visit Course Assignments")
-    when "DiscussionTopic"
+    when "DiscussionEntry", "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.discussion_label', "Visit Course Discussions")
     when "AssessmentRequest"
       return I18n.t('helpers.dashboard_helper.peer_review_label', "Visit Course Peer Reviews")
@@ -100,7 +100,7 @@ module DashboardHelper
       return I18n.t('helpers.dashboard_helper.conversation_details', "Conversation Details")
     when "Assignment"
       return I18n.t('helpers.dashboard_helper.assignment_details', "Assignment Details")
-    when "DiscussionTopic"
+    when "DiscussionEntry", "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.discussion_details', "Discussion Details")
     when "AssessmentRequest"
       return I18n.t('helpers.dashboard_helper.peer_review_details', "Peer Review Details")
@@ -123,7 +123,7 @@ module DashboardHelper
       return I18n.t('helpers.dashboard_helper.x_new_in_assignments',
                { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
                { :count => items.size, :wrapper => '<b class="count">\1</b>' })
-    when "DiscussionTopic"
+    when "DiscussionEntry", "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
                { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
                { :count => items.size, :wrapper => '<b class="count">\1</b>' })

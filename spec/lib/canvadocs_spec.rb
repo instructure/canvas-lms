@@ -198,6 +198,23 @@ describe Canvadocs do
             it "includes only the peer reviewer in the user_filter" do
               expect(user_filter).to match [peer_reviewer_real_data]
             end
+
+            context 'student annotations' do
+              before do
+                submission.update!(submission_type: 'student_annotation')
+                attachment.associate_with(submission)
+              end
+
+              it 'sets user filter type to anonymous when the peer reviews are anonymous' do
+                assignment.update!(anonymous_peer_reviews: true)
+
+                expect(user_filter).to include(student_anonymous_data)
+              end
+
+              it 'sets user filter type to real when the peer reviews are not anonymous' do
+                expect(user_filter).to include(student_real_data)
+              end
+            end
           end
         end
 

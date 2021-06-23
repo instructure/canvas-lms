@@ -70,6 +70,7 @@ describe "course syllabus" do
     end
 
     it "unhides course summary when course-summary-option checkbox is toggled on", custom_timeout: 20 do
+      skip('flaky spec LS-2286')
       @course1.syllabus_course_summary = false
       @course1.save!
       visit_syllabus_page(@course1.id)

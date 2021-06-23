@@ -22,7 +22,7 @@ import I18n from 'i18n!assignments_2_student_header'
 import {ProgressCircle} from '@instructure/ui-progress'
 import React from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 
 const possibleStates = {
   inProgress: {

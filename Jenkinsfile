@@ -462,7 +462,7 @@ pipeline {
                 .hooks([onNodeAcquired: lintersStage.&setupNode])
                 .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
                 .required(configuration.isChangeMerged())
-                .execute(lintersStage.&dependencyCheckStage)
+                .execute(dependencyCheckStage.&call)
 
               extendedStage('Linters')
                 .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])

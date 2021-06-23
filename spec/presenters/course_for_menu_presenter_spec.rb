@@ -96,7 +96,7 @@ describe CourseForMenuPresenter do
 
     context 'with `homeroom_course` setting enabled' do
       before do
-        course.update! settings: course.settings.merge(homeroom_course: true)
+        course.update! homeroom_course: true
       end
 
       it 'sets `isHomeroom` to `true`' do

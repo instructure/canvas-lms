@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {bool, string} from 'prop-types'
 

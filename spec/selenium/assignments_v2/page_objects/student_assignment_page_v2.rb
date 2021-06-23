@@ -75,6 +75,18 @@ class StudentAssignmentPageV2
       fj('button:contains("View Feedback")')
     end
 
+    def view_feedback_badge
+      f('div[data-testid="unread_comments_badge"]')
+    end
+
+    def tray_close_button
+      f("span[data-testid='tray-close-button']")
+    end
+
+    def load_more_comments_button
+      f("div[class='load-more-comments-button-container']")
+    end
+
     def comment_text_area
       f('textarea')
     end
@@ -127,6 +139,10 @@ class StudentAssignmentPageV2
 
     def record_upload_button
       f("button[data-testid='media-modal-launch-button']")
+    end
+
+    def media_comment_button
+      f("button[id='mediaCommentButton']")
     end
 
     def media_modal

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!empty_homeroom_announcement'
 import React from 'react'
 import {string} from 'prop-types'
 import {View} from '@instructure/ui-view'

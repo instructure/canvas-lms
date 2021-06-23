@@ -53,7 +53,8 @@ function saveSettings(state) {
     'userId',
     'include_test_plugin',
     'test_plugin_toolbar',
-    'test_plugin_menu'
+    'test_plugin_menu',
+    'readonly'
   ].forEach(settingKey => {
     saveSetting(settingKey, state[settingKey])
   })
@@ -85,8 +86,8 @@ function Demo() {
   const [toolbar, set_toolbar] = useState(() => updateToolbar())
   const [menu, set_menu] = useState(() => updateMenu())
   const [plugins, set_plugins] = useState(() => updatePlugins())
-  const [tinymce_editor, set_tinymce_editor] = useState(null)
   const [currentContent, setCurrentContent] = useState('')
+  const [readonly, set_readonly] = useState(() => getSetting('readonly', false))
 
   const rceRef = useRef(null)
 
@@ -122,6 +123,7 @@ function Demo() {
     set_toolbar(updateToolbar())
     set_menu(updateMenu())
     set_plugins(updatePlugins())
+    set_readonly(newOpts.readonly)
 
     saveSettings(newOpts)
 
@@ -186,6 +188,7 @@ function Demo() {
           language={lang}
           textareaId="textarea3"
           defaultContent="hello RCE"
+          readOnly={readonly}
           height={350}
           highContrastCSS={[]}
           trayProps={trayProps}
@@ -193,7 +196,6 @@ function Demo() {
           menu={menu}
           plugins={plugins}
           onInitted={editor => {
-            set_tinymce_editor(editor)
             setCurrentContent(editor.getContent())
           }}
           onContentChange={value => {
@@ -239,6 +241,7 @@ function Demo() {
             include_test_plugin={include_test_plugin}
             test_plugin_toolbar={test_plugin_toolbar}
             test_plugin_menu={test_plugin_menu}
+            readonly={readonly}
             onChange={handleOptionsChange}
           />
         </div>

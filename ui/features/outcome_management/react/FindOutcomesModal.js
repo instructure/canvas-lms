@@ -32,6 +32,7 @@ import FindOutcomesView from './FindOutcomesView'
 import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
+import useResize from '@canvas/outcomes/react/hooks/useResize'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
@@ -56,6 +57,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
+  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
+
   return (
     <Modal
       open={open}
@@ -69,7 +72,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       }
     >
       <Modal.Body padding="0 small small">
-        <Flex>
+        <Flex elementRef={setContainerRef}>
           <Flex.Item
             as="div"
             position="relative"
@@ -77,6 +80,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             height="calc(100vh - 10.25rem)"
             overflowY="visible"
             overflowX="auto"
+            data-testid="groupsColumnRef"
+            elementRef={setLeftColumnRef}
           >
             <View as="div" padding="small x-small none x-small">
               <Heading level="h3">
@@ -113,8 +118,19 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             width="1%"
             height="calc(100vh - 10.25rem)"
             margin="xxx-small 0 0"
-            borderWidth="0 small 0 0"
-          />
+          >
+            <div
+              data-testid="handlerRef"
+              ref={setDelimiterRef}
+              style={{
+                width: '1vw',
+                height: '100%',
+                cursor: 'col-resize',
+                background:
+                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+              }}
+            />
+          </Flex.Item>
           <Flex.Item
             as="div"
             position="relative"
@@ -122,6 +138,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             height="calc(100vh - 10.25rem)"
             overflowY="visible"
             overflowX="auto"
+            elementRef={setRightColumnRef}
           >
             {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
               <FindOutcomesView

@@ -90,7 +90,7 @@ describe('FileBrowser', () => {
 
     const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
-      0: {collections: [1]},
+      0: {id: 0, collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
       4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
     }
@@ -115,7 +115,7 @@ describe('FileBrowser', () => {
 
     const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
-      0: {collections: [1]},
+      0: {id: 0, collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
       4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
     }
@@ -222,7 +222,7 @@ describe('FileBrowser', () => {
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1, 3]},
+        0: {id: 0, collections: [1, 3]},
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
         3: {id: 3, collections: [], items: [], context: '/courses/1'},
         4: {id: 4, collections: [], items: [], context: '/courses/1'},
@@ -246,7 +246,7 @@ describe('FileBrowser', () => {
     it('does not get new folder/file data on folder collapse', () => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1, 3]},
+        0: {id: 0, collections: [1, 3]},
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
         3: {id: 3, collections: [], items: [], context: '/courses/1'},
         4: {id: 4, collections: [], items: [], context: '/courses/1'},
@@ -279,7 +279,7 @@ describe('FileBrowser', () => {
       })
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
         4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
       }
@@ -326,7 +326,7 @@ describe('FileBrowser', () => {
       })
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1, 3]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, collections: [4], context: 'courses/1'},
         4: {id: 4, collections: [], items: [], context: 'users/1'}
       }
@@ -363,7 +363,7 @@ describe('FileBrowser', () => {
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
         4: {
           id: 4,
@@ -406,7 +406,7 @@ describe('FileBrowser', () => {
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
         4: {id: 4, name: 'folder 4', collections: [5], items: [1], context: '/courses/1'},
         5: {id: 5, name: 'folder 5', collections: [], items: [], context: '/users/1'}
@@ -430,7 +430,7 @@ describe('FileBrowser', () => {
       const spy = sinon.spy()
       const wrapper = mount(<FileBrowser {...getProps({selectFile: spy})} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [], items: [1, 2]}
       }
       const items = {
@@ -467,7 +467,7 @@ describe('FileBrowser', () => {
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
@@ -500,7 +500,7 @@ describe('FileBrowser', () => {
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
@@ -524,7 +524,7 @@ describe('FileBrowser', () => {
     it('activates upload button for folders user can upload to', () => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',
@@ -567,7 +567,7 @@ describe('FileBrowser', () => {
     it('uploads a file', () => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',
@@ -594,7 +594,7 @@ describe('FileBrowser', () => {
       const overrides = {defaultUploadFolderId: courseFolder().id.toString()}
       const wrapper = mount(<FileBrowser {...getProps(overrides)} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',
@@ -613,7 +613,7 @@ describe('FileBrowser', () => {
     it('renders a spinner while uploading files', () => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',
@@ -639,7 +639,7 @@ describe('FileBrowser', () => {
     it('shows an alert on file upload', done => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',
@@ -690,7 +690,7 @@ describe('FileBrowser', () => {
     it('shows an alert on file upload fail', done => {
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
-        0: {collections: [1]},
+        0: {id: 0, collections: [1]},
         1: {
           id: 1,
           name: 'folder 1',

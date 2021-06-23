@@ -122,6 +122,10 @@ module BasicLTI
         @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
       end
 
+      def user_enrollment_active?(assignment, user)
+        user.student_enrollments.active_or_pending_by_date.where(course_id: assignment.context_id).any?
+      end
+
       def to_xml
         xml = LtiResponse.envelope.dup
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_codeMajor').content = code_major
@@ -176,7 +180,13 @@ module BasicLTI
         end
 
         op = self.operation_ref_identifier.underscore
-        if self.respond_to?("handle_#{op}", true)
+        # Write results are disabled for concluded users, read results are still allowed
+        if op != 'read_result' && !user_enrollment_active?(assignment, user)
+          self.code_major = 'failure'
+          self.description = 'Course not available for student'
+          self.body = "<#{operation_ref_identifier}Response />"
+          return true
+        elsif self.respond_to?("handle_#{op}", true)
           return self.send("handle_#{op}", tool, assignment, user)
         end
 

@@ -347,7 +347,7 @@ describe('mergeWeekItems', () => {
       mockItems.push(mockItem(sunday.clone().add(i, 'days').format()))
     }
     const mockDays = itemsToDays(mockItems)
-    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+    const result = mergeWeekItems()(mockItems, 'mock response')(mockDispatch, () => {
       return {
         ...getStateMock({
           loading: {partialWeekDays: mockDays, allWeekItemsLoaded: true}
@@ -357,7 +357,15 @@ describe('mergeWeekItems', () => {
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays(mockDays, 'mock response'))
     expect(mockDispatch).toHaveBeenCalledWith(
-      weekLoaded({weekDays: itemsToDays(mockItems), initialWeeklyLoad: false}, 'mock response')
+      weekLoaded(
+        {
+          initialWeeklyLoad: false,
+          weekDays: itemsToDays(mockItems),
+          weekStart: sunday,
+          isPreload: false
+        },
+        'mock response'
+      )
     )
   })
 
@@ -369,7 +377,7 @@ describe('mergeWeekItems', () => {
       mockItems.push(mockItem(sunday.clone().add(i, 'days').format()))
     }
     const mockDays = itemsToDays(mockItems)
-    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+    const result = mergeWeekItems()(mockItems, 'mock response')(mockDispatch, () => {
       return {
         ...getStateMock(),
         loading: {partialWeekDays: mockDays, allWeekItemsLoaded: false}
@@ -385,7 +393,8 @@ describe('mergeWeekItems', () => {
   it('returns true when allWeekItemsLoaded but there are no available days', () => {
     const mockDispatch = jest.fn()
     const mockItems = []
-    const result = mergeWeekItems(mockItems, 'mock response')(mockDispatch, () => {
+    const sunday = moment.tz('UTC').startOf('week')
+    const result = mergeWeekItems()(mockItems, 'mock response')(mockDispatch, () => {
       return {
         ...getStateMock({
           loading: {partialWeekDays: [], allWeekItemsLoaded: true}
@@ -396,7 +405,10 @@ describe('mergeWeekItems', () => {
     // still want to pretend something was loaded so all the loading states get updated.
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialWeekDays([], 'mock response'))
     expect(mockDispatch).toHaveBeenCalledWith(
-      weekLoaded({weekDays: [], initialWeeklyLoad: false}, 'mock response')
+      weekLoaded(
+        {initialWeeklyLoad: false, weekDays: [], weekStart: sunday, isPreload: false},
+        'mock response'
+      )
     )
   })
 })

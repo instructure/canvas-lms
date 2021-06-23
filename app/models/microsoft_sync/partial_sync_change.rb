@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,15 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CreateAccount0 < ActiveRecord::Migration[5.2]
-  tag :predeploy
+class MicrosoftSync::PartialSyncChange < ApplicationRecord
+  extend RootAccountResolver
 
-  def up
-    Account.find_or_create_by!(id: 0).
-      update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
-  end
+  belongs_to :course
+  belongs_to :user
 
-  def down
-    Account.where(id: 0).delete_all
-  end
+  validates_presence_of :user, :course, :enrollment_type
+  validates_uniqueness_of :user_id, scope: %i[course_id enrollment_type]
+
+  resolves_root_account through: :course
 end

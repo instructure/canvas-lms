@@ -16,57 +16,125 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def setupNode() {
-  def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+import groovy.transform.Field
 
-  checkoutRepo('canvas-lms', refspecToCheckout, 1)
+@Field static final COFFEE_NODE_COUNT = 4
+@Field static final JSG_NODE_COUNT = 3
 
-  credentials.withStarlordDockerLogin { ->
-    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
-  }
+def jestNodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.KARMA_RUNNER_IMAGE,
+    command: 'cat',
+    ttyEnabled: true,
+    runAsUser: '0',
+    resourceRequestCpu: '6.8',
+    resourceLimitCpu: '8'
+  ]
+
+  return [
+    containers: [baseTestContainer + [name: 'jest']]
+  ]
+}
+
+def coffeeNodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.KARMA_RUNNER_IMAGE,
+    command: 'cat',
+    ttyEnabled: true,
+    runAsUser: '0',
+    resourceRequestCpu: '1',
+    resourceLimitCpu: '8'
+  ]
+
+  return [
+    containers: (0..COFFEE_NODE_COUNT).collect { index -> baseTestContainer + [name: "coffee${index}"] }
+  ]
+}
+
+def karmaNodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.KARMA_RUNNER_IMAGE,
+    command: 'cat',
+    ttyEnabled: true,
+    runAsUser: '0',
+    resourceRequestCpu: '0.75',
+    resourceLimitCpu: '8'
+  ]
+
+  def karmaContainers = []
+
+  karmaContainers = karmaContainers + (0..JSG_NODE_COUNT).collect { index -> baseTestContainer + [name: "jsg${index}"] }
+  karmaContainers = karmaContainers + ['jsa', 'jsh', 'packages'].collect { group -> baseTestContainer + [name: group] }
+
+  return [
+    containers: karmaContainers,
+  ]
 }
 
 def tearDownNode() {
-  sh "mkdir -vp ${env.TEST_RESULT_OUTPUT_DIR}"
-  sh "docker cp \$(docker ps -qa -f name=${env.CONTAINER_NAME}):/usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${env.TEST_RESULT_OUTPUT_DIR}"
+  return {
+    sh "mkdir -p ${WORKSPACE}/${env.TEST_RESULT_OUTPUT_DIR}"
+    sh "cp -rf /usr/src/app/${env.TEST_RESULT_OUTPUT_DIR} ${WORKSPACE}/${env.TEST_RESULT_OUTPUT_DIR}"
 
-  sh "find ${env.TEST_RESULT_OUTPUT_DIR}"
-
-  archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
-  junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
-}
-
-def queueJestStage(stages, delegate) {
-  queueTestStage(stages, delegate, 'tests-jest', []) {
-    sh('build/new-jenkins/js/tests-jest.sh')
+    archiveArtifacts artifacts: "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
+    junit "${env.TEST_RESULT_OUTPUT_DIR}/**/*.xml"
   }
 }
 
-def queueKarmaStage(stages, delegate, group, ciNode, ciTotal) {
-  queueTestStage(stages, delegate, "tests-karma-${group}-${ciNode}", [
-    "CI_NODE_INDEX=${ciNode}",
-    "CI_NODE_TOTAL=${ciTotal}",
-    "JSPEC_GROUP=${group}",
-  ]) {
-    sh('build/new-jenkins/js/tests-karma.sh')
+def queueCoffeeDistribution() {
+  { stages ->
+    COFFEE_NODE_COUNT.times { index ->
+      def coffeeEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "CI_NODE_TOTAL=${COFFEE_NODE_COUNT}",
+        'JSPEC_GROUP=coffee',
+      ]
+
+      callableWithDelegate(queueTestStage())(stages, "coffee${index}", coffeeEnvVars, 'cd /usr/src/app && yarn test:karma:headless')
+    }
   }
 }
 
-def queuePackagesStage(stages, delegate) {
-  queueTestStage(stages, delegate, 'tests-packages', []) {
-    sh('build/new-jenkins/js/tests-packages.sh')
+def queueJestDistribution() {
+  { stages ->
+    callableWithDelegate(queueTestStage())(stages, 'jest', [], 'cd /usr/src/app && bundle exec rails graphql:schema && yarn test:jest')
   }
 }
 
-def queueTestStage(stages, delegate, containerName, additionalEnvVars, block) {
-  def baseEnvVars = [
-    "CONTAINER_NAME=${containerName}",
-    "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
-  ]
+def queueKarmaDistribution() {
+  { stages ->
+    JSG_NODE_COUNT.times { index ->
+      def jsgEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "CI_NODE_TOTAL=${JSG_NODE_COUNT}",
+        'JSPEC_GROUP=jsg',
+      ]
 
-  delegate.extendedStage(containerName)
-    .envVars(baseEnvVars + additionalEnvVars)
-    .hooks([onNodeReleasing: this.&tearDownNode])
-    .obeysAllowStages(false)
-    .queue(stages) { block() }
+      callableWithDelegate(queueTestStage())(stages, "jsg${index}", jsgEnvVars, 'cd /usr/src/app && yarn test:karma:headless')
+    }
+
+    ['jsa', 'jsh'].each { group ->
+      callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'cd /usr/src/app && yarn test:karma:headless')
+    }
+
+    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'cd /usr/src/app && TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
+  }
+}
+
+def queueTestStage() {
+  { stages, containerName, additionalEnvVars, scriptName ->
+    def baseEnvVars = [
+      "FORCE_FAILURE=${env.FORCE_FAILURE}",
+      'RAILS_ENV=test',
+      "RAILS_LOAD_ALL_LOCALES=${env.RAILS_LOAD_ALL_LOCALES}",
+      "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
+    ]
+
+    extendedStage(containerName)
+      .envVars(baseEnvVars + additionalEnvVars)
+      .hooks([onNodeReleasing: this.tearDownNode()])
+      .obeysAllowStages(false)
+      .nodeRequirements(container: containerName)
+      .queue(stages) { sh(scriptName) }
+  }
 }

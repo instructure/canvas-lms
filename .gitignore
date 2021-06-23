@@ -42,7 +42,8 @@ npm-debug.log
 /storybook-static/
 /tmp/*
 !/tmp/.keep
-/vendor/bundle
+/vendor/bundle/
+/vendor/cache/
 yarn-error.log
 
 # canvas-gems

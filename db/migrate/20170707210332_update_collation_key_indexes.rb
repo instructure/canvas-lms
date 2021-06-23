@@ -24,7 +24,7 @@ class UpdateCollationKeyIndexes < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def change
-    collkey = connection.extension_installed?(:pg_collkey)
+    collkey = connection.extension(:pg_collkey)&.schema
     return unless collkey
 
     reversible do |dir|

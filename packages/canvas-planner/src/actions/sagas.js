@@ -177,11 +177,11 @@ export function* loadPastUntilTodaySaga() {
   yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {mode: 'past'})
 }
 
-export function* loadWeekSaga({payload}) {
-  yield* loadingLoop(() => payload.weekStart, mergeWeekItems, {
+export function* loadWeekSaga({payload: {weekStart, weekEnd, isPreload}}) {
+  yield* loadingLoop(() => weekStart, mergeWeekItems(weekStart, isPreload), {
     mode: 'week',
     extraParams: {
-      end_date: payload.weekEnd.toISOString(),
+      end_date: weekEnd.toISOString(),
       per_page: MAX_PAGE_SIZE
     }
   })

@@ -20,7 +20,7 @@
 
 require 'nokogiri'
 
-require_relative '../spec_helper'
+require 'spec_helper'
 
 class HashWithDupCheck < Hash
   def []=(k,v)

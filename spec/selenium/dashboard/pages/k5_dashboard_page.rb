@@ -60,6 +60,10 @@ module K5PageObject
     '#tab-tab-modules'
   end
 
+  def dashboard_options_button_selector
+    "[data-testid = 'k5-dashboard-options']"
+  end
+
   def course_card_selector(course_title)
     "div[title='#{course_title}']"
   end
@@ -88,8 +92,8 @@ module K5PageObject
     "h2:contains('#{title}')"
   end
 
-  def announcement_title_selector(announcement_title)
-    "h3:contains('#{announcement_title}')"
+  def announcement_title_xpath_selector(announcement_title)
+    "//h3[text() = '#{announcement_title}']"
   end
 
   def announcement_content_text_selector(content_text)
@@ -145,7 +149,11 @@ module K5PageObject
   end
 
   def teacher_preview_selector
-    "h2:contains('Teacher Schedule Preview')"
+    "h2:contains('Schedule Preview')"
+  end
+
+  def empty_dashboard_selector
+    "[data-testid = 'empty-dash-panda']:visible"
   end
 
   def previous_week_button_selector
@@ -384,6 +392,26 @@ module K5PageObject
     ".user_content"
   end
 
+  def learning_mastery_tab_selector
+    "#tab-k5-outcomes"
+  end
+
+  def assignments_tab_selector
+    "#tab-k5-assignments"
+  end
+
+  def outcomes_group_selector
+    "#outcomes"
+  end
+
+  def empty_modules_image_selector
+    "[data-testid='empty-modules-panda']"
+  end
+
+  def classic_dashboard_header_selector
+    "h1:contains('Dashboard')"
+  end
+
   #------------------------- Elements --------------------------
 
   def enable_homeroom_checkbox
@@ -422,6 +450,14 @@ module K5PageObject
     f(modules_tab_selector)
   end
 
+  def dashboard_options_button
+    f(dashboard_options_button_selector)
+  end
+
+  def dashboard_options
+    INSTUI_Menu_options(dashboard_options_button_selector)
+  end
+
   def course_card(course_title)
     f("div[title='#{course_title}']")
   end
@@ -455,7 +491,7 @@ module K5PageObject
   end
 
   def announcement_title(announcement_title)
-    fj(announcement_title_selector(announcement_title))
+    fxpath(announcement_title_xpath_selector(announcement_title))
   end
 
   def announcement_content_text(content_text)
@@ -508,6 +544,10 @@ module K5PageObject
 
   def teacher_preview
     fj(teacher_preview_selector)
+  end
+
+  def empty_dashboard
+    fj(empty_dashboard_selector)
   end
 
   def beginning_of_week_date
@@ -767,6 +807,26 @@ module K5PageObject
     f(important_info_content_selector)
   end
 
+  def learning_mastery_tab
+    f(learning_mastery_tab_selector)
+  end
+
+  def assignments_tab
+    f(assignments_tab_selector)
+  end
+
+  def outcomes_group
+    f(outcomes_group_selector)
+  end
+
+  def empty_modules_image
+    f(empty_modules_image_selector)
+  end
+
+  def classic_dashboard_header
+    fj(classic_dashboard_header_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
@@ -844,6 +904,10 @@ module K5PageObject
     k5_app_buttons[button_item].click
   end
 
+  def click_dashboard_options_button
+    dashboard_options_button.click
+  end
+
   def click_dashboard_card
     dashboard_card.click
   end
@@ -904,6 +968,10 @@ module K5PageObject
 
   def click_assignment_group_toggle
     assignment_group_toggle.click
+  end
+
+  def click_learning_mastery_tab
+    learning_mastery_tab.click
   end
 
   #------------------------------Retrieve Text----------------------#
@@ -1000,6 +1068,10 @@ module K5PageObject
 
   def input_color_hex_value(hex_value)
     selected_color_input.send_keys(hex_value)
+  end
+
+  def announcement_title_exists?(announcement_heading)
+    element_exists?(announcement_title_xpath_selector(announcement_heading), true)
   end
 
   #----------------------------Create Content---------------------#
@@ -1155,5 +1227,29 @@ module K5PageObject
   def create_important_info_content(course, info_text)
     course.syllabus_body = "<p>#{info_text}</p>"
     course.save!
+  end
+
+  def add_and_assess_rubric_assignment
+    rubric = outcome_with_rubric(course: @subject_course)
+    assignment = create_assignment(@course, "Rubric Assignment", "Description of Rubric", 10)
+    association = rubric.associate_with(assignment, @subject_course, purpose: 'grading', use_for_grading: true)
+    submission = assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    association.assess(
+      user: @student,
+      assessor: @teacher,
+      artifact: submission,
+      assessment: {
+       assessment_type: 'grading',
+       :"criterion_#{@rubric.criteria_object.first.id}" => {
+         points: 3,
+         comments: "a comment",
+       }
+     }
+    )
+    assignment
+  end
+
+  def turn_on_learning_mastery_gradebook
+    @subject_course.enable_feature!(:student_outcome_gradebook)
   end
 end

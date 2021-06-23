@@ -38,7 +38,7 @@ developed primarily in GraphQL and may not be back-ported to the REST API.
 Fields are being added to the GraphQL API on an as-needed basis.  The GraphQL
 API does not include everything that is currently in the REST API.  Feel free
 to submit pull requests on github to add additional features or talk about it
-in the `#canvas-lms` channel on freenode.
+in the `#canvas-lms` channel on libera.chat.
 
 ## GraphQL Endpoint
 

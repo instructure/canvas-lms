@@ -53,7 +53,8 @@ StatusBar.propTypes = {
   onA11yChecker: func.isRequired,
   onFullscreen: func.isRequired,
   use_rce_pretty_html_editor: bool,
-  preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW])
+  preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
+  readOnly: bool
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -130,7 +131,7 @@ export default function StatusBar(props) {
   }
 
   function handleKey(event) {
-    const buttons = findFocusable(statusBarRef.current)
+    const buttons = findFocusable(statusBarRef.current).filter(b => !b.disabled)
     const focusedIndex = buttons.findIndex(b => b.getAttribute('data-btn-id') === focusedBtnId)
     let newFocusedIndex
     if (event.keyCode === keycode.codes.right) {
@@ -214,20 +215,22 @@ export default function StatusBar(props) {
         >
           <ScreenReaderContent>{kbshortcut}</ScreenReaderContent>
         </Button>
-        <Button
-          data-btn-id="rce-a11y-btn"
-          variant="link"
-          icon={IconA11yLine}
-          title={a11y}
-          tabIndex={tabIndexForBtn('rce-a11y-btn')}
-          onClick={event => {
-            event.target.focus()
-            props.onA11yChecker()
-          }}
-          onFocus={() => setFocusedBtnId('rce-a11y-btn')}
-        >
-          <ScreenReaderContent>{a11y}</ScreenReaderContent>
-        </Button>
+        {props.readOnly || (
+          <Button
+            data-btn-id="rce-a11y-btn"
+            variant="link"
+            icon={IconA11yLine}
+            title={a11y}
+            tabIndex={tabIndexForBtn('rce-a11y-btn')}
+            onClick={event => {
+              event.target.focus()
+              props.onA11yChecker()
+            }}
+            onFocus={() => setFocusedBtnId('rce-a11y-btn')}
+          >
+            <ScreenReaderContent>{a11y}</ScreenReaderContent>
+          </Button>
+        )}
       </View>
     )
   }
@@ -268,34 +271,36 @@ export default function StatusBar(props) {
 
     return (
       <View display="inline-block" padding="0 0 0 x-small">
-        <Button
-          data-btn-id="rce-edit-btn"
-          variant="link"
-          icon={emptyTagIcon()}
-          onClick={event => {
-            props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : getHtmlEditorView(event))
-          }}
-          onKeyUp={event => {
-            if (
-              props.use_rce_pretty_html_editor &&
-              props.editorView === WYSIWYG_VIEW &&
-              event.shiftKey &&
-              event.keyCode === 79
-            ) {
-              const html_view =
-                preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
-                  ? PRETTY_HTML_EDITOR_VIEW
-                  : RAW_HTML_EDITOR_VIEW
-              props.onChangeView(html_view)
-            }
-          }}
-          onFocus={() => setFocusedBtnId('rce-edit-btn')}
-          title={titleText}
-          tabIndex={tabIndexForBtn('rce-edit-btn')}
-          aria-describedby={includeEdtrDesc ? 'edit-button-desc' : undefined}
-        >
-          <ScreenReaderContent>{descText}</ScreenReaderContent>
-        </Button>
+        {props.readOnly || (
+          <Button
+            data-btn-id="rce-edit-btn"
+            variant="link"
+            icon={emptyTagIcon()}
+            onClick={event => {
+              props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : getHtmlEditorView(event))
+            }}
+            onKeyUp={event => {
+              if (
+                props.use_rce_pretty_html_editor &&
+                props.editorView === WYSIWYG_VIEW &&
+                event.shiftKey &&
+                event.keyCode === 79
+              ) {
+                const html_view =
+                  preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
+                    ? PRETTY_HTML_EDITOR_VIEW
+                    : RAW_HTML_EDITOR_VIEW
+                props.onChangeView(html_view)
+              }
+            }}
+            onFocus={() => setFocusedBtnId('rce-edit-btn')}
+            title={titleText}
+            tabIndex={tabIndexForBtn('rce-edit-btn')}
+            aria-describedby={includeEdtrDesc ? 'edit-button-desc' : undefined}
+          >
+            <ScreenReaderContent>{descText}</ScreenReaderContent>
+          </Button>
+        )}
         {includeEdtrDesc && (
           <span style={{display: 'none'}} id="edit-button-desc">
             {descMsg()}
@@ -306,6 +311,7 @@ export default function StatusBar(props) {
   }
 
   function renderFullscreen() {
+    if (props.readOnly) return null
     if (props.editorView === RAW_HTML_EDITOR_VIEW && !('requestFullscreen' in document.body)) {
       // this is safari, which refuses to fullscreen a textarea
       return null

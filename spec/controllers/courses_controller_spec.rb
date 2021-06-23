@@ -1036,6 +1036,7 @@ describe CoursesController do
     end
 
     it "should not find deleted courses" do
+      skip('flaky spec: LS-2269')
       user_session(@teacher)
       @course.destroy
       assert_page_not_found do
@@ -2137,6 +2138,7 @@ describe CoursesController do
     end
 
     it 'should not allow unpublishing of the course if submissions present' do
+      skip('flaky spec: LS-2269')
       course_with_student_submissions({active_all: true, submission_points: true})
       put 'update', params: {:id => @course.id, :course => {:event => 'claim'}}
       @course.reload

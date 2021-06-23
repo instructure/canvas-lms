@@ -653,6 +653,9 @@ class CoursesController < ApplicationController
   #   When set, only return courses where the user has an enrollment with the given state.
   #   This will respect section/course/term date overrides.
   #
+  # @argument homeroom [Optional, Boolean]
+  #   If set, only return homeroom courses.
+  #
   # @returns [Course]
   def user_index
     GuardRail.activate(:secondary) do
@@ -875,6 +878,13 @@ class CoursesController < ApplicationController
             return unless verified_user_check
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
+          end
+          # Sync homeroom enrollments if enabled
+          if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id]
+            progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
+            progress.user = @current_user
+            progress.reset!
+            progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
           end
           format.html { redirect_to @course }
           format.json { render :json => course_json(
@@ -1415,8 +1425,11 @@ class CoursesController < ApplicationController
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
         can_do(@context, @current_user, :manage_grades)
 
-      # Temporarily disable querying homeroom_courses until it can be made more performant
-      @homeroom_courses = []
+      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+        @context.account.courses.active.homeroom.to_a
+      else
+        @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a
+      end
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
@@ -1571,7 +1584,8 @@ class CoursesController < ApplicationController
   #   Restrict students from viewing courses before start date
   #
   # @argument show_announcements_on_home_page [Boolean]
-  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit)
+  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit).
+  #   Canvas for Elementary subjects ignore this setting.
   #
   # @argument home_page_announcement_limit [Integer]
   #   Limit the number of announcements on the home page if enabled via show_announcements_on_home_page
@@ -2090,6 +2104,7 @@ class CoursesController < ApplicationController
                  COURSE: {
                    id: @context.id.to_s,
                    name: @context.name,
+                   long_name: "#{@context.name} - #{@context.short_name}",
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
                    color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
@@ -3508,6 +3523,11 @@ class CoursesController < ApplicationController
     if enrollments.any? && value_to_boolean(params[:exclude_blueprint_courses])
       mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => enrollments.map(&:course_id)).pluck(:course_id)
       enrollments.reject!{|e| mc_ids.include?(e.course_id)}
+    end
+
+    if value_to_boolean(params[:homeroom])
+      homeroom_ids = Course.homeroom.where(id: enrollments.map(&:course_id)).pluck(:id)
+      enrollments.reject!{|e| homeroom_ids.exclude?(e.course_id)}
     end
 
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)

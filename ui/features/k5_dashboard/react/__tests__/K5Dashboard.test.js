@@ -19,7 +19,7 @@
 import React from 'react'
 import moment from 'moment-timezone'
 import moxios from 'moxios'
-import {act, render, waitFor} from '@testing-library/react'
+import {act, render, screen, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
@@ -200,7 +200,9 @@ const defaultEnv = {
   TIMEZONE: 'America/Denver'
 }
 const defaultProps = {
+  canDisableElementaryDashboard: false,
   currentUser,
+  currentUserRoles: ['admin'],
   createPermissions: 'none',
   plannerEnabled: false,
   loadAllOpportunities: () => {},
@@ -307,6 +309,7 @@ beforeEach(() => {
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
   fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
+  fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
   global.ENV = defaultEnv
 })
 
@@ -324,6 +327,37 @@ describe('K-5 Dashboard', () => {
   it('displays a welcome message to the logged-in user', () => {
     const {getByText} = render(<K5Dashboard {...defaultProps} />)
     expect(getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
+  })
+
+  it('allows admins and teachers to turn off the elementary dashboard', async () => {
+    const {getByRole} = render(<K5Dashboard {...defaultProps} canDisableElementaryDashboard />)
+    const optionsButton = getByRole('button', {name: 'Dashboard Options'})
+    act(() => optionsButton.click())
+
+    // There should be an Elementary View menu option already checked
+    const elementaryViewOption = screen.getByRole('menuitemradio', {
+      name: 'Elementary View',
+      checked: true
+    })
+    expect(elementaryViewOption).toBeInTheDocument()
+
+    // There should be a Classic View menu option initially un-checked
+    const classicViewOption = screen.getByRole('menuitemradio', {
+      name: 'Classic View',
+      checked: false
+    })
+    expect(classicViewOption).toBeInTheDocument()
+
+    // Clicking the Classic View option should update the user's dashboard setting
+    act(() => classicViewOption.click())
+    await waitFor(() => {
+      expect(fetchMock.called('/api/v1/users/self/settings', 'PUT')).toBe(true)
+      expect(fetchMock.lastOptions('/api/v1/users/self/settings').body).toEqual(
+        JSON.stringify({
+          elementary_dashboard_disabled: true
+        })
+      )
+    })
   })
 
   describe('Tabs', () => {
@@ -443,6 +477,27 @@ describe('K-5 Dashboard', () => {
     it('shows loading skeletons for course cards while they load', () => {
       const {getAllByText} = render(<K5Dashboard {...defaultProps} />)
       expect(getAllByText('Loading Card')[0]).toBeInTheDocument()
+    })
+
+    it('displays an empty state on the homeroom and schedule tabs if the user has no cards', async () => {
+      moxios.stubs.reset()
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+        status: 200,
+        response: []
+      })
+      const {getByRole, getByTestId, getByText} = render(
+        <K5Dashboard {...defaultProps} plannerEnabled />
+      )
+      await waitFor(() =>
+        expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
+      )
+      expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
+
+      const scheduleTab = getByRole('tab', {name: 'Schedule'})
+      act(() => scheduleTab.click())
+
+      expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
+      expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
     })
 
     it('only fetches announcements and LTIs based on cards once per page load', done => {
@@ -570,9 +625,9 @@ describe('K-5 Dashboard', () => {
       )
 
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()
-      expect(getByText('Teacher Schedule Preview')).toBeInTheDocument()
+      expect(getByText('Schedule Preview')).toBeInTheDocument()
       expect(
-        getByText('Below is an example of how your students will see their schedule')
+        getByText('Below is an example of how students will see their schedule')
       ).toBeInTheDocument()
       expect(getByText('Social Studies')).toBeInTheDocument()
       expect(getByText('A great discussion assignment')).toBeInTheDocument()

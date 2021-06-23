@@ -29,11 +29,11 @@ class PermissionsIndex
 
     # ---------------------- Controls ----------------------
     def course_roles_tab
-      f('#tab-course')
+      f('#tab-tab-panel-course')
     end
 
     def account_roles_tab
-      f('#tab-account')
+      f('#tab-tab-panel-account')
     end
 
     def search_box

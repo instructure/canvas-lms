@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import I18n from 'i18n!dashboard_pages_K5AppLink'
+import I18n from 'i18n!k5_app_link'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'

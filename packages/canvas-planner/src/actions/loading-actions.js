@@ -199,6 +199,8 @@ export function getWeeklyPlannerItems(fromMoment) {
     dispatch(getWayFutureItem(fromMoment))
     dispatch(getWayPastItem(fromMoment))
     loadWeekItems(dispatch, getState)
+    loadWeekItems(dispatch, getState, -7)
+    loadWeekItems(dispatch, getState, 7)
   }
 }
 
@@ -217,6 +219,11 @@ export function loadPastWeekItems() {
     } else {
       loadWeekItems(dispatch, getState)
     }
+    // Pre-load the week before the previous week if it isn't loaded yet
+    const nextWeekStart = weekly.weekStart.clone().add(-14, 'days')
+    if (!(nextWeekStart.format() in weekly.weeks)) {
+      loadWeekItems(dispatch, getState, -7)
+    }
   }
 }
 
@@ -230,6 +237,11 @@ export function loadNextWeekItems() {
       dispatch(jumpToWeek({weekDays: weekly.weeks[weekStart.format()]}))
     } else {
       loadWeekItems(dispatch, getState)
+    }
+    // Pre-load the week after the next week if it isn't loaded yet
+    const nextWeekStart = weekly.weekStart.clone().add(14, 'days')
+    if (!(nextWeekStart.format() in weekly.weeks)) {
+      loadWeekItems(dispatch, getState, 7)
     }
   }
 }
@@ -249,9 +261,11 @@ export function loadThisWeekItems() {
   }
 }
 
-function loadWeekItems(dispatch, getState) {
+function loadWeekItems(dispatch, getState, preloadDays = 0) {
   const weekly = getState().weeklyDashboard
-  dispatch(startLoadingWeekSaga({weekStart: weekly.weekStart, weekEnd: weekly.weekEnd}))
+  const weekStart = weekly.weekStart.clone().add(preloadDays, 'days')
+  const weekEnd = weekly.weekEnd.clone().add(preloadDays, 'days')
+  dispatch(startLoadingWeekSaga({weekStart, weekEnd, isPreload: !!preloadDays}))
 }
 
 function getWayFutureItem(fromMoment) {

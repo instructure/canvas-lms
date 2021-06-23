@@ -24,7 +24,7 @@ import React, {lazy, Suspense} from 'react'
 import SubmissionManager from './SubmissionManager'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Tabs} from '@instructure/ui-tabs'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 
 const RubricTab = lazy(() => import('./RubricTab'))
 

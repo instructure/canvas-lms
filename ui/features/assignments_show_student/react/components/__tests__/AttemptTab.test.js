@@ -199,6 +199,21 @@ describe('ContentTabs', () => {
     })
   })
 
+  describe('the submission type is student_annotation', () => {
+    it('renders the student annotation tab', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['student_annotation']}
+      })
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
+    })
+  })
+
   describe('there are multiple submission types', () => {
     describe('when no submission type is selected', () => {
       it('renders the submission type selector if the submission can be modified', async () => {

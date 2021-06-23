@@ -51,7 +51,7 @@ const getTextInput = container => {
 }
 const getToggle = container => {
   return container.getByRole('checkbox', {
-    name: /microsoft sync toggle button/i
+    name: /allows syncing of canvas course members to a microsoft team/i
   })
 }
 

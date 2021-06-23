@@ -738,6 +738,7 @@ describe CommunicationChannel do
     it "sends directly via SMS if configured" do
       expect(cc.e164_path).to eq '+18015555555'
       account = double()
+      expect(Account.site_admin).to_not receive(:feature_enabled?).with(:deprecate_sms)
       allow(account).to receive(:feature_enabled?).and_return(true)
       allow(account).to receive(:global_id).and_return('totes_an_ID')
       expect(Services::NotificationService).to receive(:process).with(

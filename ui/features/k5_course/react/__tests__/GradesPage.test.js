@@ -134,6 +134,16 @@ describe('GradesPage', () => {
           expect(queryByText('Loading total grade for History')).not.toBeInTheDocument()
         )
         expect(getByText('Total: 89.39%')).toBeInTheDocument()
+        expect(getByText('History Total: 89.39%')).toBeInTheDocument()
+      })
+
+      it('displays button to expand assignment group totals', async () => {
+        const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
+        await waitFor(() =>
+          expect(queryByText('Loading assignment group totals')).not.toBeInTheDocument()
+        )
+        expect(getByText('View Assignment Group Totals')).toBeInTheDocument()
+        expect(getByText("View History's Assignment Group Totals")).toBeInTheDocument()
       })
 
       it('displays assignment group totals when expanded', async () => {
@@ -181,6 +191,14 @@ describe('GradesPage', () => {
         fetchMock.get(ENROLLMENTS_URL, enrollmentsData, {overwriteRoutes: true})
         const {findByText} = render(<GradesPage {...getProps()} />)
         expect(await findByText('Total: 84.60% (B)')).toBeInTheDocument()
+      })
+
+      it('shows a message explaining how totals are calculated if totals are shown', async () => {
+        const {findByText, getByText} = render(<GradesPage {...getProps()} />)
+        expect(await findByText('Total: 89.39%')).toBeInTheDocument()
+        expect(
+          getByText('Totals are calculated based only on graded assignments.')
+        ).toBeInTheDocument()
       })
     })
   })

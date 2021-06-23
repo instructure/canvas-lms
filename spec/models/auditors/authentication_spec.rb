@@ -184,6 +184,12 @@ describe Auditors::Authentication do
     describe "sharding" do
       specs_require_sharding
 
+      before(:once) do
+        [Shard.current, @shard1, @shard2].each do |s|
+          s.activate{ Auditors::ActiveRecord::Partitioner.process }
+        end
+      end
+
       context "different shard, same database server" do
         before do
           @shard1.activate do

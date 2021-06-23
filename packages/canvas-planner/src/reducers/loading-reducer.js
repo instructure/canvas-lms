@@ -52,8 +52,8 @@ function getNextUrls(state, action) {
   }
   if (state.isLoading || state.loadingWeek) {
     linkState.weekNextUrl = nextLink
-    if (nextLink == null) linkState.allWeekItemsLoaded = true
   }
+  if (nextLink == null) linkState.allWeekItemsLoaded = true
 
   return linkState
 }

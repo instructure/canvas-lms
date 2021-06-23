@@ -48,6 +48,7 @@ class DashboardHeader extends React.Component {
     dashboard_view: string,
     planner_enabled: bool.isRequired,
     screenReaderFlashMessage: func,
+    canEnableElementaryDashboard: bool,
     env: object,
     showTodoList: func,
     responsiveSize: oneOf(['small', 'medium', 'large'])
@@ -164,14 +165,31 @@ class DashboardHeader extends React.Component {
       })
   }
 
+  saveElementaryPreference(disabled) {
+    return axios
+      .put('/api/v1/users/self/settings', {
+        elementary_dashboard_disabled: disabled
+      })
+      .then(() => window.location.reload())
+      .catch(showFlashError(I18n.t('Failed to save dashboard selection')))
+  }
+
   changeDashboard = newView => {
-    this.saveDashboardView(newView)
-    this.switchDashboard(newView)
+    if (newView === 'elementary') {
+      this.switchToElementary()
+    } else {
+      this.saveDashboardView(newView)
+      this.switchDashboard(newView)
+    }
   }
 
   switchDashboard = newView => {
     this.showDashboard(newView)
     this.setState({currentDashboard: newView})
+  }
+
+  switchToElementary = () => {
+    this.saveElementaryPreference(false)
   }
 
   showDashboard = newView => {
@@ -214,6 +232,7 @@ class DashboardHeader extends React.Component {
               menuButtonRef={ref => {
                 this.menuButtonFocusable = ref
               }}
+              canEnableElementaryDashboard={this.props.canEnableElementaryDashboard}
             />
           </div>
           {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}

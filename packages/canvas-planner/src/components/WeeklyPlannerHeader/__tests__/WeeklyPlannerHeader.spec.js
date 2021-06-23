@@ -190,3 +190,17 @@ describe('processFocusTarget', () => {
     )
   })
 })
+
+describe('personal to-dos', () => {
+  it('opens the to-do editor if todo updateitem prop is set', () => {
+    const todo = {
+      updateTodoItem: {
+        id: 10
+      }
+    }
+    const {queryByTestId, rerender} = render(<WeeklyPlannerHeader {...defaultProps()} />)
+    expect(queryByTestId('todo-editor-modal')).not.toBeInTheDocument()
+    rerender(<WeeklyPlannerHeader {...defaultProps({todo, openEditingPlannerItem: () => {}})} />)
+    expect(queryByTestId('todo-editor-modal')).toBeInTheDocument()
+  })
+})

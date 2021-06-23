@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!k5_course_GradingPeriodSelect'
+import I18n from 'i18n!course_grading_period_select'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'

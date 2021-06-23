@@ -61,7 +61,7 @@ module DataFixup::MoveSubAccountGradingPeriodsToCourses
   end
 
   def self.destroy_sub_account_grading_period_groups_and_grading_periods
-    account_subquery = Account.where.not(root_account_id: nil)
+    account_subquery = Account.non_root_accounts
     groups = GradingPeriodGroup.active.where(account_id: account_subquery)
     groups.find_ids_in_batches do |group_ids_chunk|
       GradingPeriodGroup.where(id: group_ids_chunk).update_all(workflow_state: "deleted")

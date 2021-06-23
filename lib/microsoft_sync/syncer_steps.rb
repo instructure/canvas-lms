@@ -69,7 +69,7 @@ module MicrosoftSync
       3
     end
 
-    def restart_job_after_inactivity
+    def max_delay
       6.hours
     end
 

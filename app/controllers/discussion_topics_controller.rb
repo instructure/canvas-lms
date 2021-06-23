@@ -637,9 +637,9 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def show
+    @topic = @context.all_discussion_topics.find(params[:id])
     # Render updated Post UI if feature flag is enabled
-    if @context.feature_enabled?(:react_discussions_post)
-      @topic = @context.all_discussion_topics.find(params[:id])
+    if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       js_env({
@@ -649,12 +649,12 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
              })
       js_bundle :discussion_topics_post
+      css_bundle :discussions_index
       render html: '', layout: true
       return
     end
 
     parent_id = params[:parent_id]
-    @topic = @context.all_discussion_topics.find(params[:id])
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
     @assignment = if @topic.for_assignment?
       AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
@@ -730,7 +730,7 @@ class DiscussionTopicsController < ApplicationController
             if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
                                              course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
-                                             group(:course_section_id).count
+                group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
                 cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
               end
@@ -764,7 +764,7 @@ class DiscussionTopicsController < ApplicationController
                     !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
                 :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                     !@topic.locked_for?(@current_user, :check_policies => true),
+                  !@topic.locked_for?(@current_user, :check_policies => true),
                 # Can moderate any topic
                 :MODERATE         => user_can_moderate
               },

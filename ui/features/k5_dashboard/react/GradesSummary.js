@@ -30,7 +30,7 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import I18n from 'i18n!k5_dashboard'
+import I18n from 'i18n!grades_summary'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
@@ -191,7 +191,7 @@ GradeSummaryLine.propTypes = GradeSummaryShape
 
 const GradesSummary = ({courses}) => {
   return (
-    <View as="div" margin="medium 0">
+    <View as="div" margin="medium none none">
       {courses.map(course => (
         <GradeSummaryLine key={course.courseId} {...course} />
       ))}

@@ -33,6 +33,7 @@ import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
+import useResize from '@canvas/outcomes/react/hooks/useResize'
 import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
@@ -86,6 +87,7 @@ const OutcomeManagementPanel = () => {
     prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
     return updatedState
   }, {})
+  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
 
   const selected = Object.keys(selectedOutcomes).length
   const noop = () => {}
@@ -97,10 +99,11 @@ const OutcomeManagementPanel = () => {
     rootId,
     selectedGroupId,
     selectedParentGroupId
-  } = useManageOutcomes()
+  } = useManageOutcomes(true)
   const {group, loading, loadMore} = useGroupDetail({
     id: selectedGroupId,
-    searchString: debouncedSearchString
+    searchString: debouncedSearchString,
+    showAlert: false
   })
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
@@ -211,7 +214,7 @@ const OutcomeManagementPanel = () => {
         <NoOutcomesBillboard />
       ) : (
         <>
-          <Flex>
+          <Flex elementRef={setContainerRef}>
             <Flex.Item
               width="33%"
               display="inline-block"
@@ -220,6 +223,7 @@ const OutcomeManagementPanel = () => {
               as="div"
               overflowY="auto"
               overflowX="hidden"
+              elementRef={setLeftColumnRef}
             >
               <View as="div" padding="small none none x-small">
                 <Text size="large" weight="light" fontStyle="normal">
@@ -233,15 +237,26 @@ const OutcomeManagementPanel = () => {
               </View>
             </Flex.Item>
             <Flex.Item
-              width="1%"
-              display="inline-block"
-              position="relative"
-              padding="small none large none"
-              margin="small none none none"
-              borderWidth="none small none none"
-              height="60vh"
               as="div"
-            />
+              position="relative"
+              width="1%"
+              height="60vh"
+              margin="small none none none"
+              padding="small none large none"
+              display="inline-block"
+            >
+              <div
+                data-testid="handlerRef"
+                ref={setDelimiterRef}
+                style={{
+                  width: '1vw',
+                  height: '100%',
+                  cursor: 'col-resize',
+                  background:
+                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+                }}
+              />
+            </Flex.Item>
             <Flex.Item
               as="div"
               width="66%"
@@ -250,6 +265,7 @@ const OutcomeManagementPanel = () => {
               height="60vh"
               overflowY="visible"
               overflowX="auto"
+              elementRef={setRightColumnRef}
             >
               <View as="div" padding="x-small none none x-small">
                 {selectedGroupId && (

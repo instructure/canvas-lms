@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
-          use_rce_enhancements: (@context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
+          use_rce_enhancements: (@context.blank? || @context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
@@ -2589,6 +2589,7 @@ class ApplicationController < ActionController::Base
         permissions[:manage] && 'module_ids'
       ].reject(&:blank?),
       exclude_response_fields: ['description', 'rubric'],
+      exclude_assignment_submission_types: ['wiki_page'],
       override_assignment_dates: !permissions[:manage],
       per_page: ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX
     ), id: 'assignment_groups_url')
@@ -2825,8 +2826,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def k5_user?
+  def k5_disabled?
+    # Only admins and teachers can opt-out of being considered a k5 user
+    can_disable = @current_user.roles(@domain_root_account).any? { |role| %w[admin teacher].include?(role) }
+    can_disable && @current_user.elementary_dashboard_disabled?
+  end
+
+  def k5_user?(check_disabled = true)
     if @current_user
+      return false if check_disabled && k5_disabled?
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
       Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
         uncached_k5_user?

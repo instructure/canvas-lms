@@ -324,6 +324,7 @@ class FeatureFlagsController < ApplicationController
       flag = @context.feature_flags.find_by!(feature: params[:feature])
       prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
+      flag.current_user = @current_user # necessary step for audit log
       if flag.destroy
         feature_def = Feature.definitions[params[:feature]]
         feature_def.after_state_change_proc&.call(@current_user, @context, prior_state, feature_def.state)
@@ -341,6 +342,7 @@ class FeatureFlagsController < ApplicationController
           current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build
       new_flag.assign_attributes(attributes)
+      new_flag.current_user = @current_user # necessary step for audit log
       result = new_flag.save
       [new_flag, result]
     end

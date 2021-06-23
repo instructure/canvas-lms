@@ -489,6 +489,38 @@ describe('Upload data actions', () => {
     })
 
     describe('link embed', () => {
+      describe('when the content-type is preveiewable by canvas', () => {
+        const uploadResult = {
+          display_name: 'display_name',
+          url: 'http://somewhere',
+          'content-type': 'application/pdf'
+        }
+
+        it('inserts link with data-canvas-previewable', () => {
+          actions.embedUploadResult(uploadResult)
+          sinon.assert.calledWithMatch(
+            Bridge.insertLink,
+            {
+              'data-canvas-previewable': true,
+              title: uploadResult.display_name,
+              href: uploadResult.url
+            },
+            false
+          )
+        })
+
+        it('sets "disablePreview" embed data to true', () => {
+          actions.embedUploadResult(uploadResult)
+          sinon.assert.calledWithMatch(
+            Bridge.insertLink,
+            {
+              embed: {disablePreview: true}
+            },
+            false
+          )
+        })
+      })
+
       it('inserts link with display_name as title', () => {
         const expected = 'foo'
         actions.embedUploadResult({display_name: expected})
@@ -499,24 +531,6 @@ describe('Upload data actions', () => {
         const expected = 'http://github.com'
         actions.embedUploadResult({url: expected})
         sinon.assert.calledWithMatch(Bridge.insertLink, {href: expected}, false)
-      })
-
-      it('inserts link with data-canvas-previewable if the content-type is previewable by canvas', () => {
-        const uploadResult = {
-          display_name: 'display_name',
-          url: 'http://somewhere',
-          'content-type': 'application/pdf'
-        }
-        actions.embedUploadResult(uploadResult)
-        sinon.assert.calledWithMatch(
-          Bridge.insertLink,
-          {
-            'data-canvas-previewable': true,
-            title: uploadResult.display_name,
-            href: uploadResult.url
-          },
-          false
-        )
       })
 
       it('delegates to fileEmbed for embed data', () => {

@@ -22,6 +22,8 @@ const defaultTinymceConfig = {
   // to override (though you really should provide content_css)
   // ============================================================================
 
+  auto_focus: false,
+
   // any values provided (in an array) will be merged into the standard then sorted
   // you provide the translations
   block_formats: undefined,
@@ -82,6 +84,8 @@ const defaultTinymceConfig = {
   // copied from
   // https://www.tiny.cloud/docs-3x/reference/configuration/Configuration3x@valid_elements/#defaultruleset
   // then edited.
+  //
+  // this list needs to be kept in sync with the list in gems/canvas_sanitize/lib/canvas_sanitize/canvas_sanitize.rb
   valid_elements:
     '@[id|class|style|title|dir<ltr?rtl|lang|xml::lang|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup|role],a[rel|rev|charset|hreflang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur],strong/b,em/i,strike,u,#p,-ol[type|compact],-ul[type|compact],-li,br,img[longdesc|usemap|src|border|alt|title|hspace|vspace|width|height|align|role],-sub,-sup,-blockquote,-table[border=0|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor],-tr[rowspan|width|height|align|valign|bgcolor|background|bordercolor],tbody,thead,tfoot,#td[colspan|rowspan|width|height|align|valign|bgcolor|background|bordercolor|scope],#th[colspan|rowspan|width|height|align|valign|scope],caption,-div,-span,-code,-pre,address,-h1,-h2,-h3,-h4,-h5,-h6,hr[size|noshade],-font[face|size|color],dd,dl,dt,cite,abbr,acronym,del[datetime|cite],ins[datetime|cite],object[classid|width|height|codebase|*],param[name|value|_value],embed[type|width|height|src|*],script[src|type],map[name],area[shape|coords|href|alt|target],bdo,col[align|char|charoff|span|valign|width],colgroup[align|char|charoff|span|valign|width],dfn,kbd,label[for],legend,q[cite],samp,small,tt,var,big,figure,figcaption,source,track,mark,article,aside,details,footer,header,nav,section,summary,time',
   extended_valid_elements:

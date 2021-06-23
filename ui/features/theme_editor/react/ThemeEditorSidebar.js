@@ -17,19 +17,29 @@
  */
 
 import I18n from 'i18n!theme_editor'
-import React from 'react'
+import React, {useState} from 'react'
 import {bool, func, object} from 'prop-types'
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import types from '@canvas/theme-editor/react/PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 
 export default function ThemeEditorSidebar(props) {
+  const [selected, setSelected] = useState('tab-panel-edit')
+
+  function changeTab(_ev, {id}) {
+    setSelected(id)
+  }
+
   if (props.allowGlobalIncludes) {
     return (
-      <TabList variant="minimal" size="medium" padding="0">
-        <TabList.Panel title={I18n.t('Edit')}>
+      <Tabs padding="0" onRequestTabChange={changeTab}>
+        <Tabs.Panel
+          renderTitle={I18n.t('Edit')}
+          id="tab-panel-edit"
+          isSelected={selected === 'tab-panel-edit'}
+        >
           <ThemeEditorAccordion
             variableSchema={props.variableSchema}
             brandConfigVariables={props.brandConfig.variables}
@@ -39,8 +49,13 @@ export default function ThemeEditorSidebar(props) {
             themeState={props.themeState}
             handleThemeStateChange={props.handleThemeStateChange}
           />
-        </TabList.Panel>
-        <TabList.Panel title={I18n.t('Upload')} padding="0">
+        </Tabs.Panel>
+        <Tabs.Panel
+          renderTitle={I18n.t('Upload')}
+          id="tab-panel-upload"
+          isSelected={selected === 'tab-panel-upload'}
+          padding="0"
+        >
           <div className="Theme__editor-upload-overrides">
             <div className="Theme__editor-upload-warning">
               <div className="Theme__editor-upload-warning_icon">
@@ -126,8 +141,8 @@ export default function ThemeEditorSidebar(props) {
               />
             </div>
           </div>
-        </TabList.Panel>
-      </TabList>
+        </Tabs.Panel>
+      </Tabs>
     )
   }
   return (

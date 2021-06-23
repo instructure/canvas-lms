@@ -42,12 +42,14 @@ module Api::V1::Account
     attributes = %w(id name parent_account_id root_account_id workflow_state uuid)
     if read_only
       return api_json(account, user, session, :only => attributes).tap do |hash|
+        hash['root_account_id'] = nil if account.root_account?
         hash['default_time_zone'] = account.default_time_zone.tzinfo.name
       end
     end
 
     methods = %w(default_storage_quota_mb default_user_storage_quota_mb default_group_storage_quota_mb)
     api_json(account, user, session, :only => attributes, :methods => methods).tap do |hash|
+      hash['root_account_id'] = nil if account.root_account?
       hash['default_time_zone'] = account.default_time_zone.tzinfo.name
       hash['sis_account_id'] = account.sis_source_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash['sis_import_id'] = account.sis_batch_id if !account.root_account? && account.root_account.grants_right?(user, session, :manage_sis)

@@ -32,9 +32,9 @@ import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentFooter from './StudentFooter'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))

@@ -17,114 +17,139 @@
  */
 
 import I18n from 'i18n!permissions_v2'
-import React, {Component} from 'react'
+import React, {useEffect, useState} from 'react'
 import {func, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
-import {debounce} from 'lodash'
+import {isEqual} from 'lodash'
+import {useDebounce} from 'use-debounce'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
-import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {TabList} from '@instructure/ui-tabs'
-import {Select} from '@instructure/ui-forms'
+import {Tabs} from '@instructure/ui-tabs'
+import CanvasMultiSelect from '@canvas/multi-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
 
 import actions from '../actions'
-import propTypes, {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '@canvas/permissions/react/propTypes'
+import propTypes, {
+  COURSE,
+  ACCOUNT,
+  ALL_ROLES_VALUE,
+  ALL_ROLES_LABEL
+} from '@canvas/permissions/react/propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
 import {ConnectedPermissionTray} from './PermissionTray'
 import {ConnectedRoleTray} from './RoleTray'
 import {ConnectedAddTray} from './AddTray'
 
-const SEARCH_DELAY = 350
-const COURSE_TAB_INDEX = 0
-
-export default class PermissionsIndex extends Component {
-  static propTypes = {
-    filterRoles: func.isRequired,
-    roles: arrayOf(propTypes.role).isRequired,
-    searchPermissions: func.isRequired,
-    setAndOpenAddTray: func.isRequired,
-    tabChanged: func.isRequired,
-    selectedRoles: arrayOf(propTypes.filteredRole).isRequired
+function setDiff(minuend, subtrahend) {
+  const difference = new Set(minuend)
+  for (const elt of subtrahend) {
+    difference.delete(elt)
   }
+  return difference
+}
 
-  state = {
-    permissionSearchString: '',
-    contextType: COURSE
-  }
+const SEARCH_DELAY = 500
 
-  onRoleFilterChange = (_, value) => {
-    if (value.length > this.props.selectedRoles.length) {
-      const addedValue = value.filter(option => {
-        const addedElement = this.props.selectedRoles.findIndex(i => i.label === option.label)
-        return addedElement < 0
-      })
-      $.screenReaderFlashMessage(I18n.t('%{value} Added', {value: addedValue[0].label}))
-    } else if (value.length < this.props.selectedRoles.length) {
-      const removedValue = this.props.selectedRoles.filter(option => {
-        const removedElement = value.findIndex(i => i.label === option.label)
-        return removedElement < 0
-      })
-      $.screenReaderFlashMessage(I18n.t('%{value} Removed', {value: removedValue[0].label}))
-    }
-    const valueCopy = value.filter(option => option.value !== ALL_ROLES_VALUE)
-    this.props.filterRoles({
-      selectedRoles: valueCopy,
-      contextType: this.state.contextType
+export default function PermissionsIndex(props) {
+  const [contextType, setContextType] = useState(COURSE)
+  const [selectedTabId, setSelectedTabId] = useState('tab-panel-course')
+  const [permissionSearchString, setPermissionSearchString] = useState('')
+  const [debouncedSearchString] = useDebounce(permissionSearchString, SEARCH_DELAY)
+
+  useEffect(() => {
+    const searchPermissions = props.searchPermissions
+
+    searchPermissions({
+      permissionSearchString: debouncedSearchString,
+      contextType
     })
+  }, [contextType, debouncedSearchString, props.searchPermissions])
+
+  function onSearchStringChange(e) {
+    setPermissionSearchString(e.target.value)
   }
 
-  onSearchStringChange = e => {
-    this.setState({permissionSearchString: e.target.value}, this.filterPermissions)
-  }
+  function onRoleFilterChange(newIdList) {
+    let resultSet = new Set(newIdList)
+    const oldSet = new Set(props.selectedRoles.map(r => r.id || r.value))
+    if (oldSet.size === 0) oldSet.add(ALL_ROLES_VALUE)
+    if (resultSet.size === 0) resultSet.add(ALL_ROLES_VALUE)
 
-  onTabChanged = (newIndex, oldIndex) => {
-    if (newIndex === oldIndex) return
-    const newContextType = newIndex === COURSE_TAB_INDEX ? COURSE : ACCOUNT
-    this.props.filterRoles({
-      selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
-      contextType: this.state.contextType
-    })
-    this.setState(
-      {
-        permissionSearchString: '',
-
-        contextType: newContextType
-      },
-      () => {
-        this.props.tabChanged(newContextType)
+    if (!oldSet.has(ALL_ROLES_VALUE) && resultSet.has(ALL_ROLES_VALUE)) {
+      resultSet = new Set(ALL_ROLES_VALUE)
+    } else {
+      const added = setDiff(resultSet, oldSet)
+      const removed = setDiff(oldSet, resultSet)
+      if (added.size > 0) {
+        const addedRole = props.roles.find(r => added.has(r.id || r.value))
+        $.screenReaderFlashMessage(I18n.t('%{value} Added', {value: addedRole.label}))
       }
-    )
-  }
-
-  onAutocompleteBlur = e => {
-    if (e.target.value === '' && this.props.selectedRoles.length === 0) {
-      this.props.filterRoles({
-        selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
-        contextType: this.state.contextType
-      })
+      if (removed.size > 0) {
+        const removedRole = props.roles.find(r => removed.has(r.id || r.value))
+        $.screenReaderFlashMessage(I18n.t('%{value} Removed', {value: removedRole.label}))
+      }
     }
+
+    if (resultSet.size > 1) resultSet.delete(ALL_ROLES_VALUE)
+    if (isEqual(oldSet, resultSet)) return
+    const sel = props.roles.filter(r => resultSet.has(r.id))
+    props.filterRoles({
+      selectedRoles: sel,
+      contextType
+    })
   }
 
-  filterPermissions = debounce(() => this.props.searchPermissions(this.state), SEARCH_DELAY, {
-    leading: false,
-    trailing: true
-  })
+  function onTabChanged(_e, {id}) {
+    if (id === selectedTabId) return
+    const newContextType = id === 'tab-panel-course' ? COURSE : ACCOUNT
+    props.filterRoles({
+      selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
+      contextType
+    })
+    setPermissionSearchString('')
+    setContextType(newContextType)
+    setSelectedTabId(id)
+    props.tabChanged(newContextType)
+  }
 
-  renderHeader() {
+  function optionsToRender() {
+    const options = props.roles
+      .filter(role => role.contextType === contextType)
+      .map(role => (
+        <CanvasMultiSelect.Option
+          key={role.id}
+          id={role.id || role.value}
+          value={role.value || role.id}
+        >
+          {role.label}
+        </CanvasMultiSelect.Option>
+      ))
+
+    options.push(
+      <CanvasMultiSelect.Option key={ALL_ROLES_VALUE} id={ALL_ROLES_VALUE} value={ALL_ROLES_VALUE}>
+        {ALL_ROLES_LABEL}
+      </CanvasMultiSelect.Option>
+    )
+    return options
+  }
+
+  function renderHeader() {
+    const selectedIds = props.selectedRoles.map(r => r.id || r.value)
+    if (selectedIds.length === 0) selectedIds.push(ALL_ROLES_VALUE)
     return (
       <div className="permissions-v2__header_container">
         <View display="block">
-          <Grid startAt="large" rowSpacing="small">
+          <Grid>
             <Grid.Row vAlign="middle">
-              <Grid.Col width="auto">
+              <Grid.Col width={3}>
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
@@ -133,45 +158,29 @@ export default class PermissionsIndex extends Component {
                       <IconSearchLine focusable={false} />
                     </span>
                   )}
-                  onChange={this.onSearchStringChange}
+                  onChange={onSearchStringChange}
                   name="permission_search"
                 />
               </Grid.Col>
-              <Grid.Col width={null}>
-                <Select
+              <Grid.Col width={8}>
+                <CanvasMultiSelect
                   id="permissions-role-filter"
-                  label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
-                  selectedOption={this.props.selectedRoles}
-                  onBlur={this.onAutocompleteBlur}
-                  multiple
-                  editable
+                  label=""
                   assistiveText={I18n.t(
-                    'Start typing to search. Press the down arrow to navigate results.'
+                    'Filter Roles. Type or use arrow keys to navigate. Multiple selections are allowed.'
                   )}
-                  onChange={this.onRoleFilterChange}
-                  formatSelectedOption={tag => (
-                    <AccessibleContent
-                      alt={I18n.t(`Remove role filter %{label}`, {label: tag.label})}
-                    >
-                      {tag.label}
-                    </AccessibleContent>
-                  )}
+                  onChange={onRoleFilterChange}
+                  selectedOptionIds={selectedIds}
                 >
-                  {this.props.roles
-                    .filter(role => role.contextType === this.state.contextType)
-                    .map(role => (
-                      <option key={`${role.id}`} value={`${role.id}`}>
-                        {role.label}
-                      </option>
-                    ))}
-                </Select>
+                  {optionsToRender()}
+                </CanvasMultiSelect>
               </Grid.Col>
-              <Grid.Col width="auto">
+              <Grid.Col width={2}>
                 <Button
                   id="add_role"
                   variant="primary"
                   margin="0 x-small 0 0"
-                  onClick={this.props.setAndOpenAddTray}
+                  onClick={props.setAndOpenAddTray}
                 >
                   {I18n.t('Add Role')}
                 </Button>
@@ -183,34 +192,44 @@ export default class PermissionsIndex extends Component {
     )
   }
 
-  render() {
-    return (
-      <div className="permissions-v2__wrapper">
-        <ScreenReaderContent>
-          <Heading level="h1">{I18n.t('Permissions')}</Heading>
-        </ScreenReaderContent>
-        <ConnectedRoleTray />
-        <ConnectedAddTray />
-        <ConnectedPermissionTray
-          tab={
-            this.props.roles.length
-              ? this.props.roles.find(role => !!role.displayed).contextType
-              : COURSE
-          }
-        />
-        <TabList onChange={this.onTabChanged}>
-          <TabList.Panel title={I18n.t('Course Roles')}>
-            {this.renderHeader()}
-            <ConnectedPermissionsTable />
-          </TabList.Panel>
-          <TabList.Panel title={I18n.t('Account Roles')}>
-            {this.renderHeader()}
-            <ConnectedPermissionsTable />
-          </TabList.Panel>
-        </TabList>
-      </div>
-    )
-  }
+  return (
+    <div className="permissions-v2__wrapper">
+      <ScreenReaderContent>
+        <Heading level="h1">{I18n.t('Permissions')}</Heading>
+      </ScreenReaderContent>
+      <ConnectedRoleTray />
+      <ConnectedAddTray />
+      <ConnectedPermissionTray
+        tab={props.roles.length ? props.roles.find(role => !!role.displayed).contextType : COURSE}
+      />
+      <Tabs onRequestTabChange={onTabChanged}>
+        <Tabs.Panel
+          id="tab-panel-course"
+          renderTitle={I18n.t('Course Roles')}
+          isSelected={selectedTabId === 'tab-panel-course'}
+        >
+          {renderHeader()}
+          <ConnectedPermissionsTable />
+        </Tabs.Panel>
+        <Tabs.Panel
+          id="tab-panel-account"
+          renderTitle={I18n.t('Account Roles')}
+          isSelected={selectedTabId === 'tab-panel-account'}
+        >
+          {renderHeader()}
+          <ConnectedPermissionsTable />
+        </Tabs.Panel>
+      </Tabs>
+    </div>
+  )
+}
+
+PermissionsIndex.propTypes = {
+  filterRoles: func.isRequired,
+  roles: arrayOf(propTypes.role).isRequired,
+  searchPermissions: func.isRequired,
+  tabChanged: func.isRequired,
+  selectedRoles: arrayOf(propTypes.filteredRole).isRequired
 }
 
 function mapStateToProps(state, ownProps) {

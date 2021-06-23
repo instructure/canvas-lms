@@ -37,7 +37,9 @@ export default function MicrosoftSyncTitle(props) {
           id="microsoft_sync_toggle_button"
           checked={props.syncEnabled}
           label={
-            <ScreenReaderContent>{I18n.t('Microsoft Sync Toggle Button')}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {I18n.t('Allows syncing of Canvas course members to a Microsoft Team')}
+            </ScreenReaderContent>
           }
           labelPlacement="start"
           onChange={props.handleClick}

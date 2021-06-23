@@ -21,21 +21,25 @@ import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 
 import {
-  createTeacherPreview,
   loadThisWeekItems,
   startLoadingAllOpportunities,
   responsiviser,
   store,
   toggleMissingItems
 } from '@instructure/canvas-planner'
-import {Heading} from '@instructure/ui-heading'
 import {
   IconBankLine,
   IconCalendarMonthLine,
   IconHomeLine,
+  IconMoreLine,
   IconStarLightLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {Menu} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 
 import K5Tabs from '@canvas/k5/react/K5Tabs'
@@ -46,11 +50,16 @@ import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
-import {groupAnnouncementsByHomeroom, FOCUS_TARGETS, TAB_IDS} from '@canvas/k5/react/utils'
+import {
+  groupAnnouncementsByHomeroom,
+  saveElementaryDashboardPreference,
+  FOCUS_TARGETS,
+  TAB_IDS
+} from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
-import useTabState from '@canvas/k5/react/hooks/useTabState'
-import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import usePlanner from '@canvas/k5/react/hooks/usePlanner'
+import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const DASHBOARD_TABS = [
@@ -76,20 +85,43 @@ const DASHBOARD_TABS = [
   }
 ]
 
+const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
+  return (
+    <Menu
+      trigger={
+        <Button variant="icon" icon={IconMoreLine} data-testid="k5-dashboard-options">
+          <ScreenReaderContent>{I18n.t('Dashboard Options')}</ScreenReaderContent>
+        </Button>
+      }
+    >
+      <Menu.Group
+        label={I18n.t('Dashboard View')}
+        onSelect={onDisableK5Dashboard}
+        selected={['elementary']}
+      >
+        <Menu.Item value="classic">{I18n.t('Classic View')}</Menu.Item>
+        <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
+      </Menu.Group>
+    </Menu>
+  )
+}
+
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
-  loadingOpportunities,
+  createPermissions,
   currentUser: {display_name},
+  currentUserRoles,
+  loadingOpportunities,
   loadAllOpportunities,
   switchToToday,
   timeZone,
+  locale,
   toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large',
-  createPermissions
+  responsiveSize = 'large'
 }) => {
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
   const [cards, setCards] = useState(null)
@@ -104,9 +136,10 @@ export const K5Dashboard = ({
     focusFallback: tabsRef,
     callback: () => loadAllOpportunities()
   })
+  const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
 
   useEffect(() => {
-    if (!cards && (currentTab === TAB_IDS.HOMEROOM || currentTab === TAB_IDS.RESOURCES)) {
+    if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
         const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
         setCards(activeCards)
@@ -165,10 +198,27 @@ export const K5Dashboard = ({
     switchToToday()
   }
 
-  const dashboardHeader = (sticky, name) => (
-    <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
-      {I18n.t('Welcome, %{name}!', {name})}
-    </Heading>
+  const handleDisableK5Dashboard = (e, [newView]) => {
+    if (newView === 'classic') {
+      saveElementaryDashboardPreference(true)
+        .then(() => window.location.reload())
+        .catch(showFlashError(I18n.t('Failed to opt-out of the Canvas for Elementary dashboard')))
+    }
+  }
+
+  const renderDashboardHeader = sticky => (
+    <Flex as="section">
+      <Flex.Item shouldGrow>
+        <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
+          {I18n.t('Welcome, %{name}!', {name: display_name})}
+        </Heading>
+      </Flex.Item>
+      {canDisableElementaryDashboard && (
+        <Flex.Item>
+          <K5DashboardOptionsMenu onDisableK5Dashboard={handleDisableK5Dashboard} />
+        </Flex.Item>
+      )}
+    </Flex>
   )
 
   return (
@@ -194,7 +244,7 @@ export const K5Dashboard = ({
             tabs={DASHBOARD_TABS}
             tabsRef={setTabsRef}
           >
-            {sticky => dashboardHeader(sticky, display_name)}
+            {renderDashboardHeader}
           </K5Tabs>
         )}
         <HomeroomPage
@@ -204,9 +254,15 @@ export const K5Dashboard = ({
           loadingAnnouncements={loadingAnnouncements}
           visible={currentTab === TAB_IDS.HOMEROOM}
         />
-        {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
-        {!plannerEnabled && currentTab === TAB_IDS.SCHEDULE && createTeacherPreview(timeZone)}
-        <GradesPage visible={currentTab === TAB_IDS.GRADES} />
+        <SchedulePage
+          plannerEnabled={plannerEnabled}
+          plannerInitialized={plannerInitialized}
+          timeZone={timeZone}
+          locale={locale}
+          userHasEnrollments={!!cards?.length}
+          visible={currentTab === TAB_IDS.SCHEDULE}
+        />
+        <GradesPage visible={currentTab === TAB_IDS.GRADES} currentUserRoles={currentUserRoles} />
         {cards && (
           <ResourcesPage
             cards={cards}
@@ -226,18 +282,20 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  loadingOpportunities: PropTypes.bool.isRequired,
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   currentUser: PropTypes.shape({
     display_name: PropTypes.string
   }).isRequired,
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  loadingOpportunities: PropTypes.bool.isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
   switchToToday: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
+  locale: PropTypes.string.isRequired,
   toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired
+  responsiveSize: PropTypes.string
 }
 
 const mapDispatchToProps = {

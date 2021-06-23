@@ -40,10 +40,10 @@ describe Auditors do
   end
 
   describe "settings parsing" do
-    it "parses pre-change write paths" do
+    it "parses pre-change write paths (but with deprecation forces postgres writes)" do
       inject_auditors_settings("write_paths:\n  - cassandra\nread_path: cassandra")
       expect(Auditors.write_to_cassandra?).to eq(true)
-      expect(Auditors.write_to_postgres?).to eq(false)
+      expect(Auditors.write_to_postgres?).to eq(true)
       expect(Auditors.read_from_cassandra?).to eq(true)
       expect(Auditors.read_from_postgres?).to eq(false)
     end

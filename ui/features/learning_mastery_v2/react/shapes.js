@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createStore, applyMiddleware} from 'redux'
-import ReduxThunk from 'redux-thunk'
-import rootReducer from 'jsx/announcements/reducer'
+import PropTypes from 'prop-types'
 
-export default function mockStore(initialState) {
-  return applyMiddleware(ReduxThunk)(createStore)(rootReducer, initialState)
+export const proficiencyRatingShape = {
+  points: PropTypes.number,
+  color: PropTypes.string,
+  description: PropTypes.string.isRequired,
+  masteryAt: PropTypes.number.isRequired
+}
+
+export const studentShape = {
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  display_name: PropTypes.string.isRequired,
+  avatar_url: PropTypes.string
 }

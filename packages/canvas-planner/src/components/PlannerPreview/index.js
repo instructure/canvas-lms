@@ -106,7 +106,7 @@ const ITEMS = [
   }
 ]
 
-export default function TeacherPreview({timeZone}) {
+export default function PlannerPreview({timeZone}) {
   return (
     <View as="section">
       <View as="section" margin="x-large large">
@@ -116,11 +116,11 @@ export default function TeacherPreview({timeZone}) {
           </View>
           <Text letterSpacing="expanded">
             <Heading as="h2" level="h3" margin="small">
-              {formatMessage('Teacher Schedule Preview')}
+              {formatMessage('Schedule Preview')}
             </Heading>
           </Text>
           <Text>
-            {formatMessage('Below is an example of how your students will see their schedule')}
+            {formatMessage('Below is an example of how students will see their schedule')}
           </Text>
         </Flex>
       </View>
@@ -137,6 +137,6 @@ export default function TeacherPreview({timeZone}) {
   )
 }
 
-TeacherPreview.propTypes = {
+PlannerPreview.propTypes = {
   timeZone: string.isRequired
 }

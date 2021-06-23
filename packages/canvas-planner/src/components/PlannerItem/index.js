@@ -560,7 +560,7 @@ export class PlannerItem extends Component {
         >
           <Checkbox
             ref={this.registerFocusElementRef}
-            aria-label={checkboxLabel}
+            label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
             checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
             onChange={this.props.toggleCompletion}
             disabled={this.props.toggleAPIPending}

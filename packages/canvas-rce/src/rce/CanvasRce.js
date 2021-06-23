@@ -17,12 +17,13 @@
  */
 
 import React, {forwardRef, useState} from 'react'
-import {arrayOf, func, number, string} from 'prop-types'
+import {arrayOf, bool, func, number, object, objectOf, oneOfType, shape, string} from 'prop-types'
 import formatMessage from '../format-message'
 import RCEWrapper, {toolbarPropType, menuPropType} from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
+import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
 import defaultTinymceConfig from '../defaultTinymceConfig'
 import getTranslations from '../getTranslations'
@@ -36,53 +37,34 @@ if (!process?.env?.BUILD_LOCALE) {
   })
 }
 
-const baseProps = {
-  autosave: {enabled: false},
-  defaultContent: '',
-  // handleUnmount: () => {},
-  instRecordDisabled: false,
-  language: 'en',
-  // languages: [],
-  liveRegion: () => document.getElementById('flash_screenreader_holder'),
-  mirroredAttrs: {name: 'message'}, // ???
-  // onBlur: () => {},
-  // onFous: () => {},
-  textareaClassName: 'input-block-level',
-  // textareaId: 'textarea2',
-  // trayProps: {
-  //   canUploadFiles: false,
-  //   containingContext: {contextType: 'course', contextId: '1', userId: '1'},
-  //   contextId: '1',
-  //   contextType: 'course',
-  //   filesTabDisabled: true,
-  //   host: 'localhost:3001', // RCS
-  //   jwt: 'this is not for real', // RCE
-  //   refreshToken: () => {},
-  //   themeUrl: undefined // "/dist/brandable_css/default/variables-8391c84da435c9cfceea2b2b3317ff66.json"
-  // },
-  highContrastCSS: [],
-  use_rce_pretty_html_editor: true,
-  editorOptions: {...defaultTinymceConfig}
-}
-
-function addCanvasConnection(propsOut, propsIn) {
-  if (propsIn.trayProps) {
-    propsOut.trayProps = propsIn.trayProps
-  }
-}
-
 // forward rceRef to it refs the RCEWrapper where clients can call getCode etc. on it.
-const CanvasRce = forwardRef((props, rceRef) => {
+const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   const {
+    autosave,
     defaultContent,
-    textareaId,
+    editorOptions, // tinymce config
     height,
-    language,
     highContrastCSS,
+    instRecordDisabled,
+    language,
+    liveRegion,
+    mirroredAttrs, // attributes to transfer from the original textarea to the one created by tinymce
+    menu,
+    plugins,
+    readOnly,
+    textareaId,
+    textareaClassName,
     trayProps,
+    toolbar,
+    use_rce_pretty_html_editor,
+    use_rce_buttons_and_icons,
+    onFocus,
+    onBlur,
+    onInit,
     onContentChange,
     ...rest
   } = props
+
   useState(() => formatMessage.setup({locale: normalizeLocale(props.language)}))
   const [translations, setTranslations] = useState(() => {
     const locale = normalizeLocale(props.language)
@@ -98,53 +80,104 @@ const CanvasRce = forwardRef((props, rceRef) => {
     return p
   }, [])
 
-  // merge CanvasRce props into the base properties
-  // Note: languages is a bit of a mess. Tinymce and Canvas
+  // some properties are only used on initialization
+  // Languages is a bit of a mess. Tinymce and Canvas
   // have 2 different sets of language names. normalizeLocale
-  // takes the lanbuage prop and returns the locale Canvas knows.
+  // takes the language prop and returns the locale Canvas knows,
   // editorLanguage takes the language prop and returns the
-  // corresponding name for tinymce.
-  const [wrapperProps] = useState(() => {
-    const rceProps = {...baseProps}
-    rceProps.language = normalizeLocale(props.language || 'en')
-    rceProps.highContrastCSS = highContrastCSS || []
-    rceProps.defaultContent = defaultContent
-    rceProps.textareaId = textareaId
-    rceProps.onContentChange = onContentChange
-    rceProps.editorOptions.selector = `#${textareaId}`
-    rceProps.editorOptions.height = height
-    rceProps.editorOptions.language = editorLanguage(props.language || 'en')
-    rceProps.editorOptions.toolbar = props.toolbar
-    rceProps.editorOptions.menu = props.menu
-    rceProps.editorOptions.menubar = props.menu ? Object.keys(props.menu).join(' ') : undefined
-    rceProps.editorOptions.plugins = props.plugins
-    rceProps.trayProps = trayProps
+  // corresponding locale for tinymce.
+  const [initOnlyProps] = useState(() => {
+    const iProps = {
+      autosave,
+      defaultContent,
+      highContrastCSS,
+      instRecordDisabled,
+      language: normalizeLocale(language),
+      liveRegion,
+      menu,
+      plugins,
+      textareaId,
+      textareaClassName,
+      trayProps,
+      toolbar,
+      use_rce_pretty_html_editor,
+      use_rce_buttons_and_icons,
+      editorOptions: Object.assign(editorOptions, editorOptions, {
+        selector: `#${textareaId}`,
+        height,
+        language: editorLanguage(props.language),
+        toolbar: props.toolbar,
+        menu: props.menu,
+        menubar: props.menu ? Object.keys(props.menu).join(' ') : undefined,
+        plugins: props.plugins,
+        readonly: readOnly
+      })
+    }
+    wrapInitCb(mirroredAttrs, iProps.editorOptions)
 
-    addCanvasConnection(rceProps, props)
-
-    return rceProps
-  }, [])
+    return iProps
+  })
 
   if (typeof translations !== 'boolean') {
     return formatMessage('Loading...')
   } else {
-    return <RCEWrapper ref={rceRef} tinymce={tinyRCE} {...wrapperProps} {...rest} />
+    return (
+      <RCEWrapper
+        ref={rceRef}
+        tinymce={tinyRCE}
+        readOnly={readOnly}
+        {...initOnlyProps}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onContentChange={onContentChange}
+        onInitted={onInit}
+        {...rest}
+      />
+    )
   }
 })
 
 export default CanvasRce
 
 CanvasRce.propTypes = {
-  language: string,
+  autosave: shape({enabled: bool, maxAge: number}),
   defaultContent: string,
-  textareaId: string.isRequired,
-  height: number,
+  editorOptions: object, // tinymce config
+  height: oneOfType([number, string]),
   highContrastCSS: arrayOf(string),
-  trayProps: trayPropTypes,
-  toolbar: toolbarPropType,
+  instRecordDisabled: bool,
+  language: string,
+  liveRegion: func,
+  mirroredAttrs: objectOf(string), // attributes to transfer from the original textarea to the one created by tinymce
   menu: menuPropType,
   plugins: arrayOf(string),
+  readOnly: bool,
+  textareaId: string.isRequired,
+  textareaClassName: string,
+  trayProps: trayPropTypes,
+  toolbar: toolbarPropType,
+  use_rce_pretty_html_editor: bool,
+  use_rce_buttons_and_icons: bool,
+  onFocus: func, // f(RCEWrapper component)
+  onBlur: func, // f(event)
+  onInit: func, // f(tinymce_editor)
+  onContentChange: func // f(content), don't mistake this as an indication CanvasRce is a controlled component
+}
 
-  onInitted: func, // f(tinymce_editor)
-  onContentChange: func // don't mistake this as an indication CanvasRce is a controlled component
+CanvasRce.defaultProps = {
+  autosave: {enabled: false, maxAge: 3600000},
+  defaultContent: '',
+  editorOptions: {...defaultTinymceConfig},
+  highContrastCSS: [],
+  instRecordDisabled: false,
+  language: 'en',
+  liveRegion: () => document.getElementById('flash_screenreader_holder'),
+  mirroredAttrs: {},
+  readOnly: false,
+  use_rce_pretty_html_editor: true,
+  use_rce_buttons_and_icons: true,
+  onFocus: () => {},
+  onBlur: () => {},
+  onContentChange: () => {},
+  onInit: () => {}
 }

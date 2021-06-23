@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import tinymce from 'tinymce'
 
 export default function sanitizeHtml(html) {
   // Note: it is expected that tinymce be loaded and available globally at `window.tinymce` by the

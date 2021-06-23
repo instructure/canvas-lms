@@ -118,6 +118,11 @@ pipeline {
 
         sh 'docker cp axe-parser:/usr/src/app/axe_results.csv .'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'axe_results.csv'
+
+        // Only alert on periodic jobs, not ones resulting from manual tests
+        if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+          slackSend channel: '#canvas-axe-build', message: "<$env.BUILD_URL/testReport|Latest Canvas Axe Selenium Results>"
+        }
       }
     }
     cleanup {

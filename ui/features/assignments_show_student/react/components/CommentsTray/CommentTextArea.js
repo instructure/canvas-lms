@@ -300,6 +300,7 @@ export default class CommentTextArea extends Component {
                   <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>
                 </Button>
                 <Button
+                  id="mediaCommentButton"
                   onClick={() => this.setState({mediaModalOpen: true})}
                   icon={IconAttachMediaLine}
                   margin="0 x-small 0 0"

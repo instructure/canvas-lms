@@ -50,6 +50,10 @@ export default class ImageOptionsTrayDriver {
     return this.$element.getAttribute('aria-label')
   }
 
+  get $urlField() {
+    return this.$element.querySelector('input[name="file-url"]')
+  }
+
   get $altTextField() {
     return this.$element.querySelector('textarea')
   }
@@ -70,6 +74,10 @@ export default class ImageOptionsTrayDriver {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
+  }
+
+  get urlText() {
+    return this.$urlField.value
   }
 
   get altText() {
@@ -124,5 +132,9 @@ export default class ImageOptionsTrayDriver {
     await waitFor(() => getSizeOptions(this.$sizeSelect))
     const $options = getSizeOptions(this.$sizeSelect)
     $options.find($option => $option.textContent.trim().includes(sizeText)).click()
+  }
+
+  async setUrl(url) {
+    fireEvent.change(this.$urlField, {target: {value: url}})
   }
 }

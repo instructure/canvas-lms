@@ -17,8 +17,8 @@
  */
 
 import {useEffect, useState} from 'react'
-import I18n from 'i18n!use_planner'
-import $ from 'jquery'
+import I18n from 'i18n!k5_use_planner'
+import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {initializePlanner} from '@instructure/canvas-planner'
@@ -61,11 +61,7 @@ export default function usePlanner({
         flashMessage: message => showFlashAlert({message, type: 'info'}),
         srFlashMessage: message => showFlashAlert({message, type: 'info', srOnly: true}),
         convertApiUserContent: apiUserContent.convert,
-        dateTimeFormatters: {
-          dateString: $.dateString,
-          timeString: $.timeString,
-          datetimeString: $.datetimeString
-        },
+        dateTimeFormatters: {dateString, timeString, datetimeString},
         externalFallbackFocusable: focusFallback,
         env: window.ENV,
         singleCourse

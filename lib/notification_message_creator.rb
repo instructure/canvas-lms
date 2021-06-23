@@ -281,6 +281,10 @@ class NotificationMessageCreator
 
   # only send emails to active channels or registration notifications to default users' channel
   def add_channel?(user, channel)
+    if Account.site_admin.feature_enabled?(:deprecate_sms) && channel.path_type == CommunicationChannel::TYPE_SMS
+      return false
+    end
+
     channel.active? || (@notification.registration? && default_email?(user, channel))
   end
 

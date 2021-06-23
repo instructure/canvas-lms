@@ -44,7 +44,9 @@ module ActiveSupport::Cache
   end
   Store.prepend(RailsCacheShim)
 
-  Store.prepend(Canvas::CacheRegister::ActiveSupport::Cache::Store)
+  require 'active_support/cache_register'
+
+  Store.prepend(ActiveSupport::CacheRegister::Cache::Store)
 
   module AllowMocksInStore
     def compress!(*args)

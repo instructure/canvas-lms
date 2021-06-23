@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!k5_ImportantInfo'
+import I18n from 'i18n!important_info'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'

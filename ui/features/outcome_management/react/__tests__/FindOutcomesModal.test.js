@@ -173,6 +173,7 @@ describe('FindOutcomesModal', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while loading account outcomes.',
+        srOnly: false,
         type: 'error'
       })
     })
@@ -198,6 +199,7 @@ describe('FindOutcomesModal', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while loading course outcomes.',
+        srOnly: false,
         type: 'error'
       })
     })
