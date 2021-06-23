@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +15,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-module Auditors::ActiveRecord
-  module Attributes
-    def fetch(key)
-      self[key]
-    end
 
-    def [](key)
-      if key.to_s == 'attributes'
-        self
-      else
-        # this works because we expect this module to be included
-        # in AR models, which allow you to use the square bracket
-        # interface for attribute access
-        super
-      end
-    end
+class AllowFfLogUserIdNulls < ActiveRecord::Migration[6.0]
+  tag :predeploy
+
+  def up
+    # it's possible to have some contexts (like jobs)
+    # where feature flags get changed an no
+    # user can be inferred.  We don't want those to fail.
+    change_column_null :auditor_feature_flag_records, :user_id, true
+    Auditors::ActiveRecord::FeatureFlagRecord.where(user_id: 0).update_all(user_id: nil)
+  end
+
+  def down
+    Auditors::ActiveRecord::FeatureFlagRecord.where(user_id: nil).update_all(user_id: 0)
+    change_column_null :auditor_feature_flag_records, :user_id, false
   end
 end

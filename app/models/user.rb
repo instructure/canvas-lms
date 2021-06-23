@@ -203,6 +203,10 @@ class User < ActiveRecord::Base
     class_name: "Auditors::ActiveRecord::GradeChangeRecord",
     dependent: :destroy,
     inverse_of: :grader
+  has_many :auditor_feature_flag_records,
+    class_name: 'Auditors::ActiveRecord::FeatureFlagRecord',
+    dependent: :destroy,
+    inverse_of: :user
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, :class_name => 'MicrosoftSync::PartialSyncChange', dependent: :destroy, inverse_of: :user
