@@ -7,4 +7,3 @@ doc/*.js
 github-pages/dist
 canvas
 testcafe/build
-canvas-rce-junit.xml
