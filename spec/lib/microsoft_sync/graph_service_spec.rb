@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
+require 'spec_helper'
 
 describe MicrosoftSync::GraphService do
   include WebMock::API
@@ -64,17 +64,19 @@ describe MicrosoftSync::GraphService do
       }
     end
 
+  before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
+
     unless opts[:ignore_404]
       context 'with a 404 status code' do
         let(:response) { json_response(404, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPNotFound error' do
-          expect(InstStatsd::Statsd).to receive(:increment)
-            .with('microsoft_sync.graph_service.notfound', tags: statsd_tags)
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPNotFound,
             /Graph service returned 404 for tenant mytenant.*uh-oh!/
           )
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.notfound', tags: statsd_tags)
         end
       end
     end
@@ -84,12 +86,12 @@ describe MicrosoftSync::GraphService do
         let(:response) { json_response(code, error: {message: 'uh-oh!'}) }
 
         it 'raises an HTTPInvalidStatus with the code and message' do
-          expect(InstStatsd::Statsd).to receive(:increment)
-            .with('microsoft_sync.graph_service.error', tags: statsd_tags)
           expect { subject }.to raise_error(
             MicrosoftSync::Errors::HTTPInvalidStatus,
             /Graph service returned #{code} for tenant mytenant.*uh-oh!/
           )
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.error', tags: statsd_tags)
         end
       end
     end
@@ -100,12 +102,12 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
-        expect(InstStatsd::Statsd).to receive(:increment)
-          .with('microsoft_sync.graph_service.throttled', tags: statsd_tags)
         expect { subject }.to raise_error(
           MicrosoftSync::Errors::HTTPTooManyRequests,
           /Graph service returned 429 for tenant mytenant.*uh-oh!/
         )
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.throttled', tags: statsd_tags)
       end
 
       it 'includes the retry-after time in the error' do
@@ -119,11 +121,11 @@ describe MicrosoftSync::GraphService do
       it 'increments an "error" counter and bubbles up the error' do
         error = SocketError.new
         expect(HTTParty).to receive(http_method.to_sym).and_raise error
-        expect(InstStatsd::Statsd).to receive(:increment).with(
+        expect { subject }.to raise_error(error)
+        expect(InstStatsd::Statsd).to have_received(:increment).with(
           'microsoft_sync.graph_service.error',
           tags: statsd_tags.merge(status_code: 'unknown')
         )
-        expect { subject }.to raise_error(error)
       end
     end
 
@@ -136,12 +138,12 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
-        expect(InstStatsd::Statsd).to receive(:increment)
-          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
         expect { subject }.to raise_error do |e|
           expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
       end
     end
 
@@ -154,21 +156,21 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
-        expect(InstStatsd::Statsd).to receive(:increment)
-          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
         expect { subject }.to raise_error do |e|
           expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.error', tags: statsd_tags)
       end
     end
 
     it 'increments a success statsd metric on success' do
-      expect(InstStatsd::Statsd).to receive(:increment).with(
+      subject
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
         'microsoft_sync.graph_service.success',
         tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
       )
-      subject
     end
 
     it 'records time with a statsd time metric' do
@@ -279,6 +281,15 @@ describe MicrosoftSync::GraphService do
     end
   end
 
+  shared_examples_for 'an endpoint that uses up quota' do |read_and_write_points_array|
+    it 'sends the quota to GraphServiceHttp#request' do
+      expect(service.http).to receive(:request)
+        .with(anything, anything, hash_including(quota: read_and_write_points_array))
+        .and_call_original
+      subject
+    end
+  end
+
   # Shared helpers/examples for batching
 
   def succ(id)
@@ -308,13 +319,13 @@ describe MicrosoftSync::GraphService do
     end
 
     it 'increments statsd counters based on the responses' do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
       expect { subject }.to raise_error(expected_error)
 
       codes.each do |type, codes_list|
         codes_list = [codes_list].flatten
         codes_list.uniq.each do |code|
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+          expect(InstStatsd::Statsd).to have_received(:count).once.with(
             "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code),
             tags: {msft_endpoint: endpoint_name, status: code}
           )
@@ -423,7 +434,9 @@ describe MicrosoftSync::GraphService do
     let(:method_args) { [] }
     let(:url) { 'https://graph.microsoft.com/v1.0/education/classes' }
 
-    it_behaves_like 'a paginated list endpoint'
+    it_behaves_like 'a paginated list endpoint' do
+      it_behaves_like 'an endpoint that uses up quota', [1, 0]
+    end
   end
 
   describe '#create_education_class' do
@@ -437,6 +450,7 @@ describe MicrosoftSync::GraphService do
     it { is_expected.to eq(response_body) }
 
     it_behaves_like 'a graph service endpoint'
+    it_behaves_like 'an endpoint that uses up quota', [1, 1]
   end
 
   describe '#update_group' do
@@ -450,6 +464,7 @@ describe MicrosoftSync::GraphService do
     it { is_expected.to eq(nil) }
 
     it_behaves_like 'a graph service endpoint'
+    it_behaves_like 'an endpoint that uses up quota', [1, 1]
   end
 
   describe '#add_users_to_group_ignore_duplicates' do
@@ -517,6 +532,9 @@ describe MicrosoftSync::GraphService do
       end
 
       it { is_expected.to eq(nil) }
+
+      # Microsoft told us write quota is about one per three users...
+      it_behaves_like 'an endpoint that uses up quota', [1, 7]
     end
 
     context 'when more than 20 users are given' do
@@ -628,6 +646,7 @@ describe MicrosoftSync::GraphService do
     it { is_expected.to eq(response_body) }
 
     it_behaves_like 'a graph service endpoint'
+    it_behaves_like 'an endpoint that uses up quota', [1, 0]
 
     context 'when certain fields are selected' do
       subject { service.get_group('msgroupid', select: %w[abc d e]) }
@@ -643,7 +662,9 @@ describe MicrosoftSync::GraphService do
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/members' }
 
-    it_behaves_like 'a paginated list endpoint'
+    it_behaves_like 'a paginated list endpoint' do
+      it_behaves_like 'an endpoint that uses up quota', [3, 0]
+    end
   end
 
   describe '#list_group_owners' do
@@ -651,7 +672,9 @@ describe MicrosoftSync::GraphService do
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners' }
 
-    it_behaves_like 'a paginated list endpoint'
+    it_behaves_like 'a paginated list endpoint' do
+      it_behaves_like 'an endpoint that uses up quota', [2, 0]
+    end
   end
 
   describe '#remove_group_users_ignore_missing' do

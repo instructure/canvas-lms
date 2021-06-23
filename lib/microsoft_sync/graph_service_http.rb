@@ -22,6 +22,12 @@
 # such as making requests, expanding parameters ('filter', 'select', etc.),
 # stats/metrics, logging, throttling, pagination, and making batch requests.
 # To be used only through GraphService, which provides individual endpoints.
+#
+# Stats metrics supplied here:
+# * timings for all requests
+# * counters one per request (split up by method and first part of path)
+# * quota points used (split up the same way). (See `quota` argument to request
+#   and `increment_statsd_quota_points`)
 module MicrosoftSync
   class GraphServiceHttp
     attr_reader :tenant
@@ -54,8 +60,13 @@ module MicrosoftSync
       @tenant = tenant
     end
 
-    def request(method, path, options={})
+    # Example options: body (hash for JSON), query (hash of query string), headers (hash),
+    # quota (array of integers [read_quota_points, write_quota_points]; will be adjusted
+    # if $selected query param is used.)
+    # Options except for quota are passed thru to HTTParty.
+    def request(method, path, quota: nil, **options)
       statsd_tags = statsd_tags_for_request(method, path)
+      increment_statsd_quota_points(quota, options, statsd_tags)
 
       Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{path}")
 
@@ -85,8 +96,13 @@ module MicrosoftSync
       end
     end
 
-    def get_paginated_list(endpoint, options)
-      response = request(:get, endpoint, query: expand_options(**options))
+    # Iterate through all pages in a GET endpoint that may return
+    # multiple pages of results.
+    # @param [Hash] options_to_be_expanded: sent to expand_options
+    # @param [Array] quota array of [read_quota_used, write_quota_used] for each page/request
+    def get_paginated_list(endpoint, quota:, **options_to_be_expanded)
+      request_options = expand_options(**options_to_be_expanded)
+      response = request(:get, endpoint, query: request_options, quota: quota)
       return response[PAGINATED_VALUE_KEY] unless block_given?
 
       loop do
@@ -96,7 +112,7 @@ module MicrosoftSync
 
         break if next_link.nil?
 
-        response = request(:get, next_link)
+        response = request(:get, next_link, quota: quota)
       end
     end
 
@@ -166,6 +182,26 @@ module MicrosoftSync
       end
     end
 
+    # Keep track of quota points we use. See https://docs.microsoft.com/en-us/graph/throttling
+    # Endpoints should supply a base quota points ("Base Resource Unit Cost")
+    # of [read_cost, right_cost], typically passed into request(). From the
+    # Microsoft docs:
+    # > Using $select decreases [read] cost by 1
+    # > Using $top with a value of less than 20 decreases [read] cost by 1
+    #   [not implemented here because we never use $top < 20]
+    # > A request [read] cost can never be lower than 1.
+    def increment_statsd_quota_points(quota, request_options, tags)
+      read, write = quota
+      if read && read > 0
+        query = request_options['query'] || request_options[:query]
+        read -= 1 if read > 1 && query&.dig('$select')
+        InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_read", read, tags: tags)
+      end
+      if write && write > 0
+        InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_write", write, tags: tags)
+      end
+    end
+
     def statsd_tags_for_request(method, path)
       {
         msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
@@ -227,7 +263,7 @@ module MicrosoftSync
       responses_grouped_by_type.each do |type, responses|
         responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
           tags = {msft_endpoint: endpoint_name, status: code}
-          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+          InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
       end
     end

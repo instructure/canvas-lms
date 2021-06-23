@@ -45,17 +45,17 @@ module MicrosoftSync
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_education_classes(options={}, &blk)
-      get_paginated_list('education/classes', options, &blk)
+      get_paginated_list('education/classes', quota: [1, 0], **options, &blk)
     end
 
     def create_education_class(params)
-      request(:post, 'education/classes', body: params)
+      request(:post, 'education/classes', quota: [1, 1], body: params)
     end
 
     # === Groups: ===
 
-    def update_group(group_id, params)
-      request(:patch, "groups/#{group_id}", body: params)
+    def update_group(group_id, params, write_quota=1)
+      request(:patch, "groups/#{group_id}", quota: [1, write_quota], body: params)
     end
 
     def add_users_to_group(group_id, members: [], owners: [])
@@ -69,23 +69,24 @@ module MicrosoftSync
         body['owners@odata.bind'] = owners.map{|o| DIRECTORY_OBJECT_PREFIX + o}
       end
 
-      update_group(group_id, body)
+      # Irregular write cost of adding members, about users_added/3, according to Microsoft.
+      update_group(group_id, body, ((members.length + owners.length) / 3.0).ceil)
     end
 
     # Used for debugging. Example:
     # get_group('id', select: %w[microsoft_EducationClassLmsExt microsoft_EducationClassSisExt])
     def get_group(group_id, options={})
-      request(:get, "groups/#{group_id}", query: expand_options(**options))
+      request(:get, "groups/#{group_id}", quota: [1, 0], query: expand_options(**options))
     end
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_group_members(group_id, options={}, &blk)
-      get_paginated_list("groups/#{group_id}/members", options, &blk)
+      get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &blk)
     end
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_group_owners(group_id, options={}, &blk)
-      get_paginated_list("groups/#{group_id}/owners", options, &blk)
+      get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &blk)
     end
 
     # Returns nil if all removed, or a hash with a list of :members and/or :owners that did
@@ -180,7 +181,7 @@ module MicrosoftSync
     # === Users ===
 
     def list_users(options={}, &blk)
-      get_paginated_list('users', options, &blk)
+      get_paginated_list('users', quota: [2, 0], **options, &blk)
     end
 
     # ==== Helpers for removing and adding in batch ===

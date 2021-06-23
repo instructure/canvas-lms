@@ -219,7 +219,7 @@ module MicrosoftSync
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
                         "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}")
-      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total)
+      InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total)
     end
 
     # Run the API calls to add/remove users.
