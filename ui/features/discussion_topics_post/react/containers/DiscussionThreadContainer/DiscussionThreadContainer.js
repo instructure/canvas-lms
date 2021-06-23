@@ -204,10 +204,13 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t('%{replies} replies, %{unread} unread', {
-          replies: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-          unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-        })}
+        expandText={I18n.t(
+          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
+          {
+            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
+          }
+        )}
         onClick={() => setExpandReplies(!expandReplies)}
         isExpanded={expandReplies}
       />

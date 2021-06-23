@@ -146,9 +146,15 @@ export function Alert({...props}) {
         : singleDueDate}
       <Flex.Item padding="x-small" align="end">
         <Text weight="light" size="small">
-          {I18n.t('This is a graded discussion: %{pointsPossible} points possible', {
-            pointsPossible: props.pointsPossible
-          })}
+          {I18n.t(
+            {
+              one: 'This is a graded discussion: %{count} point possible',
+              other: 'This is a graded discussion: %{count} points possible'
+            },
+            {
+              count: props.pointsPossible
+            }
+          )}
         </Text>
       </Flex.Item>
     </Flex>

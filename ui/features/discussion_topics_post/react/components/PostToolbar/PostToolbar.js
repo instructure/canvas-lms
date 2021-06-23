@@ -49,7 +49,12 @@ function InfoText({repliesCount, unreadCount}) {
   const infoText = []
 
   if (repliesCount > 0) {
-    infoText.push(I18n.t('%{repliesCount} replies', {repliesCount}))
+    infoText.push(
+      I18n.t(
+        {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
+        {count: repliesCount, repliesCount}
+      )
+    )
   }
 
   if (unreadCount > 0) {
