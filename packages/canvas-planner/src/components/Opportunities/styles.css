@@ -40,3 +40,7 @@
 .loading {
   text-align: center;
 }
+
+#tabs_container > div:first-child {
+  display: inline-block;
+}
