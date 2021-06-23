@@ -49,3 +49,12 @@ it('triggers sync and hides if a file is accepted', () => {
   expect(trigger).toHaveBeenCalledWith('start_sync', dummyFile)
   expect(modal.instance().state.show).toEqual(false)
 })
+
+it('calls onFileDrop and hides if a file is accepted', () => {
+  const onFileDrop = jest.fn()
+  const dummyFile = {file: 'foo'}
+  const modal = shallow(<ImportOutcomesModal onFileDrop={onFileDrop} />)
+  modal.instance().onSelection([dummyFile], [], {})
+  expect(onFileDrop).toHaveBeenCalledWith(dummyFile)
+  expect(modal.instance().state.show).toEqual(false)
+})

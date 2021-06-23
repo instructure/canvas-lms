@@ -72,13 +72,17 @@ export default class OutcomesImporter extends Component {
     this.beginUpload()
   }
 
+  componentWillUnmount() {
+    clearInterval(this.pollStatus)
+  }
+
   pollImportStatus(importId) {
-    const pollStatus = setInterval(() => {
+    this.pollStatus = setInterval(() => {
       apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
         const workflowState = response.data.workflow_state
         if (workflowState === 'succeeded' || workflowState === 'failed') {
           this.completeUpload(response.data.processing_errors.length, workflowState === 'succeeded')
-          clearInterval(pollStatus)
+          clearInterval(this.pollStatus)
         }
       })
     }, 1000)

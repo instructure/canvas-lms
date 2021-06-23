@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!OutcomeManagement'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
@@ -31,11 +32,12 @@ import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModa
 import FindOutcomesModal from './FindOutcomesModal'
 import CreateOutcomeModal from './CreateOutcomeModal'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
-import WithBreakpoints from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-const ManagementHeader = ({breakpoints}) => {
+const ManagementHeader = ({breakpoints, handleFileDrop}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
+  const showImportModal = () => showImportOutcomesModal({onFileDrop: handleFileDrop})
   const isDropdown = !breakpoints?.tablet
 
   return (
@@ -53,7 +55,7 @@ const ManagementHeader = ({breakpoints}) => {
                 </Button>
               }
             >
-              <Menu.Item onSelect={showImportOutcomesModal}>
+              <Menu.Item onSelect={showImportModal}>
                 <IconImportLine size="x-small" />
                 <View padding="0 small">{I18n.t('Import')}</View>
               </Menu.Item>
@@ -69,7 +71,7 @@ const ManagementHeader = ({breakpoints}) => {
           ) : (
             <>
               <Button
-                onClick={showImportOutcomesModal}
+                onClick={showImportModal}
                 renderIcon={IconImportLine}
                 margin="x-small"
               >
@@ -92,6 +94,11 @@ const ManagementHeader = ({breakpoints}) => {
       />
     </div>
   )
+}
+
+ManagementHeader.propTypes = {
+  handleFileDrop: PropTypes.func.isRequired,
+  breakpoints: breakpointsShape
 }
 
 export default WithBreakpoints(ManagementHeader)

@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect, useMemo, useRef} from 'react'
+import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
@@ -24,6 +25,12 @@ import {ApolloProvider, createClient} from '@canvas/apollo'
 import OutcomesContext, {getContext} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management/index'
+import {
+  showOutcomesImporter,
+  showOutcomesImporterIfInProgress
+} from '@canvas/outcomes/react/OutcomesImporter'
+
+const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -43,10 +50,16 @@ export const OutcomePanel = () => {
 
 export const OutcomeManagementWithoutGraphql = () => {
   const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
+  const [importRef, setImportRef] = useState(null)
+  const [isImporting, setIsImporting] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
   })
+
+  const onSetImportRef = useCallback(node => {
+    setImportRef(node)
+  }, [])
 
   // Need to use a ref because a when normal setState is changed, this component will render
   // By rendering again, the handleTabChange will be a new function.
@@ -73,6 +86,14 @@ export const OutcomeManagementWithoutGraphql = () => {
     }
   }
 
+  useEffect(() => {
+    if (selectedIndex !== 0) {
+      unmountImportRef()
+      resetManageView()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex])
+
   // close tab / load link
   useEffect(() => {
     const onBeforeUnload = e => {
@@ -88,12 +109,50 @@ export const OutcomeManagementWithoutGraphql = () => {
     }
   }, [hasUnsavedChangesRef])
 
+  useEffect(() => {
+    ;(async () => {
+      if (improvedManagement && selectedIndex === 0 && importRef) {
+        await showOutcomesImporterIfInProgress(
+          {
+            disableOutcomeViews: disableManageView,
+            resetOutcomeViews: resetManageView,
+            mount: importRef,
+            contextUrlRoot: ENV.CONTEXT_URL_ROOT
+          },
+          ENV.current_user.id
+        )
+      }
+    })()
+  }, [improvedManagement, selectedIndex, importRef])
+
+  const unmountImportRef = () => {
+    unmount(importRef)
+  }
+
+  const disableManageView = () => {
+    setIsImporting(true)
+  }
+
+  const resetManageView = () => {
+    setIsImporting(false)
+  }
+
+  const onFileDrop = file => {
+    showOutcomesImporter({
+      file,
+      disableOutcomeViews: disableManageView,
+      resetOutcomeViews: resetManageView,
+      mount: importRef,
+      contextUrlRoot: ENV.CONTEXT_URL_ROOT
+    })
+  }
+
   return (
     <OutcomesContext.Provider value={getContext()}>
-      {improvedManagement && <ManagementHeader />}
+      {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
-          {improvedManagement ? <OutcomeManagementPanel /> : <OutcomePanel />}
+          {improvedManagement ? !isImporting && <OutcomeManagementPanel /> : <OutcomePanel />}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
           <MasteryScale onNotifyPendingChanges={setHasUnsavedChanges} />
@@ -102,6 +161,7 @@ export const OutcomeManagementWithoutGraphql = () => {
           <MasteryCalculation onNotifyPendingChanges={setHasUnsavedChanges} />
         </Tabs.Panel>
       </Tabs>
+      <div ref={onSetImportRef} />
     </OutcomesContext.Provider>
   )
 }

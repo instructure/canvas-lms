@@ -33,6 +33,7 @@ const render = children => {
 describe('ManagementHeader', () => {
   const defaultProps = (props = {}) => ({
     breakpoints: {tablet: true},
+    handleFileDrop: () => {},
     ...props
   })
 
@@ -54,10 +55,12 @@ describe('ManagementHeader', () => {
   })
 
   it('calls showImportOutcomesModal when click on Import', () => {
+    const props = defaultProps()
     // breakpoints.tablet: true, meaning window.innerWidth >= 768px
-    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
+    const {getByText} = render(<ManagementHeader {...props} />)
     fireEvent.click(getByText('Import'))
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
+    expect(showImportOutcomesModal).toHaveBeenCalledWith({onFileDrop: props.handleFileDrop})
   })
 
   it('opens FindOutcomesModal when Find button is clicked', async () => {
