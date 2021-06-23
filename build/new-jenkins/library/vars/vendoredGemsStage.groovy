@@ -22,7 +22,7 @@ def setupNode() {
 
     checkoutRepo('canvas-lms', refspecToCheckout, 1)
 
-    credentials.withStarlordDockerLogin { ->
+    credentials.withStarlordCredentials { ->
       sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     }
 

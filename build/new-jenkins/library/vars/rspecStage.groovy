@@ -71,7 +71,7 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
 
-  credentials.withStarlordDockerLogin { ->
+  credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
 
