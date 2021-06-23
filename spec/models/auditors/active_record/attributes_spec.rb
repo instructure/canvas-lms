@@ -22,33 +22,21 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe Auditors::ActiveRecord::Attributes do
   describe "treating a model like it has event stream attributes" do
     before :each do
-      @model_type = Class.new do
+
+      @model_type = Class.new(Hash) do
         include Auditors::ActiveRecord::Attributes
-        def method_one
-          :one
-        end
-
-        def method_two
-          :two
-        end
-
-        def method_three
-          @_three
-        end
-
-        def method_three=(value)
-          @_three = value
-        end
       end
     end
 
-    it "transparently fetches values" do
+    it "transparently fetches values using parent interface" do
       model = @model_type.new
-      expect(model['attributes']['method_one']).to eq(:one)
-      expect(model['attributes'].fetch('method_two')).to eq(:two)
+      model['attr_one'] = 'parent_hash_one'
+      model['attr_two'] = 'parent_hash_two'
+      expect(model['attributes']['attr_one']).to eq("parent_hash_one")
+      expect(model['attributes'].fetch('attr_two')).to eq('parent_hash_two')
     end
 
-    it "sets values too" do
+    it "sets values through the attributes interface" do
       model = @model_type.new
       model['attributes']['method_three'] = :four
       expect(model['attributes'].fetch('method_three')).to eq(:four)
