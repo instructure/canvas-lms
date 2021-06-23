@@ -101,4 +101,17 @@ describe('isSubmitted', () => {
     const submission = {state: 'unsubmitted', attempt: 1}
     expect(isSubmitted(submission)).toBe(false)
   })
+  it('returns media_recording if media object is not null', () => {
+    const submission = {
+      url: null,
+      body: null,
+      attachments: [],
+      mediaObject: {
+        _id: 'm-123456',
+        id: '1',
+        title: 'dope video'
+      }
+    }
+    expect(getCurrentSubmissionType(submission)).toBe('media_recording')
+  })
 })

@@ -25,6 +25,8 @@ export function getCurrentSubmissionType(submission, assignment) {
     return 'online_text_entry'
   } else if (submission.attachments.length !== 0) {
     return 'online_upload'
+  } else if (submission.mediaObject != null) {
+    return 'media_recording'
   } else if (assignment.submissionTypes.includes('student_annotation')) {
     // TODO: EVAL-1774 - add an identifying token to submission objects to
     // be able to tell that a past attempt is in fact a student_annotation
