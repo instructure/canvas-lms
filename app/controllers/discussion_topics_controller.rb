@@ -637,9 +637,9 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def show
+    @topic = @context.all_discussion_topics.find(params[:id])
     # Render updated Post UI if feature flag is enabled
-    if @context.feature_enabled?(:react_discussions_post)
-      @topic = @context.all_discussion_topics.find(params[:id])
+    if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       js_env({
@@ -655,7 +655,6 @@ class DiscussionTopicsController < ApplicationController
     end
 
     parent_id = params[:parent_id]
-    @topic = @context.all_discussion_topics.find(params[:id])
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
     @assignment = if @topic.for_assignment?
       AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
