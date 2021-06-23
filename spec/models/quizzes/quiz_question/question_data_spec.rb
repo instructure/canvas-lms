@@ -41,7 +41,6 @@ describe Quizzes::QuizQuestion::QuestionData do
     }
   end
 
-
   describe '.generate' do
     it "returns an instance of QuestionData" do
       question = Quizzes::QuizQuestion::QuestionData.generate
@@ -134,7 +133,6 @@ describe Quizzes::QuizQuestion::QuestionData do
         end
       end
     end
-
   end
 
 
