@@ -36,9 +36,15 @@ module MicrosoftSync
     # Database batch size for users without AAD ids. Should be an even multiple of
     # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
     ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
-    STANDARD_RETRY_DELAY = [5, 20, 100].freeze
+
     MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
     MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
+
+    # Delays for intermittent errors and to allow Microsoft's
+    # eventually-consistent API time to settle:
+    STANDARD_RETRY_DELAY = [15, 60, 300].freeze
+    DELAY_BEFORE_UPDATE_GROUP = 8.seconds
+    DELAY_BEFORE_CREATE_TEAM = 24.seconds
 
     # The more changes, the more likely it is that some of the changes will
     # be duplicative and cause retries when adding/removing, which makes
@@ -141,7 +147,7 @@ module MicrosoftSync
       end
 
       StateMachineJob::DelayedNextStep.new(
-        :step_update_group_with_course_data, 2.seconds, new_group_id
+        :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id
       )
     rescue *Errors::INTERMITTENT => e
       retry_object_for_error(e)
@@ -261,7 +267,7 @@ module MicrosoftSync
     def step_check_team_exists(_mem_data, _job_state_data)
       if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
         && !graph_service.team_exists?(group.ms_group_id)
-        StateMachineJob::DelayedNextStep.new(:step_create_team, 10.seconds)
+        StateMachineJob::DelayedNextStep.new(:step_create_team, DELAY_BEFORE_CREATE_TEAM)
       else
         StateMachineJob::COMPLETE
       end

@@ -110,7 +110,7 @@ describe MicrosoftSync::SyncerSteps do
   shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
     # use actual graph service instead of double and intercept calls to "request":
     let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
-    let(:retry_args) { {delay_amount: [5, 20, 100]}.merge(options[:retry_args] || {}) }
+    let(:retry_args) { {delay_amount: [15, 60, 300]}.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
@@ -264,7 +264,7 @@ describe MicrosoftSync::SyncerSteps do
             receive(:create_education_class).with(course).and_return('id' => 'newid')
 
           expect_delayed_next_step(
-            subject, :step_update_group_with_course_data, 2.seconds, 'newid'
+            subject, :step_update_group_with_course_data, 8.seconds, 'newid'
           )
         end
       end
@@ -276,7 +276,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(graph_service_helpers).to_not receive(:create_education_class)
 
           expect_delayed_next_step(
-            subject, :step_update_group_with_course_data, 2.seconds, 'newid2'
+            subject, :step_update_group_with_course_data, 8.seconds, 'newid2'
           )
         end
       end
@@ -677,7 +677,7 @@ describe MicrosoftSync::SyncerSteps do
     context "when the team doesn't exist" do
       it "moves on to step_create_team after a delay" do
         expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
-        expect_delayed_next_step(subject, :step_create_team, 10.seconds)
+        expect_delayed_next_step(subject, :step_create_team, 24.seconds)
       end
     end
   end
