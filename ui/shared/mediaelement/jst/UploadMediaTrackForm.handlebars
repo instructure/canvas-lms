@@ -12,23 +12,18 @@
       <div>
         <p class="uploadMediaTrackFormDescription">
         <strong>{{#t "upload_media_track_form_step1_label"}}Step 1:{{/t}}</strong>
-          {{#t "upload_media_track_form_description_1"}}Copy this video url:{{/t}}
+          {{#t "upload_media_track_form_description_1"}}Copy this video URL:{{/t}}
         </p>
-        <div class="content-callout media-track-video-url">{{video_url}}</div>
+        <div id="media-track-video-url-container"></div>
       </div>
 
       <div>
         <p class="uploadMediaTrackFormDescription">
         <strong>{{#t "upload_media_track_form_step2_label"}}Step 2:{{/t}}</strong>
-          {{#t "upload_media_track_form_description_2"}}Create a subtitle file by clicking this link and following the instructions.{{/t}}
+          {{#t "upload_media_track_form_description_2"}}Create a subtitle file by clicking the following link:{{/t}}
+          <a href="https://amara.org/en/videos/create/" target="_blank">{{#t "amara_link_text"}}Amara (Subtitle creation tool){{/t}}</a>.
+          {{#t "amara_instructions"}}When prompted, paste in the video URL copied in step 1.{{/t}}
         </p>
-
-        <div class="content-box media-track-content-box">
-          <form action="https://amara.org/en/videos/create/" method="POST" target="_blank" >
-            <input type="hidden" name="video_url" value="{{video_url}}">
-            <button class="btn btn-small media-track-form-button" type="submit" value="Begin">{{#t "media_track_form_button"}}Go to subtitle creation tool{{/t}}</button>
-          </form>
-        </div>
       </div>
     {{/if}}
 
