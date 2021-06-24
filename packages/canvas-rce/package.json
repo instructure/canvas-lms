@@ -181,5 +181,8 @@
     "webpack-merge": "^5",
     "webpack-nano": "^1",
     "webpack-plugin-serve": "^1"
+  },
+  "resolutions": {
+    "format-message-estree-util": "../packages/format-message-estree-util"
   }
 }

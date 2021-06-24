@@ -12700,11 +12700,6 @@ format-message-cli@^6:
     safe-buffer "^5.1.1"
     source-map "^0.5.7"
 
-format-message-estree-util@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/format-message-estree-util/-/format-message-estree-util-6.1.0.tgz#4e87989e667d74ce5cc5b18922508e31f39d746d"
-  integrity sha512-z8nZdDI3vQdYVARVBVFebKSUEEZhw3/sgD8F+PneLT7TGBKt3QpeSQ8g2yUoQrj9saoR2fYbpXeaQ8qnjg013Q==
-
 format-message-formats@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/format-message-formats/-/format-message-formats-6.2.0.tgz#231c2a3d2806e3200331c7aa06430cb403f58792"
