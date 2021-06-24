@@ -115,7 +115,7 @@ describe MicrosoftSync::SyncerSteps do
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
         it 'returns a Retry object' do
-          expect(graph_service).to receive(:request).and_raise(error_class.new)
+          expect(graph_service.http).to receive(:request).and_raise(error_class.new)
           expect_retry(subject, error_class: error_class, **retry_args)
         end
       end
@@ -123,7 +123,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the Microsoft API returns a 500" do
       it 'returns a Retry object' do
-        expect(graph_service).to receive(:request).and_raise(new_http_error(500))
+        expect(graph_service.http).to receive(:request).and_raise(new_http_error(500))
         expect_retry(subject,
                      error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
       end
@@ -132,7 +132,7 @@ describe MicrosoftSync::SyncerSteps do
     unless options[:except_404]
       context 'on 404' do
         it 'goes back to step_generate_diff with a delay' do
-          expect(graph_service).to receive(:request).and_raise(new_http_error(404))
+          expect(graph_service.http).to receive(:request).and_raise(new_http_error(404))
           expect_retry(subject,
                        error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
         end
@@ -142,7 +142,7 @@ describe MicrosoftSync::SyncerSteps do
     unless options[:except_throttled]
       context 'when the Microsoft API returns a 429 with a retry-after header' do
         it 'returns a Retry object with that retry-after time' do
-          expect(graph_service).to receive(:request).and_raise(
+          expect(graph_service.http).to receive(:request).and_raise(
             new_http_error(429, 'retry-after' => '3.14')
           )
           expect_retry(subject,
@@ -153,16 +153,16 @@ describe MicrosoftSync::SyncerSteps do
 
       context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
         it 'returns a Retry object with that retry-after time' do
-          err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
+          err = MicrosoftSync::GraphServiceHttp::BatchRequestThrottled.new('foo', [])
           expect(err).to receive(:retry_after_seconds).and_return(1.23)
-          expect(graph_service).to receive(:request).and_raise(err)
+          expect(graph_service.http).to receive(:request).and_raise(err)
           expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
         end
       end
 
       context 'when the Microsoft API returns a 429 with no retry-after header' do
         it 'returns a Retry object with our default retry times' do
-          expect(graph_service).to receive(:request).and_raise(new_http_error(429))
+          expect(graph_service.http).to receive(:request).and_raise(new_http_error(429))
           expect_retry(subject,
                        error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
         end
@@ -846,7 +846,7 @@ describe MicrosoftSync::SyncerSteps do
                           except_throttled: true do
             context 'when a request is throttled' do
               it 'turns into a full sync job with the delay given in the retry-after header' do
-                expect(graph_service).to receive(:request).and_raise(
+                expect(graph_service.http).to receive(:request).and_raise(
                   new_http_error(429, 'retry-after' => '3.14')
                 )
                 expect_delayed_next_step(

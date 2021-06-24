@@ -139,7 +139,7 @@ describe MicrosoftSync::GraphService do
         expect(InstStatsd::Statsd).to receive(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
         expect { subject }.to raise_error do |e|
-          expect(e).to be_a(described_class::ApplicationNotAuthorizedForTenant)
+          expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
       end
@@ -157,7 +157,7 @@ describe MicrosoftSync::GraphService do
         expect(InstStatsd::Statsd).to receive(:increment)
           .with('microsoft_sync.graph_service.error', tags: statsd_tags)
         expect { subject }.to raise_error do |e|
-          expect(e).to be_a(described_class::ApplicationNotAuthorizedForTenant)
+          expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
       end
@@ -325,7 +325,7 @@ describe MicrosoftSync::GraphService do
 
   shared_examples_for 'a members/owners batch request that can fail' do
     let(:ignored_code) { ignored_members_m1_response[:status] }
-    let(:expected_error) { described_class::BatchRequestFailed }
+    let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestFailed }
 
     context 'a batch request with an errored subrequest' do
       it_behaves_like 'a batch request that fails' do
@@ -365,7 +365,7 @@ describe MicrosoftSync::GraphService do
         let(:bad_codes) { [429, 429] }
         let(:bad_bodies) { %w[badthrottled badthrottled] }
         let(:codes) { { success: 204, throttled: [429, 429], ignored: ignored_code } }
-        let(:expected_error) { described_class::BatchRequestThrottled }
+        let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestThrottled }
       end
 
       context 'when no response has a retry delay' do
@@ -404,7 +404,7 @@ describe MicrosoftSync::GraphService do
           err('members_m2'), throttled('owners_o1'), succ('owners_o2')
         ]
       end
-      let(:expected_error) { described_class::BatchRequestThrottled }
+      let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestThrottled }
 
       it_behaves_like 'a batch request that fails'
 
