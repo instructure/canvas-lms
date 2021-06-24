@@ -24,10 +24,19 @@ Mutagen 0.12 beta has is the version we need to support mutagen compose.
 
 # Setting up and running canvas
 
-You'll want to do your initial setup using manual steps documented in
+The easiest way to get a working development environment is to run:
+
+```
+./script/docker_dev_setup.sh --mutagen
+```
+
+This will guide you through the process of building the docker images and setting up Canvas with mutagen.
+
+If you would rather do things manually, read on!
+
+Initial setup using manual steps are documented in
 [develping_with_docker.md](../../doc/docker/developing_with_docker.md) but using the `docker-compose.override.yml` file
-in this directory as your base. (We cannot use the `docker_dev_script.sh` yet because it is not yet aware that you may
-want the mutagen environment running.)
+in this directory as your base. 
 
 The one difference from normal docker development is in many cases you'll use `mutagen compose` instead of
 `docker-compose`. This ensures that the mutagen daemon is running as well as the needed mutagen container.
@@ -40,14 +49,9 @@ but won't start any of your containers.
 2. `mutagen compose build --pull`
 3. This step will have mutagen start so it can sync canvas code into the docker volume: `mutagen compose up --no-start
    web`
-4. This step fixes a permission issue in /usr/src/app, so your docker environment can create new files that can be
-   synced back to your local environment in the root directory: `mutagen compose run -u root --rm web chown
-   docker:docker /usr/src/app` You will see mutagen complain about not supporting run fully and also docker messages
-   about an orphan container (which is mutagan's agent.) That is normal.
-5. `mutagen compose run --rm web ./script/install_assets.sh`
-6. `mutagen compose run --rm web bundle exec rake db:create`
-7. `mutagen compose run --rm web bundle exec rake db:initial_setup`
-8. Enjoy your canvas
+4. `mutagen compose run --rm web bundle exec rake db:create`
+5. `mutagen compose run --rm web bundle exec rake db:initial_setup`
+6. Enjoy your canvas
 
 Really, for any of the `mutagen compose run` steps you could just use `docker-compose run` since mutagen doesn't do much
 there, but its worth getting into the `mutagen compose` habit. (Although, be aware based on recent chatter in the
