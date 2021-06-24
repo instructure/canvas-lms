@@ -2623,11 +2623,16 @@ class Submission < ActiveRecord::Base
   def rubric_assessments_for_attempt(attempt: nil)
     return rubric_assessments.to_a if attempt.blank?
 
+    # If the requested attempt is 0, no attempt has actually been submitted.
+    # The submission's attempt will be nil (not 0), so we do actually want to
+    # find assessments with a nil artifact_attempt.
+    effective_attempt = attempt == 0 ? nil : attempt
+
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-      if assessment.artifact_attempt == attempt
+      if assessment.artifact_attempt == effective_attempt
         assessments_for_attempt << assessment
       else
-        version = assessment.versions.find { |v| v.model.artifact_attempt == attempt }
+        version = assessment.versions.find { |v| v.model.artifact_attempt == effective_attempt }
         assessments_for_attempt << version.model if version
       end
     end

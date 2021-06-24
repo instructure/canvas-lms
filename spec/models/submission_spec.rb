@@ -5354,6 +5354,33 @@ describe Submission do
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: nil)
         ).to contain_exactly(@teacher_assessment, @student_assessment)
       end
+
+      it "specifically returns assessments with a nil artifact_attempt if an attempt of 0 is specified" do
+        assignment = @course.assignments.create!(submission_types: "online_text_entry")
+        rubric_association = rubric_association_model(association_object: assignment, purpose: 'grading')
+        submission = assignment.submission_for_student(@student)
+
+        assessment_before_submitting = rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: 'grading',
+          assessor: @student,
+          rubric: rubric_association.rubric,
+          user: @student
+        })
+
+        submission = assignment.submit_homework(@student, body: "hi")
+
+        rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: 'grading',
+          assessor: @teacher,
+          rubric: rubric_association.rubric,
+          user: @student
+        })
+
+        expect(submission.visible_rubric_assessments_for(@student, attempt: 0))
+          .to contain_exactly(assessment_before_submitting)
+      end
     end
   end
 
