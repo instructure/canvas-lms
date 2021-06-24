@@ -2627,12 +2627,20 @@ class Submission < ActiveRecord::Base
 
   def self.process_bulk_update(progress, context, section, grader, grade_data)
     missing_ids = []
+    unpublished_assignment_ids = []
     graded_user_ids = Set.new
     preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
 
     Submission.suspend_callbacks(:touch_graders) do
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
+      unless assignment.published?
+        # if we don't bail here, the submissions will throw
+        # errors deeper in the update because you can't change grades
+        # on submissions that belong to deleted assignments
+        unpublished_assignment_ids << assignment.id
+        next
+      end
 
       scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
       if section
@@ -2702,11 +2710,20 @@ class Submission < ActiveRecord::Base
     end
     end
 
+    # make sure we don't pretend everything was fine if there were missing or
+    # bad-state records that we couldn't handle.  We don't need to throw an exception,
+    # but we do need to make the reason for lack of command compliance
+    # visible.
     if missing_ids.any?
       progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
       progress.save
       progress.fail
+    elsif unpublished_assignment_ids.any?
+      progress.message = "Some assignments are either not published or deleted and can not be graded #{unpublished_assignment_ids.map{|id| "'#{id}'"}.join(", ")}"
+      progress.save
+      progress.fail
     end
+
   ensure
     context.clear_todo_list_cache_later(:admins)
     user_ids = graded_user_ids.to_a
