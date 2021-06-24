@@ -1995,6 +1995,18 @@ describe Attachment do
       quota = Attachment.get_quota(@group)
       expect(quota[:quota_used]).to eq 0
     end
+
+    it "returns available quota" do
+      course_model
+      @course.update storage_quota: 5.megabytes
+      attachment_model(:context => @course, :uploaded_data => stub_png_data, :filename => 'whatever.png')
+      @attachment.update_attribute :size, 1.megabyte
+      expect(Attachment.quota_available(@course)).to eq 4.megabytes
+
+      # ensure it doesn't go negative
+      @attachment.update_attribute :size, 10.megabytes
+      expect(Attachment.quota_available(@course)).to eq 0
+    end
   end
 
   context "#open" do
