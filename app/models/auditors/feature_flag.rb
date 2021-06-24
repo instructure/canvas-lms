@@ -85,13 +85,13 @@ class Auditors::FeatureFlag
     end
 
     def user
-      @user ||= User.find(user_id)
+      @user ||= user_id && User.find(user_id)
     end
 
     def user=(user)
       @user ||= user
       # might be nil in a rare circumstance with an unprovisioned console user
-      attributes['user_id'] = @user&.global_id || 0
+      attributes['user_id'] = @user&.global_id
     end
   end
 
