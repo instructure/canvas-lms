@@ -1096,6 +1096,15 @@ class SubmissionsApiController < ApplicationController
       return render_unauthorized_action
     end
 
+    # this needs to happen AFTER we've done the authorization check on ":manage_grades" above
+    # so we're only leaking information about which assignments exist and don't
+    # to users who are entitled to that information
+    if assignment_ids.size > @assignments.size
+      inactive_ids = assignment_ids - @assignments.map(&:id)
+      error_message = "Some assignments could not be found: ( #{inactive_ids.join(", ")} )"
+      return render(json: { error: error_message }, status: :bad_request)
+    end
+
     progress = Submission.queue_bulk_update(@context, @section, @current_user, grade_data)
     render :json => progress_json(progress, @current_user, session)
   end
