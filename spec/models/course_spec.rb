@@ -1047,7 +1047,7 @@ describe Course do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_delete: true})
+      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_reset: true})
       @admin1 = @admin
       account_admin_user_with_role_changes(role: @role2, role_changes: {manage_sis: true})
       @admin2 = @admin

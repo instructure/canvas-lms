@@ -222,6 +222,22 @@ class RoleOverride < ActiveRecord::Base
       account_allows:
         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
     },
+    manage_courses_reset: {
+      label: lambda { t('Reset courses') },
+      label_v2: lambda { t('Courses - reset') },
+      group: 'manage_courses',
+      group_label: lambda { t('Manage Courses') },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        TaEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin],
+      account_allows:
+        lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+    },
     manage_courses_delete: {
       label: lambda { t('Delete courses') },
       label_v2: lambda { t('Courses - delete') },
@@ -460,7 +476,7 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [ 'AccountAdmin' ]
      },
-     # deprecated; replaced by manage_courses_publish, :manage_courses_conclude, :manage_courses_delete
+     # deprecated
      change_course_state: {
        label: lambda { t('permissions.change_course_state', 'Change course state') },
        label_v2: lambda { t('Course State - manage') },
