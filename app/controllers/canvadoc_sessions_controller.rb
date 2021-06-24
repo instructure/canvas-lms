@@ -88,6 +88,7 @@ class CanvadocSessionsController < ApplicationController
       if opts[:enable_annotations]
         # Docviewer only cares about the enrollment type when we're doing annotations
         opts[:enrollment_type] = blob["enrollment_type"]
+        opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
         assignment = submission.assignment

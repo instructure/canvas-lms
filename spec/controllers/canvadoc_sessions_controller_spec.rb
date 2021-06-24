@@ -204,7 +204,7 @@ describe CanvadocSessionsController do
       @blob = {
         attachment_id: @attachment1.global_id,
         user_id: @teacher.global_id,
-        type: "canvadoc",
+        type: "canvadoc"
       }
     end
 
@@ -354,6 +354,23 @@ describe CanvadocSessionsController do
         expect(arg2[:submission_id]).to eq @submission.id
       end
 
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send disable_annotation_notifications as false by default" do
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
+        expect(arg2[:disable_annotation_notifications]).to eq false
+      end
+      get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
+    end
+
+    it "should send disable_annotation_notifications as true" do
+      @blob[:disable_annotation_notifications] = true
+      allow(Attachment).to receive(:find).and_return(@attachment1)
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
+        expect(arg2[:disable_annotation_notifications]).to eq true
+      end
       get :show, params: {blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)}
     end
 
