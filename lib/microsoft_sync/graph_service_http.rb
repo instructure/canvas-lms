@@ -55,34 +55,17 @@ module MicrosoftSync
     end
 
     def request(method, path, options={})
-      statsd_tags = {
-        msft_endpoint:
-          InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
-      }
+      statsd_tags = statsd_tags_for_request(method, path)
 
-      options[:headers] ||= {}
-      options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
-      if options[:body]
-        options[:headers]['Content-type'] = 'application/json'
-        options[:body] = options[:body].to_json
-      end
-
-      url = path.start_with?('https:') ? path : BASE_URL + path
-      Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{url}")
+      Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{path}")
 
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         InstStatsd::Statsd.time("#{STATSD_PREFIX}.time", tags: statsd_tags) do
-          HTTParty.send(method, url, options)
+          request_without_metrics(method, path, options)
         end
       end
 
-      if application_not_authorized_response?(response)
-        raise ApplicationNotAuthorizedForTenant
-      elsif !(200..299).cover?(response.code)
-        raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
-          service: 'graph', tenant: tenant, response: response
-        )
-      end
+      raise_error_if_bad_response(response)
 
       result = response.parsed_response
       InstStatsd::Statsd.increment(statsd_name, tags: statsd_tags)
@@ -159,6 +142,35 @@ module MicrosoftSync
     private
 
     # -- Helpers for request():
+
+    def request_without_metrics(method, path, options)
+      options[:headers] ||= {}
+      options[:headers]['Authorization'] = 'Bearer ' + LoginService.token(tenant)
+      if options[:body]
+        options[:headers]['Content-type'] = 'application/json'
+        options[:body] = options[:body].to_json
+      end
+
+      url = path.start_with?('https:') ? path : BASE_URL + path
+
+      HTTParty.send(method, url, options)
+    end
+
+    def raise_error_if_bad_response(response)
+      if application_not_authorized_response?(response)
+        raise ApplicationNotAuthorizedForTenant
+      elsif !(200..299).cover?(response.code)
+        raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
+          service: 'graph', tenant: tenant, response: response
+        )
+      end
+    end
+
+    def statsd_tags_for_request(method, path)
+      {
+        msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
+      }
+    end
 
     def application_not_authorized_response?(response)
       (
