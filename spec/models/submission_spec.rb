@@ -4352,6 +4352,22 @@ describe Submission do
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
     end
+
+    it "does not explode if the assignment is deleted" do
+      @a1.destroy
+      expect{
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+          @a1.id.to_s => {
+            @u1.id => {posted_grade: 5},
+            @u2.id => {posted_grade: 10}
+          }
+        })
+      }.to_not raise_error
+      expect(@progress.reload.failed?).to be_truthy
+
+      expect(@a1.submission_for_student(@u1).grade).to be_nil
+      expect(@a1.submission_for_student(@u2).grade).to be_nil
+    end
   end
 
   describe 'find_or_create_provisional_grade!' do
