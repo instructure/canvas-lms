@@ -17,24 +17,22 @@
  */
 
 import I18n from 'i18n!discussion_posts'
-import React, {useEffect} from 'react'
-import {useDiscussionRCE} from './useDiscussionRCE'
+import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
+import CanvasRce from '@canvas/rce/react/CanvasRce'
 
 export const DiscussionEdit = props => {
-  const [setRCERef, getRCEText, setRCEText] = useDiscussionRCE(rceMentionsIsEnabled())
+  const rceRef = useRef()
+  const [rceContent, setRceContent] = useState(false)
+  const textAreaId = useRef(`message-body-${nanoid()}`)
 
-  // Load text into RCE when Value updates
   useEffect(() => {
-    setRCEText(props.value)
-  }, [props.value, setRCEText])
-
-  function rceMentionsIsEnabled() {
-    return !!ENV.rce_mentions_in_discussions
-  }
+    setRceContent(props.value)
+  }, [props.value, setRceContent])
 
   return (
     <div
@@ -46,7 +44,28 @@ export const DiscussionEdit = props => {
       data-testid="DiscussionEdit-container"
     >
       <View display="block">
-        <textarea ref={setRCERef} data-testid="message-body" />
+        <textarea style={{display: 'none'}} id={textAreaId.current} data-testid="message-body" />
+        <span>
+          <CanvasRce
+            textareaId={textAreaId.current}
+            onFocus={() => {}}
+            onBlur={() => {}}
+            onInit={() => {
+              setTimeout(() => {
+                rceRef?.current?.focus()
+              }, 1500)
+            }}
+            ref={rceRef}
+            onContentChange={content => {
+              setRceContent(content)
+            }}
+            editorOptions={{
+              focus: true
+            }}
+            height={300}
+            defaultContent={props.value}
+          />
+        </span>
       </View>
       <Flex margin="small none none none">
         <Flex.Item shouldGrow shouldShrink textAlign="end">
@@ -55,7 +74,6 @@ export const DiscussionEdit = props => {
               if (props.onCancel) {
                 props.onCancel()
               }
-              setRCEText('')
             }}
             display="inline-block"
             color="secondary"
@@ -66,9 +84,8 @@ export const DiscussionEdit = props => {
           <Button
             onClick={() => {
               if (props.onSubmit) {
-                props.onSubmit(getRCEText())
+                props.onSubmit(rceContent)
               }
-              setRCEText('')
             }}
             display="inline-block"
             color="primary"

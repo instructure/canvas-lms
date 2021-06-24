@@ -95,6 +95,10 @@ describe('DiscussionTopicContainer', () => {
       document.body.appendChild(liveRegion)
     }
 
+    window.INST = {
+      editorButtons: []
+    }
+
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
@@ -359,6 +363,11 @@ describe('DiscussionTopicContainer', () => {
     })
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
     const sendToButton = await container.findByText('Send To...')
     fireEvent.click(sendToButton)
     expect(await container.findByText('Send to:')).toBeTruthy()
@@ -396,6 +405,11 @@ describe('DiscussionTopicContainer', () => {
     await waitFor(() =>
       expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     )
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
     expect(await container.findByTestId('discussion-topic-reply')).toBeInTheDocument()
   })
 

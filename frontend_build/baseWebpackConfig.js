@@ -76,6 +76,7 @@ module.exports = {
             'discussion_topics_edit',
             'k5_dashboard',
             'permissions',
+            'discussion_topics_post',
           ]
           return (
             assetFilename.endsWith('.js') &&
