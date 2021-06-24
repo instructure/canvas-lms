@@ -29,6 +29,9 @@ module MicrosoftSync
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     STATSD_PREFIX = 'microsoft_sync.graph_service'
 
+    PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
+    PAGINATED_VALUE_KEY = 'value'
+
     class ApplicationNotAuthorizedForTenant < StandardError
       include Errors::GracefulCancelErrorMixin
     end
@@ -90,28 +93,14 @@ module MicrosoftSync
       raise
     end
 
-    def application_not_authorized_response?(response)
-      (
-        response.code == 401 &&
-        response.body.include?('The identity of the calling application could not be established.')
-      ) || (
-        response.code == 403 &&
-        response.body.include?('Required roles claim values are not provided')
-      )
+    # Builds a query string (hash) from options used by get or list endpoints
+    def expand_options(filter: {}, select: [], top: nil)
+      {}.tap do |query|
+        query['$filter'] = filter_clause(filter) unless filter.empty?
+        query['$select'] = select.join(',') unless select.empty?
+        query['$top'] = top if top
+      end
     end
-
-    def statsd_name(error=nil)
-      name = case error
-             when nil then 'success'
-             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
-             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
-             else 'error'
-             end
-      "#{STATSD_PREFIX}.#{name}"
-    end
-
-    PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
-    PAGINATED_VALUE_KEY = 'value'
 
     def get_paginated_list(endpoint, options)
       response = request(:get, endpoint, query: expand_options(**options))
@@ -125,55 +114,6 @@ module MicrosoftSync
         break if next_link.nil?
 
         response = request(:get, next_link)
-      end
-    end
-
-    # Builds a query string (hash) from options used by get or list endpoints
-    def expand_options(filter: {}, select: [], top: nil)
-      {}.tap do |query|
-        query['$filter'] = filter_clause(filter) unless filter.empty?
-        query['$select'] = select.join(',') unless select.empty?
-        query['$top'] = top if top
-      end
-    end
-
-    def filter_clause(filter)
-      filter.map do |filter_key, filter_value|
-        if filter_value.is_a?(Array)
-          quoted_values = filter_value.map{|v| quote_value(v)}
-          "#{filter_key} in (#{quoted_values.join(', ')})"
-        else
-          "#{filter_key} eq #{quote_value(filter_value)}"
-        end
-      end.join(' and ')
-    end
-
-    def quote_value(str)
-      "'#{str.gsub("'", "''")}'"
-    end
-
-    # Returns a hash with possible keys (:ignored, :throttled, :success:, :error) and values
-    # being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
-    def group_batch_subresponses_by_type(responses, &response_should_be_ignored)
-      responses.group_by do |subresponse|
-        if response_should_be_ignored[subresponse]
-          :ignored
-        elsif subresponse['status'] == 429
-          :throttled
-        elsif (200..299).cover?(subresponse['status'])
-          :success
-        else
-          :error
-        end
-      end
-    end
-
-    def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
-      responses_grouped_by_type.each do |type, responses|
-        responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
-          tags = {msft_endpoint: endpoint_name, status: code}
-          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
-        end
       end
     end
 
@@ -209,6 +149,75 @@ module MicrosoftSync
       end
 
       grouped[:ignored]&.map{|r| r['id']} || []
+    end
+
+    # Used mostly internally but can be useful for endpoint specifics
+    def quote_value(str)
+      "'#{str.gsub("'", "''")}'"
+    end
+
+    private
+
+    # -- Helpers for request():
+
+    def application_not_authorized_response?(response)
+      (
+        response.code == 401 &&
+        response.body.include?('The identity of the calling application could not be established.')
+      ) || (
+        response.code == 403 &&
+        response.body.include?('Required roles claim values are not provided')
+      )
+    end
+
+    def statsd_name(error=nil)
+      name = case error
+             when nil then 'success'
+             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+             else 'error'
+             end
+      "#{STATSD_PREFIX}.#{name}"
+    end
+
+    # -- Helpers for expand_options():
+
+    def filter_clause(filter)
+      filter.map do |filter_key, filter_value|
+        if filter_value.is_a?(Array)
+          quoted_values = filter_value.map{|v| quote_value(v)}
+          "#{filter_key} in (#{quoted_values.join(', ')})"
+        else
+          "#{filter_key} eq #{quote_value(filter_value)}"
+        end
+      end.join(' and ')
+    end
+
+    # -- Helpers for run_batch()
+
+    # Returns a hash with possible keys (:ignored, :throttled, :success:, :error) and values
+    # being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
+    def group_batch_subresponses_by_type(responses, &response_should_be_ignored)
+      responses.group_by do |subresponse|
+        if response_should_be_ignored[subresponse]
+          :ignored
+        elsif subresponse['status'] == 429
+          :throttled
+        elsif (200..299).cover?(subresponse['status'])
+          :success
+        else
+          :error
+        end
+      end
+    end
+
+    def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
+      responses_grouped_by_type.each do |type, responses|
+        responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
+          tags = {msft_endpoint: endpoint_name, status: code}
+          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+        end
+      end
     end
   end
 end

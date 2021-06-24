@@ -137,6 +137,16 @@ module MicrosoftSync
       add_users_to_group_via_batch(group_id, members, owners)
     end
 
+    # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
+    # to a hash like {members: %w[a b], owners: %w[a]}
+    def split_request_ids_to_hash(req_ids)
+      return nil if req_ids.blank?
+
+      req_ids
+        .group_by{|id| id.split("_").first.to_sym}
+        .transform_values{|ids| ids.map{|id| id.split("_").last}}
+    end
+
     # === Teams ===
     def get_team(team_id, options={})
       request(:get, "teams/#{team_id}", query: expand_options(**options))
@@ -182,16 +192,6 @@ module MicrosoftSync
         raise ArgumentError, "Only #{GROUP_USERS_BATCH_SIZE} users can be batched at " \
           "once. Got #{n_total_additions}."
       end
-    end
-
-    # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
-    # to a hash like {members: %w[a b], owners: %w[a]}
-    def split_request_ids_to_hash(req_ids)
-      return nil if req_ids.blank?
-
-      req_ids
-        .group_by{|id| id.split("_").first.to_sym}
-        .transform_values{|ids| ids.map{|id| id.split("_").last}}
     end
 
     def group_add_user_requests(group_id, user_aad_ids, members_or_owners)
