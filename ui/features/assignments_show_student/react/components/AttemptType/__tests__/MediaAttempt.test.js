@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {mount} from 'enzyme'
 import {fireEvent, render} from '@testing-library/react'
 import MediaAttempt from '../MediaAttempt'
+import {MediaPlayer} from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 
@@ -98,6 +100,43 @@ describe.skip('MediaAttempt', () => {
       )
       expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
       expect(getByTestId('media-recording')).toBeInTheDocument()
+    })
+
+    it('sets default cc when auto_show_cc is enabled', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov',
+            mediaTracks: [
+              {
+                _id: 3,
+                locale: 'fr',
+                type: 'captions',
+                language: 'fr'
+              },
+              {
+                _id: 1,
+                locale: 'en',
+                type: 'captions',
+                language: 'en'
+              },
+              {
+                _id: 2,
+                locale: 'es',
+                type: 'captions',
+                language: 'es'
+              }
+            ]
+          },
+          state: 'submitted'
+        }
+      })
+      global.ENV = {auto_show_cc: true}
+      const wrapper = mount(<MediaAttempt {...props} uploadingFiles={false} />)
+      const mediaplayer = wrapper.find(MediaPlayer)
+      expect(mediaplayer.props().autoShowCaption).toBe('en')
     })
   })
 

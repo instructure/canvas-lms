@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {getAutoTrack} from '../../../../media_player_iframe_content/react/CanvasMediaPlayer'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
@@ -110,7 +111,7 @@ export default class MediaAttempt extends React.Component {
       language: track.locale
     }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.state.iframeURL
-
+    const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
     return (
       <Flex direction="column" alignItems="center">
         <Flex.Item data-testid="media-recording" width="100%">
@@ -139,6 +140,7 @@ export default class MediaAttempt extends React.Component {
               tracks={mediaTracks}
               sources={mediaObject.mediaSources}
               captionPosition="bottom"
+              autoShowCaption={autoCCTrack}
             />
           )}
         </Flex.Item>
