@@ -104,7 +104,14 @@ describe MicrosoftSync::GraphServiceHttp do
       end
     end
 
-    # it 'uses the correct msft_endpoint when passed in a url' TODO this bug hasn't been fixed yet
+    it 'uses the correct msft_endpoint when passed in a url' do
+      # pagination "next" links are complete URLs
+      subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar', quota: [1, 0])
+      expect(InstStatsd::Statsd).to have_received(:count)
+        .with("microsoft_sync.graph_service.quota_read", 1, tags: {msft_endpoint: 'get_foo'})
+      expect(InstStatsd::Statsd).to have_received(:increment)
+        .with("microsoft_sync.graph_service.success", tags: {msft_endpoint: 'get_foo'})
+    end
   end
 
   describe '#expand_options' do

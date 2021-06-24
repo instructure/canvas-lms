@@ -202,7 +202,10 @@ module MicrosoftSync
       end
     end
 
-    def statsd_tags_for_request(method, path)
+    def statsd_tags_for_request(method, path_or_url)
+      # Strip https, hostname, "v1.0"
+      path = path_or_url.gsub(%r{^https?://[^/]*/[^/]*/}, '')
+
       {
         msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
       }
