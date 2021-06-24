@@ -137,6 +137,25 @@ describe('ContentTabs', () => {
     })
   })
 
+  describe('the submission type is student_annotation', () => {
+    it('renders the canvadocs iframe', async () => {
+      const assignmentAndSubmission = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['student_annotation']}
+      })
+      const props = {
+        ...assignmentAndSubmission,
+        createSubmissionDraft: jest.fn().mockResolvedValue({})
+      }
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
+    })
+  })
+
   describe('the submission type is online_text_entry', () => {
     beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
@@ -228,21 +247,6 @@ describe('ContentTabs', () => {
           })
         })
       })
-    })
-  })
-
-  describe('the submission type is student_annotation', () => {
-    it('renders the student annotation tab', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['student_annotation']}
-      })
-
-      const {getByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
     })
   })
 

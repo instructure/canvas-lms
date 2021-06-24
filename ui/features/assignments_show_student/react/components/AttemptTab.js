@@ -179,7 +179,11 @@ export default class AttemptTab extends Component {
   renderStudentAnnotationAttempt = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
-        <StudentAnnotationAttempt submission={this.props.submission} />
+        <StudentAnnotationAttempt
+          submission={this.props.submission}
+          assignment={this.props.assignment}
+          createSubmissionDraft={this.props.createSubmissionDraft}
+        />
       </Suspense>
     )
   }
@@ -239,7 +243,7 @@ export default class AttemptTab extends Component {
     }
 
     const submissionType = ['submitted', 'graded'].includes(submission.state)
-      ? getCurrentSubmissionType(submission)
+      ? getCurrentSubmissionType(submission, assignment)
       : this.props.activeSubmissionType
 
     const multipleSubmissionTypes = assignment.submissionTypes.length > 1

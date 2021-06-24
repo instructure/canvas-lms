@@ -1378,9 +1378,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def annotation_context(attempt: nil, draft: false)
+  def annotation_context(attempt: nil, in_progress: false, draft: false)
     if draft
       canvadocs_annotation_contexts.find_or_create_by(
+        attachment_id: assignment.annotatable_attachment_id,
+        submission_attempt: nil
+      )
+    elsif in_progress
+      canvadocs_annotation_contexts.find_by(
         attachment_id: assignment.annotatable_attachment_id,
         submission_attempt: nil
       )

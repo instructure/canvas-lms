@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {totalAllowedAttempts, friendlyTypeName} from '../SubmissionHelpers'
+import {
+  totalAllowedAttempts,
+  friendlyTypeName,
+  getCurrentSubmissionType
+} from '../SubmissionHelpers'
 
 describe('totalAllowedAttempts', () => {
   it('returns null if allowedAttempts on the assignment is null', () => {
@@ -43,5 +47,35 @@ describe('totalAllowedAttempts', () => {
 
   it('returns the value Annotation for the submission type student_annotation', () => {
     expect(friendlyTypeName('student_annotation')).toBe('Annotation')
+  })
+})
+
+describe('getCurrentSubmissionType', () => {
+  it('returns online_url if submission url is not null', () => {
+    const submission = {url: 'www.google.com'}
+    const assignment = {}
+    expect(getCurrentSubmissionType(submission, assignment)).toBe('online_url')
+  })
+
+  it('returns online_text_entry if submission body is not null or empty', () => {
+    const submission = {url: null, body: 'submission text'}
+    const assignment = {}
+    expect(getCurrentSubmissionType(submission, assignment)).toBe('online_text_entry')
+  })
+
+  it('returns online_upload if submission has an attachment', () => {
+    const submission = {url: null, body: null, attachments: [{displayName: 'test.jpg'}]}
+    const assignment = {}
+    expect(getCurrentSubmissionType(submission, assignment)).toBe('online_upload')
+  })
+
+  it('returns student_annotation if assignment accepts student annotations as a submission type', () => {
+    const submission = {
+      url: null,
+      body: null,
+      attachments: []
+    }
+    const assignment = {submissionTypes: ['online_text_entry', 'student_annotation']}
+    expect(getCurrentSubmissionType(submission, assignment)).toBe('student_annotation')
   })
 })

@@ -18,13 +18,18 @@
 
 import I18n from 'i18n!assignments_2_submission_helpers'
 
-export function getCurrentSubmissionType(submission) {
+export function getCurrentSubmissionType(submission, assignment) {
   if (submission.url !== null) {
     return 'online_url'
   } else if (submission.body !== null && submission.body !== '') {
     return 'online_text_entry'
   } else if (submission.attachments.length !== 0) {
     return 'online_upload'
+  } else if (assignment.submissionTypes.includes('student_annotation')) {
+    // TODO: EVAL-1774 - add an identifying token to submission objects to
+    // be able to tell that a past attempt is in fact a student_annotation
+    // and use that token here
+    return 'student_annotation'
   }
 }
 

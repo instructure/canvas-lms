@@ -289,6 +289,13 @@ export default class SubmissionManager extends Component {
           })
         }
         break
+      case 'student_annotation':
+        if (this.props.submission.submissionDraft) {
+          await this.submitToGraphql(submitMutation, {
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
       default:
         throw new Error('submission type not yet supported in A2')
     }
@@ -555,6 +562,10 @@ export default class SubmissionManager extends Component {
         break
       case 'online_url':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
+        break
+      case 'student_annotation':
+        activeTypeMeetsCriteria =
+          this.props.submission?.submissionDraft?.meetsStudentAnnotationCriteria
     }
 
     return (

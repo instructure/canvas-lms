@@ -21,27 +21,39 @@ import I18n from 'i18n!assignments_2_student_annotation'
 import LoadingIndicator from '@canvas/loading-indicator'
 import axios from '@canvas/axios'
 
-export default function StudentAnnotationAttempt({submission}) {
+export default function StudentAnnotationAttempt(props) {
   const [iframeURL, setIframeURL] = useState(null)
   const [fetchingCanvadocSession, setFetchingCanvadocSession] = useState(true)
   const [validResponse, setValidResponse] = useState(true)
 
+  const isSubmitted = ['graded', 'submitted'].includes(props.submission.state)
+
   useEffect(() => {
     axios
       .post('/api/v1/canvadoc_session', {
-        submission_attempt: 'draft',
-        submission_id: submission._id
+        submission_attempt: isSubmitted ? props.submission.attempt : 'draft',
+        submission_id: props.submission._id
       })
       .then(result => {
         setIframeURL(result.data.canvadocs_session_url)
         setFetchingCanvadocSession(false)
         setValidResponse(true)
+
+        if (!isSubmitted) {
+          props.createSubmissionDraft({
+            variables: {
+              id: props.submission.id,
+              activeSubmissionType: 'student_annotation',
+              attempt: props.submission.attempt || 1
+            }
+          })
+        }
       })
       .catch(_error => {
         setFetchingCanvadocSession(false)
         setValidResponse(false)
       })
-  }, [])
+  }, [isSubmitted, props.submission.attempt])
 
   return (
     <div data-testid="canvadocs-pane">
