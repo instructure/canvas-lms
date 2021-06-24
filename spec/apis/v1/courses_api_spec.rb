@@ -1775,7 +1775,7 @@ describe CoursesController, type: :request do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @course.root_account.role_overrides.create!(
           role: teacher_role,
-          permission: 'manage_courses_delete',
+          permission: 'manage_courses_reset',
           enabled: true
         )
         expect(Auditors::Course).to receive(:record_reset).once.

@@ -1612,7 +1612,7 @@ class Course < ActiveRecord::Base
         user && !self.deleted? &&
         fetch_on_enrollments('active_content_admin_enrollments', user) {
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        }.any? {|e| e.has_permission_to?(:manage_courses_delete) }
+        }.any? {|e| e.has_permission_to?(:manage_courses_reset) }
     end
     can :reset_content
 
@@ -1729,7 +1729,7 @@ class Course < ActiveRecord::Base
     # reset manually created course
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
+        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_reset)
     end
     can :reset_content
 
@@ -1745,7 +1745,7 @@ class Course < ActiveRecord::Base
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
         self.sis_source_id && self.account_membership_allows(user, :manage_sis) &&
-        self.account_membership_allows(user, :manage_courses_delete)
+        self.account_membership_allows(user, :manage_courses_reset)
     end
     can :reset_content
 

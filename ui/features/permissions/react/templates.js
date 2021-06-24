@@ -43,7 +43,7 @@ export const PERMISSION_DETAIL_SECTIONS = [
 ]
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
-  manage_courses: () => I18n.t('add / conclude / delete / publish'),
+  manage_courses: () => I18n.t('add / conclude / delete / publish / reset'),
   manage_files: () => I18n.t('add / delete / edit'),
   manage_sections: () => I18n.t('add / delete / edit'),
   manage_wiki: () => I18n.t('create / delete / update'),
@@ -2092,15 +2092,17 @@ const courseManagePermissions = generateActionTemplates(
     },
     {
       title: I18n.t('Courses - delete'),
-      description: I18n.t(
-        'Allows user to view the Delete this Course button. Allows user to view the Reset Course Content button.'
-      )
+      description: I18n.t('Allows user to view the Delete this Course button.')
     },
     {
       title: I18n.t('Courses - publish'),
       description: I18n.t(
         'Allows user to view the Publish Course and Unpublish Course buttons in the Course Home page. Allows user to view the Publish button in a course card for an unpublished course (Card View Dashboard).'
       )
+    },
+    {
+      title: I18n.t('Courses - reset'),
+      description: I18n.t('Allows user to view the Reset Course Content button.')
     }
   ],
   [
@@ -2192,9 +2194,6 @@ const courseManagePermissions = generateActionTemplates(
       description: I18n.t('Allows user to view the Delete this Course button.')
     },
     {
-      description: I18n.t('Allows user to view the Reset Course Content button.')
-    },
-    {
       title: I18n.t('Courses - publish'),
       description: I18n.t(
         'Allows user to view the Publish Course and Unpublish Course buttons in the Course Home page.'
@@ -2204,6 +2203,10 @@ const courseManagePermissions = generateActionTemplates(
       description: I18n.t(
         'Allows user to view the Publish button in a course card for an unpublished course (Card View Dashboard).'
       )
+    },
+    {
+      title: I18n.t('Courses - reset'),
+      description: I18n.t('Allows user to view the Reset Course Content button.')
     }
   ],
   [
