@@ -47,6 +47,10 @@ export const getGroupDiscussionUrl = (groupId, childDiscussionId) => {
   return `/groups/${groupId}/discussion_topics/${childDiscussionId}`
 }
 
+export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
+  return `/courses/${courseId}/assignments/${assignmentId}/submissions/${revieweeId}`
+}
+
 export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
   const options = {
     id: discussionTopicGraphQLId,

@@ -20,6 +20,8 @@ import gql from 'graphql-tag'
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 
 import {AssignmentOverride} from './AssignmentOverride'
+import {AssessmentRequest} from './AssessmentRequest'
+import {PeerReviews} from './PeerReviews'
 
 export const Assignment = {
   fragment: gql`
@@ -36,8 +38,16 @@ export const Assignment = {
           ...AssignmentOverride
         }
       }
+      assessmentRequestsForCurrentUser {
+        ...AssessmentRequest
+      }
+      peerReviews {
+        ...PeerReviews
+      }
     }
     ${AssignmentOverride.fragment}
+    ${AssessmentRequest.fragment}
+    ${PeerReviews.fragment}
   `,
 
   shape: shape({
@@ -48,7 +58,9 @@ export const Assignment = {
     unlockAt: string,
     onlyVisibleToOverrides: bool,
     pointsPossible: number,
-    assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)})
+    assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)}),
+    assessmentRequest: arrayOf(AssessmentRequest.shape),
+    peerReviews: PeerReviews.shape
   }),
 
   mock: ({
@@ -62,7 +74,9 @@ export const Assignment = {
     assignmentOverrides = {
       nodes: [AssignmentOverride.mock()],
       __typename: 'AssignmentOverrideConnection'
-    }
+    },
+    assessmentRequestsForCurrentUser = [AssessmentRequest.mock()],
+    peerReviews = PeerReviews.mock()
   } = {}) => ({
     id,
     _id,
@@ -72,6 +86,8 @@ export const Assignment = {
     onlyVisibleToOverrides,
     pointsPossible,
     assignmentOverrides,
+    assessmentRequestsForCurrentUser,
+    peerReviews,
     __typename: 'Assignment'
   })
 }

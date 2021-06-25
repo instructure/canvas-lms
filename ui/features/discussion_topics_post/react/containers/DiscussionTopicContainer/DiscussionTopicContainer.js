@@ -29,6 +29,7 @@ import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/Disc
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_posts'
+import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
@@ -41,7 +42,13 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation} from 'react-apollo'
-import {isGraded, getSpeedGraderUrl, getEditUrl, getPeerReviewsUrl} from '../../utils'
+import {
+  isGraded,
+  getSpeedGraderUrl,
+  getEditUrl,
+  getPeerReviewsUrl,
+  getReviewLinkUrl
+} from '../../utils'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
@@ -358,6 +365,23 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                   }
                   canSeeMultipleDueDates={canSeeMultipleDueDates}
                 />
+                {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                  assessmentRequest => (
+                    <PeerReview
+                      key={assessmentRequest._id}
+                      dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                        props.discussionTopic.assignment.peerReviews?.dueAt
+                      )}
+                      revieweeName={assessmentRequest.user.name}
+                      reviewLinkUrl={getReviewLinkUrl(
+                        ENV.course_id,
+                        props.discussionTopic.assignment._id,
+                        assessmentRequest.user._id
+                      )}
+                      workflowState={assessmentRequest.workflowState}
+                    />
+                  )
+                )}
               </View>
             )}
 

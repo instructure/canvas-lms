@@ -28,6 +28,8 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {Discussion} from '../../../../graphql/Discussion'
+import {PeerReviews} from '../../../../graphql/PeerReviews'
+import {Assignment} from '../../../../graphql/Assignment'
 
 jest.mock('@canvas/rce/RichContentEditor')
 
@@ -512,5 +514,39 @@ describe('DiscussionTopicContainer', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
     expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
+  })
+
+  describe('Peer Reviews', () => {
+    it('renders with a due date', () => {
+      const props = {discussionTopic: Discussion.mock()}
+      const {getByText} = setup(props)
+
+      expect(getByText('Peer review for Morty Smith Due: Mar 31 5:59am')).toBeTruthy()
+    })
+
+    it('renders with out a due date', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            peerReviews: PeerReviews.mock({dueAt: null})
+          })
+        })
+      }
+      const {getByText} = setup(props)
+
+      expect(getByText('Peer review for Morty Smith')).toBeTruthy()
+    })
+
+    it('does not render peer reviews if there are not any', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          peerReviews: null,
+          assessmentRequestsForCurrentUser: []
+        })
+      }
+      const {queryByText} = setup(props)
+
+      expect(queryByText('eer review for Morty Smith Due: Mar 31 5:59am')).toBeNull()
+    })
   })
 })
