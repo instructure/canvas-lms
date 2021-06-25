@@ -128,3 +128,24 @@ a#k5-manage-home-btn {
     transition: min-height 140ms ease;
   }
 }
+
+// Override a few things in the right-side sidebar for important dates
+#right-side-wrapper {
+  background-color: #FAFAFA;
+
+  hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #C7CDD1;
+    border-bottom: none;
+  }
+
+  // Make the right-side sticky when displayed in column, but leave it
+  // alone when collapsed under cards on smaller devices
+  @include breakpoint(desktop) {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+  }
+}

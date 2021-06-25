@@ -50,8 +50,8 @@
 <% end %>
 
 <% provide :right_side do %>
-  <% if !show_planner? and !k5_user? %>
-    <div class="placeholder"></div>
+  <% if !show_planner? || (k5_user? && Account.site_admin.feature_enabled?(:important_dates)) %>
+    <div class="placeholder" id="right-side-placeholder"></div>
   <% end %>
 <% end %>
 

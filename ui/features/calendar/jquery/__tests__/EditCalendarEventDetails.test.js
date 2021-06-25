@@ -202,6 +202,12 @@ describe('EditCalendarEventDetails', () => {
   })
 
   describe('important dates section', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES = {
+        important_dates: true
+      }
+    })
+
     it('is hidden by default', () => {
       render()
       expect(within(document.body).queryByText('Mark as Important Date')).not.toBeVisible()

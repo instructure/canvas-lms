@@ -2566,6 +2566,11 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
         end
+
+        it "sets ENV.IMPORTANT_DATES_CONTEXT_CODES with current user's enrollments" do
+          get 'user_dashboard'
+          expect(assigns[:js_env][:IMPORTANT_DATES_CONTEXT_CODES]).to eq ["course_#{@course.id}"]
+        end
       end
     end
 

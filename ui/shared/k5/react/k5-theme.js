@@ -51,6 +51,7 @@ const baseFont = {
 const base = {
   typography: {
     ...baseFont.typography,
+    fontSizeXSmall: '0.875rem',
     fontSizeSmall: '1rem',
     fontSizeMedium: '1.125rem',
     fontSizeLarge: '1.5rem',

@@ -509,7 +509,8 @@ class UsersController < ApplicationController
         :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
         :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
       },
-      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user
+      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user,
+      :IMPORTANT_DATES_CONTEXT_CODES => Enrollment.for_user(@current_user).active.limit(20).pluck(:course_id).map! {|id| "course_#{id}"}
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
