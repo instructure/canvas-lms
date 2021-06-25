@@ -16,26 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer} from 'react'
-
-import {View} from '@instructure/ui-view'
-
-import {DEFAULT_SETTINGS} from '../../svg/constants'
-import {PreviewSection} from './PreviewSection'
-import {ShapeSection} from './ShapeSection'
-import {ColorSection} from './ColorSection'
-
-export const CreateButtonForm = () => {
-  const [settings, dispatch] = useReducer(
-    (state, changes) => ({...state, ...changes}),
-    DEFAULT_SETTINGS
-  )
-
-  return (
-    <View as="div">
-      <PreviewSection settings={settings} />
-      <ShapeSection settings={settings} onChange={dispatch} />
-      <ColorSection settings={settings} onChange={dispatch} />
-    </View>
-  )
+export function createSvgElement(tag, attributes = {}) {
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag)
+  Object.entries(attributes).forEach(([attr, value]) => {
+    element.setAttribute(attr, value)
+  })
+  return element
 }

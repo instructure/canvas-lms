@@ -16,26 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer} from 'react'
+export const DEFAULT_SETTINGS = {
+  shape: 'square',
+  size: 'small',
+  color: null,
+  outlineColor: null,
+  outlineSize: 'none'
+}
 
-import {View} from '@instructure/ui-view'
+export const BASE_SIZE = {
+  'x-small': 74,
+  small: 122,
+  medium: 158,
+  large: 218
+}
 
-import {DEFAULT_SETTINGS} from '../../svg/constants'
-import {PreviewSection} from './PreviewSection'
-import {ShapeSection} from './ShapeSection'
-import {ColorSection} from './ColorSection'
-
-export const CreateButtonForm = () => {
-  const [settings, dispatch] = useReducer(
-    (state, changes) => ({...state, ...changes}),
-    DEFAULT_SETTINGS
-  )
-
-  return (
-    <View as="div">
-      <PreviewSection settings={settings} />
-      <ShapeSection settings={settings} onChange={dispatch} />
-      <ColorSection settings={settings} onChange={dispatch} />
-    </View>
-  )
+export const STROKE_WIDTH = {
+  none: 0,
+  small: 2,
+  medium: 4,
+  large: 8
 }
