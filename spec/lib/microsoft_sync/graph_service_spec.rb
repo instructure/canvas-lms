@@ -597,6 +597,12 @@ describe MicrosoftSync::GraphService do
         end
 
         it { is_expected.to eq(nil) }
+
+        it 'passes along the quota used to run_batch' do
+          expect(service.http).to \
+            receive(:run_batch).with(anything, anything, quota: [4, 4]).and_call_original
+          subject
+        end
       end
 
       context 'when some owners were already in the group' do
@@ -720,6 +726,12 @@ describe MicrosoftSync::GraphService do
       end
 
       it { is_expected.to eq(nil) }
+
+      it 'passes along the quota used to run_batch' do
+        expect(service.http).to \
+          receive(:run_batch).with(anything, anything, quota: [4, 4]).and_call_original
+        subject
+      end
     end
 
     context 'when some owners were not in the group' do

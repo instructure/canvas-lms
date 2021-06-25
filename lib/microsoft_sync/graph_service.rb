@@ -101,7 +101,8 @@ module MicrosoftSync
       reqs =
         group_remove_user_requests(group_id, members, 'members') +
         group_remove_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch('group_remove_users', reqs) do |resp|
+      quota = [reqs.count, reqs.count]
+      failed_req_ids = run_batch('group_remove_users', reqs, quota: quota) do |resp|
         (
           resp['status'] == 404 && resp['body'].to_s =~
             /does not exist or one of its queried reference-property objects are not present/i
@@ -120,7 +121,7 @@ module MicrosoftSync
       reqs =
         group_add_user_requests(group_id, members, 'members') +
         group_add_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch('group_add_users', reqs) do |r|
+      failed_req_ids = run_batch('group_add_users', reqs, quota: [reqs.count, reqs.count]) do |r|
         r['status'] == 400 && r['body'].to_s =~ /One or more added object references already exist/i
       end
       split_request_ids_to_hash(failed_req_ids)

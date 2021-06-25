@@ -161,4 +161,36 @@ describe MicrosoftSync::GraphServiceHttp do
         have_received(:request).with(:get, continue_url, hash_including(quota: [2, 3]))
     end
   end
+
+  describe '#run_batch' do
+    before do
+      WebMock.disable_net_connect!
+      WebMock.stub_request(:post, 'https://graph.microsoft.com/v1.0/$batch')
+        .with(body: {requests: requests})
+        .and_return(
+          status: 200, body: {responses:[]}.to_json,
+          headers: {'Content-type' => 'application/json'}
+        )
+    end
+
+    after { WebMock.enable_net_connect! }
+
+    let(:requests) do
+      [
+        {id: 'a', method: 'GET', url: '/foo'},
+        {id: 'a', method: 'GET', url: '/bar'},
+      ]
+    end
+
+    let(:run_batch) { subject.run_batch('wombat', requests, quota: [3, 4]) }
+
+    it 'counts statsd metrics with the quota' do
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
+      run_batch
+      expect(InstStatsd::Statsd).to have_received(:count)
+        .with("microsoft_sync.graph_service.quota_read", 3, tags: {msft_endpoint: 'batch_wombat'})
+      expect(InstStatsd::Statsd).to have_received(:count)
+        .with("microsoft_sync.graph_service.quota_write", 4, tags: {msft_endpoint: 'batch_wombat'})
+    end
+  end
 end

@@ -120,8 +120,9 @@ module MicrosoftSync
     # HTTP request. Expected failures can be ignored by passing in a block which checks
     # the response. Other non-2xx responses cause a BatchRequestFailed error.
     # Returns a list of ids of the requests that were ignored.
-    def run_batch(endpoint_name, requests, &response_should_be_ignored)
+    def run_batch(endpoint_name, requests, quota:, &response_should_be_ignored)
       Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
+      increment_statsd_quota_points(quota, {}, msft_endpoint: "batch_#{endpoint_name}")
 
       response =
         begin
