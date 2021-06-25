@@ -124,9 +124,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # moves an existing outcome link from the same context to be under this
   # group.
   def adopt_outcome_link(outcome_link, opts={})
+    return if self.context && self.context != outcome_link.context
+    # no-op if the group is global and the link isn't
+    return if self.context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
     # no-op if we're already the parent
-    return unless outcome_link.context == self.context
     return outcome_link if outcome_link.associated_asset == self
+
+    # update context_id if global
+    outcome_link.context_id = self.id if self.context.nil?
 
     # change the parent
     outcome_link.associated_asset = self

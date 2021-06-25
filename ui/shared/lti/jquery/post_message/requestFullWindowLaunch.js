@@ -19,6 +19,7 @@ import {ltiState} from './handleLtiPostMessage'
 
 const parseData = data => {
   const defaults = {
+    display: 'borderless',
     launchType: 'same_window',
     launchOptions: {}
   }
@@ -40,29 +41,32 @@ const parseData = data => {
   }
 }
 
-const buildLaunchUrl = (messageUrl, placement) => {
+const buildLaunchUrl = (messageUrl, placement, display) => {
   let context = ENV.context_asset_string.replace('_', 's/')
   if (!(context.startsWith('account') || context.startsWith('course'))) {
     context = 'accounts/' + ENV.DOMAIN_ROOT_ACCOUNT_ID
   }
-  const baseUrl = `${window.location.origin}/${context}/external_tools/retrieve?display=borderless`
+  const baseUrl = `${window.location.origin}/${context}/external_tools/retrieve?display=${display}`
 
   const toolLaunchUrl = new URL(messageUrl)
   const clientId = toolLaunchUrl.searchParams.get('client_id')
   const clientIdParam = clientId ? `&client_id=${clientId}` : ''
   const placementParam = placement ? `&placement=${placement}` : ''
 
+  const assignmentId = toolLaunchUrl.searchParams.get('assignment_id')
+  const assignmentParam = assignmentId ? `&assignment_id=${assignmentId}` : ''
+
   // xsslint safeString.property window.location
   toolLaunchUrl.searchParams.append('platform_redirect_url', window.location)
   toolLaunchUrl.searchParams.append('full_win_launch_requested', '1')
   const encodedToolLaunchUrl = encodeURIComponent(toolLaunchUrl.toString())
 
-  return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}`
+  return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}${assignmentParam}`
 }
 
 const handler = data => {
-  const {url, launchType, launchOptions, placement} = parseData(data)
-  const launchUrl = buildLaunchUrl(url, placement)
+  const {url, launchType, launchOptions, placement, display} = parseData(data)
+  const launchUrl = buildLaunchUrl(url, placement, display)
 
   let proxy
   switch (launchType) {

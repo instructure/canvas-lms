@@ -24,11 +24,15 @@ module FeatureFlags
   end
 
   def feature_enabled?(feature)
-    return false if id&.zero?
+    if id&.zero?
+      InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
+      return false
+    end
 
     flag = lookup_feature_flag(feature)
     return flag.enabled? if flag
 
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: 'false'})
     false
   end
 

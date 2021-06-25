@@ -152,7 +152,7 @@ export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
         variables: {
           id: '1',
           type: 'Account',
-          rootGroupId: includeGlobalRootGroup ? 1 : 0,
+          rootGroupId: includeGlobalRootGroup ? '1' : '0',
           includeGlobalRootGroup
         }
       },
@@ -173,7 +173,7 @@ export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
         variables: {
           id: '1',
           type: 'Course',
-          rootGroupId: 0,
+          rootGroupId: '0',
           includeGlobalRootGroup: false
         }
       },
@@ -210,7 +210,7 @@ const parentAccountMock = () => ({
       childGroupsCount: 10,
       outcomesCount: 0,
       __typename: 'LearningOutcomeGroup',
-      _id: 100 + i
+      _id: (100 + i).toString()
     }
   }))
 })

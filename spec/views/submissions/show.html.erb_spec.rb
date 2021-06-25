@@ -567,6 +567,20 @@ describe "/submissions/show" do
         expect(rubric_link_text).to match(/Show Rubric/)
       end
 
+      it "shows a message when the request is complete" do
+        @assessment_request.complete!
+
+        view_context(@course, @student)
+        assign(:assignment, @assignment)
+        assign(:submission, @submission)
+        assign(:assessment_request, @assessment_request)
+
+        render 'submissions/show'
+        html = Nokogiri::HTML5.fragment(response.body)
+        completed_message = html.css('.assessment_request_completed_message')
+        expect(completed_message.attr('style').value).not_to match(/display:\s*none/)
+      end
+
       it 'adds assessing class to rubric_container' do
         view_context(@course, @student)
         assign(:assignment, @assignment)
@@ -577,6 +591,45 @@ describe "/submissions/show" do
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).to include('assessing')
       end
+    end
+  end
+
+  context "when an assignment is peer-reviewed" do
+    let(:assignment) { @course.assignments.create!(peer_reviews: true) }
+    let(:student_to_assess) { @course.enroll_student(User.create!, enrollment_state: "active").user }
+    let(:submission) { assignment.submission_for_student(student_to_assess) }
+
+    let(:assessment_request) do
+      submission.assessment_requests.create!(
+        assessor: @student,
+        assessor_asset: assignment.submission_for_student(@student),
+        user: submission.user
+      )
+    end
+
+    before(:each) do
+      view_context(@course, @student)
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      assign(:assessment_request, assessment_request)
+    end
+
+    it "shows assessment instructions when the assignment does not have a rubric" do
+      render 'submissions/show'
+      html = Nokogiri::HTML5.fragment(response.body)
+      message_container = html.at_css('.assessment_request_incomplete_message')
+      expect(message_container.text).to include('This peer review is not finished yet.')
+      expect(message_container.attr('style')).not_to match(/display:\s*none/)
+    end
+
+    it "does not show assessment instructions when the assignment has a rubric" do
+      rubric_association = rubric_association_model(association_object: assignment, purpose: 'grading')
+      assessment_request.update!(rubric_association: rubric_association)
+
+      render 'submissions/show'
+      html = Nokogiri::HTML5.fragment(response.body)
+      message_container = html.at_css('.assessment_request_incomplete_message')
+      expect(message_container.attr('style')).to match(/display:\s*none/)
     end
   end
 

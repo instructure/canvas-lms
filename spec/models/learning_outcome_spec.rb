@@ -116,6 +116,7 @@ describe LearningOutcome do
 
     it "adding outcomes to a rubric should increment datadog counter" do
       expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome.align')
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -606,6 +607,43 @@ describe LearningOutcome do
       expect {
         @outcome.rubric_criterion = @outcome.rubric_criterion.merge(mpoints)
       }.to change{@outcome.rubric_criterion}.to(@outcome.rubric_criterion.merge(mpoints))
+    end
+
+    it "should update aligned rubrics after save" do
+      rubric = Rubric.create!(:context => @course)
+      rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+        }
+      ]
+      rubric.save!
+
+      @outcome.data[:rubric_criterion][:description] = 'New description'
+      @outcome.save!
+
+      rubric.reload
+      expect(rubric.data.first[:ratings].map {|r| r[:description]}).to match_array([
+        "Exceeds Expectations",
+        "Meets Expectations",
+        "Does Not Meet Expectations"
+      ])
     end
   end
 

@@ -26,9 +26,7 @@ const DEFAULT_CONTEXT = {
   loadingOpportunities: false,
   isStudent: false,
   responsiveSize: 'large',
-  subjectAnnouncements: [],
-  switchToMissingItems: () => {},
-  switchToToday: () => {}
+  subjectAnnouncements: []
 }
 
 const K5DashboardContext = createContext(DEFAULT_CONTEXT)

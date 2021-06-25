@@ -35,9 +35,13 @@ export function PostMessage({...props}) {
     <Byline
       title={
         <>
-          <View padding="none small none none">
-            <Text weight="bold">{props.authorName}</Text>
-          </View>
+          {props.hasAuthor && (
+            <View padding="none small none none">
+              <Text weight="bold" data-testid="author_name">
+                {props.authorName}
+              </Text>
+            </View>
+          )}
           {!!props.discussionRoles && (
             <RolePillContainer
               discussionRoles={props.discussionRoles}
@@ -106,12 +110,23 @@ export function PostMessage({...props}) {
           />
         </div>
       )}
-      <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 0" />
+      {props.hasAuthor && (
+        <Avatar
+          name={props.authorName}
+          src={props.avatarUrl}
+          margin="0 0 0 0"
+          data-testid="author_avatar"
+        />
+      )}
     </Byline>
   )
 }
 
 PostMessage.propTypes = {
+  /**
+   * Boolean to define if the PostMessage has an author or not.
+   */
+  hasAuthor: PropTypes.bool,
   /**
    * Display name for the author of the message
    */
@@ -167,6 +182,10 @@ PostMessage.propTypes = {
    * Marks whether an unread message has a forcedReadState
    */
   isForcedRead: PropTypes.bool
+}
+
+PostMessage.defaultProps = {
+  hasAuthor: true
 }
 
 export default PostMessage

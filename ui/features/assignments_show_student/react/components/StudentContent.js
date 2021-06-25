@@ -53,43 +53,43 @@ function EnrollmentConcludedNotice() {
   )
 }
 
-function renderSubmissionlessAssignment({assignment}, alertContext) {
-  const buttons = []
-
+function SubmissionlessFooter({onMarkAsDoneError}) {
+  // If this assignment has digital submissions, the SubmissionManager
+  // component will handle rendering the footer.  If not, we still need to show
+  // the "Mark as Done" button for assignments that belong to modules.
   const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
-  if (moduleItem != null) {
-    buttons.push({
+  if (moduleItem == null) {
+    return null
+  }
+
+  const buttons = [
+    {
       element: (
         <MarkAsDoneButton
           done={moduleItem.done}
           itemId={moduleItem.id}
           moduleId={moduleItem.module_id}
-          onError={() => {
-            alertContext.setOnFailure(I18n.t('Error updating status of module item'))
-          }}
+          onError={onMarkAsDoneError}
         />
       ),
       key: 'mark-as-done'
-    })
-  }
+    }
+  ]
 
-  return (
-    <>
-      <AssignmentToggleDetails description={assignment.description} />
-      {buttons.length > 0 && <StudentFooter buttons={buttons} />}
-    </>
-  )
+  return <StudentFooter buttons={buttons} />
 }
 
 function renderAttemptsAndAvailability({assignment, submission}) {
   return (
     <View as="div" margin="medium 0">
-      <Text as="div" weight="bold">
-        {I18n.t(
-          {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
-          {count: totalAllowedAttempts({assignment, submission}) || 0}
-        )}
-      </Text>
+      {assignment.expectsSubmission && (
+        <Text as="div" weight="bold">
+          {I18n.t(
+            {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+            {count: totalAllowedAttempts({assignment, submission}) || 0}
+          )}
+        </Text>
+      )}
       <Text as="div">
         <AvailabilityDates assignment={assignment} formatStyle="long" />
       </Text>
@@ -103,8 +103,6 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (assignment.env.unlockDate) {
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
-  } else if (assignment.nonDigitalSubmission) {
-    return renderSubmissionlessAssignment({assignment}, alertContext)
   } else if (ENV.belongs_to_unpublished_module) {
     return <UnpublishedModule />
   } else if (submission == null) {
@@ -121,6 +119,9 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
       </>
     )
   } else {
+    const onMarkAsDoneError = () =>
+      alertContext.setOnFailure(I18n.t('Error updating status of module item'))
+
     return (
       <>
         {renderAttemptsAndAvailability({assignment, submission})}
@@ -130,7 +131,11 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
             <RubricsQuery assignment={assignment} submission={submission} />
           </Suspense>
         )}
-        <ContentTabs assignment={assignment} submission={submission} />
+        {assignment.expectsSubmission ? (
+          <ContentTabs assignment={assignment} submission={submission} />
+        ) : (
+          <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
+        )}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>
     )

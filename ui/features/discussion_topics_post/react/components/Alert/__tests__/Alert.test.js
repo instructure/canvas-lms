@@ -49,44 +49,44 @@ const overrides = [
   }
 ]
 
-const setup = withOverrides => {
-  return withOverrides
-    ? render(
-        <Alert
-          pointsPossible={7}
-          dueAtDisplayText="Jan 26 11:49pm"
-          assignmentOverrides={overrides}
-          canSeeMultipleDueDates={withOverrides}
-        />
-      )
-    : render(
-        <Alert
-          pointsPossible={7}
-          dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
-          assignmentOverrides={[]}
-          canSeeMultipleDueDates={withOverrides}
-        />
-      )
+const setup = props => {
+  return render(
+    <Alert
+      pointsPossible={7}
+      dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
+      assignmentOverrides={[]}
+      canSeeMultipleDueDates={false}
+      {...props}
+    />
+  )
 }
 
 describe('Alert', () => {
   it('displays points possible info', () => {
-    const {queryByText} = setup(false)
+    const {queryByText} = setup()
     expect(queryByText('This is a graded discussion: 7 points possible')).toBeTruthy()
   })
 
+  it('displays correct pluralization', () => {
+    const {queryByText} = setup({pointsPossible: 1})
+    expect(queryByText('This is a graded discussion: 1 point possible')).toBeTruthy()
+  })
+
   it('displays due date when there are no overrides', () => {
-    const {queryByText} = setup(false)
+    const {queryByText} = setup()
     expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
   })
 
   it('displays "Show due dates" button when there are overrides', () => {
-    const {queryByText} = setup(true)
+    const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
     expect(queryByText('Show Due Dates (3)')).toBeTruthy()
   })
 
   it('displays tray and correctly formatted dates', async () => {
-    const {queryByText, findByText, findByTestId} = setup(true)
+    const {queryByText, findByText, findByTestId} = setup({
+      assignmentOverrides: overrides,
+      canSeeMultipleDueDates: true
+    })
     expect(queryByText('Show Due Dates (3)')).toBeTruthy()
     fireEvent.click(queryByText('Show Due Dates (3)'))
     expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
@@ -97,7 +97,10 @@ describe('Alert', () => {
     overrides[2].dueAt = null
     overrides[2].unlockAt = null
     overrides[2].lockAt = null
-    const {queryByText, findByText} = setup(true)
+    const {queryByText, findByText} = setup({
+      assignmentOverrides: overrides,
+      canSeeMultipleDueDates: true
+    })
     expect(queryByText('Show Due Dates (3)')).toBeTruthy()
     fireEvent.click(queryByText('Show Due Dates (3)'))
     expect(await findByText('No Due Date')).toBeTruthy()

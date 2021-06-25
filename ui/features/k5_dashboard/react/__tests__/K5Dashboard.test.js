@@ -434,15 +434,26 @@ describe('K-5 Dashboard', () => {
       expect(getByText('Your homeroom is currently unpublished.')).toBeInTheDocument()
     })
 
-    it('shows a due today link pointing to the first item on schedule tab for today', async () => {
-      const {findByText} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
-      const dueTodayLink = await findByText('1 due today', {timeout: 5000})
+    it('shows a due today link pointing to the schedule tab of the course', async () => {
+      const {findByRole} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      const dueTodayLink = await findByRole('link', {
+        name: 'View 1 items due today for course Economics 101',
+        timeout: 5000
+      })
       expect(dueTodayLink).toBeInTheDocument()
+      expect(dueTodayLink.getAttribute('href')).toMatch('/courses/1?focusTarget=today#schedule')
+    })
 
-      act(() => dueTodayLink.click())
-      expect(await findByText('Assignment 15')).toBeInTheDocument()
-      // window.requestAnimationFrame doesn't really work in jsdom, so we can't test that the
-      // correct element is focused since that occurs at the end of the scrolling animation
+    it('shows a missing items link pointing to the schedule tab of the course', async () => {
+      const {findByRole} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      const dueTodayLink = await findByRole('link', {
+        name: 'View 2 missing items for course Economics 101',
+        timeout: 5000
+      })
+      expect(dueTodayLink).toBeInTheDocument()
+      expect(dueTodayLink.getAttribute('href')).toMatch(
+        '/courses/1?focusTarget=missing-items#schedule'
+      )
     })
 
     it('shows the latest announcement for each subject course if one exists', async () => {
@@ -450,28 +461,6 @@ describe('K-5 Dashboard', () => {
       const announcementLink = await findByText("This sure isn't a homeroom")
       expect(announcementLink).toBeInTheDocument()
       expect(announcementLink.closest('a').href).toMatch('/courses/1/announcements/21')
-    })
-
-    it('shows a missing items link pointing to the missing items section on the schedule tab', async () => {
-      const {findByText, getByRole, getByText} = render(
-        <K5Dashboard {...defaultProps} plannerEnabled />
-      )
-      const missingLink = await findByText('2 missing')
-      expect(missingLink).toBeInTheDocument()
-
-      act(() => missingLink.click())
-      expect(await findByText('Assignment 15')).toBeInTheDocument()
-
-      // The missing items button should be expanded and focused
-      await waitFor(() => {
-        expect(document.activeElement.dataset.testid).toBe('missing-item-info')
-        expect(document.activeElement.getAttribute('aria-expanded')).toBe('true')
-      })
-      expect(getByRole('button', {name: 'Hide 2 missing items'})).toBeInTheDocument()
-
-      // Missing item details should be shown underneath it
-      expect(getByText('Assignment 1')).toBeInTheDocument()
-      expect(getByText('Assignment 2')).toBeInTheDocument()
     })
 
     it('shows loading skeletons for course cards while they load', () => {

@@ -88,9 +88,12 @@
                 !point_value_for_input(user_answer, question).nan? &&
                 round_if_whole(point_value_for_input(user_answer, question).round(2)) || ''
               %>" />
+            <label class="screenreader-only" for="question_score_<%= hash_get(question, :id) %>_visible"><%= t(:question_score, 'Question Score') %></label>
             <input class="question_input"
               placeholder="--"
               data-question-id="<%= hash_get(question, :id) %>"
+              name="question_score_<%= hash_get(question, :id) %>_visible"
+              id="question_score_<%= hash_get(question, :id) %>_visible"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
                 render_score(point_value_for_input(user_answer, question)) || ''

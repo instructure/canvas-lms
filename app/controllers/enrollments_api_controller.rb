@@ -489,7 +489,7 @@ class EnrollmentsApiController < ApplicationController
         if use_bookmarking
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
             {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
-          BookmarkedCollection.wrap(bookmarker, enrollments)
+          ShardedBookmarkedCollection.build(bookmarker, enrollments)
         else
           enrollments
         end
@@ -919,7 +919,7 @@ class EnrollmentsApiController < ApplicationController
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
-      approved_accounts = user.associated_root_accounts.shard(user).inject([]) do |accounts, ra|
+      approved_accounts = user.associated_root_accounts.except(:order).shard(user).inject([]) do |accounts, ra|
         accounts << ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
         accounts
       end

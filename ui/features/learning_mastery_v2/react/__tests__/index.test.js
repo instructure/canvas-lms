@@ -18,14 +18,14 @@
 
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import axios from '@canvas/axios'
 import LearningMastery from '../index'
+import useRollups from '../hooks/useRollups'
+
+jest.mock('../hooks/useRollups')
 
 jest.useFakeTimers()
 
 describe('LearningMastery', () => {
-  let axiosMock
   const ratings = [
     {
       color: 'blue',
@@ -47,6 +47,39 @@ describe('LearningMastery', () => {
     }
   ]
 
+  const users = [
+    {
+      id: '1',
+      name: 'Student 1',
+      display_name: 'Student 1',
+      avatar_url: 'url'
+    }
+  ]
+
+  const outcomes = [
+    {
+      id: '1',
+      title: 'outcome 1',
+      ratings
+    }
+  ]
+
+  const rollups = [
+    {
+      studentId: '1',
+      outcomeRollups: [
+        {
+          outcomeId: '1',
+          rating: {
+            points: 3,
+            color: 'green',
+            description: 'rating description!'
+          }
+        }
+      ]
+    }
+  ]
+
   const defaultProps = (props = {}) => {
     return {
       courseId: '1',
@@ -55,73 +88,40 @@ describe('LearningMastery', () => {
   }
 
   beforeEach(() => {
+    useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     window.ENV = {GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}}}
-    const promise = Promise.resolve({
-      status: 200,
-      data: {
-        linked: {
-          users: [
-            {
-              id: '1',
-              name: 'Student 1',
-              display_name: 'Student 1',
-              avatar_url: 'url'
-            }
-          ]
-        }
-      }
-    })
-    axiosMock = jest.spyOn(axios, 'get').mockResolvedValue(promise)
   })
 
   afterAll(() => {
     window.ENV = {}
   })
 
-  it('renders each proficiency rating description specified in window.ENV', () => {
+  it('renders each proficiency rating description specified in window.ENV', async () => {
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
     ratings.forEach(rating => {
       expect(getByText(rating.description)).toBeInTheDocument()
     })
   })
 
-  it('renders a loading spinner', () => {
+  it('renders a loading spinner when useRollups.isLoading is true', async () => {
+    useRollups.mockReturnValue({isLoading: true})
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByText('Loading')).toBeInTheDocument()
   })
 
-  it('calls the /rollups url', () => {
-    render(<LearningMastery {...defaultProps()} />)
-    const params = {
-      params: {
-        rating_percents: true,
-        per_page: 20,
-        include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
-        page: 1
-      }
-    }
-    expect(axiosMock).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
-  })
-
-  it('renders each student', async () => {
+  it('renders each student, outcome, rollup from the response', async () => {
+    useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Student 1')).toBeInTheDocument()
+    expect(getByText('outcome 1')).toBeInTheDocument()
+    expect(getByText('rating description!')).toBeInTheDocument()
   })
 
-  describe('when the rollup request is not successful', () => {
-    beforeEach(() => {
-      jest.spyOn(axios, 'get').mockRejectedValue({})
-    })
-
-    it("displays a flash alert if the rollups couldn't be fetched", async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-      render(<LearningMastery {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'Error loading rollups',
-        type: 'error'
-      })
-    })
+  it('calls useRollups with the provided courseId', () => {
+    const props = defaultProps()
+    render(<LearningMastery {...props} />)
+    expect(useRollups).toHaveBeenCalledWith({courseId: props.courseId})
   })
 })

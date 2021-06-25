@@ -63,8 +63,8 @@ const fetchApps = cards => {
         acc.push({
           id: app.id,
           courses: [course],
-          title: app.course_navigation.text || app.name,
-          icon: app.course_navigation.icon_url || app.icon_url
+          title: app.course_navigation?.text || app.name,
+          icon: app.course_navigation?.icon_url || app.icon_url
         })
       }
       return acc

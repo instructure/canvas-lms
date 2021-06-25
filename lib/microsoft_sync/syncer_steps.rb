@@ -19,13 +19,15 @@
 #
 
 #
-# Code which syncs course enrollments to Microsoft groups/teams
-# See also MicrosoftSync::Group model
+# Code which syncs course enrollments to Microsoft groups/teams. This is a good
+# starting place to understand the syncing process.
+# See also MicrosoftSync::Group model.
 #
-# This ideally shouldn't contain much job plumbing, but focus on the business
-# logic about what to do in each step of a sync. For job plumbing, see
-# StateMachineJob. This should normally be used by creating a StateMachineJob
-# with this as the steps_object; see MicrosoftSync::Group#syncer_job
+# This ideally shouldn't contain much job plumbing (retry logic, strands, state
+# storage, etc.), but focus on the business logic about what to do in each step
+# of a sync. For job plumbing, see StateMachineJob. This should normally be
+# used by creating a StateMachineJob with this as the steps_object; see
+# MicrosoftSync::Group#syncer_job
 #   group.syncer_job.run_later
 #   group.syncer_job.run_synchronously # e.g. manually in a console
 #
@@ -37,6 +39,16 @@ module MicrosoftSync
     STANDARD_RETRY_DELAY = [5, 20, 100].freeze
     MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
     MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
+
+    # The more changes, the more likely it is that some of the changes will
+    # be duplicative and cause retries when adding/removing, which makes
+    # partial sync less efficient, and it makes sense to just do a full sync.
+    # This number is fairly arbitrary but it should be small enough that
+    # we can get all the enrollments from the DB in one fetch.  Also, given a
+    # max course size of 25k, this means that in the worst case, triggering a
+    # full sync would be (25k/20) extra requests to get the current user list,
+    # or about 3 extra requests per user added... not too bad.
+    MAX_PARTIAL_SYNC_CHANGES = 500
 
     STATSD_NAME_SKIPPED_BATCHES = "microsoft_sync.syncer_steps.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "microsoft_sync.syncer_steps.skipped_total"
@@ -59,10 +71,6 @@ module MicrosoftSync
 
     def initialize(group)
       @group = group
-    end
-
-    def initial_step
-      :step_ensure_max_enrollments_in_a_course
     end
 
     def max_retries
@@ -88,21 +96,29 @@ module MicrosoftSync
       StateMachineJob::Retry.new(error: e, delay_amount: delay_amount, **extra_args)
     end
 
-    # The first step that checks if the max enrollments in a curse were reached
-    # before starting the full sync with the Microsoft side.
-    def step_ensure_max_enrollments_in_a_course(_mem_data, _job_state_data)
+    def step_initial(job_type, _job_state_data)
+      StateMachineJob::NextStep.new(
+        job_type.to_s == 'partial' ? :step_partial_sync : :step_full_sync_prerequisites
+      )
+    end
+
+    # Checks if there are too many enrollments to sync, and if, so aborts.
+    # Also deletes PartialSyncChanges that are unnecessary now that we will
+    # be processing all enrollments. (Deletes only records that have been
+    # replicated to the secondary. We read Enrollments from the secondary so we
+    # don't want to delete PartialSyncChanges corresponding to enrollments not
+    # yet replicated.)
+    def step_full_sync_prerequisites(_mem_data, _job_state_data)
       raise_max_enrollment_members_reached if max_enrollment_members_reached?
       raise_max_enrollment_owners_reached if max_enrollment_owners_reached?
+
+      PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
 
       StateMachineJob::NextStep.new(:step_ensure_class_group_exists)
     end
 
     # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
-      # TODO: as we continue building the job we could possibly just use the
-      # group.ms_group_id and if we get an error know we have to create it.
-      # That will save us a API call. But we won't be able to detect if there
-      # are multiple; and it makes handling the 404s soon after a creation trickier.
       remote_ids = graph_service_helpers.list_education_classes_for_course(course).map{|c| c['id']}
 
       # If we've created the group previously, we're good to go
@@ -149,21 +165,25 @@ module MicrosoftSync
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
         course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
       ) do |user_ids|
-        users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
-        users_and_upns = users_upns_finder.call
-
-        # If some users in different slices have the same UPNs, this could end up
-        # looking up the same UPN multiple times; but this should be very rare
-        users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
-          upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
-          user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
-          UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
-        end
+        ensure_user_mappings(user_ids)
       end
 
       StateMachineJob::NextStep.new(:step_generate_diff)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e)
+    end
+
+    def ensure_user_mappings(user_ids)
+      users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
+      users_and_upns = users_upns_finder.call
+
+      # If some users in different slices have the same UPNs, this could end up
+      # looking up the same UPN multiple times; but this should be very rare
+      users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
+        upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
+        user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
+        UserMapping.bulk_insert_for_root_account_id(course.root_account_id, user_id_to_aad)
+      end
     end
 
     # Get group members/owners from the API and local enrollments and calculate
@@ -188,7 +208,7 @@ module MicrosoftSync
 
       n_total = users.values.map(&:length).sum
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
-                        "Skipping #{type} for #{n_total}: #{users.to_json}")
+                        "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total)
     end
@@ -206,6 +226,16 @@ module MicrosoftSync
       raise_max_enrollment_members_reached if diff.max_enrollment_members_reached?
       raise_max_enrollment_owners_reached if diff.max_enrollment_owners_reached?
 
+      execute_diff(diff)
+
+      StateMachineJob::NextStep.new(:step_check_team_exists)
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      retry_object_for_error(e, step: :step_generate_diff)
+    end
+
+    # Execute a MembershipDiff or PartialMembershipDiff -- add and remove
+    # users in batches
+    def execute_diff(diff)
       batch_size = GraphService::GROUP_USERS_BATCH_SIZE
       diff.additions_in_slices_of(batch_size) do |members_and_owners|
         skipped = graph_service.add_users_to_group_ignore_duplicates(
@@ -223,10 +253,6 @@ module MicrosoftSync
         )
         log_batch_skipped(:remove, skipped)
       end
-
-      StateMachineJob::NextStep.new(:step_check_team_exists)
-    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
-      retry_object_for_error(e, step: :step_generate_diff)
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)
@@ -257,6 +283,78 @@ module MicrosoftSync
     rescue *Errors::INTERMITTENT => e
       retry_object_for_error(e)
     end
+
+    # Returns array of arrays of [user_id, change_enrollment_type, updated_at]
+    # [[234, 'member', timestamp1], [456, 'member', timestamp2], [456, 'owner', timestamp3]]
+    def load_partial_sync_changes
+      PartialSyncChange.where(course: course).limit(MAX_PARTIAL_SYNC_CHANGES + 1)
+        .pluck(:user_id, :enrollment_type, :updated_at)
+    end
+
+    def step_partial_sync(_mem_state, _job_state)
+      # Step 1. Kick off a full sync if we haven't created a group yet, or if
+      # there are too many changes to effectively handle here.
+      if group.ms_group_id.nil? ||
+          (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
+        return StateMachineJob::NextStep.new(:step_full_sync_prerequisites)
+      end
+
+      return StateMachineJob::COMPLETE if changes.empty?
+
+      # Step 2. ensure users have aad object ids:
+      # changes_by_user_id is a hash from user_id ->
+      #   array of arrays of [user_id, change_enrollment_type, updated_at]:
+      changes_by_user_id = changes.group_by(&:first)
+      user_ids = changes_by_user_id.keys
+      ensure_user_mappings(UserMapping.user_ids_without_mappings(user_ids, course.root_account_id))
+
+      # Step 3. Generate PartialMembership diff by combining three mappings:
+      #   user_id -> change type       from PartialSyncChanges
+      #   user_id <-> aad id           from UserMappings (UserMapping.enrollments_aad_aads)
+      #   user_id -> enrollment types  from Enrollments (UserMapping.enrollments_aad_aads)
+      # We need to look at all Enrollments for each user, not just those of the change type
+      # because the user could be removed as an owner but not as a member, etc.
+
+      # e.g., { 123 => ['member', 'owner'], 1230000000000099 => ['owner']}
+      users_to_msft_role_types = changes_by_user_id.transform_values{|chgs| chgs.map(&:second)}
+      diff = PartialMembershipDiff.new(users_to_msft_role_types)
+
+      mappings = UserMapping.where(root_account_id: course.root_account_id, user_id: user_ids)
+        .pluck(:user_id, :aad_id)
+      mappings.each { |user_id, aad_id| diff.set_member_mapping(user_id, aad_id) }
+
+      users_with_mappings = mappings.map(&:first)
+      enrollments = Enrollment.active
+        .where(course: course, user_id: users_with_mappings)
+        .pluck(:user_id, :type)
+      enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
+
+      # Step 4. Execute diff and delete changes. Match additionally on
+      # updated_at to avoid deleting any changes that have updated since we
+      # started (and will get executed on the next run)
+      diff.log_all_actions
+      execute_diff(diff)
+      PartialSyncChange
+        .where(course: course)
+        .with_values_in(%w[user_id enrollment_type updated_at], changes)
+        .delete_all
+
+      StateMachineJob::COMPLETE
+    rescue Errors::Throttled => e
+      # If throttled, it's likely due to adds/removes. the fact we didn't
+      # delete changes will mean retrying will cause us to fail more and probably
+      # get throttled more. It will save quota to do a full sync, even if it means
+      # incurring more read quota from getting the list of users in a group
+      # (generally, cheaper).
+      full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
+      Rails.logger.info 'MicrosoftSync::SyncerSteps: partial sync throttled, ' \
+        "full sync in #{full_sync_after}"
+      StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
+    rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
+      retry_object_for_error(e)
+    end
+
+    private
 
     def tenant
       @tenant ||=

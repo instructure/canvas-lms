@@ -19,27 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
-
-def cleanupFn(status) {
-  junit 'tmp/spec_results/**/*.xml'
-
-  if (status == 'SUCCESS' && configuration.isChangeMerged()) {
-    sh 'build/new-jenkins/pact/contracts-publish-api.sh'
-  }
-}
-
-def runAndCopyResults(databaseName, consumerName, scriptName='build/new-jenkins/pact/contracts-verify-api.sh') {
-  withEnv([
-    "DATABASE_NAME=${databaseName}",
-    "PACT_API_CONSUMER=${consumerName}",
-  ]) {
-    try {
-      sh scriptName
-    } finally {
-      sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir"
-    }
-  }
-}
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 pipeline {
   agent none
@@ -63,67 +43,57 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker').obeysAllowStages(false).execute {
-            stage('Start Docker Images') {
-              timeout(3) {
-                def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
+          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: contractTestsStage.nodeRequirementsTemplate()).obeysAllowStages(false).execute {
+            def stages = [:]
 
-                checkoutRepo('canvas-lms', refspecToCheckout, 1)
-
-                credentials.withStarlordDockerLogin { ->
-                  sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-                }
-                sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
-              }
-            }
-
-            def postBuildHandler = [
-              onStageEnded: { stageName, stageConfig ->
-                cleanupFn(stageConfig.status())
-              }
+            def consumerEnvVars = [
+              'DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true',
+              'RUN_API_CONTRACT_TESTS=1',
             ]
 
-            extendedStage('Provider Verification for API and Live Event Consumers').hooks(postBuildHandler).obeysAllowStages(false).execute {
-              def stages = [:]
+            callableWithDelegate(contractTestsStage.queueTestStage('Android'))(stages,
+              databaseName: 'pact_test1',
+              consumerName: 'android',
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
+            )
 
-              stages['Android'] = {
-                timeout(5) {
-                  runAndCopyResults('pact_test1', 'android')
-                }
-              }
+            callableWithDelegate(contractTestsStage.queueTestStage('Canvas iOS'))(stages,
+              databaseName: 'pact_test2',
+              consumerName: 'canvas-ios',
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
+            )
 
-              stages['Canvas iOS'] = {
-                timeout(5) {
-                  runAndCopyResults('pact_test2', 'canvas-ios')
-                }
-              }
+            callableWithDelegate(contractTestsStage.queueTestStage('Quiz LTI'))(stages,
+              databaseName: 'pact_test3',
+              consumerName: 'Quiz LTI',
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
+            )
 
-              stages['Quiz LTI'] = {
-                timeout(10) {
-                  runAndCopyResults('pact_test3', 'Quiz LTI')
-                }
-              }
+            callableWithDelegate(contractTestsStage.queueTestStage('Sistemic'))(stages,
+              databaseName: 'pact_test4',
+              consumerName: 'Sistemic',
+              envVars: consumerEnvVars,
+              command: 'cd /usr/src/app && bundle exec rake pact:verify'
+            )
 
-              stages['Sistemic'] = {
-                timeout(5) {
-                  runAndCopyResults('pact_test4', 'Sistemic')
-                }
-              }
+            callableWithDelegate(contractTestsStage.queueTestStage('Live Events'))(stages,
+              databaseName: 'pact_test5',
+              command: 'cd /usr/src/app && bin/rspec spec/contracts/service_consumers/live_events --tag pact_live_events --format doc'
+            )
 
-              stages['Live Events'] = {
-                timeout(5) {
-                  runAndCopyResults('live_events', '', 'build/new-jenkins/pact/contracts-verify-live-events.sh')
-                }
-              }
+            callableWithDelegate(contractTestsStage.queueTestStage('Outcomes'))(stages,
+              databaseName: 'pact_test6',
+              envVars: [
+                "PUBLISH_API=${configuration.isChangeMerged() ? '1' : '0'}",
+                "SHA=${env.GERRIT_PATCHSET_REVISION}"
+              ],
+              command: 'cd /usr/src/app && build/new-jenkins/pact/contracts-generate-api.sh'
+            )
 
-              stages['Outcomes'] = {
-                timeout(5) {
-                  runAndCopyResults('pact_test6', '', 'build/new-jenkins/pact/contracts-generate-api.sh')
-                }
-              }
-
-              parallel(stages)
-            }
+            parallel(stages)
           }
         }
       }

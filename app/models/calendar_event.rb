@@ -199,6 +199,8 @@ class CalendarEvent < ActiveRecord::Base
   scope :user_created, -> { where(:timetable_code => nil) }
   scope :for_timetable, -> { where.not(:timetable_code => nil) }
 
+  scope :with_important_dates, -> { where(important_dates: true) }
+
   def validate_context!
     @validate_context = true
     context.validation_event_override = self

@@ -256,11 +256,13 @@ class Course < ActiveRecord::Base
   before_update :handle_syllabus_changes_for_master_migration
 
   before_save :touch_root_folder_if_necessary
+  before_save :hide_external_tool_tabs_if_necessary
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
   validate :validate_default_view
   validate :validate_template
+  validate :validate_not_on_siteadmin
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -496,6 +498,12 @@ class Course < ActiveRecord::Base
       errors.add(:template, t("Courses with enrollments can't become templates"))
     elsif !template? && !can_stop_being_template?
       errors.add(:template, t("Courses that are set as a template in any account can't stop being templates"))
+    end
+  end
+
+  def validate_not_on_siteadmin
+    if root_account_id_changed? && root_account_id == Account.site_admin.id
+      self.errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
   end
 
@@ -2982,10 +2990,32 @@ class Course < ActiveRecord::Base
   end
 
   def external_tool_tabs(opts, user)
-    tools = self.context_external_tools.active.having_setting('course_navigation')
-    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
-    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
+    tools = external_tools_for_tabs.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
+  end
+
+  def external_tools_for_tabs
+    self.context_external_tools.active.having_setting('course_navigation') +
+      ContextExternalTool.active.having_setting('course_navigation').where(
+        context_type: 'Account', context_id: account_chain_ids
+      ).to_a
+  end
+
+  def hide_external_tool_tabs_if_necessary
+    return true unless tab_configuration_changed?
+
+    tabs_by_id = tab_configuration.each_with_object({}) { |tab,memo| memo[tab['id']] = tab}
+    external_tools_for_tabs.each do |tool|
+      next unless tabs_by_id[tool.asset_string]
+
+      if tabs_by_id[tool.asset_string]['hidden']
+        tool.override_visibility('admins', :course_navigation)
+      else
+        tool.clear_visibility_override(:course_navigation)
+      end
+      tool.save!
+    end
+    true
   end
 
   def tabs_available(user=nil, opts={})

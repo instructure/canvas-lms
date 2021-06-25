@@ -1852,7 +1852,7 @@ class User < ActiveRecord::Base
             if ids.empty?
               scope = scope.none
             else
-              shards = shards & ids.map { |id| Shard.shard_for(id) }
+              shards &= ids.map { |id| Shard.shard_for(id) }
               scope = scope.where(id: ids)
             end
           end
@@ -1863,9 +1863,11 @@ class User < ActiveRecord::Base
           end
 
           GuardRail.activate(:secondary) do
-            scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
-                order(Arel.sql("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")).
-                distinct_on(:id).shard(shards).to_a
+            Shard.with_each_shard(shards) do
+              scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date")
+                .order(Arel.sql("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}"))
+                .distinct_on(:id).shard(Shard.current)
+            end
           end
         end
         result.dup
@@ -2958,7 +2960,7 @@ class User < ActiveRecord::Base
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
       Rails.cache.fetch(['adminable_accounts_1', self, ApplicationController.region].cache_key) do
-        adminable_accounts_scope.order(Account.best_unicode_collation_key('name'), :id).to_a
+        adminable_accounts_scope.order(:id).to_a
       end
     end
   end

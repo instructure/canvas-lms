@@ -124,22 +124,22 @@ module ActiveRecord
           expect do
             User.create!
             User.select(:name).find_in_batches do |batch|
-              User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
+              User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
           end.to_not raise_error
         end
 
         it "should not use a temp table for a plain query" do
           User.create!
-          User.find_in_batches do |batch|
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
+          User.find_in_batches do
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
         it "should not use a temp table for a select with id" do
           User.create!
-          User.select(:id).find_in_batches do |batch|
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:id).to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
+          User.select(:id).find_in_batches do
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:id).to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
@@ -148,7 +148,7 @@ module ActiveRecord
           User.create!
           selectors.each do |selector|
             expect {
-              User.select(selector).find_in_batches(start: 0){|batch| }
+              User.select(selector).find_in_batches(strategy: :id) {}
             }.not_to raise_error
           end
         end
@@ -156,8 +156,8 @@ module ActiveRecord
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches_with_temp_table {}
-            User.all.find_in_batches_with_temp_table {}
+            User.all.find_in_batches(strategy: :temp_table) {}
+            User.all.find_in_batches(strategy: :temp_table) {}
           end.to_not raise_error
         end
 
@@ -165,12 +165,12 @@ module ActiveRecord
           User.create!
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches_with_temp_table do
+            User.all.find_in_batches(strategy: :temp_table) do
               raise ArgumentError
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_in_batches_with_temp_table {}
+          User.all.find_in_batches(strategy: :temp_table) {}
         end
 
         it "does not die with index error when table size is exactly batch size" do
@@ -178,7 +178,7 @@ module ActiveRecord
           User.delete_all
           user_count.times{ user_model }
           expect(User.count).to eq(user_count)
-          User.all.find_in_batches_with_temp_table(batch_size: user_count) {}
+          User.all.find_in_batches(strategy: :temp_table, batch_size: user_count) {}
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -187,7 +187,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_in_batches_with_temp_table do |batch|
+              User.all.find_in_batches(strategy: :temp_table) do |batch|
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end

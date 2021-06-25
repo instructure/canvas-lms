@@ -16,15 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import I18n from 'i18n!assignments_2_student_annotation'
+import LoadingIndicator from '@canvas/loading-indicator'
+import axios from '@canvas/axios'
 
-export default class StudentAnnotationAttempt extends React.Component {
-  render() {
-    return (
-      <div data-testid="canvadocs-pane">
+export default function StudentAnnotationAttempt({submission}) {
+  const [iframeURL, setIframeURL] = useState(null)
+  const [fetchingCanvadocSession, setFetchingCanvadocSession] = useState(true)
+  const [validResponse, setValidResponse] = useState(true)
+
+  useEffect(() => {
+    axios
+      .post('/api/v1/canvadoc_session', {
+        submission_attempt: 'draft',
+        submission_id: submission._id
+      })
+      .then(result => {
+        setIframeURL(result.data.canvadocs_session_url)
+        setFetchingCanvadocSession(false)
+        setValidResponse(true)
+      })
+      .catch(_error => {
+        setFetchingCanvadocSession(false)
+        setValidResponse(false)
+      })
+  }, [])
+
+  return (
+    <div data-testid="canvadocs-pane">
+      {fetchingCanvadocSession && <LoadingIndicator />}
+      {validResponse ? (
         <div className="ef-file-preview-stretch">
           <iframe
+            src={iframeURL}
             data-testid="canvadocs-iframe"
             allowFullScreen
             title={I18n.t('Document to annotate')}
@@ -32,7 +57,9 @@ export default class StudentAnnotationAttempt extends React.Component {
             style={{width: '100%'}}
           />
         </div>
-      </div>
-    )
-  }
+      ) : (
+        <div>{I18n.t('There was an error loading the document.')}</div>
+      )}
+    </div>
+  )
 }

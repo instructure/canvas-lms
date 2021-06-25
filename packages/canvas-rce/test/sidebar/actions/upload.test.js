@@ -76,6 +76,7 @@ describe('Upload data actions', () => {
   }
 
   beforeEach(() => {
+    Bridge.focusEditor(null)
     successSource.uploadFRD.resetHistory()
     successSource.uploadFRD.returns(Promise.resolve(results))
     successSource.setUsageRights.resetHistory()
@@ -343,7 +344,6 @@ describe('Upload data actions', () => {
     }
 
     beforeEach(() => {
-      Bridge.focusEditor(null)
       const baseState = getBaseState()
       store = spiedStore(baseState)
       props = {}

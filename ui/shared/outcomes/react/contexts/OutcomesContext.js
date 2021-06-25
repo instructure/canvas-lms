@@ -25,12 +25,15 @@ export const getContext = () => {
   const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
   const useRceEnhancements = ENV.use_rce_enhancements
   const rootOutcomeGroup = ENV.ROOT_OUTCOME_GROUP
+  const friendlyDescriptionFF = ENV.OUTCOMES_FRIENDLY_DESCRIPTION
+
   return {
     env: {
       contextType,
       contextId,
       useRceEnhancements,
-      rootOutcomeGroup
+      rootOutcomeGroup,
+      friendlyDescriptionFF
     }
   }
 }

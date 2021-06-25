@@ -103,7 +103,7 @@ const FindOutcomeItem = ({id, title, description, isChecked, onCheckboxHandler})
 
 FindOutcomeItem.propTypes = {
   id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   description: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired

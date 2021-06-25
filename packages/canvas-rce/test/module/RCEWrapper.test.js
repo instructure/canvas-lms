@@ -47,7 +47,7 @@ function createBasicElement(opts) {
     // so RCEWrapper.mceInstance() works
     fakeTinyMCE.editors[0].id = opts.textareaId
   }
-  const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...opts}
+  const props = {textareaId, tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps(), ...opts}
   return new RCEWrapper(props)
 }
 
@@ -70,15 +70,28 @@ function createdMountedElement(additionalProps = {}) {
 function trayProps() {
   return {
     trayProps: {
+      canUploadFiles: true,
       host: 'rcs.host',
       jwt: 'donotlookatme',
       contextType: 'course',
       contextId: '17',
       containingContext: {
+        userId: '1',
         contextType: 'course',
         contextId: '17'
       }
     }
+  }
+}
+
+// many of the tests call `new RCEWrapper`, so there's no React
+// to provide the default props
+function defaultProps() {
+  return {
+    highContrastCSS: [],
+    languages: [{id: 'en', label: 'English'}],
+    autosave: {enabled: false},
+    ltiTools: []
   }
 }
 
@@ -89,13 +102,22 @@ describe('RCEWrapper', () => {
 
   beforeEach(() => {
     jsdomify.create(`
-      <!DOCTYPE html><html><head></head><body>
+      <!DOCTYPE html><html dir="ltr"><head></head><body>
       <div id="flash_screenreader_holder"/>
       <div id="app">
         <textarea id="${textareaId}" />
       </div>
       </body></html>
     `)
+
+    // I don't know why this mocha tests suite uses jsdom, but it does.
+    // mock MutationObserver
+    if (!global.MutationObserver) {
+      global.MutationObserver = function MutationObserver(_props) {
+        this.observe = () => {}
+      }
+    }
+
     // must create react after jsdom setup
     requireReactDeps()
     editorCommandSpy = sinon.spy()
@@ -183,7 +205,7 @@ describe('RCEWrapper', () => {
         const editor = {
           ui: {registry: {addIcon: () => {}}}
         }
-        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE, ...trayProps()})
+        const wrapper = new RCEWrapper({tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps()})
         const options = wrapper.wrapOptions({})
         options.setup(editor)
         assert.equal(RCEWrapper.getByEditor(editor), wrapper)
@@ -953,6 +975,7 @@ describe('RCEWrapper', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
+        ...defaultProps(),
         instRecordDisabled: false
       })
       const options = wrapper.wrapOptions({})
@@ -963,6 +986,7 @@ describe('RCEWrapper', () => {
       const wrapper = new RCEWrapper({
         tinymce: fakeTinyMCE,
         ...trayProps(),
+        ...defaultProps(),
         instRecordDisabled: true
       })
       const options = wrapper.wrapOptions({})
@@ -1176,6 +1200,56 @@ describe('RCEWrapper', () => {
         const result = standardPlugins.concat(['fizz'])
         assert.deepStrictEqual(mergePlugins(a, b), result)
       })
+    })
+  })
+
+  describe('lti tool favorites', () => {
+    it('extracts favorites', () => {
+      const element = createBasicElement({
+        ltiTools: [
+          {
+            canvas_icon_class: null,
+            description: 'the thing',
+            favorite: true,
+            height: 160,
+            id: 1,
+            name: 'A Tool',
+            width: 340
+          },
+          {
+            canvas_icon_class: null,
+            description: 'another thing',
+            favorite: false,
+            height: 600,
+            id: 2,
+            name: 'Not a favorite tool',
+            width: 560
+          },
+          {
+            canvas_icon_class: null,
+            description: 'another thing',
+            favorite: true,
+            height: 600,
+            id: 3,
+            name: 'Another Tool',
+            width: 560
+          },
+          {
+            canvas_icon_class: null,
+            description: 'yet another thing',
+            favorite: true,
+            height: 600,
+            id: 4,
+            name: 'Yet Another Tool',
+            width: 560
+          }
+        ]
+      })
+
+      assert.deepStrictEqual(element.ltiToolFavorites, [
+        'instructure_external_button_1',
+        'instructure_external_button_3'
+      ])
     })
   })
 })

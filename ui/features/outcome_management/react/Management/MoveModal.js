@@ -158,7 +158,7 @@ const MoveModal = ({
 MoveModal.propTypes = {
   title: PropTypes.string.isRequired,
   groupId: PropTypes.string.isRequired,
-  parentGroupId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  parentGroupId: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onMoveHandler: PropTypes.func.isRequired,

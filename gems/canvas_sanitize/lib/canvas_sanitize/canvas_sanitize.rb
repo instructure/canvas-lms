@@ -54,7 +54,8 @@ module CanvasSanitize #:nodoc:
           'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'track', 'audio',
           # added to unify tinymce and canvas_sanitize whitelists
           'address', 'acronym', 'map', 'area','bdo', 'dfn', 'kbd', 'legend', 'samp', 'tt', 'var', 'big',
-          'article', 'aside', 'details', 'footer', 'header', 'nav', 'section', 'summary', 'time',
+          'article', 'aside', 'details', 'footer', 'header', 'nav', 'section', 'summary', 'time', 'picture',
+          'ruby', 'rt', 'rp',
           # MathML
           'annotation', 'annotation-xml', 'maction', 'maligngroup', 'malignmark', 'math',
           'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv',
@@ -111,10 +112,11 @@ module CanvasSanitize #:nodoc:
                    'aria-valuenow',
                    'aria-valuetext'].freeze,
           'a' => ['href', 'target', 'name'].freeze,
+          'area' => ['alt', 'coords', 'href', 'shape', 'target'].freeze,
           'blockquote' => ['cite'].freeze,
           'col' => ['span', 'width'].freeze,
           'colgroup' => ['span', 'width'].freeze,
-          'img' => ['align', 'alt', 'height', 'src', 'width', 'longdesc'].freeze,
+          'img' => ['align', 'alt', 'height', 'src', 'usemap', 'width', 'longdesc'].freeze,
           'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling',
                        'allow', # TODO: remove explicit allow with domain whitelist account setting
                        'sandbox', 'allowfullscreen','webkitallowfullscreen','mozallowfullscreen'].freeze,
@@ -127,7 +129,7 @@ module CanvasSanitize #:nodoc:
           'ul' => ['type'].freeze,
           'param' => ['name', 'value'].freeze,
           'object' => ['width', 'height', 'style', 'data', 'type', 'classid', 'codebase'].freeze,
-          'source' => ['src', 'type'].freeze,
+          'source' => ['media', 'sizes', 'src', 'srcset', 'type'].freeze,
           'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode',
                       'allowscriptaccess', 'width', 'height'].freeze,
           'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls', 'playsinline'].freeze,
@@ -140,6 +142,7 @@ module CanvasSanitize #:nodoc:
           'maction' => ['href', 'xref', 'mathcolor', 'mathbackground', 'actiontype', 'selection'].freeze,
           'maligngroup' => ['href', 'xref', 'mathcolor', 'mathbackground', 'groupalign'].freeze,
           'malignmark' => ['href', 'xref', 'mathcolor', 'mathbackground', 'edge'].freeze,
+          'map' => ['name'].freeze,
           'math' => ['href', 'xref', 'display', 'maxwidth', 'overflow', 'altimg', 'altimg-width',
                      'altimg-height', 'altimg-valign', 'alttext', 'cdgroup', 'mathcolor',
                      'mathbackground', 'scriptlevel', 'displaystyle', 'scriptsizemultiplier',
@@ -292,9 +295,9 @@ module CanvasSanitize #:nodoc:
       }.freeze,
       css: {
         properties: ([
-          'background', 'border', 'clear', 'clip', 'color',
-          'cursor', 'direction', 'display', 'float',
-          'font', 'height', 'left', 'line-height',
+          'background', 'border', 'border-radius', 'clear', 'clip', 'color',
+          'cursor', 'direction', 'display', 'flex', 'float',
+          'font', 'grid', 'height', 'left', 'line-height',
           'list-style', 'margin', 'max-height',
           'max-width', 'min-height', 'min-width',
           'overflow', 'overflow-x', 'overflow-y',

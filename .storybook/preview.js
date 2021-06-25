@@ -6,7 +6,7 @@ import i18nLolcalize from '@canvas/i18n/i18nLolcalize'
 import '@instructure/canvas-high-contrast-theme'
 import '@instructure/canvas-theme'
 
-window.ENV ||= {
+window.ENV = window.ENV || {
   FEATURES: {
     rce_pretty_html_editor: true,
     rce_auto_save: true
@@ -17,7 +17,7 @@ window.ENV ||= {
   current_user_id: 2
 }
 
-window.INST ||= {
+window.INST = window.INST || {
   editorButtons: []
 }
 

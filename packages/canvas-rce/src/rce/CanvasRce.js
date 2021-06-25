@@ -19,7 +19,7 @@
 import React, {forwardRef, useState} from 'react'
 import {arrayOf, bool, func, number, object, objectOf, oneOfType, shape, string} from 'prop-types'
 import formatMessage from '../format-message'
-import RCEWrapper, {toolbarPropType, menuPropType} from './RCEWrapper'
+import RCEWrapper, {toolbarPropType, menuPropType, ltiToolsPropType} from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -148,6 +148,7 @@ CanvasRce.propTypes = {
   instRecordDisabled: bool,
   language: string,
   liveRegion: func,
+  ltiTools: ltiToolsPropType,
   mirroredAttrs: objectOf(string), // attributes to transfer from the original textarea to the one created by tinymce
   menu: menuPropType,
   plugins: arrayOf(string),

@@ -60,6 +60,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     end
   end
 
+  def self.user_ids_without_mappings(user_ids, root_account_id)
+    existing_mappings = where(root_account_id: root_account_id, user_id: user_ids)
+    user_ids - existing_mappings.pluck(:user_id)
+  end
+
   # Example: bulk_insert_for_root_account_id(course.root_account_id,
   #                                          user1.id => 'aad1', user1.id => 'aad2')
   # Uses Rails 6's insert_all, which unlike our bulk_insert(), ignores
@@ -85,13 +90,27 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # Selects "type" (enrollment type) and "aad_id".
   # Returns a scope that can be used with find_each.
   def self.enrollments_and_aads(course)
-    Enrollment.
-      active.not_fake.where(course_id: course.id).
-      joins(%{
+    Enrollment
+      .active.not_fake.where(course_id: course.id)
+      .joins(%{
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id
         AND mappings.root_account_id=#{course.root_account_id.to_i}
-      }).
-      select(:id, :type, 'mappings.aad_id as aad_id')
+      })
+      .select(:id, :type, 'mappings.aad_id as aad_id')
+  end
+
+  def self.delete_old_user_mappings_later(account, batch_size = 1000)
+    Rails.logger.info("Triggering Microsoft Sync User Mappings hard delete for account #{account.global_id}")
+    # We only need one job deleting UserMappings, so we can drop all other jobs
+    # for the same root account that try to start up.
+    self.delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
+      .delete_user_mappings_for_account(account, batch_size)
+  end
+
+  def self.delete_user_mappings_for_account(account, batch_size)
+    # TODO: When we figure out a way to ensure a UserMapping is up-to-date with an account's Sync settings
+    # (like by using a hash), we'll need to update this query to filter by the account's current settings.
+    while self.where(root_account: account).limit(batch_size).delete_all > 0; end
   end
 end

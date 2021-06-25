@@ -123,6 +123,13 @@ describe CanvadocSessionsController do
       expect(json_parse(response.body)["canvadocs_session_url"]).not_to be_nil
     end
 
+    it "contains the annotation context launch id in the response" do
+      post :create, params: params
+
+      launch_id = @submission.annotation_context(draft: true).launch_id
+      expect(json_parse(response.body)["annotation_context_launch_id"]).to eq(launch_id)
+    end
+
     it "contains a blob param in the returned canvadocs_session_url" do
       post :create, params: params
       expect(canvadocs_session_url_params["blob"]).not_to be_nil
@@ -175,6 +182,11 @@ describe CanvadocSessionsController do
       it "contains the submission_id" do
         post :create, params: params
         expect(blob["submission_id"]).to be @submission.id
+      end
+
+      it "disables the annotation notifications" do
+        post :create, params: params
+        expect(blob["disable_annotation_notifications"]).to be true
       end
     end
   end

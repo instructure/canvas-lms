@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
+import {arrayOf, shape, string} from 'prop-types'
 
 export const User = {
   fragment: gql`
@@ -33,19 +33,22 @@ export const User = {
     id: string,
     _id: string,
     avatarUrl: string,
-    name: string
+    name: string,
+    courseRoles: arrayOf(string)
   }),
 
   mock: ({
     id = 'VXNlci0y',
     _id = '2',
     avatarUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-    name = 'Hank Mccoy'
+    name = 'Hank Mccoy',
+    courseRoles = []
   } = {}) => ({
     id,
     _id,
     avatarUrl,
     name,
+    courseRoles,
     __typename: 'User'
   })
 }
@@ -54,6 +57,7 @@ export const DefaultMocks = {
   User: () => ({
     _id: '1',
     avatarUrl: 'someFakeUrl',
-    name: 'Turd Ferguson'
+    name: 'Turd Ferguson',
+    courseRoles: []
   })
 }

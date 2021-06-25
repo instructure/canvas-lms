@@ -49,7 +49,12 @@ function InfoText({repliesCount, unreadCount}) {
   const infoText = []
 
   if (repliesCount > 0) {
-    infoText.push(I18n.t('%{repliesCount} replies', {repliesCount}))
+    infoText.push(
+      I18n.t(
+        {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
+        {count: repliesCount, repliesCount}
+      )
+    )
   }
 
   if (unreadCount > 0) {
@@ -94,12 +99,16 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
           onClick={props.onToggleSubscription}
         />
       )}
-      {renderMenu(props)}
+      <ToolbarMenu {...props} />
     </>
   )
 }
 
-const renderMenu = props => {
+const ToolbarMenu = props => {
+  const menuConfigs = getMenuConfigs(props)
+  if (menuConfigs.length === 0) {
+    return null
+  }
   return (
     <Menu
       trigger={
@@ -113,7 +122,9 @@ const renderMenu = props => {
         />
       }
     >
-      {getMenuConfigs(props).map(config => renderMenuItem({...config}))}
+      {menuConfigs.map(config => (
+        <MenuItem {...config} />
+      ))}
     </Menu>
   )
 }
@@ -146,7 +157,7 @@ const getMenuConfigs = props => {
   }
   if (props.onCloseForComments) {
     options.push({
-      key: 'toggle-comments',
+      key: 'close-comments',
       icon: <IconLockLine />,
       label: I18n.t('Close for Comments'),
       selectionCallback: props.onCloseForComments
@@ -154,7 +165,7 @@ const getMenuConfigs = props => {
   }
   if (props.onOpenForComments) {
     options.push({
-      key: 'toggle-comments',
+      key: 'open-comments',
       icon: <IconUnlockLine />,
       label: I18n.t('Open for Comments'),
       selectionCallback: props.onOpenForComments
@@ -219,13 +230,13 @@ const getMenuConfigs = props => {
   return options
 }
 
-const renderMenuItem = ({selectionCallback, icon, label, key}) => {
+const MenuItem = props => {
   return (
-    <Menu.Item key={key} onSelect={selectionCallback} data-testid={key}>
+    <Menu.Item onSelect={props.selectionCallback}>
       <Flex>
-        <Flex.Item>{icon}</Flex.Item>
+        <Flex.Item>{props.icon}</Flex.Item>
         <Flex.Item padding="0 0 0 xx-small">
-          <Text>{label}</Text>
+          <Text>{props.label}</Text>
         </Flex.Item>
       </Flex>
     </Menu.Item>

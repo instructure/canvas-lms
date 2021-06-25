@@ -196,18 +196,20 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('should be able to send to edit page when canUpdate', async () => {
-    const {getByTestId} = setup(discussionTopicMock)
+    const {getByTestId, getByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('edit'))
+    fireEvent.click(getByText('Edit'))
+
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith(getEditUrl('1', '1'))
     })
   })
 
   it('should be able to send to peer reviews page when canPeerReview', async () => {
-    const {getByTestId} = setup(discussionTopicMock)
+    const {getByTestId, getByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('peerReviews'))
+    fireEvent.click(getByText('Peer Reviews'))
+
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith(getPeerReviewsUrl('1', '1337'))
     })
@@ -215,9 +217,9 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should be able to delete topic', async () => {
     window.confirm = jest.fn(() => true)
-    const {getByTestId, findByTestId} = setup(discussionTopicMock)
-    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('delete'))
+    const {getByTestId, getByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Delete'))
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion topic was successfully deleted.')
@@ -229,16 +231,29 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should not be able to delete the topic if does not have permission', async () => {
     const {getByTestId, queryByTestId} = setup({
-      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {delete: false}}
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {copyAndSendTo: true, delete: false}
+      }
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(queryByTestId('delete')).toBeNull()
   })
 
+  it('Should not show discussion topic menu if no appropriate permissions', async () => {
+    const {queryByTestId} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        permissions: {}
+      }
+    })
+    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
+  })
+
   it('Should be able to open SpeedGrader', async () => {
-    const {getByTestId} = setup(discussionTopicMock)
+    const {getByTestId, getByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('speedGrader'))
+    fireEvent.click(getByText('Open in Speedgrader'))
 
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'))
@@ -252,13 +267,12 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
   })
 
-  it('Should not be able to open SpeedGrader if the user does not have permission', () => {
-    const {getByTestId, queryByTestId} = setup({
+  it('Should not be able to see post menu if no permissions', () => {
+    const {queryByTestId} = setup({
       discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
     })
 
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(queryByTestId('speedGrader')).toBeNull()
+    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
   })
 
   it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
@@ -346,11 +360,10 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('can send users to Commons if they can manageContent', async () => {
-    const container = setup(discussionTopicMock)
-    const kebob = await container.findByTestId('discussion-post-menu-trigger')
-    fireEvent.click(kebob)
-    const shareToCommonsOption = await container.findByTestId('shareToCommons')
-    fireEvent.click(shareToCommonsOption)
+    const {getByTestId, getByText} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Share to Commons'))
+
     await waitFor(() => {
       expect(assignMock).toHaveBeenCalledWith(
         `example.com&discussion_topics%5B%5D=${discussionTopicMock.discussionTopic._id}`
@@ -411,9 +424,9 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to close for comments', async () => {
-    const {getByTestId, findByTestId} = setup(discussionTopicMock)
-    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('toggle-comments'))
+    const {getByText, getByTestId} = setup(discussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Close for Comments'))
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith(
@@ -427,9 +440,9 @@ describe('DiscussionTopicContainer', () => {
     testDiscussionTopicMock.discussionTopic.permissions.openForComments = true
     testDiscussionTopicMock.discussionTopic.permissions.closeForComments = false
 
-    const {getByTestId, findByTestId} = setup(testDiscussionTopicMock)
-    fireEvent.click(await findByTestId('discussion-post-menu-trigger'))
-    fireEvent.click(getByTestId('toggle-comments'))
+    const {getByText, getByTestId} = setup(testDiscussionTopicMock)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    fireEvent.click(getByText('Open for Comments'))
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith(
@@ -489,5 +502,11 @@ describe('DiscussionTopicContainer', () => {
     props.discussionTopic.assignment.lockAt = null
     const container = setup(props)
     expect(await container.findByText('assignment override 3: No Due Date')).toBeTruthy()
+  })
+
+  it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
+    const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
+    const container = setup(props)
+    expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
   })
 })

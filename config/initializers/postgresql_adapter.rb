@@ -262,11 +262,6 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  # shim until all plugins use the new method name
-  def extension_installed?(extension)
-    self.extension(extension)&.schema
-  end
-
   # we no longer use any triggers, so we removed hair_trigger,
   # but don't want to go modifying all the old migrations, so just
   # make them dummies

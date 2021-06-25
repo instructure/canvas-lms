@@ -183,6 +183,31 @@ describe "discussions" do
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
       end
 
+      it "should create a graded group discussion", priority: "1" do
+        assignment_group
+        group
+        get "/courses/#{course.id}/discussion_topics/new"
+        f('#discussion-title').send_keys('New Discussion')
+        type_in_tiny 'textarea[name=message]', 'Discussion topic message'
+        expect(f('#availability_options')).to be_displayed
+        f('#use_for_grading').click
+        wait_for_ajaximations
+        expect(f('#availability_options')).to_not be_displayed
+        f('#discussion_topic_assignment_points_possible').send_keys('10')
+        wait_for_ajaximations
+        click_option('#assignment_group_id', assignment_group.name)
+        f('#has_group_category').click
+        drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
+        expect(drop_down).to include('category 1')
+        click_option('#assignment_group_category_id', @category1.name)
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
+        expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
+        " each group has its own conversation for this topic."\
+        " Here are the ones you have access to:\nsome group")
+        expect(f("a.discussion-reply-action[role='button']")).to be_present
+      end
+
       it "should show attachment", priority: "1", test_id: 150478 do
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load{f('#add_discussion').click}

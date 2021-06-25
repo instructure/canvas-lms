@@ -23,11 +23,18 @@ import ManageOutcomesFooter from '../ManageOutcomesFooter'
 describe('ManageOutcomesFooter', () => {
   let onRemoveHandlerMock
   let onMoveHandlerMock
-  const defaultProps = (props = {}) => ({
-    selected: 2,
+  const generateOutcomes = (num, canUnlink) =>
+    new Array(num).fill(0).reduce(
+      (_val, idx) => ({
+        [idx + 1]: {_id: `idx + 1`, title: `Outcome ${idx + 1}`, canUnlink}
+      }),
+      {}
+    )
+  const defaultProps = (numberToGenerate = 2, canUnlink = true) => ({
+    selected: generateOutcomes(numberToGenerate, canUnlink),
+    selectedCount: numberToGenerate,
     onRemoveHandler: onRemoveHandlerMock,
-    onMoveHandler: onMoveHandlerMock,
-    ...props
+    onMoveHandler: onMoveHandlerMock
   })
 
   beforeEach(() => {
@@ -39,28 +46,14 @@ describe('ManageOutcomesFooter', () => {
     jest.clearAllMocks()
   })
 
-  it('renders # of selected outcomes when selected props provided and ge 0 ', () => {
+  it('# of selected outcomes is enabled when selected props provided and ge 0 ', () => {
     const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
     expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
-  })
-
-  it('does not render # of selected outcomes when selected props provided and lt 0', () => {
-    const {queryByText} = render(<ManageOutcomesFooter {...defaultProps({selected: -1})} />)
-    expect(queryByText('Outcomes Selected')).not.toBeInTheDocument()
-  })
-
-  it('does not render # of selected outcomes when selected props not provided', () => {
-    const {queryByText} = render(<ManageOutcomesFooter {...defaultProps({selected: null})} />)
-    expect(queryByText('Outcomes Selected')).not.toBeInTheDocument()
-  })
-
-  it('renders # selected outcomes when selected props provided and gt 0', () => {
-    const {getByText} = render(<ManageOutcomesFooter {...defaultProps()} />)
     expect(getByText('2 Outcomes Selected').hasAttribute('aria-disabled')).toBe(false)
   })
 
-  it('renders # selected outcomes when selected props provided and eq 0', () => {
-    const {getByText} = render(<ManageOutcomesFooter {...defaultProps({selected: 0})} />)
+  it('# selected outcomes is disabled when selected props provided and eq 0', () => {
+    const {getByText} = render(<ManageOutcomesFooter {...defaultProps(0)} />)
     expect(getByText(`0 Outcomes Selected`).hasAttribute('aria-disabled')).toBe(true)
   })
 
@@ -71,7 +64,7 @@ describe('ManageOutcomesFooter', () => {
     })
 
     it('renders buttons disabled when selected props provided and eq 0 ', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps({selected: 0})} />)
+      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(0)} />)
       expect(getByText('Remove').closest('button')).toHaveAttribute('disabled')
     })
 
@@ -92,12 +85,12 @@ describe('ManageOutcomesFooter', () => {
 
   describe('Text pluralization', () => {
     it('handles properly pluralization if 1 Outcome Selected', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps({selected: 1})} />)
+      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(1)} />)
       expect(getByText('1 Outcome Selected')).toBeInTheDocument()
     })
 
     it('handles properly pluralization if gt 1 Outcome Selected', () => {
-      const {getByText} = render(<ManageOutcomesFooter {...defaultProps({selected: 2})} />)
+      const {getByText} = render(<ManageOutcomesFooter {...defaultProps(2)} />)
       expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
     })
   })

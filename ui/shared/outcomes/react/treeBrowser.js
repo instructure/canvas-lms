@@ -25,8 +25,8 @@ import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useCanvasContext from './hooks/useCanvasContext'
 
-export const ROOT_ID = 0
-export const ACCOUNT_FOLDER_ID = -1
+export const ROOT_ID = '0'
+export const ACCOUNT_FOLDER_ID = '-1'
 
 const defaultStruct = (id, name) => ({
   id,
@@ -264,7 +264,7 @@ export const useFindOutcomeModal = open => {
         variables: {
           id: contextId,
           type: contextType,
-          rootGroupId: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID || 0,
+          rootGroupId: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID || '0',
           includeGlobalRootGroup: !!ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID
         }
       })

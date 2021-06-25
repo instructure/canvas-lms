@@ -698,6 +698,16 @@ describe Course do
       expect{course_model}.not_to raise_error
     end
 
+    it 'should not allow creating on site_admin' do
+      expect{course_model(account: Account.site_admin)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'should not allow updating account to site_admin' do
+      course = course_model
+      course.root_account = Account.site_admin
+      expect(course).to_not be_valid
+    end
+
     it "should require unique sis_source_id" do
       other_course = course_factory
       other_course.sis_source_id = "sisid"
@@ -4530,6 +4540,72 @@ describe Course, 'tabs_available' do
     @course.enable_feature!(:analytics_2)
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
+  end
+end
+
+describe Course, '#hide_external_tool_tabs_if_necessary' do
+  before :once do
+    course_model
+  end
+
+  def hide_tool(tool)
+    @course.tab_configuration = [{id: tool.asset_string, hidden: true}]
+    @course.save!
+  end
+
+  def unhide_tool(tool)
+    @course.tab_configuration = [{id: tool.asset_string}]
+    @course.save!
+  end
+
+  context 'when tool does not have visibility defined' do
+    def new_tool
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.course_navigation = {url: "http://www.example.com", default: "active" }
+      tool.save!
+      tool
+    end
+
+    it 'restricts tool visibility to teachers when tool tab is hidden from navigation' do
+      tool = new_tool
+      hide_tool(tool)
+      expect(tool.reload.extension_setting(:course_navigation, :visibility_override)).to eq('admins')
+    end
+
+    it 'removes restrictions on tool visibility when tool tab is unhidden' do
+      tool = new_tool
+      hide_tool(tool)
+      unhide_tool(tool)
+      expect(tool.reload.extension_setting(:course_navigation, :visibility_override)).to be_nil
+    end
+  end
+
+  context 'when tool has visibility defined' do
+    def new_tool
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.course_navigation = {url: "http://www.example.com", visibility: 'members', default: "active" }
+      tool.save!
+      tool
+    end
+
+    it 'keeps originally-defined visibility for later reuse' do
+      tool = new_tool
+      hide_tool(tool)
+      tool.reload
+
+      expect(tool.extension_setting(:course_navigation, :visibility_override)).to eq('admins')
+      expect(tool.extension_setting(:course_navigation, :visibility)).to eq('members')
+    end
+
+    it 'restores originally-defined visibility when tool is un-hidden' do
+      tool = new_tool
+      hide_tool(tool)
+      unhide_tool(tool)
+      tool.reload
+
+      expect(tool.extension_setting(:course_navigation, :visibility_override)).to be_nil
+      expect(tool.extension_setting(:course_navigation, :visibility)).to eq('members')
+    end
   end
 end
 

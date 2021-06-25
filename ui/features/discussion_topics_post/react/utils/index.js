@@ -92,14 +92,21 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
     })
   }
 }
-export const addReplyToSubentries = (cache, discussionEntryId, sort, newDiscussionEntry) => {
+export const addReplyToSubentries = (
+  cache,
+  discussionEntryId,
+  sort,
+  newDiscussionEntry,
+  courseID
+) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: discussionEntryId,
         perPage: PER_PAGE,
-        sort
+        sort,
+        courseID
       }
     }
     const currentSubentries = JSON.parse(JSON.stringify(cache.readQuery(options)))

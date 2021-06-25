@@ -112,6 +112,33 @@ describe('FindOutcomesView', () => {
     expect(onChangeHandlerMock).toHaveBeenCalled()
   })
 
+  it('render a message when search does not return any result', () => {
+    const {queryByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          searchString: 'abc',
+          outcomes: {
+            edges: []
+          }
+        })}
+      />
+    )
+    expect(queryByText('The search returned no results')).toBeInTheDocument()
+  })
+
+  it('does not render a message when does not have search when group does not have outcome', () => {
+    const {queryByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          outcomes: {
+            edges: []
+          }
+        })}
+      />
+    )
+    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+  })
+
   it('calls onClearHandler on click on clear search button', () => {
     const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: '123'})} />)
     const btn = getByText('Clear search field')

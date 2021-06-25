@@ -182,6 +182,15 @@ describe('MicrosoftSyncAccountSettings', () => {
       expect(doFetchApi).toHaveBeenCalledTimes(0)
     })
 
+    it('clears validation error on text change', async () => {
+      const container = setup()
+      fireEvent.input(getTextInput(container), {target: {value: 'garbage_input_with_$$.com'}})
+      fireEvent.click(getUpdateButton(container))
+      fireEvent.input(getTextInput(container), {target: {value: 'garbage_input_with_$$.co'}})
+      const errMsg = container.queryByText(/please provide a valid tenant domain/i)
+      expect(errMsg).not.toBeInTheDocument()
+    })
+
     it('does not show a Microsoft admin consent link if disabled', () => {
       const container = setup(
         ({loading, success}) => {

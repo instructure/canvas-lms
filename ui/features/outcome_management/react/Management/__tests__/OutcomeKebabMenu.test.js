@@ -62,6 +62,13 @@ describe('OutcomeKebabMenu', () => {
     expect(getByText('Move')).toBeInTheDocument()
   })
 
+  it('renders View Description in Kebab menu if a groupDescription is provided and menu button clicked', () => {
+    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: ''})} />)
+    const menuButton = getByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(getByText('View Description')).toBeInTheDocument()
+  })
+
   describe('with Kebab menu open', () => {
     it('handles click on Edit item', () => {
       const {getByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
@@ -91,6 +98,25 @@ describe('OutcomeKebabMenu', () => {
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('move')
+    })
+
+    it('handles click on View Description item', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: 'desc'})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('View Description')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('description')
+    })
+
+    it('does not call menuHandler if View Description item is disabled', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: ''})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('View Description')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).not.toHaveBeenCalled()
     })
 
     it('does not call menuHandler if canDestroy is false', () => {

@@ -21,7 +21,7 @@ export const svgUrl = (points, masteryAt) => {
 }
 
 const getTagIcon = (points, masteryAt) => {
-  if (points === null) {
+  if (points == null) {
     return 'unassessed'
   }
   const score = points - masteryAt

@@ -22,13 +22,13 @@
 if CANVAS_RAILS6_0
   gem 'rails', '6.0.3.7'
     gem 'tzinfo', '1.2.7'
-  gem 'switchman', '2.0.9'
+  gem 'switchman', '2.0.13'
     gem 'guardrail', '2.0.1'
   gem 'switchman-inst-jobs', '3.1.2'
 else
   gem 'rails', '6.1.3.2'
     gem 'tzinfo', '2.0.4'
-  gem 'switchman', '3.0.1'
+  gem 'switchman', '3.0.5'
     gem 'guardrail', '3.0.0'
   gem 'switchman-inst-jobs', '4.0.0'
 end

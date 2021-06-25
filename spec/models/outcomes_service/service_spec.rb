@@ -22,7 +22,9 @@ require_relative '../../spec_helper'
 require_relative '../../sharding_spec_helper'
 
 describe OutcomesService::Service do
-  Service = OutcomesService::Service
+  before :once do
+    OService = OutcomesService::Service
+  end
 
   let(:root_account) { account_model }
   let(:course) { course_model(root_account: root_account) }
@@ -30,19 +32,19 @@ describe OutcomesService::Service do
   context 'without settings' do
     describe '.url' do
       it 'returns nil url' do
-        expect(Service.url(course)).to be_nil
+        expect(OService.url(course)).to be_nil
       end
     end
 
     describe '.enabled_in_context?' do
       it 'returns not enabled' do
-        expect(Service.enabled_in_context?(course)).to eq false
+        expect(OService.enabled_in_context?(course)).to eq false
       end
     end
 
     describe '.jwt' do
       it 'returns nil jwt' do
-        expect(Service.jwt(course, 'outcomes.show')).to be_nil
+        expect(OService.jwt(course, 'outcomes.show')).to be_nil
       end
     end
   end
@@ -60,33 +62,33 @@ describe OutcomesService::Service do
 
     describe '.url' do
       it 'returns url' do
-        expect(Service.url(course)).to eq 'http://canvas.test'
+        expect(OService.url(course)).to eq 'http://canvas.test'
       end
 
       describe 'if ApplicationController.test_cluster_name is specified' do
         it 'returns a url using the test_cluster_name domain' do
           allow(ApplicationController).to receive(:test_cluster?).and_return(true)
           allow(ApplicationController).to receive(:test_cluster_name).and_return('beta')
-          expect(Service.url(course)).to eq 'http://canvas.beta'
+          expect(OService.url(course)).to eq 'http://canvas.beta'
           allow(ApplicationController).to receive(:test_cluster_name).and_return('invalid')
-          expect(Service.url(course)).to eq nil
+          expect(OService.url(course)).to eq nil
         end
       end
     end
 
     describe '.enabled_in_context?' do
       it 'returns enabled' do
-        expect(Service.enabled_in_context?(course)).to eq true
+        expect(OService.enabled_in_context?(course)).to eq true
       end
     end
 
     describe '.jwt' do
       it 'returns valid jwt' do
-        expect(Service.jwt(course, 'outcomes.show')).not_to be_nil
+        expect(OService.jwt(course, 'outcomes.show')).not_to be_nil
       end
 
       it 'includes overrides' do
-        token = Service.jwt(course, 'outcomes.list', overrides: { context_uuid: 'xyz' })
+        token = OService.jwt(course, 'outcomes.list', overrides: { context_uuid: 'xyz' })
         decoded = JWT.decode(token, 'woo', true, algorithm: 'HS512')
         expect(decoded[0]).to include(
           'host' => 'canvas.test',
@@ -110,12 +112,12 @@ describe OutcomesService::Service do
 
       it 'enables feature flag' do
         expect_post('http://canvas.test/api/features/enable')
-        Service.toggle_feature_flag(root_account, 'fake_flag', true)
+        OService.toggle_feature_flag(root_account, 'fake_flag', true)
       end
 
       it 'disables feature flag' do
         expect_post('http://canvas.test/api/features/disable')
-        Service.toggle_feature_flag(root_account, 'fake_flag', false)
+        OService.toggle_feature_flag(root_account, 'fake_flag', false)
       end
     end
   end

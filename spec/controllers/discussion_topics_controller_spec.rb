@@ -365,6 +365,44 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    context 'with the "react_discussions_post" FF enabled' do
+      subject { get 'show', params: { course_id: course.id, id: discussion.id } }
+
+      let!(:discussion) do
+        course.discussion_topics.create!(
+          user: user,
+          title: 'Lego',
+          message: 'What upcoming set are you most excited for?'
+        )
+      end
+
+      let(:course) { @course }
+      let(:user) { @teacher }
+
+      before do
+        course.enable_feature! :react_discussions_post
+        user_session(user)
+      end
+
+      context 'and "rce_mentions_in_discussions" enabled' do
+        before { Account.site_admin.enable_feature! :rce_mentions_in_discussions }
+
+        it 'sets "rce_mentions_in_discussions" to true in the JS ENV' do
+          subject
+          expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be true
+        end
+      end
+
+      context 'and "rce_mentions_in_discussions" disabled' do
+        before { Account.site_admin.disable_feature! :rce_mentions_in_discussions }
+
+        it 'sets "rce_mentions_in_discussions" to false in the JS ENV' do
+          subject
+          expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be false
+        end
+      end
+    end
+
     context 'section specific announcements' do
       before(:once) do
         course_with_teacher(active_course: true)

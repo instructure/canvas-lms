@@ -28,7 +28,11 @@ describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
       const {queryByText} = setup({repliesCount: 1})
-      expect(queryByText('1 replies')).toBeTruthy()
+      expect(queryByText('1 reply')).toBeTruthy()
+    })
+    it('correct pluralization displayed', () => {
+      const {queryByText} = setup({repliesCount: 2})
+      expect(queryByText('2 replies')).toBeTruthy()
     })
   })
 

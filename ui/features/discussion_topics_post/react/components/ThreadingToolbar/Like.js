@@ -22,6 +22,7 @@ import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 
 export function Like({...props}) {
   return (
@@ -46,7 +47,9 @@ export function Like({...props}) {
       </ScreenReaderContent>
       {props.likeCount > 0 && (
         <>
-          <PresentationContent>{props.likeCount}</PresentationContent>
+          <PresentationContent>
+            <Text weight="bold">{props.likeCount}</Text>
+          </PresentationContent>
           <ScreenReaderContent>
             {I18n.t('Like count: %{count}', {count: props.likeCount})}
           </ScreenReaderContent>

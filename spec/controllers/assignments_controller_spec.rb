@@ -42,6 +42,7 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "should throw 404 error without a valid context id" do
+      skip 'skipping due to high failure rate (unskip in EVAL-1771)'
       #controller.use_rails_error_handling!
       get 'index', params: {:course_id => 'notvalid'}
       assert_status(404)
@@ -547,6 +548,7 @@ describe AssignmentsController do
 
   describe "GET 'show'" do
     it "should return 404 on non-existant assignment" do
+      skip 'skipping due to high failure rate (unskip in EVAL-1771)'
       #controller.use_rails_error_handling!
       user_session(@student)
 
@@ -1571,6 +1573,7 @@ describe AssignmentsController do
     end
 
     it "should not assign to a group from a different course" do
+      skip 'skipping due to high failure rate (unskip in EVAL-1771)'
       user_session(@student)
       course2 = Account.default.courses.create!
       group2 = course2.assignment_groups.create!(name: 'group2')

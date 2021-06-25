@@ -33,15 +33,11 @@ module Outcomes
     end
 
     def total_subgroups(learning_outcome_group_id)
-      return 0 unless improved_outcomes_management?
-
       children_ids(learning_outcome_group_id).length
     end
 
     def total_outcomes(learning_outcome_group_id, args={})
-      return 0 unless improved_outcomes_management?
-
-      if args == {}
+      if args == {} && improved_outcomes_management?
         cache_key = total_outcomes_cache_key(learning_outcome_group_id)
         Rails.cache.fetch(cache_key) do
           total_outcomes_for(learning_outcome_group_id, args)
@@ -52,8 +48,6 @@ module Outcomes
     end
 
     def suboutcomes_by_group_id(learning_outcome_group_id, args={})
-      return ContentTag.none unless improved_outcomes_management?
-
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
       relation = ContentTag.active.learning_outcome_links.
         where(associated_asset_id: learning_outcome_groups_ids).
@@ -127,7 +121,11 @@ module Outcomes
     end
 
     def data
-      Rails.cache.fetch(descendants_cache_key) do
+      if improved_outcomes_management?
+        Rails.cache.fetch(descendants_cache_key) do
+          LearningOutcomeGroup.connection.execute(learning_outcome_group_descendants_query).as_json
+        end
+      else
         LearningOutcomeGroup.connection.execute(learning_outcome_group_descendants_query).as_json
       end
     end

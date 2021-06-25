@@ -34,12 +34,13 @@ export default {
 
 const Template = args => {
   return (
-    <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
+    <OutcomesContext.Provider
+      value={{env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: true}}}
+    >
       <MockedProvider cache={createCache()} mocks={smallOutcomeTree('Account')}>
         <CreateOutcomeModal {...args} />
       </MockedProvider>
     </OutcomesContext.Provider>
   )
 }
-
 export const Default = Template.bind({})

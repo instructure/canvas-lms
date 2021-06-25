@@ -19,22 +19,42 @@
 import {useState, useEffect, useCallback} from 'react'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
-export const useDiscussionRCE = () => {
+export const useDiscussionRCE = (useRceMentions = false) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const [textareaRef, setTextareaRef] = useState(null)
+  const defaultRCEOpts = {
+    focus: false,
+    manageParent: false
+  }
 
   useEffect(() => {
+    async function getEditorOptions() {
+      const options = {...defaultRCEOpts}
+
+      if (useRceMentions) {
+        // Use the canvas mentions tinymce plugin
+        const mentionsPlugin = await import('@canvas/rce/plugins/canvas_mentions/plugin')
+        options.tinyOptions = {plugins: [mentionsPlugin.name]}
+        options.optionsToMerge = ['plugins']
+      }
+
+      return options
+    }
+
     if (!isLoaded && textareaRef) {
-      RichContentEditor.loadNewEditor(
-        textareaRef,
-        {
-          focus: false,
-          manageParent: false
-        },
-        () => {
-          setIsLoaded(true)
-        }
-      )
+      getEditorOptions()
+        .then(options => {
+          RichContentEditor.loadNewEditor(textareaRef, options, () => {
+            setIsLoaded(true)
+          })
+        })
+        .catch(error => {
+          console.error(error)
+          // If there was an error loading the mentions plugin, load without it
+          RichContentEditor.loadNewEditor(textareaRef, defaultRCEOpts, () => {
+            setIsLoaded(true)
+          })
+        })
     }
 
     return () => {
@@ -49,9 +69,10 @@ export const useDiscussionRCE = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [textareaRef])
 
-  const getText = useCallback(() => RichContentEditor.callOnRCE(textareaRef, 'get_code'), [
-    textareaRef
-  ])
+  const getText = useCallback(
+    () => RichContentEditor.callOnRCE(textareaRef, 'get_code'),
+    [textareaRef]
+  )
   const setText = useCallback(
     content => RichContentEditor.callOnRCE(textareaRef, 'set_code', content),
     [textareaRef]

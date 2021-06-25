@@ -583,19 +583,21 @@ describe "admin settings tab" do
   end
 
   it "shows all feature flags that are expected to be visible" do
-    course_with_admin_logged_in(:account => Account.site_admin)
-    provision_quizzes_next(Account.site_admin)
-    get "/accounts/#{Account.site_admin.id}/settings"
+    user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
+    course_with_admin_logged_in(account: Account.default, user: user)
+    provision_quizzes_next(Account.default)
+    get "/accounts/#{Account.default.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations
 
-    Feature.applicable_features(Account.site_admin).each do |feature|
-      next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
+    features_text = f("#tab-features").text
+    Feature.applicable_features(Account.default).each do |feature|
+      next if feature.visible_on && !feature.visible_on.call(Account.default)
       # We don't want flags that are enabled in code to appear in the UI
-      if feature.enabled?
-        expect(f(".feature")).to_not contain_jqcss(".#{feature.feature}")
+      if feature.enabled? && !feature.can_override?
+        expect(features_text).not_to include(feature.display_name.call)
       else
-        expect(f(".feature.#{feature.feature}")).to be_displayed
+        expect(features_text).to include(feature.display_name.call)
       end
     end
   end

@@ -5,3 +5,9 @@ rce_buttons_and_icons:
   description: |-
     Manage a library of custom buttons and icons from the RCE.
   applies_to: SiteAdmin
+rce_mentions_in_discussions:
+  state: hidden
+  display_name: RCE Mentions in Discussions
+  description: |-
+    When enabled, turns on "@mention" functionality in course discussions.
+  applies_to: SiteAdmin

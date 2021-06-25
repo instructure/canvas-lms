@@ -966,8 +966,34 @@ end
     end
   end
 
+  def override_visibility(visibility, placement = nil)
+    to_override = placement.present? ? self.settings[placement.to_sym] : self.settings
+    to_override[:visibility_override] = visibility
+  end
+
+  def clear_visibility_override(placement = nil)
+    to_override = placement.present? ? self.settings[placement.to_sym] : self.settings
+    to_override.delete(:visibility_override)
+  end
+
+  def visible?(placement, user, context, session=nil)
+    return self.globally_visible?(user, context, session) if placement&.to_sym == :global_navigation
+
+    visibility = self.extension_setting(placement, :visibility_override) || self.extension_setting(placement, :visibility)
+    self.class.visible?(visibility, user, context, session)
+  end
+
+  def globally_visible?(user, context, session=nil)
+    granted_permissions =
+      self.class.global_navigation_granted_permissions(
+        root_account: context.root_account, user: user, context: context, session: session
+      )
+    self.class.global_tool_visible?(self, granted_permissions)
+  end
+
   def visible_with_permission_check?(launch_type, user, context, session=nil)
-    return false unless self.class.visible?(self.extension_setting(launch_type, 'visibility'), user, context, session)
+    return false unless self.visible?(launch_type, user, context, session)
+
     permission_given?(launch_type, user, context, session)
   end
 
@@ -1131,21 +1157,18 @@ end
 
   def self.filtered_global_navigation_tools(root_account, granted_permissions)
     tools = self.all_global_navigation_tools(root_account)
+    tools.select { |tool| self.global_tool_visible?(tool, granted_permissions) }
+  end
 
-    if granted_permissions[:original_visibility] != 'admins'
-      # reject the admin only tools
-      tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
-    end
+  def self.global_tool_visible?(tool, granted_permissions)
+    # reject the admin only tools
+    return false if granted_permissions[:original_visibility] != 'admins' && tool.extension_setting(:global_navigation, :visibility) == 'admins'
+
     # check against permissions if needed
-    tools.select! do |tool|
-      required_permissions_str = tool.extension_setting(:global_navigation, 'required_permissions')
-      if required_permissions_str
-        required_permissions_str.split(",").map(&:to_sym).all?{|p| granted_permissions[p]}
-      else
-        true
-      end
-    end
-    tools
+    required_permissions_str = tool.extension_setting(:global_navigation, 'required_permissions')
+    return true unless required_permissions_str
+
+    required_permissions_str.split(",").map(&:to_sym).all? { |p| granted_permissions[p] }
   end
 
   def self.key_for_granted_permissions(granted_permissions)

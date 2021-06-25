@@ -710,8 +710,7 @@ enrollments.csv
 <td>✓&#42;</td>
 <td></td>
 <td>student, teacher, ta, observer, designer, or a custom role defined
-by the account</td>
-</tr>
+by the account. When using a custom role, the name is case sensitive.</td></tr>
 <tr>
 <td>role_id</td>
 <td>text</td>
@@ -1095,7 +1094,8 @@ admins.csv
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>AccountAdmin, or a custom role defined by the account</td>
+<td>AccountAdmin, or a custom role defined by the account.
+ When using a custom role, the name is case sensitive.</td>
 </tr>
 <tr>
 <td>status</td>

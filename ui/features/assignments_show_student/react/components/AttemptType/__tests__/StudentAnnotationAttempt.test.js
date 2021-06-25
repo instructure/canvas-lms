@@ -17,8 +17,9 @@
  */
 
 import StudentAnnotationAttempt from '../StudentAnnotationAttempt'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
+import axios from '@canvas/axios'
 import React from 'react'
 
 async function makeProps(overrides) {
@@ -36,5 +37,35 @@ describe('StudentAnnotationAttempt', () => {
     const props = await makeProps({})
     const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
     expect(getByTestId('canvadocs-iframe')).toBeInTheDocument()
+  })
+})
+
+describe('when fetching canvadocs session fails', () => {
+  beforeEach(() => {
+    jest.spyOn(axios, 'post').mockRejectedValue({})
+  })
+
+  it('displays an error message', async () => {
+    const props = await makeProps({})
+    const {getByText} = render(<StudentAnnotationAttempt {...props} />)
+    await waitFor(() => {
+      expect(getByText('There was an error loading the document.')).toBeInTheDocument()
+    })
+  })
+})
+
+describe('when fetching canvadocs session success', () => {
+  beforeEach(() => {
+    jest
+      .spyOn(axios, 'post')
+      .mockResolvedValue({data: {canvadocs_session_url: 'CANVADOCS_SESSION_URL'}})
+  })
+
+  it('sets the url of the iframe', async () => {
+    const props = await makeProps({})
+    const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
+    await waitFor(() => {
+      expect(getByTestId('canvadocs-iframe').src).toEqual('http://localhost/CANVADOCS_SESSION_URL')
+    })
   })
 })

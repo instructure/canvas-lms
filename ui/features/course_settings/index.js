@@ -21,7 +21,6 @@ import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import NavigationView from './backbone/views/NavigationView'
 import ErrorBoundary from '@canvas/error-boundary'
-import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import CourseColorSelector from './react/components/CourseColorSelector'
@@ -81,12 +80,7 @@ if (courseTemplate) {
 const navView = new NavigationView({el: $('#tab-navigation')})
 
 if (document.getElementById('tab-features')) {
-  if (window.ENV.NEW_FEATURES_UI) {
-    ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
-  } else {
-    const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
-    featureFlagView.collection.fetchAll()
-  }
+  ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
 }
 
 $(() => navView.render())

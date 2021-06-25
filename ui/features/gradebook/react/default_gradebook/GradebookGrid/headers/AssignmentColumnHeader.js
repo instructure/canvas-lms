@@ -127,7 +127,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }).isRequired,
 
     postGradesAction: shape({
-      featureEnabled: bool.isRequired,
+      enabledForUser: bool.isRequired,
       hasGradesOrPostableComments: bool.isRequired,
       hasGradesOrCommentsToPost: bool.isRequired,
       onSelect: func.isRequired
@@ -407,14 +407,16 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
         </Menu.Item>
 
-        <Menu.Item
-          disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
-          onSelect={this.postGrades}
-        >
-          {labelForPostGradesAction(this.props.postGradesAction)}
-        </Menu.Item>
+        {this.props.postGradesAction.enabledForUser && (
+          <Menu.Item
+            disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
+            onSelect={this.postGrades}
+          >
+            {labelForPostGradesAction(this.props.postGradesAction)}
+          </Menu.Item>
+        )}
 
-        {this.props.postGradesAction.featureEnabled && (
+        {this.props.postGradesAction.enabledForUser && (
           <Menu.Item
             disabled={!this.props.hideGradesAction.hasGradesOrCommentsToHide}
             onSelect={this.hideGrades}
@@ -459,9 +461,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </Menu.Item>
         )}
 
-        {this.props.postGradesAction.featureEnabled && <Menu.Separator />}
+        {this.props.postGradesAction.enabledForUser && <Menu.Separator />}
 
-        {this.props.postGradesAction.featureEnabled && (
+        {this.props.postGradesAction.enabledForUser && (
           <Menu.Item onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
           </Menu.Item>

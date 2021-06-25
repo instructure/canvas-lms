@@ -30,15 +30,15 @@ export const ShapeSection = ({settings, onChange}) => (
   <Flex as="section" justifyItems="space-between" direction="column">
     <Flex.Item padding="small">
       <SimpleSelect
-        assistiveText={formatMessage('Use arrow keys to navigate options.')}
+        assistiveText={formatMessage('Use arrow keys to select a shape.')}
         id="button-shape"
         onChange={(e, option) => onChange({shape: option.value})}
         renderLabel={formatMessage('Button Shape')}
         value={settings.shape}
       >
         {SHAPES.map(shape => (
-          <SimpleSelect.Option id={`shape-${shape}`} key={shape} value={shape}>
-            {getShapeLabel(shape)}
+          <SimpleSelect.Option id={`shape-${shape}`} key={`shape-${shape}`} value={shape}>
+            {SHAPE_DESCRIPTION[shape] || ''}
           </SimpleSelect.Option>
         ))}
       </SimpleSelect>
@@ -46,15 +46,15 @@ export const ShapeSection = ({settings, onChange}) => (
 
     <Flex.Item padding="small">
       <SimpleSelect
-        assistiveText={formatMessage('Use arrow keys to navigate options.')}
+        assistiveText={formatMessage('Use arrow keys to select a size.')}
         id="button-size"
         onChange={(e, option) => onChange({size: option.value})}
         renderLabel={formatMessage('Button Size')}
         value={settings.size}
       >
         {SIZES.map(size => (
-          <SimpleSelect.Option id={`size-${size}`} key={size} value={size}>
-            {getSizeLabel(size)}
+          <SimpleSelect.Option id={`size-${size}`} key={`size-${size}`} value={size}>
+            {SIZE_DESCRIPTION[size] || ''}
           </SimpleSelect.Option>
         ))}
       </SimpleSelect>
@@ -62,36 +62,18 @@ export const ShapeSection = ({settings, onChange}) => (
   </Flex>
 )
 
-function getShapeLabel(shape) {
-  switch (shape) {
-    case 'square':
-      return formatMessage('Square')
-    case 'circle':
-      return formatMessage('Circle')
-    case 'triangle':
-      return formatMessage('Triangle')
-    case 'hexagon':
-      return formatMessage('Hexagon')
-    case 'octagon':
-      return formatMessage('Octagon')
-    case 'star':
-      return formatMessage('Star')
-    default:
-      return ''
-  }
+const SHAPE_DESCRIPTION = {
+  square: formatMessage('Square'),
+  circle: formatMessage('Circle'),
+  triangle: formatMessage('Triangle'),
+  hexagon: formatMessage('Hexagon'),
+  octagon: formatMessage('Octagon'),
+  star: formatMessage('Star')
 }
 
-function getSizeLabel(size) {
-  switch (size) {
-    case 'x-small':
-      return formatMessage('Extra Small')
-    case 'small':
-      return formatMessage('Small')
-    case 'medium':
-      return formatMessage('Medium')
-    case 'large':
-      return formatMessage('Large')
-    default:
-      return ''
-  }
+const SIZE_DESCRIPTION = {
+  'x-small': formatMessage('Extra Small'),
+  small: formatMessage('Small'),
+  medium: formatMessage('Medium'),
+  large: formatMessage('Large')
 }

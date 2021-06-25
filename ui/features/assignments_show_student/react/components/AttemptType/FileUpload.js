@@ -395,7 +395,7 @@ export default class FileUpload extends Component {
 
   renderUploadedFiles = files => {
     return (
-      <Table caption={I18n.t('Uploaded files')}>
+      <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
           <Table.Row>
             <Table.ColHeader id="thumbnail" width="1rem" />

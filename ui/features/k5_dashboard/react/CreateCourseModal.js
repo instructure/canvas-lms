@@ -208,6 +208,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
             />
             {syncHomeroomEnrollments && (
               <SimpleSelect
+                data-testid="homeroom-select"
                 renderLabel={I18n.t('Select a homeroom')}
                 assistiveText={I18n.t('Use arrow keys to navigate options.')}
                 onChange={(_e, data) => handleHomeroomSelected(data.id)}

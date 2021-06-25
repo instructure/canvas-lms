@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useReducer, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
@@ -34,10 +34,13 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
+import useSelectedOutcomes from '@canvas/outcomes/react/hooks/useSelectedOutcomes'
 import MoveModal from './MoveModal'
 import EditGroupModal from './EditGroupModal'
+import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
+import OutcomeRemoveMultiModal from './OutcomeRemoveMultiModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import {moveOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -82,14 +85,10 @@ const OutcomeManagementPanel = () => {
     onChangeHandler: onSearchChangeHandler,
     onClearHandler: onSearchClearHandler
   } = useSearch()
-  const [selectedOutcomes, toggleSelectedOutcomes] = useReducer((prevState, id) => {
-    const updatedState = {...prevState}
-    prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
-    return updatedState
-  }, {})
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
-
-  const selected = Object.keys(selectedOutcomes).length
+  const [scrollContainer, setScrollContainer] = useState(null)
+  const {selectedOutcomes, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
+    useSelectedOutcomes()
   const noop = () => {}
   const {
     error,
@@ -110,11 +109,20 @@ const OutcomeManagementPanel = () => {
   const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
+  const [isOutcomeRemoveMultiModalOpen, openOutcomeRemoveMultiModal, closeOutcomeRemoveMultiModal] =
+    useModal()
   const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
+  const [isGroupDescriptionModalOpen, openGroupDescriptionModal, closeGroupDescriptionModal] =
+    useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
+
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
+  }
+  const onCloseOutcomeRemoveMultiModal = () => {
+    closeOutcomeRemoveMultiModal()
+    clearSelectedOutcomes()
   }
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
@@ -134,6 +142,8 @@ const OutcomeManagementPanel = () => {
       openGroupRemoveModal()
     } else if (action === 'edit') {
       openEditGroupModal()
+    } else if (action === 'description') {
+      openGroupDescriptionModal()
     }
   }
   const outcomeMenuHandler = useCallback(
@@ -184,6 +194,11 @@ const OutcomeManagementPanel = () => {
     startMoveOutcome(contextType, contextId, selectedOutcome, selectedGroupId, newParentGroup)
     onCloseOutcomeMoveModal()
   }
+  const onRemoveOutcomesHandler = () => {
+    // TODO: update backend via GraphQL mutation
+    // Depends on: OUT-4499
+    onCloseOutcomeRemoveMultiModal()
+  }
 
   if (isLoading) {
     return (
@@ -203,10 +218,7 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  // Currently we're checking the presence of outcomes by checking the presence of folders
-  // we need to implement the correct behavior later
-  // https://gerrit.instructure.com/c/canvas-lms/+/255898/8/app/jsx/outcomes/Management/index.js#235
-  const hasOutcomes = Object.keys(collections).length > 1
+  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -233,6 +245,8 @@ const OutcomeManagementPanel = () => {
                   onCollectionToggle={queryCollections}
                   collections={collections}
                   rootId={rootId}
+                  showRootCollection
+                  defaultExpandedIds={[rootId]}
                 />
               </View>
             </Flex.Item>
@@ -265,7 +279,10 @@ const OutcomeManagementPanel = () => {
               height="60vh"
               overflowY="visible"
               overflowX="auto"
-              elementRef={setRightColumnRef}
+              elementRef={el => {
+                setRightColumnRef(el)
+                setScrollContainer(el)
+              }}
             >
               <View as="div" padding="x-small none none x-small">
                 {selectedGroupId && (
@@ -281,20 +298,22 @@ const OutcomeManagementPanel = () => {
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
+                    scrollContainer={scrollContainer}
+                    isRootGroup={selectedGroupId === rootId}
                   />
                 )}
               </View>
             </Flex.Item>
           </Flex>
-          <hr />
+          <hr style={{margin: '0 0 7px'}} />
+          <ManageOutcomesFooter
+            selected={selectedOutcomes}
+            selectedCount={selectedOutcomesCount}
+            onRemoveHandler={openOutcomeRemoveMultiModal}
+            onMoveHandler={noop}
+          />
           {selectedGroupId && (
             <>
-              <ManageOutcomesFooter
-                selected={selected}
-                onRemoveHandler={noop}
-                onMoveHandler={noop}
-              />
-
               <MoveModal
                 title={loading ? '' : group.title}
                 groupId={selectedGroupId}
@@ -337,10 +356,25 @@ const OutcomeManagementPanel = () => {
             </>
           )}
           {group && (
-            <EditGroupModal
-              outcomeGroup={group}
-              isOpen={isEditGroupModalOpen}
-              onCloseHandler={onCloseEditGroupModal}
+            <>
+              <EditGroupModal
+                outcomeGroup={group}
+                isOpen={isEditGroupModalOpen}
+                onCloseHandler={onCloseEditGroupModal}
+              />
+              <GroupDescriptionModal
+                outcomeGroup={group}
+                isOpen={isGroupDescriptionModalOpen}
+                onCloseHandler={closeGroupDescriptionModal}
+              />
+            </>
+          )}
+          {selectedOutcomesCount > 0 && (
+            <OutcomeRemoveMultiModal
+              outcomes={selectedOutcomes}
+              isOpen={isOutcomeRemoveMultiModalOpen}
+              onCloseHandler={closeOutcomeRemoveMultiModal}
+              onRemoveHandler={onRemoveOutcomesHandler}
             />
           )}
         </>

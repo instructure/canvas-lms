@@ -208,7 +208,7 @@ describe('FindOutcomesModal', () => {
   describe('global standards', () => {
     beforeEach(() => {
       window.ENV = {
-        GLOBAL_ROOT_OUTCOME_GROUP_ID: 1
+        GLOBAL_ROOT_OUTCOME_GROUP_ID: '1'
       }
     })
 

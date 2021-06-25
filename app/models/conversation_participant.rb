@@ -61,8 +61,8 @@ class ConversationParticipant < ActiveRecord::Base
     own_root_account_ids = Shard.birth.activate do
       # check the target user's accounts - the masquerader may still have rights even if they're not directly associated
       accts = (
-          masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a +
-          user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a
+          masquerading_user.associated_root_accounts.except(:order).shard(masquerading_user.in_region_associated_shards).to_a +
+          user_being_viewed.associated_root_accounts.except(:order).shard(user_being_viewed.in_region_associated_shards).to_a
         ).uniq.select{ |a| a.grants_right?(masquerading_user, :become_user) }
       # we really shouldn't need the global id here, but we've got a lot of participants with
       # global id's in their root_account_ids for some reason

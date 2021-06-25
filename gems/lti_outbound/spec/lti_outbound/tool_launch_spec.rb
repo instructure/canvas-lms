@@ -113,7 +113,8 @@ describe LtiOutbound::ToolLaunch do
                                 :link_code => '123456',
                                 :return_url => 'http://www.google.com',
                                 :outgoing_email_address => 'outgoing_email_address',
-                                :variable_expander => variable_expander)
+                                :variable_expander => variable_expander,
+                                :include_module_context => true)
   end
 
   describe '#generate' do
@@ -416,6 +417,15 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['ext_outcome_submission_submitted_at_accepted']).to be true
       expect(hash['custom_canvas_assignment_title']).to eq '$Canvas.assignment.title'
       expect(hash['custom_canvas_assignment_points_possible']).to eq '$Canvas.assignment.pointsPossible'
+    end
+
+    it 'includes module context info when associated option is true' do
+      tool_launch.for_assignment!(assignment, '/my/test/url', '/my/other/test/url', '/a/test/url')
+
+      hash = tool_launch.generate
+
+      expect(hash['custom_canvas_module_id']).to eq '$Canvas.module.id'
+      expect(hash['custom_canvas_module_item_id']).to eq '$Canvas.moduleItem.id'
     end
   end
 

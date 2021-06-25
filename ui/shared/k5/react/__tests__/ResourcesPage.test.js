@@ -170,6 +170,14 @@ describe('ResourcesPage', () => {
       expect(image).toBeInTheDocument()
       expect(image.src).toContain('/2.png')
     })
+
+    it("doesn't fail if course_navigation property is null", async () => {
+      const response = [{id: '3'}]
+      utils.fetchCourseApps.mockReturnValue(Promise.resolve(response))
+      const {getByText, queryByText} = render(<ResourcesPage {...getProps()} />)
+      await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())
+      expect(queryByText('Failed to load apps.')).not.toBeInTheDocument()
+    })
   })
 
   describe('Staff section', () => {
