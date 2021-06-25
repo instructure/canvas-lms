@@ -22,7 +22,13 @@ require 'spec_helper'
 
 describe K5Mode do
   controller(AssignmentsController) do
-    def index; end
+    def index
+      respond_to do |format|
+        format.html do
+          render :new_index
+        end
+      end
+    end
   end
 
   before :once do
