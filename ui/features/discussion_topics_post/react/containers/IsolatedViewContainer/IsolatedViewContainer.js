@@ -17,51 +17,98 @@
  */
 
 import {CloseButton} from '@instructure/ui-buttons'
-import {Discussion} from '../../../graphql/Discussion'
 import {Heading} from '@instructure/ui-heading'
-import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {Flex} from '@instructure/ui-flex'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import I18n from 'i18n!discussion_topics_post'
+import theme from '@instructure/canvas-theme'
+import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import PropTypes from 'prop-types'
+import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
+import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
-  IsolatedRootEntry: {
-    id: '432',
-    author: {
-      name: 'Jeffrey Johnson',
-      avatarUrl: 'someURL'
-    },
-    createdAt: '2021-02-08T13:36:05-07:00',
-    message:
-      '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
-    read: true,
-    lastReply: null,
-    rootEntryParticipantCounts: {
-      unreadCount: 0,
-      repliesCount: 0
-    },
-    subentriesCount: 0,
-    permissions: {
-      attach: true,
-      create: true,
-      delete: true,
-      rate: true,
-      read: true,
-      reply: true,
-      update: true,
-      viewRating: true
-    }
-  }
+  discussionEntry: DiscussionEntry.mock()
 }
 
 export const IsolatedViewContainer = props => {
   const [showTray, setShowTray] = useState(true)
 
+  const threadActions = []
+
+  if (props.discussionEntry.permissions.reply) {
+    threadActions.push(
+      <ThreadingToolbar.Reply
+        key={`reply-${props.discussionEntry.id}`}
+        authorName={props.discussionEntry.author.name}
+        delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
+        onClick={() => {}}
+      />
+    )
+  }
+  if (
+    props.discussionEntry.permissions.viewRating &&
+    (props.discussionEntry.permissions.rate || props.discussionEntry.ratingSum > 0)
+  ) {
+    threadActions.push(
+      <ThreadingToolbar.Like
+        key={`like-${props.discussionEntry.id}`}
+        delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
+        onClick={() => {
+          if (props.onToggleRating) {
+            props.onToggleRating()
+          }
+        }}
+        authorName={props.discussionEntry.author.name}
+        isLiked={props.discussionEntry.rating}
+        likeCount={props.discussionEntry.ratingSum || 0}
+        interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
+      />
+    )
+  }
+
+  if (props.discussionEntry.lastReply) {
+    threadActions.push(
+      <ThreadingToolbar.Expansion
+        key={`expand-${props.discussionEntry.id}`}
+        delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
+        expandText={I18n.t(
+          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
+          {
+            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
+          }
+        )}
+        isReadOnly
+        isExpanded={false}
+        onClick={() => {}}
+      />
+    )
+  }
+
   return (
-    <Tray open={showTray} placement="end" size="large" offset="large" label="Isolated View">
+    <Tray
+      open={showTray}
+      placement="end"
+      size="medium"
+      offset="large"
+      label="Isolated View"
+      shouldCloseOnDocumentClick
+      onDismiss={() => {
+        setShowTray(false)
+
+        if (props.onClose) {
+          props.onClose()
+        }
+      }}
+    >
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
-          <Heading margin="medium medium medium">Thread</Heading>
+          <Heading margin="medium medium medium" theme={{h2FontWeight: 700}}>
+            Thread
+          </Heading>
         </Flex.Item>
         <Flex.Item>
           <CloseButton
@@ -70,17 +117,59 @@ export const IsolatedViewContainer = props => {
             screenReaderLabel="Close"
             onClick={() => {
               setShowTray(false)
+
+              if (props.onClose) {
+                props.onClose()
+              }
             }}
           />
         </Flex.Item>
       </Flex>
+      <div
+        style={{
+          marginLeft: theme.variables.spacing.medium,
+          paddingLeft: '0.75rem',
+          paddingRight: '0.75rem'
+        }}
+      >
+        <Flex>
+          <Flex.Item shouldShrink shouldGrow>
+            <PostMessageContainer
+              discussionEntry={props.discussionEntry}
+              threadActions={threadActions}
+            />
+          </Flex.Item>
+          {!props.discussionEntry.deleted && (
+            <Flex.Item align="stretch">
+              <ThreadActions
+                id={props.discussionEntry.id}
+                isUnread={!props.discussionEntry.read}
+                onToggleUnread={() => {
+                  if (props.onToggleUnread) {
+                    props.onToggleUnread()
+                  }
+                }}
+                onDelete={props.onDelete}
+                onEdit={() => {}}
+                onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+                goToParent={() => {}}
+                goToTopic={() => {}}
+              />
+            </Flex.Item>
+          )}
+        </Flex>
+      </div>
     </Tray>
   )
 }
 
 IsolatedViewContainer.propTypes = {
-  IsolatedRootEntry: PropTypes.object.isRequired,
-  DiscussionTopic: Discussion.shape
+  discussionEntry: DiscussionEntry.shape,
+  onClose: PropTypes.func,
+  onToggleRating: PropTypes.func,
+  onToggleUnread: PropTypes.func,
+  onDelete: PropTypes.func,
+  onOpenInSpeedGrader: PropTypes.func
 }
 IsolatedViewContainer.defaultProps = {}
 

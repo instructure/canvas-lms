@@ -18,15 +18,12 @@
 
 import React from 'react'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
-import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {render} from '@testing-library/react'
 
 describe('IsolatedViewContainer', () => {
-  const defaultProps = ({discussionTopic = {}, IsolatedRootEntry = {}} = {}) => ({
-    discussionTopic: Discussion.mock(),
-
-    IsolatedRootEntry: DiscussionEntry.mock()
+  const defaultProps = () => ({
+    discussionEntry: DiscussionEntry.mock()
   })
 
   const setup = props => {

@@ -18,21 +18,18 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
-import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
@@ -47,6 +44,8 @@ import {
   addReplyToDiscussion
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
+import {IsolatedViewContainer} from '../IsolatedViewContainer/IsolatedViewContainer'
+import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
   discussionEntry: {
@@ -84,6 +83,7 @@ export const DiscussionThreadContainer = props => {
   const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
+  const [openIsolatedView, setOpenIsolatedView] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
   const threadRef = useRef()
@@ -197,8 +197,6 @@ export const DiscussionThreadContainer = props => {
     )
   }
 
-  const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
-
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
@@ -211,7 +209,13 @@ export const DiscussionThreadContainer = props => {
             unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
           }
         )}
-        onClick={() => setExpandReplies(!expandReplies)}
+        onClick={() => {
+          if (ENV.isolated_view) {
+            setOpenIsolatedView(!openIsolatedView)
+          } else {
+            setExpandReplies(!expandReplies)
+          }
+        }}
         isExpanded={expandReplies}
       />
     )
@@ -237,39 +241,14 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const renderPostMessage = () => {
-    if (props.discussionEntry.deleted) {
-      const name = props.discussionEntry.editor
-        ? props.discussionEntry.editor.name
-        : props.discussionEntry.author.name
-      return (
-        <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
-          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
-        </DeletedPostMessage>
+  const onOpenInSpeedGrader = () => {
+    window.location.assign(
+      getSpeedGraderUrl(
+        ENV.course_id,
+        props.discussionTopic.assignment._id,
+        props.discussionEntry.author._id
       )
-    } else {
-      return (
-        <PostMessage
-          authorName={props.discussionEntry.author.name}
-          avatarUrl={props.discussionEntry.author.avatarUrl}
-          lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-            props.discussionEntry.lastReply?.createdAt
-          )}
-          timingDisplay={createdAt}
-          message={props.discussionEntry.message}
-          isUnread={!props.discussionEntry.read}
-          isEditing={isEditing}
-          onCancel={() => {
-            setIsEditing(false)
-          }}
-          onSave={onUpdate}
-          isForcedRead={props.discussionEntry.forcedReadState}
-          discussionRoles={props.discussionEntry.author?.courseRoles}
-        >
-          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
-        </PostMessage>
-      )
-    }
+    )
   }
 
   // Scrolling auto listener to mark messages as read
@@ -298,7 +277,15 @@ export const DiscussionThreadContainer = props => {
       <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
         <Flex>
           <Flex.Item shouldShrink shouldGrow>
-            {renderPostMessage()}
+            <PostMessageContainer
+              discussionEntry={props.discussionEntry}
+              threadActions={threadActions}
+              isEditing={isEditing}
+              onCancel={() => {
+                setIsEditing(false)
+              }}
+              onSave={onUpdate}
+            />
           </Flex.Item>
           {!props.discussionEntry.deleted && (
             <Flex.Item align="stretch">
@@ -315,17 +302,7 @@ export const DiscussionThreadContainer = props => {
                     : null
                 }
                 onOpenInSpeedGrader={
-                  props.discussionTopic.permissions?.speedGrader
-                    ? () => {
-                        window.location.assign(
-                          getSpeedGraderUrl(
-                            ENV.course_id,
-                            props.discussionTopic.assignment._id,
-                            props.discussionEntry.author._id
-                          )
-                        )
-                      }
-                    : null
+                  props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
                 }
                 goToParent={
                   props.depth === 0
@@ -397,6 +374,20 @@ export const DiscussionThreadContainer = props => {
             <CollapseReplies onClick={() => setExpandReplies(false)} />
           </View>
         </View>
+      )}
+      {openIsolatedView && (
+        <IsolatedViewContainer
+          discussionEntry={props.discussionEntry}
+          onClose={() => {
+            setOpenIsolatedView(false)
+          }}
+          onToggleRating={toggleRating}
+          onToggleUnread={toggleUnread}
+          onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+          onOpenInSpeedGrader={
+            props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
+          }
+        />
       )}
     </>
   )
