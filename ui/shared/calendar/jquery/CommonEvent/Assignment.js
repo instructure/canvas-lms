@@ -50,6 +50,7 @@ Object.assign(Assignment.prototype, {
     this.description = data.description
     this.start = this.parseStartDate()
     this.end = null // in case it got set by midnight fudging
+    this.important_dates = data.important_dates
 
     return Assignment.__super__.copyDataFromObject.apply(this, arguments)
   },
