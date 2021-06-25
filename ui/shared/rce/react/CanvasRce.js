@@ -24,6 +24,9 @@ import getRCSProps from '../getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
 
+// the ref you add via <CanvasRce ref={yourRef} /> will be a reference
+// to the underlying RCEWrapper. You probably shouldn't use it until
+// onInit has been called. Until then tinymce is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   const {
     autosave,
@@ -99,7 +102,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       textareaClassName={textareaClassName}
       textareaId={textareaId}
       height={height}
-      trayProps={RCSProps}
+      rcsProps={RCSProps}
       onFocus={onFocus}
       onBlur={onBlur}
       onContentChange={onContentChange}
@@ -114,14 +117,24 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
 export default CanvasRce
 
 CanvasRce.propTypes = {
+  // should the RCE autosave content to localStorage as the user types
   autosave: bool,
+  // the initial content
   defaultContent: string,
+  // tinymce configuration overrides
   editorOptions: object,
+  // height of the RCE. If a number, in px
   height: oneOfType([number, string]),
+  // name:value pairs of attributes to add to the textarea
+  // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
+  // is thie RCE readonly?
   readOnly: bool,
+  // class name added to the generated textarea
   textareaClassName: string,
+  // id of the generated textarea
   textareaId: string.isRequired,
+  // event handlers
   onFocus: func, // f(RCEWrapper component) (sorry)
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)
