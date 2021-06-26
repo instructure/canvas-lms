@@ -24,12 +24,13 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import I18n from 'i18n!OutcomeManagement'
+import {isRTL} from '@canvas/i18n/rtlHelper'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
 
 const FindOutcomesView = ({
   collection,
@@ -89,9 +90,30 @@ const FindOutcomesView = ({
                   {searchString ? (
                     <Flex>
                       <Flex.Item shouldShrink>
-                        <TruncateText>
-                          {`${addZeroWidthSpace(groupTitle)} > ${addZeroWidthSpace(searchString)}`}
-                        </TruncateText>
+                        <div
+                          style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          <View data-testid="group-name-ltr">
+                            {isRTL() ? searchString : groupTitle}
+                          </View>
+                          <div
+                            style={{
+                              display: 'inline-block',
+                              transform: 'scale(0.6)',
+                              verticalAlign: 'middle',
+                              marginBottom: '0.25rem'
+                            }}
+                          >
+                            <IconArrowOpenEndSolid title={I18n.t('search results for')} />
+                          </div>
+                          <View data-testid="search-string-ltr">
+                            {isRTL() ? groupTitle : searchString}
+                          </View>
+                        </div>
                       </Flex.Item>
                       <Flex.Item>
                         {loading ? (

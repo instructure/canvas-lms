@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, within} from '@testing-library/react'
 import FindOutcomesView from '../FindOutcomesView'
+import {isRTL} from '@canvas/i18n/rtlHelper'
+
+jest.mock('@canvas/i18n/rtlHelper')
 
 describe('FindOutcomesView', () => {
   let onChangeHandlerMock
@@ -236,5 +239,25 @@ describe('FindOutcomesView', () => {
       <FindOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
     )
     expect(getByTestId('search-loading')).toBeInTheDocument()
+  })
+
+  it('shows in search breadcrumb right arrow icon with screen reader accessible title', () => {
+    const {getByTitle} = render(
+      <FindOutcomesView {...defaultProps({loading: true, searchString: 'test'})} />
+    )
+    expect(getByTitle('search results for')).toBeInTheDocument()
+  })
+
+  it('flips order of search term and outcome title if RTL is enabled', () => {
+    isRTL.mockReturnValue(false)
+    const {getByTestId, rerender} = render(
+      <FindOutcomesView {...defaultProps({loading: true, searchString: 'ltrtest'})} />
+    )
+    expect(within(getByTestId('group-name-ltr')).getByText('State Standards')).toBeTruthy()
+    expect(within(getByTestId('search-string-ltr')).getByText('ltrtest')).toBeTruthy()
+    isRTL.mockReturnValue(true)
+    rerender(<FindOutcomesView {...defaultProps({loading: true, searchString: 'rtltest'})} />)
+    expect(within(getByTestId('group-name-ltr')).getByText('rtltest')).toBeTruthy()
+    expect(within(getByTestId('search-string-ltr')).getByText('State Standards')).toBeTruthy()
   })
 })
