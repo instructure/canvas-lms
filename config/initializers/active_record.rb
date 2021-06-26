@@ -898,7 +898,7 @@ module UsefulFindInBatches
     checkin = -> do
       pool&.synchronize do
         pool.send(:adopt_connection, conn)
-        pool.checkin(conn)
+        pool.checkin(conn, keep_connection: true)
         if (conn2 = klass.connection) != conn
           # checkin the secondary connection that was established, so that the
           # next usage will immediately checkout the original connection.
@@ -1949,8 +1949,9 @@ module MaxRuntimeConnectionPool
     end
   end
 
-  def checkin(conn)
-    return super unless max_runtime && conn.runtime >= max_runtime
+  def checkin(conn, keep_connection: false)
+    return super(conn) unless max_runtime && conn.runtime >= max_runtime
+    return super(conn) if keep_connection
 
     conn.lock.synchronize do
       synchronize do
