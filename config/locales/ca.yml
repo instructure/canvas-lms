@@ -5619,7 +5619,7 @@ ca:
         join_course: "Uneix-te al curs"
         new_announcement: "Anunci nou"
         student_view: "Vista d'estudiant"
-        view_course_calendar: "Mostra el calendari del curs"
+        view_course_calendar: "Veure el calendari del curs"
         view_course_notification_settings: "Visualitza les notificacions del curs"
         view_course_stream: "Mostra la seqüència del curs"
       re_sending: "S'està tornant a enviar..."
@@ -16439,7 +16439,7 @@ ca:
       at_least_more_events_two_weeks: "com a mínim %{count_of_events} més les darreres dues setmanes"
       at_least_more_events_two_weeks_future: "com a mínim %{count_of_events} més les properes dues setmanes"
       links: 
-        view_calendar: "Mostra el calendari"
+        view_calendar: "Veure el calendari"
       more_events: "%{count_of_events} més"
       more_events_one_week: "%{count_of_events} més la setmana passada"
       more_events_one_week_future: "%{count_of_events} més la propera setmana"
