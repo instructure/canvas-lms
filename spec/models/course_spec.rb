@@ -1074,7 +1074,7 @@ describe Course do
       expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
       expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
       expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
 
       # completed, non-sis course
@@ -1098,7 +1098,7 @@ describe Course do
       expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
       expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
       expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
     end
 
