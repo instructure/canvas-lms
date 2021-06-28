@@ -47,9 +47,6 @@ export default function LoginAttributeSelector(props) {
               renderIcon={IconInfoLine}
               withBackground={false}
               withBorder={false}
-              screenReaderLabel={I18n.t(
-                'Tooltip that contains info about the Microsoft Teams Sync Login Attribute.'
-              )}
             />
           </Tooltip>
         </Flex.Item>
