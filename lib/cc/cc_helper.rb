@@ -223,6 +223,11 @@ module CCHelper
           match.url.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
         end
       end
+      @rewriter.set_handler('courses') do |match|
+        if match.obj_id == @course.id
+          "#{COURSE_TOKEN}/"
+        end
+      end
       @rewriter.set_handler('files') do |match|
         if match.obj_id.nil?
           if match_data = match.url.match(%r{/files/folder/(.*)})
