@@ -4,17 +4,16 @@
 version: '2.3'
 services:
   js-tests:
-    build:
-      context: .
-      dockerfile: docker-compose/karma/Dockerfile
+    build: ./docker-compose/karma
     volumes:
       - .:/usr/src/app
+      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
+      - public_dist:/usr/src/app/public/dist
+      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
+      - log:/usr/src/app/log
+      - node_modules:/usr/src/app/node_modules
+      - tmp:/usr/src/app/tmp
+      - yarn-cache:/home/docker/.cache/yarn
     environment:
       NODE_ENV: CI
-    cap_add:
-      - SYS_ADMIN
-    # for linux the default profile restricts mount usage, set to have no restrictions
-    security_opt:
-      - apparmor:unconfined
-    entrypoint: /root/entrypoint.sh
     command: yarn run test:karma:watch:headless
