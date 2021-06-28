@@ -44,7 +44,10 @@ import {
   addReplyToDiscussion
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
-import {IsolatedViewContainer} from '../IsolatedViewContainer/IsolatedViewContainer'
+import {
+  ISOLATED_VIEW_MODES,
+  IsolatedViewContainer
+} from '../IsolatedViewContainer/IsolatedViewContainer'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
@@ -175,7 +178,12 @@ export const DiscussionThreadContainer = props => {
         authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
-          setEditorExpanded(!editorExpanded)
+          const newEditorExpanded = !editorExpanded
+          setEditorExpanded(newEditorExpanded)
+
+          if (ENV.isolated_view) {
+            setOpenIsolatedView(newEditorExpanded)
+          }
         }}
       />
     )
@@ -272,6 +280,17 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRef, props.discussionEntry.read, props])
 
+  const onReplySubmit = text => {
+    createDiscussionEntry({
+      variables: {
+        discussionTopicId: ENV.discussion_topic_id,
+        parentEntryId: props.discussionEntry._id,
+        message: text
+      }
+    })
+    setEditorExpanded(false)
+  }
+
   return (
     <>
       <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
@@ -323,7 +342,7 @@ export const DiscussionThreadContainer = props => {
         </Flex>
       </div>
       <div style={{marginLeft: replyMarginDepth}}>
-        {editorExpanded && (
+        {editorExpanded && !ENV.isolated_view && (
           <View
             display="block"
             background="primary"
@@ -333,14 +352,7 @@ export const DiscussionThreadContainer = props => {
           >
             <DiscussionEdit
               onSubmit={text => {
-                createDiscussionEntry({
-                  variables: {
-                    discussionTopicId: ENV.discussion_topic_id,
-                    parentEntryId: props.discussionEntry._id,
-                    message: text
-                  }
-                })
-                setEditorExpanded(false)
+                onReplySubmit(text)
               }}
               onCancel={() => setEditorExpanded(false)}
             />
@@ -378,8 +390,14 @@ export const DiscussionThreadContainer = props => {
       {openIsolatedView && (
         <IsolatedViewContainer
           discussionEntry={props.discussionEntry}
+          mode={
+            editorExpanded
+              ? ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY
+              : ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
+          }
           onClose={() => {
             setOpenIsolatedView(false)
+            setEditorExpanded(false)
           }}
           onToggleRating={toggleRating}
           onToggleUnread={toggleUnread}
@@ -387,6 +405,12 @@ export const DiscussionThreadContainer = props => {
           onOpenInSpeedGrader={
             props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
           }
+          onReply={() => {
+            setEditorExpanded(!editorExpanded)
+          }}
+          onReplySubmit={text => {
+            onReplySubmit(text)
+          }}
         />
       )}
     </>

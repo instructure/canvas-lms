@@ -17,6 +17,7 @@
  */
 
 import {CloseButton} from '@instructure/ui-buttons'
+import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -29,9 +30,15 @@ import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 
 export const mockThreads = {
   discussionEntry: DiscussionEntry.mock()
+}
+
+export const ISOLATED_VIEW_MODES = {
+  VIEW_ROOT_ENTRY: 1,
+  REPLY_TO_ROOT_ENTRY: 2
 }
 
 export const IsolatedViewContainer = props => {
@@ -45,7 +52,11 @@ export const IsolatedViewContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        onClick={() => {}}
+        onClick={() => {
+          if (props.onReply) {
+            props.onReply()
+          }
+        }}
       />
     )
   }
@@ -97,12 +108,21 @@ export const IsolatedViewContainer = props => {
       offset="large"
       label="Isolated View"
       shouldCloseOnDocumentClick
-      onDismiss={() => {
-        setShowTray(false)
+      onDismiss={e => {
+        // When the RCE is open, it stills the mouse position when using it and we do this trick
+        // to avoid the whole Tray getting closed because of a click inside the RCE area.
+        if (
+          props.mode == ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY &&
+          e.clientY - e.target.offsetTop == 0
+        ) {
+          return
+        }
 
         if (props.onClose) {
           props.onClose()
         }
+
+        setShowTray(false)
       }}
     >
       <Flex>
@@ -159,20 +179,49 @@ export const IsolatedViewContainer = props => {
             </Flex.Item>
           )}
         </Flex>
+        {props.mode == ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
+          <View
+            display="block"
+            background="primary"
+            borderWidth="none none none none"
+            padding="none none small none"
+            margin="none none x-small none"
+          >
+            <DiscussionEdit
+              onSubmit={text => {
+                if (props.onReplySubmit) {
+                  props.onReplySubmit(text)
+                }
+              }}
+              onCancel={() => {
+                if (props.onClose) {
+                  props.onClose()
+                }
+              }}
+            />
+          </View>
+        )}
       </div>
-      <IsolatedThreadsContainer discussionEntryId={props.discussionEntry.id} />
+      {props.mode != ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
+        <IsolatedThreadsContainer discussionEntryId={props.discussionEntry.id} />
+      )}
     </Tray>
   )
 }
 
 IsolatedViewContainer.propTypes = {
   discussionEntry: DiscussionEntry.shape,
+  mode: PropTypes.number,
   onClose: PropTypes.func,
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
-  onOpenInSpeedGrader: PropTypes.func
+  onOpenInSpeedGrader: PropTypes.func,
+  onReply: PropTypes.func,
+  onReplySubmit: PropTypes.func
 }
-IsolatedViewContainer.defaultProps = {}
+IsolatedViewContainer.defaultProps = {
+  mode: ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
+}
 
 export default IsolatedViewContainer

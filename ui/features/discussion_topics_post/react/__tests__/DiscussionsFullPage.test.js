@@ -329,4 +329,35 @@ describe('DiscussionFullPage', () => {
       expect(taPill).toEqual([])
     })
   })
+
+  describe('isolated view', () => {
+    beforeAll(() => {
+      window.ENV.isolated_view = true
+    })
+
+    afterAll(() => {
+      window.ENV.isolated_view = false
+    })
+
+    it('should be able to post a reply to an entry', async () => {
+      const {findByText, findByTestId, findAllByTestId, getAllByTestId} = setup()
+
+      const replyButton = await findByTestId('threading-toolbar-reply')
+      fireEvent.click(replyButton)
+
+      expect(findByText('Thread')).toBeTruthy()
+
+      const rce = await findAllByTestId('DiscussionEdit-container')
+      expect(rce[1].style.display).toBe('')
+
+      const doReplyButton = getAllByTestId('DiscussionEdit-submit')
+      fireEvent.click(doReplyButton[1])
+
+      expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
+
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+      )
+    })
+  })
 })
