@@ -17,17 +17,18 @@
  */
 
 import {CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
-import React, {useState} from 'react'
-import {Tray} from '@instructure/ui-tray'
-import {Flex} from '@instructure/ui-flex'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!discussion_topics_post'
-import theme from '@instructure/canvas-theme'
-import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import PropTypes from 'prop-types'
-import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
+import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
+import PropTypes from 'prop-types'
+import React, {useState} from 'react'
+import theme from '@instructure/canvas-theme'
+import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
+import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import {Tray} from '@instructure/ui-tray'
 
 export const mockThreads = {
   discussionEntry: DiscussionEntry.mock()
@@ -159,6 +160,7 @@ export const IsolatedViewContainer = props => {
           )}
         </Flex>
       </div>
+      <IsolatedThreadsContainer discussionEntryId={props.discussionEntry.id} />
     </Tray>
   )
 }

@@ -18,15 +18,14 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
-import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {render} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
-import {IsolatedViewContainer} from '../IsolatedViewContainer'
+import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 
-describe('IsolatedViewContainer', () => {
+describe('IsolatedThreadsContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
@@ -60,22 +59,23 @@ describe('IsolatedViewContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const setup = props => {
+  const setup = () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <IsolatedViewContainer {...props} />
+          <IsolatedThreadsContainer discussionEntryId="1" />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
   }
 
-  const defaultProps = () => ({
-    discussionEntry: DiscussionEntry.mock()
+  it('should render', () => {
+    const container = setup()
+    expect(container).toBeTruthy()
   })
 
-  it('should render', () => {
-    const {container} = setup(defaultProps())
-    expect(container).toBeTruthy()
+  it('should render sub-entries in the correct order', async () => {
+    const container = setup()
+    expect(await container.findByText('This is the child reply')).toBeInTheDocument()
   })
 })
