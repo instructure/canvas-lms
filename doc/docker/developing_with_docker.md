@@ -25,7 +25,8 @@ By default `docker-compose` will look at 2 files
 - docker-compose.override.yml
 
 If you do not specify your own `docker-compose.override.yml` file,
-the `./script/docker_dev_setup.sh` will copy a working one into the root directory for docker-compose to use.
+the `./script/docker_dev_setup.sh` (as well as the `./script/docker_dev_update.sh` script) will copy a working
+one into the root directory for docker-compose to use.
 The `docker-compose.override.yml` file is ignored by git in the `.gitignore` file, so you must provide one or run the
 setup script before running docker-compose.
 You may manually copy the `config/docker-compose.override.yml.example` to `docker-compose.override.yml` with the following
@@ -74,6 +75,7 @@ Now you're ready to build all of the containers. This will take a while as a lot
 
 ```bash
 docker-compose build
+docker-compose run --rm web ./script/install_assets.sh
 docker-compose run --rm web bundle exec rake db:create db:initial_setup
 docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
 ```
@@ -94,7 +96,7 @@ docker images, pull plugin code, run migrations, and recompile assets. This can
 all be done with one command:
 
 ```
-./script/docker_dev_setup.sh
+./script/docker_dev_update.sh
 ```
 
 Changes you're making are not showing up? See the Caveats section below.
