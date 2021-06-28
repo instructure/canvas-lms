@@ -89,7 +89,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const canShowRubric = discussionTopicData?.permissions?.showRubric
   const canAddRubric = discussionTopicData?.permissions?.addRubric
   const canOpenForComments = discussionTopicData?.permissions?.openForComments
-  const canCloseForComments = discussionTopicData?.permissions?.closeForComments
+  const canCloseForComments =
+    discussionTopicData?.permissions?.closeForComments && !props.discussionTopic?.rootTopic
   const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
   const canModerate = discussionTopicData?.permissions?.moderateForum
   const canUnpublish = props.discussionTopic.canUnpublish

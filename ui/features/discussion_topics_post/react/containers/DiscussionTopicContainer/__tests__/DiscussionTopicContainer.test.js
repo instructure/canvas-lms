@@ -323,6 +323,20 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Close for Comments')).toBeInTheDocument()
   })
 
+  it('does not render Close for Comments even when there is permission if child topic', () => {
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{
+          rootTopic: {id: 'asdasdasd', _id: '12', __typename: 'Discussion'},
+          permissions: {closeForComments: true}
+        }
+      }
+    })
+    fireEvent.click(container.getByTestId('discussion-post-menu-trigger'))
+    expect(container.queryByText('Close for Comments')).toBeNull()
+  })
+
   it('Renders Copy To and Send To in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {
