@@ -540,6 +540,11 @@ const usersManageLoginPermissions = generateActionTemplates(
       )
     },
     {
+      description: I18n.t(
+        'To merge users, the Self Service User Merge feature option must also be enabled.'
+      )
+    },
+    {
       title: I18n.t('People (Course)'),
       description: I18n.t(
         'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
@@ -914,7 +919,7 @@ const allowCourseAdminActions = generateActionTemplates(
     {
       title: I18n.t('Observers'),
       description: I18n.t(
-        'To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.'
+        'To link an observer to a student, Conversations - send to individual course members must be enabled.'
       )
     },
     {
@@ -2074,7 +2079,7 @@ const courseManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons.'
+        'Allows user to access Student View (test student), Copy this Course, and Permanently Delete Course buttons.'
       )
     },
     {
@@ -2156,6 +2161,11 @@ const courseManagePermissions = generateActionTemplates(
       )
     },
     {
+      description: I18n.t(
+        'The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission.'
+      )
+    },
+    {
       title: I18n.t('Courses - Account Navigations'),
       description: I18n.t(
         'To access the Courses link in Account Navigation, Manage Courses: Admin - manage / update and Courses - view list must be enabled.'
@@ -2214,6 +2224,11 @@ const courseManagePermissions = generateActionTemplates(
       title: I18n.t('Course Settings'),
       description: I18n.t(
         'The Courses - delete permission affects viewing the Permanently Delete this Course button, which only appears for manually created courses.'
+      )
+    },
+    {
+      description: I18n.t(
+        'The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission.'
       )
     },
     {
