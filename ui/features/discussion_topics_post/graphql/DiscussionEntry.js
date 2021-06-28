@@ -47,6 +47,13 @@ export const DiscussionEntry = {
       permissions {
         ...DiscussionEntryPermissions
       }
+      rootEntry {
+        id
+        rootEntryParticipantCounts {
+          unreadCount
+          repliesCount
+        }
+      }
     }
     ${DiscussionEntryPermissions.fragment}
   `,
@@ -73,7 +80,14 @@ export const DiscussionEntry = {
     lastReply: shape({
       createdAt: string
     }),
-    permissions: DiscussionEntryPermissions.shape
+    permissions: DiscussionEntryPermissions.shape,
+    rootEntry: shape({
+      id: string,
+      rootEntryParticipantCounts: shape({
+        unreadCount: number,
+        repliesCount: number
+      })
+    })
   }),
 
   mock: ({
@@ -105,7 +119,8 @@ export const DiscussionEntry = {
       nodes: [],
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionSubentriesConnection'
-    }
+    },
+    rootEntry = null
   } = {}) => ({
     id,
     _id,
@@ -125,6 +140,7 @@ export const DiscussionEntry = {
     lastReply,
     permissions,
     discussionSubentriesConnection,
+    rootEntry,
     __typename: 'DiscussionEntry'
   })
 }

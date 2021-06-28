@@ -73,6 +73,7 @@ const getOptimisticResponse = text => {
           viewRating: false,
           __typename: 'DiscussionEntryPermissions'
         },
+        rootEntry: null,
         __typename: 'DiscussionEntry'
       },
       errors: null,
