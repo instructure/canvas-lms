@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, memo} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -109,4 +109,4 @@ FindOutcomeItem.propTypes = {
   onCheckboxHandler: PropTypes.func.isRequired
 }
 
-export default FindOutcomeItem
+export default memo(FindOutcomeItem)

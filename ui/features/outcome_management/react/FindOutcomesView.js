@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -46,9 +46,9 @@ const FindOutcomesView = ({
   const enabled = !!outcomesCount && outcomesCount > 0
   const [scrollContainer, setScrollContainer] = useState(null)
 
-  const onSelectOutcomesHandler = _id => {
+  const onSelectOutcomesHandler = useCallback(_id => {
     // TODO: OUT-4154
-  }
+  }, [])
 
   if (loading && !outcomes) {
     return (
