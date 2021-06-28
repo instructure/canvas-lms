@@ -524,6 +524,7 @@ describe MicrosoftSync::SyncerSteps do
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
 
         subject
 
@@ -531,7 +532,7 @@ describe MicrosoftSync::SyncerSteps do
           .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
           .with("microsoft_sync.syncer_steps.skipped_batches.add")
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
+        expect(InstStatsd::Statsd).to have_received(:count).twice
           .with("microsoft_sync.syncer_steps.skipped_total.add", 3)
       end
     end
@@ -544,6 +545,7 @@ describe MicrosoftSync::SyncerSteps do
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
 
         subject
 
@@ -551,7 +553,7 @@ describe MicrosoftSync::SyncerSteps do
           .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
           .with("microsoft_sync.syncer_steps.skipped_batches.remove")
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
+        expect(InstStatsd::Statsd).to have_received(:count).twice
           .with("microsoft_sync.syncer_steps.skipped_total.remove", 2)
       end
     end
