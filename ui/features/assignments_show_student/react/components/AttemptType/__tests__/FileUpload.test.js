@@ -517,17 +517,43 @@ describe('FileUpload', () => {
     expect(getAllByText(filename)[0]).toBeInTheDocument()
   })
 
-  it('displays the more options button in the upload box', async () => {
+  it('displays a button for uploading Canvas files in the upload box', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
-    const {getByTestId, findByText} = render(
+    const {getByTestId, findByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
     )
     const emptyRender = getByTestId('upload-box')
 
-    expect(emptyRender).toContainElement(await findByText('More Options'))
+    expect(emptyRender).toContainElement(await findByRole('button', {name: /Files/}))
+  })
+
+  it('displays buttons for uploading using external tools in the upload box', async () => {
+    const mocks = await createGraphqlMocks({
+      ExternalToolConnection: {
+        nodes: [
+          {
+            _id: '1',
+            description: 'just an external tool',
+            name: 'my external tool',
+            settings: {
+              iconUrl: 'http://localhost:3000/icon'
+            }
+          }
+        ]
+      }
+    })
+    const props = await makeProps()
+    const {getByTestId, findByRole} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const emptyRender = getByTestId('upload-box')
+
+    expect(emptyRender).toContainElement(await findByRole('button', {name: /my external tool/}))
   })
 
   it('displays allowed extensions in the upload box', async () => {
