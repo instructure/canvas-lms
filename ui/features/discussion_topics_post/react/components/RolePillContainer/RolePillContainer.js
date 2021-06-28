@@ -65,9 +65,7 @@ function roleName(baseRole) {
 }
 
 function sortDiscussionRoles(roleNameArray) {
-  if (roleNameArray === null || roleNameArray === undefined) {
-    return []
-  }
+  roleNameArray = Array.isArray(roleNameArray) ? roleNameArray : []
 
   roleNameArray.sort((roleNameA, roleNameB) => {
     const roleASortScore = ROLE_HIERARCHY.indexOf(roleNameA)

@@ -143,9 +143,11 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         ...DiscussionEntry
         editor {
           ...User
+          courseRoles
         }
         author {
           ...User
+          courseRoles
         }
       }
       errors {

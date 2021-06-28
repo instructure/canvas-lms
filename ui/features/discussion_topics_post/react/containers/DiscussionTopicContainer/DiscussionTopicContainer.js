@@ -47,7 +47,8 @@ import {
   getSpeedGraderUrl,
   getEditUrl,
   getPeerReviewsUrl,
-  getReviewLinkUrl
+  getReviewLinkUrl,
+  resolveAuthorRoles
 } from '../../utils'
 import {View} from '@instructure/ui-view'
 
@@ -62,6 +63,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const discussionTopicData = {
     _id: props.discussionTopic._id,
     authorName: props.discussionTopic?.author?.name || '',
+    authorId: props.discussionTopic?.author?.id,
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
     message: props.discussionTopic?.message || '',
     permissions: props.discussionTopic?.permissions || {},
@@ -402,7 +404,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       timingDisplay={discussionTopicData.postedAt}
                       title={discussionTopicData.title}
                       message={discussionTopicData.message}
-                      discussionRoles={discussionTopicData.authorRoles}
+                      discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
                     >
                       {canReply && (
                         <Button

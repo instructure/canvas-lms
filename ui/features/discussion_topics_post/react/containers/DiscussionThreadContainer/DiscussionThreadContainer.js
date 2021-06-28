@@ -41,7 +41,8 @@ import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   addReplyToSubentries,
-  addReplyToDiscussion
+  addReplyToDiscussion,
+  resolveAuthorRoles
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
 import {
@@ -80,8 +81,6 @@ export const mockThreads = {
   }
 }
 
-const courseID = window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
-
 export const DiscussionThreadContainer = props => {
   const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -96,7 +95,13 @@ export const DiscussionThreadContainer = props => {
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry, courseID)
+    addReplyToSubentries(
+      cache,
+      props.discussionEntry._id,
+      sort,
+      newDiscussionEntry,
+      window.ENV?.course_id
+    )
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -304,6 +309,12 @@ export const DiscussionThreadContainer = props => {
                 setIsEditing(false)
               }}
               onSave={onUpdate}
+              discussionRoles={resolveAuthorRoles(
+                props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
+                  !!props?.discussionTopic?.author?.id &&
+                  !!props?.discussionEntry?.author?.id,
+                props?.discussionEntry?.author?.courseRoles
+              )}
             />
           </Flex.Item>
           {!props.discussionEntry.deleted && (
@@ -438,7 +449,7 @@ const DiscussionSubentries = props => {
     discussionEntryID: props.discussionEntryId,
     perPage: PER_PAGE,
     sort,
-    courseID
+    courseID: window.ENV?.course_id
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables

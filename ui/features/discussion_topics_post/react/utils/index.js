@@ -126,3 +126,10 @@ export const addReplyToSubentries = (
     // eslint-disable-next-line no-empty
   } catch (e) {}
 }
+
+export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
+  if (isAuthor) {
+    return discussionRoles.concat('Author')
+  }
+  return discussionRoles
+}

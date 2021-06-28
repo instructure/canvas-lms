@@ -51,7 +51,7 @@ export const PostMessageContainer = props => {
         onCancel={props.onCancel}
         onSave={props.onSave}
         isForcedRead={props.discussionEntry.forcedReadState}
-        discussionRoles={props.discussionEntry.author?.courseRoles}
+        discussionRoles={props?.discussionRoles}
       >
         <ThreadingToolbar>{props.threadActions}</ThreadingToolbar>
       </PostMessage>

@@ -108,7 +108,7 @@ const DiscussionTopicManager = props => {
     rootEntries: !searchTerm && filter === 'all',
     filter,
     sort,
-    courseID: window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
+    courseID: window.ENV?.course_id
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
