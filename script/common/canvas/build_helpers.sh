@@ -40,6 +40,28 @@ need to remove it before we can install gems, to prevent conflicting dependency
 errors.'
     confirm_command 'rm -f Gemfile.lock' || true
   fi
+
+  # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
+  if ! _canvas_lms_track_with_log $DOCKER_COMMAND run --no-deps --rm web touch Gemfile.lock; then
+    message \
+"The 'docker' user is not allowed to write to Gemfile.lock. We need write
+permissions so we can install gems."
+    touch Gemfile.lock
+    confirm_command 'chmod a+rw Gemfile.lock' || true
+  fi
+}
+
+function build_assets {
+  message "Building assets..."
+  start_spinner "> Bundle install..."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c bundle
+  stop_spinner
+  start_spinner "> Yarn install...."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c yarn
+  stop_spinner
+  start_spinner "> Compile assets...."
+  _canvas_lms_track_with_log run_command ./script/install_assets.sh -c compile
+  stop_spinner
 }
 
 function database_exists {
@@ -59,28 +81,26 @@ permissions so we can run migrations."
   if database_exists; then
     stop_spinner
     message \
-'An existing database was found.'
-    if ! is_running_on_jenkins; then
-      prompt "Do you want to drop and create new or migrate existing? [DROP/migrate] " dropped
-    fi
-    if [[ ${dropped:-migrate} == 'DROP' ]]; then
-      message \
-'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+'An existing database was found.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 This script will destroy ALL EXISTING DATA if it continues
-If you want to migrate the existing database, cancel now
+If you want to migrate the existing database, use docker_dev_update
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-      message 'About to run "bundle exec rake db:drop"'
-      start_spinner "Deleting db....."
-      _canvas_lms_track_with_log run_command bundle exec rake db:drop
-      stop_spinner
+    message 'About to run "bundle exec rake db:drop"'
+    if ! is_running_on_jenkins; then
+      prompt "type NUKE in all caps: " nuked
+      [[ ${nuked:-n} == 'NUKE' ]] || exit 1
     fi
-  fi
-  stop_spinner
-  if [[ ${dropped:-DROP} == 'DROP' ]]; then
-    start_spinner "Creating new database...."
-    _canvas_lms_track_with_log run_command bundle exec rake db:create
+    start_spinner "Deleting db....."
+    _canvas_lms_track_with_log run_command bundle exec rake db:drop
     stop_spinner
   fi
+  stop_spinner
+
+  start_spinner "Creating new database...."
+  _canvas_lms_track_with_log run_command bundle exec rake db:create
+  stop_spinner
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
   start_spinner "Migrating (Development env)...."
@@ -89,7 +109,7 @@ If you want to migrate the existing database, cancel now
   start_spinner "Migrating (Test env)...."
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
   stop_spinner
-  [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command bundle exec rake db:initial_setup
+  _canvas_lms_track run_command bundle exec rake db:initial_setup
 }
 
 function sync_bundler_version {
@@ -149,10 +169,12 @@ function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
   if is_mutagen; then
     message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
-    confirm_command 'cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml' || true
+    cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
+  elif [ -f "docker-compose.override.yml" ]; then
+    message "docker-compose.override.yml exists, skipping copy of default configuration"
   else
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-    confirm_command 'cp config/docker-compose.override.yml.example docker-compose.override.yml' || true
+    cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
   if [ -f ".env" ]; then
     prompt '.env file exists, would you like to reset it to default? [y/n]' confirm

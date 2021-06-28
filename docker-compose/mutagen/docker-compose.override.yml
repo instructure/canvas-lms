@@ -6,16 +6,12 @@ services:
       context: .
     volumes:
       - code:/usr/src/app
+      - bundler:/home/docker/.bundler/
+      - canvas-docker-gems:/home/docker/.gem/
+      - yarn-cache:/home/docker/.cache/yarn
     environment: &BASE-ENV
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: development
-      MUTAGEN: 'true'
-    cap_add:
-      - SYS_ADMIN
-    # for linux the default profile restricts mount usage, set to have no restrictions
-    security_opt:
-      - apparmor:unconfined
-    entrypoint: /root/entrypoint.sh
 
   webpack:
     <<: *BASE
@@ -43,7 +39,10 @@ services:
 
 volumes:
   code: {}
+  bundler: {}
+  canvas-docker-gems: {}
   pg_data: {}
+  yarn-cache: {}
 
 
 
