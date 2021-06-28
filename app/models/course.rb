@@ -1719,19 +1719,19 @@ class Course < ActiveRecord::Base
     can :manage and can :update and can :use_student_view and can :manage_feature_flags and
     can :view_feature_flags
 
+    # reset course content
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.account_membership_allows(user, :manage_courses_reset)
+    end
+    can :reset_content
+
     # delete and undelete manually created course
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
         !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
-
-    # reset manually created course
-    given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_reset)
-    end
-    can :reset_content
 
     # delete course managed by SIS
     given do |user|
@@ -1740,14 +1740,6 @@ class Course < ActiveRecord::Base
         self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
-
-    # reset course managed by SIS
-    given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
-        self.sis_source_id && self.account_membership_allows(user, :manage_sis) &&
-        self.account_membership_allows(user, :manage_courses_reset)
-    end
-    can :reset_content
 
     given { |user| self.account_membership_allows(user, :read_course_content) }
     can :read and can :read_outcomes
