@@ -2,6 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Checker from "./components/checker"
 import formatMessage from "./format-message"
+import checkNode from "./node-checker"
 
 let instance
 const pendingInstanceCallbacks = []
@@ -25,6 +26,13 @@ tinymce.create("tinymce.plugins.AccessibilityChecker", {
           instance.check(...args)
         }
       )
+    })
+
+    ed.addCommand("checkAccessibility", function(
+      ui,
+      { done, config, additional_rules }
+    ) {
+      checkNode(ed.getBody(), done, config, additional_rules)
     })
 
     if (tinymce.majorVersion === "4") {
