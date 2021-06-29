@@ -488,6 +488,12 @@ class UsersController < ApplicationController
     k5_user = k5_user?(false)
     js_env({K5_USER: k5_user && !k5_disabled}, true)
 
+    if k5_user?
+    # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
+    active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
+    js_env({HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) }})
+    end
+
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {

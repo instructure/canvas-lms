@@ -208,7 +208,8 @@ const defaultProps = {
   createPermissions: 'none',
   plannerEnabled: false,
   loadAllOpportunities: () => {},
-  timeZone: defaultEnv.TIMEZONE
+  timeZone: defaultEnv.TIMEZONE,
+  hideGradesTabForStudents: false
 }
 
 beforeEach(() => {
@@ -627,6 +628,13 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Grades Section', () => {
+    it('does not show the grades tab to students if hideGradesTabForStudents is set', async () => {
+      const {queryByRole} = render(
+        <K5Dashboard {...defaultProps} currentUserRoles={['student']} hideGradesTabForStudents />
+      )
+      expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
+    })
+
     it('displays a score summary for each non-homeroom course', async () => {
       const {findByText, getByText, queryByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />

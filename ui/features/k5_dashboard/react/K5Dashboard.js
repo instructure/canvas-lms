@@ -106,6 +106,18 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
   )
 }
 
+const toRenderTabs = (currentUserRoles, hideGradesTabForStudents) =>
+  DASHBOARD_TABS.filter(
+    ({id}) =>
+      (id !== TAB_IDS.TODO &&
+        !(
+          hideGradesTabForStudents &&
+          id === TAB_IDS.GRADES &&
+          currentUserRoles.includes('student')
+        )) ||
+      currentUserRoles.includes('teacher')
+  )
+
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
@@ -118,9 +130,11 @@ export const K5Dashboard = ({
   timeZone,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  hideGradesTabForStudents = false
 }) => {
-  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
+  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
+  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
@@ -134,9 +148,6 @@ export const K5Dashboard = ({
     callback: () => loadAllOpportunities()
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
-  const availableTabs = DASHBOARD_TABS.filter(
-    ({id}) => id !== TAB_IDS.TODO || currentUserRoles.includes('teacher')
-  )
 
   useEffect(() => {
     if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
@@ -281,7 +292,8 @@ K5Dashboard.propTypes = {
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string
+  responsiveSize: PropTypes.string,
+  hideGradesTabForStudents: PropTypes.bool
 }
 
 const mapDispatchToProps = {

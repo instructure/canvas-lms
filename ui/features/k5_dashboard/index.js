@@ -32,6 +32,7 @@ ready(() => {
         currentUserRoles={ENV.current_user_roles}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
+        hideGradesTabForStudents={ENV.HIDE_K5_DASHBOARD_GRADES_TAB}
         createPermissions={
           ENV.PERMISSIONS?.create_courses_as_admin
             ? 'admin'
