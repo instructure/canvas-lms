@@ -70,12 +70,22 @@ describe('IsolatedViewContainer', () => {
     )
   }
 
-  const defaultProps = () => ({
-    discussionEntry: DiscussionEntry.mock()
+  const defaultProps = ({discussionEntryOverrides = {}} = {}) => ({
+    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides)
   })
 
   it('should render', () => {
     const {container} = setup(defaultProps())
     expect(container).toBeTruthy()
+  })
+  it('should render a back button', () => {
+    const rootEntry = DiscussionEntry.mock({_id: 32})
+    const {getByTestId} = setup(defaultProps({discussionEntryOverrides: {rootEntry}}))
+    expect(getByTestId('back-button')).toBeTruthy()
+  })
+
+  it('should not render a back button', () => {
+    const {queryByTestId} = setup(defaultProps())
+    expect(queryByTestId('back-button')).toBeNull()
   })
 })

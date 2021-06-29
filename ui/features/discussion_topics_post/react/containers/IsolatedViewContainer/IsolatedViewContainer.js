@@ -18,6 +18,7 @@
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
+import {BackButton} from '../../components/BackButton/BackButton'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -146,6 +147,17 @@ export const IsolatedViewContainer = props => {
           />
         </Flex.Item>
       </Flex>
+      {props.discussionEntry.rootEntry && (
+        <div
+          style={{
+            paddingLeft: '0.50rem',
+            paddingRight: '0.50rem',
+            paddingBottom: '0.50rem'
+          }}
+        >
+          <BackButton />
+        </div>
+      )}
       <div
         style={{
           marginLeft: theme.variables.spacing.medium,
