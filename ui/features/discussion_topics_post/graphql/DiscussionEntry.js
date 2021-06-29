@@ -54,6 +54,12 @@ export const DiscussionEntry = {
           repliesCount
         }
       }
+      discussionTopic {
+        entryCounts {
+          unreadCount
+          repliesCount
+        }
+      }
     }
     ${DiscussionEntryPermissions.fragment}
   `,
@@ -84,6 +90,12 @@ export const DiscussionEntry = {
     rootEntry: shape({
       id: string,
       rootEntryParticipantCounts: shape({
+        unreadCount: number,
+        repliesCount: number
+      })
+    }),
+    discussionTopic: shape({
+      entryCounts: shape({
         unreadCount: number,
         repliesCount: number
       })
@@ -120,7 +132,15 @@ export const DiscussionEntry = {
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionSubentriesConnection'
     },
-    rootEntry = null
+    rootEntry = null,
+    discussionTopic = {
+      entryCounts: {
+        unreadCount: 2,
+        repliesCount: 56,
+        __typename: 'DiscussionEntryCounts'
+      },
+      __typename: 'Discussion'
+    }
   } = {}) => ({
     id,
     _id,
@@ -141,6 +161,7 @@ export const DiscussionEntry = {
     permissions,
     discussionSubentriesConnection,
     rootEntry,
+    discussionTopic,
     __typename: 'DiscussionEntry'
   })
 }

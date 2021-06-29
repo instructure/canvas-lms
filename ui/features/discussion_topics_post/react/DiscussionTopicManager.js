@@ -74,6 +74,7 @@ const getOptimisticResponse = text => {
           __typename: 'DiscussionEntryPermissions'
         },
         rootEntry: null,
+        discussionTopic: null,
         __typename: 'DiscussionEntry'
       },
       errors: null,
