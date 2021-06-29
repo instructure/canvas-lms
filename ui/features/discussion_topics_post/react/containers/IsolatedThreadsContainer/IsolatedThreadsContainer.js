@@ -24,18 +24,24 @@ import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useQuery} from 'react-apollo'
+import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
+
+const FIRST_PAGE = 5
+const OTHER_PAGES = 20
 
 export const IsolatedThreadsContainer = props => {
   const courseID = window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
   const {setOnFailure} = useContext(AlertManagerContext)
+  const [pageNumber, setPageNumber] = useState(1)
 
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    perPage: 5,
+    page: btoa(0),
+    perPage: FIRST_PAGE + OTHER_PAGES * (pageNumber - 1),
     sort: 'desc',
     courseID
   }
@@ -61,6 +67,11 @@ export const IsolatedThreadsContainer = props => {
     return new Date(a.createdAt) - new Date(b.createdAt)
   }
 
+  const subentriesCount = subentries.data.legacyNode.subentriesCount
+  const actualSubentriesCount =
+    subentries.data.legacyNode.discussionSubentriesConnection.nodes.length
+  const hasMoreReplies = actualSubentriesCount < subentriesCount
+
   return (
     <div
       style={{
@@ -68,9 +79,19 @@ export const IsolatedThreadsContainer = props => {
         paddingRight: '0.75rem'
       }}
     >
-      {
-        // TODO: Conditionally render "show more replies" button
-      }
+      {hasMoreReplies && (
+        <div
+          style={{
+            marginBottom: `1.5rem`
+          }}
+        >
+          <ShowOlderRepliesButton
+            onClick={() => {
+              setPageNumber(pageNumber + 1)
+            }}
+          />
+        </div>
+      )}
       {subentries.data.legacyNode.discussionSubentriesConnection.nodes
         .sort(sortReverseDisplay)
         .map(entry => (
