@@ -7,17 +7,16 @@ export default {
       return true
     }
 
-    const alt = elem.getAttribute("alt")
-    const isDecorative = elem.hasAttribute("data-decorative")
-    return (alt && alt.replace(/\s/g, "") !== "") || isDecorative
+    const alt = elem.hasAttribute("alt") ? elem.getAttribute("alt") : null
+    return alt !== null
   },
 
   data: elem => {
-    const alt = elem.getAttribute("alt")
-    const decorative = elem.hasAttribute("data-decorative")
+    const alt = elem.hasAttribute("alt") ? elem.getAttribute("alt") : null
+    const decorative = alt !== null && alt.replace(/\s/g, "") === ""
     return {
       alt: alt || "",
-      decorative: !alt && decorative
+      decorative: decorative
     }
   },
 
@@ -37,11 +36,9 @@ export default {
   update: (elem, data) => {
     if (data.decorative) {
       elem.setAttribute("alt", "")
-      elem.setAttribute("data-decorative", "true")
       elem.setAttribute("role", "presentation")
     } else {
       elem.setAttribute("alt", data.alt)
-      elem.removeAttribute("data-decorative")
       elem.removeAttribute("role")
     }
     return elem
