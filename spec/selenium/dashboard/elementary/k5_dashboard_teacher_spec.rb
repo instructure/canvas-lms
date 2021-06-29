@@ -131,6 +131,18 @@ describe "teacher k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}/edit")
     end
 
+    it 'opens up the announcement when announcement title is clicked' do
+      announcement_title = "Happy Monday!"
+      announcement = new_announcement(@homeroom_course, announcement_title, "Let's get to work")
+
+      get "/"
+
+      click_announcement_title(announcement_title)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}")
+    end
+
     it 'shows two different homeroom course announcements for teacher enrolled in two homerooms' do
       first_course_announcement_title = "K5 Latest"
       new_announcement(@homeroom_course, first_course_announcement_title, "Let's get to work!")

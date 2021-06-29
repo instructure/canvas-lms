@@ -54,9 +54,11 @@ describe('K5Announcement', () => {
     expect(courseName.href).toBeUndefined()
   })
 
-  it('shows announcement title', () => {
+  it('shows announcement title with a link to the announcement', () => {
     const {getByText} = render(<K5Announcement {...getProps()} />)
-    expect(getByText('20 minutes of weekly reading')).toBeInTheDocument()
+    const announcementTitle = getByText('20 minutes of weekly reading')
+    expect(announcementTitle).toBeInTheDocument()
+    expect(announcementTitle.href).toBe('http://google.com/url')
   })
 
   it('shows announcement body with rich content', () => {

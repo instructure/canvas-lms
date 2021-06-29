@@ -46,7 +46,7 @@ module K5DashboardPageObject
   end
 
   def announcement_title_xpath_selector(announcement_title)
-    "//h3[text() = '#{announcement_title}']"
+    "//h3/a[text() = '#{announcement_title}']"
   end
 
   def assignment_edit_button_selector
@@ -448,6 +448,10 @@ module K5DashboardPageObject
 
   def click_announcement_edit_pencil
     announcement_edit_pencil.click
+  end
+
+  def click_announcement_title(announcement_title)
+    announcement_title(announcement_title).click
   end
 
   def click_assignments_link

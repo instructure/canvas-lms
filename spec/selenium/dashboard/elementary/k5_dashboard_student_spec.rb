@@ -69,6 +69,18 @@ describe "student k5 dashboard" do
       expect(announcement_content_text(announcement_content)).to be_displayed
     end
 
+    it 'opens up the announcement when announcement title is clicked' do
+      announcement_title = "Happy Monday!"
+      announcement = new_announcement(@homeroom_course, announcement_title, "Let's get to work")
+
+      get "/"
+
+      click_announcement_title(announcement_title)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}")
+    end
+
     it 'shows no announcement creation button when there are no announcements' do
       get "/"
 
@@ -158,7 +170,7 @@ describe "student k5 dashboard" do
       create_dated_assignment(@subject_course, 'assignment three', 1.week.from_now(Time.zone.now), 10)
 
       get "/"
-      
+
       expect(nothing_due(@subject_course_title)).to be_displayed
     end
   end
