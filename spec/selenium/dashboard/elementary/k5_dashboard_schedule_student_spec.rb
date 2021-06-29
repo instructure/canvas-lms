@@ -54,6 +54,63 @@ describe "student k5 dashboard schedule" do
     end
   end
 
+  context 'student events and todos' do
+    let(:title) { "Student Todo" }
+
+    before :once do
+      @student.planner_notes.create!(todo_date: Time.zone.now, title: title)
+    end
+
+    it 'shows student todo in modal when todo title selected' do
+      get "/#schedule"
+
+      expect(todo_edit_pencil).to be_displayed
+
+      click_todo_edit_pencil
+
+      expect(todo_editor_modal).to be_displayed
+    end
+
+    it 'provide close without edit button', ignore_js_errors: true do
+      get "/#schedule"
+
+      click_todo_edit_pencil
+      wait_for_ajaximations
+      new_title = "New Title"
+      update_todo_title(title, new_title)
+      click_close_editor_modal_button
+
+      expect(todo_item).to include_text(title)
+    end
+
+    it 'updates student todo with modal' do
+      get "/#schedule"
+
+      click_todo_edit_pencil
+      new_title = "New Student Todo"
+      update_todo_title(title, new_title)
+      click_todo_save_button
+      expect(wait_for_no_such_element { todo_editor_modal }).to be_truthy
+      expect(todo_item).to include_text(new_title)
+    end
+  end
+
+  context 'student-created events' do
+    it 'shows student-created calender event info when selected' do
+      title = "Student Event"
+      @student.calendar_events.create!(title: title, start_at: Time.zone.now)
+
+      get "/#schedule"
+
+      click_todo_item
+
+      expect(calendar_event_modal).to be_displayed
+
+      click_close_calendar_event_modal
+      expect(wait_for_no_such_element { calendar_event_modal }).to be_truthy
+    end
+  end
+
   context 'navigation' do
     before :each do
       [
@@ -194,6 +251,18 @@ describe "student k5 dashboard schedule" do
       get "/courses/#{@subject_course.id}#schedule"
 
       expect(items_missing_exists?).to be_truthy
+    end
+
+    it 'has todo capabilities for specific student course', custom_timeout: 20 do
+      title = "Student Course Todo"
+      @student.planner_notes.create!(todo_date: Time.zone.now, title: title, course_id: @subject_course.id)
+
+      get "/courses/#{@subject_course.id}#schedule"
+
+      scroll_to_element(todo_item)
+      click_todo_item
+
+      expect(todo_editor_modal).to be_displayed
     end
   end
 
