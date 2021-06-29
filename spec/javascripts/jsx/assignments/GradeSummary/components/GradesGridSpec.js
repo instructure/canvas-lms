@@ -115,6 +115,7 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
   function goToPage(page) {
     const onPageClick = wrapper.find('PageNavigation').prop('onPageClick')
     onPageClick(page)
+    wrapper.update()
   }
 
   function speedGraderUrlFor(studentId, anonymousStudents = false) {
