@@ -405,6 +405,7 @@ describe "student planner" do
     end
 
     it "allows editing the course of a to-do item", priority: "1", test_id: 3418827 do
+      skip('Flaky, LS-2359')
       view_todo_item
       todo_tray_select_course_from_dropdown
       todo_save_button.click
