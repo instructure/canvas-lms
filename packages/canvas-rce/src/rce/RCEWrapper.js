@@ -317,11 +317,7 @@ class RCEWrapper extends React.Component {
   }
 
   setCode(newContent) {
-    if (this.state.editorView === PRETTY_HTML_EDITOR_VIEW) {
-      return this.mceInstance()?.setContent(newContent, {format: 'raw'})
-    } else {
-      return this.mceInstance()?.setContent(newContent)
-    }
+    this.mceInstance()?.setContent(newContent)
   }
 
   // This function is called imperatively by the page that renders the RCE.
