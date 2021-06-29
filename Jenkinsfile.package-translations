@@ -49,6 +49,9 @@ pipeline {
     }
   }
   post {
+    failure {
+      slackSend channel: '#i18n', color: '#FF0000', message: "Failed Translations Job: $msg"
+    }
     cleanup {
       script {
         libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
