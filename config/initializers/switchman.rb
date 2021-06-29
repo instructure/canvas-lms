@@ -158,7 +158,7 @@ Rails.application.config.after_initialize do
 
       next_day = maintenance_days.find { |d| d.future? }
       # Time offsets are strange
-      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours
+      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
 
       [start_at, end_at]
@@ -166,6 +166,10 @@ Rails.application.config.after_initialize do
 
     def maintenance_window_start_hour
       Setting.get('maintenance_window_start_hour', nil)&.to_i
+    end
+
+    def maintenance_window_offset
+      Setting.get('maintenance_window_offset', '0').to_i
     end
 
     def maintenance_window_duration
