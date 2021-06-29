@@ -150,15 +150,6 @@ describe("update", () => {
       expect(newA.firstElementChild.getAttribute("alt")).toBe("")
     })
 
-    test("sets data-decorative when removing redundant image alt text", () => {
-      a1.appendChild(img)
-      a2.appendChild(text)
-      const newA = rule.update(a1, { combine: true })
-      expect(newA.firstElementChild.getAttribute("data-decorative")).toBe(
-        "true"
-      )
-    })
-
     test("works with image on right as well", () => {
       a1.appendChild(text)
       a2.appendChild(img)

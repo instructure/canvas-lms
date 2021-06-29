@@ -93,7 +93,6 @@ export default {
       // https://www.w3.org/TR/WCAG20-TECHS/H2.html
       const image = descendantImageWithRedundantAltText(elem, next)
       if (image) {
-        image.setAttribute("data-decorative", "true")
         image.setAttribute("alt", "")
       }
 

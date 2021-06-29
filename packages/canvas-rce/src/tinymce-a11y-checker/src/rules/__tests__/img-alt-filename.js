@@ -17,8 +17,8 @@ describe("test", () => {
     expect(rule.test(el)).toBeTruthy()
   })
 
-  test("returns true if decorative", () => {
-    el.setAttribute("data-decorative", "file.txt")
+  test("returns true if alt text is empty", () => {
+    el.setAttribute("alt", "")
     expect(rule.test(el)).toBeTruthy()
   })
 
@@ -43,13 +43,9 @@ describe("data", () => {
     expect(rule.data(el).alt).toBe("")
   })
 
-  test("returns decorative true if el has data-decorative", () => {
-    el.setAttribute("data-decorative", "")
+  test("returns decorative true if el has empty alt attribute", () => {
+    el.setAttribute("alt", "")
     expect(rule.data(el).decorative).toBeTruthy()
-  })
-
-  test("returns decorative false if el does not have data-decorative", () => {
-    expect(rule.data(el).decorative).toBeFalsy()
   })
 })
 
@@ -67,17 +63,14 @@ describe("update", () => {
   test("sets alt text to empty and role to 'presentation' if decorative", () => {
     rule.update(el, { decorative: true })
     expect(el.getAttribute("alt")).toBe("")
-    expect(el.hasAttribute("data-decorative")).toBeTruthy()
     expect(el.getAttribute("role")).toBe("presentation")
   })
 
   test("sets alt text and removes role if not decorative", () => {
     el.setAttribute("alt", "")
-    el.setAttribute("data-decorative", "")
     el.setAttribute("role", "presentation")
     rule.update(el, { decorative: false, alt: "some text" })
     expect(el.getAttribute("alt")).toBe("some text")
-    expect(el.hasAttribute("data-decorative")).toBeFalsy()
     expect(el.hasAttribute("role")).toBeFalsy()
   })
 
@@ -89,15 +82,16 @@ describe("update", () => {
     ).toBe(text)
   })
 
-  test("removes data-decorative if not decorative", () => {
-    el.setAttribute("data-decorative", "")
-    rule.update(el, { decorative: false })
-    expect(el.hasAttribute("data-decorative")).toBeFalsy()
+  test("removes role if not decorative", () => {
+    const text = "this is my text"
+    rule.update(el, { alt: text, decorative: false })
+    expect(el.hasAttribute("role")).toBeFalsy()
+    expect(el.getAttribute("alt")).toBe(text)
   })
 
-  test("sets alt text to empty and data-decorative if decorative", () => {
+  test("sets alt text to empty and role if decorative", () => {
     rule.update(el, { decorative: true })
-    expect(el.hasAttribute("data-decorative")).toBeTruthy()
+    expect(el.getAttribute("role")).toBe("presentation")
     expect(el.getAttribute("alt")).toBe("")
   })
 })
