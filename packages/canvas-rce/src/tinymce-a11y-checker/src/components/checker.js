@@ -23,7 +23,7 @@ import PlaceholderSVG from "./placeholder-svg"
 
 import describe from "../utils/describe"
 import * as dom from "../utils/dom"
-import rules from "../rules"
+import checkNode from "../node-checker"
 import formatMessage from "../format-message"
 import { clearIndicators } from "../utils/indicate"
 
@@ -89,33 +89,13 @@ export default class Checker extends React.Component {
 
   _check(done) {
     const node = this.props.getBody()
-    const errors = []
-    if (node) {
-      dom.walk(
-        node,
-        child => {
-          const composedRules = rules.concat(this.props.additionalRules)
-          for (let rule of composedRules) {
-            if (child.hasAttribute("data-ignore-a11y-check")) {
-              continue
-            }
-            const promise = Promise.resolve(
-              rule.test(child, this.state.config)
-            ).then(result => {
-              if (!result) {
-                errors.push({ node: child, rule })
-              }
-            })
-          }
-        },
-        () => {
-          this.setState({ errorIndex: 0, errors, checking: false }, () => {
-            this.selectCurrent()
-            done()
-          })
-        }
-      )
+    const checkDone = errors => {
+      this.setState({ errorIndex: 0, errors, checking: false }, () => {
+        this.selectCurrent()
+        done()
+      })
     }
+    checkNode(node, checkDone, this.state.config, this.props.additionalRules)
   }
 
   firstError() {
