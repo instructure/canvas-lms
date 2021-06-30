@@ -296,7 +296,7 @@ body:not(.course-menu-expanded) {
 .ic-app-course-nav-toggle {
   margin-#{direction(right)}: $ic-sp;
   padding: 0;
-  width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
+  width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp*0.5);
   @include overwrite-default-icon-size(1.5rem);
   i[class*=icon-], i[class^=icon-] { margin-#{direction(right)}: 0; }
 }

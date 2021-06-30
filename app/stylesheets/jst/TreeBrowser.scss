@@ -48,7 +48,7 @@
   }
   .icon-folder:before, .icon-folder-locked:before {
     @include fontSize(11px);
-    padding-#{direction(right)}: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp*0.5;
     vertical-align: middle;
   }
 

@@ -76,7 +76,7 @@
       height: $ic-sp * 3;
       border: 1px solid $ic-border-color;
       padding: 2px;
-      margin-#{direction(right)}: $ic-sp / 2;
+      margin-#{direction(right)}: $ic-sp * 0.5;
       vertical-align: middle;
       float: direction(left);
     }

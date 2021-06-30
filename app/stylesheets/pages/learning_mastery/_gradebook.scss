@@ -263,8 +263,8 @@ $gradebook_cell_padding_top: 8px;
 
   .Gradebook__ColumnHeaderDetailLine {
     display: block;
-    height: $header-content-height / 2;
-    line-height: $header-content-height / 2;
+    height: $header-content-height * 0.5;
+    line-height: $header-content-height * 0.5;
   }
 
   .Gradebook__ColumnHeaderAction {
@@ -771,8 +771,8 @@ $gradebook_checkbox_size: 16px;
   position: absolute;
   #{direction(left)}: 50%;
   top: 50%;
-  margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
-  margin-#{direction(left)}: -$gradebook_checkbox_size / 2;
+  margin-top: -($gradebook_checkbox_size * 0.5) - ( $gradebook_cell_padding_top * 0.5 );
+  margin-#{direction(left)}: -$gradebook_checkbox_size * 0.5;
 }
 
 #hide_warning {
@@ -839,12 +839,12 @@ $gradebook_checkbox_size: 16px;
 .gradebook-filter-container {
   display: inline-block;
   flex: 0 1 auto;
-  margin-#{direction(left)}: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp*0.5;
 }
 
 .gradebook_filter {
   display: inline-block;
-  margin-#{direction(left)}: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp*0.5;
 
   input {
     width: 248px;
@@ -852,7 +852,7 @@ $gradebook_checkbox_size: 16px;
 }
 
 .gradebook_menu {
-  margin-#{direction(left)}: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp*0.5;
   flex: 0 1 auto;
 
   @include breakpoint(desktop) {

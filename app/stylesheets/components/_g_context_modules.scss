@@ -502,7 +502,7 @@ $context_module_bg_color: $ic-color-light;
       display: none;
     }
     .ig-info {
-      margin-#{direction(left)}: $ic-sp/4;
+      margin-#{direction(left)}: $ic-sp*0.25;
     }
     .criterion img {
       display: none;

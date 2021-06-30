@@ -90,7 +90,7 @@ $ic-Expand-link-size: $ic-sp*4;
     top: 0; #{direction(right)}: 0;
     text-align: center;
     &:before {
-      top: $ic-sp/2;
+      top: $ic-sp*0.5;
       font-size: $ic-Expand-link-size - $ic-sp;
     }
   }

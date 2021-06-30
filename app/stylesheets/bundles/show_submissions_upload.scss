@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 
 $spacing-medium: 1.5rem;
@@ -55,8 +57,8 @@ $svg-height: 250px;
   background-repeat: no-repeat;
   padding: $ic-sp*2;
   margin-block-start: $ic-sp*2;
-  background-size: $svg-width * 2/3 $svg-height * 2/3;
-  min-height: $svg-height * 2/3;
+  background-size: math.div($svg-width * 2, 3) math.div($svg-height * 2, 3);
+  min-height: math.div($svg-height * 2, 3);
 }
 
 @include breakpoint(mini-tablet) {

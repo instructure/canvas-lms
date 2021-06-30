@@ -92,7 +92,7 @@
 }
 .name {
   > i {
-    padding-#{direction(right)}: $ic-sp/2;
+    padding-#{direction(right)}: $ic-sp*0.5;
   }
 }
 

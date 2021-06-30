@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 @import "components/rubric";
 
@@ -41,7 +43,7 @@
   }
 }
 .submission-details-header__heading {
-  margin: 0 0 $ic-sp / 2;
+  margin: 0 0 $ic-sp * 0.5;
   line-height: $ic-label-line-height;
 
   @include breakpoint(tablet) {
@@ -61,7 +63,7 @@
   }
 }
 .submission-details-header__info {
-  margin-top: $ic-sp / 3;
+  margin-top: math.div($ic-sp, 3);
   display: flex;
 
   .submission-details-header__attempts_info {
@@ -73,7 +75,7 @@
   }
 }
 .submission-details-header__time {
-  margin-#{direction(right)}: $ic-sp / 4;
+  margin-#{direction(right)}: $ic-sp * 0.25;
   &.late {
     color: $ic-color-danger;
     font-weight: bold;
@@ -111,7 +113,7 @@
   display: flex;
   align-items: center;
   background: $ic-color-light;
-  padding: $ic-sp $ic-sp/2;
+  padding: $ic-sp $ic-sp*0.5;
   border-bottom: 1px solid $ic-border-light;
   &:last-of-type { border-bottom: none; }
 }
@@ -122,7 +124,7 @@
   padding-#{direction(right)}: $ic-sp;
   > a {
     @include fontSize(13px); // need to overwrite default tiny-text style here
-    margin-#{direction(right)}: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp*0.5;
     font-weight: bold;
   }
   flex: 1;

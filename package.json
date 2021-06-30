@@ -20,7 +20,7 @@
     ]
   },
   "dependencies": {
-    "@instructure/brandable_css": "2.0.0",
+    "@instructure/brandable_css": "^3",
     "@instructure/canvas-rce-old": "4.1.5",
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
@@ -279,7 +279,6 @@
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
     "msw": "^0.27.2",
-    "node-sass": "~4.14.1",
     "nyc": "^13",
     "prettier": "^2.2.1",
     "qunitjs": "^1.14.0",

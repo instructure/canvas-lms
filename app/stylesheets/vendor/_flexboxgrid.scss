@@ -28,6 +28,8 @@ To create vertical space between grid rows, consider using the `.content-box` an
 
 */
 
+@use "sass:math";
+
 @import "base/environment";
 
 $c-grid-sp: $ic-sp;
@@ -51,7 +53,7 @@ $c-grid-columns: 12;
   }
 
   @for $i from 1 through $c-grid-columns {
-    $width: percentage($i/$c-grid-columns);
+    $width: percentage(math.div($i, $c-grid-columns));
 
     .col-#{$size}-#{$i} {
       @extend %base-#{$size};
