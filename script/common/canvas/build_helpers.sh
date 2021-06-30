@@ -81,26 +81,28 @@ permissions so we can run migrations."
   if database_exists; then
     stop_spinner
     message \
-'An existing database was found.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-This script will destroy ALL EXISTING DATA if it continues
-If you want to migrate the existing database, use docker_dev_update
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    message 'About to run "bundle exec rake db:drop"'
+'An existing database was found.'
     if ! is_running_on_jenkins; then
-      prompt "type NUKE in all caps: " nuked
-      [[ ${nuked:-n} == 'NUKE' ]] || exit 1
+      prompt "Do you want to drop and create new or migrate existing? [DROP/migrate] " dropped
     fi
-    start_spinner "Deleting db....."
-    _canvas_lms_track_with_log run_command bundle exec rake db:drop
-    stop_spinner
+    if [[ ${dropped:-migrate} == 'DROP' ]]; then
+      message \
+'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+This script will destroy ALL EXISTING DATA if it continues
+If you want to migrate the existing database, cancel now
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+      message 'About to run "bundle exec rake db:drop"'
+      start_spinner "Deleting db....."
+      _canvas_lms_track_with_log run_command bundle exec rake db:drop
+      stop_spinner
+    fi
   fi
   stop_spinner
-
-  start_spinner "Creating new database...."
-  _canvas_lms_track_with_log run_command bundle exec rake db:create
-  stop_spinner
+  if [[ ${dropped:-DROP} == 'DROP' ]]; then
+    start_spinner "Creating new database...."
+    _canvas_lms_track_with_log run_command bundle exec rake db:create
+    stop_spinner
+  fi
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
   start_spinner "Migrating (Development env)...."
@@ -109,7 +111,7 @@ If you want to migrate the existing database, use docker_dev_update
   start_spinner "Migrating (Test env)...."
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
   stop_spinner
-  _canvas_lms_track run_command bundle exec rake db:initial_setup
+  [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command bundle exec rake db:initial_setup
 }
 
 function sync_bundler_version {
