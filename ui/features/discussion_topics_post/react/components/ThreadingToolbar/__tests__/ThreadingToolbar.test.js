@@ -32,4 +32,15 @@ describe('PostToolbar', () => {
     expect(getByText('First')).toBeTruthy()
     expect(getByText('Second')).toBeTruthy()
   })
+
+  it('renders "Go to Reply" button', () => {
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="asdf">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
+  })
 })

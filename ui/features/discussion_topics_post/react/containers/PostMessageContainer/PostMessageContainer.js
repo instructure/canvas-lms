@@ -22,10 +22,12 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext} from 'react'
+import {SearchContext} from '../../utils/constants'
 
 export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
+  const {searchTerm} = useContext(SearchContext)
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
@@ -53,7 +55,7 @@ export const PostMessageContainer = props => {
         isForcedRead={props.discussionEntry.forcedReadState}
         discussionRoles={props?.discussionRoles}
       >
-        <ThreadingToolbar>{props.threadActions}</ThreadingToolbar>
+        <ThreadingToolbar searchTerm={searchTerm}>{props.threadActions}</ThreadingToolbar>
       </PostMessage>
     )
   }
