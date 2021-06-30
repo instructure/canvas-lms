@@ -44,7 +44,7 @@ describe MicrosoftSync::GraphService do
 
   after { WebMock.enable_net_connect! }
 
-  let(:service) { described_class.new('mytenant') }
+  let(:service) { described_class.new('mytenant', extra_tag: 'abc') }
   let(:url) { nil }
 
   let(:response) { json_response(200, response_body) }
@@ -60,7 +60,8 @@ describe MicrosoftSync::GraphService do
     let(:statsd_tags) do
       {
         msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
-        status_code: response[:status].to_s
+        status_code: response[:status].to_s,
+        extra_tag: 'abc',
       }
     end
 
@@ -168,15 +169,20 @@ describe MicrosoftSync::GraphService do
     it 'increments a success statsd metric on success' do
       subject
       expect(InstStatsd::Statsd).to have_received(:increment).with(
-        'microsoft_sync.graph_service.success',
-        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+        'microsoft_sync.graph_service.success', tags: {
+          msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+          extra_tag: 'abc',
+        }
       )
     end
 
     it 'records time with a statsd time metric' do
       expect(InstStatsd::Statsd).to receive(:time).with(
         'microsoft_sync.graph_service.time',
-        tags: {msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}"}
+        tags: {
+          msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
+          extra_tag: 'abc',
+        }
       ).and_call_original
       subject
     end
@@ -326,8 +332,9 @@ describe MicrosoftSync::GraphService do
         codes_list = [codes_list].flatten
         codes_list.uniq.each do |code|
           expect(InstStatsd::Statsd).to have_received(:count).once.with(
-            "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code),
-            tags: {msft_endpoint: endpoint_name, status: code}
+            "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code), tags: {
+              msft_endpoint: endpoint_name, status: code, extra_tag: 'abc'
+            }
           )
         end
       end

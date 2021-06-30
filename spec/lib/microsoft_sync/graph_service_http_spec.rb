@@ -26,7 +26,7 @@ require 'spec_helper'
 describe MicrosoftSync::GraphServiceHttp do
   include WebMock::API
 
-  subject { described_class.new('mytenant') }
+  subject { described_class.new('mytenant', extra_tag: 'abc') }
 
   before do
     allow(MicrosoftSync::LoginService).to receive(:token).with('mytenant').and_return('mytoken')
@@ -47,7 +47,8 @@ describe MicrosoftSync::GraphServiceHttp do
     describe 'quota option' do
       def expect_quota_counted(read_or_write, num)
         expect(InstStatsd::Statsd).to have_received(:count)
-          .with("microsoft_sync.graph_service.quota_#{read_or_write}", num, tags: {msft_endpoint: 'get_foo'})
+          .with("microsoft_sync.graph_service.quota_#{read_or_write}", num,
+                tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
       end
 
       def expect_quota_not_counted(read_or_write)
@@ -108,9 +109,11 @@ describe MicrosoftSync::GraphServiceHttp do
       # pagination "next" links are complete URLs
       subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar', quota: [1, 0])
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_read", 1, tags: {msft_endpoint: 'get_foo'})
+        .with("microsoft_sync.graph_service.quota_read", 1,
+              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
       expect(InstStatsd::Statsd).to have_received(:increment)
-        .with("microsoft_sync.graph_service.success", tags: {msft_endpoint: 'get_foo'})
+        .with("microsoft_sync.graph_service.success",
+              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
     end
   end
 
@@ -127,7 +130,7 @@ describe MicrosoftSync::GraphServiceHttp do
       results
     end
 
-    let(:http) { described_class.new('mytenant') }
+    let(:http) { described_class.new('mytenant', extra_tag: 'foo') }
     let(:initial_url) { 'https://graph.microsoft.com/v1.0/some/list' }
     let(:continue_url) { initial_url + '?cont=123' }
     let(:continue_response) { json_200_response(value: {a: 1}, '@odata.nextLink' => continue_url) }
@@ -188,9 +191,11 @@ describe MicrosoftSync::GraphServiceHttp do
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
       run_batch
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_read", 3, tags: {msft_endpoint: 'batch_wombat'})
+        .with("microsoft_sync.graph_service.quota_read", 3,
+              tags: {msft_endpoint: 'batch_wombat', extra_tag: 'abc'})
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_write", 4, tags: {msft_endpoint: 'batch_wombat'})
+        .with("microsoft_sync.graph_service.quota_write", 4,
+              tags: {msft_endpoint: 'batch_wombat', extra_tag: 'abc'})
     end
   end
 end

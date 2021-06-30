@@ -56,9 +56,12 @@ module MicrosoftSync
       end
     end
 
-    def initialize(tenant)
+    def initialize(tenant, extra_statsd_tags)
       @tenant = tenant
+      @extra_statsd_tags = extra_statsd_tags
     end
+
+    attr_reader :extra_statsd_tags
 
     # Example options: body (hash for JSON), query (hash of query string), headers (hash),
     # quota (array of integers [read_quota_points, write_quota_points]; will be adjusted
@@ -122,7 +125,8 @@ module MicrosoftSync
     # Returns a list of ids of the requests that were ignored.
     def run_batch(endpoint_name, requests, quota:, &response_should_be_ignored)
       Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
-      increment_statsd_quota_points(quota, {}, msft_endpoint: "batch_#{endpoint_name}")
+      tags = extra_statsd_tags.merge(msft_endpoint: "batch_#{endpoint_name}")
+      increment_statsd_quota_points(quota, {}, tags)
 
       response =
         begin
@@ -207,9 +211,9 @@ module MicrosoftSync
       # Strip https, hostname, "v1.0"
       path = path_or_url.gsub(%r{^https?://[^/]*/[^/]*/}, '')
 
-      {
+      extra_statsd_tags.merge(
         msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
-      }
+      )
     end
 
     def application_not_authorized_response?(response)
@@ -266,7 +270,7 @@ module MicrosoftSync
     def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
       responses_grouped_by_type.each do |type, responses|
         responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
-          tags = {msft_endpoint: endpoint_name, status: code}
+          tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: code)
           InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
       end

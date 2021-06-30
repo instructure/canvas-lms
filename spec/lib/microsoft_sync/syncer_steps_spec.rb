@@ -32,6 +32,7 @@ describe MicrosoftSync::SyncerSteps do
   let(:graph_service) { graph_service_helpers.graph_service }
   let(:tenant) { 'mytenant123' }
   let(:sync_enabled) { true }
+  let(:sync_type_statsd_tag) { 'full' }
 
   def expect_next_step(result, step, memory_state=nil)
     expect(result).to be_a(MicrosoftSync::StateMachineJob::NextStep)
@@ -81,7 +82,7 @@ describe MicrosoftSync::SyncerSteps do
     ra.save!
 
     allow(MicrosoftSync::GraphServiceHelpers).to \
-      receive(:new).with(tenant).and_return(graph_service_helpers)
+      receive(:new).with(tenant, sync_type: sync_type_statsd_tag).and_return(graph_service_helpers)
   end
 
   describe '#max_retries' do
@@ -109,7 +110,7 @@ describe MicrosoftSync::SyncerSteps do
 
   shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
     # use actual graph service instead of double and intercept calls to "request":
-    let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
+    let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant, {}) }
     let(:retry_args) { {delay_amount: [15, 60, 300]}.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
@@ -570,9 +571,11 @@ describe MicrosoftSync::SyncerSteps do
         expect(Rails.logger).to have_received(:warn).twice
           .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
-          .with("microsoft_sync.syncer_steps.skipped_batches.add")
+          .with("microsoft_sync.syncer_steps.skipped_batches.add",
+                tags: {sync_type: sync_type_statsd_tag})
         expect(InstStatsd::Statsd).to have_received(:count).twice
-          .with("microsoft_sync.syncer_steps.skipped_total.add", 3)
+          .with("microsoft_sync.syncer_steps.skipped_total.add", 3,
+                tags: {sync_type: sync_type_statsd_tag})
       end
     end
 
@@ -591,9 +594,11 @@ describe MicrosoftSync::SyncerSteps do
         expect(Rails.logger).to have_received(:warn).twice
           .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
-          .with("microsoft_sync.syncer_steps.skipped_batches.remove")
+          .with("microsoft_sync.syncer_steps.skipped_batches.remove",
+                tags: {sync_type: sync_type_statsd_tag})
         expect(InstStatsd::Statsd).to have_received(:count).twice
-          .with("microsoft_sync.syncer_steps.skipped_total.remove", 2)
+          .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
+                tags: {sync_type: sync_type_statsd_tag})
       end
     end
   end
@@ -732,6 +737,7 @@ describe MicrosoftSync::SyncerSteps do
 
   describe '#step_partial_sync' do
     subject { syncer_steps.step_partial_sync(nil, nil) }
+    let(:sync_type_statsd_tag) { 'partial' }
 
     before { group.update! ms_group_id: 'mygroup' }
 
@@ -765,8 +771,24 @@ describe MicrosoftSync::SyncerSteps do
       end
 
       shared_examples_for 'a step that turns into a full sync job' do
+        let(:sync_type_statsd_tag) { 'full' }
+
         it 'turns into a full sync job' do
           expect_next_step(subject, :step_full_sync_prerequisites)
+        end
+
+        it 'increments the statsd counter partial_into_full' do
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+          subject
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.syncer_steps.partial_into_full')
+        end
+
+        it 'leaves sync_type=full for statsd' do
+          subject
+          syncer_steps.send(:graph_service)
+          expect(MicrosoftSync::GraphServiceHelpers).to \
+            have_received(:new).with(anything, sync_type: 'full')
         end
       end
 
@@ -847,14 +869,21 @@ describe MicrosoftSync::SyncerSteps do
           it_behaves_like 'a step that returns retry on intermittent error',
                           except_throttled: true do
             context 'when a request is throttled' do
+              before do
+                allow(graph_service.http).to receive(:request)
+                  .and_raise(new_http_error(429, 'retry-after' => '3.14'))
+              end
+
               it 'turns into a full sync job with the delay given in the retry-after header' do
-                expect(graph_service.http).to receive(:request).and_raise(
-                  new_http_error(429, 'retry-after' => '3.14')
-                )
-                expect_delayed_next_step(
-                  subject,
-                  :step_full_sync_prerequisites, 3.14
-                )
+                expect_delayed_next_step(subject, :step_full_sync_prerequisites, 3.14)
+                expect(graph_service.http).to have_received(:request)
+              end
+
+              it 'increments the statsd counter partial_into_full_throttled' do
+                allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+                subject
+                expect(InstStatsd::Statsd).to have_received(:increment)
+                  .with('microsoft_sync.syncer_steps.partial_into_full_throttled')
               end
             end
           end

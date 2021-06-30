@@ -255,8 +255,8 @@ module MicrosoftSync
         expect(steps_object).to receive(:step_initial).and_return StateMachineJob::COMPLETE
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         subject.send(:run, nil, nil)
-        expect(InstStatsd::Statsd).to \
-          have_received(:increment).with('microsoft_sync.smj.complete', tags: {})
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.smj.complete', tags: {microsoft_sync_step: 'step_initial'})
       end
 
       describe 'retry counting' do

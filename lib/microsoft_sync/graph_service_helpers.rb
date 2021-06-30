@@ -36,8 +36,8 @@ module MicrosoftSync
     MAX_MAIL_NICKNAME_LENGTH = 64
     GET_GROUP_USERS_BATCH_SIZE = 999 # Max batch size to minimize API calls
 
-    def initialize(tenant)
-      @graph_service = GraphService.new(tenant)
+    def initialize(tenant, extra_statsd_tags)
+      @graph_service = GraphService.new(tenant, extra_statsd_tags)
     end
 
     def list_education_classes_for_course(course)

@@ -56,8 +56,9 @@ module MicrosoftSync
     # or about 3 extra requests per user added... not too bad.
     MAX_PARTIAL_SYNC_CHANGES = 500
 
-    STATSD_NAME_SKIPPED_BATCHES = "microsoft_sync.syncer_steps.skipped_batches"
-    STATSD_NAME_SKIPPED_TOTAL = "microsoft_sync.syncer_steps.skipped_total"
+    STATSD_NAME = 'microsoft_sync.syncer_steps'
+    STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
+    STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
 
     # SyncCanceled errors are semi-expected errors -- so we raise them they will
     # cleanup_after_failure but not produce a failed job.
@@ -218,8 +219,10 @@ module MicrosoftSync
       n_total = users.values.map(&:length).sum
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
                         "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
-      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}")
-      InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total)
+      InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
+                                   tags: {sync_type: sync_type})
+      InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
+                               tags: {sync_type: sync_type})
     end
 
     # Run the API calls to add/remove users.
@@ -305,10 +308,13 @@ module MicrosoftSync
       # there are too many changes to effectively handle here.
       if group.ms_group_id.nil? ||
           (changes = load_partial_sync_changes).length > MAX_PARTIAL_SYNC_CHANGES
+        InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full")
         return StateMachineJob::NextStep.new(:step_full_sync_prerequisites)
       end
 
       return StateMachineJob::COMPLETE if changes.empty?
+      # Set sync_type before graph_service used (created) but after we may switch to full sync:
+      self.sync_type = 'partial'
 
       # Step 2. ensure users have aad object ids:
       # changes_by_user_id is a hash from user_id ->
@@ -358,12 +364,18 @@ module MicrosoftSync
       full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
       Rails.logger.info 'MicrosoftSync::SyncerSteps: partial sync throttled, ' \
         "full sync in #{full_sync_after}"
+      InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full_throttled")
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e)
     end
 
     private
+
+    attr_writer :sync_type
+    def sync_type
+      @sync_type || 'full'
+    end
 
     def tenant
       @tenant ||=
@@ -378,7 +390,7 @@ module MicrosoftSync
     end
 
     def graph_service_helpers
-      @graph_service_helpers ||= tenant && GraphServiceHelpers.new(tenant)
+      @graph_service_helpers ||= tenant && GraphServiceHelpers.new(tenant, sync_type: sync_type)
     end
 
     def graph_service

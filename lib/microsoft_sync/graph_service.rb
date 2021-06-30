@@ -35,8 +35,8 @@ module MicrosoftSync
     attr_reader :http
     delegate :request, :expand_options, :get_paginated_list, :run_batch, :quote_value, to: :http
 
-    def initialize(tenant)
-      @http = GraphServiceHttp.new(tenant)
+    def initialize(tenant, extra_statsd_tags)
+      @http = GraphServiceHttp.new(tenant, extra_statsd_tags)
     end
 
     # ENDPOINTS:
