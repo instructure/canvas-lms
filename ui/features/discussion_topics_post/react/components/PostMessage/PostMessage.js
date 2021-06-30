@@ -49,8 +49,10 @@ export function PostMessage({...props}) {
             />
           )}
           <View display="inline-flex" padding="none small none none">
-            <Text color="secondary">{props.timingDisplay}</Text>
-            <Text color="secondary">
+            <Text color="secondary" size="small">
+              {props.timingDisplay}
+            </Text>
+            <Text color="secondary" size="small">
               {!!props.lastReplyAtDisplayText &&
                 I18n.t(', last reply %{lastReplyAtDisplayText}', {
                   lastReplyAtDisplayText: props.lastReplyAtDisplayText
