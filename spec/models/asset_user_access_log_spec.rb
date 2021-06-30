@@ -307,6 +307,13 @@ describe AssetUserAccessLog do
         MessageBus.reset!
       end
 
+      it "does not choke on pre-existing un-postgres-partitioned iterator state" do
+        default_metadata = AssetUserAccessLog.metadatum_payload
+        default_metadata.delete(:temp_root_account_max_log_ids)
+        AssetUserAccessLog.update_metadatum(default_metadata)
+        expect{ AssetUserAccessLog.compact }.to_not raise_error
+      end
+
       it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
         expect(@asset_1.view_score).to be_nil
         expect(@asset_5.view_score).to be_nil
