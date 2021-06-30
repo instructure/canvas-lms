@@ -244,7 +244,7 @@ new_sis_integrations:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-      Settings. The Post to SIS feature option has been incorporated into this new
+      Settings. The Post to SIS feature preview has been incorporated into this new
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true
@@ -405,7 +405,7 @@ underline_all_links:
     wrapper: <span class="feature-detail-underline">\1</span>
     underline_all_links_description: |-
       Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
-      *underlined text*. This feature option does not apply to user-generated content links in the
+      *underlined text*. This feature does not apply to user-generated content links in the
       Rich Content Editor, which always underlines links for all users.
   applies_to: User
 use_semi_colon_field_separators_in_gradebook_exports:

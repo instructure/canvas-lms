@@ -35,7 +35,7 @@ export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
     >
       <Modal.Body>
         {I18n.t(
-          'Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.'
+          'Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Previews in your User Settings.'
         )}
       </Modal.Body>
       <Modal.Footer>
