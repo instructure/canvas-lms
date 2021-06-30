@@ -41,7 +41,8 @@ const FindOutcomesView = ({
   searchString,
   onChangeHandler,
   onClearHandler,
-  onAddAllHandler
+  onAddAllHandler,
+  isResponsiveMode
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const enabled = !!outcomesCount && outcomesCount > 0
@@ -50,6 +51,123 @@ const FindOutcomesView = ({
   const onSelectOutcomesHandler = useCallback(_id => {
     // TODO: OUT-4154
   }, [])
+
+  const countAndAddButton = (
+    <Flex.Item>
+      <Flex
+        as="div"
+        alignItems="center"
+        justifyItems={isResponsiveMode ? 'space-between' : 'start'}
+        width={isResponsiveMode ? '100vw' : ''}
+        wrap="wrap"
+      >
+        <Flex.Item as="div" padding={isResponsiveMode ? 'x-small 0' : 'x-small medium x-small 0'}>
+          <Text size="medium">
+            {I18n.t(
+              {
+                one: '%{count} Outcome',
+                other: '%{count} Outcomes'
+              },
+              {
+                count: outcomesCount || 0
+              }
+            )}
+          </Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            margin="x-small 0"
+            interaction={enabled && !searchString ? 'enabled' : 'disabled'}
+            onClick={onAddAllHandler}
+          >
+            {I18n.t('Add All Outcomes')}
+          </Button>
+        </Flex.Item>
+      </Flex>
+    </Flex.Item>
+  )
+
+  const searchAndSelectContainer = (
+    <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
+      <View as="div" padding={isResponsiveMode ? 'x-small 0 0' : 'small 0 0'}>
+        <Heading level="h2" as="h3">
+          <Text wrap="break-word" weight={isResponsiveMode ? 'bold' : 'normal'}>
+            {addZeroWidthSpace(groupTitle)}
+          </Text>
+        </Heading>
+      </View>
+      <View as="div" padding={isResponsiveMode ? 'x-small 0' : 'large 0 medium'}>
+        <OutcomeSearchBar
+          enabled={enabled || searchString.length > 0}
+          placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
+          searchString={searchString}
+          onChangeHandler={onChangeHandler}
+          onClearHandler={onClearHandler}
+        />
+      </View>
+      <View
+        as="div"
+        position="relative"
+        padding={isResponsiveMode ? '0 0 0 xx-small' : '0 0 small'}
+      >
+        <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
+          <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
+            <Heading level="h4">
+              {searchString ? (
+                <Flex>
+                  <Flex.Item shouldShrink>
+                    <div
+                      style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
+                      <View data-testid="group-name-ltr">
+                        {isRTL() ? searchString : groupTitle}
+                      </View>
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          transform: 'scale(0.6)',
+                          verticalAlign: 'middle',
+                          marginBottom: '0.25rem'
+                        }}
+                      >
+                        <IconArrowOpenEndSolid title={I18n.t('search results for')} />
+                      </div>
+                      <View data-testid="search-string-ltr">
+                        {isRTL() ? groupTitle : searchString}
+                      </View>
+                    </div>
+                  </Flex.Item>
+                  <Flex.Item>
+                    {loading ? (
+                      <Spinner
+                        renderTitle={I18n.t('Loading')}
+                        size="x-small"
+                        margin="0 0 0 small"
+                        data-testid="search-loading"
+                      />
+                    ) : (
+                      ''
+                    )}
+                  </Flex.Item>
+                </Flex>
+              ) : (
+                <Text wrap="break-word">
+                  {I18n.t('All %{groupTitle} Outcomes', {
+                    groupTitle: addZeroWidthSpace(groupTitle)
+                  })}
+                </Text>
+              )}
+            </Heading>
+          </Flex.Item>
+          {countAndAddButton}
+        </Flex>
+      </View>
+    </View>
+  )
 
   if (loading && !outcomes) {
     return (
@@ -64,110 +182,17 @@ const FindOutcomesView = ({
       as="div"
       height="100%"
       minWidth="300px"
-      padding="0 x-large 0 medium"
+      padding={!isResponsiveMode && '0 x-large 0 medium'}
       data-testid="find-outcome-container"
     >
       <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
-          <View as="div" padding="small 0 0">
-            <Heading level="h2" as="h3">
-              <Text wrap="break-word">{addZeroWidthSpace(groupTitle)}</Text>
-            </Heading>
-          </View>
-          <View as="div" padding="large 0 medium">
-            <OutcomeSearchBar
-              enabled={enabled || searchString.length > 0}
-              placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
-              searchString={searchString}
-              onChangeHandler={onChangeHandler}
-              onClearHandler={onClearHandler}
-            />
-          </View>
-          <View as="div" position="relative" padding="0 0 small">
-            <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
-              <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
-                <Heading level="h4">
-                  {searchString ? (
-                    <Flex>
-                      <Flex.Item shouldShrink>
-                        <div
-                          style={{
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }}
-                        >
-                          <View data-testid="group-name-ltr">
-                            {isRTL() ? searchString : groupTitle}
-                          </View>
-                          <div
-                            style={{
-                              display: 'inline-block',
-                              transform: 'scale(0.6)',
-                              verticalAlign: 'middle',
-                              marginBottom: '0.25rem'
-                            }}
-                          >
-                            <IconArrowOpenEndSolid title={I18n.t('search results for')} />
-                          </div>
-                          <View data-testid="search-string-ltr">
-                            {isRTL() ? groupTitle : searchString}
-                          </View>
-                        </div>
-                      </Flex.Item>
-                      <Flex.Item>
-                        {loading ? (
-                          <Spinner
-                            renderTitle={I18n.t('Loading')}
-                            size="x-small"
-                            margin="0 0 0 small"
-                            data-testid="search-loading"
-                          />
-                        ) : (
-                          ''
-                        )}
-                      </Flex.Item>
-                    </Flex>
-                  ) : (
-                    <Text wrap="break-word">
-                      {I18n.t('All %{groupTitle} Outcomes', {
-                        groupTitle: addZeroWidthSpace(groupTitle)
-                      })}
-                    </Text>
-                  )}
-                </Heading>
-              </Flex.Item>
-              <Flex.Item>
-                <Flex as="div" alignItems="center" wrap="wrap">
-                  <Flex.Item as="div" padding="x-small medium x-small 0">
-                    <Text size="medium">
-                      {I18n.t(
-                        {
-                          one: '%{count} Outcome',
-                          other: '%{count} Outcomes'
-                        },
-                        {
-                          count: outcomesCount || 0
-                        }
-                      )}
-                    </Text>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Button
-                      margin="x-small 0"
-                      interaction={enabled && !searchString ? 'enabled' : 'disabled'}
-                      onClick={onAddAllHandler}
-                    >
-                      {I18n.t('Add All Outcomes')}
-                    </Button>
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-            </Flex>
-          </View>
-        </View>
+        {!isResponsiveMode && searchAndSelectContainer}
         <div
-          style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}
+          style={{
+            flex: '1 0 24rem',
+            overflow: isResponsiveMode ? 'visible' : 'auto',
+            position: 'relative'
+          }}
           ref={setScrollContainer}
         >
           <InfiniteScroll
@@ -175,7 +200,6 @@ const FindOutcomesView = ({
             loadMore={loadMore}
             scrollContainer={scrollContainer}
             loader={
-              // Temp solution until InfiniteScroll is fixed (ticket OUT-4190)
               <Flex
                 as="div"
                 justifyItems="center"
@@ -197,6 +221,7 @@ const FindOutcomesView = ({
               </Flex>
             }
           >
+            {isResponsiveMode && searchAndSelectContainer}
             <View as="div" data-testid="find-outcome-items-list">
               {outcomes?.edges?.length === 0 && searchString && !loading && (
                 <View as="div" textAlign="center" margin="small 0 0">
@@ -213,6 +238,7 @@ const FindOutcomesView = ({
                   isFirst={index === 0}
                   isChecked={isImported}
                   onCheckboxHandler={onSelectOutcomesHandler}
+                  isResponsiveMode={isResponsiveMode}
                 />
               ))}
             </View>
@@ -250,7 +276,8 @@ FindOutcomesView.propTypes = {
   onClearHandler: PropTypes.func.isRequired,
   onAddAllHandler: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  loadMore: PropTypes.func.isRequired
+  loadMore: PropTypes.func.isRequired,
+  isResponsiveMode: PropTypes.bool
 }
 
 export default FindOutcomesView

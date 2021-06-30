@@ -35,6 +35,7 @@ describe('FindOutcomesModal', () => {
   const defaultProps = (props = {}) => ({
     open: true,
     onCloseHandler: onCloseHandlerMock,
+    breakpoints: {tablet: true},
     ...props
   })
 
@@ -156,6 +157,15 @@ describe('FindOutcomesModal', () => {
     render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
     await act(async () => jest.runAllTimers())
     expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
+  })
+
+  it('does not render the TreeBrowser if in responsive mode', async () => {
+    const {queryByTestId} = render(
+      <FindOutcomesModal {...defaultProps({breakpoints: {tablet: false}})} />
+    )
+    await act(async () => jest.runAllTimers())
+    const treeBrowser = queryByTestId('groupsColumnRef')
+    expect(treeBrowser).not.toBeInTheDocument()
   })
 
   describe('within an account context', () => {

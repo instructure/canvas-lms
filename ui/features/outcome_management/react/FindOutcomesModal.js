@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -35,7 +36,7 @@ import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
-const FindOutcomesModal = ({open, onCloseHandler}) => {
+const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
   const {contextType} = useCanvasContext()
   const {
     rootId,
@@ -58,6 +59,22 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   })
 
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
+  const isResponsiveMode = !breakpoints?.tablet
+
+  const findOutcomesView = (
+    <FindOutcomesView
+      collection={collections[selectedGroupId]}
+      outcomesCount={group?.outcomesCount || 0}
+      outcomes={group?.outcomes}
+      searchString={searchString}
+      onChangeHandler={updateSearch}
+      onClearHandler={clearSearch}
+      onAddAllHandler={() => {}}
+      loading={loading}
+      loadMore={loadMore}
+      isResponsiveMode={isResponsiveMode}
+    />
+  )
 
   return (
     <Modal
@@ -71,92 +88,88 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
           : I18n.t('Add Outcomes to Account')
       }
     >
-      <Modal.Body padding="0 small small">
-        <Flex elementRef={setContainerRef}>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="25%"
-            height="calc(100vh - 10.25rem)"
-            overflowY="visible"
-            overflowX="auto"
-            data-testid="groupsColumnRef"
-            elementRef={setLeftColumnRef}
-          >
-            <View as="div" padding="small x-small none x-small">
-              <Heading level="h3">
-                <Text size="large" weight="light" fontStyle="normal">
-                  {I18n.t('Outcome Groups')}
-                </Text>
-              </Heading>
-              <View>
-                {isLoading ? (
-                  <div style={{textAlign: 'center', paddingTop: '2rem'}}>
-                    <Spinner renderTitle={I18n.t('Loading')} size="large" />
-                  </div>
-                ) : error ? (
-                  <Text color="danger">
-                    {contextType === 'Course'
-                      ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
-                      : I18n.t('An error occurred while loading account outcomes: %{error}', {
-                          error
-                        })}
+      <Modal.Body padding={isResponsiveMode ? '0 medium small' : '0 small small'}>
+        {!isResponsiveMode ? (
+          <Flex elementRef={setContainerRef}>
+            <Flex.Item
+              as="div"
+              position="relative"
+              width="25%"
+              height="calc(100vh - 10.25rem)"
+              overflowY="visible"
+              overflowX="auto"
+              data-testid="groupsColumnRef"
+              elementRef={setLeftColumnRef}
+            >
+              <View as="div" padding="small x-small none x-small">
+                <Heading level="h3">
+                  <Text size="large" weight="light" fontStyle="normal">
+                    {I18n.t('Outcome Groups')}
                   </Text>
-                ) : (
-                  <TreeBrowser
-                    onCollectionToggle={toggleGroupId}
-                    collections={collections}
-                    rootId={rootId}
-                  />
-                )}
+                </Heading>
+                <View>
+                  {isLoading ? (
+                    <div style={{textAlign: 'center', paddingTop: '2rem'}}>
+                      <Spinner renderTitle={I18n.t('Loading')} size="large" />
+                    </div>
+                  ) : error ? (
+                    <Text color="danger">
+                      {contextType === 'Course'
+                        ? I18n.t('An error occurred while loading course outcomes: %{error}', {
+                            error
+                          })
+                        : I18n.t('An error occurred while loading account outcomes: %{error}', {
+                            error
+                          })}
+                    </Text>
+                  ) : (
+                    <TreeBrowser
+                      onCollectionToggle={toggleGroupId}
+                      collections={collections}
+                      rootId={rootId}
+                    />
+                  )}
+                </View>
               </View>
-            </View>
-          </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="1%"
-            height="calc(100vh - 10.25rem)"
-            margin="xxx-small 0 0"
-          >
-            <div
-              data-testid="handlerRef"
-              ref={setDelimiterRef}
-              style={{
-                width: '1vw',
-                height: '100%',
-                cursor: 'col-resize',
-                background:
-                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
-              }}
-            />
-          </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="74%"
-            height="calc(100vh - 10.25rem)"
-            overflowY="visible"
-            overflowX="auto"
-            elementRef={setRightColumnRef}
-          >
-            {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
-              <FindOutcomesView
-                collection={collections[selectedGroupId]}
-                outcomesCount={group?.outcomesCount || 0}
-                outcomes={group?.outcomes}
-                searchString={searchString}
-                onChangeHandler={updateSearch}
-                onClearHandler={clearSearch}
-                onAddAllHandler={() => {}}
-                loading={loading}
-                loadMore={loadMore}
+            </Flex.Item>
+            <Flex.Item
+              as="div"
+              position="relative"
+              width="1%"
+              height="calc(100vh - 10.25rem)"
+              margin="xxx-small 0 0"
+            >
+              <div
+                data-testid="handlerRef"
+                ref={setDelimiterRef}
+                style={{
+                  width: '1vw',
+                  height: '100%',
+                  cursor: 'col-resize',
+                  background:
+                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+                }}
               />
-            ) : (
-              <FindOutcomesBillboard />
-            )}
-          </Flex.Item>
-        </Flex>
+            </Flex.Item>
+            <Flex.Item
+              as="div"
+              position="relative"
+              width="74%"
+              height="calc(100vh - 10.25rem)"
+              overflowY="visible"
+              overflowX="auto"
+              elementRef={setRightColumnRef}
+            >
+              {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
+                findOutcomesView
+              ) : (
+                <FindOutcomesBillboard />
+              )}
+            </Flex.Item>
+          </Flex>
+        ) : (
+          findOutcomesView
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" color="primary" margin="0 x-small 0 0" onClick={onCloseHandler}>
@@ -169,7 +182,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
 FindOutcomesModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  breakpoints: breakpointsShape
 }
 
-export default FindOutcomesModal
+export default WithBreakpoints(FindOutcomesModal)
