@@ -2178,19 +2178,6 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-byline@^7":
-  version "7.7.1"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-byline/-/ui-byline-7.7.1.tgz#86ec7a74937a8e41fe0afd031a680cdc69680208"
-  integrity sha512-LASG6kzCOUNnNip1ohokI62fFRgd7IbrRuLsShdF1ohiePvhKg8ct/3w+CHC5vOUrCrEF8VUMizb2ssy7tyy7w==
-  dependencies:
-    "@babel/runtime" "^7.9.2"
-    "@instructure/ui-react-utils" "^7.7.1"
-    "@instructure/ui-testable" "^7.7.1"
-    "@instructure/ui-themeable" "^7.7.1"
-    "@instructure/ui-view" "^7.7.1"
-    classnames "^2"
-    prop-types "^15"
-
 "@instructure/ui-calendar@^7", "@instructure/ui-calendar@^7.7.1":
   version "7.7.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-calendar/-/ui-calendar-7.7.1.tgz#887a0141fe6a6e7ec840b9a946786246c3bc72ea"

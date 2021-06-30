@@ -31,7 +31,6 @@ import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
-import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
@@ -42,15 +41,9 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation} from 'react-apollo'
-import {
-  isGraded,
-  getSpeedGraderUrl,
-  getEditUrl,
-  getPeerReviewsUrl,
-  getReviewLinkUrl,
-  resolveAuthorRoles
-} from '../../utils'
+import {isGraded, getReviewLinkUrl, resolveAuthorRoles} from '../../utils'
 import {View} from '@instructure/ui-view'
+import {PostToolbarContainer} from '../PostToolbarContainer/PostToolbarContainer'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -83,22 +76,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   // TODO: Change this to the new canGrade permission.
   const hasAuthor = !!props.discussionTopic?.author
-  const canGrade = discussionTopicData?.permissions?.speedGrader || false
-  const canDelete = discussionTopicData?.permissions?.delete || false
   const canReply = discussionTopicData?.permissions?.reply
-  const canUpdate = discussionTopicData?.permissions?.update || false
-  const canPeerReview = discussionTopicData?.permissions?.peerReview
-  const canShowRubric = discussionTopicData?.permissions?.showRubric
-  const canAddRubric = discussionTopicData?.permissions?.addRubric
-  const canOpenForComments = discussionTopicData?.permissions?.openForComments
   const canCloseForComments =
     discussionTopicData?.permissions?.closeForComments && !props.discussionTopic?.rootTopic
-  const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
-  const canModerate = discussionTopicData?.permissions?.moderateForum
-  const canUnpublish = props.discussionTopic.canUnpublish
   const requiresInitialPost = props.discussionTopic.initialPostRequiredForCurrentUser
-  const canSeeCommons =
-    discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
+  const canUnpublish = props.discussionTopic.canUnpublish
 
   const canSeeMultipleDueDates = !!(
     discussionTopicData?.permissions?.readAsAdmin &&
@@ -222,24 +204,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   })
 
-  const onPublish = () => {
-    updateDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        published: !discussionTopicData.published
-      }
-    })
-  }
-
-  const onToggleLocked = locked => {
-    updateDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        locked
-      }
-    })
-  }
-
   const [updateDiscussionReadState] = useMutation(UPDATE_DISCUSSION_READ_STATE, {
     onCompleted: data => {
       if (!data.updateDiscussionReadState.errors) {
@@ -252,15 +216,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
     }
   })
-
-  const onMarkAllAsRead = () => {
-    updateDiscussionReadState({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        read: true
-      }
-    })
-  }
 
   const [subscribeToDiscussionTopic] = useMutation(SUBSCRIBE_TO_DISCUSSION_TOPIC, {
     onCompleted: data => {
@@ -278,15 +233,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
     }
   })
-
-  const onSubscribe = () => {
-    subscribeToDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        subscribed: !discussionTopicData.subscribed
-      }
-    })
-  }
 
   const onSearchChange = value => {
     setSearchTerm(value)
@@ -314,6 +260,42 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     } else {
       return null
     }
+  }
+
+  const onPublish = () => {
+    updateDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        published: !discussionTopicData.published
+      }
+    })
+  }
+
+  const onToggleLocked = locked => {
+    updateDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        locked
+      }
+    })
+  }
+
+  const onMarkAllAsRead = () => {
+    updateDiscussionReadState({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        read: true
+      }
+    })
+  }
+
+  const onSubscribe = () => {
+    subscribeToDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        subscribed: !discussionTopicData.subscribed
+      }
+    })
   }
 
   return (
@@ -405,6 +387,21 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       title={discussionTopicData.title}
                       message={discussionTopicData.message}
                       discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
+                      postUtilities={
+                        <PostToolbarContainer
+                          canUnpublish={canUnpublish}
+                          canCloseForComments={canCloseForComments}
+                          deleteDiscussionTopic={deleteDiscussionTopic}
+                          discussionTopicData={discussionTopicData}
+                          requiresInitialPost={requiresInitialPost}
+                          onPublish={onPublish}
+                          onToggleLocked={onToggleLocked}
+                          onMarkAllAsRead={onMarkAllAsRead}
+                          onSubscribe={onSubscribe}
+                          setSendToOpen={setSendToOpen}
+                          setCopyToOpen={setCopyToOpen}
+                        />
+                      }
                     >
                       {canReply && (
                         <Button
@@ -418,102 +415,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         </Button>
                       )}
                     </PostMessage>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <PostToolbar
-                      onReadAll={!requiresInitialPost ? onMarkAllAsRead : null}
-                      onDelete={
-                        canDelete
-                          ? () => {
-                              if (
-                                // eslint-disable-next-line no-alert
-                                window.confirm(
-                                  I18n.t('Are you sure you want to delete this topic?')
-                                )
-                              ) {
-                                deleteDiscussionTopic({
-                                  variables: {
-                                    id: discussionTopicData._id
-                                  }
-                                })
-                              }
-                            }
-                          : null
-                      }
-                      repliesCount={discussionTopicData.replies}
-                      unreadCount={discussionTopicData.unread}
-                      onSend={
-                        canCopyAndSendTo
-                          ? () => {
-                              setSendToOpen(true)
-                            }
-                          : null
-                      }
-                      onCopy={
-                        canCopyAndSendTo
-                          ? () => {
-                              setCopyToOpen(true)
-                            }
-                          : null
-                      }
-                      onEdit={
-                        canUpdate
-                          ? () => {
-                              window.location.assign(
-                                getEditUrl(ENV.course_id, discussionTopicData._id)
-                              )
-                            }
-                          : null
-                      }
-                      onTogglePublish={canModerate ? onPublish : null}
-                      onToggleSubscription={onSubscribe}
-                      onOpenSpeedgrader={
-                        canGrade
-                          ? () => {
-                              window.location.assign(
-                                getSpeedGraderUrl(ENV.course_id, discussionTopicData.assignment._id)
-                              )
-                            }
-                          : null
-                      }
-                      onPeerReviews={
-                        canPeerReview
-                          ? () => {
-                              window.location.assign(
-                                getPeerReviewsUrl(ENV.course_id, discussionTopicData.assignment._id)
-                              )
-                            }
-                          : null
-                      }
-                      onShowRubric={canShowRubric ? () => {} : null}
-                      onAddRubric={canAddRubric ? () => {} : null}
-                      isPublished={discussionTopicData.published}
-                      canUnpublish={canUnpublish}
-                      isSubscribed={discussionTopicData.subscribed}
-                      onOpenForComments={
-                        canOpenForComments
-                          ? () => {
-                              onToggleLocked(false)
-                            }
-                          : null
-                      }
-                      onCloseForComments={
-                        canCloseForComments
-                          ? () => {
-                              onToggleLocked(true)
-                            }
-                          : null
-                      }
-                      onShareToCommons={
-                        canSeeCommons
-                          ? () => {
-                              window.location.assign(
-                                `${ENV.discussion_topic_menu_tools[0].base_url}&discussion_topics%5B%5D=${discussionTopicData._id}`
-                              )
-                            }
-                          : null
-                      }
-                    />
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
