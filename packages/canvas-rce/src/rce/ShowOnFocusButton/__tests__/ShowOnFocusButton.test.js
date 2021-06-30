@@ -23,7 +23,7 @@ import ShowOnFocusButton from '../index'
 function renderComponent() {
   return render(
     <div>
-      <ShowOnFocusButton>I am a button</ShowOnFocusButton>
+      <ShowOnFocusButton screenReaderLabel="read me">I am a button</ShowOnFocusButton>
       <input id="focusme" />
     </div>
   )

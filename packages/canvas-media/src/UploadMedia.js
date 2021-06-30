@@ -94,7 +94,7 @@ export default class UploadMedia extends React.Component {
       computerFile: props.computerFile || null,
       subtitles: [],
       recordedFile: null,
-      modalBodySize: {width: undefined, height: undefined}
+      modalBodySize: {width: NaN, height: NaN}
     }
 
     this.modalBodyRef = React.createRef()
@@ -173,18 +173,25 @@ export default class UploadMedia extends React.Component {
     this.props.onDismiss && this.props.onDismiss()
   }
 
+  componentDidMount() {
+    this.setBodySize(this.state)
+  }
+
   componentDidUpdate(_prevProps, prevState) {
+    this.setBodySize(prevState)
+  }
+
+  setBodySize(state) {
     if (this.modalBodyRef.current) {
       // eslint-disable-next-line react/no-find-dom-node
       const thebody = ReactDOM.findDOMNode(this.modalBodyRef.current)
       const modalBodySize = thebody.getBoundingClientRect()
       modalBodySize.height -= px('3rem') // leave room for the tabs
       if (
-        modalBodySize.width !== prevState.modalBodySize.width ||
-        modalBodySize.height !== prevState.modalBodySize.height
+        modalBodySize.width !== state.modalBodySize.width ||
+        modalBodySize.height !== state.modalBodySize.height
       ) {
         if (modalBodySize.width > 0 && modalBodySize.height > 0) {
-          // eslint-disable-next-line react/no-did-update-set-state
           this.setState({modalBodySize})
         }
       }

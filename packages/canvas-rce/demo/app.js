@@ -202,10 +202,10 @@ function Demo() {
             setCurrentContent(value)
           }}
         />
-        <View margin="small 0 0 0">
+        <View as="div" margin="small 0 0 0">
           <pre>{currentContent}</pre>
         </View>
-        <View margin="small 0 0 0">
+        <View as="div" margin="small 0 0 0">
           <Button
             interaction={rceRef.current ? 'enabled' : 'disabled'}
             onClick={() => {

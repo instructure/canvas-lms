@@ -23,7 +23,6 @@ import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -1622,15 +1621,12 @@ class RCEWrapper extends React.Component {
         onBlur={this.handleBlurRCE}
       >
         <ShowOnFocusButton
-          buttonProps={{
-            variant: 'link',
-            onClick: this.openKBShortcutModal,
-            icon: IconKeyboardShortcutsLine,
-            margin: 'xx-small'
-          }}
+          onClick={this.openKBShortcutModal}
+          margin="xx-small"
+          screenReaderLabel={formatMessage('View keyboard shortcuts')}
           ref={el => (this._showOnFocusButton = el)}
         >
-          <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
+          <IconKeyboardShortcutsLine />
         </ShowOnFocusButton>
         <AlertMessageArea
           messages={this.state.messages}

@@ -23,16 +23,18 @@
  * among canvas' sub-packages.
  */
 import React, {Component} from 'react'
-import {node, object} from 'prop-types'
+import {func, node, object, oneOfType, string} from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class ShowOnFocusButton extends Component {
   static propTypes = {
-    buttonProps: object,
-    srProps: object,
-    children: node.isRequired
+    children: oneOfType([node, func]).isRequired, // func === functional component
+    onClick: func,
+    screenReaderLabel: string.isRequired,
+    margin: string,
+    srProps: object
   }
 
   state = {
@@ -63,20 +65,23 @@ export default class ShowOnFocusButton extends Component {
   }
 
   renderButton() {
-    const {buttonProps, children} = this.props
     return (
-      <Button
+      <IconButton
         data-testid="ShowOnFocusButton__button"
-        variant="link"
+        color="primary"
+        margin={this.props.margin}
         ref={btn => {
           this.btnRef = btn
         }}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
-        {...buttonProps}
+        onClick={this.props.onClick}
+        screenReaderLabel={this.props.screenReaderLabel}
+        withBackground={false}
+        withBorder={false}
       >
-        {children}
-      </Button>
+        {this.props.children}
+      </IconButton>
     )
   }
 
