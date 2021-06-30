@@ -22,6 +22,10 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
+import {
+  ISOLATED_VIEW_MODES,
+  IsolatedViewContainer
+} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import {PER_PAGE, SearchContext} from './utils/constants'
@@ -88,7 +92,7 @@ const DiscussionTopicManager = props => {
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
-  const value = {
+  const searchContext = {
     searchTerm,
     setSearchTerm,
     filter,
@@ -97,6 +101,21 @@ const DiscussionTopicManager = props => {
     setSort,
     pageNumber,
     setPageNumber
+  }
+
+  // Isolated View State
+  const [isolatedEntry, setIsolatedEntry] = useState(null)
+  const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
+  const [editorExpanded, setEditorExpanded] = useState(false)
+
+  const openIsolatedView = (discussionEntry, withRCE) => {
+    setIsolatedEntry(discussionEntry)
+    setIsolatedViewOpen(true)
+    setEditorExpanded(withRCE)
+  }
+
+  const closeIsolatedView = () => {
+    setIsolatedViewOpen(false)
   }
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -163,28 +182,41 @@ const DiscussionTopicManager = props => {
     )
   }
   return (
-    <>
-      <SearchContext.Provider value={value}>
-        <DiscussionTopicContainer
+    <SearchContext.Provider value={searchContext}>
+      <DiscussionTopicContainer
+        discussionTopic={discussionTopicQuery.data.legacyNode}
+        createDiscussionEntry={text => {
+          createDiscussionEntry({
+            variables: {
+              discussionTopicId: ENV.discussion_topic_id,
+              message: text
+            },
+            optimisticResponse: getOptimisticResponse(text)
+          })
+        }}
+      />
+      {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
+      (searchTerm || filter === 'unread') ? (
+        <NoResultsFound />
+      ) : (
+        <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          createDiscussionEntry={text => {
-            createDiscussionEntry({
-              variables: {
-                discussionTopicId: ENV.discussion_topic_id,
-                message: text
-              },
-              optimisticResponse: getOptimisticResponse(text)
-            })
-          }}
+          openIsolatedView={openIsolatedView}
         />
-        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
-        (searchTerm || filter === 'unread') ? (
-          <NoResultsFound />
-        ) : (
-          <DiscussionThreadsContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
-        )}
-      </SearchContext.Provider>
-    </>
+      )}
+      {ENV.isolated_view && (
+        <IsolatedViewContainer
+          discussionEntry={isolatedEntry}
+          open={isolatedViewOpen}
+          mode={
+            editorExpanded
+              ? ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY
+              : ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
+          }
+          onClose={closeIsolatedView}
+        />
+      )}
+    </SearchContext.Provider>
   )
 }
 

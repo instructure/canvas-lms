@@ -45,10 +45,6 @@ import {
   resolveAuthorRoles
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
-import {
-  ISOLATED_VIEW_MODES,
-  IsolatedViewContainer
-} from '../IsolatedViewContainer/IsolatedViewContainer'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
@@ -85,7 +81,6 @@ export const DiscussionThreadContainer = props => {
   const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
-  const [openIsolatedView, setOpenIsolatedView] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
   const threadRef = useRef()
@@ -187,7 +182,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            setOpenIsolatedView(newEditorExpanded)
+            props.openIsolatedView(props.discussionEntry, true)
           }
         }}
       />
@@ -224,7 +219,7 @@ export const DiscussionThreadContainer = props => {
         )}
         onClick={() => {
           if (ENV.isolated_view) {
-            setOpenIsolatedView(!openIsolatedView)
+            props.openIsolatedView(props.discussionEntry, false)
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -398,32 +393,6 @@ export const DiscussionThreadContainer = props => {
           </View>
         </View>
       )}
-      {openIsolatedView && (
-        <IsolatedViewContainer
-          discussionEntry={props.discussionEntry}
-          mode={
-            editorExpanded
-              ? ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY
-              : ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
-          }
-          onClose={() => {
-            setOpenIsolatedView(false)
-            setEditorExpanded(false)
-          }}
-          onToggleRating={toggleRating}
-          onToggleUnread={toggleUnread}
-          onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-          onOpenInSpeedGrader={
-            props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
-          }
-          onReply={() => {
-            setEditorExpanded(!editorExpanded)
-          }}
-          onReplySubmit={text => {
-            onReplySubmit(text)
-          }}
-        />
-      )}
     </>
   )
 }
@@ -433,7 +402,8 @@ DiscussionThreadContainer.propTypes = {
   discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object
+  parentRef: PropTypes.object,
+  openIsolatedView: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {

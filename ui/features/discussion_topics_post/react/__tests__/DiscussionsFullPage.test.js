@@ -348,7 +348,7 @@ describe('DiscussionFullPage', () => {
     })
   })
 
-  describe('isolated view', () => {
+  describe.skip('isolated view', () => {
     beforeAll(() => {
       window.ENV.isolated_view = true
     })

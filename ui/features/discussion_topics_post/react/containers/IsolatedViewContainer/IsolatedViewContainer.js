@@ -26,7 +26,7 @@ import I18n from 'i18n!discussion_topics_post'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React from 'react'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
@@ -43,7 +43,9 @@ export const ISOLATED_VIEW_MODES = {
 }
 
 export const IsolatedViewContainer = props => {
-  const [showTray, setShowTray] = useState(true)
+  if (!props.discussionEntry) {
+    return null
+  }
 
   const threadActions = []
 
@@ -103,18 +105,17 @@ export const IsolatedViewContainer = props => {
 
   return (
     <Tray
-      open={showTray}
+      open={props.open}
       placement="end"
       size="medium"
       offset="large"
       label="Isolated View"
-      shouldCloseOnDocumentClick
       onDismiss={e => {
         // When the RCE is open, it stills the mouse position when using it and we do this trick
         // to avoid the whole Tray getting closed because of a click inside the RCE area.
         if (
-          props.mode == ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY &&
-          e.clientY - e.target.offsetTop == 0
+          props.mode === ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY &&
+          e.clientY - e.target.offsetTop === 0
         ) {
           return
         }
@@ -122,8 +123,6 @@ export const IsolatedViewContainer = props => {
         if (props.onClose) {
           props.onClose()
         }
-
-        setShowTray(false)
       }}
     >
       <Flex>
@@ -138,8 +137,6 @@ export const IsolatedViewContainer = props => {
             offset="small"
             screenReaderLabel="Close"
             onClick={() => {
-              setShowTray(false)
-
               if (props.onClose) {
                 props.onClose()
               }
@@ -191,7 +188,7 @@ export const IsolatedViewContainer = props => {
             </Flex.Item>
           )}
         </Flex>
-        {props.mode == ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
+        {props.mode === ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
           <View
             display="block"
             background="primary"
@@ -214,7 +211,7 @@ export const IsolatedViewContainer = props => {
           </View>
         )}
       </div>
-      {props.mode != ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
+      {props.mode !== ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
         <IsolatedThreadsContainer discussionEntryId={props.discussionEntry.id} />
       )}
     </Tray>
@@ -223,6 +220,7 @@ export const IsolatedViewContainer = props => {
 
 IsolatedViewContainer.propTypes = {
   discussionEntry: DiscussionEntry.shape,
+  open: PropTypes.bool,
   mode: PropTypes.number,
   onClose: PropTypes.func,
   onToggleRating: PropTypes.func,

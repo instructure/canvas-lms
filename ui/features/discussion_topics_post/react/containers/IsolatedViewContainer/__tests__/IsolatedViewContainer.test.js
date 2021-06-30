@@ -71,7 +71,8 @@ describe('IsolatedViewContainer', () => {
   }
 
   const defaultProps = ({discussionEntryOverrides = {}} = {}) => ({
-    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides)
+    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
+    open: true
   })
 
   it('should render', () => {
