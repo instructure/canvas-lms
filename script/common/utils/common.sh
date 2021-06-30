@@ -166,22 +166,26 @@ function is_running_on_jenkins() {
   [[ -n "${JENKINS:-}" ]]
 }
 
-function rebuild_docker_images {
+function check_dockerfile {
   if [ -n "$(git diff --name-only "${before_rebase_sha:-origin/master}" | grep -E 'Dockerfile$|Dockerfile.githook$|docker-compose/postgres/Dockerfile$')" ]; then
     message "There have been some updates made to Dockerfile, you should rebuild your docker images."
     prompt "Rebuild docker images? [y/n]" rebuild_image
     if [ "${rebuild_image:n}" == 'y' ]; then
-      start_spinner "Rebuilding docker images..."
-      if [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-        _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
-      else
-        _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
-      fi
-      stop_spinner
+      rebuild_docker_images
     else
       echo "Your docker image is now outdated and needs to be rebuilt! You should run \"${DOCKER_COMMAND} build\"."
     fi
   fi
+}
+
+function rebuild_docker_images {
+  start_spinner "Rebuilding docker images..."
+    if [[ "${OS:-}" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
+      _canvas_lms_track_with_log docker-compose build --pull --build-arg USER_ID=$(id -u)
+    else
+      _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
+    fi
+  stop_spinner
 }
 
 function is_mutagen {
