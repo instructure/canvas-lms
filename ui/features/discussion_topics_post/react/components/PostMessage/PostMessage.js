@@ -22,6 +22,7 @@ import React from 'react'
 
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
+import {Flex} from '@instructure/ui-flex'
 import {Byline} from '@instructure/ui-byline'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -34,32 +35,36 @@ export function PostMessage({...props}) {
   return (
     <Byline
       title={
-        <>
-          {props.hasAuthor && (
-            <View padding="none small none none">
-              <Text weight="bold" data-testid="author_name">
-                {props.authorName}
+        <Flex direction="column">
+          <Flex.Item>
+            {props.hasAuthor && (
+              <View padding="none small none none">
+                <Text weight="bold" data-testid="author_name">
+                  {props.authorName}
+                </Text>
+              </View>
+            )}
+            {props.discussionRoles?.length > 0 && (
+              <RolePillContainer
+                discussionRoles={props.discussionRoles}
+                data-testid="pill-container"
+              />
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            <View display="inline-flex" padding="none small none none">
+              <Text color="secondary" size="small">
+                {props.timingDisplay}
+              </Text>
+              <Text color="secondary" size="small">
+                {!!props.lastReplyAtDisplayText &&
+                  I18n.t(', last reply %{lastReplyAtDisplayText}', {
+                    lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                  })}
               </Text>
             </View>
-          )}
-          {!!props.discussionRoles && (
-            <RolePillContainer
-              discussionRoles={props.discussionRoles}
-              data-testid="pill-container"
-            />
-          )}
-          <View display="inline-flex" padding="none small none none">
-            <Text color="secondary" size="small">
-              {props.timingDisplay}
-            </Text>
-            <Text color="secondary" size="small">
-              {!!props.lastReplyAtDisplayText &&
-                I18n.t(', last reply %{lastReplyAtDisplayText}', {
-                  lastReplyAtDisplayText: props.lastReplyAtDisplayText
-                })}
-            </Text>
-          </View>
-        </>
+          </Flex.Item>
+        </Flex>
       }
       description={
         <>
