@@ -342,6 +342,7 @@ class AssetUserAccessLog
       compaction_map = {}
       to_acknowledge = []
       new_iterator_state = compaction_state[:max_log_ids].dup
+      compaction_state[:temp_root_account_max_log_ids] ||= {}
       root_account_postgres_iterators = compaction_state[:temp_root_account_max_log_ids].dup
       # map of partition ids to max message ID seen for that partition
       # of the topic for the current root account
