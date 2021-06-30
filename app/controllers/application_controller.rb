@@ -2820,12 +2820,16 @@ class ApplicationController < ActionController::Base
   end
   helper_method :show_student_view_button?
 
-  IMMERSIVE_READER_PAGES = ["wiki_pages#show"].freeze
 
   def show_immersive_reader?
     controller_action = "#{params[:controller]}##{params[:action]}"
+    immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
+      ["assignments#syllabus", "wiki_pages#show"].freeze
+    else
+      ["wiki_pages#show"].freeze
+    end
 
-    return false unless IMMERSIVE_READER_PAGES.include?(controller_action)
+    return false unless immersive_reader_pages.include?(controller_action)
 
     @context&.account&.feature_enabled?(:immersive_reader_wiki_pages)
   end
