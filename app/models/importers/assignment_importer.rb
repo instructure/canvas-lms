@@ -356,6 +356,8 @@ module Importers
         item.turnitin_settings = settings
       end
 
+      set_annotatable_attachment(item, hash, context)
+
       migration.add_imported_item(item)
 
       if migration.date_shift_options
@@ -516,6 +518,19 @@ module Importers
           end
         end
       end
+    end
+
+    def self.set_annotatable_attachment(assignment, hash, context)
+      return unless hash[:annotatable_attachment_migration_id].present? && assignment.annotated_document?
+
+      attachment = context.attachments.find_by(migration_id: hash[:annotatable_attachment_migration_id])
+      return if attachment.blank? || attachment.deleted?
+
+      # Move this to the correct folder (creating the folder in the process) if
+      # it's not already there
+      attachment.update!(folder: context.student_annotation_documents_folder)
+      attachment.move_to_bottom if attachment.saved_change_to_folder_id?
+      assignment.annotatable_attachment = attachment
     end
   end
 end

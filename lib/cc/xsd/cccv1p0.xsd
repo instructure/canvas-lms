@@ -260,6 +260,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="annotatable_attachment_migration_id" type="xs:ID" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="identifier" type="xs:ID" use="required"/>
   </xs:complexType>

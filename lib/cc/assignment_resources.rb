@@ -47,6 +47,9 @@ module CC
     def add_assignment(assignment)
       add_exported_asset(assignment)
 
+      # Student Annotation assignments need to include the attachment they're using
+      add_item_to_export(assignment.annotatable_attachment) if assignment.annotated_document?
+
       migration_id = create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)
@@ -302,6 +305,10 @@ module CC
             add_line_item(line_items_node, line_item, assignment) if line_item.active?
           end
         end
+      end
+
+      if assignment.annotated_document? && assignment.annotatable_attachment&.available?
+        node.annotatable_attachment_migration_id(key_generator.create_key(assignment.annotatable_attachment))
       end
     end
 
