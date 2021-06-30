@@ -966,7 +966,7 @@ acknowledge that you have read and agreed to the
             <p>
               <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
               <br/>
-              <%= settings.label :outgoing_email_default_name_option_custom_name, :en => 'Name:' %>
+              <%= settings.label :outgoing_email_default_name, :en => 'Name:' %>
               <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
             </p>
           </div>
