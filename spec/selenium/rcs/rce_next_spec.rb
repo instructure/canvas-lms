@@ -1488,6 +1488,25 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect_new_page_load { submit_quiz }
           expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(quiz_content)
         end
+
+        it 'sanitizes the HTML set in the HTML editor' do
+          get '/'
+
+          html = <<~HTML
+            <img src="/" id="test-image" onerror="alert('hello')" />
+          HTML
+
+          rce_wysiwyg_state_setup(
+            @course,
+            html,
+            html: true,
+            new_rce: true
+          )
+
+          in_frame rce_page_body_ifr_id do
+            expect(f('#test-image').attribute('onerror')).to be_nil
+          end
+        end
       end
     end
   end
