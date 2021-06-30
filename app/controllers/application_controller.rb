@@ -2830,8 +2830,11 @@ class ApplicationController < ActionController::Base
       # See if the user has associations with any k5-enabled accounts
       k5_accounts = @domain_root_account.settings[:k5_accounts]
       return false if k5_accounts.blank?
-
-      @current_user.user_account_associations.shard(@domain_root_account).where(account_id: k5_accounts).exists?
+      enrolled_course_ids = @current_user.enrollments.shard(@domain_root_account).new_or_active_by_date.select(:course_id)
+      enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
+      enrolled_account_ids += @current_user.account_users.shard(@domain_root_account).active.pluck(:account_id)
+      enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
+      (enrolled_account_chain_ids & k5_accounts).any?
     else
       # Default to classic canvas if the user isn't logged in
       false
