@@ -27,7 +27,7 @@ describe('<PreviewSection />', () => {
       <PreviewSection
         settings={{
           ...DEFAULT_SETTINGS,
-          color: '#f00',
+          color: null,
           outlineColor: '#0f0',
           outlineSize: 'medium',
           shape: 'triangle',
@@ -42,8 +42,31 @@ describe('<PreviewSection />', () => {
         viewBox="0 0 218 218"
         width="218px"
       >
+        <pattern
+          height="16"
+          id="checkerboard"
+          patternUnits="userSpaceOnUse"
+          width="16"
+          x="0"
+          y="0"
+        >
+          <rect
+            fill="#d9d9d9"
+            height="8"
+            width="8"
+            x="0"
+            y="0"
+          />
+          <rect
+            fill="#d9d9d9"
+            height="8"
+            width="8"
+            x="8"
+            y="8"
+          />
+        </pattern>
         <g
-          fill="#f00"
+          fill="url(#checkerboard)"
           stroke="#0f0"
           stroke-width="4"
         >

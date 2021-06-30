@@ -24,6 +24,10 @@ export const DEFAULT_SETTINGS = {
   outlineSize: 'none'
 }
 
+export const DEFAULT_OPTIONS = {
+  isPreview: false
+}
+
 export const BASE_SIZE = {
   'x-small': 74,
   small: 122,

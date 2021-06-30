@@ -26,7 +26,7 @@ export const PreviewSection = ({settings}) => {
   const wrapper = useRef(null)
 
   useEffect(() => {
-    const svg = buildSvg(settings)
+    const svg = buildSvg(settings, {isPreview: true})
     appendSvg(svg, wrapper.current)
   }, [settings])
 

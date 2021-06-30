@@ -16,18 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DEFAULT_SETTINGS, BASE_SIZE, STROKE_WIDTH} from './constants'
+import {BASE_SIZE, DEFAULT_OPTIONS, DEFAULT_SETTINGS, STROKE_WIDTH} from './constants'
 import {createSvgElement} from './utils'
 import {buildShape} from './shape'
 
-export function buildSvg(settings = {}) {
+export function buildSvg(settings, options = DEFAULT_OPTIONS) {
   settings = {...DEFAULT_SETTINGS, ...settings}
 
   const wrapper = buildSvgWrapper(settings)
-  const g = buildGroup(settings)
-  const shape = buildShape(settings)
 
+  if (options.isPreview) {
+    const checkerboard = buildCheckerboard()
+    wrapper.appendChild(checkerboard)
+  }
+
+  const g = buildGroup(settings, options)
+  const shape = buildShape(settings)
   g.appendChild(shape)
+
   wrapper.appendChild(g)
 
   return wrapper
@@ -43,11 +49,31 @@ export function buildSvgWrapper({size}) {
   })
 }
 
-export function buildGroup({color, outlineColor, outlineSize}) {
-  const g = createSvgElement('g', {fill: color || 'none'})
+export function buildGroup({color, outlineColor, outlineSize}, options = DEFAULT_OPTIONS) {
+  const fill = color || (options.isPreview ? 'url(#checkerboard)' : 'none')
+  const g = createSvgElement('g', {fill})
   if (outlineColor) {
     g.setAttribute('stroke', outlineColor)
     g.setAttribute('stroke-width', STROKE_WIDTH[outlineSize])
   }
   return g
+}
+
+export function buildCheckerboard() {
+  const pattern = createSvgElement('pattern', {
+    id: 'checkerboard',
+    x: '0',
+    y: '0',
+    width: '16',
+    height: '16',
+    patternUnits: 'userSpaceOnUse'
+  })
+
+  const children = [
+    createSvgElement('rect', {fill: '#d9d9d9', x: '0', width: '8', height: '8', y: '0'}),
+    createSvgElement('rect', {fill: '#d9d9d9', x: '8', width: '8', height: '8', y: '8'})
+  ]
+  children.forEach(child => pattern.appendChild(child))
+
+  return pattern
 }

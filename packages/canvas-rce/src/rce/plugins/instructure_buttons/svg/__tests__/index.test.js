@@ -17,9 +17,9 @@
  */
 
 import {buildGroup, buildSvg, buildSvgWrapper} from '../index'
-import {DEFAULT_SETTINGS} from '../constants'
+import {DEFAULT_OPTIONS, DEFAULT_SETTINGS} from '../constants'
 
-let settings
+let settings, options
 
 describe('buildSvg()', () => {
   beforeEach(() => {
@@ -31,9 +31,10 @@ describe('buildSvg()', () => {
       outlineColor: '#fff',
       outlineSize: 'large'
     }
+    options = {...DEFAULT_OPTIONS}
   })
 
-  it('builds the whole button svg', () => {
+  it('builds the button svg', () => {
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg
         fill="none"
@@ -43,6 +44,54 @@ describe('buildSvg()', () => {
       >
         <g
           fill="#000"
+          stroke="#fff"
+          stroke-width="8"
+        >
+          <circle
+            cx="109"
+            cy="109"
+            r="105"
+          />
+        </g>
+      </svg>
+    `)
+  })
+
+  it('builds the button svg when is preview mode', () => {
+    settings = {...settings, color: null}
+    options = {...options, isPreview: true}
+    expect(buildSvg(settings, options)).toMatchInlineSnapshot(`
+      <svg
+        fill="none"
+        height="218px"
+        viewBox="0 0 218 218"
+        width="218px"
+      >
+        <pattern
+          height="16"
+          id="checkerboard"
+          patternUnits="userSpaceOnUse"
+          width="16"
+          x="0"
+          y="0"
+        >
+          <rect
+            fill="#d9d9d9"
+            height="8"
+            width="8"
+            x="0"
+            y="0"
+          />
+          <rect
+            fill="#d9d9d9"
+            height="8"
+            width="8"
+            x="8"
+            y="8"
+          />
+        </pattern>
+        <g
+          fill="url(#checkerboard)"
           stroke="#fff"
           stroke-width="8"
         >
@@ -112,6 +161,16 @@ describe('buildGroup()', () => {
     settings = {...DEFAULT_SETTINGS, color: '#f00', outlineColor: '#0f0', outlineSize: 'small'}
   })
 
+  it('builds the <g /> element when color is set', () => {
+    expect(buildGroup(settings)).toMatchInlineSnapshot(`
+      <g
+        fill="#f00"
+        stroke="#0f0"
+        stroke-width="2"
+      />
+    `)
+  })
+
   it('builds the <g /> element when color is not set', () => {
     settings = {...settings, color: null}
     expect(buildGroup(settings)).toMatchInlineSnapshot(`
@@ -123,10 +182,12 @@ describe('buildGroup()', () => {
     `)
   })
 
-  it('builds the <g /> element when color is set', () => {
-    expect(buildGroup(settings)).toMatchInlineSnapshot(`
+  it('builds the <g /> element when color is not set and is preview mode', () => {
+    settings = {...settings, color: null}
+    options = {...options, isPreview: true}
+    expect(buildGroup(settings, options)).toMatchInlineSnapshot(`
       <g
-        fill="#f00"
+        fill="url(#checkerboard)"
         stroke="#0f0"
         stroke-width="2"
       />
