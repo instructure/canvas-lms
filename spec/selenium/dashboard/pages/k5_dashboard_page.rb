@@ -186,7 +186,7 @@ module K5DashboardPageObject
   end
 
   def new_course_modal_selector
-    "[aria-label='Create Course']"
+    "[aria-label='Create Subject']"
   end
 
   def nothing_due_selector(subject_course_title)

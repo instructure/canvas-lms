@@ -101,10 +101,10 @@ const HomeroomPage = ({
           </Flex.Item>
           {canCreateCourses && (
             <Flex.Item>
-              <Tooltip renderTip={I18n.t('Start a new course')}>
+              <Tooltip renderTip={I18n.t('Start a new subject')}>
                 <IconButton
                   data-testid="new-course-button"
-                  screenReaderLabel={I18n.t('Open new course modal')}
+                  screenReaderLabel={I18n.t('Open new subject modal')}
                   withBackground={false}
                   withBorder={false}
                   onClick={() => setCourseModalOpen(true)}

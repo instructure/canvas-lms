@@ -149,7 +149,7 @@ describe "admin k5 dashboard" do
       click_sync_enrollments_checkbox
       click_option(homeroom_select_selector, second_homeroom_course_name)
       click_new_course_create
-      
+
       expect(new_course_modal_exists?).to be_falsey
       expect(course_homeroom_option(second_homeroom_course_name)).to have_attribute("selected", "true")
     end
