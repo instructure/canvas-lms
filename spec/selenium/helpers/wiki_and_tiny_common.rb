@@ -279,11 +279,12 @@ module WikiAndTinyCommon
       select_all_wiki
     end
   end
-  def rce_wysiwyg_state_setup(course, text = "1\n2\n3", html: false)
+  def rce_wysiwyg_state_setup(course, text = "1\n2\n3", html: false, new_rce: false)
     visit_front_page_edit(course)
     wait_for_tiny(edit_wiki_css)
     if html
-      f('button[title="Switch to the html editor"]').click
+      button_title = new_rce ? 'Click or shift-click for the html editor.' : 'Switch to the html editor'
+      f("button[title='#{button_title}']").click
       in_frame tiny_rce_ifr_id do
         tinyrce_element = f('body')
         tinyrce_element.send_keys(text)
