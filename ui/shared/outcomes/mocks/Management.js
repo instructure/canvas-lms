@@ -22,7 +22,8 @@ import {
   SEARCH_GROUP_OUTCOMES,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
   UPDATE_LEARNING_OUTCOME,
-  DELETE_OUTCOME_LINKS
+  DELETE_OUTCOME_LINKS,
+  MOVE_OUTCOME_LINKS
 } from '../graphql/Management'
 
 export const accountMocks = ({
@@ -1035,6 +1036,109 @@ export const deleteOutcomeMock = ({
       query: DELETE_OUTCOME_LINKS,
       variables: {
         ids
+      }
+    },
+    result
+  }
+}
+
+export const moveOutcomeMock = ({
+  groupId = '101',
+  outcomeLinkIds = ['1', '2'],
+  failResponse = false,
+  failMutation = false,
+  failMutationNoErrMsg = false,
+  partialSuccess = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      moveOutcomeLinks: {
+        movedOutcomeLinkIds: outcomeLinkIds
+      },
+      __typename: 'MoveOutcomeLinksPayload',
+      errors: null
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: outcomeLinkIds[0],
+        message: 'Could not find associated outcome in this context',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutation = {
+    data: {
+      moveOutcomeLinks: {
+        __typename: 'MoveOutcomeLinksPayload',
+        movedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: 'Mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      moveOutcomeLinks: {
+        __typename: 'MoveOutcomeLinksPayload',
+        movedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const partialSuccessResponse = {
+    data: {
+      moveOutcomeLinks: {
+        movedOutcomeLinkIds: outcomeLinkIds.filter((_, idx) => idx !== 0)
+      },
+      __typename: 'MoveOutcomeLinksPayload',
+      errors: [
+        {
+          attribute: outcomeLinkIds[0],
+          message: 'Could not find associated outcome in this context',
+          __typename: 'Error'
+        }
+      ]
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  } else if (partialSuccess) {
+    result = partialSuccessResponse
+  }
+
+  return {
+    request: {
+      query: MOVE_OUTCOME_LINKS,
+      variables: {
+        input: {
+          groupId,
+          outcomeLinkIds
+        }
       }
     },
     result

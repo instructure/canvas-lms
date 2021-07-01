@@ -122,20 +122,22 @@ const ManageOutcomesView = ({
               <Text color="secondary">{I18n.t('The search returned no results')}</Text>
             </View>
           )}
-          {outcomes?.edges?.map(({canUnlink, id, node: {_id, title, description, canEdit}}) => (
-            <ManageOutcomeItem
-              key={_id}
-              _id={_id}
-              linkId={id}
-              title={title}
-              description={description}
-              canManageOutcome={canEdit}
-              canUnlink={canUnlink}
-              isChecked={!!selectedOutcomes[_id]}
-              onMenuHandler={onOutcomeMenuHandler}
-              onCheckboxHandler={onSelectOutcomesHandler}
-            />
-          ))}
+          {outcomes?.edges?.map(
+            ({canUnlink, id: linkId, node: {_id, title, description, canEdit}}) => (
+              <ManageOutcomeItem
+                key={linkId}
+                _id={_id}
+                linkId={linkId}
+                title={title}
+                description={description}
+                canManageOutcome={canEdit}
+                canUnlink={canUnlink}
+                isChecked={!!selectedOutcomes[linkId]}
+                onMenuHandler={onOutcomeMenuHandler}
+                onCheckboxHandler={onSelectOutcomesHandler}
+              />
+            )
+          )}
         </View>
       </InfiniteScroll>
     </View>

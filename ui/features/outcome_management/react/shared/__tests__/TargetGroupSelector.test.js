@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {render as realRender, act, fireEvent, within} from '@testing-library/react'
+import {render as realRender, act, fireEvent} from '@testing-library/react'
 import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
-import MoveModal from '../MoveModal'
+import TargetGroupSelector from '../TargetGroupSelector'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -33,25 +33,21 @@ jest.mock('@canvas/outcomes/graphql/Management', () => ({
   addOutcomeGroup: jest.fn()
 }))
 
-describe('MoveModal', () => {
-  let onCloseHandlerMock
+describe('TargetGroupSelector', () => {
   let cache
+  let setTargetGroupMock
   let showFlashAlertSpy
 
   const defaultProps = (props = {}) => ({
-    isOpen: true,
-    onCloseHandler: onCloseHandlerMock,
-    onMoveHandler: jest.fn(),
-    title: 'Account folder 0',
-    type: 'group',
     groupId: '100',
-    parentGroupId: '0',
+    parentGroupId: '1',
+    setTargetGroup: setTargetGroupMock,
     ...props
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
     cache = createCache()
+    setTargetGroupMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
@@ -77,42 +73,8 @@ describe('MoveModal', () => {
     )
   }
 
-  it('renders component with Group title', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Move "Account folder 0"')).toBeInTheDocument()
-  })
-
-  it('shows modal if open prop true', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Cancel')).toBeInTheDocument()
-  })
-
-  it('does not show modal if open prop false', async () => {
-    const {queryByText} = render(<MoveModal {...defaultProps({isOpen: false})} />)
-    await act(async () => jest.runAllTimers())
-    expect(queryByText('Cancel')).not.toBeInTheDocument()
-  })
-
-  it('calls onCloseHandlerMock on Close button click', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    const closeBtn = getByText('Close')
-    fireEvent.click(closeBtn)
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls onCloseHandlerMock on Cancel button click', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    const closeBtn = getByText('Cancel')
-    fireEvent.click(closeBtn)
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
   it('loads nested groups', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />, {
+    const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
@@ -121,54 +83,27 @@ describe('MoveModal', () => {
     expect(getByText('Account folder 0')).toBeInTheDocument()
   })
 
-  it('disables the move button when the selected group is equal to the group to be moved', async () => {
-    // Once TreeBrowser is updated to the latest version, groupId can go back to being a string
-    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: '100'})} />, {
+  it('calls setTargetGroup with the selected group object', async () => {
+    const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
-    await act(async () => jest.runAllTimers())
-    expect(within(getByRole('dialog')).getByText('Move').closest('button')).toHaveAttribute(
-      'disabled'
-    )
-  })
-
-  it('disables the move button when the selected parent group is equal to the parent of the group to be moved', async () => {
-    const {getByText, getByRole} = render(
-      <MoveModal {...defaultProps({groupId: '400', parentGroupId: '100'})} />,
-      {
-        mocks: [...smallOutcomeTree('Account')]
-      }
-    )
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 0'))
-    await act(async () => jest.runAllTimers())
-    expect(within(getByRole('dialog')).getByText('Move').closest('button')).toHaveAttribute(
-      'disabled'
-    )
-  })
-
-  it('enables the move button when a valid group is selected', async () => {
-    const {getByText, getByRole} = render(<MoveModal {...defaultProps({groupId: '100'})} />, {
-      mocks: [...smallOutcomeTree('Account')]
+    expect(setTargetGroupMock).toHaveBeenCalledWith({
+      canEdit: true,
+      collections: [],
+      descriptor: '2 Groups | 2 Outcomes',
+      id: '100',
+      name: 'Account folder 0',
+      outcomesCount: 2,
+      parentGroupId: '1'
     })
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Root account folder'))
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account folder 1'))
-    await act(async () => jest.runAllTimers())
-    expect(within(getByRole('dialog')).getByText('Move').closest('button')).not.toHaveAttribute(
-      'disabled'
-    )
   })
 
   it('displays an error on failed request for account outcome groups', async () => {
-    render(<MoveModal {...defaultProps()} />, {
+    render(<TargetGroupSelector {...defaultProps()} />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
@@ -180,7 +115,7 @@ describe('MoveModal', () => {
   })
 
   it('displays an error on failed request for course outcome groups', async () => {
-    render(<MoveModal {...defaultProps()} />, {
+    render(<TargetGroupSelector {...defaultProps()} />, {
       contextId: '2',
       contextType: 'Course',
       mocks: []
@@ -194,7 +129,7 @@ describe('MoveModal', () => {
   })
 
   it('renders a create new group link', async () => {
-    const {getByText} = render(<MoveModal {...defaultProps()} />)
+    const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Create New Group')).toBeInTheDocument()
   })
@@ -202,7 +137,7 @@ describe('MoveModal', () => {
   describe('when the create new group link is expanded', () => {
     it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
       addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
-      const {getByText, getByLabelText} = render(<MoveModal {...defaultProps()} />)
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
@@ -217,21 +152,37 @@ describe('MoveModal', () => {
       })
     })
 
-    it('displays an error if the group could not be created', async () => {
-      const {getByText, getByLabelText} = render(<MoveModal {...defaultProps()} />)
+    it('displays custom error message if group cannot be created', async () => {
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       addOutcomeGroup.mockReturnValue(Promise.reject(new Error('Server is busy')))
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create New Group'))
       await act(async () => jest.runAllTimers())
-
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
         message: 'An error occurred adding group "new group name": Server is busy'
+      })
+    })
+
+    it('displays default error message if group cannot be created and no error message is returned', async () => {
+      const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      addOutcomeGroup.mockReturnValue(Promise.reject(new Error()))
+      fireEvent.click(getByText('Create New Group'))
+      fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
+      fireEvent.click(getByText('Create New Group'))
+      await act(async () => jest.runAllTimers())
+      expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
+      expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        type: 'error',
+        message: 'An error occurred adding group "new group name"'
       })
     })
   })

@@ -223,6 +223,18 @@ export const UPDATE_LEARNING_OUTCOME = gql`
   }
 `
 
+export const MOVE_OUTCOME_LINKS = gql`
+  mutation MoveOutcomeLinks($input: MoveOutcomeLinksInput!) {
+    moveOutcomeLinks(input: $input) {
+      movedOutcomeLinkIds
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
   axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
@@ -248,17 +260,3 @@ export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) =>
     {title}
   )
 }
-
-export const moveOutcome = (
-  contextType,
-  contextId,
-  outcomeId,
-  oldParentGroupId,
-  newParentGroupId
-) =>
-  axios.put(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${newParentGroupId}/outcomes/${outcomeId}`,
-    {move_from: oldParentGroupId}
-  )

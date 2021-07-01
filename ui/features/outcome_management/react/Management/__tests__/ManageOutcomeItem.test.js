@@ -25,6 +25,7 @@ describe('ManageOutcomeItem', () => {
   let onCheckboxHandlerMock
   const defaultProps = (props = {}) => ({
     _id: '1',
+    linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
     isChecked: false,
@@ -66,9 +67,10 @@ describe('ManageOutcomeItem', () => {
     const checkbox = getByText('Select outcome')
     fireEvent.click(checkbox)
     expect(onCheckboxHandlerMock).toHaveBeenCalledWith({
-      canUnlink: true,
       _id: '1',
-      title: 'Outcome Title'
+      linkId: '2',
+      title: 'Outcome Title',
+      canUnlink: true
     })
   })
 
@@ -114,7 +116,7 @@ describe('ManageOutcomeItem', () => {
     fireEvent.click(getByText('Outcome Menu'))
     fireEvent.click(getByText('Remove'))
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
-    expect(onMenuHandlerMock.mock.calls[0][0]).toBe('1')
+    expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
   })
 

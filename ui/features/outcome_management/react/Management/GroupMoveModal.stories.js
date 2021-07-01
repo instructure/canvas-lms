@@ -17,27 +17,25 @@
  */
 
 import React from 'react'
-import MoveModal from './MoveModal'
+import GroupMoveModal from './GroupMoveModal'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
 import {createCache} from '@canvas/apollo'
 
 export default {
-  title: 'Examples/Outcomes/MoveModal',
-  component: MoveModal,
+  title: 'Examples/Outcomes/GroupMoveModal',
+  component: GroupMoveModal,
   args: {
     isOpen: true,
-    title: 'Group Title',
-    type: 'group',
-    contextId: 1,
+    groupId: '100',
+    groupTitle: 'Outcome Group 1',
+    contextId: '1',
     contextType: 'Account',
-    groupId: '101',
-    parentGroupId: '100'
+    parentGroupId: '0'
   },
   argTypes: {
-    onCloseHandler: {action: 'closed'},
-    onMoveHandler: {action: 'moved'}
+    onCloseHandler: {action: 'closed'}
   }
 }
 
@@ -46,20 +44,16 @@ const Template = args => {
     <OutcomesContext.Provider
       value={{env: {contextType: 'Account', contextId: '1', rootOutcomeGroup: {id: '100'}}}}
     >
-      <MockedProvider mocks={smallOutcomeTree()} cache={createCache()}>
-        <MoveModal {...args} />
+      <MockedProvider mocks={smallOutcomeTree('Account')} cache={createCache()}>
+        <GroupMoveModal {...args} />
       </MockedProvider>
     </OutcomesContext.Provider>
   )
 }
 export const Default = Template.bind({})
 
-export const veryLongOutcomeTitle = Template.bind({})
-veryLongOutcomeTitle.args = {
-  title: 'This is a very long title.'.repeat(10)
-}
-
-export const showsMoveGroupHeader = Template.bind({})
-showsMoveGroupHeader.args = {
-  type: 'group'
+export const withLongGroupTitle = Template.bind({})
+withLongGroupTitle.args = {
+  groupId: '100',
+  groupTitle: 'This is a long group title. '.repeat(4)
 }
