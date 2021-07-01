@@ -1123,9 +1123,7 @@ module UsefulBatchEnumerator
   def pluck(*args)
     return to_enum(:pluck, *args) unless block_given?
 
-    @relation.except(:select)
-      .select(*args)
-      .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
+    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
       yield relation.pluck(*args)
     end
   end
