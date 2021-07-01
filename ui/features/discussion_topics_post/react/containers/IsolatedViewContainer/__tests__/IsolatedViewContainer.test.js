@@ -19,12 +19,13 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {render} from '@testing-library/react'
+import {graphql} from 'msw'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
+import {render} from '@testing-library/react'
 
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
@@ -49,6 +50,7 @@ describe('IsolatedViewContainer', () => {
   })
 
   afterEach(() => {
+    mswClient.resetStore()
     server.resetHandlers()
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
@@ -70,22 +72,33 @@ describe('IsolatedViewContainer', () => {
     )
   }
 
-  const defaultProps = ({discussionEntryOverrides = {}} = {}) => ({
-    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
-    open: true
+  const defaultProps = () => ({
+    discussionEntryId: '1',
+    open: true,
+    onClose: () => {}
   })
 
   it('should render', () => {
     const {container} = setup(defaultProps())
     expect(container).toBeTruthy()
   })
-  it('should render a back button', () => {
+
+  it('should render a back button', async () => {
     const rootEntry = DiscussionEntry.mock({_id: 32})
-    const {getByTestId} = setup(defaultProps({discussionEntryOverrides: {rootEntry}}))
-    expect(getByTestId('back-button')).toBeTruthy()
+    const {findByTestId} = setup(defaultProps({discussionEntryOverrides: {rootEntry}}))
+    expect(await findByTestId('back-button')).toBeTruthy()
   })
 
   it('should not render a back button', () => {
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock()
+          })
+        )
+      })
+    )
     const {queryByTestId} = setup(defaultProps())
     expect(queryByTestId('back-button')).toBeNull()
   })

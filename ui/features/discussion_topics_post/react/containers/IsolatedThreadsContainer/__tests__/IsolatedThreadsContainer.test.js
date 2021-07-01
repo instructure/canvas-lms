@@ -18,6 +18,8 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
+import {PageInfo} from '../../../../graphql/PageInfo'
 import {render} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
@@ -59,23 +61,39 @@ describe('IsolatedThreadsContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const setup = () => {
+  const defaultProps = () => ({
+    discussionEntry: DiscussionEntry.mock({
+      discussionSubentriesConnection: {
+        nodes: [
+          DiscussionEntry.mock({
+            _id: '50',
+            id: '50',
+            message: '<p>This is the child reply</P>'
+          })
+        ],
+        pageInfo: PageInfo.mock(),
+        __typename: 'DiscussionSubentriesConnection'
+      }
+    })
+  })
+
+  const setup = props => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <IsolatedThreadsContainer discussionEntryId="1" />
+          <IsolatedThreadsContainer {...props} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
   }
 
   it('should render', () => {
-    const container = setup()
+    const container = setup(defaultProps())
     expect(container).toBeTruthy()
   })
 
   it('should render sub-entries in the correct order', async () => {
-    const container = setup()
+    const container = setup(defaultProps())
     expect(await container.findByText('This is the child reply')).toBeInTheDocument()
   })
 })

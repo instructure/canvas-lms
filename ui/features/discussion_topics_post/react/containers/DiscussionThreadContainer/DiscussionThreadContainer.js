@@ -182,7 +182,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry, true)
+            props.openIsolatedView(props.discussionEntry._id, true)
           }
         }}
       />
@@ -219,7 +219,7 @@ export const DiscussionThreadContainer = props => {
         )}
         onClick={() => {
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry, false)
+            props.openIsolatedView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
           }

@@ -16,48 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
-import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
-import LoadingIndicator from '@canvas/loading-indicator'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
-import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {useQuery} from 'react-apollo'
 import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 
-const FIRST_PAGE = 5
-const OTHER_PAGES = 20
-
 export const IsolatedThreadsContainer = props => {
-  const courseID = window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
-  const {setOnFailure} = useContext(AlertManagerContext)
-  const [pageNumber, setPageNumber] = useState(1)
-
-  const variables = {
-    discussionEntryID: props.discussionEntryId,
-    page: btoa(0),
-    perPage: FIRST_PAGE + OTHER_PAGES * (pageNumber - 1),
-    sort: 'desc',
-    courseID
-  }
-  const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    variables
-  })
-
-  if (subentries.error) {
-    setOnFailure(I18n.t('There was an unexpected error loading the replies.'))
-    return null
-  }
-
-  if (subentries.loading) {
-    return <LoadingIndicator />
-  }
-
   /**
    * We need the sort function, because we want the subEntries to return in desc (created_at) order,
    * thus newest to oldest.
@@ -67,9 +35,8 @@ export const IsolatedThreadsContainer = props => {
     return new Date(a.createdAt) - new Date(b.createdAt)
   }
 
-  const subentriesCount = subentries.data.legacyNode.subentriesCount
-  const actualSubentriesCount =
-    subentries.data.legacyNode.discussionSubentriesConnection.nodes.length
+  const subentriesCount = props.discussionEntry.subentriesCount
+  const actualSubentriesCount = props.discussionEntry.discussionSubentriesConnection.nodes.length
   const hasMoreReplies = actualSubentriesCount < subentriesCount
 
   return (
@@ -87,24 +54,23 @@ export const IsolatedThreadsContainer = props => {
         >
           <ShowOlderRepliesButton
             onClick={() => {
-              setPageNumber(pageNumber + 1)
+              // TODO: add callback for fetchMore option
             }}
           />
         </div>
       )}
-      {subentries.data.legacyNode.discussionSubentriesConnection.nodes
+      {props.discussionEntry.discussionSubentriesConnection.nodes
         .sort(sortReverseDisplay)
         .map(entry => (
-          <IsolatedThreadContainer discussionEntry={entry} key={`discussion-thread-${entry.id}`} />
+          <IsolatedThreadContainer discussionEntry={entry} key={entry.id} />
         ))}
     </div>
   )
 }
 
 IsolatedThreadsContainer.propTypes = {
-  discussionEntryId: PropTypes.string
+  discussionEntry: DiscussionEntry.shape
 }
-IsolatedThreadsContainer.defaultProps = {}
 
 export default IsolatedThreadsContainer
 

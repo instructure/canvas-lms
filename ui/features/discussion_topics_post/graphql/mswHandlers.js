@@ -112,6 +112,7 @@ export const handlers = [
     return res(
       ctx.data({
         legacyNode: DiscussionEntry.mock({
+          rootEntry: DiscussionEntry.mock({_id: 32}),
           discussionSubentriesConnection: {
             nodes: [
               DiscussionEntry.mock({

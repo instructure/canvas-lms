@@ -22,13 +22,10 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
-import {
-  ISOLATED_VIEW_MODES,
-  IsolatedViewContainer
-} from './containers/IsolatedViewContainer/IsolatedViewContainer'
+import {ISOLATED_VIEW_MODES, PER_PAGE, SearchContext} from './utils/constants'
+import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
@@ -104,12 +101,12 @@ const DiscussionTopicManager = props => {
   }
 
   // Isolated View State
-  const [isolatedEntry, setIsolatedEntry] = useState(null)
+  const [isolatedEntryId, setIsolatedEntryId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
-  const openIsolatedView = (discussionEntry, withRCE) => {
-    setIsolatedEntry(discussionEntry)
+  const openIsolatedView = (discussionEntryId, withRCE) => {
+    setIsolatedEntryId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
   }
@@ -204,9 +201,9 @@ const DiscussionTopicManager = props => {
           openIsolatedView={openIsolatedView}
         />
       )}
-      {ENV.isolated_view && (
+      {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
-          discussionEntry={isolatedEntry}
+          discussionEntryId={isolatedEntryId}
           open={isolatedViewOpen}
           mode={
             editorExpanded
