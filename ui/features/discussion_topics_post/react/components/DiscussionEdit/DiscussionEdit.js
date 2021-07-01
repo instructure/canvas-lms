@@ -44,7 +44,6 @@ export const DiscussionEdit = props => {
       data-testid="DiscussionEdit-container"
     >
       <View display="block">
-        <textarea style={{display: 'none'}} id={textAreaId.current} data-testid="message-body" />
         <span>
           <CanvasRce
             textareaId={textAreaId.current}
@@ -64,6 +63,7 @@ export const DiscussionEdit = props => {
             }}
             height={300}
             defaultContent={props.value}
+            mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
       </View>

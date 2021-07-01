@@ -143,7 +143,7 @@ describe('DiscussionFullPage', () => {
     })
 
     it('updates discussion entry', async () => {
-      const {getByTestId, queryByText, findByTestId, queryAllByTestId, getAllByTestId} = setup()
+      const {getByTestId, queryByText, findByTestId, getAllByTestId} = setup()
       await waitFor(() => expect(queryByText('This is the parent reply')).toBeInTheDocument())
 
       const actionsButton = await findByTestId('thread-actions-menu')
@@ -154,8 +154,7 @@ describe('DiscussionFullPage', () => {
         expect(tinymce.editors[0]).toBeDefined()
       })
 
-      const bodyInput = queryAllByTestId('message-body')[1]
-      fireEvent.change(bodyInput, {target: {value: ''}})
+      document.querySelectorAll('textarea')[1].value = ''
 
       const submitButton = getAllByTestId('DiscussionEdit-submit')[1]
       fireEvent.click(submitButton)
@@ -267,7 +266,7 @@ describe('DiscussionFullPage', () => {
   })
 
   it('should be able to post a reply to the topic', async () => {
-    const {getByTestId, findByTestId, queryAllByTestId} = setup()
+    const {getByTestId, findByTestId, queryAllByText} = setup()
 
     const replyButton = await findByTestId('discussion-topic-reply')
     fireEvent.click(replyButton)
@@ -279,10 +278,9 @@ describe('DiscussionFullPage', () => {
     const rce = await findByTestId('DiscussionEdit-container')
     expect(rce.style.display).toBe('')
 
-    const bodyInput = queryAllByTestId('message-body')[0]
-    fireEvent.change(bodyInput, {target: {value: 'This is a reply'}})
+    document.querySelectorAll('textarea')[0].value = 'This is a reply'
 
-    expect(bodyInput.value).toEqual('This is a reply')
+    expect(queryAllByText('This is a reply')).toBeTruthy()
 
     const doReplyButton = getByTestId('DiscussionEdit-submit')
     fireEvent.click(doReplyButton)
