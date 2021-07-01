@@ -112,6 +112,10 @@ module K5ResourceTabPageObject
     f(important_info_content_selector)
   end
 
+  def important_info_content_list
+    ff(important_info_content_selector)
+  end
+
   def instructor_bio(instructor_bio)
     fxpath(instructor_bio_selector(instructor_bio))
   end
@@ -175,6 +179,10 @@ module K5ResourceTabPageObject
 
   #----------------------------Element Management---------------------#
 
+  def important_info_text_list
+    important_info_content_list.map(&:text)
+  end
+  
   def is_cancel_available?
     element_value_for_attr(cancel_button, 'cursor') == 'pointer'
   end

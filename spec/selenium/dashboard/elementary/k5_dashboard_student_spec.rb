@@ -344,6 +344,22 @@ describe "student k5 dashboard" do
       get "/#resources"
       expect(important_info_content).to include_text(important_info_text)
     end
+
+    it 'shows the Important Info multiple homerooms for the main resources tab' do
+      important_info_text1 = "Show me what you can do"
+      important_info_text2 = "More homeroom info"
+      create_important_info_content(@homeroom_course, important_info_text1)
+
+      course_with_student(active_all: true, user: @student, course_name: "Second Homeroom")
+      second_homeroom_course = Course.last
+      second_homeroom_course.update!(homeroom_course: true)
+      create_important_info_content(second_homeroom_course, important_info_text2)
+
+      get "/#resources"
+
+      expect(important_info_text_list[0]).to eq(important_info_text1)
+      expect(important_info_text_list[1]).to eq(important_info_text2)
+    end
   end
 
   context 'homeroom dashboard resource panel LTI resources' do
