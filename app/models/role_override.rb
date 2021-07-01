@@ -163,9 +163,7 @@ class RoleOverride < ActiveRecord::Base
     },
     manage_courses_admin: {
       label: lambda { t('Manage account level course actions') },
-      label_v2: lambda { t('Admin - manage / update') },
-      group: 'manage_courses',
-      group_label: lambda { t('Manage Courses') },
+      label_v2: lambda { t('Courses - manage / update') },
       available_to: %w[AccountAdmin AccountMembership],
       true_for: ['AccountAdmin'],
       account_only: true,

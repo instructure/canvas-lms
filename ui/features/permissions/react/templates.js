@@ -373,17 +373,17 @@ const blueprintCoursePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on files, Manage Courses: Admin - manage / update and Course Files - edit must also be enabled.'
+        'To edit lock settings on files, Courses - manage / update and Course Files - edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To edit lock settings on quizzes, Manage Courses: Admin - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled.'
+        'To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To manage lock settings for object types, Manage Courses: Admin - manage / update must also be enabled.'
+        'To manage lock settings for object types, Courses - manage / update must also be enabled.'
       )
     }
   ],
@@ -438,9 +438,7 @@ const sisDataManagePermissions = generateActionTemplates(
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(
-        'To edit course settings, Manage Courses: Admin - manage / update must be enabled.'
-      )
+      description: I18n.t('To edit course settings, Courses - manage / update must be enabled.')
     },
     {
       title: I18n.t('People (Account)'),
@@ -601,7 +599,7 @@ const courseContentViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Undelete Courses)'),
       description: I18n.t(
-        'If Manage Courses: Admin - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
+        'If Courses - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
       )
     },
     {
@@ -1283,7 +1281,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -1293,7 +1291,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -1368,7 +1366,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -1378,7 +1376,7 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -1561,7 +1559,7 @@ const courseContentAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'To publish and unpublish module content, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
+        'To publish and unpublish module content, Courses - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
       )
     }
   ],
@@ -2057,37 +2055,6 @@ const courseManagePermissions = generateActionTemplates(
   'manage_courses',
   [
     {
-      title: I18n.t('Admin - manage / update'),
-      description: I18n.t('Allows user to sync Blueprint Courses.')
-    },
-    {
-      description: I18n.t('Allows user to view Blueprint Sync history.')
-    },
-    {
-      description: I18n.t('Allows user to view and manage courses in the account.')
-    },
-    {
-      description: I18n.t('Allows user to view the Course Setup Checklist button.')
-    },
-    {
-      description: I18n.t('Allows user to access the Navigation tab in Course Settings.')
-    },
-    {
-      description: I18n.t(
-        'Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.'
-      )
-    },
-    {
-      description: I18n.t(
-        'Allows user to access Student View (test student), Copy this Course, and Permanently Delete Course buttons.'
-      )
-    },
-    {
-      description: I18n.t(
-        'Allows user to view student context cards in announcement and discussion replies.'
-      )
-    },
-    {
       title: I18n.t('Courses - add'),
       description: I18n.t('Allows user to add new courses to an account.')
     },
@@ -2136,12 +2103,12 @@ const courseManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Course Content'),
       description: I18n.t(
-        'To manage course content, Manage Courses: Admin - manage / update and Course Content - add / edit / delete must be enabled.'
+        'To manage course content, Courses - manage / update and Course Content - add / edit / delete must be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To view Choose Home Page and Course Setup Checklist buttons, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)'
+        'To view Choose Home Page and Course Setup Checklist buttons, Courses - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)'
       )
     },
     {
@@ -2152,12 +2119,12 @@ const courseManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To cross-list a section, Manage Courses: Admin - manage / update and Manage Course Sections - edit must also be enabled.'
+        'To cross-list a section, Courses - manage / update and Manage Course Sections - edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To edit the course SIS ID, Manage Courses: Admin - manage / update and SIS Data - manage must also be enabled.'
+        'To edit the course SIS ID, Courses - manage / update and SIS Data - manage must also be enabled.'
       )
     },
     {
@@ -2168,13 +2135,13 @@ const courseManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Courses - Account Navigations'),
       description: I18n.t(
-        'To access the Courses link in Account Navigation, Manage Courses: Admin - manage / update and Courses - view list must be enabled.'
+        'To access the Courses link in Account Navigation, Courses - manage / update and Courses - view list must be enabled.'
       )
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To view grades in a course, Manage Courses: Admin - manage / update and Grades - view all grades must also be enabled.'
+        'To view grades in a course, Courses - manage / update and Grades - view all grades must also be enabled.'
       )
     },
     {
@@ -2186,7 +2153,7 @@ const courseManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Student Context Cards'),
       description: I18n.t(
-        'Student context cards must be enabled for an account by an admin. If Manage Courses: Admin - manage / update is not enabled, users can still view context cards through the Gradebook.'
+        'Student context cards must be enabled for an account by an admin. If Courses - manage / update is not enabled, users can still view context cards through the Gradebook.'
       )
     }
   ],
@@ -2240,6 +2207,40 @@ const courseManagePermissions = generateActionTemplates(
   ]
 )
 
+const courseManageAdminPermissions = generateActionTemplates('manage_courses_admin', [
+  {
+    title: I18n.t('Courses - manage / update'),
+    description: I18n.t('Allows user to sync Blueprint Courses.')
+  },
+  {
+    description: I18n.t('Allows user to view Blueprint Sync history.')
+  },
+  {
+    description: I18n.t('Allows user to view and manage courses in the account.')
+  },
+  {
+    description: I18n.t('Allows user to view the Course Setup Checklist button.')
+  },
+  {
+    description: I18n.t('Allows user to access the Navigation tab in Course Settings.')
+  },
+  {
+    description: I18n.t(
+      'Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab.'
+    )
+  },
+  {
+    description: I18n.t(
+      'Allows user to access Student View (test student), Copy this Course, and Permanently Delete Course buttons.'
+    )
+  },
+  {
+    description: I18n.t(
+      'Allows user to view student context cards in announcement and discussion replies.'
+    )
+  }
+])
+
 const courseFilesAddPermissions = generateActionTemplates(
   'manage_files',
   [
@@ -2275,7 +2276,7 @@ const courseFilesAddPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update must also be enabled.'
       )
     }
   ],
@@ -2382,7 +2383,7 @@ const gradesEditPermissions = generateActionTemplates(
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'To edit course grading schemes, Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit course grading schemes, Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -2529,7 +2530,7 @@ const gradesAddEditDeletePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
       )
     },
     {
@@ -2725,7 +2726,7 @@ const courseSectionsViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Cross-Listing'),
       description: I18n.t(
-        'To cross-list sections, Course Sections - edit and Manage Courses: Admin - manage / update must also be enabled.'
+        'To cross-list sections, Course Sections - edit and Courses - manage / update must also be enabled.'
       )
     }
   ],
@@ -3011,7 +3012,7 @@ const pagesAddRemovePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update.'
+        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update.'
       )
     },
     {
@@ -3125,7 +3126,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings on the Discussions index page, Manage Courses: Admin - manage / update and Discussions - view must also be enabled.'
+        'To edit lock settings on the Discussions index page, Courses - manage / update and Discussions - view must also be enabled.'
       )
     },
     {
@@ -3376,7 +3377,7 @@ const discussionViewPermissions = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
+        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
       )
     },
     {
@@ -4355,6 +4356,7 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     courseFilesAddPermissions.ACCOUNT,
     courseListViewPermissions.ACCOUNT,
     courseManagePermissions.ACCOUNT,
+    courseManageAdminPermissions.ACCOUNT,
     courseSectionsViewPermissions.ACCOUNT,
     courseTemplatesPermissions.ACCOUNT,
     courseUndeletePermissions.ACCOUNT,
