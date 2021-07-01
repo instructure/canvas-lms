@@ -63,7 +63,7 @@ class ExternalFeed < ActiveRecord::Base
   }
 
   def destroy_entries_and_unlink_topics
-    external_feed_entries.in_batches(of: 100).delete_all
+    while self.external_feed_entries.limit(100).delete_all > 0; end
     while self.discussion_topics.limit(100).update_all(:external_feed_id => nil) > 0; end
   end
 
