@@ -25,8 +25,9 @@ module DataFixup::MigrateMessagesToPartitions
     # don't re-run the deletion if we don't need to
     unless last_run_date_threshold && last_run_date_threshold >= min_date_threshold
       # remove all messages that would be inserted into a dropped partition
-      Message.from("ONLY #{Message.quoted_table_name}")
-        .where("created_at < ?", min_date_threshold).in_batches.delete_all
+      while Message.from("ONLY #{Message.quoted_table_name}").
+        where("created_at < ?", min_date_threshold).limit(1000).delete_all > 0
+      end
     end
 
     partman = CanvasPartman::PartitionManager.create(Message)

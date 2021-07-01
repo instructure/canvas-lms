@@ -124,22 +124,22 @@ module ActiveRecord
           expect do
             User.create!
             User.select(:name).find_in_batches do |batch|
-              User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
+              User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
           end.to_not raise_error
         end
 
         it "should not use a temp table for a plain query" do
           User.create!
-          User.find_in_batches do
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
+          User.find_in_batches do |batch|
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
         it "should not use a temp table for a select with id" do
           User.create!
-          User.select(:id).find_in_batches do
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:id).to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
+          User.select(:id).find_in_batches do |batch|
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.select(:id).to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
@@ -148,7 +148,7 @@ module ActiveRecord
           User.create!
           selectors.each do |selector|
             expect {
-              User.select(selector).find_in_batches(strategy: :id) {}
+              User.select(selector).find_in_batches(start: 0){|batch| }
             }.not_to raise_error
           end
         end
