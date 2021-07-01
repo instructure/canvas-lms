@@ -35,6 +35,11 @@ describe('DiscussionPostToolbar', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('collapseToggle')).toBeNull()
     })
+
+    it('should not render clear search button by default', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('clear-search-button')).toBeNull()
+    })
   })
 
   describe('Search Field', () => {
@@ -46,6 +51,23 @@ describe('DiscussionPostToolbar', () => {
       window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(1), 1500)
       fireEvent.change(searchInput, {target: {value: 'B'}})
       window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(2), 1500)
+    })
+
+    it('should clear input when button is pressed', () => {
+      const {getByLabelText, queryByTestId} = setup()
+      let searchInput = getByLabelText('Search entries or author')
+
+      fireEvent.change(searchInput, {target: {value: 'A new Search'}})
+      let clearSearchButton = queryByTestId('clear-search-button')
+      searchInput = getByLabelText('Search entries or author')
+      expect(searchInput.value).toBe('A new Search')
+      expect(clearSearchButton).toBeInTheDocument()
+
+      fireEvent.click(clearSearchButton)
+      clearSearchButton = queryByTestId('clear-search-button')
+      searchInput = getByLabelText('Search entries or author')
+      expect(searchInput.value).toBe('')
+      expect(clearSearchButton).toBeNull()
     })
   })
 

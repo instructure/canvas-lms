@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -26,10 +26,12 @@ import {
   IconArrowDownLine,
   IconArrowUpLine,
   IconCircleArrowUpLine,
-  IconSearchLine
+  IconSearchLine,
+  IconTroubleLine
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React, {useCallback} from 'react'
+
+import React, {useState, useCallback, useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
@@ -48,7 +50,27 @@ export const getMenuConfig = props => {
   return options
 }
 
+const getClearButton = props => {
+  if (!props.searchValue.length) return
+
+  return (
+    <IconButton
+      type="button"
+      size="small"
+      withBackground={false}
+      withBorder={false}
+      screenReaderLabel="Clear search"
+      onClick={props.handleClear}
+      data-testid="clear-search-button"
+    >
+      <IconTroubleLine />
+    </IconButton>
+  )
+}
+
 export const DiscussionPostToolbar = props => {
+  const [searchValue, setSearchValue] = useState('')
+
   const debouncedSave = useCallback(
     debounce(nextValue => props.onSearchChange(nextValue), 500),
     [] // will be created only once initially
@@ -58,8 +80,18 @@ export const DiscussionPostToolbar = props => {
     const {value: nextValue} = event.target
     // Even though handleChange is created on each render and executed
     // it references the same debouncedSave that was created initially
+    setSearchValue(nextValue)
     debouncedSave(nextValue)
   }
+
+  const handleClear = useCallback(() => {
+    setSearchValue('')
+    debouncedSave('')
+  }, [debouncedSave])
+
+  const clearButton = useMemo(() => {
+    return getClearButton({handleClear, searchValue})
+  }, [handleClear, searchValue])
 
   return (
     <View maxWidth="56.875em">
@@ -76,7 +108,9 @@ export const DiscussionPostToolbar = props => {
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>
               }
+              value={searchValue}
               renderBeforeInput={<IconSearchLine inline={false} />}
+              renderAfterInput={clearButton}
               placeholder={I18n.t('Search entries or author...')}
               shouldNotWrap
               width="308px"
