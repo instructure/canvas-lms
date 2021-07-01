@@ -167,6 +167,12 @@
     "group_navigation_99f191a": {
         "message": "Խմբի նավարկում"
     },
+    "home_351838cd": {
+        "message": "Սկիզբ"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML խմբագիր"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
     },
@@ -199,6 +205,9 @@
     },
     "invalid_url_cbde79f": {
         "message": "Սխալ URL"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Անցնել այսօրվան"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Արագ հասանելիության ստեղներ"
@@ -245,8 +254,14 @@
     "no_e16d9132": {
         "message": "Ոչ"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"
+    },
     "no_results_940393cf": {
         "message": "No results."
+    },
+    "none_3b5e34d2": {
+        "message": "Ոչինչ չկա"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Առայժմ ոչինչ"
@@ -295,6 +310,9 @@
     },
     "size_b30e1077": {
         "message": "Չափ"
+    },
+    "star_8d156e09": {
+        "message": "Նշել աստղիկով"
     },
     "submit_a3cc6859": {
         "message": "Ուղարկել"

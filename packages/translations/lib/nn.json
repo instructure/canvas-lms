@@ -554,6 +554,12 @@
     "height_69b03e15": {
         "message": "Høgde"
     },
+    "home_351838cd": {
+        "message": "Heim"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML-redigeringsprogram"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Eg har løyve til å bruke denne fila. "
     },
@@ -601,6 +607,9 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Hopp til i dag"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Hurtigtastar"
@@ -737,11 +746,17 @@
     "no_grade_3b4d7f3e": {
         "message": "Inga vurdering"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
+    },
     "no_results_940393cf": {
         "message": "Utan resultat. "
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Ingen resultat funne for { filterTerm }"
+    },
+    "none_3b5e34d2": {
+        "message": "Ingen"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Ingenting akkurat no"
@@ -946,6 +961,9 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "firkanta uordna liste"
+    },
+    "star_8d156e09": {
+        "message": "Merk med stjerne"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } til { endDate }"

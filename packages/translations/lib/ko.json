@@ -140,6 +140,9 @@
     "group_navigation_99f191a": {
         "message": "그룹 탐색"
     },
+    "home_351838cd": {
+        "message": "홈"
+    },
     "image_8ad06": {
         "message": "이미지"
     },
@@ -166,6 +169,9 @@
     },
     "invalid_url_cbde79f": {
         "message": "잘못된 URL"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "오늘로 가기"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "키보드 단축키"
@@ -215,6 +221,9 @@
     "no_results_940393cf": {
         "message": "No results."
     },
+    "none_3b5e34d2": {
+        "message": "없음"
+    },
     "nothing_for_now_e3e3ce2a": {
         "message": "현재 없음"
     },
@@ -262,6 +271,9 @@
     },
     "sort_by_e75f9e3e": {
         "message": "정렬 조건"
+    },
+    "star_8d156e09": {
+        "message": "별표 표시"
     },
     "submit_a3cc6859": {
         "message": "제출"

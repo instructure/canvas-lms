@@ -362,6 +362,12 @@
     "height_69b03e15": {
         "message": "Yükseklik"
     },
+    "home_351838cd": {
+        "message": "Ana Sayfa"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML Düzenleyici"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Bu dosyayı kullanmak için iznim var."
     },
@@ -403,6 +409,9 @@
     },
     "invalid_url_cbde79f": {
         "message": "Geçersiz bağlantı"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Bugüne Git"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
@@ -479,8 +488,14 @@
     "no_e16d9132": {
         "message": "Hayır"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Bu dosya için ön izleme bulunmamaktadır."
+    },
     "no_results_940393cf": {
         "message": "Sonuç yok."
+    },
+    "none_3b5e34d2": {
+        "message": "Yok"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Şimdilik bir şey yok"
@@ -550,6 +565,9 @@
     },
     "sort_by_e75f9e3e": {
         "message": "Sırala"
+    },
+    "star_8d156e09": {
+        "message": "Yıldız Ver"
     },
     "submit_a3cc6859": {
         "message": "Gönder"
