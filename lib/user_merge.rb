@@ -98,7 +98,7 @@ class UserMerge
       max_position = Pseudonym.where(user_id: target_user).ordered.last.try(:position) || 0
       pseudonyms_to_move = Pseudonym.where(user_id: from_user)
       merge_data.add_more_data(pseudonyms_to_move)
-      pseudonyms_to_move.update_all(["user_id=?, position=position+?", target_user, max_position])
+      pseudonyms_to_move.update_all(["updated_at=NOW(), user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
         Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
@@ -121,7 +121,7 @@ class UserMerge
 
       account_users = AccountUser.where(user_id: from_user)
       merge_data.add_more_data(account_users)
-      account_users.update_all(user_id: target_user.id)
+      account_users.update_all(user_id: target_user.id, updated_at: Time.now.utc)
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
@@ -138,6 +138,7 @@ class UserMerge
       updates['conversation_messages'] = 'author_id'
       updates = updates.to_a
       version_updates = ['rubric_assessments', 'wiki_pages']
+      touching_updates = ['access_tokens', 'group_memberships']
       updates.each do |table, column|
         begin
           klass = table.classify.constantize
@@ -147,7 +148,12 @@ class UserMerge
               if version_updates.include?(table)
                 update_versions(scope, table, column)
               end
-              scope.update_all(column => target_user.id)
+
+              update = { column => target_user.id }
+              if touching_updates.include?(table) && klass.column_names.include?('updated_at')
+                update[:updated_at] = Time.now.utc
+              end
+              scope.update_all(update)
             end
           end
         rescue => e
@@ -158,8 +164,8 @@ class UserMerge
       context_updates = ['calendar_events']
       context_updates.each do |table|
         klass = table.classify.constantize
-        klass.where(context_id: from_user, context_type: 'User').
-          update_all(context_id: target_user.id, context_code: target_user.asset_string)
+        scope = klass.where(context_id: from_user, context_type: 'User')
+        scope.update_all(context_id: target_user.id, context_code: target_user.asset_string)
       end
 
       merge_data.bulk_insert_merge_data(data) unless data.empty?
@@ -326,6 +332,7 @@ class UserMerge
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
         merge_data.build_more_data(scope, data: data)
+        scope.touch_all()
         scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
     end
@@ -421,7 +428,7 @@ class UserMerge
       merge_data.build_more_data(to_delete, data: data)
       to_delete.destroy_all
       # update links to target_user
-      UserObservationLink.active.where(id: shard_observer_links).update_all(observer_id: target_user.id)
+      UserObservationLink.active.where(id: shard_observer_links).update_all(observer_id: target_user.id, updated_at: Time.now.utc)
     end
 
     student_links = from_user.as_student_observation_links.shard(from_user)
@@ -435,7 +442,7 @@ class UserMerge
       merge_data.build_more_data(to_delete, data: data)
       to_delete.destroy_all
       # update links to target_user
-      UserObservationLink.active.where(id: shard_student_links).update_all(user_id: target_user.id)
+      UserObservationLink.active.where(id: shard_student_links).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       target_user.as_student_observation_links.where(observer_id: shard_student_links).each(&:create_linked_enrollments)
     end
 
@@ -579,7 +586,7 @@ class UserMerge
           # upgrade to strong association if there are any enrollments
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
           merge_data.build_more_data(to_move, data: data)
-          to_move.update_all(column => target_user.id)
+          to_move.update_all(column => target_user.id, updated_at: Time.now.utc)
         end
       end
     end
