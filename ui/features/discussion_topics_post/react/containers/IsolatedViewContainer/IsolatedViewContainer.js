@@ -16,8 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  addReplyToDiscussion,
+  addReplyToDiscussionEntry,
+  addReplyToSubentries,
+  getSpeedGraderUrl
+} from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
+import {
+  CREATE_DISCUSSION_ENTRY,
+  DELETE_DISCUSSION_ENTRY,
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
+  UPDATE_DISCUSSION_ENTRY
+} from '../../../graphql/Mutations'
+import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
@@ -26,15 +39,130 @@ import I18n from 'i18n!discussion_topics_post'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {ISOLATED_VIEW_MODES, PER_PAGE} from '../../utils/constants'
+import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {Tray} from '@instructure/ui-tray'
-import {useQuery} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedViewContainer = props => {
-  const {setOnFailure} = useContext(AlertManagerContext)
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const updateCache = (cache, result) => {
+    const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+
+    addReplyToDiscussion(cache, props.discussionTopic.id)
+    addReplyToDiscussionEntry(cache, props.discussionEntryId, newDiscussionEntry)
+    addReplyToSubentries(
+      cache,
+      props.discussionEntryId,
+      btoa(0),
+      'desc',
+      newDiscussionEntry,
+      window.ENV?.course_id
+    )
+  }
+
+  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
+    update: updateCache,
+    onCompleted: () => setOnSuccess(I18n.t('The discussion entry was successfully created.')),
+    onError: () =>
+      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+  })
+
+  const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.deleteDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The reply was successfully deleted.'))
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
+      }
+    },
+    onError: () => setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
+  })
+
+  const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.updateDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The reply was successfully updated.'))
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+      }
+    },
+    onError: () => setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+  })
+
+  const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    onCompleted: data => {
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
+      }
+      setOnSuccess(I18n.t('The reply was successfully updated.'))
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
+    }
+  })
+
+  const toggleRating = discussionEntry => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: discussionEntry._id,
+        rating: discussionEntry.rating ? 'not_liked' : 'liked'
+      }
+    })
+  }
+
+  const toggleUnread = discussionEntry => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: discussionEntry._id,
+        read: !discussionEntry.read,
+        forcedReadState: discussionEntry.read || null
+      }
+    })
+  }
+
+  const onDelete = discussionEntry => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
+      deleteDiscussionEntry({
+        variables: {
+          id: discussionEntry._id
+        }
+      })
+    }
+  }
+
+  const onUpdate = (discussionEntry, message) => {
+    updateDiscussionEntry({
+      variables: {
+        discussionEntryId: discussionEntry._id,
+        message
+      }
+    })
+  }
+
+  const onOpenInSpeedGrader = discussionEntry => {
+    window.location.assign(
+      getSpeedGraderUrl(
+        window.ENV?.course_id,
+        props.discussionTopic.assignment._id,
+        discussionEntry.author._id
+      )
+    )
+  }
+
+  const onReplySubmit = message => {
+    createDiscussionEntry({
+      variables: {
+        discussionTopicId: props.discussionTopic._id,
+        parentEntryId: props.discussionEntryId,
+        message
+      }
+    })
+  }
 
   const isolatedEntry = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
@@ -61,12 +189,9 @@ export const IsolatedViewContainer = props => {
       label="Isolated View"
       shouldCloseOnDocumentClick
       onDismiss={e => {
-        // When the RCE is open, it stills the mouse position when using it and we do this trick
+        // When the RCE is open, it steals the mouse position when using it and we do this trick
         // to avoid the whole Tray getting closed because of a click inside the RCE area.
-        if (
-          props.mode === ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY &&
-          e.clientY - e.target.offsetTop === 0
-        ) {
+        if (props.RCEOpen && e.clientY - e.target.offsetTop === 0) {
           return
         }
 
@@ -100,13 +225,13 @@ export const IsolatedViewContainer = props => {
         <>
           <IsolatedParent
             discussionEntry={isolatedEntry.data.legacyNode}
-            onToggleUnread={() => {}}
-            onDelete={() => {}}
-            onOpenInSpeedGrader={() => {}}
-            onReply={() => {}}
-            onToggleRating={() => {}}
+            onToggleUnread={() => toggleUnread(isolatedEntry.data.legacyNode)}
+            onDelete={() => onDelete(isolatedEntry.data.legacyNode)}
+            onOpenInSpeedGrader={() => onOpenInSpeedGrader(isolatedEntry.data.legacyNode)}
+            onReply={() => props.setRCEOpen(true)}
+            onToggleRating={() => toggleRating(isolatedEntry.data.legacyNode)}
           >
-            {props.mode === ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
+            {props.RCEOpen && (
               <View
                 display="block"
                 background="primary"
@@ -115,18 +240,23 @@ export const IsolatedViewContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
-                  onSubmit={() => {}}
-                  onCancel={() => {
-                    if (props.onClose) {
-                      props.onClose()
-                    }
+                  onSubmit={text => {
+                    onReplySubmit(text)
+                    props.setRCEOpen(false)
                   }}
+                  onCancel={() => props.setRCEOpen(false)}
                 />
               </View>
             )}
           </IsolatedParent>
-          {props.mode !== ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY && (
-            <IsolatedThreadsContainer discussionEntry={isolatedEntry.data.legacyNode} />
+          {!props.RCEOpen && (
+            <IsolatedThreadsContainer
+              discussionEntry={isolatedEntry.data.legacyNode}
+              onToggleRating={toggleRating}
+              onToggleUnread={toggleUnread}
+              onDelete={onDelete}
+              onOpenInSpeedGrader={onOpenInSpeedGrader}
+            />
           )}
         </>
       )}
@@ -135,13 +265,12 @@ export const IsolatedViewContainer = props => {
 }
 
 IsolatedViewContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntryId: PropTypes.string,
   open: PropTypes.bool,
-  mode: PropTypes.number,
-  onClose: PropTypes.func
-}
-IsolatedViewContainer.defaultProps = {
-  mode: ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
+  onClose: PropTypes.func,
+  RCEOpen: PropTypes.bool,
+  setRCEOpen: PropTypes.func
 }
 
 export default IsolatedViewContainer

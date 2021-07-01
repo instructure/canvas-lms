@@ -30,8 +30,3 @@ const searchFilter = {
   setPageNumber: () => {}
 }
 export const SearchContext = React.createContext(searchFilter)
-
-export const ISOLATED_VIEW_MODES = {
-  VIEW_ROOT_ENTRY: 1,
-  REPLY_TO_ROOT_ENTRY: 2
-}

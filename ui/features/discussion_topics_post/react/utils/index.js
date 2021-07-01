@@ -99,6 +99,7 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
 export const addReplyToSubentries = (
   cache,
   discussionEntryId,
+  page,
   sort,
   newDiscussionEntry,
   courseID
@@ -108,6 +109,7 @@ export const addReplyToSubentries = (
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: discussionEntryId,
+        page,
         perPage: PER_PAGE,
         sort,
         courseID

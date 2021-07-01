@@ -20,6 +20,7 @@ import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
+import PropTypes from 'prop-types'
 import React from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
@@ -62,14 +63,25 @@ export const IsolatedThreadsContainer = props => {
       {props.discussionEntry.discussionSubentriesConnection.nodes
         .sort(sortReverseDisplay)
         .map(entry => (
-          <IsolatedThreadContainer discussionEntry={entry} key={entry.id} />
+          <IsolatedThreadContainer
+            discussionEntry={entry}
+            key={entry.id}
+            onToggleRating={props.onToggleRating}
+            onToggleUnread={props.onToggleUnread}
+            onDelete={props.onDelete}
+            onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+          />
         ))}
     </div>
   )
 }
 
 IsolatedThreadsContainer.propTypes = {
-  discussionEntry: DiscussionEntry.shape
+  discussionEntry: DiscussionEntry.shape,
+  onToggleRating: PropTypes.func,
+  onToggleUnread: PropTypes.func,
+  onDelete: PropTypes.func,
+  onOpenInSpeedGrader: PropTypes.func
 }
 
 export default IsolatedThreadsContainer
@@ -93,7 +105,7 @@ const IsolatedThreadContainer = props => {
       <ThreadingToolbar.Like
         key={`like-${entry.id}`}
         delimiterKey={`like-delimiter-${entry.id}`}
-        onClick={() => {}}
+        onClick={() => props.onToggleRating(props.discussionEntry)}
         authorName={entry.author.name}
         isLiked={entry.rating}
         likeCount={entry.ratingSum || 0}
@@ -135,10 +147,10 @@ const IsolatedThreadContainer = props => {
             <ThreadActions
               id={entry.id}
               isUnread={!DiscussionEntry.read}
-              onToggleUnread={() => {}}
-              onDelete={() => {}}
+              onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
+              onDelete={() => props.onDelete(props.discussionEntry)}
               onEdit={() => {}}
-              onOpenInSpeedGrader={() => {}}
+              onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
               goToParent={() => {}}
               goToTopic={() => {}}
             />
@@ -150,5 +162,9 @@ const IsolatedThreadContainer = props => {
 }
 
 IsolatedThreadContainer.propTypes = {
-  discussionEntry: DiscussionEntry.shape
+  discussionEntry: DiscussionEntry.shape,
+  onToggleRating: PropTypes.func,
+  onToggleUnread: PropTypes.func,
+  onDelete: PropTypes.func,
+  onOpenInSpeedGrader: PropTypes.func
 }

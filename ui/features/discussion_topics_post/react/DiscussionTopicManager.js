@@ -22,7 +22,7 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
-import {ISOLATED_VIEW_MODES, PER_PAGE, SearchContext} from './utils/constants'
+import {PER_PAGE, SearchContext} from './utils/constants'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
@@ -203,13 +203,11 @@ const DiscussionTopicManager = props => {
       )}
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
+          discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
           open={isolatedViewOpen}
-          mode={
-            editorExpanded
-              ? ISOLATED_VIEW_MODES.REPLY_TO_ROOT_ENTRY
-              : ISOLATED_VIEW_MODES.VIEW_ROOT_ENTRY
-          }
+          RCEOpen={editorExpanded}
+          setRCEOpen={setEditorExpanded}
           onClose={closeIsolatedView}
         />
       )}
