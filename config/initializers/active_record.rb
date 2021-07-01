@@ -792,6 +792,16 @@ module UsefulFindInBatches
     end
   end
 
+  # back-compat for pluck
+  def find_in_batches_with_temp_table(batch_size: 1000, pluck: nil, **kwargs, &block)
+    if pluck
+      select(*pluck).in_batches(of: batch_size, strategy: :temp_table, **kwargs).pluck(*pluck, &block)
+      return
+    end
+
+    find_in_batches(strategy: :temp_table, batch_size: batch_size, **kwargs, &block)
+  end
+
   def in_batches(strategy: nil, start: nil, finish: nil, **kwargs, &block)
     unless block_given?
       return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
