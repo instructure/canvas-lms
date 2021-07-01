@@ -36,7 +36,7 @@ export function PostMessage({...props}) {
     <Byline
       title={
         <Flex direction="column">
-          <Flex.Item>
+          <Flex.Item overflowY="hidden">
             {props.hasAuthor && (
               <View padding="none small none none">
                 <Text weight="bold" data-testid="author_name">
