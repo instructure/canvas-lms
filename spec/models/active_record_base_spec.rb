@@ -154,6 +154,39 @@ describe ActiveRecord::Base do
         expect(es.length).to eq 6
         expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
       end
+
+      it "plucks" do
+        scope = Course.where(id: [@c1, @c2])
+        cs = []
+        Course.transaction do
+          scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
+            cs.concat(batch)
+          end
+        end
+        expect(cs.sort).to eq [@c1.id, @c2.id].sort
+      end
+
+      it "multi-column plucks" do
+        scope = Course.where(id: [@c1, @c2])
+        cs = []
+        Course.transaction do
+          scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
+            cs.concat(batch)
+          end
+        end
+        expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
+      end
+
+      it "plucks with join" do
+        scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
+        es = []
+        Course.transaction do
+          scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
+            es.concat(batch)
+          end
+        end
+        expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
+      end
     end
 
     context "with cursor" do
