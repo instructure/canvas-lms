@@ -544,7 +544,7 @@ ca:
         yes-abbreviation: s
       grade_change_logging_results: 
         Anonymous: Anònim
-        Assignment: Tasca
+        Assignment: Activitat
         Course: Curs
         Grader: Qualificador
         Student: Estudiant
@@ -2131,8 +2131,8 @@ ca:
       other: "Mostra els fitxers adjunts"
     errors: 
       cannot_save_att: "No teniu permís per editar l'atribut bloquejat %{att_name}"
-    feed_entry_title: "Tasca: %{assignment}"
-    feed_entry_title_with_course: "Tasca, %{course}: %{assignment}"
+    feed_entry_title: "Activitat: %{assignment}"
+    feed_entry_title_with_course: "Activitat, %{course}: %{assignment}"
     gpa_scale_explainer: "Què són les qualificacions amb l'escala GPA?"
     grading_type_options: 
       gpa_scale: "Escala GPA"
@@ -2167,7 +2167,7 @@ ca:
     loading: "S'està carregant..."
     titles: 
       assignment_rubric_details: "Detalls de la rúbrica de la tasca"
-  assignment_976578a8: Tasca
+  assignment_976578a8: Activitat
   assignment_allowed_attempts_7e3d43ee: "Intents permesos de la tasca"
   assignment_and_link_selection_557faf38: "Selecció d'enllaços i tasques"
   assignment_assignment_submission_paper_view_8a4c9776: "Visualització en paper de l'entrega de la tasca %{assignment}"
@@ -2230,8 +2230,8 @@ ca:
       gpa_scale_explainer: "Què són les qualificacions amb l'escala GPA?"
       grading_scheme_info: "Visualitza/edita l'esquema de qualificació"
   assignment_group: 
-    default_name: Tasques
-    default_title: Tasques
+    default_name: Activitats
+    default_title: Activitats
   assignment_group_1a781505: "Grup de tasques"
   assignment_group_filter_c03f8a1d: "Filtre per grup de tasques"
   assignment_group_selector: 
@@ -2332,7 +2332,7 @@ ca:
       closed: Tancat
       not_available_until: "No disponible fins al"
     create_assignment: 
-      assignment: Tasca
+      assignment: Activitat
       assignment_due_at: "Venciment:"
       assignment_name: "Nom:"
       assignment_points: "Punts:"
@@ -2439,21 +2439,21 @@ ca:
       group_set: "Conjunt de grups"
       is_group_assignment: "Aquesta és una tasca de grup"
     index_view: 
-      add_assignment: Tasca
+      add_assignment: Activitat
       add_group: Grup
       add_quiz_lti: Qüestionari/prova
-      assignments: Tasques
+      assignments: Activitats
       search_for_assignment: "Cerca una tasca"
       title_add_assignment: "Afegeix una tasca"
       title_add_group: "Afegeix un grup de tasques"
       title_add_quiz_lti: "Afegeix un qüestionari/prova"
     multiple_due_dates: "Diverses dates de venciment"
-    new_assignment: "Tasca nova"
+    new_assignment: "Activitat nova"
     no_assignments_list_item: 
       no_assignments_in_this_group: "No hi ha cap tasca en aquest grup"
     no_assignments_search: 
-      aria_assignments: Tasques
-      assignments: Tasques
+      aria_assignments: Activitats
+      assignments: Activitats
       no_assignments_found: "No s'ha trobat cap tasca"
     notices: 
       assignment_delete: "Aquesta tasca s'ha suprimit"
@@ -2728,7 +2728,7 @@ ca:
     past_assignments: "Tasques antigues"
     undated_assignments: "Tasques sense data"
     upcoming_assignments: "Properes tasques"
-  assignments_1e02582c: Tasques
+  assignments_1e02582c: Activitats
   assignments_2: 
     attempts: 
       filter: Intents
@@ -3314,7 +3314,7 @@ ca:
     edit_event: 
       tabs: 
         appointment_group: "Grup de cites"
-        assignment: Tasca
+        assignment: Activitat
         event: Esdeveniment
         todo: "Les meves tasques pendents"
     edit_planner_note: 
@@ -3929,7 +3929,7 @@ ca:
   collaborations_are_web_based_tools_to_work_collabo_6fa285b6: "Les col·laboracions són eines basades en el web per treballar de manera col·laborativa en tasques com prendre notes o tasques en grup. Parleu amb el professor per començar."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Les col·laboracions són eines basades en la web per treballar de manera col·laborativa en tasques com prendre notes o tasques en grup. Per començar, afegiu una aplicació de col·laboració."
   collaborations_tutorial_tray_9219d9d: "Safata de tutorial sobre les col·laboracions"
-  collapse_all_50275533: "Redueix-ho tot"
+  collapse_all_50275533: "Amaga-ho tot"
   collapse_all_modules_e092807c: "Redueix tots els mòduls"
   collapse_discussion_thread_52bab65a: "Redueix el fil del debat"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Redueix la llista de membres del grup %{groupName}"
@@ -4637,7 +4637,7 @@ ca:
     errors: 
       reorder: "No s'han pogut reordenar, torneu-ho a provar."
     optgroup: 
-      assignments: Tasques
+      assignments: Activitats
       discussion_topics: Debats
       external_tools: "Eines externes"
       external_urls: "URLs externs"
@@ -5621,7 +5621,7 @@ ca:
         student_view: "Vista d'estudiant"
         view_course_calendar: "Veure el calendari del curs"
         view_course_notification_settings: "Visualitza les notificacions del curs"
-        view_course_stream: "Mostra la seqüència del curs"
+        view_course_stream: "Activitat recent"
       re_sending: "S'està tornant a enviar..."
       send_done: "Fet! Pot ser que el missatge trigui uns minuts."
       send_failed: "La sol·licitud ha fallat. Torneu-ho a provar."
@@ -5790,7 +5790,7 @@ ca:
   crumbs: 
     access_report: "Informe d'accés"
     announcements: Anuncis
-    assignments: Tasques
+    assignments: Activitats
     calendar_events: "Esdeveniments del calendari"
     collaborations: Col·laboracions
     conferences: Conferències
@@ -5950,7 +5950,7 @@ ca:
     show_more_link: 
       show_less: "Mostra'n menys"
       show_more: "Mostra'n més"
-  dashboard_7f1dbf71: Tauler
+  dashboard_7f1dbf71: "Panell de control"
   dashboard_card_movement_menu_b65b98f5: "Menú de moviment de targetes al tauler"
   dashboard_options_b240ed5a: "Opcions del tauler"
   dashboard_view_d7d85969: "Visualització del tauler"
@@ -6949,7 +6949,7 @@ ca:
   enabled_web_services_f620b2be: "Serveis web habilitats"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita la visualització d'informes de plagi i puntuacions de similitud a la safata d'entrega de Llibre de qualificacions nou."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet que s’apliquin dates importants a tasques, esdeveniments del calendari i altres activitats."
-  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Permet nous extrems API per a les dades de l'usuari i del curs proporcionades per Analítica nova."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Permet nous extrems API per a les dades de l'usuari i del curs proporcionades per Noves analítiques."
   enables_siteadmin_users_to_configure_release_notes_96c7a7e8: "Permet als usuaris administradors del lloc configurar les notes sobre el llançament per mostrar-les als usuaris"
   enables_the_course_templates_feature_globally_79d5302f: "Habilita la característica de Plantilles de curs globalment"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "En habilitar el tema per a l'educació primària, canviarà el tipus de lletra a la interfície del Canvas i es simplificarà el menú de navegació del curs per a tots els usuaris del curs."
@@ -7494,7 +7494,7 @@ ca:
   excused_5877183c: Excusat!
   excused_cf8792eb: Excusat
   exit_d0c7b013: Surt
-  expand_all_bb64d2ea: "Desplega-ho tot"
+  expand_all_bb64d2ea: "Mostra-ho tot"
   expand_all_modules_a7d79134: "Desplega tots els mòduls"
   expand_closed_caption_languages_2642db5b: "Desplega els idiomes dels subtítols tancats"
   expand_collapse_lang_73edc33c: "Desplega/redueix %{lang}"
@@ -8099,7 +8099,7 @@ ca:
       submission_failed: "L'entrega no s'ha realitzat correctament: %{error}"
       submission_failed_default: "L'entrega ha fallat"
     grade_summary: 
-      assignments: Tasques
+      assignments: Activitats
       click_to_change: "Feu clic per provar una altra puntuació"
       close_comments: Tanca
       close_comments_label: "Tanca els comentaris"
@@ -8352,7 +8352,7 @@ ca:
   group_a8f5ed9c: Grup
   group_add_permission_is_needed_to_create_a_new_gro_3cd0d1b5: "Cal el permís Afegeix un grup per crear una categoria de grup nou"
   group_announcements_f6e0fc8c: "Anuncis del grup"
-  group_assignment_7060989f: "Tasca de grup"
+  group_assignment_7060989f: "Activitat de grup"
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Les tasques de grup no es poden qualificar anònimament"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Les tasques de grup no es poden habilitar per a tasques de qualificació anònima"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Les tasques de grup no es poden habilitar per a tasques moderades"
@@ -8873,8 +8873,8 @@ ca:
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Com puc respondre a un debat com a instructor?"
   how_do_i_schedule_a_zoom_video_meeting_5986f068: "Com puc planificar una reunió en vídeo amb el Zoom?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Com puc seleccionar contingut específic com a part de la importació d'un curs?"
-  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Com puc enviar un missatge a tots els estudiants segons un criteri específic del curs a Analítica nova?"
-  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Com puc enviar un missatge a un estudiant concret a Analítica nova?"
+  how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Com puc enviar un missatge a tots els estudiants segons un criteri específic del curs a Noves analítiques?"
+  how_do_i_send_a_message_to_an_individual_student_i_92c7fb: "Com puc enviar un missatge a un estudiant concret a Noves analítiques?"
   how_do_i_set_a_front_page_in_a_course_a5f53cd5: "Com puc establir una pàgina frontal en un curs?"
   how_do_i_set_details_for_a_course_52cfbeff: "Com puc establir els detalls d'un curs?"
   how_do_i_share_my_screen_c280e585: "Com puc compartir la meva pantalla?"
@@ -9680,7 +9680,7 @@ ca:
       migration: 
         announcements: Anuncis
         assessment_question_banks: "Bancs de preguntes"
-        assignments: Tasques
+        assignments: Activitats
         attachments: Fitxers
         calendar_events: "Esdeveniments del calendari"
         context_modules: Mòduls
@@ -11754,7 +11754,7 @@ ca:
   migration: 
     announcement_type: Anunci
     assignment_group_type: "Grup de tasques"
-    assignment_type: Tasca
+    assignment_type: Activitat
     calendar_event_type: "Esdeveniment del calendari"
     discussion_topic_type: "Tema de debat"
     external_feed_type: "Canal de continguts externs"
@@ -12089,14 +12089,14 @@ ca:
   never_df100b49: Mai
   new_13daf639: Nou
   new_account_role_6e5c4964: "Rol de compte nou"
-  new_analytics_api_access_7eec1ead: "Nou accés a l'API d'analítica"
-  new_analytics_f6147886: "Analítica nova"
+  new_analytics_api_access_7eec1ead: "Accés a l'API Noves analítiques"
+  new_analytics_f6147886: "Noves analítiques"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
-      Analítica nova és una eina interactiva que us permet a vós i als estudiants fer un millor
+      Noves analítiques és una eina interactiva que us permet a vós i als estudiants fer un millor
           seguiment del rendiment i l'activitat dins del curs. Vegeu quins estudiants han visualitzat
           les pàgines i els recursos i han participat a les tasques, i quins estudiants pot ser que necessitin una
           mica més de motivació.
-  new_analytics_tutorial_tray_2511a34a: "Safata de tutorial sobre Analítica nova"
+  new_analytics_tutorial_tray_2511a34a: "Safata de tutorial sobre Noves analítiques"
   new_announcement_23af4598: "Anunci nou"
   new_announcement_in_course_name_title_84607f44: "Anunci nou a %{course_name}: %{title}"
   new_announcement_title_30ba7c1b: "Anunci nou: %{title}"
@@ -15899,7 +15899,7 @@ ca:
       low_score: "Puntuació baixa"
       outcome_info: "Informació sobre el resultat"
     screenreader_gradebook: 
-      assignments: Tasques
+      assignments: Activitats
       learning_mastery: "Domini de l'aprenentatge"
     settings: 
       assignment_toggles_and_actions: 
@@ -16527,7 +16527,7 @@ ca:
         name: "Nom del curs"
       new_course_name_placeholder: "Nom del curs"
       sample_course_code: "Conceptes bàsics del curs"
-      start_a_new_course: "Inicia un curs nou"
+      start_a_new_course: "Crea un curs nou"
     new_nav_header: 
       default_page_title: "Plataforma d'ensenyament virtual Canvas"
       links: 
@@ -16665,7 +16665,7 @@ ca:
         assign_rubric: "Assigna una rúbrica"
     select_content_dialog: 
       add_to_module: "Afegeix %{item} al *mòdul*"
-      assignment_item: Tasca
+      assignment_item: Activitat
       assignment_item_select_label: "Seleccioneu la tasca que voleu associar o seleccioneu \"Tasca nova\" per afegir una tasca nova."
       assignment_item_select_label_create: "Seleccioneu la tasca que voleu associar o seleccioneu \"Crea una tasca\" per afegir una tasca nova."
       assignment_item_select_label_new: "Seleccioneu la tasca que voleu associar o seleccioneu \"Tasca nova\" per afegir una tasca nova."
@@ -16718,7 +16718,7 @@ ca:
       new_topic_notice: "Seleccioneu el tema que voleu associar amb aquest *mòdul* o seleccioneu \"Tema nou\" per afegir un tema."
       new_topic_option: "[ Tema nou ]"
       options: 
-        assignments: Tasques
+        assignments: Activitats
       quiz_item: Qüestionari
       quiz_notice: "Seleccioneu el qüestionari que voleu associar amb aquest *mòdul* o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
       quiz_select_label: "Seleccioneu el qüestionari que voleu associar o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
@@ -16818,7 +16818,7 @@ ca:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Mostra el nom dels estudiants observats a les notificacions."
   show_name_of_observed_students_in_notifications_d38b53ca: "Mostra el nom dels estudiants observats a les notificacions"
   show_navigation_menu_34e7f441: "Mostra el menú de navegació"
-  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Permet mostrar analítiques noves per a les dades de cursos i usuaris. Les dades poden trigar fins a 24 hores a aparèixer a Analítica nova, després de marcar aquesta característica com a activa."
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Permet mostrar analítiques noves per a les dades de cursos i usuaris. Les dades poden trigar fins a 24 hores a aparèixer a Noves analítiques, després de marcar aquesta característica com a activa."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Mostra Qüestionaris nous a la pàgina Qüestionaris"
   show_one_question_at_a_time_271e346d: "Mostra una pregunta a la vegada"
   show_only_blueprint_courses_9fb37b41: "Mostra només els cursos plantilla"
@@ -17087,7 +17087,7 @@ ca:
   starred_subject_click_to_unstar_6aafcddc: "S'ha marcat \"%{subject}\" amb una estrella, feu clic per anul·lar-ho."
   start_5a4cfcd6: Comença
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Inicieu una conversa amb el vostre instructor a la safata d'entrada del Canvas."
-  start_a_new_course_1f5f2266: "Inicia un curs nou"
+  start_a_new_course_1f5f2266: "Crea un curs nou"
   start_assignment_d56256d3: "Comença la tasca"
   start_date_e937be8a: "Data d'inici"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
@@ -17425,7 +17425,7 @@ ca:
   submissions_base: 
     assignment_submitted: "S'ha entregat la tasca."
     crumbs: 
-      assignments: Tasques
+      assignments: Activitats
     errors: 
       no_report: "No s'ha pogut trobar cap informe per a aquest element de l'entrega"
     errors_update_failed: "L'actualització ha fallat"
@@ -17583,7 +17583,7 @@ ca:
   table_of_contents_d2d11ba6: "Índex de continguts"
   tabs: 
     announcements: Anuncis
-    assignments: Tasques
+    assignments: Activitats
     collaborations: Col·laboracions
     conferences: Conferències
     discussions: Debats
@@ -18408,7 +18408,7 @@ ca:
     aligned_items: "Elements alineats"
     announcement: Anunci
     announcements: Anuncis
-    assignments: Tasques
+    assignments: Activitats
     come_back_later: "Heu marcat aquesta pregunta per tornar-hi més tard"
     discussion: Debat
     discussions: Debats
@@ -19282,7 +19282,7 @@ ca:
     dashboard_sidebar: 
       coming_up: "Pròximes tasques"
       recent_feedback: "Comentaris recents"
-      start_new_course: "Inicia un curs nou"
+      start_new_course: "Crea un curs nou"
     enrollment: 
       course_not_published: "Aquest curs encara no s'ha publicat"
       linked_to_user: "(Enllaçat a %{user_name})"
