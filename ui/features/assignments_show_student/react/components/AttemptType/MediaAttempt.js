@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
@@ -61,18 +62,22 @@ export default class MediaAttempt extends React.Component {
   }
 
   onComplete = (err, data) => {
-    this.props.updateUploadingFiles(true)
-    if (data.mediaObject.embedded_iframe_url) {
-      this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
-    }
-    this.props.createSubmissionDraft({
-      variables: {
-        id: this.props.submission.id,
-        activeSubmissionType: 'media_recording',
-        attempt: this.props.submission.attempt || 1,
-        mediaId: data.mediaObject.media_object.media_id
+    if (err) {
+      this.context.setOnFailure(I18n.t('There was an error submitting your attempt.'))
+    } else {
+      this.props.updateUploadingFiles(true)
+      if (data.mediaObject.embedded_iframe_url) {
+        this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
       }
-    })
+      this.props.createSubmissionDraft({
+        variables: {
+          id: this.props.submission.id,
+          activeSubmissionType: 'media_recording',
+          attempt: this.props.submission.attempt || 1,
+          mediaId: data.mediaObject.media_object.media_id
+        }
+      })
+    }
   }
 
   onDismiss = () => {
@@ -219,3 +224,5 @@ export default class MediaAttempt extends React.Component {
     return this.renderMediaUpload()
   }
 }
+
+MediaAttempt.contextType = AlertManagerContext
