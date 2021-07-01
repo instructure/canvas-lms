@@ -2094,6 +2094,14 @@ describe ApplicationController do
       end
     end
 
+    it "caches the eligibility computation at the request level" do
+      RequestCache.enable do
+        expect(@controller).to receive(:k5_disabled?).once
+        expect(@controller.send(:k5_user?)).to eq true
+        expect(@controller.send(:k5_user?)).to eq true
+      end
+    end
+
     it "returns true if associated with a k5 account" do
       expect(@controller.send(:k5_user?)).to be_truthy
     end

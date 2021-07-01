@@ -2848,14 +2848,16 @@ class ApplicationController < ActionController::Base
   end
 
   def k5_user?(check_disabled = true)
-    if @current_user
-      return false if check_disabled && k5_disabled?
-      # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+    RequestCache.cache('k5_user', @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
+      if @current_user
+        next false if check_disabled && k5_disabled?
+        # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
+        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+          uncached_k5_user?
+        end
+      else
         uncached_k5_user?
       end
-    else
-      uncached_k5_user?
     end
   end
   helper_method :k5_user?
