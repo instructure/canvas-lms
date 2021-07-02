@@ -111,7 +111,7 @@ const FindOutcomesView = ({
         padding={isResponsiveMode ? '0 0 0 xx-small' : '0 0 small'}
       >
         <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
-          <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
+          <Flex.Item size="50%" shouldGrow>
             <Heading level="h4">
               {searchString ? (
                 <Flex>
@@ -120,7 +120,8 @@ const FindOutcomesView = ({
                       style={{
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        textOverflow: 'ellipsis',
+                        padding: '0.375rem 0'
                       }}
                     >
                       <View data-testid="group-name-ltr">
@@ -130,8 +131,7 @@ const FindOutcomesView = ({
                         style={{
                           display: 'inline-block',
                           transform: 'scale(0.6)',
-                          verticalAlign: 'middle',
-                          marginBottom: '0.25rem'
+                          height: '1em'
                         }}
                       >
                         <IconArrowOpenEndSolid title={I18n.t('search results for')} />
@@ -141,25 +141,25 @@ const FindOutcomesView = ({
                       </View>
                     </div>
                   </Flex.Item>
-                  <Flex.Item>
-                    {loading ? (
+                  <Flex.Item size="2.5rem">
+                    {loading && (
                       <Spinner
                         renderTitle={I18n.t('Loading')}
                         size="x-small"
-                        margin="0 0 0 small"
+                        margin="0 0 0 x-small"
                         data-testid="search-loading"
                       />
-                    ) : (
-                      ''
                     )}
                   </Flex.Item>
                 </Flex>
               ) : (
-                <Text wrap="break-word">
-                  {I18n.t('All %{groupTitle} Outcomes', {
-                    groupTitle: addZeroWidthSpace(groupTitle)
-                  })}
-                </Text>
+                <View as="div" padding="xx-small 0">
+                  <Text wrap="break-word">
+                    {I18n.t('All %{groupTitle} Outcomes', {
+                      groupTitle: addZeroWidthSpace(groupTitle)
+                    })}
+                  </Text>
+                </View>
               )}
             </Heading>
           </Flex.Item>

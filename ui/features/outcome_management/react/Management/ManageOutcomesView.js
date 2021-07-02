@@ -88,7 +88,7 @@ const ManageOutcomesView = ({
           <Heading level="h4">
             <Flex>
               <Flex.Item shouldShrink>
-                <div style={{overflowWrap: 'break-word'}}>
+                <div style={{overflowWrap: 'break-word', padding: '0.375rem 0'}}>
                   {I18n.t(
                     {
                       one: '1 "%{groupTitle}" Outcome',
@@ -101,16 +101,14 @@ const ManageOutcomesView = ({
                   )}
                 </div>
               </Flex.Item>
-              <Flex.Item>
-                {searchString && loading ? (
+              <Flex.Item size="2.5rem">
+                {searchString && loading && (
                   <Spinner
                     renderTitle={I18n.t('Loading')}
                     size="x-small"
-                    margin="0 0 0 small"
+                    margin="0 0 0 x-small"
                     data-testid="search-loading"
                   />
-                ) : (
-                  ''
                 )}
               </Flex.Item>
             </Flex>
