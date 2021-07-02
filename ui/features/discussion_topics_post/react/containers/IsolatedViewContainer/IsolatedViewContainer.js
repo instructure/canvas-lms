@@ -191,7 +191,7 @@ export const IsolatedViewContainer = props => {
       onDismiss={e => {
         // When the RCE is open, it steals the mouse position when using it and we do this trick
         // to avoid the whole Tray getting closed because of a click inside the RCE area.
-        if (props.RCEOpen && e.clientY - e.target.offsetTop === 0) {
+        if (e.clientY - e.target.offsetTop === 0) {
           return
         }
 
@@ -230,6 +230,7 @@ export const IsolatedViewContainer = props => {
             onOpenInSpeedGrader={() => onOpenInSpeedGrader(isolatedEntry.data.legacyNode)}
             onReply={() => props.setRCEOpen(true)}
             onToggleRating={() => toggleRating(isolatedEntry.data.legacyNode)}
+            onSave={onUpdate}
           >
             {props.RCEOpen && (
               <View

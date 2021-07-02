@@ -22,13 +22,15 @@ import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState} from 'react'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 
 export const IsolatedParent = props => {
+  const [isEditing, setIsEditing] = useState(false)
   const threadActions = []
+
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
@@ -109,6 +111,16 @@ export const IsolatedParent = props => {
             <PostMessageContainer
               discussionEntry={props.discussionEntry}
               threadActions={threadActions}
+              isEditing={isEditing}
+              onCancel={() => {
+                setIsEditing(false)
+              }}
+              onSave={message => {
+                if (props.onSave) {
+                  props.onSave(props.discussionEntry, message)
+                  setIsEditing(false)
+                }
+              }}
             />
           </Flex.Item>
           {!props.discussionEntry.deleted && (
@@ -122,7 +134,13 @@ export const IsolatedParent = props => {
                   }
                 }}
                 onDelete={props.onDelete}
-                onEdit={() => {}}
+                onEdit={
+                  props.discussionEntry.permissions?.update
+                    ? () => {
+                        setIsEditing(true)
+                      }
+                    : null
+                }
                 onOpenInSpeedGrader={props.onOpenInSpeedGrader}
                 goToParent={() => {}}
                 goToTopic={() => {}}
@@ -143,5 +161,6 @@ IsolatedParent.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   onReply: PropTypes.func,
   onToggleRating: PropTypes.func,
+  onSave: PropTypes.func,
   children: PropTypes.node
 }

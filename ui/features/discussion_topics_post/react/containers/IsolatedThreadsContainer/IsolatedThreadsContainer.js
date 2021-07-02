@@ -16,15 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext, useState} from 'react'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
+import {UPDATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
+import {useMutation} from 'react-apollo'
 
 export const IsolatedThreadsContainer = props => {
   /**
@@ -90,6 +93,32 @@ const IsolatedThreadContainer = props => {
   const threadActions = []
   const entry = props.discussionEntry
 
+  const [isEditing, setIsEditing] = useState(false)
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
+    onCompleted: data => {
+      if (!data.updateDiscussionEntry.errors) {
+        setOnSuccess(I18n.t('The reply was successfully updated.'))
+        setIsEditing(false)
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+    }
+  })
+
+  const onUpdate = newMesssage => {
+    updateDiscussionEntry({
+      variables: {
+        discussionEntryId: entry._id,
+        message: newMesssage
+      }
+    })
+  }
+
   if (entry.permissions.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
@@ -140,7 +169,15 @@ const IsolatedThreadContainer = props => {
     <div>
       <Flex>
         <Flex.Item shouldShrink shouldGrow>
-          <PostMessageContainer discussionEntry={entry} threadActions={threadActions} />
+          <PostMessageContainer
+            discussionEntry={entry}
+            threadActions={threadActions}
+            isEditing={isEditing}
+            onCancel={() => {
+              setIsEditing(false)
+            }}
+            onSave={onUpdate}
+          />
         </Flex.Item>
         {!entry.deleted && (
           <Flex.Item align="stretch">
@@ -149,7 +186,13 @@ const IsolatedThreadContainer = props => {
               isUnread={!DiscussionEntry.read}
               onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
               onDelete={() => props.onDelete(props.discussionEntry)}
-              onEdit={() => {}}
+              onEdit={
+                entry.permissions?.update
+                  ? () => {
+                      setIsEditing(true)
+                    }
+                  : null
+              }
               onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
               goToParent={() => {}}
               goToTopic={() => {}}

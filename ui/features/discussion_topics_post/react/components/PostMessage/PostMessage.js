@@ -84,6 +84,7 @@ export function PostMessage({...props}) {
                 onCancel={props.onCancel}
                 value={props.message}
                 onSubmit={props.onSave}
+                isEdit
               />
             </View>
           ) : (

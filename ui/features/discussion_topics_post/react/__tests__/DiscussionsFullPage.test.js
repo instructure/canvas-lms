@@ -348,7 +348,7 @@ describe('DiscussionFullPage', () => {
     })
   })
 
-  describe.skip('isolated view', () => {
+  describe('isolated view', () => {
     beforeAll(() => {
       window.ENV.isolated_view = true
     })
@@ -357,24 +357,45 @@ describe('DiscussionFullPage', () => {
       window.ENV.isolated_view = false
     })
 
+    afterEach(() => {
+      setOnSuccess.mockClear()
+    })
+
     it('should be able to post a reply to an entry', async () => {
-      const {findByText, findByTestId, findAllByTestId, getAllByTestId} = setup()
+      const {findByText, findByTestId, findAllByTestId, getByTestId} = setup()
 
       const replyButton = await findByTestId('threading-toolbar-reply')
       fireEvent.click(replyButton)
 
       expect(findByText('Thread')).toBeTruthy()
 
-      const rce = await findAllByTestId('DiscussionEdit-container')
-      expect(rce[1].style.display).toBe('')
-
-      const doReplyButton = getAllByTestId('DiscussionEdit-submit')
-      fireEvent.click(doReplyButton[1])
+      const doReplyButton = getByTestId('DiscussionEdit-submit')
+      fireEvent.click(doReplyButton)
 
       expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
 
       await waitFor(() =>
         expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+      )
+    })
+
+    it('should be able to edit a root entry', async () => {
+      const {findByText, findByTestId, findAllByTestId} = setup()
+
+      const expandButton = await findByTestId('expand-button')
+      fireEvent.click(expandButton)
+
+      const actionsButtons = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(actionsButtons[0]) // Root Entry kebab
+
+      const editButton = await findByText('Edit')
+      fireEvent.click(editButton)
+
+      const saveButton = await findByText('Save')
+      fireEvent.click(saveButton)
+
+      await waitFor(() =>
+        expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
       )
     })
   })

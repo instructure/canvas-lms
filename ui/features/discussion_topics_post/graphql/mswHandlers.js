@@ -227,18 +227,21 @@ export const handlers = [
     )
   }),
   graphql.mutation('UpdateDiscussionEntry', (req, res, ctx) => {
-    ctx.data({
-      updateDiscussionEntry: {
-        discussionTopic: mswAssign(
-          {...DiscussionEntry.mock()},
-          {
-            id: req.body.variables.discussionEntryId,
-            message: req.body.variables.message
-          }
-        ),
-        __typename: 'UpdateDiscussionEntryPayload'
-      }
-    })
+    return res(
+      ctx.data({
+        updateDiscussionEntry: {
+          discussionEntry: mswAssign(
+            {...DiscussionEntry.mock()},
+            {
+              id: req.body.variables.discussionEntryId,
+              message: req.body.variables.message
+            }
+          ),
+          errors: null,
+          __typename: 'UpdateDiscussionEntryPayload'
+        }
+      })
+    )
   }),
   graphql.mutation('UpdateDiscussionEntriesReadState', (req, res, ctx) => {
     const discussionEntries = req.variables.discussionEntryIds.map(id => ({

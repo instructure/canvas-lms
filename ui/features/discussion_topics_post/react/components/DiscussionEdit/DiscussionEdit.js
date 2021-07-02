@@ -92,7 +92,7 @@ export const DiscussionEdit = props => {
             margin="none none none small"
             data-testid="DiscussionEdit-submit"
           >
-            {I18n.t('Reply')}
+            {props.isEdit ? I18n.t('Save') : I18n.t('Reply')}
           </Button>
         </Flex.Item>
       </Flex>
@@ -104,11 +104,13 @@ DiscussionEdit.propTypes = {
   show: PropTypes.bool,
   value: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  isEdit: PropTypes.bool
 }
 
 DiscussionEdit.defaultProps = {
-  show: true
+  show: true,
+  isEdit: false
 }
 
 export default DiscussionEdit
