@@ -591,6 +591,29 @@ describe BasicLTI::BasicOutcomes do
         expect(submission.reload.submission_type).to eq submission_type
       end
     end
+
+    context 'sharding' do
+      specs_require_sharding
+      let(:source_id) {gen_source_id(u: @user1)}
+
+      it 'should succeed with cross-sharded users' do
+        @shard1.activate do
+          @root = Account.create
+          @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
+                                              username: 'other_shard@example.com', sis_user_id: 'other_shard')
+        end
+        @course.enroll_student(@user1)
+        xml.css('resultData').remove
+        request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+        expect(request.code_major).to eq 'success'
+        expect(request.body).to eq '<replaceResultResponse />'
+        expect(request.handle_request(tool)).to be_truthy
+        submission = assignment.submissions.where(user_id: @user1.id).first
+        expected_value = assignment.points_possible * 0.92.to_d
+        expect(submission.grade).to eq expected_value.to_s
+      end
+    end
   end
 
   context 'with attachments' do
