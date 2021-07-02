@@ -489,9 +489,9 @@ class UsersController < ApplicationController
     js_env({K5_USER: k5_user && !k5_disabled}, true)
 
     if k5_user?
-    # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
-    active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
-    js_env({HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) }})
+      # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
+      active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
+      js_env({HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) }})
     end
 
     js_env({
@@ -509,8 +509,7 @@ class UsersController < ApplicationController
         :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
         :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
       },
-      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user,
-      :IMPORTANT_DATES_CONTEXT_CODES => Enrollment.for_user(@current_user).active.limit(20).pluck(:course_id).map! {|id| "course_#{id}"}
+      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -521,8 +520,7 @@ class UsersController < ApplicationController
     end
 
     if k5_user?
-      css_bundle :k5_dashboard
-      css_bundle :dashboard_card
+      css_bundle :k5_common, :k5_dashboard, :dashboard_card
       js_bundle :k5_dashboard
     else
       css_bundle :dashboard

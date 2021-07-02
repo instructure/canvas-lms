@@ -2228,7 +2228,7 @@ class CoursesController < ApplicationController
           )
 
           js_bundle :k5_course, :context_modules
-          css_bundle :k5_dashboard, :content_next, :context_modules2, :grade_summary
+          css_bundle :k5_common, :k5_course, :content_next, :context_modules2, :grade_summary
         when 'announcements'
           js_bundle :announcements
           css_bundle :announcements_index

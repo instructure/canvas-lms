@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import K5Dashboard from './react/K5Dashboard'
-import ImportantDates from './react/ImportantDates'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import ready from '@instructure/ready'
 
@@ -43,16 +42,9 @@ ready(() => {
             ? 'teacher'
             : 'none'
         }
+        showImportantDates={!!ENV.FEATURES.important_dates}
       />,
       dashboardContainer
-    )
-  }
-
-  const importantDatesContainer = document.getElementById('right-side-placeholder')
-  if (importantDatesContainer) {
-    ReactDOM.render(
-      <ImportantDates timeZone={ENV.TIMEZONE} contextCodes={ENV.IMPORTANT_DATES_CONTEXT_CODES} />,
-      importantDatesContainer
     )
   }
 })

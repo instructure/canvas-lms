@@ -19,7 +19,7 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import moment from 'moment-timezone'
-import {render} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 
 import ImportantDates from '../ImportantDates'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
@@ -137,5 +137,20 @@ describe('ImportantDates', () => {
     const mathLink = getByText('Math HW')
     expect(mathLink).toBeInTheDocument()
     expect(mathLink.href).toBe('http://localhost:3000/courses/30/assignments/175')
+  })
+
+  it('shows close button if handleClose is provided', async () => {
+    const handleCloseFunc = jest.fn()
+    const {findByRole} = render(<ImportantDates {...getProps()} handleClose={handleCloseFunc} />)
+    const closeButton = await findByRole('button', {name: 'Hide Important Dates'})
+    expect(closeButton).toBeInTheDocument()
+    act(() => closeButton.click())
+    expect(handleCloseFunc).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not show close button if handleClose is not provided', async () => {
+    const {findByText, queryByText} = render(<ImportantDates {...getProps()} />)
+    await findByText('Math HW')
+    expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
   })
 })

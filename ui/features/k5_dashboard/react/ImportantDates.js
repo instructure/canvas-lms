@@ -21,12 +21,12 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!important_dates'
 import moment from 'moment-timezone'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {PresentationContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {CloseButton} from '@instructure/ui-buttons'
 
-import {theme} from '@canvas/k5/react/k5-theme'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
@@ -35,7 +35,7 @@ import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
 
-const ImportantDates = ({timeZone, contextCodes}) => {
+const ImportantDates = ({timeZone, contextCodes, handleClose}) => {
   const [loadingAssignments, setLoadingAssignments] = useState(true)
   const [loadingEvents, setLoadingEvents] = useState(true)
   const [assignments, setAssignments] = useState([])
@@ -60,7 +60,8 @@ const ImportantDates = ({timeZone, contextCodes}) => {
     params: {
       type: 'assignment',
       ...fetchParams
-    }
+    },
+    forceResult: contextCodes?.length ? undefined : []
   })
 
   useFetchApi({
@@ -71,7 +72,8 @@ const ImportantDates = ({timeZone, contextCodes}) => {
     params: {
       type: 'event',
       ...fetchParams
-    }
+    },
+    forceResult: contextCodes?.length ? undefined : []
   })
 
   const datesSkeleton = () => (
@@ -99,44 +101,52 @@ const ImportantDates = ({timeZone, contextCodes}) => {
   )
 
   return (
-    <ApplyTheme theme={theme}>
-      <View as="div">
-        <Heading as="h3" level="h4" margin="small 0">
-          {I18n.t('Important Dates')}
-        </Heading>
-        <PresentationContent>
-          <hr
-            style={{
-              margin: 0
-            }}
-          />
-        </PresentationContent>
-        <LoadingWrapper
-          id="important-dates-skeleton"
-          isLoading={loadingAssignments || loadingEvents}
-          renderCustomSkeleton={datesSkeleton}
-          skeletonsCount={3}
-        >
-          {dates?.length ? (
-            dates.map(date => (
-              <ImportantDateSection
-                key={`important-date-${date.date}`}
-                timeZone={timeZone}
-                {...date}
-              />
-            ))
-          ) : (
-            <ImportantDatesEmpty />
-          )}
-        </LoadingWrapper>
-      </View>
-    </ApplyTheme>
+    <View as="div" padding="medium">
+      <Flex margin="small 0" alignItems="center" justifyItems="space-between">
+        <Flex.Item>
+          <Heading as="h3" level="h4">
+            {I18n.t('Important Dates')}
+          </Heading>
+        </Flex.Item>
+        {handleClose && (
+          <Flex.Item>
+            <CloseButton screenReaderLabel={I18n.t('Hide Important Dates')} onClick={handleClose} />
+          </Flex.Item>
+        )}
+      </Flex>
+      <PresentationContent>
+        <hr
+          style={{
+            margin: 0
+          }}
+        />
+      </PresentationContent>
+      <LoadingWrapper
+        id="important-dates-skeleton"
+        isLoading={contextCodes == null || loadingAssignments || loadingEvents}
+        renderCustomSkeleton={datesSkeleton}
+        skeletonsCount={3}
+      >
+        {dates?.length ? (
+          dates.map(date => (
+            <ImportantDateSection
+              key={`important-date-${date.date}`}
+              timeZone={timeZone}
+              {...date}
+            />
+          ))
+        ) : (
+          <ImportantDatesEmpty />
+        )}
+      </LoadingWrapper>
+    </View>
   )
 }
 
 ImportantDates.propTypes = {
   timeZone: PropTypes.string.isRequired,
-  contextCodes: PropTypes.arrayOf(PropTypes.string).isRequired
+  contextCodes: PropTypes.arrayOf(PropTypes.string),
+  handleClose: PropTypes.func
 }
 
 export default ImportantDates

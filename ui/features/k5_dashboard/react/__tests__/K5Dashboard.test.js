@@ -25,7 +25,9 @@ import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
 import {MOCK_TODOS} from './mocks'
+import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const currentUser = {
   id: '1',
@@ -48,6 +50,7 @@ const dashboardCards = [
     courseCode: 'ECON-001',
     enrollmentState: 'active',
     isHomeroom: false,
+    isK5Subject: true,
     canManage: true,
     published: true
   },
@@ -60,6 +63,7 @@ const dashboardCards = [
     courseCode: 'HOME-001',
     enrollmentState: 'active',
     isHomeroom: true,
+    isK5Subject: false,
     canManage: true,
     published: false
   },
@@ -71,6 +75,7 @@ const dashboardCards = [
     courseCode: 'DA-MATHS',
     enrollmentState: 'invited',
     isHomeroom: false,
+    isK5Subject: true,
     canManage: true,
     published: true
   }
@@ -193,7 +198,8 @@ const defaultEnv = {
   current_user_id: '1',
   K5_USER: true,
   FEATURES: {
-    unpublished_courses: true
+    unpublished_courses: true,
+    important_dates: true
   },
   PREFERENCES: {
     hide_dashcard_color_overlays: false
@@ -209,7 +215,8 @@ const defaultProps = {
   plannerEnabled: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
-  hideGradesTabForStudents: false
+  hideGradesTabForStudents: false,
+  showImportantDates: true
 }
 
 beforeEach(() => {
@@ -314,6 +321,11 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
   fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
   fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
+  fetchMock.get(
+    /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/,
+    MOCK_ASSIGNMENTS
+  )
+  fetchMock.get(/\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/, MOCK_EVENTS)
   global.ENV = defaultEnv
 })
 
@@ -325,6 +337,7 @@ afterEach(() => {
   resetPlanner()
   sessionStorage.clear()
   window.location.hash = ''
+  destroyContainer()
 })
 
 describe('K-5 Dashboard', () => {
@@ -689,6 +702,26 @@ describe('K-5 Dashboard', () => {
       )
       expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
       expect(queryByRole('tab', {name: 'To Do'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Important Dates', () => {
+    it('does not render any important dates if the flag is off', async () => {
+      const {findByText, queryByText} = render(
+        <K5Dashboard {...defaultProps} showImportantDates={false} />
+      )
+      expect(await findByText('My Subjects')).toBeInTheDocument()
+      expect(queryByText('Important Dates')).not.toBeInTheDocument()
+      expect(queryByText('View Important Dates')).not.toBeInTheDocument()
+    })
+
+    it('renders a sidebar with important dates and no tray buttons on large screens', async () => {
+      const {findByText, getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
+      expect(await findByText('History Discussion')).toBeInTheDocument()
+      expect(getByText('Algebra 2')).toBeInTheDocument()
+      expect(getByText('Important Dates')).toBeInTheDocument()
+      expect(queryByText('View Important Dates')).not.toBeInTheDocument()
+      expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
     })
   })
 })
