@@ -27,7 +27,8 @@ class SisBatchError < ActiveRecord::Base
   scope :warnings, -> {where(failure: false)}
 
   def self.cleanup_old_errors
-    expired_errors.in_batches(of: 10_000).delete_all
+    cleanup = expired_errors.limit(10_000)
+    while cleanup.delete_all > 0; end
   end
 
   def description
