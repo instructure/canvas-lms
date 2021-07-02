@@ -108,7 +108,9 @@ duplicate_modules:
 embedded_release_notes:
   state: allowed_on
   display_name: Embedded Release Notes
-  description: Shows Instructure-provided release notes in the help menu for all users (filtered by user role)
+  description: Show Instructure-provided release notes filtered by user role in the
+       Help Menu. Available to users with admin, teacher (instructor), and observer
+       roles. Applicable features for student roles are included in observer notes.
   applies_to: Account
 encrypted_sourcedids:
   state: allowed
