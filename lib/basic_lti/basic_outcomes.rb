@@ -123,7 +123,7 @@ module BasicLTI
       end
 
       def user_enrollment_active?(assignment, user)
-        user.student_enrollments.active_or_pending_by_date.where(course_id: assignment.context_id).any?
+        assignment.context.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
       end
 
       def to_xml
