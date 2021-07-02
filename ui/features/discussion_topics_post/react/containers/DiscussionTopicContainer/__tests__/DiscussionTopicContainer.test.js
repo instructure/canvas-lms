@@ -367,10 +367,6 @@ describe('DiscussionTopicContainer', () => {
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
 
-    await waitFor(() => {
-      expect(tinymce.editors[0]).toBeDefined()
-    })
-
     const sendToButton = await container.findByText('Send To...')
     fireEvent.click(sendToButton)
     expect(await container.findByText('Send to:')).toBeTruthy()
@@ -409,10 +405,6 @@ describe('DiscussionTopicContainer', () => {
       expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     )
 
-    await waitFor(() => {
-      expect(tinymce.editors[0]).toBeDefined()
-    })
-
     expect(await container.findByTestId('discussion-topic-reply')).toBeInTheDocument()
   })
 
@@ -434,22 +426,6 @@ describe('DiscussionTopicContainer', () => {
 
     await waitFor(() => expect(container.queryByTestId('discussion-topic-reply')).toBeNull())
     defaultTopic.permissions.reply = true
-  })
-
-  it('should find "Super Group" group name', async () => {
-    const container = setup({discussionTopic: {...defaultTopic}})
-    expect(await container.queryByText('Super Group')).toBeFalsy()
-    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
-    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
-  })
-
-  it('should show groups menu when discussion has no child topics but has sibling topics', async () => {
-    // defaultTopic has a root topic which has a child topic named Super Group
-    // we are only removing the child topic from defaultTopic itself, not its root topic
-    const container = setup({discussionTopic: {...defaultTopic, childTopics: null}})
-    expect(await container.queryByText('Super Group')).toBeFalsy()
-    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
-    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
   })
 
   it('should not render group menu button when there is child topics but no group set', async () => {
@@ -544,7 +520,9 @@ describe('DiscussionTopicContainer', () => {
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
-    expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
+    waitFor(() =>
+      expect(container.queryByText('You must post before seeing replies.')).toBeInTheDocument()
+    )
   })
 
   it('should not render author if author is null', async () => {

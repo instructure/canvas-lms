@@ -31,6 +31,7 @@ import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 
 const getOptimisticResponse = text => {
   return {
@@ -174,8 +175,10 @@ const DiscussionTopicManager = props => {
       />
     )
   }
+
   return (
     <SearchContext.Provider value={searchContext}>
+      <DiscussionPostToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {

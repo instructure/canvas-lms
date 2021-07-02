@@ -25,7 +25,6 @@ import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
-import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -52,7 +51,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
 
-  const {setSearchTerm, filter, setFilter, sort, setSort} = useContext(SearchContext)
+  const {searchTerm} = useContext(SearchContext)
 
   const discussionTopicData = {
     _id: props.discussionTopic._id,
@@ -235,34 +234,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   })
 
-  const onSearchChange = value => {
-    setSearchTerm(value)
-  }
-
-  const onViewFilter = (_event, value) => {
-    setFilter(value.value)
-  }
-
-  const onSortClick = () => {
-    sort === 'asc' ? setSort('desc') : setSort('asc')
-  }
-
-  const getGroupsMenuTopics = () => {
-    if (!discussionTopicData?.permissions?.readAsAdmin) {
-      return null
-    }
-    if (!discussionTopicData?.groupSet) {
-      return null
-    }
-    if (discussionTopicData.childTopics.length > 0) {
-      return discussionTopicData.childTopics
-    } else if (discussionTopicData.siblingTopics.length > 0) {
-      return discussionTopicData.siblingTopics
-    } else {
-      return null
-    }
-  }
-
   const onPublish = () => {
     updateDiscussionTopic({
       variables: {
@@ -306,22 +277,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   return (
     <>
-      <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
-        <View as="div" padding="medium 0" background="primary">
-          <DiscussionPostToolbar
-            childTopics={getGroupsMenuTopics()}
-            selectedView={filter}
-            sortDirection={sort}
-            isCollapsedReplies
-            onSearchChange={onSearchChange}
-            onViewFilter={onViewFilter}
-            onSortClick={onSortClick}
-            onCollapseRepliesToggle={() => {}}
-            onTopClick={() => {}}
-          />
-        </View>
-      </div>
-      {requiresInitialPost && (
+      {discussionTopicData?.initialPostRequiredForCurrentUser && (
         <AlertFRD renderCloseButtonLabel="Close">
           {I18n.t('You must post before seeing replies.')}
         </AlertFRD>
@@ -337,124 +293,128 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
             </AlertFRD>
           </View>
         )}
-      <Flex as="div" direction="column">
-        <Flex.Item>
-          <View
-            as="div"
-            borderWidth="small"
-            borderRadius="medium"
-            borderStyle="solid"
-            borderColor="primary"
-          >
-            {isGraded(discussionTopicData.assignment) && (
-              <View as="div" padding="none medium none">
-                <Alert
-                  dueAtDisplayText={discussionTopicData.dueAt}
-                  pointsPossible={discussionTopicData.pointsPossible}
-                  assignmentOverrides={
-                    singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
-                  }
-                  canSeeMultipleDueDates={canSeeMultipleDueDates}
-                />
-                {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
-                  assessmentRequest => (
-                    <PeerReview
-                      key={assessmentRequest._id}
-                      dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-                        props.discussionTopic.assignment.peerReviews?.dueAt
-                      )}
-                      revieweeName={assessmentRequest.user.name}
-                      reviewLinkUrl={getReviewLinkUrl(
-                        ENV.course_id,
-                        props.discussionTopic.assignment._id,
-                        assessmentRequest.user._id
-                      )}
-                      workflowState={assessmentRequest.workflowState}
-                    />
-                  )
-                )}
-              </View>
-            )}
-
-            <Highlight isHighlighted={highlightEntry}>
-              <Flex direction="column">
-                <Flex.Item>
-                  <Flex
-                    direction="row"
-                    justifyItems="space-between"
-                    padding="medium small none"
-                    alignItems="start"
-                  >
-                    <Flex.Item shouldShrink shouldGrow>
-                      <PostMessage
-                        hasAuthor={hasAuthor}
-                        authorName={discussionTopicData.authorName}
-                        avatarUrl={discussionTopicData.avatarUrl}
-                        timingDisplay={discussionTopicData.postedAt}
-                        title={discussionTopicData.title}
-                        message={discussionTopicData.message}
-                        discussionRoles={resolveAuthorRoles(
-                          hasAuthor,
-                          discussionTopicData.authorRoles
-                        )}
-                        postUtilities={
-                          <PostToolbarContainer
-                            canUnpublish={canUnpublish}
-                            canCloseForComments={canCloseForComments}
-                            deleteDiscussionTopic={deleteDiscussionTopic}
-                            discussionTopicData={discussionTopicData}
-                            requiresInitialPost={requiresInitialPost}
-                            onPublish={onPublish}
-                            onToggleLocked={onToggleLocked}
-                            onMarkAllAsRead={onMarkAllAsRead}
-                            onSubscribe={onSubscribe}
-                            setSendToOpen={setSendToOpen}
-                            setCopyToOpen={setCopyToOpen}
-                          />
-                        }
-                      >
-                        {canReply && (
-                          <Button
-                            color="primary"
-                            onClick={() => {
-                              setExpandedReply(!expandedReply)
-                            }}
-                            data-testid="discussion-topic-reply"
-                          >
-                            {I18n.t('Reply')}
-                          </Button>
-                        )}
-                      </PostMessage>
-                    </Flex.Item>
-                  </Flex>
-                </Flex.Item>
-                <Flex.Item
-                  shouldShrink
-                  shouldGrow
-                  padding={
-                    expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
-                  }
-                  overflowX="hidden"
-                  overflowY="hidden"
-                >
-                  <DiscussionEdit
-                    show={expandedReply}
-                    onSubmit={text => {
-                      if (createDiscussionEntry) {
-                        createDiscussionEntry(text)
-                        setExpandedReply(false)
-                      }
-                    }}
-                    onCancel={() => {
-                      setExpandedReply(false)
-                    }}
+      {!searchTerm && (
+        <Flex as="div" direction="column" data-testid="discussion-topic-container">
+          <Flex.Item>
+            <View
+              as="div"
+              borderWidth="small"
+              borderRadius="medium"
+              borderStyle="solid"
+              borderColor="primary"
+            >
+              {isGraded(discussionTopicData.assignment) && (
+                <View as="div" padding="none medium none">
+                  <Alert
+                    dueAtDisplayText={discussionTopicData.dueAt}
+                    pointsPossible={discussionTopicData.pointsPossible}
+                    assignmentOverrides={
+                      singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
+                    }
+                    canSeeMultipleDueDates={canSeeMultipleDueDates}
                   />
-                </Flex.Item>
-              </Flex>
-            </Highlight>
-          </View>
-        </Flex.Item>
-      </Flex>
+                  {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                    assessmentRequest => (
+                      <PeerReview
+                        key={assessmentRequest._id}
+                        dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                          props.discussionTopic.assignment.peerReviews?.dueAt
+                        )}
+                        revieweeName={assessmentRequest.user.name}
+                        reviewLinkUrl={getReviewLinkUrl(
+                          ENV.course_id,
+                          props.discussionTopic.assignment._id,
+                          assessmentRequest.user._id
+                        )}
+                        workflowState={assessmentRequest.workflowState}
+                      />
+                    )
+                  )}
+                </View>
+              )}
+
+              <Highlight isHighlighted={highlightEntry}>
+                <Flex direction="column">
+                  <Flex.Item>
+                    <Flex
+                      direction="row"
+                      justifyItems="space-between"
+                      padding="medium small none"
+                      alignItems="start"
+                    >
+                      <Flex.Item shouldShrink shouldGrow>
+                        <PostMessage
+                          hasAuthor={hasAuthor}
+                          authorName={discussionTopicData.authorName}
+                          avatarUrl={discussionTopicData.avatarUrl}
+                          timingDisplay={discussionTopicData.postedAt}
+                          title={discussionTopicData.title}
+                          message={discussionTopicData.message}
+                          discussionRoles={resolveAuthorRoles(
+                            hasAuthor,
+                            discussionTopicData.authorRoles
+                          )}
+                          postUtilities={
+                            <PostToolbarContainer
+                              canUnpublish={canUnpublish}
+                              canCloseForComments={canCloseForComments}
+                              deleteDiscussionTopic={deleteDiscussionTopic}
+                              discussionTopicData={discussionTopicData}
+                              requiresInitialPost={requiresInitialPost}
+                              onPublish={onPublish}
+                              onToggleLocked={onToggleLocked}
+                              onMarkAllAsRead={onMarkAllAsRead}
+                              onSubscribe={onSubscribe}
+                              setSendToOpen={setSendToOpen}
+                              setCopyToOpen={setCopyToOpen}
+                            />
+                          }
+                        >
+                          {canReply && (
+                            <Button
+                              color="primary"
+                              onClick={() => {
+                                setExpandedReply(!expandedReply)
+                              }}
+                              data-testid="discussion-topic-reply"
+                            >
+                              {I18n.t('Reply')}
+                            </Button>
+                          )}
+                        </PostMessage>
+                      </Flex.Item>
+                    </Flex>
+                  </Flex.Item>
+                  <Flex.Item
+                    shouldShrink
+                    shouldGrow
+                    padding={
+                      expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
+                    }
+                    overflowX="hidden"
+                    overflowY="hidden"
+                  >
+                    {expandedReply && (
+                      <DiscussionEdit
+                        show={expandedReply}
+                        onSubmit={text => {
+                          if (createDiscussionEntry) {
+                            createDiscussionEntry(text)
+                            setExpandedReply(false)
+                          }
+                        }}
+                        onCancel={() => {
+                          setExpandedReply(false)
+                        }}
+                      />
+                    )}
+                  </Flex.Item>
+                </Flex>
+              </Highlight>
+            </View>
+          </Flex.Item>
+        </Flex>
+      )}
       <DirectShareUserModal {...directShareUserModalProps} />
       <DirectShareCourseTray {...directShareCourseTrayProps} />
     </>

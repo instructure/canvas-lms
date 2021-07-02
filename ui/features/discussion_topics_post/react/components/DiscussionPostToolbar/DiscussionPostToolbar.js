@@ -104,6 +104,7 @@ export const DiscussionPostToolbar = props => {
           >
             {props.childTopics && <GroupsMenu width="10px" childTopics={props.childTopics} />}
             <TextInput
+              data-testid="search-filter"
               onChange={handleChange}
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>

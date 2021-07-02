@@ -23,6 +23,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {handlers} from '../../graphql/mswHandlers'
 import {mswClient} from '../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../shared/msw/mswServer'
+import {Discussion} from '../../graphql/Discussion'
 import {graphql} from 'msw'
 import React from 'react'
 
@@ -154,9 +155,9 @@ describe('DiscussionFullPage', () => {
         expect(tinymce.editors[0]).toBeDefined()
       })
 
-      document.querySelectorAll('textarea')[1].value = ''
+      document.querySelectorAll('textarea')[0].value = ''
 
-      const submitButton = getAllByTestId('DiscussionEdit-submit')[1]
+      const submitButton = getAllByTestId('DiscussionEdit-submit')[0]
       fireEvent.click(submitButton)
 
       await waitFor(() => expect(queryByText('This is the parent reply')).not.toBeInTheDocument())
@@ -194,6 +195,15 @@ describe('DiscussionFullPage', () => {
       await button.click()
 
       await waitFor(() => expect(container.queryByText('This is a Reply asc')).toBeInTheDocument())
+    })
+
+    it('hides discussion topic when search term is present', async () => {
+      const container = setup()
+      expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
+      fireEvent.change(await container.getByLabelText('Search entries or author'), {
+        target: {value: 'a'}
+      })
+      await waitFor(() => expect(container.queryByTestId('discussion-topic-container')).toBeNull())
     })
   })
 
@@ -266,7 +276,7 @@ describe('DiscussionFullPage', () => {
   })
 
   it('should be able to post a reply to the topic', async () => {
-    const {getByTestId, findByTestId, queryAllByText} = setup()
+    const {queryByTestId, findByTestId, queryAllByText} = setup()
 
     const replyButton = await findByTestId('discussion-topic-reply')
     fireEvent.click(replyButton)
@@ -282,10 +292,10 @@ describe('DiscussionFullPage', () => {
 
     expect(queryAllByText('This is a reply')).toBeTruthy()
 
-    const doReplyButton = getByTestId('DiscussionEdit-submit')
+    const doReplyButton = await findByTestId('DiscussionEdit-submit')
     fireEvent.click(doReplyButton)
 
-    expect((await findByTestId('DiscussionEdit-container')).style.display).toBe('none')
+    await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
@@ -293,7 +303,7 @@ describe('DiscussionFullPage', () => {
   })
 
   it('should be able to post a reply to an entry', async () => {
-    const {findByTestId, findAllByTestId, getAllByTestId} = setup()
+    const {findByTestId, queryByTestId} = setup()
 
     const replyButton = await findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
@@ -302,13 +312,13 @@ describe('DiscussionFullPage', () => {
       expect(tinymce.editors[0]).toBeDefined()
     })
 
-    const rce = await findAllByTestId('DiscussionEdit-container')
-    expect(rce[1].style.display).toBe('')
+    const rce = await findByTestId('DiscussionEdit-container')
+    expect(rce.style.display).toBe('')
 
-    const doReplyButton = getAllByTestId('DiscussionEdit-submit')
-    fireEvent.click(doReplyButton[1])
+    const doReplyButton = await findByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton)
 
-    expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
+    await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
@@ -362,17 +372,17 @@ describe('DiscussionFullPage', () => {
     })
 
     it('should be able to post a reply to an entry', async () => {
-      const {findByText, findByTestId, findAllByTestId, getByTestId} = setup()
+      const {findByText, findByTestId, queryByTestId} = setup()
 
       const replyButton = await findByTestId('threading-toolbar-reply')
       fireEvent.click(replyButton)
 
       expect(findByText('Thread')).toBeTruthy()
 
-      const doReplyButton = getByTestId('DiscussionEdit-submit')
+      const doReplyButton = await findByTestId('DiscussionEdit-submit')
       fireEvent.click(doReplyButton)
 
-      expect((await findAllByTestId('DiscussionEdit-container')).style).toBeFalsy()
+      await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
 
       await waitFor(() =>
         expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
@@ -397,6 +407,31 @@ describe('DiscussionFullPage', () => {
       await waitFor(() =>
         expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
       )
+    })
+  })
+  describe('group menu button', () => {
+    it('should find "Super Group" group name', async () => {
+      const container = setup()
+      expect(await container.queryByText('Super Group')).toBeFalsy()
+      const groupsMenuButton = await container.findByTestId('groups-menu-btn')
+      fireEvent.click(groupsMenuButton)
+      await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+    })
+
+    it('should show groups menu when discussion has no child topics but has sibling topics', async () => {
+      // defaultTopic has a root topic which has a child topic named Super Group
+      // we are only removing the child topic from defaultTopic itself, not its root topic
+      server.use(
+        graphql.query('GetDiscussionQuery', (req, res, ctx) => {
+          return res.once(ctx.data({legacyNode: Discussion.mock({childTopics: null})}))
+        })
+      )
+
+      const container = setup()
+      expect(await container.queryByText('Super Group')).toBeFalsy()
+      const groupsMenuButton = await container.findByTestId('groups-menu-btn')
+      fireEvent.click(groupsMenuButton)
+      await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
     })
   })
 })
