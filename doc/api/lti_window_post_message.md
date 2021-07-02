@@ -135,7 +135,7 @@ Toggles the module navigation footer based on the message's content.
 ```js
 window.parent.postMessage(
   {
-    subject: "lti.frameResize",
+    subject: "lti.showModuleNavigation",
     show: true
   },
   "*"
