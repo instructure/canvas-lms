@@ -37,15 +37,17 @@ function mediaServerSession() {
 }
 
 describe('saveMediaRecording', () => {
-  const rcsConfig = {
-    contentId: '1',
-    contentType: 'course',
-    origin: 'http://host:port',
-    jwt: 'doesnotmatter'
-  }
+  let rcsConfig
 
   beforeEach(() => {
     moxios.install()
+
+    rcsConfig = {
+      contentId: '1',
+      contentType: 'course',
+      origin: 'http://host:port',
+      headers: {Authorization: 'Bearer doesnotmatter'}
+    }
   })
   afterEach(() => {
     moxios.uninstall()
@@ -157,17 +159,43 @@ describe('saveMediaRecording', () => {
       }
     )
   })
+
+  it('calls canvas api if rcsConfig.origin is not provided', async () => {
+    delete rcsConfig.origin
+    delete rcsConfig.headers
+
+    moxios.stubRequest('/api/v1/services/kaltura_session?include_upload_config=1', {
+      status: 200,
+      response: mediaServerSession()
+    })
+    moxios.stubRequest('/api/v1/media_objects', {
+      status: 500,
+      response: {error: 'womp womp'}
+    })
+    const doneFunction2 = jest.fn()
+    const progressFunction = jest.fn()
+    return saveMediaRecording({file: 'thing'}, rcsConfig, doneFunction2, progressFunction).then(
+      async uploader => {
+        uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
+        await new Promise(setTimeout)
+        expect(doneFunction2).toHaveBeenCalledTimes(1)
+        expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
+      }
+    )
+  })
 })
 
 describe('saveClosedCaptions', () => {
-  const rcsConfig = {
-    host: 'host:port',
-    jwt: 'doesnotmatter',
-    method: 'PUT'
-  }
+  let rcsConfig
 
   beforeEach(() => {
     moxios.install()
+
+    rcsConfig = {
+      origin: 'http://host:port',
+      headers: {Authorization: 'Bearer doesnotmatter'},
+      method: 'PUT'
+    }
   })
   afterEach(() => {
     moxios.uninstall()
@@ -202,5 +230,23 @@ describe('saveClosedCaptions', () => {
     })
     const successPromise = saveClosedCaptions(mediaId, [fileAndLanguage], rcsConfig)
     return expect(successPromise).rejects.toMatchObject({response: {status: 500}})
+  })
+
+  it('calls canvas api if rcsConfig.origin is not provided', () => {
+    delete rcsConfig.origin
+    delete rcsConfig.headers
+    const mediaId = '4'
+    const fileContents = 'file contents'
+    const file = new Blob([fileContents], {type: 'text/plain'})
+    const fileAndLanguage = {
+      language: {selectedOptionId: 'en'},
+      file
+    }
+    moxios.stubRequest(`/api/v1/media_objects/${mediaId}/media_tracks`, {
+      status: 200,
+      response: {data: 'media object data'}
+    })
+    const successPromise = saveClosedCaptions(mediaId, [fileAndLanguage], rcsConfig)
+    return expect(successPromise).resolves.toMatchObject({data: {data: 'media object data'}})
   })
 })

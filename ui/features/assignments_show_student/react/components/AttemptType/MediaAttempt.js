@@ -33,7 +33,6 @@ import {
   MediaCaptureStrings,
   SelectStrings
 } from '../../helpers/UploadMediaTranslations'
-import {getRCSAuthenticationHeaders, getRCSOriginFromHost} from '@instructure/canvas-rce'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -179,9 +178,7 @@ export default class MediaAttempt extends React.Component {
         onDismiss={this.onDismiss}
         rcsConfig={{
           contextId: this.props.assignment.env.courseId,
-          contextType: 'course',
-          origin: getRCSOriginFromHost(ENV.RICH_CONTENT_APP_HOST),
-          headers: getRCSAuthenticationHeaders(ENV.JWT)
+          contextType: 'course'
         }}
         open={this.state.mediaModalOpen}
         tabs={{embed: false, record: true, upload: true}}

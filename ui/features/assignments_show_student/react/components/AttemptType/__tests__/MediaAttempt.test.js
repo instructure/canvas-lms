@@ -47,11 +47,7 @@ const makeProps = async overrides => {
   }
 }
 
-// LS-1339  created to figure out why these are failing
-// since updating @instructure/ui-media-player to v7
-
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('MediaAttempt', () => {
+describe('MediaAttempt', () => {
   describe('unsubmitted', () => {
     it('renders the upload tab by default', async () => {
       const props = await makeProps()

@@ -66,6 +66,11 @@ describe('Upload Media', () => {
       expect(getByText('Computer')).toBeInTheDocument()
     })
 
+    it('renders Computer without RCS info', () => {
+      const {getByText} = renderComponent({tabs: {record: false, upload: true}, rcsConfig: {}})
+      expect(getByText('Computer')).toBeInTheDocument()
+    })
+
     it('renders Computer and Record', () => {
       const {getByText} = renderComponent({tabs: {record: true, upload: true}})
       expect(getByText('Computer')).toBeInTheDocument()
