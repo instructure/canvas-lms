@@ -191,6 +191,8 @@ class LtiApiController < ApplicationController
 
     opts = {type: :grade_passback}
     error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    error_info[:extra][:description] = outcome.description
+    error_info[:extra][:message] = outcome.code_major
 
     begin
       error_info[:extra][:xml] = @xml.to_s if @xml
