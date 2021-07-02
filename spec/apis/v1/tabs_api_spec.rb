@@ -959,6 +959,32 @@ describe TabsController, type: :request do
       expect(result).to eq 401
     end
 
-  end
+    it 'allows updating tabs to a new LTI position when the penultimate tab is hidden' do
+      course_with_teacher(:active_all => true)
+      tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+      @course.tab_configuration = tab_ids.each_with_index.map do |id, i|
+        { 'id' => id, 'hidden' => (i == tab_ids.count - 2) }
+      end
+      @course.save!
 
+      @tool = @course.context_external_tools.new({
+          :name => 'Example',
+          :url => 'http://www.example.com',
+          :consumer_key => 'key',
+          :shared_secret => 'secret',
+          :course_navigation => {
+            :enabled => 'true',
+            :url => 'http://www.example.com',
+          }
+        })
+      @tool.save!
+      tab_id = 'rubrics'
+      position = 14
+
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+          :position => position, :course_id => @course.to_param, :tab_id => tab_id,
+          :format => 'json'})
+      expect(json['position']).to eq position
+    end
+  end
 end
