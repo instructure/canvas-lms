@@ -279,6 +279,7 @@ class RoleOverridesController < ApplicationController
   #         manage_courses_conclude      -- [ TaD ] Courses - conclude
   #         manage_courses_delete        -- [ TaD ] Courses - delete
   #         manage_courses_publish       -- [ TaD ] Courses - publish
+  #         manage_courses_reset         -- [ TaD ] Courses - reset
   #     Manage Files granular permissions
   #         manage_files_add             -- [ TADo] Course Files - add
   #         manage_files_edit            -- [ TADo] Course Files - edit
