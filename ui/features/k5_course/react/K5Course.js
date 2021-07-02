@@ -260,7 +260,23 @@ export function K5Course({
       modulesRef.current.style.display =
         currentTab === TAB_IDS.MODULES && (modulesExist || canManage) ? 'block' : 'none'
     }
+    // Rails only takes care of the url without the hash in the request.referer, so to keep the navigation after loading or leaving
+    // the student view mode, we need to add the tab hash portion to the links href to the maintain the navigation after redirections
+    const resetStudentBtn = document.querySelector('a.leave_student_view[data-method="delete"]')
+    const leaveStudentModeBtn = document.querySelector('a.reset_test_student[data-method="delete"]')
+    if (resetStudentBtn) {
+      resetStudentBtn.href = addCurrentTabSegment(resetStudentBtn.href)
+    }
+    if (leaveStudentModeBtn) {
+      leaveStudentModeBtn.href = addCurrentTabSegment(leaveStudentModeBtn.href)
+    }
   }, [currentTab, modulesExist, canManage])
+
+  const addCurrentTabSegment = url => {
+    const currentTabUrlSegment = window.location.hash
+    const baseUrl = url.split('#')[0]
+    return baseUrl + currentTabUrlSegment
+  }
 
   const courseHeader = sticky => {
     const extendedViewport = window.innerHeight + 180
@@ -277,7 +293,7 @@ export function K5Course({
             canManage={canManage}
             settingsPath={settingsPath}
             showStudentView={showStudentView}
-            studentViewPath={studentViewPath}
+            studentViewPath={`${studentViewPath + window.location.hash}`}
             courseContext={name}
           />
         )}
