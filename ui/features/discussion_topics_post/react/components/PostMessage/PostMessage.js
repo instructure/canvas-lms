@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext} from 'react'
 
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
@@ -27,10 +27,13 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
+import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {Heading} from '@instructure/ui-heading'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
+import {SearchContext} from '../../utils/constants'
 
 export function PostMessage({...props}) {
+  const {searchTerm} = useContext(SearchContext)
   return (
     <Flex padding="0 0 medium 0">
       <Flex.Item align="start">
@@ -78,7 +81,7 @@ export function PostMessage({...props}) {
                     {props.hasAuthor && (
                       <View padding="none small none none">
                         <Text weight="bold" data-testid="author_name">
-                          {props.authorName}
+                          <SearchSpan searchTerm={searchTerm} text={props.authorName} />
                         </Text>
                       </View>
                     )}
@@ -132,7 +135,7 @@ export function PostMessage({...props}) {
                 </View>
               ) : (
                 <>
-                  <div dangerouslySetInnerHTML={{__html: props.message}} />
+                  <SearchSpan searchTerm={searchTerm} text={props.message} />
                   <View display="block" margin="small none none none">
                     {props.children}
                   </View>
