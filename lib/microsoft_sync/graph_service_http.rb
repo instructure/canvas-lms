@@ -135,6 +135,9 @@ module MicrosoftSync
           # The main request may return a 424 if any subrequests fail (esp. if throttled).
           # Regardless, we handle subrequests failures below.
           e.response.parsed_response
+        rescue
+          increment_batch_statsd_counters_unknown_error(endpoint_name, requests.count)
+          raise
         end
 
       grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
@@ -274,6 +277,11 @@ module MicrosoftSync
           InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
       end
+    end
+
+    def increment_batch_statsd_counters_unknown_error(endpoint_name, count)
+      tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: 'unknown')
+      InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.error", count, tags: tags)
     end
   end
 end

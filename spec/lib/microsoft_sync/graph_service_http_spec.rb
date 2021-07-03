@@ -171,9 +171,10 @@ describe MicrosoftSync::GraphServiceHttp do
       WebMock.stub_request(:post, 'https://graph.microsoft.com/v1.0/$batch')
         .with(body: {requests: requests})
         .and_return(
-          status: 200, body: {responses:[]}.to_json,
+          status: status_code, body: {responses:[]}.to_json,
           headers: {'Content-type' => 'application/json'}
         )
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
     end
 
     after { WebMock.enable_net_connect! }
@@ -184,11 +185,11 @@ describe MicrosoftSync::GraphServiceHttp do
         {id: 'a', method: 'GET', url: '/bar'},
       ]
     end
-
+    let(:status_code) { 200 }
     let(:run_batch) { subject.run_batch('wombat', requests, quota: [3, 4]) }
 
+
     it 'counts statsd metrics with the quota' do
-      allow(InstStatsd::Statsd).to receive(:count).and_call_original
       run_batch
       expect(InstStatsd::Statsd).to have_received(:count)
         .with("microsoft_sync.graph_service.quota_read", 3,
@@ -196,6 +197,17 @@ describe MicrosoftSync::GraphServiceHttp do
       expect(InstStatsd::Statsd).to have_received(:count)
         .with("microsoft_sync.graph_service.quota_write", 4,
               tags: {msft_endpoint: 'batch_wombat', extra_tag: 'abc'})
+    end
+
+    context 'when the batch request itself fails' do
+      let(:status_code) { 500 }
+
+      it 'counts a statsd metric with error status=unknown' do
+        expect { run_batch }.to raise_error(MicrosoftSync::Errors::HTTPInternalServerError)
+        expect(InstStatsd::Statsd).to have_received(:count)
+          .with("microsoft_sync.graph_service.batch.error", 2,
+                tags: {msft_endpoint: 'wombat', extra_tag: 'abc', status: 'unknown'})
+      end
     end
   end
 end
