@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -32,11 +33,13 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
+import {outcomeGroupShape, groupCollectionShape} from './Management/shapes'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {IMPORT_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 const FindOutcomesView = ({
+  outcomesGroup,
   collection,
-  outcomesCount,
-  outcomes,
   loading,
   loadMore,
   searchString,
@@ -46,15 +49,59 @@ const FindOutcomesView = ({
   onAddAllHandler,
   mobileScrollContainer
 }) => {
+  const {contextType, contextId} = useCanvasContext()
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
+  const outcomesCount = outcomesGroup?.outcomesCount || 0
+  const outcomes = outcomesGroup?.outcomes
   const enabled = !!outcomesCount && outcomesCount > 0
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
+  const [importOutcomes] = useMutation(IMPORT_OUTCOMES)
 
-  const onAddedOutcomeHandler = useCallback(_id => {
-    // TODO: OUT-4154
-  }, [])
+  const onImportError = (setAddedOutcome, setButtonMessage) => {
+    setAddedOutcome(false)
+    setButtonMessage(I18n.t('Add'))
+    showFlashAlert({
+      message: I18n.t('This outcome failed to import.  Please check your network and try again.'),
+      type: 'error'
+    })
+  }
+
+  const onAddedOutcomeHandler = useCallback(
+    (_id, setAddedOutcome, setButtonMessage) => {
+      // NOTE: For Global outcomes, the group contextType & contextId will be undefined
+      // For outcomes at the root group level for Account & Course will not import
+      // at this time.  Refer to OUT-4640 for more information.
+      ;(async () => {
+        try {
+          let input = {
+            outcomeId: _id,
+            targetContextId: contextId,
+            targetContextType: contextType
+          }
+          if (outcomesGroup.contextId && outcomesGroup.contextType) {
+            input = {
+              ...input,
+              sourceContextId: outcomesGroup.contextId,
+              sourceContextType: outcomesGroup.contextType
+            }
+          }
+          const variables = {variables: {input}}
+          const result = await importOutcomes(variables)
+          if (result.data?.errors) {
+            onImportError(setAddedOutcome, setButtonMessage)
+          } else {
+            setAddedOutcome(true)
+            setButtonMessage(I18n.t('Added'))
+          }
+        } catch (_err) {
+          onImportError(setAddedOutcome, setButtonMessage)
+        }
+      })()
+    },
+    [outcomesGroup, contextId, contextType, importOutcomes]
+  )
 
   const countAndAddButton = (
     <Flex.Item>
@@ -183,7 +230,6 @@ const FindOutcomesView = ({
       </View>
     </View>
   )
-
   if (loading && !outcomes) {
     return (
       <View as="div" padding="xx-large 0" textAlign="center" margin="0 auto" data-testid="loading">
@@ -245,7 +291,6 @@ const FindOutcomesView = ({
                   <Text color="primary">{I18n.t('The search returned no results.')}</Text>
                 </View>
               )}
-
               {outcomes?.edges?.map(({node: {_id, title, description, isImported}}, index) => (
                 <FindOutcomeItem
                   key={_id}
@@ -253,8 +298,8 @@ const FindOutcomesView = ({
                   title={title}
                   description={description}
                   isFirst={index === 0}
-                  isAdded={!!isImported}
-                  onAddClickHandler={onAddedOutcomeHandler}
+                  isAdded={isImported}
+                  onAddOutcomeHandler={onAddedOutcomeHandler}
                 />
               ))}
             </View>
@@ -265,29 +310,17 @@ const FindOutcomesView = ({
   )
 }
 
+FindOutcomesView.defaultProps = {
+  collection: {
+    id: '0',
+    name: '',
+    isRootGroup: false
+  }
+}
+
 FindOutcomesView.propTypes = {
-  collection: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    isRootGroup: PropTypes.bool.isRequired
-  }).isRequired,
-  outcomesCount: PropTypes.number.isRequired,
-  outcomes: PropTypes.shape({
-    edges: PropTypes.arrayOf(
-      PropTypes.shape({
-        node: PropTypes.shape({
-          _id: PropTypes.string.isRequired,
-          title: PropTypes.string.isRequired,
-          isImported: PropTypes.bool.isRequired,
-          description: PropTypes.string
-        })
-      })
-    ),
-    pageInfo: PropTypes.shape({
-      endCursor: PropTypes.string,
-      hasNextPage: PropTypes.bool.isRequired
-    })
-  }),
+  collection: groupCollectionShape,
+  outcomesGroup: outcomeGroupShape,
   searchString: PropTypes.string.isRequired,
   disableAddAllButton: PropTypes.bool,
   onChangeHandler: PropTypes.func.isRequired,

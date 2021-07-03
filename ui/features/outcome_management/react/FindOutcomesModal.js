@@ -81,9 +81,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
   const findOutcomesView = (
     <FindOutcomesView
+      outcomesGroup={group}
       collection={collections[selectedGroupId]}
-      outcomesCount={group?.outcomesCount || 0}
-      outcomes={group?.outcomes}
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}

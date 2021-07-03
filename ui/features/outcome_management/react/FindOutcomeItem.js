@@ -35,9 +35,9 @@ import OutcomeDescription from './Management/OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) => {
+const FindOutcomeItem = ({id, title, description, isAdded, onAddOutcomeHandler}) => {
   const [truncate, setTruncate] = useState(true)
-  // NOTE: addedOutcome state will not be needed once refetching of groups/outcomes
+  // NOTE: addedOutcome & buttonMessage state handlers will not be needed once refetching of groups/outcomes
   // is completed.  See OUT-4521 & OUT-4559
   const [addedOutcome, setAddedOutcome] = useState(isAdded)
   const [buttonMessage, setButtonMessage] = useState(isAdded ? I18n.t('Added') : I18n.t('Add'))
@@ -46,10 +46,8 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
 
-  const onButtonClick = () => {
-    setAddedOutcome(true)
-    setButtonMessage(I18n.t('Added'))
-    onAddClickHandler(id)
+  const onAddButtonClick = () => {
+    onAddOutcomeHandler(id, setAddedOutcome, setButtonMessage)
   }
 
   const checkbox = (
@@ -67,7 +65,7 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
           size="small"
           margin={isMobileView ? '0' : '0 x-small 0 0'}
           renderIcon={IconAddSolid}
-          onClick={onButtonClick}
+          onClick={onAddButtonClick}
         >
           {buttonMessage}
         </Button>
@@ -151,7 +149,7 @@ FindOutcomeItem.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   isAdded: PropTypes.bool.isRequired,
-  onAddClickHandler: PropTypes.func.isRequired
+  onAddOutcomeHandler: PropTypes.func.isRequired
 }
 
 export default memo(FindOutcomeItem)

@@ -82,6 +82,8 @@ export const FIND_GROUP_OUTCOMES = gql`
       ... on LearningOutcomeGroup {
         _id
         title
+        contextType
+        contextId
         outcomesCount(searchQuery: $searchQuery)
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
@@ -165,6 +167,21 @@ export const SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION = gql`
       errors {
         attribute
         message
+      }
+    }
+  }
+`
+
+export const IMPORT_OUTCOMES = gql`
+  mutation ImportOutcomes($input: ImportOutcomesInput!) {
+    importOutcomes(input: $input) {
+      errors {
+        attribute
+        message
+      }
+      progress {
+        id
+        state
       }
     }
   }

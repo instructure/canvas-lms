@@ -24,7 +24,8 @@ import {
   UPDATE_LEARNING_OUTCOME,
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
-  UPDATE_LEARNING_OUTCOME_GROUP
+  UPDATE_LEARNING_OUTCOME_GROUP,
+  IMPORT_OUTCOMES
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -237,6 +238,8 @@ export const groupDetailMocks = ({
   contextType = 'Account',
   contextId = '1',
   outcomeIsImported = false,
+  outcomesGroupContextId = 1,
+  outcomesGroupContextType = 'Account',
   searchQuery = '',
   withMorePage = true,
   groupDescription = 'Group Description'
@@ -257,6 +260,8 @@ export const groupDetailMocks = ({
           _id: groupId,
           title,
           description: `${groupDescription} 1`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -271,6 +276,7 @@ export const groupDetailMocks = ({
                   _id: '1',
                   description: '',
                   title: `Outcome 1 - ${title}`,
+                  isImported: outcomeIsImported,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -281,6 +287,7 @@ export const groupDetailMocks = ({
                   _id: '2',
                   description: '',
                   title: `Outcome 2 - ${title}`,
+                  isImported: outcomeIsImported,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -310,6 +317,8 @@ export const groupDetailMocks = ({
           _id: groupId,
           title,
           description: `${groupDescription} 2`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -324,6 +333,7 @@ export const groupDetailMocks = ({
                   _id: '1',
                   description: '',
                   title: `Outcome 1 - ${title}`,
+                  isImported: outcomeIsImported,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -334,6 +344,7 @@ export const groupDetailMocks = ({
                   _id: '3',
                   description: '',
                   title: `Outcome 3 - ${title}`,
+                  isImported: outcomeIsImported,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -364,6 +375,8 @@ export const groupDetailMocks = ({
           _id: groupId,
           title,
           description: `${groupDescription} 3`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -389,6 +402,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '6',
                   description: '',
+                  isImported: outcomeIsImported,
                   title: `Outcome 6 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
@@ -588,6 +602,8 @@ export const findOutcomesMocks = ({
   outcomeIsImported = true,
   contextType = 'Account',
   contextId = '1',
+  outcomesGroupContextId = 1,
+  outcomesGroupContextType = 'Account',
   searchQuery = 'mathematics'
 } = {}) => [
   {
@@ -605,6 +621,8 @@ export const findOutcomesMocks = ({
         group: {
           _id: groupId,
           title: `Group ${groupId}`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
           outcomesCount: 25,
           outcomes: {
             pageInfo: {
@@ -659,6 +677,8 @@ export const findOutcomesMocks = ({
         group: {
           _id: groupId,
           title: `Group ${groupId}`,
+          contextType: outcomesGroupContextType,
+          contextId: outcomesGroupContextId,
           outcomesCount: 15,
           outcomes: {
             pageInfo: {
@@ -877,6 +897,68 @@ export const updateOutcomeMocks = ({
     }
   }
 ]
+
+export const importOutcomesMock = ({
+  sourceContextId = null,
+  sourceContextType = null,
+  targetContextId = '1',
+  targetContextType = 'Course',
+  outcomeId = '11',
+  failResponse = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      importOutcomes: {
+        errors: null,
+        progress: {id: '1', state: 'queued', __typename: 'Progress'},
+        __typename: 'ImportOutcomesPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: {
+      importOutcomes: null
+    },
+    errors: [
+      {
+        attribute: null,
+        message: 'Mutation failed',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  }
+
+  let input = {
+    targetContextId,
+    targetContextType,
+    outcomeId
+  }
+
+  if (sourceContextId && sourceContextType) {
+    input = {
+      ...input,
+      sourceContextId,
+      sourceContextType
+    }
+  }
+
+  return {
+    request: {
+      query: IMPORT_OUTCOMES,
+      variables: {
+        input
+      }
+    },
+    result
+  }
+}
 
 export const deleteOutcomeMock = ({
   ids = ['1'],

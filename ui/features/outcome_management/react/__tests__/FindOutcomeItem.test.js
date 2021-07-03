@@ -15,27 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import FindOutcomeItem from '../FindOutcomeItem'
 
+jest.useFakeTimers()
+
 describe('FindOutcomeItem', () => {
   let onMenuHandlerMock
-  let onAddClickHandlerMock
+  let onAddOutcomeHandlerMock
   const defaultProps = (props = {}) => ({
     id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
     isAdded: false,
     onMenuHandler: onMenuHandlerMock,
-    onAddClickHandler: onAddClickHandlerMock,
+    onAddOutcomeHandler: onAddOutcomeHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
-    onAddClickHandlerMock = jest.fn()
+    onAddOutcomeHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -62,18 +63,6 @@ describe('FindOutcomeItem', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps({isAdded: true})} />)
     expect(getByText('Added')).toBeInTheDocument()
     expect(getByText('Added').closest('button')).toBeDisabled()
-  })
-
-  it('handles click on add button handler', () => {
-    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Add'))
-    expect(onAddClickHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('passes item id to add button handler', () => {
-    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Add'))
-    expect(onAddClickHandlerMock).toHaveBeenCalledWith('1')
   })
 
   it('displays right pointing caret when description is collapsed', () => {
@@ -103,5 +92,27 @@ describe('FindOutcomeItem', () => {
   it('displays disabled caret button if no description', () => {
     const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />)
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
+  })
+
+  describe('onAddOutcomeHandler is called', () => {
+    it('when user clicks on Add button', () => {
+      const {getByText} = render(<FindOutcomeItem {...defaultProps()} />, {
+        contextType: 'Course'
+      })
+      fireEvent.click(getByText('Add'))
+      expect(onAddOutcomeHandlerMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('with outcomeId and two functions for state handling', () => {
+      const {getByText} = render(<FindOutcomeItem {...defaultProps()} />, {
+        contextType: 'Course'
+      })
+      fireEvent.click(getByText('Add'))
+      expect(onAddOutcomeHandlerMock).toHaveBeenCalledWith(
+        '1',
+        expect.any(Function),
+        expect.any(Function)
+      )
+    })
   })
 })
