@@ -99,7 +99,8 @@ describe('ImportantDates', () => {
     expect(getByTestId('important-dates-panda')).toBeInTheDocument()
   })
 
-  it('displays a timestamp for each date bucket', async () => {
+  // UTC vs local date change sensitivity needs to be fixed (LS-2311)
+  it.skip('displays a timestamp for each date bucket', async () => {
     const assignments = MOCK_ASSIGNMENTS
     const date = moment().tz('America/Denver').add(2, 'days')
     assignments[0].assignment.due_at = date
