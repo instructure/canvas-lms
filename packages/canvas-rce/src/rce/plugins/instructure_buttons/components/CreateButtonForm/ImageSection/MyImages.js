@@ -16,28 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer} from 'react'
+import React, {useState} from 'react'
 
 import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
+import {IconAddLine} from '@instructure/ui-icons'
 
-import {DEFAULT_SETTINGS} from '../../svg/constants'
-import {PreviewSection} from './PreviewSection'
-import {ShapeSection} from './ShapeSection'
-import {ColorSection} from './ColorSection'
-import {ImageSection} from './ImageSection'
+import formatMessage from '../../../../../../format-message'
+import {UploadModal} from './UploadModal'
 
-export const CreateButtonForm = () => {
-  const [settings, dispatch] = useReducer(
-    (state, changes) => ({...state, ...changes}),
-    DEFAULT_SETTINGS
-  )
-
+export const MyImages = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   return (
-    <View as="div">
-      <PreviewSection settings={settings} />
-      <ShapeSection settings={settings} onChange={dispatch} />
-      <ColorSection settings={settings} onChange={dispatch} />
-      <ImageSection settings={settings} onChange={dispatch} />
+    <View as="div" padding="small 0">
+      <Button onClick={() => setIsModalOpen(true)} renderIcon={IconAddLine}>
+        {formatMessage('Add Image')}
+      </Button>
+      <UploadModal onDismiss={() => setIsModalOpen(false)} open={isModalOpen} />
     </View>
   )
 }
