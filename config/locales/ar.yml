@@ -1979,12 +1979,14 @@ ar:
   adding_to_library_b552868: "جارٍ الإضافة إلى المكتبة"
   additional_comments_9aed10bb: "التعليقات الإضافية"
   additional_considerations_3ee46e5b: "الاعتبارات الإضافية"
+  additional_considerations_a36efeef: "الاعتبارات الإضافية"
   additional_occurrence_s_7b5b0173: "حدث إضافي (أحداث إضافية)"
   additional_outcomes_options_6df428f1: "خيارات النواتج الإضافية"
   additional_settings_20362654: "الإعدادات الإضافية"
   additional_settings_for_sis_syncing_f926973e: "إعدادات إضافية لمزامنة نظام معلومات الطالب"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "الإعدادات الإضافية للمهمة والاختبار الموجز والمناقشة الخاصة بمزامنة نظام معلومات الطالب الإضافية"
   additional_sort_options_for_new_gradebook_2dc1939: "خيارات فرز إضافية لدفتر درجات جديد"
+  additionally_if_this_permission_is_disabled_users__6acf5d08: "وبالإضافة إلى ما سبق، ففي حالة تعطيل هذا الإذن، فلن يمكن للمستخدمين حذف التطبيقات الخارجية المضافة يدويًا."
   address_use_as_wildcard_48f2cf60: "العنوان (استخدام * كحرف بدل)"
   addressbook_microservice_a4940422: "AddressBook خدمة مصغرة"
   addressbook_performance_tap_98ddf67: "AddressBook علامة تبويب الأداء"
@@ -2093,6 +2095,7 @@ ar:
   alerts_6b871b71: التنبيهات
   alerts_add_edit_delete_d71091c6: "التنبيهات - إضافة / تحرير / حذف"
   alerts_course_settings_53551794: "التنبيهات (إعدادات المساق)"
+  alerts_must_be_configured_for_the_institution_aler_43bbacb1: "يجب تكوين التنبيهات للمؤسسة. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب-المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
   align_outcomes_to_this_page_7d055196: "محاذاة حصائل لهذه الصفحة"
   all_4321c3a1: الكل
   all_account_types_e83c1516: "جميع أنواع الحسابات"
@@ -2199,6 +2202,7 @@ ar:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "السماح بإمكانية إرسال إخطارات من خلال نظامنا للإرسال."
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "السماح بإرسال الإخطارات من خلال نظامنا للإرسال"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "السماح لهذه الأداة للوصول إلى خدمة IMS لتوفير الأسماء والأدوار"
+  allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "السماح لعناوين البريد الإلكتروني غير المؤكدة عند إضافة مستخدمين"
   allow_users_to_comment_45b8f753: "السماح للمستخدمين بالتعليق"
   allowed_attempts_4e229caa: "المحاولات المسموح بها"
   allowed_domains_ee7868c8: "المجالات المسموح بها"
@@ -2224,6 +2228,7 @@ ar:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "تسمح بتمييز روابط التعليمات كروابط بارزة أو جديدة وتعرض رابط التعليمات البارزة بشكل واضح في قائمة التعليمات."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "السماح بإمكانية تحديد نتائج التعليم عند ترحيل محتوى المساق"
   allows_setting_account_course_level_mastery_scales_1939e0fd: "تسمح بتعيين مقاييس وطرق حساب الإجادة على مستويي الحساب والمساق واستبدال تقييمات المعايير وطرق الحساب حسب المخرجات"
+  allows_students_to_access_other_student_groups_wit_43918810: "للسماح للطلاب بالوصول إلى مجموعات الطلاب الأخرى داخل مجموعة طلاب من خلال ارتباط مباشر."
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "للسماح بمزامنة أعضاء مساق Canvas إلى Microsoft Team"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "يسمح للأدوار القائمة على المعلم، المصمم، المعلم المساعد بالوصول إلى أداة الدردشة."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "يسمح للأدوار القائمة على المعلم/المصمم/المعلم المساعد بالوصول إلى أداة الدردشة."
@@ -2243,19 +2248,28 @@ ar:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "السماح بجدولة أحداث التقويم المتكررة"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "تسمح للمستخدم بالانتقال بعيداً أثناء تقدم عمليات إعادة تحميل الإرسالات"
   allows_uer_to_delete_a_submission_file_5302db48: "يسمح للمستخدم بحذف ملف الإرسال."
+  allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: "للسماح للمستخدم بالوصول إلى قائمة إعدادات المستخدم وتفاصيل المستخدم."
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "يسمح للمستخدم بالوصول إلى إعدادات المسؤول وتحريرها في Commons. يسمح للمستخدم بإنشاء وإدارة المجموعات. يسمح للمستخدم بإدارة الموارد المشتركة في الحساب."
+  allows_user_to_access_and_edit_the_admin_settings__e45da9d7: "للسماح للمستخدم بالوصول إلى إعدادات المسؤول وتحريرها في Commons."
+  allows_user_to_access_gradebook_history_9d599681: "للسماح للمستخدم بالوصول إلى سجل دفتر الدرجات."
+  allows_user_to_access_gradebook_history_allows_use_79dfddd: "للسماح للمستخدم بالوصول إلى سجل دفتر الدرجات. للسماح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "يسمح للمستخدم بالوصول إلى SpeedGrader من المهام."
+  allows_user_to_access_student_view_test_student_co_8b57e87c: "للسماح للمستخدم بالوصول إلى طريقة عرض الطالب (طالب الاختبار)، أزرار نسخ هذا المساق، وإعادة تعيين محتوى المساق، والحذف الدائم للمساق."
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: "يسمح للمستخدم بالوصول لارتباط التصرف كمستخدم على بطاقات سياق الطالب."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "يسمح للمستخدم بالوصول إلى ارتباط الإعلانات في لوحة تنقل المساق. يسمح للمستخدم لعرض إعلانات المساق. يسمح للمستخدم بعرض الإعلانات الحديثة على الصفحة الرئيسية للمساق."
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       يسمح للمستخدم بالوصول إلى ارتباط الإعلانات في لوحة تنقل المساق.
       يسمح للمستخدم لعرض إعلانات المساق.
       يسمح للمستخدم بعرض الإعلانات الحديثة على الصفحة الرئيسية للمساق.
+  allows_user_to_access_the_announcements_link_in_co_f2e824e9: "للسماح للمستخدم بالوصول إلى ارتباط الإعلانات في لوحة تنقل المساق."
   allows_user_to_access_the_attendance_tool_72ef0b68: "لتمكين المستخدم من الوصول إلى أداة الحضور."
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "يسمح للمستخدم بالوصول إلى الشريط الجانبي للمساقات المخططة. يسمح للمستخدم بإدارة إعدادات محتوى المساقات المخططة في إعدادات المساق. يسمح للمستخدم بإزالة مساق مقترن. يسمح للمستخدم بتحرير إعدادات قفل المخطط على المهام أو الصفحات أو النقاشات الفردية"
   allows_user_to_access_the_chat_tool_48d5f5c4: "لتمكين المستخدم من الوصول إلى أداة الدردشة."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "يسمح للمستخدم بالوصول إلى علامة تبويب الملفات في محدد المحتوى."
+  allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: "للسماح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
+  allows_user_to_access_the_manage_question_banks_li_616d45c8: "للسماح للمستخدم بالوصول إلى ارتباط إدارة بنوك الأسئلة أو صفحة فهرس الاختبارات الموجزة."
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "يسمح للمستخدم بالوصول إلى علامة تبويب لوحة التنقل في إعدادات المساق. يسمح للمستخدم بالوصول إلى طريقة عرض الطالب (طالب الاختبار)، أزرار نسخ هذا المساق، وإعادة تعيين محتوى المساق، والحذف الدائم للمساق. يسمح للمستخدم بتحرير صورة المساق والاسم ورمز المساق والمنطقة الزمنية والحساب الفرعي والفصل الدراسي والخيارات الأخرى في علامة تبويب تفاصيل المساق."
+  allows_user_to_access_the_navigation_tab_in_course_e266d985: "للسماح للمستخدم بالوصول إلى علامة تبويب لوحة التنقل في إعدادات المساق."
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: "يسمح للمستخدم بالوصول إلى ارتباط الأشخاص في تنقل الحساب."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "يسمح للمستخدم بالوصول إلى علامة تبويب استعادة المساقات في أدوات المسؤول."
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "يسمح للمستخدم بالوصول إلى علامة تبويب استعادة المساقات في أداة المسؤول"
@@ -2263,22 +2277,27 @@ ar:
   allows_user_to_access_the_theme_editor_26691f9a: "يسمح للمستخدم بالوصول إلى محرر الأنساق."
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "يسمح للمستخدم بالوصول إلى ارتباط المستخدمين في لوحة تنقل المساق."
   allows_user_to_access_the_view_notifications_tab_i_71995596: "يسمح للمستخدم بالوصول إلى علامة تبويب إعلامات العرض في أدوات المسؤول."
-  allows_user_to_act_as_other_users_in_the_account_195628ae: "يسمح للمستخدم بالتصرف كمستخدمين آخرين في الحساب."
+  allows_user_to_act_as_other_users_in_the_account_195628ae: "للسماح للمستخدم بالتصرف كمستخدمين آخرين في الحساب."
   allows_user_to_act_as_other_users_in_the_account_t_56c81672: |-
       يسمح للمستخدم بالتصرف كمستخدمين آخرين في الحساب. ينبغي ألا يتم تعيين هذا الإذن إلا للمستخدمين الذي سمحت لهم مؤسستك بالتصرف كمستخدمين آخر في حساب Canvas الخاص بك بالكامل.
               يستطيع المستخدمون من خلال هذا الإذن استخدام الإجراء كميزة لإدارة إعدادات الحساب وعرض الدرجات وتعديلها والوصول إلى معلومات المستخدم وما شابه.
               كما يسمح هذا الإذن للمسؤولين المخصصين لحساب فرعي بالوصول إلى الإعدادات والمعلومات خارج حسابهم الفرعي.
+  allows_user_to_add_and_remove_associated_courses_2ae6e4d6: "للسماح للمستخدم بإضافة وإزالة المساقات المقترنة."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "يسمح للمستخدم لإضافة مسؤولين الحساب الآخرين وإزالتهم."
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: "يسمح للمستخدم بإضافة وإزالة المعلمين الآخرين أو مصممي المساقات أو المعلمين المساعدين. يسمح للمستخدم بإضافة وإزالة المراقبين. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين والمصممين والمعلمين المساعدين. يسمح للمستخدم بعرض تفاصيل المستخدم من أي مستخدم. يسمح للمستخدم بتحرير قسم أو دور المستخدمين."
   allows_user_to_add_and_remove_other_teachers_cours_bff27199: "يسمح للمستخدم بإضافة وإزالة المعلمين الآخرين أو مصممي المساقات أو المعلمين المساعدين. يسمح للمستخدم بإضافة وإزالة المراقبين إلى ومن المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين والمصممين والمعلمين المساعدين. يسمح للمستخدم بعرض قائمة الإعدادات للمعلمين ومصممي المساقات والمعلمين المساعدين والمراقبين. يسمح للمستخدم بعرض تفاصيل المستخدم للمعلمين ومصممي المساقات والمعلمين المساعدين. يسمح للمستخدم بتقييد الطلاب بعرض أعضاء الأقسام الزملاء فقط."
   allows_user_to_add_and_remove_students_allows_user_6b31aafc: "يسمح للمستخدم بإضافة وإزالة الطلاب. يسمح للمستخدم بإضافة وإزالة المراقبين. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للطلاب. يسمح للمستخدم بعرض التسجيلات المسبقة. يسمح للمستخدم بالوصول إلى قائمة إعدادات المستخدم وتفاصيل المستخدم. يسمح للمستخدم بتحرير قسم أو الطلاب أو دورهم. يسمح للمستخدم بإعادة إرسال دعوات المساق من صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "يسمح للمستخدم بإضافة الطلاب إلى المساق وإزالتهم منه. يسمح للمستخدم بإضافة وإزالة المراقبين إلى المساق وإزالتهم منه. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للطلاب. يسمح للمستخدم بعرض التسجيلات المسبقة. يسمح للمستخدم بالوصول إلى قائمة إعدادات المستخدم وتفاصيل المستخدم. يسمح للمستخدم بإنهاء أو حذف التسجيلات على صفحة تفاصيل الطالب. يسمح للمستخدم بإعادة إرسال دعوات المساق."
+  allows_user_to_add_announcements_in_the_announceme_726541b5: "للسماح للمستخدم بإضافة إعلانات في صفحة الإعلانات."
+  allows_user_to_add_assignment_groups_in_a_course_3054675c: "للسماح للمستخدم بإضافة مجموعات المهام في المساقات."
+  allows_user_to_add_course_files_and_folders_566e3447: "للسماح للمستخدم بإضافة ملفات ومجلدات المساق."
   allows_user_to_add_course_files_and_folders_allows_eecf49f9: "للسماح للمستخدم بإضافة ملفات ومجلدات المساق. للسماح للمستخدم باستيراد ملف مضغوط."
   allows_user_to_add_course_sections_in_course_setti_f8e4cabf: "يسمح للمستخدم بإضافة أقسام المساق في إعدادات المساق."
   allows_user_to_add_designers_in_the_course_allows__ee166883: |-
       يسمح للمستخدم بإضافة مصممين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمصممين.
               يسمح للمستخدم بعرض تفاصيل المستخدم للمصممين. يسمح للمستخدم بتحرير قسم أو دور المصمم.
   allows_user_to_add_designers_to_a_course_f81791e8: "يسمح للمستخدم بإضافة مصممين إلى المساق."
+  allows_user_to_add_designers_to_a_course_from_the__427db55b: "للسماح للمستخدم بإضافة مصممين إلى المساق من صفحة مساقات الحساب."
   allows_user_to_add_designers_to_a_course_from_the__b48e0a92: "يسمح للمستخدم بإضافة مصممين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة مصممين إلى المساق."
   allows_user_to_add_designers_to_the_course_from_th_ee349841: "يسمح للمستخدم بإضافة مصممين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة مصممين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمصممين. يسمح للمستخدم بعرض تفاصيل المستخدم للمصممين. يسمح للمستخدم بتحرير قسم أو دور المصمم."
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "يسمح للمستخدم بإضافة نقاشات في صفحة النقاشات."
@@ -2301,10 +2320,12 @@ ar:
       يسمح للمستخدم بالوصول إلى سجل دفتر الدرجات.
       يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها).
   allows_user_to_add_edit_and_update_grades_in_the_g_5d50d581: "يسمح للمستخدم بإضافة الدرجات في دفتر الدرجات وتحريرها وتحديثها. يسمح للمستخدم بالوصول إلى سجل دفتر الدرجات. يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
+  allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: "للسماح للمستخدم بإضافة الدرجات في دفتر الدرجات وتحريرها وتحديثها."
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       يسمح للمستخدم بإضافة الدرجات في دفتر الدرجات وفي SpeedGrader وتحريرها وتحديثها.
       يسمح للمستخدم بالوصول إلى سجل دفتر الدرجات.
   allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: "يسمح للمستخدم بإضافة المهام وتحريرها وحذفها ونشرها وإلغاء نشرها. يسمح للمستخدم بإدارة إعدادات المهام. يسمح للمستخدم بإضافة مجموعات المهام في المساقات. يسمح للمستخدم بتمكين أوزان مجموعات المهام وتحريرها في المساقات."
+  allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: "للسماح للمستخدم بإضافة المهام وتحريرها وحذفها ونشرها وإلغاء نشرها."
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: "يسمح للمستخدم بإضافة الاختبارات الموجزة وتحريرها وحذفها ونشرها وإلغاء نشرها."
   allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "يسمح للمستخدم بإضافة الاختبارات الموجزة وتحريرها وحذفها ونشرها/إلغاء نشرها."
   allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
@@ -2320,7 +2341,9 @@ ar:
   allows_user_to_add_observers_in_the_course_allows__9c6bb78c: "يسمح للمستخدم بإضافة مراقبين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمراقبين. يسمح للمستخدم بعرض تفاصيل المستخدم للمراقبين. يسمح للمستخدم بتحرير قسم أو دور المراقب."
   allows_user_to_add_observers_to_a_course_ca1a678b: "يسمح للمستخدم بإضافة مراقبين إلى المساق."
   allows_user_to_add_observers_to_a_course_from_the__806ec842: "يسمح للمستخدم بإضافة مراقبين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة مراقبين إلى المساق."
+  allows_user_to_add_observers_to_a_course_from_the__9017365c: "للسماح للمستخدم بإضافة مراقبين إلى المساق من صفحة مساقات الحساب."
   allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: "يسمح للمستخدم بإضافة مراقبين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة مراقبين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمراقبين. يسمح للمستخدم بعرض تفاصيل المستخدم للمراقبين. يسمح للمستخدم بتحرير قسم أو دور المراقب."
+  allows_user_to_add_page_to_student_to_do_list_7085a054: "للسماح للمستخدم بإضافة صفحة إلى قائمة مهام الطالب."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "لتمكين المستخدم من إضافة صفحات للوحة معلومات عرض القائمة عبر إضافة إلى مربع تحديد قائمة مهام الطلب."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       يسمح للمستخدم بإضافة/إزالة المعلمين الآخرين أو مصممي المساقات أو المعلمين المساعدين.
@@ -2345,52 +2368,74 @@ ar:
       يسمح للمستخدم بإنهاء أو حذف التسجيلات على صفحة تفاصيل الطالب.
       يسمح للمستخدم بإعادة إرسال دعوات المساق.
   allows_user_to_add_students_to_a_course_aa642fa6: "يسمح للمستخدم بإضافة طلاب إلى المساق."
-  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "يسمح للمستخدم بإضافة الطلاب إلى المساق من صفحة مساقات الحساب."
+  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "للسماح للمستخدم بإضافة الطلاب إلى المساق من صفحة مساقات الحساب."
   allows_user_to_add_students_to_a_course_from_the_a_43abb0e6: "يسمح للمستخدم بإضافة الطلاب إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة طلاب إلى المساق."
   allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: "يسمح للمستخدم بإضافة مدرسين مساعدين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمدرسين المساعدين. يسمح للمستخدم بعرض تفاصيل المستخدم للمدرسين المساعدين. يسمح للمستخدم بتحرير قسم أو دور المدرس المساعد."
+  allows_user_to_add_tas_in_the_course_f4de4c19: "للسماح للمستخدم بإضافة معلمين مساعدين في المساق."
+  allows_user_to_add_tas_to_a_course_from_the_accoun_66e76aee: "للسماح للمستخدم بإضافة معلمين مساعدين إلى المساق من صفحة مساقات الحساب."
   allows_user_to_add_tas_to_a_course_from_the_accoun_be5446f0: "يسمح للمستخدم بإضافة معلمين مساعدين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة معلمين مساعدين في المساق."
   allows_user_to_add_tas_to_the_course_from_the_acco_254e4c5f: "يسمح للمستخدم بإضافة مدرسين مساعدين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة مدرسين مساعدين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمدرسين المساعدين. يسمح للمستخدم بعرض تفاصيل المستخدم للمدرسين المساعدين. يسمح للمستخدم بتحرير قسم أو دور المدرس المساعد."
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "يسمح للمستخدم بإضافة المعلمين أو مصممي المساقات أو المعلمين المساعدين إلى مساق من صفحة مساقات الحساب."
   allows_user_to_add_teachers_in_the_course_allows_u_3f80b57d: "يسمح للمستخدم بإضافة معلمين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين. يسمح للمستخدم بعرض تفاصيل المستخدم للمعلمين. يسمح للمستخدم بتحرير قسم أو دور المعلم."
   allows_user_to_add_teachers_to_a_course_37b9594c: "يسمح للمستخدم بإضافة معلمين إلى المساق."
   allows_user_to_add_teachers_to_a_course_from_the_a_40af6066: "يسمح للمستخدم بإضافة معلمين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة معلمين إلى المساق."
+  allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: "للسماح للمستخدم بإضافة معلمين إلى المساق من صفحة مساقات الحساب."
   allows_user_to_add_teachers_to_the_course_from_the_dc03e973: "يسمح للمستخدم بإضافة معلمين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإضافة معلمين في المساق. يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين. يسمح للمستخدم بعرض تفاصيل المستخدم للمعلمين. يسمح للمستخدم بتحرير قسم أو دور المعلم."
+  allows_user_to_change_start_and_end_dates_for_cour_f437cee1: "للسماح للمستخدم بتغيير تواريخ البداية والنهاية لأقسام المساق."
   allows_user_to_change_the_template_being_used_by_a_86f46490: "للسماح للمستخدم بتغيير القالب المستخدَم من الحساب. للسماح للمستخدم بعرض أسماء قوالب المساق في الحساب الجذر."
+  allows_user_to_change_the_template_being_used_by_a_eab509a3: "للسماح للمستخدم بتغيير القالب المستخدَم من الحساب."
+  allows_user_to_close_for_comments_move_pin_and_unp_2adb3d95: "للسماح للمستخدم بالإغلاق للتعليقات والنقل والتثبيت وإلغاء التثبيت والتحرير والحذف لموضوعات النقاش المنشأة بواسطة المستخدمين الآخرين."
   allows_user_to_configure_alerts_in_course_settings_38675b12: "يسمح للمستخدم بتكوين تنبيهات في إعدادات المساق. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب-المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "يسمح للمستخدم بتكوين تنبيهات في إعدادات المساق. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب/المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "يسمح للمستخدم بتكوين تنبيهات في إعدادات المساق. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب/المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
+  allows_user_to_configure_alerts_in_course_settings_c6b938ab: "للسماح للمستخدم بتكوين تنبيهات في إعدادات المساق."
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "يسمح للمستخدم بتكوين تنبيهات في إعدادات المساق. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب-المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
+  allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "لتمكين المستخدم من نسخ عناصر مساق فردية لمساق آخر."
   allows_user_to_create_accounts_for_new_users_allow_bb7575e9: "يسمح للمستخدم بإنشاء حسابات لمستخدمين جدد. يسمح للمستخدم بإزالة المستخدمين ودمجهم في الحسابات. يسمح للمستخدم بتعديل تفاصيل حساب المستخدم. يسمح للمستخدم بعرض معلومات تسجيل الدخول وتعديلها للمستخدمين."
+  allows_user_to_create_accounts_for_new_users_e4ec27c3: "للسماح للمستخدم بإنشاء حسابات لمستخدمين جدد."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "يسمح للمستخدم بإنشاء حسابات للمستخدمين الجدد من خلال زر إضافة أشخاص من مستوى الحساب. يسمح للمستخدم بإزالة المستخدمين ودمجهم في الحسابات. يسمح للمستخدم بتعديل تفاصيل حساب المستخدم مثل الاسم والبريد الإلكتروني والمنطقة الزمنية. يسمح للمستخدم بعرض معلومات تسجيل الدخول وتعديلها للمستخدمين."
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       يسمح للمستخدم بإنشاء حسابات للمستخدمين الجدد من خلال زر إضافة أشخاص من مستوى الحساب.
       يسمح للمستخدم بإزالة المستخدمين ودمجهم في الحسابات.
       يسمح للمستخدم بتعديل تفاصيل حساب المستخدم مثل الاسم والبريد الإلكتروني والمنطقة الزمنية. يسمح للمستخدم بعرض معلومات تسجيل الدخول وتعديلها للمستخدمين.
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: "يمسح للمستخدم بإنشاء المواعيد وإدارتها على التقويم باستخدام أداة الجدولة."
+  allows_user_to_create_and_manage_groups_allows_use_562e0013: "للسماح للمستخدم بإنشاء وإدارة المجموعات. للسماح للمستخدم بإدارة الموارد المشتركة في الحساب."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "يسمح للمستخدم بإنشاء ومخططات التقييم وتعديلها."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "يسمح للمستخدم بإنشاء التعاونات. يسمح للمستخدم بعرض المؤتمرات التي أنشأها وتحريرها وحذفها."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "يسمح للمستخدم بإنشاء التعاونات. يسمح للمستخدم بعرض التعاونات التي أنشأها وتحريرها وحذفها."
+  allows_user_to_create_collaborations_b4f214bf: "للسماح للمستخدم بإنشاء التعاونات."
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "يسمح للمستخدم بإنشاء صفحات المساق. يسمح للمستخدم بتحرير إعدادات تأمين المخطط لكل صفحة على حدة في أحد المساقات المخططة الرئيسية."
   allows_user_to_create_course_pages_ec9c6647: "للسماح للمستخدم بإنشاء صفحات المساق."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "يسمح للمستخدم بإنشاء مفاتيح مطورين للحسابات."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "يسمح للمستخدم بإنشاء مجموعات حسابات وتحريرها وحذفها."
   allows_user_to_create_edit_and_delete_course_group_36097d72: "يسمح للمستخدم بإنشاء مجموعات مساقات وتحريرها وحذفها. يسمح للمستخدم بإنشاء مجموعات المساقات المنشأة بواسطة الطلاب وتحريرها وحذفها."
+  allows_user_to_create_edit_and_delete_course_group_40367907: "للسماح للمستخدم بإنشاء مجموعات مساقات وتحريرها وحذفها."
+  allows_user_to_create_edit_and_delete_course_group_7aa3842: "للسماح للمستخدم بإنشاء مجموعات المساقات المنشأة بواسطة الطلاب وتحريرها وحذفها."
   allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
       يسمح للمستخدم بإنشاء مجموعات مساقات وتحريرها وحذفها.
       يسمح للمستخدم بإنشاء مجموعات المساقات المنشأة بواسطة الطلاب وتحريرها وحذفها.
+  allows_user_to_create_edit_and_delete_course_rubri_493ac58f: "للسماح للمستخدم بإنشاء معايير تقييم المساق وتحريرها وحذفها."
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "يسمح للمستخدم بإنشاء مقاييس التقييم وتحريرها وحذفها في ارتباط مقاييس التقييم."
+  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: "للسماح للمستخدم بإنشاء وتحرير وحذف المخرجات ومجموعات المخرجات على مستويي الحساب والمساق."
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "يسمح للمستخدم بإنشاء وتحرير وحذف المخرجات ومجموعات المخرجات  على مستوى المساق."
-  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "يسمح للمستخدم بإنشاء مقاييس التقييم وتحريرها وحذفها."
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "للسماح للمستخدم بإنشاء مقاييس التقييم وتحريرها وحذفها."
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       يسمح للمستخدم بإنشاء واستيراد وتحرير وحذف الحصائل ومجموعات
       الحصائل على مستوى المساق.
   allows_user_to_create_import_edit_and_delete_outco_8eff991: "يسمح للمستخدم بإنشاء واستيراد وتحرير وحذف الحصائل ومجموعات الحصائل على مستوى المساق."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "يسمح للمستخدم بإنشاء المؤتمرات الجديدة. يسمح للمستخدم ببدء المؤتمرات التي أنشأها."
+  allows_user_to_create_new_conferences_in_courses_a_80899f64: "للسماح للمستخدم بإنشاء مؤتمرات جديدة في المساقات والمجموعات."
+  allows_user_to_create_new_entries_in_the_faculty_j_2a280fec: "للسماح للمستخدم بإنشاء إدخالات جديدة في دفتر المعلمين."
+  allows_user_to_cross_list_sections_f6726df2: "للسماح للمستخدم بإدراج الأقسام بشكل متعدد."
+  allows_user_to_define_users_allowed_to_edit_the_pa_39fddc1c: "للسماح للمستخدم بتحديد المستخدمين المسموح لهم بتحرير الصفحة."
   allows_user_to_delete_a_submission_file_65f1dd7d: "يسمح للمستخدم بحذف ملف الإرسال."
+  allows_user_to_delete_a_user_from_a_course_section_4b99a5c4: "للسماح للمستخدم بحذف مستخدم من أحد أقسام المساق."
   allows_user_to_delete_course_files_and_folders_34a7793c: "للسماح للمستخدم بحذف ملفات ومجلدات المساق."
   allows_user_to_delete_course_pages_allows_user_to__d6e4174d: "يسمح للمستخدم بحذف صفحات المساق. يسمح للمستخدم بتحرير إعدادات تأمين المخطط لكل صفحة على حدة في أحد المساقات المخططة الرئيسية."
   allows_user_to_delete_course_pages_dfaf4fb7: "للسماح للمستخدم بحذف صفحات المساق."
+  allows_user_to_delete_course_sections_19193a35: "للسماح للمستخدم بحذف أقسام المساق."
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "يسمح للمستخدم بحذف أقسام المساق. يسمح للمستخدم بحذف مستخدم من أحد أقسام المساق."
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "للسماح للمستخدم بتعيين مساق كمساق مخطط."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "يسمح للمستخدم بتعيين مساق كمساق مخطط. يسمح للمستخدم بإدارة إعدادات المساقات المخططة في إعدادات المساق. يسمح للمستخدم بإضافة مساقات مقترنة."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       للسماح للمستخدم بتعيين مساق كمساق مخطط. للسماح للمستخدم بإدارة إعدادات المساقات المخططة في إعدادات المساق.
@@ -2401,20 +2446,31 @@ ar:
       يسمح للمستخدم بإضافة مساقات مقترنة.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "يسمح للمستخدم بتوزيع المهام على الطلاب كل على حدة."
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "يسمح للمستخدم بتنزيل جميع التعليقات في إرسال الطالب."
+  allows_user_to_edit_a_student_s_section_or_role_d2b312ad: "للسماح للمستخدم بتحرير قسم أو الطلاب أو دورهم."
+  allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "للسماح للمستخدم بتحرير قسم أو دور المستخدمين (إذا لم يُضاف عبر SIS)."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "يسمح للمستخدم بتحرير تفاصيل المهام على النقاشات الفردية. الوحدات النمطية: يسمح للمستخدم بإضافة المهام الجديدة إلى الوحدة النمطية."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "يسمح للمستخدم بتحرير تفاصيل المهام على النقاشات الفردية."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "يسمح للمستخدم بتحرير إعدادات قفل المحتوى المخطط على النقاشات الفردية."
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "للسماح للمستخدم بتحرير إعدادات قفل المحتوى المخطط على الإعدادات الفردية إذا كان المستخدم مسجلاً في مساق مخطط رئيسي."
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "للسماح للمستخدم بتحرير إعدادات قفل المحتوى المخطط على النقاشات الفردية."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "يسمح للمستخدم بتحرير إعدادات قفل المحتوى المخطط على الإعدادات الفردية إذا كان المستخدم مسجلاً في مساق مخطط رئيسي."
+  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "للسماح للمستخدم بتحرير إعدادات قفل المساق المخطط في صفحة فهرس الصفحات وللصفحات الفردية في المساقات الرئيسية المخططة."
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "للسماح للمستخدم بتحرير إعدادات تأمين المخطط لكل صفحة على حدة في أحد المساقات المخططة الرئيسية."
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "للسماح للمستخدم بتحرير إعدادات قفل المخطط في صفحة فهرس الصفحات وللصفحات الفردية في المساقات المخططة الرئيسية."
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "يسمح للمستخدم بتحرير إعدادات قفل المخطط على صفحة فهرس الصفحات في المساقات المخططة الرئيسية."
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       يسمح للمستخدم بتحرير إعدادات قفل المخطط على صفحات فهرس المهام
       والاختبارات الموجزة في المساقات المخططة الرئيسية.
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "للسماح للمستخدم بتحرير إعدادات قفل المخطط على صفحات فهرس المهام والاختبارات الموجزة في المساقات المخططة الرئيسية."
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "للسماح للمستخدم بتحرير إعدادات قفل المخطط على صفحة فهرس النقاشات في المساقات المخططة الرئيسية."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "يسمح للمستخدم بتحرير إعدادات قفل المخطط على صفحة فهرس النقاشات في المساقات المخططة الرئيسية."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "يسمح للمستخدم بتحرير إعدادات قفل المخطط على صفحة الملفات في المساقات المخططة الرئيسية."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "يسمح للمستخدم بتحرير إعدادات قفل المخطط على صفحات فهرس المهام والاختبارات الموجزة في المساقات المخططة الرئيسية."
   allows_user_to_edit_conferences_61eb62e0: "لتمكين المستخدم من تحرير المؤتمرات."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "يسمح للمستخدم بتحرير التكوينات للتطبيقات الخارجية المضافة يدويًا."
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: "للسماح للمستخدم بتحرير ملفات ومجلدات المساق."
+  allows_user_to_edit_course_image_name_course_code__8a4681c8: "للسماح للمستخدم بتحرير صورة المساق والاسم ورمز المساق والمنطقة الزمنية والحساب الفرعي والفصل الدراسي والخيارات الأخرى في علامة تبويب تفاصيل المساق."
+  allows_user_to_edit_course_pages_30f188b4: "للسماح للمستخدم بتحرير صفحات المساق."
   allows_user_to_edit_course_pages_allows_user_to_de_65fec49b: |-
       للسماح للمستخدم بتحرير صفحات المساق. للسماح للمستخدم بتحديد المستخدمين المسموح لهم بتحرير الصفحة. للسماح للمستخدم بإضافة صفحة إلى قائمة المهام للطالب.
               يسمح للمستخدم بنشر وإلغاء نشر الصفحات. للسماح للمستخدم بعرض سجل الصفحة وتعيين الصفحة الأمامية.
@@ -2424,6 +2480,7 @@ ar:
               يسمح للمستخدم بنشر وإلغاء نشر الصفحات. يسمح للمستخدم بعرض سجل الصفحة وتعيين الصفحة الأمامية.
               يسمح للمستخدم بتحرير إعدادات تأمين المخطط في صفحة فهرس الصفحات وللصفحات كل حدة في أحد المساقات المخططة الرئيسية.
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "يسمح للمستخدم بتحرير الدرجات وإضافة التعليقات في SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "للسماح للمستخدم بتحرير الدرجات في دفتر الدرجات."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "يسمح للمستخدم بتحرير الدرجات في دفتر الدرجات. يسمح للمستخدم بالوصول إلى سجل دفتر الدرجات. يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       يسمح للمستخدم بتحرير الدرجات في دفتر الدرجات.
@@ -2431,9 +2488,14 @@ ar:
       يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها).
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "يسمح للمستخدم بتحرير الدرجات في دفتر الدرجات. يسمح للمستخدم بالوصول إلى سجل دفتر الدرجات."
   allows_user_to_edit_grading_schemes_98c35117: "يسمح للمستخدم بتحرير مخططات التقييم."
+  allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "للسماح للمستخدم بتحرير إعدادات التأمين على المهام أو الصفحات أو النقاشات الفردية."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "يسمح للمستخدم بتحرير معرف SIS للمساق."
   allows_user_to_edit_the_course_syllabus_a28ff262: "يسمح للمستخدم بتحرير المخطط الدراسي للمساق."
+  allows_user_to_edit_title_description_or_remove_co_483daae5: "للسماح للمستخدم بتحرير العنوان أو الوصف أو إزالة التعاونات على جميع التعاونات."
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "للسماح للمستخدم بتمكين أوزان مجموعات المهام وتحريرها في المساقات."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "يسمح للمستخدم بتصدير دفتر الدرجات إلى ملف بقيم مفصولة بفاصلة (CSV). يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "للسماح للمستخدم بتصدير دفتر الدرجات إلى ملف بقيم مفصولة بفاصلة (CSV)."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "للسماح للمستخدم بتصفية المساقات المخططة على مستوى الحساب. للسماح للمستخدم بإضافة مساقات مقترنة."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "يسمح للمستخدم بتصفية المساقات المخططة على مستوى الحساب. يسمح للمستخدم بإضافة مساقات مقترنة."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       يسمح للمستخدم بتصفية المساقات المخططة على مستوى الحساب.
@@ -2441,6 +2503,7 @@ ar:
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "يسمح للمستخدم بإنشاء رمز إقران بالنيابة عن المستخدم لمشاركتها مع المراقب."
   allows_user_to_generate_login_logout_activity_repo_bba62f2: "يسمح للمستخدم بإنشاء تقرير نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول."
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: "يسمح للمستخدم بإنشاء تقرير نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. (غير متوفر على مستوى الحساب الفرعي)."
+  allows_user_to_import_a_zip_file_97bd7db2: "للسماح للمستخدم باستيراد ملف مضغوط."
   allows_user_to_import_account_learning_outcomes_f6f6d0b9: "يسمح للمستخدم باستيراد مخرجات التعلم الخاصة بالحساب."
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "يسمح للمستخدم باستيراد المحتوى باستخدام أداة استيراد المساق."
   allows_user_to_import_course_learning_outcomes_2ca3f18f: "يسمح للمستخدم باستيراد مخرجات التعلم الخاصة بالمساق."
@@ -2450,8 +2513,11 @@ ar:
       يسمح للمستخدم باستيراد الموارد من Commons إلى المساقات.
       يسمح للمستخدم بمشاركة المهام إلى Commons أو تحرير المحتوى المشترك مسبقًا.
   allows_user_to_import_resources_from_commons_into__6e9d32e6: "يسمح للمستخدم باستيراد الموارد من Commons إلى المساقات. يسمح للمستخدم بمشاركة المهام إلى Commons أو تحرير المحتوى المشترك مسبقًا."
+  allows_user_to_import_resources_from_commons_into__79e8255e: "للسماح للمستخدم باستيراد الموارد من Commons إلى المساقات."
   allows_user_to_import_sis_data_583b20a5: "يسمح للمستخدم باستيراد بيانات SIS."
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "يسمح للمستخدم بالإعجاب بمنشورات النقاش عند تحديد خانة اختيار يمكن الإعجاب بواسطة المقيّمين فقط."
+  allows_user_to_manage_assignment_settings_35d94690: "للسماح للمستخدم بإدارة إعدادات المهام."
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "للسماح للمستخدم بإدارة إعدادات المساقات المخططة في إعدادات المساق."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "يسمح للمستخدم بإدارة خيارات الميزة في إعدادات الحساب."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       يسمح للمستخدم بإدارة الوحدات النمطية (إنشاء، إضافة العناصر، تحرير إعدادات
@@ -2459,14 +2525,20 @@ ar:
   allows_user_to_manage_modules_create_add_items_edi_9459e815: "يسمح للمستخدم بإدارة الوحدات النمطية (إنشاء، إضافة العناصر، تحرير إعدادات الوحدات النمطية، نشر، إلغاء نشر، وما شابه)."
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "يسمح للمستخدم بإدارة المراقبين المقترنين بالطلاب في الحساب."
   allows_user_to_manage_rubrics_326eedc2: "يسمح للمستخدم بإدارة مقاييس التقييم."
+  allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: "للسماح للمستخدم بإدارة الموارد المشتركة في الحساب."
+  allows_user_to_manage_the_visibility_options_in_co_e781e4e4: "للسماح للمستخدم بإدارة خيارات العرض في إعدادات المساق أو عند إنشاء مساق جديد."
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "يسمح للمستخدم بإضافة تطبيق يدويًا في إعدادات الحساب."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "يسمح للمستخدم بإضافة تطبيق أو حذفه يدويًا في إعدادات الحساب."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "يسمح للمستخدم بإضافة تطبيق أو حذفه يدويًا في إعدادات المساق."
   allows_user_to_moderate_a_quiz_6953d369: "يسمح للمستخدم بالإشراف على اختبار موجز."
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "يسمح للمستخدم بالإشراف على اختبار موجز وعرض صفحة إحصائيات الاختيار الموجز."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "يسمح للمستخدم بالإشراف على اختبار موجز. الإعدادات: يسمح للمستخدم بتحرير مخططات التقييم."
+  allows_user_to_modify_user_account_details_e16fb115: "للسماح للمستخدم بتعديل تفاصيل حساب المستخدم."
+  allows_user_to_publish_and_unpublish_pages_e9397f80: "للسماح للمستخدم بنشر الصفحات وإلغاء نشرها."
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "يسمح للمستخدم بنشر المساقات وإنهائها وحذفها."
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "للسماح للمستخدم بإزالة المساق كقالب مساق في إعدادات المساق."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "للسماح للمستخدم بإزالة المساق كقالب مساق في إعدادات المساق. للسماح للمستخدم بتعيين حساب لعدم استخدام قالب."
+  allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "للسماح للمستخدم بإزالة المستخدمين ودمجهم في الحسابات."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "يسمح للمستخدم بإزالة مصممين من المساق."
   allows_user_to_remove_designers_to_the_course_from_1053d170: "يسمح للمستخدم بإزالة مصممين إلى المساق من صفحة مساقات الحساب. يسمح للمستخدم بإزالة مصممين في المساق."
   allows_user_to_remove_designers_to_the_course_from_f5a7225e: "يسمح للمستخدم بإزالة مصممين إلى المساق من صفحة مساقات الحساب."
@@ -2480,13 +2552,15 @@ ar:
   allows_user_to_remove_teachers_from_a_course_6d627914: "يسمح للمستخدم بإزالة معلمين من المساق."
   allows_user_to_remove_teachers_from_the_course_bf4b2d8: "يسمح للمستخدم بإزالة معلمين في المساق."
   allows_user_to_remove_teachers_from_the_course_fro_75ffab61: "يسمح للمستخدم بإزالة معلمين من المساق من صفحة مساقات الحساب. يسمح للمستخدم بإزالة معلمين في المساق."
+  allows_user_to_rename_course_sections_928982f0: "للسماح للمستخدم بإعادة تسمية أقسام المساق."
   allows_user_to_rename_course_sections_allows_user__8e9e7bac: "يسمح للمستخدم بإعادة تسمية أقسام المساق. يسمح للمستخدم بتغيير تواريخ البداية والنهاية لأقسام المساق. يسمح للمستخدم بإدراج الأقسام بشكل متعدد."
   allows_user_to_reply_to_a_discussion_post_83f43e19: "يسمح للمستخدم بالرد على منشور نقاش."
+  allows_user_to_resend_course_invitations_from_the__2822fe53: "للسماح للمستخدم بإعادة إرسال دعوات المساق من صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_restore_a_course_32084c5c: "يسمح للمستخدم باستعادة مساق."
   allows_user_to_restore_a_course_not_available_at_t_3a749177: "يسمح للمستخدم باستعادة مساق. (غير متوفر على مستوى الحساب الفرعي)."
   allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: "يسمح للمستخدم بمراجعة مسار تدقيق في المهام، كلٍ من المشرف عليها والمجهولة."
   allows_user_to_search_by_assignment_id_in_grade_ch_308afd80: "يسمح للمستخدم بالبحث بمعرف المهام في سجلات تغييرات الدرجات. (غير متوفر على مستوى الحساب الفرعي)."
-  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "يسمح للمستخدم بالبحث بمعرف المهام في سجلات تغييرات الدرجات."
+  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "للسماح للمستخدم بالبحث بمعرف المهام في سجلات تغييرات الدرجات."
   allows_user_to_search_by_course_id_or_assignment_i_1f41eb6a: "يسمح للمستخدم بالبحث بمعرف المساق أو معرف المهام في سجلات تغييرات الدرجات في أدوات المسؤولين (غير متاح على مستوى الحساب الفرعي)."
   allows_user_to_search_by_course_id_or_assignment_i_b30d9175: "يسمح للمستخدم بالبحث بمعرف المساق أو معرف المهام في سجلات تغييرات الدرجات في أدوات المسؤولين."
   allows_user_to_search_by_course_id_or_assignment_i_e6f3e7f: "يسمح للمستخدم بالبحث بمعرف المساق أو معرف المهام في سجلات تغييرات الدرجات في أدوات المسؤولين. (غير متوفر على مستوى الحساب الفرعي)."
@@ -2494,24 +2568,31 @@ ar:
   allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
       يسمح للمستخدم بالبحث عن مستخدمي الحسابات عن طريق عنوان البريد الإلكتروني الرئيسي في صفحة الأشخاص الخاصة بالحساب.
       يسمح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق عنوان البريد الإلكتروني الرئيسي في صفحة الأشخاص الخاصة المساق.
+  allows_user_to_search_for_account_users_via_primar_db535df4: "للسماح للمستخدم بالبحث عن مستخدمي الحسابات عن طريق عنوان البريد الإلكتروني الرئيسي في صفحة الأشخاص الخاصة بالحساب."
   allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "يسمح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق معرف تسجيل الدخول في صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_search_for_other_users_by_login_id__3edb3702: "يسمح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق معرف تسجيل الدخول في صفحة الأشخاص الخاصة بالحساب."
   allows_user_to_search_for_other_users_by_login_id__97d49785: |-
       يسمح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق معرف تسجيل الدخول في صفحة الأشخاص الخاصة بالحساب.
       يسمح للمستخدم بعرض معرفات تسجيل الدخول في صفحة الأشخاص الخاصة بالمساق.
+  allows_user_to_search_for_other_users_via_primary__c1da56c8: "للسماح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق عنوان البريد الإلكتروني الرئيسي في صفحة الأشخاص الخاصة المساق."
   allows_user_to_search_for_other_users_via_primary__c95888c8: "يسمح للمستخدم بالبحث عن المستخدمين الآخرين عن طريق عناوين البريد الإلكتروني الرئيسي في صفحة الأشخاص."
+  allows_user_to_search_grade_change_logs_by_grader__406d1976: "للسماح للمستخدم بالبحث في سجلات تغييرات الدرجات حسب المقيّم أو الطالب في أدوات المسؤول."
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "يسمح للمستخدم برؤية قائمة المساقات في الحساب."
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: "يسمح للمستخدم برؤية قائمة المساقات المبتدأة والمنتهية حديثًا في إحصائيات الحساب."
   allows_user_to_see_the_list_of_recently_started_en_1012704d: "يسمح للمستخدم برؤية قائمة المساقات المبتدأة/المنتهية حديثًا في إحصائيات الحساب."
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: "للسماح للمستخدم بتحديد المساق كقالب مساق في إعدادات المساق."
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "يسمح للمستخدم بتحديد الدرجة النهائية للمهام المشرف عليها."
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "يسمح للمستخدم بإرسال رسالة في المحادثات بدون تحديد مساق."
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: "يسمح للمستخدم بإرسال رسالة إلى \"الجميع في [course name]\". يسمح للمستخدم بإرسال رسالة إلى \"الجميع في [course group]\"."
+  allows_user_to_send_a_message_to_all_in_course_nam_4f41b5a2: "للسماح للمستخدم بإرسال رسالة إلى \"الجميع في [course name]\" أو \"الجميع في [course group]\"."
   allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
       يسمح للمستخدم بإرسال رسالة إلى \"الجميع في [course name]\".
       يسمح للمستخدم بإرسال رسالة إلى \"الجميع في [course group]\".
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "يسمح للمستخدم بإرسال رسالة إلى \"الجميع في [course name]\" أو \"الجميع في [course group]\"."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "يسمح للمستخدم بإرسال رسائل إلى أفراد المساق كل على حدة."
+  allows_user_to_set_a_template_for_an_account_34fe3695: "للسماح للمستخدم بتعيين قالب لحساب."
   allows_user_to_set_a_template_for_an_account_allow_210403ed: "للسماح للمستخدم بتعيين قالب لحساب. للسماح للمستخدم بتحديد المساق كقالب مساق في إعدادات المساق. للسماح للمستخدم بعرض أسماء قوالب المساق في الحساب الجذر."
+  allows_user_to_set_an_account_to_not_use_a_templat_d34fe23c: "للسماح للمستخدم بتعيين حساب لعدم استخدام قالب."
   allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: "لتمكين المستخدم بتعيين مقاييس إجادة المخرجات على مستويي الحساب والمساق."
   allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: "لتمكين المستخدم بتعيين مقاييس إجادة المخرجات على مستوى المساق."
   allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "لتمكين المستخدم بتعيين حسابات إجادة المخرجات على مستوى المساق."
@@ -2519,11 +2600,15 @@ ar:
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "لتمكين المستخدم بتعيين مقاييس إجادة المخرجات على مستويي الحساب والمساق."
   allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: "لتمكين المستخدم بتعيين مقاييس إجادة المخرجات على مستوى المساق."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "يسمح للمستخدم بمشاركة اختبار موجز إلى Commons."
+  allows_user_to_share_assignments_to_commons_or_edi_c70ddf7: "للسماح للمستخدم بمشاركة المهام إلى Commons أو تحرير المحتوى المشترك مسبقًا."
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "لتمكين المستخدم من مشاركة عناصر المساق مباشرة مع مستخدمين آخرين. لتمكين المستخدم من نسخ عناصر مساق فردية لمساق آخر."
+  allows_user_to_share_course_items_directly_with_ot_e5793d35: "لتمكين المستخدم من مشاركة عناصر المساق مباشرة مع مستخدمين آخرين."
+  allows_user_to_start_conferences_they_created_281b03ea: "للسماح للمستخدم ببدء المؤتمرات التي أنشأها."
   allows_user_to_sync_blueprint_courses_allows_user__61af2285: |-
       للسماح للمستخدم بمزامنة المساقات المخططة. للسماح للمستخدم بعرض محفوظات مزامنة المخطط. يسمح للمستخدم بعرض المساقات وإدارتها في الحساب. للسماح للمستخدم بعرض زر قائمة اختيار إعداد المساق.
               للسماح للمستخدم بالوصول إلى علامة تبويب لوحة التنقل في إعدادات المساق. للسماح للمستخدم بتحرير صورة المساق والاسم ورمز المساق والمنطقة الزمنية والحساب الفرعي والفصل الدراسي والخيارات الأخرى في علامة تبويب تفاصيل المساق.
               للسماح للمستخدم بالوصول إلى طريقة عرض الطالب (طالب الاختبار)، أزرار نسخ هذا المساق، وإعادة تعيين محتوى المساق، والحذف الدائم للمساق. للسماح للمستخدم بعرض بطاقات سياق الطلاب في الإعلانات وردود النقاشات.
+  allows_user_to_sync_blueprint_courses_db4fcc03: "للسماح للمستخدم بمزامنة المساقات المخططة."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "يسمح للمستخدم بعرض معرف SIS للمساق."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "يسمح للمستخدم بعرض ارتباط على SpeedGrader من المهام."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2531,12 +2616,15 @@ ar:
       يسمح للمستخدم بعرض معلومات دفتر المعلمين لكل طالب على حدا.
       يسمح للمستخدم بإنشاء إدخالات جديدة في دفتر المعلمين.
   allows_user_to_view_a_link_to_the_faculty_journal__4c48b57b: "يسمح للمستخدم بعرض ارتباط إلى دفتر المعلمين في الشريط الجانبي لصفحة تفاصيل المستخدم. يسمح للمستخدم بعرض معلومات دفتر المعلمين لكل طالب على حدا. يسمح للمستخدم بإنشاء إدخالات جديدة في دفتر المعلمين."
+  allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: "للسماح للمستخدم بعرض ارتباط إلى دفتر المعلمين في الشريط الجانبي لصفحة تفاصيل المستخدم."
   allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
       يسمح للمستخدم بعرض ارتباط إلى دفتر المعلمين في الشريط الجانبي لصفحة تفاصيل المستخدم.
       يسمح للمستخدم بعرض معلومات دفتر المعلمين لكل طالب على حدا.
       يسمح للمستخدم بإنشاء إدخالات جديدة في دفتر المعلمين.
+  allows_user_to_view_access_reports_f7be7a84: "للسماح للمستخدم لعرض تقارير الوصول."
   allows_user_to_view_account_analytics_98fbc6ad: "يسمح للمستخدم لعرض تحليلات الحساب."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "يسمح للمستخدم بعرض جميع مجموعات المساق، ليس فقط المجموعات الذين قاموا بالتسجيل بها، في نافذة التعاون مع."
+  allows_user_to_view_all_course_groups_not_just_whe_e107af44: "للسماح للمستخدم بعرض جميع مجموعات المساق، ليس فقط المجموعات الذين قاموا بالتسجيل بها، في نافذة التعاون مع."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "يسمح للمستخدم بعرض جميع إرسالات مهام الطلاب وإضافة التعليقات."
   allows_user_to_view_analytics_link_in_the_user_set_56867782: "يسمح للمستخدم بعرض ارتباط تحليلات في قائمة إعدادات المستخدم."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "يسمح للمستخدم بعرض المستخدمين وإضافتهم في التعاونات."
@@ -2544,7 +2632,9 @@ ar:
       يسمح للمستخدم بعرض التقارير وتكوينها في إعدادات الحساب.
       يسمح للمستخدم بعرض تقارير الوصول وتقارير تفاعل الطلاب.
       يسمح للمستخدم بعرض معلومات النشاط الأخير وإجمالي النشاط على صفحة الأشخاص.
+  allows_user_to_view_and_configure_reports_in_accou_d3cee49f: "للسماح للمستخدم بعرض التقارير وتكوينها في إعدادات الحساب."
   allows_user_to_view_and_configure_reports_in_accou_e8c6f9a1: "يسمح للمستخدم بعرض التقارير وتكوينها في إعدادات الحساب. يسمح للمستخدم لعرض تقارير الوصول. يسمح للمستخدم بعرض معلومات النشاط الأخير وإجمالي النشاط على صفحة الأشخاص."
+  allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "للسماح للمستخدم بعرض معرف SIS وتحريره ومعرف التفاعل في تفاصيل تسجيل دخول المستخدم."
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "يسمح للمستخدم بعرض معرف SIS وتحريره ومعرف التفاعل في تفاصيل تسجيل دخول المستخدم."
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "يسمح للمستخدم بعرض البيانات وإدخالها في حقل معرف SIS."
   allows_user_to_view_and_link_questions_in_a_quiz_t_b899a247: "يسمح للمستخدم بعرض الأسئلة وربطها في اختبار موجز ببنوك أسئلة من مستوى الحسابات. في حالة تعطيلها، سيتمكن المستخدم من العرض والربط ببنوك أسئلة المساق فقط. يمكّن من ارتباط إدارة بنوك الأسئلة أو صفحة فهرس الاختبارات الموجزة."
@@ -2553,18 +2643,25 @@ ar:
       في حالة تعطيلها، سيتمكن المستخدم من العرض والربط ببنوك أسئلة المساق فقط. يمكّن من ارتباط إدارة بنوك الأسئلة أو صفحة فهرس الاختبارات الموجزة
   allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: "يسمح للمستخدم بعرض الأسئلة وربطها في اختبار موجز ببنوك أسئلة من مستوى الحسابات. في حالة تعطيلها، سيتمكن المستخدم من العرض والربط ببنوك أسئلة المساق فقط."
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "يسمح للمستخدم بعرض الأسئلة وربطها في اختبار موجز ببنوك أسئلة من مستوى الحسابات."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: "للسماح للمستخدم بعرض الأسئلة وربطها في اختبار موجز ببنوك أسئلة من مستوى المساقات."
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "يسمح للمستخدم بعرض خيارات المصادقة وإدارتها للحساب بأكمله."
-  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "يسمح للمستخدم بعرض المساقات وإدارتها في الحساب."
+  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "للسماح للمستخدم بعرض المساقات وإدارتها في الحساب."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "يسمح للمستخدم بعرض الأذونات وإدارتها."
   allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "يسمح للمستخدم بعرض علامة تبويب الحصص وإدارتها في إعدادات الحساب. يسمكن للمستخدم تعيين حصص تخزين المساقات والمستخدمين والمجموعات."
   allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: "يسمح للمستخدم بعرض علامة تبويب الحصص وإدارتها في إعدادات الحساب. يسمكن للمستخدم تعيين حصص تخزين المساقات والمستخدمين والمجموعات."
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "يسمح للمستخدم بعرض الحسابات الفرعية وإدارتها للحساب."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "يسمح للمستخدم بعرض الفصول الدراسية وإدارتها للحساب."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "يسمح للمستخدم بعرض وإدارة علامات تبويب الإعدادات والإعلامات في إعدادات الحساب."
+  allows_user_to_view_and_modify_login_information_f_78f3a544: "للسماح للمستخدم بعرض معلومات تسجيل الدخول وتعديلها للمستخدمين."
+  allows_user_to_view_blueprint_sync_history_d545cb7d: "للسماح للمستخدم بعرض محفوظات مزامنة المخطط."
   allows_user_to_view_canvas_insights_f4f7ba8b: "للسماح للمستخدم بعرض Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "يسمح للمستخدم بعرض أزرار اختر الصفحة الرئيسية وقائمة اختيار إعداد المساق في الصفحة الرئيسية."
+  allows_user_to_view_course_activity_information_fo_e420113b: "للسماح للمستخدم بعرض معلومات نشاط المساق للحساب."
+  allows_user_to_view_course_analytics_through_the_c_192889dc: "للسماح للمستخدم بعرض تحليلات المساق من خلال لوحة معلومات المساق."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "يسمح للمستخدم بعرض تحليلات المساق من خلال لوحة معلومات المساق. يسمح للمستخدم بعرض تحليلات الطالب."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "يسمح للمستخدم بعرض تحليلات المساق والطالب من الصفحة الرئيسية للمساق وصفحة الأشخاص."
+  allows_user_to_view_course_announcements_e71afc2: "للسماح للمستخدم لعرض إعلانات المساق."
+  allows_user_to_view_course_discussions_23346fa1: "للسماح للمستخدم لعرض نقاشات المساق."
   allows_user_to_view_course_sis_id_3a1818a5: "يسمح للمستخدم بعرض معرف SIS للمساق."
   allows_user_to_view_course_status_choose_home_page_21bf32a8: "يسمح للمستخدم بعرض أزرار حالة المساق واختر الصفحة الرئيسية وقائمة اختيار إعداد المساق في الصفحة الرئيسية."
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
@@ -2576,8 +2673,13 @@ ar:
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       يسمح للمستخدم بعرض الصفحات وإنشائها وتحريرها وحذفها ونشرها/إلغاء نشرها.
       يسمح للطلاب بعرض سجل الصفحة وتعيين الصفحة الأمامية.
+  allows_user_to_view_edit_and_delete_collaborations_f2281cb0: "للسماح للمستخدم بعرض التعاونات التي أنشأها وتحريرها وحذفها."
+  allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: "للسماح للمستخدم بعرض المؤتمرات التي أنشأها وتحريرها وحذفها."
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "يسمح للمستخدم بعرض التسجيلات على علامة تبويب الأقسام."
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "يسمح للمستخدم بعرض إدخالات دفتر المعلمين في تقرير تفاعل الطلاب."
+  allows_user_to_view_faculty_journal_information_fo_3c725307: "للسماح للمستخدم بعرض معلومات دفتر المعلمين لكل طالب على حدا."
+  allows_user_to_view_feature_options_in_account_set_befc6b83: "للسماح للمستخدم بعرض خيارات الميزة في إعدادات الحساب."
+  allows_user_to_view_gradebook_9720b3e2: "للسماح للطلاب بعرض دفتر الدرجات."
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       يسمح للطلاب بعرض دفتر الدرجات.
       يسمح للمستخدم بتصدير دفتر الدرجات إلى ملف بقيم مفصولة بفاصلة (CSV).
@@ -2588,6 +2690,7 @@ ar:
   allows_user_to_view_gradebook_allows_user_to_expor_e6b24e2c: "يسمح للطلاب بعرض دفتر الدرجات. يسمح للمستخدم بتصدير دفتر الدرجات إلى ملف بقيم مفصولة بفاصلة (CSV). يسمح للمستخدم بالوصول إلى دفتر درجات إجادة التعلم (في حالة تمكينها)."
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "يسمح للمستخدم بعرض تقييمات المقيّم على مقياس التقييم في SpeedGrader."
   allows_user_to_view_groups_in_a_course_8a95805b: "يسمح للمستخدم بعرض المجموعات في المساق."
+  allows_user_to_view_last_activity_and_total_activi_105b5bc3: "للسماح للمستخدم بعرض معلومات النشاط الأخير وإجمالي النشاط على صفحة الأشخاص."
   allows_user_to_view_last_activity_and_total_activi_1455c521: "يسمح للمستخدم بعرض تقارير النشاط الأخير والنشاط الإجمالي."
   allows_user_to_view_last_activity_and_total_activi_786a7286: "يسمح للمستخدم بعرض معلومات النشاط الأخير والنشاط الإجمالي على صفحة الأشخاص."
   allows_user_to_view_last_activity_total_activity_a_e0bee860: "يسمح للمستخدم بعرض تقارير النشاط الأخير والنشاط الإجمالي وتفاعل الطلاب."
@@ -2595,35 +2698,49 @@ ar:
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       يسمح للمستخدم بعرض قائمة المستخدمين في صفحة الأشخاص الخاصة بالمساق.
       يسمح للمستخدم بعرض زر التسجيلات المسبقة في صفحة الأشخاص الخاصة بالمساق.
+  allows_user_to_view_list_of_users_in_the_course_pe_9ab1309c: "للسماح للمستخدم بعرض قائمة المستخدمين في صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_view_list_of_users_in_the_course_pe_bc91c8fb: "يسمح للمستخدم بعرض قائمة المستخدمين في صفحة الأشخاص الخاصة بالمساق. يسمح للمستخدم بعرض زر التسجيلات المسبقة في صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_view_login_id_information_for_stude_33512e60: "يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للطلاب. يسمح للمستخدم بعرض التسجيلات المسبقة. يسمح للمستخدم بالوصول إلى قائمة إعدادات المستخدم وتفاصيل المستخدم. يسمح للمستخدم بتحرير قسم أو الطلاب أو دورهم. يسمح للمستخدم بإعادة إرسال دعوات المساق من صفحة الأشخاص الخاصة بالمساق."
+  allows_user_to_view_login_id_information_for_stude_70930399: "للسماح للمستخدم بعرض معلومات معرف تسجيل الدخول للطلاب."
   allows_user_to_view_login_id_information_for_teach_4b30f308: "يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين والمصممين والمعلمين المساعدين. يسمح للمستخدم بعرض تفاصيل المستخدم من أي مستخدم. يسمح للمستخدم بتحرير قسم أو دور المستخدمين."
   allows_user_to_view_login_id_information_for_teach_ad237acc: "يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمعلمين والمصممين والمعلمين المساعدين. يسمح للمستخدم بعرض قائمة الإعدادات للمعلمين ومصممي المساقات والمعلمين المساعدين والمراقبين. يسمح للمستخدم بعرض تفاصيل المستخدم للمعلمين ومصممي المساقات والمعلمين المساعدين. يسمح للمستخدم بتقييد الطلاب بعرض أعضاء الأقسام الزملاء فقط."
+  allows_user_to_view_login_id_information_for_users_895256fb: "للسماح للمستخدم بعرض معلومات معرف تسجيل الدخول للمستخدمين."
   allows_user_to_view_login_id_information_for_users_ab5c64ea: "يسمح للمستخدم بعرض معلومات معرف تسجيل الدخول للمستخدمين. يسمح للمستخدم بعرض تفاصيل المستخدم لمستخدمي المساق. يسمح للمستخدم بتحرير قسم أو دور المستخدمين (إذا لم يُضاف عبر SIS)."
   allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "يسمح للمستخدم بعرض معرفات تسجيل الدخول في صفحة الأشخاص الخاصة بالمساق."
   allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
       يسمح للمستخدم بعرض نشاط تسجيل دخول/تسجيل خروج المستخدمين في أدوات المسؤول.
       يسمح للمستخدم بالبحث في سجلات تغييرات الدرجات حسب المقيّم أو الطالب في أدوات المسؤول.
+  allows_user_to_view_login_logout_activity_of_users_e11dd2de: "للسماح للمستخدم بعرض نشاط تسجيل دخول/تسجيل خروج المستخدمين في أدوات المسؤول."
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: "يسمح للمستخدم بعرض نشاط تسجيل دخول/تسجيل خروج المستخدمين في أدوات المسؤول. يسمح للمستخدم بالبحث في سجلات تغييرات الدرجات حسب المقيّم أو الطالب في أدوات المسؤول. (غير متوفر على مستوى الحساب الفرعي)."
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "للسماح للمستخدم بعرض أسماء قوالب المساق في الحساب الجذر."
+  allows_user_to_view_page_history_and_set_front_pag_c2321326: "للسماح للطلاب بعرض سجل الصفحة وتعيين الصفحة الأمامية."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       يسمح للمستخدم بعرض التعاونات المنشأة مسبقًا.
       يسمح للمستخدم بتحرير العنوان أو الوصف أو إزالة التعاونات على جميع التعاونات.
   allows_user_to_view_previously_created_collaborati_bb4b86f1: "يسمح للمستخدم بعرض التعاونات المنشأة مسبقًا. يسمح للمستخدم بتحرير العنوان أو الوصف أو إزالة التعاونات على جميع التعاونات."
+  allows_user_to_view_previously_created_collaborati_d3a37402: "للسماح للمستخدم بعرض التعاونات المنشأة مسبقًا."
+  allows_user_to_view_prior_enrollments_df5286d: "للسماح للمستخدم بعرض التسجيلات المسبقة."
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "يسمح للمستخدم بعرض محتوى المساق المنشور وغير المنشور."
-  allows_user_to_view_student_context_cards_in_annou_dadef934: "يسمح للمستخدم بعرض بطاقات سياق الطلاب في الإعلانات وردود النقاشات."
+  allows_user_to_view_recent_announcements_on_the_co_e56c881e: "للسماح للمستخدم بعرض الإعلانات الحديثة على الصفحة الرئيسية للمساق."
+  allows_user_to_view_student_analytics_89bfd9e8: "للسماح للمستخدم بعرض تحليلات الطالب."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "للسماح للمستخدم بعرض بطاقات سياق الطلاب في الإعلانات وردود النقاشات."
   allows_user_to_view_student_grades_pages_e0091b20: "يسمح للمستخدم بعرض صفحات درجات الطلاب."
   allows_user_to_view_student_quiz_logs_e1c4491: "يسمح للمستخدم بعرض سجلات الاختبارات الموجزة للطلاب."
   allows_user_to_view_student_results_and_or_access__60fac9: "يسمح للمستخدم بعرض نتائج الطلاب و/أو الوصول إلى الاختبارات الموجزة في SpeedGrader."
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "يسمح للمستخدم بعرض نتائج الطلاب وعرض إحصائيات الاختبارات الموجزة والوصول إلى الاختبارات الموجزة في SpeedGrader."
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "يسمح للمستخدم بعرض بيانات خاصة بالطلاب في التحليلات."
+  allows_user_to_view_the_announcements_link_in_cour_b3522273: "للسماح للمستخدم بعرض ارتباط الإعلانات في لوحة تنقل المساق."
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "يسمح للمستخدم بعرض ارتباط الإعلانات في لوحة تنقل المساق. يسمح للمستخدم لعرض إعلانات المساق."
   allows_user_to_view_the_conclude_course_button_e90a1175: "للسماح للمستخدم بعرض زر إنهاء المساق."
   allows_user_to_view_the_course_grading_scheme_32a6042: "يسمح للمستخدم بعرض مخطط تقييم المساق."
+  allows_user_to_view_the_course_setup_checklist_but_4d7524f0: "للسماح للمستخدم بعرض زر قائمة اختيار إعداد المساق."
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "يسمح للمستخدم بعرض زر إحصائيات المساق في إعدادات المساق."
+  allows_user_to_view_the_delete_this_course_button_92a4c832: "للسماح للمستخدم بعرض زر حذف هذا المساق."
   allows_user_to_view_the_delete_this_course_button__6edc6b46: "للسماح للمستخدم بعرض زر حذف هذا المساق. للسماح للمستخدم بعرض زر إعادة تعيين محتوى المساق."
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       يسمح للمستخدم بعرض ارتباط النقاش في لوحة تنقل المساق.
       يسمح للمستخدم لعرض نقاشات المساق.
+  allows_user_to_view_the_discussions_link_in_course_80ab2fca: "للسماح للمستخدم بعرض ارتباط النقاش في لوحة تنقل المساق."
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "يسمح للمستخدم بعرض ارتباط النقاش في لوحة تنقل المساق. يسمح للمستخدم لعرض نقاشات المساق."
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "لتمكين المستخدم من عرض صفحة الإشراف على المحفظة الإلكترونية وإدارة محتوى البريد العشوائي للمحفظة الإلكترونية."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "يسمح للمستخدم بعرض ارتباط دفتر المعلمين في لوحة التنقل العامة."
@@ -2631,17 +2748,26 @@ ar:
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       يسمح للمستخدم بعرض الصفحات الرئيسية للمجموعة لجميع مجموعات الطلاب.
       يسمح للطلاب بالوصول إلى مجموعات الطلاب الأخرى داخل مجموعة طلاب من خلال ارتباط مباشر.
+  allows_user_to_view_the_group_home_pages_of_all_st_b463b0f9: "للسماح للمستخدم بعرض الصفحات الرئيسية للمجموعة لجميع مجموعات الطلاب."
   allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: "يسمح للمستخدم بعرض زر الإشراف للمهام المشرف عليها. ملاحظة: يتم إهمال هذا الإذن. لتمكين المستخدمين من عرض زر الإشراف، يرجى تمكين الدرجات - تحديد الدرجة النهائية للإشراف."
   allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
       يسمح للمستخدم بعرض زر الإعلان الجديد في الصفحة الرئيسية.
       يسمح للمستخدم بإضافة إعلانات في صفحة الإعلانات.
+  allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "للسماح للمستخدم بعرض زر الإعلان الجديد في الصفحة الرئيسية."
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "يسمح للمستخدم بعرض زر الإعلان الجديد في الصفحة الرئيسية. يسمح للمستخدم بإضافة إعلانات في صفحة الإعلانات."
   allows_user_to_view_the_new_gradebook_50f53ef0: "يسمح للمستخدم بعرض دفتر الدرجات الجديد."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "يسمح للمستخدم بعرض ارتباط الأشخاص في لوحة تنقل المساق."
+  allows_user_to_view_the_previous_sis_import_dates__1716ddb5: "للسماح للمستخدم بعض تواريخ وأخطاء استيراد SIS السابق والعناصر المستوردة."
+  allows_user_to_view_the_prior_enrollments_button_i_b04b8132: "للسماح للمستخدم بعرض زر التسجيلات المسبقة في صفحة الأشخاص الخاصة بالمساق."
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "للسماح للمستخدم بعرض زر النشر في بطاقة مساق لمساق غير منشور (لوحة معلومات عرض البطاقة)."
   allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "للسماح للمستخدم بعرض أزرار نشر المساق وإلغاء نشر المساق في الصفحة الرئيسية للمساق. للسماح للمستخدم بعرض زر النشر في بطاقة مساق لمساق غير منشور (لوحة معلومات عرض البطاقة)."
+  allows_user_to_view_the_publish_course_and_unpubli_aac98465: "للسماح للمستخدم بعرض أزرار نشر المساق وإلغاء نشر المساق في الصفحة الرئيسية للمساق."
+  allows_user_to_view_the_reset_course_content_butto_75c8c410: "للسماح للمستخدم بعرض زر إعادة تعيين محتوى المساق."
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: "للسماح للمستخدم بعرض رابط معايير التقييم في لوحة تنقل المساق."
   allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: "يسمح للمستخدم بعرض رابط معايير التقييم في لوحة تنقل المساق. يسمح للمستخدم بإنشاء معايير تقييم المساق وتحريرها وحذفها."
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "يسمح للمستخدم بعرض معرف SIS في تفاصيل تسجيل دخول المستخدم."
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "يسمح للمستخدم بعرض عمود معرف SIS في ملف CSV لتحليل عنصر الاختبار الموجز."
+  allows_user_to_view_user_details_for_course_users_ec1b6218: "للسماح للمستخدم بعرض تفاصيل المستخدم لمستخدمي المساق."
   allows_user_to_view_user_sis_ids_68a9d218: "يسمح للمستخدم بعرض معرفات SIS للمستخدم."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "يسمح للمستخدم بعرض معرفات SIS للمستخدم في صفحة الأشخاص الخاصة بالمساق."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "للسماح للمستخدم بإضافة وصف ودي للمخرجات لعرض المعلم وولي الأمر في دفتر درجات إتقان التعلم."
@@ -3145,6 +3271,7 @@ ar:
   as_of_a036fa2e: "اعتبارًا من"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "بينما تقوم بالكتابة في هذا الحقل، ستتم تصفية قائمة المجموعات تلقائيًا لتشمل فقط تلك التي تطابق أسماؤها إدخالك."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "سيتم تحديث قائمة النتائج تلقائياً أثناء الكتابة في هذا الحقل."
+  ascending_b3c87427: تصاعديًا
   ask_your_instructor_a_question_a61ca5e9: "طرح سؤال على معلمك"
   assess_and_survey_your_students_ce8172a9: "قم بتقييم طلابك واستطلاع آرائهم"
   assess_student_understanding_1e0b8d7f: "قيّم فهم الطلاب"
@@ -4327,11 +4454,13 @@ ar:
   author_215203d2: المؤلف
   author_id_570d3131: author_id
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} وضع لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{submission_submittor} ل %{assignment}"
+  author_login_id_57aaec4f: author_login_id
   author_name_12d871ff: author_name
   author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "وضع %{author_name} لتوه تعليقًا توضيحياً جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "وضع %{author_name} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "وضع %{author_name} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user_name} لـ %{assignment_title}."
   author_s_name_b35e905a: "اسم المؤلف"
+  author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: تخويل
   authorize_url_f28167a3: "تخويل عنوان URL"
   auto_leader_7791c30a: auto_leader
@@ -4511,10 +4640,12 @@ ar:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       يجب تمكين المساقات المخططة للحساب بواسطة مسؤول. لتحرير إعدادات التأمين على صفحة فهرس الصفحات، الصفحات - التحديث، المساقات المخططة - إضافة / تحرير / إقران / حذف، وإدارة المساقات: المسؤول - إدارة / تحديث.
               ولكن إذا تم تمكين هذه الأذونات الإضافية، ولم يتم تمكين إذن الصفحات - تحديث، فلا يزال بإمكان المستخدم تعديل إعدادات تأمين المحتوى في الصفحات كل على حدة في أحد المساقات المخططة الرئيسية.
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "يجب تمكين المساقات المخططة للحساب بواسطة مسؤول."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       يجب تمكين المساقات المخططة للحساب بواسطة مسؤول.
       يمكن لأدوار المساق فقط إدارة محتويات المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم.
       إذا تم تعطيل هذا الإعداد وتمكين النقاشات -عرض، فلا يزال بإمكان المستخدم تعديل إعدادات قفل المحتوى على النقاشات الفردية في مساق مخطط رئيسي.
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "يجب تمكين المساقات المخططة للحساب بواسطة مسؤول."
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "يجب تمكين المساقات المخططة للحساب بواسطة مسؤول. يمكن لأدوار المساق فقط إدارة محتويات المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم. لتحرير إعدادات قفل المخططات من صفحة فهرس النقاشات، يجب تمكين النقاشات - إشراف أيضًا."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "يجب تمكين المساقات المخططة للحساب بواسطة مسؤول. يمكن لأدوار المساق فقط إدارة محتويات المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم."
   blueprint_information_95dcef55: "معلومات المساق المخطط"
@@ -4543,10 +4674,12 @@ ar:
   bookmarks_5b5b81c9: "الإشارات المرجعية"
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات. إذا تم تمكين هذا الإذن، فلا تكون النقاشات - إنشاء مهمة. لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض. للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر. لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات. إذا تم تمكين هذا الإذن، فلا تكون النقاشات - إنشاء مهمة. لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض. للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر. لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
+  both_discussions_create_and_discussions_moderate_a_482e4c7e: "تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       تسمح كل من المناقشات - إنشاء والمناقشات - إشراف للمستخدم بإنشاء مناقشة في صفحة المناقشات. إذا تم تمكين هذا الإذن، فلا تكون المناقشات - إنشاء مهمة.
               لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض.
       للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر. لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف.
+  both_discussions_create_and_discussions_moderate_a_ca6f38a2: "تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات. إذا تم تمكين هذا الإذن، فلا تكون النقاشات - إنشاء مهمة."
   both_discussions_create_and_discussions_moderate_a_f20cc937: |-
       تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات. إذا تم تمكين هذا الإذن، فلا تكون النقاشات - إنشاء مهمة.
               لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض.
@@ -4702,11 +4835,13 @@ ar:
   by_b90c6b6f: بواسطة
   by_client_id_4f2fe02c: "بواسطة معرف العميل"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "في الوضع الافتراضي، تكون جميع الارتباطات ممكنة للمساق. لن يرى الطلاب الارتباطات التي تنقل إلى أقسام لا محتوىً بها. على سبيل المثال، إن لم تقم بعمل أية اختبارات، فلن يرى الطلاب ارتباط الاختبارات. يمكنك تصنيف هذه الارتباطات ويمكنك تعطيلها صراحةً إذا كانت هناك أجزاء من االمساق لا ترغب في الوصول إليها من قبل الطلاب."
+  by_default_students_are_able_to_create_groups_to_r_ac2a70bd: "يستطيع الطلاب افتراضيًا إنشاء المجموعات، لمنع الطلاب من إنشاء المجموعات، لا تقم بتحديد خانة اختبار السماح للطلاب بتنظيم مجموعاتهم في إعدادات المساق."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       يستطيع الطلاب افتراضيًا إنشاء المجموعات، لمنع الطلاب من إنشاء المجموعات، قم بإلغاء
       تحديد خانة اختبار السماح للطلاب بتنظيم مجموعاتهم في إعدادات المساق.
   by_default_students_are_able_to_create_groups_to_r_d4901649: "يستطيع الطلاب افتراضيًا إنشاء المجموعات، لمنع الطلاب من إنشاء المجموعات، قم بإلغاء تحديد خانة اختبار السماح للطلاب بتنظيم مجموعاتهم في إعدادات المساق."
   by_default_students_can_always_create_groups_in_a__149d08b7: "يتمكن الطلاب دومًا بشكل افتراضي من إنشاء المجموعات في المساقات. لمنع الطلاب من إنشاء المجموعات، يجب تمكين المساقات - إضافة / تحرير / حذف كما يجب إلغاء تحديد خانة اختيار السماح للطلاب بتنظيم مجموعاتهم."
+  by_default_students_can_always_create_groups_in_a__60ca6e9e: "يتمكن الطلاب دومًا بشكل افتراضي من إنشاء المجموعات في المساقات."
   by_default_students_can_always_create_groups_in_a__af000dd: "يتمكن الطلاب دومًا بشكل افتراضي من إنشاء المجموعات في المساقات. لتقييد الطلاب من إنشاء المجموعة، يجب تمكين إدارة المساقات: المسؤول - إدارة/تحديث كما يجب إلغاء تحديد خانة اختيار السماح للطلاب بتنظيم مجموعاتهم."
   by_lti_2_registration_url_e421e523: "عبر عنوان URL لتسجيل LTI 2"
   by_url_a163275e: "حسب URL"
@@ -5387,6 +5522,7 @@ ar:
   changing_course_dates_may_override_term_availabili_d92b10de: "قد يؤدي تغيير تواريخ المساق إلى تجاوز إعدادات توافر الفصل الدراسي والتعيين في صفحة المساقات ولوحة المعلومات. يرجى تأكيد تواريخ الفصل الدراسي قبل تعديل تواريخ المساق."
   changing_section_dates_may_override_course_and_ter_6634950e: "قد يؤدي تغيير تواريخ القسم إلى تجاوز إعدادات توافر المساق والفصل الدراسي والتعيين في صفحة المساقات ولوحة المعلومات. يرجى تأكيد تواريخ الفصل الدراسي والمساق قبل تعديل تواريخ القسم."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "سيؤثر تغيير السياسة الأخيرة على الإرسالات التي تم تقييم درجاتها مسبقًا."
+  changing_the_tenant_will_delete_existing_groups_f86c48dc: "سيؤدي تغيير المستأجر إلى حذف المجموعات الموجودة."
   changing_your_policy_now_will_affect_previously_gr_62063898: "سيؤثر تغيير سياستك الآن على الإرسالات التي تم تقييم درجاتها مسبقًا."
   chars_written_max_character_length_len_fec9bd18: "%{chars} كتابة، الحد الأقصى من طول الأحرف %{len}"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "مخطط درجات الطالب لكل مهمة"
@@ -5833,6 +5969,7 @@ ar:
   concluded_63150003: "تم الانتهاء"
   concluded_conferences_cdbe53f9: "المؤتمرات المنجزة"
   concluded_courses_94782e21: "المساقات المنتهية"
+  concluded_enrollments_8f460271: "التسجيلات المنتهية"
   concluded_enrollments_9da8da6: "تسجيلات منتهية"
   conditional_content_7d39e313: "محتوى شرطي"
   conditional_content_b284da8f: "محتوى شرطي"
@@ -7527,8 +7664,11 @@ ar:
   course_results_updated_df9d1c95: "تم تحديث نتائج المساق."
   course_role_role_type_119c2f64: "الدور في المساق: %{role_type}"
   course_roles_1314f962: "أدوار المساق"
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "يمكن لأدوار المساق فقط إدارة المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم."
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "يمكن لأدوار المساق فقط إدارة المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم. للوصول إلى الشريط الجانبي للمساقات المخططة، يجب تمكين المساقات - إضافة / تحرير / حذف المساقات. لإضافة مساق مقترن، يجب أيضًا تمكين المساقات - عرض القائمة والمساقات - إضافة / تحرير / حذف. لتحرير إعدادات القفل على أي نوع كائن مخطط، يجب تمكين المساقات - إضافة / تحرير / حذف."
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "يمكن لأدوار المساق فقط إدارة المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم. لإدارة المساقات المقترنة، يجب أيضًا تمكين المساقات - عرض القائمة وإدارة المساقات - إضافة. لتحرير إعدادات التأمين على الملفات، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث وملفات المساق - تحرير. لتحرير إعدادات التأمين على الاختبارات الموجزة، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "يمكن لأدوار المساق فقط إدارة محتويات المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم."
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "يمكن لأدوار المساق فقط إدارة محتويات المساقات المخططة إذا تمت إضافتهم إلى المساق المخطط بصفة معلم أو معلم مساعد أو مصمم."
   course_roles_d2d5d666: "أدوار المساق"
   course_roster_78f70e97: "كشف المساقات"
   course_rubrics_881dcf0: "عناوين المساق"
@@ -8187,6 +8327,7 @@ ar:
   courses_account_settings_79e2f748: "المساقات - إعدادات الحساب"
   courses_add_20891f99: "المساقات - إضافة"
   courses_add_edit_delete_aa2b55d3: "المساقات - إضافة / تحرير / حذف"
+  courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "لا يمنك إنشاء المساقات على حساب site_admin."
   courses_change_visibility_9150ff1b: "المساقات - تغيير الرؤية"
   courses_conclude_7bf4ce68: "المساقات - إنهاء"
   courses_course_templates_5a3fbafd: "المساقات - قوالب المساق"
@@ -8943,6 +9084,7 @@ ar:
   deprecate_sms_be6b00a: "تجاوز الرسائل القصيرة"
   deprecated_59e99d2a: "تم الإهمال"
   desc_12ad2869: "%{desc}"
+  descending_b7828162: تنازليًا
   description_436c48d7: الوصف
   description_61f4296: "* الوصف"
   description_for_mastery_level_position_description_cc17114b: "وصف مستوى الإجادة %{position} %{description}"
@@ -8954,12 +9096,14 @@ ar:
   designers_remove_3e590bff: "المصممون - إزالة"
   details_98a31b68: التفاصيل
   details_a6f427c3: "التفاصيل:"
+  determines_visibility_and_management_of_outcomes_i_6f390b57: "يحدد إمكانية الرؤية والإدارة للمخرجات في لوحة تنقل الحساب."
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "يحدد إمكانية الرؤية والإدارة للمخرجات في لوحة تنقل الحساب. يسمح للمستخدم بإنشاء وتحرير وحذف المخرجات ومجموعات المخرجات على مستويي الحساب والمساق."
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       يحدد إمكانية الرؤية والإدارة لعلامة تبويب الحصائل في لوحة تنقل الحساب.
       يسمح للمستخدم بإنشاء واستيراد وتحرير وحذف الحصائل ومجموعات الحصائل على مستويي الحساب والمساق.
   determines_visibility_and_management_of_outcomes_t_8a40bf86: "يحدد إمكانية الرؤية والإدارة لعلامة تبويب الحصائل في لوحة تنقل الحساب. يسمح للمستخدم بإنشاء واستيراد وتحرير وحذف الحصائل ومجموعات الحصائل على مستويي الحساب والمساق."
   determines_visibility_and_management_of_rubrics_li_83a26d8e: "يحدد إمكانية الرؤية والإدارة لرابط معايير التقييم في لوحة تنقل الحساب. يسمح للمستخدم بعرض رابط معايير التقييم في لوحة تنقل المساق. يسمح للمستخدم بإنشاء معايير تقييم المساق وتحريرها وحذفها."
+  determines_visibility_and_management_of_rubrics_li_9b974d71: "يحدد إمكانية الرؤية والإدارة لرابط معايير التقييم في لوحة تنقل الحساب."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       يحدد إمكانية الرؤية والإدارة لعلامة تبويب مقاييس التقييم في لوحة تنقل الحساب.
       يسمح للمستخدم بإدارة مقاييس التقييم.
@@ -8968,13 +9112,16 @@ ar:
   determines_visibility_and_management_of_sis_import_bf386823: "يحدد إمكانية الرؤية والإدارة لرابط استيراد SIS في لوحة تنقل الحساب."
   determines_visibility_and_management_of_the_questi_c57c5b31: "يحدد إمكانية الرؤية والإدارة لرابط بنوك الأسئلة في لوحة تنقل الحساب."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "يحدد إمكانية الرؤية وإدارة ارتباط لوحة تنقل بنوك الأسئلة."
+  determines_visibility_and_management_of_the_rubric_533da0b8: "يحدد إمكانية الرؤية والإدارة لرابط معايير التقييم في لوحة تنقل الحساب."
   determines_visibility_and_management_of_the_rubric_55b55b25: "يحدد إمكانية الرؤية والإدارة لرابط معايير التقييم في لوحة تنقل الحساب. يسمح للمستخدم بإنشاء مقاييس التقييم وتحريرها وحذفها."
+  determines_visibility_of_sis_import_link_in_accoun_53da8632: "يحدد إمكانية الرؤية لرابط استيراد SIS في لوحة تنقل الحساب."
   determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: "يحدد إمكانية الرؤية لرابط استيراد SIS في لوحة تنقل الحساب. يسمح للمستخدم بعض تواريخ وأخطاء استيراد SIS السابق والعناصر المستوردة."
   determines_visibility_of_sis_import_tab_in_account_3d48272d: "يحدد إمكانية الرؤية لعلامة تبويب استيراد SIS في لوحة تنقل الحساب. يسمح للمستخدم بعض تواريخ وأخطاء استيراد SIS السابق والعناصر المستوردة."
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       يحدد إمكانية الرؤية لعلامة تبويب استيراد SIS في لوحة تنقل الحساب.
       يسمح للمستخدم بعض تواريخ وأخطاء استيراد SIS السابق والعناصر المستوردة.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "يحدد إمكانية رؤية خيار نشاط المساق في علامة تبويب تسجيل الدخول بأدوات المسؤول. يسمح للمستخدم بعرض معلومات نشاط المساق للحساب."
+  determines_visibility_of_the_course_activity_optio_6dc5ceb9: "يحدد إمكانية رؤية خيار نشاط المساق في علامة تبويب تسجيل الدخول بأدوات المسؤول."
   determines_visibility_of_the_grade_change_activity_6c23036b: "يحدد إمكانية رؤية خيار نشاط تغيير الدرجات في علامة تبويب تسجيل الدخول بأدوات المسؤول."
   determines_whether_a_publish_button_is_included_in_f7ad9b56: "يحدد ما إذا كان زر النشر مضمّن في بطاقة مساق لمساق غير منشور (لوحة معلومات عرض البطاقة)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "يحدد ما إذا كان خيار نشر المساق مضمنًا على الصفحة الرئيسية للمساق."
@@ -11706,6 +11853,7 @@ ar:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "سيكون دفتر الدرجات وSpeedGrader غير قابل للوصول إذا كان كل من الدرجات - تحرير والدرجات - عرض كل الدرجات معطلة."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "سيكون دفتر الدرجات وSpeedGrader غير قابل للوصول إذا كان كل من الدرجات - تحرير والدرجات - عرض كل الدرجات معطلة."
   gradebook_context_name_9dbae5bc: "دفتر الدرجات - %{context_name}"
+  gradebook_csv_export_assignment_order_matches_the__9044f08e: "ترتيب مهمة تصدير CSV لدفتر الدرجات يطابق شبكة دفتر الدرجات"
   gradebook_csv_headers_include_grading_period_1015185c: "رؤوس CSV لدفتر الدرجات تحتوي على فترة تقييم"
   gradebook_csvs: 
     grades_filename: الدرجات
@@ -13129,6 +13277,7 @@ ar:
   how_is_the_grade_determined_bb75bf53: "كيف يتم تحديد الدرجة؟"
   how_is_this_affecting_you_b3b6a639: "كيف يؤثر عليك ذلك؟"
   how_many_minutes_ecca5ee7: "كم عدد الدقائق؟"
+  however_if_these_additional_permissions_are_enable_35d3082c: "ولكن إذا تم تمكين هذه الأذونات الإضافية، ولم يتم تمكين إذن الصفحات - تحديث، فلا يزال بإمكان المستخدم تعديل إعدادات تأمين المحتوى في الصفحات كل على حدة في أحد المساقات المخططة الرئيسية."
   html5_first_videos_description: |-
       بشكل افتراضي، سيحاول Canvas استخدام Flash أولاً لتشغيل مقاطع الفيديو. يمكنك تشغيل هذا الخيار لمحاولة استخدام HTML5 أولاً،
       ثم العودة إلى Flash.
@@ -13191,6 +13340,7 @@ ar:
   if_an_enrollment_is_created_via_sis_only_admins_ca_205e9a3c: |-
       إذا تم إنشاء تسجيل عبر SIS، فإن المسؤولين وحدهم من يستطيع إزالة التسجيل من المساق.
               لإزالة مستخدم عبر معرف SIS، يجب بيانات SIS - إدارة.
+  if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: "إذا تم إنشاء تسجيل عبر SIS، فسيتمكن المسؤولون وحدهم إزالة التسجيل من المساق."
   if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       إذا تم تثبيت أداة LTI مكونة من خلال التعيين، فسيظهر إدخال جديدة في
       القائمة المنسدلة لنوع إرسال المهمة لتكوين المهمة للأداة بسرعة
@@ -13198,7 +13348,11 @@ ar:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
   if_commons_is_installed_allows_importing_favorited_eff368f: "إذا تم تثبيت Commons، يتم السماح باستيراد عناصر المحتوى المفضلة من داخل Canvas."
+  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض وتحرير وحذف جميع التعاونات."
+  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض تحرير حذف جميع التعاونات."
+  if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "تم حصر إمكانية رؤية المساق للمستخدمين المسجلين في المساق، يمكّن هذا الإذن المستخدم من عرض محتوى المساق بدون التسجيل في المساق."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "إذا تم تمكين المساقات - إضافة / تحرير / حذف والمساقات - إلغاء الحذف، سيتمكن مستخدم من مستوى الحساب من استعادة المساقات المحذوفة في أدوات المسؤول."
+  if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "إذا تم تمكين المساقات - إضافة وتعطيل المساقات - عرض القائمة، فبإمكان المستخدمين إضافة مساق جديد من خلال زر إضافة مساق جديد في إعدادات الحساب."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "في حالة التعطيل، تصبح صفحة الحصائل للقراءة فقط ويختفي زر إدارة مقاييس التقييم. لن يزال بإمكان المستخدم الوصول إلى مقاييس تقييم المهام الفردية من خلال المهام."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "في حالة التعطيل، لا يزال بإمكان المستخدم عرض الملفات وتنزيلها في صورة ملف zip."
   if_disabled_user_will_still_have_access_to_course__541e130: "في حالة التعطيل، لن يزال بإمكان المستخدم إمكانية الوصول إلى إعدادات المساق. لا يمكن للمستخدم إدارة محتوى المساقات الفردية بدون وجود إذن ملائم لعنصر المحتوى ذلك. تم حصر إمكانية رؤية المساق للمستخدمين المسجلين في المساق، يمكّن هذا الإذن المستخدم من عرض محتوى المساق بدون التسجيل في المساق."
@@ -13211,6 +13365,7 @@ ar:
       تم حصر إمكانية رؤية المساق للمستخدمين المسجلين في المساق، يمكّن هذا الإذن المستخدم
       من عرض محتوى المساق بدون التسجيل في المساق.
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "في حالة التعطيل، لن يزال بإمكان المستخدم إمكانية الوصول إلى إعدادات المساق. لا يمكن للمستخدم إدارة محتوى المساقات الفردية بدون وجود إذن ملائم لعنصر المحتوى ذلك. تم حصر إمكانية رؤية المساق للمستخدمين المسجلين في المساق، يمكّن هذا الإذن المستخدم من عرض محتوى المساق بدون التسجيل في المساق."
+  if_disabled_user_will_still_have_access_to_course__fbf32c87: "في حالة التعطيل، لن يزال بإمكان المستخدم إمكانية الوصول إلى إعدادات المساق."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "إذا تم التمكين، سيتم تمكين الوصول إلى ميزة LTI 1.3 وLTI."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "في حالة التمكين، تسمح بأكثر من الحد الأقصى للدرجات المحتملة للناتج المحدد في معايير تقييم."
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
@@ -13272,15 +13427,23 @@ ar:
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "إذا تم تعيينه، ستتجاهل حاسبة التقديرات المهام المجهولة غير المنشورة عند حساب القيم الإجمالية."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "إذا تم تعيين هذا الخيار، سيلحق القائم بتصدير دفتر الدرجات بتنسيق CSV عنوانًا لفترة التقييم المحددة إلى رؤوس الصفوف التي تتفاوت قيمها بناءً على فترة التقييم."
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "إذا تم تعيينه، فسوف يتخلص دفتر الدرجات من تحميل المهام، بتحميل المهام لفترة التقييم المحددة أولًا."
+  if_set_the_order_of_assignments_in_gradebook_csv_e_bf5c663e: "إذا تم تعيينها، فإن ترتيب المهام في عمليات تصدير CSV لدفتر الدرجات سيطابق الترتيب الموجود في شبكة دفتر الدرجات."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "إذا تم تعيينه، سيؤدي إلى إيقاف تشغلي وظيفة النشر في SIS للمهام أثناء غلق فترة التقييم. لا ينطبق إلا في تم تمكين ميزة \"تمكين إعدادات تكامل SIS جديد\"."
+  if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "إذا كان إذن بيانات SIS - إدارة معطلاً وكان إذن بيانات SIS - قراءة ممكّنًا، فسيتمكن المستخدمون فقط من عرض معرفات SIS للمساق والمستخدم والحساب الفرعي."
+  if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "إذا كان إذن بيانات SIS - إدارة ممكّنًا وبيانات SIS - قراءة معطلاً، فإن إذن الحساب سيتجاوز إذن المساق."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "إذا تم تمكين الإحصائيات - عرض أو المستخدمون - إدارة تفاصيل تسجيل الدخول، فسيتمكن المستخدم من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "إذا تم تمكين الإحصائيات - عرض أو المستخدمون - إدارة تفاصيل تسجيل الدخول، فسيتمكن المستخدم من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "إذا تم تمكين الإحصائيات - عرض أو المستخدمون - عرض تفاصيل تسجيل الدخول، فسيتمكن المستخدم من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
+  if_the_additional_permissions_are_enabled_but_this_619c2a4a: "إذا تم تمكين الأذونات الإضافية، ولكن لم يتم تمكين هذا الإذن، يمكن تحرير إعدادات التأمين على المناقشات الفردية."
+  if_the_course_content_permission_enabled_and_web_c_85f91e32: "إذا كان إذن محتوى المساق ممكّناً ومؤتمرات الويب - إنشاء معطلاً، فلا يزال بإمكان المستخدم إدارة المؤتمرات."
+  if_the_open_registration_account_setting_is_enable_10b1965c: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المصممين إلى مساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المصمم لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_1994a971: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المدرسين المساعدين إلى المساق عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المدرس المساعد لا يمتلك بالفعل حساب على Canvas."
+  if_the_open_registration_account_setting_is_enable_1e679e07: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المدرسين المساعدين إلى مساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المدرس المساعد لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_2cc15467: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين المساعدين إلى المساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم المساعد لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
               للوصول إلى صفحة مساقات الحساب، يجب أيضًا تمكين المساقات - عرض القائمة.
+  if_the_open_registration_account_setting_is_enable_2f43fcc0: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة الطلاب إلى مساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان الطالب لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_3cbed3ad: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة الطلاب إلى المساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان الطالب لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
@@ -13289,6 +13452,7 @@ ar:
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المصممين إلى المساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المصمم لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة. إذا تم إنشاء تسجيل عبر SIS، فسيتمكن المسؤولون وحدهم إزالة التسجيل من المساق. لإزالة مستخدم عبر معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة.
   if_the_open_registration_account_setting_is_enable_43bfe76c: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المصممين إلى المساق عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المصمم لا يمتلك بالفعل حساب على Canvas."
+  if_the_open_registration_account_setting_is_enable_474c98c2: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المصممين إلى مساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المصمم لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_519e246f: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المراقبين إلى المساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المراقب لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
@@ -13304,16 +13468,20 @@ ar:
               إذا تم إنشاء تسجيل عبر SIS، فإن المسؤولين وحدهم من يستطيع إزالة التسجيل من المساق.
               لإزالة مستخدم عبر معرف SIS، يجب بيانات SIS - إدارة.
   if_the_open_registration_account_setting_is_enable_6aaf8ead: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين إلى المساق عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم لا يمتلك بالفعل حساب على Canvas."
+  if_the_open_registration_account_setting_is_enable_87662428: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المشرفين إلى مساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المشرف لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_88d349f8: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المراقبين إلى المساق عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول إذا كان المراقب لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_95ada4ab: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين إلى المساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
               إذا تم إنشاء تسجيل عبر SIS، فإن المسؤولين وحدهم من يستطيع إزالة التسجيل من المساق.
               لإزالة مستخدم عبر معرف SIS، يجب بيانات SIS - إدارة.
+  if_the_open_registration_account_setting_is_enable_99a8a04a: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة الطلاب إلى مساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان الطالب لا يمتلك بالفعل حساب على Canvas."
+  if_the_open_registration_account_setting_is_enable_9ca710e2: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين إلى مساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_9db0bc16: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين إلى المساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
               للوصول إلى صفحة مساقات الحساب، يجب أيضًا تمكين المساقات - عرض القائمة.
+  if_the_open_registration_account_setting_is_enable_9e63fda6: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المشرفين إلى مساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المشرف لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_a2b9c5e6: |-
       إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المراقبين إلى المساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المراقب لا يمتلك بالفعل حساب على Canvas.
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
@@ -13323,13 +13491,19 @@ ar:
               لإضافة مستخدم عبر معرف SIS، يجب تمكين بيانات SIS - إدارة.
               إذا تم إنشاء تسجيل عبر SIS، فإن المسؤولين وحدهم من يستطيع إزالة التسجيل من المساق.
               لإزالة مستخدم عبر معرف SIS، يجب بيانات SIS - إدارة.
+  if_the_open_registration_account_setting_is_enable_b6fdaab4: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المدرسين المساعدين إلى مساق من صفحة الأشخاص عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المدرس المساعد لا يمتلك بالفعل حساب على Canvas."
+  if_the_open_registration_account_setting_is_enable_e7f97cf0: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة المعلمين إلى مساق من صفحة المساقات عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول حتى لو كان المعلم لا يمتلك بالفعل حساب على Canvas."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة الطلاب أو المراقبين إلى المساق عبر عنوان البريد الإلكتروني أو معرف تسجيل الدخول إذا لم يكن الطالب أو المراقب يمتلك بالفعل حساب على Canvas."
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "إذا تم تعطيل إذن الصفحات - تحديث، فلا يزال بإمكان المستخدم تعديل إعدادات قفل المحتوى على الصفحات الفردية في المساقات المخططة الرئيسية."
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "إذا تم تمكين هذه الأذونات الإضافية، ولكن لم يتم تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف، فإنه يمكن إدارة إعدادات قفل المخططات للمهمة من صفحة تفاصيل المهمة."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "إذا تم تعطيل هذا الإذن وتمكين المساقات - إضافة / تحرير / حذف، فبإمكان المستخدمين إضافة مساق جديد من خلال زر إضافة مساق جديد في إعدادات الحساب."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
       إذا تم تعطيل هذا الإذن وتمكين المساقات - إضافة / تحرير / حذف،
       فبإمكان المستخدمين إضافة مساق جديد من خلال زر إضافة مساق جديد
       في إعدادات الحساب.
   if_this_permission_is_disabled_and_manage_courses__8fbc2efe: "إذا تم تعطيل هذا الإذن وتمكين المساقات - إضافة، فبإمكان المستخدمين إضافة مساق جديد من خلال زر إضافة مساق جديد في إعدادات الحساب."
+  if_this_permission_is_disabled_and_users_view_logi_9dbd9236: "إذا كان هذا الإذن معطلاً، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي ممكّنة، فسيظل بإمكان المستخدمين قادرين على رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول."
+  if_this_permission_is_disabled_at_the_account_leve_1b0e403f: "إذا تم تعطيل هذا الإذن على مستوى الحساب، فلن يتمكن المستخدم من عرض أي مجموعات حسابات حالية. بإمكان المستخدم على مستوى المساق عرض أي مجموعات حالية، بما يشمل المجموعات المنشأة بواسطة الطلاب ولكن دون الوصول إليها."
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "إذا تم تعطيل هذا الإذن على مستوى الحساب، فلن يتمكن المستخدمون من عرض أي مجموعات حسابات حالية. بإمكان المستخدمين على مستوى المساق عرض أي مجموعات حالية، بما يشمل المجموعات المنشأة بواسطة الطلاب ولكن دون الوصول إليها. لعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعات من مستوى الحساب من خلال ملفات CSV، بيانات SIS، يجب أيضًا تمكين الاستيراد."
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "إذا تم تعطيل هذا الإذن على مستوى الحساب، فلن يتمكن المستخدمون من عرض أي مجموعات حسابات حالية. بإمكان المستخدمين على مستوى المساق عرض أي مجموعات حالية، بما يشمل المجموعات المنشأة بواسطة الطلاب ولكن دون الوصول إليها. لعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعات من مستوى الحساب من خلال ملفات CSV، بيانات SIS، يجب أيضًا تمكين الاستيراد."
   if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "إذا تم تعطيل هذا الإذن على مستوى الحساب، فلن يتمكن المستخدم من عرض أي مجموعات حسابات حالية. بإمكان المستخدم على مستوى المساق عرض أي مجموعات حالية، بما يشمل المجموعات المنشأة بواسطة الطلاب ولكن دون الوصول إليها. لعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعات من مستوى الحساب من خلال ملفات CSV، بيانات SIS، يجب أيضًا تمكين الاستيراد."
@@ -13337,7 +13511,9 @@ ar:
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "إذا تم تمكين هذا الإذن، فبإمكان المستخدمين عرض المجموعات الحالية فقط والتي تشمل المجموعات المنشأة بواسطة المجموعات."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "إذا تم تعطيل هذا الإذن، فلا يزال بإمكان المستخدمين إنشاء أو إضافة مقاييس التقييم إلى المهام إذا تم تمكين ميزة المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "إذا تم تعطيل هذا الإذن، فلا يزال بإمكان المستخدمين تثبيت التطبيقات المعتمدة من خلال Canvas App Center (إذا كان ممكنًّا بواسطة مؤسستك). وبالإضافة إلى ما سبق، ففي حالة تعطيل هذا الإذن، فلن يمكن للمستخدمين حذف التطبيقات الخارجية المضافة يدويًا."
+  if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "إذا تم تعطيل هذا الإذن، فلا يزال بإمكان المستخدمين تثبيت التطبيقات المعتمدة من خلال Canvas App Center (إذا كان ممكنًّا بواسطة مؤسستك)."
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "إذا تم تمكين هذا الإذن وتعطيل المساقات - عرض القائمة، فبإمكان المستخدمين إضافة مساق جديد من خلال زر إضافة مساق جديد في إعدادات الحساب."
+  if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "إذا كان هذا الإذن ممكّنًا، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي معطلة، فسيتمكن المستخدمون من رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول."
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "إذا تم تمكين هذا الإذن، فلن يحتاج المستخدمون إلى تمكين إذا بيانات SIS - قراءة. يتجاوز إذن الحساب إذن المساق. لإلغاء السماح للمستخدمين من إدارة معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة. لإضافة مستخدمين إلى المساقات من خلال معرف SIS، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب من المساقات و أو المستخدمون - إضافة/إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات."
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       إذا تم تمكين هذا الإذن، فلن يحتاج المستخدمون إلى تمكين إذا بيانات SIS - قراءة. يتجاوز إذن الحساب إذن المساق. لإلغاء السماح للمستخدمين من إدارة معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة.
@@ -13345,6 +13521,8 @@ ar:
   if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
       إذا تم تمكين هذا الإذن، فلن يحتاج المستخدمون إلى تمكين إذا بيانات SIS - قراءة. يتجاوز إذن الحساب إذن المساق. لإلغاء السماح للمستخدمين من إدارة معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة.
       لإضافة مستخدمين إلى المساقات من خلال معرف SIS، يجب أيضًا تمكين المستخدمون - إضافة / إزالة الطلاب من المساقات و/أو المستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات.
+  if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "إذا تم تمكين هذا الإذن، فلن يحتاج المستخدمون إلى تمكين إذا بيانات SIS - قراءة. يتجاوز إذن الحساب إذن المساق."
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "إذا تم تعطيل هذا الإعداد وتمكين النقاشات -عرض، فلا يزال بإمكان المستخدم تعديل إعدادات قفل المحتوى على النقاشات الفردية في مساق مخطط رئيسي."
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدمون من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدمون من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدم من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
@@ -13468,6 +13646,7 @@ ar:
   improved_learning_mastery_gradebook_8628d06a: "دفتر درجات إتقان التعلم المحسّن"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "دعم محسّن للاختبارات الموجزة الجديدة بوحدات نمطية تشتمل على إنشاء اختبارات موجزة جديدة من الوحدات النمطية"
   improved_outcomes_management_4692f886: "تحسين إدارة المخرجات"
+  improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "دعم محسّن لتلقي الاختبارات الموجزة الجديدة من داخل الوحدات المنطقية"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "تذكيرات مرئية محسنة لتشجيع المدرسين على نشر المساقات"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "تم إجراء تحسينات لتعزيز تجربة المستخدم داخل دفتر درجات إتقان التعلم."
   in_a_few_seconds_538ddff3: "بعد بضع ثوان"
@@ -13492,6 +13671,7 @@ ar:
   inactive_34365329: "غير نشط"
   inactive_cd40317f: معطل
   inactive_enrollments_3b84be3d: "تسجيلات غير نشطة"
+  inactive_enrollments_bd1831ea: "التسجيلات غير النشطة"
   inbox_bb245a60: "علبة الوارد"
   include_a_download_link_next_to_each_file_link_in__481761de: "تضمين ارتباط تنزيل إلى جوار كل ارتباط ملف في RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "تضمين ارتباط إلى لقطة شاشة/تسجيل رقمي لمخرجات الشاشة باستخدام شيء مثل *Jing*."
@@ -14621,6 +14801,8 @@ ar:
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "قم بإدارة حالة التسجيل وإنشاء المجموعات وإضافة المستخدمين من هذه الصفحة."
   manage_grading_schemes_in_context_name_e3678273: "إدارة أنظمة تقييم الدرجات في %{context_name}"
   manage_group_group_name_ac8578c6: "إدارة المجموعة %{group_name}"
+  manage_home_4fc3480b: "إدارة الصفحة الرئيسية"
+  manage_home_for_coursename_5e5c7661: "إدارة الصفحة الرئيسية لـ%{courseName}"
   manage_item_name_6118d4b0: "إدارة %{item_name}"
   manage_line_items_244b289f: "إدارة عناصر البنود"
   manage_module_name_dfe16816: "إدارة %{module_name}"
@@ -17344,6 +17526,7 @@ ar:
   new_quizzes_assignment_build_button_72b6531a: "زر بناء مهمة اختبارات موجزة جديدة"
   new_quizzes_banks_migrations_9ab4de4a: "عمليات ترحيل بنوك الاختبارات الموجزة الجديدة"
   new_quizzes_dbda7e0a: "الاختبارات الموجزة الجديدة"
+  new_quizzes_embedded_module_progression_cd2307b6: "تقدم الوحدة النمطية المضمنة للاختبارات الموجزة الجديدة"
   new_quizzes_importing_c167dce0: "استيراد New Quizzes"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "ترحيل الاختبارات الموجزة الجديدة أثناء استيراد/نسخ المساق"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "تمكين ترحيل الاختبارات الموجزة افتراضياً"
@@ -17396,6 +17579,7 @@ ar:
   nickname_1e6da3ad: الكنية
   nickname_7df95b09: "الكنية:"
   no_74e9b590: لا
+  no_additional_details_were_added_for_this_assignme_547c0de7: "لم تتم إضافة تفاصيل إضافة لهذه المهمة."
   no_alignments_are_available_for_this_outcome_7f8346f9: "لا توجد محاذاة متوفرة لهذه الحصيلة."
   no_allowed_domains_b6633d12: "لا توجد مجالات مسموح بها"
   no_announcements_280df147: "لا توجد إعلانات"
@@ -17579,6 +17763,7 @@ ar:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "ملاحظة: تقع بعض العناصر خارج تواريخ البدء و/أو الانتهاء الخاصة بالمساق"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "ملاحظة: يوجد لدى الطلاب أعمال مرسلة لهذه المهام ولم يتم تقييمها. إذا قمت بإرسال هذه التقييمات الأن، فستحتاج إلى إعادة إرسال درجاتهم بعد تقييم عمليات الإرسال الأخيرة الخاصة بهم."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "ملاحظة: نٌسق الحسابات الفرعية ليست نشطة أثناء هذه المعاينة."
+  note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "ملاحظة: يتم تشغيل المزامنة من خلال التغييرات التي تجرى على تسجيلات المساق. في المرة الأولى التي تقوم فيها بتمكين مزامنة Microsoft، قد تحتاج إلى تشغيل مزامنة يدويًا من خلال الزر أدناه."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "يرجى الانتباه إلى أنه قد لا يتم ملء البريد الإلكتروني في ملف تعريف المستخدم في Microsoft في جميع الحالات. لن يتم ملء Oid بالنسبة لحسابات Microsoft الخاصة."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "يرجى الانتباه إلى أنه قد لا يتم ملء بعض السمات بالنسبة لجميع المستخدمين في  Clever."
   note_this_is_not_your_official_score_f2d4582f: "*ملاحظة*: هذه ليست درجتك الرسمية."
@@ -18660,6 +18845,7 @@ ar:
   please_select_a_user_role_for_this_link_9fb4e655: "الرجاء تحديد دور لهذا الارتباط."
   please_select_an_item_30c287ef: "الرجاء تحديد عنصر"
   please_select_one_f931e883: "الرجاء تحديد واحد"
+  please_try_again_4c3d11b4: "يرجى إعادة المحاولة"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "يرجى إعادة تأسيس الاتصال بالأداة من خلال إعادة تحديد الأداة في المهمة أو واجهة عنصر الوحدة والحفظ."
   please_upload_files_as_a_zip_5a2c799f: "الرجاء تحميل الملفات بتنسيق zip. مضغوط"
   please_wait_2b646bc2: "يرجى الانتظار."
@@ -19914,6 +20100,7 @@ ar:
       show_details: "إظهار تفاصيل السؤال"
   question_banks_45bdf347: "بنوك الأسئلة"
   question_banks_account_navigation_9a7ab7c2: "بنوك الأسئلة (لوحة تنقل الحساب)"
+  question_banks_courses_dd907ecf: "بنوك الأسئلة (المساقات)"
   question_banks_view_and_link_e6d9cde2: "بنوك الأسئلة - عرض وربط"
   question_banks_view_and_link_to_f1bca68b: "بنوك الأسئلة - عرض وربط بـ"
   question_f06476d1: سؤال
@@ -21722,6 +21909,7 @@ ar:
   remove_all_course_observer_members_4622c70d: "إزالة جميع أعضاء المساق المراقبين"
   remove_all_group_observer_members_af5675f3: "إزالة جميع أعضاء المجموعة المراقبين"
   remove_as_front_page_2698aa12: "إزالة كصفحة أمامية"
+  remove_as_frontpagetext_133cdaee: "إزالة كـ%{frontPageText}"
   remove_association_1412eabf: "إزالة الاقتران"
   remove_attachment_ceae0973: "إزالة المرفق"
   remove_attendee_name_55165070: "إزالة شخص حاضر %{name}"
@@ -21759,6 +21947,14 @@ ar:
   remove_observers_from_courses_703edc34: "إزالة المراقبين من المساقات"
   remove_outcome_20e16da7: "هل تريد إزالة المخرج؟"
   remove_outcome_2feaf5fd: "إزالة المخرج"
+  remove_outcomes_5f8b601c: 
+    few: "إزالة المخرجات"
+    many: "إزالة المخرجات"
+    one: "إزالة المخرج"
+    other: "إزالة المخرجات"
+    two: "إزالة المخرجات"
+    zero: "إزالة المخرجات"
+  remove_outcomes_9abcc8fd: "هل تريد إزالة المخرجات؟"
   remove_placement_90862c13: "إزالة %{placement}"
   remove_points_from_rubric_dcd4b585: "إزالة نقاط من معيار التقييم"
   remove_pronouns_5ff760ff: "إزالة الضمائر"
@@ -21924,6 +22120,7 @@ ar:
   retrieval_of_received_shares_failed_6c5583e3: "فشل استعادة المشاركات التي تم استلامها"
   retrieve_timeout: "تعذرت استعادة التكوين، انتهت مهلة استجابة الخادم"
   retrieving_content_ed0b9b33: "جارٍ استعادة المحتوى"
+  retrieving_tool_51709735: "أداة الاسترداد"
   retry_duplicating_original_assignment_name_90b83bb8: "إعادة محاولة تكرار \"%{original_assignment_name}\""
   retry_duplicating_originalassignmentname_884aee1: "إعادة محاولة تكرار \"%{originalAssignmentName}\""
   retry_ebd5f8ba: "إعادة المحاولة"
@@ -23691,6 +23888,7 @@ ar:
   show_by_type_c5d61732: "إظهار حسب النوع"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "إظهار أحداث التقويم في العرض الشهري على عدة خطوط إن تعذر ذلك على خط واحد"
   show_concluded_enrollments_6a05544c: "عرض التسجيلات المنتهية"
+  show_contributing_scores_7674c46f: "إظهار نتائج المساهمة"
   show_correct_answers_at_30c37e01: "عرض الإجابات الصحيحة في"
   show_correct_answers_at_a5475aa3: "عرض الأجوبة الصحيحة في"
   show_course_sections_for_course_name_5f715702: "إظهار أقسام المساقات للمساق %{name}"
@@ -23726,6 +23924,7 @@ ar:
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "اعرض التحليلات الجديدة للمساق وبيانات المستخدم. قد يستغرق ظهور البيانات 24 ساعة في التحليلات الجديدة بعد تعيين علامة هذه الميزة على تشغيل."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "اعرض الاختبارات الموجزة الجديدة على صفحة الاختبارات الموجزة"
   show_notes_column_22d2b6c1: "عرض عمود الملاحظات"
+  show_older_replies_e85891b3: "إظهار الردود الأقدم"
   show_one_question_at_a_time_271e346d: "عرض سؤال واحد في كل مرة"
   show_only_blueprint_courses_9fb37b41: "إظهار مساقات مخططة فقط"
   show_originality_report_to_students_be22f5ee: "إظهار تقرير الأصالة للطلاب"
@@ -23938,6 +24137,8 @@ ar:
   sort_by_72dbba9c: "الفزر حسب"
   sort_by_e75f9e3e: "الفزر حسب"
   sort_courses_cf94b8d4: "ترتيب المساقات"
+  sort_outcome_column_c53702ed: "فرز عمود المخرجات"
+  sort_students_1a561e98: "فرز الطلاب"
   sortable_name_73f707cf: "اسم قابل للفرز"
   sortable_name_e25fe66c: "الاسم القابل للفرز:"
   sorted_ascending_1f9b52c6: "تم الفرز تصاعديًا."
@@ -24282,6 +24483,7 @@ ar:
   students_will_automatically_receive_full_credit_on_cc61df39: "سيحصل الطلاب تلقائيًا على القيمة بأكملها بمجرد بدء الاستطلاع"
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "سيتمكن الطلاب من رؤية أن درجات هذه المهمة مخفية."
   students_with_no_submissions_title: "الطلاب الذين بدون إرسالات"
+  students_without_assessments_eb100e60: "طلاب بدون مهام"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} طالب من بين %{totalStudentsEnrolled}"
   sub_account_daeadd0: "حساب فرعي"
   sub_accounts: 
@@ -24331,9 +24533,12 @@ ar:
       zero: "%{count} من الحسابات الفرعية"
   sub_accounts_can_choose_one_of_three_options_b0dfe46a: "يمكن للحسابات الفرعية اختيار خيار واحد من الخيارات الثلاثة:"
   subaccount_91f4c279: "حساب فرعي"
+  subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS إلا إذا مُنحوا دور معلم في أحد المساقات."
+  subaccount_admins_cannot_view_sis_information_with_15a41444: "لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS بدون ربط المساق، حيث يمتلك دور المعلم الإذن لقراءة بيانات SIS على مستوى الحسابات."
   subaccount_navigation_account_settings_add9eff9: "التنقل في الحسابات الفرعية (إعدادات الحساب)"
   subaccount_settings_8549eff7: "إعدادات الحسابات الفرعية"
   subaccounts_efd02bd4: "الحسابات الفرعية"
+  subaccounts_only_have_ownership_of_courses_and_sec_56385a91: "تحتوي الحسابات الفرعية فقط على ملكية المساقات والأقسام، ولا تمتلك بيانات المستخدم. لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS إلا إذا مُنحوا دور معلم في أحد المساقات."
   subdomain_url_1e43b6f0: "عنوان URL المجال الفرعي"
   subject_114b2e98: الموضوع
   subject_1bc03dea: "الموضوع:"
@@ -24859,6 +25064,7 @@ ar:
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
       يجب تمكين ميزة التحليلات في إعدادات الحساب لعرض صفحات التحليلات.
       للاطلاع على ارتباط التحليلات في الشريط الجانبي للمستخدم من صفحة الأشخاص، يجب تعطيل ملفات التعريف في حسابك.
+  the_analytics_feature_must_be_enabled_in_account_s_869b63a2: "يجب تمكين ميزة التحليلات في إعدادات الحساب لعرض صفحات التحليلات."
   the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
       يجب تمكين ميزة التحليلات في إعدادات الحساب لعرض صفحات التحليلات.
       للاطلاع على ارتباط التحليلات في الشريط الجانبي للمستخدم من صفحة الأشخاص، يجب تعطيل ملفات التعريف في حسابك.
@@ -24937,6 +25143,13 @@ ar:
                        لإزالة هذه المجالات، قم بإزالة الأدوات المقترنة.
   the_following_errors_occurred_bdec1e44: "حدثت الأخطاء التالية:"
   the_following_fields_are_invalid_fields_b3565800: "الحقول التالية غير صالحة: %{fields}"
+  the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
+    few: "لا يمكن إزالة المخرَجات التالية لأنها متوافقة مع المحتوى. يرجى إلغاء تحديدها وإعادة المحاولة."
+    many: "لا يمكن إزالة المخرَجات التالية لأنها متوافقة مع المحتوى. يرجى إلغاء تحديدها وإعادة المحاولة."
+    one: "لا يمكن إزالة المخرَج التالي لأنه متوافق مع المحتوى. يُرجى إلغاء تحديده وإعادة المحاولة."
+    other: "لا يمكن إزالة المخرَجات التالية لأنها متوافقة مع المحتوى. يرجى إلغاء تحديدها وإعادة المحاولة."
+    two: "لا يمكن إزالة المخرَجات التالية لأنها متوافقة مع المحتوى. يرجى إلغاء تحديدها وإعادة المحاولة."
+    zero: "لا يمكن إزالة المخرَجات التالية لأنها متوافقة مع المحتوى. يرجى إلغاء تحديدها وإعادة المحاولة."
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       قام الطلاب التالون بإلغاء حفظ التغييرات على إرسالات الاختبار الخاص بهم: 
       
@@ -25019,6 +25232,7 @@ ar:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "أدوار المستخدم الذي يقوم بالإبلاغ (طالب، معلم، مسؤول، إلخ)"
   the_salesforce_account_id_if_it_exists_e7949706: "معرف حساب Salesforce (حال وجوده)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "تسمح لك أداة الجدولة بإعداد الفترات الزمنية التي يستطيع الطلبة (أو مجموعات الطلاب) تسجيل المشاركة فيها. للبدء، انقر فوق الزر أدناه."
+  the_search_returned_no_results_cd9eee1e: "البحث لم يقدم أي نتائج"
   the_selected_group_was_cleared_because_the_student_656e4f1c: "تم إزالة تحديد المجموعة لأن الطالب الذي طلبته ليس جزءاً من أي مجموعة. يمكنك تحديد المجموعة في دفتر الدرجات."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "حدّة المشكلة، حسب ما حدده المستخدم في القائمة المنسدلة."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "أيقونة الاختصار لأجهزة iOS/Android. بحجم 180x180 بتنسيق png"
@@ -25308,12 +25522,15 @@ ar:
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "هذه معاينة للإصدار المنشور للاختبار"
   this_is_a_siteadmin_test_feature_flag_3ab5184: "هذه علامة ميزة اختبار SiteAdmin."
   this_is_a_what_if_score_cbdc04f9: "هذا مجموع نقاط ماذا لو"
+  this_is_an_account_setting_that_must_be_enabled_by_8ced660: "هذا إعداد حساب يجب تمكينه بواسطة مدير نجاح العملاء. التنبيهات هي ميزة نادرة الاستخدام مصممة لإرسال تنبيه إلى الطلاب أو المعلمين أو المسؤولين لأسباب محددة (مثل عدم وجود تفاعل من الطالب-المعلم لمدة 7 أيام). يتم فحصها كل يوم، وسيتم إرسال الإعلامات للطالب و/أو للمعلم حتى يتم حل المشكلة السبب."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "هذا إعداد حساب يجب تشغيله بواسطة مدير نجاح العملاء."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "هذه ميزة خاصة بالمطورين ويمكنك تشغيلها للحصول على معاينة لمظهر الصفحات في بيئة من اليمين لليسار، دون الحاجة لتغيير لغتك للغة من اليمين لليسار."
   this_is_not_a_valid_grade_9cc2cb8: "هذه ليست درجة صالحة"
+  this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "هذه ثغرة أمنية نظريًا، ولكن تحتاج بعض المدارس إلى الاحتفاظ بمهام سير العمل لفترة زمنية."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "هذه هي الدرجة المختارة حاليًا لهذا الطالب."
   this_is_the_default_email_address_f3c421fb: "هذا هو عنوان البريد الإلكتروني الافتراضي"
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "هذه واجهة المستخدم الجديدة لمعاينة الميزة. هذه للقراءة فقط في الوقت الحالي. للرجوع إلى واجهة المستخدم القديمة، انقر فوق الزر. سيؤدي هذا إلى تعطيل ميزة \"إشارات الميزة الجديدة\" وتحديث الصفحة."
+  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "هذا هو المكان الذي ستصل إليه عندما تكتمل صفحتك الرئيسية."
   this_is_your_course_landing_page_33d445ec: "هذه هي الصفحة المنتقل إليها الخاصة بمساقك"
   this_is_your_course_landing_page_f87a920d: "هذه هي الصفحة المنتقل إليها الخاصة بمساقك!"
   this_is_your_current_theme_4331709b: "هذا نسقك الحالي"
@@ -25371,6 +25588,7 @@ ar:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       يمكن لهذا الإذن أن يتحكم في إضافة المستخدمين على مستوى الحساب. لإضافة مستخدمين إلى المساقات، يجب أيضًا
       تمكين المستخدمون - إضافة / إزالة الطلاب من المساقات أو المستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات إلى المساق الذي يجب تمكينه.
+  this_permission_should_only_be_assigned_to_users_t_231c182e: "يجب تعيين هذا الإذن فقط للمستخدمين الذين خولتهم مؤسستك للتصرف كمستخدمين آخرين في حساب Canvas لديك بالكامل."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "هذا التعيين يتطلب دعم ارتباط داخلي بواسطة البائع. تحقق من بائع الأداة للتأكد من دعمهم لهذه الوظيفة"
   this_pronoun_appears_after_last_name_bf5c0bf5: "هذا الضمير يظهر بعد اسم العائلة"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "سيظهر هذا الضمير بعد تمكين اسمك"
@@ -25705,6 +25923,7 @@ ar:
   to_1126ab55: " إلى"
   to_35c6baa2: "إلى "
   to_51406be9: إلى
+  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "للوصول إلى صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "للوصول إلى إرسالات المهام من خلال المهام أو دفتر الدرجات أو للعرض في SpeedGrader، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات أو الدرجات - تحرير."
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       للوصول إلى إرسالات المهام من خلال المهام وSpeedGrader، يجب أيضًا تمكين الدرجات - تحرير.
@@ -25714,6 +25933,7 @@ ar:
       تمكين الدرجات - عرض جميع الدرجات.
   to_access_the_account_courses_page_courses_view_li_e1da6165: "للوصول إلى صفحة مساقات الحساب، يجب أيضًا تمكين المساقات - عرض القائمة."
   to_access_the_account_settings_tab_account_level_s_9676d44b: "للوصول إلى علامة تبويب إعدادات الحساب، يجب أيضًا تمكين إعدادات على مستوى الحساب - إدارة."
+  to_access_the_assignments_index_page_course_conten_49d884f2: "للوصول إلى صفحة فهرس المهام، يجب تمكين محتوى المساق - عرض."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "للوصول إلى صفحة فهرس المهام، يجب تمكين محتوى المساق - عرض. لتوزيع المهام على الطلاب كل على حدة، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "للوصول إلى رابط المساقات في لوحة تنقل الحساب، يجب أيضًا تمكين المساقات - عرض القائمة."
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
@@ -25721,10 +25941,12 @@ ar:
               إذا تم تمكين المساقات - إضافة وتعطيل المساقات - عرض القائمة، يمكن للمستخدمين إضافة مساق جديد بزر إضافة مساق جديد في إعدادات الحساب.
               لاستعادة مساق محذوف، يجب أيضًا تمكين المساقات، حذف، والمساقات - إلغاء الحذف، ومحتوى المساق - عرض.
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "للوصول إلى رابط المساقات في تنقل الحساب، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والمساقات - عرض القائمة."
+  to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "للوصول إلى ارتباط إدارة بنوك الأسئلة على صفحة فهرس اختبارات المساق الموجزة، يجب أيضًا تمكين محتوى المساق - عرض والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "للوصول إلى صفحة الأشخاص وعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة. إذا تم تمكين إعداد فتح حساب التسجيل، فبإمكان المستخدمين المتمتعين بهذا الإذن إضافة الطلاب إلى المساق عبر عنوان البريد الإلكتروني إذا لم يكن المستخدم يمتلك بالفعل حساب على Canvas. لعرض معرفات SIS، يجب تمكين بيانات SIS - قراءة. لإضافة مستخدم إلى مساق من خلال معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة. لتحرير قسم الطالب، يجب أيضًا تمكين المستخدمون - عرض القائمة والمحادثات - إرسال رسائل إلى أفراد المساق كل على حدة. لربط مراقب بأحد الطلاب، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة. إذا كان هذا الإذن ممكّنًا، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي معطلة، فسيتمكن المستخدمون من رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول. لعرض معرفات تسجيل الدخول - يجب أيضًا تمكين المستخدمون / إضافة /إزالة الطلاب من المساقات والمستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين في المساقات."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة."
+  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة."
   to_access_the_people_page_users_view_list_must_be__6f42bf9e: "للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       للوصول إلى صفحة الأشخاص، يجب تمكين المستخدمون - عرض القائمة.
@@ -25742,17 +25964,26 @@ ar:
       إذا كان هذا الإذن معطلاً، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي ممكّنة، فسيظل بإمكان المستخدمين قادرين على رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول.
   to_access_the_student_interactions_report_courses__e8432cd0: "للوصول إلى تقرير تفاعلات الطالب، يجب أيضًا تمكين المساقات - عرض تقارير الاستخدام."
   to_access_the_student_interactions_report_grades_v_69105662: "للوصول إلى تقرير تفاعلات الطالب، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
+  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "للتصرف بصفة مستخدمين آخرين، يجب أيضًا تمكين المستخدمون - التصرف بصفة."
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "لتنشيط الرسائل القصيرة SMS، أدخل رمز التأكيد المكون من أربعة أحرف والذي أُرسل إلى %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "لتنشيط قناة الاتصال هذه، أدخل رمز التأكيد المكون من أربعة أحرف الذي أُرسل إلى %{sms_number}."
+  to_add_a_course_group_to_a_collaboration_group_vie_36a5d341: "لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - عرض جميع مجموعات الطلاب."
+  to_add_a_course_group_to_a_collaboration_groups_ad_7e51136a: "لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف."
+  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "لإضافة مستخدم عبر معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة."
+  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "لإضافة مجموعات من مستوى الحساب من خلال ملفات CSV، بيانات SIS، يجب أيضًا تمكين الاستيراد."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "لإضافة الإعلانات، يجب أيضًا تمكين النقاشات - إشراف. لعرض الإعلانات الحديثة على الصفحة الرئيسية، يجب تحديد إظهار الإعلانات الحديثة على خانة اختيار الصفحة الرئيسية للمساق في إعدادات المساق."
+  to_add_announcements_discussions_moderate_must_als_a83fd681: "لإضافة الإعلانات، يجب أيضًا تمكين النقاشات - إشراف."
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "لإضافة مساقات مقترنة، فيجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف وإدارة المساقات - إضافة."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "لإضافة مساقات مقترنة، فيجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف والمساقات - إضافة / تحرير / حذف."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "لإضافة مستخدمين ومساقات وتسجيلات بشكل مجمع، انقر فوق عمليات استيراد SIS"
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "لإضافة المجموعات أو تحريرها أو حذفها، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف."
   to_add_individual_courses_click_courses_c5355180: "لإضافة مساق فردي، انقر فوق المساقات."
   to_add_individual_users_click_people_4d6de56a: "لإضافة مستخدم فردي، انقر فوق الأشخاص."
+  to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "لإضافة طالب إلى مساق أو إزالته منه، يجب تمكين إذن المستخدمين - الطالب."
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "لإضافة مستخدمين لمساق أو إزالته منه، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون)."
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "لإضافة مستخدمين لمساق أو إزالته منه، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون). لتحرير تحديد المستخدم، يجب أيضًا تمكين المستخدمون - السماح بإجراءات إدارية في المساقات والمستخدمون - عرض القائمة."
+  to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "لإضافة مستخدمين لمساق أو إزالته منه عبر SIS، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون)."
+  to_add_students_to_a_collaboration_users_view_list_806a5935: "لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "لإضافة طلاب إلى مجموعة إشراف، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "لإضافة مستخدمين إلى المساقات، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب من المساقات وأو المستخدمون - إضافة/إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات الذي يجب تمكينه. لتحرير قسم الطلاب، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة والمستخدمون - إضافة/إزالة الطلاب من المساقات. لتحرير قسم المعلم أو مصمم المساقات أو المعلمين المساعدين، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة والمستخدمون - إضافة/إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
@@ -25776,6 +26007,7 @@ ar:
       لإنهاء مؤتمر يستمر لمدة طويلة، يجب تمكين محتوى المساق - إضافة / تحرير / حذف.
       إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنا ومؤتمرات الويب - إنشاء معطلاً، فلا يزال بإمكان المستخدم إدارة المؤتمرات.
       يتحكم هذا الإذن في قدرة المستخدم على إنشاء مؤتمرات في المساقات والمجموعات.
+  to_allow_full_management_of_conferences_created_by_bc7910e6: "للسماح بالإدارة الكاملة للمؤتمرات المنشأة بواسطة المستخدم أو آخرين، يجب أيضًا تمكين إذن محتوى المساق."
   to_allow_full_management_of_conferences_created_by_bece5de: "للسماح بالإدارة الكاملة للمؤتمرات المنشأة بواسطة المستخدم أو آخرين، يجب أيضًا تمكين إذن محتوى المساق. لإنهاء مؤتمر يستمر لمدة طويلة، يجب تمكين إذن محتوى المساق. إذا كان إذن محتوى المساق ممكّناً ومؤتمرات الويب - إنشاء معطلاً، فلا يزال بإمكان المستخدم إدارة المؤتمرات. يتحكم هذا الإذن في قدرة المستخدم على إنشاء مؤتمرات في المساقات والمجموعات."
   to_allow_full_management_of_conferences_created_by_eae032e7: "للسماح بالإدارة الكاملة للمؤتمرات المنشأة بواسطة المستخدم أو آخرين، يجب أيضًا تمكين إذن محتوى المساق. لإنهاء مؤتمر يستمر لمدة طويلة، يجب تمكين إذن محتوى المساق. إذا كان إذن محتوى المساق ممكّنا ومؤتمرات الويب - إنشاء معطلاً، فلا يزال بإمكان المستخدم إدارة المؤتمرات. يتحكم هذا الإذن في قدرة المستخدم على إنشاء مؤتمرات في المساقات والمجموعات."
   to_allow_full_management_of_conferences_created_by_feec1984: |-
@@ -25783,6 +26015,7 @@ ar:
       لإنهاء مؤتمر يستمر لمدة طويلة، يجب تمكين محتوى المساق - إضافة / تحرير / حذف.
       إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنا ومؤتمرات الويب - إنشاء معطلاً، فلا يزال بإمكان المستخدم إدارة المؤتمرات.
       يتحكم هذا الإذن في قدرة المستخدم على إنشاء مؤتمرات في المساقات والمجموعات.
+  to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "للسماح لصفحة المخرجات كصفحة للقراءة فقط، يمكن تعطيل هذا الإذن ولكن يجب تمكين محتوى المساق - عرض."
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "للسماح لصفحة المخرجات كصفحة للقراءة فقط، يمكن تعطيل هذا الإذن ولكن يجب تمكين محتوى المساق - عرض. لاستيراد مخرجات التعلم، يمكن تمكين مخرجات التعلم - استيراد."
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "للسماح للمستخدم بالإشراف على الدرجات، يجب أيضًا تمكين الدرجات - تحديد الدرجة النهائية للإشراف."
   to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
@@ -25791,14 +26024,17 @@ ar:
       لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف.
   to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "للسماح بعرض وتحرير وحذف وظيفة التعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف. إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض وتحرير وحذف جميع التعاونات. لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف."
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "للسماح بعرض وتحرير وحذف وظيفة التعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف. إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض جميع التعاونات وتحريرها وحذفها. لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف."
+  to_allow_view_edit_and_delete_functionality_of_col_f948198e: "للسماح بعرض وتحرير وحذف وظيفة التعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف."
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "للسماح بعرض/تحرير/حذف وظيفة التعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف. إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض/تحرير/حذف جميع التعاونات. لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - عرض جميع مجموعات الطلاب."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "للسماح بوظائف عرض تحرير حذف للتعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف. إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض تحرير حذف جميع التعاونات. لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - عرض جميع مجموعات الطلاب."
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "للسماح بوظائف عرض تحرير حذف للتعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف. إذا كان إذن محتوى المساق - إضافة / تحرير / حذف ممكّنًا وكان إذن تعاونات الطالب - إنشاء معطلاً، فلن يتمكن المستخدم من إنشاء تعاونات جديدة ولكن سيمكنه عرض تحرير حذف جميع التعاونات. لإضافة طلاب إلى تعاون، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مجموعة مساقات إلى تعاون، يجب أيضًا تمكين المجموعات - عرض جميع مجموعات الطلاب."
+  to_allow_view_edit_delete_functionality_of_collabo_f46fade2: "للسماح بوظائف عرض تحرير حذف للتعاونات المنشأة بواسطة المستخدمين الآخرين، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف."
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: "لتعيين طلاب لمجموعة، أدخل أسماء المجموعة في عمود \"اسم_المجموعة\" (group_name)."
   to_be_added_2959cc72: "ستتم إضافته"
   to_be_removed_d4b48586: "مقرر إزالته"
   to_c4c44f4b: إلى
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "لتغيير sis_account_id، يجب أن يمتلك المستخدم إذن manage_sis."
+  to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "لتغيير كلمات مرور المستخدم، يجب أيضًا تمكين المستخدمون - عرض."
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "للتحقق من ارتباطات معطلة أخرى، يرجى زيارة مدقق ارتباط المساق."
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "للتحقق من ارتباطات معطلة أخرى، يرجى زيارة %{validator_link}"
   to_check_for_other_broken_links_visit_validator_li_e350c852: "للتحقق من ارتباطات معطلة أخرى، يرجى زيارة %{validator_link}"
@@ -25816,6 +26052,7 @@ ar:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "للإدراج المتعدد للقسم، يجب أيضًا تمكين أقسام المساق - إضافة / تحرير / حذف. لتحرير معرف SIS للمساق، يجب أيضًا تمكين بيانات SIS - إدارة. للسماح لمستخدم على مستوى الحساب لحذف مساق، يجب أيضًا تمكين حالة المساق - إدارة."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "للإدراج المتعدد للقسم، يجب أيضًا تمكين أقسام المساق - إضافة / تحرير / حذف. لتحرير معرف SIS للمساق، يجب أيضًا تمكين بيانات SIS - إدارة. للسماح لمستخدم على مستوى الحساب لحذف مساق، يجب أيضًا تمكين حالة المساق - إدارة."
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "للإدراج المتعدد للقسم، يجب أيضًا تمكين أقسام إدارة المساق - تحرير. لتحرير معرف SIS للمساق، يجب أيضًا تمكين بيانات SIS - إدارة. للسماح لمستخدم على مستوى الحساب لحذف مساق، يجب أيضًا تمكين حالة المساق - إدارة."
+  to_cross_list_a_section_manage_courses_admin_manag_7992434e: "للإدراج المتبادل للقسم، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث وإدارة أقسام المساق - تحرير."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "للإدراج المتعدد للأقسام، يجب أيضًا تمكين المساق - إضافة / تحرير / حذف."
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "للإدراج المتعدد للأقسام، يجب أيضًا تمكين أقسام المساق - تحرير وإدارة المساقات: المسؤول - إدارة / تحديث."
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "للإدراج المتعدد للأقسام، يجب تمكين أقسام المساق - تحرير. يجب أيضًا تسجيل المستخدم كمعلم في المساقات التي تتم إدراجها بشكل متعدد."
@@ -25823,6 +26060,8 @@ ar:
   to_date_can_t_come_before_from_date_cf9e18aa: "لا يمكن أن يأتي \"تاريخ الانتهاء\" قبل \"تاريخ البدء\""
   to_date_cannot_come_before_from_date_3eeb2633: "لا يمكن أن يأتي \"تاريخ الانتهاء\" قبل \"تاريخ البدء\""
   to_differentiate_assignments_to_individual_student_6cc40fde: "لتوزيع المهام على الطلاب كل على حدة، يجب أيضًا تمكين المستخدمون - عرض القائمة."
+  to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "لإلغاء السماح للمستخدمين من إدارة معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة."
+  to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "لإلغاء السماح للمستخدمين من عرض أي معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة."
   to_do_1d554f36: "قائمة مهام"
   to_do_5526f10a: "قائمة مهام:"
   to_do_6ac7b2dc: "قائمة المهام:"
@@ -25836,6 +26075,7 @@ ar:
   to_do_list_dashboard_d741f64e: "لوحة معلومات قائمة المهام"
   to_do_time_a7e17623: "وقت قائمة المهام"
   to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "لتحرير درجة أو إضافة تعليقات في SpeedGrader أو دفتر الدرجات، يجب تمكين الدرجات - تحرير."
+  to_edit_a_student_s_section_conversations_send_to__12a2623f: "لتحرير قسم الطالب، يجب أيضًا تمكين المحادثات - إرسال إلى أفراد المساق كل على حدة."
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
       لتحرير قسم طالب، يجب أيضًا تمكين المستخدمون - إضافة / إزالة الطلاب الموجودين في المساقات والمستخدمون - عرض القائمة.
       لتحرير قسم لمعلم أو لمصمم مساق أو لمعلم مساعد، يجب أيضًا تمكين المستخدمون - إضافة / إزالة المعلمين أو مصممي المساق أو المعلمين المساعدين في المساقات والمستخدمون - عرض القائمة.
@@ -25848,11 +26088,14 @@ ar:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       لتحرير قسم طالب، يجب أيضًا تمكين المستخدمون - إضافة / إزالة الطلاب الموجودين من المساقات وإرسال رسائل إلى أفراد المساق كل على حدة.
       لتحرير قسم معلم أو معلم مساعدة أو مصمم مساق، يجب تمكين المستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات إلى المساق والمحادثات - إرسال رسائل إلى أفراد المساق كل على حدة.
+  to_edit_a_user_s_section_conversations_send_to_ind_a54de83d: "لتحرير قسم المستخدم، يجب تمكين المحادثات - إرسال إلى أفراد المساق كل على حدة."
   to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: "لتحرير قسم المستخدم، يجب أيضًا تمكين إذن المستخدمون الملائم (مثل المستخدمون - المعلمون)، والمستخدمون - السماح بإجراءات إدارية في المساقات، والمحادثات - إرسال رسائل إلى أفراد المساق كل على حدة."
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: "لتحرير تحديد المستخدم، يجب أيضًا تمكين المستخدمون - السماح بإجراءات إدارية في المساقات والمستخدمون - عرض القائمة. "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "لتحرير قسم مستخدم، يجب أيضًا تمكين المستخدمون - السماح بإجراءات إدارية في المساقات والمستخدمون - عرض القائمة."
+  to_edit_assignment_details_on_a_discussion_assignm_1764e657: "لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "لتحرير إعدادات المساقات المخططة في إعدادات المساقات، فيجب تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف. لإضافة مساق مقترن، فيجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف والمساقات - عرض القائمة. لتحرير إعدادات القفل على أي نوع كائن مخطط، يجب تمكين هذا الإذن. لتحرير إعدادات القفل على الملفات، يجب أيضًا تمكين ملفات المساق - إضافة / تحرير / حذف. لتحرير إعدادات القفل على الاختبارات الموجزة، يجب أيضًا تمكين الاختبارات الموجزة - إضافة / تحرير / حذف."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "لتحرير إعدادات قفل المخططات من صفحة فهرس المهام، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف. إذا لم يتم تمكين هذا الإذن، وتم تمكين المساقات - إضافة / تحرير / حذف، فإنه يمكن إدارة إعدادات قفل المخططات للمهمة من صفحة تفاصيل المهمة. لتحرير إعدادات قفل المخططات على اختبار موجز فردي، أو على صفحة فهرس الاختبارات الموجزة، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف."
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "لتحرير إعدادات قفل المخططات من صفحة فهرس النقاشات، يجب تمكين النقاشات - إشراف أيضًا."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "لتحرير إعدادات قفل المخططات من صفحة فهرس النقاشات، يجب تمكين المساق - إضافة / تحرير / حذف والنقاشات - إشراف أيضًا. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "لتحرير إعدادات قفل المخططات على صفحة فهرس النقاشات، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف والنقاشات - عرض. إذا لم يتم تمكين هذا الإذن، وتم تمكين المساقات - إضافة / تحرير / حذف والنقاشات - العرض، فإنه يمكن تحرير إعدادات قفل المخططات على النقاشات كل على حدة."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "لتحرير إعدادات قفل المخططات على صفحة فهرس الصفحات، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف. إذا لم يتم تمكين هذا الإذن، وتم تمكين المساقات - إضافة / تحرير / حذف، فإنه يمكن تحرير إعدادات قفل المخططات على الصفحات كل على حدة."
@@ -25866,24 +26109,38 @@ ar:
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       لتحرير إعدادات التأمين من صفحة فهرس المهام، يجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف، وإدارة المساقات: المسؤول - إدارة / تحديث. إذا تم تمكين هذه الأذونات الإضافية، ولكن لم يتم تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف، يمكن إدارة إعدادات تأمين المخطط لمهمة من صفحة تفاصيل المهمة.
               لتحرير إعدادات التأمين على اختبار موجز فردي، أو على صفحة فهرس الاختبارات الموجزة، يجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف وإدارة المساقات: المسؤول - إدارة / تحديث.
+  to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "لتحرير إعدادات التأمين من صفحة فهرس المهام، يجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف، وإدارة المساقات: المسؤول - إدارة / تحديث."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "لتحرير إعدادات التأمين من صفحة فهرس المناقشات، يجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / إقران / حذف، وإدارة المساقات: المسؤول - إدارة / تحديث."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "لتحرير إعدادات القفل على اختبار موجز فردي، أو على صفحة فهرس الاختبارات الموجزة، يجب أيضًا تمكين المساقات المخططة - إضافة / تحرير / حذف وإدارة المساقات: المسؤول - إدارة / تحديث."
+  to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "لتحرير إعدادات التأمين على الملفات، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث وملفات المساق - تحرير."
+  to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "لتحرير إعدادات التأمين على الاختبارات الموجزة، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "لتحرير إعدادات التأمين على صفحة فهرس المناقشات، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والمناقشات - عرض. إذا تم تمكين الأذونات الإضافية، ولكن لم يتم تمكين هذا الإذن، يمكن تحرير إعدادات التأمين على المناقشات الفردية."
+  to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "لتحرير إعدادات التأمين على صفحة فهرس المناقشات، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والمناقشات - عرض."
+  to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "لتحرير إعدادات التأمين على صفحة فهرس الصفحات، الصفحات - التحديث، المساقات المخططة - إضافة / تحرير / إقران / حذف، وإدارة المساقات: المسؤول - إدارة / تحديث."
+  to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "لتحرير معرف SIS، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث وبيانات SIS - إدارة."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       لتحرير تفاصيل المستخدم أو تعديل تفاصيل تسجيل الدخول أو تغيير كلمات المرور، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول.
       لعرض طرق عرض صفحات المستخدم، يجب أيضًا تمكين الإحصائيات -عرض.
       للتصرف بصفة مستخدمين آخرين، يجب أيضًا تمكين المستخدمون - التصرف بصفة.
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: "لتحرير تفاصيل المستخدم أو تعديل تفاصيل تسجيل الدخول أو تغيير كلمات المرور، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول."
   to_edit_user_details_modify_login_details_or_chang_800e894d: "لتحرير تفاصيل المستخدم أو تعديل تفاصيل تسجيل الدخول أو تغيير كلمات المرور، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول. لعرض طرق عرض صفحات المستخدم، يجب أيضًا تمكين الإحصائيات -عرض. للتصرف بصفة مستخدمين آخرين، يجب أيضًا تمكين المستخدمون - التصرف بصفة."
+  to_end_a_long_running_conference_the_course_conten_63e3f993: "لإنهاء مؤتمر يستمر لمدة طويلة، يجب تمكين إذن محتوى المساق."
   to_f0e90538: "إلى:"
+  to_fully_manage_course_level_question_banks_assign_2c31396f: "لإدارة بنوك الأسئلة على مستوى المساقات بشكل كامل، يجب أيضًا تمكين إذن المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - إضافة/إزالة الطلاب الموجودين في المساقات."
   to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: "لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - السماح بإجراءات إدارية في المساقات."
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - إضافة / إزالة الطلاب الموجودين في المساقات."
+  to_generate_a_pairing_code_from_a_student_s_user_d_b3256aa0: "لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - السماح بإجراءات إدارية في المساقات."
   to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "لإنشاء رمز إقران من صفحة إعدادات المستخدم للطالب، يجب أيضًا تمكين إذن المستخدم - تصرف بصفة. لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - إضافة/إزالة الطلاب الموجودين من المساقات."
   to_generate_a_pairing_code_from_a_student_s_user_s_5da92dc: "لإنشاء رمز إقران من صفحة إعدادات المستخدم للطالب، يجب أيضًا تمكين إذن المستخدم - تصرف بصفة. لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - السماح بإجراءات إدارية في المساقات."
+  to_generate_a_pairing_code_from_a_student_s_user_s_5dcba185: "لإنشاء رمز إقران من صفحة إعدادات المستخدم للطالب، يجب أيضًا تمكين إذن المستخدم - تصرف بصفة."
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       لإنشاء رمز إقران من صفحة إعدادات المستخدم للطالب، يجب أيضًا تمكين إذن المستخدم - تصرف بصفة.
       لإنشاء رمز إقران من صفحة تفاصيل المستخدم للطالب، يجب أيضًا تمكين إذن المستخدمون - إضافة / إزالة الطلاب الموجودين من المساقات.
+  to_generate_a_pairing_code_on_behalf_of_a_student__3caa504b: "لإنشاء رموز إقران بالنيابة عن الطالب لمشاركتها مع المشرف، يجب أيضًا تمكين المستخدمون - إنشاء رموز إقران مراقب للطلاب."
+  to_generate_grade_change_logs_in_admin_tools_grade_cbcab1c9: "لإنشاء سجلات تغيير الدرجات في أدوات المسؤول، يجب أيضًا تمكين الدرجات - عرض سجلات التغيير."
   to_generate_login_logout_activity_in_admin_tools_u_253c565b: "لإنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض. لإنشاء سجلات تغيير الدرجات في أدوات المسؤول، يجب أيضًا تمكين الدرجات - عرض سجلات التغيير."
+  to_generate_login_logout_activity_in_admin_tools_u_603c40a0: "لإنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض."
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "لإنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض. لإنشاء سجلات تغيير الدرجات في أدوات المسؤول، يجب أيضًا تمكين الدرجات - عرض سجلات التغيير."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "لاستيراد المهام والاختبارات الموجزة باستخدام أداة استيراد المساق، يجب تمكين محتوى المساق - إضافة / تحرير / حذف."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "لاستيراد الملفات باستخدام أداة استيراد المساق، يجب أيضًا تمكين محتوى المساق - إضافة / تحرير / حذف."
@@ -25898,18 +26155,26 @@ ar:
   to_link_an_observer_to_a_student_users_manage_logi_c24e1e45: |-
       لربط مراقب بأحد الطلاب، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول والمحادثات - إرسال رسائل إلى أفراد المساق كل على حدة.
               لإنشاء رمز إقران لصالح الطالب للمشاركة مع المراقب، يجب أيضًا تمكين إذن المستخدمون - إنشاء رموز إقران مراقب للطلاب.
+  to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "لربط مراقب بأحد الطلاب، يجب أيضًا تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول والمحادثات - إرسال رسائل إلى أفراد المساق كل على حدة."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "لربط مراقب الدورة *%{name}* مع طالب ما، قم بكتابة اسم الطالب للعثور عليه ثم انقر فوق تحديث."
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "لتسجيل الدخول في حسابك على Canvas أثناء تنقلك، امسح رمز QR هذا من تطبيق Canvas Student."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "لتسجيل الدخول في حسابك على Canvas أثناء تنقلك، امسح رمز QR هذا من تطبيق Canvas على الأجهزة المحمولة."
+  to_manage_associated_courses_courses_view_list_and_7bb3bedb: "لإدارة المساقات المقترنة، يجب أيضًا تمكين المساقات - عرض القائمة وإدارة المساقات - إضافة."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "لإدارة إعدادات المساقات المخططة في إعدادات المساقات، فيجب تمكين المساقات - إضافة / تحرير / حذف."
+  to_manage_course_announcements_discussions_moderat_5f02f46e: "لإدارة إعلانات المساقات، يجب أيضًا تمكين النقاشات - إشراف."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "لإدارة محتوى المساق، يجب تمكين محتوى المساق - إضافة / تحرير / حذف."
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "لإدارة محتوى المساق، يجب تمكين إدارة المساقات: المسؤول - إدارة / تحديث ومحتوى المساق - إضافة / تحرير / حذف. لعرض أزرار اختر الصفحة الرئيسية وقائمة اختيار إعداد المساق، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث ومحتوى المساق - عرض. (يستطيع المعلمون والمصممون والمعلمون المساعدون تعيين الصفحة الرئيسية للمساق، بغض النظر عن أذوناتهم)."
+  to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "لإدارة محتوى المساق، يجب تمكين إدارة المساقات: المسؤول - إدارة / تحديث ومحتوى المساق - إضافة / تحرير / حذف."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       لإدارة النقاشات، يجب أيضًا تمكين النقاشات - إشراف.
       
       للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر.
+  to_manage_discussions_discussions_moderate_must_al_834a8b9: "لإدارة النقاشات، يجب أيضًا تمكين النقاشات - إشراف."
   to_manage_discussions_discussions_moderate_must_al_d6d665be: "لإدارة النقاشات، يجب أيضًا تمكين النقاشات - إشراف. للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر."
+  to_manage_discussions_discussions_moderate_must_be_7307a00a: "لإدارة النقاشات، يجب تمكين النقاشات - إشراف."
+  to_manage_discussions_discussions_post_and_discuss_47aaeceb: "لإدارة النقاشات، يجب أيضًا تمكين النقاشات - نشر والنقاشات - إشراف."
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "لإدارة النقاشات، يجب أيضًا تمكين النقاشات - نشر والنقاشات - إشراف. للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر."
+  to_manage_feature_options_for_an_account_feature_o_6327c2da: "لإدارة خيارات الميزة لحساب محدد، يجب أيضًا تمكين خيارات الميزات - تمكين / تعطيل."
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "لإدارة إعدادات التأمين لأنواع الكائن، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث."
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "لإدارة التقييم المشرف عليه، يجب أيضًا تمكين الدرجات - إشراف."
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -25919,6 +26184,7 @@ ar:
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "لإدارة بيانات SIS، يجب أيضًا تمكين بيانات SIS - إدارة."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "لإدارة بيانات SIS، يجب تمكين بيانات SIS - إدارة. إذا كان إذن بيانات SIS - إدارة ممكّنًا وبيانات SIS - قراءة معطلاً، فإن إذن الحساب سيتجاوز إذن المساق. إذا كان إذن بيانات SIS - إدارة معطلاً وكان إذن بيانات SIS - قراءة ممكّنًا، فسيتمكن المستخدمون فقط من عرض معرفات SIS للمساق والمستخدم والحساب الفرعي. لإلغاء السماح للمستخدمين من عرض أي معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة."
   to_manage_sis_data_sis_data_manage_must_be_enabled_a92ce831: "لإدارة بيانات SIS، يجب تمكين بيانات SIS - إدارة. إذا كان إذن بيانات SIS - إدارة ممكّنًا وبيانات SIS - قراءة معطلاً، فإن إذن الحساب سيتجاوز إذن المساق. إذا كان إذن بيانات SIS - إدارة معطلاً وكان إذن بيانات SIS - قراءة ممكّنًا، فسيتمكن المستخدمون فقط من عرض معرفات SIS للمساق والمستخدم والحساب الفرعي. لإلغاء السماح للمستخدمين من عرض أي معرفات SIS على مستوى المساق، يجب تعطيل كل من ميزتي بيانات SIS - إدارة وبيانات SIS - قراءة."
+  to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: "لإدارة بيانات SIS، يجب تمكين بيانات SIS - إدارة."
   to_manage_the_feature_options_tab_feature_options__c478f81: "لإدارة علامة تبويب خيارات الميزات، يجب تمكين خيارات الميزات - تمكين / تعطيل."
   to_manage_the_feature_options_tab_feature_options__fc32fca3: "لإدارة علامة تبويب خيارات الميزات، يجب تمكين خيارات الميزات - تمكين - تعطيل."
   to_minscore_43e5452e: "إلى %{minScore}%"
@@ -25931,6 +26197,7 @@ ar:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
       للإشراف على اختبار موجز، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف.
       لعرض عمود معرف SIS للمستخدم في ملف CSV لتحليل عنصر الاختبار الموجز، يجب أيضًا تمكين بيانات SIS - قراءة.
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_c2e739c8: "للإشراف على اختبار موجز، أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ca1e4e6a: |-
       للإشراف على اختبار موجز، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف.
               لعرض عمود معرف SIS للمستخدم في ملف CSV لتحليل عنصر الاختبار الموجز، يجب أيضًا تمكين بيانات SIS - قراءة.
@@ -25941,6 +26208,8 @@ ar:
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "للإشراف على الدرجات، يجب أيضًا تمكين الدرجات - تحديد الدرجة النهائية للإشراف."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "للحصول على معرف عميل، سيحتاج مسؤول الحساب إلى إنشاء مفتاح مطور LTI."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "لتثبيت مناقشة في أعلى الصفحة، اسحب المناقشة هنا، أو حدد \"تثبيت\" من قائمة إعدادات المناقشة."
+  to_post_or_hide_grades_for_a_moderated_assignment__bf929e0c: "لنشر أو إخفاء الدرجات لمهمة مشرف عليها، يجب أيضًا تمكين الدرجات - تحرير."
+  to_post_or_hide_grades_for_an_assignment_grades_ed_974f6de4: "لنشر أو إخفاء الدرجات لمهمة، يجب أيضًا تمكين الدرجات - تحرير."
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "لنشر أو إخفاء الدرجات، يجب أيضًا تمكين الدرجات - تحرير."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "لمعاينة علامة محرر النسق، يتعين عليك *إيقاف تشغيل واجهة المستخدم عالية التباين*."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "لنشر وإلغاء نشر محتوى الوحدة النمطية، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف ومحتوى المساق - عرض. لا يمكن إلغاء نشر عناصر الوحدة النمطية إذا كان هناك إرسالات طلاب."
@@ -25953,8 +26222,14 @@ ar:
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "لنشر الدرجات النهائية لمهمة مشرف عليها، يجب أيضًا تمكين الدرجات - تحرير. لنشر أو إخفاء الدرجات لمهمة مشرف عليها، يجب أيضًا تمكين الدرجات - تحرير."
   to_publish_final_grades_for_a_moderated_assignment_713090cf: "لنشر الدرجات النهائية لمهمة مشرف عليها، يجب أيضًا تمكين الدرجات - تحرير."
   to_publish_unpublish_module_content_course_content_efc294d4: "لنشر/إلغاء نشر محتوى الوحدة النمطية، يجب تمكين محتوى المساق - إضافة / تحرير / حذف."
+  to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "لإزالة مستخدم عبر معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة."
+  to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر."
+  to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "لاستعادة مساق محذوف، يجب أيضًا تمكين المساقات - حذف، والمساقات - إلغاء الحذف، ومحتوى المساق - عرض."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "لاستعادة مساق محذوف، يجب تمكين المساقات - إلغاء الحذف ومحتوى المساق - عرض."
+  to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "لاستعادة مساق محذوف في حساب، يجب أيضًا تمكين إدارة المساقات - حذف ومحتوى المساق - عرض."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "لمنع الطلاب من إنشاء المجموعات، قم بإلغاء تحديد خانة اختبار السماح للطلاب بتنظيم مجموعاتهم في إعدادات المساق."
+  to_restrict_students_from_creating_groups_do_not_s_b6da85dc: "لمنع الطلاب من إنشاء المجموعات، لا تقم بتحديد خانة اختبار السماح للطلاب بتنظيم مجموعاتهم في إعدادات المساق."
+  to_restrict_students_from_creating_groups_manage_c_7cd09af9: "لتقييد الطلاب من إنشاء المجموعة، يجب تمكين إدارة المساقات: المسؤول - إدارة/تحديث كما يجب عدم تحديد خانة اختيار السماح للطلاب بتنظيم مجموعاتهم."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "لتقييد المستخدمين من مقاطعة Clever، أدخل معرف مقاطعة Clever هنا. هذا مطلوب ليعمل تسجيل الدخول الفوري إلى Clever في محيط متعدد الحائزين."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "لتقييد مجال معين من Google Apps للمستخدمين، أدخل المجال هنا."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "لتقييد مجالات معينة من Google Apps للمستخدمين، أدخل المجالات هنا في قائمة مفصولة بفواصل. للتقييد لمستخدم Google Apps بشكل عام، يمكنك إدخال \"*\"."
@@ -25962,18 +26237,23 @@ ar:
   to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "لمراجعة مهمة مشرف عليها في SpeedGrader، يجب أيضًا تمكين الدرجات - تحرير."
   to_search_and_view_notifications_for_a_user_users__becfb733: "للبحث عن الإعلامات لأحد المستخدمين وعرضها، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "للبحث عن الإعلامات لأحد المستخدمين وعرضها، يجب أيضًا تمكين المستخدمون - عرض."
+  to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "للبحث حسب معرف المهمة فقط، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
+  to_search_by_course_id_or_assignment_id_grades_edi_ac2c7b94: "للبحث حسب معرف المساق أو معرف المهمة، يجب أيضًا تمكين الدرجات - تحرير."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
       للبحث حسب معرف المقّيم أو الطالب، يجب أيضًا تمكين المستخدمون - عرض القائمة.
       للبحث حسب معرف المساق أو معرف المهمة، يجب أيضًا تمكين الدرجات - تحرير.
       للبحث حسب معرف المهمة فقط، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات.
+  to_search_by_grader_or_student_id_users_view_must__4639a825: "للبحث حسب معرف المقّيم أو الطالب، يجب أيضًا تمكين المستخدمون - عرض."
   to_search_by_grader_or_student_id_users_view_must__524aa668: "للبحث حسب معرف المقّيم أو الطالب، يجب أيضًا تمكين المستخدمون - عرض. للبحث حسب معرف المساق أو معرف المهمة، يجب أيضًا تمكين الدرجات - تحرير. للبحث حسب معرف المهمة فقط، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       للبحث عن مساق في علامة تبويب استعادة المساقات، يجب أيضًأ تمكين محتوى المساق - عرض.
       لاستعادة مساق محذوف في الحسابات، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف، محتوى المساق - عرض والمساقات - إلغاء الحذف.
   to_search_for_a_course_in_the_restore_courses_tab__475b1a02: "للبحث عن مساق في علامة تبويب استعادة المساقات، يجب أيضًأ تمكين محتوى المساق - عرض. لاستعادة مساق محذوف في حساب، يجب أيضًا تمكين إدارة المساقات - حذف ومحتوى المساق - عرض."
+  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "للبحث عن مساق في علامة تبويب استعادة المساقات، يجب أيضًأ تمكين محتوى المساق - عرض."
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "للبحث عن مساق في علامة تبويب استعادة المساقات، يجب أيضًأ تمكين محتوى المساق - عرض. لاستعادة مساق محذوف في الحسابات، يجب أيضًا تمكين المساقات - إضافة / تحرير / حذف، محتوى المساق - عرض والمساقات - إلغاء الحذف."
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "للبحث في سجلات تغيير الدرجات، يجب أيضًا تمكين الدرجات - عرض سجلات التغيير."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "للبحث في سجلات تغيير الدرجات، يجب أيضًا تمكين الدرجات - عرض سجلات التغيير."
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "للاطلاع على ارتباط التحليلات في الشريط الجانبي للمستخدم من صفحة الأشخاص، يجب تعطيل ملفات التعريف في حسابك."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "للاطلاع على خيار قائمة اختيار إعداد المساق على الصفحة الرئيسية للمساق، يجب أيضًا تمكين إدارة (إضافة / تحرير / حذف) المساقات."
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "للاطلاع على خيار قائمة اختيار إعداد المساق على الصفحة الرئيسية للمساق، يجب أيضًا تمكين إدارة - إضافة / تحرير / حذف المساقات."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "لإرسال رسالة إلى مستخدم فردي، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة."
@@ -25987,11 +26267,14 @@ ar:
       لاستيراد حصائل التعلم من صفحة الحصائل، يجب أيضًا تمكين مقاييس التقييم - إضافة / تحرير / حذف.
       يمكن للمستخدمين الوصول والإنشاء (وليس تحرير)لمقاييس المهام الفردية من خلال المهام في حالة تمكين محتوى المساق - عرض، والمهام والاختبارات الموجزة - إضافة / تحرير / حذف.
   to_view_a_course_outcomes_page_as_read_only_course_b961cbec: "لعرض صفحة حصائل المساق كصفحة للقراءة فقط، يجب تمكين محتوى المساق - عرض. لاستيراد حصائل التعلم من صفحة الحصائل، يجب أيضًا تمكين مقاييس التقييم - إضافة / تحرير / حذف. يمكن للمستخدمين الوصول والإنشاء (وليس تحرير)لمقاييس المهام الفردية من خلال المهام في حالة تمكين محتوى المساق - عرض، والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
+  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "لعرض معرف تكامل المستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة."
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "لعرض تفاصيل تسجيل دخول المستخدم، يجب أيضًا تمكين المستخدمون - عرض القائمة وتعديل تفاصيل تسجيل الدخول للمستخدمين."
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "لعرض معرف SIS للمستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة أو بيانات SIS - قراءة."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "لعرض مجموعات من مستوى الحساب، يجب أيضًا تمكين المجموعات - إضافة / تحرير / حذف."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "لعرض جميع الإخطارات المرسلة إلى مستخدم Canvas، حدد المستخدم ونطاق التاريخ لعملية البحث."
   to_view_announcements_announcements_view_must_also_75f652df: "لعرض الإعلانات، يجب أيضًا تمكين الإعلانات - عرض."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "لعرض المهام، تأكد من أن طريقة عرض *جدول الأعمال* نشطة."
+  to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "لعرض أزرار اختر الصفحة الرئيسية وقائمة اختيار إعداد المساق، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث ومحتوى المساق - عرض. (يستطيع المعلمون والمصممون والمعلمون المساعدون تعيين الصفحة الرئيسية للمساق، بغض النظر عن أذوناتهم)."
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       لعرض النقاشات في مساق، يجب أيضًا تمكين النقاشات - عرض.
       لإدارة النقاشات، يجب تمكين النقاشات - إشراف.
@@ -26000,6 +26283,7 @@ ar:
       لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض.
       للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر.
       لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف.
+  to_view_discussions_in_a_course_discussions_view_m_6be8ec80: "لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض."
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض.
       للرد على نقاش، يجب أيضًا تمكين النقاشات - نشر. لتحرير تفاصيل المهام على نقاش، يجب أيضًا تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف.
@@ -26014,32 +26298,44 @@ ar:
       لعرض النقاشات في مساق، يجب أيضًا تمكين النقاشات - عرض.
       لإدارة النقاشات، يجب تمكين النقاشات - إشراف.
   to_view_discussions_in_a_course_discussions_view_m_c0d9e312: "لعرض النقاشات في مساق، يجب تمكين النقاشات - عرض. تسمح كل من النقاشات - إنشاء والنقاشات - إشراف للمستخدم بإنشاء مناقشة في صفحة النقاشات. لإدارة النقاشات، يجب أيضًا تمكين النقاشات - إشراف."
+  to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "لعرض النقاشات في مساق، يجب أيضًا تمكين النقاشات - عرض."
+  to_view_feature_options_for_an_account_feature_opt_14b0cea0: "لعرض خيارات الميزة لحساب محدد، يجب أيضًا تمكين خيارات الميزات - تمكين / تعطيل."
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "لعرض الدرجات في مساق، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "لعرض التقديرات في مساق، يجب أيضًا تمكين إدارة المساقات: المسؤول - إدارة / تحديث والتقديرات - عرض."
+  to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "لعرض المجموعات، يجب أيضًا تمكين المستخدمون - عرض القائمة."
+  to_view_last_activity_and_total_activity_informati_473265d8: "لعرض النشاط الأخير وإجمالي معلومات النشاط على صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمين المستخدمون - عرض القائمة."
   to_view_last_activity_and_total_activity_informati_a06859f3: |-
       لعرض النشاط الأخير وإجمالي معلومات النشاط على صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمين المستخدمون - عرض القائمة.
       للوصول إلى صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمكين المستخدمون - عرض القائمة.
   to_view_last_activity_and_total_activity_informati_b24e3864: "لعرض النشاط الأخير وإجمالي معلومات النشاط على صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمين المستخدمون - عرض القائمة. للوصول إلى صفحة الأشخاص الخاصة بالمساق، يجب أيضًا تمكين المستخدمون - عرض القائمة."
+  to_view_login_ids_users_allow_administrative_actio_1b5789db: "لعرض معرفات تسجيل الدخول، يجب أيضًا تمكين المستخدمون - السماح بإجراءات إدارية في المساقات."
   to_view_module_progression_grades_view_all_grades__1acc0880: "لعرض تقدم وحدة نمطية، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "لعرض تقدم وحدة نمطية، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "لعرض أو تحرير معرف SIS أو معرف التكامل للطالب، يجب أيضًا تمكين المستخدمون - عرض القائمة والمستخدمون - إدارة تفاصيل تسجيل الدخول."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "لعرض أو تحرير معرف SIS أو معرف التكامل للطالب، يجب أيضًا تمكين المستخدمون - عرض القائمة والمستخدمون - إدارة تفاصيل تسجيل الدخول."
+  to_view_recent_announcements_on_the_home_page_cour_5a91447e: "لعرض الإعلانات الحديثة على الصفحة الرئيسية، يجب تمكين محتوى المساق - عرض، ويجب تحديد إظهار الإعلانات الحديثة على خانة اختيار الصفحة الرئيسية للمساق في إعدادات المساق."
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "لعرض الإعلانات الحديثة على الصفحة الرئيسية، يجب تمكين محتوى المساق - عرض، ويجب تحديد إظهار الإعلانات الحديثة على خانة اختيار الصفحة الرئيسية للمساق في إعدادات المساق. لإدارة إعلانات المساقات، يجب أيضًا تمكين النقاشات - إشراف."
+  to_view_recent_announcements_on_the_home_page_the__fbd8d115: "لعرض الإعلانات الحديثة على الصفحة الرئيسية، يجب تحديد إظهار الإعلانات الحديثة على خانة اختيار الصفحة الرئيسية للمساق في إعدادات المساق."
+  to_view_sis_ids_sis_data_read_must_be_enabled_12edce68: "لعرض معرفات SIS، يجب تمكين بيانات SIS - قراءة."
   to_view_student_analytics_analytics_view_must_also_8a41d86e: "لعرض تحليلات الطلاب، يجب أيضًا تمكين التحليلات - عرض."
   to_view_student_analytics_analytics_view_must_also_a735c0b4: "لعرض تحليلات الطلاب، يجب أيضًا تمكين التحليلات - عرض."
   to_view_student_analytics_in_course_analytics_anal_21ed5b9c: "لعرض تحليلات الطلاب في تحليلات المساق، يجب أيضًا تمكين التحليلات - عرض."
   to_view_student_analytics_in_course_analytics_anal_9466b742: "لعرض تحليلات الطلاب في تحليلات المساق، يجب أيضًا تمكين التحليلات - عرض."
+  to_view_student_analytics_in_course_analytics_grad_654a5c5a: "لعرض تحليلات الطلاب في تحليلات المساق، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "لعرض تحليلات الطلاب في تحليلات المساق، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات"
   to_view_student_analytics_users_view_list_and_anal_2c2776b2: "لعرض تحليلات الطلاب، يجب أيضًا تمكين المستخدمون - عرض القائمة والتحليلات - عرض."
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "لعرض تحليلات الطلاب، يجب أيضًا تمكين المستخدمون - عرض القائمة والتحليلات - عرض."
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "لعرض تحليلات الطلاب، يجب أيضًا تمكين المستخدمون - عرض القائمة والدرجات - عرض جميع الدرجات."
+  to_view_the_account_people_page_users_view_list_mu_9d0bdb80: "لعرض صفحة الأشخاص الخاصة بالحساب، يجب تمكين المستخدمون - عرض القائمة."
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "لعرض صفحة الأشخاص الخاصة بالحساب، يجب تمكين المستخدمون - عرض القائمة. إذا كان هذا الإذن معطلاً، وإذا كانت ميزة المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي ممكّنة، فسيظل بإمكان المستخدمين قادرين على رؤية عناوين البريد الإلكتروني المستخدمة كمعرفات تسجيل دخول."
+  to_view_the_gradebook_course_content_view_must_als_45c2e607: "لعرض دفتر الدرجات، يجب أيضًا تمكين محتوى المساق - عرض."
   to_view_the_gradebook_course_content_view_must_als_676f3e8: "لعرض دفتر الدرجات، يجب أيضًا تمكين محتوى المساق - عرض. في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
   to_view_the_gradebook_grades_view_all_grades_must__7ead435: "لعرض دفتر الدرجات، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات."
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "لعرض قائمة المستخدمين في أحد الحسابات، يجب تمكين المستخدمون - عرض القائمة."
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "لعرض قائمة المستخدمين في أحد الحسابات، يجب أيضًا تمكين المستخدمون - عرض."
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "لعرض قائمة المستخدمين في أحد الحسابات، يجب تمكين المستخدمون - عرض القائمة."
   to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "لعرض قائمة المستخدمين في أحد الحسابات، يجب تمكين المستخدمون - عرض القائمة."
+  to_view_the_list_of_users_in_the_course_users_view_20278cf: "لعرض قائمة المستخدمين في المساقات، يجب تمكين المستخدمون - عرض القائمة."
   to_view_the_list_of_users_in_the_course_users_view_26412777: "لعرض قائمة المستخدمين في المساقات، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مستخدمين من خلال معرف SIS، يجب أيضًا تمكين المستخدمون - إضافة / إزالة الطلاب من المساقات و/أو المستخدمون - إضافة / إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات إلى المساق."
   to_view_the_list_of_users_in_the_course_users_view_34c164ea: "لعرض قائمة المستخدمين في المساقات، يجب تمكين المستخدمون - عرض القائمة. لعرض معرفات SIS، يجب تمكين بيانات SIS - قراءة. لإضافة مستخدم إلى مساق من خلال معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة. لتحرير قسم معلم أو معلم مساعد، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة. لربط مراقب بأحد الطلاب، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة."
   to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
@@ -26057,6 +26353,7 @@ ar:
       لعرض معرفات SIS، يجب تمكين بيانات SIS - قراءة. لإضافة مستخدم إلى مساق من خلال معرف SIS، يجب أيضًا تمكين بيانات SIS - إدارة.
       لتحرير قسم معلم أو معلم مساعد، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة.
       لربط مراقب بأحد الطلاب، يجب أيضًا تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة.
+  to_view_the_list_of_users_in_the_course_users_view_b7b9b4ef: "لعرض قائمة المستخدمين في المساقات، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_view_the_list_of_users_in_the_course_users_view_bc0462e3: "لعرض قائمة المستخدمين في المساقات، يجب أيضًا تمكين المستخدمون - عرض القائمة. لإضافة مستخدمين من خلال معرف SIS، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب من المساقات و أو المستخدمون - إضافة/إزالة المعلمين أو مصممي المساقات أو المعلمين المساعدين من المساقات."
   to_view_the_list_of_users_in_the_course_users_view_bd2ce438: |-
       لعرض قائمة المستخدمين في المساق، يجب تمكين المستخدمين - عرض القائمة
@@ -26078,6 +26375,7 @@ ar:
   to_view_the_outcomes_page_as_read_only_course_cont_d176be65: |-
       لعرض صفحة الحصائل كصفحة للقراءة فقط، يجب تمكين محتوى المساق - عرض.
       يمكن للمستخدمين الوصول لمقاييس المهام الفردية من خلال المهام في حالة تمكين محتوى المساق - عرض، والمهام والاختبارات الموجزة - إضافة / تحرير / حذف.
+  to_view_the_people_page_courses_view_list_must_be__c1d54670: "لعرض صفحة الأشخاص، يجب تمكين المساقات - عرض القائمة."
   to_view_the_people_page_courses_view_list_must_be__fa021b7f: |-
       لعرض صفحة الأشخاص، يجب تمكين المساقات - عرض القائمة.
               لإضافة مستخدمين لمساق أو إزالته منه، يجب تمكين إذن المستخدمين الملائم (مثل المستخدمون - المعلمون).
@@ -26085,8 +26383,11 @@ ar:
               لتحرير قسم المستخدم، يجب تمكين المحادثات - إرسال رسائل إلى أفراد المساق كل على حدة.
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "لعرض علامة تبويب التقارير، يجب أيضًا تمكين المساقات - عرض تقارير الاستخدام."
   to_view_the_student_interactions_report_grades_vie_68f791b0: "لعرض إلى تقرير تفاعلات الطالب، يجب أيضًا تمكين الدرجات - عرض جميع الدرجات والمساقات - عرض تقارير الاستخدام."
+  to_view_the_submission_log_quizzes_view_submission_b8353d6e: "لعرض سجل الإرسالات، يجب أيضًا تمكين الاختبارات الموجزة - عرض سجل الإرسالات."
   to_view_the_user_details_page_for_a_student_users__51d98047: "لعرض صفحة تفاصيل المستخدم لأحد الطلاب، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب في المساقات."
   to_view_the_user_details_page_for_a_student_users__5d0ca2d5: "لعرض صفحة تفاصيل المستخدم لأحد الطلاب، يجب أيضًا تمكين المستخدمون - إضافة/إزالة الطلاب في المساقات."
+  to_view_the_user_sis_id_column_in_the_quiz_item_an_2bf433fa: "لعرض عمود معرف SIS للمستخدم في ملف CSV لتحليل عنصر الاختبار الموجز، يجب أيضًا تمكين بيانات SIS - قراءة."
+  to_view_user_page_views_statistics_view_must_also__e400875a: "لعرض طرق عرض صفحات المستخدم، يجب أيضًا تمكين الإحصائيات -عرض."
   to_view_user_page_views_users_view_list_must_also__81cc34ed: "لعرض طرق عرض صفحات المستخدم، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_view_user_page_views_users_view_list_must_also__f4246239: "لعرض طرق عرض صفحات المستخدم، يجب أيضًا تمكين المستخدمون - عرض القائمة."
   to_view_users_and_user_account_details_users_view__99807b12: |-
@@ -26094,6 +26395,7 @@ ar:
       لتغيير كلمات مرور المستخدم، يجب أيضًا تمكين المستخدمون - عرض القائمة.
       لعرض معرف SIS للمستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة أو بيانات SIS - قراءة.
       لعرض معرف تكامل المستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة.
+  to_view_users_and_user_account_details_users_view__cc958682: "لعرض المستخدمين وتفاصيل حساب المستخدمين، يجب تمكين المستخدمون - عرض القائمة."
   to_view_users_and_user_account_details_users_view__ff62392: "لعرض المستخدمين وتفاصيل حساب المستخدمين، يجب تمكين المستخدمون - عرض القائمة. لتغيير كلمات مرور المستخدم، يجب أيضًا تمكين المستخدمون - عرض. لعرض معرف SIS للمستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة أو بيانات SIS - قراءة. لعرض معرف تكامل المستخدمين، يجب أيضًا تمكين بيانات SIS - إدارة."
   today_76e10f9c: اليوم
   toggle_alignment_details_for_title_944f605: "تبديل تفاصيل المحاذاة لـ %{title}"
@@ -26110,6 +26412,7 @@ ar:
   toggle_tooltip_1ed3b35e: "تبديل تلميح الأداة"
   toggle_tooltip_2447b4fa: "تبديل تلميح الأداة"
   toggle_tooltip_d3b7cb86: "تبديل تلميح الأداة"
+  toggling_placement_ee1ab8b5: "تعيين التبديل"
   tolerance_value_9e96573c: "فيمة التفاوت المسموح به"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "عدد محاولات تسجيل الدخول الفاشلة كبير للغاية. يرجى المحاولة مرة أخرى لاحقًا أو الاتصال بمسؤول النظام."
   too_many_members_b8b15069: "أعضاء كثيرون"
@@ -26299,6 +26602,7 @@ ar:
   unaccepted_students_aa68ea98: "طلاب غير مقبولين"
   unarchive_f245e2d6: "إلغاء الأرشفة"
   unarchive_selected_e0c4bd3d: "إلغاء أرشفة التحديد"
+  unassessed_a0264e97: "غير مُقيّم"
   unassessed_students_3809ac5e: "الطلاب غير المقوّمين"
   unassigned_permissions_6a38ca95: "الأذونات غير المعينة"
   unassigned_roles_cb9e95ec: "أداة غير مخصصة"
@@ -26579,6 +26883,7 @@ ar:
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: "استخدم مفاتيح أسهم لتحديد مزود مؤتمر"
   use_arrows_a60b3330: "استخدام أسهم"
   use_as_front_page_274a488b: "استخدم كصفحة أمامية"
+  use_as_frontpagetext_fa88bbb2: "استخدام كـ%{frontPageText}"
   use_between_for_adding_multiple_users_26bff207: "استخدم \",\" في الوسط لإضافة مستخدمين متعددين."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "استخدام إضافة إشارة مرجعية لفصل الصفحات في فهرس التسجيلات"
   use_cloudfront_for_docviewer_f21b96db: "استخدام CloudFront لـ DocViewer"
@@ -26648,6 +26953,7 @@ ar:
   user_access_tokens_title: "رموز وصول المستخدم"
   user_avatars_e4fc4ed3: "الصور المجسمة للمستخدم"
   user_c95de254: المستخدم
+  user_cannot_manage_individual_course_content_witho_d7b65fd4: "لا يمكن للمستخدم إدارة محتوى المساقات الفردية بدون وجود إذن ملائم لعنصر المحتوى ذلك."
   user_content_aaf0fb5a: "محتوى المستخدم"
   user_count_respondents_e30a8593: "%{user_count} مجيبين"
   user_data_export_from_date_6ba21b89: "*تصدير بيانات المستخدم من %{date}*"
@@ -27148,6 +27454,7 @@ ar:
       يوجد المستخدمون والفصول الدراسية في الحساب، لذا تؤكد نقطة نهاية SIS دومًا أذونات المستخدم وفقًا للحساب. تحتوي الحسابات الفرعية فقط على ملكية المساقات والأقسام، ولا تمتلك بيانات المستخدم.
       لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS إلا إذا مُنحوا دور معلم في أحد المساقات. لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS بدون ربط المساق، حيث يمتلك دور المعلم الإذن لقراءة بيانات SIS على مستوى الحسابات.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "يوجد المستخدمون والفصول الدراسية في الحساب، لذا تؤكد نقطة نهاية SIS دومًا أذونات المستخدم وفقًا للحساب. تحتوي الحسابات الفرعية فقط على ملكية المساقات والأقسام، ولا تمتلك بيانات المستخدم. لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS إلا إذا مُنحوا دور معلم في أحد المساقات. لا يمكن لمسؤولي الحسابات الفرعية عرض معلومات SIS بدون ربط المساق، حيث يمتلك دور المعلم الإذن لقراءة بيانات SIS على مستوى الحسابات."
+  users_and_terms_are_located_at_the_account_so_the__8f3258e6: "يوجد المستخدمون والفصول الدراسية في الحساب، لذا تؤكد نقطة نهاية SIS دومًا أذونات المستخدم وفقًا للحساب."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "يمكن للمستخدمين الوصول والإنشاء (وليس تحرير)لمقاييس المهام الفردية من خلال المهام في حالة تمكين محتوى المساق - عرض، والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "يمكن للمستخدمين الوصول والإنشاء (وليس تحرير) لمعايير قياس المهام الفردية من خلال المهام في حالة تمكين المهام والاختبارات الموجزة - إضافة / تحرير / حذف."
   users_can_access_the_manage_question_banks_link_on_e411d01: "يمكن للمستخدمين الوصول إلى ارتباط إدارة بنوك الأسئلة على صفحة فهرس الاختبارات الموجزة عند تمكين محتوى المساق - عرض والمهام والاختبارات الموجزة - إضافة / تحرير / حذف."
@@ -27170,6 +27477,7 @@ ar:
   users_view_list_861c7a3f: "المستخدمون - قائمة العرض"
   users_view_login_ids_a2e6a85: "المستخدمون - عرض معرفات تسجيل الدخول"
   users_view_primary_email_address_14f4978f: "المستخدمون - عرض عنوان البريد الإلكتروني الرئيسي"
+  users_with_this_permission_may_be_able_to_use_the__84394072: "يستطيع المستخدمون من خلال هذا الإذن استخدام الإجراء كميزة لإدارة إعدادات الحساب وعرض الدرجات وتعديلها والوصول إلى معلومات المستخدم وما شابه. كما يسمح هذا الإذن للمسؤولين المخصصين لحساب فرعي بالوصول إلى الإعدادات والمعلومات خارج حسابهم الفرعي."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "استخدام المجدول الجديد ووظيفته"
   validate: 
     is_required: "هذا الحقل مطلوب"
@@ -27214,6 +27522,7 @@ ar:
   view_course_analytics_eefe6b2: "عرض المعلومات التحليلية للمساق"
   view_coursename_gradebook_8b3a6240: "عرض دفتر درجات %{courseName}"
   view_coursename_s_assignment_group_totals_bd4b707: "عرض إجماليات مجموعة مهمة %{courseName}"
+  view_description_b6d8e52b: "وصف طريقة عرض"
   view_due_items_due_today_for_course_coursename_129e433: "عرض %{due} من العناصر المستحقة اليوم للمساق %{courseName}"
   view_faculty_journals_ad0e8c8f: "عرض دفاتر الكلية"
   view_feature_settings_at_an_account_level_ec7f5e10: "عرض إعدادات الميزة على مستوى الحساب"
@@ -27388,6 +27697,7 @@ ar:
   what_assignment_types_can_i_create_in_a_course_1ed4eed4: "ما أنواع المهام التي يمكنني إنشاءها في مساق ما؟"
   what_does_provisioning_only_mean_eac9a4a1: "ماذا يعني التزويد فقط؟"
   what_happened_322d8259: "ماذا حدث؟"
+  what_it_does_c158cc83: "ماذا تفعل"
   what_it_does_d4debc07: "ماذا تفعل"
   what_layout_options_are_available_in_the_course_ho_5d364ce3: "ما خيارات التخطيط المتوفرة للصفحة الرئيسية للمساق كمعلم؟"
   what_options_can_i_set_in_a_quiz_53522d76: "ما الخبارات التي يمكنني تعيينها في الاختبارات الموجزة؟"
@@ -27475,9 +27785,9 @@ ar:
         view_all_pages: "عرض كافة الصفحات"
       delete_wiki: حذف
       labels: 
-        front_page: "الصفحة الأمامية"
+        front_page: "%{frontPageText}"
       menu: 
-        use_front_page: "استخدم كصفحة أمامية"
+        use_front_page: "استخدام كـ%{frontPageText}"
       published_indicator: منشور
       toolbar_menu: 
         settings: إعدادات
@@ -27524,7 +27834,7 @@ ar:
       page_title: العنوان
     wiki_page_index_item: 
       labels: 
-        front_page: "الصفحة الأمامية"
+        front_page: "%{frontPageText}"
       menu: 
         delete: حذف
         edit: تحرير
@@ -27634,6 +27944,13 @@ ar:
   would_you_like_to_enable_this_app_ccdf735d: "هل ترغب في تمكين هذا التطبيق؟"
   would_you_like_to_go_back_to_include_1d279044: "هل ترغب في الرجوع لتضمين:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "هل ترغب في ترك الطلاب متابعة المساق أم ترغب في إعادة قفل هذه الوحدات حتى يتم إكمال المتطلبات الجديدة؟"
+  would_you_like_to_remove_these_count_outcomes_5075697d: 
+    few: "هل ترغب في إزالة هذه المُخرَجات الـ %{count}؟"
+    many: "هل ترغب في إزالة هذه المُخرَجات الـ %{count}؟"
+    one: "هل ترغب في إزالة هذا المُخرَج؟"
+    other: "هل ترغب في إزالة هذه المُخرَجات الـ %{count}؟"
+    two: "هل ترغب في إزالة هذه المُخرَجات الـ %{count}؟"
+    zero: "هل ترغب في إزالة هذه المُخرَجات الـ %{count}؟"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "لف عناوين الأحداث في العرض الشهري للتقويم"
   write_something_430e346c: "اكتب شيئًا ما..."
   wrong_answer_comments_14963a24: "تعليقات على الإجابة الخاطئة"
@@ -27831,6 +28148,7 @@ ar:
   you_must_have_a_student_or_section_selected_a99e45df: "يجب أن تقوم بتحديد طالب أو قسم"
   you_must_input_a_section_b8d370fe: "يجب إدخال قسم."
   you_must_log_in_to_view_replies_9ccd4da0: "يجب أن تقوم بتسجيل الدخول لعرض الأجوبة"
+  you_must_post_before_seeing_replies_24f8bcd4: "يجب أن تنشر قبل رؤية الردود."
   you_must_provide_a_date_with_a_time_ec369ff4: "يجب عليك إدخال تاريخ مع وقت."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "يجب تقديم مستأجر وسمة تسجيل دخول لتمكين مزامنة Microsoft Teams"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "يجب توفير قيمة أو إلغاء تحديد الخيار."
