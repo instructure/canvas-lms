@@ -248,12 +248,14 @@ export const outcomeGroup = {
 
 export const groupDetailMocks = ({
   groupId = '1',
+  title = `Group ${groupId}`,
   canEdit = true,
   canUnlink = true,
   contextType = 'Account',
   contextId = '1',
   outcomeIsImported = false,
-  searchQuery = ''
+  searchQuery = '',
+  withMorePage = true
 } = {}) => [
   {
     request: {
@@ -269,11 +271,12 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          title: `Group ${groupId}`,
+          title,
+          description: '',
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
-              hasNextPage: true,
+              hasNextPage: withMorePage,
               endCursor: 'Mg',
               __typename: 'PageInfo'
             },
@@ -283,7 +286,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '1',
                   description: '',
-                  title: `Outcome 1 - Group ${groupId}`,
+                  title: `Outcome 1 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -293,7 +296,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '2',
                   description: '',
-                  title: `Outcome 2 - Group ${groupId}`,
+                  title: `Outcome 2 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -321,11 +324,12 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          title: `Group ${groupId}`,
+          title,
+          description: '',
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
-              hasNextPage: true,
+              hasNextPage: withMorePage,
               endCursor: 'Mg',
               __typename: 'PageInfo'
             },
@@ -335,7 +339,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '1',
                   description: '',
-                  title: `Outcome 1 - Group ${groupId}`,
+                  title: `Outcome 1 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -345,7 +349,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '3',
                   description: '',
-                  title: `Outcome 3 - Group ${groupId}`,
+                  title: `Outcome 3 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -374,7 +378,8 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          title: `Group ${groupId}`,
+          title,
+          description: '',
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -390,7 +395,7 @@ export const groupDetailMocks = ({
                   description: '',
                   isImported: false,
                   friendlyDescription: null,
-                  title: `Outcome 5 - Group ${groupId}`,
+                  title: `Outcome 5 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -400,7 +405,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '6',
                   description: '',
-                  title: `Outcome 6 - Group ${groupId}`,
+                  title: `Outcome 6 - ${title}`,
                   __typename: 'LearningOutcome'
                 },
                 __typename: 'ContentTag'
@@ -428,11 +433,11 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           description: '',
-          title: `Group ${groupId}`,
+          title,
           outcomesCount: 2,
           outcomes: {
             pageInfo: {
-              hasNextPage: true,
+              hasNextPage: withMorePage,
               endCursor: 'Mx',
               __typename: 'PageInfo'
             },
@@ -443,7 +448,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '1',
                   description: '',
-                  title: `Outcome 1 - Group ${groupId}`,
+                  title: `Outcome 1 - ${title}`,
                   displayName: '',
                   canEdit,
                   contextId,
@@ -459,7 +464,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '2',
                   description: '',
-                  title: `Outcome 2 - Group ${groupId}`,
+                  title: `Outcome 2 - ${title}`,
                   displayName: '',
                   canEdit,
                   contextId,
@@ -493,7 +498,7 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           description: '',
-          title: `Group ${groupId}`,
+          title,
           outcomesCount: 2,
           outcomes: {
             pageInfo: {
@@ -508,7 +513,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '3',
                   description: '',
-                  title: `Outcome 3 - Group ${groupId}`,
+                  title: `Outcome 3 - ${title}`,
                   displayName: '',
                   canEdit,
                   contextId,
@@ -524,7 +529,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '4',
                   description: '',
-                  title: `Outcome 4 - Group ${groupId}`,
+                  title: `Outcome 4 - ${title}`,
                   displayName: '',
                   canEdit,
                   contextId,
@@ -558,7 +563,7 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           description: '',
-          title: `Group ${groupId}`,
+          title,
           outcomesCount: 1,
           outcomes: {
             pageInfo: {
@@ -573,7 +578,7 @@ export const groupDetailMocks = ({
                 node: {
                   _id: '1',
                   description: '',
-                  title: `Outcome 1 - Group ${groupId}`,
+                  title: `Outcome 1 - ${title}`,
                   displayName: '',
                   canEdit,
                   contextId,

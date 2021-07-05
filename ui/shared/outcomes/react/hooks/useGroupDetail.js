@@ -16,13 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect, useRef} from 'react'
-import {useApolloClient} from 'react-apollo'
+import {useEffect, useRef} from 'react'
+import {useQuery} from 'react-apollo'
 import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
+
+const useAbortController = dependencies => {
+  const abortRef = useRef()
+  const previousDependencies = useRef()
+  const dependenciesString = dependencies.join('-')
+
+  // if the dependencies changes, abort previous request
+  // and return a new controller
+  if (previousDependencies.current !== dependenciesString) {
+    // There is a issue in aborting controller,
+    // it'll be handled in OUT-4630, so leave it comment for now
+
+    // abortRef.current?.abort()
+    abortRef.current = new window.AbortController()
+    previousDependencies.current = dependenciesString
+  }
+
+  return abortRef.current
+}
+
+// If searchString size if 1 or 2, return previous searchString
+const useSearchString = searchString => {
+  const str = searchString || ''
+  const ref = useRef('')
+
+  if (![1, 2].includes(str.length)) {
+    ref.current = str
+  }
+
+  return ref.current
+}
 
 const useGroupDetail = ({
   query = SEARCH_GROUP_OUTCOMES,
@@ -31,73 +62,39 @@ const useGroupDetail = ({
   id
 }) => {
   const {contextType, contextId} = useCanvasContext()
-  const client = useApolloClient()
-  const [group, setGroup] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const abortController = useRef(null)
-  const abortLatest = () => abortController.current && abortController.current.abort()
+  searchString = useSearchString(searchString)
+  const abortController = useAbortController([id, searchString])
   const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
 
-  const load = currentGroup => {
-    if (
-      id &&
-      String(id) !== String(ACCOUNT_FOLDER_ID) &&
-      ((searchString || '').length === 0 || searchString.length > 2)
-    ) {
-      setLoading(true)
+  if (searchString) queryVars.searchQuery = searchString
 
-      if (searchString) queryVars.searchQuery = searchString
+  const skip = !id || id === ACCOUNT_FOLDER_ID
 
-      abortLatest()
-      const controller = new window.AbortController()
-      abortController.current = controller
-
-      client
-        .query({
-          query,
-          variables: {
-            id,
-            outcomeIsImported: loadOutcomesIsImported,
-            outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor,
-            ...queryVars
-          },
-          context: {
-            fetchOptions: {signal: controller.signal}
-          }
-        })
-        .then(({data}) => {
-          if (!currentGroup) {
-            setGroup(data.group)
-          } else {
-            setGroup({
-              ...data.group,
-              outcomes: {
-                pageInfo: data.group.outcomes.pageInfo,
-                edges: [...currentGroup.outcomes.edges, ...data.group.outcomes.edges]
-              }
-            })
-          }
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-        .catch(err => {
-          setError(err.message)
-        })
+  const {loading, error, data, fetchMore} = useQuery(query, {
+    variables: {
+      id,
+      outcomeIsImported: loadOutcomesIsImported,
+      ...queryVars
+    },
+    skip,
+    context: {
+      fetchOptions: {
+        signal: abortController.signal
+      }
     }
+  })
+
+  // this will handle the case when we click in group 1, wait for group 1
+  // load to finish, then click in a different group
+  // it'll issue a query to load the second group
+  // but until the query finishs the first group will be in the cache,
+  // and we don't want to return the first group if
+  // we're loading the second group.
+  // So consider group is null if group id doesn't match
+  let group = data?.group
+  if ((group?._id || '') !== id) {
+    group = null
   }
-
-  useEffect(() => {
-    setGroup(null)
-  }, [id])
-
-  useEffect(() => {
-    setError(null)
-    setLoading(true)
-    load(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, searchString])
 
   useEffect(() => {
     if (error) {
@@ -106,12 +103,28 @@ const useGroupDetail = ({
         type: 'error'
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
   const loadMore = () => {
     if (!loading) {
-      load(group)
+      fetchMore({
+        variables: {
+          outcomesCursor: group?.outcomes?.pageInfo?.endCursor
+        },
+        updateQuery: (prevData, {fetchMoreResult}) => {
+          return {
+            ...prevData,
+            group: {
+              ...prevData.group,
+              outcomes: {
+                ...prevData.group.outcomes,
+                edges: [...prevData.group.outcomes.edges, ...fetchMoreResult.group.outcomes.edges],
+                pageInfo: fetchMoreResult.group.outcomes.pageInfo
+              }
+            }
+          }
+        }
+      })
     }
   }
 
@@ -119,7 +132,6 @@ const useGroupDetail = ({
     loading,
     group,
     error,
-    setGroup,
     loadMore
   }
 }

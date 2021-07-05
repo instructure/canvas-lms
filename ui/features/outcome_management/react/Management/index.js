@@ -101,6 +101,7 @@ const OutcomeManagementPanel = () => {
     id: selectedGroupId,
     searchString: debouncedSearchString
   })
+
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()

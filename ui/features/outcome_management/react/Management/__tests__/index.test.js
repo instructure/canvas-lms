@@ -60,7 +60,13 @@ describe('OutcomeManagementPanel', () => {
     mocks: [
       ...courseMocks({childGroupsCount: 2}),
       ...groupMocks({groupId: '200'}),
-      ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2'})
+      ...groupDetailMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false
+      })
     ]
   }
 
@@ -199,9 +205,9 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText('Group 200 Outcomes')).toBeInTheDocument()
-    expect(getByText('Outcome 1 - Group 200')).toBeInTheDocument()
-    expect(getByText('Outcome 2 - Group 200')).toBeInTheDocument()
+    expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
+    expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    expect(getByText('Outcome 2 - Course folder 0')).toBeInTheDocument()
   })
 
   it('shows remove group modal if remove option from group menu is selected', async () => {
@@ -318,7 +324,7 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(within(getByRole('menu')).getByText('Move'))
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Cancel'))
-    expect(queryByText('Move "Outcome 1 - Group 200"')).not.toBeInTheDocument()
+    expect(queryByText('Move "Outcome 1 - Course folder 0"')).not.toBeInTheDocument()
   })
 
   it('hides the Outcome Menu if the user doesnt have permission to edit the outcome', async () => {
@@ -344,7 +350,7 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
     fireEvent.change(getByLabelText('Search field'), {target: {value: 'no matched results'}})
     await act(async () => jest.advanceTimersByTime(500))
     expect(getByLabelText('Search field')).toBeEnabled()
@@ -358,27 +364,29 @@ describe('OutcomeManagementPanel', () => {
         ...courseMocks({childGroupsCount: 2}),
         ...groupMocks({groupId: '200'}),
         ...groupDetailMocks({
+          title: 'Course folder 0',
           groupId: '200',
           contextType: 'Course',
           contextId: '2',
-          searchQuery: 'Outcome 1'
+          searchQuery: 'Outcome 1',
+          withMorePage: false
         })
       ]
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Course folder 0'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
     const searchInput = getByLabelText('Search field')
     fireEvent.change(searchInput, {target: {value: 'Outcome'}})
     await act(async () => jest.advanceTimersByTime(100))
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
     fireEvent.change(searchInput, {target: {value: 'Outcome '}})
     await act(async () => jest.advanceTimersByTime(300))
-    expect(getByText('2 "Group 200" Outcomes')).toBeInTheDocument()
+    expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
     fireEvent.change(searchInput, {target: {value: 'Outcome 1'}})
     await act(async () => jest.advanceTimersByTime(500))
-    expect(getByText('1 "Group 200" Outcome')).toBeInTheDocument()
+    expect(getByText('1 "Course folder 0" Outcome')).toBeInTheDocument()
   })
 
   describe('Bulk remove outcomes', () => {

@@ -112,10 +112,10 @@ describe('groupDetailHook', () => {
 
   it('should not load group info if ACCOUNT_FOLDER_ID passed as id', async () => {
     const {result} = renderHook(() => useGroupDetail({id: ACCOUNT_FOLDER_ID}), {wrapper})
-    expect(result.current.loading).toBe(true)
+    expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
     await act(async () => jest.runAllTimers())
-    expect(result.current.loading).toBe(true)
+    expect(result.current.loading).toBe(false)
     expect(result.current.group).toBe(null)
   })
 
