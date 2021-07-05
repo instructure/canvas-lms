@@ -1927,12 +1927,14 @@ ja:
   adding_to_library_b552868: ライブラリに追加中
   additional_comments_9aed10bb: 追加コメント
   additional_considerations_3ee46e5b: 追加の考慮点
+  additional_considerations_a36efeef: さらなる考慮事項
   additional_occurrence_s_7b5b0173: 追加の発生
   additional_outcomes_options_6df428f1: その他の結果オプション
   additional_settings_20362654: 追加設定
   additional_settings_for_sis_syncing_f926973e: SIS同期の追加設定
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: 追加のSIS同期割り当て、クイズ、ディスカッション設定
   additional_sort_options_for_new_gradebook_2dc1939: 新しい成績表の追加の並べ替えオプション
+  additionally_if_this_permission_is_disabled_users__6acf5d08: さらに、この権限が無効になっていると、ユーザーは手動で追加した外部アプリを削除できません。
   address_use_as_wildcard_48f2cf60: "アドレス (*をワイルドカードとして使用)"
   addressbook_microservice_a4940422: "AddressBook マイクロサービス"
   addressbook_performance_tap_98ddf67: "AddressBook パフォーマンスタップ"
@@ -2041,6 +2043,7 @@ ja:
   alerts_6b871b71: アラート
   alerts_add_edit_delete_d71091c6: "アラート - 追加/編集/削除"
   alerts_course_settings_53551794: アラート（コース設定）
+  alerts_must_be_configured_for_the_institution_aler_43bbacb1: 教育機関向けにアラートを設定しなければなりません。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
   align_outcomes_to_this_page_7d055196: 結果をこのページに一致させる
   all_4321c3a1: すべて
   all_account_types_e83c1516: "すべてのアカウント タイプ"
@@ -2147,6 +2150,7 @@ ja:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: 発送の列を通して、通知を送付する性能を可能にする
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: 発送の列を通して、通知を送ることを可能にします
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "このツールで IMS の名前と役割のプロビジョニングサービスにアクセスできるようにする"
+  allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: ユーザーを追加するときに未確認の電子メールアドレスを許可する
   allow_users_to_comment_45b8f753: ユーザーにコメントを許可する
   allowed_attempts_4e229caa: 許可されている試行回数
   allowed_domains_ee7868c8: 許可されているドメイン
@@ -2172,6 +2176,7 @@ ja:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: コースコンテンツの移行時に学習結果を選択できるようにします
   allows_setting_account_course_level_mastery_scales_1939e0fd: アカウントおよびコースレベルの達成度スケールと計算方法を設定し、結果ごとの基準の評価と計算方法を置き換えできるようにします
+  allows_students_to_access_other_student_groups_wit_43918810: ユーザーが、受講生が直接リンクしているグループ内の他の受講生グループにアクセスできるようにします。
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Canvasコースメンバーを MicrosoftTeam に同期できるようにします"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: 講師、デザイナー、TAベースの役割がチャットツールにアクセスできるようにします。
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 講師/デザイナー/TAベースの役割がチャットツールにアクセスできるようにします。
@@ -2191,19 +2196,28 @@ ja:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: 定期的なカレンダーのイベントのスケジュールを許可します
   allows_the_user_to_navigate_away_while_submission__276d73b7: ユーザーは、提出の再アップロードの処理中に別の場所にナビゲートできます
   allows_uer_to_delete_a_submission_file_5302db48: ユーザーが送信ファイルを削除できるようにします。
+  allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: ユーザーがユーザーの設定メニューとユーザーの詳細にアクセスできるようにします。
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: ユーザーがCommonsの管理者設定にアクセスして編集できるようにします。ユーザーがグループを作成・管理できるようにします。ユーザーがアカウント内の共有リソースを管理できるようにします。
+  allows_user_to_access_and_edit_the_admin_settings__e45da9d7: ユーザーがCommonsの管理者設定にアクセスして編集できるようにします。
+  allows_user_to_access_gradebook_history_9d599681: ユーザーがグレードブック履歴にアクセスできるようにします。
+  allows_user_to_access_gradebook_history_allows_use_79dfddd: ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: ユーザーが課題からSpeedGraderにアクセスできるようにします。
+  allows_user_to_access_student_view_test_student_co_8b57e87c: ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: 受講生がコンテクストカード上の「ユーザーとして操作」のリンクにアクセスできるようにします
   allows_user_to_access_the_announcements_link_in_co_2783579a: ユーザーがコースナビゲーションでお知らせのリンクにアクセスできるようにします。ユーザーがコースのお知らせを見ることができるようにします。ユーザーがコースのホームページで最新のお知らせを見ることができます。
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       ユーザーがコースナビゲーションでお知らせのリンクにアクセスできるようにします。
       ユーザーがコースのお知らせを見ることができるようにします。
       ユーザーがコースのホームページで最新のお知らせを見ることができます。
+  allows_user_to_access_the_announcements_link_in_co_f2e824e9: ユーザーがコースナビゲーションでお知らせのリンクにアクセスできるようにします。
   allows_user_to_access_the_attendance_tool_72ef0b68: ユーザーが出席ツールにアクセスできるようにします。
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "ユーザーが Blueprint コースのサイドバーにアクセスできるようにします。コース設定で Blueprint コースのコンテンツ設定を管理できるようにします。ユーザーが関連するコースを削除できるようにします。ユーザーが個々の課題、ページ、またはディスカッションで Blueprint ロック設定を編集できるようにすします"
   allows_user_to_access_the_chat_tool_48d5f5c4: ユーザーがチャットツールにアクセスできるようにします。
   allows_user_to_access_the_files_tab_in_the_content_a5187929: ユーザーがコンテンツのファイルタブにアクセスできるようにします。
+  allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+  allows_user_to_access_the_manage_question_banks_li_616d45c8: クイズインデックスページの問題バンクの管理のリンクをユーザーがアクセスできるようにします。
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。コース詳細のタブで、コース画像、名前、コースコード、タイムゾーン、サブカウント、用語、その他のオプションを編集できるようにします。
+  allows_user_to_access_the_navigation_tab_in_course_e266d985: ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: アカウントのナビゲーションで人々のリンクにアクセスできるようにします。
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: ユーザーが管理者ツール内でコースの復元のタブにアクセスできできるようにします
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: ユーザーが管理者内でもコースの復元のタブにアクセスできできるようにします
@@ -2216,17 +2230,22 @@ ja:
       ユーザーがアカウント内で他のユーザーとして操作できるようにします。この権限は、Canvasアカウント全体で他のユーザーとして行動することを組織が承認したユーザーにのみ割り当てることができます。
               この権限を持つユーザーは、アカウント設定の管理、成績の表示と調整、ユーザー情報へのアクセスを行う機能として権限を利用できる場合があります。
               この権限はまた、サブアカウントに指定された管理者が、サブアカウント外の設定や情報にアクセスすることもできるようにします。
+  allows_user_to_add_and_remove_associated_courses_2ae6e4d6: ユーザーが関連コースを追加・削除できるようにします。
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: ユーザーが他のアカウント管理者を追加したり削除したりできるようにします。
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: ユーザーが他の講師、コースデザイナー、TAを追加・削除できるようにします。ユーザーがオブザーバーを追加・削除できるようにします。ユーザーが受講生、デザイナー、TAのログインID情報を表示できるようにします。ユーザーがいずれのユーザーの詳細も閲覧できるようにします。ユーザーがユーザーのセクションまたは役割を編集できるようにします。
   allows_user_to_add_and_remove_other_teachers_cours_bff27199: ユーザーが他の講師、コースデザイナー、TAを追加・削除できるようにします。コースにオブザーバーを追加・削除できるようにします。ユーザーが受講生、デザイナー、TAのログインID情報を表示できるようにします。ユーザーが講師、コースデザイナー、TA、オブザーバーの設定メニューを閲覧できるようにします。ユーザーが講師、コースデザイナー、TA、のユーザーの詳細を閲覧できるようにします。ユーザーが受講生に対して、仲間のセクションメンバーのみ閲覧できるように制限します。
   allows_user_to_add_and_remove_students_allows_user_6b31aafc: ユーザーが受講生を追加・削除できるようにします。ユーザーがオブザーバーを追加・削除できるようにします。ユーザーが受講生に対して、ログインID情報を閲覧できるようにします。ユーザーが以前の登録を閲覧できるようにします。ユーザーがユーザーの設定メニューとユーザーの詳細にアクセスできるようにします。ユーザーが受講生のセクションまたは役割を編集できるようにします。ユーザーがコースの人物のページからコース招待状を再送することができるようにします。
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: コースに受講生を追加・削除できるようにします。コースにオブザーバーを追加・削除できるようにします。ユーザーが受講生に対して、ログインID情報を閲覧できるようにします。ユーザーが以前の登録を閲覧できるようにします。ユーザーがユーザーの設定メニューとユーザーの詳細にアクセスできるようにします。ユーザーが受講生の詳細ページの登録を締め切りまたは削除できるようにします。ユーザーがコース招待状を再送できるようにします。
+  allows_user_to_add_announcements_in_the_announceme_726541b5: ユーザーがお知らせページにお知らせを追加できるようにします。
+  allows_user_to_add_assignment_groups_in_a_course_3054675c: ユーザーがコースに課題グループを追加できるようにします。
+  allows_user_to_add_course_files_and_folders_566e3447: ユーザーがコースファイルとフォルダを追加できるようにします。
   allows_user_to_add_course_files_and_folders_allows_eecf49f9: ユーザーがコースファイルとフォルダを追加できるようにします。zipが送信ファイルをインポートできるようにします。
   allows_user_to_add_course_sections_in_course_setti_f8e4cabf: ユーザーがコース設定でコースセクションを追加できるようにします。
   allows_user_to_add_designers_in_the_course_allows__ee166883: |-
       ユーザーがコースにデザイナーを追加できるようにします。ユーザーがデザイナーのログインID情報を表示できるようにします。
               ユーザーがデザイナーのユーザー詳細を表示できるようにします。ユーザーがデザイナーのセクションまたは役割を編集できるようにします。
   allows_user_to_add_designers_to_a_course_f81791e8: ユーザーがコースに設計者を追加できるようにします。
+  allows_user_to_add_designers_to_a_course_from_the__427db55b: ユーザーがアカウントの「コース」ページから設計者をコースに追加できるようにします。
   allows_user_to_add_designers_to_a_course_from_the__b48e0a92: ユーザーがアカウントの「コース」ページから設計者をコースに追加できるようにします。ユーザーがコースに設計者を追加できるようにします。
   allows_user_to_add_designers_to_the_course_from_th_ee349841: ユーザーがアカウントのコースページからデザイナーをコースに追加できるようにします。ユーザーがコースにデザイナーを追加できるようにします。ユーザーがデザイナーに対して、ログインID情報を閲覧できるようにします。ユーザーがデザイナーの詳細も閲覧できるようにします。ユーザーがデザイナーのセクションまたは役割を編集できるようにします。
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: ユーザーがディスカッションページにディスカッションを追加できるようにします。
@@ -2249,10 +2268,12 @@ ja:
       ユーザーがグレードブック履歴にアクセスできるようにします。
       ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_add_edit_and_update_grades_in_the_g_5d50d581: ユーザーがグレードブック内で成績を追加、編集、更新することがでるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+  allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: ユーザーがグレードブック内で成績を追加、編集、更新することがでるようにします。
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       ユーザーがグレードブックやSpeedGrader内で成績を追加、編集、更新することがでるようにします。
       ユーザーがグレードブック履歴にアクセスできるようにします。
   allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: ユーザーが課題を追加、編集、削除、および公開・非公開できるようにします。ユーザーが課題設定を管理できるようにします。ユーザーがコースに課題グループを追加できるようにします。ユーザーがコースで課題グループの重み付けを有効にして編集できるようにします。
+  allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: ユーザーが課題を追加、編集、削除、および公開・非公開できるようにします。
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: ユーザーがクイズを追加、編集、削除、および公開・非公開できるようにします。
   allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: ユーザーがクイズを追加、編集、削除、公開/非公開できるようにします。
   allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
@@ -2268,7 +2289,9 @@ ja:
   allows_user_to_add_observers_in_the_course_allows__9c6bb78c: ユーザーがコースにオブザーバーを追加できるようにします。ユーザーがオブザーバーに対して、ログインID情報を閲覧できるようにします。ユーザーがオブザーバーの詳細も閲覧できるようにします。ユーザーがオブザーバーのセクションまたは役割を編集できるようにします。
   allows_user_to_add_observers_to_a_course_ca1a678b: ユーザーがコースに受講生を追加できるようにします。
   allows_user_to_add_observers_to_a_course_from_the__806ec842: ユーザーがアカウントの「コース」ページからオブザーバーをコースに追加できるようにします。ユーザーがコースに受講生を追加できるようにします。
+  allows_user_to_add_observers_to_a_course_from_the__9017365c: ユーザーがアカウントの「コース」ページからオブザーバーをコースに追加できるようにします。
   allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: ユーザーがアカウントのコースページからオブザーバーをコースに追加できるようにします。ユーザーがコースにオブザーバーを追加できるようにします。ユーザーがオブザーバーに対して、ログインID情報を閲覧できるようにします。ユーザーがオブザーバーの詳細も閲覧できるようにします。ユーザーがオブザーバーのセクションまたは役割を編集できるようにします。
+  allows_user_to_add_page_to_student_to_do_list_7085a054: ユーザーが受講者「to-do」リストにページを追加・削除できるようにします。
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "ユーザーが[受講生に追加] タスクチェックボックスを使用して、ページをリスト表示ダッシュボードに追加できるようにします。"
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       ユーザーが他の講師、コースデザイナー、TAを追加/削除できるようにします。
@@ -2296,49 +2319,71 @@ ja:
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: ユーザーがアカウントのコースページから受講生をコースに追加できるようにします。
   allows_user_to_add_students_to_a_course_from_the_a_43abb0e6: ユーザーがアカウントのコースページから受講生をコースに追加できるようにします。ユーザーがコースに受講生を追加できるようにします。
   allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: ユーザーがコースにTAを追加できるようにします。ユーザーがTAに対して、ログインID情報を閲覧できるようにします。ユーザーがTAの詳細も閲覧できるようにします。ユーザーがTAのセクションまたは役割を編集できるようにします。
+  allows_user_to_add_tas_in_the_course_f4de4c19: ユーザーがコースにTAを追加できるようにします。
+  allows_user_to_add_tas_to_a_course_from_the_accoun_66e76aee: ユーザーがアカウントの「コース」ページからTA（助手）をコースに追加できるようにします。
   allows_user_to_add_tas_to_a_course_from_the_accoun_be5446f0: ユーザーがアカウントの「コース」ページからTA（助手）をコースに追加できるようにします。ユーザーがコースにTAを追加できるようにします。
   allows_user_to_add_tas_to_the_course_from_the_acco_254e4c5f: ユーザーがアカウントのコースページからTAをコースに追加できるようにします。ユーザーがコースにTAを追加できるようにします。ユーザーがTAに対して、ログインID情報を閲覧できるようにします。ユーザーがTAの詳細も閲覧できるようにします。ユーザーがTAのセクションまたは役割を編集できるようにします。
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: ユーザーがアカウントのコースページから講師、コースデザイナー、またはTAをコースに追加できるようにします。
   allows_user_to_add_teachers_in_the_course_allows_u_3f80b57d: ユーザーがコースに教員を追加できるようにします。ユーザーが教員に対して、ログインID情報を閲覧できるようにします。ユーザーが教師の詳細も閲覧できるようにします。ユーザーが教員のセクションまたは役割を編集できるようにします。
   allows_user_to_add_teachers_to_a_course_37b9594c: ユーザーがコースに講師を追加できるようにします。
   allows_user_to_add_teachers_to_a_course_from_the_a_40af6066: ユーザーがアカウントの「コース」ページから講師をコースに追加できるようにします。ユーザーがコースに講師を追加できるようにします。
+  allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: ユーザーがアカウントの「コース」ページから講師をコースに追加できるようにします。
   allows_user_to_add_teachers_to_the_course_from_the_dc03e973: ユーザーがアカウントのコースページから教員をコースに追加できるようにします。ユーザーがコースに教員を追加できるようにします。ユーザーが教員に対して、ログインID情報を閲覧できるようにします。ユーザーが教員の詳細も閲覧できるようにします。ユーザーが教員のセクションまたは役割を編集できるようにします。
+  allows_user_to_change_start_and_end_dates_for_cour_f437cee1: ユーザーがコースセクションの開始日と終了日を変更できるようにします。
   allows_user_to_change_the_template_being_used_by_a_86f46490: ユーザーがアカウントで使用されるテンプレートを変更できるようにします。ユーザーがrootアカウントのコーステンプレートの名前を表示できるようにします。
+  allows_user_to_change_the_template_being_used_by_a_eab509a3: ユーザーがアカウントで使用されるテンプレートを変更できるようにします。
+  allows_user_to_close_for_comments_move_pin_and_unp_2adb3d95: ユーザーが、他のユーザーが作成したディスカッショントピックのコメント欄を閉じる、移動、ピンの固定・解除、編集、および削除できるようにします。
   allows_user_to_configure_alerts_in_course_settings_38675b12: ユーザーがコース設定でアラートを設定できるようにします。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: ユーザーがコース設定でアラートを設定できるようにします。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
   allows_user_to_configure_alerts_in_course_settings_806397b5: ユーザーがコース設定でアラートを設定できるようにします。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
+  allows_user_to_configure_alerts_in_course_settings_c6b938ab: ユーザーがコース設定でアラートを設定できるようにします。
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: ユーザーがコース設定でアラートを設定できるようにします。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
+  allows_user_to_copy_individual_course_items_to_ano_46ba40d6: ユーザーが個々のコースアイテムを別のコースにコピーできます。
   allows_user_to_create_accounts_for_new_users_allow_bb7575e9: ユーザーが新しいユーザーアカウントを作成できるようにします。ユーザーがアカウントのユーザーを削除してマージできるようにします。ユーザーがユーザーアカウントの詳細を変更できるようにします。ユーザーがユーザーのユーザーのログイン情報を表示および変更できるようにします。
+  allows_user_to_create_accounts_for_new_users_e4ec27c3: ユーザーが新しいユーザーアカウントを作成できるようにします。
   allows_user_to_create_accounts_for_new_users_with__30b55094: ユーザーがアカウントレベルの人物を追加のボタンを使用して、新しいユーザーのアカウントを作成できるようにします。ユーザーがアカウントのユーザーを削除してマージできるようにします。ユーザーが名前、電子メール、タイムゾーンなどのユーザーアカウントの詳細を変更できるようにします。ユーザーがユーザーのユーザーのログイン情報を表示および変更できるようにします。
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       ユーザーがアカウントレベルの人物を追加のボタンを使用して、新しいユーザーのアカウントを作成できるようにします。
       ユーザーがアカウントのユーザーを削除してマージできるようにします。
       ユーザーが名前、電子メール、タイムゾーンなどのユーザーアカウントの詳細を変更できるようにします。ユーザーがユーザーのユーザーのログイン情報を表示および変更できるようにします。
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: ユーザーがスケジューラを使用して予定表に予定を作成および管理できるようにします。
+  allows_user_to_create_and_manage_groups_allows_use_562e0013: ユーザーがグループを作成・管理できるようにします。ユーザーがアカウント内の共有リソースを管理できるようにします。
   allows_user_to_create_and_modify_grading_schemes_e4433a19: ユーザーが採点スキームを作成および変更できるようにします。
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: ユーザーがコラボレーションを作成できるようにします。ユーザーが自分が作成した会議を追加、編集、削除できるようにします。
   allows_user_to_create_collaborations_allows_user_t_eff2a175: ユーザーがコラボレーションを作成できるようにします。ユーザーが自分が作成したコラボレーションを追加、編集、削除できるようにします。
+  allows_user_to_create_collaborations_b4f214bf: ユーザーがコラボレーションを作成できるようにします。
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "ユーザーがコースページを作成できるようにします。ユーザーが Blueprint マスターコースの個別ページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_create_course_pages_ec9c6647: ユーザーがコースページを作成できるようにします。
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: ユーザーがアカウントの開発者キーを作成できるようにします。
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: ユーザーがアカウントグループを作成、編集、および削除できるようにします。
   allows_user_to_create_edit_and_delete_course_group_36097d72: ユーザーがコースグループを作成、編集、削除できるようにします。ユーザーが受講生が作成したコースグループを作成、編集、削除することができるようにします。
+  allows_user_to_create_edit_and_delete_course_group_40367907: ユーザーがコースグループを作成、編集、削除できるようにします。
+  allows_user_to_create_edit_and_delete_course_group_7aa3842: ユーザーが受講生が作成したコースグループを作成、編集、削除することができるようにします。
   allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
       ユーザーがコースグループを作成、編集、削除できるようにします。
       ユーザーが受講生が作成したコースグループを作成、編集、削除することができるようにします。
+  allows_user_to_create_edit_and_delete_course_rubri_493ac58f: ユーザーが規定を作成、編集、削除できるようにします。
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: ユーザーがルーブリックリンクでコースルービックを作成、編集、削除できるようにします。
+  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: ユーザーが、アカウントとコースレベルで成果と成果グループを作成、編集、および削除できるようにします。
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: ユーザーが、コースレベルで成果と成果グループを作成、編集、および削除できるようにします。
-  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: ユーザーがルービックを作成、編集、削除できるようにします。
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: ユーザーが規定を作成、編集、削除できるようにします。
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       ユーザーが、コースレベルで結果と成果グループを作成、インポート、編集、
       および削除できるようにします。
   allows_user_to_create_import_edit_and_delete_outco_8eff991: ユーザーが、コースレベルで結果と成果グループを作成、インポート、編集、および削除できるようにします。
   allows_user_to_create_new_conferences_allows_user__89cebec2: ユーザーが新しい会議を作成できるようにします。ユーザーが作成した会議を開始できるようにします。
+  allows_user_to_create_new_conferences_in_courses_a_80899f64: ユーザーがコースとグループに新規の会議を作成できるようにします。
+  allows_user_to_create_new_entries_in_the_faculty_j_2a280fec: ユーザーが新規の学部日誌エントリーを作成できるようにします。
+  allows_user_to_cross_list_sections_f6726df2: ユーザーがセクションを相互リストできるようにします。
+  allows_user_to_define_users_allowed_to_edit_the_pa_39fddc1c: ユーザーがページの編集を許可されるユーザーを定義できるようにします。
   allows_user_to_delete_a_submission_file_65f1dd7d: ユーザーが送信ファイルを削除できるようにします。
+  allows_user_to_delete_a_user_from_a_course_section_4b99a5c4: ユーザーがコースセクションを削除できるようにします。
   allows_user_to_delete_course_files_and_folders_34a7793c: ユーザーがコースファイルとフォルダを削除できるようにします。
   allows_user_to_delete_course_pages_allows_user_to__d6e4174d: "ユーザーがコースページを削除できるようにします。ユーザーが Blueprint マスターコースの個別ページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_delete_course_pages_dfaf4fb7: ユーザーがコースページを削除できるようにします。
+  allows_user_to_delete_course_sections_19193a35: ユーザーがコースセクションを削除できるようにします。
   allows_user_to_delete_course_sections_allows_user__649d2d0d: ユーザーがコースセクションを削除できるようにします。ユーザーがコースセクションを削除できるようにします。
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "ユーザーがコースを Blueprint コースとして指定することができるようにします。"
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "ユーザーがコースを Blueprint コースとして指定することができるようにします。ユーザーコース設定で Blueprint コースの設定を管理できるようにします。ユーザーが関連するコースを追加できるようにします。"
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       ユーザーがコースを Blueprint コースとして指定することができるようにします。ユーザーがコース設定で Blueprint コース設定を管理できるようにします。
@@ -2349,20 +2394,31 @@ ja:
       ユーザーが関連するコースを追加できるようにします。
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: ユーザーが課題を個々の受講生で差別化することができます。
   allows_user_to_download_all_comments_in_a_student__33b36d0a: 学生が投稿したすべてのコメントをダウンロードすることができます。
+  allows_user_to_edit_a_student_s_section_or_role_d2b312ad: ユーザーが受講生のセクションまたは役割を編集できるようにします。
+  allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: ユーザーがユーザーのセクションまたは役割を編集できるようにします（SISを介して追加されない場合）。
   allows_user_to_edit_assignment_details_on_individu_3e50993a: グループの作成、個々のディスカッションに関する課題の詳細を編集できるようにします。モジュール：ユーザーが新しい課題をモジュールに追加できるようにします。
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: グループの作成、個々のディスカッションに関する課題の詳細を編集できるようにします。
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "ユーザーが個々のディスカッションの Blueprint コンテンツのロック設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "ユーザーが Blueprintマスターコースに登録されている場合、ユーザーが個々の設定で Blueprint コンテンツのロック設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "ユーザーが個々のディスカッションの Blueprint コンテンツのロック設定を編集できるようにします。"
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "ユーザーが Blueprintマスターコースに登録されている場合、ユーザーが個々の設定で Blueprint コンテンツのロック設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "ユーザーが Blueprint コースのロック設定を、ページインデックスページおよび Blueprint マスターコースの個々のページに対して編集することができるようにします。"
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "ユーザーが Blueprint マスターコースの個別ページの Blueprint ロックの設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "ユーザーが Blueprint マスターコースのページインデックスページと個々のページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "ユーザーが Blueprint マスターコースのページインデックスページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       ユーザーが Blueprint マスターコースのクイズインデックスページで 課題とクイズの Blueprint
       ロック設定を編集できるようにします。
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "ユーザーが Blueprint マスターコースのクイズインデックスページで 課題とクイズの Blueprint ロック設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "ユーザーが Blueprint マスターコースのディスカッションインデックスページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "ユーザーが Blueprint マスターコースのディスカッションインデックスページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "ユーザーが Blueprint マスターコースのファイルページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "ユーザーが Blueprint マスターコースのクイズインデックスページで 課題とクイズの Blueprint ロック設定を編集できるようにします。"
   allows_user_to_edit_conferences_61eb62e0: ユーザーが会議を編集できるようにします。
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: ユーザーが手動で追加された外部アプリの設定を編集できるようにします。
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: ユーザーがコースファイルとフォルダを編集できるようにします。
+  allows_user_to_edit_course_image_name_course_code__8a4681c8: コース詳細のタブで、コース画像、名前、コースコード、タイムゾーン、サブカウント、用語、その他のオプションを編集できるようにします。
+  allows_user_to_edit_course_pages_30f188b4: ユーザーがコースページを編集できるようにします。
   allows_user_to_edit_course_pages_allows_user_to_de_65fec49b: |-
       ユーザーがコースページを編集できるようにします。ユーザーがページの編集を許可されるユーザーを定義できるようにします。ユーザーが学生の to-do（やること）リストにページを追加できるようにします。
               ユーザーがページを公開・非公開できるようにします。ユーザーがページ履歴を表示し、フロントページを設定できるようにします。
@@ -2372,6 +2428,7 @@ ja:
               ユーザーがページを公開・非公開できるようにします。ユーザーがページ履歴を表示し、フロントページを設定できるようにします。
               ユーザーがページインデックスページおよび Blueprint マスターコースの個々のページの Blueprint ロック設定を編集できるようにします。
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: ユーザーがSpeedGrader内で成績を編集し、コメントを追加できるようにします。
+  allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: ユーザーがグレードブック内で成績を編集できるようにします。
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: ユーザーがグレードブック内で成績を編集できるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       ユーザーがグレードブック内で成績を編集できるようにします。
@@ -2379,9 +2436,14 @@ ja:
               ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: ユーザーがグレードブック内で成績を編集できるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。
   allows_user_to_edit_grading_schemes_98c35117: ユーザーが採点スキームを編集できるようにします。
+  allows_user_to_edit_lock_settings_on_individual_as_80ed188a: ユーザーが個々の課題、ページ、またはディスカッションでロック設定を編集できるようにします
   allows_user_to_edit_the_course_sis_id_e1eccee3: "ユーザーがコースの SIS ID を編集できるようにします。"
   allows_user_to_edit_the_course_syllabus_a28ff262: ユーザーがコースのシラバスを編集できるようにします。
+  allows_user_to_edit_title_description_or_remove_co_483daae5: ユーザーが、すべてのコラボレーションでタイトルを編集、説明、共編者を削除できるようにします。
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: ユーザーがコースで課題グループの重み付けを有効にして編集できるようにします。
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "ユーザーがアカウントレベルで Blueprint コースをフィルタリングすることができます。ユーザーが関連するコースを追加できるようにします。"
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "ユーザーがアカウントレベルで Blueprint コースをフィルタリングすることができます。ユーザーが関連するコースを追加できるようにします。"
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       ユーザーがアカウントレベルで Blueprint コースをフィルタリングすることができます。
@@ -2389,6 +2451,7 @@ ja:
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: オブザーバーと共有するために、受講生の代わりにユーザーがペアリングコードを生成することができるようにします。
   allows_user_to_generate_login_logout_activity_repo_bba62f2: ユーザーが管理ツールでログイン/ログアウトアクティビティレポートを生成できるようにします。
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: ユーザーが管理ツールでログイン/ログアウトアクティビティレポートを生成できるようにします。（サブアカウントレベルでは利用できません。）
+  allows_user_to_import_a_zip_file_97bd7db2: zipが送信ファイルをインポートできるようにします。
   allows_user_to_import_account_learning_outcomes_f6f6d0b9: ユーザーがアカウントの学習成果をインポートできるようにします。
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: ユーザーがコースインポートツールを使用してコンテンツをインポートできるようにします。
   allows_user_to_import_course_learning_outcomes_2ca3f18f: ユーザーがアカウントの学習成果をインポートできるようにします。
@@ -2398,8 +2461,11 @@ ja:
       ユーザーが Commons からコースにリソースをインポートできるようにします。
       ユーザーが Commons に課題を共有、または以前共有したコンテンツを編集できるようにします。
   allows_user_to_import_resources_from_commons_into__6e9d32e6: "ユーザーが Commons からコースにリソースをインポートできるようにします。ユーザーが Commons に課題を共有、または以前共有したコンテンツを編集できるようにします。"
+  allows_user_to_import_resources_from_commons_into__79e8255e: "ユーザーが Commons からコースにリソースをインポートできるようにします。"
   allows_user_to_import_sis_data_583b20a5: ユーザーがSISデータをインポートできるようにします。
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "[採点者のみがいいねを押せる]チェックボックスがオンの場合、ユーザーがディスカッション投稿にいいねを押すことができるようにします。"
+  allows_user_to_manage_assignment_settings_35d94690: ユーザーが課題設定を管理できるようにします。
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "ユーザーコース設定で Blueprint コースの設定を管理できるようにします。"
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: ユーザーがアカウント設定で機能オプションを管理できるようにします。
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       ユーザーがモジュールの管理（アイテムの作成、追加、モジュール設定の編集、
@@ -2407,14 +2473,20 @@ ja:
   allows_user_to_manage_modules_create_add_items_edi_9459e815: ユーザーがモジュールの管理（アイテムの作成、追加、モジュール設定の編集、公開、非公開など）を行えるようにします。
   allows_user_to_manage_observers_associated_with_st_4b45f2be: ユーザーがアカウント内の受講生に関連付けられたオブザーバーを管理できるようにします。
   allows_user_to_manage_rubrics_326eedc2: ユーザーがルーブリックを管理できるようにします。
+  allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: ユーザーがアカウント内の共有リソースを管理できるようにします。
+  allows_user_to_manage_the_visibility_options_in_co_e781e4e4: ユーザーがコース設定または新規コース作成時に表示オプションを管理することができるようにします。
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: ユーザーがアカウント設定でアプリを手動で追加できるようにします。
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: ユーザーがアカウント設定でアプリを手動で追加したり削除したりできるようにします。
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: ユーザーがアカウント設定でアプリを手動で追加したり削除したりできるようにします。
   allows_user_to_moderate_a_quiz_6953d369: ユーザーがクイズを調整できるようにします。
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: ユーザーがクイズを管理し、クイズ統計ページを表示できるようにします。
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: ユーザーがクイズを調整できるようにします。設定ユーザーが採点スキームを編集できるようにします。
+  allows_user_to_modify_user_account_details_e16fb115: ユーザーがユーザーアカウントの詳細を変更できるようにします。
+  allows_user_to_publish_and_unpublish_pages_e9397f80: ユーザーがページの公開・非公開を行うことができるようにします。
   allows_user_to_publish_conclude_and_delete_courses_336cf352: ユーザーがコースを公開、締結、削除できるようにします。
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: ユーザーがコース設定でコーステンプレートとしてコースを削除できるようにします。
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: ユーザーがコース設定でコーステンプレートとしてコースを削除できるようにします。ユーザーがテンプレートを使用しないようにアカウントを設定できるようにします。
+  allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: ユーザーがアカウントのユーザーを削除してマージできるようにします。
   allows_user_to_remove_designers_from_a_course_fa9e887e: ユーザーがコースから設計者を削除できるようにします。
   allows_user_to_remove_designers_to_the_course_from_1053d170: ユーザーがアカウントのコースページからデザイナーを削除できるようにします。ユーザーがコースからデザイナーを削除できるようにします。
   allows_user_to_remove_designers_to_the_course_from_f5a7225e: ユーザーがアカウントのコースページからデザイナーを削除できるようにします。
@@ -2428,8 +2500,10 @@ ja:
   allows_user_to_remove_teachers_from_a_course_6d627914: ユーザーがコースから講師を削除できるようにします。
   allows_user_to_remove_teachers_from_the_course_bf4b2d8: ユーザーがコースから教員を削除できるようにします。
   allows_user_to_remove_teachers_from_the_course_fro_75ffab61: ユーザーがアカウントのコースページから教員をコースから削除できるようにします。ユーザーがコースから教員を削除できるようにします。
+  allows_user_to_rename_course_sections_928982f0: ユーザーがコースセクションの名前を付け替えられるようにします。
   allows_user_to_rename_course_sections_allows_user__8e9e7bac: ユーザーがコースセクションの名前を付け替えられるようにします。ユーザーがコースセクションの開始日と終了日を変更できるようにします。ユーザーがセクションを相互リストできるようにします。
   allows_user_to_reply_to_a_discussion_post_83f43e19: ユーザーがディスカッション投稿に返信できるようにします。
+  allows_user_to_resend_course_invitations_from_the__2822fe53: ユーザーがコースの人物のページからコース招待状を再送することができるようにします。
   allows_user_to_restore_a_course_32084c5c: ユーザーがコースを復元できるようにします。
   allows_user_to_restore_a_course_not_available_at_t_3a749177: ユーザーがコースを復元できるようにします。（サブアカウントレベルでは利用できません。）
   allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: ユーザーが管理対象と匿名の両方の課題で監査記録を確認できるようにします。
@@ -2442,24 +2516,31 @@ ja:
   allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
       ユーザーがアカウントのユーザーページのプライマリ電子メールアドレスを使用してアカウントユーザーを検索することができるようにします。
       ユーザーがコースの人物のページのプライマリ電子メールアドレスを使用して他のユーザーを検索することができるようにします。
+  allows_user_to_search_for_account_users_via_primar_db535df4: ユーザーがアカウントのユーザーページのプライマリ電子メールアドレスを使用してアカウントユーザーを検索することができるようにします。
   allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: ユーザーがコースの人物のページのログインIDで他のユーザーを検索することができるようにします。
   allows_user_to_search_for_other_users_by_login_id__3edb3702: ユーザーがアカウントの人物のページのログインIDで他のユーザーを検索することができるようにします。
   allows_user_to_search_for_other_users_by_login_id__97d49785: |-
       ユーザーがアカウントの人物のページのログインIDで他のユーザーを検索することができるようにします。
       ユーザーがコースの人物のページでログインIDを表示できるようにします。
+  allows_user_to_search_for_other_users_via_primary__c1da56c8: ユーザーがコースの人物のページのプライマリ電子メールアドレスを使用して他のユーザーを検索することができるようにします。
   allows_user_to_search_for_other_users_via_primary__c95888c8: ユーザーが人物のページのプライマリ電子メールアドレスを使用して他のユーザーを検索することができるようにします。
+  allows_user_to_search_grade_change_logs_by_grader__406d1976: ユーザーが管理ツールの採点者または受講生による成績変更ログを検索できるようにします。
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: ユーザーがアカウント内のコースリストを見ることができるようにします。
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: ユーザーがアカウントの統計情報で、最近開始/終了したコースのリストを見ることができるようにします。
   allows_user_to_see_the_list_of_recently_started_en_1012704d: ユーザーがアカウントの統計情報で、最近開始/終了したコースのリストを見ることができるようにします。
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: ユーザーがコース設定でコーステンプレートとしてコースを選択できるようにします。
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: ユーザーが調整された課題の最終成績を選択することができるようにします。
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: ユーザーがコースを選択することなく、会話でメッセージを送信できるようにします。
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: "ユーザーが「すべての[course name]」にメッセージを送信できるようにします。ユーザーが「すべての[course group]」にメッセージを送信できるようにします。"
+  allows_user_to_send_a_message_to_all_in_course_nam_4f41b5a2: "ユーザーが「すべての[コース名]」または「すべての[コースグループ]」にメッセージを送信できるようにします。"
   allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
       ユーザーが「すべての[course name]」にメッセージを送信できるようにします。
       ユーザーが「すべての[course group]」にメッセージを送信できるようにします。
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "ユーザーが「すべての[course name]またはすべての[course group]にメッセージを送信できるようにします。"
   allows_user_to_send_messages_to_individual_course__9347e1e2: ユーザーが個々のコースメンバーにメッセージを送信できるようにします。
+  allows_user_to_set_a_template_for_an_account_34fe3695: ユーザーがアカウントにテンプレートを設定できるようにします。
   allows_user_to_set_a_template_for_an_account_allow_210403ed: ユーザーがアカウントにテンプレートを設定できるようにします。ユーザーがコース設定でコーステンプレートとしてコースを選択できるようにします。ユーザーがrootアカウントのコーステンプレートの名前を表示できるようにします。
+  allows_user_to_set_an_account_to_not_use_a_templat_d34fe23c: ユーザーがテンプレートを使用しないようにアカウントを設定できるようにします。
   allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: ユーザーがアカウントおよびコースレベルで成果達成度スケールを設定できるようにします。
   allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: ユーザーがコースレベルで成果達成度スケールを設定できるようにします。
   allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: ユーザーがアカウントおよびコースレベルで成果熟達度の計算を設定できるようにします。
@@ -2467,11 +2548,15 @@ ja:
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: ユーザーがアカウントおよびコースレベルで成果熟達度スケールを設定できるようにします。
   allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: ユーザーがアカウントおよびコースレベルで成果熟達度のスケールを設定できるようにします。
   allows_user_to_share_a_quiz_to_commons_6746e0da: "ユーザーが Commons にクイズを共有できるようにします。"
+  allows_user_to_share_assignments_to_commons_or_edi_c70ddf7: "ユーザーが Commons に課題を共有、または以前共有したコンテンツを編集できるようにします。"
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: ユーザーが他のユーザーと直接、コースアイテムを共有できるようにします。ユーザーが個々のコースアイテムを別のコースにコピーできます。
+  allows_user_to_share_course_items_directly_with_ot_e5793d35: ユーザーが他のユーザーと直接、コースアイテムを共有できるようにします。
+  allows_user_to_start_conferences_they_created_281b03ea: ユーザーが作成した会議を開始できるようにします。
   allows_user_to_sync_blueprint_courses_allows_user__61af2285: |-
       ユーザーが Blueprint コースを同期できるようにします。ユーザーが Blueprint 同期の履歴を表示できるようにします。ユーザーがアカウントのコースを表示および管理できるようにします。ユーザーがコース設定チェックリストボタンを表示できるようにします。
               ユーザーがコース設定の[ナビゲーション]タブにアクセスできるようにします。ユーザーが[コースの詳細]タブでコースの画像、名前、コースコード、タイムゾーン、サブアカウント、用語、およびその他のオプションを編集できるようにします。
               ユーザーが学生ビュー（テスト学生）にアクセスしたり、このコースをコピーしたり、コースコンテンツをリセットしたり、コースを完全に削除したりするボタンにアクセスできるようにします。ユーザーが発表とディスカッションの回答で学生コンテクストカードを表示できるようにします。
+  allows_user_to_sync_blueprint_courses_db4fcc03: "ユーザーが Blueprint コースを同期できるようにします。"
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "ユーザーがコースの SIS ID を表示できるようにします。"
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "ユーザーが課題から SpeedGraderへのリンクを表示できるようにします。"
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2479,12 +2564,15 @@ ja:
                 ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
                ユーザーが新規の学部日誌エントリーを作成できるようにします。
   allows_user_to_view_a_link_to_the_faculty_journal__4c48b57b: ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。ユーザーが個別の受講生の学部日誌を閲覧できるようにします。ユーザーが新規の学部日誌エントリーを作成できるようにします。
+  allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
   allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
       ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
               ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
              ユーザーが新規の学部日誌エントリーを作成できるようにします。
+  allows_user_to_view_access_reports_f7be7a84: ユーザーがアクセスレポートを表示できるようにします。
   allows_user_to_view_account_analytics_98fbc6ad: ユーザーがアカウント分析を表示できるようにします。
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "ユーザーが、自分が登録されているコースグループだけでなく、すべてのコースグループを[共編者]のウィンドウで表示できるようにします。"
+  allows_user_to_view_all_course_groups_not_just_whe_e107af44: "ユーザーが、自分が登録されているコースグループだけでなく、すべてのコースグループを[共編者]のウィンドウで表示できるようにします。"
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: ユーザーがすべての受講生の課題提出を表示し、コメントを追加できるようにします。
   allows_user_to_view_analytics_link_in_the_user_set_56867782: ユーザーがユーザー設定メニューに分析リンクを表示できるようにします。
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: ユーザーがコラボレーションでユーザーを表示および追加できるようにします。
@@ -2492,7 +2580,9 @@ ja:
       ユーザーがアカウント設定でレポートを表示および設定できるようにします。
       ユーザーがアクセスレポートと受講生インタラクションレポートを表示できるようにします。
       ユーザーが人物ページの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
+  allows_user_to_view_and_configure_reports_in_accou_d3cee49f: ユーザーがアカウント設定でレポートを表示および設定できるようにします。
   allows_user_to_view_and_configure_reports_in_accou_e8c6f9a1: ユーザーがアカウント設定でレポートを表示および設定できるようにします。ユーザーがアクセスレポートを表示できるようにします。ユーザーが人物ページの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
+  allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "ユーザーがユーザーのログイン情報に SIS ID とインテグレーションIDを表示および編集できるようにします"
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "ユーザーがユーザーのログイン情報に SIS ID とインテグレーションIDを表示および編集できるようにします"
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "ユーザーが SIS ID フィールドにデータを表示して挿入できるようにします。"
   allows_user_to_view_and_link_questions_in_a_quiz_t_b899a247: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。クイズインデックスページの問題バンクの管理のリンクを有効にします。
@@ -2501,6 +2591,7 @@ ja:
       無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。クイズインデックスページの問題バンクの管理のリンクを有効にします
   allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: ユーザーがクイズ内の質問を表示し、コースレベルの質問をバンクにリンクできるようにします。
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: ユーザーがアカウント全体の認証オプションを表示および管理できるようにします。
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: ユーザーがアカウントのコースを表示および管理できるようにします。
   allows_user_to_view_and_manage_permissions_bdc80a1d: ユーザーが権限を表示および管理できるようにします。
@@ -2509,10 +2600,16 @@ ja:
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: ユーザーがアカウントのサブアカウントを表示および管理できるようにします。
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: ユーザーがアカウントの用語を表示および管理できるようにします。
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: ユーザーがアカウント設定の設定タブと通知タブを表示および管理できるようにします。
+  allows_user_to_view_and_modify_login_information_f_78f3a544: ユーザーがユーザーのユーザーのログイン情報を表示および変更できるようにします。
+  allows_user_to_view_blueprint_sync_history_d545cb7d: "ユーザーが Blueprint 同期の履歴を表示できるようにします。"
   allows_user_to_view_canvas_insights_f4f7ba8b: "ユーザーが Canvas Insights を表示できるようにします。"
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: ユーザーがホームページのホームページを選択およびコース設定チェックリストボタンを表示できるようにします。
+  allows_user_to_view_course_activity_information_fo_e420113b: ユーザーがアカウントのコース活動情報を表示できるようにします。
+  allows_user_to_view_course_analytics_through_the_c_192889dc: ユーザーがコースダッシュボードを通じてコース分析を表示できるようにします。
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: ユーザーがコースダッシュボードを通じてコース分析を表示できるようにします。ユーザーが受講生の分析を表示できるようにします。
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: ユーザーがコースのホームページや人物のページからコースや受講生の分析を表示できるようにします。
+  allows_user_to_view_course_announcements_e71afc2: ユーザーがコースのお知らせを見ることができるようにします。
+  allows_user_to_view_course_discussions_23346fa1: ユーザーがコースのディスカッションを表示できるようにします。
   allows_user_to_view_course_sis_id_3a1818a5: "ユーザーがコースの SIS ID を表示できるようにします。"
   allows_user_to_view_course_status_choose_home_page_21bf32a8: ユーザーがコースステータス、ホームページの選択、およびコース設定チェックリストボタンを表示できるようにします。
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
@@ -2526,8 +2623,13 @@ ja:
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       ユーザーがページを表示、作成、編集、削除、公開/非公開できるようにします。
       ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
+  allows_user_to_view_edit_and_delete_collaborations_f2281cb0: ユーザーが自分が作成したコラボレーションを追加、編集、削除できるようにします。
+  allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: ユーザーが自分が作成した会議を追加、編集、削除できるようにします。
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: ユーザーがセクションタブで登録を表示できるようにします。
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: ユーザーが受講生インタラクションレポート内に学部日誌を表示できるようにします。
+  allows_user_to_view_faculty_journal_information_fo_3c725307: ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
+  allows_user_to_view_feature_options_in_account_set_befc6b83: ユーザーがアカウント設定で機能オプションを閲覧できるようにします。
+  allows_user_to_view_gradebook_9720b3e2: ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
       ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
@@ -2538,6 +2640,7 @@ ja:
   allows_user_to_view_gradebook_allows_user_to_expor_e6b24e2c: ユーザーがページの履歴を表示し、フロントページを設定できるようにします。ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: ユーザーが採点者のコメントをSpeedGrader内のルーブリックで表示できるようにします。
   allows_user_to_view_groups_in_a_course_8a95805b: ユーザーがコースでグループを表示できるようにします。
+  allows_user_to_view_last_activity_and_total_activi_105b5bc3: ユーザーが人物ページの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
   allows_user_to_view_last_activity_and_total_activi_1455c521: ユーザーがレポートの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
   allows_user_to_view_last_activity_and_total_activi_786a7286: ユーザーが人物ページの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
   allows_user_to_view_last_activity_total_activity_a_e0bee860: ユーザーが最後のアクティビティと合計アクティビティ、受講生インタラクションレポートを表示できるようにします。
@@ -2545,35 +2648,49 @@ ja:
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       ユーザーがコースの人物のページでユーザーリストを表示できるようにします。
       ユーザーがコースの人物のページで以前の登録ボタンを表示できるようにします。
+  allows_user_to_view_list_of_users_in_the_course_pe_9ab1309c: ユーザーがコースの人物のページでユーザーリストを表示できるようにします。
   allows_user_to_view_list_of_users_in_the_course_pe_bc91c8fb: ユーザーがコースの人物のページでユーザーリストを表示できるようにします。ユーザーがコースの人物のページで以前の登録ボタンを表示できるようにします。
   allows_user_to_view_login_id_information_for_stude_33512e60: ユーザーが受講生に対して、ログインID情報を閲覧できるようにします。ユーザーが以前の登録を閲覧できるようにします。ユーザーがユーザーの設定メニューとユーザーの詳細にアクセスできるようにします。ユーザーが受講生のセクションまたは役割を編集できるようにします。ユーザーがコースの人物のページからコース招待状を再送することができるようにします。
+  allows_user_to_view_login_id_information_for_stude_70930399: ユーザーが受講生に対して、ログインID情報を閲覧できるようにします。
   allows_user_to_view_login_id_information_for_teach_4b30f308: ユーザーが受講生、デザイナー、TAのログインID情報を表示できるようにします。ユーザーがいずれのユーザーの詳細も閲覧できるようにします。ユーザーがユーザーのセクションまたは役割を編集できるようにします。
   allows_user_to_view_login_id_information_for_teach_ad237acc: ユーザーが受講生、デザイナー、TAのログインID情報を表示できるようにします。ユーザーが講師、コースデザイナー、TA、オブザーバーの設定メニューを閲覧できるようにします。ユーザーが講師、コースデザイナー、TA、のユーザーの詳細を閲覧できるようにします。ユーザーが受講生に対して、仲間のセクションメンバーのみ閲覧できるように制限します。
+  allows_user_to_view_login_id_information_for_users_895256fb: ユーザーがユーザーに対して、ログインID情報を閲覧できるようにします。
   allows_user_to_view_login_id_information_for_users_ab5c64ea: ユーザーがユーザーに対して、ログインID情報を閲覧できるようにします。ユーザーがコースユーザーの詳細を閲覧できるようにします。ユーザーがユーザーのセクションまたは役割を編集できるようにします（SISを介して追加されない場合）。
   allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: ユーザーがコースの人物のページでログインIDを表示できるようにします。
   allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
       ユーザーが管理ツールでユーザーのログイン/ログアウトアクティビティを表示できるようにします。
       ユーザーが管理ツールの採点者または受講生による成績変更ログを検索できるようにします
+  allows_user_to_view_login_logout_activity_of_users_e11dd2de: ユーザーが管理ツールでユーザーのログイン/ログアウトアクティビティを表示できるようにします。
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: ユーザーが管理ツールでユーザーのログイン/ログアウトアクティビティを表示できるようにします。ユーザーが管理ツールの採点者または受講生による成績変更ログを検索できるようにします。（サブアカウントレベルでは利用できません。）
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: ユーザーがrootアカウントのコーステンプレートの名前を表示できるようにします。
+  allows_user_to_view_page_history_and_set_front_pag_c2321326: ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       ユーザーがコラボレーションを作成できるようにします。
       ユーザーが、すべてのコラボレーションでタイトルを編集、説明、共編者を削除できるようにします。
   allows_user_to_view_previously_created_collaborati_bb4b86f1: ユーザーがコラボレーションを作成できるようにします。ユーザーが、すべてのコラボレーションでタイトルを編集、説明、共編者を削除できるようにします。
+  allows_user_to_view_previously_created_collaborati_d3a37402: ユーザーがコラボレーションを作成できるようにします。
+  allows_user_to_view_prior_enrollments_df5286d: ユーザーが以前の登録を閲覧できるようにします。
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: ユーザーが公開されたコースの内容と未発表のコースの内容を表示できるようにします。
-  allows_user_to_view_student_context_cards_in_annou_dadef934: ユーザーが発表とディスカッションの回答で受講生コンテクストカードを表示できるようにします。
+  allows_user_to_view_recent_announcements_on_the_co_e56c881e: ユーザーがコースのホームページで最新のお知らせを見ることができます。
+  allows_user_to_view_student_analytics_89bfd9e8: ユーザーが受講生の分析を表示できるようにします。
+  allows_user_to_view_student_context_cards_in_annou_dadef934: ユーザーが発表とディスカッションの回答で受講者コンテクストカードを表示できるようにします。
   allows_user_to_view_student_grades_pages_e0091b20: ユーザーが受講生の成績ページを表示できるようにします。
   allows_user_to_view_student_quiz_logs_e1c4491: ユーザーが受講生のクイズログを表示できるようにします。
   allows_user_to_view_student_results_and_or_access__60fac9: ユーザーがSpeedGrader内で受講生の成果を表示したり、クイズにアクセスしたりできるようにします。
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "ユーザーが SpeedGrader 内で受講生の成果やクイズ統計を表示したり、クイズにアクセスしたりできるようにします。"
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: ユーザーが分析で受講生固有のデータ表示できるようにします。
+  allows_user_to_view_the_announcements_link_in_cour_b3522273: ユーザーがコースナビゲーションでお知らせのリンクを表示できるようにします。
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: ユーザーがコースナビゲーションでお知らせのリンクを表示できるようにします。ユーザーがコースのお知らせを見ることができるようにします。
   allows_user_to_view_the_conclude_course_button_e90a1175: "ユーザーが[コースを終了]ボタンを表示できるようにします。"
   allows_user_to_view_the_course_grading_scheme_32a6042: ユーザーがコースの成績評価スキームを表示できるようにします。
+  allows_user_to_view_the_course_setup_checklist_but_4d7524f0: "ユーザーが[コースセットアップチェックリスト]ボタンを表示できるようにします。"
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: ユーザーがコース設定内でコース統計ボタンを表示できるようにします。
+  allows_user_to_view_the_delete_this_course_button_92a4c832: "ユーザーが[このコースを削除]ボタンを表示できるようにします。"
   allows_user_to_view_the_delete_this_course_button__6edc6b46: "ユーザーが[このコースを削除]ボタンを表示できるようにします。ユーザーが[コースコンテンツのリセット]ボタンを表示できるようにします。"
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       ユーザーがコースナビゲーションでディスカッションリンクを表示できるようにします。
       ユーザーがコースのディスカッションを表示できるようにします。
+  allows_user_to_view_the_discussions_link_in_course_80ab2fca: ユーザーがコースナビゲーションでディスカッションリンクを表示できるようにします。
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: ユーザーがコースナビゲーションでディスカッションリンクを表示できるようにします。ユーザーがコースのディスカッションを表示できるようにします。
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: ユーザーがePortfolioモデレーションページを表示し、ePortfolioスパムコンテンツを管理できるようにします。
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: ユーザーがグローバルナビゲーション内に学部日誌を表示できるようにします。
@@ -2581,17 +2698,26 @@ ja:
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       ユーザーがすべての受講生グループのグループホームページを表示できるようにします。
       ユーザーが、受講生が直接リンクしているグループ内の他の受講生グループにアクセスできるようにします。
+  allows_user_to_view_the_group_home_pages_of_all_st_b463b0f9: ユーザーがすべての受講生グループのグループホームページを表示できるようにします。
   allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: ユーザーが調整された課題の調整ボタンを表示できるようにします。注意：この許可は推奨されません。ユーザーが調整ボタンを表示できるようにするには、成績を有効にします。
   allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
       ユーザーがホームページに新しいお知らせボタンを表示できるようにします。
       ユーザーがお知らせページにお知らせを追加できるようにします。
+  allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: ユーザーがホームページに新しいお知らせボタンを表示できるようにします。
   allows_user_to_view_the_new_announcement_button_in_d21f2922: ユーザーがホームページに新しいお知らせボタンを表示できるようにします。ユーザーがお知らせページにお知らせを追加できるようにします。
   allows_user_to_view_the_new_gradebook_50f53ef0: ユーザーは新しい成績帳をみることができます。
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: ユーザーがコースナビゲーションにディスカッションリンクを表示できるようにします。
+  allows_user_to_view_the_previous_sis_import_dates__1716ddb5: ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
+  allows_user_to_view_the_prior_enrollments_button_i_b04b8132: ユーザーがコースの人物のページで以前の登録ボタンを表示できるようにします。
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "ユーザーが未公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
   allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。ユーザーが未公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
+  allows_user_to_view_the_publish_course_and_unpubli_aac98465: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。"
+  allows_user_to_view_the_reset_course_content_butto_75c8c410: "ユーザーが[コースコンテンツのリセット]ボタンを表示できるようにします。"
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: ユーザーがコースナビゲーションに規定リンクを表示できるようにします。
   allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: ユーザーがコースナビゲーションに規定リンクを表示できるようにします。ユーザーが規定を作成、編集、削除できるようにします。
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "ユーザーがユーザーのログイン情報内で SIS ID を表示できるようにします。"
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "ユーザーは、クイズ項目分析 CSVファイルのユーザーSIS ID列を表示できます。"
+  allows_user_to_view_user_details_for_course_users_ec1b6218: ユーザーがコースユーザーの詳細を閲覧できるようにします。
   allows_user_to_view_user_sis_ids_68a9d218: "ユーザーがユーザーの SIS ID を表示できるようにします。"
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "ユーザーがコースの人物のページのユーザー SIS ID を表示できるようにします。"
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "ユーザーが Student Learning Mastery Gradebook（学生学習達成度成績表）の生徒と保護者のビューの結果にわかりやすい説明を追加できるようにします。"
@@ -3066,6 +3192,7 @@ ja:
   as_of_a036fa2e: （）現在
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: このフィールドに入力すると、結果のリストが自動的に更新されます。
+  ascending_b3c87427: 昇順
   ask_your_instructor_a_question_a61ca5e9: インストラクタに質問する
   assess_and_survey_your_students_ce8172a9: あなたの受講者のサーベイのいずれかにアクセスする
   assess_student_understanding_1e0b8d7f: 受講者の理解度を評価する
@@ -4199,11 +4326,13 @@ ja:
   author_215203d2: 著者
   author_id_570d3131: author_id
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author}（）の%{submission_submittor}用の提出物に新しいコメントが付きました%{assignment}"
+  author_login_id_57aaec4f: author_login_id
   author_name_12d871ff: author_name
   author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name}が %{assignment_title}の%{user_name}への提出物に新しい注釈を付けました"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name}が %{assignment_title}の%{user_name}への提出物に新しいコメントを付けました"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name}が %{assignment_title}の%{user_name}への提出物に新しいコメントを付けました。"
   author_s_name_b35e905a: 著者名
+  author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: 認証する
   authorize_url_f28167a3: URLを承認
   auto_leader_7791c30a: auto_leader
@@ -4388,10 +4517,12 @@ ja:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       Blueprint コースは、管理者がアカウントに対して有効でなければなりません。ページインデックスページの Blueprint ロック設定を編集するには、コース - 追加/編集/削除も有効でなければなりません。管理者 - 管理/更新。
               ただし、コース - 追加/編集/削除が有効になっているが、ページ-更新権限が有効になっていない場合でも、ユーザーは Blueprint マスターコースの個々のページのコンテンツロック設定を調整することができます。
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Blueprint コースは、管理者がアカウントに対して有効でなければなりません。"
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Blueprint コースは、管理者がアカウントに対して有効でなければなりません。
       コースの役割は、Blueprint コースのコンテンツを、Blueprint コースに講師、TA、またはデザイナーの役割として追加する場合にのみ管理できます。
       この設定が無効で、ディスカッション - 表示が有効になっている場合でも、ユーザーは Blueprint マスターコースの個々のディスカッションでコンテンツロック設定を調整できます。
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Blueprint コースは、管理者がアカウントに対して有効でなければなりません。"
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Blueprint コースは、管理者がアカウントに対して有効でなければなりません。コースの役割は、Blueprint コースのコンテンツを、Blueprint コースに講師、TA、またはデザイナーの役割と追加する場合にのみ管理できます。ディスカッション - インデックスページから Blueprint ロック設定を編集するには、ディスカッション - 調整も有効にしなければなりません。"
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint コースは、管理者がアカウントに対して有効でなければなりません。コースの役割は、Blueprint コースのコンテンツを、Blueprint コースに講師、TA、またはデザイナーの役割として追加する場合にのみ管理できます。"
   blueprint_information_95dcef55: 青写真情報
@@ -4420,10 +4551,12 @@ ja:
   bookmarks_5b5b81c9: ブックマーク
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。"
   both_discussions_create_and_discussions_moderate_a_41c29c37: "「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。"
+  both_discussions_create_and_discussions_moderate_a_482e4c7e: "[ディスカッション - 作成]と[ディスカッション - 仲介]のどちらも、ディスカッションページにディスカッションを作成できるようにします。"
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
               コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
+  both_discussions_create_and_discussions_moderate_a_ca6f38a2: "[ディスカッション - 作成]と[ディスカッション - 仲介]のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、[ディスカッション - 作成]は必須ではありません。"
   both_discussions_create_and_discussions_moderate_a_f20cc937: |-
       「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
               コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
@@ -4579,11 +4712,13 @@ ja:
   by_b90c6b6f: 担当者
   by_client_id_4f2fe02c: "依頼者 ID 別"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: デフォルトでは、コースのすべてのリンクが有効になっています。受講生はコンテンツのないセクションへのリンクは参照できません。例えば、クイズを作成していない場合は、受講生はクイズへのリンクを参照できません。コース内に受講生にアクセスさせたくない領域がある場合は、このようなリンクを並べ替えて明示的に無効化することができます。
+  by_default_students_are_able_to_create_groups_to_r_ac2a70bd: "デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、[コース設定で受講生が自分のグループを整理する]チェックボックスを選択しないでください。"
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、
       コース設定で受講生が自分のグループを整理するチェックボックスをオフにします。
   by_default_students_are_able_to_create_groups_to_r_d4901649: デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、コース設定で受講生が自分のグループを整理するチェックボックスをオフにします。
   by_default_students_can_always_create_groups_in_a__149d08b7: "デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、コース - 追加/編集/削除が有効にされていなければなりません。また、コース設定で受講生が自分のグループを整理するチェックボックスがオフにされていなければなりません。"
+  by_default_students_can_always_create_groups_in_a__60ca6e9e: デフォルトでは、受講者はグループを作成できます。
   by_default_students_can_always_create_groups_in_a__af000dd: "デフォルトでは、学生はグループを作成できます。学生によるグループの作成を制限するには、[コース管理：管理者-管理/更新]が有効にされていなければなりません。また、コース設定で「受講生が自分のグループを整理する」チェックボックスがオフになっていなければなりません。"
   by_lti_2_registration_url_e421e523: "LTI 2 登録 URL"
   by_url_a163275e: "URL ごと"
@@ -5260,6 +5395,7 @@ ja:
   changing_course_dates_may_override_term_availabili_d92b10de: コースの日付を変更すると、コースのページやダッシュボード内で有効期間の設定や設置が上書きされることがあります。コースの日付を変更する前には、期間の日付を確認してください。
   changing_section_dates_may_override_course_and_ter_6634950e: セクションの日付を変更すると、コースのページやダッシュボード内でコースや期間の利用可能性の設定や配置が上書きされることがあります。セクションの日付を変更する前には、期間とコースの日付を確認してください。
   changing_the_late_policy_will_affect_previously_gr_49071db7: 今、遅延ポリシーを変更すると、以前に採点した提出に影響を与えます。
+  changing_the_tenant_will_delete_existing_groups_f86c48dc: テナントを変更すると、既存のグループが削除されます。
   changing_your_policy_now_will_affect_previously_gr_62063898: 今、あなたのポリシーを変更すると、以前に採点した提出に影響を与えます。
   chars_written_max_character_length_len_fec9bd18: "%{chars} 書かれたとき、最大文字数%{len}"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: 各課題の受講生の成績の表
@@ -5702,6 +5838,7 @@ ja:
   concluded_63150003: 完了
   concluded_conferences_cdbe53f9: 終了した会議
   concluded_courses_94782e21: 完了したコース
+  concluded_enrollments_8f460271: 終了した登録
   concluded_enrollments_9da8da6: 終了した登録
   conditional_content_7d39e313: 条件付きコンテンツ
   conditional_content_b284da8f: 条件付きコンテンツ
@@ -7208,8 +7345,11 @@ ja:
   course_results_updated_df9d1c95: コースの結果が更新されました。
   course_role_role_type_119c2f64: "コースの役割: %{role_type}"
   course_roles_1314f962: コースの役割
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "コースの役割は、Blueprint コースを教師、TA、またはデザイナーの役割として Blueprint コースに追加する場合にのみ、Blueprint コースを管理できます。"
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "コースの役割は、Blueprint コースを講師、TA、またはデザイナーの役割として Blueprint コースに追加する場合にのみ、Blueprint コースを管理できます。Blueprint コースのサイドバーにアクセスするには、コース - コースの追加/編集/削除が有効でなければなりません。関連するコースを追加するには、コース - 表示リストとコース - 追加/編集/削除も有効でなければなりません。いずれかの Blueprint オブジェクトタイプのロック設定を編集するには、コース - 追加/編集/削除が有効でなければなりません。"
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "コースの役割は、Blueprint コースを教師、TA、またはデザイナーの役割として Blueprint コースに追加する場合にのみ、Blueprint コースを管理できます。関連するコースを管理するには、コース - 表示リストとコースの管理 - 追加も有効でなければなりません。ファイルのロック設定を編集するには、[コース管理:管理者 - 管理/更新]および[コースファイル - 編集]も有効でなければなりません。クイズのロック設定を編集するには、[コース管理：管理者 - 管理/更新]および[課題とクイズ - 追加]も有効にされていなければなりません。"
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "コースの役割は、Blueprint コースのコンテンツを、Blueprint コースに講師、TA、またはデザイナーの役割として追加する場合にのみ管理できます。"
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "コースの役割は、Blueprint コースのコンテンツを、Blueprint コースに講師、TA、またはデザイナーの役割と追加する場合にのみ管理できます。"
   course_roles_d2d5d666: コースの役割
   course_roster_78f70e97: コース名簿
   course_rubrics_881dcf0: コースの注釈
@@ -7856,6 +7996,7 @@ ja:
   courses_account_settings_79e2f748: "コース - アカウント設定"
   courses_add_20891f99: "コース - 追加"
   courses_add_edit_delete_aa2b55d3: "コース - 追加/編集/削除"
+  courses_cannot_be_created_on_the_site_admin_accoun_68053d94: コースはsite_adminアカウントには作成できません。
   courses_change_visibility_9150ff1b: "コース - 可視性を変更"
   courses_conclude_7bf4ce68: "コース - 結論"
   courses_course_templates_5a3fbafd: "コース - コーステンプレート"
@@ -8535,6 +8676,7 @@ ja:
   deprecate_sms_be6b00a: SMSを廃止
   deprecated_59e99d2a: 非推奨
   desc_12ad2869: "%{desc}"
+  descending_b7828162: 降順
   description_436c48d7: 説明
   description_61f4296: "* 説明"
   description_for_mastery_level_position_description_cc17114b: "達成レベル%{position}の説明:%{description}"
@@ -8546,12 +8688,14 @@ ja:
   designers_remove_3e590bff: "デザイナー - 削除"
   details_98a31b68: 詳細
   details_a6f427c3: "詳細:"
+  determines_visibility_and_management_of_outcomes_i_6f390b57: アカウントのナビゲーションで成果の表示と管理を決定します。
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: アカウントのナビゲーションで成果の表示と管理を決定します。ユーザーが、アカウントとコースレベルで成果と成果グループを作成、編集、および削除できるようにします。
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       アカウントのナビゲーションで成果のタブの表示と管理を決定します。
       ユーザーが、アカウントとコースレベルで成果と成果グループを作成、インポート、編集、および削除できるようにします。
   determines_visibility_and_management_of_outcomes_t_8a40bf86: アカウントのナビゲーションで成果のタブの表示と管理を決定します。ユーザーが、アカウントとコースレベルで成果と成果グループを作成、インポート、編集、および削除できるようにします。
   determines_visibility_and_management_of_rubrics_li_83a26d8e: アカウントのナビゲーションでの規定の表示と管理を決定します。ユーザーがコースナビゲーションに規定リンクを表示できるようにします。ユーザーが規定を作成、編集、削除できるようにします。
+  determines_visibility_and_management_of_rubrics_li_9b974d71: アカウントのナビゲーションでの規定の表示と管理を決定します。
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       アカウントのナビゲーションでルーブリックタブの表示と管理を決定します。
       ユーザーがルーブリックを管理できるようにします。
@@ -8560,13 +8704,16 @@ ja:
   determines_visibility_and_management_of_sis_import_bf386823: アカウントのナビゲーションでSISインポートリンクの表示と管理を決定します。
   determines_visibility_and_management_of_the_questi_c57c5b31: アカウントのナビゲーションで質問バンクリンクの表示と管理を決定します。
   determines_visibility_and_management_of_the_questi_fbf70ba9: "問題バンク アカウントのナビゲーションリンクの表示と管理を決定します。"
+  determines_visibility_and_management_of_the_rubric_533da0b8: アカウントのナビゲーションでの規定の表示と管理を決定します。
   determines_visibility_and_management_of_the_rubric_55b55b25: アカウントのナビゲーションでの規定の表示と管理を決定します。ユーザーが規定を作成、編集、削除できるようにします。
+  determines_visibility_of_sis_import_link_in_accoun_53da8632: アカウントのナビゲーションでSISインポートリンクの表示を決定します。
   determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: アカウントのナビゲーションでSISインポートリンクの表示を決定します。ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
   determines_visibility_of_sis_import_tab_in_account_3d48272d: アカウントのナビゲーションでSISインポートタブの表示を決定します。ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       アカウントのナビゲーションでSISインポートタブの表示を決定します。
       ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
   determines_visibility_of_the_course_activity_optio_2446c4b3: 管理ツールのログのタブでコースアクティビティのオプションの表示を決定します。ユーザーがアカウントのコース活動情報を表示できるようにします。
+  determines_visibility_of_the_course_activity_optio_6dc5ceb9: 管理ツールのログのタブでコースアクティビティのオプションの表示を決定します。
   determines_visibility_of_the_grade_change_activity_6c23036b: 管理ツールのログのタブで成績変更アクティビティのオプションの表示を決定します。
   determines_whether_a_publish_button_is_included_in_f7ad9b56: "非公開コースのコースカード（カードビューダッシュボード）に[公開]ボタンを含めるかどうかを決定します。"
   determines_whether_a_publish_course_option_is_incl_9bf770e9: コースの公開オプションをコースのホームページに含めるかどうかを決定します。
@@ -11214,6 +11361,7 @@ ja:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "グレードブックとSpeedGraderは、両方の成績 - 編集と成績 - すべての成績を表示が無効になっている場合、アクセスできなくなります。"
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "グレードブックとSpeedGraderは、両方の成績 - 編集と成績 - すべての成績を表示が無効になっている場合、アクセスできなくなります。"
   gradebook_context_name_9dbae5bc: "成績表 - %{context_name}"
+  gradebook_csv_export_assignment_order_matches_the__9044f08e: 成績表CSVエクスポートの課題の順番が成績表のグリッドと一致する
   gradebook_csv_headers_include_grading_period_1015185c: 成績表のCSVヘッダーには成績評価期間が含まれます
   gradebook_csvs: 
     grades_filename: 成績
@@ -12570,6 +12718,7 @@ ja:
   how_is_the_grade_determined_bb75bf53: 成績を決め方は？
   how_is_this_affecting_you_b3b6a639: この問題はどのくらい深刻ですか?
   how_many_minutes_ecca5ee7: 何分ですか?
+  however_if_these_additional_permissions_are_enable_35d3082c: "ただし、追加権限が有効になっているで、[ページ - 更新]権限が有効になっていない場合でも、ユーザーは Blueprint マスターコースの個々のページのコンテンツロック設定を調整することができます。"
   html5_first_videos_description: |-
       Canvas は、デフォルトでは Flash を優先的に使用してビデオの再生を試みます。HTML5 を優先して使用し、
       その後に Flash での再生を試みる場合は、この設定を有効にします。
@@ -12632,6 +12781,7 @@ ja:
   if_an_enrollment_is_created_via_sis_only_admins_ca_205e9a3c: |-
       SISを介して登録が作成された場合、管理者のみがコースから登録を削除できます。
               SIS IDを介してユーザーを削除するには、SISデータ管理も有効でしなければなりません。
+  if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: 登録がSISを介して作成された場合、管理者のみがコースから登録を削除できます。
   if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       プレースメントで構成されたLTIツールがインストールされている場合、
       課題提出タイプドロップダウンに新しいエントリが表示され、ツールの課題を迅速に構成できます
@@ -12639,7 +12789,11 @@ ja:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   if_commons_is_installed_allows_importing_favorited_eff368f: Commonsがインストールされている場合、お気に入りのコンテンツアイテムをCanvasからインポートできます。
+  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "[コースの内容 - 追加/編集/削除]が有効で、[受講生コラボレーション - 作成]が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。"
+  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "[コースの内容 - 追加/編集/削除]が有効で、[受講生コラボレーション - 作成]が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。"
+  if_course_visibility_is_limited_to_users_enrolled__ab1b1517: コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: コース-追加/編集/削除およびコース-削除取り消しも有効になっている場合、アカウントレベルのユーザーは、管理ツールで削除されたコースを復元できます。
+  if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "[コース - 追加]のアクセス許可が有効で、[コース - 表示リスト]が無効な場合、ユーザーはアカウント設定内の新しいコースを追加のボタンを使用して新しいコースを追加できます。"
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: 無効にすると、結果ページは読み取り専用になり、管理ルーブリックボタンが非表示となります。ユーザーは、課題からて個々の課題ルーブルに引き続きアクセスすることができます。
   if_disabled_user_can_still_view_and_download_files_336ffc30: 無効にしても、ユーザーは引き続きファイルを表示してzipファイルにダウンロードできます。
   if_disabled_user_will_still_have_access_to_course__541e130: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
@@ -12652,6 +12806,7 @@ ja:
               コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、
               ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
   if_disabled_user_will_still_have_access_to_course__d78fddc4: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
+  if_disabled_user_will_still_have_access_to_course__fbf32c87: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "有効にすると、LTI 1.3およびLTI Advantage へのアクセスが有効になります。"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上が規定で許可されます。
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
@@ -12713,15 +12868,23 @@ ja:
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: そう設定されている場合、成績計算機は合計を計算するときに未提出の匿名の課題を無視します。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: 設定されている場合、成績表CSVエクスポータが選択された評価期間のタイトルを評価期間に基づいて値が変化する列ヘッダーに追加します。
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: そう設定されている場合、成績表は課題の読み込みを切り離し、これを選択された採点期間の課題に読み込みます。
+  if_set_the_order_of_assignments_in_gradebook_csv_e_bf5c663e: 設定されている場合、成績表CSVエクスポートの割り当ての順序は、成績表グリッドの順序と一致します。
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: 設定されている場合、採点期間終了時に、課題のSISへの掲載機能をオフにします。「新しいSIS統合設定を有効にする」機能が有効な場合にのみ適用されます。
+  if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "[SIS データ - 管理]が無効で、[SISデータ - 読み取り]が有効な場合、ユーザーはコース、ユーザー、およびサブアカウントの SIS ID のみを表示できます。"
+  if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "[SISデータ - 管理]が有効で[SISデータ - 読み取り]が無効な場合、アカウントのアクセス権限はコースの権限に優先されます。"
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_statistics_view_or_users_manage_login_details_i_da650b69: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
+  if_the_additional_permissions_are_enabled_but_this_619c2a4a: 追加の権限が有効になっているが、この権限が有効になっていない場合は、個々のディスカッションでロック設定を編集することができます。
+  if_the_course_content_permission_enabled_and_web_c_85f91e32: "コースの内容許可が有効で、[ウェブ会議 - 作成]が無効の場合、ユーザーは引き続き会議を管理できます。"
+  if_the_open_registration_account_setting_is_enable_10b1965c: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、デザイナーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してコースページからデザイナーをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_1994a971: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、TAに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してTAをコースに追加できます。"
+  if_the_open_registration_account_setting_is_enable_1e679e07: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、TAに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してコースページからTAをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_2cc15467: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、TAがまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介してコースページからTAをコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
               アカウントの「コース」ページにアクセスするには、コース - リストの表示が有効になっていなければなりません。
+  if_the_open_registration_account_setting_is_enable_2f43fcc0: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、ユーザーが Canvas アカウントをまだ持っていない場合であっても、電子メールアドレスまたはログインIDを使用してコースの人物のページからコースに追加することができます。"
   if_the_open_registration_account_setting_is_enable_3cbed3ad: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、受講生がまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介してコースページから受講生をコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
@@ -12730,6 +12893,7 @@ ja:
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、設計者がまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介して人物ページから設計者をコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。登録がSISを介して作成された場合、管理者のみがコースから登録を削除できます。SIS ID を使用してコースにユーザーを削除するには、SIS データ - 管理も有効にされていなければなりません。
   if_the_open_registration_account_setting_is_enable_43bfe76c: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、デザイナーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してデザイナーをコースに追加できます。"
+  if_the_open_registration_account_setting_is_enable_474c98c2: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、デザイナーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して人物のページからデザイナーをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_519e246f: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、オブザーバーがまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介して人物ページからオブザーバーをコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
@@ -12745,16 +12909,20 @@ ja:
               登録がSISを介して作成された場合、管理者のみがコースから登録を削除できます。
               SIS IDを経由てユーザーを削除するには、SISデータ管理も有効になっていなければなりません。
   if_the_open_registration_account_setting_is_enable_6aaf8ead: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、教員に Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して教員をコースに追加できます。"
+  if_the_open_registration_account_setting_is_enable_87662428: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、オブザーバーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してコースページからオブザーバーをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_88d349f8: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、オブザーバーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してオブザーバーをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_95ada4ab: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、講師がまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介して人物ページから講師をコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
               登録がSISを介して作成された場合、管理者のみがコースから登録を削除できます。
               SIS IDを経由てユーザーを削除するには、SISデータ管理も有効になっていなければなりません。
+  if_the_open_registration_account_setting_is_enable_99a8a04a: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、ユーザーが Canvas アカウントをまだ持っていない場合であっても、電子メールアドレスまたはログインIDを使用してコースのコースのページからコースに追加することができます。"
+  if_the_open_registration_account_setting_is_enable_9ca710e2: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、講師に Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してピープルのページから講師をコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_9db0bc16: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、講師がまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介してコースページから講師をコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
               アカウントの「コース」ページにアクセスするには、コース - リストの表示が有効になっていなければなりません。
+  if_the_open_registration_account_setting_is_enable_9e63fda6: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、オブザーバーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して人物のページからオブザーバーをコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_a2b9c5e6: |-
       オープン登録アカウント設定が有効になっている場合、この権限を持つユーザーは、設計者がまだCanvasアカウントを持っていない場合でも、メールアドレスまたはログインIDを介してコースページから設計者をコースに追加できます。
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
@@ -12764,13 +12932,19 @@ ja:
               SIS IDを介してユーザーを追加するには、SISデータ - 管理も有効になっていなければなりません。
               登録がSISを介して作成された場合、管理者のみがコースから登録を削除できます。
               SIS IDを経由てユーザーを削除するには、SISデータ管理も有効になっていなければなりません。
+  if_the_open_registration_account_setting_is_enable_b6fdaab4: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、TAに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して人物のページからTAをコースに追加できます。"
+  if_the_open_registration_account_setting_is_enable_e7f97cf0: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、講師に Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用してコースのページから講師をコースに追加できます。"
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、受講生またはオブザーバーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して受講生またはオブザーバーをコースに追加できます。"
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "[ページ - 更新]の権限を無効にしても、ユーザーは Blueprint マスターコースの個々のページでコンテンツロックの設定を調整できます。"
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "この追加の権限が有効ではないのに、[課題とクイズ - 追加/編集/削除]が有効になっている場合、課題の Blueprint ロック設定は課題の詳細ページから管理できます。"
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "この権限が無効で、コース - 追加/編集/削除が有効になっている場合、ユーザーはアカウント設定の新しいコースの追加ボタンで新しいコースを追加できます。"
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
       この権限が無効で、コース - 追加/編集/削除が有効になっている場合、
       ユーザーはアカウント設定の新しいコースの追加ボタンで新しいコースを
       追加できます。
   if_this_permission_is_disabled_and_manage_courses__8fbc2efe: "この権限が無効で、[コース管理 - 追加]が有効になっている場合、ユーザーはアカウント設定の[新しいコースを追加ボタン]で新しいコースを追加できます。"
+  if_this_permission_is_disabled_and_users_view_logi_9dbd9236: "この権限が有効で、[ユーザー - ログインIDの表示]が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。"
+  if_this_permission_is_disabled_at_the_account_leve_1b0e403f: この権限が無効な場合、ユーザーはアカウントレベルでは既存のアカウントグループを表示できません。コースレベルでは、ユーザーは受講生が作成したグループを含め既存のグループを表示できますが、アクセスはできません。
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "この権限が無効な場合、ユーザーはアカウントレベルでは既存のアカウントグループを表示できません。コースレベルでは、ユーザーは受講生が作成したグループを含め既存のグループを表示できますが、アクセスはできません。グループを表示するには、ユーザー - 表示リストも有効でなければなりません。CSV経由でアカウントレベルのグループを追加するには、SISデータインポートも有効でなければなりません。"
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "この権限が無効な場合、ユーザーはアカウントレベルでは既存のアカウントグループを表示できません。コースレベルでは、ユーザーは受講生が作成したグループを含め既存のグループを表示できますが、アクセスはできません。グループを表示するには、ユーザー - 表示リストも有効でなければなりません。CSV経由でアカウントレベルのグループを追加するには、SISデータインポートも有効でなければなりません。"
   if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "この権限が無効な場合、ユーザーはアカウントレベルでは既存のアカウントグループを表示できません。コースレベルでは、ユーザーは受講生が作成したグループを含め既存のグループを表示できますが、アクセスはできません。グループを表示するには、ユーザー - 表示リストも有効でなければなりません。CSV経由でアカウントレベルのグループを追加するには、SISデータインポートも有効でなければなりません。"
@@ -12778,7 +12952,9 @@ ja:
   if_this_permission_is_disabled_users_can_only_view_b68143d5: この権限が無効な場合、ユーザーは受講生が作成したグループを含む既存のグループのみを表示できます。
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "この権限を無効にしても、課題とクイズ - 追加/編集/削除が有効になっている場合、ユーザーは依然として課題にルーブリックを作成または追加できます。"
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "この権限が無効になっていても、ユーザーは Canvas アプリセンターから承認されたアプリをインストールすることができます（貴機関で有効にされている場合）。さらに、この権限が無効になっていると、ユーザーは手動で追加した外部アプリを削除できません。"
+  if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "この権限が無効になっていても、ユーザーは Canvas アプリセンターから承認されたアプリをインストールすることができます（貴機関で有効にされている場合）。"
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "このアクセス許可が有効で、コース - 表示リストの表示が無効な場合、ユーザーはアカウント設定内の新しいコースを追加のボタンを使用して新しいコースを追加できます。"
+  if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "この権限が有効で、[ユーザー - プライマリ電子メールアドレスの表示]が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。"
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。ユーザーがコースレベルで SIS ID を管理できないようにするには、SIS データ - 管理および SIS データ - 読み取りの両方が無効にされていなければなりません。SIS ID 経由でコースにユーザーを追加するには、ユーザーがコースおよび/またはユーザーの追加/削除 - コースの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。"
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。ユーザーがコースレベルでSISIDを管理できないようにするには、SISデータ-管理とSISデータ-読み取りの両方を無効にする必要があります。
@@ -12786,6 +12962,8 @@ ja:
   if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
       この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。ユーザーがコースレベルで SIS ID を管理できないようにするには、SIS データ - 管理および SIS データ - 読み取りの両方が無効にされていなければなりません。
       SIS ID 経由でコースにユーザーを追加するには、ユーザーがコースおよび/またはユーザーの追加/削除 - コースの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。
+  if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "この権限が有効な場合、ユーザーSIS データ - 読み取り許可が有効であることを必要としません。アカウントの権限は、コースの権限に優先します。"
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "この設定が無効で、ディスカッション - 表示が有効になっている場合でも、ユーザーは Blueprint マスターコースの個々のディスカッションでコンテンツロック設定を調整できます。"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
@@ -12909,6 +13087,7 @@ ja:
   improved_learning_mastery_gradebook_8628d06a: 改善された学習達成度の成績表
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: モジュールからの新しいクイズの作成を含む、モジュールによる新しいクイズサポートを改善
   improved_outcomes_management_4692f886: 成果管理の改善
+  improved_support_for_taking_new_quizzes_from_withi_4dbc794e: モジュール内から新しいクイズを受けるためのサポートを改善しました
   improved_visual_reminders_to_encourage_instructors_f203c7f: コースを公開するように講師を促すために改善された視覚的リマインダ
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: 学習達成度の成績表内のユーザーエクスペリエンスを強化するためになされた改善。
   in_a_few_seconds_538ddff3: 数秒で
@@ -12933,6 +13112,7 @@ ja:
   inactive_34365329: 無効
   inactive_cd40317f: 非アクティブ
   inactive_enrollments_3b84be3d: 不活発な登録
+  inactive_enrollments_bd1831ea: 非アクティブな登録
   inbox_bb245a60: 受信トレイ
   include_a_download_link_next_to_each_file_link_in__481761de: RCEの各ファイルリンクの横にダウンロードリンクを含める
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "*Jing* などを使用するスクリーンキャスト/スクリーンショットへのリンクを含めます。"
@@ -14044,6 +14224,8 @@ ja:
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 登録状況を管理し、グループを作成し、このページからユーザーを追加する。
   manage_grading_schemes_in_context_name_e3678273: "%{context_name}における採点スキームの管理"
   manage_group_group_name_ac8578c6: "グループ %{group_name} の管理"
+  manage_home_4fc3480b: ホームを管理する
+  manage_home_for_coursename_5e5c7661: "%{courseName}のホームを管理する"
   manage_item_name_6118d4b0: "%{item_name}を管理"
   manage_line_items_244b289f: ライン項目を管理
   manage_module_name_dfe16816: "%{module_name}を管理"
@@ -16699,6 +16881,7 @@ ja:
   new_quizzes_assignment_build_button_72b6531a: 新しいクイズ割り当てビルドボタン
   new_quizzes_banks_migrations_9ab4de4a: 新しいクイズバンクの移行
   new_quizzes_dbda7e0a: 新しいクイズ
+  new_quizzes_embedded_module_progression_cd2307b6: 新しいクイズ組み込みモジュールの進行
   new_quizzes_importing_c167dce0: 新クイズのインポート
   new_quizzes_migration_during_course_import_copy_e9dd124e: コースのインポート/コピー中の、新しいクイズの移行
   new_quizzes_migration_enabled_by_default_5f9bcc81: デフォルトで有効になっている新しいクイズの移行
@@ -16751,6 +16934,7 @@ ja:
   nickname_1e6da3ad: ニックネーム
   nickname_7df95b09: "ニックネーム:"
   no_74e9b590: いいえ
+  no_additional_details_were_added_for_this_assignme_547c0de7: この課題の詳細は追加されていません。
   no_alignments_are_available_for_this_outcome_7f8346f9: この結果には位置調整はありません。
   no_allowed_domains_b6633d12: 許可されていないドメイン
   no_announcements_280df147: アナウンスメントなし
@@ -16934,6 +17118,7 @@ ja:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "注: コースの開始日や終了日から外れているアイテムがあります"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "注: 受講生が未採点の課題の作業内容を提出しています。ここで成績を投稿する場合は、直近の提出物を採点してから受講生のスコアを再投稿する必要があります。"
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "注意: サブアカウントのテーマは、このプレビュー中はアクティブではありません。"
+  note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: 注意：同期は、コース登録の変更によってトリガされます。初めてMicrosoftSyncを有効にするときは、下のボタンを使用して手動で同期をトリガしなければなりませんする。
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Eメールは常に、Microsoft のユーザーのプロファイルに取り込まれるとは限りらないことに注意してください。OIDは、個人のマイクロソフトアカウントに取り込まれません。　"
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: いくつかの属性は、Cleverのすめてのユーザーを取り込むとは限らないことに注意してください。
   note_this_is_not_your_official_score_f2d4582f: "*注*:これは公式スコアではありません。"
@@ -17994,6 +18179,7 @@ ja:
   please_select_a_user_role_for_this_link_9fb4e655: このリンクのユーザーの役割を選択してください。
   please_select_an_item_30c287ef: 項目を選択してください。
   please_select_one_f931e883: "1 つ選択してください"
+  please_try_again_4c3d11b4: もう一度やり直してください
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 課題またはモジュールアイテムインターフェイスでツールを再選択して保存することにより、ツールへの接続を再確立してみてください。
   please_upload_files_as_a_zip_5a2c799f: "ファイルは .zip 形式でアップロードしてください"
   please_wait_2b646bc2: お待ちください。
@@ -19224,6 +19410,7 @@ ja:
       show_details: 問題の詳細情報の表示
   question_banks_45bdf347: 問題バンク
   question_banks_account_navigation_9a7ab7c2: 問題バンク（アカウントナビゲーション）
+  question_banks_courses_dd907ecf: 質問バンク（コース）
   question_banks_view_and_link_e6d9cde2: "問題バンク - 表示とリンク"
   question_banks_view_and_link_to_f1bca68b: "質問バンク - 表示とリンク"
   question_f06476d1: 質問
@@ -20858,6 +21045,7 @@ ja:
   remove_all_course_observer_members_4622c70d: すべてのコースオブザーバーメンバーを削除
   remove_all_group_observer_members_af5675f3: すべてのグループオブザーバーメンバーを削除
   remove_as_front_page_2698aa12: フロントページとして削除
+  remove_as_frontpagetext_133cdaee: "%{frontPageText}として削除する"
   remove_association_1412eabf: 関連付けを削除
   remove_attachment_ceae0973: 添付ファイルの削除
   remove_attendee_name_55165070: "出席者を削除する%{name}"
@@ -20895,6 +21083,10 @@ ja:
   remove_observers_from_courses_703edc34: オブザーバーをコースから削除
   remove_outcome_20e16da7: 結果を削除しますか？
   remove_outcome_2feaf5fd: 結果を削除する
+  remove_outcomes_5f8b601c: 
+    one: 結果を削除する
+    other: 結果を削除する
+  remove_outcomes_9abcc8fd: 結果を削除しますか？
   remove_placement_90862c13: "%{placement}を削除する"
   remove_points_from_rubric_dcd4b585: ルービックからポイントを削除する
   remove_pronouns_5ff760ff: 代名詞を削除する
@@ -21060,6 +21252,7 @@ ja:
   retrieval_of_received_shares_failed_6c5583e3: 受信した共有の取得に失敗しました
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   retrieving_content_ed0b9b33: コンテンツを取得
+  retrieving_tool_51709735: ツールを取得する
   retry_duplicating_original_assignment_name_90b83bb8: "\"%{original_assignment_name}\"の重複を再試行"
   retry_duplicating_originalassignmentname_884aee1: "\"%{originalAssignmentName}\"の重複を再試行"
   retry_ebd5f8ba: 再試行
@@ -22766,6 +22959,7 @@ ja:
   show_by_type_c5d61732: タイプごとに表示
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 件名が一行に収まらない場合、複数の行の上の月の表示にカレンダーのイベントが表示されます。
   show_concluded_enrollments_6a05544c: 完了した登録の表示
+  show_contributing_scores_7674c46f: 貢献スコアを表示する
   show_correct_answers_at_30c37e01: 正解を表示
   show_correct_answers_at_a5475aa3: 正解を表示
   show_course_sections_for_course_name_5f715702: "コース用コースセクションを表示する%{name}"
@@ -22801,6 +22995,7 @@ ja:
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "コースとユーザーデータの新しい分析を表示します。新しい分析にデータが表示されるまで、この機能フラグをオンに設定してから 24 時間かかる場合があります。"
   show_new_quizzes_on_the_quizzes_page_b2db14d8: クイズページに新しいクイズを表示する
   show_notes_column_22d2b6c1: メモ列を表示
+  show_older_replies_e85891b3: 古い返信を表示する
   show_one_question_at_a_time_271e346d: "一度に 1 つの問題を表示する"
   show_only_blueprint_courses_9fb37b41: 青写真コースのみを表示する
   show_originality_report_to_students_be22f5ee: 受講生に独創性レポートを表示する
@@ -23013,6 +23208,8 @@ ja:
   sort_by_72dbba9c: 並べ替え基準
   sort_by_e75f9e3e: 分類する
   sort_courses_cf94b8d4: コース並べ替え
+  sort_outcome_column_c53702ed: 結果列の並べ替え
+  sort_students_1a561e98: 受講者の並べ替え
   sortable_name_73f707cf: 並べ替え可能な名前
   sortable_name_e25fe66c: 並べ替え可能な名前：
   sorted_ascending_1f9b52c6: 昇順に並べ替え
@@ -23345,6 +23542,7 @@ ja:
   students_will_automatically_receive_full_credit_on_cc61df39: 受講生は、このサーベイに回答すると、自動的に全単位を取得します
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: 受講生​は、この課題の成績が非表示になっていることを確認できます。
   students_with_no_submissions_title: 提出物のない受講生
+  students_without_assessments_eb100e60: アセスメントのない受講者
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{totalStudentsEnrolled} 受講生中 %{studentsPerRangeCount} "
   sub_account_daeadd0: サブアカウント
   sub_accounts: 
@@ -23378,9 +23576,12 @@ ja:
       other: "%{count} 件のサブアカウント"
   sub_accounts_can_choose_one_of_three_options_b0dfe46a: サブアカウントは、3つのオプションのうち1つを選択できます：
   subaccount_91f4c279: サブアカウント
+  subaccount_admins_are_not_able_to_view_sis_informa_a9690589: サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。
+  subaccount_admins_cannot_view_sis_information_with_15a41444: サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
   subaccount_navigation_account_settings_add9eff9: サブアカウントナビゲーション（アカウント設定）
   subaccount_settings_8549eff7: サブカウント設定
   subaccounts_efd02bd4: サブカウント
+  subaccounts_only_have_ownership_of_courses_and_sec_56385a91: サブカウントはコースとセクションの所有権しか持ちません。ユーザーデータは所有していません。サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。
   subdomain_url_1e43b6f0: サブドメインURL
   subject_114b2e98: 件名
   subject_1bc03dea: 件名：
@@ -23899,6 +24100,7 @@ ja:
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
       分析ページを表示するには、アカウント設定で分析機能が有効でなければなりません。
       ユーザーページのユーザーサイドバーにある分析リンクを表示するには、アカウントでプロファイルが無効でなければなりません。
+  the_analytics_feature_must_be_enabled_in_account_s_869b63a2: 分析ページを表示するには、アカウント設定で分析機能が有効でなければなりません。
   the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
       分析ページを表示するには、アカウント設定で分析機能が有効でなければなりません。
       ユーザーページのユーザーサイドバーにある分析リンクを表示するには、アカウントでプロファイルが無効でなければなりません。
@@ -23977,6 +24179,9 @@ ja:
                        これらのドメインを削除するには、関連するツールを削除してください。
   the_following_errors_occurred_bdec1e44: 以下のエラーが起こりました：
   the_following_fields_are_invalid_fields_b3565800: "次のフィールドは無効です: %{fields}"
+  the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
+    one: コンテンツと合わせているため、以下の成果は削除できません。選択解除してもう一度やり直してください。
+    other: コンテンツと合わせているため、以下の成果は削除できません。選択解除してもう一度やり直してください。
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       次の時効性は、クイズの送信に変更を保存していません。
       
@@ -24061,6 +24266,7 @@ ja:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: レポーティングユーザの役割(生徒、教師、管理者等)
   the_salesforce_account_id_if_it_exists_e7949706: セールスフォースアカウントID(もしあれば)
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: スケジューラーツールを使用すると、受講生(または受講生のグループ)がサインアップすることができるタイムスロットを設定できます。下のボタンをクリックして開始できます。
+  the_search_returned_no_results_cd9eee1e: 検索結果は返されませんでした
   the_selected_group_was_cleared_because_the_student_656e4f1c: リクエストした学生はどのグループにも属していないため、選択したグループは消去されました。成績表内でグループを選択できます。
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: ドロップダウンメニューからユーザによって選択された問題の深刻度。
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "iOS/Android デバイスのショートカット アイコン。180x180 png"
@@ -24338,12 +24544,15 @@ ja:
   this_is_a_preview_of_the_published_version_of_the__70e0c8: これは、クイズの公開バージョンのプレビューです
   this_is_a_siteadmin_test_feature_flag_3ab5184: "これは SiteAdmin テスト機能フラグです"
   this_is_a_what_if_score_cbdc04f9: "これは what-if (仮の事態を想定した) スコアです"
+  this_is_an_account_setting_that_must_be_enabled_by_8ced660: これは、カスタマーマネジャーによって有効にされなければならないアカウント設定です。アラートは、受講生、講師、または管理者に特定のトリガ（たとえば、受講生と講師が7日間やり取りなし）のアラートを送信するようにデザインされる、めったに使用されない機能です。毎日チェックされ、誘発される問題が解決されるまで、受講生および/または講師に通知が送信されます。
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: これは、カスタマーマネジャーによってオンにされなければならないアカウント設定です。
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "これは、あなたの言語を通常 RTL に変更することなく、RTL 環境でページがどのように表示されるかをプレビューするためのオンデマンド機能です。"
   this_is_not_a_valid_grade_9cc2cb8: これは有効な成績ではありません
+  this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: これは技術的にはセキュリティの脆弱性ですが、一部の学校ではしばらくワークフローを維持する必要があります。
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: この成績は、現在この受講生に対して選択されています。
   this_is_the_default_email_address_f3c421fb: これは、デフォルトのメールアドレスです
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "これは新しい機能プレビュー UI です。現在は読取専用です。古い UI に戻るには、ボタンをクリックします。これで、「新しい機能フラグ」機能が無効になり、ページが更新されます。"
+  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: これは、ホームが完成したときに着陸する場所です。
   this_is_your_course_landing_page_33d445ec: これは、あなたのコースのランディングページです！
   this_is_your_course_landing_page_f87a920d: これは、あなたのコースのランディングページです！
   this_is_your_current_theme_4331709b: これは現在のあなたのテーマです
@@ -24401,6 +24610,7 @@ ja:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       この権限は、アカウントレベルでのユーザーの追加のみを制御します。コースにユーザーを追加するには、
       ユーザー - コースまたはユーザーからの受講生の追加/削除 - コースのコースから講師、コースデザイナー、またはTAの追加/削除が有効にされていなければなりません。
+  this_permission_should_only_be_assigned_to_users_t_231c182e: "この権限は、Canvas アカウント全体で他のユーザーとして行動することを教育機関が許可したユーザーにのみ割り当ててください。"
   this_placement_requires_deep_link_support_by_the_v_702d554f: この配置には、ベンダーによるディープリンクサポートが必要です。ベンダーのツールに問い合わせて、彼らがこの機能をサポートしているかどうか確認します
   this_pronoun_appears_after_last_name_bf5c0bf5: この代名詞は、姓の後に表示されます
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: この代名詞は、有効にすると名前の後に表示されます。
@@ -24727,6 +24937,7 @@ ja:
   to_1126ab55: ～へ
   to_35c6baa2: ～
   to_51406be9: 変更後
+  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "コースの人物のページにアクセスするには、[ユーザー - 表示リスト]も有効にされていなければなりません。"
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "課題またはグレードブックを使って課題提出にアクセスして　SpeedGrader内で表示するには、成績 - すべての成績または成績を表示する - 編集も有効にされていなければなりません。"
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       課題とSpeedGraderを介して課題提出にアクセスするには、成績 - 編集も有効にされていなければなりません。
@@ -24734,19 +24945,22 @@ ja:
   to_access_assignment_submissions_through_assignmen_ecbb8fb7: |-
       課題とグレードブックを介して課題提出にアクセスするには、
       成績 - すべての成績を表示するも有効にされていなければなりません。
-  to_access_the_account_courses_page_courses_view_li_e1da6165: "アカウントコースページにアクセスするには、コース - 表示リストが有効にされていなければなりません。"
+  to_access_the_account_courses_page_courses_view_li_e1da6165: "アカウントコースページにアクセスするには、[コース - 表示リスト]が有効にされていなければなりません。"
   to_access_the_account_settings_tab_account_level_s_9676d44b: "[アカウント設定]タブにアクセスするには、[アカウントレベルの設定 - 管理]が有効にされていなければなりません。"
+  to_access_the_assignments_index_page_course_conten_49d884f2: "課題のインデックスページにアクセスするには、[コース内容 - 表示]が有効にされていなければなりません。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "課題のインデックスページにアクセスするには、コース内容 - 表示が有効有効にされていなければなりません。課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
-  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "アカウントナビゲーションのコースリンクにアクセスするには、コース - 表示リストが有効にされていなければなりません。"
+  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "アカウントナビゲーションのコースリンクにアクセスするには、[コース - 表示リスト]が有効にされていなければなりません。"
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
       アカウントナビゲーションの[コース]リンクにアクセスするには、[コース - ビュー]リストが有効にされていなければなりません。
               コース-追加が有効で、コース-ビューリストが無効の場合、ユーザーはアカウント設定の[新しいコースの追加]ボタンを使用して新しいコースを追加できます。
               削除されたコースを復元するには、[コース - 削除]、[コース - 削除解除]、および[コースコンテンツ - 表示]も有効ににされていなければなりません。
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "アカウントナビゲーションの[コース]リンクにアクセスするには、[コース管理:管理者 - 管理/更新]および[コース - リスト表示]が有効でなければなりません。"
+  to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "クイズインデックスページの問題バンクの管理リンクにアクセスするには、[コース内容 - 表示]と[課題とクイズ - 追加/編集/削除]も有効にされていなければなりません。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "人物ページにアクセスしてグループを表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、ユーザーが Canvas アカウントをまだ持っていない場合でも、電子メールアドレスを使用してコースに追加することができます。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。受講生のセクションを編集するには、ユーザー - 表示リストと会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。"
   to_access_the_people_page_users_view_list_must_be__2f01333b: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。この権限が有効で、ユーザー - プライマリ電子メールアドレスの表示が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。ログインIDを表示するには、コース内の受講生の追加/削除 - コース内の講師、コースデザイナー、またはTAの追加/削除も有効にする必要があります。"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。"
+  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "人物ページにアクセスするには、「ユーザー - 表示リスト]が有効にされていなければなりません。"
   to_access_the_people_page_users_view_list_must_be__6f42bf9e: "人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。"
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       人物ページにアクセスするには、ユーザー - 表示リストが有効にされていなければなりません。
@@ -24764,17 +24978,26 @@ ja:
       この権限が有効で、ユーザー - プライマリ電子メールアドレスの表示が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。
   to_access_the_student_interactions_report_courses__e8432cd0: "受講生やり取りレポートにアクセスするには、成績 - 「すべての成績を表示する」も有効にされていなければなりません。"
   to_access_the_student_interactions_report_grades_v_69105662: "受講生やり取りレポートにアクセスするには、成績 - 「すべての成績を表示する」も有効にされていなければなりません。"
+  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "他のユーザーとして操作するためには、[（）として操作する]が有効にされていなければなりません。"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "SMSをアクティブにするには、%{sms_number}に送付した4文字の確認コードを入力してください。"
   to_activate_this_communication_channel_enter_the_f_f465efc5: "この通信チャンネルを有効にするには、%{sms_number} に送信された4文字の確認コードを入力してください。"
+  to_add_a_course_group_to_a_collaboration_group_vie_36a5d341: コラボレーションにコースグループを追加するには、すべての受講生のコース表示も有効にされていなければなりません。
+  to_add_a_course_group_to_a_collaboration_groups_ad_7e51136a: コラボレーションにコースグループを追加/編集/削除も有効にされていなければなりません。
+  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "SIS ID を使用してコースにユーザーを追加するには、[SIS データ - 管理]も有効にされていなければなりません。"
+  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: CSV経由でアカウントレベルのグループを追加するには、SISデータインポートも有効でなければなりません。
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "アナウンスを追加するには、ディスカッション - 調整が有効にされていなければなりません。ホームページで最新のアナウンスを表示するには、コース設定でコースのホームページに最新のアナウンスを表示するチェックボックスが選択されていなければなりません。"
+  to_add_announcements_discussions_moderate_must_als_a83fd681: "アナウンスを追加するには、[ディスカッション - 調整]が有効にされていなければなりません。"
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "関連するコースを追加するには、Blueprint コース - 追加/編集/関連/削除および[コース管理 - 追加]も有効でなければなりません。"
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "関連するコースを追加するには、Blueprint コース - 追加/編集/関連/削除とコース - 追加/編集/削除も有効でなければなりません。"
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "ユーザー、コース、および登録を一括で追加するには、「SIS インポート」をクリックします。"
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "グループを追加、編集、または削除するには、グループ - 追加/編集/削除も有効にされていなければなりません。"
   to_add_individual_courses_click_courses_c5355180: 個々のコースを追加するには、「コース」をクリックします。
   to_add_individual_users_click_people_4d6de56a: 個々のユーザーを追加するには、「人」をクリックします。
+  to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "受講者をコースに追加またはコースから削除するには、[ユーザー-受講者のアクセス許可]が有効にされていなければなりません。"
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "コースにユーザーを追加または削除するには、適切なユーザー権限が有効になっていなければなりません（例：ユーザー - 講師）。"
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "コースにユーザーを追加または削除するには、適切なユーザー権限が有効になっていなければなりません（例：ユーザー - 講師）。受講生のセクションを編集するには、ユーザー - コースでの管理アクションを許可し、ユーザー-リストの表示も有効にされていなければなりません。"
+  to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "SISを介してコースにユーザーを追加または削除するには、適切なユーザー権限が有効になっていなければなりません（例：ユーザー - 講師）。"
+  to_add_students_to_a_collaboration_users_view_list_806a5935: "受講生をコラボレーションに追加するためには、[ユーザー - 表示リスト]も有効にされていなければなりません。"
   to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "調整セットに受講生を追加するには、成績 - すべての成績を表示するも有効にされていなければなりません。"
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "コースにユーザーを追加するには、ユーザー - コースからの受講者の追加/削除、および/またはユーザー - コースからの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。受講生のセクションを編集するには、会話 - 個々のコースメンバーとユーザーにメッセージを送信する - コースから受講生を追加/削除も有効にされていなければなりません。講師、コースデザイナー、またはTAセクションを編集するには、会話 - 個々のコースメンバーとユーザーにメッセージを送信する - コースの講師、コースデザイナー、またはTAを追加/削除するも有効にされていなければなりません。"
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
@@ -24798,6 +25021,7 @@ ja:
         長時間にわたる会議を終了するには、コースの内容 - 追加/編集/削除を有効にされていなければなりません。
         コースの内容 - 追加/編集/削除が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。
         この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。
+  to_allow_full_management_of_conferences_created_by_bc7910e6: ユーザーまたは他人が作成した会議を完全に管理するには、コースの内容許可も有効にされていなければなりません。
   to_allow_full_management_of_conferences_created_by_bece5de: "ユーザーまたは他人が作成した会議を完全に管理するには、コースの内容許可も有効にされていなければなりません。長時間にわたる会議を終了するには、コースの内容許可が有効にされていなければなりません。コースの内容許可が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。"
   to_allow_full_management_of_conferences_created_by_eae032e7: "ユーザーまたは他人が作成した会議を完全に管理するには、コースの内容許可も有効にされていなければなりません。長時間にわたる会議を終了するには、コースの内容許可が有効にされていなければなりません。コースの内容許可が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。"
   to_allow_full_management_of_conferences_created_by_feec1984: |-
@@ -24805,6 +25029,7 @@ ja:
       長時間にわたる会議を終了するには、コースの内容 - 追加/編集/削除を有効にされていなければなりません。
       コースの内容 - 追加/編集/削除が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。
       この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。
+  to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "成果ページを読み取り専用として許可するには、この権限を無効にすることができますが、[コースの内容 - 表示]が有効にされていなければなりません。"
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "成果ページを読み取り専用として許可するには、この権限を無効にすることができますが、コースの内容 - 表示が有効にされていなければなりません。学習成果をインポートするには、学習成果-インポートも有効にされていなければなりません。"
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "ユーザーが成績を管理できるようにするには、成績 - 調整する最終成績の選択も有効にされていなければなりません。"
   to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
@@ -24813,14 +25038,17 @@ ja:
       受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加/編集/削除も有効にされていなければなりません。
   to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "他のユーザーによって作成されたコラボレーションの表示、編集、削除機能を許可するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。コースの内容 - 追加/編集/削除が有効で、受講生コラボレーション - 作成が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加/編集/削除も有効にされていなければなりません。"
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "他のユーザーによって作成されたコラボレーションの表示、編集、削除機能を許可するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。コースの内容 - 追加/編集/削除が有効で、受講生コラボレーション - 作成が無効の場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示、編集、削除できます。受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加/編集/削除も有効にされていなければなりません。"
+  to_allow_view_edit_and_delete_functionality_of_col_f948198e: "他のユーザーによって作成されたコラボレーションの表示、編集、削除機能を許可するには、[コースの内容 - 追加/編集/削除]も有効にされていなければなりません。"
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "他のユーザーによって作成されたコラボレーションの表示/編集/削除機能を許可するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。コースの内容 - 追加/編集/削除が有効で、受講生コラボレーション - 作成が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加するには、すべての受講生のコース表示も有効にされていなければなりません。"
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "他のユーザーによって作成されたコラボレーションの表示/編集/削除機能を許可するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。コースの内容 - 追加/編集/削除が有効で、受講生コラボレーション - 作成が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加するには、すべての受講生のコース表示も有効にされていなければなりません。"
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "他のユーザーによって作成されたコラボレーションの表示/編集/削除機能を許可するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。コースの内容 - 追加/編集/削除が有効で、受講生コラボレーション - 作成が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。受講生をコラボレーションに追加するためには、ユーザー - 表示リストも有効にされていなければなりません。コラボレーションにコースグループを追加するには、すべての受講生のコース表示も有効にされていなければなりません。"
+  to_allow_view_edit_delete_functionality_of_collabo_f46fade2: "他のユーザーによって作成されたコラボレーションの表示/編集/削除機能を許可するには、[コースの内容 - 追加/編集/削除]も有効にされていなければなりません。"
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: 受講生をグループに割り当てるには、「group_name」欄にグループ名を入力します。
   to_be_added_2959cc72: 追加される
   to_be_removed_d4b48586: 削除するもの
   to_c4c44f4b: 移動先
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: sis_account_id変更するにはユーザーにはmanage_sis許可が必要です。
+  to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "ユーザーのパスワードを変更するには、[ユーザー - 表示]も有効でなければなりません。"
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: 他のリンク切れをチェックするには、コースリンクバリデーターにアクセスしてください
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "他のリンク切れをチェックするには、%{validator_link}にアクセスしてください"
   to_check_for_other_broken_links_visit_validator_li_e350c852: "他のリンク切れをチェックするには、%{validator_link}にアクセスしてください"
@@ -24838,6 +25066,7 @@ ja:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "セクションをクロスリストするには、コースセクション - 追加/編集/削除も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "セクションをクロスリストするには、コースセクション - 追加/編集/削除も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "セクションを相互リストするには、コースセクション管理 - 編集も有効にされていなければなりません。コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。アカウントレベルのユーザーがコースを削除できるようにするには、コース状態 - 管理も有効にされていなければなりません。"
+  to_cross_list_a_section_manage_courses_admin_manag_7992434e: "セクションを相互リストするには、[コースを管理：管理者 - 管理/更新]および[コースセクションの管理 - 編集]も有効でなければなりません。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "セクションをクロスリストするには、コース - 追加/編集/削除も有効にされていなければなりません。"
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "セクションを相互リストするには、コースセクション-コースの編集と管理：管理者 - 管理/更新も有効でなければなりません。"
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "セクションを相互リストするには、コースセクション管理 - 編集が有効にされていなければなりません。ユーザーはまた、相互リストされているコースの講師としても登録されていなければなりません。"
@@ -24845,6 +25074,8 @@ ja:
   to_date_can_t_come_before_from_date_cf9e18aa: 「終了日時」は「開始日時」の前に来ることはできません。
   to_date_cannot_come_before_from_date_3eeb2633: 「終了日時」は「開始日時」の前に来ることはできません
   to_differentiate_assignments_to_individual_student_6cc40fde: "課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
+  to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "ユーザーがコースレベルで SIS ID を管理できないようにするには、[SIS データ - 管理]および [SIS データ - 読み取り]の両方が無効にされていなければなりません。"
+  to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "ユーザーがコースレベルで SIS ID を表示できないようにするには、[SISデータ - 管理]と[SISデータ - 読み取り]の両方が無効にされていなければなりません。"
   to_do_1d554f36: タスク
   to_do_5526f10a: タスク：
   to_do_6ac7b2dc: タスク：
@@ -24858,6 +25089,7 @@ ja:
   to_do_list_dashboard_d741f64e: タスクリストダッシュボード
   to_do_time_a7e17623: タスク時間
   to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "SpeedGraderで成績を編集、またはグレードブックにコメントを追加するには、成績 - 編集が有効にされていなければなりません。"
+  to_edit_a_student_s_section_conversations_send_to__12a2623f: "受講者のセクションを編集するには、[会話 - 個々のコースメンバーに送信する]も有効にされていなければなりません。"
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
       受講生のセクションを編集するには、ユーザー - コースの受講生の追加/削除とユーザー - 表示リストの両方が有効にされていなければなりません。
       講師、コースデザイナー、またはTAのセクションを編集するには、コースの講師、コースデザイナー、TAの追加/削除、およびユーザー - 表示リストの両方が有効にされていなければなりません。
@@ -24870,11 +25102,14 @@ ja:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       受講生のセクションを編集するには、ユーザー - コースから受講生を追加/削除し、個々のコースメンバーにメッセージを送信する機能も有効にされていなければなりません。
       講師、TA、またはコースデザイナーのセクションを編集するには、講師、コースデザイナー、またはTAを講座からコースに追加/削除し、会話 - 個々のコースメンバーにメッセージを送信する機能も有効にされていなければなりません。
+  to_edit_a_user_s_section_conversations_send_to_ind_a54de83d: "ユーザーのセクションを編集するには、[会話 - 個々のコースメンバーに送信する]も有効にされていなければなりません。"
   to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: "ユーザーのセクションを編集するには、適切なユーザー権限（例：ユーザー - 講師）、ユーザー-コースでの管理アクションの許可、会話 - 個々のコースメンバーへの送信も有効になっていなければなりません。"
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: "受講生のセクションを編集するには、ユーザー - コースでの管理アクションを許可し、ユーザー-リストの表示も有効にされていなければなりません。 "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "受講生のセクションを編集するには、ユーザー - コースでの管理アクションを許可し、ユーザー-リストの表示も有効にされていなければなりません。"
+  to_edit_assignment_details_on_a_discussion_assignm_1764e657: "ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。"
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "コース設定でブループリントコースの設定を編集するには、Blueprint コース - 追加/編集/関連/削除も有効でなければなりません。関連するコースを追加するには、Blueprint コース - 追加/編集/関連/削除 - とコース - 表示リストも有効でなければなりません。いずれかの Blueprint オブジェクトのロック設定を編集するには、この権限が有効でなければなりません。ファイルのロック設定を編集するには、コースファイル - 追加/編集/削除も有効でなければなりません。クイズのロック設定を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。"
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "課題インデックスページから Blueprint ロック設定を編集するには、コース - 追加/編集/削除も有効でなければなりません。この権限が有効でなく、コース - 追加/編集/削除が有効になっている場合、課題の Blueprint ロック設定は課題の詳細ページから管理できます。個々のクイズ、またはクイズのインデックスページで Blueprint ロックの設定を編集するには、コース - 追加/編集/削除も有効でなければなりません。"
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "ディスカッション - インデックスページから Blueprint ロック設定を編集するには、ディスカッション - 調整も有効にしなければなりません。"
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "ディスカッションインデックスページから Blueprint ロック設定を編集するには、コース - 追加/編集/削除とディスカッション - 調整も有効にしなければなりません。 "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "ディスカッションインデックスページの Blueprint ロック設定を編集するには、コース - 追加/編集/削除とディスカッション - 表示も有効でなければなりません。この権限が有効でなく、コース - 追加/編集/削除およびディスカッション - 表示が有効になっている場合、Blueprint ロックの設定は個々のディスカッションで編集できます。"
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "ページインデックスページの Blueprint ロック設定を編集するには、コース - 追加/編集/削除も有効でなければなりません。この権限が有効でなく、コース - 追加/編集/削除が有効になっている場合、Blueprint ロック設定は個々のページで編集できます。"
@@ -24888,24 +25123,38 @@ ja:
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       [課題インデックス]ページからロック設定を編集するには、[Blueprint コース - 追加/編集/関連付け/削除]および[コース管理：管理者 - 管理/更新]も有効でなければなりません。これらの追加の権限が有効になっているが、[課題とクイズ - 追加/編集/削除]が有効になっていない場合、課題のブループリントロック設定は、課題の詳細ページから管理することができます。
               個々のクイズまたはクイズのインデックスページでロック設定を編集するには、[Blueprint コース - コースの追加/編集/関連付け/削除]および[管理：管理者 - 管理/更新]も有効でなければなりません。
+  to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "[課題インデックス]ページからロック設定を編集するには、[Blueprint コース - 追加/編集/関連付け/削除]および[コース管理：管理者 - 管理/更新]も有効でなければなりません。"
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "[ディスカッションインデックス]ページからロック設定を編集するには、[Blueprint コース - 追加/編集/関連付け/削除]および[コース管理：管理者 - 管理/更新]も有効でなければなりません。"
+  to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "個々のクイズ、またはクイズのインデックスページでロックの設定を編集するには、[Blueprint コース - 追加/編集/関連付け/削除：管理者 - 管理/更新]も有効でなければなりません。"
+  to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "ファイルのロック設定を編集するには、[コース管理:管理者 - 管理/更新]および[コースファイル - 編集]も有効でなければなりません。"
+  to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "クイズのロック設定を編集するには、[コース管理：管理者 - 管理/更新]および[課題とクイズ - 追加]も有効にされていなければなりません。"
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "[ディスカッションインデックス]ページのロック設定を編集するには、[コース管理：管理者 - 管理/更新]および[ディスカッション - - 表示]も有効でなければなりません。追加の権限が有効になっているが、この権限が有効になっていない場合は、個々のディスカッションでロック設定を編集することができます。"
+  to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "[ディスカッションインデックス]ページのロック設定を編集するには、[コース管理：管理者 - 管理/更新]および[ディスカッション - - 表示]も有効でなければなりません。"
+  to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "ページインデックスページのロック設定を編集するには、ページ - 更新、Blueprint コース - 追加/編集/関連付け/、およびコース管理：管理者 - 管理 / 更新。"
+  to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "コースSISIDを編集するには、[コース管理：管理者 - 管理/更新]および[SISデータ-管理]も有効でなければなりません。"
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       ユーザーの詳細を編集、ログインの詳細を変更、またはユーザーのパスワードを変更するには、ユーザー - ログインの詳細の管理も有効にされていなければなりません。
       ユーザーページビューを表示するには、統計表示も有効にされていなければなりません。
       他のユーザーとして操作するためには、[（）として操作する]が有効にされていなければなりません。
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: "ユーザーの詳細を編集、ログインの詳細を変更、またはユーザーのパスワードを変更するには、ユーザー - ログインの詳細の管理も有効にされていなければなりません。"
   to_edit_user_details_modify_login_details_or_chang_800e894d: "ユーザーの詳細を編集、ログインの詳細を変更、またはユーザーのパスワードを変更するには、ユーザー - ログインの詳細の管理も有効にされていなければなりません。ユーザーページビューを表示するには、統計表示も有効にされていなければなりません。他のユーザーとして操作するためには、[（）として操作する]が有効にされていなければなりません。"
+  to_end_a_long_running_conference_the_course_conten_63e3f993: 長時間にわたる会議を終了するには、コースの内容の権限が有効にされていなければなりません。
   to_f0e90538: 宛先.
+  to_fully_manage_course_level_question_banks_assign_2c31396f: コースレベルの質問バンク、課題、クイズを完全に管理するには、追加/編集/削除の権限も有効でなければなりません。
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "受講生のユーザーの詳細ページからペア設定コードを生成するには、ユーザー - コースの受講生の追加/削除権限も有効にされていなければなりません。"
   to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: "受講生のユーザーの詳細ページからペア設定コードを生成するには、ユーザー - コースでの管理アクションを許可する権限も有効にされていなければなりません。"
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "受講生のユーザーの詳細ページからペア設定コードを生成するには、ユーザー - コースの受講生の追加/削除権限も有効にされていなければなりません。"
+  to_generate_a_pairing_code_from_a_student_s_user_d_b3256aa0: "受講生の[ユーザー詳細]ページからペアリングコードを生成するには、[ユーザー - コースでの管理操作を許可する]権限も有効にされていなければなりません。"
   to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "受講生のユーザー設定ページからペア設定コードを生成するには、ユーザー - 操作の権限も有効にされていなければなりません。受講生のユーザーの詳細ページからペア設定コードを生成するには、ユーザー - コースからの受講生の追加/削除権限も有効にされていなければなりません。"
   to_generate_a_pairing_code_from_a_student_s_user_s_5da92dc: "受講生のユーザー設定ページからペア設定コードを生成するには、ユーザー - 操作の権限も有効にされていなければなりません。SISをを介してユーザーをコースに追加または削除するには、適切なユーザー権限が有効になっていなければなりません（例：ユーザー-講師）。"
+  to_generate_a_pairing_code_from_a_student_s_user_s_5dcba185: "受講生のユーザー設定ページからペア設定コードを生成するには、[ユーザー - 操作の権限]も有効にされていなければなりません。"
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       受講生のユーザー設定ページからペア設定コードを生成するには、ユーザー - 操作の権限も有効にされていなければなりません。
       受講生のユーザーの詳細ページからペア設定コードを生成するには、ユーザー - コースからの受講生の追加/削除権限も有効にされていなければなりません。
+  to_generate_a_pairing_code_on_behalf_of_a_student__3caa504b: "受講者に代わってオブザーバーと共有するペアリングコードを生成するには、[ユーザー-受講者用のオブザーバーペアリングコードの生成]も有効にされていなければなりません。"
+  to_generate_grade_change_logs_in_admin_tools_grade_cbcab1c9: "管理ツールで成績変更ログを生成するには、[成績 - 表示変更ログ]も有効にされていなければなりません。"
   to_generate_login_logout_activity_in_admin_tools_u_253c565b: "管理ツールでログイン/ログアウトアクティビティを生成するには、ユーザー - ログインの詳細の管理または統計 - 表示も有効にされていなければなりません。管理ツールで成績変更ログを生成するには、成績 - 表示変更ログも有効にされていなければなりません。"
+  to_generate_login_logout_activity_in_admin_tools_u_603c40a0: "管理ツールでログイン/ログアウトアクティビティを生成するには、ユーザー - ログインの詳細または統計の管理 - ビューも有効にされていなければなりません。"
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "管理ツールでログイン/ログアウトアクティビティを生成するには、ユーザー - ログインの詳細の管理または統計 - 表示も有効にされていなければなりません。管理ツールで成績変更ログを生成するには、成績 - 表示変更ログも有効にされていなければなりません。"
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "コースインポートツールを使用して課題やクイズをインポートするには、コースの内容 - 追加/編集/削除が有効にされていなければなりません。"
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "コースインポートツールを使用してファイルをインポートするには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。"
@@ -24920,18 +25169,26 @@ ja:
   to_link_an_observer_to_a_student_users_manage_logi_c24e1e45: |-
       オブザーバーを受講生にリンクするには、ユーザー - ログインの詳細と会話を管理する - を個々のコースメンバーに送信するも有効になっていなければなりません。
               受講生に代わってオブザーバーと共有するペアリングコードを生成するには、ユーザー - 受講生用のオブザーバーペアリングコードの生成も有効になっていなければなりません。
+  to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "オブザーバーを受講生にリンクするには、ユーザー - ログインの詳細と会話を管理する - 個々のコースメンバーに送信するも有効にされていなければなりません。"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "受講生にコースオブザーバー*%{name}* をリンクするためには、彼らをみつけるために受講生の名前を下にタイプし、更新をクリックします。"
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "移動中に Canvas アカウントにログインするには、Canvas Student アプリからこの QR コードをスキャンしてください。"
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: 移動中にCanvasアカウントにログインするには、CanvasモバイルアプリからこのQRコードをスキャンしてください。
+  to_manage_associated_courses_courses_view_list_and_7bb3bedb: "関連するコースを管理するには、コース - 表示リストとコースの管理 - 追加も有効でなければなりません。"
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "コース設定で Blueprint コースの設定を編集するには、コース - 追加/編集/関連/削除も有効にされていなければなりません。"
+  to_manage_course_announcements_discussions_moderat_5f02f46e: "コースアナウンスを管理するには、ディスカッション - 調整も有効にされていなければなりません。"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "コースコンテンツを管理するには、コースの内容 - 追加/編集/削除が有効にされていなければなりません。"
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "コースコンテンツを管理するには、[コース管理：管理者 - 管理/更新]および[コース内容 - 追加/編集/削除]が有効にされていなければなりません。[ホームページの選択]および[コース設定のチェックリスト]ボタンを表示するには、[コース管理]：管理者 - 管理/更新]および[コース内容 - 表示]も有効でなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
+  to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "コースコンテンツを管理するには、[コース管理：管理者 - 管理/更新]および[コース内容 - 追加/編集/削除]が有効にされていなければなりません。"
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       ディスカッションを管理するには、ディスカッション - 調整も有効にされていなければなりません。
       
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。
+  to_manage_discussions_discussions_moderate_must_al_834a8b9: "ディスカッションを管理するには、[ディスカッション - 調整]も有効にされていなければなりません。"
   to_manage_discussions_discussions_moderate_must_al_d6d665be: "ディスカッションを管理するには、ディスカッション - 調整も有効にされていなければなりません。ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。"
+  to_manage_discussions_discussions_moderate_must_be_7307a00a: "ディスカッションを管理するには、[ディスカッション - 調整]が有効にされていなければなりません。"
+  to_manage_discussions_discussions_post_and_discuss_47aaeceb: "ディスカッションを管理するには、[ディスカッション - 投稿]および[ディカッション - 調整]も有効にされていなければなりません。"
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "ディスカッションを管理するには、ディスカッション - 投稿およびディカッション - 調整も有効にされていなければなりません。ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。"
+  to_manage_feature_options_for_an_account_feature_o_6327c2da: "アカウントの[機能オプション]を管理するには、[機能オプション - 有効/無効]も有効ににされていなければなりません。"
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "オブジェクトタイプのロック設定を管理するには、[コース管理します：管理者 - 管理/更新]も有効でなければなりません。"
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "採点調整を管理するには、成績 - 調整も有効にされていなければなりません。"
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -24941,6 +25198,7 @@ ja:
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "SISデータを管理するには、SISデータ - 管理も有効にされていなければなりません。"
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "SISデータを管理するには、SISデータ - 管理が有効にされていなければなりません。SISデータ管理が有効でSISデータ - 読み取りが無効な場合、アカウントのアクセス権限はコースの権限に優先されます。SIS データ - 管理が無効で、SISデータ - 読み取りが有効な場合、ユーザーはコース、ユーザー、およびサブアカウントの SIS ID のみを表示できます。ユーザーがコースレベルで SIS ID を表示できないようにするには、SISデータ - 管理とSISデータ - 読み取りの両方が無効にされていなければなりません。"
   to_manage_sis_data_sis_data_manage_must_be_enabled_a92ce831: "SISデータを管理するには、SISデータ - 管理が有効にされていなければなりません。SISデータ管理が有効でSISデータ - 読み取りが無効な場合、アカウントのアクセス権限はコースの権限に優先されます。SIS データ - 管理が無効で、SISデータ - 読み取りが有効な場合、ユーザーはコース、ユーザー、およびサブアカウントの SIS ID のみを表示できます。ユーザーがコースレベルで SIS ID を表示できないようにするには、SISデータ - 管理とSISデータ - 読み取りの両方が無効にされていなければなりません。"
+  to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: "SISデータを管理するには、SISデータ - 管理が有効にされていなければなりません。"
   to_manage_the_feature_options_tab_feature_options__c478f81: "[機能オプション]タブを管理するには、[機能オプション - 有効/無効]も有効にする必要があります。"
   to_manage_the_feature_options_tab_feature_options__fc32fca3: "[機能オプション]タブを管理するには、[機能オプション - 有効/無効]も有効にする必要があります。"
   to_minscore_43e5452e: "%{minScore}% まで"
@@ -24953,6 +25211,7 @@ ja:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
       クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。
               クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にでなければなりません。
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_c2e739c8: "クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ca1e4e6a: |-
       クイズをモデレートするには、課題とクイズ - 追加/編集/削除も有効にする必要があります。
               クイズ項目分析CSVファイルのユーザーSIS ID列を表示するには、SISデータ - 読み取りも有効にする必要があります。
@@ -24963,6 +25222,8 @@ ja:
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "成績を管理できるようにするには、成績 - 調整する最終成績の選択も有効にされていなければなりません。"
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "クライアント ID を取得するには、アカウント管理者が LTI デベロッパキーを生成する必要があります。"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "ディスカッションをページの上部に固定するには、ここにディスカッションをドラッグして、ディスカッションの設定メニューから [固定] を選択します。"
+  to_post_or_hide_grades_for_a_moderated_assignment__bf929e0c: 調整された課題の最終成績を掲示・非表示するには、成績編集も有効にされていなければなりません。
+  to_post_or_hide_grades_for_an_assignment_grades_ed_974f6de4: "課題の最終成績を掲示・非表示するには、[成績 - 編集]も有効にされていなければなりません。"
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: 成績を掲示・非表示するには、成績編集も有効にされていなければなりません。
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "テーマエディターブランディングをプレビューするには、*High Contrast UIを切る*必要があります。"
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "モジュールコンテンツを公開および非公開にするには、コース - 追加/編集/削除およびコースの内容 - 表示も有効にされていなければなりません。受講生の提出物がある場合、モジュール項目は非公開にすることはできません。"
@@ -24975,8 +25236,14 @@ ja:
   to_publish_final_grades_for_a_moderated_assignment_430368a0: 調整された課題の最終成績を公開するには、成績編集も有効にされていなければなりません。調整された課題の最終成績を掲示・非表示するには、成績編集も有効にされていなければなりません。
   to_publish_final_grades_for_a_moderated_assignment_713090cf: 調整された課題の最終成績を公開するには、成績編集も有効にされていなければなりません。
   to_publish_unpublish_module_content_course_content_efc294d4: "モジュールコンテンツを公開/非公開するには、コースの内容 - 追加/編集/削除が有効にされていなければなりません。"
+  to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "SIS ID を使用してコースにユーザーを削除するには、[SIS データ - 管理]も有効にされていなければなりません。"
+  to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "ディスカッションに返信するには、[ディスカッション - 投稿]も有効にされていなければなりません。"
+  to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "削除されたコースを復元するには、[コース - 削除]、[コース - 復元]および[コース内容 - 表示]も有効にされていなければなりません。"
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "削除されたコースを復元するには、コース - 元に戻すとコースの内容 - 表示も両方有効にされていなければなりません。"
+  to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "アカウント内で削除されたコースを復元するには、[コース管理 - 削除]および[コースの内容 - 表示]も有効にされていなければなりません。"
   to_restrict_students_from_creating_groups_deselect_6269c8cb: 受講生がグループを作成するのを制限するには、コース設定で受講生が自分のグループを整理するチェックボックスをオフにします。
+  to_restrict_students_from_creating_groups_do_not_s_b6da85dc: 受講生がグループを作成するのを制限するには、コース設定で受講生が自分のグループを整理するチェックボックスを選択しないでください。
+  to_restrict_students_from_creating_groups_manage_c_7cd09af9: "受講者によるグループの作成を制限するには、[コース管理：管理者-管理/更新]が有効にされていなければなりません。また、コース設定で[受講生が自分のグループを整理する]チェックボックスがオフになっていなければなりません。"
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: 特定のClever地区からのユーザーを制限するには、ここに地区のCleverIDを入力してください。
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: 特定のGoogleアプリドメインからのユーザーを背一減するには、ここにドメインを入力してください。
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "特定のGoogle Appsドメインのユーザーに制限するには、ドメインをコンマ区切りリストとしてここに入力します。一般に、「*」を入力すると、Google Appsユーザーに制限することができます。"
@@ -24984,18 +25251,23 @@ ja:
   to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "調整された課題をレビューするには、成績 - 編集も有効にされていなければなりません。"
   to_search_and_view_notifications_for_a_user_users__becfb733: "ユーザーの通知を検索して表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_search_and_view_notifications_for_a_user_users__fab7293a: "ユーザーの通知を検索して表示するには、ユーザー - 表示も有効にされていなければなりません。"
+  to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "課題IDのみで検索するには、[成績 - すべての成績を表示する]も有効にされていなければなりません。"
+  to_search_by_course_id_or_assignment_id_grades_edi_ac2c7b94: "コースIDまたは課題IDで検索するには、成績 - 編集も有効にされていなければなりません。"
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
       採点者または受講生IDを検索して表示するには、表示リストも有効にされていなければなりません。
       コースIDまたは課題IDで検索するには、成績 - 編集も有効にされていなければなりません。
       課題IDのみで検索するには、成績 - すべての成績を表示するも有効にされていなければなりません。
+  to_search_by_grader_or_student_id_users_view_must__4639a825: 採点者または受講生IDを検索して表示するには、表示も有効にされていなければなりません。
   to_search_by_grader_or_student_id_users_view_must__524aa668: "採点者または受講生IDを検索して表示するには、表示も有効にされていなければなりません。コースIDまたは課題IDで検索するには、成績 - 編集も有効にされていなければなりません。課題IDのみで検索するには、成績 - すべての成績を表示するも有効にされていなければなりません。"
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       コースの復元のタブでコースを検索するには、コースの内容 - 表示も有効にされていなければなりません。
                アカウント内の削除されたコースを復元するには、コース - 追加/編集/削除、コースの内容 - 表示、コース - 元に戻す、のすべてが有効にされていなければなりません。
   to_search_for_a_course_in_the_restore_courses_tab__475b1a02: "コースの復元のタブでコースを検索するには、コースの内容 - 表示も有効にされていなければなりません。アカウント内で削除されたコースを復元するには、[コース管理 - 削除]および[コースの内容 - 表示]も有効にされていなければなりません。"
+  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "コースの復元のタブでコースを検索するには、コースの内容 - 表示も有効にされていなければなりません。"
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "コースの復元のタブでコースを検索するには、コースの内容 - 表示も有効にされていなければなりません。アカウント内の削除されたコースを復元するには、コース - 追加/編集/削除、コースの内容 - 表示、コース - 元に戻す、のすべてが有効にされていなければなりません。"
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "成績変更ログを検索するには、成績 - 表示変更ログも有効にされていなければなりません。"
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "成績変更ログを検索するには、成績 - 表示変更ログも有効にされていなければなりません。"
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: ユーザーページのユーザーサイドバーにある分析リンクを表示するには、アカウントでプロファイルが無効でなければなりません。
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: コースホームページのコース設定チェックリストのオプションを表示するには、コースの管理（追加/編集/削除）も有効にされていなければなりません。
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "コースホームページのコース設定チェックリストのオプションを表示するには、コースの管理 - 追加/編集/削除も有効にされていなければなりません。"
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "個々のユーザーにメッセージを送信するには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。"
@@ -25009,11 +25281,14 @@ ja:
       成果のページから学習成果をインポートするには、ルーブリック - 追加/編集/削除も有効にされていなければなりません。
       ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除が有効になっているときには、課題を介して個々の課題のルーブリックにアクセス・作成することはできますが、編集することはできません。
   to_view_a_course_outcomes_page_as_read_only_course_b961cbec: "コースの成果ページを読み取り専用として表示するには、コースの内容 - 表示が有効にされていなければなりません。成果のページから学習成果をインポートするには、ルーブリック - 追加/編集/削除も有効にされていなければなりません。ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除が有効になっているときには、課題を介して個々の課題のルーブリックにアクセス・作成することはできますが、編集することはできません。"
+  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "ユーザーの統合IDを表示するには、SIS データ - 管理も有効にされていなければなりません。"
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: ユーザーのログインの詳細を表示するには、ユーザーの表示リストとログインの詳細が両方とも有効にされていなければなりません。
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "ユーザーの SIS ID を表示するには、SISデータ管理またはSISデータ読み取りも有効でなければなりません。"
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "アカウントレベルのグループを表示するには、グループ - 追加/編集/削除も有効にされていなければなりません。"
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "特定の Canvas ユーザに送信されたすべてのお知らせを表示するには、検索するユーザと日付範囲を選択してください。"
   to_view_announcements_announcements_view_must_also_75f652df: "アナウンスを表示するには、アナウンス - 表示も有効にされていなければなりません。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
+  to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "[ホームページの選択]および[コース設定のチェックリスト]ボタンを表示するには、[コース管理]：管理者 - 管理/更新]および[コース内容 - 表示]も有効でなければなりません。（教師、デザイナー、およびTAは、権限に関係なくコースのホームページを設定できます。）"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションを管理するには、ディスカッション - 調整が有効にされていなければなりません。
@@ -25022,6 +25297,7 @@ ja:
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。
       ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
+  to_view_discussions_in_a_course_discussions_view_m_6be8ec80: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。"
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
@@ -25036,32 +25312,44 @@ ja:
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションを管理するには、ディスカッション - 調整が有効にされていなければなりません。
   to_view_discussions_in_a_course_discussions_view_m_c0d9e312: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。ディスカッションを管理するには、ディスカッション - 調整も有効にされていなければなりません。"
+  to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。"
+  to_view_feature_options_for_an_account_feature_opt_14b0cea0: "[機能オプション]タブを管理するには、[機能オプション - 有効/無効]も有効にされていなければなりません。"
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。"
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "コースの成績を表示するには、[コース管理：管理者-管理/更新]および[成績 - すべての成績を表示]も有効でなければなりません。"
+  to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "グループを表示するには、[ユーザー - 表示リスト]も有効でなければなりません。"
+  to_view_last_activity_and_total_activity_informati_473265d8: "コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_view_last_activity_and_total_activity_informati_a06859f3: |-
       コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。
               コースの人物のページにアクセスするには、ユーザー - 表示リストも有効にされていなければなりません。
   to_view_last_activity_and_total_activity_informati_b24e3864: "コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。コースの人物のページにアクセスするには、ユーザー - 表示リストも有効にされていなければなりません。"
+  to_view_login_ids_users_allow_administrative_actio_1b5789db: "ログインIDを表示するには、ユーザー - コースでの管理アクションを許可するも有効になっていなければなりません。"
   to_view_module_progression_grades_view_all_grades__1acc0880: "モジュールの進行状況を表示するには、成績 - すべての成績の表示も有効にされていなければなりません。"
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "モジュールの進行状況を表示するには、成績 - すべての成績の表示も有効にされていなければなりません。"
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "ユーザーの SIS ID または統合IDを表示または編集するには、ユーザー - 表示リストとユーザー - 管理ログイン情報の両方が有効にされていなければなりません。"
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "ユーザーの SIS ID または統合IDを表示または編集するには、ユーザー - 表示リストとユーザー - 管理ログイン情報の両方が有効にされていなければなりません。"
+  to_view_recent_announcements_on_the_home_page_cour_5a91447e: "ホームページで最近のアナウンスを表示するには、コースの内容 - 表示が有効にされていなければなりません。また、コースの設定で、コースのホームページチェックボックスの最新のアナウンスを表示するがオンになっていなければなりません。"
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "ホームページで最近のアナウンスを表示するには、コースの内容 - 表示が有効にされていなければなりません。また、コースの設定で、コースのホームページチェックボックスの最新のアナウンスを表示するがオンになっていなければなりません。コースアナウンスを管理するには、ディスカッション - 調整も有効にされていなければなりません。"
+  to_view_recent_announcements_on_the_home_page_the__fbd8d115: ホームページで最新のアナウンスを表示するには、コース設定でコースのホームページに最新のアナウンスを表示するチェックボックスが選択されていなければなりません。
+  to_view_sis_ids_sis_data_read_must_be_enabled_12edce68: "SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。"
   to_view_student_analytics_analytics_view_must_also_8a41d86e: "受講生の分析を表示するには、分析 - 表示も有効にされていなければなりません。"
   to_view_student_analytics_analytics_view_must_also_a735c0b4: "受講生の分析を表示するには、分析 - 表示も有効にされていなければなりません。"
   to_view_student_analytics_in_course_analytics_anal_21ed5b9c: "コース分析で受講生の分析を表示するには、分析 - 表示も有効にされていなければなりません。"
   to_view_student_analytics_in_course_analytics_anal_9466b742: "コース分析で受講生の分析を表示するには、分析 - 表示も有効にされていなければなりません。"
+  to_view_student_analytics_in_course_analytics_grad_654a5c5a: "コース分析で受講生の分析を表示するには、[成績 - すべての成績を表示する]も有効にされていなければなりません。"
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "コース分析で受講生の分析を表示するには、成績 - すべての成績を表示するも有効にされていなければなりません。"
   to_view_student_analytics_users_view_list_and_anal_2c2776b2: "受講生の分析を表示するには、ユーザー - 表示リストと分析 - 表示も有効にされていなければなりません。"
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "受講生の分析を表示するには、ユーザー - 表示リストと分析 - 表示も有効にされていなければなりません。"
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "受講生の分析を表示するには、ユーザー - 表示リストと成績 - すべての成績を表示するも有効にされていなければなりません。"
+  to_view_the_account_people_page_users_view_list_mu_9d0bdb80: "アカウントの人物ページを表示するには、ユーザー - 表示リストが有効にされていなければなりません。"
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "アカウントの人物ページを表示するには、ユーザー - 表示リストが有効にされていなければなりません。この権限が有効で、ユーザー - プライマリ電子メールアドレスの表示が無効である場合、ユーザーにはログインIDとして使用される電子メールアドレスが表示されます。"
+  to_view_the_gradebook_course_content_view_must_als_45c2e607: 受講生の成績表を表示するには、コースの内容も有効にされていなければなりません。
   to_view_the_gradebook_course_content_view_must_als_676f3e8: "受講生の成績表を表示するには、コースの内容も有効にされていなければなりません。成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   to_view_the_gradebook_grades_view_all_grades_must__7ead435: "成績表を表示するには、成績 - すべての成績の表示も有効にされていなければなりません。"
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "アカウント内のユーザーのリストを表示するには、ユーザー - 表示リストが有効にされていなければなりません。"
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "アカウント内のユーザーのリストを表示するには、ユーザー - 表示も有効にされていなければなりません。"
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "アカウント内のユーザーのリストを表示するには、ユーザー - 表示リストが有効にされていなければなりません。"
   to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "アカウント内のユーザーのリストを表示するには、ユーザー - 表示リストが有効にされていなければなりません。"
+  to_view_the_list_of_users_in_the_course_users_view_20278cf: "コース内のユーザーのリストを表示するには、[ユーザー - 表示リスト]が有効にされていなければなりません。"
   to_view_the_list_of_users_in_the_course_users_view_26412777: "コースのユーザー一覧を表示するには、ユーザー - 表示リストも有効にされていなければなりません。SIS ID を使用してユーザーを追加するには、ユーザー - コースおよび/またはユーザーからの受講生の追加/削除 - コースからコースへの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。"
   to_view_the_list_of_users_in_the_course_users_view_34c164ea: "コース内のユーザーのリストを表示するには、ユーザー - 表示リストを有効にされていなければなりません。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。講師またはTAのセクションを編集するには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。"
   to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
@@ -25079,6 +25367,7 @@ ja:
       SIS ID を表示するには、SISデータ読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。
       講師またはTAのセクションを編集するには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
       オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
+  to_view_the_list_of_users_in_the_course_users_view_b7b9b4ef: "コースのユーザー一覧を表示するには、[ユーザー - 表示リスト]も有効にされていなければなりません。"
   to_view_the_list_of_users_in_the_course_users_view_bc0462e3: "コースのユーザー一覧を表示するには、ユーザー - 表示リストも有効にされていなければなりません。SIS ID 経由でユーザーを追加するには、ユーザー - コースおよび/またはユーザーの追加/削除 - コースの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。"
   to_view_the_list_of_users_in_the_course_users_view_bd2ce438: |-
       コース内のユーザーのリストを表示するには、ユーザー - リストの表示を有効にする必要があります。
@@ -25100,6 +25389,7 @@ ja:
   to_view_the_outcomes_page_as_read_only_course_cont_d176be65: |-
       成果ページを読み取り専用として表示するには、コースの内容 - 表示が有効にされていなければなりません。
       ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除も有効になっているときには、課題を介して個々の課題のルーブリックにアクセスすることができます。
+  to_view_the_people_page_courses_view_list_must_be__c1d54670: "アカウントの人物ページを表示するには、[ユーザー - 表示リスト]が有効にされていなければなりません。"
   to_view_the_people_page_courses_view_list_must_be__fa021b7f: |-
       人物ページを表示するには、コース-リストの表示有効になっていなければなりません。
               コースにユーザーを追加または削除するには、適切なユーザー権限が有効になっていなければなりません（例：ユーザー - 講師）。
@@ -25107,8 +25397,11 @@ ja:
               ユーザーのセクションを編集するには、会話 - 個々のコースメンバーに送信が有効になっていなければなりません。
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "レポートタブを表示するには、コース - 使用状況レポートの表示も有効にされていなければなりません。"
   to_view_the_student_interactions_report_grades_vie_68f791b0: "受講生やり取りレポートにアクセスするには、成績 - 「すべての成績とコースを表示する」 - 利用表示レポートも有効にされていなければなりません。"
+  to_view_the_submission_log_quizzes_view_submission_b8353d6e: "送信ログを表示するには、クイズ - 送信ログの表示も有効にされていなければなりません。"
   to_view_the_user_details_page_for_a_student_users__51d98047: "受講生の「ユーザーの詳細」ページを表示するには、コースの「ユーザー - 受講生の追加/削除」も有効にする必要があります。"
   to_view_the_user_details_page_for_a_student_users__5d0ca2d5: "受講生の「ユーザーの詳細」ページを表示するには、コースの「ユーザー - 受講生の追加/削除」も有効にする必要があります。"
+  to_view_the_user_sis_id_column_in_the_quiz_item_an_2bf433fa: "クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にされていなければなりません。"
+  to_view_user_page_views_statistics_view_must_also__e400875a: ユーザーページビューを表示するには、統計表示も有効にされていなければなりません。
   to_view_user_page_views_users_view_list_must_also__81cc34ed: "ユーザーページビューを表示するには、ユーザー - 表示リスト - も有効にされていなければなりません。"
   to_view_user_page_views_users_view_list_must_also__f4246239: "ユーザーページビューを表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
   to_view_users_and_user_account_details_users_view__99807b12: |-
@@ -25116,6 +25409,7 @@ ja:
       ユーザーのパスワードを変更するには、ユーザー - 表示リストも有効でなければなりません。
       ユーザーの SIS ID を表示するには、SISデータ管理またはSISデータ読み取りも有効でなければなりません。
       ユーザーの統合IDを表示するには、SIS データ - 管理も有効にされていなければなりません。
+  to_view_users_and_user_account_details_users_view__cc958682: "ユーザーおよびユーザーアカウントの詳細を表示するには、[ユーザー - 表示リスト]も有効にされていなければなりません。"
   to_view_users_and_user_account_details_users_view__ff62392: "ユーザーおよびユーザーアカウントの詳細を表示するには、ユーザー - 表示リストも有効にされていなければなりません。ユーザーのパスワードを変更するには、ユーザー - 表示も有効でなければなりません。ユーザーの SIS ID を表示するには、SISデータ管理またはSISデータ読み取りも有効でなければなりません。ユーザーの統合IDを表示するには、SIS データ - 管理も有効にされていなければなりません。"
   today_76e10f9c: 本日
   toggle_alignment_details_for_title_944f605: "%{title} の位置調整の詳細を切り替える"
@@ -25132,6 +25426,7 @@ ja:
   toggle_tooltip_1ed3b35e: ツールチップを切り替える
   toggle_tooltip_2447b4fa: ツールチップの切り替え
   toggle_tooltip_d3b7cb86: ツールチップを切り替える
+  toggling_placement_ee1ab8b5: トグルの配置
   tolerance_value_9e96573c: 公差値
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: ログインの試行回数が多すぎます。後でもう一度、試してください。または、システム管理者までご連絡ください。
   too_many_members_b8b15069: メンバーが多すぎます
@@ -25321,6 +25616,7 @@ ja:
   unaccepted_students_aa68ea98: 受諾されていない受講生
   unarchive_f245e2d6: アーカイブ解凍
   unarchive_selected_e0c4bd3d: アーカイブ解除が選択されました
+  unassessed_a0264e97: アセスメントなし
   unassessed_students_3809ac5e: 未評価の受講生
   unassigned_permissions_6a38ca95: 割り当てられていない許可
   unassigned_roles_cb9e95ec: 割り当て解除された役割
@@ -25596,6 +25892,7 @@ ja:
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: 矢印キーを使って会議プロバイダーを選択する
   use_arrows_a60b3330: 矢印を使用する
   use_as_front_page_274a488b: "トップ ページとして使用"
+  use_as_frontpagetext_fa88bbb2: "%{frontPageText}として使用"
   use_between_for_adding_multiple_users_26bff207: "複数のユーザーを追加するには、\",\" で区切ります。"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: 登録インデックスでAPIページネーションにブックマークを使用する
   use_cloudfront_for_docviewer_f21b96db: "DocViewer にはCloudFrontを使用"
@@ -25665,6 +25962,7 @@ ja:
   user_access_tokens_title: "ユーザーアクセス トークン"
   user_avatars_e4fc4ed3: ユーザのアバター
   user_c95de254: ユーザー
+  user_cannot_manage_individual_course_content_witho_d7b65fd4: ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。
   user_content_aaf0fb5a: ユーザーコンテンツ
   user_count_respondents_e30a8593: "%{user_count} の回答者"
   user_data_export_from_date_6ba21b89: "*ユーザーデータのエクスポート元%{date}*"
@@ -26133,6 +26431,7 @@ ja:
       ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。サブカウントはコースとセクションの所有権しか持ちません。ユーザーデータは所有していません。
       サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
   users_and_terms_are_located_at_the_account_so_the__6896b895: ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。サブカウントはコースとセクションの所有権しか持ちません。ユーザーデータは所有していません。サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
+  users_and_terms_are_located_at_the_account_so_the__8f3258e6: ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。
   users_can_access_and_create_but_not_edit_individua_72b88c41: "ユーザーは、コースの内容（表示と課題とクイズ） - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "ユーザーは、課題とクイズ - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "ユーザーは、コース内容 - 表示、課題とクイズ - 追加/編集/削除が有効になっているときに、クイズインデックスページの問題バンクの管理リンクにアクセスできます。"
@@ -26155,6 +26454,7 @@ ja:
   users_view_list_861c7a3f: "ユーザー - 表示リスト"
   users_view_login_ids_a2e6a85: "ユーザー - ログインIDを表示する"
   users_view_primary_email_address_14f4978f: "ユーザー - プライマリ電子メールアドレスを表示する"
+  users_with_this_permission_may_be_able_to_use_the__84394072: この権限を持つユーザーは、アカウント設定の管理、成績の表示と調整、ユーザー情報へのアクセスを行う機能として権限を利用できます。この権限はまた、サブアカウントに指定された管理者が、サブアカウント外の設定や情報にアクセスすることもできるようにします。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 新しいスケジューラーとその機能を使う
   validate: 
     is_required: このフィールドは必須項目です
@@ -26199,6 +26499,7 @@ ja:
   view_course_analytics_eefe6b2: コース分析の表示
   view_coursename_gradebook_8b3a6240: "%{courseName} 成績表を表示"
   view_coursename_s_assignment_group_totals_bd4b707: "%{courseName} の課題グループの合計を表示"
+  view_description_b6d8e52b: 説明を表示
   view_due_items_due_today_for_course_coursename_129e433: "コース%{courseName}の今日が期限の%{due}項目の表示"
   view_faculty_journals_ad0e8c8f: 講師日誌を表示する
   view_feature_settings_at_an_account_level_ec7f5e10: 機能設定をアカウントレベルで表示する
@@ -26360,6 +26661,7 @@ ja:
   what_assignment_types_can_i_create_in_a_course_1ed4eed4: コースではどのような課題タイプを作成できますか？
   what_does_provisioning_only_mean_eac9a4a1: 「準備のみ」とはどういう意味ですか？
   what_happened_322d8259: なにが起こったのでしょう？
+  what_it_does_c158cc83: それが何をするか
   what_it_does_d4debc07: それが何をするか
   what_layout_options_are_available_in_the_course_ho_5d364ce3: 講師として、コースのホームページではどのようなレイアウトオプションを使用できますか？
   what_options_can_i_set_in_a_quiz_53522d76: クイズにはどのようなオプションを設定できますか？
@@ -26447,9 +26749,9 @@ ja:
         view_all_pages: すべてのページを表示
       delete_wiki: 削除
       labels: 
-        front_page: "トップ ページ"
+        front_page: "%{frontPageText}"
       menu: 
-        use_front_page: "トップ ページとして使用"
+        use_front_page: "%{frontPageText}として使用"
       published_indicator: 公開済み
       toolbar_menu: 
         settings: 設定
@@ -26496,7 +26798,7 @@ ja:
       page_title: タイトル
     wiki_page_index_item: 
       labels: 
-        front_page: "トップ ページ"
+        front_page: "%{frontPageText}"
       menu: 
         delete: 削除
         edit: 編集
@@ -26606,6 +26908,9 @@ ja:
   would_you_like_to_enable_this_app_ccdf735d: このアプリを有効にしますか?
   would_you_like_to_go_back_to_include_1d279044: "戻って次を含めますか:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "受講生がコースを続行できるようにしますか? または、新しい要件が完了するまで、これらのモジュールを再度ロックしますか?"
+  would_you_like_to_remove_these_count_outcomes_5075697d: 
+    one: "これら%{count}の成果を削除しますか？"
+    other: "これら%{count}の成果を削除しますか？"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: カレンダーの月表示でイベントのタイトルを終了します
   write_something_430e346c: 何か書く...
   wrong_answer_comments_14963a24: 不正解時のコメント
@@ -26787,6 +27092,7 @@ ja:
   you_must_have_a_student_or_section_selected_a99e45df: 選択された受講生かセクションを有している必要があります
   you_must_input_a_section_b8d370fe: セクションを入力してください
   you_must_log_in_to_view_replies_9ccd4da0: 返信を見るには、ログインが必要です
+  you_must_post_before_seeing_replies_24f8bcd4: 返信を見る前に投稿しなければなりません。
   you_must_provide_a_date_with_a_time_ec369ff4: 日時を指定する必要があります。
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Microsoft Teamsの同期を有​​効にするには、テナントとログイン属性を指定する必要があります"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: 値を指定するか、オプションの選択を解除する必要があります。
