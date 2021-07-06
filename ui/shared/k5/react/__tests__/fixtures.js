@@ -43,6 +43,7 @@ export const GRADING_PERIODS = [
 
 export const MOCK_ASSIGNMENTS = [
   {
+    context_code: 'course_1',
     context_color: null,
     context_name: 'Algebra 2',
     html_url: 'http://localhost:3000/courses/30/assignments/175',
@@ -57,6 +58,7 @@ export const MOCK_ASSIGNMENTS = [
     }
   },
   {
+    context_code: 'course_3',
     context_color: '#CCCCCC',
     context_name: 'History',
     html_url: 'http://localhost:3000/courses/31/assignments/176',
@@ -71,6 +73,7 @@ export const MOCK_ASSIGNMENTS = [
     }
   },
   {
+    context_code: 'course_3',
     context_color: '#CCCCCC',
     context_name: 'History',
     html_url: 'http://localhost:3000/courses/31/assignments/177',
@@ -83,6 +86,50 @@ export const MOCK_ASSIGNMENTS = [
       due_at: '2021-07-04T22:00:00Z', // 4pm MT, 3:45am Jul 5 Kathmandu
       submission_types: ['online_quiz']
     }
+  }
+]
+
+export const MOCK_CARDS = [
+  {
+    id: '1',
+    assetString: 'course_1',
+    href: '/courses/1',
+    shortName: 'Econ 101',
+    originalName: 'Economics 101',
+    color: 'yellow',
+    courseCode: 'ECON-001',
+    enrollmentState: 'active',
+    isHomeroom: false,
+    isK5Subject: true,
+    canManage: true,
+    published: true
+  },
+  {
+    id: '2',
+    assetString: 'course_2',
+    href: '/courses/2',
+    shortName: 'Homeroom1',
+    originalName: 'Home Room',
+    color: 'blue',
+    courseCode: 'HOME-001',
+    enrollmentState: 'active',
+    isHomeroom: true,
+    isK5Subject: false,
+    canManage: true,
+    published: false
+  },
+  {
+    id: '3',
+    assetString: 'course_3',
+    href: '/courses/3',
+    originalName: 'The Maths',
+    color: 'red',
+    courseCode: 'DA-MATHS',
+    enrollmentState: 'invited',
+    isHomeroom: false,
+    isK5Subject: true,
+    canManage: true,
+    published: true
   }
 ]
 

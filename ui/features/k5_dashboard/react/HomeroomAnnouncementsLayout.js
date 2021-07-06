@@ -28,8 +28,8 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, loading}) {
-  const loadingMask = () => (
-    <>
+  const loadingMask = props => (
+    <div {...props}>
       <LoadingSkeleton
         screenReaderLabel={I18n.t('Loading Homeroom Course Name')}
         margin="medium 0 small"
@@ -48,7 +48,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
         width="100%"
         height="8em"
       />
-    </>
+    </div>
   )
 
   return (

@@ -19,12 +19,12 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import moment from 'moment-timezone'
-import {render, act} from '@testing-library/react'
+import {act, render, waitForElementToBeRemoved} from '@testing-library/react'
 
 import ImportantDates from '../ImportantDates'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
-import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
@@ -32,7 +32,8 @@ const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&
 describe('ImportantDates', () => {
   const getProps = (overrides = {}) => ({
     timeZone: 'America/Denver',
-    contextCodes: ['course_1', 'course_2'],
+    contexts: MOCK_CARDS,
+    selectedContextsLimit: 2,
     ...overrides
   })
 
@@ -152,5 +153,65 @@ describe('ImportantDates', () => {
     const {findByText, queryByText} = render(<ImportantDates {...getProps()} />)
     await findByText('Math HW')
     expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
+  })
+
+  it('allows a modal showing the selected calendars to be opened and closed', async () => {
+    const {getByRole, findByText, queryByText} = render(
+      <ImportantDates {...getProps({selectedContextCodes: ['course_3']})} />
+    )
+    const calendarsButton = getByRole('button', {
+      name: 'Select calendars to retrieve important dates from'
+    })
+    expect(calendarsButton).not.toBeDisabled()
+
+    act(() => calendarsButton.click())
+
+    expect(await findByText('Calendars')).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Economics 101', checked: false})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Home Room', checked: false})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'The Maths', checked: true})).toBeInTheDocument()
+
+    act(() => getByRole('button', {name: 'Cancel'}).click())
+
+    await waitForElementToBeRemoved(() => queryByText('Calendars'))
+  })
+
+  it('defaults to the first <selectedContextsLimit> calendars when no selectedContextCodes are provided', async () => {
+    const {getByRole, findByText} = render(<ImportantDates {...getProps()} />)
+
+    act(() =>
+      getByRole('button', {
+        name: 'Select calendars to retrieve important dates from'
+      }).click()
+    )
+
+    expect(await findByText('Calendars')).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Economics 101', checked: true})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Home Room', checked: true})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'The Maths', checked: false})).toBeInTheDocument()
+  })
+
+  it('also defaults when none of the selectedContextCodes are valid', async () => {
+    const {getByRole, findByText} = render(
+      <ImportantDates {...getProps()} selectedContextCodes={[]} />
+    )
+
+    act(() =>
+      getByRole('button', {
+        name: 'Select calendars to retrieve important dates from'
+      }).click()
+    )
+
+    expect(await findByText('Calendars')).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Economics 101', checked: true})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'Home Room', checked: true})).toBeInTheDocument()
+    expect(getByRole('checkbox', {name: 'The Maths', checked: false})).toBeInTheDocument()
+  })
+
+  it('does not show the calendar select modal if fewer contexts than the limit are provided', () => {
+    const {queryByRole} = render(<ImportantDates {...getProps({selectedContextsLimit: 10})} />)
+    expect(
+      queryByRole('button', {name: 'Select calendars to retrieve important dates from'})
+    ).not.toBeInTheDocument()
   })
 })

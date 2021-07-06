@@ -354,6 +354,13 @@ export const groupImportantDates = (assignments, events, timeZone) => {
   return dates.sort((a, b) => moment(a.date).diff(moment(b.date)))
 }
 
+export const saveSelectedContexts = selected_contexts =>
+  doFetchApi({
+    path: `/api/v1/calendar_events/save_selected_contexts`,
+    method: 'POST',
+    params: {selected_contexts}
+  }).then(data => data.json)
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',
