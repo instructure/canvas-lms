@@ -98,8 +98,7 @@ const OutcomeManagementPanel = () => {
   } = useManageOutcomes(true)
   const {group, loading, loadMore} = useGroupDetail({
     id: selectedGroupId,
-    searchString: debouncedSearchString,
-    showAlert: false
+    searchString: debouncedSearchString
   })
   const [isGroupMoveModalOpen, openGroupMoveModal, closeGroupMoveModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
@@ -180,7 +179,7 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  if (error) {
+  if (error && Object.keys(collections).length === 0) {
     return (
       <Text color="danger">
         {contextType === 'Course'

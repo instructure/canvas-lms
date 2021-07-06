@@ -19,7 +19,7 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
-import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
+import {accountMocks, smallOutcomeTree, groupMocks} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
@@ -102,19 +102,19 @@ describe('TargetGroupSelector', () => {
     })
   })
 
-  it('displays an error on failed request for account outcome groups', async () => {
+  it('displays a screen reader error and text error on failed request for account outcome groups', async () => {
     render(<TargetGroupSelector {...defaultProps()} />, {
       mocks: []
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading account outcomes.',
-      srOnly: false,
+      message: 'An error occurred while loading account learning outcome groups.',
+      srOnly: true,
       type: 'error'
     })
   })
 
-  it('displays an error on failed request for course outcome groups', async () => {
+  it('displays a screen reader error and text error on failed request for course outcome groups', async () => {
     render(<TargetGroupSelector {...defaultProps()} />, {
       contextId: '2',
       contextType: 'Course',
@@ -122,9 +122,27 @@ describe('TargetGroupSelector', () => {
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading course outcomes.',
-      srOnly: false,
+      message: 'An error occurred while loading course learning outcome groups.',
+      srOnly: true,
       type: 'error'
+    })
+  })
+
+  it('displays a flash alert when a child group fails to load', async () => {
+    const mocks = [
+      ...accountMocks({childGroupsCount: 2}),
+      ...groupMocks({groupId: 100, childGroupOffset: 400})
+    ]
+    const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {mocks})
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 1'))
+    await act(async () => jest.runAllTimers())
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading account learning outcome groups.',
+      type: 'error',
+      srOnly: false
     })
   })
 

@@ -83,30 +83,7 @@ describe('groupDetailHook', () => {
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading selected group.',
-      type: 'error',
-      srOnly: false
-    })
-    expect(result.current.error).not.toBe(null)
-  })
-
-  it('should not flash error message if showAlert arg is false', async () => {
-    const {result} = renderHook(() => useGroupDetail({id: '2', showAlert: false}), {
-      wrapper
-    })
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).not.toHaveBeenCalled()
-    expect(result.current.error).not.toBe(null)
-  })
-
-  it("should show a screen reader only error message and return the error when coudn't load if srOnlyAlert arg is true", async () => {
-    const {result} = renderHook(() => useGroupDetail({id: '2', srOnlyAlert: true}), {
-      wrapper
-    })
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading selected group.',
-      type: 'error',
-      srOnly: true
+      type: 'error'
     })
     expect(result.current.error).not.toBe(null)
   })

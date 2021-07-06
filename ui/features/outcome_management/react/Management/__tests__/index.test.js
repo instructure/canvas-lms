@@ -139,29 +139,45 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Group 100 folder 0')).toBeInTheDocument()
   })
 
-  it('displays an error on failed request for course outcome groups', async () => {
-    render(<OutcomeManagementPanel />, {
+  it('displays a screen reader error and text error on failed request for course outcome groups', async () => {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       contextType: 'Course',
       contextId: '2',
       mocks: []
     })
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading course outcomes.',
+      message: 'An error occurred while loading course learning outcome groups.',
       srOnly: true,
       type: 'error'
     })
+    expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
   })
 
-  it('displays an error on failed request for account outcome groups', async () => {
-    render(<OutcomeManagementPanel />, {
+  it('displays a screen reader error and text error on failed request for account outcome groups', async () => {
+    const {getByText} = render(<OutcomeManagementPanel />, {
       mocks: []
     })
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading account outcomes.',
+      message: 'An error occurred while loading account learning outcome groups.',
       srOnly: true,
       type: 'error'
+    })
+    expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
+  })
+
+  it('displays a flash alert if a child group fails to load', async () => {
+    const {getByText} = render(<OutcomeManagementPanel />, {
+      mocks: [...accountMocks({childGroupsCount: 2})]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred while loading account learning outcome groups.',
+      type: 'error',
+      srOnly: false
     })
   })
 

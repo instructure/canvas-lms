@@ -76,7 +76,7 @@ const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup}) => {
         <div style={{textAlign: 'center'}}>
           <Spinner renderTitle={I18n.t('Loading')} size="large" />
         </div>
-      ) : error ? (
+      ) : error && Object.keys(collections).length === 0 ? (
         <Text color="danger">
           {contextType === 'Course'
             ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})

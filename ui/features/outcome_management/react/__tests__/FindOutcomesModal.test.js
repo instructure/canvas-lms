@@ -183,14 +183,15 @@ describe('FindOutcomesModal', () => {
       expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
     })
 
-    it('displays an error on failed request', async () => {
-      render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
+    it('displays a screen reader error and text error on failed request', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while loading account outcomes.',
-        srOnly: false,
+        message: 'An error occurred while loading account learning outcome groups.',
+        srOnly: true,
         type: 'error'
       })
+      expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
     })
   })
 
@@ -206,16 +207,33 @@ describe('FindOutcomesModal', () => {
       expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
     })
 
-    it('displays an error on failed request', async () => {
-      render(<FindOutcomesModal {...defaultProps()} />, {
+    it('displays a screen reader error and text error on failed request', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
         contextType: 'Course',
         mocks: []
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while loading course outcomes.',
-        srOnly: false,
+        message: 'An error occurred while loading course learning outcome groups.',
+        srOnly: true,
         type: 'error'
+      })
+      expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
+    })
+
+    it('displays a flash alert when a child group fails to load', async () => {
+      const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+        contextType: 'Course'
+      })
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Account Standards'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Course Account Outcome Group'))
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred while loading course learning outcome groups.',
+        type: 'error',
+        srOnly: false
       })
     })
   })

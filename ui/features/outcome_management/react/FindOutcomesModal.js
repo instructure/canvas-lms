@@ -109,7 +109,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     <div style={{textAlign: 'center', paddingTop: '2rem'}}>
                       <Spinner renderTitle={I18n.t('Loading')} size="large" />
                     </div>
-                  ) : error ? (
+                  ) : error && Object.keys(collections).length === 0 ? (
                     <Text color="danger">
                       {contextType === 'Course'
                         ? I18n.t('An error occurred while loading course outcomes: %{error}', {
