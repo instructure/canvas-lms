@@ -32,6 +32,7 @@ describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
+  const onOpenIsolatedView = jest.fn()
 
   beforeAll(() => {
     // eslint-disable-next-line no-undef
@@ -55,6 +56,7 @@ describe('IsolatedViewContainer', () => {
     server.resetHandlers()
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
+    onOpenIsolatedView.mockClear()
   })
 
   afterAll(() => {
@@ -76,7 +78,8 @@ describe('IsolatedViewContainer', () => {
   const defaultProps = () => ({
     discussionEntryId: '1',
     open: true,
-    onClose: () => {}
+    onClose: () => {},
+    onOpenIsolatedView
   })
 
   it('should render', () => {
@@ -136,5 +139,23 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(showOlderRepliesButton)
 
     expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+  })
+
+  it('calls the onOpenIsolatedView callback when clicking View Replies', async () => {
+    const {findByText} = setup(defaultProps())
+
+    const viewRepliesButton = await findByText('View Replies')
+    fireEvent.click(viewRepliesButton)
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', false)
+  })
+
+  it('calls the onOpenIsolatedView callback when clicking reply', async () => {
+    const {findAllByText} = setup(defaultProps())
+
+    const replyButton = await findAllByText('Reply')
+    fireEvent.click(replyButton[1])
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', true)
   })
 })

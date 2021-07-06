@@ -204,6 +204,7 @@ const DiscussionTopicManager = props => {
           RCEOpen={editorExpanded}
           setRCEOpen={setEditorExpanded}
           onClose={closeIsolatedView}
+          onOpenIsolatedView={openIsolatedView}
         />
       )}
     </SearchContext.Provider>

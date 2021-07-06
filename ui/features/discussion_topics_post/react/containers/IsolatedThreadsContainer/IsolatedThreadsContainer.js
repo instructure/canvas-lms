@@ -69,6 +69,7 @@ export const IsolatedThreadsContainer = props => {
             onToggleUnread={props.onToggleUnread}
             onDelete={props.onDelete}
             onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+            onOpenIsolatedView={props.onOpenIsolatedView}
           />
         ))}
     </div>
@@ -81,7 +82,8 @@ IsolatedThreadsContainer.propTypes = {
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
-  showOlderReplies: PropTypes.func
+  showOlderReplies: PropTypes.func,
+  onOpenIsolatedView: PropTypes.func
 }
 
 export default IsolatedThreadsContainer
@@ -122,7 +124,7 @@ const IsolatedThreadContainer = props => {
         key={`reply-${entry.id}`}
         authorName={entry.author.name}
         delimiterKey={`reply-delimiter-${entry.id}`}
-        onClick={() => {}}
+        onClick={() => props.onOpenIsolatedView(entry.id, true)}
       />
     )
   }
@@ -140,24 +142,14 @@ const IsolatedThreadContainer = props => {
     )
   }
 
-  if (entry.lastReply) {
+  if (entry.subentriesCount) {
     threadActions.push(
       <ThreadingToolbar.Expansion
         key={`expand-${entry.id}`}
         delimiterKey={`expand-delimiter-${entry.id}`}
-        expandText={I18n.t(
-          {
-            one: '%{count} reply, %{unread} unread',
-            other: '%{count} replies, %{unread} unread'
-          },
-          {
-            count: entry.rootEntryParticipantCounts?.repliesCount || 0,
-            unread: entry.rootEntryParticipantCounts?.unreadCount || 0
-          }
-        )}
-        isReadOnly
+        expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => {}}
+        onClick={() => props.onOpenIsolatedView(entry.id, false)}
       />
     )
   }
@@ -206,5 +198,6 @@ IsolatedThreadContainer.propTypes = {
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
-  onOpenInSpeedGrader: PropTypes.func
+  onOpenInSpeedGrader: PropTypes.func,
+  onOpenIsolatedView: PropTypes.func
 }

@@ -284,6 +284,7 @@ export const IsolatedViewContainer = props => {
               onDelete={onDelete}
               onOpenInSpeedGrader={onOpenInSpeedGrader}
               showOlderReplies={fetchMoreEntries}
+              onOpenIsolatedView={props.onOpenIsolatedView}
             />
           )}
         </>
@@ -298,7 +299,8 @@ IsolatedViewContainer.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func,
   RCEOpen: PropTypes.bool,
-  setRCEOpen: PropTypes.func
+  setRCEOpen: PropTypes.func,
+  onOpenIsolatedView: PropTypes.func
 }
 
 export default IsolatedViewContainer
