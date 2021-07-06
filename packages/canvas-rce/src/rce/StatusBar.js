@@ -21,10 +21,9 @@ import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, number, oneOf, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
-import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {Text} from '@instructure/ui-text'
 import {SVGIcon} from '@instructure/ui-svg-images'
@@ -112,9 +111,11 @@ export default function StatusBar(props) {
     }
     // adding a delay before including the HTML Editor description to wait the focus moves to the RCE
     // and prevent JAWS from reading the aria-describedby element when switching back to RCE view
-    setTimeout(() => {
+    const timerid = setTimeout(() => {
       setIncludeEdtrDesc(props.use_rce_pretty_html_editor && !isHtmlView())
     }, 100)
+
+    return () => clearTimeout(timerid)
   }, [props.editorView]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function preferredHtmlEditor() {
