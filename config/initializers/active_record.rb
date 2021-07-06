@@ -906,21 +906,7 @@ module UsefulFindInBatches
     pool.remove(conn)
 
     checkin = -> do
-      pool&.synchronize do
-        pool.send(:adopt_connection, conn)
-        pool.checkin(conn)
-        if (conn2 = klass.connection) != conn
-          # checkin the secondary connection that was established, so that the
-          # next usage will immediately checkout the original connection.
-          # this ensures original transaction state is preserved
-          pool.checkin(conn2)
-          # the pool uses a LIFO queue, so put the correct connection at the front
-          # by pretending to explicitly check it out and then return it
-          conn.lease
-          pool.checkin(conn)
-        end
-        klass.connection
-      end
+      pool&.restore_connection(conn)
       pool = nil
     end
 
@@ -1936,6 +1922,28 @@ module ConnectionWithMaxRuntime
   end
 end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)
+
+module RestoreConnectionConnectionPool
+  def restore_connection(conn)
+    synchronize do
+      adopt_connection(conn)
+      # check if a new connection was checked out in the meantime, and check it back in
+      if (old_conn = @thread_cached_conns[connection_cache_key(current_thread)]) && old_conn != conn
+        # this is just the necessary parts of #checkin
+        old_conn.lock.synchronize do
+          old_conn._run_checkin_callbacks do
+            old_conn.expire
+          end
+
+          @available.add old_conn
+        end
+      end
+      @thread_cached_conns[connection_cache_key(current_thread)] = conn
+    end
+  end
+end
+ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(RestoreConnectionConnectionPool)
+
 
 module MaxRuntimeConnectionPool
   def max_runtime
