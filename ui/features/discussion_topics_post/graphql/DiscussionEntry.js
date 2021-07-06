@@ -60,6 +60,9 @@ export const DiscussionEntry = {
           repliesCount
         }
       }
+      parent {
+        id
+      }
     }
     ${DiscussionEntryPermissions.fragment}
   `,
@@ -99,7 +102,8 @@ export const DiscussionEntry = {
         unreadCount: number,
         repliesCount: number
       })
-    })
+    }),
+    parent: shape({id: string})
   }),
 
   mock: ({
@@ -140,6 +144,10 @@ export const DiscussionEntry = {
         __typename: 'DiscussionEntryCounts'
       },
       __typename: 'Discussion'
+    },
+    parent = {
+      id: '77',
+      __typename: 'DiscussionEntry'
     }
   } = {}) => ({
     id,
@@ -162,6 +170,7 @@ export const DiscussionEntry = {
     discussionSubentriesConnection,
     rootEntry,
     discussionTopic,
+    parent,
     __typename: 'DiscussionEntry'
   })
 }

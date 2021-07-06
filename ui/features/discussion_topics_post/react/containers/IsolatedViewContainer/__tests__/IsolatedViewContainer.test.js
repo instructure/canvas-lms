@@ -88,22 +88,28 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('should render a back button', async () => {
-    const rootEntry = DiscussionEntry.mock({_id: 32})
-    const {findByTestId} = setup(defaultProps({discussionEntryOverrides: {rootEntry}}))
-    expect(await findByTestId('back-button')).toBeTruthy()
+    const {findByTestId} = setup(defaultProps())
+
+    const backButton = await findByTestId('back-button')
+    expect(backButton).toBeInTheDocument()
+
+    fireEvent.click(backButton)
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('77', false)
   })
 
-  it('should not render a back button', () => {
+  it('should not render a back button', async () => {
     server.use(
       graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
         return res.once(
           ctx.data({
-            legacyNode: DiscussionEntry.mock()
+            legacyNode: DiscussionEntry.mock({parent: null})
           })
         )
       })
     )
-    const {queryByTestId} = setup(defaultProps())
+    const {findByText, queryByTestId} = setup(defaultProps())
+    expect(await findByText('This is the parent reply')).toBeInTheDocument()
     expect(queryByTestId('back-button')).toBeNull()
   })
 

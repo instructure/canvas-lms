@@ -257,6 +257,7 @@ export const IsolatedViewContainer = props => {
             onReply={() => props.setRCEOpen(true)}
             onToggleRating={() => toggleRating(isolatedEntry.data.legacyNode)}
             onSave={onUpdate}
+            onOpenIsolatedView={props.onOpenIsolatedView}
           >
             {props.RCEOpen && (
               <View

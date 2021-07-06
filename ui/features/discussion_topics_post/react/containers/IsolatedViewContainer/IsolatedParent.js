@@ -88,7 +88,7 @@ export const IsolatedParent = props => {
 
   return (
     <>
-      {props.discussionEntry.rootEntry && (
+      {props.discussionEntry.parent && (
         <div
           style={{
             paddingLeft: '0.50rem',
@@ -96,7 +96,9 @@ export const IsolatedParent = props => {
             paddingBottom: '0.50rem'
           }}
         >
-          <BackButton />
+          <BackButton
+            onClick={() => props.onOpenIsolatedView(props.discussionEntry.parent.id, false)}
+          />
         </div>
       )}
       <div
@@ -162,5 +164,6 @@ IsolatedParent.propTypes = {
   onReply: PropTypes.func,
   onToggleRating: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.node
+  children: PropTypes.node,
+  onOpenIsolatedView: PropTypes.func
 }
