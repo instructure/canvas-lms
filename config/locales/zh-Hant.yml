@@ -1927,12 +1927,14 @@ zh-Hant:
   adding_to_library_b552868: 添加到檔案庫中
   additional_comments_9aed10bb: 其他評論
   additional_considerations_3ee46e5b: 其他考慮因素
+  additional_considerations_a36efeef: 其他考慮因素
   additional_occurrence_s_7b5b0173: 附加事項
   additional_outcomes_options_6df428f1: 額外的結果選項
   additional_settings_20362654: 其他設定
   additional_settings_for_sis_syncing_f926973e: "額外的 SIS 同步化設定"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "額外 SIS 同步作業、測驗及討論區設定"
   additional_sort_options_for_new_gradebook_2dc1939: 適用於「新成績單」的其他排序選項
+  additionally_if_this_permission_is_disabled_users__6acf5d08: 另外，如果停用此權限，使用者不能刪除手動添加的外部應用程式。
   address_use_as_wildcard_48f2cf60: 地址（以*為萬用字元）
   addressbook_microservice_a4940422: "AddressBook Microservice"
   addressbook_performance_tap_98ddf67: "AddressBook 表現點選"
@@ -2041,6 +2043,7 @@ zh-Hant:
   alerts_6b871b71: 提醒
   alerts_add_edit_delete_d71091c6: "提示 - 添加 / 編輯 / 刪除"
   alerts_course_settings_53551794: 提醒（課程設定）
+  alerts_must_be_configured_for_the_institution_aler_43bbacb1: "必須設定使用於機構的提醒。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）傳送提醒。每天都會進行檢查，並將通知傳送給學生和/或教師，直到觸發問題得到解決。"
   align_outcomes_to_this_page_7d055196: 將結果校準至此頁面
   all_4321c3a1: 全部
   all_account_types_e83c1516: 所有的帳戶類型
@@ -2147,6 +2150,7 @@ zh-Hant:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: 允許透過分發佇列傳送通知的功能
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: 允許通過分發隊列的方式發送通知。
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "允許此工具訪問 IMS 名稱和角色佈建服務"
+  allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: 添加使用者時，允許未確認的電郵地址
   allow_users_to_comment_45b8f753: 允許使用者評論
   allowed_attempts_4e229caa: 允許的嘗試
   allowed_domains_ee7868c8: 獲允許網域
@@ -2172,6 +2176,7 @@ zh-Hant:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允許支援連結標籤為精選或全新，並在支援選單中顯示為精選支援連結。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: 遷移課程內容期間允許選取各學習成果
   allows_setting_account_course_level_mastery_scales_1939e0fd: 允許設定帳戶及課程級別的掌握程度及其計算方式，取代逐一顯示及計算每個學習成果的評級
+  allows_students_to_access_other_student_groups_wit_43918810: 允許學生透過直接連結存取小組內的其他學生小組。
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "允許將 Canvas 學生同步至 Microsoft Team"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: 允許以教師/設計者/助教為基礎的身份存取「聊天」工具。
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: 允許以教師/設計者/助教為基礎的身份存取聊天工具。
@@ -2191,19 +2196,28 @@ zh-Hant:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: 允許對周期性月曆事件進行排程
   allows_the_user_to_navigate_away_while_submission__276d73b7: 允許使用者在處理提交項目重新上傳時結束導航
   allows_uer_to_delete_a_submission_file_5302db48: 允許使用者刪除提交項目檔案。
+  allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: 允許使用者存取使用者的設定選單及使用者詳細資料。
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: 允許使用者存取及編輯公用區的管理員設定。允許使用者創建及管理小組。允許使用者管理帳戶中分享的資源。
+  allows_user_to_access_and_edit_the_admin_settings__e45da9d7: 允許使用者存取及編輯公用區的管理員設定。
+  allows_user_to_access_gradebook_history_9d599681: 允許使用者存取成績單記錄。
+  allows_user_to_access_gradebook_history_allows_use_79dfddd: 允許使用者存取成績單記錄。允許使用者存取學習掌握程度成績單（如已啟用）。
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "允許使用者從作業中存取 SpeedGrader。"
+  allows_user_to_access_student_view_test_student_co_8b57e87c: 允許使用者存取「學生視圖（測試學生）」、「複製此課程」、「重置課程內容」，以及「永久刪除課程」按鈕。
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: 允許使用者於學生群組卡上存取「作為使用者」連結。
   allows_user_to_access_the_announcements_link_in_co_2783579a: 允許使用者存取課程導航中的通告連結。允許使用者檢視課程通告。允許使用者於課程主頁檢視最新通告。
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       允許使用者存取課程導航中的通告連結。
       允許使用者查看課程通告。
       允許使用者於課程主頁查看最新通告。
+  allows_user_to_access_the_announcements_link_in_co_f2e824e9: 允許使用者存取課程導航中的通告連結。
   allows_user_to_access_the_attendance_tool_72ef0b68: 允許使用者存取「出席紀錄」工具。
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: 允許使用者存取藍圖課程側欄。允許使用者管理課程設定中的藍圖課程內容設定。允許使用者移除關聯課程。允許使用者於個別作業、頁面或討論區編輯藍圖鎖定設定
   allows_user_to_access_the_chat_tool_48d5f5c4: 允許使用者存取「聊天」工具。
   allows_user_to_access_the_files_tab_in_the_content_a5187929: 允許使用者存取內容選擇器中的檔案標籤。
+  allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: 允許使用者存取學習掌握程度成績單（如已啟用）。
+  allows_user_to_access_the_manage_question_banks_li_616d45c8: 允許者用者存取「測驗索引頁面」的「管理題庫」連結。
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: 允許使用者存取課程設定中的導航工具標籤。允許使用者存取「學生視圖（測試學生）」、「複製此課程」、「重置課程內容」，以及「永久刪除課程」按鈕。允許使用者於課程詳細資料標籤內編輯課程圖像、名稱、課程代碼、時區、子帳戶、學期，以及其他選項。
+  allows_user_to_access_the_navigation_tab_in_course_e266d985: 允許使用者存取課程設定中的導航工具標籤。
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: 允許使用者存取帳戶導航中的成員連結。
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: 允許使用者存取管理員工具中的「還原課程」標籤。
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: 允許使用者存取管理員工具中的還原課程標籤
@@ -2216,17 +2230,22 @@ zh-Hant:
       允許使用者於帳戶內以其他使用者的身份操作。您的機構內獲授權在整個 Canvas 帳戶內以其他使用者身份操作的使用者，才應獲得此權限。
               擁有此權限的使用者獲許使用「作為」功能以管理帳戶設定、檢視及調整評分、存取使用者資訊等。
               此權限亦允許獲指派至子帳戶的管理員存取其子帳戶以外的設定及資訊。
+  allows_user_to_add_and_remove_associated_courses_2ae6e4d6: 允許使用者添加和移除關聯的課程。
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: 允許使用者添加及移除其他帳戶管理員。
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: "允許使用者添加和移除其他教師、課程設計者或助教。允許使用者添加和移除觀察者。允許使用者檢視教師、設計者及助教的登入 ID 資訊。允許使用者檢視任何使用者的使用者詳細資料。允許使用者編輯使用者的分班或身份。"
   allows_user_to_add_and_remove_other_teachers_cours_bff27199: "允許使用者添加和移除其他教師、課程設計者或助教。允許使用者於課程中添加和移除觀察者。允許使用者檢視教師、設計者及助教的登入 ID 資訊。允許使用者檢視教師、課程設計者、助教及觀察者的設定選單。允許使用者檢視教師、課程設計者、助教及觀察者的使用者詳細資料。允許使用者限制學生僅可檢視同一分班的成員。"
   allows_user_to_add_and_remove_students_allows_user_6b31aafc: "允許使用者添加和移除學生。允許使用者添加和移除觀察者。允許使用者檢視學生的登入 ID 資訊。允許使用者檢視之前的註冊。允許使用者存取使用者的設定選單及使用者詳細資料。允許使用者編輯學生的分班或身份。允許使用者於課程成員頁面重新傳送課程邀請。"
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "允許使用者於課程中添加和移除學生。允許使用者於課程中添加和移除觀察者。允許使用者檢視學生的登入 ID 資訊。允許使用者檢視之前的註冊。允許使用者存取使用者的設定選單及使用者詳細資料。允許使用者於學生的詳細資料頁面結束或刪除註冊。允許使用者重新傳送課程邀請。"
+  allows_user_to_add_announcements_in_the_announceme_726541b5: 允許使用者於通告頁面添加通告。
+  allows_user_to_add_assignment_groups_in_a_course_3054675c: 允許使用者添加作業小組至課程中。
+  allows_user_to_add_course_files_and_folders_566e3447: 允許使用者添加檔案和資料夾。
   allows_user_to_add_course_files_and_folders_allows_eecf49f9: 允許使用者添加檔案和資料夾。允許使用者匯入壓縮檔。
   allows_user_to_add_course_sections_in_course_setti_f8e4cabf: 允許使用者於課程設定內新增課程。
   allows_user_to_add_designers_in_the_course_allows__ee166883: |-
       允許使用者於課程內添加設計者。允許使用者檢視設計者的登入 ID 資訊。
               允許使用者檢視設計者的使用者詳細資料。允許使用者編輯設計者的分班或身份。
   allows_user_to_add_designers_to_a_course_f81791e8: 允許使用者添加設計者至課程。
+  allows_user_to_add_designers_to_a_course_from_the__427db55b: 允許使用者從帳戶課程頁面添加設計者至課程。
   allows_user_to_add_designers_to_a_course_from_the__b48e0a92: 允許使用者從帳戶課程頁面添加設計者至課程。允許使用者添加設計者至課程。
   allows_user_to_add_designers_to_the_course_from_th_ee349841: "允許使用者於帳戶課程頁面添加設計者至課程。允許使用者於課程內添加設計者。允許使用者檢視設計者的登入 ID 資訊。允許使用者檢視設計者的使用者詳細資料。允許使用者編輯設計者的分班或身份。"
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: 允許使用者於討論區頁面添加討論區。
@@ -2249,10 +2268,12 @@ zh-Hant:
       允許使用者存取成績單記錄。
       允許使用者存取學習掌握程度（如已啟用）。
   allows_user_to_add_edit_and_update_grades_in_the_g_5d50d581: 允許使用者添加、編輯和更新成績單內的成績。允許使用者存取成績單記錄。允許使用者存取學習掌握程度成績單（如已啟用）。
+  allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: 允許使用者添加、編輯和更新成績單內的成績。
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       允許使用者添加、編輯和更新成績單及 SpeedGrader 內的成績。
       允許使用者存取成績單記錄。
   allows_user_to_add_edit_delete_and_publish_and_unp_4f9c2fd4: 允許使用者添加、編輯、刪除和發佈與取消發佈作業。允許使用者管理作業設定。允許使用者添加作業小組至課程中。允許使用者啟用及編輯課程中的作業小組所佔百分比。
+  allows_user_to_add_edit_delete_and_publish_and_unp_5b1059b: 允許使用者添加、編輯、刪除和發佈與取消發佈作業。
   allows_user_to_add_edit_delete_and_publish_and_unp_5f5b97aa: 允許使用者添加、編輯、刪除和發佈與取消發佈測驗。
   allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: 允許使用者添加、編輯、刪除和發佈/取消發佈測驗。
   allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
@@ -2268,7 +2289,9 @@ zh-Hant:
   allows_user_to_add_observers_in_the_course_allows__9c6bb78c: "允許使用者於課程內添加觀察者。允許使用者檢視觀察者的登入 ID 資訊。允許使用者檢視觀察者的使用者詳細資料。允許使用者編輯觀察者的分班或身份。"
   allows_user_to_add_observers_to_a_course_ca1a678b: 允許使用者添加觀察者至課程。
   allows_user_to_add_observers_to_a_course_from_the__806ec842: 允許使用者從帳戶課程頁面添加觀察者至課程。允許使用者添加觀察者至課程。
+  allows_user_to_add_observers_to_a_course_from_the__9017365c: 允許使用者從帳戶課程頁面添加觀察者至課程。
   allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: "允許使用者於帳戶課程頁面添加觀察者至課程。允許使用者於課程內添加觀察者。允許使用者檢視觀察者的登入 ID 資訊。允許使用者檢視觀察者的使用者詳細資料。允許使用者編輯觀察者的分班或身份。"
+  allows_user_to_add_page_to_student_to_do_list_7085a054: 允許使用者添加頁面至學生待辦事項淸單。
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: 允許使用者透過「添加到學生待辦事項」勾選框將頁面添加到「清單視圖控制面板」中。
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       允許使用者添加/移除其他教師、課程設計者或助教。
@@ -2296,49 +2319,71 @@ zh-Hant:
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: 允許使用者從帳戶課程頁面添加學生至課程。
   allows_user_to_add_students_to_a_course_from_the_a_43abb0e6: 允許使用者從帳戶課程頁面添加學生至課程。允許使用者添加學生至課程。
   allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: "允許使用者於課程內添加助教。允許使用者檢視助教的登入 ID 資訊。允許使用者檢視助教的使用者詳細資料。允許使用者編輯助教的分班或身份。"
+  allows_user_to_add_tas_in_the_course_f4de4c19: 允許使用者於課程內添加助教。
+  allows_user_to_add_tas_to_a_course_from_the_accoun_66e76aee: 允許使用者從帳戶課程頁面添加助教至課程。
   allows_user_to_add_tas_to_a_course_from_the_accoun_be5446f0: 允許使用者從帳戶課程頁面添加助教至課程。允許使用者於課程內添加助教。
   allows_user_to_add_tas_to_the_course_from_the_acco_254e4c5f: "允許使用者於帳戶課程頁面添加助教至課程。允許使用者於課程內添加助教。允許使用者檢視助教的登入 ID 資訊。允許使用者檢視助教的使用者詳細資料。允許使用者編輯助教的分班或身份。"
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: 允許使用者於帳戶課程頁面添加教師、課程設計者或助教至課程。
   allows_user_to_add_teachers_in_the_course_allows_u_3f80b57d: "允許使用者於課程內添加教師。允許使用者檢視教師的登入 ID 資訊。允許使用者檢視教師的使用者詳細資料。允許使用者編輯教師的分班或身份。"
   allows_user_to_add_teachers_to_a_course_37b9594c: 允許使用者添加教師至課程。
   allows_user_to_add_teachers_to_a_course_from_the_a_40af6066: 允許使用者從帳戶課程頁面添加教師至課程。允許使用者添加教師至課程。
+  allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: 允許使用者從帳戶課程頁面添加教師至課程。
   allows_user_to_add_teachers_to_the_course_from_the_dc03e973: "允許使用者於帳戶課程頁面添加教授至課程。允許使用者於課程內添加教師。允許使用者檢視教師的登入 ID 資訊。允許使用者檢視教師的使用者詳細資料。允許使用者編輯教師的分班或身份。"
+  allows_user_to_change_start_and_end_dates_for_cour_f437cee1: 允許使用者更改課程分班的開始及結束日期。
   allows_user_to_change_the_template_being_used_by_a_86f46490: 可以變更帳戶正在使用的範本。允許使用者在元帳戶中檢視課程範本的名稱。
+  allows_user_to_change_the_template_being_used_by_a_eab509a3: 可以變更帳戶正在使用的範本。
+  allows_user_to_close_for_comments_move_pin_and_unp_2adb3d95: 允許使用者結束由其他使用者建立的討論主題以徵求評論、移動、釘選/取消釘選以及刪除。
   allows_user_to_configure_alerts_in_course_settings_38675b12: "允許使用者於課程設定中配置提醒。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）傳送提醒。每天都會進行檢查，並將通知傳送給學生和/或教師，直到觸發問題得到解決。"
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "允許使用者於課程設定中配置提醒。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）發送提醒。每天都會進行檢查，並將通知發送給學生和/或教師，直到觸發問題得到解決。"
   allows_user_to_configure_alerts_in_course_settings_806397b5: "允許使用者於課程設定中配置提醒。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）發送提醒。每天都會進行檢查，並將通知發送給學生和/或教師，直到觸發問題得到解決。"
+  allows_user_to_configure_alerts_in_course_settings_c6b938ab: 允許使用者於課程設定中配置提醒。
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "允許使用者於課程設定中配置提醒。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）傳送提醒。每天都會進行檢查，並將通知傳送給學生和/或教師，直到觸發問題得到解決。"
+  allows_user_to_copy_individual_course_items_to_ano_46ba40d6: 允許使用者將個別課程項目複製到其他課程。
   allows_user_to_create_accounts_for_new_users_allow_bb7575e9: 允許使用者建立新使用者的帳戶。允許使用者於帳戶內移除及合併使用者。允許使用者修改使用者帳戶詳細資料。允許使用和檢視及修改其他使用者的登入資訊。
+  allows_user_to_create_accounts_for_new_users_e4ec27c3: 允許使用者建立新使用者的帳戶。
   allows_user_to_create_accounts_for_new_users_with__30b55094: 允許使用者以帳戶級別「添加成員」按鈕為新使用者建立帳戶。允許使用者於帳戶內移除及合併使用者。允許使用者修改使用者帳戶詳細資料，如姓名、電子郵件及時區。允許使用和檢視及修改其他使用者的登入資訊。
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       允許使用者以帳戶級別「添加成員」按鈕為新使用者創建帳戶。
       允許使用者於帳戶內移除及合併使用者。
       允許使用者修改使用者帳戶詳細資料，如姓名、電子郵件及時區。允許使用和查看及修改其他使用者的登入資訊。
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: 允許使用者使用排程工具於行事曆上創建及管理預約見面。
+  allows_user_to_create_and_manage_groups_allows_use_562e0013: 允許使用者建立及管理小組。允許使用者管理帳戶中分享的資源。
   allows_user_to_create_and_modify_grading_schemes_e4433a19: 允許使用者創建及修改等級評分方式。
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: 允許使用者創建協作。允許使用者查看、編輯及刪除自己創建的會議。
   allows_user_to_create_collaborations_allows_user_t_eff2a175: 允許使用者創建協作。允許使用者查看、編輯及刪除自己創建的協作。
+  allows_user_to_create_collaborations_b4f214bf: 允許使用者建立協作。
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: 允許使用者建立課程頁面。允許使用者於藍圖主課程中編輯個人頁面的藍圖鎖定設定。
   allows_user_to_create_course_pages_ec9c6647: 允許使用者建立課程頁面。
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: 允許使用者為帳戶創建開發人員金鑰。
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: 允許使用者創建、編輯及刪除帳戶小組。
   allows_user_to_create_edit_and_delete_course_group_36097d72: 允許使用者建立、編輯及刪除課程小組。允許使用者建立、編輯及刪除由學生建立的課程小組。
+  allows_user_to_create_edit_and_delete_course_group_40367907: 允許使用者建立、編輯及刪除課程小組。
+  allows_user_to_create_edit_and_delete_course_group_7aa3842: 允許使用者建立、編輯及刪除由學生建立的課程小組。
   allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
       允許使用者創建、編輯及刪除課程小組。
       允許使用者創建、編輯及刪除由學生創建的課程小組。
+  allows_user_to_create_edit_and_delete_course_rubri_493ac58f: 允許使用者建立、編輯及刪除課程評分標準。
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: 允許使用者創建、編輯及刪除評分標準連結內的課程評分標準。
+  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: 允許使用者於帳戶及課程級別建立、編輯及刪除成果及成果小組。
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: 允許使用者於課程級別建立、編輯及刪除成果及成果小組。
-  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: 允許使用者創建、編輯及刪除評分標準。
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: 允許使用者建立、編輯及刪除評分標準。
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
       允許使用者於課程級別創建、匯入、編輯及刪除成
       果及成果小組。
   allows_user_to_create_import_edit_and_delete_outco_8eff991: 允許使用者於課程級別建立、匯入、編輯及刪除成果及成果小組。
   allows_user_to_create_new_conferences_allows_user__89cebec2: 允許使用者創建新會議。允許使用者開始自己創建的會議。
+  allows_user_to_create_new_conferences_in_courses_a_80899f64: 允許使用者在課程和小組中建立新會議。
+  allows_user_to_create_new_entries_in_the_faculty_j_2a280fec: 允許使用者在教職員日誌中建立新條目。
+  allows_user_to_cross_list_sections_f6726df2: 允許使用者跨清單選擇分班。
+  allows_user_to_define_users_allowed_to_edit_the_pa_39fddc1c: 允許使用者指定獲允許編輯頁面的使用者。
   allows_user_to_delete_a_submission_file_65f1dd7d: 允許使用者刪除提交項目檔案。
+  allows_user_to_delete_a_user_from_a_course_section_4b99a5c4: 允許使用者刪除課程分班內的使用者。
   allows_user_to_delete_course_files_and_folders_34a7793c: 允許使用者刪除檔案和資料夾。
   allows_user_to_delete_course_pages_allows_user_to__d6e4174d: 允許使用者刪除課程頁面。允許使用者於藍圖主課程中編輯個人頁面的藍圖鎖定設定。
   allows_user_to_delete_course_pages_dfaf4fb7: 允許使用者刪除課程頁面。
+  allows_user_to_delete_course_sections_19193a35: 允許使用者刪除課程分班。
   allows_user_to_delete_course_sections_allows_user__649d2d0d: 允許使用者刪除課程分班。允許使用者刪除課程分班內的使用者。
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: 允許使用者指定課程為藍圖課程。
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: 允許使用者指定課程為藍圖課程。允許使用者於課程設定內管理藍圖課程設定。允許使用者添加關聯課程。
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       允許使用者指定課程為藍圖課程。允許使用者管理「課程設定」中的「藍圖課程」設定。
@@ -2349,20 +2394,31 @@ zh-Hant:
       允許使用者添加關聯課程。
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: 允許使用者分發不同的作業予個別學生。
   allows_user_to_download_all_comments_in_a_student__33b36d0a: 允許使用者下載學生提交項目內的所有評論。
+  allows_user_to_edit_a_student_s_section_or_role_d2b312ad: 允許使用者編輯學生的分班或身份。
+  allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "允許使用者編輯使用者的分班或身份（如果不是透過 SIS 添加）。"
   allows_user_to_edit_assignment_details_on_individu_3e50993a: 允許使用者於個別討論區中編輯作業詳細資料。單元：允許使用者添加作業至單元中。
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: 允許使用者於個別討論區中編輯作業詳細資料。
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: 允許使用者於個別討論區編輯藍圖鎖定設定。
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: 允許使用者於使用者已註冊藍圖主課程的情況下，在個別討論區編輯藍圖鎖定設定。
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: 允許使用者於個別討論區編輯藍圖鎖定設定。
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: 允許使用者於使用者已註冊藍圖主課程的情況下，在個別討論區編輯藍圖鎖定設定。
+  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: 允許使用者於「頁面」索引頁面和藍圖主課程的個別頁面中編輯藍圖課程鎖定設定。
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: 允許使用者於藍圖主課程中編輯個別頁面的藍圖鎖定設定。
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: 允許使用者於藍圖主課程中編輯「頁面」索引頁面的藍圖課程鎖定設定。
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: 允許使用者於藍圖主課程中編輯「頁面」索引頁面的藍圖鎖定設定。
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       允許使用者於藍圖主課程中編輯「作業和測驗」索引
       頁面的藍圖鎖定設定。
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: 允許使用者於藍圖主課程中編輯「作業和測驗」索引頁面的藍圖鎖定設定。
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: 允許使用者於藍圖主課程中編輯「討論區」索引頁面的藍圖鎖定設定。
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: 允許使用者於藍圖主課程中編輯「討論區」索引頁面的藍圖鎖定設定。
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: 允許使用者於藍圖主課程中編輯檔案頁面的藍圖鎖定設定。
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: 允許使用者於藍圖主課程中編輯「作業及測驗」索引頁面的藍圖鎖定設定。
   allows_user_to_edit_conferences_61eb62e0: 允許使用者編輯「會議」。
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: 允許使用者編輯手動添加的外部應用程式的配置。
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: 允許使用者編輯課程檔案和資料夾。
+  allows_user_to_edit_course_image_name_course_code__8a4681c8: 允許使用者於課程詳細資料標籤內編輯課程圖像、名稱、課程代碼、時區、子帳戶、學期，以及其他選項。
+  allows_user_to_edit_course_pages_30f188b4: 允許使用者編輯課程頁面。
   allows_user_to_edit_course_pages_allows_user_to_de_65fec49b: |-
       允許使用者編輯課程頁面。允許使用者指定獲允許編輯頁面的使用者。允許使用者在學生待辦事項清單內添加頁面。
               允許使用者發佈及取消發佈頁面。允許使用者檢視頁面歷史記錄及設定首頁。
@@ -2372,6 +2428,7 @@ zh-Hant:
               允許使用者發佈及取消發佈頁面。允許使用者檢視頁面歷史記錄及設定首頁。
               允許使用者在內容頁首頁內編輯藍圖鎖定設定，以及在藍圖主課程中編輯個人頁面。
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "允許使用者於 SpeedGrader 內編輯成績及添加評論。"
+  allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: 允許使用者編輯成績單內的成績。
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: 允許使用者編輯成績單內的成績。允許使用者存取成績單記錄。允許使用者存取學習掌握程度成績單（如已啟用）。
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       允許使用者編輯成績單內的成績。
@@ -2379,9 +2436,14 @@ zh-Hant:
       允許使用者存取學習掌握程度（如已啟用）。
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: 允許使用者編輯成績單內的成績。允許使用者存取成績單記錄。
   allows_user_to_edit_grading_schemes_98c35117: 允許使用者編輯等級評分方式。
+  allows_user_to_edit_lock_settings_on_individual_as_80ed188a: 允許使用者在個別作業列表、頁面或討論區上編輯鎖定設定。
   allows_user_to_edit_the_course_sis_id_e1eccee3: "允許使用者編輯課程 SIS ID。"
   allows_user_to_edit_the_course_syllabus_a28ff262: 允許使用者編輯課程大綱。
+  allows_user_to_edit_title_description_or_remove_co_483daae5: 允許使用者就所有協作編輯標題、說明或移除協作人員。
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: 允許使用者啟用及編輯課程中的作業小組所佔百分比。
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "允許使用者匯出成績單為 CSV 檔案。允許使用者存取學習掌握程度成績單（如已啟用）。"
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "允許使用者匯出成績單為 CSV 檔案。"
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: 允許使用者以帳戶級別篩選藍圖課程。允許使用者添加關聯課程。
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: 允許使用者以帳戶級別篩選藍圖課程。允許使用者添加關聯課程。
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       允許使用者以帳戶級別篩選藍圖課程。
@@ -2389,6 +2451,7 @@ zh-Hant:
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: 允許使用者為學生產生配對代碼，以分享予觀察者。
   allows_user_to_generate_login_logout_activity_repo_bba62f2: 允許使用者於管理員工具內產生登入/登出活動報告。
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: 允許使用者於管理員工具內產生登入/登出活動報告。（不可於子帳戶級別中使用。）
+  allows_user_to_import_a_zip_file_97bd7db2: 允許使用者匯入壓縮檔。
   allows_user_to_import_account_learning_outcomes_f6f6d0b9: 允許使用者匯入帳戶學習成果。
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: 允許使用者使用課程匯入工具匯入內容。
   allows_user_to_import_course_learning_outcomes_2ca3f18f: 允許使用者匯入課程學習成果。
@@ -2398,8 +2461,11 @@ zh-Hant:
       允許使用者將公用區的資源匯入至課程。
       允許使用者分享作業至公用區或編輯之前已分享的內容。
   allows_user_to_import_resources_from_commons_into__6e9d32e6: 允許使用者將公用區的資源匯入至課程。允許使用者分享作業至公用區或編輯之前已分享的內容。
+  allows_user_to_import_resources_from_commons_into__79e8255e: 允許使用者將公用區的資源匯入至課程。
   allows_user_to_import_sis_data_583b20a5: "允許使用者匯入 SIS 數據。"
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: 允許使用者在選取了「僅評分員可以讃好」勾選框後「讃好」討論區帖子。
+  allows_user_to_manage_assignment_settings_35d94690: 允許使用者管理作業設定。
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: 允許使用者於課程設定內管理藍圖課程設定。
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: 允許使用者於帳戶設定內管理功能選項。
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       允許使用者管理單元（創建、添加項目、編輯單元設定、
@@ -2407,14 +2473,20 @@ zh-Hant:
   allows_user_to_manage_modules_create_add_items_edi_9459e815: 允許使用者管理單元（建立、添加項目、編輯單元設定、發佈/取消發佈等等）。
   allows_user_to_manage_observers_associated_with_st_4b45f2be: 允許使用者管理於帳戶中與學生有關聯的觀察者。
   allows_user_to_manage_rubrics_326eedc2: 允許使用者管理評分標準。
+  allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: 允許使用者管理帳戶中分享的資源。
+  allows_user_to_manage_the_visibility_options_in_co_e781e4e4: 允許使用者在建立新課程時，管理課程設定中的「可見度」選項。
   allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: 允許使用者於帳戶設定中手動添加應用程式。
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: 允許使用者於帳戶設定中手動添加及刪除應用程式。
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: 允許使用者於課程設定中手動添加及刪除應用程式。
   allows_user_to_moderate_a_quiz_6953d369: 允許使用者為測驗調整分數。
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: 允許使用者調整測驗的分數，並檢視測驗統計資料頁面。
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: 允許使用者為測驗調整分數。設定：允許使用者編輯等級評分方式。
+  allows_user_to_modify_user_account_details_e16fb115: 允許使用者修改使用者帳戶詳細資料。
+  allows_user_to_publish_and_unpublish_pages_e9397f80: 允許使用者發佈和取消發佈頁面。
   allows_user_to_publish_conclude_and_delete_courses_336cf352: 允許使用者發佈、結束及刪除課程。
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: 允許使用者移除在「課程設定」中作為課程範本的課程。
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: 允許使用者移除在「課程設定」中作為課程範本的課程。允許使用者設定帳戶不作為範本。
+  allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: 允許使用者於帳戶內移除及合併使用者。
   allows_user_to_remove_designers_from_a_course_fa9e887e: 允許使用者從課程中移除設計者。
   allows_user_to_remove_designers_to_the_course_from_1053d170: 允許使用者於帳戶課程頁面從課程移除設計者。允許使用者於從課程移除設計者。
   allows_user_to_remove_designers_to_the_course_from_f5a7225e: 允許使用者於帳戶課程頁面從課程移除設計者。
@@ -2428,8 +2500,10 @@ zh-Hant:
   allows_user_to_remove_teachers_from_a_course_6d627914: 允許使用者從課程中移除教師。
   allows_user_to_remove_teachers_from_the_course_bf4b2d8: 允許使用者於從課程移除教師。
   allows_user_to_remove_teachers_from_the_course_fro_75ffab61: 允許使用者於帳戶課程頁面從課程移除教師。允許使用者於從課程移除教師。
+  allows_user_to_rename_course_sections_928982f0: 允許使用者重新命名課程分班。
   allows_user_to_rename_course_sections_allows_user__8e9e7bac: 允許使用者重新命名課程分班。允許使用者更改課程分班的開始及結束日期。允許使用者跨清單選擇分班。
   allows_user_to_reply_to_a_discussion_post_83f43e19: 允許使用者回覆討論區的帖子。
+  allows_user_to_resend_course_invitations_from_the__2822fe53: 允許使用者於課程成員頁面重新傳送課程邀請。
   allows_user_to_restore_a_course_32084c5c: 允許使用者還原課程。
   allows_user_to_restore_a_course_not_available_at_t_3a749177: 允許使用者還原課程。（不可於子帳戶級別中使用。）
   allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: 允許使用者以經調整分數及匿名方式檢閱作業的審計跟蹤。
@@ -2442,24 +2516,31 @@ zh-Hant:
   allows_user_to_search_for_account_users_via_primar_7a58eb6e: |-
       允許使用者於帳戶成員頁面中透過主要電郵地址搜尋帳戶使用者。
       允許使用者於課程成員頁面中透過主要電郵地址搜尋其他使用者。
+  allows_user_to_search_for_account_users_via_primar_db535df4: 允許使用者於帳戶成員頁面中透過主電郵地址搜尋帳戶使用者。
   allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "允許使用者於課程成員頁面中透過登入 ID 搜尋其他使用者。"
   allows_user_to_search_for_other_users_by_login_id__3edb3702: "允許使用者於帳戶成員頁面中透過登入 ID 搜尋其他使用者。"
   allows_user_to_search_for_other_users_by_login_id__97d49785: |-
       允許使用者於帳戶成員頁面中搜尋其他使用者。
       允許使用者於課程成員頁面中查看登入 ID。
+  allows_user_to_search_for_other_users_via_primary__c1da56c8: 允許使用者於課程成員頁面中透過主電郵地址搜尋其他使用者。
   allows_user_to_search_for_other_users_via_primary__c95888c8: 允許使用者於成員頁面中透過主要電郵地址搜尋其他使用者。
+  allows_user_to_search_grade_change_logs_by_grader__406d1976: 允許使用者於管理員工具根據評分者或學生搜尋評分變更日誌。
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: 允許使用者於帳戶中檢視課程列表。
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: 允許使用者於帳戶統計資料中檢視最近開始/結束的課程清單。
   allows_user_to_see_the_list_of_recently_started_en_1012704d: 允許使用者於帳戶統計資料中檢視最近開始/結束的課程列表。
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: 允許使用者選擇在「課程設定」中作為課程範本的課程。
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: 允許使用者為已調整分數的作業選擇最終評分。
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: 允許使用者於交談中傳送訊息而不需選取課程。
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: "允許使用者傳送訊息至「[course name]的所有成員」。允許使用者傳送訊息至「[course group]的所有成員」。"
+  allows_user_to_send_a_message_to_all_in_course_nam_4f41b5a2: "允許使用者傳送訊息至「[課程名稱] 的所有成員」或「[課程小組] 的所有成員」。"
   allows_user_to_send_a_message_to_all_in_course_nam_697703a0: |-
       允許使用者傳送訊息至「[course name]的所有成員」。
       允許使用者傳送訊息至「[course group]的所有成員」。
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "允許使用者傳送訊息至「[course name]的所有成員」或「[course group]的所有成員」。"
   allows_user_to_send_messages_to_individual_course__9347e1e2: 允許使用者傳送訊息至個別學生。
+  allows_user_to_set_a_template_for_an_account_34fe3695: 允許使用者設定帳戶的範本。
   allows_user_to_set_a_template_for_an_account_allow_210403ed: 允許使用者設定帳戶的範本。允許使用者選擇在「課程設定」中作為課程範本的課程。允許使用者在元帳戶中檢視課程範本的名稱。
+  allows_user_to_set_an_account_to_not_use_a_templat_d34fe23c: 允許使用者設定帳戶不作為範本。
   allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: 允許使用者在帳戶和課程級別設定結果掌握程度。
   allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: 允許使用者在課程級別設定結果掌握程度。
   allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: 允許使用者在課程級別設定結果能力計算。
@@ -2467,11 +2548,15 @@ zh-Hant:
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: 允許使用者在帳戶和課程級別設定結果能力程度。
   allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: 允許使用者在課程級別設定結果能力程度。
   allows_user_to_share_a_quiz_to_commons_6746e0da: 允許使用者將測驗分享至公用區。
+  allows_user_to_share_assignments_to_commons_or_edi_c70ddf7: 允許使用者分享作業至公用區或編輯之前已分享的內容。
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: 允許使用者直接與其他使用者共用課程項目。允許使用者將個別課程項目複製到其他課程。
+  allows_user_to_share_course_items_directly_with_ot_e5793d35: 允許使用者直接與其他使用者共用課程項目。
+  allows_user_to_start_conferences_they_created_281b03ea: 允許使用者開始自己建立的會議。
   allows_user_to_sync_blueprint_courses_allows_user__61af2285: |-
       允許使用者同步「藍圖課程」。允許使用者檢視「藍圖同步」歷史記錄。允許使用者檢視及管理帳戶的課程。允許使用者檢視「課程設定檢查淸單」按鈕。
               允許使用者存取「課程設定」中的「導航」標籤。允許使用者編輯課程影像、名稱、課程代碼、時區、子帳戶、學期和「課程詳情」標籤中的其他選項。
               允許使用者存取「學生視圖」（測試學生）、「複製此課程」、「重設課程內容」和「永久刪除課程」按鈕。允許使用者於通告及討論區回覆中檢視學生內容卡。
+  allows_user_to_sync_blueprint_courses_db4fcc03: 允許使用者同步「藍圖課程」。
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "允許使用者查看課程的 SIS ID。"
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "允許使用者從作業查看 SpeedGrader 的連結。"
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2479,12 +2564,15 @@ zh-Hant:
       允許使用者查看個別學生的教職員日誌資訊。
       允許使用者在教職員日誌中創建新條目。
   allows_user_to_view_a_link_to_the_faculty_journal__4c48b57b: 允許使用者在使用者詳情頁面側欄中檢視教職員日誌的連結。允許使用者檢視個別學生的教職員日誌資訊。允許使用者在教職員日誌中建立新條目。
+  allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: 允許使用者在使用者詳細資料頁面側欄中檢視教職員日誌的連結。
   allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
       允許使用者在使用者詳情頁面側欄中查看教職員日誌的連結。
       允許使用者查看個別學生的教職員日誌資訊。
       允許使用者在教職員日誌中創建新條目。
+  allows_user_to_view_access_reports_f7be7a84: 允許使用者檢視「存取報告」。
   allows_user_to_view_account_analytics_98fbc6ad: 允許使用者查看帳戶分析工具。
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: 允許使用者於「與其協作」視窗中查看所有課程小組，而不僅是已註冊的課程小組。
+  allows_user_to_view_all_course_groups_not_just_whe_e107af44: 允許使用者於「協作對象」視窗中檢視所有課程小組，而不僅是已註冊的課程小組。
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: 允許使用者查看所有學生作業提交項目並添加評論。
   allows_user_to_view_analytics_link_in_the_user_set_56867782: 允許使用者在使用者設定選單查看分析工具連結。
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: 允許使用者於協作內查看及添加使用者。
@@ -2492,7 +2580,9 @@ zh-Hant:
       允許使用者於帳戶設定內查看及配置報告。
       允許使用者查看存取報告及學生互動報告。
       允許使用者於成員頁面上查看最新活動狀況及總活動資訊。
+  allows_user_to_view_and_configure_reports_in_accou_d3cee49f: 允許使用者於帳戶設定內檢視及配置報告。
   allows_user_to_view_and_configure_reports_in_accou_e8c6f9a1: 允許使用者於帳戶設定內檢視及配置報告。允許使用者檢視「存取報告」。允許使用者於「成員」頁面上檢視最新活動狀況及總活動資訊。
+  allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "允許使用者檢視及編輯使用者登入詳細資料中的 SIS ID 及集成 ID。"
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "允許使用者查看及編輯使用者登入詳細資料中的 SIS ID 及集成 ID。"
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "允許使用者於 SIS ID 欄查看及插入資料。"
   allows_user_to_view_and_link_questions_in_a_quiz_t_b899a247: 允許使用者於測驗內檢視問題及連結問題至帳戶級別題庫。如果停用此項目，使用者則僅能檢視及連結至課程題庫。啟用測驗索引頁面的「管理題庫」連結。
@@ -2501,18 +2591,25 @@ zh-Hant:
       使用者則僅能查看及連結至課程題庫。啟用測驗索引頁面的「管理題庫」連結
   allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: 允許使用者於測驗內查看問題及連結問題至帳戶級別題庫。如果停用此項目，使用者則僅能查看及連結至課程題庫。
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: 允許使用者於測驗內查看問題及連結問題至帳戶級別題庫。
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: 允許使用者於測驗內檢視問題及連結問題至課程級別題庫。
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: 允許使用者查看及管理整個帳戶的驗證選項。
-  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: 允許使用者查看及管理帳戶的課程。
+  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: 允許使用者檢視及管理帳戶的課程。
   allows_user_to_view_and_manage_permissions_bdc80a1d: 允許使用者查看及管理權限。
   allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: 允許使用者於帳戶設定內查看及管理「限額」標籤。使用者可以設定預設課程、使用者及小組儲存限額。
   allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: 允許使用者於帳戶設定內查看及管理「限額」標籤。使用者可以設定預設課程、使用者及小組儲存限額。
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: 允許使用者查看及管理帳戶下的子帳戶。
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: 允許使用者查看及管理帳戶的學期。
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: 允許使用者於帳戶設定內查看及管理「設定及通知」標籤。
+  allows_user_to_view_and_modify_login_information_f_78f3a544: 允許使用和檢視及修改其他使用者的登入資訊。
+  allows_user_to_view_blueprint_sync_history_d545cb7d: 允許使用者檢視「藍圖同步」歷史記錄。
   allows_user_to_view_canvas_insights_f4f7ba8b: "允許使用者查看 Canvas Insights。"
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: 允許使用者查看主頁的「選擇主頁」及「課程設置清單」按鈕。
+  allows_user_to_view_course_activity_information_fo_e420113b: 允許使用者檢視帳戶的課程活動資訊。
+  allows_user_to_view_course_analytics_through_the_c_192889dc: 允許使用者透過課程控制面板檢視課程分析工具。
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: 允許使用者透過課程控制面板查看課程分析工具。允許使用者查看學生分析工具。
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: 允許使用者透過課程主頁或成員頁面查看課程及學生分析工具。
+  allows_user_to_view_course_announcements_e71afc2: 允許使用者檢視課程通告。
+  allows_user_to_view_course_discussions_23346fa1: 允許使用者檢視課程討論區。
   allows_user_to_view_course_sis_id_3a1818a5: "允許使用者查看課程 SIS ID。"
   allows_user_to_view_course_status_choose_home_page_21bf32a8: 允許使用者檢視主頁中的「課程狀態」、「選擇主頁」及「課程設定檢查清單」按鈕。
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
@@ -2526,8 +2623,13 @@ zh-Hant:
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       允許使用者查看、創建、編輯、刪除及發佈/取消發佈頁面。
       允許使用者查看頁面記錄及設定首頁。
+  allows_user_to_view_edit_and_delete_collaborations_f2281cb0: 允許使用者檢視、編輯及刪除自己建立的協作。
+  allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: 允許使用者檢視、編輯及刪除自己建立的會議。
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: 允許使用者於分班標籤上查看註冊學生。
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: 允許使用者在學生互動報告中查看教職員日誌條目。
+  allows_user_to_view_faculty_journal_information_fo_3c725307: 允許使用者檢視個別學生的教職員日誌資訊。
+  allows_user_to_view_feature_options_in_account_set_befc6b83: 允許使用者於帳戶設定內檢視功能選項。
+  allows_user_to_view_gradebook_9720b3e2: 允許使用者檢視成績單。
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       允許使用者查看成績單。
       允許使用者匯出成績單為 CSV 文檔。
@@ -2538,6 +2640,7 @@ zh-Hant:
   allows_user_to_view_gradebook_allows_user_to_expor_e6b24e2c: "允許使用者檢視成績單。允許使用者匯出成績單為 CSV 檔案。允許使用者存取學習掌握程度成績單（如已啟用）。"
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "允許使用者查看 SpeedGrader 的評分標準上的評分者評論。"
   allows_user_to_view_groups_in_a_course_8a95805b: 允許使用者查看課程內的小組。
+  allows_user_to_view_last_activity_and_total_activi_105b5bc3: 允許使用者於「成員」頁面上檢視最新活動狀況及總活動資訊。
   allows_user_to_view_last_activity_and_total_activi_1455c521: 允許使用者檢視「最新活動」和「總活動」報告。
   allows_user_to_view_last_activity_and_total_activi_786a7286: 允許使用者於成員頁面上查看最新活動狀況及總活動資訊。
   allows_user_to_view_last_activity_total_activity_a_e0bee860: 允許使用者查看最新活動、總活動，以及學生互動報告。
@@ -2545,35 +2648,49 @@ zh-Hant:
   allows_user_to_view_list_of_users_in_the_course_pe_1b0b4bab: |-
       允許使用者於課程成員頁面中查看使用者列表。
       允許使用者於課程成員頁面中查看「之前的註冊」按鈕。
+  allows_user_to_view_list_of_users_in_the_course_pe_9ab1309c: 允許使用者於課程成員頁面中檢視使用者清單。
   allows_user_to_view_list_of_users_in_the_course_pe_bc91c8fb: 允許使用者於課程成員頁面中檢視使用者清單。允許使用者於課程成員頁面中檢視「之前的註冊」按鈕。
   allows_user_to_view_login_id_information_for_stude_33512e60: "允許使用者檢視學生的登入 ID 資訊。允許使用者檢視之前的註冊。允許使用者存取使用者的設定選單及使用者詳細資料。允許使用者編輯學生的分班或身份。允許使用者於課程成員頁面重新傳送課程邀請。"
+  allows_user_to_view_login_id_information_for_stude_70930399: "允許使用者檢視學生的登入 ID 資訊。"
   allows_user_to_view_login_id_information_for_teach_4b30f308: "允許使用者檢視教師、設計者及助教的登入 ID 資訊。允許使用者檢視任何使用者的使用者詳細資料。允許使用者編輯使用者的分班或身份。"
   allows_user_to_view_login_id_information_for_teach_ad237acc: "允許使用者檢視教師、設計者及助教的登入 ID 資訊。允許使用者檢視教師、課程設計者、助教及觀察者的設定選單。允許使用者檢視教師、課程設計者、助教及觀察者的使用者詳細資料。允許使用者限制學生僅可檢視同一分班的成員。"
+  allows_user_to_view_login_id_information_for_users_895256fb: "允許使用者檢視使用者的登入 ID 資訊。"
   allows_user_to_view_login_id_information_for_users_ab5c64ea: "允許使用者檢視使用者的登入 ID 資訊。允許使用者檢視課程使用者的使用者詳細資料。允許使用者編輯使用者的分班或身份（如果不是透過 SIS 添加）。"
   allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "允許使用者於課程成員頁面中查看登入 ID。"
   allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
       允許使用者於管理員工具內查看使用者的登入/登出活動。
       允許使用者於管理員工具根據評分者或學生搜尋評分變更日誌
+  allows_user_to_view_login_logout_activity_of_users_e11dd2de: 允許使用者於管理員工具內檢視使用者的登入/登出活動。
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: 允許使用者於管理員工具內檢視使用者的登入/登出活動。允許使用者於管理員工具根據評分者或學生搜尋評分變更日誌。（不可於子帳戶級別中使用。）
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: 允許使用者在元帳戶中檢視課程範本的名稱。
+  allows_user_to_view_page_history_and_set_front_pag_c2321326: 允許使用者檢視頁面記錄及設定首頁。
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       允許使用者查看之前創建的協作。
       允許使用者就所有協作編輯標題、說明或移除協作人員。
   allows_user_to_view_previously_created_collaborati_bb4b86f1: 允許使用者檢視之前建立的協作。允許使用者就所有協作編輯標題、說明或移除協作人員。
+  allows_user_to_view_previously_created_collaborati_d3a37402: 允許使用者檢視之前建立的協作。
+  allows_user_to_view_prior_enrollments_df5286d: 允許使用者檢視之前的註冊。
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: 允許使用者查看已發佈及未發佈的課程內容。
-  allows_user_to_view_student_context_cards_in_annou_dadef934: 允許使用者於通告及討論區回覆中查看學生群組卡。
+  allows_user_to_view_recent_announcements_on_the_co_e56c881e: 允許使用者在課程主頁檢視最新通告。
+  allows_user_to_view_student_analytics_89bfd9e8: 允許使用者檢視學生分析工具。
+  allows_user_to_view_student_context_cards_in_annou_dadef934: 允許使用者於通告及討論區回覆中檢視學生內容卡。
   allows_user_to_view_student_grades_pages_e0091b20: 允許使用者查看學生成績頁面。
   allows_user_to_view_student_quiz_logs_e1c4491: 允許使用者查看學生測驗日誌。
   allows_user_to_view_student_results_and_or_access__60fac9: "允許使用者查看學生成績及/或存取 SpeedGrader 內的測驗。"
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "允許使用者檢視學生成績、檢視測驗統計資料和在 SpeedGrader 中存取測驗。"
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: 允許使用者查看分析工具中特定學生的資料。
+  allows_user_to_view_the_announcements_link_in_cour_b3522273: 允許使用者檢視課程導航中的通告連結。
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: 允許使用者查看課程導航中的通告連結。允許使用者查看課程通告。
   allows_user_to_view_the_conclude_course_button_e90a1175: 允許使用者檢視「結束課程」按鈕。
   allows_user_to_view_the_course_grading_scheme_32a6042: 允許使用者查看課程等級評分方式。
+  allows_user_to_view_the_course_setup_checklist_but_4d7524f0: 允許使用者檢視「課程設定淸單」按鈕。
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: 允許使用者查看課程設定中的「課程統計資料」按鈕。
+  allows_user_to_view_the_delete_this_course_button_92a4c832: 允許使用者檢視「刪除此課程」按鈕。
   allows_user_to_view_the_delete_this_course_button__6edc6b46: 允許使用者檢視「刪除此課程」按鈕。允許使用者檢視「重設課程內容」按鈕。
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       允許使用者查看課程導航中的討論區連結。
       允許使用者查看課程討論區。
+  allows_user_to_view_the_discussions_link_in_course_80ab2fca: 允許使用者檢視課程導航中的討論區連結。
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: 允許使用者檢視課程導航中的討論區連結。允許使用者檢視課程討論區。
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: 允許使用者檢視「電子學習檔案調整分數」頁面和管理電子學習檔案垃圾郵件內容。
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: 允許使用者查看網站導航中的教職員日誌連結。
@@ -2581,17 +2698,26 @@ zh-Hant:
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       允許使用者查看所有學生小組的小組主頁。
       允許學生透過直接連結存取小組內的其他學生小組。
+  allows_user_to_view_the_group_home_pages_of_all_st_b463b0f9: 允許使用者檢視所有學生小組的小組主頁。
   allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: "允許使用者查看已調整分數的作業的「調整分數」按鈕。備註：此權限已過時。要允許使用者查看「調整分數」按鈕，啟用「成績 - 選擇最終成績以調整分數」。"
   allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
       允許使用者於主頁中查看「新通告」按鈕。
       允許使用者於通告頁面添加通告。
+  allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: 允許使用者於主頁中檢視「新通告」按鈕。
   allows_user_to_view_the_new_announcement_button_in_d21f2922: 允許使用者於主頁中檢視「新通告」按鈕。允許使用者於通告頁面添加通告。
   allows_user_to_view_the_new_gradebook_50f53ef0: 允許使用者檢視新的成績單。
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: 允許使用者查看課程導航中的成員連結。
+  allows_user_to_view_the_previous_sis_import_dates__1716ddb5: "允許使用者檢視之前的 SIS 匯入日期、錯誤及已匯入的項目。"
+  allows_user_to_view_the_prior_enrollments_button_i_b04b8132: 允許使用者於課程成員頁面中檢視「之前的註冊」按鈕。
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: 允許使用者檢視取消發佈的課程的課程卡中的「發佈」按鈕（卡片視圖控制面板）。
   allows_user_to_view_the_publish_course_and_unpubli_55fcd20: 允許使用者在課程主頁中檢視「發佈課程」和「取消發佈課程」按鈕。允許使用者檢視取消發佈的課程的課程卡中的「發佈」按鈕（卡片視圖控制面板）。
+  allows_user_to_view_the_publish_course_and_unpubli_aac98465: 允許使用者在課程主頁中檢視「發佈課程」和「取消發佈課程」按鈕。
+  allows_user_to_view_the_reset_course_content_butto_75c8c410: 允許使用者檢視「重設課程內容」按鈕。
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: 允許使用者檢視課程導航中的評分標準連結。
   allows_user_to_view_the_rubrics_link_in_course_nav_fc5fabff: 允許使用者檢視課程導航中的評分標準連結。允許使用者建立、編輯及刪除評分標準。
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "允許使用者於其他使用者的登入詳細資料中查看 SIS ID。"
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "允許使用者於測驗項目分析 CSV 文檔中查看 SIS ID 欄。"
+  allows_user_to_view_user_details_for_course_users_ec1b6218: 允許使用者檢視課程使用者的使用者詳細資料。
   allows_user_to_view_user_sis_ids_68a9d218: "允許使用者查看使用者 SIS ID。"
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "允許使用者於課程成員頁面中查看使用者 SIS ID。"
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: 允許使用者添加友好的描述到「學生學習成績概覽」中的學生和家長視圖的學習成果中。
@@ -3067,6 +3193,7 @@ zh-Hant:
   as_of_a036fa2e: 截至
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 當您在這個字段中鍵入時，群組清單將自動篩選，以便只包括那些與您的輸入相符的名字。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: 在您鍵入內容時，搜索結果清單會自動更新。
+  ascending_b3c87427: 升序
   ask_your_instructor_a_question_a61ca5e9: 向您的導師提問一個問題
   assess_and_survey_your_students_ce8172a9: 評估和調查您的學生
   assess_student_understanding_1e0b8d7f: 評估學生掌握程度
@@ -4199,11 +4326,13 @@ zh-Hant:
   author_215203d2: 作者
   author_id_570d3131: author_id
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author}剛剛對提交項目%{submission_submittor}進行了新評論，提交者為：%{assignment}"
+  author_login_id_57aaec4f: author_login_id
   author_name_12d871ff: author_name
   author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} 剛剛對 %{assignment_title} 的 %{user_name} 的提交項目進行了新注釋"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} 剛剛對 %{assignment_title} 的 %{user_name} 的提交項目進行了新評論"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} 剛剛對 %{assignment_title} 的 %{user_name} 的提交項目進行了新評論。"
   author_s_name_b35e905a: 作者姓名
+  author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: 授權
   authorize_url_f28167a3: "授權 URL"
   auto_leader_7791c30a: auto_leader
@@ -4383,10 +4512,12 @@ zh-Hant:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       必須由管理員為帳戶啟用藍圖課程。要編輯「頁面索引」頁面上的鎖定設定，必須同時啟用「頁面 - 更新」、「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。
               但是，如果已啟這些額外的權限，但未啟用「頁面 - 更新」權限，使用者仍可以在藍圖主課程內調整個人頁面的內容鎖定設定。
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: 必須由管理員為帳戶啟用藍圖課程。
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       必須由管理員為帳戶啟用藍圖課程。
       課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程的內容。
       如果此設定尚未啟用，而「討論區 - 查看」已啟用，使用者仍可於藍圖主課程的個別討論區中調整內容鎖定設定。
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: 必須由管理員為帳戶啟用藍圖課程。
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "必須由管理員為帳戶啟用藍圖課程。課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程的內容。要在討論區索引頁面編輯藍圖鎖定設定，必須同時啟用「討論區 - 調整分數」。"
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: 必須由管理員為帳戶啟用藍圖課程。課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程的內容。
   blueprint_information_95dcef55: 計劃資訊
@@ -4415,10 +4546,12 @@ zh-Hant:
   bookmarks_5b5b81c9: 書籤
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "「討論區 - 建立」和「討論區 - 調整分數」均允許使用者在討論區頁面建立討論主題。如果啟用此權限，則不需要「討論區 - 建立」。要檢視課程內的討論區，必須啟用「討論區 - 檢視」。要於討論區中回覆，必須同時啟用「討論區 - 帖子」。要編輯討論區內的作業詳細資料，必須同時啟用「作業及測驗 - 添加/編輯/刪除」。"
   both_discussions_create_and_discussions_moderate_a_41c29c37: "「討論區 - 建立」和「討論區 - 調整分數」均允許使用者在討論區頁面建立討論主題。如果啟用此權限，則不需要「討論區 - 建立」。要檢視課程內的討論區，必須啟用「討論區 - 檢視」。要於討論區中回覆，必須同時啟用「討論區 - 帖子」。要編輯討論區內的作業詳細資料，必須同時啟用「作業及測驗 - 添加/編輯/刪除」。"
+  both_discussions_create_and_discussions_moderate_a_482e4c7e: "「討論區 - 建立」和「討論區 - 調整分數」均允許使用者在討論區頁面建立討論主題。"
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       「討論區 - 創建」和「討論區 - 調整分數」均允許使用者在討論區頁面創建討論主題。如果啟用此權限，則不需要「討論區 - 創建」。
       要查看課程內的討論區，必須啟用「討論區 - 查看」。
       要於討論區中回覆，必須同時啟用「討論區 - 帖子」。要編輯討論區內的作業詳細資料，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。
+  both_discussions_create_and_discussions_moderate_a_ca6f38a2: "「討論區 - 建立」和「討論區 - 調整分數」均允許使用者在討論區頁面建立討論主題。如果啟用此權限，則不需要「討論區 - 建立」。"
   both_discussions_create_and_discussions_moderate_a_f20cc937: |-
       「討論區 - 創建」和「討論區 - 調整分數」均允許使用者在討論區頁面創建討論主題。如果啟用此權限，則不需要「討論區 - 創建」。
       要查看課程內的討論區，必須啟用「討論區 - 查看」。
@@ -4576,11 +4709,13 @@ zh-Hant:
   by_b90c6b6f: 編輯人
   by_client_id_4f2fe02c: "依用戶端 ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 預設情況下，所有連結均為一門課程而啟用。學生們不會希望看到所鏈接的部分不含有任何內容。例如，如果您並未創建任何測驗，他們就不希望看到測驗鏈接。如果您不想讓您的學生們訪問課程的某些區域，您可以對這些鏈接進行排序并將其明確關閉。
+  by_default_students_are_able_to_create_groups_to_r_ac2a70bd: 根據預設設定，學生可以建立小組；要使學生無法建立小組，請於課程設定內取消選擇「讓學生組織自己的小組」勾選框。
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       根據預設設定，學生可以創建小組；要使學生無法創建小組，
       請於課程設定內取消選擇「讓學生組織自己的小組」勾選框。
   by_default_students_are_able_to_create_groups_to_r_d4901649: 根據預設設定，學生可以建立小組；要使學生無法建立小組，請於課程設定內取消選擇「讓學生組織自己的小組」勾選框。
   by_default_students_can_always_create_groups_in_a__149d08b7: "根據預設設定，學生不論何時都能在課程中創建小組。要使學生無法創建小組，必須啟用「課程 - 添加 / 編輯 / 刪除」，並且必須於課程設定內取消選擇「讓學生組織自己的小組」勾選框。"
+  by_default_students_can_always_create_groups_in_a__60ca6e9e: 根據預設設定，學生不論何時都能在課程中建立小組。
   by_default_students_can_always_create_groups_in_a__af000dd: "根據預設設定，學生不論何時都能在課程中創建小組。要限制學生建立群組，必須啟用「管理課程：管理員 - 管理/更新」，並且必須於課程設定內取消選擇「讓學生組織自己的小組」勾選框。"
   by_lti_2_registration_url_e421e523: "按照 LTI 2 註冊 URL"
   by_url_a163275e: "透過 URL"
@@ -5257,6 +5392,7 @@ zh-Hant:
   changing_course_dates_may_override_term_availabili_d92b10de: 更改課程日期可能會重寫學期時段設定，以及課程頁面和控制面板的配置。請在修改課程日期前確認學期日期。
   changing_section_dates_may_override_course_and_ter_6634950e: 更改分班日期可能會重寫課程和學期時段設定，以及課程頁面和控制面板的配置。請在修改分班日期前確認學期及課程日期。
   changing_the_late_policy_will_affect_previously_gr_49071db7: 變更遲交政策將影響之前已評分的提交項目。
+  changing_the_tenant_will_delete_existing_groups_f86c48dc: 變更租借用戶將會刪除現有的小組。
   changing_your_policy_now_will_affect_previously_gr_62063898: 變更您的規則會影響此前已評分的提交項目。
   chars_written_max_character_length_len_fec9bd18: "%{chars} 文字，最大字符長度%{len}"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: 每個任務中的學生成績圖表
@@ -5702,6 +5838,7 @@ zh-Hant:
   concluded_63150003: 已結束
   concluded_conferences_cdbe53f9: 已結束的會議
   concluded_courses_94782e21: 已結束的課程
+  concluded_enrollments_8f460271: 註冊結束
   concluded_enrollments_9da8da6: 註冊結束
   conditional_content_7d39e313: 有條件內容
   conditional_content_b284da8f: 有條件內容
@@ -7212,8 +7349,11 @@ zh-Hant:
   course_results_updated_df9d1c95: 課程成績已更新。
   course_role_role_type_119c2f64: "課程角色： %{role_type}"
   course_roles_1314f962: 課程角色
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: 課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程。
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程。要存取藍圖課程側欄，必須啟用「課程 - 添加 / 編輯 / 刪除課程」。要添加關聯課程，必須同時啟用「課程 - 檢視清單」及「課程 - 添加 / 編輯 / 刪除」。要編輯任何藍圖物件類型的鎖定設定，必須啟用「課程 - 添加 / 編輯 / 刪除」。"
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程。要管理關聯的課程，必須同時啟用「課程 - 檢視淸單」和「管理課程 - 添加」。要編輯檔案的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程檔案 - 編輯」。要編輯測驗的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「作業及測驗 - 添加/編輯/刪除」。"
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: 課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程的內容。
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: 課程身份如果以教師、助教或設計者身份加入藍圖課程，則僅可管理藍圖課程的內容。
   course_roles_d2d5d666: 課程角色
   course_roster_78f70e97: 課程名冊
   course_rubrics_881dcf0: 課程評分標準
@@ -7860,6 +8000,7 @@ zh-Hant:
   courses_account_settings_79e2f748: "課程 - 帳戶設定"
   courses_add_20891f99: "課程 - 添加"
   courses_add_edit_delete_aa2b55d3: "課程 - 添加 / 編輯 / 刪除"
+  courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "在 site_admin 帳戶上無法建立課程。"
   courses_change_visibility_9150ff1b: "課程 - 變更可見度"
   courses_conclude_7bf4ce68: "課程 - 結束"
   courses_course_templates_5a3fbafd: "課程 - 課程範本"
@@ -8542,6 +8683,7 @@ zh-Hant:
   deprecate_sms_be6b00a: 棄用簡訊
   deprecated_59e99d2a: 棄用
   desc_12ad2869: "%{desc}"
+  descending_b7828162: 降序
   description_436c48d7: 說明
   description_61f4296: "* 描述"
   description_for_mastery_level_position_description_cc17114b: "變更掌握程度評級%{position}的描述：%{description}"
@@ -8553,12 +8695,14 @@ zh-Hant:
   designers_remove_3e590bff: "設計者 - 移除"
   details_98a31b68: 詳細資料
   details_a6f427c3: 詳細資料：
+  determines_visibility_and_management_of_outcomes_i_6f390b57: 決定帳戶導航工具內的學習成果可見度和管理程序。
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: 決定帳戶導航工具內的學習成果可見度和管理程序。允許使用者於帳戶及課程級別建立、編輯及刪除成果及成果小組。
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       決定帳戶導航工具內的學習成果標籤可見度和管理程序。
       允許使用者於帳戶及課程級別創建、匯入、編輯及刪除成果及成果小組。
   determines_visibility_and_management_of_outcomes_t_8a40bf86: 決定帳戶導航工具內的學習成果標籤可見度和管理程序。允許使用者於帳戶及課程級別建立、匯入、編輯及刪除成果及成果小組。
   determines_visibility_and_management_of_rubrics_li_83a26d8e: 決定帳戶導航工具內的評分標準連結可見度和管理程序。允許使用者檢視課程導航中的評分標準連結。允許使用者建立、編輯及刪除評分標準。
+  determines_visibility_and_management_of_rubrics_li_9b974d71: 決定帳戶導航工具內的評分標準連結可見度和管理程序。
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       決定帳戶導航工具內的評分標準標籤可見度和管理程序。
       允許使用者管理評分標準。
@@ -8567,13 +8711,16 @@ zh-Hant:
   determines_visibility_and_management_of_sis_import_bf386823: "決定帳戶導航工具內的 SIS 匯入連結可見度和管理程序。"
   determines_visibility_and_management_of_the_questi_c57c5b31: 決定帳戶導航工具內的題庫連結可見度和管理程序。
   determines_visibility_and_management_of_the_questi_fbf70ba9: 決定題庫帳號帳戶導航連結的可見度和管理程序。
+  determines_visibility_and_management_of_the_rubric_533da0b8: 決定帳戶導航工具內的評分標準連結可見度和管理程序。
   determines_visibility_and_management_of_the_rubric_55b55b25: 決定帳戶導航工具內的評分標準連結可見度和管理程序。允許使用者創建、編輯及刪除評分標準。
+  determines_visibility_of_sis_import_link_in_accoun_53da8632: "決定帳戶導航工具內的 SIS 匯入連結可見度。"
   determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: "決定帳戶導航工具內的 SIS 匯入連結可見度。允許使用者檢視之前的 SIS 匯入日期、錯誤及已匯入的項目。"
   determines_visibility_of_sis_import_tab_in_account_3d48272d: "決定帳戶導航工具內的 SIS 匯入標籤可見度。允許使用者檢視之前的 SIS 匯入日期、錯誤及已匯入的項目。"
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       決定帳戶導航工具內的 SIS 匯入標籤可見度。
       允許使用者查看之前的 SIS 匯入日期、錯誤及已匯入的項目。
   determines_visibility_of_the_course_activity_optio_2446c4b3: 決定管理員工具日誌標籤內的課程活動可見度。允許使用者查看帳戶的課程活動資訊。
+  determines_visibility_of_the_course_activity_optio_6dc5ceb9: 決定管理員工具日誌標籤內的課程活動可見度。
   determines_visibility_of_the_grade_change_activity_6c23036b: 決定管理員工具日誌標籤內的評分變更活動可見度。
   determines_whether_a_publish_button_is_included_in_f7ad9b56: 決定「發佈」按鈕是否顯示於已取消發佈的課程內（卡視圖控制面板）。
   determines_whether_a_publish_course_option_is_incl_9bf770e9: 決定是否於課程主頁中包含「發佈課程」選項。
@@ -11214,6 +11361,7 @@ zh-Hant:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "如果「成績 - 編輯」及「成績 - 查看所有成績」已停用，則不能存取成績單及 SpeedGrader。"
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "如果「成績 - 編輯」及「成績 - 檢視所有成績」已停用，則不能存取成績單及 SpeedGrader。"
   gradebook_context_name_9dbae5bc: "成績冊 -%{context_name}"
+  gradebook_csv_export_assignment_order_matches_the__9044f08e: "成績單 CSV 匯出作業順序與成績單網格"
   gradebook_csv_headers_include_grading_period_1015185c: "成績單 CSV 標題包含評分期"
   gradebook_csvs: 
     grades_filename: 成績
@@ -12568,6 +12716,7 @@ zh-Hant:
   how_is_the_grade_determined_bb75bf53: 怎樣決定評分？
   how_is_this_affecting_you_b3b6a639: 問題對您造成什麼影響？
   how_many_minutes_ecca5ee7: 多少分鐘？
+  however_if_these_additional_permissions_are_enable_35d3082c: "但是，如果已啟用這些額外的權限，但未啟用「頁面 - 更新」權限，使用者仍可以在藍圖主課程中調整個別頁面的內容鎖定設定。"
   html5_first_videos_description: "預設情況下，Canvas 會嘗試先使用 Flash 播放視頻。啟用該選項以嘗試先使用 HTML5，然後返回到 Flash。"
   html5_media_recorder_in_rce_bb59b78f: "在 RCE 中的 HTML5 媒體錄製"
   html_editor_fb2ab713: "HTML 編輯器"
@@ -12628,6 +12777,7 @@ zh-Hant:
   if_an_enrollment_is_created_via_sis_only_admins_ca_205e9a3c: |-
       如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。
               要透過 SIS ID 移除使用者 - 必須同時啟用「SIS 資料 - 管理」。
+  if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: "如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。"
   if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       如果 LTI 工具設置中包含已安裝的配置，則會在
       作業提交類型下拉選單中顯示新項目，以便快速設置作業以配合工具
@@ -12635,7 +12785,11 @@ zh-Hant:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "如果「成績 - 編輯」和「成績 - 檢視所有成績」均已停用，成績單會在課程導航中隱藏。"
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "如果「成績 - 編輯」和「成績 - 查看所有成績」均已停用，成績單則會在課程導航中隱藏。"
   if_commons_is_installed_allows_importing_favorited_eff368f: "如果已安裝公用區，將允許匯入 Canvas 內的最愛內容項目。"
+  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "如果「課程內容 - 添加/編輯/刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視、編輯和刪除所有協作。"
+  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "如果「課程內容 - 添加/編輯/刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視/編輯/刪除所有協作。"
+  if_course_visibility_is_limited_to_users_enrolled__ab1b1517: 如果課程可見度限制至已註冊該課程的使用者，此權限則會允許未註冊該課程的使用者檢視課程內容。
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "如果同時啟用「課程 - 添加 / 編輯 / 刪除」及「課程 - 取消刪除」，帳戶等級的使用者將可以在管理員工具內重置已刪除的課程。"
+  if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "如果啟用「課程 - 添加」權限，而「課程 - 檢視清單」已停用，使用者則可以使用帳戶設定內的「添加新課程」按鈕添加新課程。"
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: 如停用，學習成果頁面將變成唯讀狀態，並隱藏「管理評分標準」按鈕。使用者仍可透過作業存取個別作業的評分標準。
   if_disabled_user_can_still_view_and_download_files_336ffc30: "如停用，使用者仍可查看及下載檔案為 zip 檔案。"
   if_disabled_user_will_still_have_access_to_course__541e130: 如停用，使用者仍可存取課程設定。使用者如沒有合適的內容項目權限，則不能管理個別課程的內容。如果課程可見度限制至已註冊該課程的使用者，此權限則會允許未註冊該課程的使用者檢視課程內容。
@@ -12648,6 +12802,7 @@ zh-Hant:
               如果課程可見度限制至已註冊該課程的使用者，
               此權限則會允許未註冊該課程的使用者查看課程內容。
   if_disabled_user_will_still_have_access_to_course__d78fddc4: 如停用，使用者仍可存取課程設定。使用者如沒有合適的內容項目權限，則不能管理個別課程的內容。如果課程可見度限制至已註冊該課程的使用者，此權限則會允許未註冊該課程的使用者檢視課程內容。
+  if_disabled_user_will_still_have_access_to_course__fbf32c87: 如停用，使用者仍可存取課程設定。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "如果啟用，將會啟用存取 LTI 1.3 和 LTI Advantage。"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 如果啟用，允許在一個評分標準上給予超過最大可能分數的成果。
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
@@ -12709,15 +12864,23 @@ zh-Hant:
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: 設定後，評分計算機將在計算總分時忽略未發佈的匿名作業。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "設定後，成績單 CSV 匯出工具將把已選的評分期附加到欄位標題，而欄位標題值將根據評分期而有所不同。"
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: 設定後，成績單將在載入作業時優先載入已選評分期內的作業。
+  if_set_the_order_of_assignments_in_gradebook_csv_e_bf5c663e: "如果已設定，成績單 CSV 匯出中的作業順序將與成績單網格中的順序相符。"
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "設定後，將在作業的評分期完結後關閉「公佈至 SIS」功能。只適用於啟用了「啟用新 SIS 集成設定」功能的帳戶。"
+  if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "如果停用「SIS 資料 - 管理」，而啟用「SIS 資料 - 讀取」，使用者則僅能檢視課程、使用者及子帳戶的 SIS ID。"
+  if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "如果啟用「SIS 資料 - 管理」，而停用「SIS 資料 - 讀取」，帳戶的權限將重寫課程的權限。"
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "如果已啟用「統計 - 檢視」或「使用者 - 管理登入詳細資料」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "如果已啟用「統計 - 檢視」或「使用者 - 管理」登入詳細資料，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_statistics_view_or_users_manage_login_details_i_da650b69: "如果已啟用「統計 - 查看」或「使用者 - 管理」登入詳細資料，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
+  if_the_additional_permissions_are_enabled_but_this_619c2a4a: 如果啟用額外的權限，但未啟用此權限，則可以編輯有關個別討論區的鎖定設定。
+  if_the_course_content_permission_enabled_and_web_c_85f91e32: "如果啟用「課程內容」權限但停用「網路會議 - 建立」，使用者則仍能管理會議。"
+  if_the_open_registration_account_setting_is_enable_10b1965c: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「課程」頁面添加設計者至課程中，即使該設計者並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_1994a971: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 添加助教至課程，即使該助教並未擁有 Canvas 帳戶。"
+  if_the_open_registration_account_setting_is_enable_1e679e07: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「課程」頁面添加助教至課程中，即使該助教並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_2cc15467: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過課程頁面以電郵地址或登入 ID 添加助教至課程，即使該助教並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
               要存取帳戶課程頁面，必須啟用「課程 - 檢視清單」。
+  if_the_open_registration_account_setting_is_enable_2f43fcc0: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID從「成員」頁面添加學生至課程中，即使該學生並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_3cbed3ad: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過課程頁面以電郵地址或登入 ID 添加學生至課程，即使該學生並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
@@ -12726,6 +12889,7 @@ zh-Hant:
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過成員頁面以電郵地址或登入 ID 添加設計者至課程，即使該設計者並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。要透過 SIS ID 移除使用者，必須同時啟用「SIS 資料 - 管理」。
   if_the_open_registration_account_setting_is_enable_43bfe76c: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 添加設計者至課程，即使該設計者並未擁有 Canvas 帳戶。"
+  if_the_open_registration_account_setting_is_enable_474c98c2: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「成員」頁面添加設計者至課程中，即使該設計者並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_519e246f: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過成員頁面以電郵地址或登入 ID 添加觀察者至課程，即使該觀察者並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
@@ -12741,16 +12905,20 @@ zh-Hant:
               如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。
               要透過 SIS ID 移除使用者，必須同時啟用「SIS 資料 - 管理」。
   if_the_open_registration_account_setting_is_enable_6aaf8ead: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 添加教師至課程，即使該教師並未擁有 Canvas 帳戶。"
+  if_the_open_registration_account_setting_is_enable_87662428: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「課程」頁面添加觀察者至課程中，即使該觀察者並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_88d349f8: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 添加觀察者至課程，即使該觀察者並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_95ada4ab: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過成員頁面以電郵地址或登入 ID 添加教師至課程，即使該教師並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
               如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。
               要透過 SIS ID 移除使用者，必須同時啟用「SIS 資料 - 管理」。
+  if_the_open_registration_account_setting_is_enable_99a8a04a: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「課程」頁面添加學生至課程中，即使該學生並未擁有 Canvas 帳戶。"
+  if_the_open_registration_account_setting_is_enable_9ca710e2: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「成員」頁面添加教師至課程中，即使該教師並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_9db0bc16: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過課程頁面以電郵地址或登入 ID 添加教師至課程，即使該教師並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
               要存取帳戶課程頁面，必須啟用「課程 - 檢視清單」。
+  if_the_open_registration_account_setting_is_enable_9e63fda6: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「成員」頁面添加觀察者至課程中，即使該觀察者並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_a2b9c5e6: |-
       如啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過課程頁面以電郵地址或登入 ID 添加觀察者至課程，即使該觀察者並未擁有 Canvas 帳戶。
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
@@ -12760,13 +12928,19 @@ zh-Hant:
               要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。
               如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。
               要透過 SIS ID 移除使用者，必須同時啟用「SIS 資料 - 管理」。
+  if_the_open_registration_account_setting_is_enable_b6fdaab4: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「成員」頁面添加助教至課程中，即使該助教並未擁有 Canvas 帳戶。"
+  if_the_open_registration_account_setting_is_enable_e7f97cf0: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 從「課程」頁面添加教師至課程中，即使該教師並未擁有 Canvas 帳戶。"
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址或登入 ID 添加學生或觀察者至課程，即使該學生或觀察者並未擁有 Canvas 帳戶。"
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "如果「頁面 - 更新」權限已停用，使用者仍可於藍圖主課程的個別頁面中調整內容鎖定設定。"
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "如果這些額外權限已啟用，但「作業和測驗 - 添加/編輯/刪除」未啟用，則可以於作業的詳細資料頁面中管理作業的藍圖鎖定設定。"
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "如果停用此權限，而「課程 - 添加 / 編輯 / 刪除」已啟用，使用者則可以使用帳戶設定內的「添加新課程」按鈕以添加新課程。"
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
       如果停用此權限，而「課程 - 添加 / 編輯 / 刪除」已啟用，
       使用者則可以使用帳戶設定內的「添加新課程」按鈕以添
       加新課程。
   if_this_permission_is_disabled_and_manage_courses__8fbc2efe: "如果停用此權限且「管理課程 - 添加」已啟用，使用者可以使用「帳戶設定」中的「添加新課程」按鈕以添加新課程。"
+  if_this_permission_is_disabled_and_users_view_logi_9dbd9236: "如果停用此權限，而「使用者 - 檢視登入 ID」已啟用，使用者則仍會檢視作為登入 ID 的電郵地址。"
+  if_this_permission_is_disabled_at_the_account_leve_1b0e403f: 如果停用此權限，帳戶級別的使用者則不能檢視任何現存的帳戶小組。課程級別的使用者可以檢視任何現存的小組，包括由學生建立的小組，但不能存取這些小組。
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "如果停用此權限，帳戶級別的使用者則不能查看任何現存的帳戶小組。課程級別的使用者可以查看任何現存的小組，包括由學生創建的小組，但不能存取這些小組。要查看小組，必須同時啟用「使用者 - 查看清單」。要透過 CSV 添加帳戶級別小組，必須同時啟用「SIS 數據 - 匯入」。"
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "如果停用此權限，帳戶級別的使用者則不能檢視任何現存的帳戶小組。課程級別的使用者可以檢視任何現存的小組，包括由學生建立的小組，但不能存取這些小組。要檢視小組，必須同時啟用「使用者 - 檢視清單」。要透過 CSV 添加帳戶級別小組，必須同時啟用「SIS 資料 - 匯入」。"
   if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "如果停用此權限，帳戶級別的使用者則不能檢視任何現存的帳戶小組。課程級別的使用者可以檢視任何現存的小組，包括由學生建立的小組，但不能存取這些小組。要檢視小組，必須同時啟用「使用者 - 檢視清單」。要透過 CSV 添加帳戶級別小組，必須同時啟用「SIS 資料 - 匯入」。"
@@ -12774,7 +12948,9 @@ zh-Hant:
   if_this_permission_is_disabled_users_can_only_view_b68143d5: 如果停用此權限，使用者則只能查看現存小組，包括由學生創建的小組。
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "如果停用此權限，而「作業及測驗 - 添加 / 編輯 / 刪除」已啟用，使用者則仍能於作業創建或添加評分標準。"
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "如果停用此權限，使用者仍能透過 Canvas 應用程式中心安裝已核准的應用程式（如您的機構已啟用應用程式中心）。另外，如果停用此權限，使用者不能刪除手動添加的外部應用程式。"
+  if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "如果停用此權限，使用者仍能透過 Canvas 應用程式中心安裝已核准的應用程式（如您的機構已啟用應用程式中心）。"
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "如果啟用此權限，而「課程 - 查看清單」已啟用，使用者則可以使用帳戶設定內的「添加新課程」按鈕以添加新課程。"
+  if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "如果啟用此權限，而「使用者 - 檢視主電郵地址」已停用，使用者則會檢視作為登入 ID 的電郵地址。"
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "如果啟用此權限，使用者則不需要啟用「SIS 資料 - 讀取」權限。帳戶權限可重寫課程權限。要讓使用者無法管理課程級別的 SIS ID，必須同時停用「SIS 資料 - 管理」及「SIS 資料 - 讀取」。要透過 SIS ID 添加使用者至課程，必須同時啟用「使用者 - 從課程添加 / 移除學生」及/或「使用者 - 從課程添加 / 移除教師、課程設計者或助教」。"
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       如果啟用此權限，使用者則不需要啟用「SIS 資料 - 讀取」權限。帳戶權限可重寫課程權限。要讓使用者無法管理課程級別的 SIS ID，必須同時停用「SIS 資料 - 管理」和「SIS 資料 - 讀取」。
@@ -12782,6 +12958,8 @@ zh-Hant:
   if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
       如果啟用此權限，使用者則不需要啟用「SIS 數據 - 讀取」權限。帳戶權限可重寫課程權限。要令使用者無法管理課程級別的 SIS ID，必須同時停用「SIS 數據 - 管理」及「SIS 數據 - 讀取」。
       要透過 SIS ID 添加使用者至課程，必須同時啟用「使用者 - 從課程添加 / 移除學生」及/或「使用者 - 從課程添加 / 移除教師、課程設計者或助教」。
+  if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "如果啟用此權限，使用者則不需要啟用「SIS 資料 - 讀取」權限。帳戶權限可重寫課程權限。"
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "如果此設定尚未啟用，而「討論區 - 檢視」已啟用，使用者仍可於藍圖主課程的個別討論區中調整內容鎖定設定。"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "如果啟用「使用者 - 管理登入詳細資料」或「統計 - 查看」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "如果啟用「使用者 - 管理登入詳細資料」或「統計 - 檢視」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "如果已啟用「使用者 - 管理登入詳細資料」或「統計 - 檢視」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
@@ -12905,6 +13083,7 @@ zh-Hant:
   improved_learning_mastery_gradebook_8628d06a: 已改善的學習掌握程度成績單
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: 新測驗的單元支援功能已改良，包括可從單元建立新測驗
   improved_outcomes_management_4692f886: 已改善學習成果管理程序
+  improved_support_for_taking_new_quizzes_from_withi_4dbc794e: 單元內接受新測驗的改善的支援
   improved_visual_reminders_to_encourage_instructors_f203c7f: 改善視覺提醒，以鼓勵導師發佈課程
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: 改進以提升學習掌握程度成績單中的使用者體驗。
   in_a_few_seconds_538ddff3: 將在數秒後
@@ -12929,6 +13108,7 @@ zh-Hant:
   inactive_34365329: 停用
   inactive_cd40317f: 不活躍
   inactive_enrollments_3b84be3d: 不活躍的註冊
+  inactive_enrollments_bd1831ea: 不活躍的註冊
   inbox_bb245a60: 收件匣
   include_a_download_link_next_to_each_file_link_in__481761de: "納入 RCE 中每個檔案連結旁的下載連結"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "使用 *Jing* 或者類似軟件，將連結加入到螢幕錄影／螢幕截圖上。"
@@ -14040,6 +14220,8 @@ zh-Hant:
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: 管理註冊狀態，創建組以及從此頁面添加使用者。
   manage_grading_schemes_in_context_name_e3678273: "管理 %{context_name} 的評分方案"
   manage_group_group_name_ac8578c6: "管理群組 %{group_name}"
+  manage_home_4fc3480b: 管理主頁
+  manage_home_for_coursename_5e5c7661: "管理主頁的 %{courseName}"
   manage_item_name_6118d4b0: "管理 %{item_name}"
   manage_line_items_244b289f: 管理細項
   manage_module_name_dfe16816: "管理 %{module_name}"
@@ -16693,6 +16875,7 @@ zh-Hant:
   new_quizzes_assignment_build_button_72b6531a: 新測驗作業構建按鈕
   new_quizzes_banks_migrations_9ab4de4a: 新測驗題庫遷移
   new_quizzes_dbda7e0a: 新測驗
+  new_quizzes_embedded_module_progression_cd2307b6: 新測驗嵌入單元進度
   new_quizzes_importing_c167dce0: "New Quizzes 匯入 LTI"
   new_quizzes_migration_during_course_import_copy_e9dd124e: 課程匯入/複製期間的新測驗遷移
   new_quizzes_migration_enabled_by_default_5f9bcc81: 預設啟用的新測驗遷移
@@ -16745,6 +16928,7 @@ zh-Hant:
   nickname_1e6da3ad: 暱稱
   nickname_7df95b09: 暱稱：
   no_74e9b590: 否
+  no_additional_details_were_added_for_this_assignme_547c0de7: 未添加此作業的額外詳細資料。
   no_alignments_are_available_for_this_outcome_7f8346f9: 沒有可用於此成果的校準。
   no_allowed_domains_b6633d12: 無獲允許網域
   no_announcements_280df147: 沒有通告
@@ -16928,6 +17112,7 @@ zh-Hant:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: 注：一些項目超出了該課程的開始及/或結束日期範圍
   note_students_have_submitted_work_for_these_assign_7bc34e28: 注：學生們已經為這些尚未進行評分的作業提交了作業。如果您現在公佈這些評分，您將需要再對他們最新的提交項進行評分，然後重新公佈他們的分數。
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 注意：在本預覽中，子帳戶主題沒有激活。
+  note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "注意：變更課程註冊學生可觸發同步。第一次啟用 Microsoft Sync 時，您可能幾下列的按鈕手動觸發同步。"
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "請注意，在微軟系統下，並不一定會始終填充使用者檔案中的電郵地址。個人的微軟帳戶不會填充 Oid 資訊。"
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "注意，有些內容不會為所有 Clever 使用者填充。"
   note_this_is_not_your_official_score_f2d4582f: "*注釋*：這並非您的正式分數。"
@@ -17991,6 +18176,7 @@ zh-Hant:
   please_select_a_user_role_for_this_link_9fb4e655: 請為此連結選擇使用者角色。
   please_select_an_item_30c287ef: 請選擇一個項目
   please_select_one_f931e883: 請選擇一項
+  please_try_again_4c3d11b4: 請重試。
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 請嘗試重新設置工具連線，在作業或單元項目介面中重新選擇工具然後儲存。
   please_upload_files_as_a_zip_5a2c799f: "請以 .zip 格式上傳檔案"
   please_wait_2b646bc2: 請稍候。
@@ -19223,6 +19409,7 @@ zh-Hant:
       show_details: 顯示問題詳細資料
   question_banks_45bdf347: 題庫
   question_banks_account_navigation_9a7ab7c2: 題庫（帳戶導航）
+  question_banks_courses_dd907ecf: 題庫（課程）
   question_banks_view_and_link_e6d9cde2: "題庫 - 查看和連結"
   question_banks_view_and_link_to_f1bca68b: "題庫 - 查看和連結至"
   question_f06476d1: 問題
@@ -20857,6 +21044,7 @@ zh-Hant:
   remove_all_course_observer_members_4622c70d: 移除所有課程觀察者成員
   remove_all_group_observer_members_af5675f3: 移除所有群組觀察者成員
   remove_as_front_page_2698aa12: 移除作為內容頁
+  remove_as_frontpagetext_133cdaee: "移除 %{frontPageText}"
   remove_association_1412eabf: 移除關聯
   remove_attachment_ceae0973: 刪除附件
   remove_attendee_name_55165070: "移除參與者%{name}"
@@ -20894,6 +21082,10 @@ zh-Hant:
   remove_observers_from_courses_703edc34: 從課程移除觀察者
   remove_outcome_20e16da7: 移除成果？
   remove_outcome_2feaf5fd: 移除成果
+  remove_outcomes_5f8b601c: 
+    one: 移除學習成果
+    other: 移除學習成果
+  remove_outcomes_9abcc8fd: 移除學習成果？
   remove_placement_90862c13: "移除 %{placement}"
   remove_points_from_rubric_dcd4b585: 從評分標準移除分數
   remove_pronouns_5ff760ff: 移除代詞
@@ -21059,6 +21251,7 @@ zh-Hant:
   retrieval_of_received_shares_failed_6c5583e3: 取回收到的共用內容失敗
   retrieve_timeout: 無法取回配置文件，伺服器回應超時
   retrieving_content_ed0b9b33: 正在取回內容
+  retrieving_tool_51709735: 擷取工
   retry_duplicating_original_assignment_name_90b83bb8: "重新嘗試複製 \"%{original_assignment_name}\""
   retry_duplicating_originalassignmentname_884aee1: "重新嘗試複製 \"%{originalAssignmentName}\""
   retry_ebd5f8ba: 重試
@@ -22761,6 +22954,7 @@ zh-Hant:
   show_by_type_c5d61732: 按類型顯示
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 在月份視圖中顯示行事曆活動，如果單行無法容納標題，則顯示為多行。
   show_concluded_enrollments_6a05544c: 顯示已結束的註冊
+  show_contributing_scores_7674c46f: 顯示貢獻分數
   show_correct_answers_at_30c37e01: 將正確答案顯示在
   show_correct_answers_at_a5475aa3: 將正確答案顯示在
   show_course_sections_for_course_name_5f715702: "顯示課程的所有班別%{name}"
@@ -22796,6 +22990,7 @@ zh-Hant:
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "顯示使用於課程和使用者資料的新分析工具。將此功能新增標記設定為 ON（開）後，資料在「新分析工具」中出現可能需要花費 24 小時的時間。"
   show_new_quizzes_on_the_quizzes_page_b2db14d8: 顯示測驗頁面的新測驗
   show_notes_column_22d2b6c1: 顯示注釋欄
+  show_older_replies_e85891b3: 顯示較舊的回應
   show_one_question_at_a_time_271e346d: 每次顯示一個問題
   show_only_blueprint_courses_9fb37b41: 只顯示計劃課程
   show_originality_report_to_students_be22f5ee: 向學生展示原創檢測報告
@@ -23008,6 +23203,8 @@ zh-Hant:
   sort_by_72dbba9c: 排序規則為
   sort_by_e75f9e3e: 排序依據
   sort_courses_cf94b8d4: 將課程分類
+  sort_outcome_column_c53702ed: 將學習成果欄排序
+  sort_students_1a561e98: 將學生排序
   sortable_name_73f707cf: 可排序的名稱
   sortable_name_e25fe66c: 可排序的名稱：
   sorted_ascending_1f9b52c6: 升序排列。
@@ -23338,6 +23535,7 @@ zh-Hant:
   students_will_automatically_receive_full_credit_on_cc61df39: 在學生參加調查之後，其將自動獲得全部學分
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: 學生將能看到已隱藏此作業的成績。
   students_with_no_submissions_title: 沒有提交件的學生
+  students_without_assessments_eb100e60: 沒有評估的學生
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} 來自於 %{totalStudentsEnrolled} 學生數"
   sub_account_daeadd0: 子帳戶
   sub_accounts: 
@@ -23371,9 +23569,12 @@ zh-Hant:
       other: "%{count} 個子帳戶"
   sub_accounts_can_choose_one_of_three_options_b0dfe46a: 子帳戶可以選擇以下三個選項其中之一：
   subaccount_91f4c279: 子帳戶
+  subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "子帳戶管理員不能檢視 SIS 資訊，除非他們於課程中獲授予導師身份。"
+  subaccount_admins_cannot_view_sis_information_with_15a41444: "子帳戶管理員不能在沒有課程關聯的情況下檢視 SIS 資訊，因為導師身份有權限讀取帳戶級別的 SIS 資料。"
   subaccount_navigation_account_settings_add9eff9: 子帳戶導航工具（帳戶設定）
   subaccount_settings_8549eff7: 子帳戶設定
   subaccounts_efd02bd4: 子帳戶
+  subaccounts_only_have_ownership_of_courses_and_sec_56385a91: "子帳戶僅擁有課程和分班；並不擁有使用者資料。子帳戶管理員不能檢視 SIS 資訊，除非他們於課程中獲授予導師身份。"
   subdomain_url_1e43b6f0: 子域URL
   subject_114b2e98: 主題
   subject_1bc03dea: 主題：
@@ -23891,6 +24092,7 @@ zh-Hant:
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
       必須於帳戶設定中啟用分析工具功能，以查看分析工具頁面。
       要於成員頁面的使用者側欄內看到分析工具連結，必須停用您的帳戶的個人檔案。
+  the_analytics_feature_must_be_enabled_in_account_s_869b63a2: 必須於帳戶設定中啟用分析工具功能，以檢視分析工具頁面。
   the_analytics_feature_must_be_enabled_in_account_s_b4e77562: |
       必須於帳戶設定中啟用分析工具功能，以查看分析工具頁面。
       要於成員頁面的使用者側欄內看到分析工具連結，必須停用您的帳戶的個人檔案。
@@ -23969,6 +24171,9 @@ zh-Hant:
                        如需移除這些網域，請移除關聯工具。
   the_following_errors_occurred_bdec1e44: 發生以下錯誤：
   the_following_fields_are_invalid_fields_b3565800: "如下字段無效：%{fields}"
+  the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
+    one: 由於已對齊內容，因此無法移除以下的成果請取消選擇並重試。
+    other: 由於已對齊內容，因此無法移除以下的成果請取消選擇並重試。
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       以下的學生還未保存自己的測驗提交項目的變更：
       
@@ -24051,6 +24256,7 @@ zh-Hant:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: 報告使用者（學生，教師，管理員等）擔當的角色
   the_salesforce_account_id_if_it_exists_e7949706: "銷售人員帳戶 ID（若存在）"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: 使用排程工具，您可以設置時閒段，供學生（或學生群組）報名。按一下下面的按鈕以開始。
+  the_search_returned_no_results_cd9eee1e: 搜尋沒有傳回結果
   the_selected_group_was_cleared_because_the_student_656e4f1c: 所選定的分組已被清除，因為您所請求的學生並非任何分組的成員。您可以在成績單中選定一個分組。
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: 問題的嚴重性，由使用者從下拉菜單中進行選擇。
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "iOS/Android 設備的捷徑圖示。180x180 png"
@@ -24328,12 +24534,15 @@ zh-Hant:
   this_is_a_preview_of_the_published_version_of_the__70e0c8: 這是測驗發佈後的預覽
   this_is_a_siteadmin_test_feature_flag_3ab5184: "這是 SiteAdmin 測試功能標記"
   this_is_a_what_if_score_cbdc04f9: 这是『假設分析』分数
+  this_is_an_account_setting_that_must_be_enabled_by_8ced660: "這是必須由客戶服務經理啟用的帳戶設定。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）傳送提醒。每天都會進行檢查，並將通知傳送給學生和/或教師，直到觸發問題得到解決。"
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: 此帳戶設定必須由您的客戶服務經理啟用。
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "這只是一個僅限於開發人員的功能，您可以開啟它來預覽頁面在 RTL 環境中的外觀，而不必將語言變更為通常為 RTL 的語言"
   this_is_not_a_valid_grade_9cc2cb8: 此為一個無效的評分
+  this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: 這是技術上的安全漏洞，但有些學校需要保留他們的工作流程一段時間。
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: 當前為該學生所選取的評分。
   this_is_the_default_email_address_f3c421fb: 這是預設的電郵地址
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "這是新的功能預覽 UI。目前是唯讀的。若要回覆成舊 UI，請按一下按鈕。這樣將會停用「新的功能新增標記」並重新整理頁面。"
+  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: 這是您的主頁完成時，您將登入所在。
   this_is_your_course_landing_page_33d445ec: 這是您的課程登入頁面
   this_is_your_course_landing_page_f87a920d: 這是您的課程登入頁面！
   this_is_your_current_theme_4331709b: 其合適您的當前主題
@@ -24391,6 +24600,7 @@ zh-Hant:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       此權限僅控制於帳戶級別添加使用者的活動。要添加使用者至課程，
       必須啟用「使用者 - 從課程添加 / 移除學生」或「使用者 - 從課程添加/移除教師、課程設計者或助教至該課程」。
+  this_permission_should_only_be_assigned_to_users_t_231c182e: "此權限應僅指派給您的機構已授權作為您的整個 Canvas 帳戶中的其他使用者的使用者。"
   this_placement_requires_deep_link_support_by_the_v_702d554f: "此配置需要供應商支援 Deep Link。與您的工具供應商確認以確保他們支援此功能"
   this_pronoun_appears_after_last_name_bf5c0bf5: 此代詞將顯示於姓氏後面
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: 此代詞在啟用後將出現在您的名字之後
@@ -24717,6 +24927,7 @@ zh-Hant:
   to_1126ab55: 至
   to_35c6baa2: 至
   to_51406be9: 至
+  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "要存取課程「成員」頁面，必須同時啟用「使用者 - 檢視清單」。"
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "要透過作業列表或成績單存取作業提交項目，並於 SpeedGrader 內查看，必須同時啟用「成績 - 查看所有成績」或「成績 - 編輯」。"
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       要透過作業列表及 SpeedGrader 存取作業提交項目，必須同時啟用「成績 - 編輯」。
@@ -24724,19 +24935,22 @@ zh-Hant:
   to_access_assignment_submissions_through_assignmen_ecbb8fb7: |-
       要透過作業列表及成績單存取作業提交項目，
       必須同時啟用「成績 - 查看所有成績」。
-  to_access_the_account_courses_page_courses_view_li_e1da6165: "要存取帳戶的課程頁面，必須啟用「課程 - 查看清單」。"
+  to_access_the_account_courses_page_courses_view_li_e1da6165: "要存取帳戶的課程頁面，必須啟用「課程 - 檢視清單」。"
   to_access_the_account_settings_tab_account_level_s_9676d44b: "要存取「帳戶設定」標籤，必須啟用「帳戶級別設定 - 管理」。"
+  to_access_the_assignments_index_page_course_conten_49d884f2: "要存取作業列表的索引頁，必須啟用「課程內容 - 檢視」。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "要存取作業列表的索引頁，必須啟用「課程內容 - 查看」。要向個別學生分發不同的作業，必須同時啟用「使用者 - 查看清單」。"
-  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "要存取帳戶導航的課程連結，必須啟用「課程 - 查看清單」。"
+  to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "要存取帳戶導航的課程連結，必須啟用「課程 - 檢視清單」。"
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
       要存取「帳戶導航」中的「課程」連結，必須啟用「課程 - 檢視列表」。
               如果已啟用「課程 - 添加」並停用「課程 - 檢視列表」，使用者可以使用「帳戶設定」中的「添加新課程」按鈕添加新課程。
               要還原刪除的課程，必須同時啟用「課程 -刪除」、「課程 - 取消刪除」和「課程內容 - 檢視」。
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "要在「帳戶導航」中存取「課程」連結，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程 - 檢視列表」。"
+  to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "要存取課程測驗索引頁面中的「管理題庫」連結，必須同時啟用「課程內容 - 檢視」及「作業和測驗 - 添加/編輯/刪除」。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "要存取成員頁面並查看小組，必須同時啟用「使用者 - 查看清單」。"
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "要存取成員頁面，必須啟用「使用者 - 檢視清單」。如果已啟用「開放註冊帳戶設定」，擁有此權限的使用者則可以透過電郵地址添加學生至課程，即使該使用者並未擁有 Canvas 帳戶。要檢視 SIS ID，必須啟用「SIS 資料 - 讀取」。要透過 SIS ID 添加使用者至課程，必須同時啟用「SIS 資料 - 管理」。要編輯學生的分班，必須同時啟用「使用者 - 檢視清單」及「交談 - 傳送訊息至個別課程成員」。要將觀察者與學生進行連結，必須同時啟用「交談 - 傳送訊息至個別課程成員」。"
   to_access_the_people_page_users_view_list_must_be__2f01333b: "要存取成員頁面，必須啟用「使用者 - 查看清單」。如果啟用此權限，而「使用者 - 查看主電郵地址」已停用，使用者則會看見電郵地址被用作登入 ID。要透過檢視登入 ID，必須同時啟用「使用者 - 於課程添加 / 移除學生」及「使用者 - 於課程添加 / 移除教師、課程設計者或助教」。"
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "要存取成員頁面，必須啟用「使用者 - 查看清單」。"
+  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "要存取成員頁面，必須啟用「使用者 - 檢視清單」。"
   to_access_the_people_page_users_view_list_must_be__6f42bf9e: "要存取成員頁面，必須啟用「使用者 - 檢視清單」。"
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       要存取成員頁面，必須啟用「使用者 - 查看清單」。
@@ -24754,17 +24968,26 @@ zh-Hant:
       如果停用此權限，而「使用者 - 查看登入 ID」已啟用，使用者則仍會看見電郵地址被用作登入 ID。
   to_access_the_student_interactions_report_courses__e8432cd0: "要存取學生互動報告，必須同時啟用「課程 - 檢視使用情況報告」。"
   to_access_the_student_interactions_report_grades_v_69105662: "要存取「學生互動」報告，必須同時啟用「成績 - 檢視所有成績」。"
+  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "要以其他使用者身份操作，必須同時啟用「使用者 - 作為」。"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "如需啟動簡訊號碼，請輸入我們發送到 %{sms_number} 的四字元確認碼至。"
   to_activate_this_communication_channel_enter_the_f_f465efc5: "若要啟用此通訊頻道，請輸入我們傳送到 %{sms_number} 的四字元確認碼。"
+  to_add_a_course_group_to_a_collaboration_group_vie_36a5d341: "要添加課程小組至協作，必須同時啟用「小組 - 檢視所有學生小組」。"
+  to_add_a_course_group_to_a_collaboration_groups_ad_7e51136a: "要添加課程小組至協作，必須同時啟用「小組 - 添加/編輯/刪除」。"
+  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "要透過 SIS ID 添加使用者，必須同時啟用「SIS 資料 - 管理」。"
+  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "要透過 CSV 添加帳戶級別小組，必須同時啟用「SIS 資料 - 匯入」。"
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "要添加通告，必須同時啟用「討論區 - 調整分數」。要於主頁上查看最新通告，必須於課程設定中選取「於課程主頁顯示最新通告」勾選框。"
+  to_add_announcements_discussions_moderate_must_als_a83fd681: "要添加通告，必須同時啟用「討論區 - 調整分數」。"
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "要添加關聯課程，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程 - 添加」。"
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "要添加關聯課程，必須同時啟用「藍圖課程 - 添加 / 編輯 / 關聯 / 刪除」和「課程 - 添加 / 編輯 / 刪除」。"
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "如需批量添加使用者、課程及註冊學生，請點擊「SIS 匯入」。"
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "要添加、編輯或刪除小組，必須同時啟用「小組 - 添加 / 編輯 / 刪除」。"
   to_add_individual_courses_click_courses_c5355180: 如需添加個別課程，請點擊「課程」。
   to_add_individual_users_click_people_4d6de56a: 如需添加個別使用者，請點擊「成員」。
+  to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "要添加到或從課程移除學生，必須啟用「使用者 - 學生」權限。"
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "要添加或移除課程的使用者，必須啟用合適的使用者權限（例如「使用者 - 教師」）。"
   to_add_or_remove_users_to_a_course_the_appropriate_df1ac683: "要添加或移除課程的使用者，必須啟用合適的使用者權限（例如「使用者 - 教師」）。要編輯一名使用者的分班，必須同時啟用「使用者 - 允許在課程內進行管理行動」及「使用者 - 檢視清單」。"
+  to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "要透過 SIS 添加或移除課程的使用者，必須啟用合適的使用者權限（例如「使用者 - 教師」）。"
+  to_add_students_to_a_collaboration_users_view_list_806a5935: "要添加學生至協作，必須同時啟用「使用者 - 檢視清單」。"
   to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "要添加學生至調整分數組，必須同時啟用「成績 - 檢視所有成績」。"
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "要添加使用者至課程，必須同時啟用「使用者 - 從課程添加 / 移除學生」及/或「使用者 - 從課程添加 / 移除教師、課程設計者或助教」。要編輯學生的分班，必須同時啟用「交談 - 傳送訊息至個別課程成員」及「使用者 - 從課程添加 / 移除學生」兩者。要編輯教師、課程設計者或助教的分班，必須同時啟用「交談 - 傳送訊息至個別課程成員」及「使用者 - 從課程添加 / 移除教師、課程設計者或助教」兩者。"
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
@@ -24788,6 +25011,7 @@ zh-Hant:
       要結束長時間的會議，必須啟用「課程內容 - 添加 / 編輯 / 刪除」。
       如果啟用「課程內容 - 添加 / 編輯 / 刪除」，而停用「網路會議 - 創建」，使用者則仍能管理會議。
       此權限可決定使用者是否能於課程和小組內創建會議。
+  to_allow_full_management_of_conferences_created_by_bc7910e6: 要允許對使用者或其他人建立的會議進行全面管理，必須同時啟用「課程內容」權限。
   to_allow_full_management_of_conferences_created_by_bece5de: "要允許對使用者或其他人建立的會議進行全面管理，必須同時啟用「課程內容」權限。要結束長時間的會議，必須啟用「課程內容」權限。如果啟用「課程內容」權限但停用「網路會議 - 建立」，使用者則仍能管理會議。此權限可決定使用者是否能於課程和小組內建立會議。"
   to_allow_full_management_of_conferences_created_by_eae032e7: "要允許對使用者或其他人建立的會議進行全面管理，必須同時啟用「課程內容」權限。要結束長時間的會議，必須啟用「課程內容」權限。如果啟用「課程內容」權限但停用「網路會議 - 建立」，使用者則仍能管理會議。此權限可決定使用者是否能於課程和小組內建立會議。"
   to_allow_full_management_of_conferences_created_by_feec1984: |-
@@ -24795,6 +25019,7 @@ zh-Hant:
       要結束長時間的會議，必須啟用「課程內容 - 添加 / 編輯 / 刪除」。
       如果啟用「課程內容 - 添加 / 編輯 / 刪除」，而停用「網路會議 - 創建」，使用者則仍能管理會議。
       此權限可決定使用者是否能於課程和小組內創建會議。
+  to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "要允許以唯讀模式檢視學習成果頁面，可停用此權限，但必須啟用「課程內容 - 檢視」。"
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "要允許以唯讀模式檢視學習成果頁面，可停用此權限，但必須啟用「課程內容 - 檢視」。要匯入學習成果，必須同時啟用「學習成果 - 匯入」。"
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "要允許使用者調整分數，必須同時啟用「成績 - 選擇最終評分進行調整分數」。"
   to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
@@ -24803,14 +25028,17 @@ zh-Hant:
       要添加學生至協作，必須同時啟用「使用者 - 查看清單」。要添加課程小組至協作，必須同時啟用「小組 - 添加 / 編輯 / 刪除」。
   to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "要允許由其他使用者建立的協作具備檢視、編輯及刪除功能，必須同時啟用「課程內容 - 添加/編輯/刪除」。如果「課程內容 - 添加 / 編輯 / 刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視、編輯和刪除所有協作。要添加學生至協作，必須同時啟用「使用者 - 檢視清單」。要添加課程小組至協作，必須同時啟用「小組 - 添加 / 編輯 / 刪除」。"
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "要允許由其他使用者建立的協作具備檢視、編輯及刪除功能，必須同時啟用「課程內容 - 添加/編輯/刪除」。如果「課程內容 - 添加/編輯/刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視、編輯及刪除所有協作。要添加學生至協作，必須同時啟用「使用者 - 檢視清單」。要添加課程小組至協作，必須同時啟用「小組 - 添加 / 編輯 / 刪除」。"
+  to_allow_view_edit_and_delete_functionality_of_col_f948198e: "要允許由其他使用者建立的協作具備檢視、編輯及刪除功能，必須同時啟用「課程內容 - 添加/編輯/刪除」。"
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "要允許由其他使用者創建的協作具備查看/編輯/刪除功能，必須同時啟用「課程內容 - 添加 / 編輯 / 刪除」。如果「課程內容 - 添加 / 編輯 / 刪除」已啟用，而「學生協作 - 創建」已停用，使用者則不能創建新協作，但將能夠查看/編輯/刪除所有協作。要添加學生至協作，必須同時啟用「使用者 - 查看清單」。要添加課程小組至協作，必須同時啟用「小組 - 查看所有學生小組」。"
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "要允許由其他使用者建立的協作具備檢視/編輯/刪除功能，必須同時啟用「課程內容 - 添加 / 編輯 / 刪除」。如果「課程內容 - 添加 / 編輯 / 刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視/編輯/刪除所有協作。要添加學生至協作，必須同時啟用「使用者 - 檢視清單」。要添加課程小組至協作，必須同時啟用「小組 - 檢視所有學生小組」。"
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "要允許由其他使用者建立的協作具備檢視/編輯/刪除功能，必須同時啟用「課程內容 - 添加 / 編輯 / 刪除」。如果「課程內容 - 添加 / 編輯 / 刪除」已啟用，而「學生協作 - 建立」已停用，使用者則不能建立新協作，但將能夠檢視/編輯/刪除所有協作。要添加學生至協作，必須同時啟用「使用者 - 檢視清單」。要添加課程小組至協作，必須同時啟用「小組 - 檢視所有學生小組」。"
+  to_allow_view_edit_delete_functionality_of_collabo_f46fade2: "要允許由其他使用者建立的協作具備檢視/編輯/刪除功能，必須同時啟用「課程內容 - 添加/編輯/刪除」。"
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: 如需指派學生到群組內，請在「group_name」欄內輸入群組名稱。
   to_be_added_2959cc72: 待添加
   to_be_removed_d4b48586: 有待刪除
   to_c4c44f4b: 至
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "要更改 sis_account_id 使用者必須要有 manage_sis 權限。"
+  to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "要變更使用者的密碼，必須同時啟用「使用者 - 檢視」。"
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: 要檢查其他中斷的連結，請訪問課程連結驗證工具
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "要檢查其他中斷的連結，請訪問 %{validator_link}"
   to_check_for_other_broken_links_visit_validator_li_e350c852: "要檢查其他中斷的連結，請訪問 %{validator_link}"
@@ -24828,6 +25056,7 @@ zh-Hant:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "要跨列表選擇一個分班，必須同時啟用「課程分班 - 添加 / 編輯 / 刪除」。要編輯課程的 SIS ID，必須同時啟用「SIS 數據 - 管理」。要允許帳戶級別的使用者刪除課程，必須同時啟用「課程狀態 - 管理」。"
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "要跨列表選擇一個分班，必須同時啟用「課程分班 - 添加 / 編輯 / 刪除」。要編輯課程的 SIS ID，必須同時啟用「SIS 數據 - 管理」。要允許帳戶級別的使用者刪除課程，必須同時啟用「課程狀態 - 管理」。"
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "要跨列表選擇一個分班，必須同時啟用「管理課程分班 - 編輯」。要編輯課程的 SIS ID，必須同時啟用「SIS 數據 - 管理」。要允許帳戶級別的使用者刪除課程，必須同時啟用「課程狀態 - 管理」。"
+  to_cross_list_a_section_manage_courses_admin_manag_7992434e: "要跨列表選擇分班，必須同時啟用「管理課程：管理員 - 管理/更新」和「管理課程分班 - 編輯」。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "要跨列表選擇多個分班，必須同時啟用「課程 - 添加 / 編輯 / 刪除」。"
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "要跨清單選擇分班，必須同時啟用「課程分班 - 編輯」和「管理課程：管理員 - 管理/更新」。"
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "要跨列表選擇分班，必須啟用「課程分班 - 編輯」。該使用者必須同時在將會跨列表選擇的課程中以導師身份註冊。"
@@ -24835,6 +25064,8 @@ zh-Hant:
   to_date_can_t_come_before_from_date_cf9e18aa: 「終止日期」不能在「開始日期」之前
   to_date_cannot_come_before_from_date_3eeb2633: 「終止日期」不能在「開始日期」之前
   to_differentiate_assignments_to_individual_student_6cc40fde: "要向個別學生分發不同的作業，必須同時啟用「使用者 - 查看清單」。"
+  to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "要讓使用者無法管理課程級別的 SIS ID，必須同時停用「SIS 資料 - 管理」及「SIS 資料 - 讀取」。"
+  to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "要令使用者無法檢視任何課程級別的 SIS ID，必須同時停用「SIS 資料 - 管理」及「SIS 資料 - 讀取」。"
   to_do_1d554f36: 待辦事項
   to_do_5526f10a: 待辦事項：
   to_do_6ac7b2dc: 待辦事項：
@@ -24848,6 +25079,7 @@ zh-Hant:
   to_do_list_dashboard_d741f64e: 待辦事項清單控制面板
   to_do_time_a7e17623: 待辦時間
   to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "要於 SpeedGrader 或成績單內編輯評分或添加評論，必須啟用「成績 - 編輯」。"
+  to_edit_a_student_s_section_conversations_send_to__12a2623f: "要編輯學生的分班，必須同時啟用「交談 - 傳送至個別課程成員」。"
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
       要編輯一名學生的分班，必須同時啟用「使用者 - 於課程添加 / 移除學生」及「使用者 - 查看清單」兩者。
       要編輯一名教師、課程設計者或助教的分班，必須同時啟用「使用者 - 於課程添加/移除教師、課程設計者或助教」和「使用者 - 查看清單」兩者。
@@ -24860,11 +25092,14 @@ zh-Hant:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       要編輯一名學生的分班，必須同時啟用「使用者 - 從課程添加 / 移除學生」及「發送訊息至個別課程成員」。
       要編輯一名教師、課程設計者或助教的分班，必須同時啟用「使用者 - 從課程添加 / 移除教師、課程設計者或助教至該課程」及「交談 - 發送訊息至個別課程成員」。
+  to_edit_a_user_s_section_conversations_send_to_ind_a54de83d: "要編輯使用者的分班，必須同時啟用「交談 - 傳送至個別課程成員」。"
   to_edit_a_user_s_section_the_appropriate_users_per_31b7a90d: "要編輯使用者的分班，必須同時啟用合適的「使用者權限」（例如「使用者 - 教師」）、「使用者 - 允許在課程內進行管理行動」和「交談 - 發送至個別課程成員」。"
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: "要編輯一名使用者的分班，必須同時啟用「使用者 - 允許在課程內進行管理行動」及「使用者 - 檢視清單」。 "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "要編輯一名使用者的分班，必須同時啟用「使用者 - 允許在課程內進行管理行動」及「使用者 - 檢視清單」。"
+  to_edit_assignment_details_on_a_discussion_assignm_1764e657: "要編輯討論區內的作業詳細資料，必須同時啟用「作業和測驗 - 添加/編輯/刪除」。"
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "要於課程設定編輯藍圖課程設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」。要添加一個關聯課程，必須同時啟用「藍圖課程 - 添加 / 編輯 / 關聯 / 刪除」和「課程 - 檢視清單」。要編輯任何藍圖物件的鎖定設定，必須啟用此權限。要編輯檔案的鎖定設定，必須同時啟用「課程檔案 - 添加 / 編輯 / 刪除」。要編輯測驗的鎖定設定，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。"
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "要在作業索引頁面編輯藍圖鎖定設定，必須同時啟用「課程 - 添加 / 編輯 / 刪除」。如果此權限尚未啟用，「課程 - 添加 / 編輯 / 刪除」已啟用，則可以於作業的詳細資料頁面編輯作業的藍圖鎖定設定。要編輯個別測驗或測驗索引頁面上的藍圖鎖定設定，必須同時啟用「課程 - 添加 / 編輯 / 刪除」。"
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "要在討論區索引頁面編輯藍圖鎖定設定，必須同時啟用「討論區 - 調整分數」。"
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "要在討論區索引頁面編輯藍圖鎖定設定，必須同時啟用「課程 - 添加 / 編輯 / 刪除」及「討論區 - 調整分數」。 "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "要編輯討論區索引頁面的藍圖鎖定設定，必須同時啟用「課程 - 添加/編輯/刪除」及「討論區 - 檢視」。如果此權限尚未啟用，而「課程 - 添加/編輯/刪除」及「討論區 - 檢視」已啟用，則可以編輯個別討論區的藍圖鎖定設定。"
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "要編輯作業索引頁面的藍圖鎖定設定，必須同時啟用「課程 - 添加 / 編輯 / 刪除」。如果此權限尚未啟用，而「課程 - 添加 / 編輯 / 刪除」已啟用，則可以編輯個別頁面的藍圖鎖定設定。"
@@ -24878,24 +25113,38 @@ zh-Hant:
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       要編輯「作業列表索引」頁面的鎖定設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。如果已啟用這些額外的權限，但未啟用「作業列表和測驗 - 添加/編輯/刪除」，則可以從作業的詳情頁面管理作業的藍圖鎖定設定。
               要編輯有關個人測驗或「測驗索引」頁面上的鎖定設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。
+  to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "要編輯「作業列表索引」頁面的鎖定設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。"
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "要編輯「討論區索引」頁面的鎖定設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。"
+  to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "要編輯個別測驗或測驗索引頁面上的鎖定設定，必須同時啟用「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。"
+  to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "要編輯檔案的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程檔案 - 編輯」。"
+  to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "要編輯測驗的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「作業和測驗 - 添加/編輯/刪除」。"
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "要編輯「討論區索引」頁面的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「討論區 - 檢視」。如果啟用額外的權限，但未啟用此權限，則可以編輯有關個人討論區的鎖定設定。"
+  to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "要編輯「討論區索引」頁面的鎖定設定，必須同時啟用「管理課程：管理員 - 管理/更新」和「討論區 - 檢視」。"
+  to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "要編輯「頁面索引」頁面上的鎖定設定，必須同時啟用「頁面 - 更新」、「藍圖課程 - 添加/編輯/關聯/刪除」和「管理課程：管理員 - 管理/更新」。"
+  to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "要編輯課程 SIS ID，必須同時啟用「管理課程：管理員 - 管理/更新」和「SIS 資料 - 管理」。"
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       要編輯使用者詳細資料、修改登入詳細資料或更改使用者密碼，必須同時啟用「使用者管理登入詳細資料」。
       要查看使用者頁面查看次數，必須同時啟用「統計 - 查看」。
       要以其他使用者身份操作，必須同時啟用「使用者 - 作為」。
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: 要編輯使用者詳細資料、修改登入詳細資料或變更使用者密碼，必須同時啟用「使用者管理登入詳細資料」。
   to_edit_user_details_modify_login_details_or_chang_800e894d: "要編輯使用者詳細資料、修改登入詳細資料或變更使用者密碼，必須同時啟用「使用者管理登入詳細資料」。要檢視使用者頁面檢視次數，必須同時啟用「統計 - 檢視」。要以其他使用者身份操作，必須同時啟用「使用者 - 作為」。"
+  to_end_a_long_running_conference_the_course_conten_63e3f993: 要結束長時間的會議，必須啟用「課程內容」權限。
   to_f0e90538: 至：
+  to_fully_manage_course_level_question_banks_assign_2c31396f: "要完全管理課程級別的題庫，必須同時啟用「作業和測驗 - 添加/編輯/ 刪除」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 於課程添加 / 移除學生」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: "要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 允許在課程內進行管理行動」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 於課程添加 / 移除學生」權限。"
+  to_generate_a_pairing_code_from_a_student_s_user_d_b3256aa0: "要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 允許在課程內進行管理行動」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "要從學生的使用者設定頁面產生配對代碼，必須同時啟用「使用者 - 作為」權限。要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 從課程添加 / 移除學生」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_s_5da92dc: "要從學生的使用者設定頁面產生配對代碼，必須同時啟用「使用者 - 作為」權限。要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 允許在課程內進行管理行動」權限。"
+  to_generate_a_pairing_code_from_a_student_s_user_s_5dcba185: "要從學生的使用者設定頁面產生配對代碼，必須同時啟用「使用者 - 作為」權限。"
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       要從學生的使用者設定頁面產生配對代碼，必須同時啟用「使用者 - 作為」權限。
       要從學生的使用者詳細資料頁面產生配對代碼，必須同時啟用「使用者 - 從課程添加 / 移除學生」權限。
+  to_generate_a_pairing_code_on_behalf_of_a_student__3caa504b: "要代表學生產生和觀察者共用的配對代碼，必須同時啟用「使用者 - 產生學生的觀察者配對代碼」。"
+  to_generate_grade_change_logs_in_admin_tools_grade_cbcab1c9: "要在「管理員工具」中產生評分變更日誌，必須同時啟用「成績 - 檢視變更日誌」。"
   to_generate_login_logout_activity_in_admin_tools_u_253c565b: "要於管理員工具中產生的登入/登出活動，必須同時啟用「使用者 - 管理登入詳細資料」或「統計 - 檢視」。要於管理員工具中產生成績變更日誌，必須同時啟用「成績 - 檢視變更日誌」。"
+  to_generate_login_logout_activity_in_admin_tools_u_603c40a0: "要在「管理員工具」中產生登入/登出活動，必須同時啟用「使用者 - 管理登入詳細資料」或統計資料 - 檢視」。"
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "要於管理員工具中產生的登入/登出活動，必須同時啟用「使用者 - 管理登入詳細資料」或「統計 - 查看」。要於管理員工具中產生成績變更日誌，必須同時啟用「成績 - 查看變更日誌」。"
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "要使用課程匯入工具匯入作業及測驗，必須啟用「課程內容 - 添加 / 編輯 / 刪除」。"
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "要使用課程匯入工具匯入檔案，必須同時啟用「課程內容 - 添加 / 編輯 / 刪除」。"
@@ -24910,18 +25159,26 @@ zh-Hant:
   to_link_an_observer_to_a_student_users_manage_logi_c24e1e45: |-
       要連結觀察者至學生，必須啟用「使用者 - 管理登入詳細資料」和「交談 - 發送至個別課程成員」。
               要為學生產生配對代號並與觀察者分享，必須同時啟用「使用者 - 為學生產生觀察者配對代碼」。
+  to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "要將觀察者與學生進行連結，必須同時啟用「使用者 - 管理登入詳細資料」及「交談 - 傳送訊息至個別課程成員」。"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "如需將課程觀察員 *%{name}* 連結到某位學生，請在下面開始輸入該學生姓名，查找他們，然後按一下更新。"
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "如需以流動方式登入您的 Canvas 帳戶，請從 Canvas 學生應用程式掃描此 QR 碼。"
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "如需以流動方式登入您的 Canvas 帳戶，請從任何 Canvas 應用程式掃描此 QR 碼。"
+  to_manage_associated_courses_courses_view_list_and_7bb3bedb: "要管理關聯的課程，必須同時啟用「課程 - 檢視淸單」和「管理課程 - 添加」。"
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "要於課程設定管理藍圖課程設定，必須同時啟用「課程 - 添加 / 編輯 / 刪除」。"
+  to_manage_course_announcements_discussions_moderat_5f02f46e: "要管理課程通告，必須同時啟用「討論區 - 調整分數」。"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "要管理課程內容，必須啟用「課程內容 - 添加/編輯/刪除」。"
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "要編輯課程內容，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程內容 - 添加/編輯/刪除」。要檢視「選擇主頁」和「課程設置清單」按鈕，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程內容 - 檢視」。（教師、設計者和助教可設定課程的主頁，無論他們的權限為何。）"
+  to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "要編輯課程內容，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程內容 - 添加/編輯/刪除」。"
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       要管理討論區，必須同時啟用「討論區 - 調整分數」。
       
       要於討論區中回覆，必須同時啟用「討論區 - 帖子」。
+  to_manage_discussions_discussions_moderate_must_al_834a8b9: "要管理討論區，必須同時啟用「討論區 - 調整分數」。"
   to_manage_discussions_discussions_moderate_must_al_d6d665be: "要管理討論區，必須同時啟用「討論區 - 調整分數」。要於討論區中回覆，必須同時啟用「討論區 - 帖子」。"
+  to_manage_discussions_discussions_moderate_must_be_7307a00a: "要管理討論區，必須啟用「討論區 - 調整分數」。"
+  to_manage_discussions_discussions_post_and_discuss_47aaeceb: "要管理討論區，必須同時啟用「討論區 - 帖子」及「討論區 - 調整分數」。"
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "要管理討論區，必須同時啟用「討論區 - 帖子」及「討論區 - 調整分數」。要於討論區中回覆，必須同時啟用「討論區 - 帖子」。"
+  to_manage_feature_options_for_an_account_feature_o_6327c2da: "要管理「功能選項」標籤，必須同時啟用「功能選項 - 啟用/停用」。"
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "要管理物件類型的鎖定設定，必須啟用「管理課程：管理員 - 管理/更新」。"
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "要管理綜合評分，必須同時啟用「成績 - 調整分數」。"
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -24931,6 +25188,7 @@ zh-Hant:
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "要管理 SIS 數據，必須同時啟用「SIS 數據 - 管理」。"
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "要管理 SIS 數據，必須啟用「SIS 數據 - 管理」。如果啟用「SIS 數據 - 管理」，而停用「SIS 數據 - 讀取」，帳戶的權限將重寫課程的權限。如果停用「SIS 數據 - 管理」，而啟用「SIS 數據 - 讀取」，使用者則僅能查看課程、使用者及子帳戶的 SIS ID。要令使用者無法查看任何課程級別的 SIS ID，必須同時停用「SIS 數據 - 管理」及「SIS 數據 - 讀取」。"
   to_manage_sis_data_sis_data_manage_must_be_enabled_a92ce831: "要管理 SIS 資料，必須啟用「SIS 資料 - 管理」。如果啟用「SIS 資料 - 管理」，而停用「SIS 資料 - 讀取」，帳戶的權限將重寫課程的權限。如果停用「SIS 資料 - 管理」，而啟用「SIS 資料 - 讀取」，使用者則僅能檢視課程、使用者及子帳戶的 SIS ID。要令使用者無法檢視任何課程級別的 SIS ID，必須同時停用「SIS 資料 - 管理」及「SIS 資料 - 讀取」。"
+  to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: "要管理 SIS 資料，必須啟用「SIS 資料 - 管理」。"
   to_manage_the_feature_options_tab_feature_options__c478f81: "若要管理「功能選項」標籤，必須啟用「功能選項 - 啟用/停用」。"
   to_manage_the_feature_options_tab_feature_options__fc32fca3: "若要管理「功能選項」標籤，必須同時啟用「功能選項 - 啟用/停用」。"
   to_minscore_43e5452e: "至 %{minScore}%"
@@ -24943,16 +25201,19 @@ zh-Hant:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
       要調整測驗的分數，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。
       要於測驗項目分析 CSV 文檔中查看使用者的 SIS ID 欄，必須同時啟用「SIS 資料 - 讀取」。
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_c2e739c8: "要調整測驗的分數，請同時啟用「作業和測驗 - 添加/編輯/刪除」。"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ca1e4e6a: |-
       要調整測驗的分數，必須同時啟用「作業和測驗 - 添加/編輯/刪除」。
               要在測驗項目分析 CSV 檔案中檢視使用者 SIS ID 欄，必須啟用「SIS 資料 - 讀取」。
               要檢視提交記錄，必須啟用「測驗 - 檢視提交記錄」。
-  to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "要調整測驗的分數，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。"
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "要調整測驗的分數，必須同時啟用「作業和測驗 - 添加/編輯/刪除」。"
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "要管理測驗，必須同時啟用「成績 - 編輯」。"
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "要調整分數，必須同時啟用「成績 - 選擇最終評分進行調整分數」。要發佈或隱藏作業的成績，必須同時啟用「成績 - 編輯」。"
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "要調整分數，必須同時啟用「成績 - 選擇最終評分進行調整分數」。"
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "若要取得用戶端 ID，帳戶管理員將需要產生一個 LTI 開發人員金鑰。"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: 如要釘選到頁面頂部的討論區，請在此處拖動討論區，或從討論區設定選單中選擇釘選。
+  to_post_or_hide_grades_for_a_moderated_assignment__bf929e0c: "要發佈或隱藏已調整分數作業的成績，必須同時啟用「成績 - 編輯」。"
+  to_post_or_hide_grades_for_an_assignment_grades_ed_974f6de4: "要發佈或隱藏作業的成績，必須同時啟用「成績 - 編輯」。"
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "要發佈或隱藏成績，必須同時啟用「成績 - 編輯」。"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "如需預覽主題編輯器圖標，您需要*關閉高對比度 UI*。"
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "要發佈及取消發佈單元內容，必須同時啟用「課程 - 添加/編輯/刪除」及「課程內容 - 檢視」。如果有學生的提交項目，則不能取消發佈單元項目。"
@@ -24965,8 +25226,14 @@ zh-Hant:
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "要發佈已調整分數作業的最終成績，必須同時啟用「成績 - 編輯」。要發佈或隱藏已調整分數作業的成績，必須同時啟用「成績 - 編輯」。"
   to_publish_final_grades_for_a_moderated_assignment_713090cf: "要發佈已調整分數作業的最終成績，必須同時啟用「成績 - 編輯」。"
   to_publish_unpublish_module_content_course_content_efc294d4: "要發佈/取消發佈單元內容，必須啟用「課程內容 - 添加 / 編輯 / 刪除」。"
+  to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "要透過 SIS ID 移除使用者，必須同時啟用「SIS 資料 - 管理」。"
+  to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "要於討論區中回覆，必須同時啟用「討論區 - 帖子」。"
+  to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "要還原已刪除的課程，必須同時啟用「課程 - 刪除」、「課程 - 取消刪除」及「課程內容 - 檢視」。"
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "要還原一個已刪除的課程，必須同時啟用「課程 - 取消刪除」及「課程內容 - 查看」兩者。"
+  to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "要還原帳戶中已刪除的課程，必須同時啟用「管理課程 - 刪除」和「課程內容 - 檢視」。"
   to_restrict_students_from_creating_groups_deselect_6269c8cb: 要使學生無法創建小組，請於課程設定內取消選擇「讓學生組織自己的小組」勾選框。
+  to_restrict_students_from_creating_groups_do_not_s_b6da85dc: 要使學生無法建立小組，請於課程設定內取消選擇「讓學生組織自己的小組」勾選框。
+  to_restrict_students_from_creating_groups_manage_c_7cd09af9: "要限制學生建立小組，必須啟用「管理課程：管理員 - 管理/更新」，並且必須於課程設定內取消選擇「讓學生組織自己的小組」勾選框。"
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "如需限制特定 Clever 域的使用者，請在此輸入該域的 Clever Id。這是在多租戶環境下使用 Clever 快速登入功能的必須要求。"
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "如需僅限特定 Google Apps 域的使用者使用，請在此輸入域名稱。"
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "如需限制特定 Google Apps 網域的使用者，請在此輸入網域，並以逗號分隔不同的網域。如需限制一般的 Google Apps 使用者，請輸入「*」。"
@@ -24974,18 +25241,23 @@ zh-Hant:
   to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "要於 SpeedGrader 檢閱已調整分數的作業，必須同時啟用「成績 - 編輯」。"
   to_search_and_view_notifications_for_a_user_users__becfb733: "要搜尋並檢視一名使用者的通知，必須同時啟用「使用者 - 查看清單」。"
   to_search_and_view_notifications_for_a_user_users__fab7293a: "要搜尋並檢視一名使用者的通知，必須同時啟用「使用者 - 檢視」。"
+  to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "要僅根據作業 ID 搜尋，必須同時啟用「成績 - 檢視所有成績」。"
+  to_search_by_course_id_or_assignment_id_grades_edi_ac2c7b94: "要根據課程 ID 或作業 ID 搜尋，必須同時啟用「成績 - 編輯」。"
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
       要根據評分者或學生 ID 搜尋，必須同時啟用「使用者 - 查看清單」。
       要根據課程 ID 或作業 ID 搜尋，必須同時啟用「成績 - 編輯」。
       要僅根據作業 ID 搜尋，必須同時啟用「成績 - 查看所有成績」。
+  to_search_by_grader_or_student_id_users_view_must__4639a825: "要根據評分者或學生 ID 搜尋，必須同時啟用「使用者 - 檢視」。"
   to_search_by_grader_or_student_id_users_view_must__524aa668: "要根據評分者或學生 ID 搜尋，必須同時啟用「使用者 - 檢視」。要根據課程 ID 或作業 ID 搜尋，必須同時啟用「成績 - 編輯」。要僅根據作業 ID 搜尋，必須同時啟用「成績 - 檢視所有成績」。"
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       要於還原課程標籤中搜尋課程，必須同時啟用「課程內容 - 查看」。
       要還原帳戶中已刪除的課程，必須同時啟用「課程 - 添加 / 編輯 / 刪除」、「課程內容 - 查看」以及「課程 - 取消刪除」這些權限。
   to_search_for_a_course_in_the_restore_courses_tab__475b1a02: "要於「還原課程」標籤中搜尋課程，必須同時啟用「課程內容 - 檢視」。要還原帳戶中已刪除的課程，必須同時啟用「管理課程 - 刪除」和「課程內容 - 檢視」。"
+  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "要於「還原課程」標籤中搜尋課程，必須同時啟用「課程內容 - 檢視」。"
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "要於「還原課程」標籤中搜尋課程，必須同時啟用「課程內容 - 檢視」。要還原帳戶中已刪除的課程，必須同時啟用「課程 - 添加/編輯/刪除」、「課程內容 - 檢視」以及「課程 - 取消刪除」這些權限。"
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "要根據成績變更日誌搜尋，必須同時啟用「成績 - 查看變更日誌」。"
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "要根據成績變更日誌搜尋，必須同時啟用「成績 - 查看變更日誌」。"
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: 要於「成員」頁面的使用者側欄內查看分析工具連結，必須停用您帳戶中的個人檔案。
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "要於課程主頁中看見課程設置清單，必須同時啟用「管理（添加 / 編輯 / 刪除）課程」。"
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "要於課程主頁中查看課程設定檢查清單選項，必須同時啟用「管理 - 添加/編輯/刪除」課程。"
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "要向個別使用者發送訊息，必須同時啟用「交談 - 發送訊息至個別課程成員」。"
@@ -24999,11 +25271,14 @@ zh-Hant:
       要從學習成果頁面匯入學習成果，必須同時啟用「評分標準 - 添加 / 編輯 / 刪除」。
       啟用「課程內容 - 查看」及「作業及測驗 - 添加 / 編輯 / 刪除」後，使用者可以透過作業列表存取及創建（但不能編輯）個別作業評分標準。
   to_view_a_course_outcomes_page_as_read_only_course_b961cbec: "要以唯讀模式檢視課程學習成果頁面，必須啟用「課程內容 - 檢視」。要從學習成果頁面匯入學習成果，必須同時啟用「評分標準 - 添加 / 編輯 / 刪除」。啟用「課程內容 - 檢視」及「作業及測驗 - 添加/編輯/刪除」後，使用者可以透過作業清單存取及建立（但不能編輯）個別作業評分標準。"
+  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "要檢視使用者的集成 ID，必須同時啟用「SIS 資料 - 管理」。"
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "要查看一名使用者的登入詳細資料，必須同時啟用「使用者 - 查看清單」及「修改使用者的登入詳細資料」。"
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "要檢視使用者的 SIS ID，必須同時啟用「SIS 資料 - 管理」或「SIS 資料 - 讀取」。"
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "要查看帳戶級別的小組，必須同時啟用「小組 - 添加 / 編輯 / 刪除」。"
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "如需檢視發送至 Canvas 使用者的所有通知，請選擇使用者和日期範圍，以進行搜索。"
   to_view_announcements_announcements_view_must_also_75f652df: "要查看通告，必須同時啟用「通告 - 查看」。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
+  to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "要檢視「選擇主頁」和「課程設置清單」按鈕，必須同時啟用「管理課程：管理員 - 管理/更新」和「課程內容 - 檢視」。（教師、設計者和助教可設定課程的主頁，無論他們的權限為何。）"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       要查看課程內的討論區，必須同時啟用「討論區 - 查看」。
       要管理討論區，必須啟用「討論區 - 調整分數」。
@@ -25012,6 +25287,7 @@ zh-Hant:
       要查看課程內的討論區，必須啟用「討論區 - 查看」。
       要於討論區中回覆，必須同時啟用「討論區 - 帖子」。
       要編輯討論區內的作業詳細資料，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。
+  to_view_discussions_in_a_course_discussions_view_m_6be8ec80: "要檢視課程內的討論區，必須啟用「討論區 - 檢視」。"
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       要查看課程內的討論區，必須啟用「討論區 - 查看」。
       要於討論區中回覆，必須同時啟用「討論區 - 帖子」。要編輯討論區內的作業詳細資料，必須同時啟用「作業及測驗 - 添加 / 編輯 / 刪除」。
@@ -25026,32 +25302,44 @@ zh-Hant:
       要查看課程內的討論區，必須同時啟用「討論區 - 查看」。
       要管理討論區，必須啟用「討論區 - 調整分數」。
   to_view_discussions_in_a_course_discussions_view_m_c0d9e312: "要檢視課程內的討論區，必須啟用「討論區 - 檢視」。「討論區 - 建立」和「討論區 - 調整分數」均允許使用者在討論區頁面建立討論主題。要管理討論區，必須同時啟用「討論區 - 調整分數」。"
+  to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "要檢視課程內的討論區，必須同時啟用「討論區 - 檢視」。"
+  to_view_feature_options_for_an_account_feature_opt_14b0cea0: "要檢視帳戶的「功能選項」，必須同時啟用「功能選項 - 啟用/停用」。"
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "要查看課程內的成績，必須同時啟用「成績 - 查看所有成績」。"
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "要檢視課程中的成績，必須同時啟用「管理課程：管理員 - 管理/更新」和「成績 - 檢視所有成績」。"
+  to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "要檢視小組，必須同時啟用「使用者 - 檢視清單」。"
+  to_view_last_activity_and_total_activity_informati_473265d8: "要於課程「成員」頁面中檢視最新活動及總活動資訊，必須同時啟用「使用者 - 檢視清單」。"
   to_view_last_activity_and_total_activity_informati_a06859f3: |-
       要於課程成員頁面中查看最新活動及總活動資訊，必須同時啟用「使用者 - 查看清單」。
       要存取課程成員頁面，必須啟用「使用者 - 查看清單」。
   to_view_last_activity_and_total_activity_informati_b24e3864: "要於課程「成員」頁面中檢視最新活動及總活動資訊，必須同時啟用「使用者 - 檢視清單」。要存取課程「成員」頁面，必須同時啟用「使用者 - 檢視清單」。"
+  to_view_login_ids_users_allow_administrative_actio_1b5789db: "要檢視登入 ID，必須同時啟用「使用者 - 允許在課程內進行管理行動」。"
   to_view_module_progression_grades_view_all_grades__1acc0880: "要檢視單元進度，必須同時啟用「成績 - 檢視所有成績」。"
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "要查看單元進度，必須同時啟用「成績 - 查看所有成績」。"
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "要檢視或編輯使用者的 SIS ID 或集成 ID，必須同時啟用「使用者 - 檢視清單」及「使用者 - 管理登入詳細資料」。"
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "要查看或編輯使用者的 SIS ID 或集成 ID，必須同時啟用「使用者 - 查看清單」及「使用者 - 管理登入詳細資料」。"
+  to_view_recent_announcements_on_the_home_page_cour_5a91447e: "要於主頁上檢視最新通告，必須啟用「課程內容 - 檢視」，並必須於課程設定中選取「於課程主頁顯示最新通告」勾選框。"
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "要於主頁上查看最新通告，必須啟用「課程內容 - 查看」，並必須於課程設定中選取「於課程主頁顯示最新通告」勾選框。要管理課程通告，必須同時啟用「討論區 - 調整分數」。"
+  to_view_recent_announcements_on_the_home_page_the__fbd8d115: 要於主頁上檢視最新通告，必須於課程設定中選取「於課程主頁顯示最新通告」勾選框。
+  to_view_sis_ids_sis_data_read_must_be_enabled_12edce68: "要檢視 SIS ID，必須啟用「SIS 資料 - 讀取」。"
   to_view_student_analytics_analytics_view_must_also_8a41d86e: "要查看學生分析工具，必須同時啟用「分析工具 - 查看」。"
   to_view_student_analytics_analytics_view_must_also_a735c0b4: "要檢視學生分析工具，必須同時啟用「分析工具 - 檢視」。"
   to_view_student_analytics_in_course_analytics_anal_21ed5b9c: "要於課程分析工具中檢視學生分析工具，必須同時啟用「分析工具 - 檢視」。"
   to_view_student_analytics_in_course_analytics_anal_9466b742: "要於課程分析工具中查看學生分析工具，必須同時啟用「分析工具 - 查看」。"
+  to_view_student_analytics_in_course_analytics_grad_654a5c5a: "要於課程分析工具中檢視學生分析工具，必須同時啟用「成績 - 檢視所有成績」。"
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "要於課程分析工具中查看學生分析工具，必須同時啟用「成績 - 查看所有成績」。"
   to_view_student_analytics_users_view_list_and_anal_2c2776b2: "要查看學生分析工具，必須同時啟用「使用者 - 查看清單」及「分析工具 - 查看」。"
   to_view_student_analytics_users_view_list_and_anal_41d32ecb: "要檢視學生分析工具，必須同時啟用「使用者 - 檢視清單」及「分析工具 - 檢視」。"
   to_view_student_analytics_users_view_list_and_grad_59d0da3e: "要查看學生分析工具，必須同時啟用「使用者 - 查看清單」及「成績 - 查看所有成績」。"
+  to_view_the_account_people_page_users_view_list_mu_9d0bdb80: "要檢視帳戶成員頁面，必須啟用「使用者 - 檢視清單」。"
   to_view_the_account_people_page_users_view_list_mu_f44cef80: "要查看成員頁面，必須啟用「使用者 - 查看清單」。如果停用此權限，而「使用者 - 查看登入 ID」已啟用，使用者則仍會看見電郵地址被用作登入 ID。"
+  to_view_the_gradebook_course_content_view_must_als_45c2e607: "要檢視成績單，必須同時啟用「課程內容 - 檢視」。"
   to_view_the_gradebook_course_content_view_must_als_676f3e8: "要檢視成績單，必須同時啟用「課程內容 - 檢視」。如果「成績 - 編輯」和「成績 - 查看所有成績」均已停用，成績單則會在課程導航中隱藏。"
   to_view_the_gradebook_grades_view_all_grades_must__7ead435: "要檢視成績單，必須同時啟用「成績 - 檢視所有成績」。"
   to_view_the_list_of_users_in_an_account_users_view_401b8462: "要查看帳戶中的使用者列表，必須啟用「使用者 - 查看清單」。"
   to_view_the_list_of_users_in_an_account_users_view_630d77a0: "要檢視帳戶中的使用者清單，必須同時啟用「使用者 - 檢視」。"
   to_view_the_list_of_users_in_an_account_users_view_9db2061: "要檢視帳戶中的使用者清單，必須啟用「使用者 - 檢視清單」。"
   to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "要查看帳戶中的使用者列表，必須啟用「使用者 - 查看清單」。"
+  to_view_the_list_of_users_in_the_course_users_view_20278cf: "要檢視課程中的使用者清單，必須啟用「使用者 - 檢視清單」。"
   to_view_the_list_of_users_in_the_course_users_view_26412777: "要查看課程中的使用者列表，必須同時啟用「使用者 - 查看清單」。要透過 SIS ID 添加使用者，必須同時啟用「使用者 - 從課程添加 / 移除學生」及/或「使用者 - 從課程添加 / 移除教師、課程設計者或助教至該課程」。"
   to_view_the_list_of_users_in_the_course_users_view_34c164ea: "要檢視課程中的使用者清單，必須啟用「使用者 - 檢視清單」。要檢視 SIS ID，必須啟用「SIS 資料 - 讀取」。要透過 SIS ID 添加使用者至課程，必須同時啟用「SIS 資料 - 管理」。要編輯一名教師或助教的分班，必須同時啟用「交談 - 傳送訊息至個別課程成員」。要將觀察者與學生進行連結，必須同時啟用「交談 - 傳送訊息至個別課程成員」。"
   to_view_the_list_of_users_in_the_course_users_view_524275e5: |-
@@ -25069,6 +25357,7 @@ zh-Hant:
       要查看 SIS ID，必須啟用「SIS 數據 - 讀取」。要透過 SIS ID 添加使用者至課程，必須同時啟用「SIS 數據 - 管理」。
       要編輯一名教師或助教的分班，必須同時啟用「交談 - 發送訊息至個別課程成員」。
       要將觀察者與學生進行連結，必須同時啟用「交談 - 發送訊息至個別課程成員」。
+  to_view_the_list_of_users_in_the_course_users_view_b7b9b4ef: "要檢視課程中的使用者清單，必須同時啟用「使用者 - 檢視清單」。"
   to_view_the_list_of_users_in_the_course_users_view_bc0462e3: "要檢視課程中的使用者清單，必須同時啟用「使用者 - 檢視清單」。要透過 SIS ID 添加使用者，必須同時啟用「使用者 - 從課程添加 / 移除學生」及/或「使用者 - 從課程添加 / 移除教師、課程設計者或助教」。"
   to_view_the_list_of_users_in_the_course_users_view_bd2ce438: |-
       要檢視課程中的使用者清單，必須啟用「使用者 - 檢視」清單。
@@ -25090,6 +25379,7 @@ zh-Hant:
   to_view_the_outcomes_page_as_read_only_course_cont_d176be65: |-
       要以唯讀模式查看學習成果頁面，必須啟用「課程內容 - 查看」。
       同時啟用「課程內容 - 查看」及「作業及測驗 - 添加 / 編輯 / 刪除」時，使用者可以透過作業列表存取及創建個別作業評分標準。
+  to_view_the_people_page_courses_view_list_must_be__c1d54670: "要檢視成員頁面，必須啟用「使用者 - 檢視清單」。"
   to_view_the_people_page_courses_view_list_must_be__fa021b7f: |-
       要檢視成員頁面，必須啟用「課程 - 檢視清單」。
               要添加或移除課程的使用者，必須啟用合適的使用者權限（例如使用者 - 教師）。
@@ -25097,8 +25387,11 @@ zh-Hant:
               要編輯使用者的分班，必須啟用「交談 - 發送至個別課程成員」。
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "要查看報告標籤，必須同時啟用「課程 - 查看使用情況報告」。"
   to_view_the_student_interactions_report_grades_vie_68f791b0: "要檢視學生互動報告，必須同時啟用「成績 - 檢視所有成績」和「課程 - 檢視使用情況報告」。"
+  to_view_the_submission_log_quizzes_view_submission_b8353d6e: "要檢視提交項目日誌，必須同時啟用「測驗 - 檢視提交項目日誌」。"
   to_view_the_user_details_page_for_a_student_users__51d98047: "要查看學生的使用者詳細資料頁面，必須同時啟用「使用者 - 於課程添加 / 移除學生」。"
   to_view_the_user_details_page_for_a_student_users__5d0ca2d5: "要檢視學生的使用者詳細資料頁面，必須同時啟用「使用者 - 於課程添加 / 移除學生」。"
+  to_view_the_user_sis_id_column_in_the_quiz_item_an_2bf433fa: "要於測驗項目分析 CSV 檔案中檢視使用者的 SIS ID 欄，必須同時啟用「SIS 資料 - 讀取」。"
+  to_view_user_page_views_statistics_view_must_also__e400875a: "要檢視使用者頁面檢視次數，必須同時啟用「統計 - 檢視」。"
   to_view_user_page_views_users_view_list_must_also__81cc34ed: "要檢視使用者頁面檢視次數，必須同時啟用「使用者 - 檢視清單」。"
   to_view_user_page_views_users_view_list_must_also__f4246239: "要查看使用者頁面查看次數，必須同時啟用「使用者 - 查看清單」。"
   to_view_users_and_user_account_details_users_view__99807b12: |-
@@ -25106,6 +25399,7 @@ zh-Hant:
       要更改使用者的密碼，必須同時啟用「使用者 - 查看清單」。
       要檢視使用者的 SIS ID，必須同時啟用「SIS 數據 - 管理」或「SIS 數據 - 讀取」。
       要檢視使用者的集成 ID，必須同時啟用「SIS 數據 - 管理」。
+  to_view_users_and_user_account_details_users_view__cc958682: "要檢視使用者及使用者帳戶詳細資料，必須啟用「使用者 - 檢視清單」。"
   to_view_users_and_user_account_details_users_view__ff62392: "要檢視使用者及使用者帳戶詳細資料，必須啟用「使用者 - 檢視清單」。要變更使用者的密碼，必須同時啟用「使用者 - 檢視」。要檢視使用者的 SIS ID，必須同時啟用「SIS 資料 - 管理」或「SIS 資料 - 讀取」。要檢視使用者的集成 ID，必須同時啟用「SIS 資料 - 管理」。"
   today_76e10f9c: 今天
   toggle_alignment_details_for_title_944f605: "切換校準詳細資料%{title}"
@@ -25122,6 +25416,7 @@ zh-Hant:
   toggle_tooltip_1ed3b35e: 切換工具提示
   toggle_tooltip_2447b4fa: 切換工具提示
   toggle_tooltip_d3b7cb86: 切換工具提示
+  toggling_placement_ee1ab8b5: 切換配置
   tolerance_value_9e96573c: 公差值
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 太多失敗的登入嘗試。請稍後再試，或者聯繫您的系統管理員。
   too_many_members_b8b15069: 成員太多
@@ -25311,6 +25606,7 @@ zh-Hant:
   unaccepted_students_aa68ea98: 未接受的學生
   unarchive_f245e2d6: 取消存檔
   unarchive_selected_e0c4bd3d: 已選取消存檔
+  unassessed_a0264e97: 未評估
   unassessed_students_3809ac5e: 未評估的學生
   unassigned_permissions_6a38ca95: 未分配的權限
   unassigned_roles_cb9e95ec: 未分配的身份
@@ -25586,6 +25882,7 @@ zh-Hant:
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: 使用方向鍵選擇會議服務供應商
   use_arrows_a60b3330: 使用箭頭
   use_as_front_page_274a488b: 用作標題版
+  use_as_frontpagetext_fa88bbb2: "作為 %{frontPageText}"
   use_between_for_adding_multiple_users_26bff207: 添加多個使用者時以逗號分隔。
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "對於註冊學生索引中的 API 分頁使用書籤"
   use_cloudfront_for_docviewer_f21b96db: "在 DocViewer 使用 CloudFront"
@@ -25655,6 +25952,7 @@ zh-Hant:
   user_access_tokens_title: 使用者訪問令牌
   user_avatars_e4fc4ed3: 使用者頭像
   user_c95de254: 使用者
+  user_cannot_manage_individual_course_content_witho_d7b65fd4: 使用者如沒有合適的內容項目權限，則不能管理個別課程的內容。
   user_content_aaf0fb5a: 使用者內容
   user_count_respondents_e30a8593: "%{user_count} 個回應"
   user_data_export_from_date_6ba21b89: "*使用者數據從...匯出%{date}*"
@@ -26122,6 +26420,7 @@ zh-Hant:
       使用者及學期位於帳戶內，所以 SIS 端點一定能根據帳戶確認使用者的權限。子帳戶僅擁有課程和分班；並不擁有使用者資料。
       子帳戶管理員不能查看 SIS 資訊，除非他們於課程中獲授予導師身份。子帳戶管理員不能在沒有課程關聯的情況下查看 SIS 資訊，因為導師身份有權限讀取帳戶級別的 SIS 數據。
   users_and_terms_are_located_at_the_account_so_the__6896b895: "使用者及學期位於帳戶內，所以 SIS 端點一定能根據帳戶確認使用者的權限。子帳戶僅擁有課程和分班；並不擁有使用者資料。子帳戶管理員不能檢視 SIS 資訊，除非他們於課程中獲授予導師身份。子帳戶管理員不能在沒有課程關聯的情況下檢視 SIS 資訊，因為導師身份有權限讀取帳戶級別的 SIS 資料。"
+  users_and_terms_are_located_at_the_account_so_the__8f3258e6: "使用者及學期位於帳戶內，所以 SIS 端點一定能根據帳戶確認使用者的權限。"
   users_can_access_and_create_but_not_edit_individua_72b88c41: "啟用「課程內容 - 檢視」及「作業及測驗 - 添加/編輯/刪除」後，使用者可以透過作業清單存取及建立（但不能編輯）個別作業評分標準。"
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "啟用「作業及測驗 - 添加/編輯/刪除」後，使用者可以透過作業清單存取及建立（但不能編輯）個別作業評分標準。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "啟用「課程內容 - 查看」及「作業及測驗 - 添加 / 編輯 / 刪除」後，使用者可以存取測驗索引頁的「管理題庫」連結。"
@@ -26144,6 +26443,7 @@ zh-Hant:
   users_view_list_861c7a3f: "使用者 - 查看清單"
   users_view_login_ids_a2e6a85: "使用者 - 查看登入 ID"
   users_view_primary_email_address_14f4978f: "使用者 - 查看主電子郵件地址"
+  users_with_this_permission_may_be_able_to_use_the__84394072: 擁有此權限的使用者獲許使用「作為」功能以管理帳戶設定、檢視及調整評分、存取使用者資訊等。此權限亦允許獲指派至子帳戶的管理員存取其子帳戶以外的設定及資訊。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 使用新的排程工具及其功能
   validate: 
     is_required: 此字段為必填項
@@ -26188,6 +26488,7 @@ zh-Hant:
   view_course_analytics_eefe6b2: 檢視課程分析
   view_coursename_gradebook_8b3a6240: "檢視 %{courseName} 成績單"
   view_coursename_s_assignment_group_totals_bd4b707: "檢視 %{courseName} 的作業小組總數"
+  view_description_b6d8e52b: 檢視描述
   view_due_items_due_today_for_course_coursename_129e433: "檢視課程 %{courseName} 的今天截止的 %{due} 項目"
   view_faculty_journals_ad0e8c8f: 檢視教職員日誌
   view_feature_settings_at_an_account_level_ec7f5e10: 檢視帳戶級別的功能設定
@@ -26349,6 +26650,7 @@ zh-Hant:
   what_assignment_types_can_i_create_in_a_course_1ed4eed4: 我可以在課程內創建什麼類型的作業？
   what_does_provisioning_only_mean_eac9a4a1: 僅用於佈建是什麽意思？
   what_happened_322d8259: 發生了什麼？
+  what_it_does_c158cc83: 它能做什麼
   what_it_does_d4debc07: 它能做什麼
   what_layout_options_are_available_in_the_course_ho_5d364ce3: 課程主頁有什麼版面選項供導師使用？
   what_options_can_i_set_in_a_quiz_53522d76: 測驗內有什麼選項可供設定？
@@ -26436,9 +26738,9 @@ zh-Hant:
         view_all_pages: 檢視所有頁面
       delete_wiki: 刪除
       labels: 
-        front_page: 標題版
+        front_page: "%{frontPageText}"
       menu: 
-        use_front_page: 用作標題版
+        use_front_page: "作為 %{frontPageText}"
       published_indicator: 已發佈
       toolbar_menu: 
         settings: 設置
@@ -26485,7 +26787,7 @@ zh-Hant:
       page_title: 標題
     wiki_page_index_item: 
       labels: 
-        front_page: 標題版
+        front_page: "%{frontPageText}"
       menu: 
         delete: 刪除
         edit: 編輯
@@ -26595,6 +26897,9 @@ zh-Hant:
   would_you_like_to_enable_this_app_ccdf735d: 您是否要啟用此應用程式？
   would_you_like_to_go_back_to_include_1d279044: 您是否希望返回，以包括：
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您希望讓學生繼續學習該課程，還是希望重新鎖定這些單元，直至滿足新要求？
+  would_you_like_to_remove_these_count_outcomes_5075697d: 
+    one: "是否要移除這些 %{count} 學習成果？"
+    other: "是否要移除這些 %{count} 學習成果？"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: 在行事曆月份視圖中隱藏活動標題
   write_something_430e346c: 開始撰寫……
   wrong_answer_comments_14963a24: 錯誤答案註解
@@ -26776,6 +27081,7 @@ zh-Hant:
   you_must_have_a_student_or_section_selected_a99e45df: 您必須選中一個學生或分班
   you_must_input_a_section_b8d370fe: 您必須輸入一個分班
   you_must_log_in_to_view_replies_9ccd4da0: 您必須先登入才能檢視回覆
+  you_must_post_before_seeing_replies_24f8bcd4: 看到回覆前，使用者必須先公佈。
   you_must_provide_a_date_with_a_time_ec369ff4: 您必須提供有時間的日期。
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "您必須提供租借用戶和登入屬性給已啟用的「Microsoft Teams 同步」"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: 您必須提供或取消選擇該選項。
