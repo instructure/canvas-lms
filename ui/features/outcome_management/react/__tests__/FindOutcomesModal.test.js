@@ -35,7 +35,6 @@ describe('FindOutcomesModal', () => {
   const defaultProps = (props = {}) => ({
     open: true,
     onCloseHandler: onCloseHandlerMock,
-    breakpoints: {tablet: true},
     ...props
   })
 
@@ -51,10 +50,16 @@ describe('FindOutcomesModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      isMobileView = false,
+      mocks = findModalMocks(),
+      renderer = rtlRender
+    } = {}
   ) => {
     return renderer(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, isMobileView}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -160,9 +165,9 @@ describe('FindOutcomesModal', () => {
   })
 
   it('does not render the TreeBrowser if in responsive mode', async () => {
-    const {queryByTestId} = render(
-      <FindOutcomesModal {...defaultProps({breakpoints: {tablet: false}})} />
-    )
+    const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />, {
+      isMobileView: true
+    })
     await act(async () => jest.runAllTimers())
     const treeBrowser = queryByTestId('groupsColumnRef')
     expect(treeBrowser).not.toBeInTheDocument()

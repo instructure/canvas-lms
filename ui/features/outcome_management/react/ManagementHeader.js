@@ -31,14 +31,14 @@ import {
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import FindOutcomesModal from './FindOutcomesModal'
 import CreateOutcomeModal from './CreateOutcomeModal'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-const ManagementHeader = ({breakpoints, handleFileDrop}) => {
+const ManagementHeader = ({handleFileDrop}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
+  const {isMobileView} = useCanvasContext()
   const showImportModal = () => showImportOutcomesModal({onFileDrop: handleFileDrop})
-  const isDropdown = !breakpoints?.tablet
 
   return (
     <div className="management-header" data-testid="managementHeader">
@@ -47,7 +47,7 @@ const ManagementHeader = ({breakpoints, handleFileDrop}) => {
           <h2 className="title">{I18n.t('Outcomes')}</h2>
         </View>
         <View as="div">
-          {isDropdown ? (
+          {isMobileView ? (
             <Menu
               trigger={
                 <Button renderIcon={IconOutcomesLine} margin="x-small">
@@ -70,11 +70,7 @@ const ManagementHeader = ({breakpoints, handleFileDrop}) => {
             </Menu>
           ) : (
             <>
-              <Button
-                onClick={showImportModal}
-                renderIcon={IconImportLine}
-                margin="x-small"
-              >
+              <Button onClick={showImportModal} renderIcon={IconImportLine} margin="x-small">
                 {I18n.t('Import')}
               </Button>
               <Button onClick={openCreateOutcomeModal} renderIcon={IconPlusSolid} margin="x-small">
@@ -97,8 +93,7 @@ const ManagementHeader = ({breakpoints, handleFileDrop}) => {
 }
 
 ManagementHeader.propTypes = {
-  handleFileDrop: PropTypes.func.isRequired,
-  breakpoints: breakpointsShape
+  handleFileDrop: PropTypes.func.isRequired
 }
 
-export default WithBreakpoints(ManagementHeader)
+export default ManagementHeader

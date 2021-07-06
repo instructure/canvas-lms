@@ -30,6 +30,7 @@ import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {IconArrowOpenEndSolid} from '@instructure/ui-icons'
 
 const FindOutcomesView = ({
@@ -41,12 +42,12 @@ const FindOutcomesView = ({
   searchString,
   onChangeHandler,
   onClearHandler,
-  onAddAllHandler,
-  isResponsiveMode
+  onAddAllHandler
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const enabled = !!outcomesCount && outcomesCount > 0
   const [scrollContainer, setScrollContainer] = useState(null)
+  const {isMobileView} = useCanvasContext()
 
   const onSelectOutcomesHandler = useCallback(_id => {
     // TODO: OUT-4154
@@ -57,11 +58,11 @@ const FindOutcomesView = ({
       <Flex
         as="div"
         alignItems="center"
-        justifyItems={isResponsiveMode ? 'space-between' : 'start'}
-        width={isResponsiveMode ? '100vw' : ''}
+        justifyItems={isMobileView ? 'space-between' : 'start'}
+        width={isMobileView ? '100vw' : ''}
         wrap="wrap"
       >
-        <Flex.Item as="div" padding={isResponsiveMode ? 'x-small 0' : 'x-small medium x-small 0'}>
+        <Flex.Item as="div" padding={isMobileView ? 'x-small 0' : 'x-small medium x-small 0'}>
           <Text size="medium">
             {I18n.t(
               {
@@ -89,14 +90,14 @@ const FindOutcomesView = ({
 
   const searchAndSelectContainer = (
     <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
-      <View as="div" padding={isResponsiveMode ? 'x-small 0 0' : 'small 0 0'}>
+      <View as="div" padding={isMobileView ? 'x-small 0 0' : 'small 0 0'}>
         <Heading level="h2" as="h3">
-          <Text wrap="break-word" weight={isResponsiveMode ? 'bold' : 'normal'}>
+          <Text wrap="break-word" weight={isMobileView ? 'bold' : 'normal'}>
             {addZeroWidthSpace(groupTitle)}
           </Text>
         </Heading>
       </View>
-      <View as="div" padding={isResponsiveMode ? 'x-small 0' : 'large 0 medium'}>
+      <View as="div" padding={isMobileView ? 'x-small 0' : 'large 0 medium'}>
         <OutcomeSearchBar
           enabled={enabled || searchString.length > 0}
           placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
@@ -105,11 +106,7 @@ const FindOutcomesView = ({
           onClearHandler={onClearHandler}
         />
       </View>
-      <View
-        as="div"
-        position="relative"
-        padding={isResponsiveMode ? '0 0 0 xx-small' : '0 0 small'}
-      >
+      <View as="div" position="relative" padding={isMobileView ? '0 0 0 xx-small' : '0 0 small'}>
         <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
           <Flex.Item size="50%" shouldGrow>
             <Heading level="h4">
@@ -182,15 +179,15 @@ const FindOutcomesView = ({
       as="div"
       height="100%"
       minWidth="300px"
-      padding={!isResponsiveMode && '0 x-large 0 medium'}
+      padding={!isMobileView ? '0 x-large 0 medium' : '0'}
       data-testid="find-outcome-container"
     >
       <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-        {!isResponsiveMode && searchAndSelectContainer}
+        {!isMobileView && searchAndSelectContainer}
         <div
           style={{
             flex: '1 0 24rem',
-            overflow: isResponsiveMode ? 'visible' : 'auto',
+            overflow: isMobileView ? 'visible' : 'auto',
             position: 'relative'
           }}
           ref={setScrollContainer}
@@ -221,7 +218,7 @@ const FindOutcomesView = ({
               </Flex>
             }
           >
-            {isResponsiveMode && searchAndSelectContainer}
+            {isMobileView && searchAndSelectContainer}
             <View as="div" data-testid="find-outcome-items-list">
               {outcomes?.edges?.length === 0 && searchString && !loading && (
                 <View as="div" textAlign="center" margin="small 0 0">
@@ -238,7 +235,6 @@ const FindOutcomesView = ({
                   isFirst={index === 0}
                   isChecked={isImported}
                   onCheckboxHandler={onSelectOutcomesHandler}
-                  isResponsiveMode={isResponsiveMode}
                 />
               ))}
             </View>
@@ -276,8 +272,7 @@ FindOutcomesView.propTypes = {
   onClearHandler: PropTypes.func.isRequired,
   onAddAllHandler: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  loadMore: PropTypes.func.isRequired,
-  isResponsiveMode: PropTypes.bool
+  loadMore: PropTypes.func.isRequired
 }
 
 export default FindOutcomesView

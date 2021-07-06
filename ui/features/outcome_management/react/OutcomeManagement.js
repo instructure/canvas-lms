@@ -18,6 +18,7 @@
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!OutcomeManagement'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
 import MasteryCalculation from './MasteryCalculation/index'
@@ -48,7 +49,7 @@ export const OutcomePanel = () => {
   return null
 }
 
-export const OutcomeManagementWithoutGraphql = () => {
+export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
   const [importRef, setImportRef] = useState(null)
   const [isImporting, setIsImporting] = useState(false)
@@ -147,8 +148,10 @@ export const OutcomeManagementWithoutGraphql = () => {
     })
   }
 
+  const isMobileView = !breakpoints?.tablet
+
   return (
-    <OutcomesContext.Provider value={getContext()}>
+    <OutcomesContext.Provider value={getContext(isMobileView)}>
       {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
@@ -166,14 +169,22 @@ export const OutcomeManagementWithoutGraphql = () => {
   )
 }
 
-const OutcomeManagement = () => {
+const OutcomeManagement = ({breakpoints}) => {
   const client = useMemo(() => createClient(), [])
 
   return (
     <ApolloProvider client={client}>
-      <OutcomeManagementWithoutGraphql />
+      <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
     </ApolloProvider>
   )
 }
 
-export default OutcomeManagement
+OutcomeManagement.propTypes = {
+  breakpoints: breakpointsShape
+}
+
+OutcomeManagementWithoutGraphql.propTypes = {
+  breakpoints: breakpointsShape
+}
+
+export default WithBreakpoints(OutcomeManagement)

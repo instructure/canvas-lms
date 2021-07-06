@@ -34,31 +34,22 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeDescription from './Management/OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const FindOutcomeItem = ({
-  id,
-  title,
-  description,
-  isChecked,
-  onCheckboxHandler,
-  isResponsiveMode
-}) => {
+const FindOutcomeItem = ({id, title, description, isChecked, onCheckboxHandler}) => {
   const [truncate, setTruncate] = useState(true)
   const onClickHandler = () => description && setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler(id)
-  const IconArrowOpenEnd = isResponsiveMode ? IconArrowOpenEndSolid : IconArrowOpenEndLine
-  const IconArrowOpenDown = isResponsiveMode ? IconArrowOpenDownSolid : IconArrowOpenDownLine
+  const {isMobileView} = useCanvasContext()
+  const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
+  const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
 
   const checkbox = (
-    <Flex.Item size={isResponsiveMode ? '' : '5rem'} alignSelf="end">
+    <Flex.Item size={isMobileView ? '' : '5rem'} alignSelf="end">
       <div
         style={{
-          padding: isResponsiveMode
-            ? '0'
-            : description
-            ? '1.2815rem 0 0 1rem'
-            : '0.313rem 0 0 1rem',
-          marginRight: isResponsiveMode ? '-12px' : '0'
+          padding: isMobileView ? '0' : description ? '1.2815rem 0 0 1rem' : '0.313rem 0 0 1rem',
+          marginRight: isMobileView ? '-12px' : '0'
         }}
       >
         <Checkbox
@@ -76,13 +67,9 @@ const FindOutcomeItem = ({
   if (!title) return null
 
   return (
-    <View
-      as="div"
-      padding={isResponsiveMode ? 'small 0 x-small' : 'small 0'}
-      borderWidth="0 0 small"
-    >
+    <View as="div" padding={isMobileView ? 'small 0 x-small' : 'small 0'} borderWidth="0 0 small">
       <Flex as="div" alignItems="start">
-        <Flex.Item as="div" size={isResponsiveMode ? '' : '3rem'}>
+        <Flex.Item as="div" size={isMobileView ? '' : '3rem'}>
           <Flex as="div" alignItems="start" justifyItems="center">
             <Flex.Item>
               <div style={{padding: '0.3125rem 0'}}>
@@ -110,15 +97,15 @@ const FindOutcomeItem = ({
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item size="50%" shouldGrow padding={isResponsiveMode ? '0 0 0 x-small' : '0'}>
+        <Flex.Item size="50%" shouldGrow padding={isMobileView ? '0 0 0 x-small' : '0'}>
           <div
             style={{
-              padding: isResponsiveMode ? '0 0 0.5rem 0' : '0.625rem 0',
+              padding: isMobileView ? '0 0 0.5rem 0' : '0.625rem 0',
               display: 'flex',
               justifyContent: 'space-between'
             }}
           >
-            {isResponsiveMode ? (
+            {isMobileView ? (
               <div style={{padding: '0.35rem 0px 0px 0px'}}>
                 <Text wrap="break-word" weight="bold">
                   {addZeroWidthSpace(title)}
@@ -129,7 +116,7 @@ const FindOutcomeItem = ({
                 <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
               </Heading>
             )}
-            {isResponsiveMode && checkbox}
+            {isMobileView && checkbox}
           </div>
           {description && (
             <div style={{paddingBottom: '0.75rem'}}>
@@ -142,7 +129,7 @@ const FindOutcomeItem = ({
             </div>
           )}
         </Flex.Item>
-        {!isResponsiveMode && checkbox}
+        {!isMobileView && checkbox}
       </Flex>
     </View>
   )
@@ -153,8 +140,7 @@ FindOutcomeItem.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
-  onCheckboxHandler: PropTypes.func.isRequired,
-  isResponsiveMode: PropTypes.bool
+  onCheckboxHandler: PropTypes.func.isRequired
 }
 
 export default memo(FindOutcomeItem)

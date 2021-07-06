@@ -19,7 +19,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -36,8 +35,8 @@ import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
-const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
-  const {contextType} = useCanvasContext()
+const FindOutcomesModal = ({open, onCloseHandler}) => {
+  const {contextType, isMobileView} = useCanvasContext()
   const {
     rootId,
     isLoading,
@@ -59,7 +58,6 @@ const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
   })
 
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
-  const isResponsiveMode = !breakpoints?.tablet
 
   const findOutcomesView = (
     <FindOutcomesView
@@ -72,7 +70,6 @@ const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
       onAddAllHandler={() => {}}
       loading={loading}
       loadMore={loadMore}
-      isResponsiveMode={isResponsiveMode}
     />
   )
 
@@ -88,8 +85,8 @@ const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
           : I18n.t('Add Outcomes to Account')
       }
     >
-      <Modal.Body padding={isResponsiveMode ? '0 medium small' : '0 small small'}>
-        {!isResponsiveMode ? (
+      <Modal.Body padding={isMobileView ? '0 medium small' : '0 small small'}>
+        {!isMobileView ? (
           <Flex elementRef={setContainerRef}>
             <Flex.Item
               as="div"
@@ -182,8 +179,7 @@ const FindOutcomesModal = ({open, onCloseHandler, breakpoints}) => {
 
 FindOutcomesModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired,
-  breakpoints: breakpointsShape
+  onCloseHandler: PropTypes.func.isRequired
 }
 
-export default WithBreakpoints(FindOutcomesModal)
+export default FindOutcomesModal

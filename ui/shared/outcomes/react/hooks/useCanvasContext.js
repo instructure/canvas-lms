@@ -26,13 +26,15 @@ const useCanvasContext = () => {
   const useRceEnhancements = context?.env?.useRceEnhancements
   const rootOutcomeGroup = context?.env?.rootOutcomeGroup
   const friendlyDescriptionFF = context?.env?.friendlyDescriptionFF
+  const isMobileView = context?.env?.isMobileView
 
   return {
     contextType,
     contextId,
     useRceEnhancements,
     rootOutcomeGroup,
-    friendlyDescriptionFF
+    friendlyDescriptionFF,
+    isMobileView
   }
 }
 
