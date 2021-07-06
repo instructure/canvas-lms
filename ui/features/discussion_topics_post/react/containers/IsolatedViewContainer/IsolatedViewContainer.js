@@ -254,10 +254,11 @@ export const IsolatedViewContainer = props => {
             onToggleUnread={() => toggleUnread(isolatedEntry.data.legacyNode)}
             onDelete={() => onDelete(isolatedEntry.data.legacyNode)}
             onOpenInSpeedGrader={() => onOpenInSpeedGrader(isolatedEntry.data.legacyNode)}
-            onReply={() => props.setRCEOpen(true)}
             onToggleRating={() => toggleRating(isolatedEntry.data.legacyNode)}
             onSave={onUpdate}
             onOpenIsolatedView={props.onOpenIsolatedView}
+            setRCEOpen={props.setRCEOpen}
+            RCEOpen={props.RCEOpen}
           >
             {props.RCEOpen && (
               <View

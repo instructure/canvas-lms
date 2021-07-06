@@ -37,11 +37,8 @@ export const IsolatedParent = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        onClick={() => {
-          if (props.onReply) {
-            props.onReply()
-          }
-        }}
+        onClick={() => props.setRCEOpen(true)}
+        isReadOnly={props.RCEOpen}
       />
     )
   }
@@ -79,9 +76,9 @@ export const IsolatedParent = props => {
             unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
           }
         )}
-        isReadOnly
+        isReadOnly={!props.RCEOpen}
         isExpanded={false}
-        onClick={() => {}}
+        onClick={() => props.setRCEOpen(false)}
       />
     )
   }
@@ -161,9 +158,10 @@ IsolatedParent.propTypes = {
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
-  onReply: PropTypes.func,
   onToggleRating: PropTypes.func,
   onSave: PropTypes.func,
   children: PropTypes.node,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  RCEOpen: PropTypes.bool,
+  setRCEOpen: PropTypes.func
 }

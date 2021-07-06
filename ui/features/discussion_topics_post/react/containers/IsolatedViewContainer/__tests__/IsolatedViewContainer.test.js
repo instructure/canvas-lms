@@ -185,4 +185,41 @@ describe('IsolatedViewContainer', () => {
       })
     })
   })
+
+  it('disables the reply and enables the expand buttons if the RCE is open', async () => {
+    const setRCEOpen = jest.fn()
+    const {findByTestId} = setup(defaultProps({RCEOpen: true, setRCEOpen}))
+
+    expect(await findByTestId('DiscussionEdit-container')).toBeInTheDocument()
+    expect(await findByTestId('threading-toolbar-reply')).toBeDisabled()
+    expect(await findByTestId('expand-button')).toBeEnabled()
+  })
+
+  it('disables the expand and enables the reply buttons if the RCE is closed', async () => {
+    const setRCEOpen = jest.fn()
+    const {findAllByTestId, queryByTestId} = setup(defaultProps({RCEOpen: false, setRCEOpen}))
+
+    const replyButtons = await findAllByTestId('threading-toolbar-reply')
+    expect(replyButtons[0]).toBeEnabled()
+    const expandButtons = await findAllByTestId('expand-button')
+    expect(expandButtons[0]).toBeDisabled()
+    expect(queryByTestId('DiscussionEdit-container')).toBe(null)
+  })
+
+  it('calls the setRCEOpen callback with false when clicking the expand button', async () => {
+    const setRCEOpen = jest.fn()
+    const {findByTestId} = setup(defaultProps({RCEOpen: true, setRCEOpen}))
+
+    fireEvent.click(await findByTestId('expand-button'))
+    expect(setRCEOpen).toHaveBeenCalledWith(false)
+  })
+
+  it('calls the setRCEOpen callback with true when clicking the reply button', async () => {
+    const setRCEOpen = jest.fn()
+    const {findAllByTestId} = setup(defaultProps({RCEOpen: false, setRCEOpen}))
+
+    const replyButtons = await findAllByTestId('threading-toolbar-reply')
+    fireEvent.click(replyButtons[0])
+    expect(setRCEOpen).toHaveBeenCalledWith(true)
+  })
 })
