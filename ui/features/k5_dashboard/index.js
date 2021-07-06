@@ -43,6 +43,8 @@ ready(() => {
             : 'none'
         }
         showImportantDates={!!ENV.FEATURES.important_dates}
+        selectedContextCodes={ENV.SELECTED_CONTEXT_CODES}
+        selectedContextsLimit={ENV.SELECTED_CONTEXTS_LIMIT}
       />,
       dashboardContainer
     )

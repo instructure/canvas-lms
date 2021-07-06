@@ -134,7 +134,9 @@ export const K5Dashboard = ({
   plannerEnabled = false,
   responsiveSize = 'large',
   hideGradesTabForStudents = false,
-  showImportantDates
+  showImportantDates,
+  selectedContextCodes,
+  selectedContextsLimit
 }) => {
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
@@ -241,10 +243,15 @@ export const K5Dashboard = ({
     )
   }
 
-  const importantDateContextCodes = cards
-    ?.filter(c => c.isK5Subject)
-    .slice(0, 20)
-    .map(({id}) => `course_${id}`)
+  const importantDates = (
+    <ImportantDates
+      timeZone={timeZone}
+      contexts={cards?.filter(c => c.isK5Subject)}
+      handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
+      selectedContextCodes={selectedContextCodes}
+      selectedContextsLimit={selectedContextsLimit}
+    />
+  )
 
   return (
     <>
@@ -306,7 +313,7 @@ export const K5Dashboard = ({
         </Flex.Item>
         {!useImportantDatesTray && showImportantDates && (
           <Flex.Item as="div" size="18rem" id="important-dates-sidebar">
-            <ImportantDates timeZone={timeZone} contextCodes={importantDateContextCodes} />
+            {importantDates}
           </Flex.Item>
         )}
       </Flex>
@@ -319,13 +326,7 @@ export const K5Dashboard = ({
           shouldCloseOnDocumentClick
           onDismiss={() => setTrayOpen(false)}
         >
-          <div id="important-dates-sidebar">
-            <ImportantDates
-              timeZone={timeZone}
-              contextCodes={importantDateContextCodes}
-              handleClose={() => setTrayOpen(false)}
-            />
-          </div>
+          <div id="important-dates-sidebar">{importantDates}</div>
         </Tray>
       )}
     </>
@@ -349,7 +350,9 @@ K5Dashboard.propTypes = {
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string,
   hideGradesTabForStudents: PropTypes.bool,
-  showImportantDates: PropTypes.bool.isRequired
+  showImportantDates: PropTypes.bool.isRequired,
+  selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
+  selectedContextsLimit: PropTypes.number.isRequired
 }
 
 const mapDispatchToProps = {

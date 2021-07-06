@@ -25,9 +25,11 @@ import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 
 import {MOCK_TODOS} from './mocks'
-import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+
+const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 
 const currentUser = {
   id: '1',
@@ -38,46 +40,6 @@ const cardSummary = [
     type: 'Conversation',
     unread_count: 1,
     count: 3
-  }
-]
-const dashboardCards = [
-  {
-    id: '1',
-    assetString: 'course_1',
-    href: '/courses/1',
-    shortName: 'Econ 101',
-    originalName: 'Economics 101',
-    courseCode: 'ECON-001',
-    enrollmentState: 'active',
-    isHomeroom: false,
-    isK5Subject: true,
-    canManage: true,
-    published: true
-  },
-  {
-    id: '2',
-    assetString: 'course_2',
-    href: '/courses/2',
-    shortName: 'Homeroom1',
-    originalName: 'Home Room',
-    courseCode: 'HOME-001',
-    enrollmentState: 'active',
-    isHomeroom: true,
-    isK5Subject: false,
-    canManage: true,
-    published: false
-  },
-  {
-    id: '3',
-    assetString: 'course_3',
-    href: '/courses/3',
-    originalName: 'The Maths',
-    courseCode: 'DA-MATHS',
-    enrollmentState: 'invited',
-    isHomeroom: false,
-    isK5Subject: true,
-    canManage: true,
-    published: true
   }
 ]
 const announcements = [
@@ -216,14 +178,24 @@ const defaultProps = {
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
   hideGradesTabForStudents: false,
-  showImportantDates: true
+  showImportantDates: true,
+  selectedContextCodes: ['course_1', 'course_3'],
+  selectedContextsLimit: 2
 }
+
+beforeAll(() => {
+  jest.setTimeout(10000)
+})
+
+afterAll(() => {
+  jest.setTimeout(5000)
+})
 
 beforeEach(() => {
   moxios.install()
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
     status: 200,
-    response: dashboardCards
+    response: MOCK_CARDS
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
     status: 200,
@@ -321,11 +293,12 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
   fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
   fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
-  fetchMock.get(
-    /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/,
-    MOCK_ASSIGNMENTS
-  )
+  fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
   fetchMock.get(/\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/, MOCK_EVENTS)
+  fetchMock.post(
+    /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
+    JSON.stringify({status: 'ok'})
+  )
   global.ENV = defaultEnv
 })
 
@@ -507,7 +480,7 @@ describe('K-5 Dashboard', () => {
     })
 
     it('only fetches announcements and LTIs based on cards once per page load', done => {
-      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
+      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
       moxios.withMock(() => {
         render(<K5Dashboard {...defaultProps} />)
 
@@ -517,7 +490,7 @@ describe('K-5 Dashboard', () => {
             .mostRecent()
             .respondWith({
               status: 200,
-              response: dashboardCards
+              response: MOCK_CARDS
             })
             .then(() => {
               // Expect just one announcement request for all cards
@@ -716,12 +689,56 @@ describe('K-5 Dashboard', () => {
     })
 
     it('renders a sidebar with important dates and no tray buttons on large screens', async () => {
-      const {findByText, getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
-      expect(await findByText('History Discussion')).toBeInTheDocument()
+      const {getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
       expect(getByText('Algebra 2')).toBeInTheDocument()
       expect(getByText('Important Dates')).toBeInTheDocument()
       expect(queryByText('View Important Dates')).not.toBeInTheDocument()
       expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
+    })
+
+    it('filters important dates to those selected', async () => {
+      moxios.stubs.reset()
+      // Overriding mocked cards to make all cards active so we have 2 subjects to choose from
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+        status: 200,
+        response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))
+      })
+      // Only return assignments associated with course_1 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
+
+      const {getByRole, getByText, queryByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          selectedContextsLimit={1}
+          selectedContextCodes={['course_1']}
+        />
+      )
+      await waitFor(() => {
+        expect(getByText('Algebra 2')).toBeInTheDocument()
+        expect(queryByText('History Discussion')).not.toBeInTheDocument()
+        expect(queryByText('History Exam')).not.toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_3')
+
+      // Only return assignments associated with course_3 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(1, 3), {overwriteRoutes: true})
+
+      act(() =>
+        getByRole('button', {name: 'Select calendars to retrieve important dates from'}).click()
+      )
+      act(() => getByRole('checkbox', {name: 'Economics 101', checked: true}).click())
+      act(() => getByRole('checkbox', {name: 'The Maths', checked: false}).click())
+      act(() => getByRole('button', {name: 'Submit'}).click())
+
+      await waitFor(() => {
+        expect(queryByText('Algebra 2')).not.toBeInTheDocument()
+        expect(getByText('History Discussion')).toBeInTheDocument()
+        expect(getByText('History Exam')).toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_3')
     })
   })
 })
