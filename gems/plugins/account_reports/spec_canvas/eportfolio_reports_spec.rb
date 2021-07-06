@@ -47,6 +47,12 @@ describe 'Eportfolio Reports' do
     expect(parsed.first).to include('user1_eportfolio_sis_id')
   end
 
+  it 'should not raise error when login is deleted' do
+    Pseudonym.where(sis_user_id: 'user1_eportfolio_sis_id').update_all(workflow_state: 'deleted')
+    parsed = read_report(@type, { order: 1, account: @account2 })
+    expect(parsed.first).to include('user1_eportfolio_sis_id')
+  end
+
   it 'should run on a sub account' do
     parsed = read_report(@type, { order: 2, account: @sub_account })
     expect(parsed.length).to eq 2
