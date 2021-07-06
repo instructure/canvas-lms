@@ -109,7 +109,7 @@ class Attachments::GarbageCollector
     def delete_rows
       raise "Cannot delete rows in dry_run mode" if dry_run
       deleted_scope.where.not(root_attachment_id: nil).in_batches.delete_all
-      deleted_scope.delete_all
+      deleted_scope.in_batches.delete_all
     end
 
     private
