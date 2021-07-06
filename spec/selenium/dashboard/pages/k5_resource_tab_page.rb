@@ -46,6 +46,10 @@ module K5ResourceTabPageObject
     ".user_content"
   end
 
+  def important_info_edit_pencil_selector
+    "[data-testid='important-info-edit']"
+  end
+
   def important_info_link_selector
     ".syllabus"
   end
@@ -116,6 +120,10 @@ module K5ResourceTabPageObject
     ff(important_info_content_selector)
   end
 
+  def important_info_edit_pencil
+    f(important_info_edit_pencil_selector)
+  end
+
   def instructor_bio(instructor_bio)
     fxpath(instructor_bio_selector(instructor_bio))
   end
@@ -159,6 +167,10 @@ module K5ResourceTabPageObject
     cancel_button.click
   end
 
+  def click_important_info_edit_pencil
+    important_info_edit_pencil.click
+  end
+
   def click_k5_button(button_item)
     k5_app_buttons[button_item].click
   end
@@ -182,7 +194,7 @@ module K5ResourceTabPageObject
   def important_info_text_list
     important_info_content_list.map(&:text)
   end
-  
+
   def is_cancel_available?
     element_value_for_attr(cancel_button, 'cursor') == 'pointer'
   end

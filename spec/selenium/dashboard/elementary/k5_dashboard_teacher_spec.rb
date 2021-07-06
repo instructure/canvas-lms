@@ -292,6 +292,18 @@ describe "teacher k5 dashboard" do
       get "/#resources"
       expect(important_info_content).to include_text(important_info_text)
     end
+
+    it 'edits important info from via pencil on resource tab' do
+      important_info_text = "Show me what you can do"
+      create_important_info_content(@homeroom_course, important_info_text)
+
+      get "/#resources"
+      expect(important_info_edit_pencil).to be_displayed
+
+      click_important_info_edit_pencil
+      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/assignments/syllabus")
+    end
+
   end
 
   context 'homeroom dashboard resource panel LTI resources' do
