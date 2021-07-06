@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -32,35 +32,45 @@ const OutcomeSearchBar = ({
   enabled,
   onChangeHandler,
   onClearHandler
-}) => (
-  <View as="div" position="relative">
-    <TextInput
-      type="search"
-      size="medium"
-      placeholder={placeholder}
-      value={searchString}
-      renderLabel={label || <ScreenReaderContent>{I18n.t('Search field')}</ScreenReaderContent>}
-      shouldNotWrap
-      onChange={onChangeHandler}
-      interaction={enabled ? 'enabled' : 'disabled'}
-      renderAfterInput={
-        searchString ? (
-          <IconButton
-            size="small"
-            screenReaderLabel={I18n.t('Clear search field')}
-            withBackground={false}
-            withBorder={false}
-            onClick={onClearHandler}
-          >
-            <IconEndSolid size="x-small" data-testid="clear-search-icon" />
-          </IconButton>
-        ) : (
-          <IconSearchLine size="x-small" data-testid="search-icon" />
-        )
-      }
-    />
-  </View>
-)
+}) => {
+  const [isFocused, setIsFocused] = useState(false)
+
+  const focusHandler = () => {
+    setIsFocused(!isFocused)
+  }
+
+  return (
+    <View as="div" position="relative">
+      <TextInput
+        type="search"
+        size="medium"
+        placeholder={placeholder}
+        value={searchString}
+        renderLabel={label || <ScreenReaderContent>{I18n.t('Search field')}</ScreenReaderContent>}
+        shouldNotWrap
+        onChange={onChangeHandler}
+        onFocus={focusHandler}
+        onBlur={focusHandler}
+        interaction={enabled || isFocused ? 'enabled' : 'disabled'}
+        renderAfterInput={
+          searchString ? (
+            <IconButton
+              size="small"
+              screenReaderLabel={I18n.t('Clear search field')}
+              withBackground={false}
+              withBorder={false}
+              onClick={onClearHandler}
+            >
+              <IconEndSolid size="x-small" data-testid="clear-search-icon" />
+            </IconButton>
+          ) : (
+            <IconSearchLine size="x-small" data-testid="search-icon" />
+          )
+        }
+      />
+    </View>
+  )
+}
 
 OutcomeSearchBar.defaultProps = {
   enabled: true,
