@@ -40,13 +40,11 @@ import EditGroupModal from './EditGroupModal'
 import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
-import OutcomeRemoveMultiModal from './OutcomeRemoveMultiModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 
 const NoOutcomesBillboard = () => {
-  const {contextType} = useCanvasContext()
-  const isCourse = contextType === 'Course'
+  const {isCourse} = useCanvasContext()
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -76,7 +74,7 @@ const NoOutcomesBillboard = () => {
 }
 
 const OutcomeManagementPanel = () => {
-  const {contextType} = useCanvasContext()
+  const {isCourse} = useCanvasContext()
   const {
     search: searchString,
     debouncedSearch: debouncedSearchString,
@@ -105,8 +103,7 @@ const OutcomeManagementPanel = () => {
   const [isGroupEditModalOpen, openGroupEditModal, closeGroupEditModal] = useModal()
   const [isOutcomeEditModalOpen, openOutcomeEditModal, closeOutcomeEditModal] = useModal()
   const [isOutcomeRemoveModalOpen, openOutcomeRemoveModal, closeOutcomeRemoveModal] = useModal()
-  const [isOutcomeRemoveMultiModalOpen, openOutcomeRemoveMultiModal, closeOutcomeRemoveMultiModal] =
-    useModal()
+  const [isOutcomesRemoveModalOpen, openOutcomesRemoveModal, closeOutcomesRemoveModal] = useModal()
   const [isOutcomeMoveModalOpen, openOutcomeMoveModal, closeOutcomeMoveModal] = useModal()
   const [isOutcomesMoveModalOpen, openOutcomesMoveModal, closeOutcomesMoveModal] = useModal()
   const [isGroupDescriptionModalOpen, openGroupDescriptionModal, closeGroupDescriptionModal] =
@@ -116,10 +113,6 @@ const OutcomeManagementPanel = () => {
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
-  }
-  const onCloseOutcomeRemoveMultiModal = () => {
-    closeOutcomeRemoveMultiModal()
-    clearSelectedOutcomes()
   }
   const onCloseOutcomeMoveModal = () => {
     closeOutcomeMoveModal()
@@ -165,12 +158,6 @@ const OutcomeManagementPanel = () => {
     [group]
   )
 
-  const onRemoveOutcomesHandler = () => {
-    // TODO: update backend via GraphQL mutation
-    // Depends on: OUT-4499
-    onCloseOutcomeRemoveMultiModal()
-  }
-
   if (isLoading) {
     return (
       <div style={{textAlign: 'center'}}>
@@ -182,7 +169,7 @@ const OutcomeManagementPanel = () => {
   if (error && Object.keys(collections).length === 0) {
     return (
       <Text color="danger">
-        {contextType === 'Course'
+        {isCourse
           ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
           : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
       </Text>
@@ -280,7 +267,7 @@ const OutcomeManagementPanel = () => {
           <ManageOutcomesFooter
             selected={selectedOutcomes}
             selectedCount={selectedOutcomesCount}
-            onRemoveHandler={openOutcomeRemoveMultiModal}
+            onRemoveHandler={openOutcomesRemoveModal}
             onMoveHandler={openOutcomesMoveModal}
           />
           {selectedGroupId && (
@@ -302,8 +289,7 @@ const OutcomeManagementPanel = () => {
               {selectedOutcome && (
                 <>
                   <OutcomeRemoveModal
-                    groupId={selectedGroupId}
-                    outcomeLinkId={selectedOutcome.linkId}
+                    outcomes={selectedOutcomeObj}
                     isOpen={isOutcomeRemoveModalOpen}
                     onCloseHandler={onCloseOutcomeRemoveModal}
                   />
@@ -338,11 +324,10 @@ const OutcomeManagementPanel = () => {
           )}
           {selectedOutcomesCount > 0 && (
             <>
-              <OutcomeRemoveMultiModal
+              <OutcomeRemoveModal
                 outcomes={selectedOutcomes}
-                isOpen={isOutcomeRemoveMultiModalOpen}
-                onCloseHandler={closeOutcomeRemoveMultiModal}
-                onRemoveHandler={onRemoveOutcomesHandler}
+                isOpen={isOutcomesRemoveModalOpen}
+                onCloseHandler={closeOutcomesRemoveModal}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomes}

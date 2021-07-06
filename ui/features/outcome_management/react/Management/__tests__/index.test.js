@@ -453,23 +453,6 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('Remove Outcomes?')).toBeInTheDocument()
     })
-
-    it('closes modal and clears selected outcomes when "Remove Outcomes" button is clicked', async () => {
-      const {getByText, getAllByText, getByRole, queryByText} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getAllByText('Select outcome')[0])
-      fireEvent.click(getAllByText('Select outcome')[1])
-      fireEvent.click(getByRole('button', {name: /remove/i}))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Remove Outcomes'))
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-      expect(queryByText('Remove Outcomes?')).not.toBeInTheDocument()
-    })
   })
 
   describe('Bulk move outcomes', () => {
