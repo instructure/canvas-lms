@@ -19,6 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
@@ -155,8 +156,13 @@ const IsolatedThreadContainer = props => {
     )
   }
 
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
-    <div>
+    <Highlight isHighlighted={highlightEntry}>
       <Flex>
         <Flex.Item shouldShrink shouldGrow>
           <PostMessageContainer
@@ -190,7 +196,7 @@ const IsolatedThreadContainer = props => {
           </Flex.Item>
         )}
       </Flex>
-    </div>
+    </Highlight>
   )
 }
 

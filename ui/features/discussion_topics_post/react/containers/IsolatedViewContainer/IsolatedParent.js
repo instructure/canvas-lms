@@ -19,6 +19,7 @@
 import {BackButton} from '../../components/BackButton/BackButton'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
@@ -83,6 +84,11 @@ export const IsolatedParent = props => {
     )
   }
 
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
     <>
       {props.discussionEntry.parent && (
@@ -102,52 +108,55 @@ export const IsolatedParent = props => {
         style={{
           marginLeft: theme.variables.spacing.medium,
           paddingLeft: '0.75rem',
-          paddingRight: '0.75rem'
+          paddingRight: '0.75rem',
+          paddingBottom: '0.375rem'
         }}
       >
-        <Flex>
-          <Flex.Item shouldShrink shouldGrow>
-            <PostMessageContainer
-              discussionEntry={props.discussionEntry}
-              threadActions={threadActions}
-              isEditing={isEditing}
-              onCancel={() => {
-                setIsEditing(false)
-              }}
-              onSave={message => {
-                if (props.onSave) {
-                  props.onSave(props.discussionEntry, message)
+        <Highlight isHighlighted={highlightEntry}>
+          <Flex>
+            <Flex.Item shouldShrink shouldGrow>
+              <PostMessageContainer
+                discussionEntry={props.discussionEntry}
+                threadActions={threadActions}
+                isEditing={isEditing}
+                onCancel={() => {
                   setIsEditing(false)
-                }
-              }}
-            />
-          </Flex.Item>
-          {!props.discussionEntry.deleted && (
-            <Flex.Item align="stretch">
-              <ThreadActions
-                id={props.discussionEntry.id}
-                isUnread={!props.discussionEntry.read}
-                onToggleUnread={() => {
-                  if (props.onToggleUnread) {
-                    props.onToggleUnread()
+                }}
+                onSave={message => {
+                  if (props.onSave) {
+                    props.onSave(props.discussionEntry, message)
+                    setIsEditing(false)
                   }
                 }}
-                onDelete={props.onDelete}
-                onEdit={
-                  props.discussionEntry.permissions?.update
-                    ? () => {
-                        setIsEditing(true)
-                      }
-                    : null
-                }
-                onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-                goToParent={() => {}}
-                goToTopic={() => {}}
               />
             </Flex.Item>
-          )}
-        </Flex>
-        {props.children}
+            {!props.discussionEntry.deleted && (
+              <Flex.Item align="stretch">
+                <ThreadActions
+                  id={props.discussionEntry.id}
+                  isUnread={!props.discussionEntry.read}
+                  onToggleUnread={() => {
+                    if (props.onToggleUnread) {
+                      props.onToggleUnread()
+                    }
+                  }}
+                  onDelete={props.onDelete}
+                  onEdit={
+                    props.discussionEntry.permissions?.update
+                      ? () => {
+                          setIsEditing(true)
+                        }
+                      : null
+                  }
+                  onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+                  goToParent={() => {}}
+                  goToTopic={() => {}}
+                />
+              </Flex.Item>
+            )}
+          </Flex>
+          {props.children}
+        </Highlight>
       </div>
     </>
   )

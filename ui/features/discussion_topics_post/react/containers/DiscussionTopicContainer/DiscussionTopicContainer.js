@@ -28,6 +28,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
@@ -298,6 +299,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     })
   }
 
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
@@ -370,77 +376,79 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               </View>
             )}
 
-            <Flex direction="column">
-              <Flex.Item>
-                <Flex
-                  direction="row"
-                  justifyItems="space-between"
-                  padding="medium small none"
-                  alignItems="start"
+            <Highlight isHighlighted={highlightEntry}>
+              <Flex direction="column">
+                <Flex.Item>
+                  <Flex
+                    direction="row"
+                    justifyItems="space-between"
+                    padding="medium small none"
+                    alignItems="start"
+                  >
+                    <Flex.Item shouldShrink shouldGrow>
+                      <PostMessage
+                        hasAuthor={hasAuthor}
+                        authorName={discussionTopicData.authorName}
+                        avatarUrl={discussionTopicData.avatarUrl}
+                        timingDisplay={discussionTopicData.postedAt}
+                        title={discussionTopicData.title}
+                        message={discussionTopicData.message}
+                        discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
+                        postUtilities={
+                          <PostToolbarContainer
+                            canUnpublish={canUnpublish}
+                            canCloseForComments={canCloseForComments}
+                            deleteDiscussionTopic={deleteDiscussionTopic}
+                            discussionTopicData={discussionTopicData}
+                            requiresInitialPost={requiresInitialPost}
+                            onPublish={onPublish}
+                            onToggleLocked={onToggleLocked}
+                            onMarkAllAsRead={onMarkAllAsRead}
+                            onSubscribe={onSubscribe}
+                            setSendToOpen={setSendToOpen}
+                            setCopyToOpen={setCopyToOpen}
+                          />
+                        }
+                      >
+                        {canReply && (
+                          <Button
+                            color="primary"
+                            onClick={() => {
+                              setExpandedReply(!expandedReply)
+                            }}
+                            data-testid="discussion-topic-reply"
+                          >
+                            {I18n.t('Reply')}
+                          </Button>
+                        )}
+                      </PostMessage>
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+                <Flex.Item
+                  shouldShrink
+                  shouldGrow
+                  padding={
+                    expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
+                  }
+                  overflowX="hidden"
+                  overflowY="hidden"
                 >
-                  <Flex.Item shouldShrink shouldGrow>
-                    <PostMessage
-                      hasAuthor={hasAuthor}
-                      authorName={discussionTopicData.authorName}
-                      avatarUrl={discussionTopicData.avatarUrl}
-                      timingDisplay={discussionTopicData.postedAt}
-                      title={discussionTopicData.title}
-                      message={discussionTopicData.message}
-                      discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
-                      postUtilities={
-                        <PostToolbarContainer
-                          canUnpublish={canUnpublish}
-                          canCloseForComments={canCloseForComments}
-                          deleteDiscussionTopic={deleteDiscussionTopic}
-                          discussionTopicData={discussionTopicData}
-                          requiresInitialPost={requiresInitialPost}
-                          onPublish={onPublish}
-                          onToggleLocked={onToggleLocked}
-                          onMarkAllAsRead={onMarkAllAsRead}
-                          onSubscribe={onSubscribe}
-                          setSendToOpen={setSendToOpen}
-                          setCopyToOpen={setCopyToOpen}
-                        />
+                  <DiscussionEdit
+                    show={expandedReply}
+                    onSubmit={text => {
+                      if (createDiscussionEntry) {
+                        createDiscussionEntry(text)
+                        setExpandedReply(false)
                       }
-                    >
-                      {canReply && (
-                        <Button
-                          color="primary"
-                          onClick={() => {
-                            setExpandedReply(!expandedReply)
-                          }}
-                          data-testid="discussion-topic-reply"
-                        >
-                          {I18n.t('Reply')}
-                        </Button>
-                      )}
-                    </PostMessage>
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item
-                shouldShrink
-                shouldGrow
-                padding={
-                  expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
-                }
-                overflowX="hidden"
-                overflowY="hidden"
-              >
-                <DiscussionEdit
-                  show={expandedReply}
-                  onSubmit={text => {
-                    if (createDiscussionEntry) {
-                      createDiscussionEntry(text)
+                    }}
+                    onCancel={() => {
                       setExpandedReply(false)
-                    }
-                  }}
-                  onCancel={() => {
-                    setExpandedReply(false)
-                  }}
-                />
-              </Flex.Item>
-            </Flex>
+                    }}
+                  />
+                </Flex.Item>
+              </Flex>
+            </Highlight>
           </View>
         </Flex.Item>
       </Flex>

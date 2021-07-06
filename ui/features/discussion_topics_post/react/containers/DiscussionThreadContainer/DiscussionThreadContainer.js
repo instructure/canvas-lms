@@ -28,6 +28,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
@@ -292,62 +293,69 @@ export const DiscussionThreadContainer = props => {
     setEditorExpanded(false)
   }
 
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
     <>
-      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
-        <Flex>
-          <Flex.Item shouldShrink shouldGrow>
-            <PostMessageContainer
-              discussionEntry={props.discussionEntry}
-              threadActions={threadActions}
-              isEditing={isEditing}
-              onCancel={() => {
-                setIsEditing(false)
-              }}
-              onSave={onUpdate}
-              discussionRoles={resolveAuthorRoles(
-                props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
-                  !!props?.discussionTopic?.author?.id &&
-                  !!props?.discussionEntry?.author?.id,
-                props?.discussionEntry?.author?.courseRoles
-              )}
-            />
-          </Flex.Item>
-          {!props.discussionEntry.deleted && (
-            <Flex.Item align="stretch">
-              <ThreadActions
-                id={props.discussionEntry.id}
-                isUnread={!props.discussionEntry.read}
-                onToggleUnread={toggleUnread}
-                onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                onEdit={
-                  props.discussionEntry.permissions?.update
-                    ? () => {
-                        setIsEditing(true)
-                      }
-                    : null
-                }
-                onOpenInSpeedGrader={
-                  props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
-                }
-                goToParent={
-                  props.depth === 0
-                    ? null
-                    : () => {
-                        const topOffset = props.parentRef.current.offsetTop
-                        window.scrollTo(0, topOffset - 44)
-                      }
-                }
-                goToTopic={() => {
-                  setTimeout(() => {
-                    window.scrollTo(0, 0)
-                  })
+      <Highlight isHighlighted={highlightEntry}>
+        <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
+          <Flex>
+            <Flex.Item shouldShrink shouldGrow>
+              <PostMessageContainer
+                discussionEntry={props.discussionEntry}
+                threadActions={threadActions}
+                isEditing={isEditing}
+                onCancel={() => {
+                  setIsEditing(false)
                 }}
+                onSave={onUpdate}
+                discussionRoles={resolveAuthorRoles(
+                  props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
+                    !!props?.discussionTopic?.author?.id &&
+                    !!props?.discussionEntry?.author?.id,
+                  props?.discussionEntry?.author?.courseRoles
+                )}
               />
             </Flex.Item>
-          )}
-        </Flex>
-      </div>
+            {!props.discussionEntry.deleted && (
+              <Flex.Item align="stretch">
+                <ThreadActions
+                  id={props.discussionEntry.id}
+                  isUnread={!props.discussionEntry.read}
+                  onToggleUnread={toggleUnread}
+                  onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                  onEdit={
+                    props.discussionEntry.permissions?.update
+                      ? () => {
+                          setIsEditing(true)
+                        }
+                      : null
+                  }
+                  onOpenInSpeedGrader={
+                    props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
+                  }
+                  goToParent={
+                    props.depth === 0
+                      ? null
+                      : () => {
+                          const topOffset = props.parentRef.current.offsetTop
+                          window.scrollTo(0, topOffset - 44)
+                        }
+                  }
+                  goToTopic={() => {
+                    setTimeout(() => {
+                      window.scrollTo(0, 0)
+                    })
+                  }}
+                />
+              </Flex.Item>
+            )}
+          </Flex>
+        </div>
+      </Highlight>
       <div style={{marginLeft: replyMarginDepth}}>
         {editorExpanded && !ENV.isolated_view && (
           <View
