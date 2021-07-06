@@ -80,7 +80,7 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
     padding="x-small small"
     background="primary"
   >
-    <Text as="div" size="x-small">
+    <Text data-testid="important-date-subject" as="div" size="x-small">
       {context}
     </Text>
     <TruncateText maxLines={2}>
@@ -88,6 +88,7 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
         <ItemIcon type={type} color={color} />
         &nbsp;
         <Link
+          data-testid="important-date-link"
           href={url}
           isWithinText={false}
           theme={{

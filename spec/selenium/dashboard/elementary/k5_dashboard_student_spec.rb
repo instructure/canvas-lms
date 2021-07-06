@@ -24,6 +24,8 @@ require_relative '../pages/k5_grades_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
+require_relative '../pages/k5_important_dates_section_page'
+require_relative '../shared_examples/k5_important_dates_shared_examples'
 
 describe "student k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -33,6 +35,7 @@ describe "student k5 dashboard" do
   include K5ResourceTabPageObject
   include K5Common
   include GradebookSetup
+  include K5ImportantDatesSectionPageObject
 
   before :once do
     student_setup
@@ -391,4 +394,30 @@ describe "student k5 dashboard" do
       expect(course_list.count).to eq(2)
     end
   end
+
+  context 'important dates panel' do
+    before :once do
+      Account.site_admin.enable_feature!(:important_dates)
+    end
+
+    it 'shows the important date for student with override', ignore_js_errors: true do
+      assignment_title = "Electricity Homework"
+      due_at = 2.days.ago(Time.zone.now)
+      assignment = create_dated_assignment(@subject_course, assignment_title, due_at)
+      assignment.update!(important_dates: true)
+      override = assignment_override_model(:assignment => assignment)
+      student_due_at = 2.days.from_now(Time.zone.now)
+      override.override_due_at(student_due_at)
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      get "/"
+
+      expect(important_date_link).to include_text(assignment_title)
+    end
+  end
+
+  it_behaves_like 'k5 important dates'
 end
