@@ -27,7 +27,7 @@ import {IsolatedViewContainer} from './containers/IsolatedViewContainer/Isolated
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -128,11 +128,6 @@ const DiscussionTopicManager = props => {
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
-  useEffect(() => {
-    if (!discussionTopicQuery.error && !discussionTopicQuery.loading) {
-      discussionTopicQuery.refetch()
-    }
-  }, [discussionTopicQuery, filter, searchTerm, sort])
 
   const updateCache = (cache, result) => {
     try {
