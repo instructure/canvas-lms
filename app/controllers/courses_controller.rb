@@ -2123,7 +2123,8 @@ class CoursesController < ApplicationController
                    student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
                    settings_path: course_settings_path(@context.id),
                    latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
-                   has_wiki_pages: @context.wiki_pages.not_deleted.exists?
+                   has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
+                   has_syllabus_body: @context.syllabus_body.present?
                  }
                })
 

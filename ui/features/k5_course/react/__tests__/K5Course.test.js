@@ -83,7 +83,8 @@ const defaultProps = {
     posted_at: '2021-05-14T17:06:21-06:00'
   },
   pagesPath: '/courses/30/pages',
-  hasWikiPages: true
+  hasWikiPages: true,
+  hasSyllabusBody: true
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -186,7 +187,9 @@ describe('K-5 Subject Course', () => {
         {id: '19'},
         {id: 'context_external_tool_3', hidden: true}
       ]
-      const {getAllByRole} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      const {getAllByRole} = render(
+        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />
+      )
       const renderedTabs = getAllByRole('tab')
       expect(renderedTabs.map(({id}) => id.replace('tab-', ''))).toEqual([
         TAB_IDS.MODULES,
@@ -194,8 +197,26 @@ describe('K-5 Subject Course', () => {
       ])
     })
 
+    it('still renders Resource tab if course has no LTIs but has Important Info', () => {
+      const tabs = [{id: '10'}, {id: '5'}, {id: '19'}]
+      const {getByText} = render(<K5Course {...defaultProps} tabs={tabs} />)
+      expect(getByText('Resources')).toBeInTheDocument()
+      expect(getByText('Arts and Crafts Resources')).toBeInTheDocument()
+    })
+
+    it('does not render Resource tab if course has no LTIs nor Important Info', () => {
+      const tabs = [{id: '10'}, {id: '5'}, {id: '19'}]
+      const {queryByText} = render(
+        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />
+      )
+      expect(queryByText('Resources')).not.toBeInTheDocument()
+      expect(queryByText('Arts and Crafts Resources')).not.toBeInTheDocument()
+    })
+
     it('renders an empty state instead of any tabs if none are provided', () => {
-      const {getByTestId, getByText, queryByRole} = render(<K5Course {...defaultProps} tabs={[]} />)
+      const {getByTestId, getByText, queryByRole} = render(
+        <K5Course {...defaultProps} tabs={[]} hasSyllabusBody={false} />
+      )
       expect(getByText(defaultProps.name)).toBeInTheDocument()
       expect(queryByRole('tab')).not.toBeInTheDocument()
       expect(getByTestId('space-panda')).toBeInTheDocument()
@@ -203,7 +224,9 @@ describe('K-5 Subject Course', () => {
     })
 
     it('renders a link to update tab settings if no tabs are provided and the user has manage permissions', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} canManage tabs={[]} />)
+      const {getByRole} = render(
+        <K5Course {...defaultProps} canManage tabs={[]} hasSyllabusBody={false} />
+      )
       const link = getByRole('link', {name: 'Reestablish your world'})
       expect(link).toBeInTheDocument()
       expect(link.href).toBe('http://localhost/courses/30/settings#tab-navigation')
