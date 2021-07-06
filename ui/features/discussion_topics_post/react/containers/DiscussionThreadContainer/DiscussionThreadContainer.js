@@ -93,7 +93,7 @@ export const DiscussionThreadContainer = props => {
     addReplyToSubentries(
       cache,
       props.discussionEntry._id,
-      btoa(0),
+      PER_PAGE,
       sort,
       newDiscussionEntry,
       window.ENV?.course_id

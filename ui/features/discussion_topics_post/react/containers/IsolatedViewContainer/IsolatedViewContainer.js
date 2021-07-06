@@ -36,10 +36,10 @@ import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!discussion_topics_post'
+import {ISOLATED_VIEW_INITIAL_PAGE_SIZE, PER_PAGE} from '../../utils/constants'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PER_PAGE} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {Tray} from '@instructure/ui-tray'
@@ -57,7 +57,7 @@ export const IsolatedViewContainer = props => {
     addReplyToSubentries(
       cache,
       props.discussionEntryId,
-      btoa(0),
+      ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       'desc',
       newDiscussionEntry,
       window.ENV?.course_id
@@ -167,8 +167,7 @@ export const IsolatedViewContainer = props => {
   const isolatedEntry = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
-      page: btoa(0),
-      perPage: PER_PAGE,
+      perPage: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'desc',
       courseID: window.ENV?.course_id
     }
@@ -178,6 +177,33 @@ export const IsolatedViewContainer = props => {
     setOnFailure(I18n.t('There was an unexpected error loading the discussion entry.'))
     props.onClose()
     return null
+  }
+
+  const fetchMoreEntries = () => {
+    isolatedEntry.fetchMore({
+      variables: {
+        discussionEntryID: props.discussionEntryId,
+        perPage: PER_PAGE,
+        page: isolatedEntry.data.legacyNode.discussionSubentriesConnection.pageInfo.endCursor,
+        sort: 'desc',
+        courseID: window.ENV?.course_id
+      },
+      updateQuery: (previousResult, {fetchMoreResult}) => {
+        return {
+          legacyNode: {
+            ...previousResult.legacyNode,
+            discussionSubentriesConnection: {
+              nodes: [
+                ...previousResult.legacyNode.discussionSubentriesConnection.nodes,
+                ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes
+              ],
+              pageInfo: fetchMoreResult.legacyNode.discussionSubentriesConnection.pageInfo,
+              __typename: 'DiscussionEntryConnection'
+            }
+          }
+        }
+      }
+    })
   }
 
   return (
@@ -257,6 +283,7 @@ export const IsolatedViewContainer = props => {
               onToggleUnread={toggleUnread}
               onDelete={onDelete}
               onOpenInSpeedGrader={onOpenInSpeedGrader}
+              showOlderReplies={fetchMoreEntries}
             />
           )}
         </>

@@ -19,7 +19,6 @@
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
-import {PER_PAGE} from './constants'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -99,7 +98,7 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
 export const addReplyToSubentries = (
   cache,
   discussionEntryId,
-  page,
+  perPage,
   sort,
   newDiscussionEntry,
   courseID
@@ -109,8 +108,7 @@ export const addReplyToSubentries = (
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: discussionEntryId,
-        page,
-        perPage: PER_PAGE,
+        perPage,
         sort,
         courseID
       }

@@ -56,11 +56,7 @@ export const IsolatedThreadsContainer = props => {
             marginBottom: `1.5rem`
           }}
         >
-          <ShowOlderRepliesButton
-            onClick={() => {
-              // TODO: add callback for fetchMore option
-            }}
-          />
+          <ShowOlderRepliesButton onClick={props.showOlderReplies} />
         </div>
       )}
       {props.discussionEntry.discussionSubentriesConnection.nodes
@@ -84,7 +80,8 @@ IsolatedThreadsContainer.propTypes = {
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
-  onOpenInSpeedGrader: PropTypes.func
+  onOpenInSpeedGrader: PropTypes.func,
+  showOlderReplies: PropTypes.func
 }
 
 export default IsolatedThreadsContainer

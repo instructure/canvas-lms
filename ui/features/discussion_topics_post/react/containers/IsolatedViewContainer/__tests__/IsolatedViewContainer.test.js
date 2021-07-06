@@ -19,13 +19,14 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
+import {fireEvent, render} from '@testing-library/react'
 import {graphql} from 'msw'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
-import {render} from '@testing-library/react'
 
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
@@ -101,5 +102,39 @@ describe('IsolatedViewContainer', () => {
     )
     const {queryByTestId} = setup(defaultProps())
     expect(queryByTestId('back-button')).toBeNull()
+  })
+
+  it('allows fetching more discussion entries', async () => {
+    const {findByText, queryByText} = setup(defaultProps())
+
+    const showOlderRepliesButton = await findByText('Show older replies')
+    expect(showOlderRepliesButton).toBeInTheDocument()
+    expect(queryByText('Get riggity riggity wrecked son')).toBe(null)
+
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    id: '1337',
+                    _id: '1337',
+                    message: '<p>Get riggity riggity wrecked son</p>'
+                  })
+                ],
+                pageInfo: PageInfo.mock(),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    fireEvent.click(showOlderRepliesButton)
+
+    expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
   })
 })
