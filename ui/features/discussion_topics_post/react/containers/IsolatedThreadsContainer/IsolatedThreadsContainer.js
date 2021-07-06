@@ -49,6 +49,7 @@ export const IsolatedThreadsContainer = props => {
         marginLeft: `6.0rem`,
         paddingRight: '0.75rem'
       }}
+      data-testid="isolated-view-children"
     >
       {hasMoreReplies && (
         <div

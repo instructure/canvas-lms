@@ -75,11 +75,12 @@ describe('IsolatedViewContainer', () => {
     )
   }
 
-  const defaultProps = () => ({
+  const defaultProps = overrides => ({
     discussionEntryId: '1',
     open: true,
     onClose: () => {},
-    onOpenIsolatedView
+    onOpenIsolatedView,
+    ...overrides
   })
 
   it('should render', () => {
@@ -163,5 +164,25 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(replyButton[1])
 
     expect(onOpenIsolatedView).toHaveBeenCalledWith('50', true)
+  })
+
+  describe('replying', () => {
+    describe('RCE is open', () => {
+      const props = defaultProps({RCEOpen: true})
+
+      it('should not display children', () => {
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('isolated-view-children')).toBeFalsy()
+      })
+    })
+
+    describe('RCE is closed', () => {
+      const props = defaultProps({RCEOpen: false})
+
+      it('should display children', async () => {
+        const {findByTestId} = setup(props)
+        expect(await findByTestId('isolated-view-children')).toBeTruthy()
+      })
+    })
   })
 })
