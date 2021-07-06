@@ -144,7 +144,7 @@ class RoleOverridesController < ApplicationController
 
       roles = Api.paginate(roles, self, route)
       ActiveRecord::Associations::Preloader.new.preload(roles, :account)
-      render :json => roles.collect{|role| role_json(@context, role, @current_user, session)}
+      render :json => roles.map { |role| role_json(@context, role, @current_user, session, preloaded_overrides: RoleOverride.preload_overrides(@context, roles)) }
     end
   end
 
@@ -152,13 +152,15 @@ class RoleOverridesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_role_overrides)
 
       account_role_data = []
+      preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_account_roles)
       @context.available_account_roles.each do |role|
-        account_role_data << role_json(@context, role, @current_user, session)
+        account_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
       end
 
       course_role_data = []
+      preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_course_roles)
       @context.available_course_roles.each do |role|
-        course_role_data << role_json(@context, role, @current_user, session)
+        course_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
       end
 
       js_env({
