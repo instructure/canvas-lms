@@ -43,9 +43,7 @@ module AccountReports
     ].freeze
 
     def eportfolio_report
-      if only_users_with_no_enrollments?
-        add_extra_text(I18n.t('Include users with no enrollments'))
-      end
+      add_extra_text(I18n.t('Only users with no enrollments')) if only_users_with_no_enrollments?
 
       write_report EPORTFOLIO_REPORT_HEADERS do |csv|
         eportfolio_scope.select('eportfolios.*, users.name AS user_name, pseudonyms.sis_user_id, pseudonyms.unique_id').find_each do |e|
