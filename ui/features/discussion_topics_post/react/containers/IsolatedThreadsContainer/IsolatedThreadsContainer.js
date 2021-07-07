@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -24,9 +25,9 @@ import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
+import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 import {UPDATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 
@@ -65,6 +66,7 @@ export const IsolatedThreadsContainer = props => {
         .sort(sortReverseDisplay)
         .map(entry => (
           <IsolatedThreadContainer
+            discussionTopic={props.discussionTopic}
             discussionEntry={entry}
             key={entry.id}
             onToggleRating={props.onToggleRating}
@@ -81,6 +83,7 @@ export const IsolatedThreadsContainer = props => {
 }
 
 IsolatedThreadsContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,
@@ -178,9 +181,9 @@ const IsolatedThreadContainer = props => {
           <Flex.Item align="stretch">
             <ThreadActions
               id={entry.id}
-              isUnread={!DiscussionEntry.read}
-              onToggleUnread={() => props.onToggleUnread(props.discussionEntry)}
-              onDelete={() => props.onDelete(props.discussionEntry)}
+              isUnread={!entry.read}
+              onToggleUnread={() => props.onToggleUnread(entry)}
+              onDelete={entry.permissions?.delete ? () => props.onDelete(entry) : null}
               onEdit={
                 entry.permissions?.update
                   ? () => {
@@ -188,7 +191,11 @@ const IsolatedThreadContainer = props => {
                     }
                   : null
               }
-              onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
+              onOpenInSpeedGrader={
+                props.discussionTopic.permissions?.speedGrader
+                  ? () => props.onOpenInSpeedGrader(entry)
+                  : null
+              }
               goToParent={() => {
                 props.onOpenIsolatedView(entry.rootEntry.id, false, entry.rootEntry.id)
               }}
@@ -202,6 +209,7 @@ const IsolatedThreadContainer = props => {
 }
 
 IsolatedThreadContainer.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleRating: PropTypes.func,
   onToggleUnread: PropTypes.func,

@@ -16,89 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
-import {handlers} from '../../../../graphql/mswHandlers'
-import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
-import {PageInfo} from '../../../../graphql/PageInfo'
+import {IsolatedParent} from '../IsolatedParent'
 import React from 'react'
 
-describe('IsolatedThreadsContainer', () => {
-  const server = mswServer(handlers)
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
-
-  beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-
-    window.ENV = {
-      discussion_topic_id: '1',
-      manual_mark_as_read: false,
-      current_user: {
-        id: 'PLACEHOLDER',
-        display_name: 'Omar Soto-Fortuño',
-        avatar_image_url: 'www.avatar.com'
-      },
-      course_id: '1'
-    }
-  })
-
-  afterEach(() => {
-    server.resetHandlers()
-    setOnFailure.mockClear()
-    setOnSuccess.mockClear()
-  })
-
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
-  })
-
+describe('IsolatedParent', () => {
   const defaultProps = overrides => ({
     discussionTopic: Discussion.mock(),
-    discussionEntry: DiscussionEntry.mock({
-      discussionSubentriesConnection: {
-        nodes: [
-          DiscussionEntry.mock({
-            _id: '50',
-            id: '50',
-            message: '<p>This is the child reply</P>'
-          })
-        ],
-        pageInfo: PageInfo.mock(),
-        __typename: 'DiscussionSubentriesConnection'
-      }
-    }),
+    discussionEntry: DiscussionEntry.mock(),
+    onToggleUnread: jest.fn(),
     ...overrides
   })
 
   const setup = props => {
-    return render(
-      <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <IsolatedThreadsContainer {...props} />
-        </AlertManagerContext.Provider>
-      </ApolloProvider>
-    )
+    return render(<IsolatedParent {...props} />)
   }
-
-  it('should render', () => {
-    const container = setup(defaultProps())
-    expect(container).toBeTruthy()
-  })
-
-  it('should render sub-entries in the correct order', async () => {
-    const container = setup(defaultProps())
-    expect(await container.findByText('This is the child reply')).toBeInTheDocument()
-  })
 
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', () => {
@@ -113,7 +47,7 @@ describe('IsolatedThreadsContainer', () => {
 
     it('only shows the delete option if you have permission', () => {
       const props = defaultProps({onDelete: jest.fn()})
-      props.discussionEntry.discussionSubentriesConnection.nodes[0].permissions.delete = false
+      props.discussionEntry.permissions.delete = false
       const {getByTestId, queryByTestId} = setup(props)
 
       fireEvent.click(getByTestId('thread-actions-menu'))

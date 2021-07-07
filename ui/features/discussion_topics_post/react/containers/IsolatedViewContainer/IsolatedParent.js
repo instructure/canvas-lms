@@ -17,6 +17,7 @@
  */
 
 import {BackButton} from '../../components/BackButton/BackButton'
+import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
@@ -130,12 +131,8 @@ export const IsolatedParent = props => {
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}
-                  onToggleUnread={() => {
-                    if (props.onToggleUnread) {
-                      props.onToggleUnread()
-                    }
-                  }}
-                  onDelete={props.onDelete}
+                  onToggleUnread={props.onToggleUnread}
+                  onDelete={props.discussionEntry.permissions?.delete ? props.onDelete : null}
                   onEdit={
                     props.discussionEntry.permissions?.update
                       ? () => {
@@ -143,8 +140,12 @@ export const IsolatedParent = props => {
                         }
                       : null
                   }
-                  onOpenInSpeedGrader={props.onOpenInSpeedGrader}
                   goToTopic={props.goToTopic}
+                  onOpenInSpeedGrader={
+                    props.discussionTopic.permissions?.speedGrader
+                      ? props.onOpenInSpeedGrader
+                      : null
+                  }
                 />
               </Flex.Item>
             )}
@@ -157,6 +158,7 @@ export const IsolatedParent = props => {
 }
 
 IsolatedParent.propTypes = {
+  discussionTopic: Discussion.shape,
   discussionEntry: DiscussionEntry.shape,
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,

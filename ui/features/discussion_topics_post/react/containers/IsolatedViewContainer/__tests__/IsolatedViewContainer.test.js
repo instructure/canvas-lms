@@ -18,6 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {graphql} from 'msw'
@@ -78,6 +79,7 @@ describe('IsolatedViewContainer', () => {
   }
 
   const defaultProps = overrides => ({
+    discussionTopic: Discussion.mock(),
     discussionEntryId: '1',
     open: true,
     onClose,

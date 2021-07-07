@@ -256,6 +256,7 @@ export const IsolatedViewContainer = props => {
       ) : (
         <>
           <IsolatedParent
+            discussionTopic={props.discussionTopic}
             discussionEntry={isolatedEntry.data.legacyNode}
             onToggleUnread={() => toggleUnread(isolatedEntry.data.legacyNode)}
             onDelete={() => onDelete(isolatedEntry.data.legacyNode)}
@@ -288,6 +289,7 @@ export const IsolatedViewContainer = props => {
           </IsolatedParent>
           {!props.RCEOpen && (
             <IsolatedThreadsContainer
+              discussionTopic={props.discussionTopic}
               discussionEntry={isolatedEntry.data.legacyNode}
               onToggleRating={toggleRating}
               onToggleUnread={toggleUnread}
