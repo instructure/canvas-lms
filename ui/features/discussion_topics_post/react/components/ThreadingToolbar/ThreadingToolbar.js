@@ -27,7 +27,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
 export function ThreadingToolbar({...props}) {
-  return props.searchTerm ? (
+  return props.searchTerm && ENV.isolated_view ? (
     <Link as="button" isWithinText={false} onClick={() => {}}>
       <Text weight="bold">{I18n.t('Go to Reply')}</Text>
     </Link>

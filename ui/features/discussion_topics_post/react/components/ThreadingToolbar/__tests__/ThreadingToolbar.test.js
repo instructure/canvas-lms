@@ -34,6 +34,7 @@ describe('PostToolbar', () => {
   })
 
   it('renders "Go to Reply" button', () => {
+    window.ENV.isolated_view = true
     const {getByText} = render(
       <ThreadingToolbar searchTerm="asdf">
         <>First</>
