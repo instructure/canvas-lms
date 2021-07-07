@@ -40,6 +40,9 @@ describe MicrosoftSync::GraphService do
         WebMock.stub_request(http_method, url).with(with_params).and_return(response)
       end
     end
+
+    allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    allow(InstStatsd::Statsd).to receive(:count).and_call_original
   end
 
   after { WebMock.enable_net_connect! }
@@ -64,8 +67,6 @@ describe MicrosoftSync::GraphService do
         extra_tag: 'abc',
       }
     end
-
-  before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
 
     unless opts[:ignore_404]
       context 'with a 404 status code' do
@@ -118,14 +119,14 @@ describe MicrosoftSync::GraphService do
       end
     end
 
-    context 'with a SocketError' do
+    context 'with a Timeout::Error' do
       it 'increments an "error" counter and bubbles up the error' do
-        error = SocketError.new
+        error = Timeout::Error.new
         expect(HTTParty).to receive(http_method.to_sym).and_raise error
         expect { subject }.to raise_error(error)
         expect(InstStatsd::Statsd).to have_received(:increment).with(
           'microsoft_sync.graph_service.error',
-          tags: statsd_tags.merge(status_code: 'unknown')
+          tags: statsd_tags.merge(status_code: 'Timeout__Error')
         )
       end
     end
@@ -325,7 +326,6 @@ describe MicrosoftSync::GraphService do
     end
 
     it 'increments statsd counters based on the responses' do
-      allow(InstStatsd::Statsd).to receive(:count).and_call_original
       expect { subject }.to raise_error(expected_error)
 
       codes.each do |type, codes_list|
@@ -610,6 +610,13 @@ describe MicrosoftSync::GraphService do
             receive(:run_batch).with(anything, anything, quota: [4, 4]).and_call_original
           subject
         end
+
+        it 'increments the "expected" counter for the first request' do
+          subject
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.expected',
+                  tags: hash_including(msft_endpoint: 'patch_groups'))
+        end
       end
 
       context 'when some owners were already in the group' do
@@ -797,18 +804,6 @@ describe MicrosoftSync::GraphService do
     end
   end
 
-  describe '#get_team' do
-    subject { service.get_team('mygroupid') }
-
-    let(:http_method) { :get }
-    let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
-    let(:response_body) { {'foo' => 'bar'} }
-
-    it { is_expected.to eq('foo' => 'bar') }
-
-    it_behaves_like 'a graph service endpoint'
-  end
-
   describe '#team_exists?' do
     subject { service.team_exists?('mygroupid') }
 
@@ -826,6 +821,15 @@ describe MicrosoftSync::GraphService do
       let(:response) { json_response(404, error: {code: 'NotFound', message: 'Does not exist'}) }
 
       it { is_expected.to eq(false) }
+
+      it 'increments an "expected" statsd counter instead of an "notfound" one' do
+        subject
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.expected',
+                tags: hash_including(msft_endpoint: 'get_teams'))
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
+          .with('microsoft_sync.graph_service.notfound', anything)
+      end
     end
   end
 
@@ -857,8 +861,14 @@ describe MicrosoftSync::GraphService do
         }
       end
 
-      it 'raises a GroupHasNoOwners error' do
+      it 'raises a GroupHasNoOwners error and increments an "expected" counter' do
         expect { subject }.to raise_error(MicrosoftSync::Errors::GroupHasNoOwners)
+
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
+          .with('microsoft_sync.graph_service.error', anything)
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.expected',
+                tags: hash_including(msft_endpoint: 'post_teams'))
       end
     end
 
@@ -870,8 +880,14 @@ describe MicrosoftSync::GraphService do
         }
       end
 
-      it 'raises a TeamAlreadyExists error' do
+      it 'raises a TeamAlreadyExists error and increments an "expected" counter' do
         expect { subject }.to raise_error(MicrosoftSync::Errors::TeamAlreadyExists)
+
+        expect(InstStatsd::Statsd).to_not have_received(:increment)
+          .with('microsoft_sync.graph_service.error', anything)
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.expected',
+                tags: hash_including(msft_endpoint: 'post_teams'))
       end
     end
   end

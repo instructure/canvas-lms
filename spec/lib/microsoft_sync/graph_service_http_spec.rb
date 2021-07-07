@@ -35,12 +35,17 @@ describe MicrosoftSync::GraphServiceHttp do
   describe '#request' do
     before do
       WebMock.disable_net_connect!
-      WebMock.stub_request(:get, url)
+      WebMock.stub_request(:get, url).and_return(
+        status: status,
+        body: {foo: 'bar'}.to_json,
+        headers: {'Content-type' => 'application/json'},
+      )
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
       allow(InstStatsd::Statsd).to receive(:increment).and_call_original
     end
 
     let(:url) { 'https://graph.microsoft.com/v1.0/foo/bar' }
+    let(:status) { 200 }
 
     after { WebMock.enable_net_connect! }
 
@@ -114,6 +119,48 @@ describe MicrosoftSync::GraphServiceHttp do
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with("microsoft_sync.graph_service.success",
               tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
+    end
+
+    context 'when a block is passed in' do
+      let(:status) { 409 }
+
+      context 'when the response is non-200 and the block returns truthy' do
+        let(:result) do
+          subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar') do |resp|
+            resp.code == 409 && :foo
+          end
+        end
+
+        it 'returns the value the block returned' do
+          expect(result).to eq(:foo)
+        end
+
+        it 'increments an "expected" counter and not an "error" counter' do
+          result
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.expected',
+                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+          expect(InstStatsd::Statsd).to_not have_received(:increment)
+            .with('microsoft_sync.graph_service.error', anything)
+        end
+      end
+
+      context 'when the response is non-200 and the block returns falsey' do
+        let(:result) do
+          subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar') do |resp|
+            resp.code == 408 && :foo
+          end
+        end
+
+        it 'raises an error and increments an "error" counter' do
+          expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
+          expect(InstStatsd::Statsd).to have_received(:increment)
+            .with('microsoft_sync.graph_service.error',
+                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+          expect(InstStatsd::Statsd).to_not have_received(:increment)
+            .with('microsoft_sync.graph_service.expected', anything)
+        end
+      end
     end
   end
 
