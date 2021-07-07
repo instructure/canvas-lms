@@ -27,7 +27,7 @@ import {SearchContext} from '../../utils/constants'
 
 export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
-  const {searchTerm} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
@@ -55,7 +55,9 @@ export const PostMessageContainer = props => {
         isForcedRead={props.discussionEntry.forcedReadState}
         discussionRoles={props?.discussionRoles}
       >
-        <ThreadingToolbar searchTerm={searchTerm}>{props.threadActions}</ThreadingToolbar>
+        <ThreadingToolbar searchTerm={searchTerm} filter={filter}>
+          {props.threadActions}
+        </ThreadingToolbar>
       </PostMessage>
     )
   }
