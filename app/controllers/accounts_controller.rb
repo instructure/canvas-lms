@@ -323,7 +323,7 @@ class AccountsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @accounts = (@current_user&.all_paginatable_accounts || []).paginate
+        @accounts = (@current_user&.all_paginatable_accounts || []).paginate(per_page: 100)
       end
       format.json do
         if @current_user
