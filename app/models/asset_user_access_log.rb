@@ -346,10 +346,10 @@ class AssetUserAccessLog
       root_account_postgres_iterators = compaction_state[:temp_root_account_max_log_ids].dup
       # map of partition ids to max message ID seen for that partition
       # of the topic for the current root account
-      root_account_pulsar_state = compaction_state[:pulsar_partition_iterators].fetch(root_account_id, {})
+      root_account_pulsar_state = compaction_state[:pulsar_partition_iterators].fetch(root_account_id.to_s, {})
       # if there is no temporary state for this root account right now, we should use the global state
       # since that is the max value seen in each partition regardless of root account.
-      root_account_postgres_iterator_state = root_account_postgres_iterators.fetch(root_account_id, new_iterator_state.dup)
+      root_account_postgres_iterator_state = root_account_postgres_iterators.fetch(root_account_id.to_s, new_iterator_state.dup)
       new_message_bus_iterator_state = root_account_pulsar_state.dup
       continue_consuming_from_bus = true
 
@@ -386,7 +386,11 @@ class AssetUserAccessLog
           max_postgres_partition_id = compaction_state[:max_log_ids][message_partition_index]
           max_pulsar_partition_message_id = root_account_pulsar_state[pulsar_partition_id.to_s]
           should_process_message = (
-            log_entry_id > max_postgres_partition_id &&
+            # nil would mean this message ONLY got written to pulsar.
+            # exceeding the iterator state would mean the POSTGRES compaction had not processed the letter.
+            # NOT nil, but lower than the postgres iterator would mean we'd seen
+            # it already in postgres compaction, so no reason to process it now.
+            (log_entry_id.nil? || (log_entry_id > max_postgres_partition_id)) &&
             (
               max_pulsar_partition_message_id.nil? ||
               pulsar_message_id > MessageBus::MessageId.from_string(max_pulsar_partition_message_id)
@@ -405,7 +409,7 @@ class AssetUserAccessLog
           # This is currently only set on the temporary state for this contextual root account
           # in case we have to abort the job (because we cannot make guarantees about postgres
           # ordering when we're processing from each root account in turn).
-          root_account_postgres_iterator_state[message_partition_index] = [root_account_postgres_iterator_state[message_partition_index], log_entry_id].max
+          root_account_postgres_iterator_state[message_partition_index] = [root_account_postgres_iterator_state[message_partition_index], log_entry_id].compact.max
           # always hold on to the largest message ID we've seen for this pulsar partition.
           most_recent_id_in_this_partition = [
             new_message_bus_iterator_state[pulsar_partition_id.to_s], # might be nil if this is the first one
