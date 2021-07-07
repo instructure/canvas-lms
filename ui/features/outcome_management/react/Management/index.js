@@ -209,7 +209,7 @@ const OutcomeManagementPanel = () => {
               overflowX="hidden"
               elementRef={setLeftColumnRef}
             >
-              <View as="div" padding="small none none x-small">
+              <View as="div" padding="small x-small none x-small">
                 <Text size="large" weight="light" fontStyle="normal">
                   {I18n.t('Outcome Groups')}
                 </Text>
