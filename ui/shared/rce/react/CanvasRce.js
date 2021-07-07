@@ -93,6 +93,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       language={window.ENV?.LOCALE || 'en'}
       languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      ltiTools={window.INST?.editorButtons}
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
@@ -103,8 +104,8 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onBlur={onBlur}
       onContentChange={onContentChange}
       onInit={onInit}
-      use_rce_pretty_html_editor={!!window.ENV?.FEATURES.rce_pretty_html_editor}
-      use_rce_buttons_and_icons={!!window.ENV?.FEATURES.rce_buttons_and_icons}
+      use_rce_pretty_html_editor={!!window.ENV?.FEATURES?.rce_pretty_html_editor}
+      use_rce_buttons_and_icons={!!window.ENV?.FEATURES?.rce_buttons_and_icons}
       {...rest}
     />
   )

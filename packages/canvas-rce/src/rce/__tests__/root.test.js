@@ -19,7 +19,6 @@
 import ReactDOM from 'react-dom'
 import {renderIntoDiv} from '../root'
 import Bridge from '../../bridge'
-import FakeEditor from '../plugins/shared/__tests__/FakeEditor'
 
 describe('RceModule', () => {
   let target
@@ -34,11 +33,11 @@ describe('RceModule', () => {
     target = document.getElementById('target')
 
     props = {
-      tinymce: new FakeEditor(),
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       editorOptions: () => {
         return {}
-      }
+      },
+      textareaId: 'textarea_id'
     }
   })
 

@@ -118,7 +118,7 @@
 
   <div class="clear"></div>
 
-  <% description = !@assignment.description.blank? ? public_user_content(@assignment.description) : t('defaults.no_content', "No Content") %>
+  <% description = @assignment.description.present? ? public_user_content(@assignment.description) : t("No additional details were added for this assignment.") %>
   <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "" %>"><%= description %></div>
 
   <% if can_do(@context, @current_user, :read_as_admin) %>

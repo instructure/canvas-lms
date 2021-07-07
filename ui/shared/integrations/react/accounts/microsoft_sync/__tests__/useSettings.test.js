@@ -71,6 +71,7 @@ describe('useGetSettings', () => {
         ...defaultState,
         microsoft_sync_enabled: true,
         microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
+        last_saved_microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
         microsoft_sync_login_attribute: 'email',
         selectedAttribute: 'email',
         loading: false

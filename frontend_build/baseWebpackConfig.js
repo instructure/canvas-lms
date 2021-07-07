@@ -18,11 +18,7 @@
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
-// terser-webpack-plugin is a dependency of 'webpack'. It's not in our package.json
-// because we always want to use the same version as whatever webpack would use
-// by default and if webpack ever stops using it by default we _want_ an
-// `Error: Cannot find module` here so we know we need to change things
-// eslint-disable-next-line import/no-extraneous-dependencies
+// keep this in sync with webpack's dep version
 const TerserPlugin = require('terser-webpack-plugin')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')

@@ -20,6 +20,7 @@ import {graphql} from 'msw'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
+import {User} from './User'
 
 // helper function that filters out undefined values in objects before assigning
 const mswAssign = (target, ...objects) => {
@@ -69,6 +70,15 @@ export const handlers = [
               pageInfo: PageInfo.mock(),
               __typename: 'DiscussionSubentriesConnection'
             }
+          })
+        })
+      )
+    }
+    if (req.body.variables.courseID > 0) {
+      return res(
+        ctx.data({
+          legacyNode: Discussion.mock({
+            author: User.mock({courseRoles: ['TeacherEnrollment', 'TaEnrollment'], id: 'role-user'})
           })
         })
       )

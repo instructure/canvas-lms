@@ -272,4 +272,20 @@ describe('DiscussionThreadContainer', () => {
       })
     })
   })
+
+  describe('Pluralization', () => {
+    it('pluralizes reply message correctly when there is only a single reply', async () => {
+      const {getByText} = setup(defaultProps())
+      expect(getByText('1 reply, 1 unread')).toBeTruthy()
+    })
+
+    it('pluralizes replies message correctly when there are multiple replies', async () => {
+      const {getByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
+        })
+      )
+      expect(getByText('2 replies, 1 unread')).toBeTruthy()
+    })
+  })
 })

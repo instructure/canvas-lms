@@ -94,7 +94,6 @@ export default class AttemptTab extends Component {
     activeSubmissionType: string,
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
-    editingDraft: bool,
     onContentsChanged: func,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
@@ -180,7 +179,7 @@ export default class AttemptTab extends Component {
   renderStudentAnnotationAttempt = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
-        <StudentAnnotationAttempt />
+        <StudentAnnotationAttempt submission={this.props.submission} />
       </Suspense>
     )
   }
@@ -217,7 +216,7 @@ export default class AttemptTab extends Component {
 
         <Flex>
           {this.props.assignment.submissionTypes.map(type => (
-            <Flex.Item as="div" key={type} margin="0 medium 0 0">
+            <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
               <SubmissionTypeButton
                 displayName={friendlyTypeName(type)}
                 icon={iconsByType[type]}

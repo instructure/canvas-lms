@@ -127,7 +127,9 @@ module Importers
         end
 
         migration.update_import_progress(35)
-        question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+        unless migration.quizzes_next_banks_migration?
+          question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+        end
         Importers::GroupImporter.process_migration(data, migration); migration.update_import_progress(48)
         Importers::LearningOutcomeImporter.process_migration(data, migration); migration.update_import_progress(50)
         Importers::RubricImporter.process_migration(data, migration); migration.update_import_progress(52)

@@ -78,6 +78,8 @@ export const mockThreads = {
   }
 }
 
+const courseID = window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
+
 export const DiscussionThreadContainer = props => {
   const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -91,7 +93,7 @@ export const DiscussionThreadContainer = props => {
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry)
+    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry, courseID)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -202,10 +204,13 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t('%{replies} replies, %{unread} unread', {
-          replies: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-          unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-        })}
+        expandText={I18n.t(
+          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
+          {
+            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
+          }
+        )}
         onClick={() => setExpandReplies(!expandReplies)}
         isExpanded={expandReplies}
       />
@@ -259,6 +264,7 @@ export const DiscussionThreadContainer = props => {
           }}
           onSave={onUpdate}
           isForcedRead={props.discussionEntry.forcedReadState}
+          discussionRoles={props.discussionEntry.author?.courseRoles}
         >
           <ThreadingToolbar>{threadActions}</ThreadingToolbar>
         </PostMessage>
@@ -416,7 +422,8 @@ const DiscussionSubentries = props => {
   const variables = {
     discussionEntryID: props.discussionEntryId,
     perPage: PER_PAGE,
-    sort
+    sort,
+    courseID
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables

@@ -18,6 +18,7 @@
 
 BOLD="$(tput bold)"
 NORMAL="$(tput sgr0)"
+YELLOW=$(tput setaf 3)
 
 function is_logfile_enabled() {
   [[ -n "${LOG:-}" ]] && touch "$LOG"
@@ -55,6 +56,11 @@ function init_log_file {
 function message {
   echo_console_and_log ''
   echo_console_and_log "$BOLD> $*$NORMAL"
+}
+
+function warning_message {
+  echo_console_and_log ''
+  echo_console_and_log "$BOLD$YELLOW> $*$NORMAL"
 }
 
 function prompt {

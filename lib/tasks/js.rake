@@ -20,7 +20,14 @@ namespace :js do
   desc "Ensure up-to-date node environment"
   task :yarn_install do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
-    system 'yarn install --pure-lockfile || yarn install --pure-lockfile --network-concurrency 1'
+
+    # --production=false so that it still installs devDependencies as they are
+    # needed for post-installation steps (like wsrun)
+    #
+    #  see https://classic.yarnpkg.com/en/docs/cli/install#toc-yarn-install-production-true-false
+    yarnopts = '--frozen-lockfile --pure-lockfile --production=false'
+
+    system "yarn install #{yarnopts} || yarn install #{yarnopts} --network-concurrency 1"
     unless $?.success?
       raise 'error running yarn install'
     end

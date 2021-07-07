@@ -57,6 +57,7 @@ const getOptimisticResponse = text => {
           _id: ENV.current_user.id,
           avatarUrl: ENV.current_user.avatar_image_url,
           name: ENV.current_user.display_name,
+          courseRoles: [],
           __typename: 'User'
         },
         editor: null,
@@ -104,11 +105,11 @@ const DiscussionTopicManager = props => {
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
     filter,
-    sort
+    sort,
+    courseID: window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
-
   useEffect(() => {
     if (!discussionTopicQuery.error && !discussionTopicQuery.loading) {
       discussionTopicQuery.refetch()
@@ -159,7 +160,6 @@ const DiscussionTopicManager = props => {
       />
     )
   }
-
   return (
     <>
       <SearchContext.Provider value={value}>

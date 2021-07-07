@@ -891,17 +891,6 @@ describe AccountsController do
         )
       end
 
-      it 'defaults new feature flags to false' do
-        get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(false)
-      end
-
-      it 'passes on correct value for new feature flags ui' do
-        Account.site_admin.enable_feature!(:new_features_ui)
-        get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
-      end
-
       it 'sets microsoft sync values' do
         allow(MicrosoftSync::LoginService).to receive(:client_id).and_return('1234')
         get 'settings', params: {account_id: account.id}

@@ -87,7 +87,7 @@ export default function MicrosoftSyncAccountSettings() {
               payload: {microsoft_sync_tenant: event.target.value}
             })
           }
-          messages={state.tenantErrorMessages}
+          messages={state.tenantErrorMessages.concat(state.tenantInfoMessages)}
           tenant={state.microsoft_sync_tenant}
         />
         <LoginAttributeSelector

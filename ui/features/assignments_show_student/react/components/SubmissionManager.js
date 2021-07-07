@@ -135,7 +135,11 @@ function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}
   }
 
   return (
-    <Button color="secondary" onClick={() => handleCancelDraft(deleteDraftMutation)}>
+    <Button
+      data-testid="cancel-attempt-button"
+      color="secondary"
+      onClick={() => handleCancelDraft(deleteDraftMutation)}
+    >
       {I18n.t('Cancel Attempt %{attempt}', {attempt})}
     </Button>
   )
@@ -484,7 +488,11 @@ export default class SubmissionManager extends Component {
         render: context => {
           const {attempt} = context.latestSubmission
           return (
-            <Button color="primary" onClick={context.showDraftAction}>
+            <Button
+              data-testid="back-to-attempt-button"
+              color="primary"
+              onClick={context.showDraftAction}
+            >
               {I18n.t('Back to Attempt %{attempt}', {attempt})}
             </Button>
           )
@@ -495,7 +503,11 @@ export default class SubmissionManager extends Component {
         shouldRender: context => this.shouldRenderNewAttempt(context),
         render: context => {
           return (
-            <Button color="primary" onClick={context.startNewAttemptAction}>
+            <Button
+              data-testid="try-again-button"
+              color="primary"
+              onClick={context.startNewAttemptAction}
+            >
               {I18n.t('Try Again')}
             </Button>
           )
@@ -532,8 +544,8 @@ export default class SubmissionManager extends Component {
     let activeTypeMeetsCriteria = false
     switch (this.state.activeSubmissionType) {
       case 'media_recording':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
-          ?.meetsMediaRecordingCriteria
+        activeTypeMeetsCriteria =
+          this.props.submission?.submissionDraft?.meetsMediaRecordingCriteria
         break
       case 'online_text_entry':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria

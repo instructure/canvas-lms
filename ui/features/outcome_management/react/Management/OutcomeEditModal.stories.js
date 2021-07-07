@@ -106,13 +106,13 @@ withoutEditPermission.args = {
   }
 }
 
-export const withAlternativeDescription = Template.bind({})
-withAlternativeDescription.args = {
+export const withFriendlyDescription = Template.bind({})
+withFriendlyDescription.args = {
   outcome: {
     _id: '1',
     title: 'Outcome 1',
     description: 'An outcome description.',
-    friendlyDescription: 'A alternative outcome description.',
+    friendlyDescription: 'A friendly outcome description.',
     displayName: 'Friendly outcome name'
   }
 }

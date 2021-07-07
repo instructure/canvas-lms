@@ -25,12 +25,16 @@ import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 
 export const DiscussionEdit = props => {
-  const [setRCERef, getRCEText, setRCEText] = useDiscussionRCE()
+  const [setRCERef, getRCEText, setRCEText] = useDiscussionRCE(rceMentionsIsEnabled())
 
   // Load text into RCE when Value updates
   useEffect(() => {
     setRCEText(props.value)
   }, [props.value, setRCEText])
+
+  function rceMentionsIsEnabled() {
+    return !!ENV.rce_mentions_in_discussions
+  }
 
   return (
     <div

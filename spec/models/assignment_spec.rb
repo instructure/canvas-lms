@@ -1615,6 +1615,77 @@ describe Assignment do
   end
 
   describe "#representatives" do
+    context "when filtering by section" do
+      before(:once) do
+        @student_enrollment = @enrollment
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+      end
+
+      describe "concluded students" do
+        before(:once) do
+          @student_enrollment.conclude
+        end
+
+        it "excludes concluded students by default" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+
+        it "includes concluded students if the includes param has :completed" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:completed],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "excludes concluded students if the includes param does not have :completed" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:inactive],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+      end
+
+      describe "deactivated students" do
+        before(:once) do
+          @student_enrollment.deactivate
+        end
+
+        it "includes deactivated students by default" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "includes deactivated students if the includes param has :inactive" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:inactive],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "excludes deactivated students if the includes param does not have :inactive" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:completed],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+      end
+    end
+
     context "individual students" do
       it "sorts by sortable_name" do
         student_one = student_in_course(
@@ -3174,6 +3245,13 @@ describe Assignment do
     it "should not round scores" do
       @assignment.points_possible = 15
       expect(@assignment.interpret_grade("88.75%")).to eq 13.3125
+    end
+
+    it "should not return more than 3 decimal digits" do
+      @assignment.points_possible = 100
+      score = @assignment.interpret_grade("55%")
+      decimal_part = score.to_s.split('.')[1]
+      expect(decimal_part.length).to be <= 3
     end
 
     context "with alphanumeric grades" do

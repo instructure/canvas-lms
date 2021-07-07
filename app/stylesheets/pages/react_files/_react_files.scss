@@ -29,6 +29,8 @@ $ef-thumbnail-size: 36px;
   }
 }
 
+$max-default-border: 5px;
+
 body.files {
   .ic-Layout-contentMain { padding-top: 0; }
   .ic-app-nav-toggle-and-crumbs {
@@ -264,11 +266,11 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-name-col{
+  padding: $max-default-border;
   flex: 8;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding-#{direction(right)}: $ic-sp/2;
   box-sizing: border-box;
   a {
     @if $use_high_contrast { @extend .ef-plain-link; }
@@ -281,7 +283,11 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   overflow: hidden;
 }
 
-.ef-name-col__text {
+.ef-name-col__link {
+  margin: $max-default-border;
+}
+
+.ef-modified-by-col .ef-plain-link {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -300,6 +306,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-modified-by-col{
   flex: 3;
+  padding: $max-default-border;
   @include hideForPhone;
 }
 

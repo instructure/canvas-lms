@@ -308,13 +308,13 @@ describe MicrosoftSync::GraphService do
     end
 
     it 'increments statsd counters based on the responses' do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:count)
       expect { subject }.to raise_error(expected_error)
 
       codes.each do |type, codes_list|
         codes_list = [codes_list].flatten
         codes_list.uniq.each do |code|
-          expect(InstStatsd::Statsd).to have_received(:increment).once.with(
+          expect(InstStatsd::Statsd).to have_received(:count).once.with(
             "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code),
             tags: {msft_endpoint: endpoint_name, status: code}
           )

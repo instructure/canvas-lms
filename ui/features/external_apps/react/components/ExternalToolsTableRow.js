@@ -204,7 +204,7 @@ export default class ExternalToolsTableRow extends React.Component {
               <ExternalToolPlacementButton
                 tool={tool}
                 returnFocus={this.returnFocus}
-                onSuccess={this.validateTool}
+                onToggleSuccess={this.validateTool}
               />
               <ReregisterExternalToolButton
                 tool={tool}
@@ -230,7 +230,7 @@ export default class ExternalToolsTableRow extends React.Component {
             tool={tool}
             type="button"
             returnFocus={this.returnFocus}
-            onSuccess={this.validateTool}
+            onToggleSuccess={this.validateTool}
           />
         </td>
       )

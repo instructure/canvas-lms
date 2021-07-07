@@ -352,6 +352,7 @@ Options are:
 - full_width (The Canvas global navigation is shown)
 - in_context (default - The Canvas global and context navigations are shown)
 - full_width_in_context (The Canvas global and context navigations are shown, but the tool's iframe takes all remaining space).
+- in_nav_context (The Canvas global and context navigations are shown, but other contextual info like assignment details are hidden. The tools' iframe takes up all remaining space).
 
 Which view is selected is determined by the `display_type` top-level or placement-level tool configuration.
 

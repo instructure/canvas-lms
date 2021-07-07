@@ -18,11 +18,12 @@
 
 import EditorConfig from './tinymce.config'
 import INST from 'browser-sniffer'
+import mergeConfig from './util/mergeConfig'
 
 function editorOptions(width, id, tinyMCEInitOptions, enableBookmarkingOverride, tinymce) {
   const editorConfig = new EditorConfig(tinymce, INST, width, id)
 
-  return {
+  const config = {
     ...editorConfig.defaultConfig(),
     setup: ed => {
       if (!ENV.use_rce_enhancements) {
@@ -32,8 +33,12 @@ function editorOptions(width, id, tinyMCEInitOptions, enableBookmarkingOverride,
           new EditorAccessibility(ed).accessiblize()
         })
       }
-    },
-    ...(tinyMCEInitOptions.tinyOptions || {})
+    }
+  }
+
+  return {
+    ...config,
+    ...mergeConfig(tinyMCEInitOptions.optionsToMerge || [], config, tinyMCEInitOptions.tinyOptions)
   }
 }
 

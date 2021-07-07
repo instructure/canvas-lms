@@ -93,7 +93,7 @@ export default class TextEntry extends React.Component {
       this._lastSavedContent = body
 
       if (!this.props.readOnly) {
-        this.handleEditorIframeFocus()
+        this._tinyeditor.focus()
         this.handleEditorFocus()
       }
     }
@@ -129,13 +129,6 @@ export default class TextEntry extends React.Component {
   }
 
   unloadRCE() {
-    const documentContent = document.getElementById('content')
-    if (documentContent) {
-      const editorIframe = documentContent.querySelector('[id^="random_editor"]')
-      if (editorIframe) {
-        editorIframe.removeEventListener('focus', this.handleEditorIframeFocus)
-      }
-    }
     if (this._textareaRef) {
       RichContentEditor.destroyRCE(this._textareaRef)
     }
@@ -186,19 +179,9 @@ export default class TextEntry extends React.Component {
     this._lastSavedContent = draftBody
     this._checkForChangesTimer = setInterval(this.checkForChanges, checkForChangesIntervalMS)
 
-    const documentContent = document.getElementById('content')
-    if (documentContent) {
-      const editorIframe = documentContent.querySelector('[id^="random_editor"]')
-      if (editorIframe) {
-        editorIframe.addEventListener('focus', this.handleEditorIframeFocus)
-        this._tinyeditor.focus()
-      }
-    }
-    this.setState({renderingEditor: false})
-  }
+    this._tinyeditor?.focus()
 
-  handleEditorIframeFocus = _event => {
-    this._tinyeditor.focus()
+    this.setState({renderingEditor: false})
   }
 
   handleEditorFocus = _event => {

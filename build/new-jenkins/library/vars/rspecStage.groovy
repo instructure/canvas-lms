@@ -47,11 +47,13 @@ def createDistribution(nestedStages) {
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
   ]
 
+  def rspecNodeRequirements = [label: 'canvas-docker']
+
   rspecNodeTotal.times { index ->
     extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
-      .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+      .nodeRequirements(rspecNodeRequirements)
       .timeout(15)
       .queue(nestedStages, this.&runSuite)
   }
@@ -60,7 +62,7 @@ def createDistribution(nestedStages) {
     extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
-      .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+      .nodeRequirements(rspecNodeRequirements)
       .timeout(15)
       .queue(nestedStages, this.&runSuite)
     }
@@ -69,7 +71,7 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
 
-  credentials.withStarlordDockerLogin { ->
+  credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
 

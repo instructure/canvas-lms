@@ -20,6 +20,7 @@ import {DiscussionEntry} from './DiscussionEntry'
 import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
+import {User} from './User'
 
 export const DELETE_DISCUSSION_TOPIC = gql`
   mutation DeleteDiscussionTopic($id: ID!) {
@@ -51,9 +52,16 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
 `
 export const DELETE_DISCUSSION_ENTRY = gql`
@@ -61,12 +69,19 @@ export const DELETE_DISCUSSION_ENTRY = gql`
     deleteDiscussionEntry(input: {id: $id}) {
       discussionEntry {
         ...DiscussionEntry
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -77,9 +92,16 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
     }
   }
+  ${User.fragment}
   ${Discussion.fragment}
 `
 export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
@@ -89,9 +111,16 @@ export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
     }
   }
+  ${User.fragment}
   ${Discussion.fragment}
 `
 
@@ -112,12 +141,19 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -127,12 +163,19 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     updateDiscussionEntry(input: {discussionEntryId: $discussionEntryId, message: $message}) {
       discussionEntry {
         ...DiscussionEntry
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -144,8 +187,15 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
     ) {
       discussionEntries {
         ...DiscussionEntry
+        editor {
+          ...User
+        }
+        author {
+          ...User
+        }
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
 `

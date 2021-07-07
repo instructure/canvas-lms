@@ -49,7 +49,7 @@ describe('FindOutcomeItem', () => {
 
   it('does not render component if title prop not passed', () => {
     const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({title: null})} />)
-    expect(queryByTestId('outcome-with-bottom-border')).not.toBeInTheDocument()
+    expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
   it('handles click on toggle', () => {

@@ -23,6 +23,7 @@ export const loadRollups = (courseId, page = 1) => {
       rating_percents: true,
       per_page: 20,
       include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
+      sort_by: 'student',
       page
     }
   }

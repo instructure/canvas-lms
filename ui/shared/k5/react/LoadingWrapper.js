@@ -22,41 +22,71 @@ import PropTypes from 'prop-types'
 import LoadingSkeleton from './LoadingSkeleton'
 
 export default function LoadingWrapper({
+  id,
   children,
   isLoading,
   skeletonsCount = 1,
   screenReaderLabel = 'Loading',
+  display = 'block',
   width = '100%',
   height = '10em',
   margin = 'small',
-  borderWidth
+  renderCustomSkeleton,
+  renderSkeletonsContainer,
+  renderLoadedContainer
 }) {
+  const generateKey = index => `skeleton-${id}-${index}`
   const skeletons = []
+
   for (let i = 0; i < skeletonsCount; i++) {
     skeletons.push(
-      <View
-        key={`skeleton-${i}`}
-        display="inline-block"
-        width={width}
-        height={height}
-        margin={margin}
-        borderWidth={borderWidth}
-        data-testid="skeleton-wrapper"
-      >
-        <LoadingSkeleton width="100%" height="100%" screenReaderLabel={screenReaderLabel} />
-      </View>
+      // if renderCustomSkeleton prop is passed, it will be called 'skeletonsCount' times,
+      // delegating the job of rendering the skeletons to that callback
+      renderCustomSkeleton?.({key: generateKey(i)}) || (
+        // if no renderCustomSkeleton is provided, the default skeleton will be generated
+        <View
+          key={generateKey(i)}
+          display={display}
+          width={width}
+          height={height}
+          margin={margin}
+          data-testid="skeleton-wrapper"
+        >
+          <LoadingSkeleton width="100%" height="100%" screenReaderLabel={screenReaderLabel} />
+        </View>
+      )
     )
   }
-  return isLoading ? skeletons : children
+
+  if (isLoading) {
+    // if renderSkeletonsContainer prop is passed, the skeletons will be passed to that callback to allow
+    // custom rendering while loading
+    return renderSkeletonsContainer?.(skeletons) || skeletons
+  } else {
+    // if renderLoadedContainer prop is passed, the children will be passed to that callback to allow
+    // custom rendering when finish loading
+    return renderLoadedContainer?.(children) || children
+  }
+}
+
+const requiredIfNotCustom = (props, _propName, _componentName) => {
+  const propType = {
+    [_propName]: props.renderCustomSkeleton ? PropTypes.string : PropTypes.string.isRequired
+  }
+  return PropTypes.checkPropTypes(propType, props, 'prop', 'LoadingWrapper')
 }
 
 LoadingWrapper.propTypes = {
+  id: PropTypes.string.isRequired,
   isLoading: PropTypes.bool.isRequired,
   children: PropTypes.node,
   skeletonsCount: PropTypes.number,
-  screenReaderLabel: PropTypes.string.isRequired,
-  width: PropTypes.string.isRequired,
-  height: PropTypes.string.isRequired,
+  screenReaderLabel: requiredIfNotCustom,
+  width: requiredIfNotCustom,
+  height: requiredIfNotCustom,
+  display: PropTypes.string,
   margin: PropTypes.string,
-  borderWidth: PropTypes.string
+  renderCustomSkeleton: PropTypes.func,
+  renderSkeletonsContainer: PropTypes.func,
+  renderLoadedContainer: PropTypes.func
 }

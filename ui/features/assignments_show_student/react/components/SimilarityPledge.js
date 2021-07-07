@@ -41,7 +41,7 @@ export default function SimilarityPledge(props) {
   )
 
   return (
-    <div style={{textAlign: direction('left')}}>
+    <div style={{textAlign: direction('left')}} data-testid="similarity-pledge">
       {props.comments && (
         <Text
           as="p"

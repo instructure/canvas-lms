@@ -343,10 +343,17 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
         sinon.stub(gradebook.postPolicies, 'showPostAssignmentGradesTray')
       })
 
-      test('sets featureEnabled to true', () => {
+      test('sets enabledForUser to true if the user can edit grades', () => {
         gradebook.gotChunkOfStudents([student])
         render()
-        strictEqual(component.props.postGradesAction.featureEnabled, true)
+        strictEqual(component.props.postGradesAction.enabledForUser, true)
+      })
+
+      test('sets enabledForUser to false if the user cannnot edit grades', () => {
+        gradebook.options.gradebook_is_editable = false
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.enabledForUser, false)
       })
 
       test('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
@@ -497,9 +504,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
       test('includes the assignment id when showing the "Grade Posting Policy" tray', () => {
         component.props.showGradePostingPolicyAction.onSelect(onSelectCallback)
-        const [
-          {assignmentId}
-        ] = gradebook.postPolicies.showAssignmentPostingPolicyTray.lastCall.args
+        const [{assignmentId}] =
+          gradebook.postPolicies.showAssignmentPostingPolicyTray.lastCall.args
         strictEqual(assignmentId, '2301')
       })
 

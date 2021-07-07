@@ -232,14 +232,9 @@
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
         <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>
       </div>
-      <div class="assessment_request_incomplete_message" style="<%= hidden if @assessment_request.completed? %>">
-        <% if @assessment_request && @assessment_request.active_rubric_association? %>
-          <%= mt('peer_review_not_done_rubric', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment and fill out the rubric form to the right.")
-          %>
-        <% else %>
-          <%= mt('peer_review_not_done', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment.")
-            %>
-        <% end %>
+      <% hide_assessment_instructions = @assessment_request.completed? || @assessment_request.active_rubric_association? %>
+      <div class="assessment_request_incomplete_message" style="<%= hidden if hide_assessment_instructions %>">
+        <%= mt('peer_review_not_done', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment.") %>
       </div>
     <div>
     </div>

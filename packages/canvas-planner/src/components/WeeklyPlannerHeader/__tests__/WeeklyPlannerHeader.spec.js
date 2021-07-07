@@ -35,6 +35,7 @@ function defaultProps(options) {
     visible: true,
     weekStartMoment: moment('2021-03-21'),
     weekEndMoment: moment('2021-03-27'),
+    weekLoaded: true,
     wayPastItemDate: '2021-01-01',
     wayFutureItemDate: '2021-12-31',
     ...options
@@ -129,6 +130,16 @@ describe('WeeklyPlannerHeader', () => {
     await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
   })
 
+  it('scrolls to today when it loads if already visible', async () => {
+    const callback = jest.fn()
+    const props = defaultProps({scrollToToday: callback, weekLoaded: false})
+    const {rerender} = render(<WeeklyPlannerHeader {...props} />)
+    expect(callback).not.toHaveBeenCalled()
+
+    rerender(<WeeklyPlannerHeader {...props} weekLoaded />)
+    await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
+  })
+
   it('sends today as a focus target if passed via query param', async () => {
     window.location.search = '?focusTarget=today'
     const callback = jest.fn()
@@ -140,15 +151,17 @@ describe('WeeklyPlannerHeader', () => {
     )
   })
 
-  it('sends missing-items as a focus target if passed via query param', async () => {
+  it('sends missing-items as a focus target if passed via query param and expands missing items', async () => {
     window.location.search = '?focusTarget=missing-items'
-    const callback = jest.fn()
-    const props = defaultProps({visible: false, scrollToToday: callback})
+    const scrollToToday = jest.fn()
+    const toggleMissing = jest.fn()
+    const props = defaultProps({visible: false, scrollToToday, toggleMissing})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     rerender(<WeeklyPlannerHeader {...props} visible />)
-    await waitFor(() =>
-      expect(callback).toHaveBeenCalledWith({focusTarget: 'missing-items', isWeekly: true})
-    )
+    await waitFor(() => {
+      expect(scrollToToday).toHaveBeenCalledWith({focusTarget: 'missing-items', isWeekly: true})
+      expect(toggleMissing).toHaveBeenCalledWith({forceExpanded: true})
+    })
   })
 })
 

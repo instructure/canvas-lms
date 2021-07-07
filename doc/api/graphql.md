@@ -105,7 +105,7 @@ curl https://<canvas>/api/graphql \
 ### `id` vs `_id` and the `node` field
 
 The Canvas LMS GraphQL API follows the [Relay Object Identification
-spec](https://facebook.github.io/relay/docs/en/graphql-server-specification.html#object-identification).
+spec](https://relay.dev/graphql/objectidentification.htm).
 Querying for an object's `id` will return a global identifier instead of the
 numeric ids that are used in the REST API.  The traditional ids can be queried
 by requesting the `_id` field.

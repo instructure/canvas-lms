@@ -415,12 +415,45 @@ QUnit.module('SpeedGrader', rootHooks => {
       strictEqual($('#reassign_assignment').is(':visible'), true)
     })
 
-    test('shows the Reassign Assignment button for "online"-type submissions that are not quizzes', function () {
+    test('shows the Reassign Assignment button for file upload submissions', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_upload'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), true)
+    })
+
+    test('shows the Reassign Assignment button for text entry submissions', function () {
       SpeedGrader.EG.currentStudent.submission = {
         cached_due_date: new Date(2022, 1, 1).toISOString(),
         workflow_state: 'submitted',
         submission_history: [{missing: true}],
         submission_type: 'online_text_entry'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), true)
+    })
+
+    test('shows the Reassign Assignment button for URL submissions', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'online_url'
+      }
+      SpeedGrader.EG.showSubmissionDetails()
+      strictEqual($('#reassign_assignment').is(':visible'), true)
+    })
+
+    test('shows the Reassign Assignment button for student annotation submissions', function () {
+      SpeedGrader.EG.currentStudent.submission = {
+        cached_due_date: new Date(2022, 1, 1).toISOString(),
+        workflow_state: 'submitted',
+        submission_history: [{missing: true}],
+        submission_type: 'student_annotation'
       }
       SpeedGrader.EG.showSubmissionDetails()
       strictEqual($('#reassign_assignment').is(':visible'), true)

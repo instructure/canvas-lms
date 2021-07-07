@@ -84,8 +84,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       },
 
       postGradesAction: {
-        enabled: false,
-        featureEnabled: false,
+        enabledForUser: false,
         hasGradesOrPostableComments: true,
         hasGradesOrCommentsToPost: true,
         onSelect() {}
@@ -233,7 +232,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     }
 
     hooks.beforeEach(() => {
-      props.postGradesAction.featureEnabled = true
+      props.postGradesAction.enabledForUser = true
     })
 
     QUnit.module('when the assignment is auto-posted', () => {
@@ -928,11 +927,11 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Post grades" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.featureEnabled = true
+      props.postGradesAction.enabledForUser = true
       props.postGradesAction.hasGradesOrCommentsToPost = true
     })
 
-    QUnit.module('when post policies is enabled', () => {
+    QUnit.module('when the current user can edit grades', () => {
       test('has the default text when submissions can be posted', () => {
         mountAndOpenOptionsMenu()
         ok(getMenuItem($menuContent, 'Post grades'))
@@ -966,6 +965,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       })
     })
 
+    test('does not appear when posting is not enabled for this user', () => {
+      props.postGradesAction.enabledForUser = false
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Post grades'))
+    })
+
     QUnit.module('when clicked', contextHooks => {
       contextHooks.beforeEach(() => {
         props.postGradesAction.onSelect = sinon.stub()
@@ -995,7 +1000,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Hide grades" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.featureEnabled = true
+      props.postGradesAction.enabledForUser = true
       props.hideGradesAction.hasGradesOrCommentsToHide = true
     })
 
@@ -1033,13 +1038,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       })
     })
 
-    test('is present when post policies is enabled', () => {
+    test('is present when the current user can post grades', () => {
       mountAndOpenOptionsMenu()
       ok(getMenuItem($menuContent, 'Hide grades'))
     })
 
-    test('is not present when post policies is not enabled', () => {
-      props.postGradesAction.featureEnabled = false
+    test('is not present when the current user cannot post grades', () => {
+      props.postGradesAction.enabledForUser = false
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Hide grades'))
     })
@@ -1073,16 +1078,16 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Grade Posting Policy" action', hooks => {
     hooks.beforeEach(() => {
-      props.postGradesAction.featureEnabled = true
+      props.postGradesAction.enabledForUser = true
     })
 
-    test('is present when post policies is enabled', () => {
+    test('is present when the current user can post grades', () => {
       mountAndOpenOptionsMenu()
       ok(getMenuItem($menuContent, 'Grade Posting Policy'))
     })
 
-    test('is not present when post policies is not enabled', () => {
-      props.postGradesAction.featureEnabled = false
+    test('is not present when the current user cannot post grades', () => {
+      props.postGradesAction.enabledForUser = false
       mountAndOpenOptionsMenu()
       notOk(getMenuItem($menuContent, 'Grade Posting Policy'))
     })

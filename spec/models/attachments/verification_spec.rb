@@ -79,6 +79,7 @@ describe Attachments::Verification do
 
     it "accepts the uuid of another copy of the file" do
       expect(InstStatsd::Statsd).to receive(:increment).with("attachments.related_verifier_success").twice
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
       clone = attachment.clone_for(course_factory)
       clone.save!
       v2 = Attachments::Verification.new(clone)
@@ -117,6 +118,7 @@ describe Attachments::Verification do
         id: att2.global_id, user_id: student.global_id
       }).twice
       expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_success").twice
+      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
 
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)

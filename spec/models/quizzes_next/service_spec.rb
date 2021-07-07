@@ -20,7 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe QuizzesNext::Service do
-  Service = QuizzesNext::Service
+  before :once do
+    QService = QuizzesNext::Service
+  end
 
   describe '.enabled_in_context?' do
     let(:root_account) { double "root_account", :feature_allowed? => true}
@@ -29,14 +31,14 @@ describe QuizzesNext::Service do
     context 'when the feature is enabled on the context' do
       it 'will return true' do
         allow(context).to receive(:feature_enabled?).and_return(true)
-        expect(Service.enabled_in_context?(context)).to eq(true)
+        expect(QService.enabled_in_context?(context)).to eq(true)
       end
     end
 
     context 'when the feature is not enabled on the context but allowed on root account' do
       it 'will return true' do
         allow(context).to receive(:feature_enabled?).and_return(false)
-        expect(Service.enabled_in_context?(context)).to eq(true)
+        expect(QService.enabled_in_context?(context)).to eq(true)
       end
     end
 
@@ -44,7 +46,7 @@ describe QuizzesNext::Service do
       it 'will return false' do
         allow(context).to receive(:feature_enabled?).and_return(false)
         allow(context.root_account).to receive(:feature_allowed?).and_return(false)
-        expect(Service.enabled_in_context?(context)).to eq(false)
+        expect(QService.enabled_in_context?(context)).to eq(false)
       end
     end
   end
@@ -70,14 +72,14 @@ describe QuizzesNext::Service do
       lti_assignment_active2.external_tool_tag_attributes = { :content => tool }
       lti_assignment_active2.save!
 
-      active_lti_assignments = Service.active_lti_assignments_for_course(course)
+      active_lti_assignments = QService.active_lti_assignments_for_course(course)
 
       expect(active_lti_assignments).to include(lti_assignment_active1)
       expect(active_lti_assignments).to include(lti_assignment_active2)
       expect(active_lti_assignments).not_to include(lti_assignment_inactive)
       expect(active_lti_assignments).not_to include(assignment_active)
 
-      filtered_assignments = Service.active_lti_assignments_for_course(course,
+      filtered_assignments = QService.active_lti_assignments_for_course(course,
         selected_assignment_ids: [lti_assignment_active2.id, assignment_active.id])
       expect(filtered_assignments).to eq [lti_assignment_active2]
     end
@@ -88,20 +90,20 @@ describe QuizzesNext::Service do
       assignment_hash = {'$canvas_assignment_id': "1234"}
       assignment_not_found = {'$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND}
 
-      expect(Service.assignment_not_in_export?(assignment_hash)).to eq(false)
-      expect(Service.assignment_not_in_export?(assignment_not_found)).to eq(true)
+      expect(QService.assignment_not_in_export?(assignment_hash)).to eq(false)
+      expect(QService.assignment_not_in_export?(assignment_not_found)).to eq(true)
     end
   end
 
   describe '.assignment_duplicated?' do
     it 'returns true if assignment has data suggesting it is duplicated' do
       assignment_hash = { original_assignment_id: '1234' }
-      expect(Service.assignment_duplicated?(assignment_hash)).to be_truthy
+      expect(QService.assignment_duplicated?(assignment_hash)).to be_truthy
     end
 
     it 'returns false if assignment does not have data suggesting it is duplicated' do
       assignment_hash = {}
-      expect(Service.assignment_duplicated?(assignment_hash)).to be_falsey
+      expect(QService.assignment_duplicated?(assignment_hash)).to be_falsey
     end
   end
 end

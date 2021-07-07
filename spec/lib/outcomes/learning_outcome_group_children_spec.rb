@@ -114,9 +114,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
     end
 
-    it 'caches the total subgroups' do
+    it 'caches the total subgroups if FF is on' do
       enable_cache do
         expect(LearningOutcomeGroup.connection).to receive(:execute).and_call_original.once
+        expect(subject.total_subgroups(g0.id)).to eq 6
+        expect(subject.total_subgroups(g0.id)).to eq 6
+        expect(described_class.new(context).total_subgroups(g0.id)).to eq 6
+      end
+    end
+
+    it 'doesnt caches the total subgroups if FF is off' do
+      context.root_account.disable_feature! :improved_outcomes_management
+      enable_cache do
+        expect(LearningOutcomeGroup.connection).to receive(:execute).and_call_original.exactly(3).times
         expect(subject.total_subgroups(g0.id)).to eq 6
         expect(subject.total_subgroups(g0.id)).to eq 6
         expect(described_class.new(context).total_subgroups(g0.id)).to eq 6
@@ -135,9 +145,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
       expect(subject.total_outcomes(g6.id)).to eq 3
     end
 
-    it 'caches the total outcomes' do
+    it 'caches the total outcomes if FF is on' do
       enable_cache do
         expect(ContentTag).to receive(:active).and_call_original.once
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        expect(subject.total_outcomes(g0.id)).to eq 12
+        expect(described_class.new(context).total_outcomes(g0.id)).to eq 12
+      end
+    end
+
+    it 'doesnt caches the total outcomes if FF is off' do
+      context.root_account.disable_feature! :improved_outcomes_management
+      enable_cache do
+        expect(ContentTag).to receive(:active).and_call_original.exactly(3).times
         expect(subject.total_outcomes(g0.id)).to eq 12
         expect(subject.total_outcomes(g0.id)).to eq 12
         expect(described_class.new(context).total_outcomes(g0.id)).to eq 12
@@ -187,6 +207,17 @@ describe Outcomes::LearningOutcomeGroupChildren do
           'Outcome 1', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 3', 'Outcome 4.1',
           'Outcome 4.2', 'Outcome 4.3', 'Outcome 5', 'Outcome 6', 'Outcome 7.1',
           'Outcome 7.2', 'Outcome 7.3 mathematic'
+        ]
+      )
+    end
+
+    it 'returns outcomes even if FF is off' do
+      context.root_account.disable_feature! :improved_outcomes_management
+      outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+      expect(outcomes).to match_array(
+        [
+          'Outcome 5', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 4.3', 'Outcome 4.1',
+          'Outcome 4.2', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3 mathematic'
         ]
       )
     end

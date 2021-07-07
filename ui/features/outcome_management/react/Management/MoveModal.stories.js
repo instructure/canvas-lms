@@ -33,7 +33,7 @@ export default {
     contextId: 1,
     contextType: 'Account',
     groupId: '101',
-    parentGroupId: 100
+    parentGroupId: '100'
   },
   argTypes: {
     onCloseHandler: {action: 'closed'},

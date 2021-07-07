@@ -87,7 +87,8 @@ export class PlannerItem extends Component {
     endTime: momentObj,
     timeZone: string.isRequired,
     simplifiedControls: bool,
-    isMissingItem: bool
+    isMissingItem: bool,
+    readOnly: bool
   }
 
   static defaultProps = {
@@ -336,6 +337,7 @@ export class PlannerItem extends Component {
             this.itemLink = link
           }}
           {...linkProps}
+          readOnly={this.props.readOnly}
         >
           <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
           <PresentationContent>{this.props.title}</PresentationContent>
@@ -564,6 +566,7 @@ export class PlannerItem extends Component {
             checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
             onChange={this.props.toggleCompletion}
             disabled={this.props.toggleAPIPending}
+            readOnly={this.props.readOnly}
           />
         </ApplyTheme>
       </div>

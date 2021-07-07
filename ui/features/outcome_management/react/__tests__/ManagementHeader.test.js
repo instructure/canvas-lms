@@ -31,35 +31,91 @@ const render = children => {
 }
 
 describe('ManagementHeader', () => {
+  const defaultProps = (props = {}) => ({
+    breakpoints: {tablet: true},
+    ...props
+  })
+
+  afterEach(() => {
+    showImportOutcomesModal.mockRestore()
+  })
+
   it('renders Outcomes title', () => {
     const {getByText} = render(<ManagementHeader />)
     expect(getByText('Outcomes')).toBeInTheDocument()
   })
 
   it('renders Action Buttons', () => {
-    const {getByText} = render(<ManagementHeader />)
+    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     expect(getByText('Import')).toBeInTheDocument()
     expect(getByText('Create')).toBeInTheDocument()
     expect(getByText('Find')).toBeInTheDocument()
   })
 
   it('calls showImportOutcomesModal when click on Import', () => {
-    const {getByText} = render(<ManagementHeader />)
+    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Import'))
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
   })
 
   it('opens FindOutcomesModal when Find button is clicked', async () => {
-    const {getByText} = render(<ManagementHeader />)
+    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Find'))
     await act(async () => jest.runAllTimers())
     expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
   })
 
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
-    const {getByText} = render(<ManagementHeader />)
+    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Create Outcome')).toBeInTheDocument()
+  })
+
+  describe('Responsiveness', () => {
+    it('renders only the Add Button', () => {
+      // breakpoints.tablet: false, meaning window.innerWidth < 768px
+      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      expect(getByText('Add')).toBeInTheDocument()
+    })
+
+    it('renders the Menu Items', () => {
+      // breakpoints.tablet: false, meaning window.innerWidth < 768px
+      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      fireEvent.click(getByText('Add'))
+      expect(getByText('Import')).toBeInTheDocument()
+      expect(getByText('Create')).toBeInTheDocument()
+      expect(getByText('Find')).toBeInTheDocument()
+    })
+
+    it('calls showImportOutcomesModal when click on Import Menu Item', () => {
+      // breakpoints.tablet: false, meaning window.innerWidth < 768px
+      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      fireEvent.click(getByText('Add'))
+      fireEvent.click(getByText('Import'))
+      expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
+    })
+
+    it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
+      // breakpoints.tablet: false, meaning window.innerWidth < 768px
+      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      fireEvent.click(getByText('Add'))
+      fireEvent.click(getByText('Find'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
+    })
+
+    it('opens CreateOutcomeModal when Create Menu Item is clicked', async () => {
+      // breakpoints.tablet: false, meaning window.innerWidth < 768px
+      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      fireEvent.click(getByText('Add'))
+      fireEvent.click(getByText('Create'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Create Outcome')).toBeInTheDocument()
+    })
   })
 })

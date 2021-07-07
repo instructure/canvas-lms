@@ -54,6 +54,7 @@ import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStu
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import EmptyModules from './EmptyModules'
+import EmptyHome from './EmptyHome'
 
 const HERO_HEIGHT_PX = 400
 
@@ -209,7 +210,6 @@ export function K5Course({
   loadAllOpportunities,
   name,
   timeZone,
-  locale,
   canManage = false,
   plannerEnabled = false,
   hideFinalGrades,
@@ -222,7 +222,9 @@ export function K5Course({
   outcomeProficiency,
   tabs,
   settingsPath,
-  latestAnnouncement
+  latestAnnouncement,
+  pagesPath,
+  hasWikiPages
 }) {
   const renderTabs = toRenderTabs(tabs)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
@@ -324,12 +326,21 @@ export function K5Course({
             {...announcementDetails}
           />
         )}
-        {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
+        {currentTab === TAB_IDS.HOME &&
+          (courseOverview || courseOverview?.length === 0 ? (
+            <OverviewPage content={courseOverview} />
+          ) : (
+            <EmptyHome
+              pagesPath={pagesPath}
+              hasWikiPages={hasWikiPages}
+              courseName={name}
+              userIsInstructor={userIsInstructor}
+            />
+          ))}
         <SchedulePage
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
-          locale={locale}
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
@@ -368,13 +379,12 @@ K5Course.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
-  locale: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  courseOverview: PropTypes.string.isRequired,
+  courseOverview: PropTypes.string,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   userIsStudent: PropTypes.bool.isRequired,
@@ -385,7 +395,9 @@ K5Course.propTypes = {
   outcomeProficiency: outcomeProficiencyShape,
   tabs: PropTypes.arrayOf(PropTypes.object).isRequired,
   settingsPath: PropTypes.string.isRequired,
-  latestAnnouncement: PropTypes.object
+  latestAnnouncement: PropTypes.object,
+  pagesPath: PropTypes.string.isRequired,
+  hasWikiPages: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

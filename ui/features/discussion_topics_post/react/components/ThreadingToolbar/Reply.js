@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 
 export function Reply({...props}) {
   return (
@@ -31,7 +32,7 @@ export function Reply({...props}) {
       data-testid="threading-toolbar-reply"
     >
       <AccessibleContent alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}>
-        {I18n.t('Reply')}
+        <Text weight="bold">{I18n.t('Reply')}</Text>
       </AccessibleContent>
     </CondensedButton>
   )

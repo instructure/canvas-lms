@@ -55,7 +55,10 @@ class CanvadocSessionsController < ApplicationController
       return render json: {error: "No annotations associated with that submission_attempt"}, status: :bad_request
     end
 
-    render json: {canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission)}
+    render json: {
+      annotation_context_launch_id: annotation_context.launch_id,
+      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission, true)
+    }
   end
 
   # @API Document Previews

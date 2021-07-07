@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -44,6 +44,7 @@ const FindOutcomesView = ({
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const enabled = !!outcomesCount && outcomesCount > 0
+  const [scrollContainer, setScrollContainer] = useState(null)
 
   const onSelectOutcomesHandler = _id => {
     // TODO: OUT-4154
@@ -143,10 +144,14 @@ const FindOutcomesView = ({
             </Flex>
           </View>
         </View>
-        <div style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}>
+        <div
+          style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}
+          ref={setScrollContainer}
+        >
           <InfiniteScroll
             hasMore={outcomes?.pageInfo?.hasNextPage}
             loadMore={loadMore}
+            scrollContainer={scrollContainer}
             loader={
               // Temp solution until InfiniteScroll is fixed (ticket OUT-4190)
               <Flex
@@ -171,6 +176,12 @@ const FindOutcomesView = ({
             }
           >
             <View as="div" data-testid="find-outcome-items-list">
+              {outcomes?.edges?.length === 0 && searchString && !loading && (
+                <View as="div" textAlign="center" margin="small 0 0">
+                  <Text color="secondary">{I18n.t('The search returned no results')}</Text>
+                </View>
+              )}
+
               {outcomes?.edges?.map(({node: {_id, title, description, isImported}}, index) => (
                 <FindOutcomeItem
                   key={_id}

@@ -36,6 +36,7 @@ export const Assignment = {
       }
       description
       dueAt
+      expectsSubmission
       gradingType
       lockAt
       lockInfo {
@@ -62,6 +63,7 @@ export const Assignment = {
     assignmentGroup: AssignmentGroup.shape,
     description: string,
     dueAt: string,
+    expectsSubmission: bool.isRequired,
     gradingType: string,
     lockAt: string,
     lockInfo: LockInfo.shape,
@@ -101,6 +103,7 @@ export const DefaultMocks = {
     _id: '1',
     allowedAttempts: null,
     allowedExtensions: [],
+    expectsSubmission: true,
     gradingType: 'points',
     nonDigitalSubmission: false,
     pointsPossible: 10,
@@ -110,4 +113,17 @@ export const DefaultMocks = {
     },
     submissionTypes: ['online_upload']
   })
+}
+
+export const AssignmentMocks = {
+  noSubmission: {
+    expectsSubmission: false,
+    nonDigitalSubmission: true,
+    submissionTypes: ['none']
+  },
+  onPaper: {
+    expectsSubmission: false,
+    nonDigitalSubmission: true,
+    submissionTypes: ['on_paper']
+  }
 }

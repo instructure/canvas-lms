@@ -116,6 +116,25 @@ describe AssetUserAccessLog do
         expect(data["partition_index"]).to eq(1)
       end
     end
+
+    describe "under emergency load shedding" do
+      before(:each) do
+        @channel_config = {
+          "pulsar_writes_enabled" => false,
+          "pulsar_reads_enabled" => false,
+          "db_writes_enabled" => false
+        }
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return(@channel_config)
+      end
+
+      it "writes nowhere on increment" do
+        dt = DateTime.civil(2021, 6, 21, 12, 0, 0) # a monday, index 1
+        AssetUserAccessLog::AuaLog1.delete_all
+        expect(MessageBus).to_not receive(:producer_for)
+        AssetUserAccessLog.put_view(@asset, timestamp: dt)
+        expect(AssetUserAccessLog::AuaLog1.count).to eq(0)
+      end
+    end
   end
 
   describe ".compact" do
@@ -461,28 +480,71 @@ describe AssetUserAccessLog do
         expect(@asset_6.reload.view_score).to eq(60.0)
         expect(@asset_7.reload.view_score).to eq(5.0)
         expect(@asset_8.reload.view_score).to eq(20.0)
-        # switch back to postgres!
         compaction_state = AssetUserAccessLog.metadatum_payload
         expect(compaction_state[:max_log_ids].select{|id| id > 0}.length > 0).to be_truthy
+        # Stop writing to postgres entirely for a while
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return({
+          "pulsar_writes_enabled" => true,
+          "pulsar_reads_enabled" => true,
+          "db_writes_enabled" => false
+        })
+        Timecop.freeze do
+          generate_log([@asset_3, @asset_8, @asset_4], 10)
+          AssetUserAccessLog.compact
+        end
+        compaction_state = AssetUserAccessLog.metadatum_payload
+        expect(compaction_state[:max_log_ids].select{|id| id > 0}.length > 0).to be_truthy
+        expect(@asset_1.reload.view_score).to eq(60.0)
+        expect(@asset_2.reload.view_score).to eq(85.0)
+        expect(@asset_3.reload.view_score).to eq(15.0)
+        expect(@asset_4.reload.view_score).to eq(50.0)
+        expect(@asset_5.reload.view_score).to eq(40.0)
+        expect(@asset_6.reload.view_score).to eq(60.0)
+        expect(@asset_7.reload.view_score).to eq(5.0)
+        expect(@asset_8.reload.view_score).to eq(30.0)
+
+        # resume postgres writing
+        allow(AssetUserAccessLog).to receive(:channel_config).and_return({
+          "pulsar_writes_enabled" => true,
+          "pulsar_reads_enabled" => true,
+          "db_writes_enabled" => true
+        })
+        Timecop.freeze do
+          generate_log([@asset_4, @asset_1, @asset_5], 10)
+          AssetUserAccessLog.compact
+        end
+        compaction_state = AssetUserAccessLog.metadatum_payload
+        expect(compaction_state[:max_log_ids].select{|id| id > 0}.length > 0).to be_truthy
+        expect(@asset_1.reload.view_score).to eq(70.0)
+        expect(@asset_2.reload.view_score).to eq(85.0)
+        expect(@asset_3.reload.view_score).to eq(15.0)
+        expect(@asset_4.reload.view_score).to eq(60.0)
+        expect(@asset_5.reload.view_score).to eq(50.0)
+        expect(@asset_6.reload.view_score).to eq(60.0)
+        expect(@asset_7.reload.view_score).to eq(5.0)
+        expect(@asset_8.reload.view_score).to eq(30.0)
+        # switch back to postgres compaction!
         allow(AssetUserAccessLog).to receive(:channel_config).and_return({
           "pulsar_writes_enabled" => true,
           "pulsar_reads_enabled" => false,
           "db_writes_enabled" => true
         })
         Timecop.freeze do
-          generate_log([@asset_3, @asset_8, @asset_4], 12)
+          generate_log([@asset_3, @asset_8, @asset_4], 5)
           AssetUserAccessLog.compact
-          generate_log([@asset_3, @asset_5, @asset_7], 42)
+          generate_log([@asset_3, @asset_5, @asset_7], 5)
           AssetUserAccessLog.compact
         end
-        expect(@asset_1.reload.view_score).to eq(60.0)
+        compaction_state = AssetUserAccessLog.metadatum_payload
+        expect(compaction_state[:max_log_ids].select{|id| id > 0}.length > 0).to be_truthy
+        expect(@asset_1.reload.view_score).to eq(70.0)
         expect(@asset_2.reload.view_score).to eq(85.0)
-        expect(@asset_3.reload.view_score).to eq(59.0)
-        expect(@asset_4.reload.view_score).to eq(52.0)
-        expect(@asset_5.reload.view_score).to eq(82.0)
+        expect(@asset_3.reload.view_score).to eq(25.0)
+        expect(@asset_4.reload.view_score).to eq(65.0)
+        expect(@asset_5.reload.view_score).to eq(55.0)
         expect(@asset_6.reload.view_score).to eq(60.0)
-        expect(@asset_7.reload.view_score).to eq(47.0)
-        expect(@asset_8.reload.view_score).to eq(32.0)
+        expect(@asset_7.reload.view_score).to eq(10.0)
+        expect(@asset_8.reload.view_score).to eq(35.0)
       end
     end
   end

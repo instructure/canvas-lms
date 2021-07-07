@@ -326,7 +326,7 @@ module MicrosoftSync
       responses_grouped_by_type.each do |type, responses|
         responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
           tags = {msft_endpoint: endpoint_name, status: code}
-          InstStatsd::Statsd.increment("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+          InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
       end
     end

@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 
 export function Expansion({...props}) {
   return (
@@ -29,13 +30,14 @@ export function Expansion({...props}) {
       withBackground={false}
       color="primary"
       data-testid="expand-button"
+      interaction={props.isReadOnly ? 'disabled' : 'enabled'}
     >
       <ScreenReaderContent>
         {props.isExpanded
           ? I18n.t('Collapse discussion thread')
           : I18n.t('Expand discussion thread')}
       </ScreenReaderContent>
-      {props.expandText}
+      <Text weight="bold">{props.expandText}</Text>
     </CondensedButton>
   )
 }
@@ -56,5 +58,13 @@ Expansion.propTypes = {
   /**
    * Key consumed by ThreadingToolbar's InlineList
    */
-  delimiterKey: PropTypes.string.isRequired
+  delimiterKey: PropTypes.string.isRequired,
+  /**
+   * Disable/Enable for the button
+   */
+  isReadOnly: PropTypes.bool
+}
+
+Expansion.defaultPropTypes = {
+  isReadOnly: true
 }

@@ -27,10 +27,11 @@ import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconTrashLine, IconVideoLine} from '@instructure/ui-icons'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {px} from '@instructure/ui-utils'
 import {MediaPlayer} from '@instructure/ui-media-player'
+import {TextInput} from '@instructure/ui-text-input'
 
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
@@ -119,7 +120,7 @@ export default function ComputerPanel({
         <Flex direction="row-reverse" margin="none none medium">
           <Flex.Item>
             <Button
-              buttonRef={el => {
+              elementRef={el => {
                 clearButtonRef.current = el
               }}
               onClick={() => {
@@ -127,22 +128,17 @@ export default function ComputerPanel({
                 setHasUploadedFile(false)
                 setPreviewURL(null)
               }}
-              icon={IconTrashLine}
+              renderIcon={IconTrashLine}
             >
               <ScreenReaderContent>
                 {uploadMediaTranslations.UploadMediaStrings.CLEAR_FILE_TEXT}
               </ScreenReaderContent>
             </Button>
           </Flex.Item>
-          <Flex.Item grow shrink>
-            <PresentationContent>
-              <Text>{theFile.name}</Text>
-            </PresentationContent>
-          </Flex.Item>
         </Flex>
         <View as="div" textAlign="center" margin="0 auto">
           {/* avi, wma, and wmv files won't load from a blob URL */}
-          {!isPreviewable(theFile.type) ? (
+          {!(isPreviewable(theFile.type) && previewURL) ? (
             <>
               <IconVideoLine size="medium" data-testid="preview-video-icon" />
               <Text as="p" weight="normal">
@@ -156,6 +152,16 @@ export default function ComputerPanel({
               onLoadedMetadata={handleLoadedMetadata}
             />
           )}
+        </View>
+        <View display="block" padding="medium 0 0">
+          <TextInput
+            placeholder={formatMessage('File name')}
+            value={theFile.title}
+            onChange={(e, val) => {
+              theFile.title = val
+              setFile(theFile)
+            }}
+          />
         </View>
         {isVideo(theFile.type) && (
           <>
@@ -191,6 +197,7 @@ export default function ComputerPanel({
           if (messages.length) {
             setMessages([])
           }
+          file.title = file.name
           setFile(file)
           setHasUploadedFile(true)
           setPreviewURL(URL.createObjectURL(file))
@@ -204,7 +211,7 @@ export default function ComputerPanel({
           )
         }}
         messages={messages}
-        label={
+        renderLabel={
           <Billboard
             heading={label}
             hero={<RocketSVG width="3em" height="3em" />}

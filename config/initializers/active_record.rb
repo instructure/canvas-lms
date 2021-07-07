@@ -768,11 +768,11 @@ module UsefulFindInBatches
     # because we might open a separate connection in the block, and not
     # see the contents of our current transaction)
     if connection.open_transactions == 0 && !start && eager_load_values.empty? && !ActiveRecord::Base.in_migration && !strategy || strategy == :copy
-      self.activate { |r| r.find_in_batches_with_copy(**kwargs, &block) }
+      self.activate { |r| r.find_in_batches_with_copy(**kwargs, &block); nil }
     elsif strategy == :pluck_ids
-      self.activate { |r| r.find_in_batches_with_pluck_ids(**kwargs, &block) }
+      self.activate { |r| r.find_in_batches_with_pluck_ids(**kwargs, &block); nil }
     elsif should_use_cursor? && !start && eager_load_values.empty? && !strategy || strategy == :cursor
-      self.activate { |r| r.find_in_batches_with_cursor(**kwargs, &block) }
+      self.activate { |r| r.find_in_batches_with_cursor(**kwargs, &block); nil }
     elsif find_in_batches_needs_temp_table? && !strategy || strategy == :temp_table
       if start
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key")
@@ -780,9 +780,9 @@ module UsefulFindInBatches
       unless eager_load_values.empty?
         raise ArgumentError.new("GROUP and ORDER are incompatible with `eager_load`, as is an explicit select without the primary key")
       end
-      self.activate { |r| r.find_in_batches_with_temp_table(**kwargs, &block) }
+      self.activate { |r| r.find_in_batches_with_temp_table(**kwargs, &block); nil }
     else
-      super(start: start, **kwargs, &block)
+      self.activate { |r| r.call_super(:find_in_batches, UsefulFindInBatches, start: start, **kwargs, &block); nil }
     end
   end
 end
@@ -1274,7 +1274,7 @@ ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
 module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
-      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      scope = except(:select).select(primary_key)
       return unscoped.where(primary_key => scope).delete_all
     end
     super
@@ -1282,7 +1282,7 @@ module UpdateAndDeleteAllWithLimit
 
   def update_all(updates, *args)
     if limit_value || offset_value
-      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      scope = except(:select).select(primary_key)
       return unscoped.where(primary_key => scope).update_all(updates)
     end
     super

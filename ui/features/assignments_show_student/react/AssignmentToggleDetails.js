@@ -23,9 +23,13 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import noContent from '../images/NoReportsClipboard.svg'
 import {string} from 'prop-types'
-import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
+
+function AssignmentDetailsText(description) {
+  return description
+    ? apiUserContent.convert(description)
+    : I18n.t('No additional details were added for this assignment.')
+}
 
 AssignmentToggleDetails.propTypes = {
   description: string
@@ -39,18 +43,14 @@ export default function AssignmentToggleDetails(props) {
         data-test-id="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >
-        {props.description ? (
-          <View margin="0" padding="0">
-            {/* html is sanitized on the server side */}
-            <div
-              className="user_content"
-              dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}}
-              data-test-id="assignments-2-assignment-toggle-details-text"
-            />
-          </View>
-        ) : (
-          <SVGWithTextPlaceholder text={I18n.t('No Content')} url={noContent} />
-        )}
+        <View margin="0" padding="0">
+          {/* html is sanitized on the server side */}
+          <div
+            className="user_content"
+            dangerouslySetInnerHTML={{__html: AssignmentDetailsText(props.description)}}
+            data-test-id="assignments-2-assignment-toggle-details-text"
+          />
+        </View>
       </ToggleDetails>
     </div>
   )

@@ -227,7 +227,7 @@ export function mediaUploadComplete(error, uploadData) {
         embedded_iframe_url: mediaObject.embedded_iframe_url,
         media_id: mediaObject.media_object.media_id,
         type: uploadedFile.type,
-        title: uploadedFile.name
+        title: uploadedFile.title || uploadedFile.name
       }
       dispatch(removePlaceholdersFor(uploadedFile.name))
       embedUploadResult(embedData, 'media')

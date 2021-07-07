@@ -698,6 +698,16 @@ describe Course do
       expect{course_model}.not_to raise_error
     end
 
+    it 'should not allow creating on site_admin' do
+      expect{course_model(account: Account.site_admin)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'should not allow updating account to site_admin' do
+      course = course_model
+      course.root_account = Account.site_admin
+      expect(course).to_not be_valid
+    end
+
     it "should require unique sis_source_id" do
       other_course = course_factory
       other_course.sis_source_id = "sisid"
@@ -1037,7 +1047,7 @@ describe Course do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_delete: true})
+      account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_reset: true})
       @admin1 = @admin
       account_admin_user_with_role_changes(role: @role2, role_changes: {manage_sis: true})
       @admin2 = @admin
@@ -1064,7 +1074,7 @@ describe Course do
       expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
       expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
       expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
 
       # completed, non-sis course
@@ -1088,7 +1098,7 @@ describe Course do
       expect(@course.grants_right?(@teacher, :reset_content)).to be_falsey
       expect(@course.grants_right?(@designer, :reset_content)).to be_falsey
       expect(@course.grants_right?(@ta, :reset_content)).to be_falsey
-      expect(@course.grants_right?(@admin1, :reset_content)).to be_falsey
+      expect(@course.grants_right?(@admin1, :reset_content)).to be_truthy
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
     end
 

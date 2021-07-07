@@ -46,3 +46,8 @@ new_quizzes_account_course_level_item_banks:
     banks owned by specific courses and the root account in new quizzes.
   applies_to: SiteAdmin
   state: hidden
+new_quizzes_in_module_progression:
+  display_name: New Quizzes Embedded Module Progression
+  description: Improved support for taking New Quizzes from within Modules
+  applies_to: SiteAdmin
+  state: hidden

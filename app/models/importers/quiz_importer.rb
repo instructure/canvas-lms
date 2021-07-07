@@ -346,7 +346,7 @@ module Importers
         end
       end
 
-      hash[:questions].each_with_index do |question, i|
+      !migration.quizzes_next_banks_migration? && hash[:questions].each_with_index do |question, i|
         case question[:question_type]
         when "question_reference"
           if aq = (question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])

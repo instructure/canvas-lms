@@ -53,6 +53,7 @@ const getDefaultValues = overrides => {
       weekStart: thisWeekStart,
       weekEnd: thisWeekEnd
     },
+    weekLoaded: true,
     loadingOpportunities: false,
     opportunityCount: 0,
     ...overrides
@@ -120,8 +121,8 @@ describe('Weekly PlannerApp', () => {
     }
   })
 
-  it('shows only the loading component when the isLoading prop is true', () => {
-    const {getByText} = render(<PlannerApp {...getDefaultValues()} isLoading />)
+  it('shows only the loading component when the weekLoaded prop is false', () => {
+    const {getByText} = render(<PlannerApp {...getDefaultValues()} weekLoaded={false} />)
     expect(getByText('Loading planner items')).toBeInTheDocument()
   })
 

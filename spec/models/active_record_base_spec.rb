@@ -539,6 +539,26 @@ describe ActiveRecord::Base do
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
+      u1 = User.create!(name: 'a')
+      u2 = User.create!(name: 'a')
+      User.from(<<-SQL)
+        (WITH duplicates AS (
+          SELECT users.*,
+              ROW_NUMBER() OVER(PARTITION BY users.name
+                                    ORDER BY users.created_at DESC)
+                                    AS dup_count
+          FROM #{User.quoted_table_name}
+          )
+        SELECT *
+        FROM duplicates
+        WHERE dup_count > 1) AS users
+      SQL
+        .limit(1).delete_all
+      expect { User.find(u1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(User.find(u2.id)).to eq u2
+    end
+
     it "does offset too" do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)

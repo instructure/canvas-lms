@@ -1414,7 +1414,7 @@ class Assignment < ActiveRecord::Base
     case grade.to_s
     when %r{^[+-]?\d*\.?\d+%$}
       # interpret as a percentage
-      percentage = grade.to_f / 100.0
+      percentage = grade.to_f / 100.0.to_d
       points_possible.to_f * percentage
     when %r{^[+-]?\d*\.?\d+$}
       if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
@@ -2430,7 +2430,7 @@ class Assignment < ActiveRecord::Base
 
       if section_id.present?
         students = students.joins(:enrollments).
-          where(enrollments: {course_section_id: section_id, workflow_state: :active})
+          where(enrollments: {course_section_id: section_id, workflow_state: includes + [:active]})
       end
       students.to_a
     end
@@ -2899,6 +2899,14 @@ class Assignment < ActiveRecord::Base
 
   scope :quiz_lti, -> {
     type_quiz_lti.where(submission_types: "external_tool")
+  }
+
+  scope :with_important_dates, -> {
+    joins("LEFT JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.assignment_id=assignments.id")
+      .where(important_dates: true)
+      .where(
+        'assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)'
+      )
   }
 
   def overdue?

@@ -19,7 +19,6 @@ import Backbone from '@canvas/backbone'
 import I18n from 'i18n!external_toolsHomeworkSubmissionLtiContainer'
 import $ from 'jquery'
 import _ from 'underscore'
-import mime from 'mime-types'
 import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView.coffee'
 import ExternalToolCollection from './collections/ExternalToolCollection'
 import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView.coffee'
@@ -28,7 +27,17 @@ import ExternalContentLtiLinkSubmissionView from './views/ExternalContentLtiLink
 import {recordEulaAgreement} from '../jquery/helper'
 import {handleContentItem, handleDeepLinkingError} from '../deepLinking'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
+import {findContentExtension} from './contentExtension'
+import {getEnv} from './environment'
 import '@canvas/jquery/jquery.disableWhileLoading'
+
+export const isValidFileSubmission = contentItem => {
+  if (!getEnv()?.SUBMIT_ASSIGNMENT?.ALLOWED_EXTENSIONS?.length) {
+    return true
+  }
+
+  return getEnv().SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.includes(findContentExtension(contentItem))
+}
 
 export default class HomeworkSubmissionLtiContainer {
   constructor() {
@@ -114,7 +123,7 @@ export default class HomeworkSubmissionLtiContainer {
           homeworkSubmissionView.render()
 
           // Disable submit button if the file does not match the required type
-          if (!_this.validFileSubmission(homeworkSubmissionView.model.attributes)) {
+          if (!isValidFileSubmission(homeworkSubmissionView.model.attributes)) {
             $('.external-tool-submission button[type=submit]').attr('disabled', true)
             $.flashError(I18n.t('Invalid submission file type'))
           }
@@ -152,23 +161,6 @@ export default class HomeworkSubmissionLtiContainer {
     })
 
     return homeworkSubmissionView
-  }
-
-  extensionFromString(string) {
-    const ext = string?.split('.')?.pop()?.split('?')?.shift()
-    return mime?.types[ext] != null ? ext : null
-  }
-
-  validFileSubmission(contentItem) {
-    if (ENV?.SUBMIT_ASSIGNMENT?.ALLOWED_EXTENSIONS?.length) {
-      const ext =
-        (contentItem?.mediaType && mime.extension(contentItem.mediaType)) ||
-        this.extensionFromString(contentItem.url) ||
-        this.extensionFromString(contentItem.title) ||
-        this.extensionFromSTring(contentItem.text)
-      return ext && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.includes(ext)
-    }
-    return true
   }
 }
 HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap = {

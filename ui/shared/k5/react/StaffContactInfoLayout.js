@@ -24,22 +24,9 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
 import StaffInfo, {StaffShape} from './StaffInfo'
-import LoadingSkeleton from './LoadingSkeleton'
+import LoadingWrapper from './LoadingWrapper'
 
 const StaffContactInfoLayout = ({isLoading, staff}) => {
-  const skeletons = []
-  for (let i = 0; i < 2; i++) {
-    skeletons.push(
-      <LoadingSkeleton
-        key={`skeleton-${i}`}
-        width="100%"
-        height="4em"
-        margin="small 0"
-        screenReaderLabel={I18n.t('Loading staff...')}
-      />
-    )
-  }
-
   return (
     <View>
       {(isLoading || staff.length > 0) && (
@@ -47,7 +34,19 @@ const StaffContactInfoLayout = ({isLoading, staff}) => {
           {I18n.t('Staff Contact Info')}
         </Heading>
       )}
-      {isLoading ? skeletons : staff.map(s => <StaffInfo key={s.id} {...s} />)}
+      <LoadingWrapper
+        id="staff"
+        isLoading={isLoading}
+        skeletonsCount={2}
+        width="100%"
+        height="4em"
+        margin="small 0"
+        screenReaderLabel={I18n.t('Loading staff...')}
+      >
+        {staff.map(s => (
+          <StaffInfo key={s.id} {...s} />
+        ))}
+      </LoadingWrapper>
     </View>
   )
 }

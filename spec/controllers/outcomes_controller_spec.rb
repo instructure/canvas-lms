@@ -119,6 +119,22 @@ describe OutcomesController do
         expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
       end
     end
+
+    context "outcomes_friendly_description" do
+      it "should return true if outcomes_friendly_description feature flag is enabled" do
+        Account.site_admin.enable_feature!(:outcomes_friendly_description)
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq true
+      end
+
+      it "should return false if outcomes_friendly_description feature flag is disabled" do
+        Account.site_admin.disable_feature!(:outcomes_friendly_description)
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
+      end
+    end
   end
 
   describe "GET 'show'" do

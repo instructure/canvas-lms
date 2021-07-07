@@ -1121,6 +1121,20 @@ function renderDeleteAttachmentLink($submission_file, attachment) {
   }
 }
 
+function allowsReassignment(submission) {
+  const reassignableTypes = [
+    'media_recording',
+    'online_text_entry',
+    'online_upload',
+    'online_url',
+    'student_annotation'
+  ]
+
+  return (
+    submission.cached_due_date != null && reassignableTypes.includes(submission.submission_type)
+  )
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -2303,13 +2317,7 @@ EG = {
 
       $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
-      if (
-        !!currentSubmission.cached_due_date &&
-        currentSubmission.submission_type &&
-        (currentSubmission.submission_type === 'media_recording' ||
-          (currentSubmission.submission_type.startsWith('online_') &&
-            currentSubmission.submission_type !== 'online_quiz'))
-      ) {
+      if (allowsReassignment(currentSubmission)) {
         $reassign_assignment.show()
       } else {
         $reassign_assignment.hide()

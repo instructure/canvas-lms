@@ -20,13 +20,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 
-import {
-  loadThisWeekItems,
-  startLoadingAllOpportunities,
-  responsiviser,
-  store,
-  toggleMissingItems
-} from '@instructure/canvas-planner'
+import {startLoadingAllOpportunities, responsiviser, store} from '@instructure/canvas-planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -53,7 +47,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import {
   groupAnnouncementsByHomeroom,
   saveElementaryDashboardPreference,
-  FOCUS_TARGETS,
   TAB_IDS
 } from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
@@ -115,10 +108,7 @@ export const K5Dashboard = ({
   currentUserRoles,
   loadingOpportunities,
   loadAllOpportunities,
-  switchToToday,
   timeZone,
-  locale,
-  toggleMissing,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
   responsiveSize = 'large'
@@ -187,17 +177,6 @@ export const K5Dashboard = ({
     }
   })
 
-  const handleSwitchToToday = () => {
-    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.TODAY)
-    switchToToday()
-  }
-
-  const handleSwitchToMissingItems = () => {
-    toggleMissing({forceExpanded: true})
-    handleTabChange(TAB_IDS.SCHEDULE, FOCUS_TARGETS.MISSING_ITEMS)
-    switchToToday()
-  }
-
   const handleDisableK5Dashboard = (e, [newView]) => {
     if (newView === 'classic') {
       saveElementaryDashboardPreference(true)
@@ -232,9 +211,7 @@ export const K5Dashboard = ({
           loadingOpportunities,
           isStudent: plannerEnabled,
           responsiveSize,
-          subjectAnnouncements,
-          switchToMissingItems: handleSwitchToMissingItems,
-          switchToToday: handleSwitchToToday
+          subjectAnnouncements
         }}
       >
         {currentTab && (
@@ -258,7 +235,6 @@ export const K5Dashboard = ({
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
-          locale={locale}
           userHasEnrollments={!!cards?.length}
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
@@ -289,19 +265,14 @@ K5Dashboard.propTypes = {
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
   loadingOpportunities: PropTypes.bool.isRequired,
   loadAllOpportunities: PropTypes.func.isRequired,
-  switchToToday: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
-  locale: PropTypes.string.isRequired,
-  toggleMissing: PropTypes.func.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   responsiveSize: PropTypes.string
 }
 
 const mapDispatchToProps = {
-  toggleMissing: toggleMissingItems,
-  loadAllOpportunities: startLoadingAllOpportunities,
-  switchToToday: loadThisWeekItems
+  loadAllOpportunities: startLoadingAllOpportunities
 }
 
 const WrappedK5Dashboard = connect(

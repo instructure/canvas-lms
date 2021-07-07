@@ -66,8 +66,6 @@ export function validateTenant(state) {
         type: 'error'
       }
     ]
-  } else {
-    state.tenantErrorMessages = []
   }
   return state
 }
@@ -81,4 +79,27 @@ export function clearMessages(state) {
   state.errorMessage = ''
   state.successMessage = ''
   return state
+}
+
+/**
+ * Sets the hint message that is shown when changing
+ * the tenant.
+ *
+ * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
+ * @param payload The data given to the reducer, which contains the new tenant input text
+ * @returns {import('./settingsReducer').State} The modified state, with an error message if the tenant is invalid
+ */
+export function setTenantInfoMessages(state, payload) {
+  let tenantInfoMessages = []
+
+  if (payload.microsoft_sync_tenant !== state.last_saved_microsoft_sync_tenant) {
+    tenantInfoMessages = [
+      {
+        text: I18n.t('Changing the tenant will delete existing groups.'),
+        type: 'hint'
+      }
+    ]
+  }
+
+  return tenantInfoMessages
 }

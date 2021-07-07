@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 
 describe('LoadingWrapper', () => {
   const getProps = (props = {}) => ({
+    id: 'component-to-load',
     skeletonsCount: 1,
     screenReaderLabel: 'Loading content...',
     width: '10em',
@@ -56,5 +57,53 @@ describe('LoadingWrapper', () => {
     expect(getByText('Loading content...')).toBeInTheDocument()
     expect(skeletonWrapper.style.width).toBe('10em')
     expect(skeletonWrapper.style.height).toBe('5em')
+  })
+
+  it('renders custom skeletons if renderCustomSkeleton is provided', () => {
+    const renderCustomSkeleton = jest.fn(props => <View {...props}>Custom Loading...</View>)
+    const {getAllByText} = render(
+      <LoadingWrapper
+        {...getProps({
+          isLoading: true,
+          skeletonsCount: 3,
+          renderCustomSkeleton
+        })}
+      />
+    )
+    expect(renderCustomSkeleton).toHaveBeenCalledTimes(3)
+    const customSkeletons = getAllByText('Custom Loading...')
+    expect(customSkeletons.length).toBe(3)
+  })
+
+  it('passes the skeletons to renderSkeletonsContainer when provided and shows it when loading', () => {
+    const renderSkeletonsContainer = jest.fn(c => <div className="container">{c}</div>)
+    const {getByText, container, rerender} = render(
+      <LoadingWrapper {...getProps({isLoading: true, renderSkeletonsContainer})} />
+    )
+    expect(container.querySelector('div.container')).toBeInTheDocument()
+    rerender(
+      <LoadingWrapper {...getProps({renderSkeletonsContainer})}>
+        <View>This is the loaded child component</View>
+      </LoadingWrapper>
+    )
+    expect(renderSkeletonsContainer).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('div.container')).not.toBeInTheDocument()
+    expect(getByText('This is the loaded child component')).toBeInTheDocument()
+  })
+
+  it('passes the loaded content to renderLoadedContainer when provided and shows it when finish loading', () => {
+    const renderLoadedContainer = jest.fn(content => <div className="container">{content}</div>)
+    const {getByText, container, rerender} = render(
+      <LoadingWrapper {...getProps({isLoading: true, renderLoadedContainer})} />
+    )
+    expect(container.querySelector('div.container')).not.toBeInTheDocument()
+    rerender(
+      <LoadingWrapper {...getProps({renderLoadedContainer})}>
+        <View>This is the loaded child component</View>
+      </LoadingWrapper>
+    )
+    expect(renderLoadedContainer).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('div.container')).toBeInTheDocument()
+    expect(getByText('This is the loaded child component')).toBeInTheDocument()
   })
 })

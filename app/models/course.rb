@@ -261,6 +261,7 @@ class Course < ActiveRecord::Base
   validate :validate_course_image
   validate :validate_default_view
   validate :validate_template
+  validate :validate_not_on_siteadmin
   validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -496,6 +497,12 @@ class Course < ActiveRecord::Base
       errors.add(:template, t("Courses with enrollments can't become templates"))
     elsif !template? && !can_stop_being_template?
       errors.add(:template, t("Courses that are set as a template in any account can't stop being templates"))
+    end
+  end
+
+  def validate_not_on_siteadmin
+    if root_account_id_changed? && root_account_id == Account.site_admin.id
+      self.errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
   end
 
@@ -1604,7 +1611,7 @@ class Course < ActiveRecord::Base
         user && !self.deleted? &&
         fetch_on_enrollments('active_content_admin_enrollments', user) {
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        }.any? {|e| e.has_permission_to?(:manage_courses_delete) }
+        }.any? {|e| e.has_permission_to?(:manage_courses_reset) }
     end
     can :reset_content
 
@@ -1711,19 +1718,19 @@ class Course < ActiveRecord::Base
     can :manage and can :update and can :use_student_view and can :manage_feature_flags and
     can :view_feature_flags
 
+    # reset course content
+    given do |user|
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+        self.account_membership_allows(user, :manage_courses_reset)
+    end
+    can :reset_content
+
     # delete and undelete manually created course
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
         !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
-
-    # reset manually created course
-    given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        !self.sis_source_id && self.account_membership_allows(user, :manage_courses_delete)
-    end
-    can :reset_content
 
     # delete course managed by SIS
     given do |user|
@@ -1732,14 +1739,6 @@ class Course < ActiveRecord::Base
         self.account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
-
-    # reset course managed by SIS
-    given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !self.deleted? &&
-        self.sis_source_id && self.account_membership_allows(user, :manage_sis) &&
-        self.account_membership_allows(user, :manage_courses_delete)
-    end
-    can :reset_content
 
     given { |user| self.account_membership_allows(user, :read_course_content) }
     can :read and can :read_outcomes

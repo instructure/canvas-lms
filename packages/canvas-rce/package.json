@@ -83,6 +83,7 @@
     "@instructure/ui-motion": "7",
     "@instructure/ui-overlays": "7",
     "@instructure/ui-pagination": "7",
+    "@instructure/ui-popover": "7",
     "@instructure/ui-radio-input": "7",
     "@instructure/ui-react-utils": "7",
     "@instructure/ui-simple-select": "7",

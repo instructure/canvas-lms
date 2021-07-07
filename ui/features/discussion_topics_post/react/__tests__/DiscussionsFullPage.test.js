@@ -45,7 +45,8 @@ describe('DiscussionFullPage', () => {
         id: 'PLACEHOLDER',
         display_name: 'Omar Soto-Fortuño',
         avatar_image_url: 'www.avatar.com'
-      }
+      },
+      course_id: '1'
     }
   })
 
@@ -294,5 +295,38 @@ describe('DiscussionFullPage', () => {
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
     )
+  })
+
+  describe('discussion role pills', () => {
+    let oldCourseID
+    beforeEach(() => {
+      oldCourseID = window.ENV.course_id
+    })
+
+    afterEach(() => {
+      window.ENV.course_id = oldCourseID
+    })
+
+    it('should render Teacher and Ta pills', async () => {
+      window.ENV.course_id = 1
+      const container = setup()
+      const pillContainer = await container.findAllByTestId('pill-container')
+      const teacherPill = await container.findAllByTestId('pill-Teacher')
+      const taPill = await container.findAllByTestId('pill-TA')
+      expect(pillContainer).toBeTruthy()
+      expect(teacherPill).toBeTruthy()
+      expect(taPill).toBeTruthy()
+    })
+
+    it('should not render Teacher and Ta if no course is given', async () => {
+      window.ENV.course_id = null
+      const container = setup()
+      const pillContainer = container.queryAllByTestId('pill-container')
+      const teacherPill = container.queryAllByTestId('pill-Teacher')
+      const taPill = container.queryAllByTestId('pill-TA')
+      expect(pillContainer).toEqual([])
+      expect(teacherPill).toEqual([])
+      expect(taPill).toEqual([])
+    })
   })
 })

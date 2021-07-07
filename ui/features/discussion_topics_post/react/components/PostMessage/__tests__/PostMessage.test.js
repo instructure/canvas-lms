@@ -23,6 +23,7 @@ import {PostMessage} from '../PostMessage'
 const setup = props => {
   return render(
     <PostMessage
+      hasAuthor
       authorName="Foo Bar"
       timingDisplay="Jan 1 2000"
       message="Posts are fun"
@@ -56,6 +57,20 @@ describe('PostMessage', () => {
       children: <span>Smol children</span>
     })
     expect(queryByText('Smol children')).toBeTruthy()
+  })
+
+  it('Should not display author name and avatar when author is null', () => {
+    const {queryByTestId} = setup({hasAuthor: false})
+
+    expect(queryByTestId('author_name')).toBeNull()
+    expect(queryByTestId('author_avatar')).toBeNull()
+  })
+
+  it('Should display author name and avatar when author is set', () => {
+    const {queryByTestId} = setup()
+
+    expect(queryByTestId('author_name')).toBeTruthy()
+    expect(queryByTestId('author_avatar')).toBeTruthy()
   })
 
   describe('avatar badge', () => {

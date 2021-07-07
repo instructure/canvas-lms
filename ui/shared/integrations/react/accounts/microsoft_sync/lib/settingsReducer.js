@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {doUpdateSettings, validateTenant, clearMessages} from './settingsHelper'
+import {doUpdateSettings, validateTenant, clearMessages, setTenantInfoMessages} from './settingsHelper'
 import I18n from 'i18n!account_settings_jsx_bundle'
 
 /**
@@ -83,10 +83,12 @@ export const reducerActions = {
 export const defaultState = {
   errorMessage: '',
   tenantErrorMessages: [],
+  tenantInfoMessages: [],
   loading: true,
   uiEnabled: true,
   microsoft_sync_enabled: false,
   microsoft_sync_tenant: '',
+  last_saved_microsoft_sync_tenant: '',
   microsoft_sync_login_attribute: 'email',
   selectedAttribute: 'email',
   successMessage: ''
@@ -116,9 +118,13 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       }
     }
     case reducerActions.updateTenant: {
+      const tenantInfoMessages = setTenantInfoMessages(state, payload)
+
       return {
         ...state,
-        microsoft_sync_tenant: payload.microsoft_sync_tenant
+        microsoft_sync_tenant: payload.microsoft_sync_tenant,
+        tenantErrorMessages: [],
+        tenantInfoMessages
       }
     }
     case reducerActions.updateSettings: {
@@ -167,6 +173,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         microsoft_sync_enabled: payload.microsoft_sync_enabled || state.microsoft_sync_enabled,
         microsoft_sync_tenant: payload.microsoft_sync_tenant || state.microsoft_sync_tenant,
+        last_saved_microsoft_sync_tenant: payload.microsoft_sync_tenant || state.microsoft_sync_tenant,
         microsoft_sync_login_attribute: selectedLoginAttribute,
         selectedAttribute: selectedLoginAttribute
       }
@@ -189,7 +196,9 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         successMessage: I18n.t('Microsoft Teams Sync settings updated!'),
-        uiEnabled: true
+        uiEnabled: true,
+        last_saved_microsoft_sync_tenant: state.microsoft_sync_tenant,
+        tenantInfoMessages: []
       }
     }
     case reducerActions.updateError: {

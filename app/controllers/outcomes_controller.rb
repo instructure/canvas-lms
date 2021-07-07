@@ -53,7 +53,8 @@ class OutcomesController < ApplicationController
           @context.grants_right?(@current_user, session, :manage_proficiency_scales),
         manage_proficiency_calculations:
           @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
-      }
+      },
+      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description)
     )
 
     set_tutorial_js_env

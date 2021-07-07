@@ -291,7 +291,7 @@
     padding: var(--canvasModalBodyPadding);
   }
   .tox .tox-dialog__body-nav-item {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(45, 59, 69, 0.75);
     &:focus {
       box-shadow: var(--canvasFocusBoxShadow);
     }

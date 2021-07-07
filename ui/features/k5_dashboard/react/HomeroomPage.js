@@ -32,6 +32,7 @@ import K5DashboardCard, {CARD_SIZE_PX} from './K5DashboardCard'
 import {createDashboardCards} from '@canvas/dashboard-card'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
+import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import {CreateCourseModal} from './CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
@@ -60,22 +61,24 @@ export const HomeroomPage = ({
     {deep: true}
   )
 
-  const NUM_CARD_SKELETONS = ENV?.INITIAL_NUM_K5_CARDS || 5
-  const skeletonCards = []
-  for (let i = 0; i < NUM_CARD_SKELETONS; i++) {
-    skeletonCards.push(
-      <div
-        className="ic-DashboardCard"
-        key={`card-${i}`}
-        style={{
-          height: `${CARD_SIZE_PX}px`,
-          minWidth: `${CARD_SIZE_PX}px`
-        }}
-      >
-        <LoadingSkeleton screenReaderLabel={I18n.t('Loading Card')} height="100%" width="100%" />
-      </div>
-    )
-  }
+  const skeletonCard = props => (
+    <div
+      {...props}
+      className="ic-DashboardCard"
+      style={{
+        height: `${CARD_SIZE_PX}px`,
+        minWidth: `${CARD_SIZE_PX}px`
+      }}
+    >
+      <LoadingSkeleton screenReaderLabel={I18n.t('Loading Card')} height="100%" width="100%" />
+    </div>
+  )
+
+  const skeletonCardsContainer = skeletons => (
+    <div className="ic-DashboardCard__box">
+      <div className="ic-DashboardCard__box__container">{skeletons}</div>
+    </div>
+  )
 
   const canCreateCourses = createPermissions === 'admin' || createPermissions === 'teacher'
 
@@ -112,15 +115,15 @@ export const HomeroomPage = ({
             </Flex.Item>
           )}
         </Flex>
-        {!cards ? (
-          <div className="ic-DashboardCard__box">
-            <div className="ic-DashboardCard__box__container">{skeletonCards}</div>
-          </div>
-        ) : cards.length > 0 ? (
-          dashboardCards
-        ) : (
-          <EmptyDashboardState />
-        )}
+        <LoadingWrapper
+          id="course-cards"
+          isLoading={!cards}
+          skeletonsCount={ENV?.INITIAL_NUM_K5_CARDS || 5}
+          renderCustomSkeleton={skeletonCard}
+          renderSkeletonsContainer={skeletonCardsContainer}
+        >
+          {cards?.length > 0 ? dashboardCards : <EmptyDashboardState />}
+        </LoadingWrapper>
       </View>
       {courseModalOpen && (
         <CreateCourseModal

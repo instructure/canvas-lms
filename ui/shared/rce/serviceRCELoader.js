@@ -208,6 +208,7 @@ const RCELoader = {
       trayProps: getRCSProps(),
       languages,
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
+      ltiTools: window.INST?.editorButtons,
       autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,

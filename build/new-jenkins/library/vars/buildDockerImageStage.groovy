@@ -83,7 +83,7 @@ def slackSendCacheBuild(block) {
 }
 
 def jsImage() {
-  credentials.withStarlordDockerLogin {
+  credentials.withStarlordCredentials {
     try {
       def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -110,14 +110,14 @@ def jsImage() {
 }
 
 def lintersImage() {
-  credentials.withStarlordDockerLogin {
+  credentials.withStarlordCredentials {
     sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
     sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $LINTERS_RUNNER_PREFIX'
   }
 }
 
 def premergeCacheImage() {
-  credentials.withStarlordDockerLogin {
+  credentials.withStarlordCredentials {
     withEnv([
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
@@ -151,7 +151,7 @@ def premergeCacheImage() {
 }
 
 def patchsetImage() {
-  credentials.withStarlordDockerLogin {
+  credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
     slackSendCacheBuild {

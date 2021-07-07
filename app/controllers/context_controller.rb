@@ -31,10 +31,19 @@ class ContextController < ApplicationController
 
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])
+
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
         self.extend TextHelper
-        @media_object = @context.media_objects.where(media_id: params[:id], media_type: params[:type]).first_or_initialize
+
+        # The MediaObject will be created on the current shard,
+        # not the @context's shard.
+        @media_object = MediaObject.where(
+          media_id: params[:id],
+          media_type: params[:type],
+          context: @context
+        ).first_or_initialize
+
         @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]

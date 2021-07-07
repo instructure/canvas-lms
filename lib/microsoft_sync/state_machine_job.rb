@@ -80,21 +80,22 @@ module MicrosoftSync
     attr_reader :job_state_record
 
     # steps_object defines the steps of the job and has the following:
-    #   initial_step() -- string
     #   max_retries() -- for entire job
     #   max_delay() -- delays (`Retry`s or `DelayedNextStep`s) will be clipped
     #     to this length of time.
-    #   two arguments: memory_state, job_state_data.
-    #     (If you don't need all the arguments, you can also make the methods
-    #     take 0 or 1 arguments). They should return a NextStep or Retry object
-    #     or COMPLETE (see below), or you can raise an error to signal a
-    #     unretriable error.
     #   after_failure() -- called when a job fails (unretriable error
     #     raised, or a Retry happens past max_retries), or when a stale
     #     job is restarted. Can be used to clean up state, e.g. state stored in
     #     stash_block
     #   after_complete() -- called when a step returns COMPLETE. Note: this is
     #     run even if the state record has been deleted since we last checked.
+    #   steps methods with two arguments: memory_state, job_state_data.
+    #     (If you don't need all the arguments, you can also make the methods
+    #     take 0 or 1 arguments). The steps methods should return a NextStep or
+    #     Retry object or COMPLETE (see below), or you can raise an error to
+    #     signal a unretriable error. It is recommended you begin step methods
+    #     with `step_` to make them obvious.
+    #   step_initial(initial_memory_state, job_state_data) -- the initial step
     attr_reader :steps_object
 
     def initialize(job_state_record, steps_object)
@@ -163,6 +164,8 @@ module MicrosoftSync
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
+
+    INITIAL_STEP = :step_initial
 
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state=nil)
@@ -235,7 +238,7 @@ module MicrosoftSync
     def run_main_loop(current_step, initial_mem_state, job_state_data, synchronous)
       return unless job_state_record&.update_unless_deleted(workflow_state: :running)
 
-      current_step ||= steps_object.initial_step
+      current_step ||= INITIAL_STEP
       memory_state = initial_mem_state
 
       loop do

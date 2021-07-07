@@ -542,7 +542,7 @@ describe PseudonymsController do
 
         @user.reload
         expect(@user.all_pseudonyms.length).to eq 2
-        expect(@user.all_pseudonyms.map(&:shard)).to eq [@shard1, Shard.default]
+        expect(@user.all_pseudonyms.map(&:shard)).to eq [Shard.default, @shard1]
       end
 
       it "should create a new pseudonym for a user in a different shard (same-shard)" do

@@ -25,7 +25,10 @@ describe MicrosoftSync::SyncerSteps do
     course_model(name: 'sync test course')
   end
   let(:group) { MicrosoftSync::Group.create(course: course) }
-  let(:graph_service_helpers) { double('GraphServiceHelpers', graph_service: double('GraphService')) }
+  let(:graph_service_helpers) do
+    instance_double(MicrosoftSync::GraphServiceHelpers,
+                    graph_service: instance_double(MicrosoftSync::GraphService))
+  end
   let(:graph_service) { graph_service_helpers.graph_service }
   let(:tenant) { 'mytenant123' }
   let(:sync_enabled) { true }
@@ -81,16 +84,6 @@ describe MicrosoftSync::SyncerSteps do
       receive(:new).with(tenant).and_return(graph_service_helpers)
   end
 
-  describe '#initial_step' do
-    subject { syncer_steps.initial_step }
-
-    it { is_expected.to eq(:step_ensure_max_enrollments_in_a_course) }
-
-    it 'references an existing method' do
-      expect { syncer_steps.method(subject.to_sym) }.to_not raise_error
-    end
-  end
-
   describe '#max_retries' do
     subject { syncer_steps.max_retries }
 
@@ -114,8 +107,10 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  shared_examples_for 'a step that returns retry on intermittent error' do |retry_args|
+  shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
+    # use actual graph service instead of double and intercept calls to "request":
     let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
+    let(:retry_args) { {delay_amount: [5, 20, 100]}.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
@@ -134,31 +129,43 @@ describe MicrosoftSync::SyncerSteps do
       end
     end
 
-    context 'when the Microsoft API returns a 429 with a retry-after header' do
-      it 'returns a Retry object with that retry-after time' do
-        expect(graph_service).to receive(:request).and_raise(
-          new_http_error(429, 'retry-after' => '3.14')
-        )
-        expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
-                     **retry_args.merge(delay_amount: 3.14))
+    unless options[:except_404]
+      context 'on 404' do
+        it 'goes back to step_generate_diff with a delay' do
+          expect(graph_service).to receive(:request).and_raise(new_http_error(404))
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
+        end
       end
     end
 
-    context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
-      it 'returns a Retry object with that retry-after time' do
-        err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
-        expect(err).to receive(:retry_after_seconds).and_return(1.23)
-        expect(graph_service).to receive(:request).and_raise(err)
-        expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
+    unless options[:except_throttled]
+      context 'when the Microsoft API returns a 429 with a retry-after header' do
+        it 'returns a Retry object with that retry-after time' do
+          expect(graph_service).to receive(:request).and_raise(
+            new_http_error(429, 'retry-after' => '3.14')
+          )
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
+                       **retry_args.merge(delay_amount: 3.14))
+        end
       end
-    end
 
-    context 'when the Microsoft API returns a 429 with no retry-after header' do
-      it 'returns a Retry object with our default retry times' do
-        expect(graph_service).to receive(:request).and_raise(new_http_error(429))
-        expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+      context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
+        it 'returns a Retry object with that retry-after time' do
+          err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
+          expect(err).to receive(:retry_after_seconds).and_return(1.23)
+          expect(graph_service).to receive(:request).and_raise(err)
+          expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
+        end
+      end
+
+      context 'when the Microsoft API returns a 429 with no retry-after header' do
+        it 'returns a Retry object with our default retry times' do
+          expect(graph_service).to receive(:request).and_raise(new_http_error(429))
+          expect_retry(subject,
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+        end
       end
     end
   end
@@ -183,8 +190,23 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  describe '#step_ensure_max_enrollments_in_a_course' do
-    subject { syncer_steps.step_ensure_max_enrollments_in_a_course(nil, nil) }
+  describe '#step_initial' do
+    it 'does a partial sync when initial_mem_state is :partial' do
+      expect_next_step(syncer_steps.step_initial(:partial, nil), :step_partial_sync)
+    end
+
+    it 'does a partial sync when initial_mem_state is "partial"' do
+      expect_next_step(syncer_steps.step_initial('partial', nil), :step_partial_sync)
+    end
+
+    it 'starts a full sync when when initial_mem_state is nil' do
+      expect_next_step(syncer_steps.step_initial(nil, nil),
+                       :step_full_sync_prerequisites)
+    end
+  end
+
+  describe '#step_full_sync_prerequisites' do
+    subject { syncer_steps.step_full_sync_prerequisites(nil, nil) }
 
     before do
       n_students_in_course(2, course: course)
@@ -213,6 +235,12 @@ describe MicrosoftSync::SyncerSteps do
 
       it_behaves_like 'max of owners enrollment reached', 1
     end
+
+    it 'deletes the partial sync changes for the course' do
+      expect(MicrosoftSync::PartialSyncChange).to \
+        receive(:delete_all_replicated_to_secondary_for_course).with(course.id)
+      subject
+    end
   end
 
   describe '#step_ensure_class_group_exists' do
@@ -226,7 +254,7 @@ describe MicrosoftSync::SyncerSteps do
     shared_examples_for 'a group record which requires a new or updated MS group' do
       let(:education_class_ids) { [] }
 
-      it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+      it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
       context 'when no remote MS group exists for the course' do
         # admin deleted the MS group we created, or a group never existed
@@ -316,7 +344,7 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it_behaves_like 'a step that returns retry on intermittent error',
-                    delay_amount: [5, 20, 100], job_state_data: 'newid'
+                    retry_args: {job_state_data: 'newid'}
 
     context 'on success' do
       it 'updates the LMS metadata, sets ms_group_id, and goes to the next step' do
@@ -325,19 +353,6 @@ describe MicrosoftSync::SyncerSteps do
 
         expect { subject }.to change { group.reload.ms_group_id }.to('newid')
         expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
-      end
-    end
-
-    context 'on 404' do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to \
-          receive(:update_group_with_course_data).with('newid', course)
-          .and_raise(new_http_error(404))
-        expect { subject }.to_not change { group.reload.ms_group_id }
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100], job_state_data: 'newid'
-        )
       end
     end
 
@@ -377,20 +392,9 @@ describe MicrosoftSync::SyncerSteps do
       teachers.each_with_index do |teacher, i|
         communication_channel(teacher, path_type: 'email', username: "teacher#{i}@example.com", active_cc: true)
       end
-
     end
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
-
-    context "when Microsoft's API returns 404" do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).and_raise(new_http_error(404))
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100]
-        )
-      end
-    end
+    it_behaves_like 'a step that returns retry on intermittent error'
 
     context "when Microsoft's API returns success" do
       before do
@@ -451,7 +455,7 @@ describe MicrosoftSync::SyncerSteps do
   describe '#step_generate_diff' do
     subject { syncer_steps.step_generate_diff(nil, nil) }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error'
 
     before do
       course.enrollments.to_a.each_with_index do |enrollment, i|
@@ -469,7 +473,7 @@ describe MicrosoftSync::SyncerSteps do
       expect(graph_service_helpers).to \
         receive(:get_group_users_aad_ids).with('mygroup', owners: true).and_return(%w[o1 o2])
 
-      diff = double('MembershipDiff')
+      diff = instance_double(MicrosoftSync::MembershipDiff)
       expect(MicrosoftSync::MembershipDiff).to \
         receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(diff)
       members_and_enrollment_types = []
@@ -483,32 +487,10 @@ describe MicrosoftSync::SyncerSteps do
       expect_next_step(subject, :step_execute_diff, diff)
       expect(members_and_enrollment_types).to eq([['0', 'TeacherEnrollment']])
     end
-
-    context 'on 404' do
-      it 'retries with a delay' do
-        expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
-          .and_raise(new_http_error(404))
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100]
-        )
-      end
-    end
   end
 
-  describe '#step_execute_diff' do
-    subject { syncer_steps.step_execute_diff(diff, nil) }
-
-    let(:diff) { double('MembershipDiff') }
-
-    it_behaves_like 'a step that returns retry on intermittent error',
-                    delay_amount: [5, 20, 100], step: :step_generate_diff
-
+  shared_examples_for 'a step that executes a diff' do
     before do
-      group.update!(ms_group_id: 'mygroup')
-
-      allow(diff).to receive(:max_enrollment_members_reached?).and_return(false)
-      allow(diff).to receive(:max_enrollment_owners_reached?).and_return(false)
       allow(diff).to \
         receive(:additions_in_slices_of)
         .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
@@ -519,9 +501,6 @@ describe MicrosoftSync::SyncerSteps do
         .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
         .and_yield(owners: %w[o1], members: %w[m1 m2])
         .and_yield(members: %w[m3])
-      allow(diff).to receive(:owners_to_remove).and_return(Set.new(%w[o1]))
-
-      allow(diff).to receive(:local_owners).and_return Set.new(%w[o3])
     end
 
     it 'adds/removes users based on the diff' do
@@ -534,7 +513,7 @@ describe MicrosoftSync::SyncerSteps do
       expect(graph_service).to receive(:remove_group_users_ignore_missing)
         .with('mygroup', members: %w[m3])
 
-      expect_next_step(subject, :step_check_team_exists)
+      subject
     end
 
     context 'when some users to be added already exist in the group' do
@@ -545,14 +524,15 @@ describe MicrosoftSync::SyncerSteps do
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
 
-        expect_next_step(subject, :step_check_team_exists)
+        subject
 
         expect(Rails.logger).to have_received(:warn).twice
-          .with(/Skipping add for 3: .*(o3.*o2|o2.*o3)/)
+          .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
           .with("microsoft_sync.syncer_steps.skipped_batches.add")
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
+        expect(InstStatsd::Statsd).to have_received(:count).twice
           .with("microsoft_sync.syncer_steps.skipped_total.add", 3)
       end
     end
@@ -565,26 +545,41 @@ describe MicrosoftSync::SyncerSteps do
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
 
-        expect_next_step(subject, :step_check_team_exists)
+        subject
 
         expect(Rails.logger).to have_received(:warn).twice
-          .with(/Skipping remove for 2: .*(m2.*m3|m3.*m2)/)
+          .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
         expect(InstStatsd::Statsd).to have_received(:increment).twice
           .with("microsoft_sync.syncer_steps.skipped_batches.remove")
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
+        expect(InstStatsd::Statsd).to have_received(:count).twice
           .with("microsoft_sync.syncer_steps.skipped_total.remove", 2)
       end
     end
+  end
 
-    context 'on 404' do
-      it 'goes back to step_generate_diff with a delay' do
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-          .and_raise(new_http_error(404))
-        expect_retry(
-          subject, error_class: MicrosoftSync::Errors::HTTPNotFound,
-          delay_amount: [5, 20, 100], step: :step_generate_diff
-        )
+  describe '#step_execute_diff' do
+    subject { syncer_steps.step_execute_diff(diff, nil) }
+
+    let(:diff) do
+      instance_double(
+        MicrosoftSync::MembershipDiff, local_owners: Set.new(%w[o3]),
+        max_enrollment_members_reached?: false, max_enrollment_owners_reached?: false,
+        additions_in_slices_of: nil, removals_in_slices_of: nil
+      )
+    end
+
+    before { group.update! ms_group_id: 'mygroup' }
+
+    it_behaves_like 'a step that executes a diff' do
+      it_behaves_like 'a step that returns retry on intermittent error',
+                      retry_args: {step: :step_generate_diff}
+
+      it 'goes to the step_check_team_exists on success' do
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+        expect_next_step(subject, :step_check_team_exists)
       end
     end
 
@@ -609,7 +604,7 @@ describe MicrosoftSync::SyncerSteps do
       it_behaves_like 'max of members enrollment reached'
     end
 
-    context 'when there are more than `MAX_ENROLLMENT_OWNERS` enrollments in a course' do
+    context 'when there are more than `MAX_ENROLLMENT_OWNERS` owner enrollments in a course' do
       before do
         allow(diff).to receive(:max_enrollment_owners_reached?).and_return true
       end
@@ -623,7 +618,7 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update!(ms_group_id: 'mygroupid') }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
@@ -655,7 +650,7 @@ describe MicrosoftSync::SyncerSteps do
 
     before { group.update!(ms_group_id: 'mygroupid') }
 
-    it_behaves_like 'a step that returns retry on intermittent error', delay_amount: [5, 20, 100]
+    it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
     it 'creates the team' do
       expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
@@ -696,7 +691,161 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
+  describe '#step_partial_sync' do
+    subject { syncer_steps.step_partial_sync(nil, nil) }
+
+    before { group.update! ms_group_id: 'mygroup' }
+
+    context 'when there is an ms_group_id but there are no PartialSyncChanges' do
+      it 'returns COMPLETE' do
+        expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
+      end
+    end
+
+    context 'when there are changes to process' do
+      let(:n_students) { 1 }
+      let!(:students) { 1.upto(n_students).map{student_in_course(course: course).user} }
+      let!(:teacher) { teacher_in_course(course: course).user }
+
+      before do
+        students.each_with_index do |student, index|
+          communication_channel(student, path_type: "email", username: "s#{index}@example.com",
+                                active_cc: true)
+        end
+        communication_channel(teacher, path_type: 'email', username: 't@example.com', active_cc: true)
+
+        create_partial_sync_change 'member', students[0]
+        create_partial_sync_change 'owner', teacher
+      end
+
+      def create_partial_sync_change(e_type, user, course_for_psc=nil)
+        course_for_psc ||= course
+        MicrosoftSync::PartialSyncChange.create!(
+          course: course_for_psc, enrollment_type: e_type, user: user
+        )
+      end
+
+      shared_examples_for 'a step that turns into a full sync job' do
+        it 'turns into a full sync job' do
+          expect_next_step(subject, :step_full_sync_prerequisites)
+        end
+      end
+
+      context "when the group's ms_group_id is not set" do
+        before { group.update! ms_group_id: nil }
+
+        it_behaves_like 'a step that turns into a full sync job'
+      end
+
+      context 'when there are more than the max number of changes' do
+        before do
+          stub_const('MicrosoftSync::SyncerSteps::MAX_PARTIAL_SYNC_CHANGES',
+                     MicrosoftSync::PartialSyncChange.count - 1)
+        end
+
+        it_behaves_like 'a step that turns into a full sync job'
+      end
+
+      context 'when executing a diff' do
+        let(:n_students) { 3 }
+        let(:diff) do
+          instance_double(
+            MicrosoftSync::PartialMembershipDiff,
+            set_local_member: nil, set_member_mapping: nil,
+            log_all_actions: nil, additions_in_slices_of: nil, removals_in_slices_of: nil
+          )
+        end
+
+        before do
+          # Including 2 above, creating these gives us 4 PSCs:
+          create_partial_sync_change 'member', students[2]
+          create_partial_sync_change 'owner', students[2]
+
+          MicrosoftSync::UserMapping.create!(
+            root_account: course.root_account, user: students[0], aad_id: 's0-old'
+          )
+
+          allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
+            upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+          end
+
+          allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)
+        end
+
+        it "gets user mappings that don't exist for all PartialSyncChanges users" do
+          subject
+          # s0 already has a UserMapping. s1 doesn't have a PartialSyncChange.
+          expect(graph_service_helpers).to have_received(:users_upns_to_aads)
+            .with(contain_exactly('s2@example.com', 't@example.com'))
+        end
+
+        it 'builds a partial membership diff' do
+          subject
+          expect(MicrosoftSync::PartialMembershipDiff).to have_received(:new).with(
+            students[0].id => ['member'], students[2].id => ['member', 'owner'],
+            teacher.id => ['owner']
+          )
+          expect(diff).to have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
+          expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+          expect(diff).to have_received(:set_local_member).with(teacher.id, 'TeacherEnrollment')
+          expect(diff).to have_received(:set_member_mapping).with(students[0].id, 's0-old')
+          expect(diff).to have_received(:set_member_mapping).with(students[2].id, 's2-aad')
+          expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-aad')
+        end
+
+        it 'ignores inactive enrollments' do
+          Enrollment.where(course: course, user: students[0]).update_all(workflow_state: 'deleted')
+          subject
+          expect(diff).to_not have_received(:set_local_member).with(students[0].id, 'StudentEnrollment')
+          expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
+        end
+
+        it_behaves_like 'a step that executes a diff' do
+          # the latter it_behaves_like must be inside this one because 'a step
+          # that executes a diff' makes the diff return actions. We need actions
+          # to trigger requests that can cause an intermittent error
+
+          it_behaves_like 'a step that returns retry on intermittent error',
+                          except_throttled: true do
+            context 'when a request is throttled' do
+              it 'turns into a full sync job with the delay given in the retry-after header' do
+                expect(graph_service).to receive(:request).and_raise(
+                  new_http_error(429, 'retry-after' => '3.14')
+                )
+                expect_delayed_next_step(
+                  subject,
+                  :step_full_sync_prerequisites, 3.14
+                )
+              end
+            end
+          end
+        end
+
+        it 'deletes the partial sync changes' do
+          expect { subject }.to change { MicrosoftSync::PartialSyncChange.count }.from(4).to(0)
+        end
+
+        it "doesn't delete partial sync changes which have been updated while the job is running" do
+          last_psc = MicrosoftSync::PartialSyncChange.last
+          expect(diff).to receive(:additions_in_slices_of) do
+            last_psc.update!(updated_at: 2.seconds.from_now)
+          end
+          expect { subject }.to change { MicrosoftSync::PartialSyncChange.count }.from(4).to(1)
+          expect(MicrosoftSync::PartialSyncChange.pluck(:id)).to eq([last_psc.id])
+        end
+
+        it 'returns COMPLETE' do
+          expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
+        end
+      end
+    end
+  end
+
   describe '#max_delay' do
     it { expect(syncer_steps.max_delay).to eq 6.hours }
+  end
+
+  describe '::MAX_PARTIAL_SYNC_CHANGES' do
+    it { expect(described_class::MAX_PARTIAL_SYNC_CHANGES).to eq 500 }
   end
 end

@@ -22,8 +22,15 @@ import {View} from '@instructure/ui-view'
 
 import {PreviewSection} from './PreviewSection'
 import {ShapeSection} from './ShapeSection'
+import {ColorSection} from './ColorSection'
 
-export const defaultSettings = {shape: 'square', size: 'small'}
+export const defaultSettings = {
+  shape: 'square',
+  size: 'small',
+  color: null,
+  outlineColor: null,
+  outlineSize: 'none'
+}
 
 export const CreateButtonForm = () => {
   const [settings, dispatch] = useReducer(
@@ -35,6 +42,7 @@ export const CreateButtonForm = () => {
     <View as="div">
       <PreviewSection settings={settings} />
       <ShapeSection settings={settings} onChange={dispatch} />
+      <ColorSection settings={settings} onChange={dispatch} />
     </View>
   )
 }

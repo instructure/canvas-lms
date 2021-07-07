@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-
-cat <<EOF | docker run --interactive $LINTERS_RUNNER_IMAGE /bin/bash -
 set -ex
 
 TEST_FILE=""
@@ -16,9 +13,8 @@ else
   exit 1
 fi
 
-echo "checking \$TEST_FILE with snyk"
+echo "checking $TEST_FILE with snyk"
 
 npx snyk auth $SNYK_TOKEN
-npx snyk test --severity-threshold=low --file=\$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems || true
-npx snyk monitor --severity-threshold=low --file=\$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems
-EOF
+npx snyk test --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems || true
+npx snyk monitor --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems

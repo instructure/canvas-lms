@@ -285,7 +285,8 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
+      expected_value = assignment.points_possible * 0.92.to_d
+      expect(submission.grade).to eq expected_value.to_s
     end
 
     it "rejects a grade for an assignment with no points possible" do
