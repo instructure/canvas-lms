@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class AddManageCoursesResetRoleOverride < ActiveRecord::Migration[6.0]
-  tag :postdeploy
+  tag :predeploy
 
   def change
     DataFixup::AddRoleOverridesForNewPermission.run(:manage_courses_delete, :manage_courses_reset)
