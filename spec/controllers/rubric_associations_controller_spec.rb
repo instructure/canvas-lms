@@ -107,7 +107,6 @@ describe RubricAssociationsController do
         end
 
         it "should duplicate the associated rubric" do
-          skip 'skipping due to high failure rate (unskip in EVAL-1771)'
           expect {
             post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
           }.to change {
@@ -125,7 +124,6 @@ describe RubricAssociationsController do
             end
 
             it "should use the new course mastery scales for learning outcome criterion" do
-              skip 'skipping due to high failure rate (unskip in EVAL-1771)'
               post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
               outcome_criterion = assigns[:rubric].data[0]
               expect(outcome_criterion[:ratings].length).to eq 2
@@ -142,7 +140,6 @@ describe RubricAssociationsController do
             end
 
             it "should not change the existing criterions" do
-              skip 'skipping due to high failure rate (unskip in EVAL-1771)'
               post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
               expect(assigns[:rubric].data). to eq @rubric.data
             end
@@ -158,7 +155,6 @@ describe RubricAssociationsController do
         end
 
         it "should not duplicate the rubric" do
-          skip 'skipping due to high failure rate (unskip in EVAL-1771)'
           expect {
             post 'create', params: {course_id: @course.id, rubric_association: {rubric_id: @rubric.id}}
           }.to change {
