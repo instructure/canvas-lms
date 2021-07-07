@@ -30,6 +30,7 @@ module.exports = {
     // redirect import from es/rce/CanvasRce to lib
     '@instructure/canvas-rce/es/rce/CanvasRce':
       '<rootDir>/packages/canvas-rce/lib/rce/CanvasRce.js',
+    '@instructure/canvas-rce/es/rce/tinyRCE': '<rootDir>/packages/canvas-rce/lib/rce/tinyRCE.js',
     // mock the tinymce-react Editor react component
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },

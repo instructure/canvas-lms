@@ -24,6 +24,7 @@ import {View} from '@instructure/ui-view'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
+import {name} from '@canvas/rce/plugins/canvas_mentions/plugin'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
@@ -59,8 +60,10 @@ export const DiscussionEdit = props => {
               setRceContent(content)
             }}
             editorOptions={{
-              focus: true
+              focus: true,
+              plugins: [name] // Needed for when RCE uses editorOptions for Plugin loading
             }}
+            plugins={[name]} // Short term fix to get plugin from ReactRCE to CqnvasRCE
             height={300}
             defaultContent={props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
