@@ -23,6 +23,7 @@ require 'account_reports/report_helper'
 module AccountReports
   class SisExporter
     include ReportHelper
+    include Pronouns
 
     SIS_CSV_REPORTS = ["users", "accounts", "terms", "courses", "sections",
                        "enrollments", "groups", "group_membership",
@@ -126,7 +127,7 @@ module AccountReports
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
          pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
          pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name, users.pronouns"
+         users.name, users.short_name, users.pronouns AS db_pronouns"
       ).where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
@@ -163,7 +164,7 @@ module AccountReports
       row << emails[user.user_id].try(:path)
       row << user.workflow_state
       row << user.sis_batch_id? unless @sis_format
-      row << user.pronouns if should_add_pronouns?
+      row << translate_pronouns(user.db_pronouns) if should_add_pronouns?
       row
     end
 
