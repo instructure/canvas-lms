@@ -3885,6 +3885,68 @@ describe AssignmentsApiController, type: :request do
           expect(@assignment.assignment_overrides.active.count).to eq 0
         end
       end
+
+      describe "for a group assignment with group overrides" do
+        let(:old_group_category) do
+          category = @course.group_categories.create!(name: "old")
+          category.create_groups(1)
+          category
+        end
+        let(:old_group) { old_group_category.groups.first }
+
+        let(:new_group_category) do
+          category = @course.group_categories.create!(name: "new")
+          category.create_groups(1)
+          category
+        end
+        let(:new_group) { new_group_category.groups.first }
+
+        it "removes overrides for groups in the old group category when changing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                due_at: nil,
+                group_id: new_group.id,
+                title: "group override"
+              }
+            ],
+            group_category_id: new_group_category.id,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["Group", new_group.id]
+          ]
+        end
+
+        it "removes overrides for groups in the old group category when removing the group" do
+          assignment = @course.assignments.create!(group_category_id: old_group_category.id)
+          assignment.assignment_overrides.create(set: old_group)
+
+          params = {
+            assignment_overrides: [
+              {
+                course_section_id: @course.course_sections.first.id,
+                due_at: nil,
+                title: "section override instead"
+              }
+            ],
+            group_category_id: nil,
+          }
+
+          api_update_assignment_call(@course, assignment, params)
+          assignment.reload
+
+          expect(assignment.active_assignment_overrides.pluck(:set_type, :set_id)).to eq [
+            ["CourseSection", @course.course_sections.first.id]
+          ]
+        end
+      end
     end
 
     context "broadcasting while updating overrides" do

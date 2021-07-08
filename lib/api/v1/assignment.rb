@@ -974,6 +974,11 @@ module Api::V1::Assignment
 
     assignment.transaction do
       assignment.validate_overrides_for_sis(prepared_batch)
+
+      # validate_assignment_overrides runs as a save callback, but if the group
+      # category is changing, remove overrides for old groups first so we don't
+      # fail validation
+      assignment.validate_assignment_overrides if assignment.will_save_change_to_group_category_id?
       assignment.save_without_broadcasting!
       perform_batch_update_assignment_overrides(assignment, prepared_batch)
     end
