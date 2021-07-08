@@ -580,7 +580,8 @@ class DiscussionTopicsController < ApplicationController
             :manage_files,
             *RoleOverride::GRANULAR_FILE_PERMISSIONS
           )
-      }
+      },
+      REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
