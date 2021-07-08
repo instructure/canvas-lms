@@ -109,7 +109,7 @@ export function PostMessage({...props}) {
               </Flex.Item>
             </Flex>
           </Flex.Item>
-          <Flex.Item overflowY="hidden">
+          <Flex.Item padding="small" overflowY="hidden">
             <>
               {props.title && (
                 <>
