@@ -61,9 +61,9 @@ export const DiscussionEdit = props => {
             }}
             editorOptions={{
               focus: true,
-              plugins: [name] // Needed for when RCE uses editorOptions for Plugin loading
+              plugins: [name, 'noneditable'] // Needed for when RCE uses editorOptions for Plugin loading
             }}
-            plugins={[name]} // Short term fix to get plugin from ReactRCE to CqnvasRCE
+            plugins={[name, 'noneditable']} // Short term fix to get plugin from ReactRCE to CqnvasRCE
             height={300}
             defaultContent={props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
