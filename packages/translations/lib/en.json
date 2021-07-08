@@ -14,6 +14,9 @@
   "add_cc_subtitles_55f0394e": {
     "message": "Add CC/Subtitles"
   },
+  "add_image_60b2de07": {
+    "message": "Add Image"
+  },
   "add_to_do_7537af64": {
     "message": "Add To-Do"
   },
@@ -172,6 +175,9 @@
   },
   "calendar_event_89aadc1c": {
     "message": "Calendar Event"
+  },
+  "cancel_caeb1e68": {
+    "message": "Cancel"
   },
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
@@ -796,6 +802,9 @@
   "my_grades_98834476": {
     "message": "My Grades"
   },
+  "my_images_427f9b0c": {
+    "message": "My Images"
+  },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -810,6 +819,9 @@
   },
   "new_opportunities_7d349c4d": {
     "message": "New Opportunities"
+  },
+  "next_40e12421": {
+    "message": "Next"
   },
   "next_month_749b1778": {
     "message": "Next Month"
@@ -1197,6 +1209,9 @@
   },
   "today_at_date_8ac30d6": {
     "message": "Today at { date }"
+  },
+  "toggle_summary_group_413df9ac": {
+    "message": "Toggle { summary } group"
   },
   "tomorrow_9a6c9a00": {
     "message": "Tomorrow"
