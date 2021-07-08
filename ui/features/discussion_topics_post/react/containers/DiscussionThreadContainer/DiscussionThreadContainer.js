@@ -91,14 +91,7 @@ export const DiscussionThreadContainer = props => {
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(
-      cache,
-      props.discussionEntry._id,
-      PER_PAGE,
-      sort,
-      newDiscussionEntry,
-      window.ENV?.course_id
-    )
+    addReplyToSubentries(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {

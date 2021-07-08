@@ -83,6 +83,7 @@ describe('IsolatedViewContainer', () => {
     onClose,
     onOpenIsolatedView,
     goToTopic,
+    setHighlightEntryId: jest.fn(),
     ...overrides
   })
 
@@ -289,5 +290,11 @@ describe('IsolatedViewContainer', () => {
     const replyButtons = await findAllByTestId('threading-toolbar-reply')
     fireEvent.click(replyButtons[0])
     expect(setRCEOpen).toHaveBeenCalledWith(true)
+  })
+
+  it('highlights an entry', async () => {
+    const {findByTestId} = setup(defaultProps({highlightEntryId: '50'}))
+
+    expect(await findByTestId('isHighlighted')).toBeInTheDocument()
   })
 })

@@ -34,6 +34,7 @@ import {SearchContext} from '../../utils/constants'
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
+
   return (
     <Flex padding="0 0 medium 0">
       <Flex.Item align="start">

@@ -41,23 +41,21 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const [isHighlightedParent, setIsHighlightedParent] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, props.discussionEntryId, newDiscussionEntry)
+    addReplyToDiscussionEntry(cache, newDiscussionEntry.parent.id, newDiscussionEntry)
     addReplyToSubentries(
       cache,
-      props.discussionEntryId,
       ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       'desc',
       newDiscussionEntry,
@@ -67,7 +65,13 @@ export const IsolatedViewContainer = props => {
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => setOnSuccess(I18n.t('The discussion entry was successfully created.')),
+    onCompleted: data => {
+      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
+      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.parent.id) {
+        props.onOpenIsolatedView(data.createDiscussionEntry.discussionEntry.parent.id, false)
+      }
+    },
     onError: () =>
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
   })
@@ -156,11 +160,11 @@ export const IsolatedViewContainer = props => {
     )
   }
 
-  const onReplySubmit = message => {
+  const onReplySubmit = (message, discussionEntry) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: props.discussionEntryId,
+        parentEntryId: discussionEntry.rootEntry?.id || discussionEntry.id,
         message
       }
     })
@@ -261,8 +265,8 @@ export const IsolatedViewContainer = props => {
             onOpenIsolatedView={props.onOpenIsolatedView}
             setRCEOpen={props.setRCEOpen}
             RCEOpen={props.RCEOpen}
-            isHighlighted={isHighlightedParent}
             goToTopic={props.goToTopic}
+            isHighlighted={props.highlightEntryId === props.discussionEntryId}
           >
             {props.RCEOpen && (
               <View
@@ -274,7 +278,7 @@ export const IsolatedViewContainer = props => {
               >
                 <DiscussionEdit
                   onSubmit={text => {
-                    onReplySubmit(text)
+                    onReplySubmit(text, isolatedEntry.data.legacyNode)
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
@@ -290,15 +294,12 @@ export const IsolatedViewContainer = props => {
               onDelete={onDelete}
               onOpenInSpeedGrader={onOpenInSpeedGrader}
               showOlderReplies={fetchMoreEntries}
-              onOpenIsolatedView={props.onOpenIsolatedView}
-              highlightParent={() => {
-                setIsHighlightedParent(true)
-
-                setTimeout(() => {
-                  setIsHighlightedParent(false)
-                }, 2000)
+              onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
+                props.setHighlightEntryId(highlightEntryId)
+                props.onOpenIsolatedView(discussionEntryId, withRCE)
               }}
               goToTopic={props.goToTopic}
+              highlightEntryId={props.highlightEntryId}
             />
           )}
         </>
@@ -315,7 +316,9 @@ IsolatedViewContainer.propTypes = {
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  setHighlightEntryId: PropTypes.func
 }
 
 export default IsolatedViewContainer

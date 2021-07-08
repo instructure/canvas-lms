@@ -72,8 +72,8 @@ export const IsolatedThreadsContainer = props => {
             onDelete={props.onDelete}
             onOpenInSpeedGrader={props.onOpenInSpeedGrader}
             onOpenIsolatedView={props.onOpenIsolatedView}
-            highlightParent={props.highlightParent}
             goToTopic={props.goToTopic}
+            isHighlighted={entry.id === props.highlightEntryId}
           />
         ))}
     </div>
@@ -88,8 +88,8 @@ IsolatedThreadsContainer.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   showOlderReplies: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
-  highlightParent: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  highlightEntryId: PropTypes.string
 }
 
 export default IsolatedThreadsContainer
@@ -160,13 +160,8 @@ const IsolatedThreadContainer = props => {
     )
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
-    <Highlight isHighlighted={highlightEntry}>
+    <Highlight isHighlighted={props.isHighlighted}>
       <Flex>
         <Flex.Item shouldShrink shouldGrow>
           <PostMessageContainer
@@ -195,16 +190,7 @@ const IsolatedThreadContainer = props => {
               }
               onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
               goToParent={() => {
-                if (entry?.parent?.id === entry?.rootEntry?.id) {
-                  // Something else is trying to scroll this and with this timeout we give it a moment and then we execute our scroll.
-                  setTimeout(() => {
-                    document.querySelector('span[data-cid="Transition"]').scrollTo(0, 0)
-                  }, 0)
-                } else {
-                  props.onOpenIsolatedView(entry.rootEntry.id, false)
-                }
-
-                props.highlightParent()
+                props.onOpenIsolatedView(entry.rootEntry.id, false, entry.rootEntry.id)
               }}
               goToTopic={props.goToTopic}
             />
@@ -222,6 +208,6 @@ IsolatedThreadContainer.propTypes = {
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
-  highlightParent: PropTypes.func,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  isHighlighted: PropTypes.bool
 }

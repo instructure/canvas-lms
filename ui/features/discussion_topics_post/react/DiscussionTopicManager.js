@@ -88,7 +88,7 @@ const getOptimisticResponse = text => {
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [isHighlightedTopic, setIsHighlightedTopic] = useState(false)
+  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
@@ -105,21 +105,14 @@ const DiscussionTopicManager = props => {
 
   const goToTopic = () => {
     closeIsolatedView()
-    setTimeout(() => {
-      window.scrollTo(0, 0)
-    }, 0)
-
-    setIsHighlightedTopic(true)
-
-    setTimeout(() => {
-      setIsHighlightedTopic(false)
-    }, 2000)
+    setIsTopicHighlighted(true)
   }
 
   // Isolated View State
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
+  const [highlightEntryId, setHighlightEntryId] = useState(null)
 
   const openIsolatedView = (discussionEntryId, withRCE) => {
     setIsolatedEntryId(discussionEntryId)
@@ -204,7 +197,7 @@ const DiscussionTopicManager = props => {
             optimisticResponse: getOptimisticResponse(text)
           })
         }}
-        isHighlighted={isHighlightedTopic}
+        isHighlighted={isTopicHighlighted}
       />
       {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
       (searchTerm || filter === 'unread') ? (
@@ -226,6 +219,8 @@ const DiscussionTopicManager = props => {
           onClose={closeIsolatedView}
           onOpenIsolatedView={openIsolatedView}
           goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
+          setHighlightEntryId={setHighlightEntryId}
         />
       )}
     </SearchContext.Provider>

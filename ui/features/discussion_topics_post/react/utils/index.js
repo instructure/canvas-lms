@@ -95,19 +95,12 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
     })
   }
 }
-export const addReplyToSubentries = (
-  cache,
-  discussionEntryId,
-  perPage,
-  sort,
-  newDiscussionEntry,
-  courseID
-) => {
+export const addReplyToSubentries = (cache, perPage, sort, newDiscussionEntry, courseID) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
-        discussionEntryID: discussionEntryId,
+        discussionEntryID: newDiscussionEntry.parent.id,
         perPage,
         sort,
         courseID
