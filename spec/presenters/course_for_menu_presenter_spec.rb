@@ -19,8 +19,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../helpers/k5_common'
 
 describe CourseForMenuPresenter do
+  include K5Common
+
   let_once(:account) { Account.default }
   let_once(:course) { Course.create!(account: account) }
   let_once(:user) { User.create! }
@@ -94,6 +97,19 @@ describe CourseForMenuPresenter do
       expect(cs_presenter.to_h.key?(:published)).to eq true
     end
 
+    context 'isK5Subject' do
+      it 'is set for k5 subjects' do
+        toggle_k5_setting(course.account)
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:isK5Subject]).to be_truthy
+      end
+
+      it 'is false for classic courses' do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:isK5Subject]).to be_falsey
+      end
+    end
+
     context 'with `homeroom_course` setting enabled' do
       before do
         course.update! homeroom_course: true
@@ -133,8 +149,7 @@ describe CourseForMenuPresenter do
       end
 
       it 'sets `color` if the course is associated with a K-5 account' do
-        course.account.settings[:enable_as_k5_account] = { value: true }
-        course.account.save!
+        toggle_k5_setting(course.account)
 
         h = CourseForMenuPresenter.new(course, user, account).to_h
         expect(h[:color]).to eq '#789'

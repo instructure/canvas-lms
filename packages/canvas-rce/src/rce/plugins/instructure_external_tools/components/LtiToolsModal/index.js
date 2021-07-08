@@ -24,6 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
@@ -69,6 +70,7 @@ export function LtiToolsModal(props) {
         <View as="div" padding="x-small none x-small medium">
           <TextInput
             type="search"
+            renderLabel={<ScreenReaderContent>{formatMessage('Search')}</ScreenReaderContent>}
             placeholder={formatMessage('Search')}
             renderAfterInput={<IconSearchLine inline={false} />}
             onChange={handleFilterChange}

@@ -24,21 +24,24 @@ import {startLoadingAllOpportunities, responsiviser, store} from '@instructure/c
 import {
   IconBankLine,
   IconCalendarMonthLine,
+  IconCheckDarkSolid,
   IconHomeLine,
   IconMoreLine,
-  IconStarLightLine
+  IconStarLightLine,
+  IconCalendarReservedLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {View} from '@instructure/ui-view'
+import {Tray} from '@instructure/ui-tray'
 
 import K5Tabs from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
+import TodosPage from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import loadCardDashboard from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
@@ -54,6 +57,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import ImportantDates from './ImportantDates'
 
 const DASHBOARD_TABS = [
   {
@@ -75,6 +79,11 @@ const DASHBOARD_TABS = [
     id: TAB_IDS.RESOURCES,
     icon: IconBankLine,
     label: I18n.t('Resources')
+  },
+  {
+    id: TAB_IDS.TODO,
+    icon: IconCheckDarkSolid,
+    label: I18n.t('To Do')
   }
 ]
 
@@ -99,6 +108,18 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
   )
 }
 
+const toRenderTabs = (currentUserRoles, hideGradesTabForStudents) =>
+  DASHBOARD_TABS.filter(
+    ({id}) =>
+      (id !== TAB_IDS.TODO &&
+        !(
+          hideGradesTabForStudents &&
+          id === TAB_IDS.GRADES &&
+          currentUserRoles.includes('student')
+        )) ||
+      currentUserRoles.includes('teacher')
+  )
+
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
@@ -111,15 +132,19 @@ export const K5Dashboard = ({
   timeZone,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  hideGradesTabForStudents = false,
+  showImportantDates
 }) => {
-  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, DASHBOARD_TABS)
+  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
+  const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([])
   const [subjectAnnouncements, setSubjectAnnouncements] = useState([])
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
+  const [trayOpen, setTrayOpen] = useState(false)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -127,6 +152,7 @@ export const K5Dashboard = ({
     callback: () => loadAllOpportunities()
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
+  const useImportantDatesTray = responsiveSize !== 'large'
 
   useEffect(() => {
     if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
@@ -185,71 +211,124 @@ export const K5Dashboard = ({
     }
   }
 
-  const renderDashboardHeader = sticky => (
-    <Flex as="section">
-      <Flex.Item shouldGrow>
-        <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="medium 0 small 0">
-          {I18n.t('Welcome, %{name}!', {name: display_name})}
-        </Heading>
-      </Flex.Item>
-      {canDisableElementaryDashboard && (
-        <Flex.Item>
-          <K5DashboardOptionsMenu onDisableK5Dashboard={handleDisableK5Dashboard} />
+  const renderDashboardHeader = sticky => {
+    const showingIcons =
+      (useImportantDatesTray && showImportantDates) || canDisableElementaryDashboard
+    return (
+      <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
+        <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
+          <Heading as="h1" level={sticky ? 'h2' : 'h1'}>
+            {I18n.t('Welcome, %{name}!', {name: display_name})}
+          </Heading>
         </Flex.Item>
-      )}
-    </Flex>
-  )
+        {useImportantDatesTray && showImportantDates && (
+          <Flex.Item align="start">
+            <IconButton
+              screenReaderLabel={I18n.t('View Important Dates')}
+              onClick={() => setTrayOpen(true)}
+              renderIcon={IconCalendarReservedLine}
+              withBackground={false}
+              withBorder={false}
+            />
+          </Flex.Item>
+        )}
+        {canDisableElementaryDashboard && (
+          <Flex.Item align="start">
+            <K5DashboardOptionsMenu onDisableK5Dashboard={handleDisableK5Dashboard} />
+          </Flex.Item>
+        )}
+      </Flex>
+    )
+  }
+
+  const importantDateContextCodes = cards
+    ?.filter(c => c.isK5Subject)
+    .slice(0, 20)
+    .map(({id}) => `course_${id}`)
 
   return (
-    <View as="section">
-      <K5DashboardContext.Provider
-        value={{
-          assignmentsDueToday,
-          assignmentsMissing,
-          assignmentsCompletedForToday,
-          loadingAnnouncements,
-          loadingOpportunities,
-          isStudent: plannerEnabled,
-          responsiveSize,
-          subjectAnnouncements
-        }}
-      >
-        {currentTab && (
-          <K5Tabs
-            currentTab={currentTab}
-            onTabChange={handleTabChange}
-            tabs={DASHBOARD_TABS}
-            tabsRef={setTabsRef}
+    <>
+      <Flex as="section" alignItems="start">
+        <Flex.Item shouldGrow shouldShrink padding="medium">
+          <K5DashboardContext.Provider
+            value={{
+              assignmentsDueToday,
+              assignmentsMissing,
+              assignmentsCompletedForToday,
+              loadingAnnouncements,
+              loadingOpportunities,
+              isStudent: plannerEnabled,
+              responsiveSize,
+              subjectAnnouncements
+            }}
           >
-            {renderDashboardHeader}
-          </K5Tabs>
+            {currentTab && (
+              <K5Tabs
+                currentTab={currentTab}
+                onTabChange={handleTabChange}
+                tabs={availableTabs}
+                tabsRef={setTabsRef}
+              >
+                {renderDashboardHeader}
+              </K5Tabs>
+            )}
+            <HomeroomPage
+              cards={cards}
+              createPermissions={createPermissions}
+              homeroomAnnouncements={homeroomAnnouncements}
+              loadingAnnouncements={loadingAnnouncements}
+              visible={currentTab === TAB_IDS.HOMEROOM}
+            />
+            <SchedulePage
+              plannerEnabled={plannerEnabled}
+              plannerInitialized={plannerInitialized}
+              timeZone={timeZone}
+              userHasEnrollments={!!cards?.length}
+              visible={currentTab === TAB_IDS.SCHEDULE}
+            />
+            <GradesPage
+              visible={currentTab === TAB_IDS.GRADES}
+              currentUserRoles={currentUserRoles}
+            />
+            {cards && (
+              <ResourcesPage
+                cards={cards}
+                cardsSettled={cardsSettled}
+                visible={currentTab === TAB_IDS.RESOURCES}
+                showStaff
+                filterToHomerooms
+              />
+            )}
+            {currentUserRoles.includes('teacher') && (
+              <TodosPage timeZone={timeZone} visible={currentTab === TAB_IDS.TODO} />
+            )}
+          </K5DashboardContext.Provider>
+        </Flex.Item>
+        {!useImportantDatesTray && showImportantDates && (
+          <Flex.Item as="div" size="18rem" id="important-dates-sidebar">
+            <ImportantDates timeZone={timeZone} contextCodes={importantDateContextCodes} />
+          </Flex.Item>
         )}
-        <HomeroomPage
-          cards={cards}
-          createPermissions={createPermissions}
-          homeroomAnnouncements={homeroomAnnouncements}
-          loadingAnnouncements={loadingAnnouncements}
-          visible={currentTab === TAB_IDS.HOMEROOM}
-        />
-        <SchedulePage
-          plannerEnabled={plannerEnabled}
-          plannerInitialized={plannerInitialized}
-          timeZone={timeZone}
-          userHasEnrollments={!!cards?.length}
-          visible={currentTab === TAB_IDS.SCHEDULE}
-        />
-        <GradesPage visible={currentTab === TAB_IDS.GRADES} currentUserRoles={currentUserRoles} />
-        {cards && (
-          <ResourcesPage
-            cards={cards}
-            cardsSettled={cardsSettled}
-            visible={currentTab === TAB_IDS.RESOURCES}
-            showStaff
-            filterToHomerooms
-          />
-        )}
-      </K5DashboardContext.Provider>
-    </View>
+      </Flex>
+      {useImportantDatesTray && showImportantDates && (
+        <Tray
+          label={I18n.t('Important Dates Tray')}
+          open={trayOpen}
+          placement="end"
+          size="large"
+          shouldCloseOnDocumentClick
+          onDismiss={() => setTrayOpen(false)}
+        >
+          <div id="important-dates-sidebar">
+            <ImportantDates
+              timeZone={timeZone}
+              contextCodes={importantDateContextCodes}
+              handleClose={() => setTrayOpen(false)}
+            />
+          </div>
+        </Tray>
+      )}
+    </>
   )
 }
 
@@ -268,7 +347,9 @@ K5Dashboard.propTypes = {
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  responsiveSize: PropTypes.string
+  responsiveSize: PropTypes.string,
+  hideGradesTabForStudents: PropTypes.bool,
+  showImportantDates: PropTypes.bool.isRequired
 }
 
 const mapDispatchToProps = {

@@ -147,6 +147,27 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("peerReviews { automaticReviews }")).to eq assignment.automatic_peer_reviews
   end
 
+  it 'returns assessment requests for the current user' do
+    student2 = student_in_course(course: course, name: 'Matthew Lemon', active_all: true).user
+    student3 = student_in_course(course: course, name: 'Rob Orton', active_all: true).user
+
+    assignment.assign_peer_review(student, student2)
+    assignment.assign_peer_review(student2, student3)
+    assignment.assign_peer_review(student3, student)
+
+    result = assignment_type.resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student2.name
+
+    result = GraphQLTypeTester.new(assignment, current_user: student2).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student3.name
+
+    result = GraphQLTypeTester.new(assignment, current_user: student3).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    expect(result.count).to eq 1
+    expect(result[0]).to eq student.name
+  end
+
   it "works with timezone stuffs" do
     assignment.time_zone_edited = "Mountain Time (US & Canada)"
     assignment.save!

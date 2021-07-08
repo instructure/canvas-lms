@@ -23,7 +23,7 @@
     # we need the permission in order to even figure out what the appropriate root account is.
     # So in this case, we'll take either; this appears to be safe because the permission check
     # is not used anywhere else in this view.
-    managed_accounts = @user.associated_root_accounts.active.select{|a| can_do(a, @current_user, :allow_course_admin_actions, :manage_admin_users) }
+    managed_accounts = @user.associated_root_accounts.select{|a| can_do(a, @current_user, :allow_course_admin_actions, :manage_admin_users) }
     account ||= managed_accounts.first
     root_account = account.root_account if account
   end

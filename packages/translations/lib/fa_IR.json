@@ -50,9 +50,6 @@
     "calendar_event_89aadc1c": {
         "message": "رویداد تقویم"
     },
-    "cancel_caeb1e68": {
-        "message": "لغو"
-    },
     "choose_usage_rights_33683854": {
         "message": "انتخاب حقوق استفاده..."
     },
@@ -86,10 +83,16 @@
     "copyright_holder_66ee111": {
         "message": "دارنده حق نشر:"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
     },
     "course_8a63b4a3": {
@@ -106,9 +109,6 @@
     },
     "creative_commons_license_725584ae": {
         "message": "مجوز کریتیو کامنز:"
-    },
-    "current_volume_level_c55ab825": {
-        "message": "سطح حجم فعلی"
     },
     "custom_6979cd81": {
         "message": "سفارشی"
@@ -146,9 +146,6 @@
     "done_54e3d4b6": {
         "message": "انجام شد"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "کشیدن فایل اینجا"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "بکشید و رها کنید، یا برای مرور رایانه کلیک کنید"
     },
@@ -167,17 +164,11 @@
     "embed_image_1080badc": {
         "message": "درج تصویر"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "خطا در بارگذاری ضبط ویدیو/ ضبط صدا."
-    },
     "excused_cf8792eb": {
         "message": "معاف شد"
     },
     "external_tools_6e77821": {
         "message": "ابزارهای بیرونی"
-    },
-    "file_name_8fd421ff": {
-        "message": "نام فایل"
     },
     "file_upload_failed_af22dd91": {
         "message": "آپلود پرونده انجام نشد"
@@ -190,9 +181,6 @@
     },
     "files_index_af7c662b": {
         "message": "فهرست فایل ها"
-    },
-    "finish_bc343002": {
-        "message": "پایان"
     },
     "folder_tree_fbab0726": {
         "message": "درخت پوشه"
@@ -214,6 +202,12 @@
     },
     "group_navigation_99f191a": {
         "message": "پیمایش گروه"
+    },
+    "home_351838cd": {
+        "message": "صفحه اصلی"
+    },
+    "html_editor_fb2ab713": {
+        "message": "ویرایشگر HTML"
     },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "مجوز استفاده از این فایل را به دست آورده ام."
@@ -248,6 +242,9 @@
     "invalid_url_cbde79f": {
         "message": "نشانی اینترنتی معتبر نیست"
     },
+    "jump_to_today_254ccf41": {
+        "message": "پرش به امروز"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "میانبرهای صفحه کلید"
     },
@@ -259,15 +256,6 @@
     },
     "links_14b70841": {
         "message": "پیوندها"
-    },
-    "list_collapsed_9ac35920": {
-        "message": "فهرست جمع شد."
-    },
-    "list_collapsed_dde87718": {
-        "message": "فهرست جمع شد."
-    },
-    "list_expanded_efec2d0": {
-        "message": "فهرست باز شد."
     },
     "load_more_a36f9cf9": {
         "message": "بارگذاری بیشتر"
@@ -299,9 +287,6 @@
     "media_af190855": {
         "message": "رسانه"
     },
-    "mic_a7f3d311": {
-        "message": "میکروفون"
-    },
     "missing_1a256b3b": {
         "message": "جا افتاده"
     },
@@ -323,11 +308,14 @@
     "no_e16d9132": {
         "message": "خیر"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
+    },
     "no_results_940393cf": {
         "message": "No results."
     },
-    "no_video_1ed00b26": {
-        "message": "بدون تصویر"
+    "none_3b5e34d2": {
+        "message": "هیچ کدام"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "چیزی در حال حاضر موجود نیست"
@@ -344,29 +332,17 @@
     "pages_e5414c2c": {
         "message": "صفحه ها"
     },
-    "pause_12af3bb4": {
-        "message": "مکث"
-    },
     "peer_review_74f26a13": {
         "message": "بازبینی گروهی"
     },
     "people_b4ebb13c": {
         "message": "افراد"
     },
-    "play_1a47eaa7": {
-        "message": "نمایش"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "لطفاً به Canvas اجازه دهید تا به میکروفون و وب کم شما دسترسی پیدا کند."
-    },
     "points_bceb5005": {
         "message": "امتیازها"
     },
     "preview_53003fd2": {
         "message": "پیش‌نمایش"
-    },
-    "preview_a3f8f854": {
-        "message": "پیش نمایش"
     },
     "previous_month_bb1e3c84": {
         "message": "ماه قبل"
@@ -389,9 +365,6 @@
     "record_7c9448b": {
         "message": "ضبط کردن"
     },
-    "recording_98da6bda": {
-        "message": "در حال ضبط"
-    },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"
     },
@@ -413,20 +386,14 @@
     "something_went_wrong_89195131": {
         "message": "اشکالی رخ داده است."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "در دسترسی به میکروفون یا وب کم مشکلی پیش آمد."
-    },
     "something_went_wrong_d238c551": {
         "message": "مشکلی پیش آمد"
     },
     "sort_by_e75f9e3e": {
         "message": "مرتب کردن بر اساس"
     },
-    "start_over_f7552aa9": {
-        "message": "شروع دوباره"
-    },
-    "start_recording_9a65141a": {
-        "message": "شروع ضبط"
+    "star_8d156e09": {
+        "message": "ستاره دار کردن"
     },
     "submit_a3cc6859": {
         "message": "ارسال"
@@ -470,9 +437,6 @@
     "unpublished_dfd8801": {
         "message": "منتشر نشده"
     },
-    "untitled_16aa4f2b": {
-        "message": "بدون عنوان"
-    },
     "upload_file_fd2361b8": {
         "message": "بارگذاری فایل"
     },
@@ -491,14 +455,8 @@
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
     },
-    "video_player_b371005": {
-        "message": "پخش کننده فیلم"
-    },
     "view_ba339f93": {
         "message": "مشاهده"
-    },
-    "webcam_fe91b20f": {
-        "message": "دوربین"
     },
     "wiki_home_9cd54d0": {
         "message": "صفحه اصلی ویکی"
@@ -508,8 +466,5 @@
     },
     "yesterday_c6bd6abf": {
         "message": "دیروز"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "وب کم شما ممکن است در حال استفاده باشد."
     }
 }

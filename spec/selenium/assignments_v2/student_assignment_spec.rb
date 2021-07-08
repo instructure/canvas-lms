@@ -175,35 +175,36 @@ describe 'as a student' do
       before(:each) do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
-        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
       end
 
       it 'can be submitted', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
-        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
-        StudentAssignmentPageV2.submit_button
+        StudentAssignmentPageV2.submit_button_enabled
         StudentAssignmentPageV2.submit_assignment
-        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         in_frame tiny_rce_ifr_id do
-          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+          expect(f('body')).to include_text("Hello")
         end
       end
 
       it 'should be able to be saved as a draft', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
-        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         in_frame tiny_rce_ifr_id do
-          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+          expect(f('body')).to include_text("Hello")
         end
 
         expect(StudentAssignmentPageV2.footer).to include_text("Draft Saved")
         refresh_page
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
         in_frame tiny_rce_ifr_id do
-          expect(StudentAssignmentPageV2.text_display_area).to include_text("Hello")
+          expect(f('body')).to include_text("Hello")
         end
       end
     end

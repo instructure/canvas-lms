@@ -28,12 +28,14 @@ export default {
   argTypes: {}
 }
 
-const Template = args => <Alert pointsPossible={5} dueAtDisplayText="Jan 26 11:49pm" {...args} />
+const Template = args => <Alert {...args} />
 
 export const SingleDueDate = Template.bind({})
 SingleDueDate.args = {
   assignmentOverrides: [],
-  canSeeMultipleDueDates: false
+  canSeeMultipleDueDates: false,
+  pointsPossible: 5,
+  dueAtDisplayText: 'Jan 26 11:49pm'
 }
 
 export const MultipleDueDates = Template.bind({})
@@ -57,5 +59,7 @@ MultipleDueDates.args = {
       title: 'Mutants Group 3'
     }
   ],
-  canSeeMultipleDueDates: true
+  canSeeMultipleDueDates: true,
+  pointsPossible: 5,
+  dueAtDisplayText: 'Jan 26 11:49pm'
 }

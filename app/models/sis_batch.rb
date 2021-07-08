@@ -691,6 +691,7 @@ class SisBatch < ActiveRecord::Base
       "multi_term_batch_mode" => self.options[:multi_term_batch_mode],
       "override_sis_stickiness" => self.options[:override_sis_stickiness],
       "add_sis_stickiness" => self.options[:add_sis_stickiness],
+      "update_sis_id_if_login_claimed" => self.options[:update_sis_id_if_login_claimed],
       "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
       "diffing_data_set_identifier" => self.diffing_data_set_identifier,
       "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],

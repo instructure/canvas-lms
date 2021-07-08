@@ -30,6 +30,7 @@ module Api::V1::Quiz
       description
       due_at
       hide_correct_answers_at
+      important_dates
       ip_filter
       lock_at
       lockdown_browser_monitor_data
@@ -224,6 +225,10 @@ module Api::V1::Quiz
       if time_limit && time_limit.to_i < 0
         update_params.delete 'time_limit'
       end
+    end
+
+    if update_params.key?('important_dates') && Account.site_admin.feature_enabled?(:important_dates)
+      update_params['important_dates'] = value_to_boolean(update_params['important_dates'])
     end
 
     published = update_params.delete('published') if update_params.has_key?('published')

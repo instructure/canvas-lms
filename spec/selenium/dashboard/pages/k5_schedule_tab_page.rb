@@ -25,6 +25,18 @@ module K5ScheduleTabPageObject
 
   #------------------------- Selectors --------------------------
 
+  def calendar_event_modal_selector
+    "[aria-label='Calendar Event Details']"
+  end
+
+  def close_calendar_event_modal_selector
+    "//button[.//*[. = 'Close']]"
+  end
+
+  def close_editor_modal_selector
+    "[data-testid='close-editor-modal']"
+  end
+
   def missing_assignments_selector
     ".MissingAssignments-styles__root .PlannerItem-styles__title"
   end
@@ -61,6 +73,26 @@ module K5ScheduleTabPageObject
     "h2 div:contains('Today')"
   end
 
+  def todo_edit_pencil_selector
+    ".PlannerItem-styles__editButton button[cursor='pointer']"
+  end
+
+  def todo_editor_modal_selector
+    "[data-testid='todo-editor-modal']"
+  end
+
+  def todo_item_selector
+    ".PlannerItem-styles__title button"
+  end
+
+  def todo_save_button_selector
+    "//button[.//*[. = 'Save']]"
+  end
+
+  def todo_title_input_selector(todo_title)
+    "[value='#{todo_title}']"
+  end
+
   def week_date_selector
     "h2 div"
   end
@@ -74,6 +106,18 @@ module K5ScheduleTabPageObject
   def beginning_of_week_date
     date_block = ff(week_date_selector)
     date_block[0].text == 'Today' ? date_block[1].text : date_block[0].text
+  end
+
+  def calendar_event_modal
+    f(calendar_event_modal_selector)
+  end
+
+  def close_calendar_event_modal
+    fxpath(close_calendar_event_modal_selector)
+  end
+
+  def close_editor_modal
+    f(close_editor_modal_selector)
   end
 
   def end_of_week_date
@@ -124,10 +168,38 @@ module K5ScheduleTabPageObject
     fj(today_selector)
   end
 
+  def todo_edit_pencil
+    f(todo_edit_pencil_selector)
+  end
+
+  def todo_editor_modal
+    f(todo_editor_modal_selector)
+  end
+
+  def todo_item
+    f(todo_item_selector)
+  end
+
+  def todo_save_button
+    fxpath(todo_save_button_selector)
+  end
+
+  def todo_title_input(todo_title)
+    f(todo_title_input_selector(todo_title))
+  end
+
   #----------------------- Actions & Methods -------------------------
 
 
   #----------------------- Click Items -------------------------------
+
+  def click_close_calendar_event_modal
+    close_calendar_event_modal.click
+  end
+
+  def click_close_editor_modal_button
+    close_editor_modal.click
+  end
 
   def click_missing_items
     items_missing.click
@@ -145,10 +217,26 @@ module K5ScheduleTabPageObject
     today_button.click
   end
 
+  def click_todo_edit_pencil
+    todo_edit_pencil.click
+  end
+
+  def click_todo_item
+    todo_item.click
+  end
+
+  def click_todo_save_button
+    todo_save_button.click
+  end
+
   #------------------------------Retrieve Text----------------------#
 
 
   #----------------------------Element Management---------------------#
+
+  def calendar_modal_exists?
+    element_exists?(calendar_event_modal_selector)
+  end
 
   def missing_assignments_exist?
     element_exists?(missing_assignments_selector)
@@ -160,6 +248,15 @@ module K5ScheduleTabPageObject
 
   def schedule_item_exists?
     element_exists?(schedule_item_selector)
+  end
+
+  def todo_modal_exists?
+    element_exists?(todo_editor_modal_selector)
+  end
+
+  def update_todo_title(old_todo_title, new_todo_title)
+    todo_element = todo_title_input(old_todo_title)
+    todo_element.send_keys([:command, 'a'], :backspace, new_todo_title)
   end
 
   #------------------------Helper Methods------------------------#

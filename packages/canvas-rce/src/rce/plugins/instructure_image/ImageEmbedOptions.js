@@ -58,15 +58,13 @@ function imageSizeFromKnownOptions(imageOptions) {
 }
 
 export function fromImageEmbed($element) {
-  const altText = $element.alt || ''
+  const altText = $element.getAttribute('alt')
 
   const imageOptions = {
-    altText,
+    altText: altText || '',
     appliedHeight: parsedOrNull($element, 'height'),
     appliedWidth: parsedOrNull($element, 'width'),
-    isDecorativeImage:
-      $element.getAttribute('data-decorative') === 'true' ||
-      $element.getAttribute('role') === 'presentation',
+    isDecorativeImage: altText !== null && altText.replace(/\s/g, '') === '',
     naturalHeight: $element.naturalHeight,
     naturalWidth: $element.naturalWidth,
     url: $element.src

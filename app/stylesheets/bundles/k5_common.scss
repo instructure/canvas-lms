@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+// These overrides are required because InstUI Tabs don't natively support icons or
+// themeable "selected" colors. There are also some properties required for the
+// animated sticky header transitions that can't be accomplished easily via InstUI.
+.ic-Dashboard-tabs {
+  position: sticky;
+  // This is a trick to let our JS code know when position: sticky has kicked in.
+  // See https://developers.google.com/web/updates/2017/09/sticky-headers.
+  top: -1px;
+  padding-top: 1px;
+  // These offsets let the sticky header cover content that spills over into the
+  // page padding, otherwise it's still visible behind the sticky header.
+  margin-left: -24px;
+  padding-left: 24px;
+  // We need a higher z-index than the planner items, some of which are at 1.
+  z-index: 2;
+
+  & h1 {
+    transition: font-size 0.1s ease;
+  }
+
+  & [role="tab"] {
+    padding: 0.75rem 1.25rem;
+  }
+
+  & [role="tabpanel"] {
+    display: none;
+  }
+
+  & .ic-Dashboard-tabs__tab {
+    display: flex;
+    align-items: flex-end;
+
+    &.selected {
+      color: var(--ic-brand-primary);
+    }
+
+    & svg {
+      margin-right: 0.5em;
+    }
+  }
+}
+
+// Shimmer animation for the LoadingSkeleton component
+@keyframes shimmer {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -100% 0%;
+  }
+}

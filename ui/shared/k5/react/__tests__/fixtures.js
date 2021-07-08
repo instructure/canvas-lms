@@ -40,3 +40,61 @@ export const GRADING_PERIODS = [
     workflow_state: 'deleted'
   }
 ]
+
+export const MOCK_ASSIGNMENTS = [
+  {
+    context_color: null,
+    context_name: 'Algebra 2',
+    html_url: 'http://localhost:3000/courses/30/assignments/175',
+    id: 'assignment_175',
+    important_dates: true,
+    start_at: '2021-07-02T13:59:59Z',
+    title: 'Math HW',
+    type: 'assignment',
+    assignment: {
+      due_at: '2021-07-02T13:59:59Z', // 7:59am MT, 7:44pm Kathmandu
+      submission_types: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+    }
+  },
+  {
+    context_color: '#CCCCCC',
+    context_name: 'History',
+    html_url: 'http://localhost:3000/courses/31/assignments/176',
+    id: 'assignment_176',
+    important_dates: true,
+    start_at: '2021-07-04T05:59:59Z',
+    title: 'History Discussion',
+    type: 'assignment',
+    assignment: {
+      due_at: '2021-07-04T11:30:00Z', // 5:30am MT, 5:15pm Kathmandu
+      submission_types: ['discussion_topic']
+    }
+  },
+  {
+    context_color: '#CCCCCC',
+    context_name: 'History',
+    html_url: 'http://localhost:3000/courses/31/assignments/177',
+    id: 'assignment_177',
+    important_dates: true,
+    start_at: '2021-07-04T22:00:00Z',
+    title: 'History Exam',
+    type: 'assignment',
+    assignment: {
+      due_at: '2021-07-04T22:00:00Z', // 4pm MT, 3:45am Jul 5 Kathmandu
+      submission_types: ['online_quiz']
+    }
+  }
+]
+
+export const MOCK_EVENTS = [
+  {
+    context_color: '#CCCCCC',
+    context_name: 'History',
+    html_url: 'http://localhost:3000/calendar?event_id=99&include_contexts=course_30',
+    id: '99',
+    important_dates: true,
+    start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+    title: 'Morning Yoga',
+    type: 'event'
+  }
+]

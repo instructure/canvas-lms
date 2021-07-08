@@ -148,6 +148,7 @@ export const AssignmentLinks = ({
       {numDueToday > 0 ? (
         <Flex.Item>
           <Link
+            data-testid="number-due-today"
             href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.TODAY}#schedule`}
             display="block"
             isWithinText={false}
@@ -178,6 +179,7 @@ export const AssignmentLinks = ({
           </Flex.Item>
           <Flex.Item>
             <Link
+              data-testid="number-missing"
               href={`/courses/${id}?focusTarget=${FOCUS_TARGETS.MISSING_ITEMS}#schedule`}
               display="block"
               isWithinText={false}

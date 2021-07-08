@@ -144,7 +144,7 @@ export function Alert({...props}) {
       {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
         ? multipleDueDates
         : singleDueDate}
-      <Flex.Item padding="x-small" align="end">
+      <Flex.Item shouldShrink padding="x-small" align="end">
         <Text weight="light" size="small">
           {I18n.t(
             {

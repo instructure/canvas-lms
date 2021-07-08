@@ -253,7 +253,7 @@ module MicrosoftSync
 
       it 'increments a statsd counter when complete' do
         expect(steps_object).to receive(:step_initial).and_return StateMachineJob::COMPLETE
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         subject.send(:run, nil, nil)
         expect(InstStatsd::Statsd).to \
           have_received(:increment).with('microsoft_sync.smj.complete', tags: {})
@@ -272,7 +272,7 @@ module MicrosoftSync
         end
 
         it 'increments the "retry" statsd counter' do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
           subject.send(:run, nil, nil)
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             'microsoft_sync.smj.retry',
@@ -306,7 +306,7 @@ module MicrosoftSync
           end
 
           it 'increments the "final_retry" statsd counter' do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
             expect { subject.send(:run, :step_initial, nil) }.to \
               raise_error(Errors::PublicError)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
@@ -518,7 +518,7 @@ module MicrosoftSync
           end
 
           it 'increments the "failure" statsd metric' do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
             expect { subject.send(:run, :step_initial, nil) }.to raise_error(error)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.smj.failure',
@@ -549,7 +549,7 @@ module MicrosoftSync
           end
 
           it 'increments a "canceled" statsd metric' do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
             subject.send(:run, nil, nil)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.smj.cancel',
@@ -653,7 +653,7 @@ module MicrosoftSync
             end
 
             it 'increments a "stalled" statsd metric' do
-              allow(InstStatsd::Statsd).to receive(:increment)
+              allow(InstStatsd::Statsd).to receive(:increment).and_call_original
               subject.send(:run, nil, nil)
               expect(InstStatsd::Statsd).to have_received(:increment).with(
                 'microsoft_sync.smj.stalled',

@@ -56,6 +56,7 @@ class CourseForMenuPresenter
       observee: observee,
       id: course.id,
       isFavorited: course.favorite_for_user?(@user),
+      isK5Subject: course.elementary_subject_course?,
       isHomeroom: course.homeroom_course,
       canManage: course.grants_right?(@user, :manage_content),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,

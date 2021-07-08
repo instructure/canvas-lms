@@ -19,8 +19,8 @@
 
 module DataFixup::Lti::FillLookupUuidAndResourceLinkUuidColumns
   def self.run
-    resource_links_to_update.in_batches do |resource_links|
-      update_columns!(resource_links)
+    resource_links_to_update.find_each do |resource_link|
+      update_columns!(resource_link)
     end
   end
 
@@ -36,25 +36,23 @@ module DataFixup::Lti::FillLookupUuidAndResourceLinkUuidColumns
   #
   # So, we decide that will be better to follow the second approach by
   # re-generate the UUID and set it to the old and the new column for consistency.
-  def self.update_columns!(resource_links)
-    resource_links.each do |resource_link|
-      options = {
-        lookup_uuid: resource_link.lookup_id,
-        resource_link_uuid: resource_link.resource_link_id
-      }
+  def self.update_columns!(resource_link)
+    options = {
+      lookup_uuid: resource_link.lookup_id,
+      resource_link_uuid: resource_link.resource_link_id
+    }
 
-      unless UuidHelper.valid_format?(resource_link.lookup_id)
-        Rails.logger.info("[#{name}] generating a new lookup_id for id: #{resource_link.id}, lookup_id: #{resource_link.lookup_id}")
-        options[:lookup_id] = options[:lookup_uuid] = SecureRandom.uuid
-      end
-
-      unless UuidHelper.valid_format?(resource_link.resource_link_id)
-        Rails.logger.info("[#{name}] generating a new resource_link_id for id: #{resource_link.id}, resource_link_id: #{resource_link.resource_link_id}")
-        options[:resource_link_id] = options[:resource_link_uuid] = SecureRandom.uuid
-      end
-
-      resource_link.update!(options)
+    unless UuidHelper.valid_format?(resource_link.lookup_id)
+      Rails.logger.info("[#{name}] generating a new lookup_id for id: #{resource_link.id}, lookup_id: #{resource_link.lookup_id}")
+      options[:lookup_id] = options[:lookup_uuid] = SecureRandom.uuid
     end
+
+    unless UuidHelper.valid_format?(resource_link.resource_link_id)
+      Rails.logger.info("[#{name}] generating a new resource_link_id for id: #{resource_link.id}, resource_link_id: #{resource_link.resource_link_id}")
+      options[:resource_link_id] = options[:resource_link_uuid] = SecureRandom.uuid
+    end
+
+    resource_link.update!(options)
   end
 
   def self.resource_links_to_update

@@ -19,17 +19,38 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
+import fakeENV from 'helpers/fakeENV'
 
-import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
-import Header from 'ui/features/assignment_grade_summary/react/components/Header.js'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
+import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
+import Header from 'ui/features/assignment_grade_summary/react/components/Header'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
 
 QUnit.module('GradeSummary Header', suiteHooks => {
+  let students
+  let grades
   let store
   let storeEnv
   let wrapper
 
   suiteHooks.beforeEach(() => {
+    students = [
+      {id: '1', displayName: 'Adam Jones'},
+      {id: '2', displayName: 'Larry Brown'}
+    ]
+    grades = [
+      {grade: '4', graderId: '1103', id: '34', score: 4, selected: true, studentId: '1'},
+      {grade: '6', graderId: '1102', id: '35', score: 8, selected: false, studentId: '1'},
+      {grade: '8', graderId: '1103', id: '36', score: 3, selected: true, studentId: '2'},
+      {grade: '10', graderId: '1102', id: '37', score: 9, selected: false, studentId: '2'}
+    ]
+    fakeENV.setup({
+      GRADERS: [
+        {grader_name: 'Charlie Xi', id: '4502', user_id: '1103', grader_selectable: true},
+        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false}
+      ]
+    })
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -43,8 +64,8 @@ QUnit.module('GradeSummary Header', suiteHooks => {
         id: '1105'
       },
       graders: [
-        {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
+        {grader_name: 'Charlie Xi', id: '4502', user_id: '1103', grader_selectable: true},
+        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false}
       ]
     }
   })
@@ -62,6 +83,13 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     )
   }
 
+  function mountAndInitialize() {
+    mountComponent()
+    store.dispatch(StudentActions.addStudents(students))
+    store.dispatch(GradeActions.addProvisionalGrades(grades))
+    wrapper.update()
+  }
+
   test('includes the "Grade Summary" heading', () => {
     mountComponent()
     equal(wrapper.find('h1').text(), 'Grade Summary')
@@ -73,6 +101,17 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     const childArray = children.map(child => child)
     const headingIndex = childArray.findIndex(child => child.text() === 'Grade Summary')
     equal(childArray[headingIndex + 1].text(), 'Example Assignment')
+  })
+
+  test('includes a "grader with inactive enrollments" message when a grader with inactive enrollment was selected', () => {
+    mountComponent()
+    store.dispatch(
+      AssignmentActions.setReleaseGradesStatus(
+        AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS
+      )
+    )
+    wrapper.update()
+    ok(wrapper.text().includes('grader with inactive enrollments'))
   })
 
   test('includes a "grades released" message when grades have been released', () => {
@@ -148,6 +187,38 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
       strictEqual(store.getState().assignment.releaseGradesStatus, null)
+    })
+
+    test('enables onClick when there are no grades', () => {
+      grades = []
+      mountAndInitialize()
+      const releaseButton = wrapper.find('ReleaseButton')
+      releaseButton.simulate('click')
+      strictEqual(releaseButton.find('button').props().disabled, false)
+    })
+
+    test('enables button when there are no grades selected', () => {
+      grades.forEach(grade => (grade.selected = false))
+      mountAndInitialize()
+      const releaseButton = wrapper.find('ReleaseButton')
+      releaseButton.simulate('click')
+      strictEqual(releaseButton.find('button').props().disabled, false)
+    })
+
+    test('disables onClick when there is at least one grade with a not selectable grader', () => {
+      grades[0].selected = false
+      grades[1].selected = true
+      mountAndInitialize()
+      const releaseButton = wrapper.find('ReleaseButton')
+      releaseButton.simulate('click')
+      strictEqual(releaseButton.find('button').props().disabled, true)
+    })
+
+    test('enables onClick when all the grades have a selectable grader', () => {
+      mountAndInitialize()
+      const releaseButton = wrapper.find('ReleaseButton')
+      releaseButton.simulate('click')
+      strictEqual(releaseButton.find('button').props().disabled, false)
     })
   })
 

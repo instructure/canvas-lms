@@ -59,7 +59,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
       .then(course => (window.location.href = `/courses/${course.id}/settings`))
       .catch(err => {
         setLoading(false)
-        showFlashError(I18n.t('Error creating new course'))(err)
+        showFlashError(I18n.t('Error creating new subject'))(err)
       })
   }
 
@@ -170,28 +170,28 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
   const hideAccountSelect = permissions === 'teacher' && allAccounts?.length === 1
 
   return (
-    <Modal label={I18n.t('Create Course')} open={isModalOpen} size="small" onDismiss={clearModal}>
+    <Modal label={I18n.t('Create Subject')} open={isModalOpen} size="small" onDismiss={clearModal}>
       <Modal.Body>
         {loading ? (
           <View as="div" textAlign="center">
             <Spinner
               renderTitle={
                 allAccounts.length
-                  ? I18n.t('Creating new course...')
+                  ? I18n.t('Creating new subject...')
                   : I18n.t('Loading accounts...')
               }
             />
           </View>
         ) : (
           <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Course Details')}</ScreenReaderContent>}
+            description={<ScreenReaderContent>{I18n.t('Subject Details')}</ScreenReaderContent>}
             layout="stacked"
             rowSpacing="medium"
           >
             {!hideAccountSelect && (
               <CanvasAsyncSelect
                 inputValue={accountSearchTerm}
-                renderLabel={I18n.t('Which account will this course be associated with?')}
+                renderLabel={I18n.t('Which account will this subject be associated with?')}
                 placeholder={I18n.t('Begin typing to search')}
                 noOptionsLabel={I18n.t('No Results')}
                 onInputChange={e => setAccountSearchTerm(e.target.value)}
@@ -217,7 +217,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
               </SimpleSelect>
             )}
             <TextInput
-              renderLabel={I18n.t('Course Name')}
+              renderLabel={I18n.t('Subject Name')}
               placeholder={I18n.t('Name...')}
               value={courseName}
               onChange={e => setCourseName(e.target.value)}

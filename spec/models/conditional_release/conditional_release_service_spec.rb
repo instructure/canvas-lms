@@ -86,6 +86,13 @@ describe ConditionalRelease::Service do
       expect(cr_env[:assignment][:submission_types]).to eq @assignment.submission_types
     end
 
+    it 'excludes assignment data when an assignment is locked' do
+      assignment_model course: @course, unlock_at: 1.day.from_now, due_at: 2.days.from_now
+      env = CRService.env_for(@course, @student, assignment: @assignment)
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env[:assignment]).to be nil
+    end
+
     it 'includes a grading scheme when assignment uses it' do
       standard = grading_standard_for(@course)
       assignment_model course: @course, grading_type: 'letter_grade', grading_standard: standard

@@ -100,6 +100,7 @@ module Api::V1::CalendarEvent
     end
     hash['context_code'] ||= Context.context_code_for(event)
     hash['context_name'] = context.try(:nickname_for, user)
+    hash['context_color'] = context.try(:course_color)
 
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
@@ -198,6 +199,8 @@ module Api::V1::CalendarEvent
     end
     hash['context_code'] = Context.context_code_for(assignment)
     hash['context_name'] = assignment.context.try(:nickname_for, user)
+    hash['context_color'] = assignment.context.try(:course_color)
+
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
     if assignment.applied_overrides.present?

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-import {HomeroomPage} from '../HomeroomPage'
+import HomeroomPage from '../HomeroomPage'
 
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
@@ -77,34 +77,34 @@ describe('HomeroomPage', () => {
     expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
   })
 
-  describe('start a new course button', () => {
+  describe('start a new subject button', () => {
     it('is not present if createPermissions is set to none', () => {
       const {queryByText} = render(<HomeroomPage {...getProps({createPermissions: 'none'})} />)
-      expect(queryByText('Open new course modal')).not.toBeInTheDocument()
+      expect(queryByText('Open new subject modal')).not.toBeInTheDocument()
     })
 
     it('is present if createPermissions is set to teacher', () => {
       const {getByText} = render(<HomeroomPage {...getProps({createPermissions: 'teacher'})} />)
-      expect(getByText('Open new course modal')).toBeInTheDocument()
+      expect(getByText('Open new subject modal')).toBeInTheDocument()
     })
 
     describe('with createPermissions set to admin', () => {
       it('is visible', () => {
         const {getByText} = render(<HomeroomPage {...getProps()} />)
-        expect(getByText('Open new course modal')).toBeInTheDocument()
+        expect(getByText('Open new subject modal')).toBeInTheDocument()
       })
 
       it('shows a tooltip on hover', async () => {
         const {getByText, queryByText} = render(<HomeroomPage {...getProps()} />)
-        await waitFor(() => expect(queryByText('Start a new course')).not.toBeVisible())
-        fireEvent.focus(getByText('Open new course modal'))
-        await waitFor(() => expect(getByText('Start a new course')).toBeVisible())
+        await waitFor(() => expect(queryByText('Start a new subject')).not.toBeVisible())
+        fireEvent.focus(getByText('Open new subject modal'))
+        await waitFor(() => expect(getByText('Start a new subject')).toBeVisible())
       })
 
       it('opens up the modal on click', () => {
         const {getByText} = render(<HomeroomPage {...getProps()} />)
-        act(() => getByText('Open new course modal').click())
-        expect(getByText('Create Course')).toBeInTheDocument()
+        act(() => getByText('Open new subject modal').click())
+        expect(getByText('Create Subject')).toBeInTheDocument()
       })
     })
   })

@@ -37,7 +37,7 @@ module XMLHelper
   def get_node_val(node, selector, default=nil)
     node.at_css(selector) ? node.at_css(selector).text : default
   end
-  
+
   # You can't do a css selector that only looks for direct
   # descendants of the current node, so you have to iterate
   # over the children and see if it's there.
@@ -88,11 +88,15 @@ module XMLHelper
     path = path.gsub('\\', '/') if path
     path
   end
-  
+
   def open_file(path)
     # this is cheating; we use HTML because we don't deal properly with namespaces
     # even though it's really XML
     File.exist?(path) ? ::Nokogiri::HTML(File.open(path)) : nil
+  end
+
+  def open_file_html5(path)
+    File.exist?(path) ? ::Nokogiri::HTML5(File.open(path)) : nil
   end
 
   def open_file_xml(path)

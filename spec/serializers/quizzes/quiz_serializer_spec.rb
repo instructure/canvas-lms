@@ -636,4 +636,22 @@ describe Quizzes::QuizSerializer do
   it "does not include question_types" do
     expect(json.keys).not_to include(:question_types)
   end
+
+  describe "important_dates" do
+    it "returns false if the quiz does not have an assignment" do
+      expect(quiz.assignment).to be_nil
+      expect(json[:important_dates]).to be false
+    end
+
+    it "returns the value of assignment#important_dates" do
+      assignment = Assignment.new
+      assignment.id = 1
+      assignment.context_id = @context.id
+      assignment.important_dates = true
+      allow(@quiz).to receive(:assignment).and_return assignment
+
+      expect(@serializer.as_json[:quiz][:important_dates]).to be true
+    end
+  end
+
 end

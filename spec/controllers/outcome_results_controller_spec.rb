@@ -173,6 +173,23 @@ describe OutcomeResultsController do
       expect(response).to be_successful
     end
 
+    it 'allows specifying both outcome_ids and include[]=outcome_links' do
+      user_session(@teacher)
+      context_outcome(@course)
+      get 'rollups', params: {context_id: @course.id,
+        course_id: @course.id,
+        context_type: "Course",
+        user_ids: [@student.id],
+        outcome_ids: [@outcome.id],
+        include: ['outcome_links']},
+        format: "json"
+      expect(response).to be_successful
+      json = parse_response(response)
+      links = json['linked']['outcome_links']
+      expect(links.length).to eq 1
+      expect(links[0]['outcome']['id']).to eq @outcome.id
+    end
+
     it 'should validate aggregate_stat parameter' do
       user_session(@teacher)
       get 'rollups', params: {:context_id => @course.id,

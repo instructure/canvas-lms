@@ -28,6 +28,8 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {Discussion} from '../../../../graphql/Discussion'
+import {PeerReviews} from '../../../../graphql/PeerReviews'
+import {Assignment} from '../../../../graphql/Assignment'
 
 jest.mock('@canvas/rce/RichContentEditor')
 
@@ -91,6 +93,10 @@ describe('DiscussionTopicContainer', () => {
       liveRegion.id = 'flash_screenreader_holder'
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
+    }
+
+    window.INST = {
+      editorButtons: []
     }
 
     // eslint-disable-next-line no-undef
@@ -240,16 +246,6 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('delete')).toBeNull()
   })
 
-  it('Should not show discussion topic menu if no appropriate permissions', async () => {
-    const {queryByTestId} = setup({
-      discussionTopic: {
-        ...discussionTopicMock.discussionTopic,
-        permissions: {}
-      }
-    })
-    expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
-  })
-
   it('Should be able to open SpeedGrader', async () => {
     const {getByTestId, getByText} = setup(discussionTopicMock)
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -267,12 +263,26 @@ describe('DiscussionTopicContainer', () => {
     expect(await container.findByText('Due: Apr 5 1:40pm')).toBeTruthy()
   })
 
-  it('Should not be able to see post menu if no permissions', () => {
+  it('Should not be able to see post menu if no permissions and initialPostRequiredForCurrentUser', () => {
     const {queryByTestId} = setup({
-      discussionTopic: {...discussionTopicMock.discussionTopic, permissions: {speedGrader: false}}
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{initialPostRequiredForCurrentUser: true, permissions: {speedGrader: false}}
+      }
     })
 
     expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
+  })
+
+  it('Should show Mark All as Read discussion topic menu if initialPostRequiredForCurrentUser = false ', async () => {
+    const {getByTestId, getByText} = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{initialPostRequiredForCurrentUser: false, permissions: {}}
+      }
+    })
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+    expect(getByText('Mark All as Read')).toBeInTheDocument()
   })
 
   it.skip('Renders Add Rubric in the kabob menu if the user has permission', () => {
@@ -317,6 +327,20 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Close for Comments')).toBeInTheDocument()
   })
 
+  it('does not render Close for Comments even when there is permission if child topic', () => {
+    const container = setup({
+      discussionTopic: {
+        ...discussionTopicMock.discussionTopic,
+        ...{
+          rootTopic: {id: 'asdasdasd', _id: '12', __typename: 'Discussion'},
+          permissions: {closeForComments: true}
+        }
+      }
+    })
+    fireEvent.click(container.getByTestId('discussion-post-menu-trigger'))
+    expect(container.queryByText('Close for Comments')).toBeNull()
+  })
+
   it('Renders Copy To and Send To in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: {
@@ -339,6 +363,11 @@ describe('DiscussionTopicContainer', () => {
     })
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
     const sendToButton = await container.findByText('Send To...')
     fireEvent.click(sendToButton)
     expect(await container.findByText('Send to:')).toBeTruthy()
@@ -376,6 +405,11 @@ describe('DiscussionTopicContainer', () => {
     await waitFor(() =>
       expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     )
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
     expect(await container.findByTestId('discussion-topic-reply')).toBeInTheDocument()
   })
 
@@ -508,5 +542,39 @@ describe('DiscussionTopicContainer', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
     expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
+  })
+
+  describe('Peer Reviews', () => {
+    it('renders with a due date', () => {
+      const props = {discussionTopic: Discussion.mock()}
+      const {getByText} = setup(props)
+
+      expect(getByText('Peer review for Morty Smith Due: Mar 31 5:59am')).toBeTruthy()
+    })
+
+    it('renders with out a due date', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            peerReviews: PeerReviews.mock({dueAt: null})
+          })
+        })
+      }
+      const {getByText} = setup(props)
+
+      expect(getByText('Peer review for Morty Smith')).toBeTruthy()
+    })
+
+    it('does not render peer reviews if there are not any', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          peerReviews: null,
+          assessmentRequestsForCurrentUser: []
+        })
+      }
+      const {queryByText} = setup(props)
+
+      expect(queryByText('eer review for Morty Smith Due: Mar 31 5:59am')).toBeNull()
+    })
   })
 })

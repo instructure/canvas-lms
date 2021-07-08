@@ -58,7 +58,8 @@ function optionsForGraders(graders, grades) {
       options.push({
         gradeInfo,
         label: `${I18n.n(gradeInfo.score)} (${grader.graderName})`,
-        value: gradeInfo.graderId
+        value: gradeInfo.graderId,
+        disabled: !grader.graderSelectable
       })
     }
   }
@@ -339,7 +340,12 @@ export default class GradeSelect extends Component {
         value={this.getSelectedOption()?.value || null}
       >
         {this.state.options.map(gradeOption => (
-          <SimpleSelect.Option key={gradeOption.value} id={gradeOption.value} value={gradeOption.value}>
+          <SimpleSelect.Option
+            isDisabled={gradeOption.disabled}
+            key={gradeOption.value}
+            id={gradeOption.value}
+            value={gradeOption.value}
+          >
             {gradeOption.label}
           </SimpleSelect.Option>
         ))}

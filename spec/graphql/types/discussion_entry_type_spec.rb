@@ -155,4 +155,13 @@ describe Types::DiscussionEntryType do
       end
     end
   end
+
+  it 'returns the root entry if there is one' do
+    de = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id)
+
+    expect(discussion_entry_type.resolve('rootEntry { _id }')).to be nil
+
+    sub_entry_type = GraphQLTypeTester.new(de, current_user: @teacher)
+    expect(sub_entry_type.resolve('rootEntry { _id }')).to eq discussion_entry.id.to_s
+  end
 end

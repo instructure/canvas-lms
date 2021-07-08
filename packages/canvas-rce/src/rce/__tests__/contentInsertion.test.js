@@ -322,6 +322,21 @@ describe('contentInsertion', () => {
   })
 
   describe('existingContentToLinkIsImg', () => {
+    beforeEach(() => {
+      editor.dom.$ = elem => {
+        return {
+          is: () => {
+            const item = HTMLCollection.prototype.isPrototypeOf(elem) ? elem[0] : item
+            return !!item && item.tagName === 'IMG'
+          }
+        }
+      }
+      editor.isHidden = () => false
+    })
+    it('returns false if editor is hidden', () => {
+      editor.isHidden = () => true
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
+    })
     it('returns false if no content selected', () => {
       expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
     })
@@ -333,16 +348,27 @@ describe('contentInsertion', () => {
     })
     it('returns true if selected content is img', () => {
       editor.selection.getContent = () => {
-        return 'content'
-      }
-      editor.dom.$ = () => {
-        return {
-          is: () => {
-            return true
-          }
-        }
+        return '<img src="image.jpg" alt="Test image" />'
       }
       expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(true)
+    })
+    it('returns false if selected content contains a period', () => {
+      editor.selection.getContent = () => {
+        return 'a . period'
+      }
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
+    })
+    it('returns false if selected content contains a slash', () => {
+      editor.selection.getContent = () => {
+        return 'a / slash'
+      }
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
+    })
+    it('returns false if selected content contains a question mark', () => {
+      editor.selection.getContent = () => {
+        return 'a ? question'
+      }
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
     })
   })
 

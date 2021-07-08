@@ -640,9 +640,15 @@ describe Types::UserType do
       ).to eq []
     end
 
-    it "returns empty array for course that does not exist" do
+    it "returns empty array when no course id is given" do
       expect(
-        user_type.resolve(%|courseRoles(courseId: -1, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+        user_type.resolve(%|courseRoles(roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
+      ).to eq []
+    end
+
+    it "returns empty array when course id is null" do
+      expect(
+        user_type.resolve(%|courseRoles(courseId: null, roleTypes: ["TaEnrollment","TeacherEnrollment"])|)
       ).to eq []
     end
 

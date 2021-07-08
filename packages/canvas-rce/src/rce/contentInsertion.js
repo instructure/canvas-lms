@@ -133,9 +133,16 @@ export function existingContentToLink(editor, link) {
   )
 }
 
+// Parses HTML string with support in old browsers because jQuery's parseHTML was added in 1.8.
+function parseHTML(htmlString) {
+  const tmp = document.implementation.createHTMLDocument()
+  tmp.body.innerHTML = htmlString.trim()
+  return tmp.body.children
+}
+
 function selectionIsImg(editor) {
   const selection = editor.selection.getContent()
-  return editor.dom.$(selection).is('img')
+  return editor.dom.$(parseHTML(selection)).is('img')
 }
 
 export function existingContentToLinkIsImg(editor) {

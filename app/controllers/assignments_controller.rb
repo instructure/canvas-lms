@@ -869,19 +869,19 @@ class AssignmentsController < ApplicationController
   end
 
   def strong_assignment_params
-    params.require(:assignment).
-      permit(:title, :name, :description, :due_at, :points_possible,
-        :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-        :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-        :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-        :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-        :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-        :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-        :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
-        :omit_from_final_grade, :intra_group_peer_reviews,
-        :allowed_extensions => strong_anything,
-        :turnitin_settings => strong_anything,
-        :integration_data => strong_anything)
+    params.require(:assignment)
+      .permit(:title, :name, :description, :due_at, :points_possible,
+              :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
+              :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
+              :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
+              :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
+              :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
+              :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
+              :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
+              :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
+              :allowed_extensions => strong_anything,
+              :turnitin_settings => strong_anything,
+              :integration_data => strong_anything)
   end
 
   def get_assignment_group(assignment_params)

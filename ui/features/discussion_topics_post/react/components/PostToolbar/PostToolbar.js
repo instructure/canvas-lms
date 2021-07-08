@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useMemo} from 'react'
 import {ToggleButton} from './ToggleButton'
 
 import {Flex} from '@instructure/ui-flex'
@@ -105,7 +105,12 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
 }
 
 const ToolbarMenu = props => {
-  const menuConfigs = getMenuConfigs(props)
+  const menuConfigs = useMemo(() => {
+    return getMenuConfigs(props).map(config => {
+      return renderMenuItem(config)
+    })
+  }, [props])
+
   if (menuConfigs.length === 0) {
     return null
   }
@@ -122,9 +127,7 @@ const ToolbarMenu = props => {
         />
       }
     >
-      {menuConfigs.map(config => (
-        <MenuItem {...config} />
-      ))}
+      {menuConfigs}
     </Menu>
   )
 }
@@ -230,18 +233,16 @@ const getMenuConfigs = props => {
   return options
 }
 
-const MenuItem = props => {
-  return (
-    <Menu.Item onSelect={props.selectionCallback}>
-      <Flex>
-        <Flex.Item>{props.icon}</Flex.Item>
-        <Flex.Item padding="0 0 0 xx-small">
-          <Text>{props.label}</Text>
-        </Flex.Item>
-      </Flex>
-    </Menu.Item>
-  )
-}
+const renderMenuItem = ({selectionCallback, icon, label, key}) => (
+  <Menu.Item onSelect={selectionCallback} key={key}>
+    <Flex>
+      <Flex.Item>{icon}</Flex.Item>
+      <Flex.Item padding="0 0 0 xx-small">
+        <Text>{label}</Text>
+      </Flex.Item>
+    </Flex>
+  </Menu.Item>
+)
 
 PostToolbar.propTypes = {
   /**

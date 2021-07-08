@@ -23,7 +23,6 @@ import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -60,19 +59,33 @@ const DEFAULT_RCE_HEIGHT = '400px'
 
 const toolbarPropType = PropTypes.arrayOf(
   PropTypes.shape({
+    // name of the toolbar the items are added to
+    // if this toolbar doesn't exist, it is created
     name: PropTypes.string.isRequired,
+    // items added to the toolbar
+    // each is the name of the button some plugin has
+    // registered with tinymce
     items: PropTypes.arrayOf(PropTypes.string).isRequired
   })
 )
-const menuPropType = PropTypes.arrayOf(
+
+const menuPropType = PropTypes.objectOf(
+  // the key is the name of the menu item some plugin has
+  // registered with tinymce
   PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    items: PropTypes.arrayOf(PropTypes.string).isRequired
+    // if this is a new menu in the menubar,title it's label.
+    // if these are items being merged into an existing menu, title is ignored
+    title: PropTypes.string,
+    // items is a space separated list it menu_items
+    // some plugin has registered with tinymce
+    items: PropTypes.string.isRequired
   })
 )
 const ltiToolsPropType = PropTypes.arrayOf(
   PropTypes.shape({
+    // id of the tool
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    // is this a favorite tool?
     favorite: PropTypes.bool
   })
 )
@@ -202,7 +215,6 @@ class RCEWrapper extends React.Component {
       enabled: PropTypes.bool,
       maxAge: PropTypes.number
     }),
-    confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
     editorOptions: PropTypes.object,
     handleUnmount: PropTypes.func,
@@ -1609,15 +1621,12 @@ class RCEWrapper extends React.Component {
         onBlur={this.handleBlurRCE}
       >
         <ShowOnFocusButton
-          buttonProps={{
-            variant: 'link',
-            onClick: this.openKBShortcutModal,
-            icon: IconKeyboardShortcutsLine,
-            margin: 'xx-small'
-          }}
+          onClick={this.openKBShortcutModal}
+          margin="xx-small"
+          screenReaderLabel={formatMessage('View keyboard shortcuts')}
           ref={el => (this._showOnFocusButton = el)}
         >
-          <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
+          <IconKeyboardShortcutsLine />
         </ShowOnFocusButton>
         <AlertMessageArea
           messages={this.state.messages}

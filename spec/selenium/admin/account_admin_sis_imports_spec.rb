@@ -140,7 +140,12 @@ describe "sis imports ui" do
     SisBatch.last.process_without_send_later
     expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(SisBatch.last.batch_mode).to eq true
-    expect(SisBatch.last.options).to eq({skip_deletes: false, override_sis_stickiness: true, add_sis_stickiness: true})
+    expect(SisBatch.last.options).to eq({
+      skip_deletes: false,
+      override_sis_stickiness: true,
+      add_sis_stickiness: true,
+      update_sis_id_if_login_claimed: false
+    })
 
     get "/accounts/#{@account.id}/sis_import"
     f("#override_sis_stickiness").click
@@ -149,6 +154,10 @@ describe "sis imports ui" do
     SisBatch.last.process_without_send_later
     expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(!!SisBatch.last.batch_mode).to be_falsey
-    expect(SisBatch.last.options).to eq({skip_deletes: false, override_sis_stickiness: true})
+    expect(SisBatch.last.options).to eq({
+      skip_deletes: false,
+      override_sis_stickiness: true,
+      update_sis_id_if_login_claimed: false
+    })
   end
 end

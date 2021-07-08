@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "屬性"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "無法使用音訊和影片錄製。"
-    },
     "audio_player_for_title_20cc70d": {
         "message": "{ title } 的音訊播放器"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "創意共享授權："
     },
-    "current_volume_level_c55ab825": {
-        "message": "目前音量"
-    },
     "custom_6979cd81": {
         "message": "自訂"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "拖曳檔案到此處。"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "拖曳檔案到此處。"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "拖放或按一下以瀏覽您的電腦"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "載入過去項目時發生錯誤"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "上傳錄製的影片/音訊時發生錯誤"
-    },
     "excused_cf8792eb": {
         "message": "已免除"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "反饋"
     },
-    "file_name_8fd421ff": {
-        "message": "檔案名稱"
-    },
     "file_upload_failed_af22dd91": {
         "message": "檔案上載失敗"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "檔案索引"
-    },
-    "finish_bc343002": {
-        "message": "完成"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "聚焦元素選項工具欄"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "連結"
     },
-    "list_collapsed_9ac35920": {
-        "message": "名單收起。"
-    },
-    "list_collapsed_dde87718": {
-        "message": "名單收起"
-    },
-    "list_expanded_efec2d0": {
-        "message": "名單展開。"
-    },
     "load_more_35d33c7": {
         "message": "載入更多"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "正在載入成績"
     },
-    "loading_media_f3455841": {
-        "message": "正在載入媒體"
-    },
     "loading_past_items_ca499e75": {
         "message": "正在載入先前項目"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "中"
-    },
-    "mic_a7f3d311": {
-        "message": "麥克風"
     },
     "miscellaneous_e9818229": {
         "message": "雜項"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "找不到 { term } 的結果。"
     },
-    "no_video_1ed00b26": {
-        "message": "無影片"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "未有內容"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "機會彈出視窗"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "已選擇 { option }。名單收起。"
-    },
     "optional_add_course_ef0d70fc": {
         "message": "可選：添加課程"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "段落"
     },
-    "pause_12af3bb4": {
-        "message": "暫停"
-    },
     "peer_review_74f26a13": {
         "message": "同儕互評"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "成員"
-    },
-    "play_1a47eaa7": {
-        "message": "播放"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
     },
     "points_bceb5005": {
         "message": "分數"
@@ -873,9 +825,6 @@
         "message": "已預先格式化"
     },
     "preview_53003fd2": {
-        "message": "預覽"
-    },
-    "preview_a3f8f854": {
         "message": "預覽"
     },
     "previous_month_bb1e3c84": {
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "原始 HTML 編輯器"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "讀取媒體音軌文件失敗。正在中止。"
-    },
     "record_7c9448b": {
         "message": "錄製"
     },
     "record_upload_media_5fdce166": {
         "message": "錄製/上傳媒體"
-    },
-    "recording_98da6bda": {
-        "message": "正在錄製"
     },
     "reminder_date_4564d12d": {
         "message": "提醒：{ date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "搜尋學期"
-    },
-    "select_app_3d08035a": {
-        "message": "選擇 App"
     },
     "select_language_7c93a900": {
         "message": "選擇語言"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "出現問題。"
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "存取麥克風或網路攝影機時出現問題。"
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "出現問題；我不知道應該展示什麼內容。"
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "方形無序清單"
-    },
-    "start_over_f7552aa9": {
-        "message": "重新開始"
-    },
-    "start_recording_9a65141a": {
-        "message": "開始錄製"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } 至 { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "支援的檔案類型：SRT 或 WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "切換到原始 html 編輯器"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "切換到多種格式的文字編輯器"
     },
     "syllabus_f191f65b": {
         "message": "課程大綱"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "未發佈"
     },
-    "untitled_16aa4f2b": {
-        "message": "無標題"
-    },
     "upload_document_253f0478": {
         "message": "上傳文件"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "使用者媒體"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "已上慱錄製的影片/音訊"
-    },
     "video_options_24ef6e5d": {
         "message": "影片選項"
     },
     "video_options_tray_3b9809a5": {
         "message": "影片選項收集箱"
-    },
-    "video_player_b371005": {
-        "message": "影片播放器"
     },
     "video_player_for_9e7d373b": {
         "message": "影片播放器，標題為 "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "檢視鍵盤快速鍵"
-    },
-    "webcam_fe91b20f": {
-        "message": "網路攝影機"
     },
     "width_492fec76": {
         "message": "寬度"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "您已然回到您的第一個待辦事項！"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "您的網路攝影機可能已在使用中。"
     }
 }

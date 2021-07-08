@@ -105,6 +105,10 @@ export default class Assignment extends Model
     return @get 'dueDateRequired' unless arguments.length > 0
     @set 'dueDateRequired', newDueDateRequired
 
+  importantDates: (important) =>
+    return @get 'important_dates' unless arguments.length > 0
+    @set 'important_dates', important
+
   description: (newDescription) =>
     return @get 'description' unless arguments.length > 0
     @set 'description', newDescription
@@ -594,7 +598,7 @@ export default class Assignment extends Model
       'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
       'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
-      'vericiteEnabled'
+      'vericiteEnabled', 'importantDates'
     ]
 
     hash =

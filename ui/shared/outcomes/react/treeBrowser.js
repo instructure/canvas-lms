@@ -84,7 +84,7 @@ const getCounts = rootGroups => {
   )
 }
 
-const useTreeBrowser = (srOnlyAlert = false) => {
+const useTreeBrowser = () => {
   const {contextType} = useCanvasContext()
   const client = useApolloClient()
   const [collections, setCollections] = useState({})
@@ -92,14 +92,10 @@ const useTreeBrowser = (srOnlyAlert = false) => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
-
-  const updateSelectedGroupId = props => {
-    const {id} = props
-    setSelectedGroupId(id)
-    queryCollections(props)
-  }
+  const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
 
   const queryCollections = ({id}) => {
+    setSelectedGroupId(id)
     if (['loaded', 'loading'].includes(collections[id]?.loadInfo)) {
       return
     }
@@ -121,23 +117,30 @@ const useTreeBrowser = (srOnlyAlert = false) => {
         }
       })
       .then(({data}) => {
-        setCollections(mergeCollections(data?.context?.childGroups?.nodes, newCollections, id))
+        const updatedCollections = mergeCollections(
+          data?.context?.childGroups?.nodes,
+          newCollections,
+          id
+        )
+        setCollections(updatedCollections)
+        setSelectedParentGroupId(updatedCollections[id].parentGroupId)
       })
       .catch(err => {
-        setError(err)
+        setError(err.message)
       })
   }
 
   useEffect(() => {
     if (error) {
+      const srOnlyAlert = Object.keys(collections).length === 0
       contextType === 'Course'
         ? showFlashAlert({
-            message: I18n.t('An error occurred while loading course outcomes.'),
+            message: I18n.t('An error occurred while loading course learning outcome groups.'),
             type: 'error',
             srOnly: srOnlyAlert
           })
         : showFlashAlert({
-            message: I18n.t('An error occurred while loading account outcomes.'),
+            message: I18n.t('An error occurred while loading account learning outcome groups.'),
             type: 'error',
             srOnly: srOnlyAlert
           })
@@ -151,38 +154,32 @@ const useTreeBrowser = (srOnlyAlert = false) => {
     queryCollections,
     selectedGroupId,
     setSelectedGroupId,
-    updateSelectedGroupId,
     error,
     setError,
     isLoading,
     setIsLoading,
     setRootId,
-    rootId
+    rootId,
+    selectedParentGroupId
   }
 }
 
 export const useManageOutcomes = () => {
   const {contextId, contextType} = useCanvasContext()
-  const [selectedGroupId, setSelectedGroupId] = useState(null)
-  const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
   const client = useApolloClient()
   const {
     collections,
     setCollections,
-    queryCollections: treeBrowserQueryCollection,
+    queryCollections,
     error,
     setError,
     isLoading,
     setIsLoading,
     setRootId,
-    rootId
-  } = useTreeBrowser(true)
-
-  const queryCollections = ({id}) => {
-    setSelectedGroupId(id)
-    treeBrowserQueryCollection({id})
-    setSelectedParentGroupId(collections[id].parentGroupId)
-  }
+    rootId,
+    selectedGroupId,
+    selectedParentGroupId
+  } = useTreeBrowser()
 
   useEffect(() => {
     client
@@ -202,7 +199,7 @@ export const useManageOutcomes = () => {
         setRootId(rootGroup._id)
       })
       .catch(err => {
-        setError(err)
+        setError(err.message)
       })
       .finally(() => {
         setIsLoading(false)
@@ -234,7 +231,6 @@ export const useFindOutcomeModal = open => {
     setIsLoading,
     selectedGroupId,
     setSelectedGroupId,
-    updateSelectedGroupId,
     setRootId,
     rootId
   } = useTreeBrowser()
@@ -247,7 +243,7 @@ export const useFindOutcomeModal = open => {
 
   const toggleGroupId = props => {
     if (props?.id !== selectedGroupId) clearSearch()
-    updateSelectedGroupId(props)
+    queryCollections(props)
   }
 
   useEffect(() => {
@@ -313,7 +309,7 @@ export const useFindOutcomeModal = open => {
         setRootId(ROOT_ID)
       })
       .catch(err => {
-        setError(err)
+        setError(err.message)
       })
       .finally(() => {
         setIsLoading(false)
@@ -378,7 +374,7 @@ export const useGroupMoveModal = groupId => {
           setRootId(rootGroup._id)
         })
         .catch(err => {
-          setError(err)
+          setError(err.message)
         })
         .finally(() => {
           setIsLoading(false)

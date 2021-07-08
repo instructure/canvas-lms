@@ -246,7 +246,7 @@
 </div>
 </div>
 
-<% if @user.associated_root_accounts.except(:order).shard(@user).any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
+<% if @user.associated_root_accounts.any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
 <h2><%= t('headers.inbox_opt_out', "Conversations Inbox Opt-out" ) %></h2>
 <p>
   <label for="disable_inbox"><input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>
@@ -604,7 +604,7 @@ TEXT
   </div>
 </div>
 
-<h2 aria-hidden=true><%= t(:feature_options, 'Feature Options') %></h2>
+<h2 aria-hidden=true><%= t('Feature Previews') %></h2>
 <div class="feature-flag-wrapper">
   <!-- this is populated by FeatureFlagAdminView -->
 </div>

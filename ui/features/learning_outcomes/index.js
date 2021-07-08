@@ -25,7 +25,10 @@ import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
 import browserTemplate from '@canvas/outcomes/jst/browser.handlebars'
 import instructionsTemplate from './jst/mainInstructions.handlebars'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
-import {showOutcomesImporter, showOutcomesImporterIfInProgress} from './react/OutcomesImporter'
+import {
+  showOutcomesImporter,
+  showOutcomesImporterIfInProgress
+} from '@canvas/outcomes/react/OutcomesImporter'
 
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
@@ -83,15 +86,17 @@ toolbar.on('start_sync', file =>
   })
 )
 
-showOutcomesImporterIfInProgress(
-  {
-    disableOutcomeViews,
-    resetOutcomeViews,
-    mount: content.$el[0],
-    contextUrlRoot: ENV.CONTEXT_URL_ROOT
-  },
-  ENV.current_user.id
-)
+if (!ENV.IMPROVED_OUTCOMES_MANAGEMENT) {
+  showOutcomesImporterIfInProgress(
+    {
+      disableOutcomeViews,
+      resetOutcomeViews,
+      mount: content.$el[0],
+      contextUrlRoot: ENV.CONTEXT_URL_ROOT
+    },
+    ENV.current_user.id
+  )
+}
 
 // sidebar events
 sidebar.on('select', model => content.show(model))

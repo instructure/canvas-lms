@@ -194,6 +194,18 @@ export const CREATE_LEARNING_OUTCOME = gql`
   }
 `
 
+export const DELETE_OUTCOME_LINKS = gql`
+  mutation DeleteOutcomeLinks($ids: [ID!]!) {
+    deleteOutcomeLinks(input: {ids: $ids}) {
+      deletedOutcomeLinkIds
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const UPDATE_LEARNING_OUTCOME = gql`
   mutation UpdateLearningOutcome($input: UpdateLearningOutcomeInput!) {
     updateLearningOutcome(input: $input) {
@@ -203,6 +215,18 @@ export const UPDATE_LEARNING_OUTCOME = gql`
         displayName
         description
       }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const MOVE_OUTCOME_LINKS = gql`
+  mutation MoveOutcomeLinks($input: MoveOutcomeLinksInput!) {
+    moveOutcomeLinks(input: $input) {
+      movedOutcomeLinkIds
       errors {
         attribute
         message
@@ -222,13 +246,6 @@ export const removeOutcomeGroup = (contextType, contextId, groupId) =>
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
   )
 
-export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
-  axios.delete(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
-  )
-
 export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
   axios.put(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
@@ -243,17 +260,3 @@ export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) =>
     {title}
   )
 }
-
-export const moveOutcome = (
-  contextType,
-  contextId,
-  outcomeId,
-  oldParentGroupId,
-  newParentGroupId
-) =>
-  axios.put(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${newParentGroupId}/outcomes/${outcomeId}`,
-    {move_from: oldParentGroupId}
-  )

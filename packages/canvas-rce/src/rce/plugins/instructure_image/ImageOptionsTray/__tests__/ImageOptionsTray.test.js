@@ -268,12 +268,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           expect(isDecorativeImage).toEqual(true)
         })
 
-        it('leaves the Alt Text when the "is decorative" setting is true', () => {
+        it('cleans the Alt Text when the "is decorative" setting is true', () => {
           tray.setAltText('A turtle in a party suit.')
           tray.setIsDecorativeImage(true)
           tray.$doneButton.click()
           const [{altText}] = props.onSave.mock.calls[0]
-          expect(altText).toEqual('A turtle in a party suit.')
+          expect(altText).toEqual('')
         })
 
         it('ensures there is an Alt Text when the "is decorative" setting is true', () => {
@@ -281,7 +281,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
           tray.setIsDecorativeImage(true)
           tray.$doneButton.click()
           const [{altText}] = props.onSave.mock.calls[0]
-          expect(altText).toEqual(' ')
+          expect(altText).toEqual('')
         })
 
         it('includes the "Display As" setting', () => {

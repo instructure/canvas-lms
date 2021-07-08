@@ -19,7 +19,6 @@
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
-import {PER_PAGE} from './constants'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -45,6 +44,10 @@ export const getPeerReviewsUrl = (courseId, assignmentId) => {
 
 export const getGroupDiscussionUrl = (groupId, childDiscussionId) => {
   return `/groups/${groupId}/discussion_topics/${childDiscussionId}`
+}
+
+export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
+  return `/courses/${courseId}/assignments/${assignmentId}/submissions/${revieweeId}`
 }
 
 export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
@@ -95,6 +98,7 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
 export const addReplyToSubentries = (
   cache,
   discussionEntryId,
+  perPage,
   sort,
   newDiscussionEntry,
   courseID
@@ -104,7 +108,7 @@ export const addReplyToSubentries = (
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: discussionEntryId,
-        perPage: PER_PAGE,
+        perPage,
         sort,
         courseID
       }
@@ -121,4 +125,11 @@ export const addReplyToSubentries = (
     }
     // eslint-disable-next-line no-empty
   } catch (e) {}
+}
+
+export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
+  if (isAuthor) {
+    return discussionRoles.concat('Author')
+  }
+  return discussionRoles
 }

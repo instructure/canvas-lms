@@ -83,7 +83,7 @@ export default function ImageOptionsTray(props) {
 
   function handleSave(event) {
     event.preventDefault()
-    const savedAltText = isDecorativeImage ? altText || ' ' : altText
+    const savedAltText = isDecorativeImage ? '' : altText
 
     let appliedHeight = imageHeight
     let appliedWidth = imageWidth

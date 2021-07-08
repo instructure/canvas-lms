@@ -28,6 +28,7 @@ import {
   FAILURE,
   GRADES_ALREADY_RELEASED,
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+  SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   STARTED,
   SUCCESS
 } from '../assignment/AssignmentActions'
@@ -61,10 +62,12 @@ function successButton(props) {
 
 export default function ReleaseButton(props) {
   const {gradesReleased, onClick, releaseGradesStatus, ...otherProps} = props
-  const canClick = !(gradesReleased || [STARTED, SUCCESS].includes(releaseGradesStatus))
-
+  const isValidSelection = releaseGradesStatus !== SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS
+  const canClick =
+    !(gradesReleased || [STARTED, SUCCESS].includes(releaseGradesStatus)) && isValidSelection
   const buttonProps = {
     ...otherProps,
+    disabled: !isValidSelection || null,
     'aria-readonly': !canClick,
     onClick: canClick ? onClick : null
   }
@@ -87,6 +90,7 @@ ReleaseButton.propTypes = {
     FAILURE,
     GRADES_ALREADY_RELEASED,
     NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+    SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
     STARTED,
     SUCCESS
   ])

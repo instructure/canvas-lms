@@ -99,8 +99,7 @@ function renderAttemptsAndAvailability({assignment, submission}) {
 
 function renderContentBaseOnAvailability({assignment, submission}, alertContext) {
   if (assignment.env.modulePrereq) {
-    const prereq = assignment.env.modulePrereq
-    return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
+    return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
   } else if (assignment.env.unlockDate) {
     return <DateLocked date={assignment.env.unlockDate} type="assignment" />
   } else if (ENV.belongs_to_unpublished_module) {

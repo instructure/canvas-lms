@@ -29,6 +29,7 @@ import Override from '@canvas/assignments/backbone/models/AssignmentOverride.cof
 import AssignmentOverrideHelper from '../AssignmentOverrideHelper'
 import I18n from 'i18n!due_datesDueDates'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
+import {Checkbox} from '@instructure/ui-checkbox'
 import '@canvas/rails-flash-notifications'
 
 export default class DueDates extends React.Component {
@@ -47,7 +48,9 @@ export default class DueDates extends React.Component {
       }
     },
     dueDatesReadonly: PropTypes.bool,
-    availabilityDatesReadonly: PropTypes.bool
+    availabilityDatesReadonly: PropTypes.bool,
+    importantDates: PropTypes.bool,
+    selectedGroupSetId: PropTypes.string
   }
 
   static defaultProps = {
@@ -67,7 +70,8 @@ export default class DueDates extends React.Component {
     addedRowCount: 0,
     currentlySearching: false,
     allStudentsFetched: false,
-    selectedGroupSetId: null
+    selectedGroupSetId: null,
+    importantDates: false
   }
 
   componentDidMount() {
@@ -76,7 +80,8 @@ export default class DueDates extends React.Component {
         rows: this.rowsFromOverrides(this.props.overrides),
         sections: this.formattedSectionHash(this.props.sections),
         groups: {},
-        selectedGroupSetId: this.props.selectedGroupSetId
+        selectedGroupSetId: this.props.selectedGroupSetId,
+        importantDates: this.props.importantDates
       },
       this.fetchAdhocStudents
     )
@@ -115,7 +120,7 @@ export default class DueDates extends React.Component {
   // always keep React Overrides in sync with Backbone Collection
   UNSAFE_componentWillUpdate(nextProps, nextState) {
     const updatedOverrides = this.getAllOverrides(nextState.rows)
-    this.props.syncWithBackbone(updatedOverrides)
+    this.props.syncWithBackbone(updatedOverrides, nextState.importantDates)
   }
 
   // --------------------------
@@ -373,15 +378,12 @@ export default class DueDates extends React.Component {
       keysToOmit: this.chosenNoops()
     })
     if (this.props.hasGradingPeriods && !_.includes(ENV.current_user_roles, 'admin')) {
-      ;({
-        validStudents,
-        validGroups,
-        validSections
-      } = this.filterDropdownOptionsForMultipleGradingPeriods(
-        validStudents,
-        validGroups,
-        validSections
-      ))
+      ;({validStudents, validGroups, validSections} =
+        this.filterDropdownOptionsForMultipleGradingPeriods(
+          validStudents,
+          validGroups,
+          validSections
+        ))
     }
 
     return _.union(validStudents, validSections, validGroups, validNoops)
@@ -496,16 +498,43 @@ export default class DueDates extends React.Component {
       )
     })
 
+  imporantDatesCheckbox = () => {
+    if (ENV.FEATURES?.important_dates && ENV.K5_SUBJECT_COURSE) {
+      const disabled = !this.rowsToRender().some(row => row.props.dates.due_at !== null)
+      const checked = !disabled && this.state.importantDates
+      return (
+        <div id="important-dates">
+          <Checkbox
+            label={I18n.t('Mark as important date and show on homeroom sidebar')}
+            name="important_dates"
+            size="small"
+            value={checked}
+            checked={checked}
+            onChange={event => {
+              this.setState({importantDates: event.target.checked})
+            }}
+            disabled={disabled}
+          />
+        </div>
+      )
+    }
+  }
+
   render() {
     const rowsToRender = this.rowsToRender()
+    const imporantDatesCheckbox = this.imporantDatesCheckbox()
     return (
-      <div className="ContainerDueDate" onMouseEnter={this.handleInteractionStart}>
-        <div id="bordered-wrapper" className="Container__DueDateRow">
-          {rowsToRender}
+      <div>
+        <div className="ContainerDueDate" onMouseEnter={this.handleInteractionStart}>
+          <div id="bordered-wrapper" className="Container__DueDateRow">
+            {rowsToRender}
+          </div>
+          {this.props.dueDatesReadonly || this.props.availabilityDatesReadonly ? null : (
+            <DueDateAddRowButton handleAdd={this.addRow} display />
+          )}
         </div>
-        {this.props.dueDatesReadonly || this.props.availabilityDatesReadonly ? null : (
-          <DueDateAddRowButton handleAdd={this.addRow} display />
-        )}
+
+        {imporantDatesCheckbox}
       </div>
     )
   }

@@ -22,7 +22,8 @@ function normalizeGraders() {
   const graders = ENV.GRADERS.map(grader => ({
     graderId: grader.user_id || grader.anonymous_id,
     graderName: grader.grader_name || null,
-    id: grader.id
+    id: grader.id,
+    graderSelectable: grader.grader_selectable
   }))
 
   graders.sort((a, b) => (a.graderId < b.graderId ? -1 : 1))

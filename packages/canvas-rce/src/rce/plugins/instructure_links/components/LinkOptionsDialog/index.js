@@ -89,9 +89,12 @@ export default function LinkOptionsDialog(props) {
       size="medium"
     >
       <Modal.Header>
-        <CloseButton offset="medium" placement="end" variant="icon" onClick={props.onRequestClose}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          offset="medium"
+          placement="end"
+          screenReaderLabel={formatMessage('Close')}
+          onClick={props.onRequestClose}
+        />
         <Heading>{label}</Heading>
       </Modal.Header>
 
@@ -123,10 +126,10 @@ export default function LinkOptionsDialog(props) {
 
       <Modal.Footer>
         <input type="submit" style={{display: 'none'}} />
-        <Button variant="default" onClick={props.onRequestClose} margin="0 small">
+        <Button onClick={props.onRequestClose} margin="0 small" color="secondary">
           {formatMessage('Close')}
         </Button>
-        <Button disabled={!(url && isValidURL)} onClick={handleSave} variant="primary">
+        <Button disabled={!(url && isValidURL)} onClick={handleSave} color="primary">
           {formatMessage('Done')}
         </Button>
       </Modal.Footer>

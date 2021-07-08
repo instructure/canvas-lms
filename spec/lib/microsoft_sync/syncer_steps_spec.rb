@@ -110,12 +110,12 @@ describe MicrosoftSync::SyncerSteps do
   shared_examples_for 'a step that returns retry on intermittent error' do |options={}|
     # use actual graph service instead of double and intercept calls to "request":
     let(:graph_service_helpers) { MicrosoftSync::GraphServiceHelpers.new(tenant) }
-    let(:retry_args) { {delay_amount: [5, 20, 100]}.merge(options[:retry_args] || {}) }
+    let(:retry_args) { {delay_amount: [15, 60, 300]}.merge(options[:retry_args] || {}) }
 
     [EOFError, Errno::ECONNRESET, Timeout::Error].each do |error_class|
       context "when hitting the Microsoft API raises a #{error_class}" do
         it 'returns a Retry object' do
-          expect(graph_service).to receive(:request).and_raise(error_class.new)
+          expect(graph_service.http).to receive(:request).and_raise(error_class.new)
           expect_retry(subject, error_class: error_class, **retry_args)
         end
       end
@@ -123,7 +123,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the Microsoft API returns a 500" do
       it 'returns a Retry object' do
-        expect(graph_service).to receive(:request).and_raise(new_http_error(500))
+        expect(graph_service.http).to receive(:request).and_raise(new_http_error(500))
         expect_retry(subject,
                      error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
       end
@@ -132,7 +132,7 @@ describe MicrosoftSync::SyncerSteps do
     unless options[:except_404]
       context 'on 404' do
         it 'goes back to step_generate_diff with a delay' do
-          expect(graph_service).to receive(:request).and_raise(new_http_error(404))
+          expect(graph_service.http).to receive(:request).and_raise(new_http_error(404))
           expect_retry(subject,
                        error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
         end
@@ -142,7 +142,7 @@ describe MicrosoftSync::SyncerSteps do
     unless options[:except_throttled]
       context 'when the Microsoft API returns a 429 with a retry-after header' do
         it 'returns a Retry object with that retry-after time' do
-          expect(graph_service).to receive(:request).and_raise(
+          expect(graph_service.http).to receive(:request).and_raise(
             new_http_error(429, 'retry-after' => '3.14')
           )
           expect_retry(subject,
@@ -153,16 +153,16 @@ describe MicrosoftSync::SyncerSteps do
 
       context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
         it 'returns a Retry object with that retry-after time' do
-          err = MicrosoftSync::GraphService::BatchRequestThrottled.new('foo', [])
+          err = MicrosoftSync::GraphServiceHttp::BatchRequestThrottled.new('foo', [])
           expect(err).to receive(:retry_after_seconds).and_return(1.23)
-          expect(graph_service).to receive(:request).and_raise(err)
+          expect(graph_service.http).to receive(:request).and_raise(err)
           expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
         end
       end
 
       context 'when the Microsoft API returns a 429 with no retry-after header' do
         it 'returns a Retry object with our default retry times' do
-          expect(graph_service).to receive(:request).and_raise(new_http_error(429))
+          expect(graph_service.http).to receive(:request).and_raise(new_http_error(429))
           expect_retry(subject,
                        error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
         end
@@ -264,7 +264,7 @@ describe MicrosoftSync::SyncerSteps do
             receive(:create_education_class).with(course).and_return('id' => 'newid')
 
           expect_delayed_next_step(
-            subject, :step_update_group_with_course_data, 2.seconds, 'newid'
+            subject, :step_update_group_with_course_data, 8.seconds, 'newid'
           )
         end
       end
@@ -276,7 +276,7 @@ describe MicrosoftSync::SyncerSteps do
           expect(graph_service_helpers).to_not receive(:create_education_class)
 
           expect_delayed_next_step(
-            subject, :step_update_group_with_course_data, 2.seconds, 'newid2'
+            subject, :step_update_group_with_course_data, 8.seconds, 'newid2'
           )
         end
       end
@@ -449,6 +449,45 @@ describe MicrosoftSync::SyncerSteps do
           expect(upns_looked_up).to include("student1@example.com")
         end
       end
+
+      context 'when the Account tenant changes while the job is running' do
+        before do
+          orig_root_account_method = syncer_steps.group.method(:root_account)
+
+          allow(syncer_steps.group).to receive(:root_account) do
+            result = orig_root_account_method.call
+            # Change account settings right after we have used them.
+            # This tests that we are using the same root_account for the GraphService tenant
+            # as we are passing into UserMapping.bulk_insert_for_root_account
+            acct = Account.find(result.id)
+            acct.settings[:microsoft_sync_tenant] = "EXTRA" + acct.settings[:microsoft_sync_tenant]
+            acct.save
+            result
+          end
+        end
+
+        it 'raises a UserMapping::AccountSettingsChanged error' do
+          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+        end
+      end
+
+      context 'when the Account login attribute changes while the job is running' do
+        before do
+          orig_root_account_method = MicrosoftSync::UsersUpnsFinder.method(:new)
+
+          allow(MicrosoftSync::UsersUpnsFinder).to receive(:new) do |user_ids, root_account|
+            result = orig_root_account_method.call(user_ids, root_account)
+            acct = Account.find(root_account.id)
+            acct.settings[:microsoft_sync_login_attribute] = 'somethingelse'
+            acct.save
+            result
+          end
+        end
+
+        it 'raises a UserMapping::AccountSettingsChanged error' do
+          expect{subject}.to raise_error(MicrosoftSync::UserMapping::AccountSettingsChanged)
+        end
+      end
     end
   end
 
@@ -523,8 +562,8 @@ describe MicrosoftSync::SyncerSteps do
         allow(graph_service).to receive(:remove_group_users_ignore_missing)
 
         allow(Rails.logger).to receive(:warn)
-        allow(InstStatsd::Statsd).to receive(:increment)
-        allow(InstStatsd::Statsd).to receive(:count)
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
         subject
 
@@ -544,8 +583,8 @@ describe MicrosoftSync::SyncerSteps do
           .twice.and_return(owners: %w[m2 m3])
 
         allow(Rails.logger).to receive(:warn)
-        allow(InstStatsd::Statsd).to receive(:increment)
-        allow(InstStatsd::Statsd).to receive(:count)
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
         subject
 
@@ -640,7 +679,7 @@ describe MicrosoftSync::SyncerSteps do
     context "when the team doesn't exist" do
       it "moves on to step_create_team after a delay" do
         expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
-        expect_delayed_next_step(subject, :step_create_team, 10.seconds)
+        expect_delayed_next_step(subject, :step_create_team, 24.seconds)
       end
     end
   end
@@ -809,7 +848,7 @@ describe MicrosoftSync::SyncerSteps do
                           except_throttled: true do
             context 'when a request is throttled' do
               it 'turns into a full sync job with the delay given in the retry-after header' do
-                expect(graph_service).to receive(:request).and_raise(
+                expect(graph_service.http).to receive(:request).and_raise(
                   new_http_error(429, 'retry-after' => '3.14')
                 )
                 expect_delayed_next_step(

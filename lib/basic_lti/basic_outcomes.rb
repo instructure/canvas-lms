@@ -259,13 +259,14 @@ module BasicLTI
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
 
-        submitted_at = submission_submitted_at
-        submitted_at_date = submitted_at.present? ? Time.zone.parse(submitted_at) : nil
-        if submitted_at.present? && submitted_at_date.nil?
+        xml_submitted_at = submission_submitted_at
+        submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
+        if xml_submitted_at.present? && submitted_at.nil?
           error_message = I18n.t('Invalid timestamp - timestamp not parseable')
-        elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + 1.minute
+        elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
           error_message = I18n.t('Invalid timestamp - timestamp in future')
         end
+        submission_hash[:submitted_at] = submitted_at || Time.zone.now
 
         if error_message
           self.code_major = 'failure'
@@ -301,7 +302,7 @@ to because the assignment has no points possible.
               raw_score
             )
           else
-            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
+            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score
           end
         end
 
@@ -312,8 +313,8 @@ to because the assignment has no points possible.
       # rubocop:enable Metrics/PerceivedComplexity, Metrics/MethodLength
 
       # rubocop:disable Metrics/ParameterLists
-      def create_homework_submission(tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date=nil)
-        if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
+      def create_homework_submission(tool, submission_hash, assignment, user, new_score, raw_score)
+        if submission_hash[:submission_type].present?
           @submission = assignment.submit_homework(user, submission_hash.clone)
         end
 
@@ -321,19 +322,9 @@ to because the assignment has no points possible.
           submission_hash[:grade] = (new_score > 0 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
           submission_hash[:grader_id] = -tool.id
           @submission = assignment.grade_student(user, submission_hash).first
-          if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
-            @submission.submitted_at = Time.zone.now
-          end
         end
 
-        if submitted_at_date.present?
-          @submission.submitted_at = submitted_at_date
-        end
-
-        if @submission
-          @submission.attempt -= 1 if @submission.attempt.try(:'>', 0) && @submission.submitted_at_changed?
-          @submission.save
-        else
+        unless @submission
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
         end

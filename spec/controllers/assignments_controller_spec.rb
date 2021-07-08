@@ -543,6 +543,14 @@ describe AssignmentsController do
         get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
         expect(env[:GRADERS].map {|grader| grader[:id].to_s}).not_to include(@other_teacher.id.to_s)
       end
+
+      it "sets selectable to false when the grader is removed from the course" do
+        user_session(account_admin_user)
+        @assignment.moderation_graders.create!(anonymous_id: "other", user: grader_1)
+        grader_1.enrollments.first.destroy
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:GRADERS].first['grader_selectable']).to be(false)
+      end
     end
   end
 
@@ -1587,6 +1595,11 @@ describe AssignmentsController do
       a.save!
       post 'create', params: {:course_id => @course.id, :assignment => {:title => "some assignment"}}
       expect(assigns[:assignment]).to be_post_to_sis
+    end
+
+    it "sets important_dates if provided" do
+      post 'create', params: {:course_id => @course.id, :assignment => {:important_dates => true}}
+      expect(assigns[:assignment].important_dates).to be true
     end
   end
 

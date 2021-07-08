@@ -92,7 +92,9 @@ export default class FakeEditor {
       },
       replace: (newelem, oldelem) => {
         return oldelem.parentNode.replaceChild(newelem, oldelem)
-      }
+      },
+      select: (selector) => this._$container.querySelectorAll(selector),
+      remove: (elem) => elem.remove()
     }
     this.initialize()
   }

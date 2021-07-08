@@ -45,6 +45,8 @@ services:
   webpack:
     <<: *BASE
     command: yarn run webpack
+    env_file:
+      - ./.env
 
   web:
     <<: *BASE

@@ -18,21 +18,19 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
-import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PostMessage} from '../../components/PostMessage/PostMessage'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
@@ -44,9 +42,11 @@ import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   addReplyToSubentries,
-  addReplyToDiscussion
+  addReplyToDiscussion,
+  resolveAuthorRoles
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
+import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 
 export const mockThreads = {
   discussionEntry: {
@@ -78,8 +78,6 @@ export const mockThreads = {
   }
 }
 
-const courseID = window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
-
 export const DiscussionThreadContainer = props => {
   const {sort} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -93,7 +91,14 @@ export const DiscussionThreadContainer = props => {
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
     addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, props.discussionEntry._id, sort, newDiscussionEntry, courseID)
+    addReplyToSubentries(
+      cache,
+      props.discussionEntry._id,
+      PER_PAGE,
+      sort,
+      newDiscussionEntry,
+      window.ENV?.course_id
+    )
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
@@ -175,7 +180,12 @@ export const DiscussionThreadContainer = props => {
         authorName={props.discussionEntry.author.name}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
-          setEditorExpanded(!editorExpanded)
+          const newEditorExpanded = !editorExpanded
+          setEditorExpanded(newEditorExpanded)
+
+          if (ENV.isolated_view) {
+            props.openIsolatedView(props.discussionEntry._id, true)
+          }
         }}
       />
     )
@@ -197,8 +207,6 @@ export const DiscussionThreadContainer = props => {
     )
   }
 
-  const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
-
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
@@ -211,7 +219,13 @@ export const DiscussionThreadContainer = props => {
             unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
           }
         )}
-        onClick={() => setExpandReplies(!expandReplies)}
+        onClick={() => {
+          if (ENV.isolated_view) {
+            props.openIsolatedView(props.discussionEntry._id, false)
+          } else {
+            setExpandReplies(!expandReplies)
+          }
+        }}
         isExpanded={expandReplies}
       />
     )
@@ -237,39 +251,14 @@ export const DiscussionThreadContainer = props => {
     })
   }
 
-  const renderPostMessage = () => {
-    if (props.discussionEntry.deleted) {
-      const name = props.discussionEntry.editor
-        ? props.discussionEntry.editor.name
-        : props.discussionEntry.author.name
-      return (
-        <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
-          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
-        </DeletedPostMessage>
+  const onOpenInSpeedGrader = () => {
+    window.location.assign(
+      getSpeedGraderUrl(
+        ENV.course_id,
+        props.discussionTopic.assignment._id,
+        props.discussionEntry.author._id
       )
-    } else {
-      return (
-        <PostMessage
-          authorName={props.discussionEntry.author.name}
-          avatarUrl={props.discussionEntry.author.avatarUrl}
-          lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-            props.discussionEntry.lastReply?.createdAt
-          )}
-          timingDisplay={createdAt}
-          message={props.discussionEntry.message}
-          isUnread={!props.discussionEntry.read}
-          isEditing={isEditing}
-          onCancel={() => {
-            setIsEditing(false)
-          }}
-          onSave={onUpdate}
-          isForcedRead={props.discussionEntry.forcedReadState}
-          discussionRoles={props.discussionEntry.author?.courseRoles}
-        >
-          <ThreadingToolbar>{threadActions}</ThreadingToolbar>
-        </PostMessage>
-      )
-    }
+    )
   }
 
   // Scrolling auto listener to mark messages as read
@@ -293,60 +282,82 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRef, props.discussionEntry.read, props])
 
+  const onReplySubmit = text => {
+    createDiscussionEntry({
+      variables: {
+        discussionTopicId: ENV.discussion_topic_id,
+        parentEntryId: props.discussionEntry._id,
+        message: text
+      }
+    })
+    setEditorExpanded(false)
+  }
+
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
     <>
-      <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
-        <Flex>
-          <Flex.Item shouldShrink shouldGrow>
-            {renderPostMessage()}
-          </Flex.Item>
-          {!props.discussionEntry.deleted && (
-            <Flex.Item align="stretch">
-              <ThreadActions
-                id={props.discussionEntry.id}
-                isUnread={!props.discussionEntry.read}
-                onToggleUnread={toggleUnread}
-                onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
-                onEdit={
-                  props.discussionEntry.permissions?.update
-                    ? () => {
-                        setIsEditing(true)
-                      }
-                    : null
-                }
-                onOpenInSpeedGrader={
-                  props.discussionTopic.permissions?.speedGrader
-                    ? () => {
-                        window.location.assign(
-                          getSpeedGraderUrl(
-                            ENV.course_id,
-                            props.discussionTopic.assignment._id,
-                            props.discussionEntry.author._id
-                          )
-                        )
-                      }
-                    : null
-                }
-                goToParent={
-                  props.depth === 0
-                    ? null
-                    : () => {
-                        const topOffset = props.parentRef.current.offsetTop
-                        window.scrollTo(0, topOffset - 44)
-                      }
-                }
-                goToTopic={() => {
-                  setTimeout(() => {
-                    window.scrollTo(0, 0)
-                  })
+      <Highlight isHighlighted={highlightEntry}>
+        <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
+          <Flex>
+            <Flex.Item shouldShrink shouldGrow>
+              <PostMessageContainer
+                discussionEntry={props.discussionEntry}
+                threadActions={threadActions}
+                isEditing={isEditing}
+                onCancel={() => {
+                  setIsEditing(false)
                 }}
+                onSave={onUpdate}
+                discussionRoles={resolveAuthorRoles(
+                  props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
+                    !!props?.discussionTopic?.author?.id &&
+                    !!props?.discussionEntry?.author?.id,
+                  props?.discussionEntry?.author?.courseRoles
+                )}
               />
             </Flex.Item>
-          )}
-        </Flex>
-      </div>
+            {!props.discussionEntry.deleted && (
+              <Flex.Item align="stretch">
+                <ThreadActions
+                  id={props.discussionEntry.id}
+                  isUnread={!props.discussionEntry.read}
+                  onToggleUnread={toggleUnread}
+                  onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
+                  onEdit={
+                    props.discussionEntry.permissions?.update
+                      ? () => {
+                          setIsEditing(true)
+                        }
+                      : null
+                  }
+                  onOpenInSpeedGrader={
+                    props.discussionTopic.permissions?.speedGrader ? onOpenInSpeedGrader : null
+                  }
+                  goToParent={
+                    props.depth === 0
+                      ? null
+                      : () => {
+                          const topOffset = props.parentRef.current.offsetTop
+                          window.scrollTo(0, topOffset - 44)
+                        }
+                  }
+                  goToTopic={() => {
+                    setTimeout(() => {
+                      window.scrollTo(0, 0)
+                    })
+                  }}
+                />
+              </Flex.Item>
+            )}
+          </Flex>
+        </div>
+      </Highlight>
       <div style={{marginLeft: replyMarginDepth}}>
-        {editorExpanded && (
+        {editorExpanded && !ENV.isolated_view && (
           <View
             display="block"
             background="primary"
@@ -356,14 +367,7 @@ export const DiscussionThreadContainer = props => {
           >
             <DiscussionEdit
               onSubmit={text => {
-                createDiscussionEntry({
-                  variables: {
-                    discussionTopicId: ENV.discussion_topic_id,
-                    parentEntryId: props.discussionEntry._id,
-                    message: text
-                  }
-                })
-                setEditorExpanded(false)
+                onReplySubmit(text)
               }}
               onCancel={() => setEditorExpanded(false)}
             />
@@ -407,7 +411,8 @@ DiscussionThreadContainer.propTypes = {
   discussionEntry: PropTypes.object.isRequired,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRef: PropTypes.object
+  parentRef: PropTypes.object,
+  openIsolatedView: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -423,7 +428,7 @@ const DiscussionSubentries = props => {
     discussionEntryID: props.discussionEntryId,
     perPage: PER_PAGE,
     sort,
-    courseID
+    courseID: window.ENV?.course_id
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables

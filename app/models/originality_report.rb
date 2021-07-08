@@ -20,6 +20,11 @@
 class OriginalityReport < ActiveRecord::Base
   include Rails.application.routes.url_helpers
 
+  # Allowed workflow states, for ActiveRecord callbacks. In addition, this list is sorted from least
+  # to most preferred state. This allows us to sort and determine what report we want to use if
+  # multiple exist for a given submission and attachment combo.
+  ORDERED_VALID_WORKFLOW_STATES = %w[pending error scored].freeze
+
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"
@@ -29,7 +34,7 @@ class OriginalityReport < ActiveRecord::Base
   accepts_nested_attributes_for :lti_link, allow_destroy: true
 
   validates :submission, presence: true
-  validates :workflow_state, inclusion: { in: ['scored', 'error', 'pending'] }
+  validates :workflow_state, inclusion: { in: ORDERED_VALID_WORKFLOW_STATES }
   validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
 
   alias_attribute :file_id, :attachment_id

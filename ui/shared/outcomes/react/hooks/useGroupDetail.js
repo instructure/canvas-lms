@@ -27,8 +27,6 @@ import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 const useGroupDetail = ({
   query = SEARCH_GROUP_OUTCOMES,
   loadOutcomesIsImported = false,
-  srOnlyAlert = false,
-  showAlert = true,
   searchString = '',
   id
 }) => {
@@ -85,7 +83,7 @@ const useGroupDetail = ({
           setLoading(false)
         })
         .catch(err => {
-          setError(err)
+          setError(err.message)
         })
     }
   }
@@ -102,11 +100,10 @@ const useGroupDetail = ({
   }, [id, searchString])
 
   useEffect(() => {
-    if (error && showAlert) {
+    if (error) {
       showFlashAlert({
         message: I18n.t('An error occurred while loading selected group.'),
-        type: 'error',
-        srOnly: srOnlyAlert
+        type: 'error'
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

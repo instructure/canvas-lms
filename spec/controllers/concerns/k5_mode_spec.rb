@@ -19,23 +19,44 @@
 #
 
 require 'spec_helper'
+require_relative '../../helpers/k5_common'
 
 describe K5Mode do
+  include K5Common
+
   controller(AssignmentsController) do
-    def index; end
+    def index
+      respond_to do |format|
+        format.html do
+          render :new_index
+        end
+      end
+    end
   end
 
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @course.account.settings[:enable_as_k5_account] = { value: true }
-    @course.account.save!
+    toggle_k5_setting(@course.account)
   end
 
   describe 'set_k5_mode' do
+    shared_examples_for ':show_left_side' do
+      it 'should not set :show_left_side in non-k5 contexts' do
+        toggle_k5_setting(@course.account, false)
+        get :index, params: { course_id: @course.id }
+        expect(assigns(:show_left_side)).to be_nil
+      end
+    end
+
     context 'teacher' do
-      it 'should set k5 variables' do
+      before :each do
         user_session(@teacher)
+      end
+
+      it_behaves_like ':show_left_side'
+
+      it 'should set k5 variables' do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
@@ -45,8 +66,13 @@ describe K5Mode do
     end
 
     context 'student' do
-      it 'should set k5 variables' do
+      before :each do
         user_session(@student)
+      end
+
+      it_behaves_like ':show_left_side'
+
+      it 'should set k5 variables' do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(true)
         expect(assigns(:show_left_side)).to eq(false)

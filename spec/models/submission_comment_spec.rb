@@ -814,4 +814,64 @@ This text has a http://www.google.com link in it...
       expect(comment).not_to be_allows_posting_submission
     end
   end
+
+  describe "finalizing draft comments" do
+    let(:assignment) { @course.assignments.create! }
+    let(:student) { @user }
+    let(:submission) { assignment.submission_for_student(student) }
+    let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
+    let(:admin) { @course.root_account.account_users.create!(user: User.create!).user }
+
+    context "when the associated submission is not yet posted and the assignment is auto-posted" do
+      it "posts the submission when an active instructor finalizes a draft comment" do
+        comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
+        comment.update!(draft: false)
+        expect(submission.reload).to be_posted
+      end
+
+      it "posts the submission when an admin finalizes a draft comment" do
+        comment = submission.add_comment(comment: "HMMMM", draft_comment: true, author: admin)
+        comment.update!(draft: false)
+        expect(submission.reload).to be_posted
+      end
+
+      it "does not post the submission when a non-active instructor finalizes a draft comment" do
+        comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
+        teacher.enrollments.first.destroy
+        comment.update!(draft: false)
+        expect(submission.reload).not_to be_posted
+      end
+
+      it "does not post the submission if a student somehow creates and finalizes a draft comment" do
+        comment = submission.add_comment(comment: "I am the greatest!", draft_comment: true, author: student)
+        comment.update!(draft: false)
+        expect(submission.reload).not_to be_posted
+      end
+
+      it "does not post the submission if the finalized comment has no author" do
+        comment = submission.add_comment(comment: "who am I?", draft_comment: true, skip_author: true)
+        comment.update!(draft: false)
+        expect(submission.reload).not_to be_posted
+      end
+    end
+
+    it "does not update the submission's posted_at when it is already posted" do
+      submission.update!(posted_at: 1.hour.ago(Time.zone.now))
+      comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
+
+      expect {
+        comment.update!(draft: false)
+      }.not_to change {
+        submission.reload.posted_at
+      }
+    end
+
+    it "does not post the submission when the assignment is manually-posted" do
+      assignment.post_policy.update!(post_manually: true)
+
+      comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
+      comment.update!(draft: false)
+      expect(submission.reload).not_to be_posted
+    end
+  end
 end

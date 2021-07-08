@@ -22,8 +22,8 @@ module DataFixup::Lti::FillCustomClaimColumnsForResourceLink
     update_context!
     drop_resource_links_without_a_context
 
-    Lti::ResourceLink.in_batches do |resource_links|
-      update_lookup_id!(resource_links)
+    Lti::ResourceLink.find_each do |resource_link|
+      resource_link.update!(lookup_id: SecureRandom.uuid)
     end
   end
 
@@ -46,11 +46,5 @@ module DataFixup::Lti::FillCustomClaimColumnsForResourceLink
     Lti::ResourceLink.
       joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.lti_context_id = lti_resource_links.resource_link_id").
       update_all("context_type = 'Assignment', context_id = assignments.id")
-  end
-
-  def self.update_lookup_id!(resource_links)
-    resource_links.each do |resource_link|
-      resource_link.update!(lookup_id: SecureRandom.uuid)
-    end
   end
 end

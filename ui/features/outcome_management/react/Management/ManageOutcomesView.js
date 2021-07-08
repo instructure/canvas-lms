@@ -88,7 +88,7 @@ const ManageOutcomesView = ({
           <Heading level="h4">
             <Flex>
               <Flex.Item shouldShrink>
-                <div style={{overflowWrap: 'break-word'}}>
+                <div style={{overflowWrap: 'break-word', padding: '0.375rem 0'}}>
                   {I18n.t(
                     {
                       one: '1 "%{groupTitle}" Outcome',
@@ -101,16 +101,14 @@ const ManageOutcomesView = ({
                   )}
                 </div>
               </Flex.Item>
-              <Flex.Item>
-                {searchString && loading ? (
+              <Flex.Item size="2.5rem">
+                {searchString && loading && (
                   <Spinner
                     renderTitle={I18n.t('Loading')}
                     size="x-small"
-                    margin="0 0 0 small"
+                    margin="0 0 0 x-small"
                     data-testid="search-loading"
                   />
-                ) : (
-                  ''
                 )}
               </Flex.Item>
             </Flex>
@@ -122,20 +120,22 @@ const ManageOutcomesView = ({
               <Text color="secondary">{I18n.t('The search returned no results')}</Text>
             </View>
           )}
-
-          {outcomes?.edges?.map(({canUnlink, node: {_id, title, description, canEdit}}) => (
-            <ManageOutcomeItem
-              key={_id}
-              _id={_id}
-              title={title}
-              description={description}
-              canManageOutcome={canEdit}
-              canUnlink={canUnlink}
-              isChecked={!!selectedOutcomes[_id]}
-              onMenuHandler={onOutcomeMenuHandler}
-              onCheckboxHandler={onSelectOutcomesHandler}
-            />
-          ))}
+          {outcomes?.edges?.map(
+            ({canUnlink, id: linkId, node: {_id, title, description, canEdit}}) => (
+              <ManageOutcomeItem
+                key={linkId}
+                _id={_id}
+                linkId={linkId}
+                title={title}
+                description={description}
+                canManageOutcome={canEdit}
+                canUnlink={canUnlink}
+                isChecked={!!selectedOutcomes[linkId]}
+                onMenuHandler={onOutcomeMenuHandler}
+                onCheckboxHandler={onSelectOutcomesHandler}
+              />
+            )
+          )}
         </View>
       </InfiniteScroll>
     </View>

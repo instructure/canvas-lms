@@ -2547,6 +2547,7 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).to include :dashboard
           expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
           expect(assigns[:css_bundles].flatten).to include :dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_common
           expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
           expect(assigns[:js_env][:K5_USER]).to be_falsy
         end
@@ -2562,6 +2563,7 @@ describe UsersController do
           get 'user_dashboard'
           expect(assigns[:js_bundles].flatten).to include :k5_dashboard
           expect(assigns[:js_bundles].flatten).not_to include :dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_common
           expect(assigns[:css_bundles].flatten).to include :k5_dashboard
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy

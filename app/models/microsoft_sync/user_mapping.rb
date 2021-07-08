@@ -41,6 +41,10 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   validates_uniqueness_of :user_id, scope: :root_account
   MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
+  class AccountSettingsChanged < StandardError
+    include MicrosoftSync::Errors::GracefulCancelErrorMixin
+  end
+
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
   def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
@@ -69,21 +73,40 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   #                                          user1.id => 'aad1', user1.id => 'aad2')
   # Uses Rails 6's insert_all, which unlike our bulk_insert(), ignores
   # duplicates. (Don't need the partition support that bulk_insert provides.)
-  def self.bulk_insert_for_root_account_id(root_account_id, user_id_to_aad_hash)
+  #
+  # This method also refetches the Account settings after adding to make sure
+  # the UPN type and tenant haven't changed from the root_account that is
+  # passed in. The settings in root_account should be what was used to fetch
+  # the aads. This ensures that the values we are adding are actually for the
+  # UPN type and tenant currently in the Account settings. If the settings
+  # have changed, the just-added values will be deleted and this method will
+  # raise an AccountSettingsChanged error.
+  def self.bulk_insert_for_root_account(root_account, user_id_to_aad_hash)
     return if user_id_to_aad_hash.empty?
 
     now = Time.zone.now
     records = user_id_to_aad_hash.map do |user_id, aad_id|
       {
-        root_account_id: root_account_id,
+        root_account_id: root_account.id,
         created_at: now, updated_at: now,
         user_id: user_id, aad_id: aad_id,
       }
     end
 
-    # TODO: either check UPN type in Account settings transactionally when adding, or
-    # check after adding and delete what we just added.
-    insert_all(records)
+    result = insert_all(records)
+
+    if account_microsoft_sync_settings_changed?(root_account)
+      ids_added = result.rows.map(&:first)
+      where(id: ids_added).delete_all if ids_added.present?
+      raise AccountSettingsChanged
+    end
+  end
+
+  private_class_method def self.account_microsoft_sync_settings_changed?(root_account)
+    current_settings = Account.where(id: root_account.id).select(:settings).take.settings
+    %i[microsoft_sync_tenant microsoft_sync_login_attribute].any? do |key|
+      root_account.settings[key] != current_settings[key]
+    end
   end
 
   # Find the enrollments for course which have a UserMapping for the user.
@@ -109,8 +132,6 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   end
 
   def self.delete_user_mappings_for_account(account, batch_size)
-    # TODO: When we figure out a way to ensure a UserMapping is up-to-date with an account's Sync settings
-    # (like by using a hash), we'll need to update this query to filter by the account's current settings.
     while self.where(root_account: account).limit(batch_size).delete_all > 0; end
   end
 end

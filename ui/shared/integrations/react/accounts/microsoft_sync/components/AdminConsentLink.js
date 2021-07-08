@@ -34,7 +34,7 @@ const AdminConsentLink = props => {
   const url = consentUrl(props)
 
   return (
-    <div role="region" aria-live="polite">
+    <div>
       {props.enabled && (
         <>
           <View display="block" margin="small 0 0 0">
