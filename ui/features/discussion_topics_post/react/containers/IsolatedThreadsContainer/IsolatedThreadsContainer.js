@@ -72,6 +72,7 @@ export const IsolatedThreadsContainer = props => {
             onDelete={props.onDelete}
             onOpenInSpeedGrader={props.onOpenInSpeedGrader}
             onOpenIsolatedView={props.onOpenIsolatedView}
+            highlightParent={props.highlightParent}
           />
         ))}
     </div>
@@ -85,7 +86,8 @@ IsolatedThreadsContainer.propTypes = {
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   showOlderReplies: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  highlightParent: PropTypes.func
 }
 
 export default IsolatedThreadsContainer
@@ -190,7 +192,18 @@ const IsolatedThreadContainer = props => {
                   : null
               }
               onOpenInSpeedGrader={() => props.onOpenInSpeedGrader(props.discussionEntry)}
-              goToParent={() => {}}
+              goToParent={() => {
+                if (entry?.parent?.id === entry?.rootEntry?.id) {
+                  // Something else is trying to scroll this and with this timeout we give it a moment and then we execute our scroll.
+                  setTimeout(() => {
+                    document.querySelector('span[data-cid="Transition"]').scrollTo(0, 0)
+                  }, 0)
+                } else {
+                  props.onOpenIsolatedView(entry.rootEntry.id, false)
+                }
+
+                props.highlightParent()
+              }}
               goToTopic={() => {}}
             />
           </Flex.Item>
@@ -206,5 +219,6 @@ IsolatedThreadContainer.propTypes = {
   onToggleUnread: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  highlightParent: PropTypes.func
 }

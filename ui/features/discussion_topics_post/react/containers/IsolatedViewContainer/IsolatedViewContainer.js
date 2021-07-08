@@ -41,13 +41,14 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const [isHighlightedParent, setIsHighlightedParent] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -259,6 +260,7 @@ export const IsolatedViewContainer = props => {
             onOpenIsolatedView={props.onOpenIsolatedView}
             setRCEOpen={props.setRCEOpen}
             RCEOpen={props.RCEOpen}
+            isHighlighted={isHighlightedParent}
           >
             {props.RCEOpen && (
               <View
@@ -287,6 +289,13 @@ export const IsolatedViewContainer = props => {
               onOpenInSpeedGrader={onOpenInSpeedGrader}
               showOlderReplies={fetchMoreEntries}
               onOpenIsolatedView={props.onOpenIsolatedView}
+              highlightParent={() => {
+                setIsHighlightedParent(true)
+
+                setTimeout(() => {
+                  setIsHighlightedParent(false)
+                }, 2000)
+              }}
             />
           )}
         </>

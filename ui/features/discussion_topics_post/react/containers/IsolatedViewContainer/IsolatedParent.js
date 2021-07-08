@@ -84,11 +84,6 @@ export const IsolatedParent = props => {
     )
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
     <>
       {props.discussionEntry.parent && (
@@ -112,7 +107,7 @@ export const IsolatedParent = props => {
           paddingBottom: '0.375rem'
         }}
       >
-        <Highlight isHighlighted={highlightEntry}>
+        <Highlight isHighlighted={props.isHighlighted}>
           <Flex>
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
@@ -149,7 +144,6 @@ export const IsolatedParent = props => {
                       : null
                   }
                   onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-                  goToParent={() => {}}
                   goToTopic={() => {}}
                 />
               </Flex.Item>
@@ -172,5 +166,6 @@ IsolatedParent.propTypes = {
   children: PropTypes.node,
   onOpenIsolatedView: PropTypes.func,
   RCEOpen: PropTypes.bool,
-  setRCEOpen: PropTypes.func
+  setRCEOpen: PropTypes.func,
+  isHighlighted: PropTypes.bool
 }

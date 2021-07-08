@@ -27,6 +27,7 @@ import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import {number} from "prop-types";
 
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
@@ -97,6 +98,43 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(backButton)
 
     expect(onOpenIsolatedView).toHaveBeenCalledWith('77', false)
+  })
+
+  it('should go to root reply when clicking Go To Parent', async () => {
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    _id: '50',
+                    id: '50',
+                    message: '<p>This is the child reply</p>',
+                    rootEntry: DiscussionEntry.mock({id: '70'})
+                  })
+                ],
+                pageInfo: PageInfo.mock(),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[1]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[1])
+
+    const goToParentButton = await findByText('Go To Parent')
+    expect(goToParentButton).toBeInTheDocument()
+    fireEvent.click(goToParentButton)
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('70', false)
   })
 
   it('should not render a back button', async () => {
