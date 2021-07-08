@@ -52,6 +52,7 @@ export function Alert({...props}) {
           onClick={() => {
             setDueDateTrayOpen(true)
           }}
+          data-testid="show-due-dates-button"
         >
           <Text>
             {I18n.t('Show Due Dates (%{dueDateCount})', {
@@ -101,7 +102,7 @@ export function Alert({...props}) {
                   </Grid.Col>
                 </Grid.Row>
                 {props.assignmentOverrides.map(item => (
-                  <Grid.Row key={item.id}>
+                  <Grid.Row key={item.id} data-testid="assignment-override-row">
                     <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                       <Text size="medium">
                         {item.dueAt

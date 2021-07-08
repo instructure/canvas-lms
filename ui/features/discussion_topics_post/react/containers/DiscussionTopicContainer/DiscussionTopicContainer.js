@@ -102,7 +102,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       canSeeMultipleDueDates &&
       defaultDateSet
     ) {
-      discussionTopicData.assignmentOverrides.push({
+      discussionTopicData.assignmentOverrides = discussionTopicData.assignmentOverrides.concat({
         dueAt: discussionTopicData.assignment.dueAt,
         unlockAt: discussionTopicData.assignment.unlockAt,
         lockAt: discussionTopicData.assignment.lockAt,
