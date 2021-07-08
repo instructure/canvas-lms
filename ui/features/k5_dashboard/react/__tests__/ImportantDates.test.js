@@ -31,7 +31,7 @@ const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&
 
 describe('ImportantDates', () => {
   const getProps = (overrides = {}) => ({
-    timeZone: 'America/Denver',
+    timeZone: 'UTC',
     contexts: MOCK_CARDS,
     selectedContextsLimit: 2,
     ...overrides
@@ -77,12 +77,10 @@ describe('ImportantDates', () => {
     await findByText('Math HW')
     const params = new URLSearchParams(fetchMock.lastUrl())
     expect(params.getAll('context_codes[]')).toEqual(['course_1', 'course_2'])
-    expect(params.get('start_date')).toBe(
-      moment().tz('America/Denver').startOf('day').toISOString()
-    )
+    expect(params.get('start_date')).toBe(moment().tz('UTC').startOf('day').toISOString())
     // Compare only the first half of the timestamp since the ms will differ slightly
     // from request call to assertion
-    const expectedEndDate = moment().tz('America/Denver').add(2, 'years').toISOString()
+    const expectedEndDate = moment().tz('UTC').add(2, 'years').toISOString()
     expect(params.get('end_date').split('T')[0]).toBe(expectedEndDate.split('T')[0])
   })
 
@@ -100,10 +98,9 @@ describe('ImportantDates', () => {
     expect(getByTestId('important-dates-panda')).toBeInTheDocument()
   })
 
-  // UTC vs local date change sensitivity needs to be fixed (LS-2311)
-  it.skip('displays a timestamp for each date bucket', async () => {
+  it('displays a timestamp for each date bucket', async () => {
     const assignments = MOCK_ASSIGNMENTS
-    const date = moment().tz('America/Denver').add(2, 'days')
+    const date = moment().tz('UTC').endOf('day').toISOString()
     assignments[0].assignment.due_at = date
     fetchMock.get(ASSIGNMENTS_URL, assignments, {overwriteRoutes: true})
     const {findByText} = render(<ImportantDates {...getProps()} />)
@@ -115,7 +112,7 @@ describe('ImportantDates', () => {
     assignments[0].assignment.due_at = '2150-07-02T00:00:00Z'
     fetchMock.get(ASSIGNMENTS_URL, assignments, {overwriteRoutes: true})
     const {findByText} = render(<ImportantDates {...getProps()} />)
-    expect(await findByText('Wed Jul 1, 2150')).toBeInTheDocument()
+    expect(await findByText('Thu Jul 2, 2150')).toBeInTheDocument()
   })
 
   it('shows the context names for each item', async () => {
