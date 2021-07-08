@@ -378,10 +378,6 @@ describe "Default Account Reports" do
         expect(@report.should_add_pronouns?).to eq(false)
       end
 
-      it 'should evaluate to false when disabled via Setting' do
-        Setting.set('enable_sis_export_pronouns', 'false')
-        expect(@report.should_add_pronouns?).to eq(false)
-      end
     end
 
     describe "Users" do

@@ -114,11 +114,9 @@ module AccountReports
       return @should_add_pronouns if defined?(@should_add_pronouns)
 
       # if root_account.can_add_pronouns? is true, that means the account is using pronouns
-      # if we decided to turn off this column for everyone via Setting, we should not include them
       # if one root_account has pronouns enabled, but does not want to have them in the report, we can disable for the one account
       # if any return false, don't export
       @should_add_pronouns = ![root_account.can_add_pronouns?.to_s,
-                               Setting.get('enable_sis_export_pronouns', 'true'),
                                root_account.enable_sis_export_pronouns?.to_s].include?('false')
     end
 
