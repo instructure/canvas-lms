@@ -71,7 +71,7 @@ export const overrideCourseGradingPeriods = (
 export const GradesPage = ({visible, currentUserRoles}) => {
   const [courses, setCourses] = useState(null)
   const [gradingPeriods, setGradingPeriods] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [selectedGradingPeriodId, selectGradingPeriodId] = useState('')
   const [specificPeriodGrades, setSpecificPeriodGrades] = useState([])
 
@@ -169,7 +169,8 @@ export const GradesPage = ({visible, currentUserRoles}) => {
       <LoadingWrapper
         id="grades"
         isLoading={loading}
-        skeletonsCount={selectedCourses?.length || 3}
+        skeletonsNum={selectedCourses?.length} // null is passed until the courses are loaded
+        defaultSkeletonsNum={3}
         width="100%"
         height="8.5rem"
         margin="none none medium"

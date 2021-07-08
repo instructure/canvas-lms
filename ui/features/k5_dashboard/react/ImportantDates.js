@@ -177,7 +177,9 @@ const ImportantDates = ({
           id="important-dates-skeleton"
           isLoading={!selectedContextCodes || loadingAssignments || loadingEvents}
           renderCustomSkeleton={datesSkeleton}
-          skeletonsCount={3}
+          skeletonsNum={dates?.length}
+          defaultSkeletonsNum={3}
+          allowZeroSkeletons={false}
         >
           {dates?.length ? (
             dates.map(date => (

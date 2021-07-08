@@ -31,6 +31,10 @@ describe('HomeroomPage', () => {
     window.ENV.INITIAL_NUM_K5_CARDS = 3
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   afterAll(() => {
     window.ENV = {}
   })

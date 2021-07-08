@@ -87,6 +87,7 @@ export const LatestAnnouncementLink = ({courseId, color, loading, title, html_ur
       height="4em"
       margin="small 0"
       renderCustomSkeleton={customSkeleton}
+      persistInCache={false}
     >
       {title && html_url ? (
         <Link

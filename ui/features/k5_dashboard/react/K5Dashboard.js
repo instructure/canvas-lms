@@ -308,7 +308,7 @@ export const K5Dashboard = ({
                 cardsSettled={cardsSettled}
                 visible={currentTab === TAB_IDS.RESOURCES}
                 showStaff
-                filterToHomerooms
+                isSingleCourse={false}
               />
             )}
             {currentUserRoles.includes('teacher') && (

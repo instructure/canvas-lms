@@ -384,7 +384,7 @@ export function K5Course({
             cardsSettled
             visible={currentTab === TAB_IDS.RESOURCES}
             showStaff={false}
-            filterToHomerooms={false}
+            isSingleCourse
           />
         )}
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}

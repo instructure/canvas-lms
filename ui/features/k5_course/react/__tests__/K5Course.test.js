@@ -156,6 +156,7 @@ afterEach(() => {
   global.ENV = {}
   const modulesContainer = document.getElementById('k5-modules-container')
   modulesContainer.remove()
+  localStorage.clear()
 })
 
 describe('K-5 Subject Course', () => {

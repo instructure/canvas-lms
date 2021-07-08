@@ -52,6 +52,7 @@ describe('GradesPage', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    localStorage.clear()
   })
 
   describe('without grading periods', () => {
