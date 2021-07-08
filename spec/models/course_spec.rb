@@ -702,6 +702,12 @@ describe Course do
       expect{course_model(account: Account.site_admin)}.to raise_error(ActiveRecord::RecordInvalid)
     end
 
+    it 'should not expect site_admin to exist' do
+      allow(Account).to receive(:site_admin).and_return nil
+      course = Course.new(root_account_id: Account.default.id)
+      expect(course.validate_not_on_siteadmin).to be_nil
+    end
+
     it 'should not allow updating account to site_admin' do
       course = course_model
       course.root_account = Account.site_admin
