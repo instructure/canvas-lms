@@ -501,7 +501,7 @@ class Course < ActiveRecord::Base
   end
 
   def validate_not_on_siteadmin
-    if root_account_id_changed? && root_account_id == Account.site_admin.id
+    if root_account_id_changed? && root_account_id == Account.site_admin&.id
       self.errors.add(:root_account_id, t("Courses cannot be created on the site_admin account."))
     end
   end
