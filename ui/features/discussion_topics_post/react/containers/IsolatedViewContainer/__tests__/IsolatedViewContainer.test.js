@@ -27,7 +27,6 @@ import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
-import {number} from "prop-types";
 
 describe('IsolatedViewContainer', () => {
   const server = mswServer(handlers)
