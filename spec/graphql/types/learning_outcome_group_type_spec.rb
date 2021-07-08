@@ -221,4 +221,12 @@ describe Types::LearningOutcomeGroupType do
       end
     end
   end
+
+  describe 'group' do
+    it 'returns parent group of an outcome' do
+      expect(outcome_group_type.resolve("outcomes { edges { group { _id } } }")).to match_array([
+        @outcome_group.id.to_s, @outcome_group.id.to_s
+      ])
+    end
+  end
 end
