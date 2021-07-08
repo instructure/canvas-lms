@@ -56,14 +56,12 @@ namespace :canvas do
       ].compact if build_i18n && build_js
 
       task 'js:webpack_development' => [
-        # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
-        # to exist before we run handlebars stuff, so we have to do this first
-        'css:compile',
+        'js:gulp_rev',
         ('i18n:generate_js' if build_i18n),
       ] if build_js && build_dev_js
 
       task 'js:webpack_production' => [
-        'css:compile',
+        'js:gulp_rev',
         ('i18n:generate_js' if build_i18n),
       ] if build_js && build_prod_js
     end

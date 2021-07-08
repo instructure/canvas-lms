@@ -9,6 +9,7 @@ FROM instructure/ruby-passenger:2.6
 
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
+ENV SASS_STYLE "compressed"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV YARN_VERSION 1.19.1-1
 ENV BUNDLER_VERSION 2.2.17

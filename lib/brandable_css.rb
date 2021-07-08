@@ -27,9 +27,6 @@ module BrandableCSS
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
   MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'.freeze
 
-  use_compressed = (defined?(Rails) && Rails.env.production?) || (ENV['RAILS_ENV'] == 'production')
-  SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
-
   VARIABLE_HUMAN_NAMES = {
     "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
     "ic-brand-font-color-dark" => lambda { I18n.t("Main Text Color") },
@@ -291,7 +288,7 @@ module BrandableCSS
       if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@combined_checksums)
         return @combined_checksums
       end
-      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'] + SASS_STYLE)
+      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
       if file.exist?
         @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
           memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
@@ -306,6 +303,22 @@ module BrandableCSS
         default_value = {:combinedChecksum => "Error: unknown css checksum. you need to run brandable_css"}.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
+    end
+
+    # javascript needs to know the checksums of the available variants for each
+    # handlebars template so that it loads the corresponding stylesheet when the
+    # template is rendered at runtime
+    def handlebars_index_json
+      if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@handlebars_index_json)
+        return @handlebars_index_json
+      end
+
+      file = APP_ROOT.join(CONFIG.dig('indices', 'handlebars', 'path'))
+      unless file.exist?
+        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+      end
+
+      @handlebars_index_json = file.read
     end
 
     # bundle path should be something like "bundles/speedgrader" or "plugins/analytics/something"

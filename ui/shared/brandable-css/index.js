@@ -16,6 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {isRTL} from '@canvas/i18n/rtlHelper'
+import invariant from 'invariant'
 
 const loadedStylesheets = {}
 
@@ -25,6 +26,11 @@ const brandableCss = {
     const contrast = window.ENV.use_high_contrast ? 'high_contrast' : 'normal_contrast'
     const rtl = isRTL() ? '_rtl' : ''
     return `${variant}_${contrast}${rtl}`
+  },
+
+  // see lib/brandable_css.rb#handlebars_index_json
+  getHandlebarsIndex() {
+    return window.BRANDABLE_CSS_HANDLEBARS_INDEX || [[], {}]
   },
 
   // combinedChecksum should be like '09f833ef7a'
@@ -53,6 +59,54 @@ const brandableCss = {
     // give the person trying to track down a bug a hint on how this link tag got on the page
     linkElement.setAttribute('data-loaded-by-brandableCss', true)
     document.head.appendChild(linkElement)
+  },
+
+  loadStylesheetForJST({ bundle, id }) {
+    const [variants, bundles] = brandableCss.getHandlebarsIndex()
+
+    invariant(bundles.hasOwnProperty(id),
+      `requested to load stylesheet for template "${bundle}" (${id}) but no ` +
+      `mapping is available for it!`
+    )
+
+    // "includesNoVariables" true; there's only one file regardless of variant
+    if (bundles[id].length === 1) {
+      return brandableCss.loadStylesheet(bundle, {
+        combinedChecksum: bundles[id][0],
+        includesNoVariables: true
+      })
+    }
+    else {
+      // this can be a bit whoozy, remember the structure:
+      //
+      //     [
+      //       [ 'a', 'b', 'c' ],
+      //       ^^^^^^^^^^^^^^^^^ known variants, brandableCss.getCssVariant()
+      //                         will be one of them
+      //
+      //       {
+      //         "f0d": [
+      //          ^^^ id
+      //           "variant[0] checksum",
+      //           "variant[1] checksum",
+      //           0,
+      //           ^ a ref that resolves into "variant[0] checksum"
+      //           "variant[3] checksum"
+      //         ]
+      //       }
+      //     ]
+      //
+      let checksum = bundles[id][variants.indexOf(brandableCss.getCssVariant())]
+
+      if (typeof checksum === 'number') {
+        checksum = bundles[id][checksum]
+      }
+
+      return brandableCss.loadStylesheet(bundle, {
+        combinedChecksum: checksum,
+        includesNoVariables: false
+      })
+    }
   }
 }
 export default brandableCss
