@@ -79,7 +79,7 @@ export function PostMessage({...props}) {
                     padding="xx-small none xx-small none"
                   >
                     {props.hasAuthor && (
-                      <View padding="none small none none">
+                      <View padding="none small none small">
                         <Text weight="bold" data-testid="author_name">
                           <SearchSpan searchTerm={searchTerm} text={props.authorName} />
                         </Text>
@@ -97,29 +97,34 @@ export function PostMessage({...props}) {
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
-              <Flex.Item shouldShrink>
-                <View display="inline-flex" padding="none small none none">
-                  <Text color="secondary" size="small">
-                    {props.timingDisplay}
-                  </Text>
-                  <Text color="secondary" size="small">
-                    {!!props.lastReplyAtDisplayText &&
-                      I18n.t(', last reply %{lastReplyAtDisplayText}', {
-                        lastReplyAtDisplayText: props.lastReplyAtDisplayText
-                      })}
-                  </Text>
-                </View>
-              </Flex.Item>
+              {props.timingDisplay && (
+                <Flex.Item shouldShrink padding="0 0 0 small">
+                  <View display="inline-flex" padding="none small none none">
+                    <Text color="secondary" size="small">
+                      {props.timingDisplay}
+                    </Text>
+                    <Text color="secondary" size="small">
+                      {!!props.lastReplyAtDisplayText &&
+                        I18n.t(', last reply %{lastReplyAtDisplayText}', {
+                          lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                        })}
+                    </Text>
+                  </View>
+                </Flex.Item>
+              )}
             </Flex>
           </Flex.Item>
-          <Flex.Item padding="small" overflowY="hidden">
+          <Flex.Item padding={props.hasAuthor ? 'small' : '0 small small small'} overflowY="hidden">
             <>
               {props.title && (
                 <>
                   <Heading level="h1">
                     <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
                   </Heading>
-                  <View as="div" margin="medium none">
+                  <View
+                    as="div"
+                    margin={props.hasAuthor ? 'medium none medium none' : '0 0 medium 0'}
+                  >
                     <Text size="x-large">{props.title}</Text>
                   </View>
                 </>
