@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,17 +16,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Interfaces
-  module TimestampInterface
-  include Interfaces::BaseInterface
+# Create a GraphQL interface (https://graphql-ruby.org/type_definitions/interfaces)
+# by including this module in your interface module.  In addition to the standard
+# GraphQL field declarations, this will allow you to attach `@key` and `@external`
+# directives to your interface for integration with other services' data graphs in a
+# federated supergraph. See: https://github.com/Gusto/apollo-federation-ruby#usage
+module Interfaces::BaseInterface
+  include GraphQL::Schema::Interface
+  include ApolloFederation::Interface
 
-    graphql_name "Timestamped"
-
-    description "Contains timestamp metadata"
-
-    field :created_at, Types::DateTimeType, null: true
-    field :updated_at, Types::DateTimeType, null: true
-  end
+  field_class Types::BaseField
 end

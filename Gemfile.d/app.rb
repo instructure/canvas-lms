@@ -69,6 +69,7 @@ gem 'encrypted_cookie_store-instructure', '1.2.11', require: 'encrypted_cookie_s
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.13.1', require: false
 gem 'gepub', '1.0.13'
+gem 'apollo-federation', '1.1.5'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.3'
 gem 'hashery', '2.1.2', require: false

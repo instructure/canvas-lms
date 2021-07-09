@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,15 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Interfaces
-  module TimestampInterface
-  include Interfaces::BaseInterface
-
-    graphql_name "Timestamped"
-
-    description "Contains timestamp metadata"
-
-    field :created_at, Types::DateTimeType, null: true
-    field :updated_at, Types::DateTimeType, null: true
-  end
+class Types::BaseField < GraphQL::Schema::Field
+  include ApolloFederation::Field
 end
