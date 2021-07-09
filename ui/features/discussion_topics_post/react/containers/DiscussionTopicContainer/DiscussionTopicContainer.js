@@ -21,6 +21,7 @@ import {Alert} from '../../components/Alert/Alert'
 import {Alert as AlertFRD} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
@@ -68,6 +69,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     replies: props.discussionTopic?.entryCounts?.repliesCount,
     assignment: props.discussionTopic?.assignment,
     assignmentOverrides: props.discussionTopic?.assignment?.assignmentOverrides?.nodes || [],
+    attachmentDisplayName: props.discussionTopic?.attachment?.displayName || null,
+    attachmentUrl: props.discussionTopic?.attachment?.url || null,
     childTopics: props.discussionTopic?.childTopics || [],
     groupSet: props.discussionTopic?.groupSet || false,
     siblingTopics: props.discussionTopic?.rootTopic?.childTopics || [],
@@ -349,6 +352,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             hasAuthor,
                             discussionTopicData.authorRoles
                           )}
+                          attachmentDisplayName={discussionTopicData.attachmentDisplayName}
+                          attachmentUrl={discussionTopicData.attachmentUrl}
                           postUtilities={
                             <PostToolbarContainer
                               canUnpublish={canUnpublish}
@@ -365,16 +370,26 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             />
                           }
                         >
+                          {discussionTopicData.attachmentDisplayName &&
+                            discussionTopicData.attachmentUrl && (
+                              <View as="div" padding="medium none none">
+                                <Link href={discussionTopicData.attachmentUrl}>
+                                  {discussionTopicData.attachmentDisplayName}
+                                </Link>
+                              </View>
+                            )}
                           {canReply && (
-                            <Button
-                              color="primary"
-                              onClick={() => {
-                                setExpandedReply(!expandedReply)
-                              }}
-                              data-testid="discussion-topic-reply"
-                            >
-                              {I18n.t('Reply')}
-                            </Button>
+                            <View as="div" padding="medium none none">
+                              <Button
+                                color="primary"
+                                onClick={() => {
+                                  setExpandedReply(!expandedReply)
+                                }}
+                                data-testid="discussion-topic-reply"
+                              >
+                                {I18n.t('Reply')}
+                              </Button>
+                            </View>
                           )}
                         </PostMessage>
                       </Flex.Item>

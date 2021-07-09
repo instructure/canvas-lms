@@ -399,6 +399,11 @@ describe('DiscussionTopicContainer', () => {
     })
   })
 
+  it('renders an attachment if it exists', async () => {
+    const container = setup({discussionTopic: {...defaultTopic}})
+    await waitFor(() => expect(container.getByText('288777.jpeg')).toBeInTheDocument())
+  })
+
   it('renders a reply button if user has reply permission true', async () => {
     const container = setup({discussionTopic: {...defaultTopic}})
     await waitFor(() =>
