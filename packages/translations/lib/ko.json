@@ -35,6 +35,9 @@
     "calendar_event_89aadc1c": {
         "message": "행사"
     },
+    "cancel_caeb1e68": {
+        "message": "취소"
+    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -214,6 +217,9 @@
     },
     "new_13daf639": {
         "message": "새 항목"
+    },
+    "next_40e12421": {
+        "message": "다음"
     },
     "no_e16d9132": {
         "message": "아니요"

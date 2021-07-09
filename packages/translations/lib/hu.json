@@ -143,6 +143,9 @@
     "calendar_event_89aadc1c": {
         "message": "Naptáresemény"
     },
+    "cancel_caeb1e68": {
+        "message": "Mégse"
+    },
     "canvas_planner_98ed106": {
         "message": "Canvas Tervező"
     },
@@ -730,6 +733,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Új lehetőségek"
+    },
+    "next_40e12421": {
+        "message": "Következő"
     },
     "next_month_749b1778": {
         "message": "Következő hónap"

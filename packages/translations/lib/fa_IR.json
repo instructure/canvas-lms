@@ -50,6 +50,9 @@
     "calendar_event_89aadc1c": {
         "message": "رویداد تقویم"
     },
+    "cancel_caeb1e68": {
+        "message": "لغو"
+    },
     "choose_usage_rights_33683854": {
         "message": "انتخاب حقوق استفاده..."
     },
@@ -298,6 +301,9 @@
     },
     "new_13daf639": {
         "message": "جدید"
+    },
+    "next_40e12421": {
+        "message": "بعدی"
     },
     "next_month_749b1778": {
         "message": "ماه بعد"

@@ -41,6 +41,9 @@
     "calendar_event_89aadc1c": {
         "message": "Օրացուցային միջոցառում"
     },
+    "cancel_caeb1e68": {
+        "message": "Չեղյալ համարել"
+    },
     "choose_usage_rights_33683854": {
         "message": "Ընտրել օգտագործման իրավունքները..."
     },
@@ -250,6 +253,9 @@
     },
     "new_13daf639": {
         "message": "Նոր"
+    },
+    "next_40e12421": {
+        "message": "Հաջորդը"
     },
     "no_e16d9132": {
         "message": "Ոչ"
