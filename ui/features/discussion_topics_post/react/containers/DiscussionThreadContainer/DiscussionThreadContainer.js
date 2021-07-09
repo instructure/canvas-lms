@@ -316,7 +316,8 @@ export const DiscussionThreadContainer = props => {
                 discussionRoles={resolveAuthorRoles(
                   props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
                     !!props?.discussionTopic?.author?.id &&
-                    !!props?.discussionEntry?.author?.id,
+                    !!props?.discussionEntry?.author?.id &&
+                    props?.discussionEntry?.author !== null,
                   props?.discussionEntry?.author?.courseRoles
                 )}
               />

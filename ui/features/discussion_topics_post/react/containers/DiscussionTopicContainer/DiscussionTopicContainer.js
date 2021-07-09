@@ -393,7 +393,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         timingDisplay={discussionTopicData.postedAt}
                         title={discussionTopicData.title}
                         message={discussionTopicData.message}
-                        discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
+                        discussionRoles={resolveAuthorRoles(
+                          hasAuthor,
+                          discussionTopicData.authorRoles
+                        )}
                         postUtilities={
                           <PostToolbarContainer
                             canUnpublish={canUnpublish}

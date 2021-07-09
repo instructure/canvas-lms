@@ -547,6 +547,13 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
   })
 
+  it('should not render author if author is null', async () => {
+    const props = {discussionTopic: Discussion.mock({author: null})}
+    const container = setup(props)
+    const pillContainer = container.queryAllByTestId('pill-Author')
+    expect(pillContainer).toEqual([])
+  })
+
   describe('Peer Reviews', () => {
     it('renders with a due date', () => {
       const props = {discussionTopic: Discussion.mock()}
