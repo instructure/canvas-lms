@@ -146,12 +146,13 @@ export const IsolatedViewContainer = props => {
   }
 
   const onOpenInSpeedGrader = discussionEntry => {
-    window.location.assign(
+    window.open(
       getSpeedGraderUrl(
         window.ENV?.course_id,
         props.discussionTopic.assignment._id,
         discussionEntry.author._id
-      )
+      ),
+      '_blank'
     )
   }
 

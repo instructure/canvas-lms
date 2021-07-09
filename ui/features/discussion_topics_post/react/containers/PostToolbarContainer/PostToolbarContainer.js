@@ -72,8 +72,9 @@ export const PostToolbarContainer = props => {
       onOpenSpeedgrader={
         props.discussionTopicData?.permissions?.speedGrader
           ? () => {
-              window.location.assign(
-                getSpeedGraderUrl(ENV.course_id, props.discussionTopicData.assignment._id)
+              window.open(
+                getSpeedGraderUrl(ENV.course_id, props.discussionTopicData.assignment._id),
+                '_blank'
               )
             }
           : null

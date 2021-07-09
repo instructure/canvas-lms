@@ -252,12 +252,13 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onOpenInSpeedGrader = () => {
-    window.location.assign(
+    window.open(
       getSpeedGraderUrl(
         ENV.course_id,
         props.discussionTopic.assignment._id,
         props.discussionEntry.author._id
-      )
+      ),
+      '_blank'
     )
   }
 

@@ -36,10 +36,10 @@ describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
-  const assignMock = jest.fn()
+  const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
-    window.location = {assign: assignMock}
+    window.open = openMock
     window.ENV = {
       course_id: '1'
     }
@@ -53,7 +53,7 @@ describe('DiscussionThreadContainer', () => {
     server.resetHandlers()
     onFailureStub.mockClear()
     onSuccessStub.mockClear()
-    assignMock.mockClear()
+    openMock.mockClear()
   })
 
   afterAll(() => {
@@ -243,7 +243,7 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1', '2'))
+        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1', '2'), `_blank`)
       })
     })
 

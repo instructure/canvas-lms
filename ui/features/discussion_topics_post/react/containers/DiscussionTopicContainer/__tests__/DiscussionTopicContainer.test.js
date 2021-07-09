@@ -77,11 +77,13 @@ describe('DiscussionTopicContainer', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const assignMock = jest.fn()
+  const openMock = jest.fn()
   let liveRegion = null
 
   beforeAll(() => {
     delete window.location
     window.location = {assign: assignMock}
+    window.open = openMock
     window.ENV = {
       context_asset_string: 'course_1',
       course_id: '1',
@@ -108,6 +110,7 @@ describe('DiscussionTopicContainer', () => {
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
     assignMock.mockClear()
+    openMock.mockClear()
     server.resetHandlers()
   })
 
@@ -252,7 +255,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Open in Speedgrader'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'))
+      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'), '_blank')
     })
   })
 
