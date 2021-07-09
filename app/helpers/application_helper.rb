@@ -505,7 +505,6 @@ module ApplicationHelper
     {
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
-      :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,

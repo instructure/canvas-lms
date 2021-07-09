@@ -2099,8 +2099,6 @@ class ApplicationController < ActionController::Base
         !!CanvasKaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
-      elsif feature == :crocodoc
-        !!Canvas::Crocodoc.config
       elsif feature == :vericite
         Canvas::Plugin.find(:vericite).try(:enabled?)
       elsif feature == :lockdown_browser
