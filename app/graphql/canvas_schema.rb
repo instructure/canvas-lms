@@ -98,4 +98,10 @@ class CanvasSchema < GraphQL::Schema
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
                 Types::ExternalToolType, Types::ModuleExternalToolType,
                 Types::ProgressType, Types::ModuleSubHeaderType]
+
+  def self.for_federation
+    @federatable_schema ||= Class.new(CanvasSchema) do
+      include ApolloFederation::Schema
+    end
+  end
 end

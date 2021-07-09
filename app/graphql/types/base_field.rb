@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-module Interfaces::LegacyIDInterface
-  include Interfaces::BaseInterface
+#
 
-  field :_id, ID, "legacy canvas id", method: :id, null: false
+class Types::BaseField < GraphQL::Schema::Field
+  include ApolloFederation::Field
 end

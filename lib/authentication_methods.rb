@@ -71,7 +71,7 @@ module AuthenticationMethods
         logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
     end
-    @authenticated_with_jwt = true
+    @authenticated_with_jwt = @authenticated_with_inst_access_token = true
   end
 
   def load_pseudonym_from_jwt

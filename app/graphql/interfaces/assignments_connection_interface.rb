@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Interfaces::AssignmentsConnectionInterface
-  include GraphQL::Schema::Interface
+  include Interfaces::BaseInterface
 
   class AssignmentFilterInputType < Types::BaseInputObject
     graphql_name "AssignmentFilter"

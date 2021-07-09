@@ -25,6 +25,10 @@ describe GraphQLController do
     student_in_course
   end
 
+  let(:federation_query) do
+    'query FED { _entities(representations: [ {__typename: Course, id: "1"} ]) { ...on Course { name } } }'
+  end
+
   context "graphiql" do
     it "requires a user" do
       get :graphiql
@@ -68,6 +72,11 @@ describe GraphQLController do
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
     end
 
+    it "does not handle Apollo Federation queries" do
+      post :execute, params: {query: federation_query}
+      expect(JSON.parse(response.body)["errors"]).not_to be_blank
+    end
+
     context "data dog metrics" do
       it "reports data dog metrics if requested" do
         expect(InstStatsd::Statsd).to receive(:increment).with("graphql.ASDF.count", tags: anything)
@@ -77,7 +86,21 @@ describe GraphQLController do
     end
   end
 
-  context "with release flag require_execute_auth disabled" do
+  describe "subgraph_execute" do
+    before { user_session(@student) }
+
+    it "handles standard queries" do
+      post :subgraph_execute, params: {query: 'query ASDF { course(id: "1") { id } }'}
+      expect(JSON.parse(response.body)["errors"]).to be_blank
+    end
+
+    it "handles Apollo Federation queries" do
+      post :subgraph_execute, params: {query: federation_query}
+      expect(JSON.parse(response.body)["errors"]).to be_blank
+    end
+  end
+
+  context "with feature flag disable_graphql_authentication enabled" do
 
     context "graphql, without a session" do
       it "works" do
