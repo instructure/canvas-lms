@@ -84,11 +84,19 @@ function BulkDateInput({
       if (!newDate) {
         setDate(null)
       } else if (selectedDateString) {
-        // preserve the existing selected time by adding it to the new date
+        // preserve the existing selected time
         const selectedMoment = moment.tz(selectedDateString, timezone)
-        const timeOfDayMs = selectedMoment.diff(selectedMoment.clone().startOf('day'))
+        const [h, m, s, ms] = [
+          selectedMoment.hour(),
+          selectedMoment.minute(),
+          selectedMoment.second(),
+          selectedMoment.millisecond()
+        ]
         const newMoment = moment.tz(newDate, timezone)
-        newMoment.add(timeOfDayMs, 'ms')
+        newMoment.hour(h)
+        newMoment.minute(m)
+        newMoment.second(s)
+        newMoment.millisecond(ms)
         setDate(newMoment.toDate())
       } else {
         // assign a default time to the new date
