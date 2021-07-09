@@ -45,16 +45,28 @@ module MicrosoftSync
       end
     end
 
-    def additions_in_slices_of(slice_size, &blk)
+    def additions
       # Admins/teachers need to be both owners and members in the remote group
-      owners_to_add = (@local_owners - @remote_owners).to_a
-      members_to_add = ((@local_members | @local_owners) - @remote_members).to_a
+      {
+        members: ((@local_members | @local_owners) - @remote_members).to_a,
+        owners: (@local_owners - @remote_owners).to_a
+      }
+    end
+
+    def additions_in_slices_of(slice_size, &blk)
+      members_to_add, owners_to_add = additions.values_at(:members, :owners)
       self.class.in_slices_of owners_to_add, members_to_add, slice_size, &blk
     end
 
+    def removals
+      {
+        members: @remote_members - @local_members - @local_owners,
+        owners: @remote_owners - @local_owners
+      }
+    end
+
     def removals_in_slices_of(slice_size, &blk)
-      owners_to_remove = @remote_owners - @local_owners
-      members_to_remove = @remote_members - @local_members - @local_owners
+      members_to_remove, owners_to_remove = removals.values_at(:members, :owners)
       self.class.in_slices_of owners_to_remove, members_to_remove, slice_size, &blk
     end
 
