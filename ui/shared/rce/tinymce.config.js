@@ -19,7 +19,6 @@
 import {getDirection} from '@canvas/i18n/rtlHelper'
 import defaultTinymceConfig from '@instructure/canvas-rce/es/defaultTinymceConfig'
 
-const new_rce = window.ENV.use_rce_enhancements
 export default class EditorConfig {
   /**
    * Create an editor config instance, with some internal state passed in
@@ -42,6 +41,7 @@ export default class EditorConfig {
    *  @return {EditorConfig}
    */
   constructor(tinymce, inst, width, domId) {
+    this.new_rce = window.ENV.use_rce_enhancements
     this.baseURL = tinymce.baseURL
     this.maxButtons = inst.maxVisibleEditorButtons
     this.extraButtons = inst.editorButtons
@@ -64,11 +64,6 @@ export default class EditorConfig {
    * @return {Hash}
    */
   defaultConfig() {
-    const new_rce_plugins = ['instructure_equation']
-    if (this.extraButtons?.length) {
-      new_rce_plugins.push('instructure_external_tools')
-    }
-
     return {
       ...defaultTinymceConfig,
 
@@ -79,18 +74,21 @@ export default class EditorConfig {
           ? 'elementary-theme'
           : 'default-theme',
       selector: `#${this.idAttribute}`,
-      [!new_rce && 'toolbar']: this.toolbar(), // handled in RCEWrapper
-      [!new_rce && 'theme']: 'modern',
-      [!new_rce && 'skin']: false,
+      [!this.new_rce && 'toolbar']: this.toolbar(), // handled in RCEWrapper
+      [!this.new_rce && 'theme']: 'modern',
+      [!this.new_rce && 'skin']: false,
       directionality: getDirection(),
-      plugins: new_rce
-        ? new_rce_plugins
+      // RCEWrapper includes instructure_equation, so it shouldn't be necessary here
+      // but if I leave it out equation_spec.rb and new_ui_spec selenium specs fail
+      // in jenkins (but not locally) and I can't explain why. Doesn't hurt to put it here
+      plugins: this.new_rce
+        ? 'instructure_equation'
         : 'autolink,media,paste,table,lists,textcolor,link,directionality,a11y_checker,wordcount,' +
           'instructure_image,instructure_links,instructure_equation,instructure_external_tools,instructure_record',
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
 
-      menubar: new_rce ? undefined : true,
+      menubar: this.new_rce ? undefined : true,
 
       init_instance_callback: ed => {
         $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef
@@ -131,7 +129,7 @@ export default class EditorConfig {
    */
   buildInstructureButtons() {
     let instructure_buttons = ` instructure_image instructure_equation${
-      new_rce ? ' lti_tool_dropdown' : ''
+      this.new_rce ? ' lti_tool_dropdown' : ''
     }`
     instructure_buttons += this.external_buttons()
     if (
@@ -184,7 +182,7 @@ export default class EditorConfig {
     } else {
       buttons1 = `${this.formatBtnGroup} ${this.positionBtnGroup} ${instBtnGroup} ${this.fontBtnGroup}`
     }
-    if (new_rce) {
+    if (this.new_rce) {
       return [buttons1, buttons2, buttons3]
     } else {
       return [buttons1, buttons2, buttons3].map(b => b.split(' ').join(','))

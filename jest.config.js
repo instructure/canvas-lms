@@ -27,10 +27,9 @@ module.exports = {
     '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
     // jest can't import the icons
     '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
-    // redirect import from es/rce/CanvasRce to lib
-    '@instructure/canvas-rce/es/rce/CanvasRce':
-      '<rootDir>/packages/canvas-rce/lib/rce/CanvasRce.js',
+    // redirect imports from es/rce to lib
     '@instructure/canvas-rce/es/rce/tinyRCE': '<rootDir>/packages/canvas-rce/lib/rce/tinyRCE.js',
+    '@instructure/canvas-rce/es/rce/RCE': '<rootDir>/packages/canvas-rce/lib/rce/RCE.js',
     // mock the tinymce-react Editor react component
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },
