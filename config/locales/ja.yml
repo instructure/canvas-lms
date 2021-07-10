@@ -18232,14 +18232,14 @@ ja:
       name: "移行のための BigBlueButton フォールバック"
     big_blue_button_fallback_settings: 
       description: これらは、BigBlueButtonプラグインがフォールバック設定を使用するように構成されている場合にプラグインが使用する設定です。フォールバックは、BigBlueButtonプラグインの構成で作成されなかった会議の記録を探すためにのみ使用されます。
-      domain_description: "BigBlueButtonインストールの**ホスト名**または**IPアドレス** (https://bigbluebutton.mycompany.com/bigbluebutton/など)"
+      domain_description: "BigBlueButtonインストールの**ホスト名**または**IPアドレス** (bigbluebutton.mycompany.comなど)"
       labels: 
         domain: ドメイン
         secret: シークレット
       secret_description: "これは、%{parameter_name}構成ファイル%{filename}にあるパラメータです。"
     big_blue_button_settings: 
       description: "[BigBlueButton](%{url}) インスタンスへのアクセスが必要になります。"
-      domain_description: "BigBlueButton をインストールする **ホスト名** または **IP アドレス** (例: https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "BigBlueButton をインストールする **ホスト名** または **IP アドレス** (例: bigbluebutton.mycompany.com)"
       labels: 
         domain: ドメイン
         free_trial: "この BigBlueButton インスタンスを無料トライアルとしてマークする"

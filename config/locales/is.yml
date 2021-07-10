@@ -16349,14 +16349,14 @@ is:
       name: "BigBlueButton til vara fyrir flutning"
     big_blue_button_fallback_settings: 
       description: "Þegar búið er að setja inn til vara stillingar BigBlueButton innbótarinnar eru þær stillingar notaðar. Til vara stillingarnar eru aðeins notaðar til að leita að upptökum af ráðstefnum sem voru ekki gerðar með stillingu fyrir BigBlueButton innbótina."
-      domain_description: "**hýsilnafn** eða **IP-tala** BigBlueButton uppsetningarinnar (t.d. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**hýsilnafn** eða **IP-tala** BigBlueButton uppsetningarinnar (t.d. bigbluebutton.mycompany.com)"
       labels: 
         domain: Lén
         secret: Lykill
       secret_description: "Þetta er %{parameter_name} breytan sem má finna í %{filename} stillingarskránni."
     big_blue_button_settings: 
       description: "Þú þarft aðgang að [BigBlueButton](%{url}) tilviki."
-      domain_description: "**hýsitölvunafn** eða **vistfang** BigBlueButton-uppsetningarinnar, (t.d. https://bigbluebutton.mycompany.com/bigbluebutton/)."
+      domain_description: "**hýsitölvunafn** eða **vistfang** BigBlueButton-uppsetningarinnar, (t.d. bigbluebutton.mycompany.com)."
       labels: 
         domain: Lén
         free_trial: "Merkja þetta BigBlueButton tilvik sem ókeypis prufu"

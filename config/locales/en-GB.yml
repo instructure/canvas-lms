@@ -18286,14 +18286,14 @@ en-GB:
       name: "BigBlueButton Fallback For Migration"
     big_blue_button_fallback_settings: 
       description: "When you have your BigBlueButton Plugin configured to use fallback settings, these are the settings it uses. The fallback is only used to look for recordings of conferences that were not created with the configuration for your BigBlueButton Plugin."
-      domain_description: "**hostname** or **IP address** of your BigBlueButton installation (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**hostname** or **IP address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domain
         secret: Secret
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     big_blue_button_settings: 
       description: "You will need access to a [BigBlueButton](%{url}) instance."
-      domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**hostname** or **ip address** of your BigBlueButton installation (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domain
         free_trial: "Mark this BigBlueButton instance as a free trial"

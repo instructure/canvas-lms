@@ -13596,14 +13596,14 @@ he:
       description: "תמיכת שיחות ועידה אינטרנטיות של BigBlueButton"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "**שם השרת המארח** או **כתובת ה IP** של התקנת  BigBlueButton שלך (למשל https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**שם השרת המארח** או **כתובת ה IP** של התקנת  BigBlueButton שלך (למשל bigbluebutton.mycompany.com)"
       labels: 
         domain: דומיין
         secret: סודי/ת
       secret_description: "זהו הפרמטר %{parameter_name} אשר ניתן למצוא בקובץ הקונפיגורציה %{filename}."
     big_blue_button_settings: 
       description: "יש צורך להכנס אל מופע [BigBlueButton](%{url}) ."
-      domain_description: "**שם השרת המארח** או **כתובת ה IP** של התקנת  BigBlueButton שלך (למשל https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**שם השרת המארח** או **כתובת ה IP** של התקנת  BigBlueButton שלך (למשל bigbluebutton.mycompany.com)"
       labels: 
         domain: דומיין
         recording_enabled: "מתן אפשרות להקלטת שיחות ועידה"

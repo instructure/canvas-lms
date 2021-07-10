@@ -18162,14 +18162,14 @@ de:
       name: "BigBlueButton Fallback für Migration"
     big_blue_button_fallback_settings: 
       description: "Wenn Sie Ihr BigBlueButton-Plugin so konfiguriert haben, dass es Fallback-Einstellungen verwendet, wird es diese Einstellungen verwenden. Das Fallback wird nur verwendet, um nach Aufzeichnungen von Konferenzen zu suchen, die nicht mit der Konfiguration für Ihr BigBlueButton-Plugin erstellt wurden."
-      domain_description: "**Hostname** oder **IP-Adresse** Ihrer BigBlueButton-Installation (z. B. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**Hostname** oder **IP-Adresse** Ihrer BigBlueButton-Installation (z. B. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domäne
         secret: Schlüssel
       secret_description: "Dies ist der Parameter %{parameter_name}-, der in der Konfigurationsdatei %{filename} definiert ist."
     big_blue_button_settings: 
       description: "Sie müssen Zugang zu einer [BigBlueButton](%{url})-Instanz haben."
-      domain_description: "**Hostname** oder **IP-Adresse** Ihrer BigBlueButton-Installation (z. B. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**Hostname** oder **IP-Adresse** Ihrer BigBlueButton-Installation (z. B. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domäne
         free_trial: "Markieren Sie diese BigBlueButton-Instanz als kostenlose Testversion"

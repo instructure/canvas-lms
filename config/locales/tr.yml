@@ -13567,14 +13567,14 @@ tr:
       description: "BigBlueButton web konferans desteği"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin bigbluebutton.mycompany.com)"
       labels: 
         domain: "Alan Adı"
         secret: Secret
       secret_description: "%{parameter_name} parametresi %{filename} ayar dosyasında bulundu."
     big_blue_button_settings: 
       description: "[BigBlueButton](%{url}) sunucusuna erişim gerekiyor."
-      domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin bigbluebutton.mycompany.com)"
       labels: 
         domain: Alan
         recording_enabled: "Canlı derslerin kaydedilmesine izin ver."

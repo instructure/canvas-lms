@@ -242,7 +242,7 @@ class BigBlueButtonConference < WebConference
     config_to_use = (use_fallback_config && fallback_config.presence) || config
     query_string = options.to_query
     query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config_to_use[:secret_dec]))
-    "#{config_to_use[:domain].sub(/(\/api)?\/?$/, '/api/')}#{action}?#{query_string}"
+    "https://#{config_to_use[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
   end
 
   def send_request(action, options)

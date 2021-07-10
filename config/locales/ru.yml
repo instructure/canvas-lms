@@ -18594,14 +18594,14 @@ ru:
       name: "Возврат BigBlueButton для миграции"
     big_blue_button_fallback_settings: 
       description: "Если вы сконфигурировали свой плагин BigBlueButton на использование возврата в исходный режим, он будет использовать эти настройки. Возврат в исходное положение используется только для просмотра записей конференций, которые не были созданы путем конфигурирования вашего плагина BigBlueButton."
-      domain_description: "**имя хоста** или **ip-адрес** вашей инсталляции BigBlueButton (например, https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**имя хоста** или **ip-адрес** вашей инсталляции BigBlueButton (например, bigbluebutton.mycompany.com)"
       labels: 
         domain: Домен
         secret: Секретная
       secret_description: "Это параметр %{parameter_name}, который можно найти в файле конфигурации %{filename}."
     big_blue_button_settings: 
       description: "Потребуется доступ к экземпляру [BigBlueButton](%{url})."
-      domain_description: "**Имя хоста** или **ip-адрес** установки BigBlueButton (например, https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**Имя хоста** или **ip-адрес** установки BigBlueButton (например, bigbluebutton.mycompany.com)"
       labels: 
         domain: Домен
         free_trial: "Помечает данную копию BigBlueButton как бесплатную демонстрационную версию"

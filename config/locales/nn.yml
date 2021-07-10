@@ -15416,14 +15416,14 @@ nn:
       description: "Støtte for BigBlueButton-webkonferanse"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "**hostname** eller **ip address** til BigBlueButton-installasjonen din (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**hostname** eller **ip address** til BigBlueButton-installasjonen din (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domene
         secret: Hemmelegheit
       secret_description: "Dette er %{parameter_name}-parameteren som du finn i konfigurasjonsfila %{filename}."
     big_blue_button_settings: 
       description: "Du må ha tilgang til ein [BigBlueButton](%{url})-førekomst."
-      domain_description: "**hostname** eller **ip address** til BigBlueButton-installasjonen din (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**hostname** eller **ip address** til BigBlueButton-installasjonen din (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domene
         free_trial: "Marker BigBlueButton-instansen som ein gratis test"

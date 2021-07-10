@@ -18575,14 +18575,14 @@ pl:
       name: "Cofnięcie ustawień BigBlueButton podczas migracji"
     big_blue_button_fallback_settings: 
       description: "Jeśli w konfiguracji dodatku BigBlueButton wybrano ustawienia awaryjne, tych ustawień będzie używać. Funkcja awaryjna jest używana tylko do wyszukania nagrań konferencji, których nie utworzono z konfiguracją dla dodatku BigBlueButton."
-      domain_description: "**nazwa hosta** lub **adres IP** do instalacji dodatku BigBlueButton (np. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**nazwa hosta** lub **adres IP** do instalacji dodatku BigBlueButton (np. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domena
         secret: "Klucz tajny"
       secret_description: "Jest to parametr %{parameter_name}, który można znaleźć w pliku konfiguracji %{filename}."
     big_blue_button_settings: 
       description: "Wymagany jest dostęp do wersji systemu [BigBlueButton](%{url})."
-      domain_description: "**nazwa hosta**lub **adres IP** do instalacji użytkownika w systemie BigBlueButton (np. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**nazwa hosta**lub **adres IP** do instalacji użytkownika w systemie BigBlueButton (np. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domena
         free_trial: "Oznacz tę instancję BigBlueButton jako bezpłatną wersję próbną"

@@ -18165,14 +18165,14 @@ mi:
       name: "BigBlueButton Takamuri mo te Haerenga"
     big_blue_button_fallback_settings: 
       description: "I te wā e taea ai e koete mahi i tō BigBlueButton Plugin ki te mahi i te taka ki muri tautuhinga koinei ngā tautuhinga e whakamahiatia. Te taka ki muri ka mahi noaiho ki te kimi i ngā tuhinga o ngā huinga kaore he hangaia me te whakamahi mō tō BigBlueButton Plugin."
-      domain_description: "**ingoa ope** rānei **IP wāhitau** o tō whakurutanga BigBlueButton(hei tauira https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**ingoa ope** rānei **IP wāhitau** o tō whakurutanga BigBlueButton(hei tauira bigbluebutton.mycompany.com)"
       labels: 
         domain: Rohe
         secret: Huna
       secret_description: "Ko tēnei te %{parameter_name} tawhā e taea te kitea i roto i te %{filename} whirihora kōnae."
     big_blue_button_settings: 
       description: "Ka hiahia koe i te uru ki tētahi [BigBlueButton](%{url}).tauira"
-      domain_description: "** ingoa ope **rānei ** p wāhitaui ** o tō BigBlueButtonwhakurutanga (hei tauira https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "** ingoa ope **rānei ** p wāhitaui ** o tō BigBlueButtonwhakurutanga (hei tauira bigbluebutton.mycompany.com)"
       labels: 
         domain: rohe
         free_trial: "Tohu i tēnei BigBlueButton wāhanga hei whakamahi kore utu"

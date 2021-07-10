@@ -16083,14 +16083,14 @@ cy:
       name: "BigBlueButton Wrth Gefn ar gyfer Mudo"
     big_blue_button_fallback_settings: 
       description: "Pan fyddwch chi wedi ffurfweddu eich Ategyn BigBlueButton er mwyn defnyddio gosodiadau wrth gefn, dyma’r gosodiadau mae’n eu defnyddio. Dydy’r gosodiadau wrth gefn ddim ond yn cael eu defnyddio i chwilio am recordiadau o gynadleddau na chawsant eu creu gyda’r ffufrweddiad o’ch Ategyn BigBlueButton."
-      domain_description: "**enw lletywr** neu **gyfeiriad ip** eich gosodiad BigBlueButton (e.e. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**enw lletywr** neu **gyfeiriad ip** eich gosodiad BigBlueButton (e.e. bigbluebutton.mycompany.com)"
       labels: 
         domain: Parth
         secret: Cyfrinach
       secret_description: "Dyma baramedr %{parameter_name} mae modd ei weld yn ffeil ffurfweddu %{filename}."
     big_blue_button_settings: 
       description: "Bydd angen mynediad arnoch chi i enghraifft o [BigBlueButton](%{url})."
-      domain_description: "**enw lletywr** neu **gyfeiriad ip** eich BigBlueButton gosodiad (e.e. https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**enw lletywr** neu **gyfeiriad ip** eich BigBlueButton gosodiad (e.e. bigbluebutton.mycompany.com)"
       labels: 
         domain: Parth
         free_trial: "Marcio’r achos hwn o BigBlueButton fel treial am ddim"

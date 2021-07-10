@@ -18241,7 +18241,7 @@ es:
       secret_description: "Este es el parámetro %{parameter_name} que puede encontrarse en el archivo de configuración %{filename}."
     big_blue_button_settings: 
       description: "Necesitará acceso a [BigBlueButton](%{url})."
-      domain_description: "**nombre del huésped** o **dirección ip** de su instalación BigBlueButton (p. ej., https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**nombre del huésped** o **dirección ip** de su instalación BigBlueButton (p. ej., bigbluebutton.mycompany.com)"
       labels: 
         domain: Dominio
         free_trial: "Marque esta instancia de BigBlueButton como prueba gratuita"

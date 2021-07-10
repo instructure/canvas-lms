@@ -11410,14 +11410,14 @@ hy:
       description: "Վեբ-կոնֆերանսների BigBlueButton աջակցություն"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "Ձեր BigBlueButton-ի տեղադրման **հանգույցի անունը** կամ **ip հասցեն**  (օր.՝ https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "Ձեր BigBlueButton-ի տեղադրման **հանգույցի անունը** կամ **ip հասցեն**  (օր.՝ bigbluebutton.mycompany.com)"
       labels: 
         domain: Դոմեն
         secret: Գաղտնի
       secret_description: "Սա %{parameter_name}  պարամետրն է, որը կարելի է գտնել  %{filename} կարգաբերման ֆայլում:"
     big_blue_button_settings: 
       description: "Ձեզ պետք կլինի մուտք գործել դեպի  [BigBlueButton](%{url})  օրինակ"
-      domain_description: "Ձեր BigBlueButton-ի տեղադրման **հանգույցի անունը** կամ **ip հասցեն**  (օր.՝ https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "Ձեր BigBlueButton-ի տեղադրման **հանգույցի անունը** կամ **ip հասցեն**  (օր.՝ bigbluebutton.mycompany.com)"
       labels: 
         domain: Դոմեն
         recording_enabled: "Թույլ տալ կոնֆերանսների ձայնագրումը"

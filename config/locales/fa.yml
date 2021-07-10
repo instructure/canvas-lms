@@ -15477,14 +15477,14 @@ fa:
       description: "پشتیبانی از برگزاری کنفرانس مجازی BigBlueButton"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "**نام میزبان** یا **نشانی آی پی**  برای نصب BigBlueButton شما (برای مثال، https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**نام میزبان** یا **نشانی آی پی**  برای نصب BigBlueButton شما (برای مثال، bigbluebutton.mycompany.com)"
       labels: 
         domain: دامنه
         secret: رمز
       secret_description: "این پارامتر %{parameter_name} است که می توان آن را در فایل پیکربندی %{filename} یافت."
     big_blue_button_settings: 
       description: "نیاز به دسترسی به یک نمونه ی [BigBlueButton](%{url}) خواهید داشت."
-      domain_description: "**نام میزبان** یا **نشانی آی پی**  برای نصب BigBlueButton شما (برای مثال، https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**نام میزبان** یا **نشانی آی پی**  برای نصب BigBlueButton شما (برای مثال، bigbluebutton.mycompany.com)"
       labels: 
         domain: دامنه
         recording_enabled: "به کنفرانس ها اجازه ضبط شدن بدهید."

@@ -12140,14 +12140,14 @@ uk:
       description: "Підтримка веб-конференції BigBlueButton"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "**назва хоста** або **ip-адреса** вашої установки BigBlueButton (наприклад, https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**назва хоста** або **ip-адреса** вашої установки BigBlueButton (наприклад, bigbluebutton.mycompany.com)"
       labels: 
         domain: Домен
         secret: Таємно
       secret_description: "Це параметр %{parameter_name}, який може бути знайдений в конфігураційному файлі %{filename}."
     big_blue_button_settings: 
       description: "Вам буде потрібен доступ до екземляра [BigBlueButton](%{url})."
-      domain_description: "**назва хоста** або **ip-адреса** вашої установки BigBlueButton (наприклад, https://bigbluebutton.mycompany.com/bigbluebutton/)"
+      domain_description: "**назва хоста** або **ip-адреса** вашої установки BigBlueButton (наприклад, bigbluebutton.mycompany.com)"
       labels: 
         domain: Домен
         recording_enabled: "Дозволити запис конференцій."
