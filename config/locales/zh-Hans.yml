@@ -18216,14 +18216,14 @@ zh-Hans:
       name: "BigBlueButton 迁移回退"
     big_blue_button_fallback_settings: 
       description: "将 BigBlueButton 插件配置为使用回滚设置后，它会使用这些设置。回滚仅用于查找未使用 BigBlueButton 插件配置创建的会议的录制文件。"
-      domain_description: "BigBlueButton 安装的**主机名**或** IP 地址**（例如，bigbluebutton.mycompany.com）"
+      domain_description: "BigBlueButton 安装的**主机名**或** IP 地址**（例如，https://bigbluebutton.mycompany.com/bigbluebutton/）"
       labels: 
         domain: 域
         secret: 加密
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     big_blue_button_settings: 
       description: "您将需要访问 [BigBlueButton](%{url}) 实例。"
-      domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，bigbluebutton.mycompany.com）"
+      domain_description: "BigBlueButton 安装的**主机名**或 **ip 地址**（例如，https://bigbluebutton.mycompany.com/bigbluebutton/）"
       labels: 
         domain: 域
         free_trial: "将此 BigBlueButton 实例标记为免费试用"

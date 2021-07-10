@@ -10202,14 +10202,14 @@ el:
       description: "Υποστήριξη συνεδρίας μέσω διαδικτύου BigBlueButton"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "**όνομα υπολογιστή** ή **διεύθυνση ip** της εγκατάστασής σας BigBlueButton (π.χ. bigbluebutton.mycompany.com)"
+      domain_description: "**όνομα υπολογιστή** ή **διεύθυνση ip** της εγκατάστασής σας BigBlueButton (π.χ. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domain
         secret: Μυστικό
       secret_description: "Αυτή είναι η παράμετρος %{parameter_name} που μπορεί να βρεθεί στο αρχείο ρύθμισης %{filename}"
     big_blue_button_settings: 
       description: "Πρέπει να έχετε πρόσβαση σε σύνδεση [BigBlueButton](%{url})."
-      domain_description: "**όνομα υπολογιστή** ή **διεύθυνση ip** της εγκατάστασής σας BigBlueButton (π.χ. bigbluebutton.mycompany.com)"
+      domain_description: "**όνομα υπολογιστή** ή **διεύθυνση ip** της εγκατάστασής σας BigBlueButton (π.χ. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domain
         recording_enabled: "Να επιτρέπεται η ηχογράφηση των συνεδριών."

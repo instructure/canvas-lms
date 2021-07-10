@@ -16744,14 +16744,14 @@ ht:
       name: "BigBlueButton Retou pou Migrasyon"
     big_blue_button_fallback_settings: 
       description: "Lè plugin BigBlueButton ou an konfigire pou li itilize paramèt rechanj yo, se paramèt sa yo li itilize. Yo itilize rechanj lan sèlman pou chèche anrejistreman konferans ki pa t kreye anvan konfigirasyon Plugin BigBlueButton ou an."
-      domain_description: "**Non hôte** oswa **adrès IP** enstalasyon BigBlueButton ou an (egzanp. bigbluebutton.mycompany.com)"
+      domain_description: "**Non hôte** oswa **adrès IP** enstalasyon BigBlueButton ou an (egzanp. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domèn
         secret: Sekrè
       secret_description: "Se paramèt %{parameter_name} nou ka jwenn nan fichye konfigirasyon %{filename} ."
     big_blue_button_settings: 
       description: "W ap bezwen ale sou yon enstans [BigBlueButton](%{url})."
-      domain_description: "**hostname** oswa **ip address** enstalasyon BigBlueButton ou an (e.g. bigbluebutton.mycompany.com)"
+      domain_description: "**hostname** oswa **ip address** enstalasyon BigBlueButton ou an (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domèn
         free_trial: "Make enstans BigBlueButton sa kòm tès gratis"

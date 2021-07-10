@@ -18230,14 +18230,14 @@ pt-BR:
       name: "Fallback de BigBlueButton para migração"
     big_blue_button_fallback_settings: 
       description: "Há configurações que que o plugin BigBlueButton usa, como configurações de fallback. O fallback só é usado para buscar registros de conferências que não foram criadas com a configuração para o seu plugin BigBlueButton."
-      domain_description: "**nome do host** ou **endereço ip** da sua instalação do BigBlueButton (por exemplo, bigbluebutton.mycompany.com)"
+      domain_description: "**nome do host** ou **endereço ip** da sua instalação do BigBlueButton (por exemplo, https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domínio
         secret: Segredo
       secret_description: "Este é o parâmetro %{parameter_name} que pode ser encontrado no arquivo config %{filename}."
     big_blue_button_settings: 
       description: "Será necessário acessar uma instância do [BigBlueButton](%{url})."
-      domain_description: "**nome do host** ou **endereço ip** da sua instalação do BigBlueButton (por exemplo, bigbluebutton.mycompany.com)"
+      domain_description: "**nome do host** ou **endereço ip** da sua instalação do BigBlueButton (por exemplo, https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Domínio
         free_trial: "Marcar esta instância BigBlueButton como uma avaliação grátis"

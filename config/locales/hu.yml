@@ -12102,14 +12102,14 @@ hu:
       description: "BigBlueButton webkonferencia támogatás"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "BigBlueButton telepítéshez (pl. bigbluebutton.mycompany.com) tartozó **host név** vagy **ip cím**"
+      domain_description: "BigBlueButton telepítéshez (pl. https://bigbluebutton.mycompany.com/bigbluebutton/) tartozó **host név** vagy **ip cím**"
       labels: 
         domain: Tartomány
         secret: Titkos
       secret_description: "Ez a/az %{parameter_name} paraméter, ami a/az %{filename} konfigurációs fájlban található."
     big_blue_button_settings: 
       description: "Hozzáférés szükséges egy [BigBlueButton](%{url}) példányhoz."
-      domain_description: "BigBlueButton telepítéshez (pl. bigbluebutton.mycompany.com) tartozó **host név** vagy **ip cím**"
+      domain_description: "BigBlueButton telepítéshez (pl. https://bigbluebutton.mycompany.com/bigbluebutton/) tartozó **host név** vagy **ip cím**"
       labels: 
         domain: Tartomány
         recording_enabled: "Konferenciák rögzítésének engedélyezése."

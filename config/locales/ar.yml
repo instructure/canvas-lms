@@ -18898,14 +18898,14 @@ ar:
       name: "احتياطي BigBlueButton للترحيل"
     big_blue_button_fallback_settings: 
       description: "عند تكوين المكون الإضافي BigBlueButton لاستخدام إعدادات الاحتياطي، هذه هي الإعدادات المستخدمة. لا يُستخدم الاحتياطي إلا للبحث عن تسجيلات المؤتمرات غير المنشأة بتكوين المكون الإضافي لـ BigBlueButton."
-      domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل bigbluebutton.mycompany.com)"
+      domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: المجال
         secret: "كلمة السر"
       secret_description: "هذه هي معلمة %{parameter_name} التي يمكن العثور عليها في ملف التكوين %{filename}."
     big_blue_button_settings: 
       description: "سيلزم الوصول إلى مثيل [BigBlueButton](%{url})."
-      domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل bigbluebutton.mycompany.com)"
+      domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: المجال
         free_trial: "تمييز مثيل BigBlueButton هذا كإصدار تجريبي مجاني"

@@ -9594,14 +9594,14 @@ ko:
       description: "BigBlueButton 웹 회의 지원"
       name: BigBlueButton
     big_blue_button_fallback_settings: 
-      domain_description: "설치된 BigBlueButton의 **hostname** 또는 **ip address** (e.g. bigbluebutton.mycompany.com)"
+      domain_description: "설치된 BigBlueButton의 **hostname** 또는 **ip address** (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: 도메인
         secret: 시크릿
       secret_description: "이는 %{filename} 구성 파일에서 찾을 수 있는 %{parameter_name} 매개 변수입니다."
     big_blue_button_settings: 
       description: "[BigBlueButton](%{url}) 인스턴스에 대한 액세스가 필요합니다."
-      domain_description: "설치된 BigBlueButton의 **hostname** 또는 **ip address** (e.g. bigbluebutton.mycompany.com)"
+      domain_description: "설치된 BigBlueButton의 **hostname** 또는 **ip address** (e.g. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: 도메인
         recording_enabled: "회의 녹음/녹화를 허용합니다."

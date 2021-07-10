@@ -18229,14 +18229,14 @@ zh-Hant:
       name: "BigBlueButton 遷移後援"
     big_blue_button_fallback_settings: 
       description: "如果您已設置 BigBlueButton 插件以使用後援設定，則會使用這些設定。後援僅用於尋找並非使用您的 BigBlueButton 插件設置創建的會議錄影記錄。"
-      domain_description: "您的 BigBlueButton 安裝(如 bigbluebutton.mycompany.com)的**主機名稱**或**IP 地址**"
+      domain_description: "您的 BigBlueButton 安裝(如 https://bigbluebutton.mycompany.com/bigbluebutton/)的**主機名稱**或**IP 地址**"
       labels: 
         domain: 網域
         secret: 加密資料
       secret_description: "這些是可以在 %{filename} 配置文檔中找到的 %{parameter_name} 參數。"
     big_blue_button_settings: 
       description: "您將需要訪問 [BigBlueButton](%{url})實例。"
-      domain_description: "您的 BigBlueButton 安裝（如 bigbluebutton.mycompany.com）的**主機名稱**或**IP 地址**"
+      domain_description: "您的 BigBlueButton 安裝（如 https://bigbluebutton.mycompany.com/bigbluebutton/）的**主機名稱**或**IP 地址**"
       labels: 
         domain: 網域
         free_trial: "標記此 BigBlueButton 為免費試用"

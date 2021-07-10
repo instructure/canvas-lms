@@ -14512,14 +14512,14 @@ fi:
       name: "BigBlueButton-varasuunnitelma siirtoon"
     big_blue_button_fallback_settings: 
       description: "kun BigBlueButton-lisäosa on konfiguroitu käyttämään vara-asetuksia, nämä ovat sen käyttämät asetukset. Vara-asetuksia käytetään vain sellaisten konferenssien nauhoitusten etsimiseen, joita ei luotu konfiguroinnin kanssa BiBlueButton-lisäosalle."
-      domain_description: "BigBlueButton-sovelluksen **isäntänimi** tai **ip-osoite** (esim. bigbluebutton.mycompany.com)"
+      domain_description: "BigBlueButton-sovelluksen **isäntänimi** tai **ip-osoite** (esim. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Verkkotunnus
         secret: Salaisuus
       secret_description: "Tämä on %{parameter_name} parametri, joka löytyy %{filename} konfigurointitiedostosta."
     big_blue_button_settings: 
       description: "Tarvitset pääsyn [BigBlueButton](%{url})-esiintymään."
-      domain_description: "BigBlueButton-sovelluksen **isäntänimi** tai **ip-osoite** (esim. bigbluebutton.mycompany.com)"
+      domain_description: "BigBlueButton-sovelluksen **isäntänimi** tai **ip-osoite** (esim. https://bigbluebutton.mycompany.com/bigbluebutton/)"
       labels: 
         domain: Verkkotunnus
         free_trial: "Merkitse tämä BigBlueButton- esiintymä ilmaiseksi kokeiluksi"
