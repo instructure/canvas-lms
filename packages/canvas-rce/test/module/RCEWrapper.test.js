@@ -91,8 +91,7 @@ function defaultProps() {
     highContrastCSS: [],
     languages: [{id: 'en', label: 'English'}],
     autosave: {enabled: false},
-    ltiTools: [],
-    editorOptions: {}
+    ltiTools: []
   }
 }
 

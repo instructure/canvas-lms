@@ -17,9 +17,9 @@
  */
 
 import React, {forwardRef, useState} from 'react'
-import {arrayOf, bool, func, number, objectOf, oneOfType, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, object, objectOf, oneOfType, shape, string} from 'prop-types'
 import formatMessage from '../format-message'
-import RCEWrapper, {editorOptionsPropType, ltiToolsPropType} from './RCEWrapper'
+import RCEWrapper, {toolbarPropType, menuPropType, ltiToolsPropType} from './RCEWrapper'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -40,7 +40,7 @@ if (!process?.env?.BUILD_LOCALE) {
 // forward rceRef to it refs the RCEWrapper where clients can call getCode etc. on it.
 // You probably shouldn't use it until onInit has been called. Until then tinymce
 // is not initialized.
-const RCE = forwardRef(function RCE(props, rceRef) {
+const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   const {
     autosave,
     defaultContent,
@@ -51,10 +51,13 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     language,
     liveRegion,
     mirroredAttrs, // attributes to transfer from the original textarea to the one created by tinymce
+    menu,
+    plugins,
     readOnly,
     textareaId,
     textareaClassName,
     rcsProps,
+    toolbar,
     use_rce_pretty_html_editor,
     use_rce_buttons_and_icons,
     onFocus,
@@ -93,15 +96,23 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       instRecordDisabled,
       language: normalizeLocale(language),
       liveRegion,
+      menu,
+      plugins,
       textareaId,
       textareaClassName,
       trayProps: rcsProps,
+      toolbar,
       use_rce_pretty_html_editor,
       use_rce_buttons_and_icons,
       editorOptions: Object.assign(editorOptions, editorOptions, {
         selector: `#${textareaId}`,
         height,
-        language: editorLanguage(props.language)
+        language: editorLanguage(props.language),
+        toolbar: props.toolbar,
+        menu: props.menu,
+        menubar: props.menu ? Object.keys(props.menu).join(' ') : undefined,
+        plugins: props.plugins,
+        readonly: readOnly
       })
     }
     wrapInitCb(mirroredAttrs, iProps.editorOptions)
@@ -128,9 +139,9 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   }
 })
 
-export default RCE
+export default CanvasRce
 
-RCE.propTypes = {
+CanvasRce.propTypes = {
   // do you want the rce to autosave content to localStorage, and
   // how long should it be until it's deleted.
   // If autosave is enabled, call yourRef.RCEClosed() if the user
@@ -138,9 +149,8 @@ RCE.propTypes = {
   autosave: shape({enabled: bool, maxAge: number}),
   // the initial content
   defaultContent: string,
-  // tinymce configuration. See defaultTinymceConfig for all the defaults
-  // and RCEWrapper.editorOptionsPropType for stuff you may want to include
-  editorOptions: editorOptionsPropType,
+  // tinymce configuration. See defaultTinymceConfig for the basics
+  editorOptions: object,
   // height of the RCE. if a number, in px
   height: oneOfType([number, string]),
   // array of URLs to high-contrast css
@@ -169,6 +179,10 @@ RCE.propTypes = {
   // name:value pairs of attributes to add to the textarea
   // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
+  // additional menu items that get merged into the default menubar
+  menu: menuPropType,
+  // additional plugins that get merged into the default list of plugins
+  plugins: arrayOf(string),
   // is this RCE readonly?
   readOnly: bool,
   // id put on the generated textarea
@@ -178,6 +192,8 @@ RCE.propTypes = {
   // properties necessary for the RCE to us the RCS
   // if missing, RCE features that require the RCS are omitted
   rcsProps: trayPropTypes,
+  // additional toolbar items that get merged into the default toolbars
+  toolbar: toolbarPropType,
   // enable the pretty html editor (temporary until the feature is forced on)
   use_rce_pretty_html_editor: bool,
   // enable the custom buttons feature (temporary until the feature is forced on)
@@ -186,10 +202,10 @@ RCE.propTypes = {
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)
-  onContentChange: func // f(content), don't mistake this as an indication RCE is a controlled component
+  onContentChange: func // f(content), don't mistake this as an indication CanvasRce is a controlled component
 }
 
-RCE.defaultProps = {
+CanvasRce.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
   editorOptions: {...defaultTinymceConfig},

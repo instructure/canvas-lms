@@ -19,7 +19,7 @@
 import React, {forwardRef, useEffect, useState} from 'react'
 import {bool, func, number, object, objectOf, oneOfType, string} from 'prop-types'
 import {createChainedFunction} from '@instructure/ui-utils'
-import RCE from '@instructure/canvas-rce/es/rce/RCE'
+import TheRealRce from '@instructure/canvas-rce/es/rce/CanvasRce'
 import getRCSProps from '../getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
@@ -67,12 +67,10 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     // tinymce is a global by now via import of CanvasRce importing tinyRCE
     const editorConfig = new EditorConfig(tinymce, window.INST, textareaId)
     const config = {...editorConfig.defaultConfig(), ...editorOptions}
-    if (editorOptions.init_instance_callback) {
-      config.init_instance_callback = createChainedFunction(
-        config.init_instance_callback,
-        editorOptions.init_instance_callback
-      )
-    }
+    config.init_instance_callback = createChainedFunction(
+      config.init_instance_callback,
+      editorOptions.init_instance_callback
+    )
     return config
   })
   const [autosave_] = useState({
@@ -88,7 +86,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   }, [rceRef])
 
   return (
-    <RCE
+    <TheRealRce
       ref={rceRef}
       autosave={autosave_}
       defaultContent={defaultContent}
@@ -124,7 +122,6 @@ CanvasRce.propTypes = {
   // the initial content
   defaultContent: string,
   // tinymce configuration overrides
-  // see RCEWrapper's editorOptionsPropType for details.
   editorOptions: object,
   // height of the RCE. If a number, in px
   height: oneOfType([number, string]),
@@ -146,7 +143,6 @@ CanvasRce.propTypes = {
 
 CanvasRce.defaultProps = {
   autosave: true,
-  editorOptions: {},
   mirroredAttrs: {},
   readOnly: false,
   textareaClassName: 'input-block-level',

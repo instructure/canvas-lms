@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,10 +18,10 @@
 
 import React, {createRef} from 'react'
 import {render, waitFor} from '@testing-library/react'
-import RCE from '../RCE'
+import CanvasRce from '../CanvasRce'
 import bridge from '../../bridge'
 
-describe('RCE', () => {
+describe('CanvasRce', () => {
   let target
 
   beforeEach(() => {
@@ -38,13 +38,13 @@ describe('RCE', () => {
   })
 
   it('bridges newly rendered editors', async () => {
-    render(<RCE textareaId="textarea3" />, target)
+    render(<CanvasRce textareaId="textarea3" />, target)
     await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
   })
 
   it('supports getCode() and setCode() on its ref', async () => {
     const rceRef = createRef(null)
-    render(<RCE ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" />, target)
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" />, target)
 
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 

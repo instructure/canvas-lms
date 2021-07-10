@@ -28,10 +28,9 @@
 import React, {useEffect, useRef} from 'react'
 
 class FakeEditor {
-  constructor(props) {
-    this.props = props
+  constructor(textareaId) {
     this.hidden = true
-    this._textareaId = props.id
+    this._textareaId = textareaId
     this.readonly = undefined
     this._eventHandlers = {}
   }
@@ -95,7 +94,7 @@ class FakeEditor {
 export function Editor(props) {
   const editorRef = useRef(null)
   const textareaRef = useRef(null)
-  const tinymceEditor = useRef(new FakeEditor(props))
+  const tinymceEditor = useRef(new FakeEditor(props.id))
 
   useEffect(() => {
     window.tinymce.editors[0] = tinymceEditor.current

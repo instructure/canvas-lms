@@ -61,10 +61,6 @@ const toolbarPropType = PropTypes.arrayOf(
   PropTypes.shape({
     // name of the toolbar the items are added to
     // if this toolbar doesn't exist, it is created
-    // tinymce toolbar config does not
-    // include a key to identify the individual toolbars, just a name
-    // which is translated. This toolbar's name must be translated
-    // in order to be merged correctly.
     name: PropTypes.string.isRequired,
     // items added to the toolbar
     // each is the name of the button some plugin has
@@ -74,11 +70,10 @@ const toolbarPropType = PropTypes.arrayOf(
 )
 
 const menuPropType = PropTypes.objectOf(
-  // the key is the name of the menu item a plugin has
-  // registered with tinymce. If it does not exist in the
-  // default menubar, it will be added.
+  // the key is the name of the menu item some plugin has
+  // registered with tinymce
   PropTypes.shape({
-    // if this is a new menu in the menubar, title is it's label.
+    // if this is a new menu in the menubar,title it's label.
     // if these are items being merged into an existing menu, title is ignored
     title: PropTypes.string,
     // items is a space separated list it menu_items
@@ -94,26 +89,6 @@ const ltiToolsPropType = PropTypes.arrayOf(
     favorite: PropTypes.bool
   })
 )
-
-export const editorOptionsPropType = PropTypes.shape({
-  // height of the RCE.
-  // if a number interpreted as pixels.
-  // if a string as a CSS value.
-  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  // entries you want merged into the toolbar. See toolBarPropType above.
-  toolbar: toolbarPropType,
-  // entries you want merged into to the menus. See menuPropType above.
-  // If an entry defines a new menu, tinymce's menubar config option will
-  // be updated for you. In fact, if you provide an editorOptions.menubar value
-  // it will be overwritten.
-  menu: menuPropType,
-  // additional plugins that get merged into the default list of plugins
-  // it is up to you to import the plugin's definition which will
-  // register it and any related toolbar or menu entries with tinymce.
-  plugins: PropTypes.arrayOf(PropTypes.string),
-  // is this RCE readonly?
-  readonly: PropTypes.bool
-})
 
 // we  `require` instead of `import` because the ui-themeable babel require hook only works with `require`
 // 2021-04-21: This is no longer true, but I didn't want to make a gratutious change when I found this out.
@@ -241,7 +216,7 @@ class RCEWrapper extends React.Component {
       maxAge: PropTypes.number
     }),
     defaultContent: PropTypes.string,
-    editorOptions: editorOptionsPropType,
+    editorOptions: PropTypes.object,
     handleUnmount: PropTypes.func,
     editorView: PropTypes.oneOf([WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
     id: PropTypes.string,
@@ -966,10 +941,6 @@ class RCEWrapper extends React.Component {
     // first view
     this.setEditorView(this.state.editorView)
 
-    // readonly should have been handled via the init property passed
-    // to <Editor>, but it's not.
-    editor.mode.set(this.props.readOnly ? 'readonly' : 'design')
-
     this.props.onInitted?.(editor)
   }
 
@@ -1332,14 +1303,8 @@ class RCEWrapper extends React.Component {
       canvasPlugins.push('instructure_buttons')
     }
 
-    const possibleNewMenubarItems = this.props.editorOptions.menu
-      ? Object.keys(this.props.editorOptions.menu).join(' ')
-      : undefined
-
     const wrappedOpts = {
       ...options,
-
-      readonly: this.props.readOnly,
 
       theme: 'silver', // some older code specified 'modern', which doesn't exist any more
 
@@ -1378,7 +1343,7 @@ class RCEWrapper extends React.Component {
       content_css: options.content_css || [],
       content_style: contentCSS,
 
-      menubar: mergeMenuItems('edit view insert format tools table', possibleNewMenubarItems),
+      menubar: mergeMenuItems('edit view insert format tools table', options.menubar),
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
       // we include all the canvas specific items in the menu and toolbar
@@ -1468,12 +1433,13 @@ class RCEWrapper extends React.Component {
           'instructure_media_embed',
           'instructure_external_tools',
           'a11y_checker',
-          'wordcount',
-          ...canvasPlugins
+          'wordcount'
         ],
         sanitizePlugins(options.plugins)
       )
     }
+
+    wrappedOpts.plugins.splice(wrappedOpts.plugins.length, 0, ...canvasPlugins)
 
     if (this.props.trayProps) {
       wrappedOpts.canvas_rce_user_context = {
@@ -1774,6 +1740,10 @@ function mergeMenu(standard, custom) {
 // returns: the merged result by mutating the incoming standard arg.
 // It will add commands to existing toolbars, or add a new toolbar
 // if the custom one does not exist
+// This is a little awkward in that tinymce toolbar config does not
+// include a key to identify the individual toolbars, just a name
+// which is translated. The custom toolbar's name must be translated
+// in order to be merged correctly.
 function mergeToolbar(standard, custom) {
   if (!custom) return standard
   // merge given toolbar data into the default toolbar
