@@ -262,6 +262,7 @@ export const IsolatedViewContainer = props => {
             setRCEOpen={props.setRCEOpen}
             RCEOpen={props.RCEOpen}
             isHighlighted={isHighlightedParent}
+            goToTopic={props.goToTopic}
           >
             {props.RCEOpen && (
               <View
@@ -297,6 +298,7 @@ export const IsolatedViewContainer = props => {
                   setIsHighlightedParent(false)
                 }, 2000)
               }}
+              goToTopic={props.goToTopic}
             />
           )}
         </>
@@ -312,7 +314,8 @@ IsolatedViewContainer.propTypes = {
   onClose: PropTypes.func,
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,
-  onOpenIsolatedView: PropTypes.func
+  onOpenIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func
 }
 
 export default IsolatedViewContainer

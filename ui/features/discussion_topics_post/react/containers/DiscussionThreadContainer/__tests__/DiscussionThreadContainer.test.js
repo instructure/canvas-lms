@@ -261,14 +261,14 @@ describe('DiscussionThreadContainer', () => {
 
   describe('Go to Buttons', () => {
     it('Should call scrollTo when go to topic is pressed', async () => {
-      window.scrollTo = jest.fn()
-      const {getByTestId} = setup(defaultProps())
+      const goToTopic = jest.fn()
+      const {getByTestId} = setup(defaultProps({propOverrides: {goToTopic}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('toTopic'))
 
       await waitFor(() => {
-        expect(window.scrollTo.mock.calls.length).toBe(1)
+        expect(goToTopic.mock.calls.length).toBe(1)
       })
     })
   })

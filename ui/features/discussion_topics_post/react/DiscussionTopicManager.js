@@ -88,6 +88,7 @@ const getOptimisticResponse = text => {
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [isHighlightedTopic, setIsHighlightedTopic] = useState(false)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
@@ -100,6 +101,19 @@ const DiscussionTopicManager = props => {
     setSort,
     pageNumber,
     setPageNumber
+  }
+
+  const goToTopic = () => {
+    closeIsolatedView()
+    setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 0)
+
+    setIsHighlightedTopic(true)
+
+    setTimeout(() => {
+      setIsHighlightedTopic(false)
+    }, 2000)
   }
 
   // Isolated View State
@@ -190,6 +204,7 @@ const DiscussionTopicManager = props => {
             optimisticResponse: getOptimisticResponse(text)
           })
         }}
+        isHighlighted={isHighlightedTopic}
       />
       {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
       (searchTerm || filter === 'unread') ? (
@@ -198,6 +213,7 @@ const DiscussionTopicManager = props => {
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
           openIsolatedView={openIsolatedView}
+          goToTopic={goToTopic}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (
@@ -209,6 +225,7 @@ const DiscussionTopicManager = props => {
           setRCEOpen={setEditorExpanded}
           onClose={closeIsolatedView}
           onOpenIsolatedView={openIsolatedView}
+          goToTopic={goToTopic}
         />
       )}
     </SearchContext.Provider>

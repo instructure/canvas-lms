@@ -347,11 +347,7 @@ export const DiscussionThreadContainer = props => {
                           window.scrollTo(0, topOffset - 44)
                         }
                   }
-                  goToTopic={() => {
-                    setTimeout(() => {
-                      window.scrollTo(0, 0)
-                    })
-                  }}
+                  goToTopic={props.goToTopic}
                 />
               </Flex.Item>
             )}
@@ -414,7 +410,8 @@ DiscussionThreadContainer.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRef: PropTypes.object,
-  openIsolatedView: PropTypes.func
+  openIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {

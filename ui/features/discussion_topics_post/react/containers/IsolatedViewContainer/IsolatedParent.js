@@ -144,7 +144,7 @@ export const IsolatedParent = props => {
                       : null
                   }
                   onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-                  goToTopic={() => {}}
+                  goToTopic={props.goToTopic}
                 />
               </Flex.Item>
             )}
@@ -167,5 +167,6 @@ IsolatedParent.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,
-  isHighlighted: PropTypes.bool
+  isHighlighted: PropTypes.bool,
+  goToTopic: PropTypes.func
 }

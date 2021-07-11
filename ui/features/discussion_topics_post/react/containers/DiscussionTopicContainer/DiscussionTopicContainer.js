@@ -270,11 +270,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     })
   }
 
-  /**
-   * TODO: Implement highlight logic
-   */
-  const highlightEntry = false
-
   return (
     <>
       {discussionTopicData?.initialPostRequiredForCurrentUser && (
@@ -333,7 +328,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 </View>
               )}
 
-              <Highlight isHighlighted={highlightEntry}>
+              <Highlight isHighlighted={props.isHighlighted}>
                 <Flex direction="column">
                   <Flex.Item>
                     <Flex
@@ -432,7 +427,11 @@ DiscussionTopicContainer.propTypes = {
   /**
    * Function to be executed to create a Discussion Entry.
    */
-  createDiscussionEntry: PropTypes.func
+  createDiscussionEntry: PropTypes.func,
+  /**
+   * useState Boolean to toggle highlight
+   */
+  isHighlighted: PropTypes.bool
 }
 
 export default DiscussionTopicContainer

@@ -33,6 +33,8 @@ describe('IsolatedViewContainer', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const onOpenIsolatedView = jest.fn()
+  const goToTopic = jest.fn()
+  const onClose = jest.fn()
 
   beforeAll(() => {
     // eslint-disable-next-line no-undef
@@ -78,8 +80,9 @@ describe('IsolatedViewContainer', () => {
   const defaultProps = overrides => ({
     discussionEntryId: '1',
     open: true,
-    onClose: () => {},
+    onClose,
     onOpenIsolatedView,
+    goToTopic,
     ...overrides
   })
 
@@ -134,6 +137,34 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(goToParentButton)
 
     expect(onOpenIsolatedView).toHaveBeenCalledWith('70', false)
+  })
+
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[0]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[0])
+
+    const goToTopicButton = await findByText('Go To Topic')
+    expect(goToTopicButton).toBeInTheDocument()
+    fireEvent.click(goToTopicButton)
+
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from child)', async () => {
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[1]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[1])
+
+    const goToTopicButton = await findByText('Go To Topic')
+    expect(goToTopicButton).toBeInTheDocument()
+    fireEvent.click(goToTopicButton)
+
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('should not render a back button', async () => {

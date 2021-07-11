@@ -73,6 +73,7 @@ export const IsolatedThreadsContainer = props => {
             onOpenInSpeedGrader={props.onOpenInSpeedGrader}
             onOpenIsolatedView={props.onOpenIsolatedView}
             highlightParent={props.highlightParent}
+            goToTopic={props.goToTopic}
           />
         ))}
     </div>
@@ -87,7 +88,8 @@ IsolatedThreadsContainer.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   showOlderReplies: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
-  highlightParent: PropTypes.func
+  highlightParent: PropTypes.func,
+  goToTopic: PropTypes.func
 }
 
 export default IsolatedThreadsContainer
@@ -204,7 +206,7 @@ const IsolatedThreadContainer = props => {
 
                 props.highlightParent()
               }}
-              goToTopic={() => {}}
+              goToTopic={props.goToTopic}
             />
           </Flex.Item>
         )}
@@ -220,5 +222,6 @@ IsolatedThreadContainer.propTypes = {
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
-  highlightParent: PropTypes.func
+  highlightParent: PropTypes.func,
+  goToTopic: PropTypes.func
 }
