@@ -34,8 +34,6 @@ module MicrosoftSync
 
     BASE_URL = 'https://graph.microsoft.com/v1.0/'
     STATSD_PREFIX = 'microsoft_sync.graph_service'
-    STATSD_NAME_SUCCESS = "#{STATSD_PREFIX}.success"
-    STATSD_NAME_EXPECTED = "#{STATSD_PREFIX}.expected"
 
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'
@@ -83,8 +81,6 @@ module MicrosoftSync
       statsd_tags = statsd_tags_for_request(method, path)
       increment_statsd_quota_points(quota, options, statsd_tags)
 
-      Rails.logger.info("MicrosoftSync::GraphService: #{method} #{path}")
-
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         InstStatsd::Statsd.time("#{STATSD_PREFIX}.time", tags: statsd_tags) do
           request_without_metrics(method, path, options)
@@ -92,24 +88,25 @@ module MicrosoftSync
       end
 
       if check_for_expected_response && (result = check_for_expected_response.call(response))
-        statsd_tags[:status_code] = response.code.to_s
-        InstStatsd::Statsd.increment(STATSD_NAME_EXPECTED, tags: statsd_tags)
+        log_and_increment(method, path, statsd_tags, :expected, response.code)
         return result
       end
 
       raise_error_if_bad_response(response)
 
       result = response.parsed_response
-      InstStatsd::Statsd.increment(STATSD_NAME_SUCCESS, tags: statsd_tags)
+      log_and_increment(method, path, statsd_tags, :success, response.code)
       result
     rescue => error
-      statsd_tags[:status_code] = response&.code&.to_s || error.class.name.tr(':', '_')
+      response_code = response&.code&.to_s || error.class.name.tr(':', '_')
+
       if intermittent_non_throttled?(error) && retries > 0
         retries -= 1
-        InstStatsd::Statsd.increment("#{STATSD_PREFIX}.retried", tags: statsd_tags)
+        log_and_increment(method, path, statsd_tags, :retried, response_code)
         retry
       end
-      InstStatsd::Statsd.increment(statsd_name_for_error(error), tags: statsd_tags)
+
+      log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
       raise
     end
 
@@ -257,12 +254,21 @@ module MicrosoftSync
     end
 
     def statsd_name_for_error(error)
-      name = case error
-             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
-             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
-             else 'error'
-             end
-      "#{STATSD_PREFIX}.#{name}"
+      case error
+      when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+      when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+      when *MicrosoftSync::Errors::INTERMITTENT then 'intermittent'
+      else 'error'
+      end
+    end
+
+    def log_and_increment(request_method, request_path, statsd_tags, outcome, status_code)
+      Rails.logger.info(
+        "MicrosoftSync::GraphServiceHttp: #{request_method} #{request_path} -- #{status_code}, #{outcome}"
+      )
+      InstStatsd::Statsd.increment(
+        "#{STATSD_PREFIX}.#{outcome}", tags: statsd_tags.merge(status_code: status_code.to_s)
+      )
     end
 
     # -- Helpers for expand_options():

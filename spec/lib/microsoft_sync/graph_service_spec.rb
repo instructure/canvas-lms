@@ -124,12 +124,12 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'with a Timeout::Error' do
-      it 'increments an "error" counter and bubbles up the error' do
+      it 'increments an "intermittent" counter and bubbles up the error' do
         error = Timeout::Error.new
         expect(HTTParty).to receive(http_method.to_sym).and_raise error
         expect { subject }.to raise_error(error)
         expect(InstStatsd::Statsd).to have_received(:increment).with(
-          'microsoft_sync.graph_service.error',
+          'microsoft_sync.graph_service.intermittent',
           tags: statsd_tags.merge(status_code: 'Timeout__Error')
         )
       end
@@ -176,7 +176,7 @@ describe MicrosoftSync::GraphService do
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         'microsoft_sync.graph_service.success', tags: {
           msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
-          extra_tag: 'abc',
+          extra_tag: 'abc', status_code: /^20.$/,
         }
       )
     end

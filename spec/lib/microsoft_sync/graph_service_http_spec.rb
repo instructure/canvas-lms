@@ -123,7 +123,7 @@ describe MicrosoftSync::GraphServiceHttp do
               tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with("microsoft_sync.graph_service.success",
-              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
+              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200'})
     end
 
     context 'when a block is passed in' do
@@ -157,7 +157,7 @@ describe MicrosoftSync::GraphServiceHttp do
           end
         end
 
-        it 'raises an error and increments an "error" counter' do
+        it 'raises an error and increments an "intermittent" counter' do
           expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with('microsoft_sync.graph_service.error',
@@ -192,7 +192,18 @@ describe MicrosoftSync::GraphServiceHttp do
                          status_code: status_code_statsd_tag})
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with("microsoft_sync.graph_service.success",
-                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
+                  tags: {msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200'})
+        end
+
+        it 'logs the outcome of each request' do
+          allow(Rails.logger).to receive(:info).and_call_original
+          subject.request(:get, 'foo/bar')
+          expect(Rails.logger).to have_received(:info).with(
+            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, retried"
+          )
+          expect(Rails.logger).to have_received(:info).with(
+            'MicrosoftSync::GraphServiceHttp: get foo/bar -- 200, success'
+          )
         end
       end
 
@@ -206,9 +217,20 @@ describe MicrosoftSync::GraphServiceHttp do
                   tags: {msft_endpoint: 'get_foo', extra_tag: 'abc',
                          status_code: status_code_statsd_tag})
           expect(InstStatsd::Statsd).to have_received(:increment)
-            .with("microsoft_sync.graph_service.error",
+            .with("microsoft_sync.graph_service.intermittent",
                   tags: {msft_endpoint: 'get_foo', extra_tag: 'abc',
                          status_code: status_code_statsd_tag})
+        end
+
+        it 'logs the outcome of each request' do
+          allow(Rails.logger).to receive(:info).and_call_original
+          expect { subject.request(:get, 'foo/bar') }.to raise_error(error_class)
+          expect(Rails.logger).to have_received(:info).with(
+            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, retried"
+          )
+          expect(Rails.logger).to have_received(:info).with(
+            "MicrosoftSync::GraphServiceHttp: get foo/bar -- #{status_code_statsd_tag}, intermittent"
+          )
         end
       end
 
