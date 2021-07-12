@@ -500,7 +500,7 @@ export default class DueDates extends React.Component {
 
   imporantDatesCheckbox = () => {
     if (ENV.FEATURES?.important_dates && ENV.K5_SUBJECT_COURSE) {
-      const disabled = !this.rowsToRender().some(row => row.props.dates.due_at !== null)
+      const disabled = !this.rowsToRender().some(row => row.props.dates.due_at)
       const checked = !disabled && this.state.importantDates
       return (
         <div id="important-dates">
