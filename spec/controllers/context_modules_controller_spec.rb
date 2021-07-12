@@ -750,6 +750,25 @@ describe ContextModulesController do
       end
     end
 
+    it "should return due dates for Differentiated Assignments" do
+      course_with_teacher_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @assign = @course.assignments.create! title: "Differentiated Assignment", points_possible: 100, only_visible_to_overrides:true
+      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+
+      new_section = @course.course_sections.create!(:name => 'Section 1')
+      new_due_date = 1.week.from_now
+      override = @assign.assignment_overrides.build
+      override.set = new_section
+      override.due_at = new_due_date
+      override.due_at_overridden = true
+      override.save!
+
+      get 'content_tag_assignment_data', params: {course_id: @course.id}, format: 'json'
+      json = json_parse(response.body)
+      expect(json[@tag.id.to_s]["due_date"].to_date).to eq(new_due_date.to_date)
+    end
+
     it "should return too_many_overrides if applicable for assignments" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
