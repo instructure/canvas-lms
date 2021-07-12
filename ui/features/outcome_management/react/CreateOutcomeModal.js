@@ -53,7 +53,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
   const {error, isLoading, collections, queryCollections, rootId, selectedGroupId} =
-    useManageOutcomes()
+    useManageOutcomes('CreateOutcomeModal')
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)

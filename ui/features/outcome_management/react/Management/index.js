@@ -93,7 +93,8 @@ const OutcomeManagementPanel = () => {
     rootId,
     selectedGroupId,
     selectedParentGroupId
-  } = useManageOutcomes(true)
+  } = useManageOutcomes('OutcomeManagementPanel')
+
   const {group, loading, loadMore} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString

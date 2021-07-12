@@ -20,14 +20,18 @@ import axios from '@canvas/axios'
 import pluralize from 'str-pluralize'
 import {gql} from '@canvas/apollo'
 
+export const groupFields = `
+  _id
+  title
+  description
+  outcomesCount
+  childGroupsCount
+  canEdit
+`
+
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
-    _id
-    title
-    description
-    outcomesCount
-    childGroupsCount
-    canEdit
+    ${groupFields}
   }
 `
 
