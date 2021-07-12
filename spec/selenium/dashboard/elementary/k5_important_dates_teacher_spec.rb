@@ -122,7 +122,6 @@ describe "teacher k5 dashboard important dates" do
     end
 
     it 'enables marked dates checkbox with assignment override' do
-      skip("this behavior will be fixed with LS-2378")
       assignment = create_assignment(@subject_course, "How to make a battery", "battery stuff", 10)
       due_at = 2.days.from_now(Time.zone.now)
 
