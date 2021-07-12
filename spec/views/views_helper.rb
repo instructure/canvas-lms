@@ -68,24 +68,22 @@ RSpec.shared_context 'lti_layout_spec_helper' do
 
   module LtiLayoutSpecHelper
     def self.create_tag(tool)
-      tag = ContentTag.create!({
-                                 title: 'Test',
-                                 content_id: tool.id,
-                                 content_type: 'ContextExternalTool',
-                                 tag_type: 'context_module',
-                                 context_type: 'Account',
-                                 context_id: Account.default.id,
-                                 root_account_id: Account.default,
-                                 url: 'https://example.com'
-                               })
-      tag
+      ContentTag.create!({
+                           title: 'Test',
+                           content_id: tool.id,
+                           content_type: 'ContextExternalTool',
+                           tag_type: 'context_module',
+                           context_type: 'Account',
+                           context_id: Account.default.id,
+                           root_account_id: Account.default,
+                           url: 'https://example.com'
+                         })
     end
 
-    def self.create_tool
+    def self.create_tool(tool_id = 'A brand new tool')
       dev_key = DeveloperKey.create
       course = Course.create
-      tool = ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: 'Quizzes 2')
-      tool
+      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
     end
 
     def self.create_request

@@ -16,16 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%
-  @show_left_side = false
-  add_body_class 'full-width ic-no-flex-layout ic-full-screen-lti-tool'
-  crumbs.clear
-%>
-
-<% css_bundle :external_tool_full_width %>
-
-<% if Lti::QuizzesNextHelper.quizzes_next_tool?(@tool) %>
-  <%= render 'lti/lti_message_quizzes_next' %>
+<% if Lti::QuizzesNextHelper.sessionless_launch?(@current_user, @tool) %>
+  <div class="alert alert-danger lock_explanation" role="alert">
+    <%= t 'The quiz is unavailable if you are not logged in' %>
+  </div>
+<% elsif Lti::QuizzesNextHelper.unavailable_for_students?(@context, @current_user, @tool) %>
+  <div class="alert alert-danger lock_explanation" role="alert">
+    <%= t 'This quiz is no longer available as your enrollment has been concluded.' %>
+  </div>
 <% else %>
   <%= render 'lti/lti_message' %>
 <% end %>
