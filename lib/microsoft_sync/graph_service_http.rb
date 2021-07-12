@@ -40,6 +40,8 @@ module MicrosoftSync
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'
 
+    DEFAULT_N_INTERMITTENT_RETRIES = 1
+
     class ApplicationNotAuthorizedForTenant < StandardError
       include Errors::GracefulCancelErrorMixin
     end
@@ -75,7 +77,9 @@ module MicrosoftSync
     # the value is returned, and an "expected" statsd metric is incremented.
     # This is useful if there are non-200s expected and you don't want to raise an error /
     # count those these as errors in the stats.
-    def request(method, path, quota: nil, **options, &check_for_expected_response)
+    def request(method, path,
+                quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES, **options,
+                &check_for_expected_response)
       statsd_tags = statsd_tags_for_request(method, path)
       increment_statsd_quota_points(quota, options, statsd_tags)
 
@@ -100,6 +104,11 @@ module MicrosoftSync
       result
     rescue => error
       statsd_tags[:status_code] = response&.code&.to_s || error.class.name.tr(':', '_')
+      if intermittent_non_throttled?(error) && retries > 0
+        retries -= 1
+        InstStatsd::Statsd.increment("#{STATSD_PREFIX}.retried", tags: statsd_tags)
+        retry
+      end
       InstStatsd::Statsd.increment(statsd_name_for_error(error), tags: statsd_tags)
       raise
     end
@@ -192,6 +201,10 @@ module MicrosoftSync
       url = path.start_with?('https:') ? path : BASE_URL + path
 
       HTTParty.send(method, url, options)
+    end
+
+    def intermittent_non_throttled?(error)
+      Errors::INTERMITTENT.any?{|klass| error.is_a?(klass)} && !error.is_a?(Errors::Throttled)
     end
 
     def raise_error_if_bad_response(response)

@@ -43,6 +43,10 @@ describe MicrosoftSync::GraphService do
 
     allow(InstStatsd::Statsd).to receive(:increment).and_call_original
     allow(InstStatsd::Statsd).to receive(:count).and_call_original
+
+    # Test retry on intermittent errors without internal retry
+    MicrosoftSync::GraphServiceHttp # need to load before stubbing
+    stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
   end
 
   after { WebMock.enable_net_connect! }
