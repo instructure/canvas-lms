@@ -27,7 +27,7 @@ import {getTrayHeight} from '../../shared/trayUtils'
 import {CreateButtonForm} from './CreateButtonForm'
 import {SavedButtonList} from './SavedButtonList'
 
-export function ButtonsTray({onUnmount, type}) {
+export function ButtonsTray({editor, onUnmount, type}) {
   const [isOpen, setIsOpen] = useState(true)
 
   const title =
@@ -43,7 +43,6 @@ export function ButtonsTray({onUnmount, type}) {
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldCloseOnDocumentClick
       shouldContainFocus
       shouldReturnFocus
       size="regular"
@@ -64,7 +63,7 @@ export function ButtonsTray({onUnmount, type}) {
         </Flex.Item>
 
         <Flex.Item as="content" padding="small">
-          {type === 'create' ? <CreateButtonForm /> : <SavedButtonList />}
+          {type === 'create' ? <CreateButtonForm editor={editor} /> : <SavedButtonList />}
         </Flex.Item>
       </Flex>
     </Tray>

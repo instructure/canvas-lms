@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense, useState} from 'react'
-import {arrayOf, func, number, object, oneOf, oneOfType, string} from 'prop-types'
+import {arrayOf, bool, func, number, object, oneOf, oneOfType, string} from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -68,7 +68,8 @@ const UploadFileModal = React.forwardRef(
       label,
       accept,
       modalBodyWidth,
-      modalBodyHeight
+      modalBodyHeight,
+      requireA11yAttributes = true
     },
     ref
   ) => {
@@ -262,7 +263,7 @@ const UploadFileModal = React.forwardRef(
                     </ToggleDetails>
                   </View>
                 )}
-                {/image/.test(accept) && (
+                {/image/.test(accept) && requireA11yAttributes && (
                   <View
                     as="div"
                     role="group"
@@ -312,7 +313,8 @@ UploadFileModal.propTypes = {
   label: string.isRequired,
   accept: oneOfType([arrayOf(string), string]),
   modalBodyWidth: number,
-  modalBodyHeight: number
+  modalBodyHeight: number,
+  requireA11yAttributes: bool
 }
 
 export default UploadFileModal
