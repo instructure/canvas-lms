@@ -41,8 +41,6 @@ function onInputChange(_e, ed = false) {
 
     // Make the mentions marker editable for A11y
     makeMarkerEditable(editor, MARKER_SELECTOR)
-
-    // TODO: Render the mentions component at that position
   }
 }
 

@@ -19,8 +19,40 @@ import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import MentionDropdownOption from './MentionDropdownOption'
 import {View} from '@instructure/ui-view'
+import {usePopper} from 'react-popper'
 
-const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser, popupId}) => {
+const MentionDropdownMenu = ({
+  onSelect,
+  mentionOptions,
+  show,
+  coordiantes,
+  selectedUser,
+  popupId
+}) => {
+  // Variables
+  const directionality = tinyMCE.activeEditor.getParam('directionality')
+
+  // Setup Popper
+  const virtualReference = useMemo(() => {
+    return {
+      getBoundingClientRect: () => {
+        return coordiantes
+      }
+    }
+  }, [coordiantes])
+  const [popperElement, setPopperElement] = React.useState(null)
+  const {styles, attributes} = usePopper(virtualReference, popperElement, {
+    placement: directionality === 'rtl' ? 'bottom-end' : 'bottom-start',
+    modifiers: [
+      {
+        name: 'flip',
+        options: {
+          flipVariations: false
+        }
+      }
+    ]
+  })
+
   // Memoize map of Mention Options
   const menuItems = useMemo(() => {
     return mentionOptions.map(user => {
@@ -43,18 +75,12 @@ const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser
     return null
   }
 
-  // Convert cords to px
-  const xOffset = Math.round(x).toString() + 'px'
-  const yOffset = Math.round(y).toString() + 'px'
-
   return (
     <div
       className="mention-dropdown-menu"
-      style={{
-        position: 'absolute',
-        top: yOffset,
-        left: xOffset
-      }}
+      ref={setPopperElement}
+      style={{...styles.popper, zIndex: 1000}}
+      {...attributes.popper}
     >
       <View
         as="div"
@@ -76,7 +102,8 @@ const MentionDropdownMenu = ({onSelect, mentionOptions, show, x, y, selectedUser
           style={{
             paddingInlineStart: '0px',
             marginBlockStart: '0px',
-            marginBlockEnd: '0px'
+            marginBlockEnd: '0px',
+            margin: '0'
           }}
         >
           {menuItems}
@@ -102,13 +129,9 @@ MentionDropdownMenu.proptypes = {
    */
   show: PropTypes.bool,
   /**
-   * X cordinate for menu on screen (in px)
+   * cordinates for menu on screen
    */
-  x: PropTypes.number,
-  /**
-   * y cordinate for menu on screen (in px)
-   */
-  y: PropTypes.number,
+  coordiantes: PropTypes.object,
   /**
    * Callback for selecting an item
    */

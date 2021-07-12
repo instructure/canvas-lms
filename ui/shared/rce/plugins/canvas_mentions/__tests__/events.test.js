@@ -19,6 +19,7 @@
 import {makeBodyEditable} from '../contentEditable'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import {onSetContent, onKeyDown, onMouseDown, onKeyUp} from '../events'
+import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
   makeBodyEditable: jest.fn()
@@ -28,6 +29,12 @@ jest.mock('../constants', () => ({
   ...jest.requireActual('../constants'),
   TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com'
 }))
+
+jest.mock('react-dom', () => ({
+  render: jest.fn()
+}))
+
+jest.mock('../components/MentionAutoComplete/MentionDropdown')
 
 describe('events', () => {
   let editor
@@ -50,7 +57,8 @@ describe('events', () => {
       event = {
         content: 'hello',
         target: editor,
-        paste: false
+        paste: false,
+        editor
       }
     })
 
@@ -74,6 +82,11 @@ describe('events', () => {
       it('does not make the body editable', () => {
         subject()
         expect(makeBodyEditable).not.toHaveBeenCalled()
+      })
+
+      it('mounts the dropdown component', () => {
+        subject()
+        expect(ReactDOM.render).toHaveBeenCalled()
       })
     })
   })

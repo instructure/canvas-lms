@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import React from 'react'
+import ReactDom from 'react-dom'
 import {makeBodyEditable} from './contentEditable'
 import {MARKER_SELECTOR, MARKER_ID, KEY_CODES} from './constants'
 import broadcastMessage, {inputChangeMessage, navigationMessage} from './broadcastMessage'
+import MentionDropdown from './components/MentionAutoComplete/MentionDropdown'
 
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
@@ -58,10 +60,20 @@ function inMentionsMarker(editor) {
  * @param Event e
  */
 export const onSetContent = e => {
+  const editor = e.editor || tinymce.activeEditor
+
   // If the content being inserted is not the marker and
   // due to a paste
   if (!e.content.includes(MARKER_ID) && !e.paste) {
     makeBodyEditable(e.target, MARKER_SELECTOR)
+  }
+
+  // If content being set is the marker, load the menu
+  // react component
+  if (e.content.includes(MARKER_ID)) {
+    const elm = document.createElement('div')
+    document.body.appendChild(elm)
+    ReactDom.render(<MentionDropdown rceRef={editor.getBody()} />, elm)
   }
 }
 

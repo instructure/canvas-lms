@@ -44,6 +44,9 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   }
 }))
 
+jest.mock('../components/MentionAutoComplete/MentionDropdown')
+jest.mock('react-dom')
+
 afterEach(() => {
   jest.restoreAllMocks()
 })
@@ -70,6 +73,9 @@ describe('pluginDefinition', () => {
   beforeEach(() => {
     editor = new FakeEditor()
     plugin.pluginDefinition.init(editor)
+    global.tinymce = {
+      activeEditor: editor
+    }
   })
 
   afterEach(() => editor.setContent(''))
