@@ -2198,6 +2198,10 @@ CanvasRails::Application.routes.draw do
       post 'jwts/refresh', action: :refresh
     end
 
+    scope(controller: :inst_ids) do
+      post 'inst_ids', action: :create
+    end
+
     scope(controller: :gradebook_settings) do
       put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
     end
