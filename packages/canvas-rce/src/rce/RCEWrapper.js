@@ -27,7 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
-import getCookie from 'get-cookie'
+import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
@@ -1293,11 +1293,16 @@ class RCEWrapper extends React.Component {
       return
     }
     const editor = this.mceInstance()
-    editor.execCommand('checkAccessibility', false, {
-      done: errors => {
-        this.setState({a11yErrorsCount: errors.length})
-      }
-    }, {skip_focus: true})
+    editor.execCommand(
+      'checkAccessibility',
+      false,
+      {
+        done: errors => {
+          this.setState({a11yErrorsCount: errors.length})
+        }
+      },
+      {skip_focus: true}
+    )
   }
 
   openKBShortcutModal = () => {
