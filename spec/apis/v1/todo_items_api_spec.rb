@@ -25,8 +25,8 @@ describe UsersController, type: :request do
   include Api
   include Api::V1::Assignment
   def update_assignment_json
-    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session).as_json
-    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session).as_json
+    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session,:include_all_dates => true).as_json
+    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session,:include_all_dates => true).as_json
   end
 
   def strip_secure_params(json)

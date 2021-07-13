@@ -36,7 +36,7 @@ module Api::V1::TodoItem
         hash[:html_url] = course_quiz_url(quiz.context_id, quiz.id)
       else
         assignment = assignment_or_quiz
-        hash[:assignment] = assignment_json(assignment, user, session)
+        hash[:assignment] = assignment_json(assignment, user, session, :include_all_dates => true)
         hash[:html_url] = todo_type == 'grading' ?
           speed_grader_course_gradebook_url(assignment.context_id, :assignment_id => assignment.id) :
           "#{course_assignment_url(assignment.context_id, assignment.id)}#submit"

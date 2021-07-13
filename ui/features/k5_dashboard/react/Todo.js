@@ -34,12 +34,17 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ignoreTodo} from '@canvas/k5/react/utils'
 import tz from '@canvas/timezone'
 
+export const getBaseDueAt = ({all_dates}) =>
+  (all_dates.filter(d => d.base)[0] || all_dates[0])?.due_at
+
 const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, timeZone}) => {
   const [ignored, setIgnored] = useState(false)
 
   // Only assignments are supported (ungraded_quizzes are not)
   if (!assignment || ignored) return null
-  const {due_at, name, points_possible} = assignment
+  const {id, all_dates, name, points_possible} = assignment
+  const baseDueAt = getBaseDueAt(assignment)
+  const hasMultipleDueDates = all_dates.length > 1
 
   const handleIgnoreTodo = () => {
     ignoreTodo(ignore)
@@ -48,13 +53,13 @@ const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, 
   }
 
   let dueDate = I18n.t('No Due Date')
-  if (due_at) {
-    const isSameYear = moment(due_at).isSame(moment().tz(timeZone), 'year')
-    dueDate = tz.format(due_at, `date.formats.${isSameYear ? 'date_at_time' : 'full'}`)
+  if (baseDueAt) {
+    const isSameYear = moment(baseDueAt).isSame(moment().tz(timeZone), 'year')
+    dueDate = tz.format(baseDueAt, `date.formats.${isSameYear ? 'date_at_time' : 'full'}`)
   }
 
   return (
-    <Flex as="div" alignItems="start" margin="medium 0 0">
+    <Flex id={`todo-${id}`} data-testid="todo" as="div" alignItems="start" margin="medium 0 0">
       <Badge
         standalone
         count={needs_grading_count}
@@ -103,6 +108,9 @@ const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, 
             </View>
           </PresentationContent>
           <View>{dueDate}</View>
+          {hasMultipleDueDates && (
+            <View margin="0 0 0 x-small">{I18n.t('(Multiple Due Dates)')}</View>
+          )}
         </Text>
       </Flex>
       <IconButton
@@ -122,6 +130,13 @@ const Todo = ({assignment, context_name, html_url, ignore, needs_grading_count, 
 
 Todo.propTypes = {
   assignment: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    all_dates: PropTypes.arrayOf(
+      PropTypes.shape({
+        base: PropTypes.bool,
+        due_at: PropTypes.string
+      })
+    ).isRequired,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,
     points_possible: PropTypes.number.isRequired
