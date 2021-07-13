@@ -214,6 +214,7 @@ export const IsolatedViewContainer = props => {
 
   return (
     <Tray
+      data-testid="isolated-view-container"
       open={props.open}
       placement="end"
       size="medium"

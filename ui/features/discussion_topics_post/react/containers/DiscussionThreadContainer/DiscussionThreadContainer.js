@@ -177,7 +177,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry._id, true)
+            props.onOpenIsolatedView(props.discussionEntry._id, true)
           }
         }}
       />
@@ -214,7 +214,7 @@ export const DiscussionThreadContainer = props => {
         )}
         onClick={() => {
           if (ENV.isolated_view) {
-            props.openIsolatedView(props.discussionEntry._id, false)
+            props.onOpenIsolatedView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
           }
@@ -300,6 +300,7 @@ export const DiscussionThreadContainer = props => {
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
                 discussionEntry={props.discussionEntry}
+                onOpenIsolatedView={props.onOpenIsolatedView}
                 threadActions={threadActions}
                 isEditing={isEditing}
                 onCancel={() => {
@@ -403,7 +404,7 @@ DiscussionThreadContainer.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRef: PropTypes.object,
-  openIsolatedView: PropTypes.func,
+  onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func
 }
 

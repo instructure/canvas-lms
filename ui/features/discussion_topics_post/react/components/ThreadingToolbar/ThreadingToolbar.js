@@ -27,8 +27,20 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
 export function ThreadingToolbar({...props}) {
-  return (props.searchTerm || props.filter === 'unread') && ENV.isolated_view ? (
-    <Link as="button" isWithinText={false} onClick={() => {}}>
+  return (props.searchTerm || props.filter === 'unread') &&
+    ENV.isolated_view &&
+    !props.isIsolatedView ? (
+    <Link
+      as="button"
+      isWithinText={false}
+      data-testid="go-to-reply"
+      onClick={() => {
+        const isolatedId = props.discussionEntry.parent
+          ? props.discussionEntry.parent.id
+          : props.discussionEntry.id
+        props.onOpenIsolatedView(isolatedId, false, props.discussionEntry._id)
+      }}
+    >
       <Text weight="bold">{I18n.t('Go to Reply')}</Text>
     </Link>
   ) : (
@@ -43,7 +55,10 @@ export function ThreadingToolbar({...props}) {
 ThreadingToolbar.propTypes = {
   children: PropTypes.arrayOf(PropTypes.node),
   searchTerm: PropTypes.string,
-  filter: PropTypes.string
+  filter: PropTypes.string,
+  onOpenIsolatedView: PropTypes.func,
+  discussionEntry: PropTypes.object,
+  isIsolatedView: PropTypes.bool
 }
 
 ThreadingToolbar.Reply = Reply

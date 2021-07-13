@@ -205,7 +205,10 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          openIsolatedView={openIsolatedView}
+          onOpenIsolatedView={(discussionEntryId, withRCE, highlightId) => {
+            setHighlightEntryId(highlightId)
+            openIsolatedView(discussionEntryId, withRCE)
+          }}
           goToTopic={goToTopic}
         />
       )}

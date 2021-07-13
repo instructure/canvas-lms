@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const addSearchHighlighting = (searchTerm, searchArea) => {
-  if (!!searchArea && !!searchTerm) {
+const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
+  if (!!searchArea && !!searchTerm && !isIsolatedView) {
     const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
     return searchArea.replace(
       searchExpression,
@@ -34,7 +34,7 @@ export function SearchSpan({...props}) {
   return (
     <span
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.text)
+        __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView)
       }}
     />
   )
@@ -48,5 +48,6 @@ SearchSpan.propTypes = {
   /**
    * String containing displayable message
    */
-  text: PropTypes.string.isRequired
+  text: PropTypes.string.isRequired,
+  isIsolatedView: PropTypes.bool
 }

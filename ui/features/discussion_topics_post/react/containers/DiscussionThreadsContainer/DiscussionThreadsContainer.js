@@ -97,7 +97,7 @@ export const DiscussionThreadsContainer = props => {
             discussionEntry={thread}
             discussionTopic={discussionTopic}
             markAsRead={markAsRead}
-            openIsolatedView={props.openIsolatedView}
+            onOpenIsolatedView={props.onOpenIsolatedView}
             goToTopic={props.goToTopic}
           />
         )
@@ -117,7 +117,7 @@ export const DiscussionThreadsContainer = props => {
 
 DiscussionThreadsContainer.propTypes = {
   discussionTopic: Discussion.shape,
-  openIsolatedView: PropTypes.func,
+  onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func
 }
 

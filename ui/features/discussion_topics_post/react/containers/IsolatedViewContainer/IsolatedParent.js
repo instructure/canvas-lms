@@ -113,6 +113,7 @@ export const IsolatedParent = props => {
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
                 discussionEntry={props.discussionEntry}
+                isIsolatedView
                 threadActions={threadActions}
                 isEditing={isEditing}
                 onCancel={() => {

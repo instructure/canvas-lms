@@ -55,4 +55,13 @@ describe('SearchSpan', () => {
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
   })
+
+  it('should not highlight when in isolated view', () => {
+    const {queryAllByTestId} = setup({
+      searchTerm: 'here',
+      text: 'here and HeRe',
+      isIsolatedView: true
+    })
+    expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
+  })
 })

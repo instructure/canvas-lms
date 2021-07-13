@@ -171,6 +171,7 @@ const IsolatedThreadContainer = props => {
             discussionEntry={entry}
             threadActions={threadActions}
             isEditing={isEditing}
+            isIsolatedView
             onCancel={() => {
               setIsEditing(false)
             }}

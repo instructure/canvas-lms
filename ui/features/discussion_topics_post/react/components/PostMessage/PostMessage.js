@@ -82,7 +82,11 @@ export function PostMessage({...props}) {
                     {props.hasAuthor && (
                       <View padding="none small none small">
                         <Text weight="bold" data-testid="author_name">
-                          <SearchSpan searchTerm={searchTerm} text={props.authorName} />
+                          <SearchSpan
+                            isIsolatedView={props.isIsolatedView}
+                            searchTerm={searchTerm}
+                            text={props.authorName}
+                          />
                         </Text>
                       </View>
                     )}
@@ -141,7 +145,11 @@ export function PostMessage({...props}) {
                 </View>
               ) : (
                 <>
-                  <SearchSpan searchTerm={searchTerm} text={props.message} />
+                  <SearchSpan
+                    isIsolatedView={props.isIsolatedView}
+                    searchTerm={searchTerm}
+                    text={props.message}
+                  />
                   <View display="block" margin="small none none none">
                     {props.children}
                   </View>
@@ -215,11 +223,13 @@ PostMessage.propTypes = {
    * Marks whether an unread message has a forcedReadState
    */
   isForcedRead: PropTypes.bool,
-  postUtilities: PropTypes.node
+  postUtilities: PropTypes.node,
+  isIsolatedView: PropTypes.bool
 }
 
 PostMessage.defaultProps = {
-  hasAuthor: true
+  hasAuthor: true,
+  isIsolatedView: false
 }
 
 export default PostMessage

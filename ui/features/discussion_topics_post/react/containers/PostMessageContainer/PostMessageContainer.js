@@ -43,6 +43,7 @@ export const PostMessageContainer = props => {
       <PostMessage
         authorName={props.discussionEntry.author.name}
         avatarUrl={props.discussionEntry.author.avatarUrl}
+        isIsolatedView={props.isIsolatedView}
         lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
           props.discussionEntry.lastReply?.createdAt
         )}
@@ -55,7 +56,13 @@ export const PostMessageContainer = props => {
         isForcedRead={props.discussionEntry.forcedReadState}
         discussionRoles={props?.discussionRoles}
       >
-        <ThreadingToolbar searchTerm={searchTerm} filter={filter}>
+        <ThreadingToolbar
+          searchTerm={searchTerm}
+          filter={filter}
+          discussionEntry={props.discussionEntry}
+          onOpenIsolatedView={props.onOpenIsolatedView}
+          isIsolatedView={props.isIsolatedView}
+        >
           {props.threadActions}
         </ThreadingToolbar>
       </PostMessage>
@@ -68,7 +75,9 @@ PostMessageContainer.propTypes = {
   threadActions: PropTypes.arrayOf(PropTypes.object),
   isEditing: PropTypes.bool,
   onCancel: PropTypes.func,
-  onSave: PropTypes.func
+  onSave: PropTypes.func,
+  isIsolatedView: PropTypes.bool,
+  onOpenIsolatedView: PropTypes.func
 }
 
 PostMessageContainer.defaultProps = {

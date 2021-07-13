@@ -408,7 +408,20 @@ describe('DiscussionFullPage', () => {
         expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
       )
     })
+
+    it('should open isolated view when go to reply button is clicked', async () => {
+      const container = setup()
+      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
+      fireEvent.change(await container.findByTestId('search-filter'), {
+        target: {value: 'a'}
+      })
+      const goToReply = await container.findByTestId('go-to-reply')
+      fireEvent.click(goToReply)
+
+      await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
+    })
   })
+
   describe('group menu button', () => {
     it('should find "Super Group" group name', async () => {
       const container = setup()
