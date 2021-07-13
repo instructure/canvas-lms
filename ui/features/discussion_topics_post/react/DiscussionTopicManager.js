@@ -104,6 +104,7 @@ const DiscussionTopicManager = props => {
   }
 
   const goToTopic = () => {
+    setSearchTerm('')
     closeIsolatedView()
     setIsTopicHighlighted(true)
   }

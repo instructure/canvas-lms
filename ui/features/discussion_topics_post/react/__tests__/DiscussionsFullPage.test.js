@@ -420,6 +420,55 @@ describe('DiscussionFullPage', () => {
 
       await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
     })
+
+    it('should show reply button in isolated view when search term is present', async () => {
+      const container = setup()
+      fireEvent.change(await container.findByTestId('search-filter'), {
+        target: {value: 'a'}
+      })
+      const goToReply = await container.findByTestId('go-to-reply')
+      fireEvent.click(goToReply)
+      await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
+    })
+
+    it('go to topic button should clear search term', async () => {
+      const container = setup()
+      fireEvent.change(await container.findByTestId('search-filter'), {
+        target: {value: 'a'}
+      })
+      const goToReply = await container.findByTestId('go-to-reply')
+      fireEvent.click(goToReply)
+
+      const isolatedKabab = await container.findByTestId('thread-actions-menu')
+      fireEvent.click(isolatedKabab)
+
+      await waitFor(() => {
+        expect(container.queryByTestId('discussion-topic-container')).toBeNull()
+      })
+      const goToTopic = await container.findByText('Go To Topic')
+      fireEvent.click(goToTopic)
+
+      expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
+    })
+
+    it('should clear input when button is pressed', async () => {
+      const container = setup()
+      let searchInput = container.findByTestId('search-filter')
+
+      fireEvent.change(await container.findByTestId('search-filter'), {
+        target: {value: 'A new Search'}
+      })
+      let clearSearchButton = container.queryByTestId('clear-search-button')
+      searchInput = container.getByLabelText('Search entries or author')
+      expect(searchInput.value).toBe('A new Search')
+      expect(clearSearchButton).toBeInTheDocument()
+
+      fireEvent.click(clearSearchButton)
+      clearSearchButton = container.queryByTestId('clear-search-button')
+      searchInput = container.getByLabelText('Search entries or author')
+      expect(searchInput.value).toBe('')
+      expect(clearSearchButton).toBeNull()
+    })
   })
 
   describe('group menu button', () => {

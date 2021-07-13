@@ -31,12 +31,13 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
-import React, {useState, useCallback, useMemo} from 'react'
+import React, {useContext, useCallback, useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
+import {SearchContext} from '../../utils/constants'
 
 export const getMenuConfig = props => {
   const options = {
@@ -51,7 +52,7 @@ export const getMenuConfig = props => {
 }
 
 const getClearButton = props => {
-  if (!props.searchValue.length) return
+  if (!props.searchTerm.length) return
 
   return (
     <IconButton
@@ -69,7 +70,7 @@ const getClearButton = props => {
 }
 
 export const DiscussionPostToolbar = props => {
-  const [searchValue, setSearchValue] = useState('')
+  const {searchTerm, setSearchTerm} = useContext(SearchContext)
 
   const debouncedSave = useCallback(
     debounce(nextValue => props.onSearchChange(nextValue), 500),
@@ -80,18 +81,18 @@ export const DiscussionPostToolbar = props => {
     const {value: nextValue} = event.target
     // Even though handleChange is created on each render and executed
     // it references the same debouncedSave that was created initially
-    setSearchValue(nextValue)
+    setSearchTerm(nextValue)
     debouncedSave(nextValue)
   }
 
   const handleClear = useCallback(() => {
-    setSearchValue('')
+    setSearchTerm('')
     debouncedSave('')
-  }, [debouncedSave])
+  }, [debouncedSave, setSearchTerm])
 
   const clearButton = useMemo(() => {
-    return getClearButton({handleClear, searchValue})
-  }, [handleClear, searchValue])
+    return getClearButton({handleClear, searchTerm})
+  }, [handleClear, searchTerm])
 
   return (
     <View maxWidth="56.875em">
@@ -109,7 +110,7 @@ export const DiscussionPostToolbar = props => {
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>
               }
-              value={searchValue}
+              value={searchTerm}
               renderBeforeInput={<IconSearchLine inline={false} />}
               renderAfterInput={clearButton}
               placeholder={I18n.t('Search entries or author...')}
