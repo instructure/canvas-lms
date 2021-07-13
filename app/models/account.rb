@@ -774,11 +774,13 @@ class Account < ActiveRecord::Base
 
     if @invalidations.present?
       shard.activate do
-        @invalidations.each do |key|
-          Rails.cache.delete([key, self.global_id].cache_key)
+        self.class.connection.after_transaction_commit do
+          @invalidations.each do |key|
+            Rails.cache.delete([key, self.global_id].cache_key)
+          end
+          Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
+            invalidate_inherited_caches(self, @invalidations)
         end
-        Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
-          invalidate_inherited_caches(self, @invalidations)
       end
     end
   end
