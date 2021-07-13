@@ -23,29 +23,25 @@ export const RubricAssessmentRating = {
     fragment RubricAssessmentRating on RubricAssessmentRating {
       _id
       criterion {
-        id: _id
+        _id
       }
       comments
       comments_html: commentsHtml
       description
       outcome {
-        id: _id
+        _id
       }
       points
     }
   `,
 
   shape: shape({
-    _id: string,
-    criterion: shape({
-      id: string.isRequired
-    }),
+    id: string,
     comments: string,
     comments_html: string,
+    criterion_id: string,
     description: string,
-    outcome: shape({
-      id: string.isRequired
-    }),
+    learning_outcome_id: string,
     points: number
   })
 }
