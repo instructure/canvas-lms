@@ -229,7 +229,6 @@ class RoleOverride < ActiveRecord::Base
         AccountAdmin
         AccountMembership
         TeacherEnrollment
-        TaEnrollment
         DesignerEnrollment
       ],
       true_for: %w[AccountAdmin],
@@ -245,7 +244,6 @@ class RoleOverride < ActiveRecord::Base
         AccountAdmin
         AccountMembership
         TeacherEnrollment
-        TaEnrollment
         DesignerEnrollment
       ],
       true_for: %w[AccountAdmin],
