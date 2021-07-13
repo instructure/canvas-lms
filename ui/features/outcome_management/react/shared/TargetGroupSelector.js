@@ -85,7 +85,6 @@ const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup}) => {
       ) : (
         <>
           <TreeBrowser
-            selectionType="single"
             onCollectionToggle={queryCollections}
             onCollectionClick={onCollectionClick}
             collections={collections}

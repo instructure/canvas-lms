@@ -63,7 +63,7 @@ TreeBrowser.defaultProps = {
   onCollectionClick: () => {},
   collections: {},
   rootId: '0',
-  selectionType: 'none',
+  selectionType: 'single',
   showRootCollection: false
 }
 

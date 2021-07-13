@@ -219,7 +219,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
                   </Text>
                 ) : (
                   <TreeBrowser
-                    selectionType="single"
                     onCollectionToggle={queryCollections}
                     collections={collections}
                     rootId={rootId}
