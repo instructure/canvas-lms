@@ -153,7 +153,6 @@ const useTreeBrowser = queryVariables => {
     if (loadedGroups.includes(id)) {
       return
     }
-    addLoadedGroups([id])
 
     client
       .query({
@@ -164,6 +163,7 @@ const useTreeBrowser = queryVariables => {
         }
       })
       .then(({data}) => {
+        addLoadedGroups([id])
         addGroups(extractGroups(data.context))
       })
       .catch(err => {
@@ -203,7 +203,8 @@ const useTreeBrowser = queryVariables => {
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
-    clearCache
+    clearCache,
+    loadedGroups
   }
 }
 
@@ -280,7 +281,8 @@ export const useFindOutcomeModal = open => {
     setSelectedGroupId,
     setRootId,
     rootId,
-    addLoadedGroups
+    addLoadedGroups,
+    loadedGroups
   } = useTreeBrowser({
     collection: 'findOutcomesView'
   })
@@ -357,6 +359,7 @@ export const useFindOutcomeModal = open => {
           ...extractGroups({
             _id: ROOT_ID,
             isRootGroup: true,
+            title: I18n.t('Root Learning Outcome Groups'),
             childGroups: {
               nodes: childGroups
             }
@@ -388,7 +391,8 @@ export const useFindOutcomeModal = open => {
     searchString,
     debouncedSearchString,
     updateSearch,
-    clearSearch
+    clearSearch,
+    loadedGroups
   }
 }
 
