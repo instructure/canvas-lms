@@ -69,14 +69,16 @@ const ManageOutcomeItem = ({
         <Flex.Item as="div" size="4.125rem">
           <div style={{padding: '0.3125rem 0'}}>
             <Flex alignItems="center">
-              <Flex.Item>
-                <Checkbox
-                  label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
-                  value="medium"
-                  checked={isChecked}
-                  onChange={onChangeHandler}
-                />
-              </Flex.Item>
+              {canManageOutcome && (
+                <Flex.Item>
+                  <Checkbox
+                    label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
+                    value="medium"
+                    checked={isChecked}
+                    onChange={onChangeHandler}
+                  />
+                </Flex.Item>
+              )}
               <Flex.Item as="div" padding="0 x-small 0 0">
                 <IconButton
                   size="small"

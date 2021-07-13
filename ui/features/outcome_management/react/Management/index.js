@@ -182,6 +182,7 @@ const OutcomeManagementPanel = () => {
   }
 
   const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
+  const canManage = ENV.PERMISSIONS?.manage_outcomes
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -269,12 +270,14 @@ const OutcomeManagementPanel = () => {
             </Flex.Item>
           </Flex>
           <hr style={{margin: '0 0 7px'}} />
-          <ManageOutcomesFooter
-            selected={selectedOutcomes}
-            selectedCount={selectedOutcomesCount}
-            onRemoveHandler={openOutcomesRemoveModal}
-            onMoveHandler={openOutcomesMoveModal}
-          />
+          {canManage && (
+            <ManageOutcomesFooter
+              selected={selectedOutcomes}
+              selectedCount={selectedOutcomesCount}
+              onRemoveHandler={openOutcomesRemoveModal}
+              onMoveHandler={openOutcomesMoveModal}
+            />
+          )}
           {selectedGroupId && (
             <>
               <GroupRemoveModal

@@ -42,10 +42,16 @@ describe('OutcomeManagementPanel', () => {
   beforeEach(() => {
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    window.ENV = {
+      PERMISSIONS: {
+        manage_outcomes: true
+      }
+    }
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    window.ENV = null
   })
 
   const groupDetailDefaultProps = {
@@ -491,6 +497,23 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
       expect(queryByText('Move 2 Outcomes?')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('can_manage permissions are false', () => {
+    beforeEach(() => {
+      window.ENV = {
+        PERMISSIONS: {
+          manage_outcomes: false
+        }
+      }
+    })
+
+    it('ManageOutcomesFooter is not displayed', async () => {
+      const {queryByTestId} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
   })
 })

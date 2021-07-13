@@ -29,7 +29,7 @@ const ManageOutcomesFooter = ({selected, selectedCount, onRemoveHandler, onMoveH
   const btnState = selectedCount > 0 ? 'enabled' : 'disabled'
 
   return (
-    <Flex as="div">
+    <Flex as="div" data-testid="manage-outcomes-footer">
       <Flex.Item as="div" width="34%" />
       <Flex.Item as="div" width="66%">
         <Flex justifyItems="space-between" wrap="wrap">

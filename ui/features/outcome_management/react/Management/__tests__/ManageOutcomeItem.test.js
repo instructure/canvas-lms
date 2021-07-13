@@ -128,6 +128,13 @@ describe('ManageOutcomeItem', () => {
       expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
     })
 
+    it('hides checkboxes', () => {
+      const {queryByText} = render(
+        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+      )
+      expect(queryByText('Select outcome')).not.toBeInTheDocument()
+    })
+
     describe('with manage_outcomes permission', () => {
       beforeEach(() => {
         window.ENV = {
