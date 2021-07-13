@@ -20,6 +20,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../helpers/k5_common'
 
 def new_valid_tool(course)
   tool = course.context_external_tools.new(
@@ -42,6 +43,8 @@ end
 # permission stuff is released, and I don't want to complicate the git history
 RSpec.shared_examples "course_files" do
 describe FilesController do
+  include K5Common
+
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
   end
@@ -515,6 +518,13 @@ describe FilesController do
         @assignment.all_submissions.delete_all
         get 'show', params: {user_id: @student.id, id: @attachment.id, download_frd: 1}
         expect(response).to be_successful
+      end
+
+      it "should hide the left side if in K5 mode" do
+        toggle_k5_setting(@course.account)
+        get 'show', params: {:course_id => @course.id, :id => @file.id}
+        expect(response).to be_successful
+        expect(assigns[:show_left_side]).to be false
       end
     end
 

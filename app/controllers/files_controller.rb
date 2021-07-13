@@ -522,6 +522,7 @@ class FilesController < ApplicationController
       original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
+      set_k5_mode
       # note that the /files/XXX URL implicitly uses the current user as the
       # context, even though it doesn't search for the file using
       # @current_user.attachments.find , since it might not actually be a user
