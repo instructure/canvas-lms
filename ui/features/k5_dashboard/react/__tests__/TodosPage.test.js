@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 import {MOCK_TODOS} from './mocks'
-import TodosPage from '../TodosPage'
+import TodosPage, {sortTodos} from '../TodosPage'
 
 const FETCH_TODOS_URL = /\/api\/v1\/users\/self\/todo.*/
 
@@ -55,11 +55,58 @@ describe('TodosPage', () => {
     // Displays list of todos once loaded
     expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
     expect(getByRole('link', {name: 'Grade Dream a dream'})).toBeInTheDocument()
+    expect(getByRole('link', {name: 'Grade Drain a drain'})).toBeInTheDocument()
+
+    // Expect todos to be order by due date ascending, with no date at the end
+    expect(getAllByTestId('todo').map(e => e.id)).toEqual(['todo-11', 'todo-12', 'todo-10'])
   })
 
   it('renders an error if loading todos fails', async () => {
     fetchMock.get(FETCH_TODOS_URL, 500, {overwriteRoutes: true})
     const {findAllByText} = render(<TodosPage visible timeZone="America/Denver" />)
     expect((await findAllByText('Failed to load todos'))[0]).toBeInTheDocument()
+  })
+})
+
+describe('sortTodos', () => {
+  const TODO_DATES = [
+    {id: 3, due_at: '2021-07-13T16:22:00.000Z'},
+    {id: 1, due_at: '2021-07-01T16:22:00.000Z'},
+    {id: 2, due_at: '2021-07-05T16:22:00.000Z'}
+  ]
+  const mockTodos = dates =>
+    dates.map(({id, due_at}) => ({
+      id,
+      assignment: {
+        all_dates: [
+          {
+            base: true,
+            due_at
+          }
+        ]
+      }
+    }))
+
+  it('sorts to-dos by assignment due date ascending', () => {
+    const todos = mockTodos(TODO_DATES)
+    todos.sort(sortTodos)
+    expect(todos.map(t => t.id)).toEqual([1, 2, 3])
+  })
+
+  it('puts to-dos without due dates last', () => {
+    const dates = [...TODO_DATES]
+    dates[1].due_at = null
+    const todos = mockTodos(dates)
+    todos.sort(sortTodos)
+    expect(todos.map(t => t.id)).toEqual([2, 3, 1])
+  })
+
+  it('does not reorder to-dos when their dates are the same', () => {
+    const dates = [...TODO_DATES]
+    dates[1].due_at = dates[0].due_at
+    dates[2].due_at = dates[0].due_at
+    const todos = mockTodos(dates)
+    todos.sort(sortTodos)
+    expect(todos.map(t => t.id)).toEqual([3, 1, 2])
   })
 })

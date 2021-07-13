@@ -25,7 +25,18 @@ import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 
-import Todo from './Todo'
+import Todo, {getBaseDueAt} from './Todo'
+
+// Sort to-dos based on the assignment's base due date (aka the "Everyone else"
+// override when there are multiple due dates, putting those with no due date last
+export const sortTodos = (t1, t2) => {
+  const d1 = t1.assignment && getBaseDueAt(t1.assignment)
+  const d2 = t2.assignment && getBaseDueAt(t2.assignment)
+  if (d1 === d2) return 0
+  if (!d1) return 1
+  if (!d2) return -1
+  return d1.localeCompare(d2)
+}
 
 export const TodosPage = ({timeZone, visible}) => {
   const [loading, setLoading] = useState(true)
@@ -36,6 +47,7 @@ export const TodosPage = ({timeZone, visible}) => {
       path: '/api/v1/users/self/todo',
       success: useCallback(data => {
         if (data) {
+          data.sort(sortTodos)
           setTodos(data)
           setLoading(false)
         }
