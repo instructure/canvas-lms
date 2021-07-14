@@ -102,7 +102,7 @@ describe MicrosoftSync::UserMapping do
         end
       end
 
-      context 'when the upn type in the Account settings has changed since fetching the account' do
+      context 'when the ULUV type in the Account settings has changed since fetching the account' do
         before do
           acct = Account.find(account.id)
           acct.settings[:microsoft_sync_login_attribute] = 'sis_user_id'

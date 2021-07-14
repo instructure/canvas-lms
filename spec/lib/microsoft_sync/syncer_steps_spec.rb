@@ -385,7 +385,7 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     before do
-      stub_const('MicrosoftSync::GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE', batch_size)
+      stub_const('MicrosoftSync::GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE', batch_size)
 
       students.each_with_index do |student, i|
         communication_channel(student, path_type: 'email', username: "student#{i}@example.com", active_cc: true)
@@ -399,10 +399,10 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when Microsoft's API returns success" do
       before do
-        allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-          raise "max batchsize stubbed at #{batch_size}" if upns.length > batch_size
+        allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
+          raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
-          upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+          uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, '-aad')]}.to_h # ULUV "abc@def.com" -> AAD "abc-aad"
         end
       end
 
@@ -414,14 +414,14 @@ describe MicrosoftSync::SyncerSteps do
         )
       end
 
-      it 'batches in sizes of GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE' do
-        expect(graph_service_helpers).to receive(:users_upns_to_aads).twice.and_return({})
+      it 'batches in sizes of GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE' do
+        expect(graph_service_helpers).to receive(:users_uluvs_to_aads).twice.and_return({})
         expect_next_step(subject, :step_generate_diff)
       end
 
-      context "when Microsoft doesn't have AADs for the UPNs" do
+      context "when Microsoft doesn't have AADs for the ULUVs" do
         it "doesn't add any UserMappings" do
-          expect(graph_service_helpers).to receive(:users_upns_to_aads)
+          expect(graph_service_helpers).to receive(:users_uluvs_to_aads)
             .at_least(:once).and_return({})
           expect { subject }.to_not \
             change { MicrosoftSync::UserMapping.count }.from(0)
@@ -440,14 +440,14 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it "doesn't lookup aads for those users" do
-          upns_looked_up = []
-          expect(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-            upns_looked_up += upns
+          uluvs_looked_up = []
+          expect(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
+            uluvs_looked_up += uluvs
             {}
           end
           expect_next_step(subject, :step_generate_diff)
-          expect(upns_looked_up).to_not include("student0@example.com")
-          expect(upns_looked_up).to include("student1@example.com")
+          expect(uluvs_looked_up).to_not include("student0@example.com")
+          expect(uluvs_looked_up).to include("student1@example.com")
         end
       end
 
@@ -474,9 +474,9 @@ describe MicrosoftSync::SyncerSteps do
 
       context 'when the Account login attribute changes while the job is running' do
         before do
-          orig_root_account_method = MicrosoftSync::UsersUpnsFinder.method(:new)
+          orig_root_account_method = MicrosoftSync::UsersUluvsFinder.method(:new)
 
-          allow(MicrosoftSync::UsersUpnsFinder).to receive(:new) do |user_ids, root_account|
+          allow(MicrosoftSync::UsersUluvsFinder).to receive(:new) do |user_ids, root_account|
             result = orig_root_account_method.call(user_ids, root_account)
             acct = Account.find(root_account.id)
             acct.settings[:microsoft_sync_login_attribute] = 'somethingelse'
@@ -826,8 +826,8 @@ describe MicrosoftSync::SyncerSteps do
             root_account: course.root_account, user: students[0], aad_id: 's0-old'
           )
 
-          allow(graph_service_helpers).to receive(:users_upns_to_aads) do |upns|
-            upns.map{|upn| [upn, upn.gsub(/@.*/, '-aad')]}.to_h # UPN "abc@def.com" -> AAD "abc-aad"
+          allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
+            uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, '-aad')]}.to_h # ULUV "abc@def.com" -> AAD "abc-aad"
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)
@@ -836,7 +836,7 @@ describe MicrosoftSync::SyncerSteps do
         it "gets user mappings that don't exist for all PartialSyncChanges users" do
           subject
           # s0 already has a UserMapping. s1 doesn't have a PartialSyncChange.
-          expect(graph_service_helpers).to have_received(:users_upns_to_aads)
+          expect(graph_service_helpers).to have_received(:users_uluvs_to_aads)
             .with(contain_exactly('s2@example.com', 't@example.com'))
         end
 

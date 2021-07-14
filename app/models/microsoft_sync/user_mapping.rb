@@ -28,10 +28,13 @@ require_dependency 'microsoft_sync'
 # use Microsoft's APIs.
 #
 # Typically, a user's AAD is looked up by asking Microsoft for the AAD for a given
-# "UPN" (see SyncerSteps#ensure_enrollments_user_mappings_filled). A UPN, or
-# "userPrincipalName", is a field Microsoft has on their users that corresponds
-# to a Canvas user's email address, username, or other field, as chosen by the
-# admin (see microsoft_sync_login_attribute in the root account settings)
+# UserPrincipalName (UPN) or other field on the Microsoft side that corresponds
+# to a Canvas user's email address, username, or other field. The fields on the
+# Canvas side and Microsoft side to match on are configurable in the root account
+# settings (see microsoft_sync_login_attribute setting and other
+# microsoft_sync_* settings). The value passed to the Microsoft API to match on
+# such as the Canvas user's email address is referred to throughout MicrosoftSync
+# as a "ULUV" or User Lookup Value.
 #
 class MicrosoftSync::UserMapping < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
@@ -75,10 +78,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   # duplicates. (Don't need the partition support that bulk_insert provides.)
   #
   # This method also refetches the Account settings after adding to make sure
-  # the UPN type and tenant haven't changed from the root_account that is
+  # the ULUV settings (login_attribute, login_attribute_suffix,
+  # remote_attribute) and tenant haven't changed from the root_account that is
   # passed in. The settings in root_account should be what was used to fetch
   # the aads. This ensures that the values we are adding are actually for the
-  # UPN type and tenant currently in the Account settings. If the settings
+  # ULUV settings and tenant currently in the Account settings. If the settings
   # have changed, the just-added values will be deleted and this method will
   # raise an AccountSettingsChanged error.
   def self.bulk_insert_for_root_account(root_account, user_id_to_aad_hash)
