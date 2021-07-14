@@ -19,7 +19,8 @@
 #
 
 #
-# Is responsible for finding the the user's UPNs according to the
+# Is responsible for finding the the user's ULUVs (user lookup values -- the value
+# we use to look up a Micrososft user by) according to the
 # microsoft_sync_login_attribute in the Account settings
 #
 module MicrosoftSync
@@ -29,7 +30,7 @@ module MicrosoftSync
     include Errors::GracefulCancelErrorMixin
   end
 
-  class UsersUpnsFinder
+  class UsersUluvsFinder
     attr_reader :user_ids, :root_account
 
     delegate :settings, to: :root_account
@@ -53,24 +54,24 @@ module MicrosoftSync
     private
 
     def find_by_email
-      users_upns = CommunicationChannel
+      users_uluvs = CommunicationChannel
         .where(user_id: user_ids, path_type: 'email', workflow_state: 'active')
         .order(position: :asc)
         .pluck(:user_id, :path)
 
-      uniq_upn_by_user_id(users_upns)
+      uniq_uluv_by_user_id(users_uluvs)
     end
 
     def find_by_preferred_username
-      users_upns = find_active_pseudonyms.pluck(:user_id, :unique_id)
+      users_uluvs = find_active_pseudonyms.pluck(:user_id, :unique_id)
 
-      uniq_upn_by_user_id(users_upns)
+      uniq_uluv_by_user_id(users_uluvs)
     end
 
     def find_by_sis_user_id
-      users_upns = find_active_pseudonyms.pluck(:user_id, :sis_user_id)
+      users_uluvs = find_active_pseudonyms.pluck(:user_id, :sis_user_id)
 
-      uniq_upn_by_user_id(users_upns)
+      uniq_uluv_by_user_id(users_uluvs)
     end
 
     def find_active_pseudonyms
@@ -89,14 +90,14 @@ module MicrosoftSync
     end
 
     # The user can have more than one communication channel/pseudonym, so we're
-    # ordering the users_upns by position ASC (the highest position is the
-    # smallest number) and returning the first upn found to the related user_id.
-    def uniq_upn_by_user_id(users_upns)
-      return [] unless users_upns
+    # ordering the users_uluvs by position ASC (the highest position is the
+    # smallest number) and returning the first uluv found to the related user_id.
+    def uniq_uluv_by_user_id(users_uluvs)
+      return [] unless users_uluvs
 
       response = {}
 
-      users_upns.each { |user_id, upn| response[user_id] ||= upn }
+      users_uluvs.each { |user_id, uluv| response[user_id] ||= uluv }
 
       response.to_a
     end

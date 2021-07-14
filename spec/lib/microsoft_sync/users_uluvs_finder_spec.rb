@@ -19,7 +19,7 @@
 
 require 'spec_helper'
 
-describe MicrosoftSync::UsersUpnsFinder do
+describe MicrosoftSync::UsersUluvsFinder do
   let(:course) { course_model(name: 'sync test course') }
   let(:group) { MicrosoftSync::Group.create(course: course) }
   let(:root_account) { group.root_account }
@@ -59,11 +59,11 @@ describe MicrosoftSync::UsersUpnsFinder do
           root_account.save!
         end
 
-        it 'returns an array mapping the user id with upn' do
-          users_upns = subject.to_h
+        it 'returns an array mapping the user id with uluv' do
+          users_uluvs = subject.to_h
 
-          expect(users_upns.size).to eq 1
-          expect(users_upns[communication_channel.user_id]).to eq email_address
+          expect(users_uluvs.size).to eq 1
+          expect(users_uluvs[communication_channel.user_id]).to eq email_address
         end
 
         context 'inactive communication channels' do
@@ -73,11 +73,11 @@ describe MicrosoftSync::UsersUpnsFinder do
           end
           let(:user_ids) { [communication_channel.user_id, second_user.id]}
 
-          it 'only returns the confirmed email address upn' do
-            users_upns = subject.to_h
+          it 'only returns the confirmed email address uluv' do
+            users_uluvs = subject.to_h
 
-            expect(users_upns.size).to eq 1
-            expect(users_upns[communication_channel.user_id]).to eq email_address
+            expect(users_uluvs.size).to eq 1
+            expect(users_uluvs[communication_channel.user_id]).to eq email_address
           end
         end
       end
@@ -96,11 +96,11 @@ describe MicrosoftSync::UsersUpnsFinder do
           root_account.save!
         end
 
-        it 'returns an array mapping the user id with upn' do
-          users_upns = subject.to_h
+        it 'returns an array mapping the user id with uluv' do
+          users_uluvs = subject.to_h
 
-          expect(users_upns.size).to eq 1
-          expect(users_upns[user.id]).to eq preferred_username
+          expect(users_uluvs.size).to eq 1
+          expect(users_uluvs[user.id]).to eq preferred_username
         end
       end
 
@@ -118,11 +118,11 @@ describe MicrosoftSync::UsersUpnsFinder do
           root_account.save!
         end
 
-        it 'returns an array mapping the user id with upn' do
-          users_upns = subject.to_h
+        it 'returns an array mapping the user id with uluv' do
+          users_uluvs = subject.to_h
 
-          expect(users_upns.size).to eq 1
-          expect(users_upns[user.id]).to eq sis_user_id
+          expect(users_uluvs.size).to eq 1
+          expect(users_uluvs[user.id]).to eq sis_user_id
         end
       end
 

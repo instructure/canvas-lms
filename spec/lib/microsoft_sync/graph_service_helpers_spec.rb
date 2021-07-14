@@ -187,7 +187,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     end
   end
 
-  describe '#users_upns_to_aads' do
+  describe '#users_uluvs_to_aads' do
     let(:requested) { %w[a b c d] }
 
     before do
@@ -201,9 +201,9 @@ describe MicrosoftSync::GraphServiceHelpers do
         ])
     end
 
-    context "when the graph service sends a UPN back that differs in case" do
-      it 'maps the response back to case of the UPN in the input array' do
-        expect(subject.users_upns_to_aads(%w[a b c d])).to eq(
+    context "when the graph service sends a ULUV back that differs in case" do
+      it 'maps the response back to case of the ULUV in the input array' do
+        expect(subject.users_uluvs_to_aads(%w[a b c d])).to eq(
           'a' => '123',
           'b' => '456',
           'd' => '789'
@@ -211,14 +211,14 @@ describe MicrosoftSync::GraphServiceHelpers do
       end
     end
 
-    context "when the graph service sends a upn back that it didn't ask for" do
+    context "when the graph service sends a uluv back that it didn't ask for" do
       let(:requested) { %w[c d] }
 
       it "raises an error" do
-        expect { subject.users_upns_to_aads(%w[c D]) }.to \
+        expect { subject.users_uluvs_to_aads(%w[c D]) }.to \
           raise_error do |err|
           expect(err.message).to eq(
-            '/users returned unexpected UPN(s) ["a", "b"], asked for ["c", "d"]'
+            '/users returned unexpected ULUV(s) ["a", "b"], asked for ["c", "d"]'
           )
           expect(err.public_message).to eq(
             'Unexpected response from Microsoft API. This is likely a bug. Please contact support.'
@@ -228,9 +228,9 @@ describe MicrosoftSync::GraphServiceHelpers do
       end
     end
 
-    context 'when given different-case duplicates of the same UPN' do
-      it "only requests one and copies the AAD on all matching UPNs" do
-        expect(subject.users_upns_to_aads(%w[a b c A C D])).to eq(
+    context 'when given different-case duplicates of the same ULUV' do
+      it "only requests one and copies the AAD on all matching ULUVs" do
+        expect(subject.users_uluvs_to_aads(%w[a b c A C D])).to eq(
           'a' => '123',
           'A' => '123',
           'b' => '456',
@@ -241,8 +241,8 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     context 'when passed in more than 15' do
       it 'raises ArgumentError' do
-        expect { subject.users_upns_to_aads((1..16).map(&:to_s)) }.to \
-          raise_error(ArgumentError, "Can't look up 16 UPNs at once")
+        expect { subject.users_uluvs_to_aads((1..16).map(&:to_s)) }.to \
+          raise_error(ArgumentError, "Can't look up 16 ULUVs at once")
       end
     end
   end

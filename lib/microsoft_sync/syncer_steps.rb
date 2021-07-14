@@ -34,8 +34,8 @@
 module MicrosoftSync
   class SyncerSteps
     # Database batch size for users without AAD ids. Should be an even multiple of
-    # GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE:
-    ENROLLMENTS_UPN_FETCHING_BATCH_SIZE = 750
+    # GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE:
+    ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE = 750
 
     MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
     MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
@@ -161,15 +161,16 @@ module MicrosoftSync
       retry_object_for_error(e, job_state_data: group_id)
     end
 
-    # Gets users enrolled in course, get UPNs ("userPrincipalName"s, e.g. email
+    # Gets users enrolled in course, get ULUVs (user lookup values, e.g.
     # addresses, username) for them, looks up the AADs (Azure Active Directory
     # object IDs -- Microsoft's internal ID for the user) from Microsoft, and
     # writes the User->AAD mapping into the UserMapping table.  If a user
-    # doesn't have a UPN or Microsoft doesn't have an AAD for them, skips that
-    # user.
+    # doesn't have whatever we use to bulid the ULUV (e.g. email or SIS id, as
+    # specified by the microsoft_sync_login_attribute Account setting), or
+    # Microsoft doesn't have a user for the calculated ULUV, skips that user.
     def step_ensure_enrollments_user_mappings_filled(_mem_data, _job_state_data)
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
-        course: course, batch_size: ENROLLMENTS_UPN_FETCHING_BATCH_SIZE
+        course: course, batch_size: ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE
       ) do |user_ids|
         ensure_user_mappings(user_ids)
       end
@@ -180,16 +181,16 @@ module MicrosoftSync
     end
 
     def ensure_user_mappings(user_ids)
-      users_upns_finder = MicrosoftSync::UsersUpnsFinder.new(user_ids, group.root_account)
-      users_and_upns = users_upns_finder.call
+      users_uluvs_finder = MicrosoftSync::UsersUluvsFinder.new(user_ids, group.root_account)
+      users_and_uluvs = users_uluvs_finder.call
 
-      # If some users in different slices have the same UPNs, this could end up
-      # looking up the same UPN multiple times; but this should be very rare
-      users_and_upns.each_slice(GraphServiceHelpers::USERS_UPNS_TO_AADS_BATCH_SIZE) do |slice|
-        upn_to_aad = graph_service_helpers.users_upns_to_aads(slice.map(&:last))
-        user_id_to_aad = slice.map{|user_id, upn| [user_id, upn_to_aad[upn]]}.to_h.compact
+      # If some users in different slices have the same ULUVs, this could end up
+      # looking up the same ULUV multiple times; but this should be very rare
+      users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
+        uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(slice.map(&:last))
+        user_id_to_aad = slice.map{|user_id, uluv| [user_id, uluv_to_aad[uluv]]}.to_h.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
-        # as passed into UsersUpnsFinder AND as used in #tenant, for the "have settings changed?"
+        # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.
         UserMapping.bulk_insert_for_root_account(group.root_account, user_id_to_aad)
       end
