@@ -68,6 +68,8 @@ function setup_dinghy_proxy {
     --name http-proxy \
     codekitchen/dinghy-http-proxy
 
+    sudo mkdir -p /etc/resolver
+
     echo 'nameserver 127.0.0.1' | sudo tee /etc/resolver/docker > /dev/null
     echo 'port 19322' | sudo tee -a /etc/resolver/docker > /dev/null
   fi
