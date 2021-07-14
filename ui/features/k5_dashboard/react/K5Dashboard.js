@@ -256,7 +256,7 @@ export const K5Dashboard = ({
   return (
     <>
       <Flex as="section" alignItems="start">
-        <Flex.Item shouldGrow shouldShrink padding="medium">
+        <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
           <K5DashboardContext.Provider
             value={{
               assignmentsDueToday,
