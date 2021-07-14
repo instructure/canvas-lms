@@ -28,6 +28,11 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  AUTO_MARK_AS_READ_DELAY: 0
+}))
+
 describe('IsolatedThreadsContainer', () => {
   const server = mswServer(handlers)
   const setOnFailure = jest.fn()
@@ -70,6 +75,7 @@ describe('IsolatedThreadsContainer', () => {
           DiscussionEntry.mock({
             _id: '50',
             id: '50',
+            read: false,
             message: '<p>This is the child reply</P>'
           })
         ],
@@ -100,10 +106,19 @@ describe('IsolatedThreadsContainer', () => {
     expect(await container.findByText('This is the child reply')).toBeInTheDocument()
   })
 
+  it('does not render the pagination component if there is only 1 page', () => {
+    const props = defaultProps()
+    props.discussionTopic.entriesTotalPages = 1
+    const {queryByTestId} = setup(props)
+    expect(queryByTestId('pagination')).toBeNull()
+  })
+
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', async () => {
       const onToggleUnread = jest.fn()
-      const {findByTestId, findAllByTestId} = setup(defaultProps({onToggleUnread}))
+      const props = defaultProps({onToggleUnread})
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].read = true
+      const {findAllByTestId, findByTestId} = setup(props)
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
       fireEvent.click(threadActionsMenu[0])

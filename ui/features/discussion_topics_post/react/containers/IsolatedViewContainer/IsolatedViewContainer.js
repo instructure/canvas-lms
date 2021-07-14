@@ -127,6 +127,16 @@ export const IsolatedViewContainer = props => {
     })
   }
 
+  const markAsRead = discussionEntry => {
+    updateDiscussionEntryParticipant({
+      variables: {
+        discussionEntryId: discussionEntry._id,
+        read: true,
+        forcedReadState: discussionEntry.read || null
+      }
+    })
+  }
+
   const onDelete = discussionEntry => {
     // eslint-disable-next-line no-alert
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
@@ -297,6 +307,7 @@ export const IsolatedViewContainer = props => {
               onToggleRating={toggleRating}
               onToggleUnread={toggleUnread}
               onDelete={onDelete}
+              markAsRead={markAsRead}
               onOpenInSpeedGrader={onOpenInSpeedGrader}
               showOlderReplies={fetchMoreEntries}
               onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
