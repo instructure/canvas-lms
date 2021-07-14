@@ -1266,6 +1266,7 @@ class Account < ActiveRecord::Base
     #################### Begin legacy permission block #########################
     given do |user|
       result = false
+      next false if user&.fake_student?
 
       if user && !root_account.feature_enabled?(:granular_permissions_manage_courses) && !root_account.site_admin?
         scope = root_account.enrollments.active.where(user_id: user)
@@ -1285,6 +1286,8 @@ class Account < ActiveRecord::Base
     # any logged in user with no active enrollments (i.e. FFT)
     # combined with root account setting that is enabled for Users with no enrollments
     given do |user|
+      next false if user&.fake_student?
+
       user && root_account.feature_enabled?(:granular_permissions_manage_courses) &&
         !root_account.site_admin? &&
         !root_account.enrollments.active.where(user_id: user).exists? &&
