@@ -83,10 +83,10 @@ module Outcomes
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
 
       relation = ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: learning_outcome_groups_ids).
-        joins(:learning_outcome_content)
+        where(associated_asset_id: learning_outcome_groups_ids)
 
       if args[:search_query]
+        relation = relation.joins(:learning_outcome_content)
         relation = add_search_query(relation, args[:search_query])
       end
 
