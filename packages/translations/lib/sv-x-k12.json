@@ -309,7 +309,7 @@
         "message": "Dimensioner"
     },
     "directionality_26ae9e08": {
-        "message": "Dirigerbarhet"
+        "message": "Textens riktning"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Inaktivera infogad förhandsvisning."
@@ -612,7 +612,7 @@
         "message": "Sen"
     },
     "left_to_right_e9b4fd06": {
-        "message": "Vänster till höger"
+        "message": "Vänster-till-höger"
     },
     "link_7262adec": {
         "message": "Länk"
@@ -876,7 +876,7 @@
         "message": "Redigerare för formaterat innehåll"
     },
     "right_to_left_9cfb092a": {
-        "message": "Höger till vänster"
+        "message": "Höger-till-vänster"
     },
     "save_11a80ec3": {
         "message": "Spara"

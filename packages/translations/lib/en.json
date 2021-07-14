@@ -1264,6 +1264,9 @@
   "upload_record_media_e4207d72": {
     "message": "Upload/Record Media"
   },
+  "uploading_19e8a4e7": {
+    "message": "Uploading"
+  },
   "uploading_closed_captions_subtitles_failed_bc093f3": {
     "message": "Uploading closed captions/subtitles failed."
   },
