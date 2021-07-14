@@ -2535,6 +2535,9 @@ CanvasRails::Application.routes.draw do
         get "/#{prefix}/feature_flags/:feature", action: :show
       end
     end
+
+    # LTI Access Tokens (Site Admin only)
+    get 'advantage_token', controller: 'lti/token', action: :advantage_access_token, as: :lti_advantage_token_site_admin
   end
 
   ApiRouteSet.draw(self, '/api/sis') do
