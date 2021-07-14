@@ -856,7 +856,11 @@ RSpec.configure do |config|
   end
 
   def consider_all_requests_local(value)
+    old_value = Rails.application.config.consider_all_requests_local
     Rails.application.config.consider_all_requests_local = value
+    yield
+  ensure
+    Rails.application.config.consider_all_requests_local = old_value
   end
 
   def skip_if_prepended_class_method_stubs_broken

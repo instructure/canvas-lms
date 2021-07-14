@@ -31,12 +31,11 @@ describe "API Authentication", type: :request do
   before :each do
     @client_id = @key.id
     @client_secret = @key.api_key
-    consider_all_requests_local(false)
     enable_forgery_protection
   end
 
-  after do
-    consider_all_requests_local(true)
+  around do |example|
+    consider_all_requests_local(false, &example)
   end
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
