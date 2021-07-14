@@ -98,6 +98,25 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
+      it "does not allow enrolling a student view student" do
+        c2 = Account.default.courses.create!
+        user = c2.student_view_student
+
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id                            => user.id,
+              :type                               => 'StudentEnrollment',
+              :enrollment_state                   => 'active',
+              :course_section_id                  => @section.id,
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
+            }
+          }, {}, expected_status: 400
+          expect(@section.enrollments.count).to eq 0
+      end
+
       it "accepts sis_section_id" do
         @section.update_attribute(:sis_source_id, 'sis_id')
         json = api_call :post, @path, @path_options,
