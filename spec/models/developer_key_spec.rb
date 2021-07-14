@@ -743,7 +743,7 @@ describe DeveloperKey do
       context 'when binding state is "allow"' do
         before do
           site_admin_key.developer_key_account_bindings.create!(
-            account: root_account, workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE
+            account: root_account, workflow_state: 'allow'
           )
         end
 
@@ -753,7 +753,7 @@ describe DeveloperKey do
         end
 
         it 'finds the root account binding when requesting root account' do
-          site_admin_key.developer_key_account_bindings.first.update!(workflow_state: DeveloperKeyAccountBinding::ALLOW_STATE)
+          site_admin_key.developer_key_account_bindings.first.update!(workflow_state: 'allow')
           binding = site_admin_key.account_binding_for(root_account)
           expect(binding.account).to eq root_account
         end

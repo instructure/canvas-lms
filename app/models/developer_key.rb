@@ -290,7 +290,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)

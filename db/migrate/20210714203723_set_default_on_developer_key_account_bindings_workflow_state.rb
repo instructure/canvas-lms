@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +16,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module DataFixup
-  module BackfillDevKeyAccountBindings
-    def self.run
-      DeveloperKey.nondeleted.find_each do |developer_key|
-        find_or_create_default_account_binding(developer_key)
-      end
-    end
+class SetDefaultOnDeveloperKeyAccountBindingsWorkflowState < ActiveRecord::Migration[6.0]
+  tag :predeploy
 
-    def self.find_or_create_default_account_binding(developer_key)
-      return if developer_key.owner_account.developer_key_account_bindings.where(developer_key: developer_key).exists?
+  def up
+    change_column_default :developer_key_account_bindings, :workflow_state, 'off'
+    change_column_null :developer_key_account_bindings, :created_at, false
+    change_column_null :developer_key_account_bindings, :updated_at, false
+  end
 
-      developer_key.owner_account.developer_key_account_bindings.create!(
-        workflow_state: 'on',
-        developer_key: developer_key
-      )
-    end
+  def down
+    change_column_default :developer_key_account_bindings, :workflow_state, nil
+    change_column_null :developer_key_account_bindings, :created_at, true
+    change_column_null :developer_key_account_bindings, :updated_at, true
   end
 end
