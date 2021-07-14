@@ -117,4 +117,27 @@ shared_examples_for 'k5 important dates' do
 
     expect(no_important_dates_image).to be_displayed
   end
+
+  it 'shows an important date for a calendar event' do
+    calendar_event_title = "Electricity Event"
+    start_at = 2.days.from_now(Time.zone.now)
+    calendar_event = create_calendar_event(@subject_course, calendar_event_title, start_at)
+    calendar_event.update!(important_dates: true)
+    get "/"
+
+    expect(important_date_subject).to include_text(@subject_course.name)
+    expect(important_date_icon_exists?('IconCalendarMonth')).to be_truthy
+    expect(important_date_link).to include_text(calendar_event_title)
+    expect(element_value_for_attr(important_date_link,'href')).to include("/calendar?event_id=#{calendar_event.id}&include_contexts=course_#{@subject_course.id}")
+  end
+
+  it 'does not show an important date for a calendar event' do
+    calendar_event_title = "Electricity Event"
+    start_at = 2.days.ago(Time.zone.now)
+    calendar_event = create_calendar_event(@subject_course, calendar_event_title, start_at)
+    calendar_event.update!(important_dates: true)
+    get "/"
+
+    expect(no_important_dates_image).to be_displayed
+  end
 end
