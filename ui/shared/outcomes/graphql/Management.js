@@ -195,8 +195,8 @@ export const CREATE_LEARNING_OUTCOME = gql`
 `
 
 export const DELETE_OUTCOME_LINKS = gql`
-  mutation DeleteOutcomeLinks($ids: [ID!]!) {
-    deleteOutcomeLinks(input: {ids: $ids}) {
+  mutation DeleteOutcomeLinks($input: DeleteOutcomeLinksInput!) {
+    deleteOutcomeLinks(input: $input) {
       deletedOutcomeLinkIds
       errors {
         attribute

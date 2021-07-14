@@ -949,13 +949,14 @@ export const deleteOutcomeMock = ({
   failResponse = false,
   failAlignedContentMutation = false,
   failMutation = false,
-  failMutationNoErrMsg = false
+  failMutationNoErrMsg = false,
+  partialSuccess = false
 } = {}) => {
   const successfulResponse = {
     data: {
       deleteOutcomeLinks: {
-        deletedOutcomeLinkIds: ids[0],
         __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids,
         errors: []
       }
     }
@@ -1020,6 +1021,22 @@ export const deleteOutcomeMock = ({
     }
   }
 
+  const partialSuccessResponse = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids.filter((_, idx) => idx !== 0),
+        errors: [
+          {
+            attribute: ids[0],
+            message: 'Could not find associated outcome in this context',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
   let result = successfulResponse
   if (failResponse) {
     result = failedResponse
@@ -1029,13 +1046,17 @@ export const deleteOutcomeMock = ({
     result = failedMutation
   } else if (failMutationNoErrMsg) {
     result = failedMutationNoErrMsg
+  } else if (partialSuccess) {
+    result = partialSuccessResponse
   }
 
   return {
     request: {
       query: DELETE_OUTCOME_LINKS,
       variables: {
-        ids
+        input: {
+          ids
+        }
       }
     },
     result

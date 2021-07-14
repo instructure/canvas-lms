@@ -114,6 +114,10 @@ const OutcomeManagementPanel = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
   }
+  const onCloseOutcomesRemoveModal = () => {
+    closeOutcomesRemoveModal()
+    clearSelectedOutcomes()
+  }
   const onCloseOutcomeMoveModal = () => {
     closeOutcomeMoveModal()
     setSelectedOutcome(null)
@@ -292,6 +296,7 @@ const OutcomeManagementPanel = () => {
                     outcomes={selectedOutcomeObj}
                     isOpen={isOutcomeRemoveModalOpen}
                     onCloseHandler={onCloseOutcomeRemoveModal}
+                    onCleanupHandler={onCloseOutcomeRemoveModal}
                   />
                   <OutcomeEditModal
                     outcome={selectedOutcome}
@@ -328,6 +333,7 @@ const OutcomeManagementPanel = () => {
                 outcomes={selectedOutcomes}
                 isOpen={isOutcomesRemoveModalOpen}
                 onCloseHandler={closeOutcomesRemoveModal}
+                onCleanupHandler={onCloseOutcomesRemoveModal}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomes}
