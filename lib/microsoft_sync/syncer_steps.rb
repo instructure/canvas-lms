@@ -66,12 +66,47 @@ module MicrosoftSync
       include Errors::GracefulCancelErrorMixin
     end
 
-    class MissingOwners < SyncCanceled; end
+    class MissingOwners < SyncCanceled
+      def self.public_message
+        I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
+          'corresponding to the instructors of the Canvas course could be found on the ' \
+          'Microsoft side.'
+      end
+    end
+
     # Can happen when User disables sync on account-level when jobs are running:
-    class TenantMissingOrSyncDisabled < SyncCanceled; end
-    # Can happen when the Course has more then 25k members's enrolled or 100
-    # owner's enrolled
-    class MaxEnrollmentsReached < SyncCanceled; end
+    class TenantMissingOrSyncDisabled < SyncCanceled
+      def self.public_message
+        I18n.t 'Tenant missing or sync disabled. ' \
+          'Check the Microsoft sync integration settings for the course and account.'
+      end
+    end
+
+    class MultipleEducationClasses < SyncCanceled
+      def self.public_message
+        I18n.t 'Multiple Microsoft education classes already exist for the course.'
+      end
+    end
+
+    class MaxMemberEnrollmentsReached < SyncCanceled
+      def self.public_message
+        I18n.t 'Microsoft 365 allows a maximum of %{max} members in a team.'
+      end
+
+      def public_interpolated_values
+        {max: MAX_ENROLLMENT_MEMBERS}
+      end
+    end
+
+    class MaxOwnerEnrollmentsReached < SyncCanceled
+      def self.public_message
+        I18n.t 'Microsoft 365 allows a maximum of %{max} owners in a team.'
+      end
+
+      def public_interpolated_values
+        {max: MAX_ENROLLMENT_OWNERS}
+      end
+    end
 
     attr_reader :group
     delegate :course, to: :group
@@ -116,8 +151,8 @@ module MicrosoftSync
     # don't want to delete PartialSyncChanges corresponding to enrollments not
     # yet replicated.)
     def step_full_sync_prerequisites(_mem_data, _job_state_data)
-      raise_max_enrollment_members_reached if max_enrollment_members_reached?
-      raise_max_enrollment_owners_reached if max_enrollment_owners_reached?
+      raise MaxMemberEnrollmentsReached if max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if max_enrollment_owners_reached?
 
       PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
 
@@ -133,10 +168,7 @@ module MicrosoftSync
         return StateMachineJob::NextStep.new(:step_ensure_enrollments_user_mappings_filled)
       end
 
-      if remote_ids.length > 1
-        raise MicrosoftSync::Errors::InvalidRemoteState, \
-              "Multiple Microsoft education classes exist for the course."
-      end
+      raise MultipleEducationClasses if remote_ids.length > 1
 
       # Create a group if needed. If there is already a group but we do not
       # have it in the Group record, use it but first update it with course
@@ -231,14 +263,10 @@ module MicrosoftSync
     def step_execute_diff(diff, _job_state_data)
       # TODO: If there are no instructor enrollments, we actually want to
       # remove the group on the Microsoft side (INTEROP-6672)
-      if diff.local_owners.empty?
-        raise MissingOwners, 'A Microsoft 365 Group must have owners, and no users ' \
-          'corresponding to the instructors of the Canvas course could be found on the ' \
-          'Microsoft side.'
-      end
+      raise MissingOwners if diff.local_owners.empty?
 
-      raise_max_enrollment_members_reached if diff.max_enrollment_members_reached?
-      raise_max_enrollment_owners_reached if diff.max_enrollment_owners_reached?
+      raise MaxMemberEnrollmentsReached if diff.max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if diff.max_enrollment_owners_reached?
 
       execute_diff(diff)
 
@@ -419,16 +447,6 @@ module MicrosoftSync
         .limit(MAX_ENROLLMENT_OWNERS + 1)
         .distinct
         .count > MAX_ENROLLMENT_OWNERS
-    end
-
-    def raise_max_enrollment_members_reached
-      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
-          "#{MAX_ENROLLMENT_MEMBERS} members in a team."
-    end
-
-    def raise_max_enrollment_owners_reached
-      raise MaxEnrollmentsReached, "Microsoft 365 allows a maximum of " \
-          "#{MAX_ENROLLMENT_OWNERS} owners in a team."
     end
   end
 end

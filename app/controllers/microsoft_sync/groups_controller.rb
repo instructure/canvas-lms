@@ -213,6 +213,8 @@ class MicrosoftSync::GroupsController < ApplicationController
     unless Account.site_admin.grants_right?(@current_user, :view_error_reports)
       excludes << :last_error_report_id
     end
-    (grp || group).as_json(include_root: false, except: excludes)
+    json = (grp || group).as_json(include_root: false, except: excludes)
+    json[:last_error] = MicrosoftSync::Errors.deserialize_and_localize(json[:last_error])
+    json
   end
 end

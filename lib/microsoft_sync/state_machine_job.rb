@@ -311,7 +311,7 @@ module MicrosoftSync
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.user_facing_message(error)
+      error_msg = MicrosoftSync::Errors.serialize(error)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id

@@ -20,7 +20,7 @@
 
 #
 # Is responsible for finding the the user's ULUVs (user lookup values -- the value
-# we use to look up a Micrososft user by) according to the
+# we use to look up a Microsoft user by) according to the
 # microsoft_sync_login_attribute in the Account settings
 #
 module MicrosoftSync

@@ -294,7 +294,7 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
             expect(state_record.last_error).to \
-              eq(Errors.user_facing_message(Errors::PublicError.new('foo')))
+              eq(Errors.serialize(Errors::PublicError.new('foo')))
           end
 
           it "doesn't run the stash block on the last failure" do
@@ -344,7 +344,7 @@ module MicrosoftSync
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
             expect(state_record.last_error).to \
-              eq(Errors.user_facing_message(Errors::PublicError.new('foo')))
+              eq(Errors.serialize(Errors::PublicError.new('foo')))
           end
 
           context 'when delay is an array of integers' do
@@ -505,7 +505,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
-            expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error))
             expect(steps_object.steps_run.last).to eq([:after_failure])
           end
 
@@ -545,7 +545,7 @@ module MicrosoftSync
 
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq('errored')
-            expect(state_record.last_error).to eq(Errors.user_facing_message(error))
+            expect(state_record.last_error).to eq(Errors.serialize(error))
           end
 
           it 'increments a "canceled" statsd metric' do

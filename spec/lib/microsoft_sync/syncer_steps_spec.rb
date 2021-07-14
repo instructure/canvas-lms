@@ -174,20 +174,23 @@ describe MicrosoftSync::SyncerSteps do
 
   shared_examples_for 'max of members enrollment reached' do |max_members|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to raise_error do |error|
-        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_members || 25000} members in a team."
+      expect { subject }.to \
+        raise_error(MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached) do |err|
+        expect(err).to be_a_microsoft_sync_graceful_cancel_error(
+          "Microsoft 365 allows a maximum of #{(max_members || 25000).to_s(:delimited)} " \
+          'members in a team.'
+        )
       end
     end
   end
 
   shared_examples_for 'max of owners enrollment reached' do |max_owners|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to raise_error do |error|
-        expect(error).to be_a(MicrosoftSync::SyncerSteps::MaxEnrollmentsReached)
-        expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-        expect(error.public_message).to eq "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+      expect { subject }.to \
+        raise_error(MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached) do |error|
+        expect(error).to be_a_microsoft_sync_graceful_cancel_error(
+          "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+        )
       end
     end
   end
@@ -286,21 +289,24 @@ describe MicrosoftSync::SyncerSteps do
       context 'when there is more than one remote MS group for the course' do
         let(:education_class_ids) { [group.ms_group_id || 'someid', 'newid3'] }
 
-        it 'raises an InvalidRemoteState error' do
-          expect { subject }.to raise_error(
-            MicrosoftSync::Errors::InvalidRemoteState,
-            'Multiple Microsoft education classes exist for the course.'
-          )
+        it 'raises a descriptive Graceful Cancel Error' do
+          expect { subject }.to raise_error(described_class::MultipleEducationClasses) do |e|
+            expect(e).to be_a_microsoft_sync_graceful_cancel_error(
+              'Multiple Microsoft education classes already exist for the course.'
+            )
+          end
         end
       end
 
       shared_examples_for 'missing the correct account settings' do
-        it 'raises a graceful cleanup error with a end-user-friendly name' do
+        it 'raises a graceful cleanup error with a end-user-friendly message' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
-          expect { subject }.to raise_error do |e|
-            expect(e).to be_a(described_class::TenantMissingOrSyncDisabled)
-            expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
+          expect { subject }.to raise_error(described_class::TenantMissingOrSyncDisabled) do |e|
+            expect(e).to be_a_microsoft_sync_graceful_cancel_error(
+              'Tenant missing or sync disabled. ' \
+              'Check the Microsoft sync integration settings for the course and account.'
+            )
           end
         end
       end
@@ -632,12 +638,10 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no local owners (course teacher enrollments)' do
       it 'raises a graceful exit error informing the user' do
         expect(diff).to receive(:local_owners).and_return Set.new
-        expect { subject }.to raise_error do |error|
-          expect(error).to be_a(MicrosoftSync::Errors::PublicError)
-          expect(error.public_message).to match(
+        expect { subject }.to raise_error(described_class::MissingOwners) do |error|
+          expect(error).to be_a_microsoft_sync_graceful_cancel_error(
             /no users corresponding to the instructors of the Canvas course could be found/
           )
-          expect(error).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
         end
       end
     end
