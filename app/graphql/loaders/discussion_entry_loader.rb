@@ -19,12 +19,13 @@
 #
 
 class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
-  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false)
+  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil)
     @current_user = current_user
     @search_term = search_term
     @sort_order = sort_order
     @filter = filter
     @root_entries = root_entries
+    @relative_entry_id = relative_entry_id
   end
 
   def perform(objects)
@@ -36,6 +37,12 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         scope = scope.where.not(:workflow_state => 'deleted')
         scope = scope.joins(:user).where("message ILIKE '#{UserSearch.like_string_for(@search_term)}'")
           .or(scope.joins(:user).where("users.name ILIKE '#{UserSearch.like_string_for(@search_term)}'"))
+      end
+
+      if @relative_entry_id
+        relative_entry = scope.find(@relative_entry_id)
+        condition = @sort_order == :desc ? ">=" : "<"
+        scope = scope.where("created_at #{condition}?", relative_entry.created_at)
       end
 
       scope = scope.joins(:discussion_entry_participants).where(discussion_entry_participants: {user_id: @current_user, workflow_state: 'unread'}) if @filter == 'unread'
