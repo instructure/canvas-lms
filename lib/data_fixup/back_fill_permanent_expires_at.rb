@@ -20,7 +20,7 @@ module DataFixup
   module BackFillPermanentExpiresAt
     class << self
       def run
-        dks = DeveloperKey.where(auto_expire_tokens: false).find_by(id: AccessToken.distinct_values(:developer_key_id))
+        dks = DeveloperKey.where(auto_expire_tokens: false).where(id: AccessToken.distinct_values(:developer_key_id))
         AccessToken.find_ids_in_batches do |batch|
           AccessToken.where(id: batch, developer_key_id: dks.map(&:id) + [nil], permanent_expires_at: nil)
             .where.not(expires_at: nil)
