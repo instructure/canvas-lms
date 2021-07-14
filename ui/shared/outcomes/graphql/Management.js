@@ -86,21 +86,18 @@ export const FIND_GROUP_OUTCOMES = gql`
         description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
           }
           edges {
-            canUnlink
             id
             node {
               ... on LearningOutcome {
                 _id
                 description
                 title
-                displayName
                 isImported(
                   targetContextType: $outcomesContextType
                   targetContextId: $outcomesContextId
