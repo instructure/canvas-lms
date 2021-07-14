@@ -157,7 +157,7 @@ export const K5Dashboard = ({
   const useImportantDatesTray = responsiveSize !== 'large'
 
   useEffect(() => {
-    if (!cards && [TAB_IDS.HOMEROOM, TAB_IDS.SCHEDULE, TAB_IDS.RESOURCES].includes(currentTab)) {
+    if (!cards) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
         const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
         setCards(activeCards)
@@ -169,7 +169,7 @@ export const K5Dashboard = ({
         }
       })
     }
-  }, [cards, currentTab])
+  }, [cards])
 
   useFetchApi({
     path: '/api/v1/announcements',

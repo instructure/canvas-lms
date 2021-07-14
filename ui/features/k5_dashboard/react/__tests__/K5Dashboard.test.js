@@ -740,5 +740,10 @@ describe('K-5 Dashboard', () => {
       expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_1')
       expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_3')
     })
+
+    it('loads important dates on the grades tab', async () => {
+      const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
+      await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+    })
   })
 })
