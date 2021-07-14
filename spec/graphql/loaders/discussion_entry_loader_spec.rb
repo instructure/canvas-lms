@@ -92,6 +92,17 @@ describe Loaders::DiscussionEntryLoader do
         }
       end
     end
+
+    it 'that are not deleted' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(
+          current_user: @teacher,
+          search_term: 'goodbye'
+        ).load(@discussion).then { |discussion_entries|
+          expect(discussion_entries).to match []
+        }
+      end
+    end
   end
 
   context 'allow fitering discussion entries' do

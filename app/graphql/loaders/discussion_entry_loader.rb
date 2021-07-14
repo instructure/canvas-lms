@@ -32,7 +32,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       scope = scope_for(object)
       scope = scope.reorder("created_at #{@sort_order}")
       scope = scope.where(parent_id: nil) if @root_entries
-      if @search_term
+      if @search_term.present?
+        scope = scope.where.not(:workflow_state => 'deleted')
         scope = scope.joins(:user).where("message ILIKE '#{UserSearch.like_string_for(@search_term)}'")
           .or(scope.joins(:user).where("users.name ILIKE '#{UserSearch.like_string_for(@search_term)}'"))
       end
