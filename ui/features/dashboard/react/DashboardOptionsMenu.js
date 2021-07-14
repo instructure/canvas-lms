@@ -100,7 +100,7 @@ export default class DashboardOptionsMenu extends React.Component {
           )}
           <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
           {this.props.canEnableElementaryDashboard && (
-            <Menu.Item value="elementary">{I18n.t('Elementary View')}</Menu.Item>
+            <Menu.Item value="elementary">{I18n.t('Homeroom View')}</Menu.Item>
           )}
         </Menu.Group>
         {cardView && <Menu.Separator />}
