@@ -46,6 +46,7 @@ const discussionTopicMock = {
     },
     message: '<p> This is the Discussion Topic. </p>',
     postedAt: '2021-04-05T13:40:50Z',
+    updatedAt: '2021-05-07T13:40:50Z',
     subscribed: true,
     published: true,
     canUnpublish: true,
@@ -535,6 +536,22 @@ describe('DiscussionTopicContainer', () => {
     const container = setup(props)
     const pillContainer = container.queryAllByTestId('pill-Author')
     expect(pillContainer).toEqual([])
+  })
+
+  it('should render editedBy if editor is different from author', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: {
+          id: 'vfx5000',
+          _id: '99',
+          name: 'Eddy Tor',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    }
+    const container = setup(props)
+    const editorText = container.getByText(`, edited by Eddy Tor Apr 22 6:41pm`)
+    expect(editorText).toBeInTheDocument()
   })
 
   describe('Peer Reviews', () => {

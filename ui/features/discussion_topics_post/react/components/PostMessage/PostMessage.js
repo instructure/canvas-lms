@@ -105,10 +105,18 @@ export function PostMessage({...props}) {
               {props.timingDisplay && (
                 <Flex.Item shouldShrink padding="0 0 0 small">
                   <View display="inline-flex" padding="none small none none">
-                    <Text color="secondary" size="small">
+                    <Text color="primary" size="small">
                       {props.timingDisplay}
                     </Text>
-                    <Text color="secondary" size="small">
+                    <Text color="primary" size="small">
+                      {!!props.editedTimingDisplay &&
+                        !!props.editorName &&
+                        I18n.t(', edited by %{editorName} %{editedTimingDisplay}', {
+                          editorName: props.editorName,
+                          editedTimingDisplay: props.editedTimingDisplay
+                        })}
+                    </Text>
+                    <Text color="primary" size="small">
                       {!!props.lastReplyAtDisplayText &&
                         I18n.t(', last reply %{lastReplyAtDisplayText}', {
                           lastReplyAtDisplayText: props.lastReplyAtDisplayText
@@ -177,6 +185,10 @@ PostMessage.propTypes = {
    */
   avatarUrl: PropTypes.string,
   /**
+   * Name of person who last edited
+   */
+  editorName: PropTypes.string,
+  /**
    * Children to be directly rendered below the PostMessage
    */
   children: PropTypes.node,
@@ -184,6 +196,13 @@ PostMessage.propTypes = {
    * Last Reply Date if there are discussion replies
    */
   lastReplyAtDisplayText: PropTypes.string,
+  /**
+   * Denotes time of last edit.
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
+   */
+  editedTimingDisplay: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a

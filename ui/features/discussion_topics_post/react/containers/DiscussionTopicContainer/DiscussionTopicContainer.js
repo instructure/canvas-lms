@@ -57,11 +57,14 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const discussionTopicData = {
     _id: props.discussionTopic._id,
     authorName: props.discussionTopic?.author?.name || '',
-    authorId: props.discussionTopic?.author?.id,
+    authorId: props.discussionTopic?.author?._id,
+    editorName: props.discussionTopic?.editor?.name,
+    editorId: props.discussionTopic?.editor?._id,
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
     message: props.discussionTopic?.message || '',
     permissions: props.discussionTopic?.permissions || {},
     postedAt: DateHelper.formatDatetimeForDiscussions(props.discussionTopic?.postedAt),
+    updatedAt: DateHelper.formatDatetimeForDiscussions(props.discussionTopic?.updatedAt),
     published: props.discussionTopic?.published || false,
     subscribed: props.discussionTopic?.subscribed || false,
     title: props.discussionTopic?.title || '',
@@ -79,6 +82,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   // TODO: Change this to the new canGrade permission.
   const hasAuthor = !!props.discussionTopic?.author
+  const showEditedBy =
+    !!discussionTopicData.editorId && discussionTopicData.editorId !== discussionTopicData.authorId
   const canReply = discussionTopicData?.permissions?.reply
   const canCloseForComments =
     discussionTopicData?.permissions?.closeForComments && !props.discussionTopic?.rootTopic
@@ -352,6 +357,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             hasAuthor,
                             discussionTopicData.authorRoles
                           )}
+                          editorName={showEditedBy ? discussionTopicData.editorName : null}
+                          editedTimingDisplay={showEditedBy ? discussionTopicData.updatedAt : null}
                           attachmentDisplayName={discussionTopicData.attachmentDisplayName}
                           attachmentUrl={discussionTopicData.attachmentUrl}
                           postUtilities={
