@@ -1417,8 +1417,8 @@ sv:
         find_button: Sök
         label_for_course_or_group_id: "ID:"
         manual_quotas_title: "Manuellt inställningsbara kvoter"
-        megabytes: megabytes
-        megabytes_tooltip: megabytes
+        megabytes: megabyte
+        megabytes_tooltip: megabyte
         placeholder_course_or_group_id: "Ange ID..."
         select_type_courses: Kurs-ID
         select_type_groups: Grupp-ID
@@ -1458,8 +1458,8 @@ sv:
         default_course_storage_quota: Kurskvot
         default_group_storage_quota: Gruppkvot
         default_user_storage_quota: Användarkvot
-        megabytes: megabytes
-        megabytes_tooltip: megabytes
+        megabytes: megabyte
+        megabytes_tooltip: megabyte
         update_button: Uppdatera
       report_last_run_never: Aldrig
       report_running: "Rapporten pågår. *Du kommer att få ett e-postmeddelande när den är färdig.*"
@@ -3163,7 +3163,7 @@ sv:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Vill du göra detta? Det kan inte ångras och kommer att skriva över omdömen i bedömningsöversikten."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Är du säker på att du vill avaktivera denna användaren? De kommer inte kunna delta i kursen när de är inaktiva."
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Är du säker på att du vill ta bort användaren permanent från ALLA konton"
-  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Är du säker på att du vill offentliggör omdömen för den här uppgiften till studenterna?"
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Är du säker på att du vill publicera omdömen för den här uppgiften till studenterna?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Vill du fortsätta? De ändringar du gjort kommer inte att sparas."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Är du säker på att du vill publicera den här kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Är du säker på att du vill ta bort den här betygsperioden?"
@@ -3532,7 +3532,7 @@ sv:
       external_tool_type: "Externt verktyg"
       more: "Fler alternativ"
       multiple_due_dates: "Flera inlämningsdatum"
-      not_graded_type: "Ej bedömda"
+      not_graded_type: "Ej bedömd"
       quiz_type: Quiz
       save: Spara
       saving: "Sparar ..."
@@ -4139,7 +4139,7 @@ sv:
   at_791460b3: vid
   at_least_one_scope_must_be_selected_97d6fce9: "Minst en omfattning måste väljas."
   at_least_one_section_must_be_selected_to_hide_grad_f88c946f: "Minst en sektion måste väljas för att dölja omdömen efter sektion."
-  at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Minst en sektion måste väljas för att offentliggör omdömen efter sektion."
+  at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Minst en sektion måste väljas för att publicera omdömen efter sektion."
   at_least_one_term_must_be_attached_24fd2bf5: "Minst en inskrivningstermin måste vara bifogad"
   at_the_bottom_a109f5c8: "Längs ner"
   at_the_bottom_a6a5f0fe: "Längst ned"
@@ -4349,7 +4349,7 @@ sv:
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Tillämpa automatisk omdöme för inlämningar som saknas"
   automatically_dff02416: Automatiskt
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Inaktiverar Publicera till SIS automatiskt för uppgifter när omömesperioden stängs"
-  automatically_post_grades_29a7eff5: "Offentliggör omdömen automatiskt"
+  automatically_post_grades_29a7eff5: "Publicera omdömen automatiskt"
   automatically_show_closed_captions_in_the_user_s_c_f290a22f: |-
       Visa automatiskt undertexter på användarens aktuella
       språk (om tillgängligt) vid uppspelning av Canvas-mediefiler.
@@ -5159,7 +5159,7 @@ sv:
   can_destroy_external_tools_cdb0e734: "Kan förstöra externa verktyg."
   can_destroy_subscription_to_data_service_data_b8dfca27: "Kan förstöra prenumeration på data från datatjänster."
   can_edit_this_page_role_selection_6ccec3c7: "Det går att redigera den här sidans rollval"
-  can_interact_with_users_in_their_section_only_48cb8c43: "Kan endast integrera med användare i sin sektion"
+  can_interact_with_users_in_their_section_only_48cb8c43: "Kan endast interagera med användare i sin sektion"
   can_list_categorized_event_types_52596f7: "Kan lista kategoriserade händelsetyper."
   can_list_external_tools_9132ad0f: "Kan lista externa verktyg."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan lista prenumeration på data från datatjänster."
@@ -5187,7 +5187,7 @@ sv:
   can_view_submission_data_for_assignments_associate_dd06f583: "Det går att visa inlämningsdata för uppgifter som är associerade till verktyget."
   canada_1_921df67a: "Kanada (+1)"
   canada_aec587fa: Kanada
-  cancel_attempt_attempt_aab8c2a9: "Avbryt försöket %{attempt}"
+  cancel_attempt_attempt_aab8c2a9: "Avbryt försök %{attempt}"
   cancel_caeb1e68: Avbryt
   cancel_custom_link_creation_39ec70bd: "Avbryt skapande av anpassad länk"
   cancel_duplicating_original_assignment_name_e974c534: "Avbryt duplicering av \"%{original_assignment_name}\""
@@ -7827,7 +7827,7 @@ sv:
           cant_delete: "Du kan inte radera sektioner med registrerade användare"
           delete_section: "Radera sektion"
           edit_section: "Redigera sektionen"
-      megabytes: megabytes
+      megabytes: megabyte
       move_module: 
         place: Plats
       move_nav_item: 
@@ -9106,7 +9106,7 @@ sv:
       topic_subscribe_tooltip: "Du har avslutat prenumerationen och får inga meddelanden om nya kommentarer"
       topic_subscribed_tooltip: "Du prenumererar och meddelas om nya kommentarer"
       topic_time_locked: "Det här ämnet är låst fram till %{time}"
-      topic_unsubscribe: Prenumererad
+      topic_unsubscribe: Prenumererar
       unlock_topic: "Öppna för kommentarer"
       unread: Oläst
     sub_entry: 
@@ -11786,7 +11786,7 @@ sv:
       \x20       "
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
       \x20           Omdömen döljs som standard. Omdömen som redan har publicerats forsätter att vara synliga.\n\
-      \x20           Välj när du ska offentliggör omdömen för uppgiften via kolumnen i bedömningsöversikten.\n\
+      \x20           Välj när du ska publicera omdömen för uppgiften via kolumnen i bedömningsöversikten.\n\
       \x20         "
   grades_will_be_made_visible_to_all_students_1cc4d67e: "Omdömen kan ses av alla studenter"
   grades_will_be_made_visible_to_students_with_grade_d83028d5: "Omdömen kan ses av alla studenter med bedömda inlämningar"
@@ -11894,7 +11894,7 @@ sv:
   grading_cell: 
     grade_complete: Färdig
     grade_incomplete: "Ej fullständig"
-    grade_ungraded: "Ej bedömda"
+    grade_ungraded: "Ej bedömd"
     out_of: "(utav %{points})"
     out_of_nil: "Inga möjliga poäng"
     out_of_with_score: "(%{score} utav %{points})"
@@ -12610,7 +12610,7 @@ sv:
   hide_courses_without_students_fc6fc7a0: "Dölj kurser utan studenter"
   hide_details_df9ef4a2: "Dölj detaljer"
   hide_e057ff36: Dölj
-  hide_grades_585e63b4: "Dölja omdömen"
+  hide_grades_585e63b4: "Dölj omdömen"
   hide_grades_5ff26682: "Dölj omdömen"
   hide_grades_tray_5ed267fe: "Dölj omdömesfacket"
   hide_groups_navigation_menu_62e8b3d0: "Dölj grupp-navigeringsmeny"
@@ -12627,7 +12627,7 @@ sv:
   hide_sub_accounts_for_account_name_a6de98bd: "Göm underkonto för %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Dölj knappen Importera lärandemål baserat på användarbehörigheter"
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Dölj vissa studenter och sektioner i LMGB om läraren endast har åtkomst till en viss sektion"
-  hiding_grades_82691e44: "Dölja omdömen"
+  hiding_grades_82691e44: "Dölj omdömen"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Det är inte tillåtet att dölja omdömen eftersom omdömen inte har släppts for den här uppgiften."
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Om omdömen döljs uppdateras din webbläsare. Detta kan ta en stund"
   high_b5cbd048: Hög
@@ -13646,7 +13646,7 @@ sv:
   latvian_2bbb6aab: Lettiska
   launch_external_tool_672c0409: "Starta externt verktyg"
   launch_registration_tool_38d4781: "Starta registreringsverktyget"
-  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Starta SpeedGrader Filtrerad enligt studentgrupp"
+  launch_speedgrader_filtered_by_student_group_8bd9b5c7: "Starta SpeedGrader filtrerad efter studentgrupp"
   launch_url_e150bd41: "Starta URL"
   layouts: 
     application: 
@@ -13837,7 +13837,7 @@ sv:
   limit_students_to_attend_input_value_slot_s_9a5bf576: "Begränsa antalet tider som studenter kan delta i till %{input_value}. "
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Begränsa denna tid till %{input_type_number_name_max_parti} grupper."
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "Begränsa denna tid till %{input_type_number_name_max_parti} användare."
-  limited_322546c5: Begränsad
+  limited_322546c5: Begränsat
   line_items_828f62cc: Radobjekt
   link_7262adec: Länk
   link_color_55f8b835: Länkfärg
@@ -14276,7 +14276,7 @@ sv:
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "Manuella synkroniseringar finns tillgängliga var %{coolDown} minut. Vänta %{minutesRemaining} minuter innan du synkroniserar igen."
   manually_9de23e1f: Manuellt
   manually_mark_posts_as_read_afa5d035: "Markera inlägg som lästa manuellt"
-  manually_post_grades_18248306: "Offentliggör omdömen manuellt"
+  manually_post_grades_18248306: "Publicera omdömen manuellt"
   maori_new_zealand_5380a95f: "Māori (Nya Zeeland)"
   march_2020_responsiveness_f810a65b: "Genomförda åtgärder under mars 2020"
   mark_all_as_read_8f3bdf57: "Markera alla som lästa"
@@ -16962,7 +16962,7 @@ sv:
   nickname_7df95b09: "Smeknamn:"
   no_74e9b590: nej
   no_additional_details_were_added_for_this_assignme_547c0de7: "Ingen ytterligare information lades till i den här uppgiften."
-  no_alignments_are_available_for_this_outcome_7f8346f9: "Det finns inga justeringar tillgängliga för det här lärandemålet."
+  no_alignments_are_available_for_this_outcome_7f8346f9: "Det här lärandemålet är ännu inte kopplat till någon uppgift."
   no_allowed_domains_b6633d12: "Inga tillåtna domäner"
   no_announcements_280df147: "Inga anslag"
   no_announcements_to_display_fbf9ed1e: "Inga meddelanden att visa"
@@ -18759,10 +18759,10 @@ sv:
   post_comment_a5a430a6: "Lämna kommentar"
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Att lämna betyg på SIS är avaktiverat. Klicka för att aktivera."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Att lämna in betyg på SIS är aktiverat. Klicka för att avaktivera."
-  post_grades_39c52870: "Offentliggör omdömen"
-  post_grades_3e692d46: "Offentliggör omdömen"
+  post_grades_39c52870: "Publicera omdömen"
+  post_grades_3e692d46: "Publicera omdömen"
   post_grades_description: |-
-      I offentliggör omdöme kan lärare offentliggör omdömen till aktiverade SIS-system: Powerschool,
+      I offentliggör omdöme kan lärare publicera omdömen till aktiverade SIS-system: Powerschool,
       Aspire (SIS2000), JMC och alla övriga SIF-aktiverade SIS:er som accepterar SIF-elementen GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   post_grades_to_name_e0554f64: "Skicka betyg till %{name}"
@@ -18781,7 +18781,7 @@ sv:
   posted_on_e1010e1e: "Publicerad den:"
   posted_to_student_861beec9: "Offentliggjord för studenten"
   posting_grades_cd7cd758: "Publicerar omdömen"
-  posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Det är inte tillåtet att offentliggör omdömen eftersom omdömen inte har släppts for den här uppgiften."
+  posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Det är inte tillåtet att publicera omdömen eftersom omdömen inte har släppts for den här uppgiften."
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Genom att lägga ut omdömen uppdateras din webbläsare. Detta kan ta en stund."
   posting_to_students_eaa57964: "Publicerar till studenter"
   powerschool_a30f0bfc: PowerSchool
@@ -20643,7 +20643,7 @@ sv:
         unfinished_quiz: "Du är på väg att lämna en ofärdig quiz.  Vill du fortsätta ändå?"
         unseen_questions: 
           one: "Det finns 1 fråga du inte har sett än.  Lämna in ändå?"
-          other: "Det finns %{count} frågor som du inte har sätt än.  Lämna in ändå?"
+          other: "Det finns %{count} frågor som du inte har sett än.  Lämna in ändå?"
       days_count: 
         one: "1 dag"
         other: "%{count} dagar"
@@ -21067,7 +21067,7 @@ sv:
   released_by_mastery_path_b87fcdf5: "Frisläppt av huvudsökväg"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Släppt av måluppfyllelseväg: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Släppt av målväg: %{path}"
-  releasing_grades_31a57dde: "Offentliggör omdömen"
+  releasing_grades_31a57dde: "Publicera omdömen"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Läs in sidan igen eller navigera till en ny sida för att ändringen ska träda i kraft."
   remember_my_choice_for_this_course_5a3b7206: "Kom ihåg mitt val för den här kursen"
   remind_me_next_time_6402eb7d: "Påminn mig nästa gång"
@@ -22469,7 +22469,7 @@ sv:
       remove_scheme: "Ta bort omdömesschema"
       select_another_scheme: "Välj ett annat schema"
       some_standard: "En standard"
-      use_this_standard: "Använd det här bedömningsstandarden"
+      use_this_standard: "Använd den här bedömningsstandarden"
     home_menu: 
       links: 
         courses: Kurser
@@ -23845,7 +23845,7 @@ sv:
   subscribe_4b301fb7: Prenumerera
   subscribe_failed_2eb62de0: "Prenumerationen misslyckades"
   subscribe_to_title_c7d6bbd2: "Prenumerera på %{title}"
-  subscribed_fe74d22a: Prenumererad
+  subscribed_fe74d22a: Prenumererar
   subtitle_ee60ca78: Undertext
   subtitles_could_not_be_imported_from_file_5de6da0b: "Det gick inte att importera undertexter från %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Lycka! Alla användare i den här domänen kommer du se märkningen."
@@ -24375,10 +24375,10 @@ sv:
   there_was_a_problem_marking_submission_comments_as_27c2f5c7: "Det gick inte att markera inlämningskommentarer som lästa"
   there_was_a_problem_marking_submission_comments_as_d4ba6711: "Det gick inte att markera inlämningskommentarer som lästa."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "Det gick inte att åsidosätta bedömningen."
-  there_was_a_problem_posting_assignment_grades_958669e8: "Det gick inte att offentliggör omdömen för uppgifter."
+  there_was_a_problem_posting_assignment_grades_958669e8: "Det gick inte att publicera omdömen för uppgifter."
   there_was_a_problem_posting_the_comment_75d15646: "Det uppstod ett problem vid publicering av kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Det gick inte att publicera omdömet."
-  there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att offentliggör omdömen."
+  there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att publicera omdömen."
   there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Det gick inte att återställa ditt val av quizmotor"
   there_was_a_problem_saving_the_comment_d94cbac9: "Det gick inte att spara kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Det gick inte att spara bedömningen."
@@ -25682,7 +25682,7 @@ sv:
   ungraded_count_possible_points_7571e65e: 
     one: "Ej bedömd, 1 möjligt poäng"
     other: "Ej bedömd, %{count} möjliga poäng"
-  ungraded_ed0c6f98: "Ej bedömda"
+  ungraded_ed0c6f98: "Ej bedömd"
   ungraded_or_excused_60694bd7: "Ej bedömd eller undantagen"
   ungraded_out_of_pointspossible_2d6d81da: "ej bedömda av %{pointsPossible}"
   ungraded_pointspossible_e2f86bd9: "obedömda/%{pointsPossible}"
@@ -26701,7 +26701,7 @@ sv:
             kan du lägga till studenter, lärarassistenter och observatörer i
             din kurs. Du kan även skapa studentgrupper som värdar för gruppuppgifter,
             diskussioner och filer.
-  what_should_the_csv_file_look_like_985a59ac: "Hur böj CSV-filen se ut?"
+  what_should_the_csv_file_look_like_985a59ac: "Hur bör CSV-filen se ut?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Vilka lagringsalternativ har jag i Zoom?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "När du lägger till flera användare, använd ett kommatecken eller en radbrytning för att separera användare."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Om inaktiverad, kan studenter ändå skicka individuella meddelanden till kursen lärare, lärarassistenter och studenter som hör hemma i samma kontonivågrupper."
@@ -27001,7 +27001,7 @@ sv:
   you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: "Du hittar välkomstgenomgången eller andra nya resurser här när du vill."
   you_can_add_important_information_here_that_you_wa_ca04a3f: "Här kan du lägga till viktig information som du vill visa på fliken Resurser."
   you_can_also_manage_access_at_this_time_105a2530: "Du kan även hantera åtkomst vid denna tidpunkt:"
-  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "Du kan börja skicka aviseringar igen genom att klicka på länken Offentliggör omdömen."
+  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "Du kan börja skicka aviseringar igen genom att klicka på länken Publicera omdömen."
   you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "Klicka på den här länken för att ta en titt på andra grupper: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Klicka på den här länken för att ta en titt på gruppen: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Klicka på den här länken för att ta en titt på gruppen: %{link}"
