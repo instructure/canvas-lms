@@ -37,7 +37,7 @@ export const IsolatedParent = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
@@ -58,7 +58,7 @@ export const IsolatedParent = props => {
             props.onToggleRating()
           }
         }}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}

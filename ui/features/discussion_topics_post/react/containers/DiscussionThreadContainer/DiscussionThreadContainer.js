@@ -52,7 +52,7 @@ export const mockThreads = {
   discussionEntry: {
     id: '432',
     author: {
-      name: 'Jeffrey Johnson',
+      displayName: 'Jeffrey Johnson',
       avatarUrl: 'someURL'
     },
     createdAt: '2021-02-08T13:36:05-07:00',
@@ -170,7 +170,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
@@ -192,7 +192,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry.id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={toggleRating}
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={props.discussionEntry.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}

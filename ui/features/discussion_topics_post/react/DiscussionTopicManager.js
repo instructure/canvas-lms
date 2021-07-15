@@ -58,7 +58,7 @@ const getOptimisticResponse = text => {
           id: 'PLACEHOLDER',
           _id: ENV.current_user.id,
           avatarUrl: ENV.current_user.avatar_image_url,
-          name: ENV.current_user.display_name,
+          displayName: ENV.current_user.display_name,
           courseRoles: [],
           __typename: 'User'
         },

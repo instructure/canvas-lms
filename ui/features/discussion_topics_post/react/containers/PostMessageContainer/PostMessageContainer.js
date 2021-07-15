@@ -31,7 +31,7 @@ export const PostMessageContainer = props => {
 
   const authorId = props.discussionEntry?.author?._id
   const editorId = props.discussionEntry?.editor?._id
-  const editorName = props.discussionEntry?.editor?.name
+  const editorName = props.discussionEntry?.editor?.displayName
   const editedTimingDisplay = DateHelper.formatDatetimeForDiscussions(
     props.discussionEntry.updatedAt
   )
@@ -40,8 +40,8 @@ export const PostMessageContainer = props => {
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
-      ? props.discussionEntry.editor.name
-      : props.discussionEntry.author.name
+      ? props.discussionEntry.editor.displayName
+      : props.discussionEntry.author.displayName
     return (
       <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
         <ThreadingToolbar>{props.threadActions}</ThreadingToolbar>
@@ -50,7 +50,7 @@ export const PostMessageContainer = props => {
   } else {
     return (
       <PostMessage
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
         editorName={wasEdited && editorId !== authorId ? editorName : null}
         editedTimingDisplay={wasEdited ? editedTimingDisplay : null}
         avatarUrl={props.discussionEntry.author.avatarUrl}

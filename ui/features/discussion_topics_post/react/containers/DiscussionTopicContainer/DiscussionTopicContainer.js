@@ -56,9 +56,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   const discussionTopicData = {
     _id: props.discussionTopic._id,
-    authorName: props.discussionTopic?.author?.name || '',
+    authorName: props.discussionTopic?.author?.displayName || '',
     authorId: props.discussionTopic?.author?._id,
-    editorName: props.discussionTopic?.editor?.name,
+    editorName: props.discussionTopic?.editor?.displayName,
     editorId: props.discussionTopic?.editor?._id,
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
     message: props.discussionTopic?.message || '',
@@ -323,7 +323,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
                           props.discussionTopic.assignment.peerReviews?.dueAt
                         )}
-                        revieweeName={assessmentRequest.user.name}
+                        revieweeName={assessmentRequest.user.displayName}
                         reviewLinkUrl={getReviewLinkUrl(
                           ENV.course_id,
                           props.discussionTopic.assignment._id,

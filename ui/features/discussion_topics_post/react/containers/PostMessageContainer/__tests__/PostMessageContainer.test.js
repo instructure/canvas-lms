@@ -41,7 +41,7 @@ describe('PostMessageContainer', () => {
         editor: {
           id: 'vfx5000',
           _id: '99',
-          name: 'Eddy Tor',
+          displayName: 'Eddy Tor',
           avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
         }
       })
@@ -56,7 +56,7 @@ describe('PostMessageContainer', () => {
         editor: {
           id: 'wqe54678',
           _id: '2',
-          name: 'Hank McCoy',
+          displayName: 'Hank McCoy',
           avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
         }
       })

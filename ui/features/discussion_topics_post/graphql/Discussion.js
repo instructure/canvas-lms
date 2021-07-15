@@ -142,8 +142,8 @@ export const Discussion = {
       repliesCount: 56,
       __typename: 'DiscussionEntryCounts'
     },
-    author = User.mock({_id: '1', name: 'Charles Xavier'}),
-    editor = User.mock({_id: '1', name: 'Charles Xavier'}),
+    author = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    editor = User.mock({_id: '1', displayName: 'Charles Xavier'}),
     attachment = Attachment.mock(),
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),

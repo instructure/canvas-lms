@@ -31,7 +31,7 @@ Default.args = {
   discussionTopic: {
     title: 'This is an Example Discussion',
     author: {
-      name: 'Gunnar Gunderson Gunn',
+      displayName: 'Gunnar Gunderson Gunn',
       avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
     message: 'Please introduce yourselves.'
@@ -47,7 +47,7 @@ TeacherViewGraded.args = {
     id: 'VXNlci0x',
     title: 'Graded Teacher View Discussion',
     author: {
-      name: 'Mister Teacher',
+      displayName: 'Mister Teacher',
       avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
     message: '<p> This is the Discussion Topic. It will be graded.</p>',

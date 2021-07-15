@@ -41,7 +41,7 @@ const discussionTopicMock = {
     id: 'VXNlci0x',
     title: 'Discussion Topic One',
     author: {
-      name: 'Chawn Neal',
+      displayName: 'Chawn Neal',
       avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
     message: '<p> This is the Discussion Topic. </p>',
@@ -544,7 +544,7 @@ describe('DiscussionTopicContainer', () => {
         editor: {
           id: 'vfx5000',
           _id: '99',
-          name: 'Eddy Tor',
+          displayName: 'Eddy Tor',
           avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
         }
       })

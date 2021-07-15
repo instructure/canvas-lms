@@ -131,7 +131,7 @@ const IsolatedThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${entry.id}`}
-        authorName={entry.author.name}
+        authorName={entry.author.displayName}
         delimiterKey={`reply-delimiter-${entry.id}`}
         onClick={() => props.onOpenIsolatedView(entry.id, true)}
       />
@@ -143,7 +143,7 @@ const IsolatedThreadContainer = props => {
         key={`like-${entry.id}`}
         delimiterKey={`like-delimiter-${entry.id}`}
         onClick={() => props.onToggleRating(props.discussionEntry)}
-        authorName={entry.author.name}
+        authorName={entry.author.displayName}
         isLiked={entry.rating}
         likeCount={entry.ratingSum || 0}
         interaction={entry.permissions.rate ? 'enabled' : 'disabled'}
