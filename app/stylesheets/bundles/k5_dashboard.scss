@@ -18,12 +18,16 @@
 
 @import "base/environment";
 
-.ic-dashboard-app {
-  margin-top: -($ic-sp * 2);
+// We'll control the padding from react, especially because we want the important dates sidebar
+// to sit flush against the right edge
+.ic-Layout-contentMain {
+  padding: 0;
 }
 
-.ic-notification + .ic-dashboard-app {
-  margin-top: 0;
+// Add some margin to dashboard notifications since we remove the padding around the whole app
+#dashboard > .ic-notification,
+#announcementWrapper > div:not(:empty) {
+  margin: $ic-sp;
 }
 
 // These overrides are only here because the Dashboard cards don't fully use InstUI.
@@ -62,10 +66,4 @@
   height: 100vh;
   overflow: auto;
   overscroll-behavior: contain;
-}
-
-// We'll control the padding from react, especially because we want the important dates sidebar
-// to sit flush against the right edge
-.ic-Layout-contentMain {
-  padding: 0;
 }

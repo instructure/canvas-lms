@@ -31,7 +31,7 @@ jest.mock('@canvas/k5/react/utils')
 const timeZone = 'Europe/Dublin'
 
 const defaultProps = {
-  ...MOCK_TODOS[0],
+  ...MOCK_TODOS[1],
   timeZone
 }
 
@@ -70,7 +70,11 @@ describe('Todo', () => {
     expect(singlePoint.getByText('1 point')).toBeInTheDocument()
   })
 
-  it('renders the due date without the year if it is the current year', () => {
+  it('renders the due date without the year if it is in the current year', () => {
+    moment.mockImplementation(() => ({
+      isSame: () => true,
+      tz: () => null
+    }))
     const currentYear = render(<Todo {...defaultProps} />)
     expect(currentYear.getByText('Jun 22 at 11:59pm')).toBeInTheDocument()
   })
@@ -80,21 +84,48 @@ describe('Todo', () => {
       isSame: () => false,
       tz: () => null
     }))
+    const due_at = '2020-11-19T23:59:59Z'
     const props = {
       ...defaultProps,
-      assignment: {...defaultProps.assignment, due_at: '2020-11-19T23:59:59Z'}
+      assignment: {...defaultProps.assignment, due_at, all_dates: [{base: true, due_at}]}
     }
     const currentYear = render(<Todo {...props} />)
     expect(currentYear.getByText('Nov 19, 2020 11:59pm')).toBeInTheDocument()
   })
 
   it('renders "No due date" if the assignment has no due date', () => {
+    const due_at = null
     const props = {
       ...defaultProps,
-      assignment: {...defaultProps.assignment, due_at: null}
+      assignment: {...defaultProps.assignment, due_at: null, all_dates: [{base: true, due_at}]}
     }
     const currentYear = render(<Todo {...props} />)
     expect(currentYear.getByText('No Due Date')).toBeInTheDocument()
+  })
+
+  it('renders "multiple due dates" if the assignment has more than one due date', () => {
+    moment.mockImplementation(() => ({
+      isSame: () => true,
+      tz: () => null
+    }))
+    const base_due_at = '2021-07-02T23:59:59Z'
+    const all_dates = [
+      {
+        base: true,
+        due_at: base_due_at
+      },
+      {
+        base: false,
+        due_at: '2021-07-09T23:59:59Z'
+      }
+    ]
+    const props = {
+      ...defaultProps,
+      assignment: {...defaultProps.assignment, due_at: base_due_at, all_dates}
+    }
+    const {getByText} = render(<Todo {...props} />)
+    expect(getByText('Jul 2 at 11:59pm')).toBeInTheDocument()
+    expect(getByText('(Multiple Due Dates)')).toBeInTheDocument()
   })
 
   it('displays a badge with the number of submissions that need grading with correct pluralization', () => {

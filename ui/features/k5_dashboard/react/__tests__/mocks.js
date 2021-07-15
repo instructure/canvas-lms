@@ -19,8 +19,35 @@
 export const MOCK_TODOS = [
   {
     assignment: {
+      id: '10',
+      due_at: null,
+      all_dates: [
+        {
+          base: true,
+          due_at: null
+        }
+      ],
+      name: 'Drain a drain',
+      points_possible: 10
+    },
+    context_id: '7',
+    context_type: 'Course',
+    context_name: 'Plumbing',
+    html_url: '/courses/7/gradebook/speed_grader?assignment_id=10',
+    ignore: '/api/v1/users/self/todo/assignment_10/grading?permanent=0',
+    ignore_permanently: '/api/v1/users/self/todo/assignment_10/grading?permanent=1',
+    needs_grading_count: 2
+  },
+  {
+    assignment: {
       id: '11',
       due_at: '2021-06-22T23:59:59Z',
+      all_dates: [
+        {
+          base: true,
+          due_at: '2021-06-22T23:59:59Z'
+        }
+      ],
       name: 'Plant a plant',
       points_possible: 15
     },
@@ -36,6 +63,12 @@ export const MOCK_TODOS = [
     assignment: {
       id: '12',
       due_at: '2021-07-15T23:59:59Z',
+      all_dates: [
+        {
+          base: true,
+          due_at: '2021-07-15T23:59:59Z'
+        }
+      ],
       name: 'Dream a dream',
       points_possible: 5
     },
