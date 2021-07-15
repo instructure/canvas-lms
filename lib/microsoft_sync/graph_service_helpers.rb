@@ -76,8 +76,10 @@ module MicrosoftSync
     # Returns a hash from ULUV -> AAD. Accepts 15 at a time. A ULUV (User
     # LookUp Value) is a value we use to look up users. It is derived from
     # something in Canvas (e.g. a user's email address, username, or SIS ID
-    # -- see UsersUluvsFinder).  We expect the ULUV to correspond to the UPN
-    # (UserPrincipalName) of the Microsoft user.
+    # -- see UsersUluvsFinder).  We expect the ULUV to correspond to the
+    # property of the Microsoft user indicated by the `remote_attribute`
+    # argument: e.g. userPrincipalName (default if nil is passed) or
+    # mailNickname.
     # We then return a hash of ULUV -> AAD object ID. An AAD [Azure Active
     # Directory] object ID, referred to here as just an "aad", is the ID for
     # the user on the Microsoft side, which is what Microsoft references in
@@ -88,7 +90,9 @@ module MicrosoftSync
     # Microsoft. But whatever casing the Microsoft response uses, this function
     # makes sure the keys in the return hash match the case of the ULUVs that
     # were passed in.
-    def users_uluvs_to_aads(uluvs)
+    def users_uluvs_to_aads(remote_attribute, uluvs)
+      remote_attribute ||= 'userPrincipalName'
+
       downcased_uniqued = uluvs.map(&:downcase).uniq
       if downcased_uniqued.length > USERS_ULUVS_TO_AADS_BATCH_SIZE
         raise ArgumentError, "Can't look up #{uluvs.length} ULUVs at once"
@@ -100,23 +104,23 @@ module MicrosoftSync
       result_hash = {}
 
       graph_service.list_users(
-        select: %w[id userPrincipalName],
-        filter: {userPrincipalName: downcased_uniqued}
-      ).each do |result|
-        given_forms = uluvs_downcased_to_given_forms[result['userPrincipalName'].downcase]
+        select: ['id', remote_attribute],
+        filter: {remote_attribute => downcased_uniqued}
+      ).each do |user_object|
+        given_forms = uluvs_downcased_to_given_forms[user_object[remote_attribute].downcase]
         if given_forms
           given_forms.each do |given_form|
-            result_hash[given_form] = result['id']
+            result_hash[given_form] = user_object['id']
           end
         else
-          unexpected << result['userPrincipalName']
+          unexpected << user_object[remote_attribute]
         end
       end
 
       if unexpected.present?
         raise UnexpectedResponseError,
-              "/users returned unexpected ULUV(s) #{unexpected.inspect}, " \
-              "asked for #{downcased_uniqued}"
+              "/users returned users with unexpected #{remote_attribute} values " \
+              "#{unexpected.inspect}, asked for #{downcased_uniqued}"
       end
 
       result_hash

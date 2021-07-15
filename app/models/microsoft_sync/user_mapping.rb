@@ -44,6 +44,13 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   validates_uniqueness_of :user_id, scope: :root_account
   MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
 
+  DEPENDED_ON_ACCOUNT_SETTINGS = %i[
+    microsoft_sync_tenant
+    microsoft_sync_login_attribute
+    microsoft_sync_login_attribute_suffix
+    microsoft_sync_remote_attribute
+  ].freeze
+
   class AccountSettingsChanged < StandardError
     include MicrosoftSync::Errors::GracefulCancelErrorMixin
   end
@@ -108,9 +115,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   private_class_method def self.account_microsoft_sync_settings_changed?(root_account)
     current_settings = Account.where(id: root_account.id).select(:settings).take.settings
-    %i[microsoft_sync_tenant microsoft_sync_login_attribute].any? do |key|
-      root_account.settings[key] != current_settings[key]
-    end
+    DEPENDED_ON_ACCOUNT_SETTINGS.any? { |key| root_account.settings[key] != current_settings[key] }
   end
 
   # Find the enrollments for course which have a UserMapping for the user.

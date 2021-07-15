@@ -184,11 +184,12 @@ module MicrosoftSync
     def ensure_user_mappings(user_ids)
       users_uluvs_finder = MicrosoftSync::UsersUluvsFinder.new(user_ids, group.root_account)
       users_and_uluvs = users_uluvs_finder.call
+      remote_attr = account_settings[:microsoft_sync_remote_attribute]
 
       # If some users in different slices have the same ULUVs, this could end up
       # looking up the same ULUV multiple times; but this should be very rare
       users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
-        uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(slice.map(&:last))
+        uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(remote_attr, slice.map(&:last))
         user_id_to_aad = slice.map{|user_id, uluv| [user_id, uluv_to_aad[uluv]]}.to_h.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
         # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
@@ -381,13 +382,16 @@ module MicrosoftSync
     def tenant
       @tenant ||=
         begin
-          settings = group.root_account.settings
-          enabled = settings[:microsoft_sync_enabled]
-          tenant = settings[:microsoft_sync_tenant]
+          enabled = account_settings[:microsoft_sync_enabled]
+          tenant = account_settings[:microsoft_sync_tenant]
           raise TenantMissingOrSyncDisabled unless enabled && tenant
 
           tenant
         end
+    end
+
+    def account_settings
+      @account_settings ||= group.root_account.settings
     end
 
     def graph_service_helpers
