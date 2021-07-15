@@ -54,7 +54,9 @@ module MicrosoftSync
       # The user can have more than one communication channel/pseudonym, so we're
       # ordering the users_uluvs by position ASC (the highest position is the
       # smallest number) and returning the first uluv found to the related user_id.
-      users_uluvs.uniq(&:first)
+      users_uluvs
+        .uniq(&:first)
+        .map{|user_id, uluv| [user_id, uluv + login_attribute_suffix]}
     end
 
     private
@@ -85,6 +87,10 @@ module MicrosoftSync
       raise InvalidOrMissingLoginAttributeConfig unless enabled && login_attribute
 
       login_attribute
+    end
+
+    def login_attribute_suffix
+      @login_attribute_suffix ||= settings[:microsoft_sync_login_attribute_suffix] || ''
     end
   end
 end

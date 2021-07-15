@@ -189,21 +189,22 @@ describe MicrosoftSync::GraphServiceHelpers do
 
   describe '#users_uluvs_to_aads' do
     let(:requested) { %w[a b c d] }
+    let(:expected_remote_attr) { 'mailNickname' }
 
     before do
       allow(subject.graph_service).to \
         receive(:list_users)
-        .with(select: %w[id userPrincipalName], filter: {userPrincipalName: requested})
+        .with(select: ['id', expected_remote_attr], filter: {expected_remote_attr => requested})
         .and_return([
-          {'id' => '789', 'userPrincipalName' => 'D'},
-          {'id' => '123', 'userPrincipalName' => 'a'},
-          {'id' => '456', 'userPrincipalName' => 'b'},
+          {'id' => '789', expected_remote_attr => 'D'},
+          {'id' => '123', expected_remote_attr => 'a'},
+          {'id' => '456', expected_remote_attr => 'b'},
         ])
     end
 
     context "when the graph service sends a ULUV back that differs in case" do
       it 'maps the response back to case of the ULUV in the input array' do
-        expect(subject.users_uluvs_to_aads(%w[a b c d])).to eq(
+        expect(subject.users_uluvs_to_aads(expected_remote_attr, %w[a b c d])).to eq(
           'a' => '123',
           'b' => '456',
           'd' => '789'
@@ -215,10 +216,11 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:requested) { %w[c d] }
 
       it "raises an error" do
-        expect { subject.users_uluvs_to_aads(%w[c D]) }.to \
+        expect { subject.users_uluvs_to_aads(expected_remote_attr, %w[c D]) }.to \
           raise_error do |err|
           expect(err.message).to eq(
-            '/users returned unexpected ULUV(s) ["a", "b"], asked for ["c", "d"]'
+            '/users returned users with unexpected mailNickname values ["a", "b"], ' \
+            'asked for ["c", "d"]'
           )
           expect(err.public_message).to eq(
             'Unexpected response from Microsoft API. This is likely a bug. Please contact support.'
@@ -230,7 +232,7 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     context 'when given different-case duplicates of the same ULUV' do
       it "only requests one and copies the AAD on all matching ULUVs" do
-        expect(subject.users_uluvs_to_aads(%w[a b c A C D])).to eq(
+        expect(subject.users_uluvs_to_aads(expected_remote_attr, %w[a b c A C D])).to eq(
           'a' => '123',
           'A' => '123',
           'b' => '456',
@@ -241,8 +243,17 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     context 'when passed in more than 15' do
       it 'raises ArgumentError' do
-        expect { subject.users_uluvs_to_aads((1..16).map(&:to_s)) }.to \
+        expect { subject.users_uluvs_to_aads(expected_remote_attr, (1..16).map(&:to_s)) }.to \
           raise_error(ArgumentError, "Can't look up 16 ULUVs at once")
+      end
+    end
+
+    context 'when nil is passed in for remote_attribute' do
+      let(:expected_remote_attr) { 'userPrincipalName' }
+
+      it 'defaults to userPrincipalName' do
+        expect(subject.users_uluvs_to_aads(nil, %w[a b c d])).to \
+          eq('a' => '123', 'b' => '456', 'd' => '789')
       end
     end
   end

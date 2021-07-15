@@ -78,6 +78,7 @@ describe MicrosoftSync::SyncerSteps do
     ra.settings[:microsoft_sync_enabled] = sync_enabled
     ra.settings[:microsoft_sync_tenant] = tenant
     ra.settings[:microsoft_sync_login_attribute] = 'email'
+    ra.settings[:microsoft_sync_remote_attribute] = 'mail'
     ra.save!
 
     allow(MicrosoftSync::GraphServiceHelpers).to \
@@ -398,18 +399,19 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when Microsoft's API returns success" do
       before do
-        allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
+        allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
           raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
-          uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, '-aad')]}.to_h # ULUV "abc@def.com" -> AAD "abc-aad"
+          # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+          uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
         end
       end
 
       it 'creates a mapping for each of the enrollments' do
         expect_next_step(subject, :step_generate_diff)
         expect(mappings.pluck(:user_id, :aad_id).sort).to eq(
-          students.each_with_index.map{|student, n| [student.id, "student#{n}-aad"]}.sort +
-          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-aad"]}.sort
+          students.each_with_index.map{|student, n| [student.id, "student#{n}-mail-aad"]}.sort +
+          teachers.each_with_index.map{|teacher, n| [teacher.id, "teacher#{n}-mail-aad"]}.sort
         )
       end
 
@@ -440,7 +442,7 @@ describe MicrosoftSync::SyncerSteps do
 
         it "doesn't lookup aads for those users" do
           uluvs_looked_up = []
-          expect(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
+          expect(graph_service_helpers).to receive(:users_uluvs_to_aads) do |_remote_attr, uluvs|
             uluvs_looked_up += uluvs
             {}
           end
@@ -804,8 +806,9 @@ describe MicrosoftSync::SyncerSteps do
             root_account: course.root_account, user: students[0], aad_id: 's0-old'
           )
 
-          allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |uluvs|
-            uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, '-aad')]}.to_h # ULUV "abc@def.com" -> AAD "abc-aad"
+          allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
+            # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+            uluvs.map{|uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")]}.to_h
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)
@@ -815,7 +818,7 @@ describe MicrosoftSync::SyncerSteps do
           subject
           # s0 already has a UserMapping. s1 doesn't have a PartialSyncChange.
           expect(graph_service_helpers).to have_received(:users_uluvs_to_aads)
-            .with(contain_exactly('s2@example.com', 't@example.com'))
+            .with(anything, contain_exactly('s2@example.com', 't@example.com'))
         end
 
         it 'builds a partial membership diff' do
@@ -828,8 +831,8 @@ describe MicrosoftSync::SyncerSteps do
           expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
           expect(diff).to have_received(:set_local_member).with(teacher.id, 'TeacherEnrollment')
           expect(diff).to have_received(:set_member_mapping).with(students[0].id, 's0-old')
-          expect(diff).to have_received(:set_member_mapping).with(students[2].id, 's2-aad')
-          expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-aad')
+          expect(diff).to have_received(:set_member_mapping).with(students[2].id, 's2-mail-aad')
+          expect(diff).to have_received(:set_member_mapping).with(teacher.id, 't-mail-aad')
         end
 
         it 'ignores inactive enrollments' do
