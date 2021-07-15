@@ -43,35 +43,35 @@ module MicrosoftSync
     def call
       return [] if user_ids.blank? || root_account.blank?
 
-      case login_attribute
-      when 'email' then find_by_email
-      when 'preferred_username' then find_by_preferred_username
-      when 'sis_user_id' then find_by_sis_user_id
-      else raise InvalidOrMissingLoginAttributeConfig
-      end
+      users_uluvs =
+        case login_attribute
+        when 'email' then find_by_email
+        when 'preferred_username' then find_by_preferred_username
+        when 'sis_user_id' then find_by_sis_user_id
+        else raise InvalidOrMissingLoginAttributeConfig
+        end
+
+      # The user can have more than one communication channel/pseudonym, so we're
+      # ordering the users_uluvs by position ASC (the highest position is the
+      # smallest number) and returning the first uluv found to the related user_id.
+      users_uluvs.uniq(&:first)
     end
 
     private
 
     def find_by_email
-      users_uluvs = CommunicationChannel
+      CommunicationChannel
         .where(user_id: user_ids, path_type: 'email', workflow_state: 'active')
         .order(position: :asc)
         .pluck(:user_id, :path)
-
-      uniq_uluv_by_user_id(users_uluvs)
     end
 
     def find_by_preferred_username
-      users_uluvs = find_active_pseudonyms.pluck(:user_id, :unique_id)
-
-      uniq_uluv_by_user_id(users_uluvs)
+      find_active_pseudonyms.pluck(:user_id, :unique_id)
     end
 
     def find_by_sis_user_id
-      users_uluvs = find_active_pseudonyms.pluck(:user_id, :sis_user_id)
-
-      uniq_uluv_by_user_id(users_uluvs)
+      find_active_pseudonyms.pluck(:user_id, :sis_user_id)
     end
 
     def find_active_pseudonyms
@@ -79,27 +79,12 @@ module MicrosoftSync
     end
 
     def login_attribute
-      @login_attribute ||= begin
-        enabled = settings[:microsoft_sync_enabled]
-        login_attribute = settings[:microsoft_sync_login_attribute]
+      enabled = settings[:microsoft_sync_enabled]
+      login_attribute = settings[:microsoft_sync_login_attribute]
 
-        raise InvalidOrMissingLoginAttributeConfig unless enabled && login_attribute
+      raise InvalidOrMissingLoginAttributeConfig unless enabled && login_attribute
 
-        login_attribute
-      end
-    end
-
-    # The user can have more than one communication channel/pseudonym, so we're
-    # ordering the users_uluvs by position ASC (the highest position is the
-    # smallest number) and returning the first uluv found to the related user_id.
-    def uniq_uluv_by_user_id(users_uluvs)
-      return [] unless users_uluvs
-
-      response = {}
-
-      users_uluvs.each { |user_id, uluv| response[user_id] ||= uluv }
-
-      response.to_a
+      login_attribute
     end
   end
 end
