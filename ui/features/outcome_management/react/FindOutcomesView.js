@@ -49,7 +49,7 @@ const FindOutcomesView = ({
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
 
-  const onSelectOutcomesHandler = useCallback(_id => {
+  const onAddedOutcomeHandler = useCallback(_id => {
     // TODO: OUT-4154
   }, [])
 
@@ -233,8 +233,8 @@ const FindOutcomesView = ({
                   title={title}
                   description={description}
                   isFirst={index === 0}
-                  isChecked={isImported}
-                  onCheckboxHandler={onSelectOutcomesHandler}
+                  isAdded={!!isImported}
+                  onAddClickHandler={onAddedOutcomeHandler}
                 />
               ))}
             </View>

@@ -40,7 +40,8 @@ describe('FindOutcomesView', () => {
           node: {
             _id: '11',
             title: 'Outcome 1',
-            description: 'Outcome 1 description'
+            description: 'Outcome 1 description',
+            isImported: false
           }
         }
       ],
@@ -158,8 +159,8 @@ describe('FindOutcomesView', () => {
 
   it('shows outcome as not added when outcome has not been imnported', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    expect(toggle).not.toBeChecked()
+    const addButton = getAllByText('Add')[0].closest('button')
+    expect(addButton).not.toBeDisabled()
   })
 
   it('shows outcome as added when outcome is already imported', () => {
@@ -182,23 +183,15 @@ describe('FindOutcomesView', () => {
       }
     }
     const {getAllByText} = render(<FindOutcomesView {...defaultProps(importedOutcome)} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    expect(toggle).toBeChecked()
+    const addButton = getAllByText('Added')[0].closest('button')
+    expect(addButton).toBeDisabled()
   })
 
-  it('shows outcome as added when toggle is turned on', () => {
+  it('shows outcome as added when Add button is clicked', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    fireEvent.click(toggle)
-    expect(toggle).toBeChecked()
-  })
-
-  it('shows outcome as removed when toggle is turned off', () => {
-    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
-    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
-    fireEvent.click(toggle)
-    fireEvent.click(toggle)
-    expect(toggle).not.toBeChecked()
+    const addButton = getAllByText('Add')[0].closest('button')
+    fireEvent.click(addButton)
+    expect(addButton).toBeDisabled()
   })
 
   it('disables "Add All Outcomes" button if number of outcomes eq 0', () => {
