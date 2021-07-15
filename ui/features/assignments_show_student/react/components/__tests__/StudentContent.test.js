@@ -206,6 +206,40 @@ describe('Assignment Student Content View', () => {
     })
   })
 
+  describe('when there is an unread comment', () => {
+    const makeMocks = async () => {
+      const variables = {submissionAttempt: 0, submissionId: '1'}
+      const overrides = {
+        Node: {__typename: 'Submission'},
+        SubmissionCommentConnection: {nodes: [{read: false}]}
+      }
+      const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
+      const mocks = [
+        {
+          request: {
+            query: SUBMISSION_COMMENT_QUERY,
+            variables
+          },
+          result
+        }
+      ]
+      return mocks
+    }
+
+    it('opens the feedback panel', async () => {
+      const mocks = await makeMocks()
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1}
+      })
+      const {getByText} = render(
+        <MockedProvider mocks={mocks}>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      await waitFor(() => expect(getByText('Send Comment')).toBeInTheDocument())
+    })
+  })
+
   describe('concluded enrollment notice', () => {
     const concludedMatch = /your enrollment in this course has been concluded/
 
