@@ -35,9 +35,7 @@ describe SisApiController, type: :request do
   describe '#sis_assignments' do
     context 'for an account' do
       before :once do
-        account_model
-        @account.root_account = Account.default
-        @account.save
+        account_model(root_account: Account.default)
         account_admin_user(account: @account, active_all: true)
       end
 

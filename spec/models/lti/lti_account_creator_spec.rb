@@ -38,9 +38,7 @@ describe Lti::LtiAccountCreator do
   end
   let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
   let(:canvas_account) do
-    Account.create!.tap do |account|
-      account.name = 'account_name'
-      account.root_account = root_account
+    root_account.sub_accounts.create!(name: 'account_name').tap do |account|
       allow(account).to receive(:id).and_return(123)
       account.sis_source_id = 'sis_id'
     end

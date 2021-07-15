@@ -1539,9 +1539,23 @@ describe Account do
       account3 = account2.sub_accounts.create!
       account4 = account3.sub_accounts.create!
 
-      expect(account4.account_chain).to eq [account4, account3, account2, account1]
-    end
+      chain = account4.account_chain
+      expect(chain).to eq [account4, account3, account2, account1]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1]
 
+      chain = account4.account_chain(include_site_admin: true)
+      sa = Account.site_admin
+      expect(chain).to eq [account4, account3, account2, account1, sa]
+      # ensure pre-loading worked correctly
+      expect(chain.map { |a| a.association(:parent_account).loaded? }).to eq [true, true, true, true, true]
+      expect(chain.map(&:parent_account)).to eq [account3, account2, account1, nil, nil]
+      expect(chain.map { |a| a.association(:root_account).loaded? }).to eq [true, true, true, false, false]
+      expect(chain.map(&:root_account)).to eq [account1, account1, account1, account1, sa]
+    end
   end
 
   describe "#can_see_admin_tools_tab?" do
@@ -1766,17 +1780,19 @@ describe Account do
       enable_cache do
         account = account_model
 
-        account.default_storage_quota = 10.megabytes
-        account.save!
+        sub1 = account.sub_accounts.create!
+        sub2 = account.sub_accounts.create!
+        sub2.update(default_storage_quota: 10.megabytes)
 
-        to_be_subaccount = Account.create!
+        to_be_subaccount = sub1.sub_accounts.create!
         expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
 
         # should clear caches
-        to_be_subaccount.parent_account = account
-        to_be_subaccount.root_account = account
-        to_be_subaccount.save!
-        expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        Timecop.travel(1.second.from_now) do
+          to_be_subaccount.update(parent_account: sub2)
+          to_be_subaccount = Account.find(to_be_subaccount.id)
+          expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+        end
       end
     end
   end

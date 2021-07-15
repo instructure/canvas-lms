@@ -664,12 +664,7 @@ describe DeveloperKey do
     describe 'after_save' do
       describe 'set_root_account' do
         context 'when account is not root account' do
-          let(:account) {
-            a = account_model
-            a.root_account = Account.create!
-            a.save!
-            a
-          }
+          let(:account) {account_model(root_account: Account.create!) }
 
           it 'sets root account equal to account\'s root account' do
             expect(developer_key_not_saved.root_account).to be_nil

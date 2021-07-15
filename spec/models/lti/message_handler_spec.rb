@@ -250,12 +250,11 @@ module Lti
         end
 
         it 'finds message handlers when tool is installed in account root account' do
-          root_account = Account.create!
-          account.update(root_account: root_account)
+          sub = account.sub_accounts.create!
           mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                                 product_code: jwt_body[:product_code],
                                                 resource_type_code: jwt_body[:resource_type_code],
-                                                context: account)
+                                                context: sub)
           expect(mh).to eq message_handler
         end
       end

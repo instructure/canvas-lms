@@ -333,9 +333,7 @@ module Lti
       end
 
       context 'search account chain' do
-        let(:root_account) {Account.create!}
-
-        before {account.update(root_account: root_account)}
+        let(:root_account) { account.root_account }
 
         it "succeeds if the tool is installed in the current account's root account" do
           tool_proxy.update(context: root_account)

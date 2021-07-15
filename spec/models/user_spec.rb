@@ -125,16 +125,13 @@ describe User do
     expect(@user.associated_accounts.length).to eql(1)
     expect(@user.associated_accounts.first).to eql(account1)
 
-    account2 = account_model
-    account1.parent_account = account2
-    account1.root_account = account2
-    account1.save!
-    @course.reload
+    account2 = account_model(root_account: account1)
+    @course.update(account: account2)
     @user.reload
 
     expect(@user.associated_accounts.length).to eql(2)
-    expect(@user.associated_accounts[0]).to eql(account1)
-    expect(@user.associated_accounts[1]).to eql(account2)
+    expect(@user.associated_accounts[0]).to eql(account2)
+    expect(@user.associated_accounts[1]).to eql(account1)
   end
 
   it "should update account associations when a user is associated to an account just by pseudonym" do
@@ -158,15 +155,6 @@ describe User do
     user.reload
     expect(user.associated_accounts.length).to eql(1)
     expect(user.associated_accounts.first).to eql(account1)
-
-    account1.parent_account = account2
-    account1.root_account = account2
-    account1.save!
-
-    user.reload
-    expect(user.associated_accounts.length).to eql(2)
-    expect(user.associated_accounts[0]).to eql(account1)
-    expect(user.associated_accounts[1]).to eql(account2)
   end
 
   it "should update account associations when a user is associated to an account just by account_users" do

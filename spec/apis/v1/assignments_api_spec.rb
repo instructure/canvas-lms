@@ -2077,11 +2077,9 @@ describe AssignmentsApiController, type: :request do
     context 'LTI 2.x' do
       include_context 'lti2_spec_helper'
 
-      let(:root_account) { Account.create!(name: 'root account') }
+      let(:root_account) { account.root_account }
       let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
-
-      before { account.update(root_account: root_account) }
 
       it "checks for tool installation in entire account chain" do
         user_session teacher

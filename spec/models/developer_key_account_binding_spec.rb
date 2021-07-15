@@ -219,12 +219,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         end
 
         context 'when account is not root account' do
-          let(:account) {
-            a = account_model
-            a.root_account = Account.create!
-            a.save!
-            a
-          }
+          let(:account) { account_model(root_account: Account.create!) }
 
           it 'sets root account equal to account\'s root account' do
             dev_key_binding.account = account

@@ -113,8 +113,7 @@ describe Lti::LtiContextCreator do
 
     describe "for a canvas account" do
       let(:canvas_account) do
-        Account.create!.tap do |account|
-          account.name = 'account name'
+        root_account.sub_accounts.create!(name: 'account name').tap do |account|
           account.root_account = root_account
           allow(account).to receive(:id).and_return(123)
           account.sis_source_id = 'sis_id'

@@ -630,6 +630,14 @@ class Account < ActiveRecord::Base
 
   def root_account
     return self if root_account?
+
+    super
+  end
+
+  def root_account=(value)
+    return if value == self && root_account?
+    raise ArgumentError, "cannot change the root account of a root account" if root_account? && persisted?
+
     super
   end
 
@@ -999,10 +1007,17 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self).freeze
+    @account_chain ||= Account.account_chain(self).tap do |chain|
+      # preload the root account and parent accounts that we also found here
+      ra = chain.find(&:root_account?)
+      chain.each { |a| a.root_account = ra if a.root_account_id == ra.id }
+      chain.each_with_index { |a, idx| a.parent_account = chain[idx + 1] if a.parent_account_id == chain[idx + 1]&.id }
+    end.freeze
+
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
     end
+
     @account_chain
   end
 
