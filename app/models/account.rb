@@ -567,13 +567,26 @@ class Account < ActiveRecord::Base
     keys_to_clear << :default_locale if self.saved_change_to_default_locale?
     if keys_to_clear.any?
       self.shard.activate do
-        delay_if_production.clear_downstream_caches(*keys_to_clear)
+        self.class.connection.after_transaction_commit do
+          delay_if_production(singleton: "Account#clear_downstream_caches/#{global_id}")
+            .clear_downstream_caches(*keys_to_clear, xlog_location: self.class.current_xlog_location)
+        end
       end
     end
   end
 
-  def clear_downstream_caches(*key_types)
+  def clear_downstream_caches(*key_types, xlog_location: nil, is_retry: false)
     self.shard.activate do
+      if xlog_location
+        timeout = Setting.get("account_cache_clear_replication_timeout", "60").to_i.seconds
+        unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+          delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}")
+            .clear_downstream_caches(*keys_to_clear, xlog_location: xlog_location, is_retry: true)
+          # we still clear, but only the first time; after that we just keep waiting
+          return if is_retry
+        end
+      end
+
       Account.clear_cache_keys([self.id] + Account.sub_account_ids_recursive(self.id), *key_types)
     end
   end
