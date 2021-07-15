@@ -120,7 +120,9 @@ describe('CommentsTrayBody', () => {
         mockContext(<CommentContent comments={[]} submission={submission} />)
       )
 
-      expect(queryByText('Send a comment to your instructor about this assignment.')).toBeNull()
+      expect(
+        queryByText("This is where you can leave a comment and view your instructor's feedback.")
+      ).toBeNull()
     })
 
     it('renders a message with image if there are no comments', async () => {
@@ -484,7 +486,9 @@ describe('CommentsTrayBody', () => {
     )
 
     expect(
-      await waitFor(() => getByText('Send a comment to your instructor about this assignment.'))
+      await waitFor(() =>
+        getByText("This is where you can leave a comment and view your instructor's feedback.")
+      )
     ).toBeInTheDocument()
   })
 
