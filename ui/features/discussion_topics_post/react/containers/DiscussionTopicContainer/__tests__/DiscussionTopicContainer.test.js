@@ -554,6 +554,33 @@ describe('DiscussionTopicContainer', () => {
     expect(editorText).toBeInTheDocument()
   })
 
+  it('should render plain edited if author is editor', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: {
+          id: 'abc3244',
+          _id: '1',
+          name: 'Charles Xavier',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    }
+    const container = setup(props)
+    const editorText = container.getByText(`, edited Apr 22 6:41pm`)
+    expect(editorText).toBeInTheDocument()
+  })
+
+  it('should not render edited info if no editor', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: null
+      })
+    }
+    const container = setup(props)
+    const editorText = container.queryByText(`, edited Apr 22 6:41pm`)
+    expect(editorText).toBeNull()
+  })
+
   describe('Peer Reviews', () => {
     it('renders with a due date', () => {
       const props = {discussionTopic: Discussion.mock()}

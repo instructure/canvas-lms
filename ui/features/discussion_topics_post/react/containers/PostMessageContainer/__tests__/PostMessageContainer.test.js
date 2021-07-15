@@ -35,6 +35,46 @@ describe('PostMessageContainer', () => {
     expect(container).toBeTruthy()
   })
 
+  it('should display edited by if editor is different to author', () => {
+    const container = setup(
+      defaultProps({
+        editor: {
+          id: 'vfx5000',
+          _id: '99',
+          name: 'Eddy Tor',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    )
+    const editorText = container.getByText(', edited by Eddy Tor Apr 13 4pm')
+    expect(editorText).toBeInTheDocument()
+  })
+
+  it('should display plain edited if author is editor', () => {
+    const container = setup(
+      defaultProps({
+        editor: {
+          id: 'wqe54678',
+          _id: '2',
+          name: 'Hank McCoy',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    )
+    const editorText = container.getByText(', edited Apr 13 4pm')
+    expect(editorText).toBeInTheDocument()
+  })
+
+  it('should not display edit info when no editor', () => {
+    const container = setup(
+      defaultProps({
+        editor: null
+      })
+    )
+    const editorText = container.queryByText(', edited')
+    expect(editorText).toBeNull()
+  })
+
   it('displays deletion info if delete', () => {
     const {queryByText} = setup(defaultProps({deleted: true}))
     expect(queryByText('Deleted by Hank Mccoy')).toBeTruthy()

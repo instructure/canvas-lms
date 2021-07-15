@@ -82,8 +82,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   // TODO: Change this to the new canGrade permission.
   const hasAuthor = !!props.discussionTopic?.author
-  const showEditedBy =
-    !!discussionTopicData.editorId && discussionTopicData.editorId !== discussionTopicData.authorId
+  const wasEdited =
+    !!discussionTopicData.editorId && discussionTopicData.postedAt !== discussionTopicData.updatedAt
   const canReply = discussionTopicData?.permissions?.reply
   const canCloseForComments =
     discussionTopicData?.permissions?.closeForComments && !props.discussionTopic?.rootTopic
@@ -357,8 +357,13 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             hasAuthor,
                             discussionTopicData.authorRoles
                           )}
-                          editorName={showEditedBy ? discussionTopicData.editorName : null}
-                          editedTimingDisplay={showEditedBy ? discussionTopicData.updatedAt : null}
+                          editorName={
+                            wasEdited &&
+                            discussionTopicData.authorId !== discussionTopicData.editorId
+                              ? discussionTopicData.editorName
+                              : null
+                          }
+                          editedTimingDisplay={wasEdited ? discussionTopicData.updatedAt : null}
                           attachmentDisplayName={discussionTopicData.attachmentDisplayName}
                           attachmentUrl={discussionTopicData.attachmentUrl}
                           postUtilities={

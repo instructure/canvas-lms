@@ -35,6 +35,18 @@ import {SearchContext} from '../../utils/constants'
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
 
+  let editText = null
+  if (props.editedTimingDisplay) {
+    editText = props.editorName
+      ? I18n.t(', edited by %{editorName} %{editedTimingDisplay}', {
+          editorName: props.editorName,
+          editedTimingDisplay: props.editedTimingDisplay
+        })
+      : I18n.t(', edited %{editedTimingDisplay}', {
+          editedTimingDisplay: props.editedTimingDisplay
+        })
+  }
+
   return (
     <Flex padding="0 0 medium 0">
       <Flex.Item align="start">
@@ -109,12 +121,7 @@ export function PostMessage({...props}) {
                       {props.timingDisplay}
                     </Text>
                     <Text color="primary" size="small">
-                      {!!props.editedTimingDisplay &&
-                        !!props.editorName &&
-                        I18n.t(', edited by %{editorName} %{editedTimingDisplay}', {
-                          editorName: props.editorName,
-                          editedTimingDisplay: props.editedTimingDisplay
-                        })}
+                      {editText}
                     </Text>
                     <Text color="primary" size="small">
                       {!!props.lastReplyAtDisplayText &&

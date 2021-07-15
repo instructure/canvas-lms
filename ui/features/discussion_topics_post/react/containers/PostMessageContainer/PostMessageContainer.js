@@ -29,6 +29,15 @@ export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
   const {searchTerm, filter} = useContext(SearchContext)
 
+  const authorId = props.discussionEntry?.author?._id
+  const editorId = props.discussionEntry?.editor?._id
+  const editorName = props.discussionEntry?.editor?.name
+  const editedTimingDisplay = DateHelper.formatDatetimeForDiscussions(
+    props.discussionEntry.updatedAt
+  )
+
+  const wasEdited = editorId && props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
+
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
       ? props.discussionEntry.editor.name
@@ -42,6 +51,8 @@ export const PostMessageContainer = props => {
     return (
       <PostMessage
         authorName={props.discussionEntry.author.name}
+        editorName={wasEdited && editorId !== authorId ? editorName : null}
+        editedTimingDisplay={wasEdited ? editedTimingDisplay : null}
         avatarUrl={props.discussionEntry.author.avatarUrl}
         isIsolatedView={props.isIsolatedView}
         lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
