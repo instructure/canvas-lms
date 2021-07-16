@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
+import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 
 const getOptimisticResponse = text => {
   return {
@@ -88,7 +88,6 @@ const getOptimisticResponse = text => {
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
@@ -113,7 +112,26 @@ const DiscussionTopicManager = props => {
   const [isolatedEntryId, setIsolatedEntryId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
+
+  // Highlight State
+  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [highlightEntryId, setHighlightEntryId] = useState(null)
+
+  useEffect(() => {
+    if (isTopicHighlighted) {
+      setTimeout(() => {
+        setIsTopicHighlighted(false)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [isTopicHighlighted])
+
+  useEffect(() => {
+    if (highlightEntryId) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [highlightEntryId])
 
   const openIsolatedView = (discussionEntryId, withRCE) => {
     setIsolatedEntryId(discussionEntryId)

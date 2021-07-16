@@ -28,6 +28,10 @@ import {graphql} from 'msw'
 import React from 'react'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('../utils/constants', () => ({
+  ...jest.requireActual('../utils/constants'),
+  HIGHLIGHT_TIMEOUT: 0
+}))
 
 describe('DiscussionFullPage', () => {
   const server = mswServer(handlers)
@@ -494,6 +498,26 @@ describe('DiscussionFullPage', () => {
       const groupsMenuButton = await container.findByTestId('groups-menu-btn')
       fireEvent.click(groupsMenuButton)
       await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
+    })
+  })
+
+  describe('highlighting', () => {
+    it('should allow highlighting the discussion topic multiple times', async () => {
+      const container = setup()
+
+      expect(container.queryByTestId('isHighlighted')).toBeNull()
+
+      fireEvent.click(await container.findByTestId('thread-actions-menu'))
+      fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+      // expect the highlight to disapear
+      await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+
+      // should be able to highlight the topic multiple times
+      fireEvent.click(await container.findByTestId('thread-actions-menu'))
+      fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
     })
   })
 })
