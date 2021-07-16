@@ -98,7 +98,7 @@ const OutcomeManagementPanel = () => {
     removeGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
-  const {group, loading, loadMore} = useGroupDetail({
+  const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString
   })
@@ -321,6 +321,7 @@ const OutcomeManagementPanel = () => {
                     isOpen={isOutcomeRemoveModalOpen}
                     onCloseHandler={onCloseOutcomeRemoveModal}
                     onCleanupHandler={onCloseOutcomeRemoveModal}
+                    onRemoveLearningOutcomesHandler={removeLearningOutcomes}
                   />
                   <OutcomeEditModal
                     outcome={selectedOutcome}
@@ -359,6 +360,7 @@ const OutcomeManagementPanel = () => {
                 isOpen={isOutcomesRemoveModalOpen}
                 onCloseHandler={closeOutcomesRemoveModal}
                 onCleanupHandler={onCloseOutcomesRemoveModal}
+                onRemoveLearningOutcomesHandler={removeLearningOutcomes}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomes}

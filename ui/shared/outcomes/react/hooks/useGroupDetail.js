@@ -17,12 +17,13 @@
  */
 
 import {useEffect, useRef} from 'react'
-import {useQuery} from 'react-apollo'
+import {useApolloClient, useQuery} from 'react-apollo'
 import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 import useCanvasContext from './useCanvasContext'
 import I18n from 'i18n!OutcomeManagement'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
+import {uniqWith, isEqual} from 'lodash'
 
 const useAbortController = dependencies => {
   const abortRef = useRef()
@@ -65,17 +66,24 @@ const useGroupDetail = ({
   searchString = useSearchString(searchString)
   const abortController = useAbortController([id, searchString])
   const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
+  const client = useApolloClient()
+  const allVariables = useRef([])
 
   if (searchString) queryVars.searchQuery = searchString
 
   const skip = !id || id === ACCOUNT_FOLDER_ID
+  const variables = {
+    id,
+    outcomeIsImported: loadOutcomesIsImported,
+    ...queryVars
+  }
+
+  if (!skip) {
+    allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
+  }
 
   const {loading, error, data, fetchMore} = useQuery(query, {
-    variables: {
-      id,
-      outcomeIsImported: loadOutcomesIsImported,
-      ...queryVars
-    },
+    variables,
     skip,
     context: {
       fetchOptions: {
@@ -128,11 +136,47 @@ const useGroupDetail = ({
     }
   }
 
+  const removeLearningOutcomes = contentTagIds => {
+    allVariables.current.forEach(v => {
+      const {group: g} = client.readQuery({
+        query,
+        variables: v
+      })
+
+      let removedCount = 0
+
+      const newGroup = {
+        ...g,
+        outcomes: {
+          ...g.outcomes,
+          edges: g.outcomes.edges.filter(contentTag => {
+            if (contentTagIds.includes(contentTag.id)) {
+              removedCount += 1
+              return false
+            }
+            return true
+          })
+        }
+      }
+
+      newGroup.outcomesCount -= removedCount
+
+      client.writeQuery({
+        query,
+        variables: v,
+        data: {
+          group: newGroup
+        }
+      })
+    })
+  }
+
   return {
     loading,
     group,
     error,
-    loadMore
+    loadMore,
+    removeLearningOutcomes
   }
 }
 

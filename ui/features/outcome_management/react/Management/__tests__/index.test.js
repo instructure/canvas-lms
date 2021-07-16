@@ -26,6 +26,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   accountMocks,
   courseMocks,
+  deleteOutcomeMock,
   groupDetailMocks,
   groupMocks,
   updateOutcomeGroupMock
@@ -39,26 +40,20 @@ jest.useFakeTimers()
 describe('OutcomeManagementPanel', () => {
   let cache
   let showFlashAlertSpy
+  let defaultMocks
+  let groupDetailDefaultProps
 
   beforeEach(() => {
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+
     window.ENV = {
       PERMISSIONS: {
         manage_outcomes: true
       }
     }
-  })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-    window.ENV = null
-  })
-
-  const groupDetailDefaultProps = {
-    contextType: 'Course',
-    contextId: '2',
-    mocks: [
+    defaultMocks = [
       ...courseMocks({childGroupsCount: 2}),
       ...groupMocks({groupId: '200'}),
       ...groupDetailMocks({
@@ -70,7 +65,18 @@ describe('OutcomeManagementPanel', () => {
         withMorePage: false
       })
     ]
-  }
+
+    groupDetailDefaultProps = {
+      contextType: 'Course',
+      contextId: '2',
+      mocks: defaultMocks
+    }
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+    window.ENV = null
+  })
 
   const render = (
     children,
@@ -358,6 +364,25 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Cancel'))
     expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
+  })
+
+  it('Removes outcome from the list', async () => {
+    const {queryByText, getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps,
+      mocks: [...defaultMocks, deleteOutcomeMock({ids: ['1']})]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    expect(queryByText('2 Outcomes')).toBeInTheDocument()
+    fireEvent.click(getAllByText('Select outcome')[0])
+    fireEvent.click(getByRole('button', {name: /remove/i}))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Remove Outcome'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+    expect(queryByText('1 Outcome')).toBeInTheDocument()
   })
 
   it('clears selected outcome when move outcome modal is closed', async () => {
