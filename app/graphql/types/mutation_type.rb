@@ -93,6 +93,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :delete_outcome_links, mutation: Mutations::DeleteOutcomeLinks
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup
+  field :create_learning_outcome_group, mutation: Mutations::CreateLearningOutcomeGroup
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.
