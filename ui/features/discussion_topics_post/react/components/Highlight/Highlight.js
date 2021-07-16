@@ -26,7 +26,7 @@ export function Highlight({...props}) {
 
   useEffect(() => {
     if (props.isHighlighted && highlightRef.current) {
-      highlightRef.current.scrollIntoView({behavior: 'smooth'})
+      setTimeout(() => highlightRef.current.scrollIntoView({behavior: 'smooth'}), 0)
     }
   }, [props.isHighlighted, highlightRef])
 
