@@ -28,8 +28,4 @@ class ManageAccountBanksBackfill < ActiveRecord::Migration[6.0]
   def down
     raise ActiveRecord::IrreversibleMigration
   end
-
-  def runnable?
-    Shard.current.default?
-  end
 end

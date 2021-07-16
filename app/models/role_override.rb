@@ -870,16 +870,18 @@ class RoleOverride < ActiveRecord::Base
       account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
       account_only: true
     },
-    :manage_account_banks => {
-      :label => lambda { t('permissions.manage_account_banks', "Manage account level item Banks") },
-      :label_v2 => lambda { t("Item Banks - manage account") },
-      :available_to => [
-        'DesignerEnrollment',
-        'TeacherEnrollment',
-        'AccountAdmin',
-        'AccountMembership'
+    manage_account_banks: {
+      label: lambda { t('permissions.manage_account_banks', "Manage account level item Banks") },
+      label_v2: lambda { t("Item Banks - manage account") },
+      available_to: %w[
+        DesignerEnrollment
+        TeacherEnrollment
+        AccountAdmin
+        AccountMembership
       ],
-      :true_for => []
+      true_for: %w[
+        AccountAdmin
+      ],
     },
     manage_files_add: {
       label: -> { t('Add course files') },
