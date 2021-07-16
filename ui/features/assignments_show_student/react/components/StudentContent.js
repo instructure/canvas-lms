@@ -72,7 +72,8 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
           onError={onMarkAsDoneError}
         />
       ),
-      key: 'mark-as-done'
+      key: 'mark-as-done',
+      align: 'right'
     }
   ]
 

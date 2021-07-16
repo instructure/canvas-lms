@@ -120,6 +120,8 @@ describe('Assignment Student Content View', () => {
     })
 
     it('renders the rubric if the assignment has one', async () => {
+      window.ENV.ASSIGNMENT_ID = 1
+      window.ENV.COURSE_ID = 1
       props.assignment.rubric = {}
 
       const variables = {

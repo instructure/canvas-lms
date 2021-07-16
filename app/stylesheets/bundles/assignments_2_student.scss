@@ -33,8 +33,6 @@ $student-view-banner-height: 50px;
 }
 
 #assignments-student-footer {
-  position: fixed;
-  bottom: 0;
   height: $student-footer-height;
   #{direction(right)}: 0;
   width: 100%;
