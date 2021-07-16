@@ -74,6 +74,7 @@ module Lti::Ims
       :verify_valid_timestamp,
       :verify_valid_score_maximum,
       :verify_valid_submitted_at,
+      :verify_valid_content_item_submission_type,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
@@ -276,6 +277,12 @@ module Lti::Ims
         render_error('ScoreMaximum must be greater than or equal to 0', :unprocessable_entity)
       else
         render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
+      end
+    end
+
+    def verify_valid_content_item_submission_type
+      if !has_content_items? && submission_type == 'online_upload'
+        render_error("Content items must be provided with submission type 'online_upload'", :unprocessable_entity)
       end
     end
 
