@@ -149,6 +149,47 @@ describe Types::UserType do
     end
   end
 
+  context "integrationId" do
+    before(:once) do
+      @student.pseudonyms.create!(
+        account: @course.account,
+        unique_id: "rlands@eab.com",
+        workflow_state: 'active',
+        integration_id: "Rachel.Lands"
+      )
+    end
+
+    context 'as admin' do
+      let(:admin) { account_admin_user }
+      let(:user_type_as_admin) do
+        GraphQLTypeTester.new(@student, current_user: admin, domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create)
+      end
+
+      it "returns the integration id if admin user has permissions to read SIS info" do
+        expect(user_type_as_admin.resolve("integrationId")).to eq "Rachel.Lands"
+      end
+
+      it "returns null for integration id if admin user does not have permission to read SIS info" do
+        account_admin_user_with_role_changes(role_changes: {read_sis: false, manage_sis: false})
+        admin_type = GraphQLTypeTester.new(@student, current_user: @admin, domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create)
+        expect(admin_type.resolve("integrationId")).to be_nil
+      end
+    end
+
+    context 'as teacher' do
+      it 'returns the integration id if teacher user has permissions to read SIS info' do
+        expect(user_type.resolve("integrationId")).to eq "Rachel.Lands"
+      end
+
+      it 'returns null if teacher user does not have permission to read SIS info' do
+        @teacher.enrollments.find_by(course: @course).role.role_overrides.create!(permission: 'read_sis', enabled: false, account: @course.account)
+        expect(user_type.resolve("integrationId")).to be_nil
+      end
+    end
+  end
+
   context "enrollments" do
     before(:once) do
       @course1 = @course
