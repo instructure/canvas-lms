@@ -60,7 +60,8 @@ class Folder < ActiveRecord::Base
   after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
 
   def file_attachments_visible_to(user)
-    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+    if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
+        self.grants_right?(user, :read_as_admin)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
