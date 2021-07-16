@@ -75,6 +75,7 @@ module Lti::Ims
       :verify_valid_score_maximum,
       :verify_valid_submitted_at,
       :verify_valid_content_item_submission_type,
+      :verify_attempts_for_online_upload,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
@@ -284,6 +285,22 @@ module Lti::Ims
       if !has_content_items? && submission_type == 'online_upload'
         render_error("Content items must be provided with submission type 'online_upload'", :unprocessable_entity)
       end
+    end
+
+    # for non-online-upload requests, this check is done by assignment.submit_homework.
+    # but since that method is called in a job for requests with file content items,
+    # do this check up front so that the job doesn't fail later on.
+    # note that we don't care about this check if the attempt number is not going
+    # to get incremented.
+    def verify_attempts_for_online_upload
+      return unless has_content_items? && new_submission?
+
+      submission = line_item.assignment.find_or_create_submission(user)
+      # if attempts_left is 0, trying to submit will fail
+      # attempts_left will be nil for non-limited assignments
+      return if submission.attempts_left.nil? || submission.attempts_left > 0
+
+      render_error('The maximum number of allowed attempts has been reached for this submission', :unprocessable_entity)
     end
 
     def score_submission

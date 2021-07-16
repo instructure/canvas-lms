@@ -62,7 +62,7 @@ class Submission < ActiveRecord::Base
     }.freeze
   }.freeze
 
-  SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry].freeze
+  SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry external_tool].freeze
 
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
