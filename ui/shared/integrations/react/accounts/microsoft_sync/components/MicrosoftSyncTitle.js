@@ -34,7 +34,7 @@ export default function MicrosoftSyncTitle(props) {
         <Checkbox
           size="medium"
           variant="toggle"
-          id="microsoft_sync_toggle_button"
+          id="microsoft_teams_sync_toggle_button"
           checked={props.syncEnabled}
           label={
             <ScreenReaderContent>
