@@ -28,7 +28,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {fetchGrades, fetchGradesForGradingPeriod} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
-import GradingPeriodSelect from './GradingPeriodSelect'
+import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
 export const getGradingPeriodsFromCourses = courses =>
@@ -52,7 +52,11 @@ export const overrideCourseGradingPeriods = (
       // No grading period selected, show all courses
       if (!selectedGradingPeriodId) return course
       // The course isn't associated with this grading period, filter it out
-      if (!course.gradingPeriods.some(({id}) => id === selectedGradingPeriodId)) return null
+      if (
+        selectedGradingPeriodId !== ALL_PERIODS_OPTION &&
+        !course.gradingPeriods.some(({id}) => id === selectedGradingPeriodId)
+      )
+        return null
       // The course has this grading period, so override the current scores with
       // those from the selected grading period
       const gradingPeriod = specificPeriodGrades.find(gp => gp.courseId === course.courseId)
@@ -60,7 +64,8 @@ export const overrideCourseGradingPeriods = (
         return {
           ...course,
           grade: gradingPeriod.grade,
-          score: gradingPeriod.score
+          score: gradingPeriod.score,
+          showingAllGradingPeriods: selectedGradingPeriodId === ALL_PERIODS_OPTION
         }
       }
       return course
@@ -97,7 +102,14 @@ export const GradesPage = ({visible, currentUserRoles}) => {
   }, [courses, visible])
 
   const loadSpecificPeriodGrades = gradingPeriodId => {
-    if (gradingPeriodId) {
+    if (gradingPeriodId === ALL_PERIODS_OPTION) {
+      const allGrades = courses.map(course => ({
+        courseId: course.courseId,
+        score: course.totalScoreForAllGradingPeriods,
+        grade: course.totalGradeForAllGradingPeriods
+      }))
+      setSpecificPeriodGrades(allGrades)
+    } else if (gradingPeriodId) {
       setLoading(true)
       fetchGradesForGradingPeriod(gradingPeriodId)
         .then(results => {
