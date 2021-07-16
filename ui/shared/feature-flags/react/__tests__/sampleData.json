@@ -146,5 +146,28 @@
       "hidden": false,
       "parent_state": "allowed_on"
     }
+  },
+  "betaFeature": {
+    "feature": "betaFeature",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Beta Feature",
+    "description": "This is a work in progress",
+    "feature_flag": {
+      "feature": "betaFeature",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed_on"
+    },
+    "beta": true
   }
 }

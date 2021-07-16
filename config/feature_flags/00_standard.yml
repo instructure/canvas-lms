@@ -124,6 +124,11 @@ epub_export:
   description: This enables users to generate and download course ePub.
   applies_to: Course
   root_opt_in: true
+feature_flag_filters:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Feature Flag Filters
+  description: Adds additional information and filtering for feature flags
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin

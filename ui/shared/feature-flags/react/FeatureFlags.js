@@ -21,12 +21,14 @@ import I18n from 'i18n!feature_flags'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {groupBy, debounce} from 'lodash'
 import FeatureFlagTable from './FeatureFlagTable'
+import FeatureFlagFilter from './FeatureFlagFilter'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
 
 const SEARCH_DELAY = 350
 
@@ -34,6 +36,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFeatureStates, setSelectedFeatureStates] = useState([])
 
   useFetchApi({
     success: setFeatures,
@@ -50,7 +53,8 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     features.filter(
       feat =>
         (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
-        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (!selectedFeatureStates.length || selectedFeatureStates.some(state => feat[state]))
     ),
     'applies_to'
   )
@@ -83,22 +87,42 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     trailing: true
   })
 
+  function featureStatusFilter() {
+    if (ENV.FEATURES?.feature_flag_filters) {
+      return (
+        <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
+          <FeatureFlagFilter
+            options={[
+              {id: 'beta', label: I18n.t('Active Development')},
+              {id: 'pending_enforcement', label: I18n.t('Pending Enforcement')}
+            ]}
+            onChange={statuses => setSelectedFeatureStates(statuses)}
+          />
+        </Flex.Item>
+      )
+    }
+  }
+
   return (
     <View as="div">
       {isLoading ? (
         <Spinner renderTitle={I18n.t('Loading features')} />
       ) : (
         <>
-          <View as="div" margin="0 0 medium">
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
-              placeholder={I18n.t('Search')}
-              display="inline-block"
-              type="search"
-              onChange={(_e, val) => handleQueryChange(val)}
-              renderBeforeInput={<IconSearchLine inline={false} />}
-            />
-          </View>
+          <Flex margin="0 0 medium 0" alignItems="start">
+            <Flex.Item>
+              <TextInput
+                renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
+                placeholder={I18n.t('Search')}
+                display="inline-block"
+                type="search"
+                onChange={(_e, val) => handleQueryChange(val)}
+                renderBeforeInput={<IconSearchLine inline={false} />}
+              />
+            </Flex.Item>
+            {featureStatusFilter()}
+          </Flex>
+
           {categories.map(cat => {
             if (!groupedFeatures[cat.id]?.length) {
               return null

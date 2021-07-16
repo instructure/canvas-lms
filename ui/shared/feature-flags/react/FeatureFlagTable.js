@@ -54,7 +54,22 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                         <Pill margin="0 x-small" text={I18n.t('Hidden')} />
                       ) : null}
                       {feature.beta ? (
-                        <Pill variant="primary" margin="0 x-small" text={I18n.t('Beta')} />
+                        <Pill
+                          variant="primary"
+                          margin="0 0 0 x-small"
+                          text={
+                            ENV.FEATURES?.feature_flag_filters
+                              ? I18n.t('Active Development')
+                              : I18n.t('Beta')
+                          }
+                        />
+                      ) : null}
+                      {feature.pending_enforcement && ENV.FEATURES?.feature_flag_filters ? (
+                        <Pill
+                          variant="warning"
+                          margin="0 0 0 x-small"
+                          text={I18n.t('Pending Enforcement')}
+                        />
                       ) : null}
                     </>
                   }

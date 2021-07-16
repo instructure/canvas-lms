@@ -24,7 +24,7 @@ module Api::V1::FeatureFlag
   def feature_json(feature, current_user, session)
     # this isn't an AR object, so api_json doesn't work
     hash = feature.as_json.slice('feature', 'applies_to', 'enable_at', 'root_opt_in', 'beta', 'development',
-      'release_notes_url', 'autoexpand')
+                                 'release_notes_url', 'autoexpand', 'pending_enforcement')
     add_localized_attr(hash, feature, 'display_name')
     add_localized_attr(hash, feature, 'description')
     hash
