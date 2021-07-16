@@ -23,7 +23,6 @@ import {gql} from '@canvas/apollo'
 export const groupFields = `
   _id
   title
-  description
   outcomesCount
   childGroupsCount
   canEdit
@@ -87,7 +86,6 @@ export const FIND_GROUP_OUTCOMES = gql`
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
-        description
         title
         outcomesCount(searchQuery: $searchQuery)
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {

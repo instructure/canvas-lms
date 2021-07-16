@@ -48,7 +48,6 @@ export const accountMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
-            description: `Root account group`,
             title: `Root account folder`,
             canEdit,
             __typename: 'LearningOutcomeGroup',
@@ -57,7 +56,6 @@ export const accountMocks = ({
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
-                description: `Account folder description ${i}`,
                 _id: (100 + i).toString(),
                 outcomesCount,
                 childGroupsCount,
@@ -94,7 +92,6 @@ export const courseMocks = ({
           rootOutcomeGroup: {
             childGroupsCount,
             outcomesCount,
-            description: `Root course group`,
             title: `Root course folder`,
             canEdit,
             __typename: 'LearningOutcomeGroup',
@@ -103,7 +100,6 @@ export const courseMocks = ({
               __typename: 'LearningOutcomeGroupConnection',
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
-                description: `Course folder description ${i}`,
                 _id: (200 + i).toString(),
                 outcomesCount: 2,
                 childGroupsCount: 10,
@@ -144,7 +140,6 @@ export const groupMocks = ({
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
-              description: `Group ${groupId} folder description ${i}`,
               _id: (childGroupOffset + i).toString(),
               outcomesCount: 2,
               childGroupsCount: 5,
@@ -290,7 +285,6 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
           outcomes: {
@@ -343,7 +337,6 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
           outcomes: {
@@ -397,7 +390,6 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 0,
           outcomes: {
@@ -642,7 +634,6 @@ export const findOutcomesMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 25,
           outcomes: {
@@ -697,7 +688,6 @@ export const findOutcomesMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
           title: `Group ${groupId}`,
           outcomesCount: 15,
           outcomes: {
