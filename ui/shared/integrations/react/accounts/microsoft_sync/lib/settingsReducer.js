@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {doUpdateSettings, validateTenant, clearMessages, setTenantInfoMessages} from './settingsHelper'
+import {
+  doUpdateSettings,
+  getTenantErrorMessages,
+  setTenantInfoMessages,
+  getSuffixErrorMessages
+} from './settingsHelper'
 import I18n from 'i18n!account_settings_jsx_bundle'
 
 /**
@@ -28,6 +33,8 @@ import I18n from 'i18n!account_settings_jsx_bundle'
  * @property {string} toggleSync
  * @property {string} updateTenant
  * @property {string} updateAttribute
+ * @property {string} updateSuffix
+ * @property {string} updateRemoteAttribute
  * @property {string} removeAlerts
  * @property {string} updateSuccess
  * @property {string} updateError
@@ -44,6 +51,8 @@ export const reducerActions = {
   fetchLoading: 'fetchLoading',
   updateSettings: 'updateSettings',
   toggleSync: 'toggleSync',
+  updateSuffix: 'updateSuffix',
+  updateRemoteAttribute: 'updateRemoteAttribute',
   updateTenant: 'updateTenant',
   updateAttribute: 'updateAttribute',
   removeAlerts: 'removeAlerts',
@@ -57,12 +66,20 @@ export const reducerActions = {
  * Type definition for the state object for the settingsReducer
  * @property {string} errorMessage
  * Any error messages from fetching/updating settings.
- * @property {string[]} tenantErrorMessages
+ * @property {{text: string, type: string}[]} tenantErrorMessages
  * Any tenant input validation error messages
+ * @property {{text: string, type: string}[]} tenantInfoMessages
+ * Any tenant input info messages.
+ * @property {{text: string, type: string}[]} suffixErrorMessages
+ * Any error messages related to the user specified suffix
  * @property {boolean} loading
  * Whether settings are still being loaded or not
  * @property {boolean} uiEnabled
  * Whether the user can interact with the UI.
+ * @property {string} microsoft_sync_login_attribute_suffix
+ * The suffix that will be appended to the value determined by microsoft_sync_login_attribute.
+ * @property {'userPrincipalName' | 'mail' | 'mailNickname'} microsoft_sync_remote_attribute
+ * The Azure Active Directory field that will be used to associate Canvas users with Microsoft users.
  * @property {boolean} microsoft_sync_enabled
  * Whether Teams sync is enabled or not
  * @property {string} microsoft_sync_tenant
@@ -84,8 +101,11 @@ export const defaultState = {
   errorMessage: '',
   tenantErrorMessages: [],
   tenantInfoMessages: [],
+  suffixErrorMessages: [],
   loading: true,
   uiEnabled: true,
+  microsoft_sync_login_attribute_suffix: '',
+  microsoft_sync_remote_attribute: 'userPrincipalName',
   microsoft_sync_enabled: false,
   microsoft_sync_tenant: '',
   last_saved_microsoft_sync_tenant: '',
@@ -106,7 +126,11 @@ export const defaultState = {
 export function settingsReducer(state, {type, payload, dispatch}) {
   switch (type) {
     case reducerActions.removeAlerts: {
-      return clearMessages({...state})
+      return {
+        ...state,
+        errorMessage: '',
+        successMessage: ''
+      }
     }
     case reducerActions.updateAttribute: {
       // Gotta keep track of both the actual login attribute and the selected one
@@ -115,6 +139,19 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         microsoft_sync_login_attribute: payload.microsoft_sync_login_attribute,
         selectedAttribute: payload.selectedAttribute
+      }
+    }
+    case reducerActions.updateSuffix: {
+      return {
+        ...state,
+        microsoft_sync_login_attribute_suffix: payload.microsoft_sync_login_attribute_suffix,
+        suffixErrorMessages: []
+      }
+    }
+    case reducerActions.updateRemoteAttribute: {
+      return {
+        ...state,
+        microsoft_sync_remote_attribute: payload.microsoft_sync_remote_attribute
       }
     }
     case reducerActions.updateTenant: {
@@ -128,54 +165,46 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       }
     }
     case reducerActions.updateSettings: {
-      const stateAfterUpdate = validateTenant(clearMessages({...state}))
-      if (stateAfterUpdate.tenantErrorMessages.length > 0) {
-        return stateAfterUpdate
-      } else {
-        doUpdateSettings(
-          stateAfterUpdate.microsoft_sync_enabled,
-          stateAfterUpdate.microsoft_sync_tenant,
-          stateAfterUpdate.microsoft_sync_login_attribute
-        )
+      state.suffixErrorMessages = getSuffixErrorMessages(state)
+      state.tenantErrorMessages = getTenantErrorMessages(state)
+
+      if (state.suffixErrorMessages.length === 0 && state.tenantErrorMessages.length === 0) {
+        state.uiEnabled = false
+        doUpdateSettings(state)
           .then(() => dispatch({type: reducerActions.updateSuccess}))
           .catch(() => dispatch({type: reducerActions.updateError}))
-
-        stateAfterUpdate.uiEnabled = false
-        return stateAfterUpdate
       }
-    }
-    case reducerActions.toggleSync: {
-      const stateAfterToggle = validateTenant(clearMessages({...state}))
-
-      if (stateAfterToggle.tenantErrorMessages.length > 0) {
-        return stateAfterToggle
-      } else {
-        stateAfterToggle.microsoft_sync_enabled = !state.microsoft_sync_enabled
-        doUpdateSettings(
-          stateAfterToggle.microsoft_sync_enabled,
-          stateAfterToggle.microsoft_sync_tenant,
-          stateAfterToggle.microsoft_sync_login_attribute
-        )
-          .then(() => dispatch({type: reducerActions.updateSuccess}))
-          .catch(() => dispatch({type: reducerActions.toggleError}))
-
-        stateAfterToggle.uiEnabled = false
-        return stateAfterToggle
-      }
-    }
-    case reducerActions.fetchSuccess: {
-      // The conditional assignment ensures we don't override our sensible defaults if the account
-      // doesn't have sensible settings cause they've never enabled MSFT Teams sync before.
-      const selectedLoginAttribute =
-        payload.microsoft_sync_login_attribute || state.microsoft_sync_login_attribute
 
       return {
         ...state,
-        microsoft_sync_enabled: payload.microsoft_sync_enabled || state.microsoft_sync_enabled,
-        microsoft_sync_tenant: payload.microsoft_sync_tenant || state.microsoft_sync_tenant,
-        last_saved_microsoft_sync_tenant: payload.microsoft_sync_tenant || state.microsoft_sync_tenant,
-        microsoft_sync_login_attribute: selectedLoginAttribute,
-        selectedAttribute: selectedLoginAttribute
+        errorMessage: '',
+        successMessage: ''
+      }
+    }
+    case reducerActions.toggleSync: {
+      state.tenantErrorMessages = getTenantErrorMessages(state)
+      state.suffixErrorMessages = getSuffixErrorMessages(state)
+
+      if (state.tenantErrorMessages.length === 0 && state.suffixErrorMessages.length === 0) {
+        state.microsoft_sync_enabled = !state.microsoft_sync_enabled
+        state.uiEnabled = false
+        doUpdateSettings(state)
+          .then(() => dispatch({type: reducerActions.updateSuccess}))
+          .catch(() => dispatch({type: reducerActions.toggleError}))
+      }
+
+      return {
+        ...state,
+        errorMessage: '',
+        successMessage: ''
+      }
+    }
+    case reducerActions.fetchSuccess: {
+      return {
+        ...state,
+        ...payload,
+        last_saved_microsoft_sync_tenant:
+          payload.microsoft_sync_tenant || state.microsoft_sync_tenant
       }
     }
     case reducerActions.fetchLoading: {

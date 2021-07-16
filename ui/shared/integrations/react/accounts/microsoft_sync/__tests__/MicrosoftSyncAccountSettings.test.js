@@ -30,11 +30,14 @@ const defaultUseFetchMock = ({loading, success}) => {
   success({
     microsoft_sync_enabled: false,
     microsoft_sync_tenant: '',
-    microsoft_sync_login_attribute: 'email'
+    microsoft_sync_login_attribute: 'email',
+    microsoft_sync_remote_attribute: 'userPrincipalName',
+    microsoft_sync_login_attribute_suffix: ''
   })
 }
 const defaultDoFetchApiMock = () => {}
 
+// Helpers methods for quickly setting up and fetching things from the test document.
 const setup = (useFetchApiMock = defaultUseFetchMock, doFetchApiMock = defaultDoFetchApiMock) => {
   doFetchApi.mockImplementation(doFetchApiMock)
   useFetchApi.mockImplementationOnce(useFetchApiMock)
@@ -44,14 +47,32 @@ const setup = (useFetchApiMock = defaultUseFetchMock, doFetchApiMock = defaultDo
 const getUpdateButton = container => {
   return container.getByText(/update settings/i).closest('button')
 }
+
 const getTextInput = container => {
   return container.getByRole('textbox', {
     name: /tenant name input area/i
   })
 }
+
+const getLoginAttributeSelector = container => {
+  return container.getByRole('button', {name: /login attribute selector/i})
+}
+
 const getToggle = container => {
   return container.getByRole('checkbox', {
     name: /allows syncing of canvas course members to a microsoft team/i
+  })
+}
+
+const getSuffixInput = container => {
+  return container.getByRole('textbox', {
+    name: /login attribute suffix input area/i
+  })
+}
+
+const getLookupFieldSelector = container => {
+  return container.getByRole('button', {
+    name: /active directory lookup attribute selector/i
   })
 }
 
@@ -182,13 +203,69 @@ describe('MicrosoftSyncAccountSettings', () => {
       expect(doFetchApi).toHaveBeenCalledTimes(0)
     })
 
-    it('clears validation error on text change', async () => {
+    it('clears tenant validation error on text change', async () => {
       const container = setup()
       fireEvent.input(getTextInput(container), {target: {value: 'garbage_input_with_$$.com'}})
       fireEvent.click(getUpdateButton(container))
       fireEvent.input(getTextInput(container), {target: {value: 'garbage_input_with_$$.co'}})
       const errMsg = container.queryByText(/please provide a valid tenant domain/i)
       expect(errMsg).not.toBeInTheDocument()
+    })
+
+    it("doesn't let the user update settings with a suffix that is too long", async () => {
+      const container = setup()
+
+      fireEvent.input(getSuffixInput(container), {
+        target: {
+          value: 'a'.repeat(256)
+        }
+      })
+
+      fireEvent.click(getUpdateButton(container))
+
+      const errorMessage = await container.findByText(
+        /A suffix cannot be longer than 255 characters\. Please use a shorter suffix and try again\./i
+      )
+
+      expect(errorMessage).toBeInTheDocument()
+      expect(doFetchApi).toHaveBeenCalledTimes(0)
+    })
+
+    it("doesn't let the user update settings with an invalid suffix", async () => {
+      const container = setup()
+
+      fireEvent.input(getSuffixInput(container), {
+        target: {
+          value: '@example.edu\t some extra stuff\n'
+        }
+      })
+
+      fireEvent.click(getUpdateButton(container))
+
+      const errorMessage = await container.findByText(
+        /a suffix cannot have any tabs or spaces\. please remove them and try again\./i
+      )
+
+      expect(errorMessage).toBeInTheDocument()
+      expect(doFetchApi).toHaveBeenCalledTimes(0)
+    })
+
+    it('does let the user update settings with an empty suffix', async () => {
+      const container = setup(({loading, success}) => {
+        loading(false)
+        success({
+          microsoft_sync_enabled: true,
+          microsoft_sync_login_attribute: 'sis_user_id',
+          microsoft_sync_tenant: 'canvastest2.onmicrosoft.com'
+        })
+      })
+
+      fireEvent.click(getUpdateButton(container))
+
+      expect(
+        await container.findByText(/microsoft teams sync settings updated/i)
+      ).toBeInTheDocument()
+      expect(doFetchApi).toHaveBeenCalledTimes(1)
     })
 
     it('does not show a Microsoft admin consent link if disabled', () => {
@@ -225,29 +302,43 @@ describe('MicrosoftSyncAccountSettings', () => {
   })
 
   describe('typical user interaction', () => {
-    it('toggles sync with a valid tenant and login attribute', async () => {
+    it('toggles sync with valid settings', async () => {
+      const expectedValues = {
+        microsoft_sync_enabled: true,
+        microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
+        microsoft_sync_login_attribute: 'email',
+        microsoft_sync_login_attribute_suffix: '@example.com',
+        microsoft_sync_remote_attribute: 'userPrincipalName'
+      }
       const container = setup()
-      fireEvent.input(getTextInput(container), {target: {value: 'canvastest2.onmicrosoft.com'}})
+      fireEvent.input(getTextInput(container), {
+        target: {value: expectedValues.microsoft_sync_tenant}
+      })
+      fireEvent.input(getSuffixInput(container), {
+        target: {value: expectedValues.microsoft_sync_login_attribute_suffix}
+      })
+      fireEvent.click(getLookupFieldSelector(container))
+      fireEvent.click(container.getByText(/user principal name \(upn\)/i))
 
       fireEvent.click(getToggle(container))
 
       const success = await container.findByText(/microsoft teams sync settings updated/i)
 
+      const params = doFetchApi.mock.calls.pop()[0]
+
       expect(getToggle(container)).not.toBeDisabled()
       expect(getUpdateButton(container)).not.toBeDisabled()
       expect(success).toBeInTheDocument()
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
+      expect(params.body.account.settings).toEqual(expectedValues)
     })
 
-    it('updates settings with a valid settings', async () => {
-      const container = setup(({loading, success}) => {
-        loading(false)
-        success({
-          microsoft_sync_tenant: 'testtenant.com',
-          microsoft_sync_login_attribute: 'email',
-          microsoft_sync_enabled: true
-        })
-      })
+    it('updates settings with valid settings', async () => {
+      const container = setup()
+
+      fireEvent.input(getTextInput(container), {target: {value: 'canvastest2.onmicrosoft.com'}})
+      fireEvent.input(getSuffixInput(container), {target: {value: '@example.com'}})
+      fireEvent.click(getLookupFieldSelector(container))
+      fireEvent.click(container.getByText(/user principal name \(upn\)/i))
 
       fireEvent.click(getUpdateButton(container))
 
@@ -304,14 +395,36 @@ describe('MicrosoftSyncAccountSettings', () => {
           microsoft_sync_enabled: true
         })
       })
-      fireEvent.click(container.getByRole('button', {name: /login attribute selector/i}))
+      fireEvent.click(getLoginAttributeSelector(container))
       fireEvent.click(container.getByText(attr))
       fireEvent.click(getToggle(container))
       await waitFor(() => {
         expect(doFetchApi).toHaveBeenCalledTimes(1)
-        expect(container.getByRole('button', {name: /login attribute selector/i}).title).toMatch(
-          attr
-        )
+        expect(getLoginAttributeSelector(container).title).toMatch(attr)
+      })
+    })
+
+    it('lets the user select an Active Directory Lookup Attribute option', async () => {
+      const expectedField = /mailNickname/i
+      const container = setup(({loading, success}) => {
+        loading(false)
+        success({
+          microsoft_sync_tenant: 'testtenant.com',
+          microsoft_sync_login_attribute: 'sis_user_id',
+          microsoft_sync_enabled: false,
+          microsoft_sync_login_attribute_suffix: '@example.com',
+          microsoft_sync_remote_attribute: 'userPrincipalName'
+        })
+      })
+
+      fireEvent.click(getLookupFieldSelector(container))
+      fireEvent.click(container.getByText(expectedField))
+
+      fireEvent.click(getToggle(container))
+
+      await waitFor(() => {
+        expect(doFetchApi).toHaveBeenCalledTimes(1)
+        expect(getLookupFieldSelector(container).title).toMatch(expectedField)
       })
     })
 

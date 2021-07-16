@@ -61,6 +61,78 @@ describe "root account basic settings" do
     end
   end
 
+  context 'Integrations' do
+    context 'Microsoft Teams Sync' do
+      context('microsoft_group_enrollments FF enabled') do
+        let(:enabled) { true }
+        let(:tenant) { 'canvastest2.onmicrosoft.com' }
+        let(:login_attribute) { 'sis_user_id' }
+        let(:suffix) { '@example.com' }
+        let(:remote_attribute) { "mailNickname" }
+        let(:expected_settings) do
+          {
+            microsoft_sync_enabled: enabled,
+            microsoft_sync_tenant: tenant,
+            microsoft_sync_login_attribute: login_attribute,
+            microsoft_sync_login_attribute_suffix: suffix,
+            microsoft_sync_remote_attribute: remote_attribute
+          }
+        end
+
+        before :once do
+          account.enable_feature!(:microsoft_group_enrollments_syncing)
+        end
+
+        before :each do
+          account_admin_user(account: account)
+          user_session(@admin)
+        end
+
+        it "lets a user update what settings they want to use" do
+          get account_settings_url
+          f("#tab-integrations-link").click
+
+          tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
+          set_value(tenant_input_area, tenant)
+
+          f("#microsoft_teams_sync_attribute_selector").click
+          f("#sis_user_id").click
+
+          suffix_input_area = fxpath('//input[@placeholder="@example.edu"]')
+          set_value(suffix_input_area, suffix)
+
+          f("#microsoft_teams_sync_remote_attribute_lookup_attribute_selector").click
+          f("#remote_lookup_attribute_mail_nickname_option").click
+
+          f("#microsoft_teams_sync_toggle_button").click
+          wait_for_ajaximations
+
+          account.reload
+          expect(account.settings).to eq expected_settings
+        end
+
+        it "lets a user toggle Microsoft Teams sync" do
+          account.settings = {
+            microsoft_sync_enabled: !enabled,
+            microsoft_sync_tenant: tenant,
+            microsoft_sync_login_attribute: login_attribute,
+            microsoft_sync_login_attribute_suffix: suffix,
+            microsoft_sync_remote_attribute: remote_attribute
+          }
+          account.save!
+
+          get account_settings_url
+          f("#tab-integrations-link").click
+          f("#microsoft_teams_sync_toggle_button").click
+          wait_for_ajaximations
+
+          account.reload
+          expect(account.settings).to eq expected_settings
+        end
+      end
+    end
+  end
+
   it "downloads reports" do
     course_with_admin_logged_in
     account.account_reports.create!(

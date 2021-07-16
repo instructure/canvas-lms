@@ -42,6 +42,9 @@ export default function LoginAttributeSelector(props) {
         <SimpleSelect.Option id="sis_user_id" value="sis_user_id">
           {I18n.t('SIS User ID')}
         </SimpleSelect.Option>
+        <SimpleSelect.Option id="integration_id" value="integration_id">
+          {I18n.t('Integration ID')}
+        </SimpleSelect.Option>
       </SimpleSelect>
     </>
   )

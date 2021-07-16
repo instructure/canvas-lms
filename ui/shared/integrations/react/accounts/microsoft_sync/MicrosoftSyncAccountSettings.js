@@ -32,6 +32,8 @@ import AdminConsentLink from './components/AdminConsentLink'
 import {reducerActions} from './lib/settingsReducer'
 import useSettings from './lib/useSettings'
 import {Tooltip} from '@instructure/ui-tooltip'
+import LoginAttributeSuffixInput from './components/LoginAttributeSuffixInput'
+import ActiveDirectoryLookupAttributeSelector from './components/ActiveDirectoryLookupAttributeSelector'
 
 export default function MicrosoftSyncAccountSettings() {
   const [state, dispatch] = useSettings()
@@ -117,7 +119,7 @@ export default function MicrosoftSyncAccountSettings() {
                   tip={I18n.t(
                     'The attribute to use when associating a Canvas User with a Microsoft User'
                   )}
-                  placement="start"
+                  placement="top"
                   on={['hover', 'focus']}
                 >
                   <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
@@ -136,6 +138,56 @@ export default function MicrosoftSyncAccountSettings() {
                     })
                   }
                   selectedLoginAttribute={state.selectedAttribute}
+                />
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.RowHeader textAlign="start">
+                <span>{I18n.t('Suffix')}</span>
+                <Tooltip
+                  tip={I18n.t(
+                    'Not Required. If this is populated the entered text will be appended to the Login Attribute'
+                  )}
+                  on={['hover', 'focus']}
+                >
+                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                </Tooltip>
+              </Table.RowHeader>
+              <Table.Cell>
+                <LoginAttributeSuffixInput
+                  loginAttributeSuffix={state.microsoft_sync_login_attribute_suffix}
+                  suffixInputHandler={event => {
+                    dispatch({
+                      type: reducerActions.updateSuffix,
+                      payload: {microsoft_sync_login_attribute_suffix: event.target.value}
+                    })
+                  }}
+                  messages={state.suffixErrorMessages}
+                />
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.RowHeader>
+                <span>{I18n.t('Active Directory Lookup Attribute')}</span>
+                <Tooltip
+                  tip={I18n.t(
+                    'The Active Directory attribute that will be used to match a Canvas user to a Microsoft user'
+                  )}
+                  on={['hover', 'focus']}
+                >
+                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                </Tooltip>
+              </Table.RowHeader>
+
+              <Table.Cell>
+                <ActiveDirectoryLookupAttributeSelector
+                  fieldChangedHandler={(event, {value}) => {
+                    dispatch({
+                      type: reducerActions.updateRemoteAttribute,
+                      payload: {microsoft_sync_remote_attribute: value}
+                    })
+                  }}
+                  selectedRemoteLookupField={state.microsoft_sync_remote_attribute}
                 />
               </Table.Cell>
             </Table.Row>
