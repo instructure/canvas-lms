@@ -29,6 +29,7 @@ import OutcomeSearchBar from './OutcomeSearchBar'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {Flex} from '@instructure/ui-flex'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const ManageOutcomesView = ({
   outcomeGroup,
@@ -48,7 +49,7 @@ const ManageOutcomesView = ({
   const groupDescription = outcomeGroup?.description
   const outcomes = outcomeGroup?.outcomes
   const numOutcomes = outcomeGroup?.outcomesCount
-  const canManageGroup = outcomeGroup?.canEdit
+  const {canManage} = useCanvasContext()
 
   if (loading && !outcomeGroup) {
     return (
@@ -71,7 +72,7 @@ const ManageOutcomesView = ({
         <OutcomeGroupHeader
           title={groupTitle}
           description={groupDescription}
-          canManage={isRootGroup ? false : canManageGroup}
+          canManage={isRootGroup ? false : canManage}
           minWidth="calc(50% + 4.125rem)"
           onMenuHandler={onOutcomeGroupMenuHandler}
         />
@@ -148,7 +149,6 @@ ManageOutcomesView.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     outcomesCount: PropTypes.number.isRequired,
-    canEdit: PropTypes.bool.isRequired,
     outcomes: PropTypes.shape({
       edges: PropTypes.arrayOf(
         PropTypes.shape({

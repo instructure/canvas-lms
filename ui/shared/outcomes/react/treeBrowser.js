@@ -43,7 +43,6 @@ const structFromGroup = (g, parentGroupId) => ({
   descriptor: groupDescriptor(g),
   collections: [],
   outcomesCount: g.outcomesCount,
-  canEdit: g.canEdit,
   parentGroupId
 })
 
@@ -52,7 +51,6 @@ const getChildOutcomesCount = rootGroups =>
 
 const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
-  canEdit: false,
   childGroupsCount: null,
   description: null,
   outcomesCount: null,

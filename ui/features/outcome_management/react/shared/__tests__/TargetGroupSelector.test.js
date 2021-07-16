@@ -92,7 +92,6 @@ describe('TargetGroupSelector', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(setTargetGroupMock).toHaveBeenCalledWith({
-      canEdit: true,
       collections: [],
       descriptor: '2 Groups | 2 Outcomes',
       id: '100',

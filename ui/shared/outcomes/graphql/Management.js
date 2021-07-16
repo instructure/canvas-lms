@@ -25,7 +25,6 @@ export const groupFields = `
   title
   outcomesCount
   childGroupsCount
-  canEdit
 `
 
 const groupFragment = gql`
@@ -127,7 +126,6 @@ export const SEARCH_GROUP_OUTCOMES = gql`
         description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage

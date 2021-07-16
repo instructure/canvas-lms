@@ -66,10 +66,15 @@ describe('OutcomeManagementPanel', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      canManage = true,
+      mocks = accountMocks({childGroupsCount: 0})
+    } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, canManage}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -390,8 +395,8 @@ describe('OutcomeManagementPanel', () => {
       contextType: 'Course',
       contextId: '2',
       mocks: [
-        ...courseMocks({childGroupsCount: 2, canEdit: false}),
-        ...groupMocks({groupId: '200', canEdit: false}),
+        ...courseMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: '200'}),
         ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2', canEdit: false})
       ]
     })

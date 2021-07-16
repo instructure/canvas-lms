@@ -29,8 +29,7 @@ import {
 export const accountMocks = ({
   childGroupsCount = 10,
   outcomesCount = 2,
-  accountId = '1',
-  canEdit = true
+  accountId = '1'
 } = {}) => [
   {
     request: {
@@ -49,7 +48,6 @@ export const accountMocks = ({
             childGroupsCount,
             outcomesCount,
             title: `Root account folder`,
-            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: '1',
             childGroups: {
@@ -60,7 +58,6 @@ export const accountMocks = ({
                 outcomesCount,
                 childGroupsCount,
                 title: `Account folder ${i}`,
-                canEdit
               }))
             }
           }
@@ -73,8 +70,7 @@ export const accountMocks = ({
 export const courseMocks = ({
   childGroupsCount = 1,
   outcomesCount = 2,
-  courseId = '2',
-  canEdit = true
+  courseId = '2'
 } = {}) => [
   {
     request: {
@@ -93,7 +89,6 @@ export const courseMocks = ({
             childGroupsCount,
             outcomesCount,
             title: `Root course folder`,
-            canEdit,
             __typename: 'LearningOutcomeGroup',
             _id: '2',
             childGroups: {
@@ -104,7 +99,6 @@ export const courseMocks = ({
                 outcomesCount: 2,
                 childGroupsCount: 10,
                 title: `Course folder ${i}`,
-                canEdit
               }))
             }
           }
@@ -118,8 +112,7 @@ export const groupMocks = ({
   groupId,
   childGroupsCount = 1,
   outcomesCount = 2,
-  childGroupOffset = 300,
-  canEdit = true
+  childGroupOffset = 300
 } = {}) => [
   {
     request: {
@@ -144,7 +137,6 @@ export const groupMocks = ({
               outcomesCount: 2,
               childGroupsCount: 5,
               title: `Group ${groupId} folder ${i}`,
-              canEdit
             }))
           }
         }
@@ -161,7 +153,6 @@ export const outcomeGroup = {
       2
     ),
   outcomesCount: 15,
-  canEdit: true,
   outcomes: {
     pageInfo: {
       hasNextPage: false,
@@ -446,7 +437,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 2,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: true,
@@ -512,7 +502,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 2,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -578,7 +567,6 @@ export const groupDetailMocks = ({
           description: '',
           title: `Group ${groupId}`,
           outcomesCount: 1,
-          canEdit,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
