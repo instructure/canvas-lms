@@ -28,6 +28,9 @@ const useCanvasContext = () => {
   const rootOutcomeGroup = context?.env?.rootOutcomeGroup
   const friendlyDescriptionFF = context?.env?.friendlyDescriptionFF
   const isMobileView = context?.env?.isMobileView
+  const canManage = context?.env?.canManage
+  const canImport = context?.env?.canImport
+  const isAdmin = context?.env?.isAdmin
 
   return {
     contextType,
@@ -36,7 +39,10 @@ const useCanvasContext = () => {
     useRceEnhancements,
     rootOutcomeGroup,
     friendlyDescriptionFF,
-    isMobileView
+    isMobileView,
+    canManage,
+    canImport,
+    isAdmin
   }
 }
 

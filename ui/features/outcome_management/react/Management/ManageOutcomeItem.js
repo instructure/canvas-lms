@@ -29,16 +29,7 @@ import I18n from 'i18n!OutcomeManagement'
 import OutcomeKebabMenu from './OutcomeKebabMenu'
 import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
-
-// This allows account admins to edit global outcomes
-// within a course. See OUT-1415, OUT-1511
-const allowAdminEdit = () => {
-  return (
-    ENV.ROOT_OUTCOME_GROUP?.context_type === 'Course' &&
-    ENV.PERMISSIONS?.manage_outcomes &&
-    ENV.current_user_roles?.includes('admin')
-  )
-}
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const ManageOutcomeItem = ({
   _id,
@@ -55,6 +46,11 @@ const ManageOutcomeItem = ({
   const onClickHandler = () => setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({_id, linkId, title, canUnlink})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
+
+  // This allows account admins to edit global outcomes
+  // within a course. See OUT-1415, OUT-1511
+  const {canManage, isAdmin, isCourse} = useCanvasContext()
+  const allowAdminEdit = isCourse && canManage && isAdmin
 
   if (!title) return null
 
@@ -111,7 +107,7 @@ const ManageOutcomeItem = ({
             </Heading>
           </div>
         </Flex.Item>
-        {(canManageOutcome || allowAdminEdit()) && (
+        {(canManageOutcome || allowAdminEdit) && (
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}

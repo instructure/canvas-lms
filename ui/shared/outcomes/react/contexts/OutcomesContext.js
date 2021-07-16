@@ -26,6 +26,9 @@ export const getContext = isMobileView => {
   const useRceEnhancements = ENV.use_rce_enhancements
   const rootOutcomeGroup = ENV.ROOT_OUTCOME_GROUP
   const friendlyDescriptionFF = ENV.OUTCOMES_FRIENDLY_DESCRIPTION
+  const canManage = ENV.PERMISSIONS?.manage_outcomes
+  const canImport = ENV.PERMISSIONS?.import_outcomes
+  const isAdmin = ENV.current_user_roles?.includes('admin')
 
   return {
     env: {
@@ -34,7 +37,10 @@ export const getContext = isMobileView => {
       useRceEnhancements,
       rootOutcomeGroup,
       friendlyDescriptionFF,
-      isMobileView
+      isMobileView,
+      canManage,
+      canImport,
+      isAdmin
     }
   }
 }

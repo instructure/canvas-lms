@@ -149,14 +149,10 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   }
 
   const isMobileView = !breakpoints?.tablet
-  const canManage = ENV.PERMISSIONS?.manage_outcomes
-  const canImport = ENV.PERMISSIONS?.import_outcomes
 
   return (
     <OutcomesContext.Provider value={getContext(isMobileView)}>
-      {improvedManagement && (
-        <ManagementHeader handleFileDrop={onFileDrop} canManage={canManage} canImport={canImport} />
-      )}
+      {improvedManagement && <ManagementHeader handleFileDrop={onFileDrop} />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
           {improvedManagement ? !isImporting && <OutcomeManagementPanel /> : <OutcomePanel />}

@@ -17,8 +17,22 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
+
 import ManageOutcomeItem from '../ManageOutcomeItem'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {MockedProvider} from '@apollo/react-testing'
+
+const render = (
+  children,
+  {canManage = true, isAdmin = true, contextType = 'Account', renderer = rtlRender} = {}
+) => {
+  return renderer(
+    <OutcomesContext.Provider value={{env: {canManage, isAdmin, contextType}}}>
+      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    </OutcomesContext.Provider>
+  )
+}
 
 describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
@@ -136,33 +150,26 @@ describe('ManageOutcomeItem', () => {
     })
 
     describe('with manage_outcomes permission', () => {
-      beforeEach(() => {
-        window.ENV = {
-          ROOT_OUTCOME_GROUP: {
-            context_type: 'Course'
-          },
-          PERMISSIONS: {
-            manage_outcomes: true
-          },
-          current_user_roles: ['admin']
-        }
-      })
-
-      afterEach(() => {
-        window.ENV = null
-      })
-
       it('renders the kebab menu if the user is an admin within the course context', () => {
         const {getByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: true,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(getByText('Outcome Menu')).toBeInTheDocument()
       })
 
       it('does not render the kebab menu if the user is not an admin', () => {
-        window.ENV.current_user_roles = []
         const {queryByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: false,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
       })
