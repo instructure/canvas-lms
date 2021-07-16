@@ -226,7 +226,7 @@ describe('Assignment Student Content View', () => {
       return mocks
     }
 
-    it('opens the feedback panel', async () => {
+    it.skip('opens the feedback panel', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission({
         Submission: {unreadCommentCount: 1}
