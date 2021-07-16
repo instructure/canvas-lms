@@ -167,7 +167,7 @@ module Outcomes
     end
 
     def context_asset_string
-      (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
+     @_context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
     end
 
     def improved_outcomes_management?
