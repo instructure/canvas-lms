@@ -122,7 +122,7 @@ export const GradeSummaryLine = ({
             <Text transform="uppercase">
               <Heading as="h2" level="h3" margin="small 0">
                 <Link
-                  href={courseUrl}
+                  href={courseUrl + window.location.hash}
                   display="inline-block"
                   isWithinText={false}
                   theme={{

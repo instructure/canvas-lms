@@ -31,6 +31,10 @@ const defaultCourse = {
 }
 
 describe('GradesSummary', () => {
+  beforeAll(() => {
+    window.location.hash = '#grades'
+  })
+
   it('displays the score as a percentage if present and grading schemes are not used', () => {
     const {getByText} = render(<GradesSummary courses={[defaultCourse]} />)
     expect(getByText('90%')).toBeInTheDocument()
@@ -114,5 +118,10 @@ describe('GradesSummary', () => {
   it('does not render a link to the gradebook for students', () => {
     const {queryByRole} = render(<GradesSummary courses={[defaultCourse]} />)
     expect(queryByRole('link', {name: 'View Gradebook for Horticulture'})).not.toBeInTheDocument()
+  })
+
+  it('redirects to the course grades tab if the course name is clicked', () => {
+    const {getByRole} = render(<GradesSummary courses={[{...defaultCourse}]} />)
+    expect(getByRole('link', {name: 'Horticulture'}).href).toMatch('/courses/1#grades')
   })
 })
