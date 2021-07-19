@@ -41,6 +41,23 @@ describe "Importers::QuizImporter" do
     expect(quiz.show_correct_answers).to eq data[:show_correct_answers]
   end
 
+  context "when importing to new quizzes" do
+    before do
+      allow(@migration).to receive(:quizzes_next_migration?).and_return(true)
+    end
+
+    it "should not set the description field for the classic quiz" do
+      context = course_model
+      question_data = import_example_questions context
+      data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+      Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+      quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+      expect(data["description"]).to be_present
+      expect(quiz.description).to be_nil
+    end
+  end
+
+
   it "should complete a quiz question reference" do
     context = course_model
     question_data = import_example_questions context

@@ -192,7 +192,10 @@ module Importers
       item.scoring_policy = hash[:which_attempt_to_keep] if master_migration || hash[:which_attempt_to_keep]
 
       missing_links = []
-      item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
+
+      unless migration.quizzes_next_migration? # The description is mapped to "instructions" in NQ
+        item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
+      end
 
       %w[
         migration_id
