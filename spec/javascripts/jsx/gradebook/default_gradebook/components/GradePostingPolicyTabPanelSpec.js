@@ -30,6 +30,7 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     const componentProps = {
       anonymousAssignmentsPresent: true,
+      gradebookIsEditable: true,
       onChange: postPoliciesOnChangeStub,
       settings: {
         postManually: false,
@@ -82,6 +83,18 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
         const {checked} = manualPostingButton()
         strictEqual(checked, true)
       })
+    })
+
+    test('are disabled if gradebook cannot be edited by user', () => {
+      renderComponent({props: {gradebookIsEditable: false}})
+      strictEqual(automaticPostingButton().disabled, true)
+      strictEqual(manualPostingButton().disabled, true)
+    })
+
+    test('are enabled if gradebook can be edited by user', () => {
+      renderComponent({props: {gradebookIsEditable: true}})
+      strictEqual(automaticPostingButton().disabled, false)
+      strictEqual(manualPostingButton().disabled, false)
     })
 
     test('onChange is called when automatic posting is selected', () => {
