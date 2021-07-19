@@ -24,12 +24,30 @@ import {View} from '@instructure/ui-view'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
-import {name} from '@canvas/rce/plugins/canvas_mentions/plugin'
+import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
   const [rceContent, setRceContent] = useState(false)
   const textAreaId = useRef(`message-body-${nanoid()}`)
+
+  const rceMentionsIsEnabled = () => {
+    return !!ENV.rce_mentions_in_discussions
+  }
+
+  const getPlugins = () => {
+    const plugins = []
+
+    // Non-Editable
+    plugins.push('noneditable')
+
+    // Mentions
+    if (rceMentionsIsEnabled()) {
+      plugins.push(mentionsPluginName)
+    }
+
+    return plugins
+  }
 
   useEffect(() => {
     setRceContent(props.value)
@@ -61,9 +79,8 @@ export const DiscussionEdit = props => {
             }}
             editorOptions={{
               focus: true,
-              plugins: [name, 'noneditable'] // Needed for when RCE uses editorOptions for Plugin loading
+              plugins: getPlugins()
             }}
-            plugins={[name, 'noneditable']} // Short term fix to get plugin from ReactRCE to CqnvasRCE
             height={300}
             defaultContent={props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
