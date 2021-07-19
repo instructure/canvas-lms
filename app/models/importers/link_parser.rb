@@ -165,16 +165,16 @@ module Importers
     def link_embedded_image(info_match)
       extension = MIME::Types[info_match[:mime_type]]&.first&.extensions&.first
       image_data = Base64.decode64(info_match[:image])
-      md5 = Digest::MD5.hexdigest image_data
+      digest = Digest::SHA256.hexdigest image_data
       folder_name = I18n.t('embedded_images')
       @folder ||= Folder.root_folders(context).first.sub_folders.
         where(name: folder_name, workflow_state: 'hidden', context: context).first_or_create!
-      filename = "#{md5}.#{extension}"
-      file = Tempfile.new([md5, ".#{extension}"])
+      filename = "#{digest}.#{extension}"
+      file = Tempfile.new([digest, ".#{extension}"])
       file.binmode
       file.write(image_data)
       file.close
-      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5: md5)
+      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename)
       resolved("#{context_path}/files/#{attachment.id}/preview")
     rescue
       unresolved(:file, rel_path: "#{folder_name}/#{filename}")

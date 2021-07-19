@@ -224,7 +224,7 @@ describe ImportedHtmlConverter do
       new_string = convert_and_replace(test_string)
       attachment = Attachment.last
       expect(attachment.content_type).to eq 'image/gif'
-      expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
+      expect(attachment.name).to eq "7d8c0162b3f46d1e0ca56d53913d1cef67d672c0989c20141381a5f30f0bc481.gif"
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
     end
 
