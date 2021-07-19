@@ -120,7 +120,7 @@ describe('GroupRemoveModal', () => {
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
-      expect(onSuccessMock).toHaveBeenCalledWith(2, 1)
+      expect(onSuccessMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this account.',
         type: 'success'
@@ -139,7 +139,7 @@ describe('GroupRemoveModal', () => {
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Course', '1', '123')
     await waitFor(() => {
-      expect(onSuccessMock).toHaveBeenCalledWith(2, 1)
+      expect(onSuccessMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this course.',
         type: 'success'

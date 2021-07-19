@@ -135,9 +135,11 @@ const OutcomeManagementPanel = () => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
   }
-  const onSucessGroupRemove = (groupId, parentGroupId) => {
-    queryCollections({id: parentGroupId})
-    removeGroup(groupId, parentGroupId)
+  const onSucessGroupRemove = () => {
+    if (selectedParentGroupId) {
+      queryCollections({id: selectedParentGroupId})
+    }
+    removeGroup(selectedGroupId)
   }
 
   const groupMenuHandler = useCallback(

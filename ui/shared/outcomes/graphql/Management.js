@@ -113,7 +113,7 @@ export const FIND_GROUP_OUTCOMES = gql`
 `
 
 export const SEARCH_GROUP_OUTCOMES = gql`
-  query SearchGroupDetailQuery(
+  query SearchGroupOutcomesQuery(
     $id: ID!
     $outcomesCursor: String
     $outcomesContextId: ID!

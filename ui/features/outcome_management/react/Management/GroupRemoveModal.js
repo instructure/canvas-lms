@@ -36,8 +36,7 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler, onSuccess}) => {
     try {
       const result = await removeOutcomeGroup(contextType, contextId, groupId)
       if (result?.status === 200) {
-        const parentGroupId = result.data.parent_outcome_group.id
-        onSuccess(result.data.id, parentGroupId)
+        onSuccess()
         showFlashAlert({
           message: isAccount
             ? I18n.t('This group was successfully removed from this account.')

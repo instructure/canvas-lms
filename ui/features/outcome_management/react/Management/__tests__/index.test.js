@@ -30,6 +30,7 @@ import {
   groupMocks,
   updateOutcomeGroupMock
 } from '@canvas/outcomes/mocks/Management'
+import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/rce/RichContentEditor')
@@ -232,6 +233,50 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(getByText('Root course folder'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+  })
+
+  describe('Removing a group', () => {
+    it('Show parent group in the RHS', async () => {
+      // API mock
+      jest.spyOn(api, 'removeOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
+
+      const {getByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({
+            groupId: '200',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          ...groupMocks({groupId: '300', childGroupOffset: 400}),
+          ...groupDetailMocks({
+            groupId: '300',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText('All Course folder 0 Outcomes')).not.toBeInTheDocument()
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Remove'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // Remove Modal
+      fireEvent.click(getByText('Remove Group'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
+    })
   })
 
   it('selects/unselects outcome via checkbox', async () => {
