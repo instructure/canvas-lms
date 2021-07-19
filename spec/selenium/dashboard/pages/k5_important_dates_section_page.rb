@@ -55,7 +55,7 @@ module K5ImportantDatesSectionPageObject
   end
 
   def important_dates_title_selector
-    "h3:contains('Important Dates')"
+    "h2:contains('Important Dates')"
   end
 
   def mark_important_dates_selector
