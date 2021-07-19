@@ -17,17 +17,18 @@
  */
 
 import React from 'react'
-import {ShowOlderRepliesButton} from './ShowOlderRepliesButton'
+import {ShowMoreRepliesButton} from './ShowMoreRepliesButton'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/IsolatedView/ShowOlderRepliesButton',
-  component: ShowOlderRepliesButton,
+  title: 'Examples/Discussion Posts/Components/IsolatedView/ShowMoreRepliesButton',
+  component: ShowMoreRepliesButton,
   argTypes: {
-    onClick: {action: 'On Click'}
+    onClick: {action: 'On Click'},
+    buttonText: 'Show older replies'
   }
 }
 
-const Template = args => <ShowOlderRepliesButton {...args} />
+const Template = args => <ShowMoreRepliesButton {...args} />
 
 export const Default = Template.bind({})
 Default.args = {

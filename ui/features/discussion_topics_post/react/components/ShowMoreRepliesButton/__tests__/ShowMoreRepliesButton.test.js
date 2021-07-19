@@ -18,25 +18,25 @@
 
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
-import {ShowOlderRepliesButton} from '../ShowOlderRepliesButton'
+import {ShowMoreRepliesButton} from '../ShowMoreRepliesButton'
 
 const setup = props => {
-  return render(<ShowOlderRepliesButton {...props} />)
+  return render(<ShowMoreRepliesButton {...props} />)
 }
 
-describe('ShowOlderRepliesButton', () => {
+describe('ShowMoreRepliesButton', () => {
   const onClick = jest.fn()
 
   it('Should show the button text', () => {
-    const {queryByText} = setup()
+    const {queryByText} = setup({buttonText: 'Show older replies'})
 
     expect(queryByText('Show older replies')).toBeTruthy()
   })
 
   it('Should be able to click the button', () => {
-    const {getByTestId} = setup({onClick})
+    const {getByTestId} = setup({onClick, buttonText: 'Click Me'})
 
-    fireEvent.click(getByTestId('show-older-replies-button'))
+    fireEvent.click(getByTestId('show-more-replies-button'))
     expect(onClick.mock.calls.length).toBe(1)
   })
 })

@@ -17,31 +17,31 @@
  */
 
 import {CondensedButton} from '@instructure/ui-buttons'
-import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-export function ShowOlderRepliesButton({onClick, ...props}) {
+export function ShowMoreRepliesButton({onClick, ...props}) {
   return (
     <CondensedButton
       onClick={onClick}
       color="primary"
-      data-testid="show-older-replies-button"
+      data-testid="show-more-replies-button"
       {...props}
     >
-      <Text weight="bold">{I18n.t('Show older replies')}</Text>
+      <Text weight="bold">{props.buttonText}</Text>
     </CondensedButton>
   )
 }
 
-ShowOlderRepliesButton.propTypes = {
+ShowMoreRepliesButton.propTypes = {
   /**
-   * Behavior for showing older replies.
+   * Behavior for showing more replies.
    */
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  buttonText: PropTypes.string.isRequired
 }
 
-ShowOlderRepliesButton.defaultProps = {
+ShowMoreRepliesButton.defaultProps = {
   onClick: () => {}
 }

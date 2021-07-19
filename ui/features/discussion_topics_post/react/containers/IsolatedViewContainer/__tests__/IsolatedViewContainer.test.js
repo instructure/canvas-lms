@@ -257,6 +257,11 @@ describe('IsolatedViewContainer', () => {
     expect(await findByText('This is the search result child reply')).toBeInTheDocument()
   })
 
+  it('show newer button should not be visible', async () => {
+    const {queryByText} = setup(defaultProps())
+    await waitFor(() => expect(queryByText('Show newer replies')).toBeNull())
+  })
+
   it('calls the onOpenIsolatedView callback when clicking View Replies', async () => {
     const {findByText} = setup(defaultProps())
 

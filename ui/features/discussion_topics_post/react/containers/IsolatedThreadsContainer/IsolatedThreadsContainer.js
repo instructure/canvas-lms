@@ -26,9 +26,9 @@ import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect, useRef} from 'react'
+import {ShowMoreRepliesButton} from '../../components/ShowMoreRepliesButton/ShowMoreRepliesButton'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {ShowOlderRepliesButton} from '../../components/ShowOlderRepliesButton/ShowOlderRepliesButton'
 import {
   UPDATE_DISCUSSION_ENTRIES_READ_STATE,
   UPDATE_DISCUSSION_ENTRY
@@ -104,7 +104,10 @@ export const IsolatedThreadsContainer = props => {
             paddingLeft: theme.variables.spacing.medium
           }}
         >
-          <ShowOlderRepliesButton onClick={props.showOlderReplies} />
+          <ShowMoreRepliesButton
+            onClick={props.showOlderReplies}
+            buttonText={I18n.t('Show older replies')}
+          />
         </div>
       )}
       {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
@@ -122,6 +125,15 @@ export const IsolatedThreadsContainer = props => {
           isHighlighted={entry.id === props.highlightEntryId}
         />
       ))}
+      {false && (
+        <div
+          style={{
+            marginBottom: `1.5rem`
+          }}
+        >
+          <ShowMoreRepliesButton onClick={() => {}} buttonText={I18n.t('Show newer replies')} />
+        </div>
+      )}
     </div>
   )
 }
