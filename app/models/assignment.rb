@@ -3115,7 +3115,7 @@ class Assignment < ActiveRecord::Base
     self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
-      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
+      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
       DueDateCacher.recompute(self, update_grades: true)
     end
@@ -3127,7 +3127,8 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
-      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
+      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading? ||
+      will_save_change_to_anonymous_grading? || saved_change_to_anonymous_grading?
   end
 
   def update_due_date_smart_alerts

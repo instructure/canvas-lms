@@ -170,6 +170,14 @@ describe Assignment do
     end
 
     describe 'update_cached_due_dates' do
+      it 'invokes DueDateCacher if anonymous_grading is changed' do
+        attrs = assignment_valid_attributes.merge(anonymous_grading: true)
+        assignment = @course.assignments.create!(attrs)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(anonymous_grading: false)
+      end
+
       it 'invokes DueDateCacher if due_at is changed' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
