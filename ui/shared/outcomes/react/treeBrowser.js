@@ -47,14 +47,8 @@ const structFromGroup = (g, parentGroupId) => ({
   parentGroupId
 })
 
-const getCounts = rootGroups => {
-  return rootGroups.reduce(
-    (acc, group) => {
-      return [acc[0] + group.outcomesCount, acc[1] + group.childGroupsCount]
-    },
-    [0, 0]
-  )
-}
+const getChildOutcomesCount = rootGroups =>
+  rootGroups.reduce((acc, group) => acc + group.outcomesCount, 0)
 
 const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
@@ -329,13 +323,12 @@ export const useFindOutcomeModal = open => {
           accounts = context.parentAccountsConnection?.nodes
         }
         const rootGroups = accounts.map(account => account.rootOutcomeGroup)
-        const [outcomesCount, childGroupsCount] = getCounts(rootGroups)
         const childGroups = [
           {
             _id: ACCOUNT_FOLDER_ID,
             title: I18n.t('Account Standards'),
-            outcomesCount,
-            childGroupsCount
+            outcomesCount: getChildOutcomesCount(rootGroups),
+            childGroupsCount: rootGroups.length
           }
         ]
         if (globalRootGroup) {

@@ -32,10 +32,6 @@ module Outcomes
       @context = context
     end
 
-    def total_subgroups(learning_outcome_group_id)
-      children_ids(learning_outcome_group_id).length
-    end
-
     def total_outcomes(learning_outcome_group_id, args={})
       if args == {} && improved_outcomes_management?
         cache_key = total_outcomes_cache_key(learning_outcome_group_id)

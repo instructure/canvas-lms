@@ -177,7 +177,7 @@ describe('FindOutcomesModal', () => {
     it('renders the parent account groups', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
-      expect(getByText('100 Groups | 0 Outcomes')).toBeInTheDocument()
+      expect(getByText('10 Groups | 0 Outcomes')).toBeInTheDocument()
       fireEvent.click(getByText('Account Standards'))
       await act(async () => jest.runAllTimers())
       expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
