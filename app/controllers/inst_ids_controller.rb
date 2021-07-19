@@ -38,7 +38,7 @@
 
 class InstIdsController < ApplicationController
 
-  before_action :require_user, :require_non_inst_id_auth
+  before_action :require_user, :require_non_jwt_auth
 
   # @API Create InstID
   #
@@ -64,18 +64,16 @@ class InstIdsController < ApplicationController
       real_user_uuid: @real_current_user&.uuid,
       real_user_shard_id: @real_current_user&.shard&.id,
     )
-    render json: { token: inst_id.to_token }
+    render status: :created, json: { token: token_for(inst_id) }
   end
 
   private
 
-  def require_non_inst_id_auth
-    # TODO: a followup commit will enable InstID auth.  set this ivar when that happens.
-    if @authenticated_with_inst_id
-      render(
-        json: {error: "cannot generate an InstID when authorized by an InstID"},
-        status: 403
-      )
+  def token_for(inst_id)
+    if params[:unencrypted] && Rails.env.development?
+      inst_id.to_unencrypted_token
+    else
+      inst_id.to_token
     end
   end
 end

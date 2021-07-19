@@ -505,6 +505,63 @@ describe "API Authentication", type: :request do
     end
   end
 
+  describe "InstID" do
+    include_context "InstID setup"
+
+    before :once do
+      user_obj = user_with_pseudonym
+      course_with_teacher(user: user_obj)
+    end
+
+    it "allows API access with a valid InstID token" do
+      token = InstID.for_user(@user.uuid).to_unencrypted_token
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "allows API access for an InstID masquerading user" do
+      user = @user
+      real_user = user_with_pseudonym
+      token = InstID.for_user(
+        user.uuid,
+        real_user_uuid: real_user.uuid,
+        real_user_shard_id: real_user.shard.id
+      ).to_unencrypted_token
+
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+      expect(assigns['current_user']).to eq user
+      expect(assigns['real_current_user']).to eq real_user
+    end
+
+    it "errors if the InstID token is expired" do
+      token = InstID.for_user(@user.uuid).to_unencrypted_token
+      Timecop.travel(3601) do
+        get "/api/v1/courses", headers: {
+          'HTTP_AUTHORIZATION' => "Bearer #{token}"
+        }
+        assert_status(401)
+        expect(response.body).to match(/Invalid access token/)
+      end
+    end
+
+    it "requires an active pseudonym" do
+      token = InstID.for_user(@user.uuid).to_unencrypted_token
+      @user.pseudonym.destroy
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(401)
+      expect(response.body).to match(/Invalid access token/)
+    end
+  end
+
   describe "services JWT" do
     include_context "JWT setup"
 
