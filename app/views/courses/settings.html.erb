@@ -126,7 +126,7 @@
         <div class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></div>
         <div>
           <% if can_rename_course %>
-            <%= f.text_field :name, :class => "course_form", :maxlength => '255', :style => "width: 150px;" %>
+            <%= f.text_field :name, :class => "course_form", :maxlength => '255' %>
           <% else %>
             <span id="course_name"><%= @context.name %></span>
           <% end %>
@@ -136,7 +136,7 @@
         <div class="form-label nobr"><%= f.blabel :course_code, :en => "Course Code" %></div>
         <div>
           <% if can_rename_course %>
-            <%= f.text_field :course_code, :maxlength => '255', :style => "width: 100px;" %>
+            <%= f.text_field :course_code, :maxlength => '255' %>
           <% else %>
             <span id="course_course_code"><%= @context.course_code %></span>
           <% end %>
@@ -193,7 +193,7 @@
           <div class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></div>
           <div style="word-wrap: break-word;">
             <% if can_manage && can_do(@context.root_account, @current_user, :manage_sis) %>
-              <%= f.text_field :sis_source_id, :style => "width: 202px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
+              <%= f.text_field :sis_source_id, :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
             <% else %>
               <span id="course_sis_source_id">
                 <%= @context.sis_source_id %>

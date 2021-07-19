@@ -343,9 +343,6 @@ ul.user_list div.enrollment_type.pending {
       .syllabus-visibility {
         display: block;
       }
-      .panel-border {
-        width: unset;
-      }
     }
     .checkbox-flex-container {
       // Because we are wrapping, we need to force the
@@ -373,10 +370,6 @@ ul.user_list div.enrollment_type.pending {
   #course_default_wiki_editing_roles {
     vertical-align: baseline;
   }
-  #course_locale {
-    max-width: 360px;
-    width: 100%;
-  }
   .palign {
     line-height: 100%;
     margin-bottom: 10px;
@@ -394,6 +387,14 @@ ul.user_list div.enrollment_type.pending {
   i.date-warning {
     padding: direction-sides(8px 0 0 8px);
     color: $btnWarningBackground;
+  }
+  select {
+    width: 350px;
+    max-width: 100%;
+  }
+  input[type="text"], textarea {
+    width: 332px;
+    max-width: 100%;
   }
 
   // A few small exceptions
@@ -446,7 +447,8 @@ td.center-text {
   border-radius: 10px;
   border: 1px solid #ccc;
   padding: 15px;
-  width: 300px;
+  width: 322px;
+  max-width: 100%;
 }
 
 .master_course_restrictions {
