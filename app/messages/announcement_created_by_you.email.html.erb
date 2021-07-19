@@ -3,10 +3,8 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= before_label asset.title %> <%= asset.context.name %>
+  <%= t :subject, "You created this Announcement: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
 <% end %>
-
-You created this Announcement:
 
 <% define_content :footer_link do %>
   <a href="<%= content(:link) %>">
