@@ -217,6 +217,16 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Remove Group?')).toBeInTheDocument()
   })
 
+  it('hides the "Outcome Group Menu" for the root group', async () => {
+    const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root course folder'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+  })
+
   describe('Moving a group', () => {
     it('shows move group modal if move option from group menu is selected', async () => {
       const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {

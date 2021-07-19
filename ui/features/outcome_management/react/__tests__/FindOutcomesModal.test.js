@@ -153,15 +153,16 @@ describe('FindOutcomesModal', () => {
     const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account Standards'))
+    await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root Account Outcome Group 0'))
     await act(async () => jest.runAllTimers())
-    expect(getByText('Add All Outcomes')).toBeInTheDocument()
+    expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
     fireEvent.click(getByText('Done'))
     render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
     await act(async () => jest.runAllTimers())
     render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
     await act(async () => jest.runAllTimers())
-    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
+    expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
   })
 
   it('does not render the TreeBrowser if in responsive mode', async () => {

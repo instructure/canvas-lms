@@ -43,6 +43,7 @@ const structFromGroup = (g, parentGroupId) => ({
   descriptor: groupDescriptor(g),
   collections: [],
   outcomesCount: g.outcomesCount,
+  isRootGroup: g.isRootGroup,
   parentGroupId
 })
 
@@ -56,6 +57,7 @@ const ensureAllGroupFields = group => ({
   outcomesCount: null,
   title: null,
   parentGroupId: null,
+  isRootGroup: false,
   ...group
 })
 
@@ -82,6 +84,7 @@ const GROUPS_QUERY = gql`
   query GroupsQuery($collection: String!){
     groups(collection: $collection) {
       ${groupFields}
+      isRootGroup
       parentGroupId
     }
   }
@@ -236,7 +239,7 @@ export const useManageOutcomes = collection => {
       })
       .then(({data}) => {
         const rootGroup = data?.context?.rootOutcomeGroup
-        addGroups(extractGroups(rootGroup))
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
         addLoadedGroups([rootGroup._id])
         setRootId(rootGroup._id)
       })
@@ -325,6 +328,7 @@ export const useFindOutcomeModal = open => {
           {
             _id: ACCOUNT_FOLDER_ID,
             title: I18n.t('Account Standards'),
+            isRootGroup: true,
             outcomesCount: getChildOutcomesCount(rootGroups),
             childGroupsCount: rootGroups.length
           }
@@ -332,6 +336,7 @@ export const useFindOutcomeModal = open => {
         if (globalRootGroup) {
           childGroups.push({
             ...globalRootGroup,
+            isRootGroup: true,
             title: I18n.t('State Standards'),
             // add a different typename than LearningOutcomeGroup
             // because useDetail will load this group with a title
@@ -345,11 +350,13 @@ export const useFindOutcomeModal = open => {
           ...rootGroups.flatMap(g =>
             extractGroups({
               ...g,
+              isRootGroup: true,
               parentGroupId: ACCOUNT_FOLDER_ID
             })
           ),
           ...extractGroups({
             _id: ROOT_ID,
+            isRootGroup: true,
             childGroups: {
               nodes: childGroups
             }

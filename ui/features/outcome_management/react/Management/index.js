@@ -263,7 +263,7 @@ const OutcomeManagementPanel = () => {
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
                     scrollContainer={scrollContainer}
-                    isRootGroup={selectedGroupId === rootId}
+                    isRootGroup={collections[selectedGroupId]?.isRootGroup}
                   />
                 )}
               </View>

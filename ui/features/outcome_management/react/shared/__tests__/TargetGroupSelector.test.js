@@ -97,7 +97,8 @@ describe('TargetGroupSelector', () => {
       id: '100',
       name: 'Account folder 0',
       outcomesCount: 2,
-      parentGroupId: '1'
+      parentGroupId: '1',
+      isRootGroup: false
     })
   })
 

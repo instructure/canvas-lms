@@ -45,6 +45,7 @@ const FindOutcomesView = ({
   onAddAllHandler
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
+  const isRootGroup = collection?.isRootGroup
   const enabled = !!outcomesCount && outcomesCount > 0
   const [scrollContainer, setScrollContainer] = useState(null)
   const {isMobileView} = useCanvasContext()
@@ -62,7 +63,10 @@ const FindOutcomesView = ({
         width={isMobileView ? '100vw' : ''}
         wrap="wrap"
       >
-        <Flex.Item as="div" padding={isMobileView ? 'x-small 0' : 'x-small medium x-small 0'}>
+        <Flex.Item
+          as="div"
+          padding={isMobileView ? 'x-small 0' : isRootGroup ? '0' : 'x-small medium x-small 0'}
+        >
           <Text size="medium">
             {I18n.t(
               {
@@ -75,15 +79,17 @@ const FindOutcomesView = ({
             )}
           </Text>
         </Flex.Item>
-        <Flex.Item>
-          <Button
-            margin="x-small 0"
-            interaction={enabled && !searchString ? 'enabled' : 'disabled'}
-            onClick={onAddAllHandler}
-          >
-            {I18n.t('Add All Outcomes')}
-          </Button>
-        </Flex.Item>
+        {!isRootGroup && (
+          <Flex.Item>
+            <Button
+              margin="x-small 0"
+              interaction={enabled && !searchString ? 'enabled' : 'disabled'}
+              onClick={onAddAllHandler}
+            >
+              {I18n.t('Add All Outcomes')}
+            </Button>
+          </Flex.Item>
+        )}
       </Flex>
     </Flex.Item>
   )
@@ -248,7 +254,8 @@ const FindOutcomesView = ({
 FindOutcomesView.propTypes = {
   collection: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
+    isRootGroup: PropTypes.bool.isRequired
   }).isRequired,
   outcomesCount: PropTypes.number.isRequired,
   outcomes: PropTypes.shape({
