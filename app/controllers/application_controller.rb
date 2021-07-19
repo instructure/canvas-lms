@@ -264,7 +264,7 @@ class ApplicationController < ActionController::Base
 
   def add_to_js_env(hash, jsenv, overwrite)
     hash.each do |k,v|
-      if jsenv[k] && !overwrite
+      if jsenv[k] && jsenv[k] != v && !overwrite
         raise "js_env key #{k} is already taken"
       else
         jsenv[k] = v
@@ -405,6 +405,7 @@ class ApplicationController < ActionController::Base
   helper_method :set_master_course_js_env_data
 
   def load_blueprint_courses_ui
+    return if js_env[:BLUEPRINT_COURSES_DATA]
     return unless @context && @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
 
     is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
