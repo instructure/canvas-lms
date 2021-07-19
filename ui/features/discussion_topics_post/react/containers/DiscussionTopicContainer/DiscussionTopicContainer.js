@@ -41,7 +41,7 @@ import {
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
-import {useMutation} from 'react-apollo'
+import {useMutation, useApolloClient} from 'react-apollo'
 import {isGraded, getReviewLinkUrl, resolveAuthorRoles} from '../../utils'
 import {View} from '@instructure/ui-view'
 import {PostToolbarContainer} from '../PostToolbarContainer/PostToolbarContainer'
@@ -212,7 +212,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   })
 
+  const client = useApolloClient()
+  const resetDiscussionCache = () => {
+    client.resetStore()
+  }
   const [updateDiscussionReadState] = useMutation(UPDATE_DISCUSSION_READ_STATE, {
+    update: resetDiscussionCache,
     onCompleted: data => {
       if (!data.updateDiscussionReadState.errors) {
         setOnSuccess(I18n.t('You have successfully marked all as read.'))
