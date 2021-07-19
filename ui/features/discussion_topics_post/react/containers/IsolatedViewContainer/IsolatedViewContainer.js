@@ -57,7 +57,6 @@ export const IsolatedViewContainer = props => {
     addReplyToSubentries(
       cache,
       ISOLATED_VIEW_INITIAL_PAGE_SIZE,
-      'desc',
       newDiscussionEntry,
       window.ENV?.course_id
     )
@@ -173,8 +172,8 @@ export const IsolatedViewContainer = props => {
   const isolatedEntry = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
-      perPage: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
-      sort: 'desc',
+      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      sort: 'asc',
       courseID: window.ENV?.course_id
     }
   })
@@ -189,9 +188,9 @@ export const IsolatedViewContainer = props => {
     isolatedEntry.fetchMore({
       variables: {
         discussionEntryID: props.discussionEntryId,
-        perPage: PER_PAGE,
-        page: isolatedEntry.data.legacyNode.discussionSubentriesConnection.pageInfo.endCursor,
-        sort: 'desc',
+        last: PER_PAGE,
+        before: isolatedEntry.data.legacyNode.discussionSubentriesConnection.pageInfo.startCursor,
+        sort: 'asc',
         courseID: window.ENV?.course_id
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
@@ -200,8 +199,8 @@ export const IsolatedViewContainer = props => {
             ...previousResult.legacyNode,
             discussionSubentriesConnection: {
               nodes: [
-                ...previousResult.legacyNode.discussionSubentriesConnection.nodes,
-                ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes
+                ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes,
+                ...previousResult.legacyNode.discussionSubentriesConnection.nodes
               ],
               pageInfo: fetchMoreResult.legacyNode.discussionSubentriesConnection.pageInfo,
               __typename: 'DiscussionEntryConnection'

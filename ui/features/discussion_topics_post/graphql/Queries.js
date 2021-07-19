@@ -86,8 +86,10 @@ export const DISCUSSION_QUERY = gql`
 export const DISCUSSION_SUBENTRIES_QUERY = gql`
   query GetDiscussionSubentriesQuery(
     $discussionEntryID: ID!
-    $page: String
-    $perPage: Int
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
     $sort: DiscussionSortOrderType
     $courseID: ID
     $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
@@ -103,7 +105,13 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
-        discussionSubentriesConnection(after: $page, first: $perPage, sortOrder: $sort) {
+        discussionSubentriesConnection(
+          after: $after
+          before: $before
+          first: $first
+          last: $last
+          sortOrder: $sort
+        ) {
           nodes {
             ...DiscussionEntry
             editor {

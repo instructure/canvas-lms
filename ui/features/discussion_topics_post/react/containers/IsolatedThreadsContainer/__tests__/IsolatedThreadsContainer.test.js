@@ -101,49 +101,55 @@ describe('IsolatedThreadsContainer', () => {
   })
 
   describe('thread actions menu', () => {
-    it('allows toggling the unread state of an entry', () => {
+    it('allows toggling the unread state of an entry', async () => {
       const onToggleUnread = jest.fn()
-      const {getByTestId} = setup(defaultProps({onToggleUnread}))
+      const {findByTestId, findAllByTestId} = setup(defaultProps({onToggleUnread}))
 
-      fireEvent.click(getByTestId('thread-actions-menu'))
-      fireEvent.click(getByTestId('markAsUnread'))
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      const markAsRead = await findByTestId('markAsUnread')
+      fireEvent.click(markAsRead)
 
       expect(onToggleUnread).toHaveBeenCalled()
     })
 
-    it('only shows the delete option if you have permission', () => {
+    it('only shows the delete option if you have permission', async () => {
       const props = defaultProps({onDelete: jest.fn()})
       props.discussionEntry.discussionSubentriesConnection.nodes[0].permissions.delete = false
-      const {getByTestId, queryByTestId} = setup(props)
+      const {queryByTestId, findAllByTestId} = setup(props)
 
-      fireEvent.click(getByTestId('thread-actions-menu'))
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
       expect(queryByTestId('delete')).toBeNull()
     })
 
-    it('allows deleting an entry', () => {
+    it('allows deleting an entry', async () => {
       const onDelete = jest.fn()
-      const {getByTestId} = setup(defaultProps({onDelete}))
+      const {getByTestId, findAllByTestId} = setup(defaultProps({onDelete}))
 
-      fireEvent.click(getByTestId('thread-actions-menu'))
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
       fireEvent.click(getByTestId('delete'))
 
       expect(onDelete).toHaveBeenCalled()
     })
 
-    it('only shows the speed grader option if you have permission', () => {
+    it('only shows the speed grader option if you have permission', async () => {
       const props = defaultProps({onOpenInSpeedGrader: jest.fn()})
       props.discussionTopic.permissions.speedGrader = false
-      const {getByTestId, queryByTestId} = setup(props)
+      const {queryByTestId, findAllByTestId} = setup(props)
 
-      fireEvent.click(getByTestId('thread-actions-menu'))
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
       expect(queryByTestId('inSpeedGrader')).toBeNull()
     })
 
-    it('allows opening an entry in speedgrader', () => {
+    it('allows opening an entry in speedgrader', async () => {
       const onOpenInSpeedGrader = jest.fn()
-      const {getByTestId} = setup(defaultProps({onOpenInSpeedGrader}))
+      const {getByTestId, findAllByTestId} = setup(defaultProps({onOpenInSpeedGrader}))
 
-      fireEvent.click(getByTestId('thread-actions-menu'))
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       expect(onOpenInSpeedGrader).toHaveBeenCalled()

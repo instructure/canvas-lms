@@ -32,15 +32,6 @@ import {UPDATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 
 export const IsolatedThreadsContainer = props => {
-  /**
-   * We need the sort function, because we want the subEntries to return in desc (created_at) order,
-   * thus newest to oldest.
-   * But when we want to render the entries, we want them displayed {oldest to newest} => {top to bottom}.
-   */
-  const sortReverseDisplay = (a, b) => {
-    return new Date(a.createdAt) - new Date(b.createdAt)
-  }
-
   const subentriesCount = props.discussionEntry.subentriesCount
   const actualSubentriesCount = props.discussionEntry.discussionSubentriesConnection.nodes.length
   const hasMoreReplies = actualSubentriesCount < subentriesCount
@@ -62,22 +53,20 @@ export const IsolatedThreadsContainer = props => {
           <ShowOlderRepliesButton onClick={props.showOlderReplies} />
         </div>
       )}
-      {props.discussionEntry.discussionSubentriesConnection.nodes
-        .sort(sortReverseDisplay)
-        .map(entry => (
-          <IsolatedThreadContainer
-            discussionTopic={props.discussionTopic}
-            discussionEntry={entry}
-            key={entry.id}
-            onToggleRating={props.onToggleRating}
-            onToggleUnread={props.onToggleUnread}
-            onDelete={props.onDelete}
-            onOpenInSpeedGrader={props.onOpenInSpeedGrader}
-            onOpenIsolatedView={props.onOpenIsolatedView}
-            goToTopic={props.goToTopic}
-            isHighlighted={entry.id === props.highlightEntryId}
-          />
-        ))}
+      {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
+        <IsolatedThreadContainer
+          discussionTopic={props.discussionTopic}
+          discussionEntry={entry}
+          key={entry.id}
+          onToggleRating={props.onToggleRating}
+          onToggleUnread={props.onToggleUnread}
+          onDelete={props.onDelete}
+          onOpenInSpeedGrader={props.onOpenInSpeedGrader}
+          onOpenIsolatedView={props.onOpenIsolatedView}
+          goToTopic={props.goToTopic}
+          isHighlighted={entry.id === props.highlightEntryId}
+        />
+      ))}
     </div>
   )
 }

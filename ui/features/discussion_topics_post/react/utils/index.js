@@ -19,6 +19,7 @@
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
+import {ISOLATED_VIEW_INITIAL_PAGE_SIZE} from './constants'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -95,14 +96,14 @@ export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDi
     })
   }
 }
-export const addReplyToSubentries = (cache, perPage, sort, newDiscussionEntry, courseID) => {
+export const addReplyToSubentries = (cache, perPage, newDiscussionEntry, courseID) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
       variables: {
         discussionEntryID: newDiscussionEntry.parent.id,
-        perPage,
-        sort,
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        sort: 'asc',
         courseID
       }
     }
