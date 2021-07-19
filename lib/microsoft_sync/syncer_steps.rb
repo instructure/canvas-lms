@@ -60,13 +60,7 @@ module MicrosoftSync
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
 
-    # SyncCanceled errors are semi-expected errors -- so we raise them they will
-    # cleanup_after_failure but not produce a failed job.
-    class SyncCanceled < Errors::PublicError
-      include Errors::GracefulCancelErrorMixin
-    end
-
-    class MissingOwners < SyncCanceled
+    class MissingOwners < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
           'corresponding to the instructors of the Canvas course could be found on the ' \
@@ -75,20 +69,20 @@ module MicrosoftSync
     end
 
     # Can happen when User disables sync on account-level when jobs are running:
-    class TenantMissingOrSyncDisabled < SyncCanceled
+    class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Tenant missing or sync disabled. ' \
           'Check the Microsoft sync integration settings for the course and account.'
       end
     end
 
-    class MultipleEducationClasses < SyncCanceled
+    class MultipleEducationClasses < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Multiple Microsoft education classes already exist for the course.'
       end
     end
 
-    class MaxMemberEnrollmentsReached < SyncCanceled
+    class MaxMemberEnrollmentsReached < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Microsoft 365 allows a maximum of %{max} members in a team.'
       end
@@ -98,7 +92,7 @@ module MicrosoftSync
       end
     end
 
-    class MaxOwnerEnrollmentsReached < SyncCanceled
+    class MaxOwnerEnrollmentsReached < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Microsoft 365 allows a maximum of %{max} owners in a team.'
       end

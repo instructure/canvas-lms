@@ -104,8 +104,11 @@ describe MicrosoftSync::UserMapping do
           end
 
           it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
-            expect { subject }
-              .to raise_error(described_class::AccountSettingsChanged)
+            klass = described_class::AccountSettingsChanged
+            msg = /account-wide sync settings were changed/
+
+            expect { subject }.to \
+              raise_microsoft_sync_graceful_cancel_error(klass, msg)
               .and not_change{described_class.order(:id).map(&:attributes)}
           end
         end
@@ -117,13 +120,6 @@ describe MicrosoftSync::UserMapping do
         expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
           change { described_class.count }.from(0)
       end
-    end
-  end
-
-  describe 'AccountSettingsChanged' do
-    it 'is a graceful cancel error' do
-      expect(described_class::AccountSettingsChanged.new).to \
-        be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
     end
   end
 

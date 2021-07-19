@@ -94,7 +94,7 @@ module MicrosoftSync
 
     # Signals to StateMachineJob that an error is not entirely unexpected. It should
     # quit the job and report the error to the user, but not report to Canvas::Errors
-    module GracefulCancelErrorMixin; end
+    class GracefulCancelError < PublicError; end
 
     # This is used internally and retried (due to Microsoft's inconsistent API), but if it still
     # fails after retry, could indicate we need to up the backoff times, or indicate some other

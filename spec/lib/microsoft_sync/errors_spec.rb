@@ -264,4 +264,11 @@ describe MicrosoftSync::Errors do
       )
     end
   end
+
+  describe 'GracefulCancelError' do
+    it 'is a type of PublicError' do
+      # ... since expected errors should have error messages for users
+      expect(described_class::GracefulCancelError.new).to be_a(described_class::PublicError)
+    end
+  end
 end

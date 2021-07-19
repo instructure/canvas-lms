@@ -529,9 +529,8 @@ module MicrosoftSync
           end
         end
 
-        context 'when the error includes GracefulCancelErrorMixin' do
-          class GracefulCancelTestError < StandardError
-            include MicrosoftSync::Errors::GracefulCancelErrorMixin
+        context 'when the error is a GracefulCancelError' do
+          class GracefulCancelTestError < MicrosoftSync::Errors::GracefulCancelError
           end
 
           let(:error) { GracefulCancelTestError.new }

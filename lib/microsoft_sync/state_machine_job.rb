@@ -160,7 +160,7 @@ module MicrosoftSync
     # of time we may clear the state and restart the job. See `job_is_stale?`
     STALE_JOB_TIME = 1.day
 
-    # SEE ALSO Errors::GracefulCancelErrorMixin
+    # SEE ALSO Errors::GracefulCancelError
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
@@ -247,7 +247,7 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          if e.is_a?(Errors::GracefulCancelErrorMixin)
+          if e.is_a?(Errors::GracefulCancelError)
             statsd_increment(:cancel, current_step, e)
             update_state_record_to_errored_and_cleanup(e)
             return
