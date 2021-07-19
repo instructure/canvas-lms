@@ -19,13 +19,15 @@
 #
 
 class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
-  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil)
+  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
     @current_user = current_user
     @search_term = search_term
     @sort_order = sort_order
     @filter = filter
     @root_entries = root_entries
     @relative_entry_id = relative_entry_id
+    @before_entry = before_relative_entry
+    @include_entry = include_relative_entry
   end
 
   def perform(objects)
@@ -41,7 +43,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
 
       if @relative_entry_id
         relative_entry = scope.find(@relative_entry_id)
-        condition = @sort_order == :desc ? ">=" : "<"
+        condition = @before_entry ? "<" : ">"
+        condition += "=" if @include_entry
         scope = scope.where("created_at #{condition}?", relative_entry.created_at)
       end
 

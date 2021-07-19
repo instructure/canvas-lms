@@ -83,12 +83,16 @@ module Types
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :sort_order, DiscussionSortOrderType, required: false
       argument :relative_entry_id, ID, required: false
+      argument :before_relative_entry, Boolean, required: false
+      argument :include_relative_entry, Boolean, required: false
     end
-    def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil)
+    def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         sort_order: sort_order,
-        relative_entry_id: relative_entry_id
+        relative_entry_id: relative_entry_id,
+        before_relative_entry: before_relative_entry,
+        include_relative_entry: include_relative_entry
       ).load(object)
     end
 

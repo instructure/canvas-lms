@@ -43,19 +43,62 @@ describe Loaders::DiscussionEntryLoader do
     end
   end
 
-  it 'loads entries in both directions from relative entry' do
-    de5 = @discussion.discussion_entries.create!(message: 'from the future?', user: @student, created_at: 1.day.from_now)
-    de6 = @discussion.discussion_entries.create!(message: 'that is just crazy', user: @student, created_at: 2.days.from_now)
-    # @de1 is root, and we are loading 5 replies ordered by created_at, but force them all to be children.
-    DiscussionEntry.where(id: [@de2, @de3, @de4, de5, de6]).update_all(parent_id: @de1.id, root_entry_id: @de1.id)
-    GraphQL::Batch.batch do
-      Loaders::DiscussionEntryLoader.for(current_user: @teacher, relative_entry_id: @de4, sort_order: :desc)
-        .load(@de1).then { |discussion_entries| expect(discussion_entries.map(&:id)).to eq [de6.id, de5.id, @de4.id] }
+  describe 'relative entry' do
+    before(:once) do
+      @de5 = @discussion.discussion_entries.create!(message: 'from the future?', user: @student, created_at: 1.day.from_now)
+      @de6 = @discussion.discussion_entries.create!(message: 'that is just crazy', user: @student, created_at: 2.days.from_now)
+      # @de1 is root, and we are loading 5 replies ordered by created_at, but force them all to be children.
+      DiscussionEntry.where(id: [@de2, @de3, @de4, @de5, @de6]).update_all(parent_id: @de1.id, root_entry_id: @de1.id)
     end
 
-    GraphQL::Batch.batch do
-      Loaders::DiscussionEntryLoader.for(current_user: @teacher, relative_entry_id: @de4, sort_order: :asc)
-        .load(@de1).then { |discussion_entries| expect(discussion_entries.map(&:id)).to eq [@de3.id, @de2.id] }
+    it 'get entries before relative entry including relative by default' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de3.id, @de2.id, @de4.id]
+        end
+      end
+    end
+
+    it 'sort works wih relative_entry_id' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :desc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de2.id, @de3.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: false,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de5.id, @de6.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry including relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: true,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de5.id, @de6.id]
+        end
+      end
     end
   end
 
