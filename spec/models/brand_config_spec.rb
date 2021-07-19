@@ -229,12 +229,48 @@ describe BrandConfig do
   end
 
   it "expects md5 to be correct" do
-    what_it_should_be_if_you_have_not_ran_gulp_rev = 85663486644871658581990
-    what_it_should_be_if_you_have = 839184435922331766
+    what_it_should_be_if_you_have_not_ran_gulp_rev = 66777721041301445917021322766375798443641
+    what_it_should_be_if_you_have = 30031993956460004715076895001679933
     expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are
     # with and without running `rake canvas:compile_assets`
-    # Also update the other use of 85663486644871658581990 in lib/brandable_css.rb
+    # Also update the other use of 66777721041301445917021322766375798443641 in lib/brandable_css.rb
+  end
+
+  describe "validate_md5" do
+    it "accepts a valid md5" do
+      bc = BrandConfig.new
+      bc.md5 = "0123456789abcdef0123456789ABCDEF";
+      expect(bc.validate_md5).to be true
+      expect(bc.errors[:md5]).to be_empty
+    end
+
+    it "accepts a valid sha256" do
+      bc = BrandConfig.new
+      bc.md5 = "0123456789abcdef0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+      expect(bc.validate_md5).to be true
+      expect(bc.errors[:md5]).to be_empty
+    end
+
+    it "rejects an md5 with invalid length" do
+      bc = BrandConfig.new
+      bc.md5 = "0"*48
+      expect(bc.validate_md5).to be false
+      expect(bc.errors[:md5]).to include "must be exactly 32 or 64 hex digits"
+    end
+
+    it "rejects an md5 containing invalid chracters" do
+      bc = BrandConfig.new
+      bc.md5 = "Z"*32;
+      expect(bc.validate_md5).to be false
+      expect(bc.errors[:md5]).to include "must be exactly 32 or 64 hex digits"
+    end
+
+    it "gets called on validate" do
+      bc = BrandConfig.new
+      expect(bc).to receive(:validate_md5).at_least(:once).and_return(true)
+      bc.validate
+    end
   end
 end

@@ -19,7 +19,7 @@
 import PropTypes from 'prop-types'
 import _ from 'underscore'
 
-const MD5_REGEX = /[0-9a-fA-F]{32}$/
+const MD5_REGEX = /^([0-9a-fA-F]{32}|[0-9a-fA-F]{64})$/
 const types = {}
 
 types.md5 = (props, propName, componentName) => {

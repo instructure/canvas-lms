@@ -21,6 +21,7 @@ class CreateStateTheme < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   NAME = "State U. Theme"
+  MD5 = "7845907c6e76db998e5f24d63aca97b5"
 
   def up
     variables = {
@@ -45,7 +46,11 @@ class CreateStateTheme < ActiveRecord::Migration[4.2]
     bc = BrandConfig.new(variables: variables)
     bc.name = NAME
     bc.share = true
-    bc.save!
+    bc.md5 = MD5
+    # set the md5 directly in the record for backwards compatability
+    BrandConfig.suspend_callbacks(:generate_md5) do
+      bc.save!
+    end
     SharedBrandConfig.create!(name: bc.name, brand_config_md5: bc.md5)
   end
 
