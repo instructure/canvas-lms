@@ -34,7 +34,8 @@ const GroupMoveModal = ({
   parentGroupId,
   isOpen,
   onCloseHandler,
-  onGroupCreated
+  onGroupCreated,
+  onSuccess
 }) => {
   const [targetGroup, setTargetGroup] = useState(null)
   const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
@@ -62,6 +63,7 @@ const GroupMoveModal = ({
           }),
           type: 'success'
         })
+        onSuccess()
       } catch (err) {
         showFlashAlert({
           message: err.message
@@ -126,7 +128,13 @@ GroupMoveModal.propTypes = {
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired
+  onGroupCreated: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired
+}
+
+GroupMoveModal.defaultProps = {
+  onSuccess: () => {},
+  onGroupCreated: () => {}
 }
 
 export default GroupMoveModal

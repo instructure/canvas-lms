@@ -301,6 +301,11 @@ const OutcomeManagementPanel = () => {
                   isOpen={isGroupMoveModalOpen}
                   onCloseHandler={closeGroupMoveModal}
                   onGroupCreated={addNewGroup}
+                  onSuccess={() => {
+                    queryCollections({
+                      id: selectedParentGroupId
+                    })
+                  }}
                 />
               )}
               {selectedOutcome && (

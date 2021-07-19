@@ -27,7 +27,8 @@ import {
   accountMocks,
   courseMocks,
   groupDetailMocks,
-  groupMocks
+  groupMocks,
+  updateOutcomeGroupMock
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
@@ -432,6 +433,46 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
       expect(queryByText('Move 2 Outcomes?')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Moving a group', () => {
+    it('show parent group in the RHS when moving a group succeeds', async () => {
+      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...courseMocks({childGroupsCount: 2}),
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2'}),
+          ...groupMocks({groupId: '300', childGroupOffset: 400}),
+          ...groupDetailMocks({groupId: '300', contextType: 'Course', contextId: '2'}),
+          updateOutcomeGroupMock({
+            id: '300',
+            parentOutcomeGroupId: '201',
+            title: null,
+            description: null,
+            vendorGuid: null
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Outcome Group Kebab Menu
+      fireEvent.click(getByText('Outcome Group Menu'))
+      fireEvent.click(within(getByRole('menu')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // Move Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
     })
   })
 

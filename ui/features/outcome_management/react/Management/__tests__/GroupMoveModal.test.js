@@ -264,4 +264,26 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(r.queryByText('Group 100 folder 0')).not.toBeInTheDocument()
   })
+
+  it('calls onSuccess after move', async () => {
+    const onSuccess = jest.fn()
+    const {getByText} = render(<GroupMoveModal {...defaultProps({onSuccess})} />, {
+      mocks: [
+        ...smallOutcomeTree(),
+        updateOutcomeGroupMock({
+          title: null,
+          description: null,
+          vendorGuid: null
+        })
+      ]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 1'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Move'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(onSuccess).toHaveBeenCalled()
+  })
 })
