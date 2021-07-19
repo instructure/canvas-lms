@@ -74,6 +74,41 @@
   {{/unless}}
   <div>
     <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
+      {{#unless context_is_group}}
+        {{#unless settings.hide_sections}}
+          <li>
+            <strong>{{#t}}Sections{{/t}}</strong>
+          </li>
+          {{# each sections }}
+            <li class="member section_{{id}}">
+              <label class="checkbox" for="section_{{id}}">
+                <input name="section[{{id}}]" type="hidden" value="0">
+                <input id="section_{{id}}" name="section[{{id}}]" type="checkbox" value="1">
+                {{name}}
+              </label>
+            </li>
+          {{/each}}
+        {{/unless}}
+        {{#unless settings.hide_groups}}
+          <li>
+            <strong>{{#t}}Groups{{/t}}</strong>
+          </li>
+          {{# each groups }}
+            <li class="member group_{{id}}">
+              <label class="checkbox" for="group_{{id}}">
+                <input name="group[{{id}}]" type="hidden" value="0">
+                <input id="group_{{id}}" name="group[{{id}}]" type="checkbox" value="1">
+                {{name}}
+              </label>
+            </li>
+          {{/each}}
+        {{/unless}}
+        {{#unless settings.hide_user_header}}
+          <li>
+            <strong>{{#t}}Users{{/t}}</strong>
+          </li>
+        {{/unless}}
+      {{/unless}}
       {{# each users}}
         <li class="member user_{{id}}">
           <label class="checkbox" for="user_{{id}}">
