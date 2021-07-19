@@ -116,6 +116,7 @@ const DiscussionTopicManager = props => {
   // Highlight State
   const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [highlightEntryId, setHighlightEntryId] = useState(null)
+  const [relativeEntryId, setRelativeEntryId] = useState(null)
 
   useEffect(() => {
     if (isTopicHighlighted) {
@@ -133,10 +134,11 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, withRCE) => {
+  const openIsolatedView = (discussionEntryId, withRCE, relativeId = null) => {
     setIsolatedEntryId(discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
+    setRelativeEntryId(relativeId)
   }
 
   const closeIsolatedView = () => {
@@ -224,15 +226,16 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          onOpenIsolatedView={(discussionEntryId, withRCE, highlightId) => {
-            setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, withRCE)
+          onOpenIsolatedView={(discussionEntryId, withRCE, relativeId) => {
+            setHighlightEntryId(relativeId)
+            openIsolatedView(discussionEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
+          relativeEntryId={relativeEntryId}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
           open={isolatedViewOpen}

@@ -69,7 +69,13 @@ export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
   }
 }
 
-export const addReplyToDiscussionEntry = (cache, perPage, newDiscussionEntry, courseID) => {
+export const addReplyToDiscussionEntry = (
+  cache,
+  perPage,
+  newDiscussionEntry,
+  courseID,
+  relativeEntryId = null
+) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
@@ -77,7 +83,9 @@ export const addReplyToDiscussionEntry = (cache, perPage, newDiscussionEntry, co
         discussionEntryID: newDiscussionEntry.parent.id,
         last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
         sort: 'asc',
-        courseID
+        courseID,
+        relativeEntryId,
+        includeRelativeEntry: !!relativeEntryId
       }
     }
     const currentSubentries = JSON.parse(JSON.stringify(cache.readQuery(options)))

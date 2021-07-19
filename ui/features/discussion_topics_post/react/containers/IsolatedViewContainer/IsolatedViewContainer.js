@@ -52,7 +52,8 @@ export const IsolatedViewContainer = props => {
       cache,
       ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       newDiscussionEntry,
-      window.ENV?.course_id
+      window.ENV?.course_id,
+      props.relativeEntryId
     )
   }
 
@@ -178,7 +179,9 @@ export const IsolatedViewContainer = props => {
       discussionEntryID: props.discussionEntryId,
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
-      courseID: window.ENV?.course_id
+      courseID: window.ENV?.course_id,
+      relativeEntryId: props.relativeEntryId,
+      includeRelativeEntry: !!props.relativeEntryId
     }
   })
 
@@ -329,7 +332,8 @@ IsolatedViewContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  setHighlightEntryId: PropTypes.func
+  setHighlightEntryId: PropTypes.func,
+  relativeEntryId: PropTypes.string
 }
 
 export default IsolatedViewContainer

@@ -251,6 +251,12 @@ describe('IsolatedViewContainer', () => {
     expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
   })
 
+  it('should call query with relative id params', async () => {
+    const {findByText} = setup(defaultProps({relativeEntryId: '10'}))
+
+    expect(await findByText('This is the search result child reply')).toBeInTheDocument()
+  })
+
   it('calls the onOpenIsolatedView callback when clicking View Replies', async () => {
     const {findByText} = setup(defaultProps())
 

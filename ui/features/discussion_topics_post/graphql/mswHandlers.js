@@ -90,6 +90,25 @@ export const handlers = [
     )
   }),
   graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+    if (req.body.variables.includeRelativeEntry) {
+      return res(
+        ctx.data({
+          legacyNode: DiscussionEntry.mock({
+            discussionSubentriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  _id: '50',
+                  id: '50',
+                  message: '<p>This is the search result child reply</p>'
+                })
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionSubentriesConnection'
+            }
+          })
+        })
+      )
+    }
     if (req.body.variables.sort === 'asc') {
       return res(
         ctx.data({
