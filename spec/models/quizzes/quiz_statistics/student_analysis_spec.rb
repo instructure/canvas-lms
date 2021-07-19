@@ -25,7 +25,7 @@ require 'csv'
 describe Quizzes::QuizStatistics::StudentAnalysis do
 
   def temporary_user_code
-    "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+    "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
   end
 
   def survey_with_logged_out_submission
