@@ -23,7 +23,7 @@ require 'html_text_helper'
 module CanvasQuizStatistics
   module Util
     def self.digest(str)
-      Digest::MD5.hexdigest((str || '').to_s.strip)
+      Digest::SHA1.hexdigest((str || '').to_s.strip)
     end
 
     # Converts a hash to use symbol keys.

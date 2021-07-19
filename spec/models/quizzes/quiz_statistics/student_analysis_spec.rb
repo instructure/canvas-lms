@@ -487,7 +487,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     qs = q.generate_submission(@student)
     qs.submission_data = {
       "question_#{q.quiz_data[0][:id]}" => "<em>short_answer</em>",
-      "question_#{q.quiz_data[1][:id]}_10ca8479f89652b254a5c6ec90ab9ab8" => "<em>fimb</em>",
+      "question_#{q.quiz_data[1][:id]}_#{AssessmentQuestion.variable_id("myblank")}" => "<em>fimb</em>",
       "question_#{q.quiz_data[2][:id]}" => "<em>essay</em>",
       "question_#{q.quiz_data[3][:id]}" => "<em>numerical</em>",
       "question_#{q.quiz_data[4][:id]}" => "<em>calculated</em>",

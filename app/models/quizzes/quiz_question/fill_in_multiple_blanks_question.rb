@@ -111,7 +111,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
         answers.each do |answer|
           found = false
           if (txt = response[:"answer_for_#{answer[:blank_id]}"].try(:strip)).present?
-            answer_md5 = Digest::MD5.hexdigest(txt)
+            answer_digest = Digest::SHA256.hexdigest(txt)
           end
           answer[:responses] += 1 if response[:correct]
           answer[:answer_matches].each do |right|
@@ -122,9 +122,9 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
             end
           end
           if !found
-            if answer_md5
+            if answer_digest
               match = {
-                :id => answer_md5,
+                :id => answer_digest,
                 :responses => 1,
                 :user_ids => [response[:user_id]],
                 :text => response["answer_for_#{answer[:blank_id]}".to_sym]

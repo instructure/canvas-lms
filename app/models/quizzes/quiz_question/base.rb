@@ -140,20 +140,20 @@ class Quizzes::QuizQuestion::Base
     responses.each do |response|
       found = nil
       if response[:text].try(:strip).present?
-        answer_md5 = Digest::MD5.hexdigest(response[:text].strip)
+        answer_digest = Digest::SHA256.hexdigest(response[:text].strip)
       end
 
       answers.each do |answer|
-        if answer[:id] == response[:answer_id] || answer[:id] == answer_md5
+        if answer[:id] == response[:answer_id] || answer[:id] == answer_digest
           found = true
           answer[:responses] += 1
           answer[:user_ids] << response[:user_id]
         end
       end
 
-      if !found && answer_md5 && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
+      if !found && answer_digest && (@question_data.is_type?(:numerical) || @question_data.is_type?(:short_answer))
         answers << {
-          :id => answer_md5,
+          :id => answer_digest,
           :responses => 1,
           :user_ids => [response[:user_id]],
           :text => response[:text]

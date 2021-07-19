@@ -55,7 +55,7 @@ namespace :canvas do
       File.write(out_path, events.to_json(include_root: false))
 
       puts "\tBlob size: #{File.size(out_path)}b (#{(File.size(out_path) / 1000).round}K)"
-      puts "\tBlob signature: #{Digest::MD5.hexdigest(File.read(out_path))}"
+      puts "\tBlob signature: #{Digest::SHA256.hexdigest(File.read(out_path))}"
       puts "Done. Bye!"
       puts '*' * 80
     end
