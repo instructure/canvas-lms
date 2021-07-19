@@ -84,7 +84,7 @@ export const onKeyDown = e => {
 export const onMouseDown = e => {
   const editor = e.editor || tinymce.activeEditor
 
-  if (e.currentTarget.id !== MARKER_ID) {
+  if (e.target.id !== MARKER_ID) {
     makeBodyEditable(editor, MARKER_SELECTOR)
   }
 }

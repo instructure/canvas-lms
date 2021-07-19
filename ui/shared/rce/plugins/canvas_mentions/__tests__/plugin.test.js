@@ -226,12 +226,12 @@ describe('pluginDefinition', () => {
   })
 
   describe('MouseDown', () => {
-    let currentTarget
+    let target
 
-    const subject = () => editor.fire('MouseDown', {editor, currentTarget})
+    const subject = () => editor.fire('MouseDown', {editor, target})
 
     beforeEach(() => {
-      currentTarget = {id: ''}
+      target = {id: ''}
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
@@ -245,7 +245,7 @@ describe('pluginDefinition', () => {
     sharedExamplesForEventHandlers(subject)
 
     describe('when the target of the click is the marker', () => {
-      beforeEach(() => (currentTarget = {id: 'mentions-marker'}))
+      beforeEach(() => (target = {id: 'mentions-marker'}))
 
       it('does not make the body contenteditable', () => {
         subject()

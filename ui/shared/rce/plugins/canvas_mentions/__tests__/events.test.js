@@ -158,12 +158,12 @@ describe('events', () => {
     beforeEach(() => {
       event = {
         editor,
-        currentTarget: {}
+        target: {}
       }
     })
 
     describe('when the current target is the marker', () => {
-      beforeEach(() => (event.currentTarget.id = 'mentions-marker'))
+      beforeEach(() => (event.target.id = 'mentions-marker'))
 
       it('does not make the body editable', () => {
         subject()
@@ -172,7 +172,7 @@ describe('events', () => {
     })
 
     describe('when the current target is not the marker', () => {
-      beforeEach(() => (event.currentTarget.id = undefined))
+      beforeEach(() => (event.target.id = undefined))
 
       it('does not make the body editable', () => {
         subject()
