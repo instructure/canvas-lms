@@ -192,7 +192,7 @@ module Canvas::Migration::Helpers
         if atts.length == 1 && atts[0]['file_name'] == folder_name
           content_list << item_hash('attachments', atts[0])
         else
-          mig_id = Digest::MD5.hexdigest(folder_name)
+          mig_id = Digest::SHA256.hexdigest(folder_name)
           folder = {type: 'folders', property: "#{property_prefix}[folders][id_#{mig_id}]", title: folder_name, migration_id: mig_id, sub_items: []}
           content_list << folder
           atts.each {|att| folder[:sub_items] << item_hash('attachments', att)}

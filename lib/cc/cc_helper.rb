@@ -118,7 +118,7 @@ module CCHelper
       key = object.to_s
     end
     # make it obvious if we're using new identifiers now
-    (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
+    (global ? "g" : "i") + Digest::SHA256.hexdigest(prepend + key)
   end
 
   def self.ims_date(date=nil,default=Time.now)

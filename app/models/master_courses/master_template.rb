@@ -197,7 +197,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
     end
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
-    "#{self.class.migration_id_prefix(self.shard.id, self.id)}#{Digest::MD5.hexdigest(prepend + key)}"
+    "#{self.class.migration_id_prefix(self.shard.id, self.id)}#{Digest::SHA256.hexdigest(prepend + key)}"
   end
 
   def add_child_course!(child_course_or_id)

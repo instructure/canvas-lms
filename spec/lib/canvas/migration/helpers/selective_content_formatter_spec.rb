@@ -137,9 +137,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                 'a5' => {'path_name' => 'a5.html', 'file_name' => 'a5.html', 'migration_id' => 'a5'},
                                       }}.to_json)
       expect(@formatter.get_content_list('attachments')).to eq [{:type => "folders",
-                                                             :property => "copy[folders][id_0cc175b9c0f1b6a831c399e269772661]",
+                                                             :property => "copy[folders][id_ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb]",
                                                              :title => "a",
-                                                             :migration_id => "0cc175b9c0f1b6a831c399e269772661",
+                                                             :migration_id => "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
                                                                        :property => "copy[attachments][id_a1]",
@@ -152,9 +152,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                                        :migration_id => "a2",
                                                                        :path => "a"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][id_a7e86136543b019d72468ceebf71fb8e]",
+                                                             :property => "copy[folders][id_c14cddc033f64b9dea80ea675cf280a015e672516090a5626781153dc68fea11]",
                                                              :title => "a/b",
-                                                             :migration_id => "a7e86136543b019d72468ceebf71fb8e",
+                                                             :migration_id => "c14cddc033f64b9dea80ea675cf280a015e672516090a5626781153dc68fea11",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
                                                                        :property => "copy[attachments][id_a3]",
@@ -162,9 +162,9 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                                        :migration_id => "a3",
                                                                        :path => "a/b"}]},
                                                             {:type => "folders",
-                                                             :property => "copy[folders][id_cff49f359f080f71548fcee824af6ad3]",
+                                                             :property => "copy[folders][id_d76a7b72669c9cec266b566bdec68efbc8d4f22d1f2689bbf0146bf0b88fdbe9]",
                                                              :title => "a/b/c",
-                                                             :migration_id => "cff49f359f080f71548fcee824af6ad3",
+                                                             :migration_id => "d76a7b72669c9cec266b566bdec68efbc8d4f22d1f2689bbf0146bf0b88fdbe9",
                                                              :sub_items =>
                                                                      [{:type => "attachments",
                                                                        :property => "copy[attachments][id_a4]",

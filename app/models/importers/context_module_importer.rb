@@ -201,7 +201,7 @@ module Importers
     def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
-      hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
+      hash[:migration_id] ||= Digest::SHA256.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
