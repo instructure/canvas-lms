@@ -115,7 +115,7 @@ class UnzipAttachment
         Tempfile.open(filename) do |f|
           begin
             file_size = 0
-            md5 = entry.extract(f.path, true) do |bytes|
+            md5 = entry.extract(f.path, true, digest_class: Attachment.digest_class) do |bytes|
               file_size += bytes
             end
             zip_stats.charge_quota(file_size)

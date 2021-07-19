@@ -200,7 +200,7 @@ class CanvasUnzip
     end
 
     # yields byte count
-    def extract(dest_path, overwrite=false, maximum_size=DEFAULT_BYTE_LIMIT)
+    def extract(dest_path, overwrite=false, maximum_size=DEFAULT_BYTE_LIMIT, digest_class: Digest::SHA256)
       dir = self.directory? ? dest_path : File.dirname(dest_path)
       FileUtils.mkdir_p(dir) unless File.exist?(dir)
       return unless self.file?
@@ -210,7 +210,7 @@ class CanvasUnzip
         raise DestinationFileExists, "Destination '#{dest_path}' already exists"
       end
 
-      digest = Digest::MD5.new
+      digest = digest_class.new
       ::File.open(dest_path, "wb") do |os|
         if type == :zip
           entry.get_input_stream do |is|
