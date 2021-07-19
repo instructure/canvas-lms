@@ -31,6 +31,8 @@ import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {Heading} from '@instructure/ui-heading'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {InlineList} from '@instructure/ui-list'
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
@@ -38,14 +40,18 @@ export function PostMessage({...props}) {
   let editText = null
   if (props.editedTimingDisplay) {
     editText = props.editorName
-      ? I18n.t(', edited by %{editorName} %{editedTimingDisplay}', {
+      ? I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
           editorName: props.editorName,
           editedTimingDisplay: props.editedTimingDisplay
         })
-      : I18n.t(', edited %{editedTimingDisplay}', {
+      : I18n.t('Edited %{editedTimingDisplay}', {
           editedTimingDisplay: props.editedTimingDisplay
         })
   }
+
+  const createdTooltip = I18n.t('Created %{timingDisplay}', {
+    timingDisplay: props.timingDisplay
+  })
 
   return (
     <Flex padding="0 0 medium 0">
@@ -116,20 +122,45 @@ export function PostMessage({...props}) {
               </Flex.Item>
               {props.timingDisplay && (
                 <Flex.Item shouldShrink padding="0 0 0 small">
-                  <View display="inline-flex" padding="none small none none">
-                    <Text color="primary" size="small">
-                      {props.timingDisplay}
-                    </Text>
-                    <Text color="primary" size="small">
-                      {editText}
-                    </Text>
-                    <Text color="primary" size="small">
-                      {!!props.lastReplyAtDisplayText &&
-                        I18n.t(', last reply %{lastReplyAtDisplayText}', {
-                          lastReplyAtDisplayText: props.lastReplyAtDisplayText
-                        })}
-                    </Text>
-                  </View>
+                  <InlineList>
+                    {!props.showCreatedAsTooltip && (
+                      <InlineList.Item>
+                        <Text color="primary" size="small">
+                          {props.timingDisplay}
+                        </Text>
+                      </InlineList.Item>
+                    )}
+                    {props.showCreatedAsTooltip && !!editText ? (
+                      <InlineList.Item data-testid="created-tooltip">
+                        <Tooltip renderTip={createdTooltip}>
+                          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+                          <span tabIndex="0">
+                            <Text color="primary" size="small">
+                              {editText}
+                            </Text>
+                          </span>
+                          <ScreenReaderContent>{createdTooltip}</ScreenReaderContent>
+                        </Tooltip>
+                      </InlineList.Item>
+                    ) : (
+                      !!editText && (
+                        <InlineList.Item>
+                          <Text color="primary" size="small">
+                            {editText}
+                          </Text>
+                        </InlineList.Item>
+                      )
+                    )}
+                    {!!props.lastReplyAtDisplayText && (
+                      <InlineList.Item>
+                        <Text color="primary" size="small">
+                          {I18n.t(`Last reply %{lastReplyAtDisplayText}`, {
+                            lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                          })}
+                        </Text>
+                      </InlineList.Item>
+                    )}
+                  </InlineList>
                 </Flex.Item>
               )}
             </Flex>
@@ -250,7 +281,8 @@ PostMessage.propTypes = {
    */
   isForcedRead: PropTypes.bool,
   postUtilities: PropTypes.node,
-  isIsolatedView: PropTypes.bool
+  isIsolatedView: PropTypes.bool,
+  showCreatedAsTooltip: PropTypes.bool
 }
 
 PostMessage.defaultProps = {

@@ -139,8 +139,34 @@ describe('PostMessage', () => {
       })
       expect(queryByText('Author Name')).toBeTruthy()
       expect(queryByText('Timing Display')).toBeTruthy()
-      expect(queryByText(', last reply Apr 12 2:35pm')).toBeTruthy()
+      expect(queryByText('Last reply Apr 12 2:35pm')).toBeTruthy()
       expect(queryByTestId('pill-container')).toBeFalsy()
+      expect(queryByText(/Edited/)).toBeFalsy()
+      expect(queryByTestId('created-tooltip')).toBeFalsy()
+    })
+
+    it('prepends edited info with comma if !showCreatedAsTooltip', () => {
+      const {getByText, queryByText, queryByTestId} = setup({
+        timingDisplay: 'create time',
+        editedTimingDisplay: 'edit time',
+        editorName: 'Edi Tor'
+      })
+      expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
+      expect(queryByTestId('created-tooltip')).toBeFalsy()
+      expect(queryByText('Created create time')).toBeFalsy()
+    })
+
+    it('renders the created tooltip if showCreatedAsTooltip', () => {
+      const {getByText, getAllByText, getByTestId} = setup({
+        timingDisplay: 'create time',
+        showCreatedAsTooltip: true,
+        editedTimingDisplay: 'edit time',
+        editorName: 'Edi Tor'
+      })
+      expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
+      expect(getByTestId('created-tooltip')).toBeTruthy()
+      // one for the screenreader, the other for the tooltip
+      expect(getAllByText('Created create time').length).toEqual(2)
     })
 
     it('renders the correct pill if provided', () => {

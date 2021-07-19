@@ -46,8 +46,10 @@ describe('PostMessageContainer', () => {
         }
       })
     )
-    const editorText = container.getByText(', edited by Eddy Tor Apr 13 4pm')
-    expect(editorText).toBeInTheDocument()
+    expect(container.getByTestId('created-tooltip')).toBeTruthy()
+    // one for the screenreader, the other for the tooltip
+    expect(container.getAllByText('Created Feb 8 8:35pm').length).toEqual(2)
+    expect(container.getByText('Edited by Eddy Tor Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('should display plain edited if author is editor', () => {
@@ -61,8 +63,7 @@ describe('PostMessageContainer', () => {
         }
       })
     )
-    const editorText = container.getByText(', edited Apr 13 4pm')
-    expect(editorText).toBeInTheDocument()
+    expect(container.getByText('Edited Apr 13 4pm')).toBeInTheDocument()
   })
 
   it('should not display edit info when no editor', () => {
@@ -71,8 +72,8 @@ describe('PostMessageContainer', () => {
         editor: null
       })
     )
-    const editorText = container.queryByText(', edited')
-    expect(editorText).toBeNull()
+    expect(container.queryByText(/Edited/)).toBeNull()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   it('displays deletion info if delete', () => {

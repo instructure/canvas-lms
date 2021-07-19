@@ -36,7 +36,8 @@ export const PostMessageContainer = props => {
     props.discussionEntry.updatedAt
   )
 
-  const wasEdited = editorId && props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
+  const wasEdited =
+    !!editorId && props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
@@ -59,6 +60,7 @@ export const PostMessageContainer = props => {
           props.discussionEntry.lastReply?.createdAt
         )}
         timingDisplay={createdAt}
+        showCreatedAsTooltip={wasEdited}
         message={props.discussionEntry.message}
         isUnread={!props.discussionEntry.read}
         isEditing={props.isEditing}

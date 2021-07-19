@@ -275,7 +275,7 @@ describe('DiscussionFullPage', () => {
     it('renders the dates properly', async () => {
       const container = setup()
       expect(await container.findByText('Nov 23, 2020 6:40pm')).toBeInTheDocument()
-      expect(await container.findByText(', last reply Apr 5 7:41pm')).toBeInTheDocument()
+      expect(await container.findByText('Last reply Apr 5 7:41pm')).toBeInTheDocument()
     })
   })
 

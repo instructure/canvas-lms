@@ -550,8 +550,8 @@ describe('DiscussionTopicContainer', () => {
       })
     }
     const container = setup(props)
-    const editorText = container.getByText(`, edited by Eddy Tor Apr 22 6:41pm`)
-    expect(editorText).toBeInTheDocument()
+    expect(container.getByText(`Edited by Eddy Tor Apr 22 6:41pm`)).toBeInTheDocument()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   it('should render plain edited if author is editor', async () => {
@@ -566,8 +566,8 @@ describe('DiscussionTopicContainer', () => {
       })
     }
     const container = setup(props)
-    const editorText = container.getByText(`, edited Apr 22 6:41pm`)
-    expect(editorText).toBeInTheDocument()
+    expect(container.getByText(`Edited Apr 22 6:41pm`)).toBeInTheDocument()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   it('should not render edited info if no editor', async () => {
@@ -577,8 +577,8 @@ describe('DiscussionTopicContainer', () => {
       })
     }
     const container = setup(props)
-    const editorText = container.queryByText(`, edited Apr 22 6:41pm`)
-    expect(editorText).toBeNull()
+    expect(container.queryByText(/Edited /)).toBeFalsy()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   describe('Peer Reviews', () => {
