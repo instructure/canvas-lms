@@ -76,7 +76,8 @@ const ImportantDates = ({
     important_dates: true,
     context_codes: [...(selectedContextCodes || [])], // need to clone this list so the fetchApi effect will trigger on change
     start_date: useCallback(() => moment().tz(timeZone).startOf('day').toISOString(), [timeZone]),
-    end_date: useCallback(() => moment().tz(timeZone).add(2, 'years').toISOString(), [timeZone])
+    end_date: useCallback(() => moment().tz(timeZone).add(2, 'years').toISOString(), [timeZone]),
+    per_page: 100
   }
 
   useFetchApi({

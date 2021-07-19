@@ -84,6 +84,7 @@ describe('ImportantDates', () => {
     // from request call to assertion
     const expectedEndDate = moment().tz('America/Denver').add(2, 'years').toISOString()
     expect(params.get('end_date').split('T')[0]).toBe(expectedEndDate.split('T')[0])
+    expect(params.get('per_page')).toBe('100')
   })
 
   it('renders a header for important dates', async () => {
