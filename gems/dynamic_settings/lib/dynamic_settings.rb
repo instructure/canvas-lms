@@ -28,9 +28,6 @@ require 'dynamic_settings/prefix_proxy'
 
 module DynamicSettings
 
-  class Error < StandardError; end
-  class ConsulError < Error; end
-
   CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
   KV_NAMESPACE = "config/canvas"
   CACHE_KEY_PREFIX = "dynamic_settings/"
