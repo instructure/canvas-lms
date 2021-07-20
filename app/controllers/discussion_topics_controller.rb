@@ -633,10 +633,13 @@ class DiscussionTopicsController < ApplicationController
 
   def show
     @topic = @context.all_discussion_topics.find(params[:id])
+    # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
+    @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       js_env({
                course_id: params[:course_id],
                discussion_topic_id: params[:id],
@@ -681,8 +684,6 @@ class DiscussionTopicsController < ApplicationController
       end
     else
       @headers = !params[:headless]
-      # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
