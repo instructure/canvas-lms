@@ -71,46 +71,56 @@ module MicrosoftSync
       )
     end
 
-    USERS_UPNS_TO_AADS_BATCH_SIZE = 15 # Max number of "OR"s in filter clause
+    USERS_ULUVS_TO_AADS_BATCH_SIZE = 15 # Max number of "OR"s in filter clause
 
-    # Returns a hash from UPN -> AAD. Accepts 15 at a time.
-    # A UPN (userPrincipalName) is en email address, username, or other
-    # property that Canvas has.  An AAD (short term for AAD [Azure Active
-    # Directory] object ID) is the ID for the user on the Microsoft side, which
-    # is what Microsoft references in their groups/teams.
+    # Returns a hash from ULUV -> AAD. Accepts 15 at a time. A ULUV (User
+    # LookUp Value) is a value we use to look up users. It is derived from
+    # something in Canvas (e.g. a user's email address, username, or SIS ID
+    # -- see UsersUluvsFinder).  We expect the ULUV to correspond to the
+    # property of the Microsoft user indicated by the `remote_attribute`
+    # argument: e.g. userPrincipalName (default if nil is passed) or
+    # mailNickname.
+    # We then return a hash of ULUV -> AAD object ID. An AAD [Azure Active
+    # Directory] object ID, referred to here as just an "aad", is the ID for
+    # the user on the Microsoft side, which is what Microsoft references in
+    # their groups/teams.
     #
-    # UPNs are case-insensitive on the Microsoft side; this method downcases
-    # them before requesting them from Microsoft, but the keys in the return
-    # hash match the case of the upns that were passed in.
-    def users_upns_to_aads(upns)
-      downcased_uniqued = upns.map(&:downcase).uniq
-      if downcased_uniqued.length > USERS_UPNS_TO_AADS_BATCH_SIZE
-        raise ArgumentError, "Can't look up #{upns.length} UPNs at once"
+    # The properties on Microsoft's user objects are case-insensitive, so this
+    # method downcases and uniqs the ULUVs before requesting them from
+    # Microsoft. But whatever casing the Microsoft response uses, this function
+    # makes sure the keys in the return hash match the case of the ULUVs that
+    # were passed in.
+    def users_uluvs_to_aads(remote_attribute, uluvs)
+      remote_attribute ||= 'userPrincipalName'
+
+      downcased_uniqued = uluvs.map(&:downcase).uniq
+      if downcased_uniqued.length > USERS_ULUVS_TO_AADS_BATCH_SIZE
+        raise ArgumentError, "Can't look up #{uluvs.length} ULUVs at once"
       end
 
-      upns_downcased_to_given_forms = upns.group_by(&:downcase)
+      uluvs_downcased_to_given_forms = uluvs.group_by(&:downcase)
 
       unexpected = []
       result_hash = {}
 
       graph_service.list_users(
-        select: %w[id userPrincipalName],
-        filter: {userPrincipalName: downcased_uniqued}
-      ).each do |result|
-        given_forms = upns_downcased_to_given_forms[result['userPrincipalName'].downcase]
+        select: ['id', remote_attribute],
+        filter: {remote_attribute => downcased_uniqued}
+      ).each do |user_object|
+        given_forms = uluvs_downcased_to_given_forms[user_object[remote_attribute].downcase]
         if given_forms
           given_forms.each do |given_form|
-            result_hash[given_form] = result['id']
+            result_hash[given_form] = user_object['id']
           end
         else
-          unexpected << result['userPrincipalName']
+          unexpected << user_object[remote_attribute]
         end
       end
 
       if unexpected.present?
         raise UnexpectedResponseError,
-              "/users returned unexpected UPN(s) #{unexpected.inspect}, " \
-              "asked for #{downcased_uniqued}"
+              "/users returned users with unexpected #{remote_attribute} values " \
+              "#{unexpected.inspect}, asked for #{downcased_uniqued}"
       end
 
       result_hash

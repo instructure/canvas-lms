@@ -70,8 +70,10 @@ describe MicrosoftSync::UserMapping do
 
       let(:account) do
         account_model(settings: {
+          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
           microsoft_sync_login_attribute: 'email',
-          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com'
+          microsoft_sync_login_attribute_suffix: nil,
+          microsoft_sync_remote_attribute: 'upn',
         })
       end
       let(:user1) { user_model }
@@ -88,31 +90,24 @@ describe MicrosoftSync::UserMapping do
           eq([[user1.id, 'manual'], [user2.id, 'user2']].sort)
       end
 
-      context 'when the tenant in the Account settings has changed since fetching the account' do
-        before do
-          acct = Account.find(account.id)
-          acct.settings[:microsoft_sync_tenant] = 'EXTRA' + acct.settings[:microsoft_sync_tenant]
-          acct.save
-        end
+      {
+        microsoft_sync_tenant: 'somedifferenttenant.onmicrosoft.com',
+        microsoft_sync_login_attribute: 'sis_user_id',
+        microsoft_sync_login_attribute_suffix: '@thebestschool.edu',
+        microsoft_sync_remote_attribute: 'email',
+      }.each do |setting, value|
+        context "when the #{setting} in the Account settings has changed since fetching the account" do
+          before do
+            acct = Account.find(account.id)
+            acct.settings[setting] = value
+            acct.save
+          end
 
-        it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
-          expect { subject }
-            .to raise_error(described_class::AccountSettingsChanged)
-            .and not_change{described_class.order(:id).map(&:attributes)}
-        end
-      end
-
-      context 'when the upn type in the Account settings has changed since fetching the account' do
-        before do
-          acct = Account.find(account.id)
-          acct.settings[:microsoft_sync_login_attribute] = 'sis_user_id'
-          acct.save
-        end
-
-        it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
-          expect { subject }
-            .to raise_error(described_class::AccountSettingsChanged)
-            .and not_change{described_class.order(:id).map(&:attributes)}
+          it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
+            expect { subject }
+              .to raise_error(described_class::AccountSettingsChanged)
+              .and not_change{described_class.order(:id).map(&:attributes)}
+          end
         end
       end
     end

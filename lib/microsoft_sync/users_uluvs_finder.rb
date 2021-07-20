@@ -19,7 +19,8 @@
 #
 
 #
-# Is responsible for finding the the user's UPNs according to the
+# Is responsible for finding the the user's ULUVs (user lookup values -- the value
+# we use to look up a Micrososft user by) according to the
 # microsoft_sync_login_attribute in the Account settings
 #
 module MicrosoftSync
@@ -29,7 +30,7 @@ module MicrosoftSync
     include Errors::GracefulCancelErrorMixin
   end
 
-  class UsersUpnsFinder
+  class UsersUluvsFinder
     attr_reader :user_ids, :root_account
 
     delegate :settings, to: :root_account
@@ -42,35 +43,37 @@ module MicrosoftSync
     def call
       return [] if user_ids.blank? || root_account.blank?
 
-      case login_attribute
-      when 'email' then find_by_email
-      when 'preferred_username' then find_by_preferred_username
-      when 'sis_user_id' then find_by_sis_user_id
-      else raise InvalidOrMissingLoginAttributeConfig
-      end
+      users_uluvs =
+        case login_attribute
+        when 'email' then find_by_email
+        when 'preferred_username' then find_by_preferred_username
+        when 'sis_user_id' then find_by_sis_user_id
+        else raise InvalidOrMissingLoginAttributeConfig
+        end
+
+      # The user can have more than one communication channel/pseudonym, so we're
+      # ordering the users_uluvs by position ASC (the highest position is the
+      # smallest number) and returning the first uluv found to the related user_id.
+      users_uluvs
+        .uniq(&:first)
+        .map{|user_id, uluv| [user_id, uluv + login_attribute_suffix]}
     end
 
     private
 
     def find_by_email
-      users_upns = CommunicationChannel
+      CommunicationChannel
         .where(user_id: user_ids, path_type: 'email', workflow_state: 'active')
         .order(position: :asc)
         .pluck(:user_id, :path)
-
-      uniq_upn_by_user_id(users_upns)
     end
 
     def find_by_preferred_username
-      users_upns = find_active_pseudonyms.pluck(:user_id, :unique_id)
-
-      uniq_upn_by_user_id(users_upns)
+      find_active_pseudonyms.pluck(:user_id, :unique_id)
     end
 
     def find_by_sis_user_id
-      users_upns = find_active_pseudonyms.pluck(:user_id, :sis_user_id)
-
-      uniq_upn_by_user_id(users_upns)
+      find_active_pseudonyms.pluck(:user_id, :sis_user_id)
     end
 
     def find_active_pseudonyms
@@ -78,27 +81,16 @@ module MicrosoftSync
     end
 
     def login_attribute
-      @login_attribute ||= begin
-        enabled = settings[:microsoft_sync_enabled]
-        login_attribute = settings[:microsoft_sync_login_attribute]
+      enabled = settings[:microsoft_sync_enabled]
+      login_attribute = settings[:microsoft_sync_login_attribute]
 
-        raise InvalidOrMissingLoginAttributeConfig unless enabled && login_attribute
+      raise InvalidOrMissingLoginAttributeConfig unless enabled && login_attribute
 
-        login_attribute
-      end
+      login_attribute
     end
 
-    # The user can have more than one communication channel/pseudonym, so we're
-    # ordering the users_upns by position ASC (the highest position is the
-    # smallest number) and returning the first upn found to the related user_id.
-    def uniq_upn_by_user_id(users_upns)
-      return [] unless users_upns
-
-      response = {}
-
-      users_upns.each { |user_id, upn| response[user_id] ||= upn }
-
-      response.to_a
+    def login_attribute_suffix
+      @login_attribute_suffix ||= settings[:microsoft_sync_login_attribute_suffix] || ''
     end
   end
 end
