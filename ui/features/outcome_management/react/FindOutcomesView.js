@@ -193,8 +193,9 @@ const FindOutcomesView = ({
         <div
           style={{
             flex: '1 0 24rem',
-            overflow: isMobileView ? 'visible' : 'auto',
-            position: 'relative'
+            overflow: 'auto',
+            position: 'relative',
+            padding: isMobileView ? '0 .5rem' : '0'
           }}
           ref={setScrollContainer}
         >

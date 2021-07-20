@@ -64,14 +64,13 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
             ? '1.2815rem 0 0 1rem'
             : addedOutcome
             ? '0.313rem 0 0 0'
-            : '0.313rem 0 0 1rem',
-          marginRight: isMobileView ? '-12px' : '0'
+            : '0.313rem 0 0 1rem'
         }}
       >
         <Button
           interaction={addedOutcome ? 'disabled' : 'enabled'}
           size="small"
-          margin="0 x-small 0 0"
+          margin={isMobileView ? '0' : '0 x-small 0 0'}
           renderIcon={IconAddLine}
           onClick={onButtonClick}
         >

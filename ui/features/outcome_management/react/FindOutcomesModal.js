@@ -112,7 +112,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       size="fullscreen"
       label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
     >
-      <Modal.Body padding={isMobileView ? '0 medium small' : '0 small small'}>
+      <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (
           <Flex elementRef={setContainerRef}>
             <Flex.Item
