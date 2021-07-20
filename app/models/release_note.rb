@@ -374,9 +374,8 @@ class ReleaseNote
       # ddb client with old settings
       @ddb = nil
     end
-
-    Canvas::Reloader.on_reload { reset! }
   end
+  Canvas::Reloader.on_reload { reset! }
 
   module Bookmarker
     def self.bookmark_for(note)
