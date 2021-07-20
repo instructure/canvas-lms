@@ -254,6 +254,8 @@ class Account < ActiveRecord::Base
   add_setting :microsoft_sync_enabled, :root_only => true, :boolean => true, :default => false
   add_setting :microsoft_sync_tenant, :root_only => true
   add_setting :microsoft_sync_login_attribute, :root_only => true
+  add_setting :microsoft_sync_login_attribute_suffix, :root_only => true
+  add_setting :microsoft_sync_remote_attribute, :root_only => true
 
   # Help link settings
   add_setting :custom_help_links, :root_only => true
