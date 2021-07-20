@@ -142,7 +142,10 @@ export const outcomeGroupsMocks = [
   ...courseMocks({courseId: '12'})
 ]
 
-export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
+export const findModalMocks = ({
+  includeGlobalRootGroup = false,
+  parentAccountChildren = 10
+} = {}) => {
   const globalGroup = includeGlobalRootGroup ? globalGroupMock() : {}
 
   return [
@@ -161,7 +164,7 @@ export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
           context: {
             _id: '1',
             __typename: 'Account',
-            parentAccountsConnection: parentAccountMock()
+            parentAccountsConnection: parentAccountMock(parentAccountChildren)
           },
           ...globalGroup
         }
@@ -192,7 +195,7 @@ export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
                 __typename: 'LearningOutcomeGroup',
                 _id: '1'
               },
-              parentAccountsConnection: parentAccountMock()
+              parentAccountsConnection: parentAccountMock(parentAccountChildren)
             }
           }
         }
@@ -201,9 +204,9 @@ export const findModalMocks = ({includeGlobalRootGroup = false} = {}) => {
   ]
 }
 
-const parentAccountMock = () => ({
+const parentAccountMock = count => ({
   __typename: 'ParentAccountsConnection',
-  nodes: new Array(10).fill(0).map((_v, i) => ({
+  nodes: new Array(count).fill(0).map((_v, i) => ({
     __typename: 'Account',
     rootOutcomeGroup: {
       title: `Root Account Outcome Group ${i}`,

@@ -140,13 +140,21 @@ describe('FindOutcomesModal', () => {
     }
 
     describe('within an account context', () => {
-      it('renders the parent account groups', async () => {
+      it('renders Account Standards groups for non root accounts', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
         await act(async () => jest.runAllTimers())
         await openMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('Account Standards'))
         await act(async () => jest.runAllTimers())
         expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
+      })
+
+      it('Does not render Account Standards groups for root accounts', async () => {
+        const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
+          mocks: findModalMocks({parentAccountChildren: 0})
+        })
+        await act(async () => jest.runAllTimers())
+        expect(queryByText('Account Standards')).not.toBeInTheDocument()
       })
     })
 

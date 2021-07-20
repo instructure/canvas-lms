@@ -319,22 +319,26 @@ export const useFindOutcomeModal = open => {
       })
       .then(({data}) => {
         const {context, globalRootGroup} = data
-        let accounts = []
+        let accounts
         if (contextType === 'Course') {
-          accounts = [...context.account.parentAccountsConnection?.nodes, context.account]
+          accounts = [...context.account.parentAccountsConnection.nodes, context.account]
         } else {
-          accounts = context.parentAccountsConnection?.nodes
+          accounts = context.parentAccountsConnection.nodes
         }
+
         const rootGroups = accounts.map(account => account.rootOutcomeGroup)
-        const childGroups = [
-          {
+        const childGroups = []
+
+        if (rootGroups.length > 0) {
+          childGroups.push({
             _id: ACCOUNT_FOLDER_ID,
             title: I18n.t('Account Standards'),
             isRootGroup: true,
             outcomesCount: getChildOutcomesCount(rootGroups),
             childGroupsCount: rootGroups.length
-          }
-        ]
+          })
+        }
+
         if (globalRootGroup) {
           childGroups.push({
             ...globalRootGroup,
