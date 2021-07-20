@@ -2624,6 +2624,32 @@ describe Course, "tabs_available" do
       course_with_teacher(:active_all => true)
     end
 
+    describe 'TAB_CONFERENCES' do
+      context 'when WebConferences are enabled' do
+        before do
+          allow(WebConference).to receive(:plugins).and_return(
+            [
+              web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+              web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
+              web_conference_plugin_mock("broken_plugin", {:foor => :bar})
+            ]
+          )
+        end
+
+        it 'returns the plugin names' do
+          tabs = @course.tabs_available(@user)
+          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Formerly Conferences)")
+        end
+      end
+
+      context 'when WebConferences are not enabled' do
+        it "returns Conferences" do
+          tabs = @course.tabs_available(@user)
+          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
+        end
+      end
+    end
+
     it "should return the defaults if nothing specified" do
       length = Course.default_tabs.length
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }

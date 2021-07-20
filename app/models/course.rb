@@ -2920,7 +2920,7 @@ class Course < ActiveRecord::Base
       :href => :course_context_modules_path
     }, {
       :id => TAB_CONFERENCES,
-      :label => t('#tabs.conferences', "Conferences"),
+      :label => WebConference.conference_tab_name,
       :css_class => 'conferences',
       :href => :course_conferences_path
     }, {
