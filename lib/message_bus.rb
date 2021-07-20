@@ -109,11 +109,11 @@ module MessageBus
     begin
       producer = producer_for(namespace, topic_name)
       producer.send(message)
-    rescue ::Pulsar::Error::Timeout => ex
+    rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError => ex
       # We'll retry this exactly one time.  Sometimes
       # when a pulsar broker restarts, we have connections
       # that already knew about that broker get into a state where
-      # they just timeout instead of reconfiguring.  Often this can
+      # they just timeout or fail instead of reconfiguring.  Often this can
       # be cleared by just rebooting the process, but that's overkill.
       # If we hit a timeout, we will try one time to dump all the client
       # context and reconnect.  If we get a timeout again, that is NOT
