@@ -302,7 +302,6 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
-  include MicrosoftSync::Concerns::Settings
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -814,11 +813,9 @@ class AccountsController < ApplicationController
         end
       end
 
-      # All the Microsoft Teams Sync things!
-      sync_enabled = params.dig(:account, :settings)&.delete(:microsoft_sync_enabled)
-      tenant = params.dig(:account, :settings)&.delete(:microsoft_sync_tenant)
-      login_attribute = params.dig(:account, :settings)&.delete(:microsoft_sync_login_attribute)
-      set_microsoft_sync_settings(sync_enabled, tenant, login_attribute)
+      param_settings = params.dig(:account, :settings)
+      microsoft_sync_settings = param_settings&.permit(*MicrosoftSync::SettingsValidator::SYNC_SETTINGS)
+      MicrosoftSync::SettingsValidator.new(microsoft_sync_settings, @account).validate_and_save
 
 
       # quotas (:manage_account_quotas)
@@ -906,7 +903,8 @@ class AccountsController < ApplicationController
   #
   #   Note that if you are altering Microsoft Teams sync settings you must enable
   #   the Microsoft Group enrollment syncing feature flag. In addition, if you are enabling
-  #   Microsoft Teams sync, you must also specify a tenant and login attribute.
+  #   Microsoft Teams sync, you must also specify a tenant, login attribute, and a remote attribute.
+  #   Specifying a suffix to use is optional.
   #
   # @argument account[settings][microsoft_sync_tenant]
   #   The tenant this account should use when using Microsoft Teams Sync.
@@ -914,7 +912,16 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][microsoft_sync_login_attribute]
   #   The attribute this account should use to lookup users when using Microsoft Teams Sync.
-  #   Must be one of sub, email, oid, or preferred_username.
+  #   Must be one of "sub", "email", "oid", "preferred_username", or "integration_id".
+  #
+  # @argument account[settings][microsoft_sync_login_attribute_suffix]
+  #   A suffix that will be appended to the result of the login attribute when associating
+  #   Canvas users with Microsoft users. Must be under 255 characters and contain no whitespace.
+  #   This field is optional.
+  #
+  # @argument account[settings][microsoft_sync_remote_attribute]
+  #   The Active Directory attribute to use when associating Canvas users with Microsoft users.
+  #   Must be one of "mail", "mailNickname", or "userPrincipalName".
   #
   # @argument account[settings][restrict_student_future_view][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
@@ -1681,6 +1688,7 @@ class AccountsController < ApplicationController
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
                                    :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
+                                   :microsoft_sync_login_attribute_suffix, :microsoft_sync_remote_attribute,
                                    :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
                                    {:restrict_student_future_listing => [:value, :locked]}.freeze,
