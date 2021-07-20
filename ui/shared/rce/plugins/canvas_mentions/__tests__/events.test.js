@@ -24,6 +24,11 @@ jest.mock('../contentEditable', () => ({
   makeBodyEditable: jest.fn()
 }))
 
+jest.mock('../constants', () => ({
+  ...jest.requireActual('../constants'),
+  TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com'
+}))
+
 describe('events', () => {
   let editor
 
@@ -146,6 +151,56 @@ describe('events', () => {
       it('does not make the body editable', () => {
         subject()
         expect(makeBodyEditable).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('with mentions suggestion navigation events', () => {
+      let expectedMessageType
+
+      function examplesForMentionsNavigationEvents() {
+        it('does not make the body editable', () => {
+          subject()
+          expect(makeBodyEditable).not.toHaveBeenCalled()
+        })
+
+        it('prevents the event default', () => {
+          subject()
+          expect(event.preventDefault).toHaveBeenCalled()
+        })
+
+        it('broadcasts the message to the tiny and main windows', () => {
+          subject()
+          expect(global.postMessage).toHaveBeenCalledTimes(2)
+          expect(global.postMessage).toHaveBeenCalledWith(
+            {
+              messageType: 'mentions.NavigationEvent',
+              value: expectedMessageType
+            },
+            'https://canvas.instructure.com'
+          )
+        })
+      }
+
+      describe('when the key is "up"', () => {
+        beforeEach(() => {
+          event.which = 38
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+          expectedMessageType = 'UpArrow'
+        })
+
+        examplesForMentionsNavigationEvents()
+      })
+
+      describe('when the key is "down"', () => {
+        beforeEach(() => {
+          event.which = 40
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+          expectedMessageType = 'DownArrow'
+        })
+
+        examplesForMentionsNavigationEvents()
       })
     })
   })

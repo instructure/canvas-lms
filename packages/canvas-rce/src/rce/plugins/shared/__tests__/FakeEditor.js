@@ -46,6 +46,7 @@ export default class FakeEditor {
     }
 
     this.getBody = () => this.getContainer().firstChild
+    this.getWin = () => window
 
     this.selection = {
       getNode: () => this._selectedNode,

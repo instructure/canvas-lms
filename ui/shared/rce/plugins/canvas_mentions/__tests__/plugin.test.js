@@ -20,6 +20,7 @@ import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
 import {screen} from '@testing-library/dom'
+import {KEY_CODES} from '../constants'
 
 const mockAnchorOffset = 2
 const mockAnchorWholeText = ''
@@ -42,6 +43,10 @@ jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
     }
   }
 }))
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
 
 describe('plugin', () => {
   it('has a name', () => {
@@ -168,12 +173,13 @@ describe('pluginDefinition', () => {
   })
 
   describe('KeyDown', () => {
-    let which
+    let which, preventDefault
 
-    const subject = () => editor.fire('KeyDown', {which, editor})
+    const subject = () => editor.fire('KeyDown', {which, editor, preventDefault})
 
     beforeEach(() => {
       which = 1
+      preventDefault = jest.fn()
       editor.setContent(
         `<div data-testid="fake-body" contenteditable="false">
           <span id="test"> @
@@ -191,9 +197,39 @@ describe('pluginDefinition', () => {
         editor.selection.select(editor.dom.select('#mentions-marker')[0])
       })
 
+      function examplesForMentionNavigationEvents() {
+        it('prevents default', () => {
+          subject()
+          expect(preventDefault).toHaveBeenCalled()
+        })
+
+        it('broadcasts the event via postMessage', () => {
+          subject()
+          expect(global.postMessage).toHaveBeenCalled()
+        })
+      }
+
       it('does not make the body contenteditable', () => {
         subject()
         expect(editor.getBody().getAttribute('contenteditable')).toEqual('false')
+      })
+
+      describe('and the key pressed was "up"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.up
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionNavigationEvents()
+      })
+
+      describe('and the key pressed was "down"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.down
+          global.postMessage = jest.fn()
+        })
+
+        examplesForMentionNavigationEvents()
       })
 
       describe('with the key down for a "backspace" deleting the trigger character', () => {

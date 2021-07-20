@@ -32,7 +32,6 @@ function onInputChange(_e, ed = false) {
 
   if (mentionWasInitiated(tinySelection.getSel())) {
     // Insert a "marker" node so we can find the cursor position
-    // TODO: Add ARIA attributes to this span
     // xsslint safeString.identifier MARKER_ID
     editor.execCommand(
       'mceInsertContent',

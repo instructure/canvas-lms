@@ -16,19 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const MARKER_ID = 'mentions-marker'
-export const MARKER_SELECTOR = `span#${MARKER_ID}`
-export const TRUSTED_MESSAGE_ORIGIN = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
-export const NAVIGATION_MESSAGE = 'mentions.NavigationEvent'
+import {KEY_NAMES, TRUSTED_MESSAGE_ORIGIN, NAVIGATION_MESSAGE} from './constants'
 
-export const KEY_CODES = {
-  backspace: 8,
-  enter: 13,
-  up: 38,
-  down: 40
+export function navigationMessage(event) {
+  return {messageType: NAVIGATION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
 }
 
-export const KEY_NAMES = {
-  [KEY_CODES.up]: 'UpArrow',
-  [KEY_CODES.down]: 'DownArrow'
+function broadcastMessage(message, windows) {
+  windows.forEach(w => {
+    w.postMessage(message, TRUSTED_MESSAGE_ORIGIN)
+  })
 }
+
+export default broadcastMessage

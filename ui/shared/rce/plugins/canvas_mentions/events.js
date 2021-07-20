@@ -17,27 +17,32 @@
  */
 
 import {makeBodyEditable} from './contentEditable'
-import {MARKER_SELECTOR, MARKER_ID} from './constants'
+import {MARKER_SELECTOR, MARKER_ID, KEY_CODES} from './constants'
+import broadcastMessage, {navigationMessage} from './broadcastMessage'
 
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
-  const keyCodes = {
-    backspace: 8,
-    enter: 13
-  }
 
   // Enter key was pressed
-  if (which === keyCodes.enter) return true
+  if (which === KEY_CODES.enter) return true
 
   // Nothing but a backspace key press can restore
   // body editability at this point
-  if (which !== keyCodes.backspace) return false
+  if (which !== KEY_CODES.backspace) return false
 
   // Backspace key was pressed. Check to see if
   // the user was attempting to backspace out
   // of the mention span
   const {endOffset, startOffset} = editor.selection.getRng()
   return (endOffset === 1 && startOffset === 1) || (endOffset === 0 && startOffset === 0)
+}
+
+function isMentionsNavigationEvent(event, editor) {
+  const {which} = event
+
+  if (editor.selection.getNode().id !== MARKER_ID) return false
+
+  return which === KEY_CODES.up || which === KEY_CODES.down
 }
 
 /**
@@ -67,10 +72,27 @@ export const onSetContent = e => {
  */
 export const onKeyDown = e => {
   const editor = e.editor || tinymce.activeEditor
-  // If the user is typing outside the marker,\
-  // or types an "enter" or "backspace" within the marker
+
+  // Should the event move the cursor out of
+  // the mentions marker and restore editability
+  // to the body?
+  //
+  // or
+  //
+  // Is the current node already outside the
+  // mentions marker?
   if (editor.selection.getNode().id !== MARKER_ID || shouldRestoreFromKeyEvent(e, editor)) {
     makeBodyEditable(editor, MARKER_SELECTOR)
+  }
+
+  // Should the event control the mentions suggestion
+  // list rather than the editor?
+  if (isMentionsNavigationEvent(e, editor)) {
+    // Don't move the cursor please
+    e.preventDefault()
+
+    // Broadcast the event to mentions components
+    broadcastMessage(navigationMessage(e), [editor.getWin(), window])
   }
 }
 
