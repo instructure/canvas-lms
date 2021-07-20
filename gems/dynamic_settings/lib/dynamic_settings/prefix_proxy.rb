@@ -138,7 +138,7 @@ module DynamicSettings
       end
       DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
       nil
-    rescue Diplomat::KeyNotFound, Errno::ECONNREFUSED => e
+    rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
       raise unless cache.respond_to?(:fetch_without_expiration)
 
       cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
