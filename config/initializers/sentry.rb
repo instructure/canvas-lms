@@ -49,6 +49,7 @@ if settings.present?
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
       Rack::QueryParser::InvalidParameterError
+      PG::UnableToSend
     }
   end
 
