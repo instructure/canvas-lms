@@ -156,6 +156,11 @@ export const K5Dashboard = ({
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
 
+  // If the view width increases while the tray is open, change the state to close the tray
+  if (trayOpen && !useImportantDatesTray) {
+    setTrayOpen(false)
+  }
+
   useEffect(() => {
     if (!cards) {
       loadCardDashboard((dc, cardsFinishedLoading) => {
