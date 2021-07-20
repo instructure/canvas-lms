@@ -121,8 +121,9 @@ class AssetUserAccessLog
   end
 
   def self.publish_message_to_bus(log_values, root_account)
-    producer = MessageBus.producer_for(PULSAR_NAMESPACE, message_bus_topic_name(root_account))
-    producer.send(log_values.to_json)
+    topic_name = message_bus_topic_name(root_account)
+    msg = log_values.to_json
+    MessageBus.send_one_message(PULSAR_NAMESPACE, topic_name, msg)
   end
 
   def self.message_bus_topic_name(root_account)
