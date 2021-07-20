@@ -594,6 +594,24 @@ describe AccountsController do
           expect(@root_account.settings[:k5_accounts].length).to be 1
         end
       end
+
+      it "clears the cached k5_user value for all users when the setting is changed" do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
+        user_session(@user)
+        enable_cache(:redis_cache_store) do
+          Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            "cached!"
+          end
+          post 'update', params: toggle_k5_params(@account.id, true)
+          run_jobs
+          other_value = "something else"
+          cached_value = Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            other_value # only takes this value if the cache key is empty - i.e., its been cleared
+          end
+          expect(cached_value).to eq other_value
+        end
+      end
     end
 
     describe "quotas" do
