@@ -85,7 +85,7 @@ describe "root account basic settings" do
           set_value(tenant_input_area, tenant)
           f("#microsoft_teams_sync_attribute_selector").click
           f("#email").click
-          fxpath("//*[@id=\"tab-integrations\"]/span/button").click
+          f("#microsoft_teams_sync_update_button").click
           wait_for_ajaximations
 
           account.reload

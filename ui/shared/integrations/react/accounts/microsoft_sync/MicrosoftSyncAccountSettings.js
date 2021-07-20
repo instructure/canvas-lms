@@ -20,16 +20,18 @@ import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
-import {IconUploadLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconInfoLine, IconUploadLine} from '@instructure/ui-icons'
 import I18n from 'i18n!account_settings_jsx_bundle'
 import React from 'react'
+import {Table} from '@instructure/ui-table'
 import LoginAttributeSelector from './components/LoginAttributeSelector'
 import MicrosoftSyncTitle from './components/MicrosoftSyncTitle'
 import TenantInput from './components/TenantInput'
 import AdminConsentLink from './components/AdminConsentLink'
 import {reducerActions} from './lib/settingsReducer'
 import useSettings from './lib/useSettings'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 export default function MicrosoftSyncAccountSettings() {
   const [state, dispatch] = useSettings()
@@ -80,34 +82,77 @@ export default function MicrosoftSyncAccountSettings() {
           syncEnabled={state.microsoft_sync_enabled}
           interactionDisabled={!state.uiEnabled}
         />
-        <TenantInput
-          tenantInputHandler={event =>
-            dispatch({
-              type: reducerActions.updateTenant,
-              payload: {microsoft_sync_tenant: event.target.value}
-            })
-          }
-          messages={state.tenantErrorMessages.concat(state.tenantInfoMessages)}
-          tenant={state.microsoft_sync_tenant}
-        />
-        <LoginAttributeSelector
-          attributeChangedHandler={(event, {value}) =>
-            dispatch({
-              type: reducerActions.updateAttribute,
-              payload: {microsoft_sync_login_attribute: event.target.id, selectedAttribute: value}
-            })
-          }
-          selectedLoginAttribute={state.selectedAttribute}
-        />
+
+        <Table caption={I18n.t('Microsoft Teams Sync')}>
+          <Table.Body>
+            <Table.Row>
+              <Table.RowHeader textAlign="start">
+                <span>{I18n.t('Tenant Name')}</span>
+                <Tooltip
+                  tip={I18n.t('Your Azure Active Directory Tenant Name')}
+                  on={['hover', 'focus']}
+                >
+                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                </Tooltip>
+              </Table.RowHeader>
+
+              <Table.Cell>
+                <TenantInput
+                  tenantInputHandler={event =>
+                    dispatch({
+                      type: reducerActions.updateTenant,
+                      payload: {microsoft_sync_tenant: event.target.value}
+                    })
+                  }
+                  messages={state.tenantErrorMessages.concat(state.tenantInfoMessages)}
+                  tenant={state.microsoft_sync_tenant}
+                />
+              </Table.Cell>
+            </Table.Row>
+
+            <Table.Row>
+              <Table.RowHeader textAlign="start">
+                <span>{I18n.t('Login Attribute')}</span>
+                <Tooltip
+                  tip={I18n.t(
+                    'The attribute to use when associating a Canvas User with a Microsoft User'
+                  )}
+                  placement="start"
+                  on={['hover', 'focus']}
+                >
+                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                </Tooltip>
+              </Table.RowHeader>
+
+              <Table.Cell>
+                <LoginAttributeSelector
+                  attributeChangedHandler={(event, {value}) =>
+                    dispatch({
+                      type: reducerActions.updateAttribute,
+                      payload: {
+                        microsoft_sync_login_attribute: event.target.id,
+                        selectedAttribute: value
+                      }
+                    })
+                  }
+                  selectedLoginAttribute={state.selectedAttribute}
+                />
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+
         <Button
           renderIcon={IconUploadLine}
           interaction={state.uiEnabled ? 'enabled' : 'disabled'}
           color="primary"
           onClick={() => dispatch({type: reducerActions.updateSettings, dispatch})}
           margin="small 0 small 0"
+          id="microsoft_teams_sync_update_button"
         >
           {I18n.t('Update Settings')}
         </Button>
+
         <AdminConsentLink
           enabled={
             state.microsoft_sync_enabled &&

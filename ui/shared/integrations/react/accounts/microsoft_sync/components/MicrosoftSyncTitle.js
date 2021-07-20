@@ -26,7 +26,7 @@ import React from 'react'
 
 export default function MicrosoftSyncTitle(props) {
   return (
-    <Flex justifyItems="space-between">
+    <Flex margin="auto small" justifyItems="space-between">
       <Flex.Item shouldShrink>
         <Heading value="h2">{I18n.t('Microsoft Teams Sync')}</Heading>
       </Flex.Item>
