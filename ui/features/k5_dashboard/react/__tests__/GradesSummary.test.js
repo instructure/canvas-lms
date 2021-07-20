@@ -27,6 +27,7 @@ const defaultCourse = {
   courseName: 'Horticulture',
   currentGradingPeriodId: '1',
   enrollmentType: 'student',
+  finalGradesHidden: false,
   score: 90
 }
 
@@ -80,6 +81,13 @@ describe('GradesSummary', () => {
       <GradesSummary
         courses={[{...defaultCourse, score: undefined, currentGradingPeriodId: undefined}]}
       />
+    )
+    expect(getByText('--')).toBeInTheDocument()
+  })
+
+  it('displays "--" if a course is set to hide final grades', () => {
+    const {getByText} = render(
+      <GradesSummary courses={[{...defaultCourse, score: undefined, finalGradesHidden: true}]} />
     )
     expect(getByText('--')).toBeInTheDocument()
   })
