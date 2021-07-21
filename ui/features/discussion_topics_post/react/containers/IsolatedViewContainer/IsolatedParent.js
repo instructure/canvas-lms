@@ -21,13 +21,13 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import I18n from 'i18n!discussion_topics_post'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
+import {replyCountText} from '../../utils'
 
 export const IsolatedParent = props => {
   const [isEditing, setIsEditing] = useState(false)
@@ -71,12 +71,9 @@ export const IsolatedParent = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
+        expandText={replyCountText(
+          props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+          props.discussionEntry.rootEntryParticipantCounts?.unreadCount
         )}
         isReadOnly={!props.RCEOpen}
         isExpanded={false}

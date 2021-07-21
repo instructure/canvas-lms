@@ -30,6 +30,10 @@ describe('PostToolbar', () => {
       const {queryByText} = setup({repliesCount: 1})
       expect(queryByText('1 reply')).toBeTruthy()
     })
+    it('not displayed if replies = 0', () => {
+      const {queryByText} = setup({repliesCount: 0})
+      expect(queryByText('0 reply')).toBeFalsy()
+    })
     it('correct pluralization displayed', () => {
       const {queryByText} = setup({repliesCount: 2})
       expect(queryByText('2 replies')).toBeTruthy()

@@ -23,9 +23,9 @@ import {IsolatedParent} from '../IsolatedParent'
 import React from 'react'
 
 describe('IsolatedParent', () => {
-  const defaultProps = overrides => ({
+  const defaultProps = ({discussionEntryOverrides = {}, overrides = {}} = {}) => ({
     discussionTopic: Discussion.mock(),
-    discussionEntry: DiscussionEntry.mock(),
+    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
     onToggleUnread: jest.fn(),
     ...overrides
   })
@@ -37,7 +37,7 @@ describe('IsolatedParent', () => {
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', () => {
       const onToggleUnread = jest.fn()
-      const {getByTestId} = setup(defaultProps({onToggleUnread}))
+      const {getByTestId} = setup(defaultProps({overrides: {onToggleUnread}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('markAsUnread'))
@@ -46,7 +46,7 @@ describe('IsolatedParent', () => {
     })
 
     it('only shows the delete option if you have permission', () => {
-      const props = defaultProps({onDelete: jest.fn()})
+      const props = defaultProps({overrides: {onDelete: jest.fn()}})
       props.discussionEntry.permissions.delete = false
       const {getByTestId, queryByTestId} = setup(props)
 
@@ -56,7 +56,7 @@ describe('IsolatedParent', () => {
 
     it('allows deleting an entry', () => {
       const onDelete = jest.fn()
-      const {getByTestId} = setup(defaultProps({onDelete}))
+      const {getByTestId} = setup(defaultProps({overrides: {onDelete}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('delete'))
@@ -65,7 +65,7 @@ describe('IsolatedParent', () => {
     })
 
     it('only shows the speed grader option if you have permission', () => {
-      const props = defaultProps({onOpenInSpeedGrader: jest.fn()})
+      const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {getByTestId, queryByTestId} = setup(props)
 
@@ -75,12 +75,38 @@ describe('IsolatedParent', () => {
 
     it('allows opening an entry in speedgrader', () => {
       const onOpenInSpeedGrader = jest.fn()
-      const {getByTestId} = setup(defaultProps({onOpenInSpeedGrader}))
+      const {getByTestId} = setup(defaultProps({overrides: {onOpenInSpeedGrader}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       expect(onOpenInSpeedGrader).toHaveBeenCalled()
+    })
+  })
+
+  describe('Expand-Button', () => {
+    it('should render expand when nested replies are present', () => {
+      const {getByTestId} = setup(defaultProps())
+      expect(getByTestId('expand-button')).toBeTruthy()
+    })
+
+    it('displays unread and replyCount', async () => {
+      const {queryByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
+        })
+      )
+      expect(queryByText('2 replies, 1 unread')).toBeTruthy()
+    })
+
+    it('does not display unread count if it is 0', async () => {
+      const {queryByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+        })
+      )
+      expect(queryByText('2 replies, 0 unread')).toBeFalsy()
+      expect(queryByText('2 replies')).toBeTruthy()
     })
   })
 })

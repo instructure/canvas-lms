@@ -42,7 +42,8 @@ import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   addReplyToDiscussion,
-  resolveAuthorRoles
+  resolveAuthorRoles,
+  replyCountText
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
@@ -203,12 +204,9 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={I18n.t(
-          {one: '%{count} reply, %{unread} unread', other: '%{count} replies, %{unread} unread'},
-          {
-            count: props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-            unread: props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-          }
+        expandText={replyCountText(
+          props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
+          props.discussionEntry.rootEntryParticipantCounts?.unreadCount
         )}
         onClick={() => {
           if (ENV.isolated_view) {

@@ -44,27 +44,15 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {replyCountText} from '../../utils/index'
 
 function InfoText({repliesCount, unreadCount}) {
-  const infoText = []
+  const infoText = replyCountText(repliesCount, unreadCount)
 
-  if (repliesCount > 0) {
-    infoText.push(
-      I18n.t(
-        {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
-        {count: repliesCount, repliesCount}
-      )
-    )
-  }
-
-  if (unreadCount > 0) {
-    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
-  }
-
-  return infoText.length > 0 ? (
+  return repliesCount > 0 ? (
     <View padding="0 x-small 0 0">
       <Text weight="normal" size="small" data-testid="replies-counter">
-        {infoText.join(', ')}
+        {infoText}
       </Text>
     </View>
   ) : null

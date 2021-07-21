@@ -20,6 +20,7 @@ import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {ISOLATED_VIEW_INITIAL_PAGE_SIZE} from './constants'
+import I18n from 'i18n!discussion_topics_post'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -99,4 +100,21 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
     return discussionRoles.concat('Author')
   }
   return discussionRoles
+}
+
+export const replyCountText = (repliesCount, unreadCount) => {
+  const infoText = []
+
+  infoText.push(
+    I18n.t(
+      {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
+      {count: repliesCount, repliesCount}
+    )
+  )
+
+  if (unreadCount > 0) {
+    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
+  }
+
+  return infoText.join(', ')
 }
