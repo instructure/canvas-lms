@@ -42,10 +42,9 @@ import TreeBrowser from './Management/TreeBrowser'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
-  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
+const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
+  const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
@@ -59,7 +58,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
 
-  const isDesktop = breakpoints?.tablet
   const changeTitle = event => {
     if (!showTitleError) setShowTitleError(true)
     titleChangeHandler(event)
@@ -152,7 +150,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
   return (
     <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
       <Modal
-        size={isDesktop ? 'large' : 'fullscreen'}
+        size={!isMobileView ? 'large' : 'fullscreen'}
         label={I18n.t('Create Outcome')}
         open={isOpen}
         shouldReturnFocus
@@ -160,7 +158,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
         shouldCloseOnDocumentClick={false}
       >
         <Modal.Body>
-          {isDesktop ? (
+          {!isMobileView ? (
             <Flex as="div" alignItems="start" padding="small 0" height="7rem">
               <Flex.Item size="50%" padding="0 xx-small 0 0">
                 {titleInput}
@@ -199,7 +197,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
             <Text size="medium" weight="bold">
               {I18n.t('Location')}
             </Text>
-            {isDesktop && (
+            {!isMobileView && (
               <View as="div" padding="small 0">
                 {isLoading ? (
                   <View
@@ -255,8 +253,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, breakpoints}) => {
 
 CreateOutcomeModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired,
-  breakpoints: breakpointsShape
+  onCloseHandler: PropTypes.func.isRequired
 }
 
-export default WithBreakpoints(CreateOutcomeModal)
+export default CreateOutcomeModal

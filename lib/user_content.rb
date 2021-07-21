@@ -72,7 +72,7 @@ module UserContent
       if !use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
-        
+
         mathml_span = node.fragment(
           "<span class=\"hidden-readable\">#{mathml}</span>"
         ).children.first
@@ -150,6 +150,7 @@ module UserContent
       'assignments' => :Assignment,
       'announcements' => :Announcement,
       'calendar_events' => :CalendarEvent,
+      'courses' => :Course,
       'discussion_topics' => :DiscussionTopic,
       'collaborations' => :Collaboration,
       'files' => :Attachment,
@@ -213,7 +214,7 @@ module UserContent
 
       html.gsub(@toplevel_regex) do |url|
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
-        next url if !@contextless_types.include?(type) && prefix != @context_prefix
+        next url if !@contextless_types.include?(type) && prefix != @context_prefix && url != @context_prefix
 
         if type != "wiki" && type != "pages"
           if obj_id.to_i > 0

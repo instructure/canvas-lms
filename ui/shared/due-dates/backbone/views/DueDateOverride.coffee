@@ -52,7 +52,8 @@ export default class DueDateOverrideView extends Backbone.View
       isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
       dueAt: tz.parse(@model.assignment.get("due_at")),
       dueDatesReadonly: @options.dueDatesReadonly,
-      availabilityDatesReadonly: @options.availabilityDatesReadonly
+      availabilityDatesReadonly: @options.availabilityDatesReadonly,
+      importantDates: @model.assignment.get("important_dates")
     })
 
     ReactDOM.render(DueDatesElement, div)
@@ -156,10 +157,11 @@ export default class DueDateOverrideView extends Backbone.View
   #     syncing with react data
   # ==============================
 
-  setNewOverridesCollection: (newOverrides) =>
+  setNewOverridesCollection: (newOverrides, importantDates) =>
     @model.overrides.reset(newOverrides)
     onlyVisibleToOverrides = !@model.overrides.containsDefaultDueDate()
     @model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
+    @model.assignment.importantDates(importantDates)
 
   # =================
   #    model info

@@ -1393,6 +1393,7 @@ ru:
         no_enrollments_can_create_courses: "Пользователи без регистраций"
         open_registration: "Открыть регистрацию"
         originality_report_visibility: "Студенты могут увидеть оригинальный отчет"
+        outgoing_email_default_name: "Имя:"
         outgoing_email_default_name_option_custom: "Пользовательское имя \"От\""
         outgoing_email_default_name_option_custom_name: "Имя:"
         outgoing_email_default_name_option_default: "Настройки Canvas по умолчанию"
@@ -1831,6 +1832,7 @@ ru:
   add_collaboration_da9665ac: "Добавить совместную работу"
   add_comment_to_library_1e3d95db: "Добавить комментарий в библиотеку"
   add_conclude_delete_publish_9d8434e7: "добавить / завершить / удалить / опубликовать"
+  add_conclude_delete_publish_reset_15c3e5a2: "добавить / завершить / удалить / опубликовать/ сбросить"
   add_conference_7bcc625b: "Добавить конференцию"
   add_conferences_from_calendar_98cb86b1: "Добавить конференции из календаря"
   add_conferencing_9f4ccded: "Добавить проведение конференции"
@@ -2232,6 +2234,7 @@ ru:
   allows_user_to_access_gradebook_history_9d599681: "Позволяет пользователю получать доступ к истории журнала оценок."
   allows_user_to_access_gradebook_history_allows_use_79dfddd: "Позволяет пользователю получать доступ к истории журнала оценок. Позволяет пользователю получать доступ к журналу успеваемости (если активирован)."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Позволяет пользователю получать доступ к SpeedGrader из задания."
+  allows_user_to_access_student_view_test_student_co_35fbd387: "Позволяет пользователю получить доступ к кнопкам «Просмотр студентом» (тестируемый студент), «Копировать этот курс» и «Навсегда удалить курс»."
   allows_user_to_access_student_view_test_student_co_8b57e87c: "Позволяет пользователю получить доступ к кнопкам «Просмотр студентом» (тестируемый студент), «Копировать этот курс», «Сбросить контент курса» и «Навсегда удалить курс»."
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: "Позволяет пользователю получить доступ к ссылке Act as User (Действовать как пользователь) на контекстных карточках студентов."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Позволяет пользователю получать доступ к ссылке «Объявления» в навигации по курсу. Позволяет пользователю просматривать объявления курса. Позволяет просматривать последние объявления на главной странице курса."
@@ -2497,6 +2500,7 @@ ru:
   allows_user_to_manage_assignment_settings_35d94690: "Позволяет пользователю управлять настройками задания."
   allows_user_to_manage_blueprint_course_settings_in_697362c5: "Позволяет пользователю управлять настройками концептуального курса в настройках курса."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Позволяет пользователю управлять настройками параметрами функции в настройках учетной записи."
+  allows_user_to_manage_feature_previews_in_account__3c90a6f: "Позволяет пользователю управлять настройками предварительного просмотра функции в настройках учетной записи."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       Позволяет пользователю управлять модулями (создавать, добавлять элементы, изменять настройки модуля,
       публиковать / отменить публикацию и т.д.).
@@ -2657,6 +2661,7 @@ ru:
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Позволяет пользователю просматривать записи в журнале факультета в отчете о взаимодействии студентов."
   allows_user_to_view_faculty_journal_information_fo_3c725307: "Позволяет пользователю просматривать информацию в журнале факультета для отдельных студентов."
   allows_user_to_view_feature_options_in_account_set_befc6b83: "Позволяет пользователю просматривать опции функций в настройках учетной записи."
+  allows_user_to_view_feature_previews_in_account_se_fa8df504: "Позволяет пользователю просматривать настройки предварительного просмотра функций в настройках учетной записи."
   allows_user_to_view_gradebook_9720b3e2: "Позволяет пользователю просматривать журнал оценок."
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       Позволяет пользователю просматривать журнал оценок.
@@ -2790,10 +2795,22 @@ ru:
   an_error_occurred_during_the_sync_process_error_62d98be7: "Произошла ошибка в процессе синхронизации: %{error}"
   an_error_occurred_loading_outcomes_data_cfd18b61: "Произошла ошибка при загрузке данных результатов."
   an_error_occurred_making_a_network_request_d1bda348: "Произошла ошибка, что привело к созданию сетевого запроса"
+  an_error_occurred_moving_group_grouptitle_b20a640b: "Произошла ошибка при перемещении группы «%{groupTitle}»"
+  an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: "Произошла ошибка при перемещении группы «%{groupTitle}»: %{message}"
   an_error_occurred_moving_group_title_24fd7fb4: "Произошла ошибка при перемещении группы «%{title}»"
   an_error_occurred_moving_group_title_message_f8428b66: "Произошла ошибка при перемещении группы «%{title}»: %{message}"
   an_error_occurred_moving_outcome_title_4e616ce1: "Произошла ошибка при перемещении результата «%{title}»"
   an_error_occurred_moving_outcome_title_message_39fff0d1: "Произошла ошибка при перемещении результата «%{title}»: %{message}"
+  an_error_occurred_moving_these_outcomes_ddcc6868: 
+    few: "Произошла ошибка при перемещении данных результатов."
+    many: "Произошла ошибка при перемещении данных результатов."
+    one: "Произошла ошибка при перемещении результата «%{outcomeTitle}» в «%{newGroupTitle}»."
+    other: "Произошла ошибка при перемещении данных результатов."
+  an_error_occurred_moving_these_outcomes_errormessa_b34c1232: 
+    few: "Произошла ошибка при перемещении данных результатов: %{errorMessage}."
+    many: "Произошла ошибка при перемещении данных результатов: %{errorMessage}."
+    one: "Произошла ошибка при перемещении результата «%{outcomeTitle}» в «%{newGroupTitle}»: %{errorMessage}."
+    other: "Произошла ошибка при перемещении данных результатов: %{errorMessage}."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Произошла ошибка*, пожалуйста, попробуйте опубликовать ваш ответ позже"
   an_error_occurred_please_try_again_95361e05: "Возникла ошибка. Попробуйте еще раз."
   an_error_occurred_please_try_again_error_error_8800b506: "Произошла ошибка. Пожалуйста, попробуйте еще раз. Ошибка: %{error}"
@@ -5494,6 +5511,7 @@ ru:
   choose_a_csv_file_to_upload_9644480c: "Выберите CSV-файл для отправки:"
   choose_a_date_cd0263fe: "Выберите дату"
   choose_a_file_to_upload_a63bac0f: "Выбрать файл для загрузки"
+  choose_a_file_to_upload_from_your_device_d1b50d4c: "Выбрать файл, который нужно загрузить с вашего устройства"
   choose_a_quiz_engine_8820d521: "Выберите механизм тестирования"
   choose_a_submission_type_8f45651a: "Выберите тип отправки"
   choose_a_timezone_d9c52998: "Выбрать часовой пояс"
@@ -6919,6 +6937,7 @@ ru:
   copy_operation_started_successfully_b2f236a1: "Процедура копирования успешно запущена"
   copy_page_to_another_course_405cc07c: "Копировать страницу в другой курс"
   copy_quiz_to_course_74f9c8c1: "Копировать тест в курс"
+  copy_the_video_url_dd509606: "Скопировать URL видео"
   copy_this_module_item_to_a_course_790a0cf4: "Копировать этот элемент модуля в курс..."
   copy_this_module_to_a_course_ddd12cc7: "Копировать этот модуль в курс..."
   copy_title_to_course_2a41a2f4: "Копировать %{title} в курс"
@@ -6946,6 +6965,7 @@ ru:
   could_not_find_file_to_upload_2af12953: "Не удалось найти файл для загрузки"
   could_not_find_file_to_upload_d8a0b228: "Не удалось найти файл для загрузки."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Не удалось найти существующего пользователя для входа в систему с идентификатором SIS %{user_id}, пропуск"
+  could_not_import_learning_outcome_outcome_id_becau_662152b8: "Невозможно импортировать результат обучения %{outcome_id}, поскольку он не относится ни к одной из групп"
   could_not_save_chosencolor_741b74ce: "Не удалось сохранить '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Не удается настроить даты по заданию %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Не удалось найти полномочия для обновления"
@@ -7083,6 +7103,11 @@ ru:
     many: "%{count} Результаты"
     one: "Результат %{count}"
     other: "%{count} Результаты"
+  count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
+    few: "Результаты %{count} перемещены в «%{newGroupTitle}»."
+    many: "Результаты %{count} перемещены в «%{newGroupTitle}»."
+    one: "\"«%{outcomeTitle}» перемещено в «%{newGroupTitle}»."
+    other: "Результаты %{count} перемещены в «%{newGroupTitle}»."
   count_outcomes_selected_55902958: 
     few: "Выбрано %{count} результата(-ов)"
     many: "Выбрано %{count} результата(-ов)"
@@ -7141,6 +7166,11 @@ ru:
     one: "Одно непрочитанное примечание к выпуску."
     other: "Примечания к выпуску %{count}."
   count_replies_a685c742: "%{count} ответы"
+  count_replies_unread_unread_5c4265e8: 
+    few: "%{count} ответов, %{unread} не прочитано"
+    many: "%{count} ответов, %{unread} не прочитано"
+    one: "%{count} ответов, %{unread} не прочитано"
+    other: "%{count} ответов, %{unread} не прочитано"
   count_respondents_fc4c2da4: 
     few: "%{count} респондентов(-а)"
     many: "%{count} респондентов(-а)"
@@ -8005,6 +8035,7 @@ ru:
         alerts: Оповещения
         details: "Сведения о курсе"
         feature_options: "Опции функции"
+        feature_previews: "Предварительный просмотр функций"
         grade_publishing: "Публикация оценки"
         navigation: Навигация
         sections: Разделы
@@ -8174,10 +8205,12 @@ ru:
   courses_course_templates_5a3fbafd: "Курсы - Шаблоны курсов"
   courses_delete_20c9beb2: "Курсы - удаление"
   courses_edit_cbace938: "Курсы - изменение"
+  courses_manage_update_d3e9263e: "Курсы - управление / обновление"
   courses_navigation_menu_b3638384: "Меню навигации по курсам"
   courses_over_time_41dc0428: "курсы в течение длительного времени"
   courses_people_680bb173: "Курсы и люди"
   courses_publish_39df53f8: "Курсы — опубликовать"
+  courses_reset_211acdd: "Курсы - сброс"
   courses_that_are_set_as_a_template_in_any_account__f5da9fd7: "Курсы, заданные как шаблоны для любой учетной записи, не могут перестать быть шаблонами"
   courses_tray_cec46d6e: "Панель курсов"
   courses_undelete_1f689a97: "Курсы - отменить удаление"
@@ -8253,6 +8286,7 @@ ru:
   create_outcome_4dac05a0: "Создать результат"
   create_pages_581a4d59: "Создание страниц"
   create_slots_71dbb2f8: "Создать интервалы"
+  create_subject_86de5618: "Создать тему"
   create_theme_based_on_40651ed3: "Создать тему на основе"
   create_theme_based_on_name_7b1bd318: "Создать тему на основе %{name}"
   create_users_view: 
@@ -8278,6 +8312,7 @@ ru:
   creating_group_17bd69ce: "Создание группы"
   creating_key_8a026e61: "Создание ключа"
   creating_new_course_62cd27bb: "Создать новый курс..."
+  creating_new_subject_35fe8d13: "Создание новой темы..."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Лицензионное соглашение Creative Commons:"
   creative_commons_licenses_7d557d9a: "Лицензии Creative Commons"
@@ -9437,6 +9472,7 @@ ru:
   discussions_moderate_d1e69c7e: "Обсуждения - модерировать"
   discussions_post_62f64091: "Обсуждения - разместить"
   discussions_redesign_b505952d: "Перекомпоновка обсуждений"
+  discussions_redesign_isolated_view_78626c74: "Перекомпоновка обсуждений - изолированный просмотр"
   discussions_tutorial_tray_4ef79bcc: "Лоток справки по дискуссиям"
   discussions_view_c6818792: "Обсуждения - просмотреть"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Задания в группах не могут относиться к конкретному разделу"
@@ -10379,6 +10415,7 @@ ru:
   error_creating_conversation_1d814618: "Ошибка при создании обсуждения"
   error_creating_course_ae61c2bd: "Ошибка при создании курса"
   error_creating_new_course_9d3903bc: "Ошибка при создании нового курса"
+  error_creating_new_subject_89f16abe: "Ошибка при создании новой темы"
   error_deleting_comment_87ca3d06: "Ошибка при удалении комментария"
   error_deleting_file_551dc16e: "Ошибка при удалении %{file}"
   error_deleting_name_reason_11f9d399: "Ошибка удаления %{name}: %{reason}"
@@ -10388,6 +10425,7 @@ ru:
   error_exporting_gradebook_msg_6ea31e2f: "При экспорте журнала успеваемости возникла ошибка: %{msg}"
   error_fetching_access_token_1445a9e3: "Ошибка выборки токена доступа"
   error_fetching_user_details_7c85d23: "Ошибка выборки данных пользователя"
+  error_importing_outcomes_59a4fe81: "Ошибка при импортировании результатов"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} в диапазоне путей усвоения %{index}"
   error_loading_comment_library_db6c9045: "Ошибка при загрузке библиотеки комментариев"
   error_loading_course_data_f056172b: "Ошибка при загрузке данных курсов"
@@ -10755,6 +10793,7 @@ ru:
   failed_to_delete_role_label_27959de3: "Не удалось удалить роль %{label}"
   failed_to_delete_selected_pages_26fa87db: "Не удалось удалить выбранные страницы"
   failed_to_export_some_tool_settings_c992fc56: "Не удалось экспортировать некоторые настройки инструментов"
+  failed_to_ignore_assignment_46565fa3: "Не удалось игнорировать задание"
   failed_to_import_media_objects_4c1fcb4f: "Не удалось импортировать мультимедийные объекты"
   failed_to_import_some_lti_resource_links_ab124c3f: "Не удалось импортировать некоторые ссылки на ресурсы LTI"
   failed_to_laod_more_submissions_990aacee: "Не удалось загрузить другие представления"
@@ -10762,8 +10801,10 @@ ru:
   failed_to_load_announcements_429c16fc: "Не удалось загрузить объявления."
   failed_to_load_apps_db37e651: "Не удалось загрузить приложения."
   failed_to_load_apps_for_name_fc6ce1c: "Не удалось загрузить приложения для %{name}."
+  failed_to_load_assignments_in_important_dates_ce3b4227: "Не удалось загрузить задания в важные даты."
   failed_to_load_course_navigation_for_name_aded3650: "Не удалось загрузить навигацию по курсу для %{name}."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Не удалось загрузить информацию CSP, попробуйте обновить страницу."
+  failed_to_load_events_in_important_dates_2195b227: "Не удалось загрузить события в важные даты."
   failed_to_load_external_feeds_7ac8411d: "Не удалось загрузить внешние источники"
   failed_to_load_grade_details_for_coursename_2325cfd2: "Не удалось загрузить информацию об оценках для %{courseName}"
   failed_to_load_grades_for_coursename_3611515e: "Не удалось загрузить оценки для %{courseName}"
@@ -10776,6 +10817,7 @@ ru:
   failed_to_load_student_annotation_file_data_256d99d2: "Не удалось загрузить данные файла аннотации учащегося."
   failed_to_load_the_grades_tab_c6118c57: "Не удалось загрузить вкладку оценок"
   failed_to_load_the_schedule_tab_fd7b0911: "Не удалось загрузить вкладку расписания"
+  failed_to_load_todos_93cfc2d2: "Не удалось загрузить список заданий со сроками выполнения"
   failed_to_log_in_7ceec561: "Не удалось войти в систему"
   failed_to_move_items_e043da6: "Не удалось отправить элементы"
   failed_to_open_discussion_for_comments_87412434: "Не удалось открыть обсуждение для комментариев"
@@ -10833,6 +10875,10 @@ ru:
   feature_options_enable_disable_7e748054: "Параметры функции - включить / отключить"
   feature_options_view_a170e80c: "Опции функции – показать"
   feature_preview_5e1216a0: "Предварительный просмотр функции"
+  feature_previews_2700a397: "Предварительный просмотр функций"
+  feature_previews_account_settings_274440bc: "Предварительный просмотр функций (настройки учетной записи)"
+  feature_previews_enable_disable_707af910: "Предварительный просмотр функций - включить / отключить"
+  feature_previews_view_d3f820e4: "Предварительный просмотр функций - показать"
   featured_83f6041d: Рекомендованный
   featured_help_links_d805fe44: "Ссылки для вызова выбранных функций справки"
   features: 
@@ -11235,6 +11281,7 @@ ru:
   go_to_name_s_profile_eaa1826b: "Перейти в профиль %{name}"
   go_to_parent_7fb312b4: "Перейти на родительский уровень"
   go_to_prerequisite_175c1f3f: "Перейти к Предварительным условиям"
+  go_to_reply_36fe5f51: "Перейти к опции «Ответить»"
   go_to_settings_for_name_812308b5: "Перейти к настройкам для %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Перейти к статистике для %{name}"
   go_to_topic_af6025fc: "Перейти к теме"
@@ -12696,6 +12743,7 @@ ru:
   groups_navigation_menu_76b5acc6: "Меню навигации по группам"
   groups_tray_ef3e2649: "Панель групп"
   groups_view_all_student_groups_39bd1b85: "Группы - просмотреть все группы студентов"
+  grouptitle_has_been_moved_to_newgrouptitle_de1f8c61: "«%{groupTitle}» перемещено в «%{newGroupTitle}»."
   groupweight_of_total_9579ae8c: "%{groupWeight}% oт общего числа"
   guatemala_502_ae25c68f: "Гватемала (+502)"
   haitian_creole_7eb4195b: Гаитянско-креольский
@@ -13081,6 +13129,7 @@ ru:
   if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "Если видимость курса ограничена пользователями, зачисленными на курс, это разрешение позволяет пользователю просматривать контент курса без зачисления на курс."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Если также включены параметры «Курсы - добавить / редактировать / удалить» и «Курсы - отменить удаление», пользователь уровня учетной записи может восстанавливать удаленные курсы в средствах администрирования."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "Если параметр «Курсы - добавить» активирован, а параметр «Курсы - просмотр» деактивирован, пользователи могут добавлять новый курс с помощью кнопки «Добавить новый курс» в настройках учетной записи."
+  if_courses_manage_update_and_courses_undelete_are__670ab844: "Если опции «Курсы - управление / обновление» и «Курсы - отмена удаления» также включены, пользователь уровня учетной записи может восстанавливать удаленные курсы в средствах администрирования."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Если отключен, страница «Результаты» становится доступной только для чтения со скрытой кнопкой «Управление рубриками». Пользователь все равно может получить доступ к отдельным рубрикам задания посредством параметра «Задания»."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Если отключен, пользователь все равно может просматривать и загружать файлы в zip-файл."
   if_disabled_user_will_still_have_access_to_course__541e130: "Если отключен, у пользователя все равно будет доступ к настройкам курса. Пользователь не может управлять отдельным содержимым курса без соответствующего разрешения для этого элемента содержимого. Если видимость курса ограничена пользователями, зачисленными на курс, это разрешение позволяет пользователю просматривать контент курса без зачисления на курс."
@@ -13289,6 +13338,7 @@ ru:
   ignore_91750df8: Игнорировать
   ignore_assignment_738b3c99: "Игнорировать задание"
   ignore_assignment_a4837cb3: "Игнорировать %{assignment}"
+  ignore_assignment_until_new_submission_424f8f01: "Игнорировать %{assignment} до новой отправки"
   ignore_item_46c066f3: "Игнорировать %{item}"
   ignore_item_until_new_mark_68518bf0: "Игнорировать %{item} до новой отметки"
   ignore_item_until_new_submission_58246b15: "Игнорировать %{item} до новой отправки"
@@ -14209,6 +14259,7 @@ ru:
   loading_725811ca: загрузка
   loading_accounts_3364e7a0: "Загрузка учетных записей..."
   loading_additional_items_ed5f672d: "Загрузка дополнительных элементов..."
+  loading_additional_todo_details_acba0cf2: "Загрузка детальной информации о дополнительном списке заданий со сроками выполнения"
   loading_announcements_b927a86c: "Загрузка объявлений"
   loading_apps_f85740cb: "Идет загрузка приложений..."
   loading_artifact_dc3bfe9f: "Загрузка артефакта"
@@ -14251,6 +14302,8 @@ ru:
   loading_homeroom_announcement_content_1654f8c7: "Загрузка содержания объявления в главной комнате"
   loading_homeroom_announcement_title_34338f6d: "Загрузка заголовка объявления в главной комнате"
   loading_homeroom_course_name_9f63923d: "Загрузка названия курса в главной комнате"
+  loading_important_date_2d3a29ce: "Загрузка важной даты"
+  loading_important_date_details_1b2d2b85: "Загрузка детальной информации о важной дате"
   loading_important_info_217bf805: "Загрузка важной информации"
   loading_last_attended_date_5a42463: "Загрузка даты последнего посещения"
   loading_latest_announcement_link_f1746190: "Загрузка ссылки на последнее задание"
@@ -14278,6 +14331,8 @@ ru:
   loading_students_30b71301: "Загрузка студентов"
   loading_sync_history_3eb11baf: "Загрузка истории синхронизации..."
   loading_sync_history_9f342cbf: "Загрузка истории синхр."
+  loading_todo_course_name_b851e509: "Загрузка названия курса для списка заданий со сроками выполнения"
+  loading_todo_title_5c73a869: "Загрузка заголовка списка заданий со сроками выполнения"
   loading_total_grade_for_coursename_b6eff3b6: "Загрузка общей оценки для %{courseName}"
   loading_unsynced_changes_1b52f725: "Загрузка несинхронизированных изменений..."
   loading_unsynced_changes_b5d7b202: "Загрузка несинхронизированных изменений"
@@ -14573,6 +14628,8 @@ ru:
   mark_all_as_unread_10e7f0fe: "Отметить все как непрочитанные"
   mark_as_done_6fa48d2f: "Отметить как выполненное"
   mark_as_done_779556d7: "отметить как выполненное"
+  mark_as_important_date_533718de: "Отметить, как важную дату"
+  mark_as_important_date_and_show_on_homeroom_sideba_1bc818ad: "Отметить, как важную дату, и показать на боковой панели «домашней комнаты»"
   mark_as_read_47ec83dd: "Отметить как прочитанное"
   mark_as_read_e7de2ce3: "Отметить как прочитанное"
   mark_as_safe_c01fea35: "Помечено как «безопасное»"
@@ -16948,6 +17005,11 @@ ru:
   move_contents_29713356: "Переместить содержимое..."
   move_contents_cefe9e92: "Переместить содержимое..."
   move_contents_into_f3e4fd9d: "Переместить содержимое в"
+  move_count_outcomes_c0ca2b30: 
+    few: "Переместить %{count} Результаты?"
+    many: "Переместить %{count} Результаты?"
+    one: "Переместить «%{outcomeTitle}»?"
+    other: "Переместить %{count} Результаты?"
   move_dialog: 
     cancel: Отменить
     save: Сохранить
@@ -16960,6 +17022,7 @@ ru:
   move_down_4a9c9b18: Спуститься
   move_group_3dd7f76e: "Переместить группу"
   move_group_77ae285d: "Переместить группу..."
+  move_grouptitle_20927676: "Переместить «%{groupTitle}»"
   move_item_e94a8103: "Переместить элемент"
   move_item_failed_8e4c1db6: "Не удалось переместить элемент"
   move_left_8c364375: Влево
@@ -17246,8 +17309,8 @@ ru:
       продуктах партнеров, должны активировать эту функцию для расширения рабочих
       процессов валидации данных по заданиям. После активации эта функция отображает новые настройки
       интеграции SIS для SIS Sync (передача информации об оценках на уровне заданий по каналам обратной связи) в
-      настройках учетных записей. Опциональная функция «Публикация в SIS» была включена в эту новую
-      настройку и активирована по умолчанию.
+      настройках учетных записей. функция «Публикация в SIS» была включена в эту новую настройку
+      и активирована по умолчанию.
   new_slack_api_key_453d04d: "Новый ключ Slack API"
   new_topic_for_course_3d98222a: "Новая тема для %{course}"
   new_typography_4eaeca26: "Новая топография"
@@ -17955,6 +18018,7 @@ ru:
   only_show_site_admin_keys_in_the_site_admin_ui_64827f33: "Показывать только ключи администратора сайта в пользовательском интерфейсе администратора сайта"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Пока курс не опубликован, его могут просматривать только преподаватели"
   only_the_moderator_can_edit_this_assignment_a162b20d: "Только модератор вправе редактировать данное задание"
+  only_users_with_no_enrollments_c636e6f9: "Только пользователи без регистрации"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} вовремя, %{late} с опозданием, %{missing} отсутствует"
   oops_something_went_wrong_importing_name_d382cac1: "Ой! Возникла проблема при импортировании «%{name}»"
   oops_something_went_wrong_with_making_a_copy_of_or_22787360: "Ой! Возникла проблема при создании копии \"%{original_assignment_name}\""
@@ -17980,6 +18044,7 @@ ru:
   open_message_d7b12975: "Открыть сообщение"
   open_name_color_picker_a2646a33: "Открыть %{name} Выбор цвета"
   open_new_course_modal_a8f8ad52: "Открыть новый модуль курса"
+  open_new_subject_modal_c9049e1d: "Открыть модальность новой темы"
   open_sidebar_2852e8c8: "Открыть боковую панель"
   open_speedgrader_11604608: "Открыть SpeedGrader"
   open_student_context_tray_24c1b1d6: "Открыть контекстный лоток учащегося"
@@ -18409,6 +18474,8 @@ ru:
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Задание для независимой оценки"
   peer_review_for_assignment_ce72fc52: "Рассмотрение коллегами для %{assignment}"
+  peer_review_for_name_bcffa32f: "Рассмотрение коллегами для %{name}"
+  peer_review_for_name_due_dueattext_f5f6547d: "Рассмотрение коллегами для %{name} Срок исполнения: %{dueAtText}"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Независимо оцененные задания еще не обработаны в новом потоке заданий. Перейти на старую страницу создания заданий?"
   peer_reviewed_graded_discussion_b339df5b: "Рецензируемая дискуссия с выставлением оценок:"
   peer_reviews_api: 
@@ -21613,7 +21680,11 @@ ru:
       версией, обработанной с помощью MathJax. Данное изменение обеспечивает более высокую доступность
       и множество опций, позволяющих пользователю работать в интерактивном режиме с уравнением на данной странице.
   replies_replies_unread_unread_dc7c982f: "%{replies} ответов, %{unread} не прочитано"
-  repliescount_replies_a7fcb2e1: "%{repliesCount} ответа/ответов"
+  repliescount_replies_a7fcb2e1: 
+    few: "%{repliesCount} ответов"
+    many: "%{repliesCount} ответов"
+    one: "%{repliesCount} ответа"
+    other: "%{repliesCount} ответов"
   reply_389d6fb9: Ответить
   reply_all_80298bee: "Ответить всем"
   reply_all_b864cd0e: "Ответить на все"
@@ -21664,6 +21735,7 @@ ru:
   reserved_by_you_cd03b62d: "Зарезервировано вами"
   reserved_f247b60b: Зарезервировано
   reset_95a81614: Сброс
+  reset_courses_fe29ddf9: "Сброс курсов"
   reset_multi_factor_authentication_2b63a558: "Сбросить многофакторную аутентификацию"
   reset_quiz_engine_choice_323a40e6: "Сбросить выбор механизма тестирования"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Сброс количества отказов этого метода контакта"
@@ -22238,6 +22310,7 @@ ru:
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Поиск пользователей. Когда вы начнете набирать текст в этом поле, список пользователей будет автоматически фильтроваться, оставляя только те имена, которые соответствуют вашему вводу."
   search_permissions_915bbd09: "Разрешения поиска"
   search_results_4d5af4eb: "Результаты поиска"
+  search_results_for_62243f02: "поиск курсов для"
   search_term_must_be_at_least_num_characters_669098ed: "Предмет поиска должен быть минимум %{num} символов"
   search_title_body_or_author_1d26711f: "Искать в заголовке, тексте сообщения или по автору"
   search_users_48b1789e: "Поиск пользователей..."
@@ -23482,12 +23555,14 @@ ru:
   show_due_dates_duedatecount_5e0b056c: "Показать даты сдачи (%{dueDateCount})"
   show_due_dates_duedatecount_e0075f5e: "Показать даты сдачи (%{dueDateCount})"
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: "Показать внедренную документацию в инструменте LTI «живых» мероприятий"
+  show_event_on_homeroom_sidebar_c618275d: "Показать событие на боковой панели «домашней комнаты»"
   show_exceptions_270ea1c5: "Показать исключения"
   show_final_grade_a95e14dc: "Показывать итоговую оценку"
   show_final_grade_override_8cde5803: "Показать изменение итоговой оценки"
   show_final_grade_overrides_only_c3017aaa: "Показать только изменения итоговых оценок"
   show_groups_navigation_menu_1521d38d: "Показать меню навигации групп"
   show_inactive_enrollments_8f4c4824: "Показать неактивные регистрации"
+  show_instructure_provided_release_notes_filtered_b_f3c285c9: "Показать примечания к выпуску, предоставленные в инструкции, в меню справки для всех пользователей (отфильтрованные по роли пользователя). Доступно для пользователей с ролями администратора, преподавателя (инструктора) и наблюдателя. Функции, которые можно применять для ролей студентов, включаются в примечания наблюдателя."
   show_key_1fbf0c64: "Показать ключ"
   show_less_d5bbf728: "показать меньше"
   show_links_to_unpublished_content_30c0450d: "Показать ссылки на не опубликованный контент"
@@ -23673,6 +23748,7 @@ ru:
     android_banner_title: "Canvas от Instructure"
     android_banner_view_button: ПРОСМОТР
   sms_f0ddceeb: sms
+  sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "SMS используется только для многофакторной аутентификации (если она включена в вашей учетной записи)."
   snapshots_6e1806b4: Снэпшоты
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Снэпшоты - это резервные копии данных, создаваемые при работе с Canvas в пробном режиме. В тот момент, когда делается снэпшот, создается уникальная \"версия\", служащая идеальным инструментом учета состояния вашей работы в пробном режиме на тот момент."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Некоторые задания не могут быть созданы, потому что они придутся на закрытый период оценки."
@@ -23861,6 +23937,7 @@ ru:
   start_5a4cfcd6: Начать
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Начните беседу с преподавателем в папке Входящие в Canvas."
   start_a_new_course_1f5f2266: "Запустить новый курс"
+  start_a_new_subject_7271b3ec: "Запустить новую тему"
   start_assignment_d56256d3: "Начать задание"
   start_date_c41cb23a: "Дата начала:"
   start_date_e937be8a: "Дата начала"
@@ -23947,6 +24024,7 @@ ru:
   student_collaborations_create_b9e312c1: "Сотрудничества студентов - создать"
   student_context_card_ad59967e: "Контекстная карточка учащегося"
   student_context_cards_376d2072: "Контекстные карты студента"
+  student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: "Контекстные карты студента должны быть включены для учетной записи администратором. Если опция «Курсы - управление / обновление» не включена, пользователи по-прежнему могут просматривать контекстные карты через журнал успеваемости."
   student_context_cards_must_be_enabled_for_an_accou_d996afdc: "Контекстные карты студента должны быть включены для учетной записи администратором. Если параметр «Управление курсами: Админ - управление / обновление» не активирован, пользователи по-прежнему могут просматривать контекстные карты через журнал успеваемости."
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Контекстные карты студента должны быть включены для учетной записи администратором. Если это разрешение не включено, пользователи могут просматривать контекстные карты студента посредством журнала оценок."
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Контекстные карты студента должны быть включены для учетной записи администратором."
@@ -24111,7 +24189,9 @@ ru:
   subdomain_url_1e43b6f0: "URL суб-домена"
   subject_114b2e98: Тема
   subject_1bc03dea: "Тема:"
+  subject_details_12405b1: "Детали темы"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Название темы должно содержать менее 255 символов."
+  subject_name_a1ac4da4: "Наименование темы"
   subject_reply_to: "Ответ: %{subject}"
   subject_subject_9e1057f7: "Тема: %{subject}"
   subjects_14c0c4de: Темы
@@ -24679,6 +24759,7 @@ ru:
               Для кросс-листинга раздела параметры «Управление курсами: Админ - управление / обновление» и «Управление разделами курса - редактировать» также должны быть активированы. Чтобы изменить идентификатор SIS курса, параметры «Управление курсами: Админ - управление / обновление» и «Данные SIS - управление» также должны быть активированы.
   the_courses_delete_permission_affects_viewing_the__b8744b4c: "Разрешения «Курсы - удалить» влияют на отображение кнопки «Навсегда удалить этот курс», которая отображается только для созданных вручную курсов."
   the_courses_publish_permission_allows_the_user_to__30694e34: "Параметр «Курсы - опубликовать» позволяет пользователю публиковать курсы, которые не содержат модулей. Чтобы опубликовать/отменить публикацию содержимого модуля, необходимо активировать параметр «Содержимое курса - добавить / редактировать / удалить»."
+  the_courses_reset_permission_allows_users_to_reset_29dbc267: "Опция «Курсы - разрешение сброса» позволяет пользователям сбросить содержание курса у SIS-управляемых курсов, независимо от того, будут ли они иметь разрешение «Данные SIS - управление»."
   the_date_is_not_valid_b6285fb5: "Дата недействительна."
   the_discussion_entry_was_successfully_created_7cddf67b: "Запись обсуждения успешно создана."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "Тема обсуждения успешно удалена."
@@ -24787,6 +24868,7 @@ ru:
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Предоставленный файл Academic Benchmark содержит ошибку"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Текст вопроса для этого вопроса \"%{question_name}\" был слишком длинным."
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "Опция проверки журнала тестирования должна быть включена в настройках курса."
+  the_quiz_log_auditing_feature_preview_must_be_enab_bd1f78f1: "Функцию «Аудит журнала контрольных работ» необходимо включить в настройках курса."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Название контрольной работы должно быть короче %{length} символов"
   the_replies_were_successfully_updated_56430189: "Ответы успешно обновлены"
   the_reply_was_successfully_deleted_84f3e46e: "Ответ успешно удален."
@@ -24930,7 +25012,9 @@ ru:
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Произошла непредвиденная ошибка при создании темы обсуждения."
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Произошла непредвиденная ошибка при удалении темы обсуждения."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Произошла непредвиденная ошибка при удалении темы."
+  there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Произошла непредвиденная ошибка при загрузке темы обсуждения."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Произошла непредвиденная ошибка при скачивании ответов."
+  there_was_an_unexpected_error_marking_all_as_read_117fe739: "Произошла непредвиденная ошибка при отметке всех данных, как прочитанных."
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: "Произошла непредвиденная ошибка при обновлении темы обсуждения."
   there_was_an_unexpected_error_updating_the_entry_5333eb80: "Произошла непредвиденная ошибка при обновлении списка."
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: "Произошла непредвиденная ошибка при обновлении ответа."
@@ -25038,6 +25122,9 @@ ru:
       будет отображаться автоматически при каждом выпуске.
       Более подробную информацию см. в группе пользователей Перекомпоновка обсуждений
       в сообществе Canvas.
+  this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
+      Данный флаг функции разрешает выполнять изолированный просмотр внутри новой работы по 
+      перекомпоновке обсуждений.
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Флажок этой функции означает, что учетная запись может активироваться, если необходимо разрешить пользователям учетных записей, говорящих на языках со стандартным направлением письма справа налево (напр., арабский, иврит, фарси) просматривать компоновку языков реального времени RTL в то время, пока мы работаем над ней. После того, как функция \"готова\", флажок этой функции убирается и любой, кто говорит на этих языках, будет всегда видеть интерфейс языков реального времени RTL."
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Эта функция заставляет API загрузки файла отправки проверять тип файла
@@ -25070,6 +25157,11 @@ ru:
   this_is_a_course_template_99bbe698: "Это шаблон курса"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Это функция, позволяющая дизайну продукта удалять все разнообразные изменения размеров шрифта, обусловленные применением."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Это функция, позволяющая разрабатывать адаптивный макет"
+  this_is_a_graded_discussion_count_points_possible_59926e2c: 
+    few: "Это дискуссия, за которую ставится оценка: можно получить %{count} баллов"
+    many: "Это дискуссия, за которую ставится оценка: можно получить %{count} баллов"
+    one: "Это дискуссия, за которую ставится оценка: можно получить %{count} балл"
+    other: "Это дискуссия, за которую ставится оценка: можно получить %{count} баллов"
   this_is_a_graded_discussion_pointspossible_points__9782a08e: "Это дискуссия, за которую ставится оценка: %{pointsPossible} балла(-ов) возможно"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Это мультимедийный комментарий, *щелкните здесь для просмотра*."
   this_is_a_message_for_name_7abf1e39: "Это сообщение для *%{name}*"
@@ -25493,6 +25585,7 @@ ru:
       Для доступа к ссылке «Курсы» в разделе «Навигация по учетной записи» необходимо включить список «Курсы - просмотр».
               Если параметр «Курсы - добавить» активирован, а список «Курсы - просмотр» отключен, пользователи могут добавить новый курс с помощью кнопки «Добавить новый курс» в настройках учетной записи.
               Чтобы восстановить удаленный курс, необходимо также активировать параметры «Курсы - удалить», «Курсы - отменить удаление» и «Курсы - просмотр».
+  to_access_the_courses_link_in_account_navigation_c_eee259fa: "Для доступа к ссылке «Курсы» в разделе «Навигация по странице учетной записи» необходимо включить опции «Курсы - управление / обновление» и «Курсы - просмотр списка»."
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "Для доступа к ссылке «Курсы» в разделе «Навигация по учетной записи» список «Управление курсами: должны быть активированы параметры «Админ - управление / обновление» и список «Курсы - просмотр»."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "Для доступа к ссылке «Управление банками вопросов» на странице курса «Указатель тестов» параметр «Содержание курса - просмотр» и «Задания и тесты - добавить / редактировать / удалить» также должен быть активирован."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Для доступа к станице «Люди» и просмотра параметра «Группы» также должен быть включен параметр «Пользователи - просмотреть список»."
@@ -25604,9 +25697,11 @@ ru:
   to_create_announcements_discussions_moderate_must__8a8278f2: "Для создания объявлений необходимо также активировать параметр «Обсуждения - модерировать»."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Чтобы внести раздел в перекрестный список, также необходимо включить параметр « Разделы курса - добавить / редактировать / удалить». Чтобы отредактировать идентификатор SIS курса, необходимо также включить «Данные SIS - управление». Чтобы позволить пользователю уровня учетной записи удалить курс, должен быть включен также параметр «Статус курса - управление»."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Чтобы внести раздел в перекрестный список, также необходимо включить параметр « Разделы курса - добавить / редактировать / удалить». Чтобы отредактировать идентификатор SIS курса, необходимо также включить «Данные SIS - управление». Чтобы позволить пользователю уровня учетной записи удалить курс, должен быть включен также параметр «Статус курса - управление»."
+  to_cross_list_a_section_courses_manage_update_and__40dfb8f8: "Для кросс-листинга раздела необходимо также включить функции «Курсы - управление / обновление» и «Управление разделами курса - редактирование»."
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "Для кросс-листинга раздела необходимо также включить функцию \"Управление разделами курса - редактирование\". Чтобы отредактировать идентификатор SIS курса, необходимо также включить «Данные SIS - управление». Чтобы позволить пользователю уровня учетной записи удалить курс, должен быть включен также параметр «Статус курса - управление»."
   to_cross_list_a_section_manage_courses_admin_manag_7992434e: "Для выполнения кросс-листинга раздела, «Управление курсами»: Админ - управление / обновление» и «Управление разделами курса - редактировать» также должны быть активированы."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Чтобы внести разделы в перекрестный список, также необходимо включить параметр «Курс - добавить / редактировать / удалить»."
+  to_cross_list_sections_course_sections_edit_and_co_6db155a6: "Для выполнения кросс-листинга разделов необходимо также включить функцию «Разделы курса - редактирование» и «Курсы - управление / обновление»."
   to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: "Для выполнения кросс-листинга разделов параметры «Разделы курса - редактировать» и «Управление курсами: Админ - управление / обновление» также должны быть активированы."
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "Для выполнения кросс-листинга разделов необходимо включить функцию \"Разделы курса - редактирование\". Кроме того, пользователь должен быть зарегистрирован в качестве преподавателя на курсах, имеющих кросс-листинг."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Для перехода между разделами также должен быть включен параметр «Курсы - добавить / редактировать / удалить»."
@@ -25654,22 +25749,33 @@ ru:
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Чтобы можно было редактировать настройки блокировки макета на странице-указателе «Страницы», также должен быть включен параметр «Курсы - добавить / редактировать / удалить». Если это разрешение не включено, но включен параметр «Курсы - добавить / редактировать / удалить», настройки блокировки макета могут быть отредактированы на отдельных страницах."
   to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "Чтобы можно было редактировать настройки блокировки макета на странице-указателе «Страницы», также должен быть включен параметр «Курсы - добавить / редактировать / удалить». Однако если параметр \"Курсы - добавить / изменить / удалить\" включен, но разрешение \"Страницы - Обновить\" не включено, пользователь может по-прежнему настраивать параметры блокировки содержимого на отдельных страницах основного курса Blueprint Master Course."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Чтобы отредактировать схемы выставления оценок, также необходимо включить параметр «Курсы - добавить / редактировать / удалить»."
+  to_edit_course_grading_schemes_courses_manage_upda_f34b25b3: "Для редактирования схем выставления оценок необходимо также включить опцию «Курсы - управление / обновление»."
   to_edit_course_grading_schemes_manage_courses_admi_3059cde2: "Для изменения схем выставления оценок параметры «Управление курсами: «Управление курсами: Админ - управление / обновление» также должны быть активированы."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Для редактирования настроек курса необходимо включить «Курсы - добавить / редактировать / удалить»."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Для редактирования настроек курса необходимо включить «Курсы - добавить / редактировать / удалить»."
+  to_edit_course_settings_courses_manage_update_must_172a4fe5: "Для редактирования настроек курсов необходимо также включить опцию «Курсы - управление / обновление»."
   to_edit_course_settings_manage_courses_admin_manag_fe44d1fe: "Для редактирования настроек курса параметр «Управление курсами: Админ - управление / обновление» также должен быть активирован."
+  to_edit_lock_settings_for_course_files_course_file_392f6f70: "Для редактирования настроек блокировки необходимо также включить опции файлов курса «Файлы курса - редактировать», «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Курсы - управление / обновление»."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "Для редактирования настроек блокировки для файлов курса параметры «Файлы курса - редактировать», «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление» также должны быть активированы."
+  to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "Для редактирования настроек блокировки на странице «Указатель заданий» необходимо также включить опции «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Курсы - управление / обновление»."
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       Для редактирования настроек блокировки на странице «Указатель заданий» параметры «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление» также должны быть активированы. Если эти дополнительные разрешения активированы, но параметр «Задания и тесты - добавить / редактировать / удалить» не активирован, настройками блокировки Blueprint для задания можно управлять со страницы сведений о задании.
               Для изменения настроек блокировки для индивидуального теста или на странице «Указатель тестов» параметры «Курсы Blueprint - добавить / редактировать / связать / удалить и «Управление курсами: Админ - управление / обновление» также должны быть активированы.
   to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "Для редактирования настроек блокировки на странице «Указатель заданий» параметры «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление» также должны быть активированы."
+  to_edit_lock_settings_from_the_discussions_index_p_d344c544: "Для редактирования настроек блокировки на странице «Указатель обсуждений» необходимо также включить опции «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Курсы - управление / обновление»."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "Для изменения настроек блокировки на странице «Указатель обсуждений» параметры «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление» также должны быть активированы."
   to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "Для редактирования параметров блокировки в отдельном тесте или на странице указателя тестов параметры «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление» также должны быть активированы."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "Для редактирования настроек блокировки в отдельной контрольной работе или на странице «Указатель тестов» необходимо также включить опции «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Курсы - управление / обновление»."
+  to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "Для редактирования настроек блокировки файлов необходимо также включить опции «Курсы - управление / обновление» и «Файлы курса - редактировать»."
   to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "Для редактирования настроек блокировки файлов также необходимо включить параметры «Управление курсами: Админ - управление / обновление» и «Файлы курса - редактировать»."
+  to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: "Для редактирования настроек блокировки тестов необходимо также включить опции «Курсы - управление / обновление» и «Задания и тесты - добавить / редактировать / удалить»."
   to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "Чтобы изменить настройки блокировки в тестах, также необходимо включить параметры « Управление курсами: Админ - управление / обновление» и «Задания и тесты - добавить / редактировать / удалить»."
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "Для редактирования настроек блокировки на странице «Указатель обсуждений» в тестах параметры «Управление курсами: Админ - управление / обновление» и «Обсуждения - просмотр» также должны быть активированы. Если дополнительные разрешения активированы, но это разрешение не активировано, настройки блокировки можно редактировать в отдельных обсуждениях."
   to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: "Для редактирования настроек блокировки на странице «Указатель обсуждений» в тестах параметры «Управление курсами: Админ - управление / обновление» и «Обсуждения - просмотр» также должны быть активированы."
+  to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "Для редактирования настроек блокировки на странице «Указатель обсуждений» необходимо также включить опции «Курсы - управление / обновление» и «Обсуждения - просмотр»."
+  to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "Для редактирования настроек блокировки на странице «Указатель страниц», «Страницы - обновить», «Курсы Blueprint - добавить / редактировать / связать / удалить» и «Курсы - управление / обновление»."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "Чтобы изменить настройки блокировки на странице «Указатель страниц», «Страницы - обновить, Курсы Blueprint - добавить / редактировать / связать / удалить» и «Управление курсами: Админ - управление / обновление."
+  to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "Чтобы отредактировать идентификатор SIS курса, необходимо также включить опции «Курсы - управление / обновление» и «Данные SIS - управление»."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "Чтобы изменить идентификатор SIS курса, параметры «Управление курсами: Админ - управление / обновление» и «Данные SIS - управление» также должны быть активированы."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       Чтобы отредактировать данные пользователя, изменить данные для входа или изменить пароли пользователей, также должен быть включен параметр «Пользователи - управление регистрационными данными».
@@ -25702,6 +25808,7 @@ ru:
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Чтобы импортировать данные SIS, необходимо также включить параметр «Данные SIS - импорт»."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Чтобы импортировать данные SIS, необходимо также включить параметр «Данные SIS - импорт»."
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "Подробнее о Canvas for Elementary см. в *нашей документации*."
+  to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "Чтобы связать наблюдателя со студентом, необходимо также включить опцию «Беседы - разослать сообщения отдельным участникам курса»."
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       Чтобы привязать наблюдателя к учащемуся, необходимы разрешения «Пользователи - управление регистрационными данными» и «Беседы – отправка отдельным слушателям курса».
             Для генерирования кода сопряжения от лица учащегося для передачи наблюдателю необходимо разрешение «Пользователи - Создание кодов сопряжения наблюдателей для учащихся».
@@ -25716,6 +25823,7 @@ ru:
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Для управления настройками концептуального курса в настройках курса, также должен быть включен параметр «Курсы - добавить / редактировать / удалить»."
   to_manage_course_announcements_discussions_moderat_5f02f46e: "Для управления объявлениями в рамках курса необходимо также включить параметр «Обсуждения - модерировать»."
   to_manage_course_content_course_content_add_edit_d_94caa77f: "Для управления содержимым курса необходимо включить параметр «Содержание курса - добавить / редактировать / удалить»."
+  to_manage_course_content_courses_manage_update_and_843edf8a: "Для управления содержимыми курса необходимо включить опции «Курсы - управление / обновление» и «Содержание курса - добавить / редактировать / удалить»."
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "Для управления содержимыми курса параметры «Управление курсами: Админ - управление / обновление» и «Содержание курса - добавить / редактировать / удалить» также должны быть активированы. Для отображения кнопок «Выбор домашней страницы» и «Контрольный список для настройки курса» параметры «Управление курсами: Админ - управление / обновление» и «Содержание курса - просмотр» также должны быть активированы. (Преподаватели, дизайнеры и TA могут задавать домашнюю страницу курса независимо от их разрешений.)"
   to_manage_course_content_manage_courses_admin_mana_ab5d16a8: "Для управления содержимыми курса параметры «Управление курсами: Админ - управление / обновление» и «Содержание курса - добавить / редактировать / удалить» также должны быть активированы."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
@@ -25728,6 +25836,8 @@ ru:
   to_manage_discussions_discussions_post_and_discuss_47aaeceb: "Для управления обсуждениями необходимо также включить параметры «Обсуждения - разместить пост» и «Обсуждения - модерировать»."
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "Для управления обсуждениями необходимо также включить параметры «Обсуждения - разместить пост» и «Обсуждения - модерировать». Чтобы ответить в обсуждении, необходимо также включить параметр «Обсуждения - разместить пост»."
   to_manage_feature_options_for_an_account_feature_o_6327c2da: "Для управления параметрами функции для учетной записи также должен быть активирован параметр «Параметры функции - включить / отключить»."
+  to_manage_feature_previews_for_an_account_feature__185e63eb: "Для управления предварительными просмотрами функций для учетной записи необходимо также включить опцию «Предварительный просмотр функций - включить / отключить»."
+  to_manage_lock_settings_for_object_types_courses_m_839a7753: "Для управления настройками блокировки типов объектов необходимо также включить опцию «Курсы - управление / обновление»."
   to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: "Для управления настройками блокировки для типов объектов параметры «Управление курсами: Админ - управление / обновление» также должны быть активированы."
   to_manage_moderated_grading_grades_moderate_must_a_6502844b: "Для управления модерируемым выставлением оценок необходимо также включить параметр «Оценки - модерировать»."
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
@@ -25740,6 +25850,8 @@ ru:
   to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: "Для управления данными SIS необходимо включить параметр «Данные SIS - управление»."
   to_manage_the_feature_options_tab_feature_options__c478f81: "Для управления вкладкой Параметры функции также должен быть включен параметр «Параметры функции - включить / отключить»."
   to_manage_the_feature_options_tab_feature_options__fc32fca3: "Для управления вкладкой Параметры функции также должен быть включен параметр «Параметры функции - включить / отключить»."
+  to_manage_the_feature_previews_tab_feature_preview_b5dfe722: "Для управления вкладкой «Предварительный просмотр функций» необходимо также включить опцию «Предварительный просмотр функций - включить / отключить»."
+  to_merge_users_the_self_service_user_merge_feature_351a98f: "Для объединение пользователей необходимо также включить опцию «Объединение пользователей самообслуживания»."
   to_minscore_43e5452e: "для %{minScore}"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_22d5e3b1: "Чтобы модерировать тест, также должен быть включен параметр «Задания и тесты - добавить / редактировать / удалить». Чтобы просмотреть столбец SIS-идентификатора пользователя в файле CSV анализа элемента теста, необходимо также включить чтение данных SIS."
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_2c7f4c18: |-
@@ -25771,6 +25883,7 @@ ru:
               Элементы модуля не могут быть опубликованы, если есть заявки студентов.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "Чтобы опубликовать или отменить публикацию содержимого модуля, необходимо также включить параметры «Курсы - добавить / редактировать / удалить» и «Содержание курса - просмотреть»."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "Чтобы опубликовать или отменить публикацию содержимого модуля, необходимо также включить параметры «Курсы - добавить / редактировать / удалить» и «Содержание курса - просмотреть»."
+  to_publish_and_unpublish_module_content_courses_ma_8a591b77: "Чтобы опубликовать содержимое модуля или отменить публикацию содержимого модуля, необходимо также включить опции «Курсы - управление / обновление» и «Содержимое курса - просмотр». Элементы модуля не могут быть опубликованы, если есть заявки студентов."
   to_publish_and_unpublish_module_content_manage_cou_33c20e31: "Для публикации и отмены публикации содержимого модуля параметры «Управление курсами: Админ - управление / обновление» и «Содержание курса - просмотр» также должны быть активированы. Элементы модуля не могут быть опубликованы, если есть заявки студентов."
   to_publish_final_grades_for_a_moderated_assignment_430368a0: "Для публикации финальных оценок для модерированного задания также должен быть включен параметр «Оценки - редактировать». Для публикации или сокрытия оценок для модерированного задания, также должен быть включен параметр «Оценки - редактировать»."
   to_publish_final_grades_for_a_moderated_assignment_713090cf: "Для публикации финальных оценок для модерированного задания также должен быть включен параметр «Оценки - редактировать»."
@@ -25780,6 +25893,7 @@ ru:
   to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "Для восстановления удаленного курса также должны быть активированы параметры «Курс - удалить», «Курс - отменить удаление» и «Содержимое курса - просмотр»."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Чтобы восстановить удаленный курс, необходимо также включить оба параметра «Курсы - отменить удаление» и «Содержание курса - просмотреть»."
   to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "Для восстановления удаленного курса в учетной записи необходимо также активировать параметры «Управление курсами - удалить» и «Содержимое курса - просмотр»."
+  to_restrict_students_from_creating_groups_courses__a48430de: "Чтобы запретить студентам создавать группы, необходимо включить опцию «Курсы - управление / обновление» и снять флажок в поле «Разрешить студентам организовывать свои группы» в «Настройки курса»."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "Чтобы запрещать студентам создавать группы, снимите флажок в поле «Разрешить студентам организовывать свои собственные группы» в настройках курса."
   to_restrict_students_from_creating_groups_do_not_s_b6da85dc: "Чтобы запретить студентам создавать группы, не устанавливайте флажок «Разрешить студентам организовывать свои группы» в настройках курса."
   to_restrict_students_from_creating_groups_manage_c_7cd09af9: "Чтобы ограничить возможности студентов в создании групп, необходимо активировать «Управление курсами: Параметр «Админ - управление / обновление» должен быть активирован, а флажок «Разрешить студентам организовывать свои группы» в «Настройки курса» не должен быть установлен."
@@ -25828,6 +25942,7 @@ ru:
   to_view_announcements_announcements_view_must_also_75f652df: "Для просмотра объявлений необходимо также включить «Объявления - просмотреть»."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Чтобы просматривать задания, убедитесь, что включено представление *Повестка дня*."
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "Для отображения кнопок «Выбор домашней страницы» и «Контрольный список для настройки курса» параметры «Управление курсами: Админ - управление / обновление» и «Содержание курса - просмотр» также должны быть активированы. (Преподаватели, дизайнеры и TA могут задавать домашнюю страницу курса независимо от их разрешений.)"
+  to_view_choose_home_page_and_course_setup_checklis_ff2436d4: "Для отображения кнопок «Выбор домашней страницы» и «Контрольный список для настройки курса» необходимо также включить опции «Курсы - управление / обновление» и «Содержимое курса - просмотр». (Преподаватели, дизайнеры и TA могут задавать домашнюю страницу курса независимо от их разрешений)."
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       Для просмотра обсуждений в курсе необходимо также включить параметр «Обсуждения - просмотреть».
       Для управления обсуждениями необходимо включить параметр «Обсуждения - модерировать».
@@ -25853,6 +25968,8 @@ ru:
   to_view_discussions_in_a_course_discussions_view_m_c0d9e312: "Для просмотра обсуждений в курсе необходимо активировать параметр «Обсуждения - просмотр». Оба параметра «Обсуждения - создать» и «Обсуждения - модерировать» позволяют пользователю создавать обсуждение на странице «Обсуждения». Для управления обсуждениями необходимо также включить параметр «Обсуждения - модерировать»."
   to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: "Для просмотра обсуждений в курсе необходимо также включить параметр «Обсуждения - просмотреть»."
   to_view_feature_options_for_an_account_feature_opt_14b0cea0: "Для просмотра параметров функции для учетной записи также должен быть активирован параметр «Параметры функции - включить / отключить»."
+  to_view_feature_previews_for_an_account_feature_pr_805e5c46: "Для управления предварительным просмотром функций учетной записи необходимо также включить опцию «Предварительный просмотр функций - включить / отключить»."
+  to_view_grades_in_a_course_courses_manage_update_a_91a2448: "Для просмотра оценок в курсе необходимо также включить опции «Курсы - управление / обновление» и «Оценки - просмотр всех оценок»."
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "Для просмотра оценок в курсе, также должен быть включен параметр «Оценки - просмотреть все оценки»."
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "Для просмотра оценок в курсе параметры «Управление курсами: Админ - управление / обновление» и «Оценки - просмотр» также должны быть активированы."
   to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "Для просмотра групп также должен быть включен параметр «Пользователи - просмотреть список»."
@@ -26079,6 +26196,7 @@ ru:
   turkish_5b69578b: Турецкий
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "Включение языков реального времени RTL для языков, не относящихся к языкам RTL"
   turned_in_submission_date_e9180b8b: "включил: %{submission_date}"
+  turning_off_this_tutorial_will_remove_the_tutorial_4a5031ec: "При отключении этой справки лоток справки будет удален из просмотра всех ваших курсов. Его можно вернуть, выбрав опцию «Предварительный просмотр функций» в ваших настройках пользователя."
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "При отключении этой справки лоток справки будет удален с экрана для всех ваших курсов. Ее можно будет снова включить в разделе Функциональных опций в меню Пользовательских настроек."
   turnitin: 
     error_1007: "Загружаемый файл слишком велик."
@@ -27083,6 +27201,7 @@ ru:
   view_prior_enrollments_9b519b25: "Просмотреть предыдущие регистрации"
   view_question_banks_188a9e0f: "Просмотреть банки вопросов"
   view_range_student_details_8116d68a: "Просмотреть сведения об учащихся из диапазона"
+  view_replies_8565a729: "Просмотреть ответы"
   view_rubric_d71cce10: "Просмотр рубрики"
   view_rubric_evaluation_b1b0db2a: "Просмотреть оценку рубрики"
   view_scoring_details_9fb7a0a5: "Просмотр сведений об оценке"
@@ -27121,6 +27240,7 @@ ru:
   waiting_for_attempted_login_6d00cb49: "Ожидание попытки входа в систему"
   waiting_for_change_to_complete_b75b5e8b: "Ожидание внесения изменения"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Ожидание подтверждения для отображения QR-кода"
+  waiting_for_important_things_to_happen_5d2e2f18: "Ожидание того, что произойдут важные события."
   waiting_for_request_to_complete_13cf037a: "Ожидание завершения процедуры запроса"
   waiting_for_selection_ce0398c7: "Ожидание выбора"
   waiting_for_your_qr_code_to_load_809299e5: "Дождитесь загрузки вашего QR-кода"
@@ -27255,10 +27375,16 @@ ru:
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Если выбран этот вариант, курс недоступен вне дат курса. Если даты курса не заполнены, эти даты начала и окончания применяются к датам семестра."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Если выбран этот вариант, раздел курса доступен только для чтения вне этих дат."
   whenever_b943b119: "в любое время"
+  where_would_you_like_to_move_these_outcomes_6f9a8cf9: 
+    few: "Куда вы хотите переместить эти результаты?"
+    many: "Куда вы хотите переместить эти результаты?"
+    one: "Куда вы хотите переместить этот результат?"
+    other: "Куда вы хотите переместить эти результаты?"
   where_would_you_like_to_move_this_group_e4ddd778: "Куда вы хотите переместить эту группу?"
   where_would_you_like_to_move_this_outcome_b38588e6: "Куда вы хотите переместить этот результат?"
   where_would_you_like_to_move_title_fabd6e8f: "Куда вы хотите переместить %{title}?"
   which_account_will_this_course_be_associated_with_80f78fd2: "С какой учетной записью будет ассоциирован этот курс?"
+  which_account_will_this_subject_be_associated_with_921d6bac: "С какой учетной записью будет связана данная тема?"
   which_course_is_this_question_about_f819a158: "О каком курсе ваш вопрос?"
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "Если оценки заданий будут установлены в ручной режим, учащиеся не будут получать новые уведомления о них и не смогут их видеть:"
   while_the_grades_for_this_assignment_are_hidden_st_9fb8de65: "\n\
@@ -27276,14 +27402,16 @@ ru:
   whoops_looks_like_nothing_is_here_f5c7dd44: "Ой! Похоже, что здесь ничего нет!"
   widget: 
     upload_media_track_form: 
+      amara_instructions: "При получении запроса вставьте URL видео, скопированный на шаге 1."
+      amara_link_text: "Amara (инструмент создания субтитров)"
       choose_a_language: "--Выбрать язык--"
       error_message: "*Ошибка:* Вы должны выбрать язык и действительный файл с записью."
       file: Файл
       language: Язык
       media_track_form_button: "Перейдите к инструменту создания субтитров"
       upload_media_track_form_description: "Если у вас есть запись субтитров в формате SRT или *WebVTT*, вы можете загрузить ее сюда."
-      upload_media_track_form_description_1: "Скопировать url-адрес этого видеоролика"
-      upload_media_track_form_description_2: "Создайте файл с субтитрами посредством нажатия на данную ссылку, и далее следуйте инструкциям."
+      upload_media_track_form_description_1: "Скопируйте URL данного видео:"
+      upload_media_track_form_description_2: "Создайте файл субтитров, щелкнув по следующей ссылке:"
       upload_media_track_form_description_3: "Загрузите запись субтитров в формате SRT или *WebVTT*."
       upload_media_track_form_step1_label: "Шаг 1."
       upload_media_track_form_step2_label: "Шаг 2."
@@ -27627,6 +27755,7 @@ ru:
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "Вам не разрешено управлять оценками для этого курса"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "Вам предоставлено дополнительное время на эту попытку"
   you_have_changed_the_progression_requirements_for__6772bc89: "Вы изменили требования к прохождению для активного курса. На курсе могут быть студенты, которые уже продвинулись до этого модуля или других, связанных с ним."
+  you_have_completed_a_peer_review_for_name_4dd2264b: "Вы завершили коллегиальное рецензирование %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Вы завершили коллегиальное рецензирование в отношении %{person}. Спасибо"
   you_have_count_submissions_to_grade_6c5b511a: "У вас %{count} представлений для оценки"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Вы ввели недопустимую оценку для данного студента. Проверьте значение и тип выставления оценки и повторите попытку."
@@ -27644,6 +27773,7 @@ ru:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Вы достигли максимального количества webhooks для одной учетной записи (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Вы достигли максимального количества webhooks для одного пользователя (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Вы отправили задание"
+  you_have_successfully_marked_all_as_read_f246ef1a: "Вы успешно отметили все, как прочитанное."
   you_have_successfully_published_the_discussion_top_fa0cdd42: "Вы успешно опубликовали тему обсуждения."
   you_have_successfully_subscribed_to_the_discussion_a577c521: "Вы успешно подписались на тему обсуждения."
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Вы успешно отменили публикацию темы обсуждения."

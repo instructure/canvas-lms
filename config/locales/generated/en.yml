@@ -1048,7 +1048,6 @@ en:
       email_notification_from_settings: E-mail Notification "From" Settings
       equall_endpoint_help: This is the URL to your equella service. It will probably look something like "%{sample_url}".
       equella_settings_title: Equella Settings
-      feature_options: Feature Options
       features_title: Features
       global_announcements_title: Global Announcements
       google_docs_domain: Allowed Google Docs Domain
@@ -1094,8 +1093,8 @@ en:
         no_enrollments_can_create_courses: Users with no enrollments
         open_registration: Open Registration
         originality_report_visibility: Students can see the originality report
+        outgoing_email_default_name: 'Name:'
         outgoing_email_default_name_option_custom: Custom "From" Name
-        outgoing_email_default_name_option_custom_name: 'Name:'
         outgoing_email_default_name_option_default: Default Canvas Setting
         prevent_course_availability_editing_by_teachers: Don't let teachers modify course availability dates
         prevent_course_renaming_by_teachers: Don't let teachers rename their courses
@@ -1480,7 +1479,7 @@ en:
   add_cc_subtitle_a9ef4a66: Add CC/Subtitle
   add_collaboration_da9665ac: Add Collaboration
   add_comment_to_library_1e3d95db: Add comment to library
-  add_conclude_delete_publish_9d8434e7: add / conclude / delete / publish
+  add_conclude_delete_publish_reset_15c3e5a2: add / conclude / delete / publish / reset
   add_conference_7bcc625b: Add Conference
   add_conferences_from_calendar_98cb86b1: Add Conferences from Calendar
   add_conferencing_9f4ccded: Add Conferencing
@@ -1589,7 +1588,6 @@ en:
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: Admin CSV
   admin_export_for_multiple_grading_periods_8a0c5ac1: Admin Export for Multiple Grading Periods
-  admin_manage_update_3fbef857: Admin - manage / update
   admin_navigation_menu_77b801a2: Admin Navigation Menu
   admin_tools_grade_change_logs_d804833f: Admin Tools (Grade Change Logs)
   admin_tools_logging_tab_680698f3: Admin Tools (Logging tab)
@@ -1777,14 +1775,14 @@ en:
   allows_user_to_access_gradebook_history_9d599681: Allows user to access Gradebook History.
   allows_user_to_access_gradebook_history_allows_use_79dfddd: Allows user to access Gradebook History. Allows user to access the Learning Mastery Gradebook (if enabled).
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: Allows user to access SpeedGrader from an assignment.
-  allows_user_to_access_student_view_test_student_co_8b57e87c: Allows user to access Student View (test student), Copy this Course, Reset Course Content, and Permanently Delete Course buttons.
+  allows_user_to_access_student_view_test_student_co_35fbd387: Allows user to access Student View (test student), Copy this Course, and Permanently Delete Course buttons.
   allows_user_to_access_the_act_as_user_link_on_stud_c7391722: Allows user to access the Act as User link on student context cards.
   allows_user_to_access_the_announcements_link_in_co_f2e824e9: Allows user to access the Announcements link in Course Navigation.
   allows_user_to_access_the_attendance_tool_72ef0b68: Allows user to access the Attendance tool.
   allows_user_to_access_the_chat_tool_48d5f5c4: Allows user to access the Chat tool.
   allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: Allows user to access the Learning Mastery Gradebook (if enabled).
   allows_user_to_access_the_manage_question_banks_li_616d45c8: Allows user to access the Manage Question Banks link on the Quizzes Index Page.
-  allows_user_to_access_the_navigation_tab_in_course_e266d985: Allows user to access the Navigation tab in Course Settings.
+  allows_user_to_access_the_navigation_tab_68efd3f: Allows user to access the Navigation tab.
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: Allows user to access the People link in Account Navigation.
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: Allows user to access the Restore Courses tab in Admin Tools.
   allows_user_to_access_the_student_progress_page_aca95197: Allows user to access the Student Progress page.
@@ -1886,7 +1884,7 @@ en:
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.
   allows_user_to_manage_assignment_settings_35d94690: Allows user to manage assignment settings.
   allows_user_to_manage_blueprint_course_settings_in_697362c5: Allows user to manage Blueprint Course settings in Course Settings.
-  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: Allows user to manage Feature Options in Account Settings.
+  allows_user_to_manage_feature_previews_in_account__3c90a6f: Allows user to manage Feature Previews in Account Settings.
   allows_user_to_manage_modules_create_add_items_edi_9459e815: Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.).
   allows_user_to_manage_observers_associated_with_st_4b45f2be: Allows user to manage observers associated with students in the account.
   allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: Allows user to manage shared resources in the account.
@@ -1969,7 +1967,7 @@ en:
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: Allows user to view enrollments on the Sections tab.
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: Allows user to view Faculty Journal entries in the Student Interactions Report.
   allows_user_to_view_faculty_journal_information_fo_3c725307: Allows user to view Faculty Journal information for individual students.
-  allows_user_to_view_feature_options_in_account_set_befc6b83: Allows user to view Feature Options in Account Settings.
+  allows_user_to_view_feature_previews_in_account_se_fa8df504: Allows user to view Feature Previews in Account Settings.
   allows_user_to_view_gradebook_9720b3e2: Allows user to view Gradebook.
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: Allows user to view grader comments on a rubric in SpeedGrader.
   allows_user_to_view_groups_in_a_course_8a95805b: Allows user to view groups in a course.
@@ -2000,7 +1998,6 @@ en:
   allows_user_to_view_the_course_setup_checklist_but_4d7524f0: Allows user to view the Course Setup Checklist button.
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: Allows user to view the Course Statistics button in Course Settings.
   allows_user_to_view_the_delete_this_course_button_92a4c832: Allows user to view the Delete this Course button.
-  allows_user_to_view_the_delete_this_course_button__6edc6b46: Allows user to view the Delete this Course button. Allows user to view the Reset Course Content button.
   allows_user_to_view_the_discussions_link_in_course_80ab2fca: Allows user to view the Discussions link in Course Navigation.
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: Allows user to view the ePortfolio Moderation page and manage ePortfolio spam content.
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: Allows user to view the Faculty Journal link in Global Navigation.
@@ -2046,10 +2043,14 @@ en:
   an_error_occurred_during_the_sync_process_error_62d98be7: 'An error occurred during the sync process: %{error}'
   an_error_occurred_loading_outcomes_data_cfd18b61: An error occurred loading outcomes data.
   an_error_occurred_making_a_network_request_d1bda348: An error occurred making a network request
-  an_error_occurred_moving_group_title_24fd7fb4: An error occurred moving group "%{title}"
-  an_error_occurred_moving_group_title_message_f8428b66: 'An error occurred moving group "%{title}": %{message}'
-  an_error_occurred_moving_outcome_title_4e616ce1: An error occurred moving outcome "%{title}"
-  an_error_occurred_moving_outcome_title_message_39fff0d1: 'An error occurred moving outcome "%{title}": %{message}'
+  an_error_occurred_moving_group_grouptitle_b20a640b: An error occurred moving group "%{groupTitle}"
+  an_error_occurred_moving_group_grouptitle_message_2ffcdc3c: 'An error occurred moving group "%{groupTitle}": %{message}'
+  an_error_occurred_moving_these_outcomes_ddcc6868:
+    one: An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}".
+    other: An error occurred moving these outcomes.
+  an_error_occurred_moving_these_outcomes_errormessa_b34c1232:
+    one: 'An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}": %{errorMessage}.'
+    other: 'An error occurred moving these outcomes: %{errorMessage}.'
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*An error occurred*, please post your reply again later"
   an_error_occurred_please_try_again_95361e05: An error occurred. Please try again.
   an_error_occurred_please_try_again_error_error_8800b506: 'An error occurred, please try again. Error: %{error}'
@@ -2069,13 +2070,13 @@ en:
   an_error_occurred_while_creating_this_outcome_54842fbd: An error occurred while creating this outcome.
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: 'An error occurred while creating this outcome: %{message}.'
   an_error_occurred_while_deleting_announcements_ab1ff3f6: An error occurred while deleting announcements.
-  an_error_occurred_while_loading_account_outcomes_8f337857: An error occurred while loading account outcomes.
+  an_error_occurred_while_loading_account_learning_o_29a11066: An error occurred while loading account learning outcome groups.
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: 'An error occurred while loading account outcomes: %{error}'
   an_error_occurred_while_loading_account_proficienc_c7d6568b: 'An error occurred while loading account proficiency ratings: %{m}'
   an_error_occurred_while_loading_account_proficienc_d38554c8: An error occurred while loading account proficiency ratings
   an_error_occurred_while_loading_associations_9699b3ee: An error occurred while loading associations
   an_error_occurred_while_loading_changes_9851b56f: An error occurred while loading changes
-  an_error_occurred_while_loading_course_outcomes_320ccc44: An error occurred while loading course outcomes.
+  an_error_occurred_while_loading_course_learning_ou_c4053b06: An error occurred while loading course learning outcome groups.
   an_error_occurred_while_loading_course_outcomes_er_accefe77: 'An error occurred while loading course outcomes: %{error}'
   an_error_occurred_while_loading_courses_11d4571e: An error occurred while loading courses
   an_error_occurred_while_loading_late_policies_c415f676: An error occurred while loading late policies
@@ -2339,10 +2340,14 @@ en:
   archive_selected_d64506ca: Archive Selected
   archived_de543437: Archived
   are_you_sure_26795d3c: Are you sure?
+  are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c:
+    one: Are you sure that you want to remove this outcome from this account?
+    other: Are you sure that you want to remove these %{count} outcomes from this account?
+  are_you_sure_that_you_want_to_remove_these_count_o_8ad349c4:
+    one: Are you sure that you want to remove this outcome from this course?
+    other: Are you sure that you want to remove these %{count} outcomes from this course?
   are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: Are you sure that you want to remove this group and all of its content from your course?
   are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: Are you sure that you want to remove this group and all of its content from your account?
-  are_you_sure_that_you_want_to_remove_this_outcome__38cdb682: Are you sure that you want to remove this outcome from this account?
-  are_you_sure_that_you_want_to_remove_this_outcome__e9f0b4fa: Are you sure that you want to remove this outcome from this course?
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe:
     one: Are you sure you want to archive your copy of this conversation?
     other: Are you sure you want to archive your copies of these conversations?
@@ -3849,6 +3854,7 @@ en:
   cannot_import_a_root_group_d4654def: cannot import a root group
   cannot_modify_outcome_from_another_context_changes_a80561a4: 'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}'
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: Cannot move assignments due to closed grading periods
+  cannot_remove_c0fd581d: 'Cannot Remove:'
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: Cannot restrict by section unless groups are empty and not limited in size
   cannot_save_new_assignment_3bda0792: cannot save new assignment
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: Cannot set only visible to overrides when due in a closed grading period
@@ -4019,6 +4025,7 @@ en:
   choose_a_csv_file_to_upload_9644480c: 'Choose a CSV file to upload:'
   choose_a_date_cd0263fe: Choose a date
   choose_a_file_to_upload_a63bac0f: Choose a file to upload
+  choose_a_file_to_upload_from_your_device_d1b50d4c: Choose a file to upload from your device
   choose_a_quiz_engine_8820d521: Choose a Quiz Engine
   choose_a_submission_type_8f45651a: Choose a submission type
   choose_an_authentication_service_47dc8875: Choose an authentication service
@@ -5140,6 +5147,7 @@ en:
   copy_operation_started_successfully_b2f236a1: Copy operation started successfully
   copy_page_to_another_course_405cc07c: Copy page to another course
   copy_quiz_to_course_74f9c8c1: Copy Quiz to Course
+  copy_the_video_url_dd509606: Copy the video URL
   copy_this_module_item_to_a_course_790a0cf4: Copy this module item to a course...
   copy_this_module_to_a_course_ddd12cc7: Copy this module to a course...
   copy_title_to_course_2a41a2f4: Copy %{title} to course
@@ -5164,6 +5172,7 @@ en:
   could_not_find_associated_outcome_in_this_context_1f7425b: Could not find associated outcome in this context
   could_not_find_file_to_upload_d8a0b228: Could not find file to upload.
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: Could not find the existing user for login with SIS ID %{user_id}, skipping
+  could_not_import_learning_outcome_outcome_id_becau_662152b8: Could not import Learning Outcome %{outcome_id} because it doesn't belong to any group
   could_not_save_chosencolor_741b74ce: Could not save '%{chosenColor}'
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: Couldn't adjust dates on assignment %{name} (ID %{id})
   couldn_t_find_canvas_csv_import_headers_487f1b6c: Couldn't find Canvas CSV import headers
@@ -5253,6 +5262,9 @@ en:
   count_outcomes_3af5e3e:
     one: "%{count} Outcome"
     other: "%{count} Outcomes"
+  count_outcomes_have_been_moved_to_newgrouptitle_3018f532:
+    one: '"%{outcomeTitle}" has been moved to "%{newGroupTitle}".'
+    other: '%{count} outcomes have been moved to "%{newGroupTitle}".'
   count_outcomes_selected_55902958:
     one: 1 Outcome Selected
     other: "%{count} Outcomes Selected"
@@ -5407,7 +5419,6 @@ en:
   course_copy_no_course_error: The source course was not found.
   course_copy_not_allowed_error: You are not allowed to copy the source course.
   course_course_d1c78210: 'Course: %{course}'
-  course_details_25cdf103: Course Details
   course_discussions_38c0b74f: Course Discussions
   course_end_date_4c797823: Course End Date
   course_end_date_on_after_a6bbb0b7: Course End Date On/After
@@ -5642,6 +5653,7 @@ en:
       move_course: Move Course
       reset_course_content_dialog_help: Reset Course Content
       section_enrollments: Section Enrollments
+  course_settings_course_details_1b1576b8: Course Settings (Course Details)
   course_settings_course_details_tab_fabf1adc: Course Settings (Course Details tab)
   course_settings_f6d0bbf8: Course Settings
   course_settings_sub_navigation_b95deae: Course Settings Sub Navigation
@@ -5915,7 +5927,7 @@ en:
       tabs:
         alerts: Alerts
         details: Course Details
-        feature_options: Feature Options
+        feature_previews: Feature Previews
         navigation: Navigation
         sections: Sections
         tools: Apps
@@ -6001,6 +6013,7 @@ en:
       invalid_link: The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled.
   courses_43204aae: Courses
   courses_account_72e4fca7: Courses (Account)
+  courses_account_navigation_f84fdec3: Courses (Account Navigation)
   courses_account_navigations_a60c71db: Courses - Account Navigations
   courses_account_settings_79e2f748: Courses - Account Settings
   courses_add_20891f99: Courses - add
@@ -6011,9 +6024,11 @@ en:
   courses_course_templates_5a3fbafd: Courses - Course Templates
   courses_delete_20c9beb2: Courses - delete
   courses_from_the_selected_term_will_be_considered_6d682c77: Courses from the selected term will be considered
+  courses_manage_update_d3e9263e: Courses - manage / update
   courses_navigation_menu_b3638384: Courses Navigation Menu
   courses_over_time_41dc0428: courses over time
   courses_publish_39df53f8: Courses - publish
+  courses_reset_211acdd: Courses - reset
   courses_that_are_set_as_a_template_in_any_account__f5da9fd7: Courses that are set as a template in any account can't stop being templates
   courses_tray_cec46d6e: Courses tray
   courses_undelete_1f689a97: Courses - undelete
@@ -6034,7 +6049,6 @@ en:
   create_announcements_above_1c36202b: Create announcements above
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: Create assessments with New Quizzes and migrate existing Canvas Quizzes.
   create_assignment_68532ceb: Create Assignment
-  create_course_9a69b32c: Create Course
   create_criterion_6df4d4ad: Create Criterion
   create_delete_edit_157bb1a3: create / delete / edit
   create_delete_update_4ff115bf: create / delete / update
@@ -6053,6 +6067,7 @@ en:
   create_outcome_4dac05a0: Create Outcome
   create_pages_581a4d59: Create pages
   create_slots_71dbb2f8: Create Slots
+  create_subject_86de5618: Create Subject
   create_theme_based_on_40651ed3: Create theme based on
   created_58b8a75a: Created
   created_6ee36dff: 'Created:'
@@ -6071,7 +6086,7 @@ en:
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later.
   creating_conference_95b59116: Creating conference
   creating_key_8a026e61: Creating Key
-  creating_new_course_62cd27bb: Creating new course...
+  creating_new_subject_35fe8d13: Creating new subject...
   creative_commons_714a065f: Creative Commons
   creative_commons_license_725584ae: 'Creative Commons License:'
   creative_commons_licenses_7d557d9a: Creative Commons Licenses
@@ -6871,6 +6886,7 @@ en:
   discussions_moderate_d1e69c7e: Discussions - moderate
   discussions_post_62f64091: Discussions - post
   discussions_redesign_b505952d: Discussions Redesign
+  discussions_redesign_isolated_view_78626c74: Discussions Redesign - Isolated View
   discussions_tutorial_tray_4ef79bcc: Discussions Tutorial Tray
   discussions_view_c6818792: Discussions - view
   discussions_with_groups_cannot_be_section_specific_1146d29: Discussions with groups cannot be section-specific
@@ -7596,7 +7612,7 @@ en:
   error_canceling_draft_ec3dbdc9: Error canceling draft
   error_creating_comment_cbbfc0f0: Error creating comment
   error_creating_conversation_1d814618: Error creating conversation
-  error_creating_new_course_9d3903bc: Error creating new course
+  error_creating_new_subject_89f16abe: Error creating new subject
   error_deleting_comment_87ca3d06: Error deleting comment
   error_deleting_file_551dc16e: Error deleting %{file}
   error_deleting_name_reason_11f9d399: 'Error deleting %{name}: %{reason}'
@@ -7605,6 +7621,7 @@ en:
   error_exporting_gradebook_msg_6ea31e2f: 'Error exporting gradebook: %{msg}'
   error_fetching_access_token_1445a9e3: Error fetching access token
   error_fetching_user_details_7c85d23: Error fetching user details
+  error_importing_outcomes_59a4fe81: Error importing outcomes
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
   error_loading_comment_library_db6c9045: Error loading comment library
   error_loading_course_data_f056172b: Error loading course data
@@ -7836,12 +7853,15 @@ en:
   failed_to_delete_external_feed_36f19d70: Failed to delete external feed
   failed_to_delete_role_label_27959de3: Failed to delete role %{label}
   failed_to_delete_selected_pages_26fa87db: Failed to delete selected pages
+  failed_to_ignore_assignment_46565fa3: Failed to ignore assignment
   failed_to_import_media_objects_4c1fcb4f: Failed to import media objects
   failed_to_import_some_lti_resource_links_ab124c3f: Failed to import some LTI resource links
   failed_to_invalidate_portal_path_5bc31b91: Failed to invalidate portal path
   failed_to_load_announcements_429c16fc: Failed to load announcements.
   failed_to_load_apps_db37e651: Failed to load apps.
+  failed_to_load_assignments_in_important_dates_ce3b4227: Failed to load assignments in important dates.
   failed_to_load_csp_information_try_refreshing_the__4a056997: Failed to load CSP information, try refreshing the page.
+  failed_to_load_events_in_important_dates_2195b227: Failed to load events in important dates.
   failed_to_load_external_feeds_7ac8411d: Failed to Load External Feeds
   failed_to_load_grade_details_for_coursename_2325cfd2: Failed to load grade details for %{courseName}
   failed_to_load_grades_for_the_requested_grading_pe_52cefa9: Failed to load grades for the requested grading period
@@ -7853,6 +7873,7 @@ en:
   failed_to_load_student_annotation_file_data_256d99d2: Failed to load student annotation file data.
   failed_to_load_the_grades_tab_c6118c57: Failed to load the grades tab
   failed_to_load_the_schedule_tab_fd7b0911: Failed to load the schedule tab
+  failed_to_load_todos_93cfc2d2: Failed to load todos
   failed_to_log_in_7ceec561: Failed to Log In
   failed_to_opt_out_of_the_canvas_for_elementary_das_cf7210f0: Failed to opt-out of the Canvas for Elementary dashboard
   failed_to_perform_search_c918100f: Failed to perform search
@@ -7884,9 +7905,10 @@ en:
   feature_f5526584: Feature
   feature_flags_52141c74: Feature Flags
   feature_headline_3f0daf4: Feature headline
-  feature_options_account_settings_294a39f8: Feature Options (Account Settings)
-  feature_options_enable_disable_7e748054: Feature Options - enable / disable
-  feature_options_view_a170e80c: Feature Options - view
+  feature_previews_2700a397: Feature Previews
+  feature_previews_account_settings_274440bc: Feature Previews (Account Settings)
+  feature_previews_enable_disable_707af910: Feature Previews - enable / disable
+  feature_previews_view_d3f820e4: Feature Previews - view
   featured_83f6041d: Featured
   featured_help_links_d805fe44: Featured Help Links
   features:
@@ -8190,7 +8212,7 @@ en:
   go_back_ed239e69: Go Back
   go_to_name_s_profile_eaa1826b: Go to %{name}'s profile
   go_to_parent_7fb312b4: Go To Parent
-  go_to_prerequisite_175c1f3f: Go to Prerequisite
+  go_to_reply_36fe5f51: Go to Reply
   go_to_topic_af6025fc: Go To Topic
   good_284a7a8f: Good
   good_score_b02f3587: Good Score
@@ -8874,6 +8896,7 @@ en:
   groups_navigation_menu_76b5acc6: Groups Navigation Menu
   groups_tray_ef3e2649: Groups tray
   groups_view_all_student_groups_39bd1b85: Groups - view all student groups
+  grouptitle_has_been_moved_to_newgrouptitle_de1f8c61: '"%{groupTitle}" has been moved to "%{newGroupTitle}".'
   guatemala_502_ae25c68f: Guatemala (+502)
   haitian_creole_7eb4195b: Haitian Creole
   has_similarity_score_d5f332b4: Has similarity score
@@ -9017,6 +9040,7 @@ en:
   hide_grades_5ff26682: Hide grades
   hide_grades_tray_5ed267fe: Hide grades tray
   hide_groups_navigation_menu_62e8b3d0: Hide Groups Navigation Menu
+  hide_important_dates_c23d2102: Hide Important Dates
   hide_key_e8fe1e8c: Hide Key
   hide_name_details_23814c37: Hide %{name} details
   hide_navigation_menu_f0b3e90: Hide Navigation Menu
@@ -9190,7 +9214,6 @@ en:
   idp_logoutresponse_encoded_bac9de6b: IdP LogoutResponse encoded
   idp_logoutresponse_xml_fe65de19: IdP LogoutResponse XML
   idp_metadata_uri_dae5314a: IdP Metadata URI
-  if_admin_manage_update_is_enabled_but_blueprint_co_def0b7ff: If Admin - Manage / Update is enabled, but Blueprint Courses - add / edit / associate / delete is not enabled, users can still sync Blueprint Courses and view Sync history.
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: If an attribute is marked as provisioning only, then it will only be used when Just in Time Provisioning creates a new user, and will not be kept up to date each time the user logs in.
   if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: If an enrollment is created via SIS, only admins can remove the enrollment from a course.
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.
@@ -9199,6 +9222,7 @@ en:
   if_course_content_add_edit_delete_is_enabled_and_s_ef307329: If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view edit delete all collaborations.
   if_course_visibility_is_limited_to_users_enrolled__ab1b1517: If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course.
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: If Courses - add is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings.
+  if_courses_manage_update_and_courses_undelete_are__670ab844: If Courses - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.
   if_disabled_user_will_still_have_access_to_course__fbf32c87: If disabled, user will still have access to Course Settings.
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric.
   if_enabled_common_cartridge_importers_will_convert_9bffff09: If enabled, Common Cartridge importers will convert HTML files into Pages
@@ -9223,7 +9247,6 @@ en:
     Canvas instances where root accounts are on the same shard
     as the site admin account. Behavior in other instances
     already behaved in this way.
-  if_manage_courses_admin_manage_update_and_courses__d2f16831: 'If Manage Courses: Admin - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: If mastery scales are enabled, the report will be truncated to not include calculation method, calculation int, mastery points, or ratings
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
     If new quizzes is enabled, this allows for the creation and management of item
@@ -9263,6 +9286,7 @@ en:
   if_this_permission_is_disabled_the_user_can_only_v_75dbf069: If this permission is disabled, the user can only view existing groups, including groups created by students.
   if_this_permission_is_disabled_users_can_still_ins_e9c4269f: If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.
+  if_this_permission_is_enabled_but_blueprint_course_ccc15486: If this permission is enabled, but Blueprint Courses - add / edit / associate / delete is not enabled, users can still sync Blueprint Courses and view Sync history.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission.
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: If this setting is disabled, and Discussions - view is enabled, the user can still adjust content lock settings on individual discussions in a Blueprint master course.
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: If true will used the serialized submission for submitted_at date
@@ -9288,6 +9312,7 @@ en:
   if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more.
   ignore_assignment_738b3c99: Ignore Assignment
   ignore_assignment_a4837cb3: Ignore %{assignment}
+  ignore_assignment_until_new_submission_424f8f01: Ignore %{assignment} until new submission
   ignore_item_46c066f3: Ignore %{item}
   ignore_item_until_new_mark_68518bf0: Ignore %{item} until new mark
   ignore_item_until_new_submission_58246b15: Ignore %{item} until new submission
@@ -9321,6 +9346,7 @@ en:
   import_status_b147bd27: Import Status
   import_tutorial_tray_8b92e956: Import Tutorial Tray
   important_dates_304e306a: Important Dates
+  important_dates_tray_fa41a025: Important Dates Tray
   important_info_3bda6406: Important Info
   important_info_for_course_baa4bce1: Important Info for %{course}
   important_note_educational_institutions_have_an_ob_c9350304: "*Important note: Educational institutions have an obligation to make their content as accessible as possible. Instructure recommends at least a 3:1 text-to-background-color ratio to keep your text readable. Easily test your contrast ratios with the **WebAIM Color Contrast Checker***."
@@ -9402,7 +9428,6 @@ en:
   include_unpublished_courses_7a0e7aab: Include Unpublished Courses
   include_unsubmitted_and_deleted_submissions_101225c7: Include unsubmitted and deleted submissions
   include_unsubmitted_deleted_submissions_99fc2aad: Include Unsubmitted & Deleted Submissions
-  include_users_with_no_enrollments_2a888dac: Include users with no enrollments
   included_messages_not_for_this_conversation_986a60bf: included_messages not for this conversation
   includes_outcomes_service_alignments_when_exportin_6c578a35: Includes Outcomes Service alignments when exporting and importing course content
   includes_overridden_course_grades_in_the_gradebook_d58cffb: Includes overridden course grades in the Gradebook History.
@@ -10036,6 +10061,7 @@ en:
   loading_725811ca: loading
   loading_accounts_3364e7a0: Loading accounts...
   loading_additional_items_ed5f672d: Loading additional items...
+  loading_additional_todo_details_acba0cf2: Loading Additional Todo Details
   loading_announcements_b927a86c: Loading Announcements
   loading_apps_f85740cb: Loading apps...
   loading_assessment_audit_trail_5cf4c10: Loading assessment audit trail
@@ -10072,6 +10098,8 @@ en:
   loading_homeroom_announcement_content_1654f8c7: Loading Homeroom Announcement Content
   loading_homeroom_announcement_title_34338f6d: Loading Homeroom Announcement Title
   loading_homeroom_course_name_9f63923d: Loading Homeroom Course Name
+  loading_important_date_2d3a29ce: Loading Important Date
+  loading_important_date_details_1b2d2b85: Loading Important Date Details
   loading_important_info_217bf805: Loading important info
   loading_last_attended_date_5a42463: Loading last attended date
   loading_latest_announcement_link_f1746190: Loading latest announcement link
@@ -10091,6 +10119,8 @@ en:
   loading_staff_1ce7d803: Loading staff...
   loading_sync_history_3eb11baf: Loading sync history...
   loading_sync_history_9f342cbf: Loading Sync History
+  loading_todo_course_name_b851e509: Loading Todo Course Name
+  loading_todo_title_5c73a869: Loading Todo Title
   loading_total_grade_for_coursename_b6eff3b6: Loading total grade for %{courseName}
   loading_unsynced_changes_1b52f725: Loading unsynced changes...
   loading_unsynced_changes_b5d7b202: Loading Unsynced Changes
@@ -10341,6 +10371,8 @@ en:
   mark_all_as_unread_10e7f0fe: Mark all as unread
   mark_as_done_6fa48d2f: Mark as done
   mark_as_done_779556d7: mark as done
+  mark_as_important_date_533718de: Mark as Important Date
+  mark_as_important_date_and_show_on_homeroom_sideba_1bc818ad: Mark as important date and show on homeroom sidebar
   mark_as_read_e7de2ce3: Mark as read
   mark_as_safe_c01fea35: Mark as Safe
   mark_as_spam_9c613d87: Mark as Spam
@@ -12189,11 +12221,15 @@ en:
   move_contents_29713356: Move Contents…
   move_contents_cefe9e92: Move Contents...
   move_contents_into_f3e4fd9d: Move Contents Into
+  move_count_outcomes_c0ca2b30:
+    one: Move "%{outcomeTitle}"?
+    other: Move %{count} Outcomes?
   move_discussion_9ff5b2d1: Move Discussion
   move_discussion_title_93ea7be1: Move discussion %{title}
   move_down_4a9c9b18: Move down
   move_group_3dd7f76e: Move Group
   move_group_77ae285d: Move Group…
+  move_grouptitle_20927676: Move "%{groupTitle}"
   move_item_failed_8e4c1db6: Move Item Failed
   move_module_346b8112: Move Module...
   move_module_90e6927e: Move Module
@@ -12212,7 +12248,6 @@ en:
   move_this_module_4a262aaf: Move this module
   move_this_page_4a05c813: Move this page
   move_this_section_890bee38: Move this section
-  move_title_cafc5235: Move "%{title}"
   move_to_25d7ef11: Move To
   move_to_9b91c6e0: Move To…
   move_to_bottom_d0f71bf0: Move to bottom
@@ -12434,7 +12469,7 @@ en:
     partner products should enable this feature for enhanced assignment data
     validation workflows. When enabled, this feature displays the new SIS
     Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-    Settings. The Post to SIS feature option has been incorporated into this new
+    Settings. The Post to SIS feature preview has been incorporated into this new
     setting and will be enabled by default.
   new_slack_api_key_453d04d: New Slack Api Key
   new_topic_for_course_3d98222a: New Topic for %{course}
@@ -12984,6 +13019,7 @@ en:
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: Once a grade is posted manually, it will automatically send new notifications and be visible to students.
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: Once you have submitted an answer, you will not be able to change it later. You will not be able to view the previous question.
   once_you_start_debugging_all_info_about_the_next_a_e871403b: Once you start debugging all info about the next attempted login attempt will be collected. Click "Refresh" to see if more data has been collected or "Stop Debugging" to clear the collected data and stop the current debug attempt.
+  one_or_more_grade_selected_was_provided_by_a_grade_58d46830: One or more grade selected was provided by a grader with inactive enrollments. Please update your selections to those provided by current graders.
   one_or_more_items_are_currently_being_imported_the_186fe069: One or more items are currently being imported. They will be shown in the course below once they are available.
   one_per_line_format_name_value_79647700: 'One per line. Format: name=value'
   online_submission_type_file_uploads_24910d74: Online Submission Type - File Uploads
@@ -13010,6 +13046,7 @@ en:
   only_show_announcement_on_current_account_domain_fc341eea: Only show announcement on current account domain
   only_show_site_admin_keys_in_the_site_admin_ui_64827f33: Only show site admin keys in the site admin UI
   only_the_moderator_can_edit_this_assignment_a162b20d: Only the moderator can edit this assignment
+  only_users_with_no_enrollments_c636e6f9: Only users with no enrollments
   oops_something_went_wrong_importing_name_d382cac1: Oops! Something went wrong importing "%{name}"
   oops_something_went_wrong_with_making_a_copy_of_or_22787360: Oops! Something went wrong with making a copy of "%{original_assignment_name}"
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: Oops! Something went wrong with making a copy of "%{originalAssignmentName}"
@@ -13027,7 +13064,7 @@ en:
   open_in_theme_editor_156028e2: Open in Theme Editor
   open_message_d7b12975: Open Message
   open_name_color_picker_a2646a33: Open %{name} Color Picker
-  open_new_course_modal_a8f8ad52: Open new course modal
+  open_new_subject_modal_c9049e1d: Open new subject modal
   open_sidebar_2852e8c8: Open sidebar
   open_speedgrader_11604608: Open SpeedGrader
   open_student_context_tray_24c1b1d6: Open student context tray
@@ -13356,6 +13393,8 @@ en:
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: Peer Review Assignment
   peer_review_for_assignment_ce72fc52: Peer Review for %{assignment}
+  peer_review_for_name_bcffa32f: Peer review for %{name}
+  peer_review_for_name_due_dueattext_f5f6547d: 'Peer review for %{name} Due: %{dueAtText}'
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?
   peer_reviews_api:
     errors:
@@ -13457,9 +13496,9 @@ en:
   please_select_a_group_set_for_this_assignment_e1da63d3: Please select a group set for this assignment
   please_select_a_user_role_for_this_link_9fb4e655: Please select a user role for this link.
   please_select_one_f931e883: Please select one
-  please_try_again_4c3d11b4: Please Try Again
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving.
   please_upload_files_as_a_zip_5a2c799f: Please upload files as a .zip
+  please_visit_your_modules_page_for_more_informatio_846c5e32: Please visit your *modules page* for more information.
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: Please wait as we upload and process your file.
   please_wait_e6355980: Please wait...
   please_wait_while_we_upload_attachments_fc34efd1: Please wait while we upload attachments
@@ -13975,7 +14014,6 @@ en:
   ppt_534cb87: PPT
   practice_quiz_19a8505d: Practice Quiz
   pre_processing_92865c1d: Pre-processing
-  prerequisite_completion_period_c562d63: Prerequisite Completion Period
   prerequisites_49659f16: 'Prerequisites:'
   prerequisites_list_62d66d12: 'Prerequisites: %{list}'
   prerequisites_lookup:
@@ -14099,7 +14137,6 @@ en:
       delicious_description: Delicious is a tool that lets you store and share your bookmarks with others. Canvas's rich content editor will let you search your Delicious tags to easily link from within Canvas to other resources you find useful.
       diigo_description: Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful.
       error_loading_token_details: Error Loading Token Details
-      feature_options: Feature Options
       full_token_warning: |-
         **Copy this token down now**. Once you leave this page you won't be able to
         retrieve the full token anymore, you'll have to regenerate it to get a new
@@ -15734,6 +15771,7 @@ en:
   remove_conference_title_207d32c0: 'Remove conference: %{title}'
   remove_contact_method_ca890ba3: Remove contact method
   remove_course_association_name_b760c502: Remove course association %{name}
+  remove_d83a966c: 'Remove:'
   remove_dates_9b9ba2f6: Remove Dates
   remove_designers_from_courses_42332a57: Remove Designers from courses
   remove_displayname_a2f31aa3: Remove %{displayName}
@@ -15758,14 +15796,15 @@ en:
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
   remove_null_values_from_live_event_payloads_3c826f: Remove null values from live event payloads
   remove_observers_from_courses_703edc34: Remove Observers from courses
-  remove_outcome_20e16da7: Remove Outcome?
-  remove_outcome_2feaf5fd: Remove Outcome
   remove_outcomes_5f8b601c:
     one: Remove Outcome
     other: Remove Outcomes
-  remove_outcomes_9abcc8fd: Remove Outcomes?
+  remove_outcomes_9abcc8fd:
+    one: Remove Outcome?
+    other: Remove Outcomes?
   remove_points_from_rubric_dcd4b585: Remove points from rubric
   remove_recipient_name_a6b83cef: Remove recipient %{name}
+  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: Remove %{removableCount} out of %{totalCount} Outcomes?
   remove_row_c198da5a: Remove row
   remove_row_in_edit_mode_49c4dc07: Remove row in edit mode
   remove_row_name_c053f5ae: Remove row %{name}
@@ -15857,6 +15896,7 @@ en:
   reserved_by_you_cd03b62d: Reserved By You
   reserved_f247b60b: Reserved
   reset_95a81614: Reset
+  reset_courses_fe29ddf9: Reset courses
   reset_multi_factor_authentication_2b63a558: Reset Multi-Factor Authentication
   reset_quiz_engine_choice_323a40e6: Reset quiz engine choice
   reset_this_contact_method_s_bounce_count_3845ecf4: Reset this contact method's bounce count
@@ -16293,6 +16333,7 @@ en:
   search_people_4782671a: Search People
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.
   search_permissions_915bbd09: Search Permissions
+  search_results_for_62243f02: search results for
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: search_term is mutually exclusive with name and domain
   search_term_must_be_at_least_num_characters_669098ed: Search term must be at least %{num} characters
   search_within_grouptitle_4d38272f: Search within %{groupTitle}
@@ -17135,9 +17176,11 @@ en:
   show_details_194cf390: Show Details
   show_due_dates_duedatecount_5e0b056c: Show Due Dates (%{dueDateCount})
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: Show embedded documentation in Live Events LTI Tool
+  show_event_on_homeroom_sidebar_c618275d: Show event on homeroom sidebar
   show_exceptions_270ea1c5: Show exceptions
   show_final_grade_overrides_only_c3017aaa: Show Final Grade Overrides Only
   show_groups_navigation_menu_1521d38d: Show Groups Navigation Menu
+  show_instructure_provided_release_notes_filtered_b_f3c285c9: Show Instructure-provided release notes filtered by user role in the Help Menu. Available to users with admin, teacher (instructor), and observer roles. Applicable features for student roles are included in observer notes.
   show_key_1fbf0c64: Show Key
   show_less_d5bbf728: show less
   show_links_to_unpublished_content_30c0450d: Show links to unpublished content
@@ -17163,7 +17206,6 @@ en:
   show_welcome_tour_a105aa2e: Show Welcome Tour
   showing_1ac6ed70: 'Showing:'
   showing_all_sets_of_grading_periods_6c160874: Showing all sets of grading periods.
-  shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: Shows Instructure-provided release notes in the help menu for all users (filtered by user role)
   shrink_permission_74b01aed: Shrink %{permission}
   shuffle_answers_edb602b7: Shuffle Answers
   sign_up_dafdee18: Sign Up
@@ -17272,12 +17314,15 @@ en:
   smart_alerts_44db622e: Smart alerts
   smart_assignment_alerts_abc2224: Smart Assignment Alerts
   sms_f0ddceeb: sms
+  sms_is_only_used_for_multi_factor_authentication_i_73a11abc: SMS is only used for Multi-Factor Authentication (if enabled for your account).
   snapshots_6e1806b4: Snapshots
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: Snapshots are backups of your Canvas trial. Taking a snapshot will create a unique "version", making a perfect record of the state of your trial at the moment of the snapshot.
   some_assignments_could_not_be_created_because_they_d91f2f21: Some assignments could not be created because they would fall in a closed grading period.
   some_conferences_on_this_page_are_hidden_because_o_789684fd: Some conferences on this page are hidden because of errors while retrieving their status
   some_custom_columns_could_not_be_changed_because_t_88abc9be: Some custom columns could not be changed because they were read only; changes for those columns have been ignored.
   some_module_items_could_not_be_published_e4be3c0: Some module items could not be published
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: Some of the outcomes that you have selected cannot be removed because they are aligned to content in this account. Do you want to proceed with removing the outcomes without alignments?
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: Some of the outcomes that you have selected cannot be removed because they are aligned to content in this course. Do you want to proceed with removing the outcomes without alignments?
   some_settings_have_been_administratively_locked_9e3ee880: Some settings have been administratively locked.
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: Some settings have been disabled because the assignment is in a closed grading period.
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: Some submissions are not gradeable; grade changes for those submissions have been ignored.
@@ -17437,7 +17482,7 @@ en:
   starred_subject_click_to_unstar_6aafcddc: Starred "%{subject}", Click to unstar.
   start_5a4cfcd6: Start
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: Start a conversation with your instructor in the Canvas Inbox.
-  start_a_new_course_1f5f2266: Start a new course
+  start_a_new_subject_7271b3ec: Start a new subject
   start_assignment_d56256d3: Start Assignment
   start_date_e937be8a: Start Date
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
@@ -17515,7 +17560,8 @@ en:
   student_collaborations_create_b9e312c1: Student Collaborations - create
   student_context_card_ad59967e: Student Context Card
   student_context_cards_376d2072: Student Context Cards
-  student_context_cards_must_be_enabled_for_an_accou_d996afdc: 'Student context cards must be enabled for an account by an admin. If Manage Courses: Admin - manage / update is not enabled, users can still view context cards through the Gradebook.'
+  student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: Student context cards must be enabled for an account by an admin. If Courses - manage / update is not enabled, users can still view context cards through the Gradebook.
+  student_context_cards_must_be_enabled_for_an_accou_9b5c635: Student context cards must be enabled for an account by an admin. If this permission is not enabled, users can still view context cards through the Gradebook.
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: Student Context Cards must be enabled for an account by an admin.
   student_course_completion_dates_cb89cd6c: Student Course Completion Dates
   student_course_progress_600f0b86: Student Course Progress
@@ -17658,7 +17704,9 @@ en:
   subdomain_url_1e43b6f0: Subdomain URL
   subject_114b2e98: Subject
   subject_1bc03dea: 'Subject:'
+  subject_details_12405b1: Subject Details
   subject_must_contain_fewer_than_255_characters_2e72cd02: Subject must contain fewer than 255 characters.
+  subject_name_a1ac4da4: Subject Name
   subject_reply_to: 'Re: %{subject}'
   subject_subject_9e1057f7: 'Subject: %{subject}'
   subjects_14c0c4de: Subjects
@@ -18153,6 +18201,7 @@ en:
   the_course_to_report_on_defaults_to_canvas_id_unle_dcd805e: The course to report on defaults to Canvas id unless specified as SIS in course_id_type
   the_courses_delete_permission_affects_viewing_the__b8744b4c: The Courses - delete permission affects viewing the Permanently Delete this Course button, which only appears for manually created courses.
   the_courses_publish_permission_allows_the_user_to__30694e34: The Courses - publish permission allows the user to publish courses that do not contain modules. To publish/unpublish module content, Course Content - add / edit / delete must be enabled.
+  the_courses_reset_permission_allows_users_to_reset_29dbc267: The Courses - reset permission allows users to reset course content for SIS-managed courses, regardless of whether they have the SIS Data - manage permission.
   the_date_is_not_valid_b6285fb5: The date is not valid.
   the_default_report_only_includes_course_section_da_729092f0: The default report only includes Course/Section dates if Enrollment restrictions are enabled
   the_discussion_entry_was_successfully_created_7cddf67b: The discussion entry was successfully created.
@@ -18186,9 +18235,6 @@ en:
     The following domains have automatically been allowed from tools that already exist in your account.
                      To remove these domains, remove the associated tools.
   the_following_fields_are_invalid_fields_b3565800: 'The following fields are invalid: %{fields}'
-  the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9:
-    one: The following outcome cannot be removed because it is aligned to content. Please unselect it and try again.
-    other: The following outcomes cannot be removed because they are aligned to content. Please unselect them and try again.
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
     The following students have unsaved changes to their quiz submissions:
 
@@ -18243,11 +18289,17 @@ en:
   the_next_available_appointment_in_this_course_is_o_da10316c: The next available appointment in this course is on *%{date}*
   the_original_quizzes_interface_fcda53bc: The original quizzes interface
   the_outcome_to_report_on_7d30886d: The outcome to report on
+  the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0:
+    one: The outcome that you have selected cannot be removed because it is aligned to content in this account.
+    other: The outcomes that you have selected cannot be removed because they are aligned to content in this account.
+  the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2:
+    one: The outcome that you have selected cannot be removed because it is aligned to content in this course.
+    other: The outcomes that you have selected cannot be removed because they are aligned to content in this course.
   the_preceding_content_is_partner_provided_d753928c: The preceding content is partner provided
   the_previous_sis_batch_was_aborted_d7d89955: The previous SIS batch was aborted
   the_profile_picture_has_been_reported_d609d6dd: The profile picture has been reported
   the_question_text_for_the_question_question_name_w_3a68a2c7: The question text for the question "%{question_name}" was too long.
-  the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: The Quiz Log Auditing feature option must be enabled in Course Settings.
+  the_quiz_log_auditing_feature_preview_must_be_enab_bd1f78f1: The Quiz Log Auditing feature preview must be enabled in Course Settings.
   the_quiz_name_must_be_under_length_characters_68e7de3a: The Quiz name must be under %{length} characters
   the_replies_were_successfully_updated_56430189: The replies were successfully updated
   the_reply_was_successfully_deleted_84f3e46e: The reply was successfully deleted.
@@ -18386,7 +18438,9 @@ en:
   there_was_an_error_with_your_query_please_try_a_di_761dff12: There was an error with your query; please try a different search
   there_was_an_unexpected_error_creating_the_discuss_8811a868: There was an unexpected error creating the discussion entry.
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: There was an unexpected error deleting the discussion topic.
+  there_was_an_unexpected_error_loading_the_discussi_cc4ee42: There was an unexpected error loading the discussion entry.
   there_was_an_unexpected_error_loading_the_replies_578d9738: There was an unexpected error loading the replies.
+  there_was_an_unexpected_error_marking_all_as_read_117fe739: There was an unexpected error marking all as read.
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: There was an unexpected error updating the discussion topic.
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: There was an unexpected error updating the reply.
   there_was_an_unexpected_error_while_deleting_the_r_7df6ebe0: There was an unexpected error while deleting the reply.
@@ -18413,6 +18467,7 @@ en:
   this_assignment_is_complete_5e096a06: This assignment is complete!
   this_assignment_is_currently_being_moderated_ffd280f2: This assignment is currently being moderated
   this_assignment_is_currently_muted_that_means_stud_94d63139: This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?
+  this_assignment_is_currently_unavailable_because_y_129792e0: This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: This assignment is dropped and will not be considered in the total calculation
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: This assignment is excused and will not be considered in the total calculation
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: This assignment is in a closed grading period for this student
@@ -18455,6 +18510,9 @@ en:
     will be displayed automatically with every release.
     For full details, please see the Discussions Redesign user group
     in the Canvas Community.
+  this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
+    This feature flag enables Isolated View inside the new
+    Discussions Redesign work.
   this_field_is_required_fa58c4a: This field is required
   this_field_name_is_required_988caebc: This field "%{name}" is required.
   this_field_name_is_required_b9196401: This field "name" is required.
@@ -18828,7 +18886,6 @@ en:
   title_due_date_d3f46bfb: "%{title}: Due %{date}"
   title_ee03d132: Title
   title_f8e03596: "* Title"
-  title_has_been_moved_to_newgrouptitle_739707b4: '"%{title}" has been moved to "%{newGroupTitle}".'
   title_is_locked_click_to_unlock_21548cfb: "%{title} is locked. Click to unlock"
   title_is_required_437f9993: Title is required
   title_is_required_8bb13295: Title is required!
@@ -18860,8 +18917,9 @@ en:
   to_access_the_account_courses_page_courses_view_li_e1da6165: To access the account Courses page, Courses - view list must be enabled.
   to_access_the_account_settings_tab_account_level_s_9676d44b: To access the Account Settings tab, Account-level settings - manage must also be enabled.
   to_access_the_assignments_index_page_course_conten_49d884f2: To access the Assignments Index Page, Course Content - view must be enabled.
+  to_access_the_courses_link_in_account_navigation_c_4f4a7ffc: To access the Courses link in Account Navigation, Courses - view list must also be enabled.
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: To access the Courses link in Account Navigation, Courses - view list must be enabled.
-  to_access_the_courses_link_in_account_navigation_m_ce68b53d: 'To access the Courses link in Account Navigation, Manage Courses: Admin - manage / update and Courses - view list must be enabled.'
+  to_access_the_courses_link_in_account_navigation_c_eee259fa: To access the Courses link in Account Navigation, Courses - manage / update and Courses - view list must be enabled.
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - add / edit / delete must also be enabled.
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: To access the People page and view Groups, Users - view list must also be enabled.
   to_access_the_people_page_users_view_list_must_be__5dfdbe23: To access the People page, Users - view list must be enabled.
@@ -18908,8 +18966,9 @@ en:
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.
   to_create_a_new_course_to_use_as_a_course_template_9e7e2c6c: To create a new course to use as a course template, Manage Courses - add must also be enabled.
   to_create_announcements_discussions_moderate_must__8a8278f2: To create announcements, Discussions - moderate must also be enabled.
-  to_cross_list_a_section_manage_courses_admin_manag_7992434e: 'To cross-list a section, Manage Courses: Admin - manage / update and Manage Course Sections - edit must also be enabled.'
-  to_cross_list_sections_course_sections_edit_and_ma_ebd7e386: 'To cross-list sections, Course Sections - edit and Manage Courses: Admin - manage / update must also be enabled.'
+  to_cross_list_a_section_courses_manage_update_and__40dfb8f8: To cross-list a section, Courses - manage / update and Manage Course Sections - edit must also be enabled.
+  to_cross_list_a_section_manage_course_sections_edi_ac3d2abb: To cross-list a section, Manage Course Sections - edit must also be enabled.
+  to_cross_list_sections_course_sections_edit_and_co_6db155a6: To cross-list sections, Course Sections - edit and Courses - manage / update must also be enabled.
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: To cross-list sections, Course Sections - edit must be enabled. The user must also be enrolled as an instructor in the courses being cross-listed.
   to_date_cannot_come_before_from_date_3eeb2633: To Date cannot come before From Date
   to_differentiate_assignments_to_individual_student_6cc40fde: To differentiate assignments to individual students, Users - view list ​must also be enabled.
@@ -18932,17 +18991,18 @@ en:
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.
   to_edit_assignment_details_on_a_discussion_assignm_1764e657: To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled.
   to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: To edit Blueprint lock settings from the Discussions index page, Discussions - moderate must also be enabled.
-  to_edit_course_grading_schemes_manage_courses_admi_3059cde2: 'To edit course grading schemes, Manage Courses: Admin - manage / update must also be enabled.'
-  to_edit_course_settings_manage_courses_admin_manag_fe44d1fe: 'To edit course settings, Manage Courses: Admin - manage / update must be enabled.'
-  to_edit_lock_settings_for_course_files_course_file_60ff11c0: 'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update must also be enabled.'
-  to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: 'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
-  to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: 'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
-  to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: 'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Manage Courses: Admin - manage / update must also be enabled.'
-  to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: 'To edit lock settings on files, Manage Courses: Admin - manage / update and Course Files - edit must also be enabled.'
-  to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: 'To edit lock settings on quizzes, Manage Courses: Admin - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled.'
-  to_edit_lock_settings_on_the_discussions_index_pag_5094c62f: 'To edit lock settings on the Discussions index page, Manage Courses: Admin - manage / update and Discussions - view must also be enabled.'
-  to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: 'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update.'
-  to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: 'To edit the course SIS ID, Manage Courses: Admin - manage / update and SIS Data - manage must also be enabled.'
+  to_edit_course_grading_schemes_courses_manage_upda_f34b25b3: To edit course grading schemes, Courses - manage / update must also be enabled.
+  to_edit_course_settings_courses_manage_update_must_172a4fe5: To edit course settings, Courses - manage / update must be enabled.
+  to_edit_lock_settings_for_course_files_course_file_392f6f70: To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update must also be enabled.
+  to_edit_lock_settings_from_the_assignments_index_p_53f2f063: To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.
+  to_edit_lock_settings_from_the_discussions_index_p_d344c544: To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.
+  to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.
+  to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: To edit lock settings on files, Courses - manage / update and Course Files - edit must also be enabled.
+  to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled.
+  to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: To edit lock settings on the Discussions index page, Courses - manage / update and Discussions - view must also be enabled.
+  to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update.
+  to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: To edit the course SIS ID, Courses - manage / update and SIS Data - manage must also be enabled.
+  to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: To edit the course SIS ID, SIS Data - manage must also be enabled.
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.
   to_end_a_long_running_conference_the_course_conten_63e3f993: To end a long-running conference, the Course Content permission must be enabled.
   to_f0e90538: 'To:'
@@ -18958,20 +19018,23 @@ en:
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: To import SIS data, SIS Data - import must also be enabled.
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: To join the Canvas Community, you must first have a Canvas Account.
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: To learn more about Canvas for Elementary, please refer to *our documentation*.
+  to_link_an_observer_to_a_student_conversations_sen_37aad7b5: To link an observer to a student, Conversations - send to individual course members must be enabled.
   to_link_an_observer_to_a_student_users_manage_logi_cc370c29: To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
   to_link_the_course_observer_name_to_a_student_star_f993c826: To link the course observer *%{name}* to a student, start typing the student's name below to find them and then click Update.
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: To manage associated courses, Courses - view list and Manage Courses - add must also be enabled.
   to_manage_course_announcements_discussions_moderat_5f02f46e: To manage course announcements, Discussions - moderate ​must also be enabled.
-  to_manage_course_content_manage_courses_admin_mana_ab5d16a8: 'To manage course content, Manage Courses: Admin - manage / update and Course Content - add / edit / delete must be enabled.'
+  to_manage_course_content_course_content_add_edit_d_10b420f7: To manage course content, Course Content - add / edit / delete must also be enabled.
+  to_manage_course_content_courses_manage_update_and_843edf8a: To manage course content, Courses - manage / update and Course Content - add / edit / delete must be enabled.
   to_manage_discussions_discussions_moderate_must_al_834a8b9: To manage discussions, Discussions - moderate must also be enabled.
   to_manage_discussions_discussions_moderate_must_be_7307a00a: To manage discussions, Discussions - moderate must be enabled.
   to_manage_discussions_discussions_post_and_discuss_47aaeceb: To manage discussions, Discussions - post and Discussions - moderate must also be enabled.
-  to_manage_feature_options_for_an_account_feature_o_6327c2da: To manage Feature Options for an account, Feature Options - enable / disable must also be enabled.
-  to_manage_lock_settings_for_object_types_manage_co_4d6ce4c0: 'To manage lock settings for object types, Manage Courses: Admin - manage / update must also be enabled.'
+  to_manage_feature_previews_for_an_account_feature__185e63eb: To manage Feature Previews for an account, Feature Previews - enable / disable must also be enabled.
+  to_manage_lock_settings_for_object_types_courses_m_839a7753: To manage lock settings for object types, Courses - manage / update must also be enabled.
   to_manage_sis_data_sis_data_manage_must_also_be_en_748806e8: To manage SIS data, SIS Data - manage must also be enabled.
   to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: To manage SIS data, SIS Data - manage must be enabled.
-  to_manage_the_feature_options_tab_feature_options__fc32fca3: To manage the Feature Options tab, Feature Options - enable disable - must also be enabled.
+  to_manage_the_feature_previews_tab_feature_preview_b5dfe722: To manage the Feature Previews tab, Feature Previews - enable disable - must also be enabled.
+  to_merge_users_the_self_service_user_merge_feature_351a98f: To merge users, the Self Service User Merge feature preview must also be enabled.
   to_minscore_43e5452e: to %{minScore}%
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_c2e739c8: To moderate a quiz, Assignments and Quizzes - add / edit / delete also be enabled.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled.
@@ -18983,14 +19046,14 @@ en:
   to_post_or_hide_grades_for_an_assignment_grades_ed_974f6de4: To post or hide grades for an assignment, Grades - edit must also be enabled.
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: To post or hide grades, Grades - edit must also be enabled.
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: To preview Theme Editor branding, you will need to *turn off High Contrast UI*.
-  to_publish_and_unpublish_module_content_manage_cou_33c20e31: 'To publish and unpublish module content, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
+  to_publish_and_unpublish_module_content_courses_ma_8a591b77: To publish and unpublish module content, Courses - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.
   to_publish_final_grades_for_a_moderated_assignment_713090cf: To publish final grades for a moderated assignment, Grades - edit must also be enabled.
   to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: To remove a user via SIS ID, SIS Data - manage must also be enabled.
   to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: To reply to a discussion, Discussions - post must also be enabled.
   to_restore_a_deleted_course_courses_delete_courses_83c7e64f: To restore a deleted course, Courses - delete, Courses - undelete, and Course Content - view must also be enabled.
   to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: To restore a deleted course in an account, Manage Courses - delete and Course Content - view must also be enabled.
+  to_restrict_students_from_creating_groups_courses__a48430de: To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.
   to_restrict_students_from_creating_groups_do_not_s_b6da85dc: To restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.
-  to_restrict_students_from_creating_groups_manage_c_7cd09af9: 'To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: To restrict to users from a specific Clever district, enter the district's Clever ID here. This is required for Clever Instant Login to work in a multi-tenant environment.
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: To restrict to users from specific Google Apps domains, enter the domain(s) here as a comma separated list. To restrict to a Google Apps user in general, you can enter '*'.
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: To restrict to users of your Azure Active Directory, enter your tenant here.
@@ -19013,11 +19076,13 @@ en:
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: To view account-level groups, Groups - add / edit / delete must also be enabled.
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: To view all notifications sent to a Canvas user, select the user and date range for your search.
   to_view_announcements_announcements_view_must_also_75f652df: To view announcements, Announcements - view must also be enabled.
-  to_view_choose_home_page_and_course_setup_checklis_e7067bc1: 'To view Choose Home Page and Course Setup Checklist buttons, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)'
+  to_view_choose_home_page_and_course_setup_checklis_84797b4f: To view Choose Home Page and Course Setup Checklist buttons, Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)
+  to_view_choose_home_page_and_course_setup_checklis_ff2436d4: To view Choose Home Page and Course Setup Checklist buttons, Courses - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)
   to_view_discussions_in_a_course_discussions_view_m_6be8ec80: To view discussions in a course, Discussions - view must be enabled.
   to_view_discussions_in_a_course_discussions_view_m_eb15b3f1: To view discussions in a course, Discussions - view must also be enabled.
-  to_view_feature_options_for_an_account_feature_opt_14b0cea0: To view Feature Options for an account, Feature Options - enable / disable must also be enabled.
-  to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: 'To view grades in a course, Manage Courses: Admin - manage / update and Grades - view all grades must also be enabled.'
+  to_view_feature_previews_for_an_account_feature_pr_805e5c46: To view Feature Previews for an account, Feature Previews - enable / disable must also be enabled.
+  to_view_grades_in_a_course_courses_manage_update_a_91a2448: To view grades in a course, Courses - manage / update and Grades - view all grades must also be enabled.
+  to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: To view grades in a course, Grades - view all grades must also be enabled.
   to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: To view groups, Users - view list must also be enabled.
   to_view_last_activity_and_total_activity_informati_473265d8: To view Last Activity and Total Activity information on the Course People page, Users - view list must also be enabled.
   to_view_login_ids_users_allow_administrative_actio_1b5789db: To view login IDs, Users - allow administrative actions in courses must also be enabled.
@@ -19078,7 +19143,6 @@ en:
   tool_type_afa58fcb: Tool Type
   toolname_logo_6b639926: "%{toolName} Logo"
   tooltip_info_for_tenant_input_81a0eca8: Tooltip info for tenant input
-  tooltip_that_contains_info_about_the_microsoft_tea_24d892cf: Tooltip that contains info about the Microsoft Teams Sync Login Attribute.
   tooltips:
     finished: finished
     incomplete: incomplete
@@ -19168,7 +19232,7 @@ en:
   try_out_canvas_for_free_e2265d30: Try out Canvas for Free!
   turkish_5b69578b: Turkish
   turned_in_submission_date_e9180b8b: 'turned in: %{submission_date}'
-  turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
+  turning_off_this_tutorial_will_remove_the_tutorial_4a5031ec: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Previews in your User Settings.
   turnitin:
     error_1007: The uploaded file is too big.
     error_1009: Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)
@@ -19248,6 +19312,9 @@ en:
                                   If it continues to fail, please reach out in #canvas-sre in Slack.
   unable_to_read_file_2d04b0c: Unable to read file
   unable_to_remove_app_4293cb53: Unable to remove app
+  unable_to_remove_outcomes_f682e68f:
+    one: Unable To Remove Outcome
+    other: Unable To Remove Outcomes
   unable_to_remove_sftp_key_selected_if_it_continues_f99a7a22: |-
     Unable to remove SFTP key selected.
                                   If it continues to fail, please reach out in #canvas-sre in Slack.
@@ -19278,7 +19345,7 @@ en:
   undelivered_message_459916a9: Undelivered message
   underline_all_links_description: |-
     Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
-    *underlined text*. This feature option does not apply to user-generated content links in the
+    *underlined text*. This feature does not apply to user-generated content links in the
     Rich Content Editor, which always underlines links for all users.
   underline_links_e7cf9b4f: Underline Links
   undo_a7be8fef: Undo
@@ -19980,6 +20047,7 @@ en:
   view_gradebook_for_course_10cbf171: View Gradebook for %{course}
   view_grades_8d3bae6c: View Grades
   view_grades_for_name_45aeb2f2: View grades for %{name}
+  view_important_dates_173c7e1b: View Important Dates
   view_login_ids_for_users_142bbe7a: View login ids for users
   view_longer_description_6b762087: view longer description
   view_missing_missing_items_for_course_coursename_e7509012: View %{missing} missing items for course %{courseName}
@@ -19993,6 +20061,7 @@ en:
   view_prior_enrollments_9b519b25: View Prior Enrollments
   view_question_banks_188a9e0f: View Question Banks
   view_range_student_details_8116d68a: View range student details
+  view_replies_8565a729: View Replies
   view_rubric_d71cce10: View Rubric
   view_submission_ff3da5d: View Submission
   view_the_assignment_e61ca4fc: View the assignment
@@ -20021,6 +20090,7 @@ en:
   waiting_for_attempted_login_6d00cb49: Waiting for attempted login
   waiting_for_change_to_complete_b75b5e8b: Waiting for change to complete
   waiting_for_confirmation_to_display_qr_code_6f904d63: Waiting for confirmation to display QR code
+  waiting_for_important_things_to_happen_5d2e2f18: Waiting for important things to happen.
   waiting_for_request_to_complete_13cf037a: Waiting for request to complete
   waiting_for_results_to_load_4fc9da44: Waiting for results to load
   waiting_for_selection_ce0398c7: Waiting for Selection
@@ -20129,10 +20199,12 @@ en:
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: When selected, the course section is in a read-only state outside these dates.
   whenever_b943b119: whenever
+  where_would_you_like_to_move_these_outcomes_6f9a8cf9:
+    one: Where would you like to move this outcome?
+    other: Where would you like to move these outcomes?
   where_would_you_like_to_move_this_group_e4ddd778: Where would you like to move this group?
-  where_would_you_like_to_move_this_outcome_b38588e6: Where would you like to move this outcome?
   where_would_you_like_to_move_title_fabd6e8f: Where would you like to move %{title}?
-  which_account_will_this_course_be_associated_with_80f78fd2: Which account will this course be associated with?
+  which_account_will_this_subject_be_associated_with_921d6bac: Which account will this subject be associated with?
   which_canvas_account_would_you_like_to_use_to_log__c3718dc6: Which Canvas account would you like to use to log in?
   which_course_is_this_question_about_f819a158: Which course is this question about?
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: 'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:'
@@ -20142,14 +20214,15 @@ en:
   whoops_looks_like_nothing_is_here_f5c7dd44: Whoops... Looks like nothing is here!
   widget:
     upload_media_track_form:
+      amara_instructions: When prompted, paste in the video URL copied in step 1.
+      amara_link_text: Amara (Subtitle creation tool)
       choose_a_language: "--Choose a Language--"
       error_message: "*Error:* You must choose a language and a valid track file."
       file: File
       language: Language
-      media_track_form_button: Go to subtitle creation tool
       upload_media_track_form_description: Once you have a subtitle track in either the SRT or *WebVTT* format, you can upload it here.
-      upload_media_track_form_description_1: 'Copy this video url:'
-      upload_media_track_form_description_2: Create a subtitle file by clicking this link and following the instructions.
+      upload_media_track_form_description_1: 'Copy this video URL:'
+      upload_media_track_form_description_2: 'Create a subtitle file by clicking the following link:'
       upload_media_track_form_description_3: Upload a subtitle track in either the SRT or *WebVTT* format.
       upload_media_track_form_step1_label: 'Step 1:'
       upload_media_track_form_step2_label: 'Step 2:'
@@ -20306,9 +20379,6 @@ en:
   would_you_like_to_enable_this_app_ccdf735d: Would you like to enable this app?
   would_you_like_to_go_back_to_include_1d279044: 'Would you like to go back to include:'
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?
-  would_you_like_to_remove_these_count_outcomes_5075697d:
-    one: Would you like to remove that outcome?
-    other: Would you like to remove these %{count} outcomes?
   wrap_event_titles_in_calendar_month_view_cbb29fd8: Wrap event titles in Calendar month view
   write_something_430e346c: Write something...
   wrong_answer_comments_14963a24: Wrong answer comments
@@ -20410,6 +20480,7 @@ en:
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: You don't have permission to manage grades for this course
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: You have been given extra time on this attempt
   you_have_changed_the_progression_requirements_for__6772bc89: You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it.
+  you_have_completed_a_peer_review_for_name_4dd2264b: You have completed a peer review for %{name}
   you_have_completed_a_peer_review_for_person_thank__1371f37e: You have completed a peer review for %{person}. Thank you
   you_have_count_submissions_to_grade_6c5b511a: You have %{count} submissions to grade
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: You have entered an invalid grade for this student. Check the value and the grading type and try again.
@@ -20420,6 +20491,7 @@ en:
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: You have no outcomes. Click here to go to the outcomes page.
   you_have_reached_the_domain_limit_you_can_add_more_1143333a: You have reached the domain limit. You can add more domains by deleting existing domains in your allowed list.
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: You have reached the limit of %{len} characters in the notification message
+  you_have_successfully_marked_all_as_read_f246ef1a: You have successfully marked all as read.
   you_have_successfully_subscribed_to_the_discussion_a577c521: You have successfully subscribed to the discussion topic.
   you_have_successfully_unsubscribed_from_the_discus_883e8326: You have successfully unsubscribed from the discussion topic.
   you_have_successfully_updated_the_discussion_topic_b2910500: You have successfully updated the discussion topic.

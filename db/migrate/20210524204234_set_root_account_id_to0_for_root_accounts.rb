@@ -20,10 +20,10 @@ class SetRootAccountIdTo0ForRootAccounts < ActiveRecord::Migration[6.0]
   tag :postdeploy
 
   def up
-    Account.root_accounts.update_all(root_account_id: 0)
+    Account.where(root_account_id: nil).update_all(root_account_id: 0)
   end
 
   def down
-    Account.root_accounts.update_all(root_account_id: nil)
+    Account.where(root_account_id: 0).update_all(root_account_id: nil)
   end
 end

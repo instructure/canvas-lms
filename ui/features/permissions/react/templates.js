@@ -215,9 +215,9 @@ const accountLevelPermissions = generateActionTemplates(
       )
     },
     {
-      title: I18n.t('Feature Options (Account Settings)'),
+      title: I18n.t('Feature Previews (Account Settings)'),
       description: I18n.t(
-        'To manage the Feature Options tab, Feature Options - enable disable - must also be enabled.'
+        'To manage the Feature Previews tab, Feature Previews - enable disable - must also be enabled.'
       )
     },
     {
@@ -324,15 +324,15 @@ const featureFlagsManagePermissions = generateActionTemplates(
   'manage_feature_flags',
   [
     {
-      title: I18n.t('Feature Options (Account Settings)'),
-      description: I18n.t('Allows user to manage Feature Options in Account Settings.')
+      title: I18n.t('Feature Previews (Account Settings)'),
+      description: I18n.t('Allows user to manage Feature Previews in Account Settings.')
     }
   ],
   [
     {
-      title: I18n.t('Feature Options (Account Settings)'),
+      title: I18n.t('Feature Previews (Account Settings)'),
       description: I18n.t(
-        'To view Feature Options for an account, Feature Options - enable / disable must also be enabled.'
+        'To view Feature Previews for an account, Feature Previews - enable / disable must also be enabled.'
       )
     }
   ],
@@ -539,7 +539,7 @@ const usersManageLoginPermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To merge users, the Self Service User Merge feature option must also be enabled.'
+        'To merge users, the Self Service User Merge feature preview must also be enabled.'
       )
     },
     {
@@ -685,15 +685,15 @@ const featureFlagsViewPermissions = generateActionTemplates(
   'view_feature_flags',
   [
     {
-      title: I18n.t('Feature Options (Account Settings)'),
-      description: I18n.t('Allows user to view Feature Options in Account Settings.')
+      title: I18n.t('Feature Previews (Account Settings)'),
+      description: I18n.t('Allows user to view Feature Previews in Account Settings.')
     }
   ],
   [
     {
-      title: I18n.t('Feature Options (Account Settings)'),
+      title: I18n.t('Feature Previews (Account Settings)'),
       description: I18n.t(
-        'To manage Feature Options for an account, Feature Options - enable / disable must also be enabled.'
+        'To manage Feature Previews for an account, Feature Previews - enable / disable must also be enabled.'
       )
     }
   ],
@@ -769,7 +769,7 @@ const assignmentsAndQuizzes = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'The Quiz Log Auditing feature option must be enabled in Course Settings.'
+        'The Quiz Log Auditing feature preview must be enabled in Course Settings.'
       )
     }
   ],

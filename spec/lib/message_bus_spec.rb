@@ -44,6 +44,25 @@ describe MessageBus do
     expect(JSON.parse(msg.data)['test_key']).to eq("test_val")
   end
 
+  it "can send a single message resiliant to timeout" do
+    topic_name = "lazily-created-topic-#{SecureRandom.hex(17)}"
+    subscription_name = "subscription-#{SecureRandom.hex(5)}"
+    call_count = 0
+    original_producer_for = MessageBus.method(:producer_for)
+    allow(MessageBus).to receive(:producer_for) do |namespace, topic_name|
+      call_count += 1
+      raise(::Pulsar::Error::Timeout, "Big Ops Fail") if call_count <= 1
+      original_producer_for.call(namespace, topic_name)
+    end
+    MessageBus.send_one_message(TEST_MB_NAMESPACE, topic_name, {test_my_key: "test_my_val"}.to_json)
+    consumer = MessageBus.consumer_for(TEST_MB_NAMESPACE, topic_name, subscription_name)
+    msg = consumer.receive(1000)
+    consumer.acknowledge(msg)
+    # normally you would process the message before acknowledging it
+    # but we're trying to keep the external state as clean as possible in the tests.
+    expect(JSON.parse(msg.data)['test_my_key']).to eq("test_my_val")
+  end
+
   it "only parses the YAML one time as long as it doesn't change" do
     # make sure we aren't parsing every time
     expect(YAML).to receive(:safe_load).at_most(:twice).and_call_original

@@ -74,6 +74,7 @@ Object.assign(CalendarEvent.prototype, {
       this.editable = false
     }
     this.webConference = data.web_conference
+    this.important_dates = data.important_dates
     return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)
   },
 

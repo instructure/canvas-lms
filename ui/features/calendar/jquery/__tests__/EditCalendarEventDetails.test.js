@@ -21,9 +21,9 @@ import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import EditCalendarEventDetails from '../EditCalendarEventDetails'
 
 const CONTEXTS = [
-  {name: 'course1', asset_string: 'course_1', can_create_calendar_events: true},
-  {name: 'course2', asset_string: 'course_2', can_create_calendar_events: true},
-  {name: 'course3', asset_string: 'course_3', can_create_calendar_events: true}
+  {name: 'course1', asset_string: 'course_1', can_create_calendar_events: true, k5_subject: false},
+  {name: 'course2', asset_string: 'course_2', can_create_calendar_events: true, k5_subject: true},
+  {name: 'course3', asset_string: 'course_3', can_create_calendar_events: true, k5_subject: false}
 ]
 
 describe('EditCalendarEventDetails', () => {
@@ -89,18 +89,14 @@ describe('EditCalendarEventDetails', () => {
       it('does not show conferencing options when there is no current conference', () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render()
-        const conferencingRow = within(document.body)
-          .getByText('Conferencing:')
-          .closest('tr')
+        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
         expect(conferencingRow.className).toEqual('hide')
       })
 
       it('does show current conference when there is a current conference', () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
-        const conferencingRow = within(document.body)
-          .getByText('Conferencing:')
-          .closest('tr')
+        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
         expect(conferencingRow.className).not.toEqual('hide')
         expect(getByText(conferencingRow, 'FooConf')).not.toBeNull()
       })
@@ -160,9 +156,7 @@ describe('EditCalendarEventDetails', () => {
       it('does not show conferencing options when there is no current conference', () => {
         enableConferences()
         render({parent_event_id: 1000})
-        const conferencingRow = within(document.body)
-          .getByText('Conferencing:')
-          .closest('tr')
+        const conferencingRow = within(document.body).getByText('Conferencing:').closest('tr')
         expect(conferencingRow.className).toEqual('hide')
       })
 
@@ -204,6 +198,57 @@ describe('EditCalendarEventDetails', () => {
         fireEvent.change(selectBox, {target: {value: 'course_3'}})
         expect(view.conference).not.toBeNull()
       })
+    })
+  })
+
+  describe('important dates section', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES = {
+        important_dates: true
+      }
+    })
+
+    it('is hidden by default', () => {
+      render()
+      expect(within(document.body).queryByText('Mark as Important Date')).not.toBeVisible()
+    })
+
+    it('appears when switching to k5 subject context', () => {
+      render()
+      const selectBox = within(document.body).getByLabelText('Calendar:')
+      fireEvent.change(selectBox, {target: {value: 'course_2'}})
+      expect(within(document.body).getByText('Mark as Important Date')).toBeInTheDocument()
+      fireEvent.change(selectBox, {target: {value: 'course_1'}})
+      expect(within(document.body).queryByText('Mark as Important Date')).not.toBeVisible()
+    })
+
+    it('submits important_dates param if checked', () => {
+      const view = render()
+      view.event.save = jest.fn(params => {
+        expect(params['calendar_event[important_dates]']).toBeTruthy()
+      })
+      const selectBox = within(document.body).getByLabelText('Calendar:')
+      fireEvent.change(selectBox, {target: {value: 'course_2'}})
+      fireEvent.click(
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+      )
+      fireEvent.click(within(document.body).getByText('Submit'))
+      expect(view.event.save).toHaveBeenCalled()
+    })
+
+    it('does not submit important_dates param if not in k5 subject context', () => {
+      const view = render()
+      view.event.save = jest.fn(params => {
+        expect(params['calendar_event[important_dates]']).toBeFalsy()
+      })
+      const selectBox = within(document.body).getByLabelText('Calendar:')
+      fireEvent.change(selectBox, {target: {value: 'course_2'}})
+      fireEvent.click(
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+      )
+      fireEvent.change(selectBox, {target: {value: 'course_3'}})
+      fireEvent.click(within(document.body).getByText('Submit'))
+      expect(view.event.save).toHaveBeenCalled()
     })
   })
 })

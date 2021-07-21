@@ -156,6 +156,11 @@ module Types
       assignment
     end
 
+    field :assessment_requests_for_current_user, [AssessmentRequestType], null: true
+    def assessment_requests_for_current_user
+      Loaders::AssessmentRequestLoader.for(current_user: current_user).load(assignment)
+    end
+
     field :moderated_grading, AssignmentModeratedGrading, null: true
     def moderated_grading
       assignment

@@ -17,13 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {
-  removeOutcomeGroup,
-  removeOutcome,
-  moveOutcomeGroup,
-  addOutcomeGroup,
-  moveOutcome
-} from '../Management'
+import {removeOutcomeGroup, moveOutcomeGroup, addOutcomeGroup} from '../Management'
 
 jest.mock('@canvas/axios')
 
@@ -44,19 +38,7 @@ describe('api', () => {
     })
   })
 
-  describe('removeOutcome', () => {
-    it('provides correct arguments to API request to delete outcome within account context', () => {
-      removeOutcome('Account', '1', '2', '3')
-      expect(axios.delete).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2/outcomes/3')
-    })
-
-    it('provides correct arguments to API request to delete outcome within course context', () => {
-      removeOutcome('Course', '1', '2', '3')
-      expect(axios.delete).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/outcomes/3')
-    })
-  })
-
-  describe('moveGroup', () => {
+  describe('moveOutcomeGroup', () => {
     it('provides correct arguments to request to move group within account context', () => {
       moveOutcomeGroup('Account', '1', '2', '3')
       expect(axios.put).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/2', {
@@ -84,22 +66,6 @@ describe('api', () => {
       addOutcomeGroup('Course', '1', '2', 'new group title')
       expect(axios.post).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/2/subgroups', {
         title: 'new group title'
-      })
-    })
-  })
-
-  describe('moveOutcome', () => {
-    it('provides correct arguments to API request to move outcome within account context', () => {
-      moveOutcome('Account', '1', '2', '3', '4')
-      expect(axios.put).toHaveBeenCalledWith('/api/v1/accounts/1/outcome_groups/4/outcomes/2', {
-        move_from: '3'
-      })
-    })
-
-    it('provides correct arguments to API request to move outcome within course context', () => {
-      moveOutcome('Course', '1', '2', '3', '4')
-      expect(axios.put).toHaveBeenCalledWith('/api/v1/courses/1/outcome_groups/4/outcomes/2', {
-        move_from: '3'
       })
     })
   })

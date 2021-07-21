@@ -50,7 +50,8 @@ export default class EditCalendarEventDetails {
         location_name: this.event.location_name,
         date: this.event.startDate(),
         is_child: this.event.object.parent_event_id != null,
-        include_conference_selection: ENV.CALENDAR?.CONFERENCES_ENABLED
+        include_conference_selection: ENV.CALENDAR?.CONFERENCES_ENABLED,
+        important_dates: this.event.important_dates
       })
     )
     $(selector).append(this.$form)
@@ -167,6 +168,11 @@ export default class EditCalendarEventDetails {
       }
     }
 
+    data.important =
+      this.currentContextInfo.k5_subject &&
+      ENV.FEATURES?.important_dates &&
+      this.$form.find('#calendar_event_important_dates').prop('checked')
+
     return data
   }
 
@@ -191,6 +197,7 @@ export default class EditCalendarEventDetails {
     if (data.start_time) params.start_time = data.start_time
     if (data.end_time) params.end_time = data.end_time
     if (data.duplicate) params.duplicate = data.duplicate
+    if (data.important != null) params.important_dates = data.important
 
     if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       if (this.conference) {
@@ -200,18 +207,13 @@ export default class EditCalendarEventDetails {
       }
     }
 
-    const pieces = $(jsEvent.target)
-      .attr('href')
-      .split('#')
+    const pieces = $(jsEvent.target).attr('href').split('#')
     pieces[0] += `?${$.param(params)}`
     window.location.href = pieces.join('#')
   }
 
   setContext(newContext) {
-    this.$form
-      .find('select.context_id')
-      .val(newContext)
-      .triggerHandler('change', false)
+    this.$form.find('select.context_id').val(newContext).triggerHandler('change', false)
   }
 
   contextChange = (jsEvent, propagate) => {
@@ -241,6 +243,11 @@ export default class EditCalendarEventDetails {
       }
       this.renderConferenceWidget()
     }
+
+    // Only show important date checkbox if selected context is k5 subject
+    this.$form
+      .find('#important_dates')
+      .toggle(this.currentContextInfo.k5_subject && ENV.FEATURES?.important_dates)
   }
 
   duplicateCheckboxChanged = (jsEvent, _propagate) =>
@@ -287,7 +294,8 @@ export default class EditCalendarEventDetails {
       'calendar_event[title]': data.title != null ? data.title : this.event.title,
       'calendar_event[start_at]': data.start_at ? data.start_at.toISOString() : '',
       'calendar_event[end_at]': data.end_at ? data.end_at.toISOString() : '',
-      'calendar_event[location_name]': location_name
+      'calendar_event[location_name]': location_name,
+      'calendar_event[important_dates]': data.important
     }
     if (ENV.CALENDAR?.CONFERENCES_ENABLED && this.canUpdateConference()) {
       if (this.conference) {
@@ -328,7 +336,8 @@ export default class EditCalendarEventDetails {
           end_at: data.end_at ? data.end_at.toISOString() : null,
           location_name,
           context_code: this.$form.find('.context_id').val(),
-          webConference: this.conference
+          webConference: this.conference,
+          important_info: data.important
         }
       }
       const newEvent = commonEventFactory(objectData, this.event.possibleContexts())
@@ -340,6 +349,7 @@ export default class EditCalendarEventDetails {
       this.event.end = fcUtil.wrap(data.end_at)
       this.event.location_name = location_name
       this.event.webConference = this.conference
+      this.event.important_info = data.important
       if (this.event.can_change_context && data.context_code !== this.event.object.context_code) {
         this.event.old_context_code = this.event.object.context_code
         this.event.removeClass(`group_${this.event.old_context_code}`)

@@ -36,7 +36,7 @@ import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import {CreateCourseModal} from './CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
-export const HomeroomPage = ({
+const HomeroomPage = ({
   cards,
   createPermissions,
   homeroomAnnouncements,
@@ -101,10 +101,10 @@ export const HomeroomPage = ({
           </Flex.Item>
           {canCreateCourses && (
             <Flex.Item>
-              <Tooltip renderTip={I18n.t('Start a new course')}>
+              <Tooltip renderTip={I18n.t('Start a new subject')}>
                 <IconButton
                   data-testid="new-course-button"
-                  screenReaderLabel={I18n.t('Open new course modal')}
+                  screenReaderLabel={I18n.t('Open new subject modal')}
                   withBackground={false}
                   withBorder={false}
                   onClick={() => setCourseModalOpen(true)}

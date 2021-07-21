@@ -140,6 +140,16 @@
   </fieldset>
   {{/if}}
 
+  {{#if k5_subject}}
+    <fieldset>
+      <label class="label_with_checkbox" for="calendar_event_important_dates">
+        <input type="checkbox" id="calendar_event_important_dates" {{#if important_dates}}checked{{/if}} />
+        {{#t}}Mark as Important Date{{/t}}
+        <span style="display: block"><small>{{#t}}Show event on homeroom sidebar{{/t}}</small></span>
+      </label>
+    </fieldset>
+  {{/if}}
+
   {{#if newRecord}}
   <label class="label_with_checkbox" for="duplicate_event">
     <input type="checkbox" id="duplicate_event" name="duplicate" value="true"/>

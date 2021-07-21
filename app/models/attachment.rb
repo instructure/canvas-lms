@@ -740,6 +740,11 @@ class Attachment < ActiveRecord::Base
     return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
+  def self.quota_available(context)
+    quota = self.get_quota(context)
+    [0, quota[:quota] - quota[:quota_used]].max
+  end
+
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
 

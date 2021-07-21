@@ -21,9 +21,12 @@ import template from './jst/UploadMediaTrackForm.handlebars'
 import mejs from './index'
 import $ from 'jquery'
 
+import CopyToClipboard from '@canvas/copy-to-clipboard'
+import React from 'react'
+import ReactDOM from 'react-dom'
+
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.
-  // it will be passed along to amara.org
   constructor(mediaCommentId, video_url) {
     this.mediaCommentId = mediaCommentId
     this.video_url = video_url
@@ -51,6 +54,11 @@ export default class UploadMediaTrackForm {
           }
         ]
       })
+
+    ReactDOM.render(
+      <CopyToClipboard interaction="readonly" name="video_url" value={video_url} />,
+      document.getElementById('media-track-video-url-container')
+    )
   }
 
   onSubmit = () => {

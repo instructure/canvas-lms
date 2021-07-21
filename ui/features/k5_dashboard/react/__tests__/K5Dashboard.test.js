@@ -20,10 +20,16 @@ import React from 'react'
 import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, screen, waitFor} from '@testing-library/react'
-import K5Dashboard from '../K5Dashboard'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
+
+import {MOCK_TODOS} from './mocks'
+import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import K5Dashboard from '../K5Dashboard'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+
+const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 
 const currentUser = {
   id: '1',
@@ -34,43 +40,6 @@ const cardSummary = [
     type: 'Conversation',
     unread_count: 1,
     count: 3
-  }
-]
-const dashboardCards = [
-  {
-    id: '1',
-    assetString: 'course_1',
-    href: '/courses/1',
-    shortName: 'Econ 101',
-    originalName: 'Economics 101',
-    courseCode: 'ECON-001',
-    enrollmentState: 'active',
-    isHomeroom: false,
-    canManage: true,
-    published: true
-  },
-  {
-    id: '2',
-    assetString: 'course_2',
-    href: '/courses/2',
-    shortName: 'Homeroom1',
-    originalName: 'Home Room',
-    courseCode: 'HOME-001',
-    enrollmentState: 'active',
-    isHomeroom: true,
-    canManage: true,
-    published: false
-  },
-  {
-    id: '3',
-    assetString: 'course_3',
-    href: '/courses/3',
-    originalName: 'The Maths',
-    courseCode: 'DA-MATHS',
-    enrollmentState: 'invited',
-    isHomeroom: false,
-    canManage: true,
-    published: true
   }
 ]
 const announcements = [
@@ -191,7 +160,8 @@ const defaultEnv = {
   current_user_id: '1',
   K5_USER: true,
   FEATURES: {
-    unpublished_courses: true
+    unpublished_courses: true,
+    important_dates: true
   },
   PREFERENCES: {
     hide_dashcard_color_overlays: false
@@ -206,14 +176,26 @@ const defaultProps = {
   createPermissions: 'none',
   plannerEnabled: false,
   loadAllOpportunities: () => {},
-  timeZone: defaultEnv.TIMEZONE
+  timeZone: defaultEnv.TIMEZONE,
+  hideGradesTabForStudents: false,
+  showImportantDates: true,
+  selectedContextCodes: ['course_1', 'course_3'],
+  selectedContextsLimit: 2
 }
+
+beforeAll(() => {
+  jest.setTimeout(10000)
+})
+
+afterAll(() => {
+  jest.setTimeout(5000)
+})
 
 beforeEach(() => {
   moxios.install()
   moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
     status: 200,
-    response: dashboardCards
+    response: MOCK_CARDS
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
     status: 200,
@@ -309,7 +291,14 @@ beforeEach(() => {
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
   fetchMock.get(/\/api\/v1\/external_tools\/visible_course_nav_tools.*/, JSON.stringify(apps))
   fetchMock.get(/\/api\/v1\/courses\/2\/users.*/, JSON.stringify(staff))
+  fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
   fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
+  fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
+  fetchMock.get(/\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/, MOCK_EVENTS)
+  fetchMock.post(
+    /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
+    JSON.stringify({status: 'ok'})
+  )
   global.ENV = defaultEnv
 })
 
@@ -321,6 +310,7 @@ afterEach(() => {
   resetPlanner()
   sessionStorage.clear()
   window.location.hash = ''
+  destroyContainer()
 })
 
 describe('K-5 Dashboard', () => {
@@ -490,7 +480,7 @@ describe('K-5 Dashboard', () => {
     })
 
     it('only fetches announcements and LTIs based on cards once per page load', done => {
-      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(dashboardCards))
+      sessionStorage.setItem('dashcards_for_user_1', JSON.stringify(MOCK_CARDS))
       moxios.withMock(() => {
         render(<K5Dashboard {...defaultProps} />)
 
@@ -500,7 +490,7 @@ describe('K-5 Dashboard', () => {
             .mostRecent()
             .respondWith({
               status: 200,
-              response: dashboardCards
+              response: MOCK_CARDS
             })
             .then(() => {
               // Expect just one announcement request for all cards
@@ -624,6 +614,13 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Grades Section', () => {
+    it('does not show the grades tab to students if hideGradesTabForStudents is set', async () => {
+      const {queryByRole} = render(
+        <K5Dashboard {...defaultProps} currentUserRoles={['student']} hideGradesTabForStudents />
+      )
+      expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
+    })
+
     it('displays a score summary for each non-homeroom course', async () => {
       const {findByText, getByText, queryByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
@@ -658,6 +655,95 @@ describe('K-5 Dashboard', () => {
       expect(wrapper.getByText('Teacher')).toBeInTheDocument()
       expect(wrapper.getByText('Tommy the TA')).toBeInTheDocument()
       expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
+    })
+  })
+
+  describe('Todos Section', () => {
+    it('displays todo tab to teachers', async () => {
+      const {findByRole} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
+      const todoTab = await findByRole('tab', {name: 'To Do'})
+      expect(todoTab).toBeInTheDocument()
+
+      act(() => todoTab.click())
+
+      expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
+    })
+
+    it('does not show the todos tab to students or admins', async () => {
+      const {findByRole, queryByRole} = render(
+        <K5Dashboard {...defaultProps} currentUserRoles={['admin', 'student']} />
+      )
+      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
+      expect(queryByRole('tab', {name: 'To Do'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Important Dates', () => {
+    it('does not render any important dates if the flag is off', async () => {
+      const {findByText, queryByText} = render(
+        <K5Dashboard {...defaultProps} showImportantDates={false} />
+      )
+      expect(await findByText('My Subjects')).toBeInTheDocument()
+      expect(queryByText('Important Dates')).not.toBeInTheDocument()
+      expect(queryByText('View Important Dates')).not.toBeInTheDocument()
+    })
+
+    it('renders a sidebar with important dates and no tray buttons on large screens', async () => {
+      const {getByText, queryByText} = render(<K5Dashboard {...defaultProps} />)
+      await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+      expect(getByText('Algebra 2')).toBeInTheDocument()
+      expect(getByText('Important Dates')).toBeInTheDocument()
+      expect(queryByText('View Important Dates')).not.toBeInTheDocument()
+      expect(queryByText('Hide Important Dates')).not.toBeInTheDocument()
+    })
+
+    it('filters important dates to those selected', async () => {
+      moxios.stubs.reset()
+      // Overriding mocked cards to make all cards active so we have 2 subjects to choose from
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+        status: 200,
+        response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))
+      })
+      // Only return assignments associated with course_1 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
+
+      const {getByRole, getByText, queryByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          selectedContextsLimit={1}
+          selectedContextCodes={['course_1']}
+        />
+      )
+      await waitFor(() => {
+        expect(getByText('Algebra 2')).toBeInTheDocument()
+        expect(queryByText('History Discussion')).not.toBeInTheDocument()
+        expect(queryByText('History Exam')).not.toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_3')
+
+      // Only return assignments associated with course_3 on next call
+      fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(1, 3), {overwriteRoutes: true})
+
+      act(() =>
+        getByRole('button', {name: 'Select calendars to retrieve important dates from'}).click()
+      )
+      act(() => getByRole('checkbox', {name: 'Economics 101', checked: true}).click())
+      act(() => getByRole('checkbox', {name: 'The Maths', checked: false}).click())
+      act(() => getByRole('button', {name: 'Submit'}).click())
+
+      await waitFor(() => {
+        expect(queryByText('Algebra 2')).not.toBeInTheDocument()
+        expect(getByText('History Discussion')).toBeInTheDocument()
+        expect(getByText('History Exam')).toBeInTheDocument()
+      })
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_1')
+      expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).toMatch('context_codes%5B%5D=course_3')
+    })
+
+    it('loads important dates on the grades tab', async () => {
+      const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
+      await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
     })
   })
 })

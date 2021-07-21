@@ -29,14 +29,25 @@ import {
   outcomeGroupsMocks
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
+import * as OutcomesImporter from '@canvas/outcomes/react/OutcomesImporter'
 
+jest.mock('@canvas/outcomes/react/OutcomesImporter')
 jest.useFakeTimers()
 
 describe('OutcomeManagement', () => {
-  let cache
+  let cache, showOutcomesImporterMock, showOutcomesImporterIfInProgressMock
 
   beforeEach(() => {
     cache = createCache()
+    showOutcomesImporterMock = jest.spyOn(OutcomesImporter, 'showOutcomesImporter')
+    showOutcomesImporterIfInProgressMock = jest.spyOn(
+      OutcomesImporter,
+      'showOutcomesImporterIfInProgress'
+    )
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   const sharedExamples = () => {
@@ -61,6 +72,53 @@ describe('OutcomeManagement', () => {
       expect(getByText(/Loading/)).toBeInTheDocument()
       await act(async () => jest.runAllTimers())
       expect(getByTestId('managementHeader')).toBeInTheDocument()
+      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
+    })
+
+    it('calls showImportOutcomesModal after a file is uploaded', async () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
+      const {getByText, getByLabelText} = render(
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+          <OutcomeManagement />
+        </MockedProvider>
+      )
+      expect(getByText(/Loading/)).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      fireEvent.click(getByText('Add'))
+      fireEvent.click(getByText('Import'))
+      const fileDrop = getByLabelText(/Upload your Outcomes!/i)
+      // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
+      Object.defineProperty(fileDrop, 'files', {
+        value: [file]
+      })
+      fireEvent.change(fileDrop)
+      expect(showOutcomesImporterMock).toHaveBeenCalled()
+      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
+    })
+
+    it('checks for existing outcome imports when the user switches to the manage tab', async () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const {getByText} = render(
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+          <OutcomeManagement />
+        </MockedProvider>
+      )
+      expect(getByText(/Loading/)).toBeInTheDocument()
+      await act(async () => jest.runAllTimers())
+      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(1)
+      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledWith(
+        {
+          disableOutcomeViews: expect.any(Function),
+          resetOutcomeViews: expect.any(Function),
+          mount: expect.any(Element),
+          contextUrlRoot: ENV.CONTEXT_URL_ROOT
+        },
+        '1'
+      )
+      fireEvent.click(getByText('Calculation'))
+      fireEvent.click(getByText('Manage'))
+      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(2)
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
@@ -208,9 +266,11 @@ describe('OutcomeManagement', () => {
     beforeEach(() => {
       window.ENV = {
         context_asset_string: 'account_11',
+        CONTEXT_URL_ROOT: '/account/11',
         PERMISSIONS: {
           manage_proficiency_calculations: true
-        }
+        },
+        current_user: {id: '1'}
       }
     })
 
@@ -225,9 +285,11 @@ describe('OutcomeManagement', () => {
     beforeEach(() => {
       window.ENV = {
         context_asset_string: 'course_12',
+        CONTEXT_URL_ROOT: '/course/12',
         PERMISSIONS: {
           manage_proficiency_calculations: true
-        }
+        },
+        current_user: {id: '1'}
       }
     })
 

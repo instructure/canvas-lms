@@ -99,6 +99,18 @@ describe "student k5 course dashboard" do
       expect(announcement_content_text(announcement_content)).to be_displayed
     end
 
+    it 'opens up the announcement when announcement title is clicked' do
+      announcement_title = "Happy Monday!"
+      announcement = new_announcement(@subject_course, announcement_title, "Let's get to work")
+
+      get "/courses/#{@subject_course.id}"
+
+      click_announcement_title(announcement_title)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}/discussion_topics/#{announcement.id}")
+    end
+
     it 'does not display old announcements on the Home tab' do
       announcement_heading = "Do science"
       announcement = new_announcement(@subject_course, announcement_heading, "it's fun!")

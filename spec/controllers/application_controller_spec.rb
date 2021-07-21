@@ -2094,8 +2094,29 @@ describe ApplicationController do
       end
     end
 
+    it "caches the eligibility computation at the request level" do
+      RequestCache.enable do
+        expect(@controller).to receive(:k5_disabled?).once
+        expect(@controller.send(:k5_user?)).to eq true
+        expect(@controller.send(:k5_user?)).to eq true
+      end
+    end
+
     it "returns true if associated with a k5 account" do
       expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns true if enrolled in a subaccount of a k5 account" do
+      sub = Account.create!(parent_account_id: @course.account)
+      course_factory(account: sub)
+      student_in_course(active_all: true)
+      @controller.instance_variable_set(:@current_user, @student)
+      expect(@controller.send(:k5_user?)).to eq true
+    end
+
+    it "returns false if all k5 enrollments are concluded" do
+      @student.enrollments.where(course_id: @course.id).take.complete
+      expect(@controller.send(:k5_user?)).to eq false
     end
 
     it "returns false if not associated with a k5 account" do
@@ -2112,6 +2133,13 @@ describe ApplicationController do
       user_session(@teacher)
       @controller.instance_variable_set(:@current_user, @teacher)
       expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns true for an admin without enrollments" do
+      account_admin_user(account: @account)
+      user_session(@admin)
+      @controller.instance_variable_set(:@current_user, @admin)
+      expect(@controller.send(:k5_user?)).to eq true
     end
 
     it "ignores the disabled preference if check_disabled = false" do

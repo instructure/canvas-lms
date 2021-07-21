@@ -513,6 +513,11 @@ class SisImportsApiController < ApplicationController
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
   #
+  # @argument update_sis_id_if_login_claimed [Boolean]
+  #   This option, if present, will override the old (or non-existent)
+  #   non-matching SIS ID with the new SIS ID in the upload,
+  #   if a pseudonym is found from the login field and the SIS ID doesn't match.
+  #
   # @argument diffing_data_set_identifier [String]
   #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
   #   comparing this set of CSVs to the previous set that has the same data set
@@ -643,6 +648,7 @@ class SisImportsApiController < ApplicationController
         end
 
         batch.options[:skip_deletes] = value_to_boolean(params[:skip_deletes])
+        batch.options[:update_sis_id_if_login_claimed] = value_to_boolean(params[:update_sis_id_if_login_claimed])
 
         if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true

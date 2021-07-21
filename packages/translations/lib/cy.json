@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Priodoleddau"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Dydy recordio Sain a Fideo ddim ar gael."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Chwaraewr sain ar gyfer { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Trwydded Creative Commons:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Lefel Sain Bresennol"
-    },
     "custom_6979cd81": {
         "message": "Personol"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Llusgwch ffeil yma"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Llusgwch Ffeil Yma"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Gallwch lusgo a gollwng, neu glicio i bori drwy’ch cyfrifiadur"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "Gwall wrth lwytho eitemau blaenorol"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Gwall wrth lwytho fideo/recordiad sain i fyny"
-    },
     "excused_cf8792eb": {
         "message": "Wedi esgusodi"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Adborth"
     },
-    "file_name_8fd421ff": {
-        "message": "Enw’r Ffeil"
-    },
     "file_upload_failed_af22dd91": {
         "message": "Wedi methu llwytho ffeil i fyny"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Mynegai Ffeiliau"
-    },
-    "finish_bc343002": {
-        "message": "Gorffen"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Canolbwyntio bar offer opsiynau elfen"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Dolenni"
     },
-    "list_collapsed_9ac35920": {
-        "message": "Rhestr wedi crebachu."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Rhestr wedi crebachu"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Rhestr wedi ehangu."
-    },
     "load_more_35d33c7": {
         "message": "Llwytho Mwy"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "Llwytho Graddau"
     },
-    "loading_media_f3455841": {
-        "message": "Llwytho cyfryngau"
-    },
     "loading_past_items_ca499e75": {
         "message": "Llwytho eitemau blaenorol"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Cyfrwng"
-    },
-    "mic_a7f3d311": {
-        "message": "Meicroffon"
     },
     "miscellaneous_e9818229": {
         "message": "Amrywiol"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "Heb ddod o hyd i ganlyniadau ar gyfer { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "Dim Fideo"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Dim byd am nawr"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "neidlen cyfleoedd"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } wedi dewis. Rhestr wedi crebachu."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Dewisol: Ychwanegu Cwrs"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Paragraff"
     },
-    "pause_12af3bb4": {
-        "message": "Rhewi"
-    },
     "peer_review_74f26a13": {
         "message": "Adolygiad gan Gyd-fyfyrwyr"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "Pobl"
-    },
-    "play_1a47eaa7": {
-        "message": "Chwarae"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Gadewch i Canvas gael mynediad at eich microffon a gwe-gamera."
     },
     "points_bceb5005": {
         "message": "pwynt"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Rhagolwg"
-    },
-    "preview_a3f8f854": {
-        "message": "RHAGOLWG"
     },
     "previous_month_bb1e3c84": {
         "message": "Mis Blaenorol"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Golygydd HTML Crai"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Wedi methu darllen ffeil trac cyfryngau. Wrthi’n terfynu"
-    },
     "record_7c9448b": {
         "message": "Recordio"
     },
     "record_upload_media_5fdce166": {
         "message": "Recordio Cyfryngau/Llwytho Cyfryngau i Fyny"
-    },
-    "recording_98da6bda": {
-        "message": "Recordiad"
     },
     "reminder_date_4564d12d": {
         "message": "Nodyn atgoffa: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Term Chwilio"
-    },
-    "select_app_3d08035a": {
-        "message": "Dewis Ap"
     },
     "select_language_7c93a900": {
         "message": "Dewis Iaith"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Aeth rhywbeth o’i le."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Aeth rhywbeth o’i le wrth gael mynediad at eich meicroffon neu we-gamera."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "rhestr sgwariau sydd ddim mewn trefn"
-    },
-    "start_over_f7552aa9": {
-        "message": "Dechrau eto"
-    },
-    "start_recording_9a65141a": {
-        "message": "Dechrau’r Recordiad"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } i { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Mathau o ffeiliau y mae modd delio â nhw: SRT neu WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Newid i olygydd html crai"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Newid i olygydd testun cyfoethog"
     },
     "syllabus_f191f65b": {
         "message": "Maes Llafur"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "heb gyhoeddi"
     },
-    "untitled_16aa4f2b": {
-        "message": "Dideitl"
-    },
     "upload_document_253f0478": {
         "message": "Llwytho Dogfen i fyny"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "Cyfryngau Defnyddiwr"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Wedi llwytho fideo/recordiad sain i fyny"
-    },
     "video_options_24ef6e5d": {
         "message": "Opsiynau Fideo"
     },
     "video_options_tray_3b9809a5": {
         "message": "Ardal Opsiynau Fideo"
-    },
-    "video_player_b371005": {
-        "message": "Chwaraewr Fideo"
     },
     "video_player_for_9e7d373b": {
         "message": "Chwaraewr fideo ar gyfer "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Gweld bysellau hwylus"
-    },
-    "webcam_fe91b20f": {
-        "message": "Gwe-gamera"
     },
     "width_492fec76": {
         "message": "Lled"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Rydych chi wedi sgrolio’n ôl i’r dasg gyntaf un a oedd gennych chi i’w gwneud!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Efallai bod eich gwe-gamera yn cael ei ddefnyddio’n barod."
     }
 }

@@ -505,7 +505,7 @@ body.responsive_awareness .conversations__filter {
   }
 
   .no-messages {
-    color: #8B969E;
+    color: $ic-color-medium-lighter;
     display: block;
     @include fontSize(20px);
     font-weight: bold;

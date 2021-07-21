@@ -16,15 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'
 import {Expansion} from './Expansion'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 
 export function ThreadingToolbar({...props}) {
-  return (
+  return (props.searchTerm || props.filter === 'unread') && ENV.isolated_view ? (
+    <Link as="button" isWithinText={false} onClick={() => {}}>
+      <Text weight="bold">{I18n.t('Go to Reply')}</Text>
+    </Link>
+  ) : (
     <InlineList delimiter="pipe">
       {React.Children.map(props.children, c => (
         <InlineList.Item key={c.props.delimiterKey}>{c}</InlineList.Item>
@@ -34,7 +41,9 @@ export function ThreadingToolbar({...props}) {
 }
 
 ThreadingToolbar.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.node)
+  children: PropTypes.arrayOf(PropTypes.node),
+  searchTerm: PropTypes.string,
+  filter: PropTypes.string
 }
 
 ThreadingToolbar.Reply = Reply

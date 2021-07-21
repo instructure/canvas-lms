@@ -621,6 +621,28 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user2"
   end
 
+  it "should overwrite the old non-matching SIS ID with the new SIS ID in the upload when update_sis_id_if_login_claimed flag is set" do
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+    )
+
+    batch1 = @account.sis_batches.create! do |sb|
+      sb.options = {
+        :update_sis_id_if_login_claimed => true,
+      }
+    end
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_3,user1,User,Uno,user1@example.com,active",
+      batch: batch1
+    )
+
+    expect(importer.errors.length).to eq 0
+    expect(Pseudonym.where(account_id: @account, unique_id: "user1").first.sis_user_id).to eq "user_3"
+  end
+
   it "should not show error when an integration_id is taken" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status,integration_id",

@@ -43,7 +43,7 @@ class CalendarEvent < ActiveRecord::Base
 
   PERMITTED_ATTRIBUTES = [:title, :description, :start_at, :end_at, :location_name,
     :location_address, :time_zone_edited, :cancel_reason, :participants_per_appointment,
-    :remove_child_events, :all_day, :comments].freeze
+    :remove_child_events, :all_day, :comments, :important_dates].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end

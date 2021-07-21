@@ -38,6 +38,8 @@ if (!process?.env?.BUILD_LOCALE) {
 }
 
 // forward rceRef to it refs the RCEWrapper where clients can call getCode etc. on it.
+// You probably shouldn't use it until onInit has been called. Until then tinymce
+// is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   const {
     autosave,
@@ -54,7 +56,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     readOnly,
     textareaId,
     textareaClassName,
-    trayProps,
+    rcsProps,
     toolbar,
     use_rce_pretty_html_editor,
     use_rce_buttons_and_icons,
@@ -98,7 +100,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       plugins,
       textareaId,
       textareaClassName,
-      trayProps,
+      trayProps: rcsProps,
       toolbar,
       use_rce_pretty_html_editor,
       use_rce_buttons_and_icons,
@@ -140,25 +142,63 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
 export default CanvasRce
 
 CanvasRce.propTypes = {
+  // do you want the rce to autosave content to localStorage, and
+  // how long should it be until it's deleted.
+  // If autosave is enabled, call yourRef.RCEClosed() if the user
+  // exits the page normally (e.g. via Cancel or Save)
   autosave: shape({enabled: bool, maxAge: number}),
+  // the initial content
   defaultContent: string,
-  editorOptions: object, // tinymce config
+  // tinymce configuration. See defaultTinymceConfig for the basics
+  editorOptions: object,
+  // height of the RCE. if a number, in px
   height: oneOfType([number, string]),
+  // array of URLs to high-contrast css
   highContrastCSS: arrayOf(string),
+  // if true, do not load the plugin that provides the media toolbar and menu items
   instRecordDisabled: bool,
+  // locale of the user's language
   language: string,
+  // list of all supported languages. This is the list of languages
+  // shown to the user when adding closed captions to videos.
+  // If you are not supporting media uploads, this is not necessary.
+  // Defaults to [{id: 'en', label: 'English'}]
+  languages: arrayOf(
+    shape({
+      // the id is the locale
+      id: string.isRequired,
+      // the label to show in the UI
+      label: string.isRequired
+    })
+  ),
+  // function that returns the element where screenreader alerts go
   liveRegion: func,
+  // array of lti tools available to the user
+  // {id, favorite} are all that's required, ther fields are ignored
   ltiTools: ltiToolsPropType,
-  mirroredAttrs: objectOf(string), // attributes to transfer from the original textarea to the one created by tinymce
+  // name:value pairs of attributes to add to the textarea
+  // tinymce creates as the backing store of the RCE
+  mirroredAttrs: objectOf(string),
+  // additional menu items that get merged into the default menubar
   menu: menuPropType,
+  // additional plugins that get merged into the default list of plugins
   plugins: arrayOf(string),
+  // is this RCE readonly?
   readOnly: bool,
+  // id put on the generated textarea
   textareaId: string.isRequired,
+  // class name added to the generated textarea
   textareaClassName: string,
-  trayProps: trayPropTypes,
+  // properties necessary for the RCE to us the RCS
+  // if missing, RCE features that require the RCS are omitted
+  rcsProps: trayPropTypes,
+  // additional toolbar items that get merged into the default toolbars
   toolbar: toolbarPropType,
+  // enable the pretty html editor (temporary until the feature is forced on)
   use_rce_pretty_html_editor: bool,
+  // enable the custom buttons feature (temporary until the feature is forced on)
   use_rce_buttons_and_icons: bool,
+  // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)

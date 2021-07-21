@@ -41,6 +41,7 @@ export const ImportantInfoEditHeader = ({children, canEdit, courseName, courseId
     {canEdit && (
       <Flex.Item>
         <IconButton
+          data-testid="important-info-edit"
           screenReaderLabel={I18n.t('Edit important info for %{courseName}', {
             courseName
           })}

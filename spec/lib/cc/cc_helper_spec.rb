@@ -197,6 +197,13 @@ describe CC::CCHelper do
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
 
+    it "should interpret links to the home page as normal course pages" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
+      html = %{<a href="/courses/#{@course.id}">Home page index</a>}
+      translated = @exporter.html_content(html)
+      expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
+    end
+
     it "should prepend the domain to links outside the course" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')

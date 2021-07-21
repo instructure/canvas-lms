@@ -30,6 +30,7 @@ export function Reply({...props}) {
       withBackground={props.withBackground}
       color="primary"
       data-testid="threading-toolbar-reply"
+      interaction={props.isReadOnly ? 'disabled' : 'enabled'}
     >
       <AccessibleContent alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}>
         <Text weight="bold">{I18n.t('Reply')}</Text>
@@ -47,7 +48,6 @@ Reply.propTypes = {
    * Behavior when clicking the reply button
    */
   onClick: PropTypes.func.isRequired,
-
   /**
    * Specifies if the Button should render with a solid background.
    * When false, the background is transparent.
@@ -60,5 +60,9 @@ Reply.propTypes = {
   /**
    * Name of author of the post being replied to
    */
-  authorName: PropTypes.string.isRequired
+  authorName: PropTypes.string.isRequired,
+  /**
+   * Disable/Enable for the button
+   */
+  isReadOnly: PropTypes.bool
 }

@@ -163,7 +163,7 @@ test('initializes sis toggle if post to sis disabled', () => {
   ok(view.sisButtonView)
 })
 
-test('does not initialize sis toggle if post_to_sis feature option disabled', () => {
+test('does not initialize sis toggle if post_to_sis feature disabled', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, published: true})
   quiz.set('post_to_sis', true)
   const view = createView(quiz, {canManage: true, post_to_sis: false})

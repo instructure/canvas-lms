@@ -17,35 +17,41 @@
  */
 
 import React from 'react'
-import {render as rawRender, fireEvent, waitFor} from '@testing-library/react'
+import {createCache} from '@canvas/apollo'
+import {MockedProvider} from '@apollo/react-testing'
+import {render as realRender, fireEvent, waitFor} from '@testing-library/react'
 import OutcomeRemoveModal from '../OutcomeRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {removeOutcome} from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {accountMocks, deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
-jest.mock('@canvas/outcomes/graphql/Management')
-class CustomError extends Error {
-  constructor(message) {
-    super()
-    this.response = {
-      data: {
-        message
+const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
+  new Array(count).fill(0).reduce(
+    (acc, _curr, idx) => ({
+      ...acc,
+      [`${startId + idx}`]: {
+        _id: `${idx + 100}`,
+        linkId: `${startId + idx}`,
+        title: title || `Learning Outcome ${startId + idx}`,
+        canUnlink
       }
-    }
-  }
-}
+    }),
+    {}
+  )
 
 describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
+  let cache
+
   const defaultProps = (props = {}) => ({
-    groupId: '123',
-    outcomeId: '12',
+    outcomes: outcomesGenerator(1, 1),
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     ...props
   })
 
   beforeEach(() => {
+    cache = createCache()
     onCloseHandlerMock = jest.fn()
   })
 
@@ -53,103 +59,319 @@ describe('OutcomeRemoveModal', () => {
     jest.clearAllMocks()
   })
 
-  const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {
-    return rawRender(
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '1', mocks = accountMocks()} = {}
+  ) => {
+    return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
-        {children}
+        <MockedProvider cache={cache} mocks={mocks}>
+          {children}
+        </MockedProvider>
       </OutcomesContext.Provider>
     )
   }
-
-  it('shows modal if isOpen prop true', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    expect(getByText('Remove Outcome?')).toBeInTheDocument()
-  })
-
-  it('does not show modal if isOpen prop false', () => {
-    const {queryByText} = render(<OutcomeRemoveModal {...defaultProps({isOpen: false})} />)
-    expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
-  })
-
-  it('calls onCloseHandler on Remove button click', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls onCloseHandler on Cancel button click', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Cancel'))
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls onCloseHandler on Close (X) button click', () => {
-    const {getAllByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
-    fireEvent.click(closeBtn)
-    expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('renders component with proper text for Account context', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    expect(
-      getByText('Are you sure that you want to remove this outcome from this account?')
-    ).toBeInTheDocument()
-  })
-
-  it('renders component with proper text for Course context', () => {
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-      contextType: 'Course'
+  describe('With single outcome provided', () => {
+    it('shows modal if isOpen prop true', () => {
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+      expect(getByText('Remove Outcome?')).toBeInTheDocument()
     })
-    expect(
-      getByText('Are you sure that you want to remove this outcome from this course?')
-    ).toBeInTheDocument()
-  })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Account context', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(Promise.resolve({status: 200}))
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Account', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'This outcome was successfully removed from this account.',
-        type: 'success'
+    it('does not show modal if isOpen prop false', () => {
+      const {queryByText} = render(<OutcomeRemoveModal {...defaultProps({isOpen: false})} />)
+      expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
+    })
+
+    it('calls onCloseHandler on Remove button click', async () => {
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        mocks: [deleteOutcomeMock()]
+      })
+      fireEvent.click(getByText('Remove Outcome'))
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('calls onCloseHandler on Cancel button click', () => {
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+      fireEvent.click(getByText('Cancel'))
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('calls onCloseHandler on Close (X) button click', () => {
+      const {getAllByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+      const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
+      fireEvent.click(closeBtn)
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('renders component with proper text for Account context', () => {
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+      expect(
+        getByText('Are you sure that you want to remove this outcome from this account?')
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text for Course context', () => {
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+        contextType: 'Course'
+      })
+      expect(
+        getByText('Are you sure that you want to remove this outcome from this course?')
+      ).toBeInTheDocument()
+    })
+
+    describe('deletes outcome', () => {
+      it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock()]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'This outcome was successfully removed from this account.',
+            type: 'success'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          contextType: 'Course',
+          mocks: [deleteOutcomeMock()]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'This outcome was successfully removed from this course.',
+            type: 'success'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request fails', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock({failResponse: true})]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message:
+              'An error occurred while removing the outcome: GraphQL error: Could not find associated outcome in this context',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request fails because it is aligned with content', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock({failAlignedContentMutation: true})]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message:
+              'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete mutation fails', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock({failMutation: true})]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'An error occurred while removing the outcome.',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
+          mocks: [deleteOutcomeMock({failMutationNoErrMsg: true})]
+        })
+        fireEvent.click(getByText('Remove Outcome'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'An error occurred while removing the outcome.',
+            type: 'error'
+          })
+        })
       })
     })
   })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Course context', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(Promise.resolve({status: 200}))
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-      contextType: 'Course'
+  describe('With multiple outcomes provided', () => {
+    it('shows modal if isOpen prop true', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />
+      )
+      expect(getByText('Remove Outcomes?')).toBeInTheDocument()
     })
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Course', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'This outcome was successfully removed from this course.',
-        type: 'success'
-      })
-    })
-  })
 
-  it('displays flash error with proper message if delete request fails due to outcome being aligned to content', async () => {
-    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcome.mockReturnValue(
-      Promise.reject(new CustomError('Outcome cannot be deleted because it is aligned to content'))
-    )
-    const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-    fireEvent.click(getByText('Remove Outcome'))
-    expect(removeOutcome).toHaveBeenCalledWith('Account', '1', '123', '12')
-    await waitFor(() => {
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message:
-          'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
-        type: 'error'
-      })
+    it('does not show modal if isOpen prop false', () => {
+      const {queryByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            isOpen: false,
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />
+      )
+      expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
+    })
+
+    it('calls onCloseHandler on Remove button click', async () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />,
+        {
+          mocks: [deleteOutcomeMock()]
+        }
+      )
+      fireEvent.click(getByText('Remove Outcomes'))
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('calls onCloseHandler on Cancel button click', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />
+      )
+      fireEvent.click(getByText('Cancel'))
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('calls onCloseHandler on Close (X) button click', () => {
+      const {getAllByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />
+      )
+      const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
+      fireEvent.click(closeBtn)
+      expect(onCloseHandlerMock).toHaveBeenCalled()
+    })
+
+    it('renders component with proper text for Account context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />
+      )
+      expect(
+        getByText('Are you sure that you want to remove these 2 outcomes from this account?')
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text for Course context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2)
+          })}
+        />,
+        {
+          contextType: 'Course'
+        }
+      )
+      expect(
+        getByText('Are you sure that you want to remove these 2 outcomes from this course?')
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text when both removable and non-removable outcomes are provided in account context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: {
+              ...outcomesGenerator(1, 3),
+              ...outcomesGenerator(1, 2, false)
+            }
+          })}
+        />
+      )
+      expect(
+        getByText(
+          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this account. Do you want to proceed with removing the outcomes without alignments?'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text when both removable and non-removable outcomes are provided in course context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: {
+              ...outcomesGenerator(1, 3),
+              ...outcomesGenerator(1, 2, false)
+            }
+          })}
+        />,
+        {
+          contextType: 'Course'
+        }
+      )
+      expect(
+        getByText(
+          'Some of the outcomes that you have selected cannot be removed because they are aligned to content in this course. Do you want to proceed with removing the outcomes without alignments?'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text when only non-removable outcomes are provided in account context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2, false)
+          })}
+        />
+      )
+      expect(
+        getByText(
+          'The outcomes that you have selected cannot be removed because they are aligned to content in this account.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('renders component with proper text when only non-removable outcomes are provided in course context', () => {
+      const {getByText} = render(
+        <OutcomeRemoveModal
+          {...defaultProps({
+            outcomes: outcomesGenerator(1, 2, false)
+          })}
+        />,
+        {
+          contextType: 'Course'
+        }
+      )
+      expect(
+        getByText(
+          'The outcomes that you have selected cannot be removed because they are aligned to content in this course.'
+        )
+      ).toBeInTheDocument()
     })
   })
 })

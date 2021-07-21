@@ -119,5 +119,10 @@ module Types
         }
       end
     end
+
+    field :root_entry, Types::DiscussionEntryType, null: true
+    def root_entry
+      load_association(:root_entry)
+    end
   end
 end

@@ -106,8 +106,7 @@ class User < ActiveRecord::Base
   has_many :current_groups, :through => :current_group_memberships, :source => :group
   has_many :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
-  has_many :associated_root_accounts, -> { order("user_account_associations.depth").
-    where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
+  has_many :associated_root_accounts, -> { merge(Account.root_accounts.active) }, source: :account, through: :user_account_associations, multishard: true
   has_many :developer_keys
   has_many :access_tokens, -> { where(:workflow_state => "active") }, inverse_of: :user, multishard: true
   has_many :masquerade_tokens, -> { where(:workflow_state => "active") }, class_name: 'AccessToken', inverse_of: :real_user

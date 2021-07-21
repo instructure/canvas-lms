@@ -22,11 +22,12 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
+import {PER_PAGE, SearchContext} from './utils/constants'
+import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -73,6 +74,9 @@ const getOptimisticResponse = text => {
           viewRating: false,
           __typename: 'DiscussionEntryPermissions'
         },
+        rootEntry: null,
+        discussionTopic: null,
+        parent: null,
         __typename: 'DiscussionEntry'
       },
       errors: null,
@@ -86,7 +90,7 @@ const DiscussionTopicManager = props => {
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
-  const value = {
+  const searchContext = {
     searchTerm,
     setSearchTerm,
     filter,
@@ -95,6 +99,21 @@ const DiscussionTopicManager = props => {
     setSort,
     pageNumber,
     setPageNumber
+  }
+
+  // Isolated View State
+  const [isolatedEntryId, setIsolatedEntryId] = useState(null)
+  const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
+  const [editorExpanded, setEditorExpanded] = useState(false)
+
+  const openIsolatedView = (discussionEntryId, withRCE) => {
+    setIsolatedEntryId(discussionEntryId)
+    setIsolatedViewOpen(true)
+    setEditorExpanded(withRCE)
+  }
+
+  const closeIsolatedView = () => {
+    setIsolatedViewOpen(false)
   }
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -106,15 +125,10 @@ const DiscussionTopicManager = props => {
     rootEntries: !searchTerm && filter === 'all',
     filter,
     sort,
-    courseID: window.ENV?.course_id !== null ? parseInt(window.ENV?.course_id, 10) : -1
+    courseID: window.ENV?.course_id
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
-  useEffect(() => {
-    if (!discussionTopicQuery.error && !discussionTopicQuery.loading) {
-      discussionTopicQuery.refetch()
-    }
-  }, [discussionTopicQuery, filter, searchTerm, sort])
 
   const updateCache = (cache, result) => {
     try {
@@ -161,28 +175,40 @@ const DiscussionTopicManager = props => {
     )
   }
   return (
-    <>
-      <SearchContext.Provider value={value}>
-        <DiscussionTopicContainer
+    <SearchContext.Provider value={searchContext}>
+      <DiscussionTopicContainer
+        discussionTopic={discussionTopicQuery.data.legacyNode}
+        createDiscussionEntry={text => {
+          createDiscussionEntry({
+            variables: {
+              discussionTopicId: ENV.discussion_topic_id,
+              message: text
+            },
+            optimisticResponse: getOptimisticResponse(text)
+          })
+        }}
+      />
+      {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
+      (searchTerm || filter === 'unread') ? (
+        <NoResultsFound />
+      ) : (
+        <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          createDiscussionEntry={text => {
-            createDiscussionEntry({
-              variables: {
-                discussionTopicId: ENV.discussion_topic_id,
-                message: text
-              },
-              optimisticResponse: getOptimisticResponse(text)
-            })
-          }}
+          openIsolatedView={openIsolatedView}
         />
-        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
-        (searchTerm || filter === 'unread') ? (
-          <NoResultsFound />
-        ) : (
-          <DiscussionThreadsContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
-        )}
-      </SearchContext.Provider>
-    </>
+      )}
+      {ENV.isolated_view && isolatedEntryId && (
+        <IsolatedViewContainer
+          discussionTopic={discussionTopicQuery.data.legacyNode}
+          discussionEntryId={isolatedEntryId}
+          open={isolatedViewOpen}
+          RCEOpen={editorExpanded}
+          setRCEOpen={setEditorExpanded}
+          onClose={closeIsolatedView}
+          onOpenIsolatedView={openIsolatedView}
+        />
+      )}
+    </SearchContext.Provider>
   )
 }
 

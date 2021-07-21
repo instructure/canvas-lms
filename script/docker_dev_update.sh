@@ -62,6 +62,9 @@ while :; do
         shift
       done
       ;;
+    --rebuild)
+      REBUILD_DOCKER=true
+      ;;
     ?*)
       die 'ERROR: Unknown option: ' "$1" >&2
       ;;
@@ -81,7 +84,7 @@ else
   cp config/docker-compose.override.yml.example docker-compose.override.yml
 fi
 
-if [[ -n "$UPDATE_CODE" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
+if [[ -n "$UPDATE_CODE" ]] || [[ -n "$REBUILD_DOCKER" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
   echo "You should probably stop docker containers before rebasing code"
   prompt "Would you like to attempt to stop containers with docker-compose stop? [y/n]" stop
   if [[ ${stop:-n} == 'y' ]]; then
@@ -96,7 +99,7 @@ create_log_file
 message "Bringing Canvas up to date ..."
 init_log_file "Docker Dev Update"
 [[ -n "$UPDATE_CODE" ]] && ./script/rebase_canvas_and_plugins.sh "${params[@]}"
-rebuild_docker_images
+if [[ -n "$REBUILD_DOCKER" ]]; then rebuild_docker_images; else check_dockerfile; fi
 docker_compose_up
 bundle_install_with_check
 install_node_packages

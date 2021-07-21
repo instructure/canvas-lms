@@ -827,6 +827,34 @@ describe "ZipPackage" do
         )
       end
 
+      it 'should not blow up when exporting linked recorded media files' do
+        media_id = "m_media-id"
+        file_data = { type: 'file', name: 'video.mp4', size: 172780, files: nil }
+        att = Attachment.create!(
+          filename: 'video.mp4',
+          uploaded_data: StringIO.new('recorded stuff'),
+          folder: Folder.media_folder(@course),
+          context: @course,
+          content_type: "video/mp4"
+        )
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
+        allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
+
+        path = CGI.escape(att.full_path)
+        body = "<p><iframe style=\"width: 400px; height: 225px; display: inline-block;\" title=\"Video player for video.mp4\" data-media-type=\"video\" src=\"%24IMS-CC-FILEBASE%24/#{path}\" allowfullscreen=\"allowfullscreen\" allow=\"fullscreen\" data-media-id=\"m-mediaid\"></iframe></p>" \
+                 "<p><iframe style=\"width: 400px; height: 225px; display: inline-block;\" title=\"Video player for [Untitled Mon Jun 28 2021 14:55:55 GMT-0600 (Mountain Daylight Time)]\" data-media-type=\"video\" src=\"/media_objects_iframe/m-SbQWe5NjTGGuDLX3upVytB1jxMjNCnB?type=video\" allowfullscreen=\"allowfullscreen\" allow=\"fullscreen\" data-media-id=\"m-SbQWe5NjTGGuDLX3upVytB1jxMjNCnB\"></iframe>&nbsp;</p>"
+        page =
+          @course.wiki_pages.create!(
+            title: 'Home Page',
+            wiki: @course.wiki,
+            body: body
+          )
+        @module.content_tags.create!(content: page, context: @course, indent: 0)
+        course_data = create_zip_package.parse_course_data
+        expect(course_data[:pages].length).to eq 1
+        expect(course_data[:files]).to include(file_data)
+      end
+
       it "should handle circle-linked items" do
         assign = @course.assignments.create!(title: 'Assignment 1',
           description: "<a href=\"/courses/#{@course.id}/pages/page-1\">Link</a>")

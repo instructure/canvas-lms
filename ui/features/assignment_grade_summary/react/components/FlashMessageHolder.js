@@ -34,6 +34,7 @@ const assignmentStatuses = [
   AssignmentActions.FAILURE,
   AssignmentActions.GRADES_ALREADY_RELEASED,
   AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+  AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   AssignmentActions.STARTED,
   AssignmentActions.SUCCESS
 ]

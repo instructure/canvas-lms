@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {bool, useEffect, useState} from 'react'
-import {func, oneOf, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {bool, func, oneOf, string} from 'prop-types'
 import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'

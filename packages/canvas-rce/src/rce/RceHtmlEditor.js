@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {func, string} from 'prop-types'
-import formatMessage from 'format-message'
+import formatMessage from '../format-message'
 import {CodeEditor} from '@instructure/ui-code-editor'
 import beautify from 'js-beautify'
 
@@ -64,6 +64,7 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
 
   useEffect(() => {
     setCode(beautify.html(props.code, {inline: inline_elems}))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

@@ -319,4 +319,83 @@ describe LearningOutcomeGroup do
       expect(group.root_account_id).to eq 0
     end
   end
+
+  context "sync_source_group" do
+    def assert_tree_exists(groups, db_parent_group)
+      group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
+      expect(group_titles.sort).to eql(groups.map {|g| g[:title]}.sort)
+
+      groups.each do |group|
+        outcome_titles = group[:outcomes] || []
+        title = group[:title]
+        childs = group[:groups]
+
+        db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+
+        db_outcomes = db_group.child_outcome_links.map(&:content)
+
+        expect(outcome_titles.sort).to eql(db_outcomes.map(&:title).sort)
+
+        assert_tree_exists(childs, db_group) if childs
+      end
+    end
+
+    before do
+      make_group_structure({
+        title: "Group A",
+        outcomes: 1,
+        groups: [{
+          title: "Group C",
+          outcomes: 1,
+          groups: [{
+            title: "Group D",
+            outcomes: 1
+          }, {
+            title: "Group E",
+            outcomes: 1
+          }]
+        }]
+      }, Account.default)
+
+      group_a = LearningOutcomeGroup.find_by(title: "Group A")
+      @course_group_a = LearningOutcomeGroup.create!(
+        title: 'Group A', context: @course,
+        source_outcome_group: group_a
+      )
+    end
+
+    it "sync all groups and outcomes from source" do
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: []
+      }], @root)
+
+      @course_group_a.sync_source_group
+
+      assert_tree_exists([{
+        title: "Group A",
+        outcomes: ["0 Group A outcome"],
+        groups: [{
+          title: "Group C",
+          outcomes: ["0 Group C outcome"],
+          groups: [{
+            title: "Group D",
+            outcomes: ["0 Group D outcome"]
+          }, {
+            title: "Group E",
+            outcomes: ["0 Group E outcome"]
+          }]
+        }]
+      }], @root)
+    end
+
+    it "restore previous deleted group" do
+      @course_group_a.sync_source_group
+      group_d = LearningOutcomeGroup.find_by(title: "Group D", context: @course)
+      group_d.destroy
+      @course_group_a.sync_source_group
+      group_d.reload
+      expect(group_d.workflow_state).to eql("active")
+    end
+  end
 end

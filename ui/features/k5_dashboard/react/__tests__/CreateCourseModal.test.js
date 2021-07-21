@@ -85,14 +85,14 @@ describe('CreateCourseModal', () => {
     await waitFor(() => expect(getByText('Loading accounts...')).toBeInTheDocument())
   })
 
-  it('shows form fields for account and course name after loading accounts', async () => {
+  it('shows form fields for account and subject name after loading accounts', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => {
       expect(
-        getByLabelText('Which account will this course be associated with?')
+        getByLabelText('Which account will this subject be associated with?')
       ).toBeInTheDocument()
-      expect(getByLabelText('Course Name')).toBeInTheDocument()
+      expect(getByLabelText('Subject Name')).toBeInTheDocument()
     })
   })
 
@@ -104,17 +104,17 @@ describe('CreateCourseModal', () => {
     expect(setModalOpen).toHaveBeenCalledWith(false)
   })
 
-  it('disables the create button without a course name and account', async () => {
+  it('disables the create button without a subject name and account', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByText, getByLabelText, getByRole} = render(<CreateCourseModal {...getProps()} />)
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     const createButton = getByRole('button', {name: 'Create'})
     expect(createButton).toBeDisabled()
-    fireEvent.change(getByLabelText('Course Name'), {target: {value: 'New course'}})
+    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'New course'}})
     expect(createButton).toBeDisabled()
-    fireEvent.click(getByLabelText('Which account will this course be associated with?'))
+    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
     fireEvent.click(getByText('Elementary'))
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     expect(createButton).not.toBeDisabled()
   })
 
@@ -143,8 +143,8 @@ describe('CreateCourseModal', () => {
     fetchMock.mock(MANAGEABLE_COURSES_URL, response1)
     fetchMock.get('/api/v1/manageable_accounts?per_page=100&page=2', accountsPage2)
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this course be associated with?'))
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
     accountsPage1.forEach(a => {
       expect(getByText(a.name)).toBeInTheDocument()
     })
@@ -153,34 +153,34 @@ describe('CreateCourseModal', () => {
     })
   })
 
-  it('creates new course and enrolls user in that course', async () => {
+  it('creates new subject and enrolls user in that subject', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     fetchMock.post(encodeURI('/api/v1/accounts/6/courses?course[name]=Science&enroll_me=true'), {
       id: '14'
     })
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this course be associated with?'))
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
     fireEvent.click(getByText('Elementary'))
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    fireEvent.change(getByLabelText('Course Name'), {target: {value: 'Science'}})
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'Science'}})
     fireEvent.click(getByText('Create'))
-    expect(getByText('Creating new course...')).toBeInTheDocument()
+    expect(getByText('Creating new subject...')).toBeInTheDocument()
   })
 
-  it('shows an error message if course creation fails', async () => {
+  it('shows an error message if subject creation fails', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     fetchMock.post(encodeURI('/api/v1/accounts/5/courses?course[name]=Math&enroll_me=true'), 500)
     const {getByText, getByLabelText, getAllByText, getByRole} = render(
       <CreateCourseModal {...getProps()} />
     )
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    fireEvent.click(getByLabelText('Which account will this course be associated with?'))
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    fireEvent.click(getByLabelText('Which account will this subject be associated with?'))
     fireEvent.click(getByText('CS'))
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    fireEvent.change(getByLabelText('Course Name'), {target: {value: 'Math'}})
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    fireEvent.change(getByLabelText('Subject Name'), {target: {value: 'Math'}})
     fireEvent.click(getByText('Create'))
-    await waitFor(() => expect(getAllByText('Error creating new course')[0]).toBeInTheDocument())
+    await waitFor(() => expect(getAllByText('Error creating new subject')[0]).toBeInTheDocument())
     expect(getByRole('button', {name: 'Cancel'})).not.toBeDisabled()
   })
 
@@ -189,8 +189,8 @@ describe('CreateCourseModal', () => {
     const {getByText, getByLabelText} = render(
       <CreateCourseModal {...getProps({permissions: 'teacher'})} />
     )
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
-    act(() => getByLabelText('Which account will this course be associated with?').click())
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+    act(() => getByLabelText('Which account will this subject be associated with?').click())
     expect(getByText('Orange Elementary')).toBeInTheDocument()
     expect(getByText('Clark HS')).toBeInTheDocument()
   })
@@ -200,9 +200,9 @@ describe('CreateCourseModal', () => {
     const {queryByText, getByLabelText} = render(
       <CreateCourseModal {...getProps({permissions: 'teacher'})} />
     )
-    await waitFor(() => expect(getByLabelText('Course Name')).toBeInTheDocument())
+    await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
     expect(
-      queryByText('Which account will this course be associated with?')
+      queryByText('Which account will this subject be associated with?')
     ).not.toBeInTheDocument()
   })
 })

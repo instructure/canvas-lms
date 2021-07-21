@@ -158,9 +158,6 @@
     input.same-width-as-select {
       width: 265px;
     }
-    input[type="checkbox"] {
-      vertical-align: -3px;
-    }
   }
   fieldset {
     select, input[type="text"] {
@@ -197,6 +194,18 @@
 }
 
 #account_settings_tabs {
+  input[type="checkbox"] {
+    vertical-align: -6px;
+    height: 1rem;
+    width: 1rem;
+
+    &:focus {
+      outline-color: $electric;
+      outline-width: 2px;
+      outline-offset: 3px;
+    }
+  }
+
   legend:not(.ic-Legend) {
     @include fontSize(15px);
     font-weight: bold;

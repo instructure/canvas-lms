@@ -61,10 +61,10 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
         id: '1105'
       },
       graders: [
-        {graderId: 'frizz', graderName: 'Miss Frizzle'},
-        {graderId: 'robin', graderName: 'Mr. Keating'},
-        {graderId: 'ednak', graderName: 'Mrs. Krabappel'},
-        {graderId: 'feeny', graderName: 'Mr. Feeny'}
+        {graderId: 'frizz', graderName: 'Miss Frizzle', graderSelectable: true},
+        {graderId: 'robin', graderName: 'Mr. Keating', graderSelectable: true},
+        {graderId: 'ednak', graderName: 'Mrs. Krabappel', graderSelectable: true},
+        {graderId: 'feeny', graderName: 'Mr. Feeny', graderSelectable: true}
       ],
       grades: {
         frizz: {
@@ -865,6 +865,21 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
         await openAndSelect('–')
         strictEqual(props.onSelect.callCount, 0)
       })
+    })
+  })
+
+  QUnit.module('when a grader is not selectable', () => {
+    function openAndGetOption(optionLabel) {
+      mountComponent()
+      return clickInputToOpenMenu().then(() => {
+        return getOption(optionLabel)
+      })
+    }
+
+    test('does disable the option', async () => {
+      props.graders[3].graderSelectable = false
+      const option = await openAndGetOption(labelForGrader('feeny'))
+      strictEqual(option.getAttribute('aria-disabled'), 'true')
     })
   })
 

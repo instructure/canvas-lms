@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/copy-to-clipboard",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Weston Dransfield",
+  "main": "./react/index.js"
+}

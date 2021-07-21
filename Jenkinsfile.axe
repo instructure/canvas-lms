@@ -46,6 +46,10 @@ def getPatchsetTag() {
   (env.GERRIT_REFSPEC.contains('master')) ? "${configuration.buildRegistryPath()}:${env.GERRIT_BRANCH}" : imageTag.patchset()
 }
 
+def getResultsHTMLUrl() {
+  return "${env.BUILD_URL}/artifact/results.html"
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -123,7 +127,7 @@ pipeline {
 
         // Only alert on periodic jobs, not ones resulting from manual tests
         if (env.GERRIT_EVENT_TYPE != 'comment-added') {
-          slackSend channel: '#canvas-axe-build', message: "<$env.BUILD_URL/testReport|Latest Canvas Axe Selenium Results>"
+          slackSend channel: '#canvas-axe-build', message: "<$env.BUILD_URL/testReport|Latest Canvas Axe Selenium Results> - <${getResultsHTMLUrl()}|HTML>"
         }
       }
     }

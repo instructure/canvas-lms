@@ -117,7 +117,7 @@ export default function EmbedOptionsTray(props) {
             </Flex.Item>
 
             <Flex.Item
-              background="light"
+              background="secondary"
               borderWidth="small none none none"
               padding="small medium"
               textAlign="end"

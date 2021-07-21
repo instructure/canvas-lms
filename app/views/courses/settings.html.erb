@@ -66,7 +66,7 @@
         <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
       <% end %>
       <% if can_do(@context, @current_user, :view_feature_flags) %>
-        <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature Options}) %></a></li>
+        <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_previews', %{Feature Previews}) %></a></li>
       <% end %>
       <% if @context.grants_right?(@current_user, session, :manage_students) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
         <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>

@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Attributes"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Audio and Video recording is not available."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Audio player for { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons Licence:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Current volume level"
-    },
     "custom_6979cd81": {
         "message": "Custom"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Drag a file here"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Drag a File Here"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Drag and drop, or click to browse your computer"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "Error loading past items"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Error uploading video/audio recording"
-    },
     "excused_cf8792eb": {
         "message": "Excused"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Feedback"
     },
-    "file_name_8fd421ff": {
-        "message": "File name"
-    },
     "file_upload_failed_af22dd91": {
         "message": "File upload failed"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Files index"
-    },
-    "finish_bc343002": {
-        "message": "Finish"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Focus element options toolbar"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Links"
     },
-    "list_collapsed_9ac35920": {
-        "message": "List collapsed."
-    },
-    "list_collapsed_dde87718": {
-        "message": "List collapsed"
-    },
-    "list_expanded_efec2d0": {
-        "message": "List expanded."
-    },
     "load_more_35d33c7": {
         "message": "Load more"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "Loading grades"
     },
-    "loading_media_f3455841": {
-        "message": "Loading media"
-    },
     "loading_past_items_ca499e75": {
         "message": "Loading past items"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Medium"
-    },
-    "mic_a7f3d311": {
-        "message": "Mic"
     },
     "miscellaneous_e9818229": {
         "message": "Miscellaneous"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "No results found for { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "No Video"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Nothing for now"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "opportunities popup"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } selected. List collapsed."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Optional: Add module"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Paragraph"
     },
-    "pause_12af3bb4": {
-        "message": "Pause"
-    },
     "peer_review_74f26a13": {
         "message": "Peer Review"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "People"
-    },
-    "play_1a47eaa7": {
-        "message": "Play"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Please allow Canvas to access your microphone and webcam."
     },
     "points_bceb5005": {
         "message": "points"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Preview"
-    },
-    "preview_a3f8f854": {
-        "message": "PREVIEW"
     },
     "previous_month_bb1e3c84": {
         "message": "Previous month"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Raw HTML Editor"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Reading a media track file failed. Aborting."
-    },
     "record_7c9448b": {
         "message": "Record"
     },
     "record_upload_media_5fdce166": {
         "message": "Record/upload media"
-    },
-    "recording_98da6bda": {
-        "message": "Recording"
     },
     "reminder_date_4564d12d": {
         "message": "Reminder: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Search Term"
-    },
-    "select_app_3d08035a": {
-        "message": "Select App"
     },
     "select_language_7c93a900": {
         "message": "Select Language"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Something went wrong."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Something went wrong accessing your mic or webcam."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Something went wrong and I don''t know what to show you."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "square unordered list"
-    },
-    "start_over_f7552aa9": {
-        "message": "Start over"
-    },
-    "start_recording_9a65141a": {
-        "message": "Start recording"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } to { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Supported file types: SRT or WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Switch to raw html editor"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Switch to rich text editor"
     },
     "syllabus_f191f65b": {
         "message": "Syllabus"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "unpublished"
     },
-    "untitled_16aa4f2b": {
-        "message": "Untitled"
-    },
     "upload_document_253f0478": {
         "message": "Upload Document"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "User Media"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Video/audio recording uploaded"
-    },
     "video_options_24ef6e5d": {
         "message": "Video Options"
     },
     "video_options_tray_3b9809a5": {
         "message": "Video Options Tray"
-    },
-    "video_player_b371005": {
-        "message": "Video player"
     },
     "video_player_for_9e7d373b": {
         "message": "Video player for "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "View keyboard shortcuts"
-    },
-    "webcam_fe91b20f": {
-        "message": "Webcam"
     },
     "width_492fec76": {
         "message": "Width"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "You''ve scrolled back to your very first to-do!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Your webcam may already be in use."
     }
 }

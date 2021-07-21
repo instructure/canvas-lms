@@ -154,6 +154,7 @@ module CCHelper
     [title, body]
   end
 
+  UPLOADED_MEDIA_REGEX = /\/media_objects\/|\/Uploaded Media\//.freeze
   SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
   WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
     Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
@@ -168,13 +169,20 @@ module CCHelper
       next unless source =~ SPECIAL_REFERENCE_REGEX
 
       if source =~ WEB_CONTENT_REFERENCE_REGEX
-        attachment_key = source.sub(WEB_CONTENT_REFERENCE_REGEX, '')
+        attachment_key = CGI.unescape(source.sub(WEB_CONTENT_REFERENCE_REGEX, ''))
         if node['data-media-type']
-          attachment_key = attachment_key.split('?').second
-          attachment_key = "/" + CGI.unescape(attachment_key.split('/').second)
+          # files uploaded directly using the Kaltura plugin media recording feature
+          if attachment_key =~ UPLOADED_MEDIA_REGEX
+            # formatted appropriately, no need to massage the pathname
+            attachment_key
+          else
+            # all other media uploads
+            attachment_key = attachment_key.split('?').second
+            attachment_key = "/" + attachment_key.split('/').second
+          end
         else
           attachment_key = attachment_key.split('?').first
-          attachment_key = attachment_key.split('/').map {|ak| CGI.unescape(ak)}.join('/')
+          attachment_key = attachment_key.split('/').join('/')
         end
         linked_objects.push({local_path: attachment_key, type: 'Attachment'})
       else
@@ -213,6 +221,11 @@ module CCHelper
           "/media_objects/#{$1}"
         else
           match.url.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+        end
+      end
+      @rewriter.set_handler('courses') do |match|
+        if match.obj_id == @course.id
+          "#{COURSE_TOKEN}/"
         end
       end
       @rewriter.set_handler('files') do |match|

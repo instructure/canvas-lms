@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Atributs"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "L''enregistrament de so i vídeo no està disponible."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Reproductor de so per a { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Llicència de Creative Commons:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Nivell de volum actual"
-    },
     "custom_6979cd81": {
         "message": "Personalitzat"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Arrossega un fitxer aquí"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Arrossega un fitxer aquí"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Arrossegueu i deixeu anar o feu clic per explorar l''ordinador"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "S''ha produït un error en carregar els elements anteriors"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "S''ha produït un error en carregar l''enregistrament de vídeo o so"
-    },
     "excused_cf8792eb": {
         "message": "Excusat"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Suggeriments"
     },
-    "file_name_8fd421ff": {
-        "message": "Nom del fitxer"
-    },
     "file_upload_failed_af22dd91": {
         "message": "No s''ha pogut carregar el fitxer"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Índex de fitxers"
-    },
-    "finish_bc343002": {
-        "message": "Finalitza"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Barra d''eines d''opcions de focus d''element"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Enllaços"
     },
-    "list_collapsed_9ac35920": {
-        "message": "Llista contreta."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Llista contreta"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Llista desplegada."
-    },
     "load_more_35d33c7": {
         "message": "Carrega''n més"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "S''estan carregant les qualificacions"
     },
-    "loading_media_f3455841": {
-        "message": "S''està carregant l''element multimèdia"
-    },
     "loading_past_items_ca499e75": {
         "message": "S''estan carregant els elements anteriors"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Mitjà"
-    },
-    "mic_a7f3d311": {
-        "message": "Micròfon"
     },
     "miscellaneous_e9818229": {
         "message": "Diversos"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "No s''ha trobat cap resultat per a { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "No hi ha cap vídeo"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Per ara no hi ha res"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "finestra emergent d''oportunitats"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } seleccionat. Llista contreta."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Opcional: Afegeix un curs"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Paràgraf"
     },
-    "pause_12af3bb4": {
-        "message": "Fes una pausa"
-    },
     "peer_review_74f26a13": {
         "message": "Revisió entre companys"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "Persones"
-    },
-    "play_1a47eaa7": {
-        "message": "Reprodueix"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Permeteu que Canvas accedeixi al micròfon i a la càmera web."
     },
     "points_bceb5005": {
         "message": "punts"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Visualització prèvia"
-    },
-    "preview_a3f8f854": {
-        "message": "VISUALITZACIÓ PRÈVIA"
     },
     "previous_month_bb1e3c84": {
         "message": "El mes passat"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Editor de dades HTML sense processar"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "S''ha produït un error en llegir un fitxer de seguiment multimèdia. S''està abandonant."
-    },
     "record_7c9448b": {
         "message": "Enregistra"
     },
     "record_upload_media_5fdce166": {
         "message": "Enregistra o penja l''element multimèdia"
-    },
-    "recording_98da6bda": {
-        "message": "S''està enregistrant"
     },
     "reminder_date_4564d12d": {
         "message": "Recordatori: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Terme de cerca"
-    },
-    "select_app_3d08035a": {
-        "message": "Selecciona l''aplicació"
     },
     "select_language_7c93a900": {
         "message": "Selecciona l''idioma"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Alguna cosa no ha anat bé."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Alguna cosa no ha anat bé en accedir al micròfon o a la càmera web."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "marca amb un quadrat la llista desordenada"
-    },
-    "start_over_f7552aa9": {
-        "message": "Torna a començar"
-    },
-    "start_recording_9a65141a": {
-        "message": "Comença a enregistrar"
     },
     "startdate_to_enddate_d245175b": {
         "message": "De { startDate } a { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tipus de fitxer admesos: SRT o WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Canvia a un editor de dades HTML sense processar"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Canvia a un editor de text enriquit"
     },
     "syllabus_f191f65b": {
         "message": "Temari"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "no publicat"
     },
-    "untitled_16aa4f2b": {
-        "message": "Sense títol"
-    },
     "upload_document_253f0478": {
         "message": "Penja un document"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "Elements multimèdia de l''usuari"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "S''ha penjat l''enregistrament de vídeo o so"
-    },
     "video_options_24ef6e5d": {
         "message": "Opcions de vídeo"
     },
     "video_options_tray_3b9809a5": {
         "message": "Safata d''opcions de vídeo"
-    },
-    "video_player_b371005": {
-        "message": "Reproductor de vídeo"
     },
     "video_player_for_9e7d373b": {
         "message": "Reproductor de vídeo per a "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Mostra les dreceres del teclat"
-    },
-    "webcam_fe91b20f": {
-        "message": "Càmera web"
     },
     "width_492fec76": {
         "message": "Amplada"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Heu desplaçat la pantalla cap enrere fins a la primera tasca pendent."
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "És possible que la càmera web ja s''estigui utilitzant."
     }
 }

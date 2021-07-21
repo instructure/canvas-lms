@@ -22,7 +22,7 @@ import React from 'react'
 
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
-import {Byline} from '@instructure/ui-byline'
+import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -32,93 +32,117 @@ import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 
 export function PostMessage({...props}) {
   return (
-    <Byline
-      title={
-        <>
-          {props.hasAuthor && (
-            <View padding="none small none none">
-              <Text weight="bold" data-testid="author_name">
-                {props.authorName}
-              </Text>
-            </View>
-          )}
-          {!!props.discussionRoles && (
-            <RolePillContainer
-              discussionRoles={props.discussionRoles}
-              data-testid="pill-container"
+    <Flex padding="0 0 medium 0">
+      <Flex.Item align="start">
+        {props.isUnread && (
+          <div
+            style={{
+              float: 'left',
+              marginLeft: '-24px',
+              marginTop: '13px'
+            }}
+            data-testid="is-unread"
+            data-isforcedread={props.isForcedRead}
+          >
+            <Badge
+              type="notification"
+              placement="start center"
+              standalone
+              formatOutput={() => (
+                <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>
+              )}
             />
-          )}
-          <View display="inline-flex" padding="none small none none">
-            <Text color="secondary">{props.timingDisplay}</Text>
-            <Text color="secondary">
-              {!!props.lastReplyAtDisplayText &&
-                I18n.t(', last reply %{lastReplyAtDisplayText}', {
-                  lastReplyAtDisplayText: props.lastReplyAtDisplayText
-                })}
-            </Text>
-          </View>
-        </>
-      }
-      description={
-        <>
-          {props.title && (
-            <>
-              <Heading level="h1">
-                <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
-              </Heading>
-              <View as="div" margin="medium none">
-                <Text size="x-large">{props.title}</Text>
-              </View>
-            </>
-          )}
-          {props.isEditing ? (
-            <View display="inline-block" margin="small none none none" width="100%">
-              <DiscussionEdit
-                onCancel={props.onCancel}
-                value={props.message}
-                onSubmit={props.onSave}
-              />
-            </View>
-          ) : (
-            <>
-              <div dangerouslySetInnerHTML={{__html: props.message}} />
-              <View display="block" margin="small none none none">
-                {props.children}
-              </View>
-            </>
-          )}
-        </>
-      }
-      alignContent="top"
-      margin="0 0 medium 0"
-    >
-      {props.isUnread && (
-        <div
-          style={{
-            float: 'left',
-            marginLeft: '-24px',
-            marginTop: '13px'
-          }}
-          data-testid="is-unread"
-          data-isforcedread={props.isForcedRead}
-        >
-          <Badge
-            type="notification"
-            placement="start center"
-            standalone
-            formatOutput={() => <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>}
+          </div>
+        )}
+        {props.hasAuthor && (
+          <Avatar
+            name={props.authorName}
+            src={props.avatarUrl}
+            margin="0 small 0 0"
+            data-testid="author_avatar"
           />
-        </div>
-      )}
-      {props.hasAuthor && (
-        <Avatar
-          name={props.authorName}
-          src={props.avatarUrl}
-          margin="0 0 0 0"
-          data-testid="author_avatar"
-        />
-      )}
-    </Byline>
+        )}
+      </Flex.Item>
+      <Flex.Item shouldGrow shouldShrink>
+        <Flex direction="column">
+          <Flex.Item>
+            <Flex direction="column" width="1">
+              <Flex.Item shouldGrow>
+                <Flex shouldGrow width="100">
+                  <Flex.Item
+                    align="start"
+                    shouldGrow
+                    shouldShrink
+                    padding="xx-small none xx-small none"
+                  >
+                    {props.hasAuthor && (
+                      <View padding="none small none none">
+                        <Text weight="bold" data-testid="author_name">
+                          {props.authorName}
+                        </Text>
+                      </View>
+                    )}
+                    {props.discussionRoles?.length > 0 && (
+                      <RolePillContainer
+                        discussionRoles={props.discussionRoles}
+                        data-testid="pill-container"
+                      />
+                    )}
+                  </Flex.Item>
+                  <Flex.Item align="end" padding="xx-small small xx-small none">
+                    {props.postUtilities}
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+              <Flex.Item shouldShrink>
+                <View display="inline-flex" padding="none small none none">
+                  <Text color="secondary" size="small">
+                    {props.timingDisplay}
+                  </Text>
+                  <Text color="secondary" size="small">
+                    {!!props.lastReplyAtDisplayText &&
+                      I18n.t(', last reply %{lastReplyAtDisplayText}', {
+                        lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                      })}
+                  </Text>
+                </View>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item overflowY="hidden">
+            <>
+              {props.title && (
+                <>
+                  <Heading level="h1">
+                    <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
+                  </Heading>
+                  <View as="div" margin="medium none">
+                    <Text size="x-large">{props.title}</Text>
+                  </View>
+                </>
+              )}
+              {props.isEditing ? (
+                <View display="inline-block" margin="small none none none" width="100%">
+                  <DiscussionEdit
+                    onCancel={props.onCancel}
+                    value={props.message}
+                    onSubmit={props.onSave}
+                    isEdit
+                  />
+                </View>
+              ) : (
+                <>
+                  <div dangerouslySetInnerHTML={{__html: props.message}} />
+                  <View display="block" margin="small none none none">
+                    {props.children}
+                  </View>
+                </>
+              )}
+            </>
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+    </Flex>
   )
 }
 
@@ -181,7 +205,8 @@ PostMessage.propTypes = {
   /**
    * Marks whether an unread message has a forcedReadState
    */
-  isForcedRead: PropTypes.bool
+  isForcedRead: PropTypes.bool,
+  postUtilities: PropTypes.node
 }
 
 PostMessage.defaultProps = {

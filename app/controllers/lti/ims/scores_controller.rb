@@ -64,7 +64,7 @@ module Lti::Ims
   #       }
   #     }
   class ScoresController < ApplicationController
-    include Concerns::GradebookServices
+    include Lti::Ims::Concerns::GradebookServices
     include Api::V1::Attachment
 
     before_action(
@@ -196,7 +196,7 @@ module Lti::Ims
         rescue CanvasHttp::InvalidResponseCodeError => err
           err_message = "uploading to file service failed with #{err.code}: #{err.body}"
           return render_error(err_message, :bad_request) if err.code == 400
-  
+
           # 5xx and other unexpected errors
           return render_error(err_message, :internal_server_error)
         end

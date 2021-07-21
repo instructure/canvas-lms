@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {defaultSettings} from '../CreateButtonForm'
+import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {ColorSection} from '../ColorSection'
 
 function selectOption(button, option) {
@@ -38,7 +38,7 @@ function selectOption(button, option) {
 describe('<ColorSection />', () => {
   it('changes the button color', () => {
     const onChange = jest.fn()
-    render(<ColorSection settings={defaultSettings} onChange={onChange} />)
+    render(<ColorSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = screen.getByRole('textbox', {name: /button color/i})
     fireEvent.change(input, {target: {value: '#fff'}})
     expect(onChange).toHaveBeenCalledWith({color: '#fff'})
@@ -46,7 +46,7 @@ describe('<ColorSection />', () => {
 
   it('changes the outline color', () => {
     const onChange = jest.fn()
-    render(<ColorSection settings={defaultSettings} onChange={onChange} />)
+    render(<ColorSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = screen.getByRole('textbox', {name: /button outline/i})
     fireEvent.change(input, {target: {value: '#000'}})
     expect(onChange).toHaveBeenCalledWith({outlineColor: '#000'})
@@ -55,7 +55,7 @@ describe('<ColorSection />', () => {
   it('changes the button outline size', () => {
     const onChange = jest.fn()
     render(
-      <ColorSection settings={{...defaultSettings, outlineSize: 'medium'}} onChange={onChange} />
+      <ColorSection settings={{...DEFAULT_SETTINGS, outlineSize: 'medium'}} onChange={onChange} />
     )
     selectOption(/button outline size/i, /small/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'small'})

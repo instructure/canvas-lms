@@ -19,6 +19,7 @@
 import React from 'react'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import ManagementHeader from '../ManagementHeader'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import {MockedProvider} from '@apollo/react-testing'
 
@@ -26,13 +27,17 @@ jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
 jest.useFakeTimers()
 
-const render = children => {
-  return rtlRender(<MockedProvider mocks={[]}>{children}</MockedProvider>)
+const render = (children, {isMobileView = false, renderer = rtlRender} = {}) => {
+  return renderer(
+    <OutcomesContext.Provider value={{env: {isMobileView}}}>
+      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    </OutcomesContext.Provider>
+  )
 }
 
 describe('ManagementHeader', () => {
   const defaultProps = (props = {}) => ({
-    breakpoints: {tablet: true},
+    handleFileDrop: () => {},
     ...props
   })
 
@@ -46,7 +51,6 @@ describe('ManagementHeader', () => {
   })
 
   it('renders Action Buttons', () => {
-    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     expect(getByText('Import')).toBeInTheDocument()
     expect(getByText('Create')).toBeInTheDocument()
@@ -54,14 +58,14 @@ describe('ManagementHeader', () => {
   })
 
   it('calls showImportOutcomesModal when click on Import', () => {
-    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
-    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
+    const props = defaultProps()
+    const {getByText} = render(<ManagementHeader {...props} />)
     fireEvent.click(getByText('Import'))
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
+    expect(showImportOutcomesModal).toHaveBeenCalledWith({onFileDrop: props.handleFileDrop})
   })
 
   it('opens FindOutcomesModal when Find button is clicked', async () => {
-    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Find'))
     await act(async () => jest.runAllTimers())
@@ -69,7 +73,6 @@ describe('ManagementHeader', () => {
   })
 
   it('opens CreateOutcomeModal when Create button is clicked', async () => {
-    // breakpoints.tablet: true, meaning window.innerWidth >= 768px
     const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     fireEvent.click(getByText('Create'))
     await act(async () => jest.runOnlyPendingTimers())
@@ -78,14 +81,16 @@ describe('ManagementHeader', () => {
 
   describe('Responsiveness', () => {
     it('renders only the Add Button', () => {
-      // breakpoints.tablet: false, meaning window.innerWidth < 768px
-      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true
+      })
       expect(getByText('Add')).toBeInTheDocument()
     })
 
     it('renders the Menu Items', () => {
-      // breakpoints.tablet: false, meaning window.innerWidth < 768px
-      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true
+      })
       fireEvent.click(getByText('Add'))
       expect(getByText('Import')).toBeInTheDocument()
       expect(getByText('Create')).toBeInTheDocument()
@@ -93,16 +98,18 @@ describe('ManagementHeader', () => {
     })
 
     it('calls showImportOutcomesModal when click on Import Menu Item', () => {
-      // breakpoints.tablet: false, meaning window.innerWidth < 768px
-      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true
+      })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Import'))
       expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
     })
 
     it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
-      // breakpoints.tablet: false, meaning window.innerWidth < 768px
-      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true
+      })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
       await act(async () => jest.runAllTimers())
@@ -110,8 +117,9 @@ describe('ManagementHeader', () => {
     })
 
     it('opens CreateOutcomeModal when Create Menu Item is clicked', async () => {
-      // breakpoints.tablet: false, meaning window.innerWidth < 768px
-      const {getByText} = render(<ManagementHeader {...defaultProps({breakpoints: false})} />)
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true
+      })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Create'))
       await act(async () => jest.runOnlyPendingTimers())

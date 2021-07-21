@@ -17,11 +17,13 @@
  */
 
 import I18n from 'i18n!k5_utils'
-import {asJson, defaultFetchOptions} from '@instructure/js-utils'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
+
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -320,13 +322,53 @@ export const saveElementaryDashboardPreference = disabled =>
     body: {elementary_dashboard_disabled: disabled}
   })
 
+export const ignoreTodo = ignoreUrl =>
+  doFetchApi({
+    path: ignoreUrl,
+    method: 'DELETE'
+  })
+
+export const groupImportantDates = (assignments, events, timeZone) => {
+  const groups = assignments.concat(events).reduce((acc, item) => {
+    const parsedItem = {
+      id: item.id,
+      title: item.title,
+      context: item.context_name,
+      color: item.context_color || DEFAULT_COURSE_COLOR,
+      type: item.type === 'event' ? 'event' : item.assignment.submission_types[0],
+      url: item.html_url
+    }
+    const date = item.type === 'event' ? item.start_at : item.assignment.due_at
+    const dateBucket = moment(date).tz(timeZone).startOf('day').toISOString()
+    parsedItem.start = date
+    acc.has(dateBucket) ? acc.get(dateBucket).push(parsedItem) : acc.set(dateBucket, [parsedItem])
+    return acc
+  }, new Map())
+  const dates = []
+  groups.forEach((items, date) => {
+    dates.push({
+      date,
+      items: items.sort((a, b) => moment(a.start).diff(moment(b.start)))
+    })
+  })
+  return dates.sort((a, b) => moment(a.date).diff(moment(b.date)))
+}
+
+export const saveSelectedContexts = selected_contexts =>
+  doFetchApi({
+    path: `/api/v1/calendar_events/save_selected_contexts`,
+    method: 'POST',
+    params: {selected_contexts}
+  }).then(data => data.json)
+
 export const TAB_IDS = {
   HOME: 'tab-home',
   HOMEROOM: 'tab-homeroom',
   SCHEDULE: 'tab-schedule',
   GRADES: 'tab-grades',
   RESOURCES: 'tab-resources',
-  MODULES: 'tab-modules'
+  MODULES: 'tab-modules',
+  TODO: 'tab-todo'
 }
 
 export const FOCUS_TARGETS = {

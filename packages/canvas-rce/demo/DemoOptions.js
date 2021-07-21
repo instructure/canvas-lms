@@ -57,7 +57,7 @@ export default class DemoOptions extends Component {
             <View as="div" margin="0 0 small">
               <Checkbox
                 label="Readonly"
-                value={this.state.readonly}
+                checked={this.state.readonly}
                 onChange={event => {
                   this.setState({readonly: event.target.checked})
                 }}

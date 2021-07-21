@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Attribut"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Ljud- och videoinspelning är inte tillgänglig."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Ljudspelare för { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licens:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Aktuell volymnivå"
-    },
     "custom_6979cd81": {
         "message": "Anpassa"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Dra en fil hit"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Dra en fil hit"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Dra och släpp, eller klicka för att söka i din dator"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "Det gick inte att läsa in tidigare objekt"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Ett fel uppstod vid uppladdning av video-/ljudinspelningen"
-    },
     "excused_cf8792eb": {
         "message": "Ursäktad"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Feedback"
     },
-    "file_name_8fd421ff": {
-        "message": "Filnamn"
-    },
     "file_upload_failed_af22dd91": {
         "message": "Det gick inte att ladda upp filen"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Filindex"
-    },
-    "finish_bc343002": {
-        "message": "Avsluta"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Verktygsfält för alternativ till fokuselement"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Länkar"
     },
-    "list_collapsed_9ac35920": {
-        "message": "Listan komprimerades."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Listan komprimerades"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Listan utökades."
-    },
     "load_more_35d33c7": {
         "message": "Läs in mer"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "Läser in omdömen"
     },
-    "loading_media_f3455841": {
-        "message": "Läser in media"
-    },
     "loading_past_items_ca499e75": {
         "message": "Läser in tidigare objekt"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Medium"
-    },
-    "mic_a7f3d311": {
-        "message": "Mikrofon"
     },
     "miscellaneous_e9818229": {
         "message": "Blandat"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "Inga resultat hittades för { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "Ingen video"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Inget just nu"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "popupfönster med möjligheter"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } valda. Listan komprimerades."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Valfritt: Lägg till kurs"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Paragraf"
     },
-    "pause_12af3bb4": {
-        "message": "Pausa"
-    },
     "peer_review_74f26a13": {
         "message": "kamratresponsuppgift"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "Personer"
-    },
-    "play_1a47eaa7": {
-        "message": "Spela upp"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Ge Canvas åtkomst till din mikrofon och webbkamera."
     },
     "points_bceb5005": {
         "message": "poäng"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Förhandsvisa"
-    },
-    "preview_a3f8f854": {
-        "message": "FÖRHANDSVISA"
     },
     "previous_month_bb1e3c84": {
         "message": "Föregående månad"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Raw HTML Editor"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Det gick inte att läsa en mediespårsfil. Avbryter."
-    },
     "record_7c9448b": {
         "message": "Spela in"
     },
     "record_upload_media_5fdce166": {
         "message": "Spela in/ladda upp media"
-    },
-    "recording_98da6bda": {
-        "message": "Inspelning"
     },
     "reminder_date_4564d12d": {
         "message": "Påminnelse: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Sökterm"
-    },
-    "select_app_3d08035a": {
-        "message": "Välj app"
     },
     "select_language_7c93a900": {
         "message": "Välj språk"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Någonting gick fel."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Något gick fel vid försök att komma åt din mikrofon eller webbkamera."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Något gick fel och jag vet inte vad jag ska visa dig."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "fyrkantsmarkera oordnad lista"
-    },
-    "start_over_f7552aa9": {
-        "message": "Börja om"
-    },
-    "start_recording_9a65141a": {
-        "message": "Starta inspelning"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } till { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Filtyper som stöds: SRT eller WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Växla till rå HTML-redigerare"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Växla till RTF-redigerare"
     },
     "syllabus_f191f65b": {
         "message": "Kursöversikt"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "avpublicerad"
     },
-    "untitled_16aa4f2b": {
-        "message": "Namnlös"
-    },
     "upload_document_253f0478": {
         "message": "Ladda upp dokument"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "Användarmedia"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Video/ljudinspelning har laddats upp"
-    },
     "video_options_24ef6e5d": {
         "message": "Videoalternativ"
     },
     "video_options_tray_3b9809a5": {
         "message": "Alternativfält för videor"
-    },
-    "video_player_b371005": {
-        "message": "Videospelare"
     },
     "video_player_for_9e7d373b": {
         "message": "Videospelare för "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Visa kortkommandon"
-    },
-    "webcam_fe91b20f": {
-        "message": "Webbkamera"
     },
     "width_492fec76": {
         "message": "Bredd"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Du har bläddrat tillbaka till din allra första att göra-uppgift!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Din webbkamera kanske redan används."
     }
 }

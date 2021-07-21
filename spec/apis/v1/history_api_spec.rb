@@ -27,7 +27,7 @@ describe HistoryController, type: :request do
   describe '#index' do
     before :once do
       account_admin_user
-      @dates = [1.day.ago.beginning_of_hour, 2.days.ago.beginning_of_hour, 3.days.ago.beginning_of_hour]
+      @dates = [1.day.ago.beginning_of_hour, 2.days.ago.beginning_of_hour, 3.days.ago.beginning_of_hour, 4.days.ago.beginning_of_hour]
       course_with_student active_all: true, course_name: 'Something 101', user: user_with_pseudonym
       assignment_model title: 'Assign 1', context: @course
       group_model context: @course, name: 'A Group'
@@ -96,6 +96,14 @@ describe HistoryController, type: :request do
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
                         format: 'json', user_id: 'self', expected_status: :bad_gateway)
         expect(json['error']).to_not be_nil
+      end
+
+      it "removes verifier from file preview url" do
+        page_view_for url: 'http://example.com/courses/X/files/A/file_preview?annotate=B&verifier=C', context: @course, created_at: @dates[3],
+                      asset_category: 'files', asset_code: "attachment_1"
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                       format: 'json', user_id: 'self')
+        expect(json[3]['visited_url']).to eq 'http://example.com/courses/X/files/A/file_preview?annotate=B'
       end
     end
 

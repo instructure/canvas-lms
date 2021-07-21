@@ -35,7 +35,7 @@ export default class ChooseMigrationFile extends Backbone.View
     fileElement = @$migrationFileUpload[0]
 
     @model.set('pre_attachment', {
-      file_size: @fileSize(fileElement),
+      size: @fileSize(fileElement),
       name: filename,
       fileElement: fileElement,
       no_redirect: true

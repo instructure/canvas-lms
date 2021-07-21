@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Atribi"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Anrejistreman Odyo/Videyo pa disponib."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Lektè odyo pou { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Lisans Creative Commons"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Nivo Volim Aktyèl"
-    },
     "custom_6979cd81": {
         "message": "Pèsonalize"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Deplase yon fichye la a"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Deplase yon Fichye La a"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Deplase oswa klike pou ka navige sou òdinatè w la."
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "Erè chajman eleman pase yo"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Erè nan transfè anrejistreman videyo/odyo"
-    },
     "excused_cf8792eb": {
         "message": "Egzante"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Kòmantè"
     },
-    "file_name_8fd421ff": {
-        "message": "Non fichye"
-    },
     "file_upload_failed_af22dd91": {
         "message": "Transfè fichye echwe"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Endis Fichye"
-    },
-    "finish_bc343002": {
-        "message": "Fini"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Ba zouti opsyon eleman fokalizasyon"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Lyen"
     },
-    "list_collapsed_9ac35920": {
-        "message": "Lis ratresi."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Lis ratresi"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Lis elaji."
-    },
     "load_more_35d33c7": {
         "message": "Chaje Plis"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "Chajman Nòt"
     },
-    "loading_media_f3455841": {
-        "message": "Chajman medya"
-    },
     "loading_past_items_ca499e75": {
         "message": "Chaje eleman pase"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Mwayen"
-    },
-    "mic_a7f3d311": {
-        "message": "Mikwo"
     },
     "miscellaneous_e9818229": {
         "message": "Divès"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "Nou pa jwenn rezilta pou { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "Pa gen Videyo"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Anyen pou kounye a"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "opòtinite afiche"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } seleksyone. Lis ratresi."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Opsyonèl: Ajoute Kou"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Paragraf"
     },
-    "pause_12af3bb4": {
-        "message": "Poz"
-    },
     "peer_review_74f26a13": {
         "message": "Revisyon Kamarad"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "Moun"
-    },
-    "play_1a47eaa7": {
-        "message": "Jwe"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Tanpri pèmèt Canvas gen aksè a mikwofòn e kamera ou a."
     },
     "points_bceb5005": {
         "message": "pwen"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Apèsi"
-    },
-    "preview_a3f8f854": {
-        "message": "APÈSI"
     },
     "previous_month_bb1e3c84": {
         "message": "Mwa Pase"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Editè HTML Brit"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Lekti yon fichye miltimedya echwe. Anilasyon."
-    },
     "record_7c9448b": {
         "message": "Anrejistre"
     },
     "record_upload_media_5fdce166": {
         "message": "Anrejistre/Chaje Medya"
-    },
-    "recording_98da6bda": {
-        "message": "Anrejistreman"
     },
     "reminder_date_4564d12d": {
         "message": "Rapèl: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Tèm Rechèch"
-    },
-    "select_app_3d08035a": {
-        "message": "Seleksyone App"
     },
     "select_language_7c93a900": {
         "message": "Seleksyone Lang"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Gen yon bagay ki mal fèt."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Gen yon bagay ki pase mal lè n ap eseye itilize mikwo oswa kamera ou a."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Gen yon bagay ki pase mal ni mwen pa konnen kisa pou m montre w."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "lis kare non òdone"
-    },
-    "start_over_f7552aa9": {
-        "message": "Rekòmanse"
-    },
-    "start_recording_9a65141a": {
-        "message": "Kòmanse Anrejistre"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } a { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tip fichye ki aksepte: SRT oswa WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Pase a editè html brit"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Pase a editè tèks anrichi"
     },
     "syllabus_f191f65b": {
         "message": "Pwogram"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "pa pibliye"
     },
-    "untitled_16aa4f2b": {
-        "message": "San tit"
-    },
     "upload_document_253f0478": {
         "message": "Chaje Dokiman"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "Medya Itilizatè"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Anrejistreman odyo/videyo transfere"
-    },
     "video_options_24ef6e5d": {
         "message": "Opsyon Videyo"
     },
     "video_options_tray_3b9809a5": {
         "message": "Plato Opsyon Videyo"
-    },
-    "video_player_b371005": {
-        "message": "Lektè Videyo"
     },
     "video_player_for_9e7d373b": {
         "message": "Lektè videyo pou "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Afiche rakousi klavye"
-    },
-    "webcam_fe91b20f": {
-        "message": "Webcam"
     },
     "width_492fec76": {
         "message": "Lajè"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Ou retounan nan premye Tach ou yo!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Webcam ou an gendwa ap itilize deja."
     }
 }

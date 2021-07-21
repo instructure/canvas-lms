@@ -208,7 +208,7 @@ export class Opportunities extends Component {
         style={{maxHeight: this.props.maxHeight}}
       >
         {this.renderCloseButton()}
-        <Tabs onRequestTabChange={this.handleTabChange}>
+        <Tabs id={styles.tabs_container} onRequestTabChange={this.handleTabChange}>
           <Tabs.Panel
             renderTitle={this.renderTitle('new')}
             maxHeight={this.state.innerMaxHeight}

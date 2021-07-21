@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import {instanceOf} from 'prop-types'
+import {func, instanceOf} from 'prop-types'
 import I18n from 'i18n!ImportOutcomesModal'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -47,7 +47,8 @@ export function showImportOutcomesModal(props) {
 export default class ImportOutcomesModal extends Component {
   static propTypes = {
     parent: instanceOf(Element),
-    toolbar: instanceOf(Element)
+    toolbar: instanceOf(Element),
+    onFileDrop: func
   }
 
   static defaultProps = {
@@ -64,11 +65,14 @@ export default class ImportOutcomesModal extends Component {
   }
 
   onSelection(accepted, rejected) {
-    const {toolbar} = this.props
+    const {toolbar, onFileDrop} = this.props
+
     if (accepted.length > 0) {
       this.hide()
       if (toolbar) {
         toolbar.trigger('start_sync', accepted[0])
+      } else if (onFileDrop) {
+        onFileDrop(accepted[0])
       }
     } else if (rejected.length > 0) {
       this.setState({messages: [{text: I18n.t('Invalid file type'), type: 'error'}]})
@@ -102,13 +106,13 @@ export default class ImportOutcomesModal extends Component {
             accept=".csv, .json"
             onDrop={(acceptedFile, rejectedFile) => this.onSelection(acceptedFile, rejectedFile)}
             messages={this.state.messages}
-            label={
+            renderLabel={
               <div>
                 <Billboard
                   size="medium"
                   heading={I18n.t('Upload your Outcomes!')}
                   headingLevel="h2"
-                  message={I18n.t('Drag and drop or click to browse your computer')}
+                  message={I18n.t('Choose a file to upload from your device')}
                   hero={
                     <div style={styles}>
                       <PresentationContent>

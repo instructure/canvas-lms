@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "Lastnosti"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Snemanje video- in zvočnih posnetkov ni na voljo."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "Predvajalnik zvoka za { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "Licenca Creative Commons:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Trenutna raven glasnosti"
-    },
     "custom_6979cd81": {
         "message": "Po meri"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Datoteko povlecite sem"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Datoteko povlecite sem"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "Napaka pri nalaganju preteklih elementov"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Napaka pri nalaganju videoposnetka/zvočnega posnetka"
-    },
     "excused_cf8792eb": {
         "message": "Opravičeno"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "Povratne informacije"
     },
-    "file_name_8fd421ff": {
-        "message": "Ime datoteke"
-    },
     "file_upload_failed_af22dd91": {
         "message": "Nalaganje datoteke ni uspelo"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "Kazalo datotek"
-    },
-    "finish_bc343002": {
-        "message": "Dokončaj"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Orodna vrstica za izostritev možnosti elementov"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "Povezave"
     },
-    "list_collapsed_9ac35920": {
-        "message": "Seznam je strnjen."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Seznam je strnjen"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Seznam je razširjen."
-    },
     "load_more_35d33c7": {
         "message": "Naloži več"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "Nalaganje ocen"
     },
-    "loading_media_f3455841": {
-        "message": "Nalagam medij"
-    },
     "loading_past_items_ca499e75": {
         "message": "Nalaganje preteklih elementov"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "Srednja"
-    },
-    "mic_a7f3d311": {
-        "message": "Mikrofon"
     },
     "miscellaneous_e9818229": {
         "message": "Drugo"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "Ni najdenih rezultatov za { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "Ni videoposnetek"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Za zdaj ni ničesar."
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "pojavno okno za priložnosti"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "{ option } je izbran(a/o). Seznam je strnjen."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "Izbirno: Dodaj predmet"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Odstavek"
     },
-    "pause_12af3bb4": {
-        "message": "Začasna zaustavitev"
-    },
     "peer_review_74f26a13": {
         "message": "Ocenjevanje kolegov"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "Sodelujoči"
-    },
-    "play_1a47eaa7": {
-        "message": "Predvajaj"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Sistemu Canvas dovolite dostop do mikrofona in spletne kamere."
     },
     "points_bceb5005": {
         "message": "točk"
@@ -874,9 +826,6 @@
     },
     "preview_53003fd2": {
         "message": "Predogled"
-    },
-    "preview_a3f8f854": {
-        "message": "PREDOGLED"
     },
     "previous_month_bb1e3c84": {
         "message": "Prejšnji mesec"
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "Urejevalnik surovega HTML"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Branje datoteke z zapisi na mediju ni uspelo. Prekinjam."
-    },
     "record_7c9448b": {
         "message": "Posnemi"
     },
     "record_upload_media_5fdce166": {
         "message": "Posnemi/naloži medije"
-    },
-    "recording_98da6bda": {
-        "message": "Snemanje"
     },
     "reminder_date_4564d12d": {
         "message": "Opomnik: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "Iskalni izraz"
-    },
-    "select_app_3d08035a": {
-        "message": "Izberi aplikacijo"
     },
     "select_language_7c93a900": {
         "message": "Izberite jezik"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "Prišlo je do težav."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Pri dostopu do vaše spletne kamere ali mikrofon je prišlo do težav."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Prišlo je do težav in ne vem, kaj vam naj prikažem."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "nerazvrščeni seznam s kvadrati"
-    },
-    "start_over_f7552aa9": {
-        "message": "Začnite znova"
-    },
-    "start_recording_9a65141a": {
-        "message": "Zaženi snemanje"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } do { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Podprte vrste datotek: SRT ali WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Preklopi v surovi prikaz html"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Preklopi v oboghateni prikaz html"
     },
     "syllabus_f191f65b": {
         "message": "Učni načrt"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "neobjavljeno"
     },
-    "untitled_16aa4f2b": {
-        "message": "Brez naslova"
-    },
     "upload_document_253f0478": {
         "message": "Naloži dokument"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "Uporabnikovi mediji"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Videoposnetek/zvočni posnetek je naložen"
-    },
     "video_options_24ef6e5d": {
         "message": "Možnosti videoposnetka"
     },
     "video_options_tray_3b9809a5": {
         "message": "Vrstica z možnostmi videoposnetka"
-    },
-    "video_player_b371005": {
-        "message": "Predvajalnik videoposnetkov"
     },
     "video_player_for_9e7d373b": {
         "message": "Predvajalnik videoposnetkov za "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Prikaži bližnjice na tipkovnici"
-    },
-    "webcam_fe91b20f": {
-        "message": "Spletna kamera"
     },
     "width_492fec76": {
         "message": "Širina"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Z drsnikom ste se pomaknili na čisto prvi čakajoča opravila."
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Vaša spletna kamera je morda že v uporabi."
     }
 }

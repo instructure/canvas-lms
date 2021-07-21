@@ -66,7 +66,9 @@ export default function K5Announcement({
 
   const renderAnnouncementTitle = () => (
     <Heading level="h3" margin="x-small 0 0">
-      {title}
+      <Link href={url} isWithinText={false}>
+        {title}
+      </Link>
     </Heading>
   )
 

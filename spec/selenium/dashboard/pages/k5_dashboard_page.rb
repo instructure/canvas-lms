@@ -46,7 +46,7 @@ module K5DashboardPageObject
   end
 
   def announcement_title_xpath_selector(announcement_title)
-    "//h3[text() = '#{announcement_title}']"
+    "//h3/a[text() = '#{announcement_title}']"
   end
 
   def assignment_edit_button_selector
@@ -137,12 +137,12 @@ module K5DashboardPageObject
     '#tab-tab-homeroom'
   end
 
-  def items_due_selector(subject_title, due_today_text)
-    "//*[@aria-label = '#{subject_title}']//*[text() = '#{due_today_text}']"
+  def items_due_selector(subject_title)
+    "//*[@aria-label = '#{subject_title}']//*[@data-testid = 'number-due-today']"
   end
 
-  def items_missing_selector(subject_title, number_items_missing)
-    "//*[@aria-label = '#{subject_title}']//*[text() = '#{number_items_missing} missing']"
+  def items_missing_selector(subject_title)
+    "//*[@aria-label = '#{subject_title}']//*[@data-testid = 'number-missing']"
   end
 
   def k5_tablist_selector
@@ -186,7 +186,11 @@ module K5DashboardPageObject
   end
 
   def new_course_modal_selector
-    "[aria-label='Create Course']"
+    "[aria-label='Create Subject']"
+  end
+
+  def nothing_due_selector(subject_course_title)
+    "//*[@aria-label = '#{subject_course_title}']//*[text() = 'Nothing due today']"
   end
 
   def pink_color_button_selector
@@ -391,6 +395,10 @@ module K5DashboardPageObject
     fxpath(new_course_modal_create_selector)
   end
 
+  def nothing_due(subject_course_title)
+    fxpath(nothing_due_selector(subject_course_title))
+  end
+
   def pink_color_button
     fxpath(pink_color_button_selector)
   end
@@ -411,12 +419,12 @@ module K5DashboardPageObject
     f(student_view_button_selector)
   end
 
-  def subject_items_due(subject_title, due_today_text)
-    fxpath(items_due_selector(subject_title, due_today_text))
+  def subject_items_due(subject_title)
+    fxpath(items_due_selector(subject_title))
   end
 
-  def subject_items_missing(subject_title, number_items_missing)
-    fxpath(items_missing_selector(subject_title, number_items_missing))
+  def subject_items_missing(subject_title)
+    fxpath(items_missing_selector(subject_title))
   end
 
   def subject_title_link(subject_title)
@@ -442,6 +450,10 @@ module K5DashboardPageObject
     announcement_edit_pencil.click
   end
 
+  def click_announcement_title(announcement_title)
+    announcement_title(announcement_title).click
+  end
+
   def click_assignments_link
     assignments_link.click
   end
@@ -454,6 +466,10 @@ module K5DashboardPageObject
     dashboard_options_button.click
   end
 
+  def click_duetoday_subject_item(title)
+    subject_items_due(title).click
+  end
+
   def click_homeroom_course_title(course_title)
     homeroom_course_title_link(course_title).click
   end
@@ -461,6 +477,10 @@ module K5DashboardPageObject
   def click_manage_button
     manage_button.click
     wait_for(method: nil, timeout: 2) { course_navigation_tray }
+  end
+
+  def click_missing_subject_item(title)
+    subject_items_missing(title).click
   end
 
   def click_nav_tray_close

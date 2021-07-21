@@ -58,25 +58,72 @@ describe MicrosoftSync::UserMapping do
     end
   end
 
-  describe '.bulk_insert_for_root_account_id' do
-    it "creates UserMappings if they don't already exist" do
-      account = account_model
-      user1 = user_model
-      user2 = user_model
-      described_class.create!(root_account_id: account.id, user_id: user1.id, aad_id: 'manual')
-      described_class.create!(root_account_id: 0, user_id: user2.id, aad_id: 'manual-wrong-ra-id')
-      described_class.bulk_insert_for_root_account_id(
-        account.id,
-        user1.id => 'user1',
-        user2.id => 'user2'
-      )
-      expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort).to \
-        eq([[user1.id, 'manual'], [user2.id, 'user2']].sort)
+  describe '.bulk_insert_for_root_account' do
+    context 'when user_id_to_aad_hash is not empty' do
+      subject do
+        described_class.bulk_insert_for_root_account(
+          account,
+          user1.id => 'user1',
+          user2.id => 'user2'
+        )
+      end
+
+      let(:account) do
+        account_model(settings: {
+          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
+          microsoft_sync_login_attribute: 'email',
+          microsoft_sync_login_attribute_suffix: nil,
+          microsoft_sync_remote_attribute: 'upn',
+        })
+      end
+      let(:user1) { user_model }
+      let(:user2) { user_model }
+
+      before do
+        described_class.create!(root_account_id: account.id, user_id: user1.id, aad_id: 'manual')
+        described_class.create!(root_account_id: 0, user_id: user2.id, aad_id: 'manual-wrong-ra-id')
+      end
+
+      it "creates UserMappings if they don't already exist" do
+        subject
+        expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort).to \
+          eq([[user1.id, 'manual'], [user2.id, 'user2']].sort)
+      end
+
+      {
+        microsoft_sync_tenant: 'somedifferenttenant.onmicrosoft.com',
+        microsoft_sync_login_attribute: 'sis_user_id',
+        microsoft_sync_login_attribute_suffix: '@thebestschool.edu',
+        microsoft_sync_remote_attribute: 'email',
+      }.each do |setting, value|
+        context "when the #{setting} in the Account settings has changed since fetching the account" do
+          before do
+            acct = Account.find(account.id)
+            acct.settings[setting] = value
+            acct.save
+          end
+
+          it "raises an AccountSettingsChanged error and doesn't add/change mappings" do
+            expect { subject }
+              .to raise_error(described_class::AccountSettingsChanged)
+              .and not_change{described_class.order(:id).map(&:attributes)}
+          end
+        end
+      end
     end
 
-    it "doesn't raise an error on an empty hash" do
-      expect { described_class.bulk_insert_for_root_account_id(0, {}) }.to_not \
-        change { described_class.count }.from(0)
+    context 'when user_id_to_aad_hash is empty' do
+      it "doesn't raise an error" do
+        expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
+          change { described_class.count }.from(0)
+      end
+    end
+  end
+
+  describe 'AccountSettingsChanged' do
+    it 'is a graceful cancel error' do
+      expect(described_class::AccountSettingsChanged.new).to \
+        be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
     end
   end
 
@@ -146,7 +193,7 @@ describe MicrosoftSync::UserMapping do
     end
 
     def setup_microsoft_sync_data(account, id_to_aad_hash)
-      MicrosoftSync::UserMapping.bulk_insert_for_root_account_id(account.id, id_to_aad_hash)
+      MicrosoftSync::UserMapping.bulk_insert_for_root_account(account, id_to_aad_hash)
     end
 
     before(:each) do

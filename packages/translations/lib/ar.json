@@ -119,9 +119,6 @@
     "attributes_963ba262": {
         "message": "السمات"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "التسجيل الصوتي والمرئي غير متاح."
-    },
     "audio_player_for_title_20cc70d": {
         "message": "مشغل الصوت لـ { title }"
     },
@@ -260,9 +257,6 @@
     "creative_commons_license_725584ae": {
         "message": "ترخيص المشاع الإبداعي:"
     },
-    "current_volume_level_c55ab825": {
-        "message": "مستوى الصوت الحالي"
-    },
     "custom_6979cd81": {
         "message": "مخصص"
     },
@@ -359,9 +353,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "إفلات ملف هنا"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "إفلات ملف هنا"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
     },
@@ -431,9 +422,6 @@
     "error_loading_past_items_2881dbb1": {
         "message": "حدث خطأ في تحميل العناصر السابقة"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "خطأ في تحميل تسجيل الفيديو/الصوت"
-    },
     "excused_cf8792eb": {
         "message": "معفى"
     },
@@ -464,9 +452,6 @@
     "feedback_6dcc1991": {
         "message": "الملاحظات"
     },
-    "file_name_8fd421ff": {
-        "message": "اسم الملف"
-    },
     "file_upload_failed_af22dd91": {
         "message": "فشل تحميل الملف"
     },
@@ -490,9 +475,6 @@
     },
     "files_index_af7c662b": {
         "message": "فهرس الملفات"
-    },
-    "finish_bc343002": {
-        "message": "إنهاء"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "شريط أدوات خيارات عنصر التركيز"
@@ -641,15 +623,6 @@
     "links_14b70841": {
         "message": "الارتباطات"
     },
-    "list_collapsed_9ac35920": {
-        "message": "تم طي القائمة."
-    },
-    "list_collapsed_dde87718": {
-        "message": "تم طي القائمة"
-    },
-    "list_expanded_efec2d0": {
-        "message": "تم توسيع القائمة."
-    },
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
     },
@@ -686,9 +659,6 @@
     "loading_grades_c842c887": {
         "message": "جارٍ تحميل الدرجات"
     },
-    "loading_media_f3455841": {
-        "message": "جارٍ تحميل الوسائط"
-    },
     "loading_past_items_ca499e75": {
         "message": "جارٍ تحميل العناصر السابقة"
     },
@@ -712,9 +682,6 @@
     },
     "medium_5a8e9ead": {
         "message": "متوسط"
-    },
-    "mic_a7f3d311": {
-        "message": "الميكروفون"
     },
     "miscellaneous_e9818229": {
         "message": "متنوعات"
@@ -779,9 +746,6 @@
     "no_results_found_for_term_1564c08e": {
         "message": "لم يتم العثور على نتائج لـ { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "لا يوجد مقطع فيديو"
-    },
     "nothing_for_now_e3e3ce2a": {
         "message": "لا شيء موجود الآن"
     },
@@ -815,9 +779,6 @@
     "opportunities_popup_f6703842": {
         "message": "النافذة المنبثقة للفرص"
     },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "تم تحديد { option }. تم طي القائمة."
-    },
     "optional_add_course_ef0d70fc": {
         "message": "اختياري: إضافة مساق"
     },
@@ -842,9 +803,6 @@
     "paragraph_5e5ad8eb": {
         "message": "الفقرة"
     },
-    "pause_12af3bb4": {
-        "message": "إيقاف مؤقت"
-    },
     "peer_review_74f26a13": {
         "message": "المراجعة النظيرة"
     },
@@ -853,12 +811,6 @@
     },
     "people_b4ebb13c": {
         "message": "أشخاص"
-    },
-    "play_1a47eaa7": {
-        "message": "تشغيل"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
     },
     "points_bceb5005": {
         "message": "نقاط"
@@ -873,9 +825,6 @@
         "message": "منسق مسبقًا"
     },
     "preview_53003fd2": {
-        "message": "معاينة"
-    },
-    "preview_a3f8f854": {
         "message": "معاينة"
     },
     "previous_month_bb1e3c84": {
@@ -905,17 +854,11 @@
     "raw_html_editor_e3993e41": {
         "message": "محرر HTML الأولي"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "فشلت قراءة ملف مسار الوسائط. جارٍ الإيقاف قبل الاكتمال."
-    },
     "record_7c9448b": {
         "message": "تسجيل"
     },
     "record_upload_media_5fdce166": {
         "message": "تسجيل/تحميل الوسائط"
-    },
-    "recording_98da6bda": {
-        "message": "جارٍ التسجيل"
     },
     "reminder_date_4564d12d": {
         "message": "التذكير: { date }"
@@ -949,9 +892,6 @@
     },
     "search_term_b2d2235": {
         "message": "مصطلح البحث"
-    },
-    "select_app_3d08035a": {
-        "message": "حدد التطبيق"
     },
     "select_language_7c93a900": {
         "message": "اختر اللغة"
@@ -989,9 +929,6 @@
     "something_went_wrong_89195131": {
         "message": "حدث خطأ ما."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "حدث خطأ ما أثناء الوصول إلى الميكروفون أو كاميرا الويب الخاصة بك."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
     },
@@ -1012,12 +949,6 @@
     },
     "square_unordered_list_b15ce93b": {
         "message": "قائمة مربعة غير مرتبة"
-    },
-    "start_over_f7552aa9": {
-        "message": "البدء مرة أخرى"
-    },
-    "start_recording_9a65141a": {
-        "message": "بدء التسجيل"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } إلى { endDate }"
@@ -1054,12 +985,6 @@
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
-    },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "التبديل إلي محرر html أولي"
-    },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "التبديل إلى محرر نص منسق"
     },
     "syllabus_f191f65b": {
         "message": "المناهج"
@@ -1151,9 +1076,6 @@
     "unpublished_dfd8801": {
         "message": "غير منشور"
     },
-    "untitled_16aa4f2b": {
-        "message": "بدون عنوان"
-    },
     "upload_document_253f0478": {
         "message": "تحميل المستند"
     },
@@ -1208,17 +1130,11 @@
     "user_media_14fbf656": {
         "message": "وسائط المستخدم"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "تم تحميل تسجيل الفيديو/الصوت"
-    },
     "video_options_24ef6e5d": {
         "message": "خيارات الفيديو"
     },
     "video_options_tray_3b9809a5": {
         "message": "علبة خيارات الفيديو"
-    },
-    "video_player_b371005": {
-        "message": "مشغل الفيديو"
     },
     "video_player_for_9e7d373b": {
         "message": "مشغل الفيديو لـ "
@@ -1231,9 +1147,6 @@
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "عرض اختصارات لوحة المفاتيح"
-    },
-    "webcam_fe91b20f": {
-        "message": "كاميرا الويب"
     },
     "width_492fec76": {
         "message": "العرض"
@@ -1267,8 +1180,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "قد تكون كاميرا الويب الخاصة بك قيد الاستخدام بالفعل."
     }
 }

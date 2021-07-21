@@ -52,6 +52,7 @@ export default class Quiz extends Backbone.Model {
     this.objectType = this.objectType.bind(this)
     this.isDuplicating = this.isDuplicating.bind(this)
     this.isMigrating = this.isMigrating.bind(this)
+    this.importantDates = this.importantDates.bind(this)
 
     super.initialize(...arguments)
     this.initId()
@@ -205,6 +206,11 @@ export default class Quiz extends Backbone.Model {
   lockAt(date) {
     if (!(arguments.length > 0)) return this.get('lock_at')
     return this.set('lock_at', date)
+  }
+
+  importantDates(important) {
+    if (!(arguments.length > 0)) return this.get('important_dates')
+    return this.set('important_dates', important)
   }
 
   isDuplicating() {
@@ -369,7 +375,8 @@ export default class Quiz extends Backbone.Model {
       'dueAt',
       'lockAt',
       'unlockAt',
-      'singleSectionDueDate'
+      'singleSectionDueDate',
+      'importantDates'
     ]
     const hash = {id: this.get('id')}
     for (const field of fields) {

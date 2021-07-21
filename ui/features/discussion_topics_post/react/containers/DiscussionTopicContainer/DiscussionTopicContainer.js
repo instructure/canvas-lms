@@ -28,20 +28,23 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
+import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
+import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
-import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
-  SUBSCRIBE_TO_DISCUSSION_TOPIC
+  SUBSCRIBE_TO_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_READ_STATE
 } from '../../../graphql/Mutations'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation} from 'react-apollo'
-import {isGraded, getSpeedGraderUrl, getEditUrl, getPeerReviewsUrl} from '../../utils'
+import {isGraded, getReviewLinkUrl, resolveAuthorRoles} from '../../utils'
 import {View} from '@instructure/ui-view'
+import {PostToolbarContainer} from '../PostToolbarContainer/PostToolbarContainer'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -54,6 +57,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const discussionTopicData = {
     _id: props.discussionTopic._id,
     authorName: props.discussionTopic?.author?.name || '',
+    authorId: props.discussionTopic?.author?.id,
     avatarUrl: props.discussionTopic?.author?.avatarUrl || '',
     message: props.discussionTopic?.message || '',
     permissions: props.discussionTopic?.permissions || {},
@@ -73,21 +77,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
 
   // TODO: Change this to the new canGrade permission.
   const hasAuthor = !!props.discussionTopic?.author
-  const canGrade = discussionTopicData?.permissions?.speedGrader || false
-  const canDelete = discussionTopicData?.permissions?.delete || false
   const canReply = discussionTopicData?.permissions?.reply
-  const canUpdate = discussionTopicData?.permissions?.update || false
-  const canPeerReview = discussionTopicData?.permissions?.peerReview
-  const canShowRubric = discussionTopicData?.permissions?.showRubric
-  const canAddRubric = discussionTopicData?.permissions?.addRubric
-  const canOpenForComments = discussionTopicData?.permissions?.openForComments
-  const canCloseForComments = discussionTopicData?.permissions?.closeForComments
-  const canCopyAndSendTo = discussionTopicData?.permissions?.copyAndSendTo
-  const canModerate = discussionTopicData?.permissions?.moderateForum
+  const canCloseForComments =
+    discussionTopicData?.permissions?.closeForComments && !props.discussionTopic?.rootTopic
+  const requiresInitialPost = props.discussionTopic.initialPostRequiredForCurrentUser
   const canUnpublish = props.discussionTopic.canUnpublish
-
-  const canSeeCommons =
-    discussionTopicData?.permissions?.manageContent && ENV.discussion_topic_menu_tools?.length > 0
 
   const canSeeMultipleDueDates = !!(
     discussionTopicData?.permissions?.readAsAdmin &&
@@ -211,23 +205,18 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   })
 
-  const onPublish = () => {
-    updateDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        published: !discussionTopicData.published
+  const [updateDiscussionReadState] = useMutation(UPDATE_DISCUSSION_READ_STATE, {
+    onCompleted: data => {
+      if (!data.updateDiscussionReadState.errors) {
+        setOnSuccess(I18n.t('You have successfully marked all as read.'))
+      } else {
+        setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
       }
-    })
-  }
-
-  const onToggleLocked = locked => {
-    updateDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        locked
-      }
-    })
-  }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
+    }
+  })
 
   const [subscribeToDiscussionTopic] = useMutation(SUBSCRIBE_TO_DISCUSSION_TOPIC, {
     onCompleted: data => {
@@ -245,15 +234,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
     }
   })
-
-  const onSubscribe = () => {
-    subscribeToDiscussionTopic({
-      variables: {
-        discussionTopicId: discussionTopicData._id,
-        subscribed: !discussionTopicData.subscribed
-      }
-    })
-  }
 
   const onSearchChange = value => {
     setSearchTerm(value)
@@ -283,6 +263,47 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   }
 
+  const onPublish = () => {
+    updateDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        published: !discussionTopicData.published
+      }
+    })
+  }
+
+  const onToggleLocked = locked => {
+    updateDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        locked
+      }
+    })
+  }
+
+  const onMarkAllAsRead = () => {
+    updateDiscussionReadState({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        read: true
+      }
+    })
+  }
+
+  const onSubscribe = () => {
+    subscribeToDiscussionTopic({
+      variables: {
+        discussionTopicId: discussionTopicData._id,
+        subscribed: !discussionTopicData.subscribed
+      }
+    })
+  }
+
+  /**
+   * TODO: Implement highlight logic
+   */
+  const highlightEntry = false
+
   return (
     <>
       <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
@@ -300,7 +321,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           />
         </View>
       </div>
-      {props.discussionTopic.initialPostRequiredForCurrentUser && (
+      {requiresInitialPost && (
         <AlertFRD renderCloseButtonLabel="Close">
           {I18n.t('You must post before seeing replies.')}
         </AlertFRD>
@@ -335,160 +356,99 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                   }
                   canSeeMultipleDueDates={canSeeMultipleDueDates}
                 />
+                {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                  assessmentRequest => (
+                    <PeerReview
+                      key={assessmentRequest._id}
+                      dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                        props.discussionTopic.assignment.peerReviews?.dueAt
+                      )}
+                      revieweeName={assessmentRequest.user.name}
+                      reviewLinkUrl={getReviewLinkUrl(
+                        ENV.course_id,
+                        props.discussionTopic.assignment._id,
+                        assessmentRequest.user._id
+                      )}
+                      workflowState={assessmentRequest.workflowState}
+                    />
+                  )
+                )}
               </View>
             )}
 
-            <Flex direction="column">
-              <Flex.Item>
-                <Flex
-                  direction="row"
-                  justifyItems="space-between"
-                  padding="medium small none"
-                  alignItems="start"
+            <Highlight isHighlighted={highlightEntry}>
+              <Flex direction="column">
+                <Flex.Item>
+                  <Flex
+                    direction="row"
+                    justifyItems="space-between"
+                    padding="medium small none"
+                    alignItems="start"
+                  >
+                    <Flex.Item shouldShrink shouldGrow>
+                      <PostMessage
+                        hasAuthor={hasAuthor}
+                        authorName={discussionTopicData.authorName}
+                        avatarUrl={discussionTopicData.avatarUrl}
+                        timingDisplay={discussionTopicData.postedAt}
+                        title={discussionTopicData.title}
+                        message={discussionTopicData.message}
+                        discussionRoles={resolveAuthorRoles(true, discussionTopicData.authorRoles)}
+                        postUtilities={
+                          <PostToolbarContainer
+                            canUnpublish={canUnpublish}
+                            canCloseForComments={canCloseForComments}
+                            deleteDiscussionTopic={deleteDiscussionTopic}
+                            discussionTopicData={discussionTopicData}
+                            requiresInitialPost={requiresInitialPost}
+                            onPublish={onPublish}
+                            onToggleLocked={onToggleLocked}
+                            onMarkAllAsRead={onMarkAllAsRead}
+                            onSubscribe={onSubscribe}
+                            setSendToOpen={setSendToOpen}
+                            setCopyToOpen={setCopyToOpen}
+                          />
+                        }
+                      >
+                        {canReply && (
+                          <Button
+                            color="primary"
+                            onClick={() => {
+                              setExpandedReply(!expandedReply)
+                            }}
+                            data-testid="discussion-topic-reply"
+                          >
+                            {I18n.t('Reply')}
+                          </Button>
+                        )}
+                      </PostMessage>
+                    </Flex.Item>
+                  </Flex>
+                </Flex.Item>
+                <Flex.Item
+                  shouldShrink
+                  shouldGrow
+                  padding={
+                    expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
+                  }
+                  overflowX="hidden"
+                  overflowY="hidden"
                 >
-                  <Flex.Item shouldShrink shouldGrow>
-                    <PostMessage
-                      hasAuthor={hasAuthor}
-                      authorName={discussionTopicData.authorName}
-                      avatarUrl={discussionTopicData.avatarUrl}
-                      timingDisplay={discussionTopicData.postedAt}
-                      title={discussionTopicData.title}
-                      message={discussionTopicData.message}
-                      discussionRoles={discussionTopicData.authorRoles}
-                    >
-                      {canReply && (
-                        <Button
-                          color="primary"
-                          onClick={() => {
-                            setExpandedReply(!expandedReply)
-                          }}
-                          data-testid="discussion-topic-reply"
-                        >
-                          {I18n.t('Reply')}
-                        </Button>
-                      )}
-                    </PostMessage>
-                  </Flex.Item>
-                  <Flex.Item>
-                    <PostToolbar
-                      onDelete={
-                        canDelete
-                          ? () => {
-                              if (
-                                // eslint-disable-next-line no-alert
-                                window.confirm(
-                                  I18n.t('Are you sure you want to delete this topic?')
-                                )
-                              ) {
-                                deleteDiscussionTopic({
-                                  variables: {
-                                    id: discussionTopicData._id
-                                  }
-                                })
-                              }
-                            }
-                          : null
+                  <DiscussionEdit
+                    show={expandedReply}
+                    onSubmit={text => {
+                      if (createDiscussionEntry) {
+                        createDiscussionEntry(text)
+                        setExpandedReply(false)
                       }
-                      repliesCount={discussionTopicData.replies}
-                      unreadCount={discussionTopicData.unread}
-                      onSend={
-                        canCopyAndSendTo
-                          ? () => {
-                              setSendToOpen(true)
-                            }
-                          : null
-                      }
-                      onCopy={
-                        canCopyAndSendTo
-                          ? () => {
-                              setCopyToOpen(true)
-                            }
-                          : null
-                      }
-                      onEdit={
-                        canUpdate
-                          ? () => {
-                              window.location.assign(
-                                getEditUrl(ENV.course_id, discussionTopicData._id)
-                              )
-                            }
-                          : null
-                      }
-                      onTogglePublish={canModerate ? onPublish : null}
-                      onToggleSubscription={onSubscribe}
-                      onOpenSpeedgrader={
-                        canGrade
-                          ? () => {
-                              window.location.assign(
-                                getSpeedGraderUrl(ENV.course_id, discussionTopicData.assignment._id)
-                              )
-                            }
-                          : null
-                      }
-                      onPeerReviews={
-                        canPeerReview
-                          ? () => {
-                              window.location.assign(
-                                getPeerReviewsUrl(ENV.course_id, discussionTopicData.assignment._id)
-                              )
-                            }
-                          : null
-                      }
-                      onShowRubric={canShowRubric ? () => {} : null}
-                      onAddRubric={canAddRubric ? () => {} : null}
-                      isPublished={discussionTopicData.published}
-                      canUnpublish={canUnpublish}
-                      isSubscribed={discussionTopicData.subscribed}
-                      onOpenForComments={
-                        canOpenForComments
-                          ? () => {
-                              onToggleLocked(false)
-                            }
-                          : null
-                      }
-                      onCloseForComments={
-                        canCloseForComments
-                          ? () => {
-                              onToggleLocked(true)
-                            }
-                          : null
-                      }
-                      onShareToCommons={
-                        canSeeCommons
-                          ? () => {
-                              window.location.assign(
-                                `${ENV.discussion_topic_menu_tools[0].base_url}&discussion_topics%5B%5D=${discussionTopicData._id}`
-                              )
-                            }
-                          : null
-                      }
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item
-                shouldShrink
-                shouldGrow
-                padding={
-                  expandedReply ? 'none medium medium xx-large' : 'none medium none xx-large'
-                }
-                overflowX="hidden"
-                overflowY="hidden"
-              >
-                <DiscussionEdit
-                  show={expandedReply}
-                  onSubmit={text => {
-                    if (createDiscussionEntry) {
-                      createDiscussionEntry(text)
+                    }}
+                    onCancel={() => {
                       setExpandedReply(false)
-                    }
-                  }}
-                  onCancel={() => {
-                    setExpandedReply(false)
-                  }}
-                />
-              </Flex.Item>
-            </Flex>
+                    }}
+                  />
+                </Flex.Item>
+              </Flex>
+            </Highlight>
           </View>
         </Flex.Item>
       </Flex>

@@ -1,0 +1,8 @@
+{
+  "name": "format-message-estree-util",
+  "version": "6.1.0",
+  "description": "A copy of format-message/format-message-estree-util to fix relative import issue",
+  "eslintIgnore": [
+    "*.js"
+  ]
+}

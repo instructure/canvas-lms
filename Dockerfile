@@ -9,7 +9,7 @@ LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
 ENV APP_HOME /usr/src/app/
-ENV RAILS_ENV production
+ENV RAILS_ENV development
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8

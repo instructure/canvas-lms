@@ -232,7 +232,7 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing,
-    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons
+    :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
@@ -2830,8 +2830,11 @@ class ApplicationController < ActionController::Base
       # See if the user has associations with any k5-enabled accounts
       k5_accounts = @domain_root_account.settings[:k5_accounts]
       return false if k5_accounts.blank?
-
-      @current_user.user_account_associations.shard(@domain_root_account).where(account_id: k5_accounts).exists?
+      enrolled_course_ids = @current_user.enrollments.shard(@domain_root_account).new_or_active_by_date.select(:course_id)
+      enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
+      enrolled_account_ids += @current_user.account_users.shard(@domain_root_account).active.pluck(:account_id)
+      enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
+      (enrolled_account_chain_ids & k5_accounts).any?
     else
       # Default to classic canvas if the user isn't logged in
       false
@@ -2845,14 +2848,16 @@ class ApplicationController < ActionController::Base
   end
 
   def k5_user?(check_disabled = true)
-    if @current_user
-      return false if check_disabled && k5_disabled?
-      # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+    RequestCache.cache('k5_user', @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
+      if @current_user
+        next false if check_disabled && k5_disabled?
+        # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
+        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @current_user, batched_keys: [:k5_user], expires_in: 1.hour) do
+          uncached_k5_user?
+        end
+      else
         uncached_k5_user?
       end
-    else
-      uncached_k5_user?
     end
   end
   helper_method :k5_user?
