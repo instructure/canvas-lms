@@ -109,7 +109,7 @@ module MessageBus
     begin
       producer = producer_for(namespace, topic_name)
       producer.send(message)
-    rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError => ex
+    rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError, ::Pulsar::Error::ServiceUnitNotReady => ex
       # We'll retry this exactly one time.  Sometimes
       # when a pulsar broker restarts, we have connections
       # that already knew about that broker get into a state where
@@ -223,7 +223,7 @@ module MessageBus
         # connections as politely as possible
         begin
           cached_object.close()
-        rescue Pulsar::Error::AlreadyClosed
+        rescue ::Pulsar::Error::AlreadyClosed
           Rails.logger.warn("evicting an already-closed pulsar topic client for #{path}")
         end
       end
@@ -246,6 +246,7 @@ module MessageBus
   def self.client
     return @client if @client
 
+    Bundler.require(:pulsar)
     conf_hash = self.config
     token_vault_path = conf_hash['PULSAR_TOKEN_VAULT_PATH']
     if token_vault_path.present?
@@ -289,7 +290,13 @@ module MessageBus
   def self.reset!
     close_and_reset_cached_connections!
     connection_mutex.synchronize do
-      @client&.close()
+      begin
+        @client&.close()
+      rescue ::Pulsar::Error::AlreadyClosed
+        # we need to make sure the client actually gets cleared out if the close fails,
+        # otherwise we'll keep trying to use it
+        Rails.logger.warn("while resetting, closing client was found to already be closed")
+      end
       @client = nil
     end
     @config_cache = nil
