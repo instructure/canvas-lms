@@ -29,7 +29,8 @@ class AddAnnotatableAttachmentIdToAssignments < ActiveRecord::Migration[5.2]
                   foreign_key: {
                     to_table: :attachments
                   },
-                  index: false
+                  index: false,
+                  if_not_exists: true
     add_index :assignments,
               :annotatable_attachment_id,
               where: 'annotatable_attachment_id IS NOT NULL',
