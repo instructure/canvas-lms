@@ -41,30 +41,30 @@ module AuthenticationMethods
     request.session[:user_id]
   end
 
-  def load_pseudonym_from_inst_id(token_string)
-    return false unless InstID.is_inst_id?(token_string)
+  def load_pseudonym_from_inst_access_token(token_string)
+    return false unless InstAccess::Token.is_token?(token_string)
 
     begin
-      inst_id = InstID.from_token(token_string)
-    rescue InstID::InvalidToken, # token didn't pass signature verification
-           InstID::TokenExpired # token passed signature verification, but is expired
+      token = InstAccess::Token.from_token_string(token_string)
+    rescue InstAccess::InvalidToken, # token didn't pass signature verification
+           InstAccess::TokenExpired # token passed signature verification, but is expired
       raise AccessTokenError
-    rescue InstID::ConfigError => exception
-      # InstID isn't configured. A human should fix that, but this method
+    rescue InstAccess::ConfigError => exception
+      # InstAccess isn't configured. A human should fix that, but this method
       # should recover gracefully.
-      Canvas::Errors.capture_exception(:inst_id, exception, :warn)
+      Canvas::Errors.capture_exception(:inst_access, exception, :warn)
       return true
     end
 
-    @current_user = User.find_by(uuid: inst_id.user_uuid)
+    @current_user = User.find_by(uuid: token.user_uuid)
     @current_pseudonym = SisPseudonym.for(
       @current_user, @domain_root_account, type: :implicit, require_sis: false
     )
     raise AccessTokenError unless @current_user && @current_pseudonym
 
-    if inst_id.masquerading_user_uuid && inst_id.masquerading_user_shard_id
-      Shard.lookup(inst_id.masquerading_user_shard_id).activate do
-        @real_current_user = User.find_by!(uuid: inst_id.masquerading_user_uuid)
+    if token.masquerading_user_uuid && token.masquerading_user_shard_id
+      Shard.lookup(token.masquerading_user_shard_id).activate do
+        @real_current_user = User.find_by!(uuid: token.masquerading_user_uuid)
         @real_current_pseudonym = SisPseudonym.for(
           @real_current_user, @domain_root_account, type: :implicit, require_sis: false
         )
@@ -78,7 +78,7 @@ module AuthenticationMethods
     return unless api_request?
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
-    return if load_pseudonym_from_inst_id(token_string)
+    return if load_pseudonym_from_inst_access_token(token_string)
 
     begin
       services_jwt = Canvas::Security::ServicesJwt.new(token_string)

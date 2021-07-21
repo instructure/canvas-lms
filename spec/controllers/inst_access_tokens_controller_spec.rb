@@ -19,8 +19,8 @@
 
 require_relative '../spec_helper'
 
-describe InstIdsController do
-  include_context "InstID setup"
+describe InstAccessTokensController do
+  include_context "InstAccess setup"
 
   let_once(:user){ user_with_pseudonym }
 
@@ -34,24 +34,24 @@ describe InstIdsController do
     context "with valid user session" do
       before(:each){ user_session(user) }
 
-      it "generates an InstID token for the requeting user" do
+      it "generates an InstAccess token for the requeting user" do
         post 'create', format: 'json'
         expect(response.status).to eq(201)
         token = JSON.parse(response.body)['token']
-        inst_id = decrypt_and_deserialize_token(token)
-        expect(inst_id.user_uuid).to eq(user.uuid)
+        access_token = decrypt_and_deserialize_token(token)
+        expect(access_token.user_uuid).to eq(user.uuid)
       end
 
       it "has the user's domain in the token" do
         post 'create', format: 'json'
         token = JSON.parse(response.body)['token']
-        inst_id = decrypt_and_deserialize_token(token)
-        expect(inst_id.canvas_domain).to eq("test.host")
+        access_token = decrypt_and_deserialize_token(token)
+        expect(access_token.canvas_domain).to eq("test.host")
       end
     end
 
-    it "doesn't allow using an InstID token to generate an InstID token" do
-      token = InstID.for_user(user.uuid).to_unencrypted_token
+    it "doesn't allow using an InstAccess token to generate an InstAccess token" do
+      token = InstAccess::Token.for_user(user.uuid).to_unencrypted_token_string
       request.headers['Authorization'] = "Bearer #{token}"
       get 'create', format: 'json'
       expect(response.status).to eq(403)
@@ -61,7 +61,7 @@ describe InstIdsController do
     context "with a services JWT" do
       include_context "JWT setup"
 
-      it "doesn't allow you to create an InstID" do
+      it "doesn't allow you to create an InstAccess token" do
         token = build_wrapped_token(user.global_id)
         @request.headers['Authorization'] = "Bearer #{token}"
         get 'create', format: 'json'

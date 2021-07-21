@@ -5,11 +5,11 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
-  spec.name          = "inst_id"
+  spec.name          = "inst_access"
   spec.version       = "0.1.0"
   spec.authors       = ["Michael Ziwisky"]
   spec.email         = ["mziwisky@instructure.com"]
-  spec.summary       = %q{Generation, parsing, and validation of Instructure identity (InstID) tokens}
+  spec.summary       = %q{Generation, parsing, and validation of Instructure access tokens}
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

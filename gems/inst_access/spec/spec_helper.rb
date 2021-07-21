@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'byebug'
-require 'inst_id'
+require 'inst_access'
 
 RSpec.configure do |config|
   config.order = 'random'

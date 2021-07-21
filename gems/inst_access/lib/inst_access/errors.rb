@@ -16,17 +16,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'inst_id'
+#
 
-configure_inst_id = proc do
-  creds = Rails.application.credentials.inst_id
-  if creds
-    InstID.configure(
-      signing_key: creds[:signing_key],
-      encryption_key: creds[:encryption_key]
-    )
-  end
+module InstAccess
+  class Error < StandardError; end
+
+  class ConfigError < Error; end
+  class InvalidToken < Error; end
+  class TokenExpired < Error; end
 end
-
-Rails.configuration.after_initialize(&configure_inst_id)
-Canvas::Reloader.on_reload(&configure_inst_id)

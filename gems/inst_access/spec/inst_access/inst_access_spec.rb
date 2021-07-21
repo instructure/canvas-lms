@@ -16,8 +16,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-RSpec.shared_context "InstID setup" do
+require 'spec_helper'
+
+describe InstAccess do
   let(:signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:encryption_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:signing_priv_key) { signing_keypair.to_s }
@@ -25,17 +28,20 @@ RSpec.shared_context "InstID setup" do
   let(:encryption_priv_key) { encryption_keypair.to_s }
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
-  around do |example|
-    InstID.with_config(
-      signing_key: signing_priv_key, encryption_key: encryption_pub_key
-    ) do
-      example.run
+  describe ".configure" do
+    it "blows up if you try to pass a private key for encryption" do
+      expect do
+        described_class.configure(
+          signing_key: signing_priv_key,
+          encryption_key: encryption_priv_key
+        )
+      end.to raise_error(ArgumentError)
     end
-  end
 
-  def decrypt_and_deserialize_token(token)
-    jws = JSON::JWT.decode(token, encryption_keypair)
-    jwt = JSON::JWT.decode(jws.plain_text, signing_keypair)
-    InstID.from_token(jwt.to_s)
+    it "blows up if you pass it something that isn't an RSA key" do
+      expect do
+        described_class.configure(signing_key: "asdf123")
+      end.to raise_error(ArgumentError)
+    end
   end
 end

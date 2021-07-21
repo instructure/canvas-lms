@@ -16,12 +16,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+require 'inst_access'
 
-class InstID
-  class Error < StandardError; end
-
-  class ConfigError < Error; end
-  class InvalidToken < Error; end
-  class TokenExpired < Error; end
+configure_inst_access = proc do
+  creds = Rails.application.credentials.inst_access
+  if creds
+    InstAccess.configure(
+      signing_key: creds[:signing_key],
+      encryption_key: creds[:encryption_key]
+    )
+  end
 end
+
+Rails.configuration.after_initialize(&configure_inst_access)
+Canvas::Reloader.on_reload(&configure_inst_access)

@@ -21,7 +21,7 @@
 require 'spec_helper'
 require 'timecop'
 
-describe InstID do
+describe InstAccess::Token do
   let(:signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:encryption_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:signing_priv_key) { signing_keypair.to_s }
@@ -29,31 +29,31 @@ describe InstID do
   let(:encryption_priv_key) { encryption_keypair.to_s }
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
-  let(:an_inst_id) { described_class.for_user('user-uuid') }
+  let(:a_token) { described_class.for_user('user-uuid') }
   let(:unencrypted_token) do
-    described_class.with_config(signing_key: signing_priv_key) do
-      an_inst_id.to_unencrypted_token
+    InstAccess.with_config(signing_key: signing_priv_key) do
+      a_token.to_unencrypted_token_string
     end
   end
 
-  describe ".is_inst_id?" do
+  describe ".is_token?" do
     it 'returns false for non-JWTs' do
-      expect(described_class.is_inst_id?('asdf1234stuff')).to eq(false)
+      expect(described_class.is_token?('asdf1234stuff')).to eq(false)
     end
 
     it "returns false for JWTs from a different issuer" do
       jwt = JSON::JWT.new(iss: 'bridge').to_s
-      expect(described_class.is_inst_id?(jwt)).to eq(false)
+      expect(described_class.is_token?(jwt)).to eq(false)
     end
 
-    it 'returns true for an InstID' do
-      expect(described_class.is_inst_id?(unencrypted_token)).to eq(true)
+    it 'returns true for an InstAccess token' do
+      expect(described_class.is_token?(unencrypted_token)).to eq(true)
     end
 
-    it 'returns true for an expired InstID' do
+    it 'returns true for an expired InstAccess token' do
       token = unencrypted_token # instantiate it to set the expiration
       Timecop.travel(3601) do
-        expect(described_class.is_inst_id?(token)).to eq(true)
+        expect(described_class.is_token?(token)).to eq(true)
       end
     end
   end
@@ -80,69 +80,69 @@ describe InstID do
   end
 
   context "without being configured" do
-    it "#to_token blows up" do
+    it "#to_token_string blows up" do
       id = described_class.for_user('user-uuid')
       expect do
-        id.to_token
-      end.to raise_error(InstID::ConfigError)
+        id.to_token_string
+      end.to raise_error(InstAccess::ConfigError)
     end
 
-    it ".from_token blows up" do
+    it ".from_token_string blows up" do
       expect do
-        described_class.from_token(unencrypted_token)
-      end.to raise_error(InstID::ConfigError)
+        described_class.from_token_string(unencrypted_token)
+      end.to raise_error(InstAccess::ConfigError)
     end
   end
 
   context "when configured only for signature verification" do
     around do |example|
-      described_class.with_config(signing_key: signing_pub_key) do
+      InstAccess.with_config(signing_key: signing_pub_key) do
         example.run
       end
     end
 
-    it "#to_token blows up" do
+    it "#to_token_string blows up" do
       id = described_class.for_user('user-uuid')
       expect do
-        id.to_token
-      end.to raise_error(InstID::ConfigError)
+        id.to_token_string
+      end.to raise_error(InstAccess::ConfigError)
     end
 
-    it ".from_token decodes the given token" do
-      id = described_class.from_token(unencrypted_token)
+    it ".from_token_string decodes the given token" do
+      id = described_class.from_token_string(unencrypted_token)
       expect(id.user_uuid).to eq('user-uuid')
     end
 
-    it ".from_token blows up if the token is expired" do
+    it ".from_token_string blows up if the token is expired" do
       token = unencrypted_token # instantiate it to set the expiration
       Timecop.travel(3601) do
         expect do
-          described_class.from_token(token)
-        end.to raise_error(InstID::TokenExpired)
+          described_class.from_token_string(token)
+        end.to raise_error(InstAccess::TokenExpired)
       end
     end
 
-    it ".from_token blows up if the token has a bad signature" do
+    it ".from_token_string blows up if the token has a bad signature" do
       # reconfigure with the wrong signing key so the signature doesn't match
-      described_class.with_config(signing_key: encryption_pub_key) do
+      InstAccess.with_config(signing_key: encryption_pub_key) do
         expect do
-          described_class.from_token(unencrypted_token)
-        end.to raise_error(InstID::InvalidToken)
+          described_class.from_token_string(unencrypted_token)
+        end.to raise_error(InstAccess::InvalidToken)
       end
     end
   end
 
   context "when configured for token generation" do
     around do |example|
-      described_class.with_config(
+      InstAccess.with_config(
         signing_key: signing_priv_key, encryption_key: encryption_pub_key
       ) do
         example.run
       end
     end
 
-    it "#to_token signs and encrypts the payload, returning a JWE" do
-      id_token = an_inst_id.to_token
+    it "#to_token_string signs and encrypts the payload, returning a JWE" do
+      id_token = a_token.to_token_string
       # JWEs have 5 base64-encoded sections, each separated by a dot
       expect(id_token).to match(/[\w-]+\.[\w-]+\.[\w-]+\.[\w-]+\.[\w-]+/)
       # normally another service would need to decrypt this, but we'll do it
@@ -152,26 +152,9 @@ describe InstID do
       expect(jwt[:sub]).to eq('user-uuid')
     end
 
-    it ".from_token still decodes the given token" do
-      id = described_class.from_token(unencrypted_token)
+    it ".from_token_string still decodes the given token" do
+      id = described_class.from_token_string(unencrypted_token)
       expect(id.user_uuid).to eq('user-uuid')
-    end
-  end
-
-  describe ".configure" do
-    it "blows up if you try to pass a private key for encryption" do
-      expect do
-        described_class.configure(
-          signing_key: signing_priv_key,
-          encryption_key: encryption_priv_key
-        )
-      end.to raise_error(ArgumentError)
-    end
-
-    it "blows up if you pass it something that isn't an RSA key" do
-      expect do
-        described_class.configure(signing_key: "asdf123")
-      end.to raise_error(ArgumentError)
     end
   end
 end

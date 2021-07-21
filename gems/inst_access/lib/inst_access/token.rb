@@ -18,13 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'active_support'
-require 'json/jwt'
-require 'inst_id/errors'
-require 'inst_id/config'
-
-class InstID
-  ISSUER = "instructure:inst_id".freeze
+module InstAccess
+class Token
+  ISSUER = "instructure:inst_access".freeze
   ENCRYPTION_ALGO = :'RSA-OAEP'
   ENCRYPTION_METHOD = :'A128CBC-HS256'
 
@@ -50,21 +46,21 @@ class InstID
     jwt_payload[:masq_shard]
   end
 
-  def to_token
-    jwe = to_jws.encrypt(self.class.config.encryption_key, ENCRYPTION_ALGO, ENCRYPTION_METHOD)
+  def to_token_string
+    jwe = to_jws.encrypt(InstAccess.config.encryption_key, ENCRYPTION_ALGO, ENCRYPTION_METHOD)
     jwe.to_s
   end
 
   # only for testing purposes, or to do local dev w/o running a decrypting
   # service.  unencrypted tokens should not be released into the wild!
-  def to_unencrypted_token
+  def to_unencrypted_token_string
     to_jws.to_s
   end
 
   private
 
   def to_jws
-    key = self.class.config.signing_key
+    key = InstAccess.config.signing_key
     raise ConfigError, "Private signing key needed to produce tokens" unless key.private?
 
     jwt = JSON::JWT.new(jwt_payload)
@@ -94,8 +90,8 @@ class InstID
     end
 
     # Takes an unencrypted (but signed) token string
-    def from_token(jws)
-      sig_key = config.signing_key
+    def from_token_string(jws)
+      sig_key = InstAccess.config.signing_key
       jwt = begin
               JSON::JWT.decode(jws, sig_key)
             rescue => e
@@ -106,34 +102,12 @@ class InstID
       new(jwt.to_hash)
     end
 
-    def is_inst_id?(string)
+    def is_token?(string)
       jwt = JSON::JWT.decode(string, :skip_verification)
       jwt[:iss] == ISSUER
     rescue
       false
     end
-
-    # signing_key is required.  if you are going to be producing (and therefore
-    # signing) tokens, this needs to be an RSA private key.  if you're just
-    # consuming tokens, it can be the RSA public key corresponding to the
-    # private key that signed them.
-    # encryption_key is only required if you are going to be producing tokens.
-    def configure(signing_key:, encryption_key: nil)
-      @config = Config.new(signing_key, encryption_key)
-    end
-
-    # set a configuration only for the duration of the given block, then revert
-    # it.  useful for testing.
-    def with_config(signing_key:, encryption_key: nil)
-      old_config = @config
-      configure(signing_key: signing_key, encryption_key: encryption_key)
-      yield
-    ensure
-      @config = old_config
-    end
-
-    def config
-      @config || raise(ConfigError, "InstID is not configured!")
-    end
   end
+end
 end

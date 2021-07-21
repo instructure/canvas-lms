@@ -20,7 +20,7 @@
 
 require 'openssl'
 
-class InstID
+module InstAccess
   class Config
     attr_reader :signing_key
 
