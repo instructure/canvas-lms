@@ -172,6 +172,54 @@ describe('pluginDefinition', () => {
     })
   })
 
+  describe('KeyUp', () => {
+    let which
+
+    const subject = () => editor.fire('KeyUp', {which, editor})
+
+    beforeEach(() => {
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      editor.setSelectedNode(editor.dom.select('#mentions-marker')[0])
+
+      global.postMessage = jest.fn()
+    })
+
+    describe('when the event is for a non-navigation key', () => {
+      beforeEach(() => (which = 69))
+
+      it('broadcasts the message', () => {
+        subject()
+        expect(global.postMessage).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    describe('when the event is for a navigation key', () => {
+      beforeEach(() => (which = KEY_CODES.up))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the marker node is not selected', () => {
+      beforeEach(() => editor.selection.select(editor.dom.select('#test')[0]))
+
+      it('does not broadcast a message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('KeyDown', () => {
     let which, preventDefault
 

@@ -18,7 +18,7 @@
 
 import {makeBodyEditable} from '../contentEditable'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown} from '../events'
+import {onSetContent, onKeyDown, onMouseDown, onKeyUp} from '../events'
 
 jest.mock('../contentEditable', () => ({
   makeBodyEditable: jest.fn()
@@ -201,6 +201,56 @@ describe('events', () => {
         })
 
         examplesForMentionsNavigationEvents()
+      })
+    })
+  })
+
+  describe('onKeyUp()', () => {
+    let event
+
+    const subject = () => onKeyUp(event)
+
+    beforeEach(() => {
+      event = {
+        editor,
+        which: 1
+      }
+
+      global.postMessage = jest.fn()
+
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+      editor.setSelectedNode(editor.dom.select('#mentions-marker')[0])
+    })
+
+    it('broadcasts the message to the tiny and main windows', () => {
+      subject()
+      expect(global.postMessage).toHaveBeenCalledTimes(2)
+      expect(global.postMessage).toHaveBeenCalledWith(
+        {
+          messageType: 'mentions.InputChangeEvent',
+          value: 'wes'
+        },
+        'https://canvas.instructure.com'
+      )
+    })
+
+    describe('when the mentions marker is not the current node', () => {
+      beforeEach(() => {
+        editor.selection.select(editor.dom.select('#test')[0])
+      })
+
+      it('does not broadcast the message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+        expect(global.postMessage).not.toHaveBeenCalled()
       })
     })
   })

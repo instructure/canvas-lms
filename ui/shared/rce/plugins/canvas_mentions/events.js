@@ -18,7 +18,7 @@
 
 import {makeBodyEditable} from './contentEditable'
 import {MARKER_SELECTOR, MARKER_ID, KEY_CODES} from './constants'
-import broadcastMessage, {navigationMessage} from './broadcastMessage'
+import broadcastMessage, {inputChangeMessage, navigationMessage} from './broadcastMessage'
 
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
@@ -40,9 +40,13 @@ function shouldRestoreFromKeyEvent(event, editor) {
 function isMentionsNavigationEvent(event, editor) {
   const {which} = event
 
-  if (editor.selection.getNode().id !== MARKER_ID) return false
+  if (!inMentionsMarker(editor)) return false
 
   return which === KEY_CODES.up || which === KEY_CODES.down
+}
+
+function inMentionsMarker(editor) {
+  return editor.selection.getNode().id === MARKER_ID
 }
 
 /**
@@ -81,7 +85,7 @@ export const onKeyDown = e => {
   //
   // Is the current node already outside the
   // mentions marker?
-  if (editor.selection.getNode().id !== MARKER_ID || shouldRestoreFromKeyEvent(e, editor)) {
+  if (!inMentionsMarker(editor) || shouldRestoreFromKeyEvent(e, editor)) {
     makeBodyEditable(editor, MARKER_SELECTOR)
   }
 
@@ -93,6 +97,30 @@ export const onKeyDown = e => {
 
     // Broadcast the event to mentions components
     broadcastMessage(navigationMessage(e), [editor.getWin(), window])
+  }
+}
+
+/**
+ * Handles key up events
+ *
+ * If the current node is the mentions marker,
+ * this function will emit a "input change"
+ * message
+ *
+ * @param Event e
+ */
+export const onKeyUp = e => {
+  const editor = e.editor || tinymce.activeEditor
+
+  // Navigation messages are broadcast on key down.
+  // Prevent message duplication by returning early
+  if (isMentionsNavigationEvent(e, editor)) return
+
+  if (inMentionsMarker(editor)) {
+    broadcastMessage(inputChangeMessage(editor.selection.getNode().innerHTML), [
+      editor.getWin(),
+      window
+    ])
   }
 }
 

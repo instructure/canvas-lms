@@ -19,7 +19,9 @@
 export const MARKER_ID = 'mentions-marker'
 export const MARKER_SELECTOR = `span#${MARKER_ID}`
 export const TRUSTED_MESSAGE_ORIGIN = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+
 export const NAVIGATION_MESSAGE = 'mentions.NavigationEvent'
+export const INPUT_CHANGE_MESSAGE = 'mentions.InputChangeEvent'
 
 export const KEY_CODES = {
   backspace: 8,

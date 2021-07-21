@@ -16,12 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {KEY_NAMES, TRUSTED_MESSAGE_ORIGIN, NAVIGATION_MESSAGE} from './constants'
+import {
+  KEY_NAMES,
+  TRUSTED_MESSAGE_ORIGIN,
+  NAVIGATION_MESSAGE,
+  INPUT_CHANGE_MESSAGE
+} from './constants'
 
+/**
+ * Creates an object representing a navigation event
+ *
+ * up/down arrows are examples of key presses that
+ * would broadcast this type of event
+ *
+ * @param Event event
+ * @returns The navigation message object
+ */
 export function navigationMessage(event) {
   return {messageType: NAVIGATION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
 }
 
+/**
+ * Creates an object representing an input change
+ *
+ * Changing the text after the "@" symbol is an
+ * event that would broadcast this type of event
+ *
+ * @param String value - the current value of the text after @
+ * @returns The input change message object
+ */
+export function inputChangeMessage(value) {
+  return {messageType: INPUT_CHANGE_MESSAGE, value}
+}
+
+/**
+ * Sends the specified message to each given window
+ * via postMessage.
+ *
+ * Only broadcasts to the window if that window's origin
+ * matches that of the current Canvas page.
+ *
+ * @param Object message
+ * @param Object[] windows
+ */
 function broadcastMessage(message, windows) {
   windows.forEach(w => {
     w.postMessage(message, TRUSTED_MESSAGE_ORIGIN)

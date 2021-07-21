@@ -20,7 +20,7 @@
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
 import {makeMarkerEditable} from './contentEditable'
-import {onKeyDown, onSetContent, onMouseDown} from './events'
+import {onKeyDown, onKeyUp, onSetContent, onMouseDown} from './events'
 import {MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
@@ -52,6 +52,7 @@ export const pluginDefinition = {
     editor.on('input', onInputChange)
     editor.on('SetContent', onSetContent)
     editor.on('KeyDown', onKeyDown)
+    editor.on('KeyUp', onKeyUp)
     editor.on('MouseDown', onMouseDown)
   }
 }
