@@ -219,9 +219,9 @@ describe('FindOutcomesView', () => {
     expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
-  it('disables "Add All Outcomes" button if the search is present', () => {
-    const {getByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
-    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  it('hides "Add All Outcomes" button if search string is present', () => {
+    const {queryByText} = render(<FindOutcomesView {...defaultProps({searchString: 'test'})} />)
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
   it('shows large loader if data is loading and outcomes are missing/undefined', () => {

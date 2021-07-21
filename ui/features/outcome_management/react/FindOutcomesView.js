@@ -65,7 +65,15 @@ const FindOutcomesView = ({
       >
         <Flex.Item
           as="div"
-          padding={isMobileView ? 'x-small 0' : isRootGroup ? '0' : 'x-small medium x-small 0'}
+          padding={
+            isMobileView
+              ? 'x-small 0'
+              : isRootGroup
+              ? 'x-small 0'
+              : searchString.length === 0
+              ? 'x-small medium x-small 0'
+              : 'x-small 0'
+          }
         >
           <Text size="medium">
             {I18n.t(
@@ -79,13 +87,9 @@ const FindOutcomesView = ({
             )}
           </Text>
         </Flex.Item>
-        {!isRootGroup && (
+        {searchString.length === 0 && !isRootGroup && (
           <Flex.Item>
-            <Button
-              margin="x-small 0"
-              interaction={enabled && !searchString ? 'enabled' : 'disabled'}
-              onClick={onAddAllHandler}
-            >
+            <Button interaction={enabled ? 'enabled' : 'disabled'} onClick={onAddAllHandler}>
               {I18n.t('Add All Outcomes')}
             </Button>
           </Flex.Item>
