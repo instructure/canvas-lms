@@ -22,10 +22,6 @@ import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
 import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRavenConsoleLoggingPlugin.js'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
-import BrandableCSS from '@canvas/brandable-css'
-
-BrandableCSS.loadStylesheetForJST = () => {}
-BrandableCSS.loadStylesheet = () => {}
 
 filterUselessConsoleMessages(console)
 
