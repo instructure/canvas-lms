@@ -343,7 +343,7 @@ class AssetUserAccessLog
         CanvasErrors.capture_exception(:aua_log_compaction, e, :info)
         early_exit = true
         break
-      rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError => ex
+      rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError, ::Pulsar::Error::AlreadyClosed => ex
         connect_attempts += 1
         CanvasErrors.capture_exception(:aua_log_compaction, ex, :warn)
         if connect_attempts >= 2
