@@ -18,7 +18,7 @@
 
 import {makeBodyEditable} from '../contentEditable'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown, onKeyUp} from '../events'
+import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onActiveDescendantChange} from '../events'
 import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
@@ -295,6 +295,44 @@ describe('events', () => {
       it('does not make the body editable', () => {
         subject()
         expect(makeBodyEditable).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('onActiveDescendantChange()', () => {
+    let activeDescendant
+
+    const subject = () => onActiveDescendantChange(activeDescendant, editor)
+
+    beforeEach(() => {
+      activeDescendant = '#foo'
+
+      editor.setContent(
+        `<div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+          </span>
+        </div>`
+      )
+
+      editor.selection.select(editor.dom.select('#mentions-marker')[0])
+    })
+
+    it('sets the active descendant attribute', () => {
+      subject()
+      expect(
+        editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+      ).toEqual('#foo')
+    })
+
+    describe('when the active descendant is blank', () => {
+      beforeEach(() => (activeDescendant = undefined))
+
+      it('sets the active descendant attribute to an empty string', () => {
+        subject()
+        expect(
+          editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+        ).toEqual('')
       })
     })
   })

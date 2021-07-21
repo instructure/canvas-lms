@@ -150,3 +150,18 @@ export const onMouseDown = e => {
     makeBodyEditable(editor, MARKER_SELECTOR)
   }
 }
+
+/**
+ * Sets the ARIA Active Descendant attribute
+ * of the mentions marker to the given value
+ *
+ * @param String activeDescendant
+ * @param Editor ed
+ */
+export const onActiveDescendantChange = (activeDescendant, ed) => {
+  const editor = ed || tinymce.activeEditor
+
+  editor.dom
+    .select(MARKER_SELECTOR)[0]
+    ?.setAttribute('aria-activedescendant', activeDescendant || '')
+}
