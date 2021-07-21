@@ -36,7 +36,7 @@ import LabeledRceField from '@canvas/outcomes/react/LabeledRceField'
 
 const titleValidator = composeValidators(requiredValidator, maxLengthValidator(255))
 
-const EditGroupForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
+const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
   return (
     <Form
       onSubmit={onSubmit}
@@ -98,7 +98,7 @@ const EditGroupForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
   )
 }
 
-EditGroupForm.propTypes = {
+GroupEditForm.propTypes = {
   initialValues: PropTypes.shape({
     title: PropTypes.string,
     description: PropTypes.string
@@ -108,4 +108,4 @@ EditGroupForm.propTypes = {
   onCloseHandler: PropTypes.func.isRequired
 }
 
-export default EditGroupForm
+export default GroupEditForm

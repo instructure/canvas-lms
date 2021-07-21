@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import EditGroupModal from './EditGroupModal'
+import GroupEditModal from './GroupEditModal'
 
 export default {
-  title: 'Examples/Outcomes/EditGroupModal',
-  component: EditGroupModal,
+  title: 'Examples/Outcomes/GroupEditModal',
+  component: GroupEditModal,
   args: {
     contextType: 'Account',
     contextId: '1',
@@ -34,7 +34,7 @@ export default {
   }
 }
 
-const Template = args => <EditGroupModal {...args} />
+const Template = args => <GroupEditModal {...args} />
 
 export const Default = Template.bind({})
 

@@ -19,14 +19,14 @@
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import useRCE from '../../hooks/useRCE'
-import EditGroupForm from '../EditGroupForm'
+import GroupEditForm from '../GroupEditForm'
 import {focusChange} from './helpers'
 
 jest.useFakeTimers()
 jest.mock('../../hooks/useRCE')
 useRCE.mockReturnValue([() => {}, () => 'Updated description', null, null, null])
 
-describe('EditGroupForm', () => {
+describe('GroupEditForm', () => {
   let onCloseHandler, onSubmit
   const defaultProps = (props = {}) => ({
     isOpen: true,
@@ -41,7 +41,7 @@ describe('EditGroupForm', () => {
   })
 
   it('renders form with empty data', () => {
-    const {getByLabelText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByLabelText} = render(<GroupEditForm {...defaultProps()} />)
     expect(getByLabelText('Group Name')).toBeInTheDocument()
     expect(getByLabelText('Group Description')).toBeInTheDocument()
   })
@@ -51,12 +51,12 @@ describe('EditGroupForm', () => {
       title: 'The Group Name',
       description: 'The Group Description'
     }
-    const {getByDisplayValue} = render(<EditGroupForm {...defaultProps({initialValues})} />)
+    const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     expect(getByDisplayValue('The Group Name')).toBeInTheDocument()
   })
 
   it('calls onSubmit when submission', () => {
-    const {getByLabelText, getByText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps()} />)
     focusChange(getByLabelText('Group Name'), 'Group Name value')
     fireEvent.click(getByText('Save'))
     expect(onSubmit.mock.calls[0][0]).toEqual({
@@ -66,7 +66,7 @@ describe('EditGroupForm', () => {
   })
 
   it('disables submission if form is invalid', () => {
-    const {getByText, getByLabelText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByText, getByLabelText} = render(<GroupEditForm {...defaultProps()} />)
     focusChange(getByLabelText('Group Name'), 'a'.repeat(256))
     expect(getByText('Save').closest('button')).toBeDisabled()
   })
@@ -76,7 +76,7 @@ describe('EditGroupForm', () => {
       title: 'The Group Name',
       description: 'The Group Description'
     }
-    const {getByText, getByLabelText} = render(<EditGroupForm {...defaultProps({initialValues})} />)
+    const {getByText, getByLabelText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     expect(getByText('Save').closest('button')).toBeDisabled()
     focusChange(getByLabelText('Group Name'), 'New Group Name')
     expect(getByText('Save').closest('button')).toBeEnabled()
@@ -85,13 +85,13 @@ describe('EditGroupForm', () => {
   })
 
   it('enables submission if form is valid', () => {
-    const {getByText, getByLabelText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByText, getByLabelText} = render(<GroupEditForm {...defaultProps()} />)
     focusChange(getByLabelText('Group Name'), 'Group Name value')
     expect(getByText('Save').closest('button')).toBeEnabled()
   })
 
   it('validates name', () => {
-    const {getByLabelText, queryByText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByLabelText, queryByText} = render(<GroupEditForm {...defaultProps()} />)
     const name = getByLabelText('Group Name')
     focusChange(name, '')
     expect(queryByText('This field is required')).toBeInTheDocument()
@@ -100,24 +100,24 @@ describe('EditGroupForm', () => {
   })
 
   it('shows modal if open prop true', () => {
-    const {getByText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByText} = render(<GroupEditForm {...defaultProps()} />)
     expect(getByText('Close')).toBeInTheDocument()
   })
 
   it('does not show modal if open prop false', () => {
-    const {queryByText} = render(<EditGroupForm {...defaultProps({isOpen: false})} />)
+    const {queryByText} = render(<GroupEditForm {...defaultProps({isOpen: false})} />)
     expect(queryByText('Close')).not.toBeInTheDocument()
   })
 
   it('calls onCloseHandler on Close button click', () => {
-    const {getByText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByText} = render(<GroupEditForm {...defaultProps()} />)
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)
     expect(onCloseHandler).toHaveBeenCalledTimes(1)
   })
 
   it('calls onCloseHandler on Cancel button click', () => {
-    const {getByText} = render(<EditGroupForm {...defaultProps()} />)
+    const {getByText} = render(<GroupEditForm {...defaultProps()} />)
     const cancelBtn = getByText('Cancel')
     fireEvent.click(cancelBtn)
     expect(onCloseHandler).toHaveBeenCalledTimes(1)

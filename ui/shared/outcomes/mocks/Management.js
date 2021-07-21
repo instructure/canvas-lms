@@ -23,14 +23,11 @@ import {
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
   UPDATE_LEARNING_OUTCOME,
   DELETE_OUTCOME_LINKS,
-  MOVE_OUTCOME_LINKS
+  MOVE_OUTCOME_LINKS,
+  UPDATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
-export const accountMocks = ({
-  childGroupsCount = 10,
-  outcomesCount = 2,
-  accountId = '1'
-} = {}) => [
+export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountId = '1'} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -57,7 +54,7 @@ export const accountMocks = ({
                 _id: (100 + i).toString(),
                 outcomesCount,
                 childGroupsCount,
-                title: `Account folder ${i}`,
+                title: `Account folder ${i}`
               }))
             }
           }
@@ -67,11 +64,7 @@ export const accountMocks = ({
   }
 ]
 
-export const courseMocks = ({
-  childGroupsCount = 1,
-  outcomesCount = 2,
-  courseId = '2'
-} = {}) => [
+export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId = '2'} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -98,7 +91,7 @@ export const courseMocks = ({
                 _id: (200 + i).toString(),
                 outcomesCount: 2,
                 childGroupsCount: 10,
-                title: `Course folder ${i}`,
+                title: `Course folder ${i}`
               }))
             }
           }
@@ -136,7 +129,7 @@ export const groupMocks = ({
               _id: (childGroupOffset + i).toString(),
               outcomesCount: 2,
               childGroupsCount: 5,
-              title: `Group ${groupId} folder ${i}`,
+              title: `Group ${groupId} folder ${i}`
             }))
           }
         }
@@ -1112,6 +1105,108 @@ export const moveOutcomeMock = ({
           groupId,
           outcomeLinkIds
         }
+      }
+    },
+    result
+  }
+}
+
+export const updateOutcomeGroupMock = ({
+  id = '100',
+  title = 'Updated title',
+  description = 'Updated description',
+  vendorGuid = 'A001',
+  parentOutcomeGroupId = '101',
+  parentOutcomeGroupTitle = 'Parent Outcome Group',
+  failResponse = false,
+  failMutation = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      updateLearningOutcomeGroup: {
+        learningOutcomeGroup: {
+          _id: id,
+          title,
+          description,
+          vendorGuid,
+          parentOutcomeGroup: {
+            _id: parentOutcomeGroupId,
+            title: parentOutcomeGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'LearningOutcomeGroup'
+        },
+        errors: null,
+        __typename: 'UpdateLearningOutcomeGroupPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: id,
+        message: 'Network error',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutation = {
+    data: {
+      updateLearningOutcomeGroup: {
+        __typename: 'UpdateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: 'Mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      updateLearningOutcomeGroup: {
+        __typename: 'UpdateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  const input = {id}
+  if (title) input.title = title
+  if (description) input.description = description
+  if (vendorGuid) input.vendorGuid = vendorGuid
+  if (parentOutcomeGroupId) input.parentOutcomeGroupId = parentOutcomeGroupId
+
+  return {
+    request: {
+      query: UPDATE_LEARNING_OUTCOME_GROUP,
+      variables: {
+        input
       }
     },
     result

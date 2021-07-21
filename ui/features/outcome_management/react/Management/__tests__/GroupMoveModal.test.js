@@ -19,11 +19,10 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
-import {accountMocks, smallOutcomeTree} from '@canvas/outcomes/mocks/Management'
+import {smallOutcomeTree, updateOutcomeGroupMock} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import GroupMoveModal from '../GroupMoveModal'
-import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -36,10 +35,10 @@ describe('GroupMoveModal', () => {
 
   const defaultProps = (props = {}) => ({
     isOpen: true,
-    onCloseHandler: onCloseHandlerMock,
     groupId: '100',
     groupTitle: 'Account folder 0',
     parentGroupId: '0',
+    onCloseHandler: onCloseHandlerMock,
     ...props
   })
 
@@ -59,7 +58,7 @@ describe('GroupMoveModal', () => {
       contextType = 'Account',
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
-      mocks = accountMocks({childGroupsCount: 0})
+      mocks = smallOutcomeTree()
     } = {}
   ) => {
     return realRender(
@@ -106,9 +105,7 @@ describe('GroupMoveModal', () => {
   })
 
   it('disables the move button when the selected group is equal to the group to be moved', async () => {
-    const {getByText} = render(<GroupMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
-    })
+    const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
@@ -119,10 +116,7 @@ describe('GroupMoveModal', () => {
 
   it('disables the move button when the selected parent group is equal to the parent of the group to be moved', async () => {
     const {getByText} = render(
-      <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />,
-      {
-        mocks: [...smallOutcomeTree()]
-      }
+      <GroupMoveModal {...defaultProps({parentGroupId: '100', groupId: '400'})} />
     )
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -133,9 +127,7 @@ describe('GroupMoveModal', () => {
   })
 
   it('enables the move button when a valid group is selected', async () => {
-    const {getByText} = render(<GroupMoveModal {...defaultProps({groupId: '100'})} />, {
-      mocks: [...smallOutcomeTree()]
-    })
+    const {getByText} = render(<GroupMoveModal {...defaultProps({groupId: '100'})} />)
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
     await act(async () => jest.runAllTimers())
@@ -145,9 +137,15 @@ describe('GroupMoveModal', () => {
   })
 
   it('shows successful flash message when moving a group succeeds', async () => {
-    jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [
+        ...smallOutcomeTree(),
+        updateOutcomeGroupMock({
+          title: null,
+          description: null,
+          vendorGuid: null
+        })
+      ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -155,8 +153,6 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', '101')
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '"Account folder 0" has been moved to "Account folder 1".',
@@ -165,11 +161,16 @@ describe('GroupMoveModal', () => {
   })
 
   it('shows custom error flash message when moving a group fails', async () => {
-    jest
-      .spyOn(api, 'moveOutcomeGroup')
-      .mockImplementation(() => Promise.reject(new Error('Network error')))
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [
+        ...smallOutcomeTree(),
+        updateOutcomeGroupMock({
+          title: null,
+          description: null,
+          vendorGuid: null,
+          failResponse: true
+        })
+      ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -178,18 +179,48 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', '101')
+    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      message: 'An error occurred moving group "Account folder 0": GraphQL error: Network error',
+      type: 'error'
+    })
+  })
+
+  it('shows flash error message when move group mutation fails', async () => {
+    const {getByText} = render(<GroupMoveModal {...defaultProps()} />, {
+      mocks: [
+        ...smallOutcomeTree(),
+        updateOutcomeGroupMock({
+          title: null,
+          description: null,
+          vendorGuid: null,
+          failMutation: true
+        })
+      ]
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 1'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Account folder 0": Network error',
+      message: 'An error occurred moving group "Account folder 0": Mutation failed',
       type: 'error'
     })
   })
 
   it('shows default error flash message when moving a group fails and error message is empty', async () => {
-    jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.reject(new Error()))
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [
+        ...smallOutcomeTree(),
+        updateOutcomeGroupMock({
+          title: null,
+          description: null,
+          vendorGuid: null,
+          failMutationNoErrMsg: true
+        })
+      ]
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -197,8 +228,6 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', '101')
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred moving group "Account folder 0"',

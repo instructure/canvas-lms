@@ -29,7 +29,6 @@ import {
   groupDetailMocks,
   groupMocks
 } from '@canvas/outcomes/mocks/Management'
-import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/rce/RichContentEditor')
@@ -225,85 +224,6 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(getByText('Root course folder'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
-  })
-
-  describe('Moving a group', () => {
-    it('shows move group modal if move option from group menu is selected', async () => {
-      const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
-    })
-
-    it('shows successful flash message when moving a group succeeds', async () => {
-      // API mock
-      jest.spyOn(api, 'moveOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
-
-      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Group Tree Browser
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Outcome Group Kebab Menu
-      fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(within(getByRole('menu')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // Move Modal
-      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // moveOutcomeGroup API call & success flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Group 200" has been moved to "Course folder 1".',
-        type: 'success'
-      })
-    })
-
-    it('shows error flash message when moving a group fails', async () => {
-      // API mock
-      jest
-        .spyOn(api, 'moveOutcomeGroup')
-        .mockImplementation(() => Promise.reject(new Error('Network error')))
-
-      const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Group Tree Browser
-      fireEvent.click(getByText('Course folder 0'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // OutcomeManagementPanel Outcome Group Kebab Menu
-      fireEvent.click(getByText('Outcome Group Menu'))
-      fireEvent.click(within(getByRole('menu')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // Move Modal
-      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
-      await act(async () => jest.runOnlyPendingTimers())
-      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
-      await act(async () => jest.runOnlyPendingTimers())
-      // moveOutcomeGroup API call & error flash alert
-      expect(api.moveOutcomeGroup).toHaveBeenCalledWith('Course', '2', '200', '201')
-      await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred moving group "Group 200": Network error',
-        type: 'error'
-      })
-    })
   })
 
   it('selects/unselects outcome via checkbox', async () => {
@@ -530,5 +450,31 @@ describe('OutcomeManagementPanel', () => {
       })
       expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
+  })
+
+  it('shows move group modal if move option from group menu is selected', async () => {
+    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Move'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
+  })
+
+  it('shows edit group modal if edit option from group menu is selected', async () => {
+    const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByText('Edit Group')).toBeInTheDocument()
   })
 })

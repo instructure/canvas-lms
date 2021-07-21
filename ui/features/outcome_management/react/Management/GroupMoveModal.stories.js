@@ -30,8 +30,6 @@ export default {
     isOpen: true,
     groupId: '100',
     groupTitle: 'Outcome Group 1',
-    contextId: '1',
-    contextType: 'Account',
     parentGroupId: '0'
   },
   argTypes: {

@@ -36,7 +36,7 @@ import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useSelectedOutcomes from '@canvas/outcomes/react/hooks/useSelectedOutcomes'
 import GroupMoveModal from './GroupMoveModal'
-import EditGroupModal from './EditGroupModal'
+import GroupEditModal from './GroupEditModal'
 import GroupDescriptionModal from './GroupDescriptionModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
@@ -319,7 +319,7 @@ const OutcomeManagementPanel = () => {
           )}
           {group && (
             <>
-              <EditGroupModal
+              <GroupEditModal
                 outcomeGroup={group}
                 isOpen={isGroupEditModalOpen}
                 onCloseHandler={closeGroupEditModal}
