@@ -50,7 +50,6 @@
     background: #eee;
     font-weight: bold;
     color: #444;
-    text-shadow: 0 1px 1px #f6f6f6;
     text-decoration: none;
     @include vertical-gradient(#fdfdfd, #eeeeee);
     .ui-listview-text{
@@ -68,7 +67,6 @@
       font-weight: bold;
       color:          #101010;
       text-decoration: none;
-      text-shadow: 0 1px 1px  #fff;
       @include vertical-gradient(#ededed, #dadada);
       a{ text-decoration: none;}
     }
@@ -78,11 +76,16 @@
       font-weight: bold;
       color:          #fff;
       cursor: pointer;
-      text-shadow: 0 -1px 1px #999;
       text-decoration: none;
       @include vertical-gradient(#ccc, #aaa);
       outline: none;
-      a { color: #fff; }
+      a {
+        color: #444;
+        &:focus-visible {
+          outline: $ic-color-dark solid 2px;
+          outline-offset: 0.125rem;
+        }
+      }
     }
     .ui-listview-right {
       display: block;
@@ -99,7 +102,6 @@
       background: #5e87b0;
       color: #747575;
       font-weight: normal;
-      text-shadow: 0 -1px 1px #cce6d6;
       @include vertical-gradient(#c8e0d1, #b3cbbc);
     }
   }
