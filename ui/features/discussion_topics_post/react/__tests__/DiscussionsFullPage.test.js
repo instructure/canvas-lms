@@ -375,7 +375,7 @@ describe('DiscussionFullPage', () => {
       setOnSuccess.mockClear()
     })
 
-    it('should be able to post a reply to an entry', async () => {
+    it.skip('should be able to post a reply to an entry', async () => {
       const {findByText, findByTestId, queryByTestId} = setup()
 
       const replyButton = await findByTestId('threading-toolbar-reply')
@@ -425,7 +425,7 @@ describe('DiscussionFullPage', () => {
       await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
     })
 
-    it('should show reply button in isolated view when search term is present', async () => {
+    it.skip('should show reply button in isolated view when search term is present', async () => {
       const container = setup()
       fireEvent.change(await container.findByTestId('search-filter'), {
         target: {value: 'a'}
@@ -435,7 +435,7 @@ describe('DiscussionFullPage', () => {
       await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
     })
 
-    it('go to topic button should clear search term', async () => {
+    it.skip('go to topic button should clear search term', async () => {
       const container = setup()
       fireEvent.change(await container.findByTestId('search-filter'), {
         target: {value: 'a'}
