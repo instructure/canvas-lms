@@ -92,7 +92,9 @@ const OutcomeManagementPanel = () => {
     queryCollections,
     rootId,
     selectedGroupId,
-    selectedParentGroupId
+    selectedParentGroupId,
+    addNewGroup,
+    removeGroup
   } = useManageOutcomes('OutcomeManagementPanel')
 
   const {group, loading, loadMore} = useGroupDetail({
@@ -130,6 +132,10 @@ const OutcomeManagementPanel = () => {
   const onCloseOutcomeEditModal = () => {
     closeOutcomeEditModal()
     setSelectedOutcome(null)
+  }
+  const onSucessGroupRemove = (groupId, parentGroupId) => {
+    queryCollections({id: parentGroupId})
+    removeGroup(groupId, parentGroupId)
   }
 
   const groupMenuHandler = useCallback(
@@ -284,6 +290,8 @@ const OutcomeManagementPanel = () => {
                 groupId={selectedGroupId}
                 isOpen={isGroupRemoveModalOpen}
                 onCloseHandler={closeGroupRemoveModal}
+                onCollectionToggle={queryCollections}
+                onSuccess={onSucessGroupRemove}
               />
               {!loading && (
                 <GroupMoveModal
@@ -292,6 +300,7 @@ const OutcomeManagementPanel = () => {
                   parentGroupId={selectedParentGroupId}
                   isOpen={isGroupMoveModalOpen}
                   onCloseHandler={closeGroupMoveModal}
+                  onGroupCreated={addNewGroup}
                 />
               )}
               {selectedOutcome && (
@@ -312,6 +321,7 @@ const OutcomeManagementPanel = () => {
                     isOpen={isOutcomeMoveModalOpen}
                     onCloseHandler={onCloseOutcomeMoveModal}
                     onCleanupHandler={onCloseOutcomeMoveModal}
+                    onGroupCreated={addNewGroup}
                   />
                 </>
               )}

@@ -37,11 +37,13 @@ describe('TargetGroupSelector', () => {
   let cache
   let setTargetGroupMock
   let showFlashAlertSpy
+  let onGroupCreatedMock
 
   const defaultProps = (props = {}) => ({
     groupId: '100',
     parentGroupId: '1',
     setTargetGroup: setTargetGroupMock,
+    onGroupCreated: onGroupCreatedMock,
     ...props
   })
 
@@ -49,6 +51,7 @@ describe('TargetGroupSelector', () => {
     cache = createCache()
     setTargetGroupMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    onGroupCreatedMock = jest.fn()
   })
 
   afterEach(() => {
@@ -154,7 +157,14 @@ describe('TargetGroupSelector', () => {
 
   describe('when the create new group link is expanded', () => {
     it('calls the addOutcomeGroup api when the create group item is clicked', async () => {
-      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+      const newGroup = {
+        id: 101,
+        title: 'Group 101',
+        description: '',
+        isRootGroup: false,
+        parent_outcome_group: {id: 100}
+      }
+      addOutcomeGroup.mockReturnValue(Promise.resolve({status: 200, data: newGroup}))
       const {getByText, getByLabelText} = render(<TargetGroupSelector {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
@@ -164,6 +174,7 @@ describe('TargetGroupSelector', () => {
       expect(addOutcomeGroup).toHaveBeenCalledTimes(1)
       expect(addOutcomeGroup).toHaveBeenCalledWith('Account', '1', '100', 'new group name')
       await act(async () => jest.runAllTimers())
+      expect(onGroupCreatedMock).toHaveBeenCalledWith(newGroup)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
         message: '"new group name" has been created.'

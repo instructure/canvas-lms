@@ -36,15 +36,18 @@ class CustomError extends Error {
 
 describe('GroupRemoveModal', () => {
   let onCloseHandlerMock
+  let onSuccessMock
   const defaultProps = (props = {}) => ({
     groupId: '123',
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
+    onSuccess: onSuccessMock,
     ...props
   })
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    onSuccessMock = jest.fn()
   })
 
   afterEach(() => {
@@ -108,13 +111,16 @@ describe('GroupRemoveModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Account context', async () => {
+  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds in Account context', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+    removeOutcomeGroup.mockReturnValue(
+      Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
+    )
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
+      expect(onSuccessMock).toHaveBeenCalledWith(2, 1)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this account.',
         type: 'success'
@@ -122,15 +128,18 @@ describe('GroupRemoveModal', () => {
     })
   })
 
-  it('displays flash confirmation with proper message if delete request succeeds in Course context', async () => {
+  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds in Course context', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
-    removeOutcomeGroup.mockReturnValue(Promise.resolve({status: 200}))
+    removeOutcomeGroup.mockReturnValue(
+      Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
+    )
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />, {
       contextType: 'Course'
     })
     fireEvent.click(getByText('Remove Group'))
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Course', '1', '123')
     await waitFor(() => {
+      expect(onSuccessMock).toHaveBeenCalledWith(2, 1)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed from this course.',
         type: 'success'

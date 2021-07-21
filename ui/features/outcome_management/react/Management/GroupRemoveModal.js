@@ -28,7 +28,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
+const GroupRemoveModal = ({groupId, isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId} = useCanvasContext()
   const isAccount = contextType === 'Account'
   const onRemoveGroupHandler = async () => {
@@ -36,6 +36,8 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
     try {
       const result = await removeOutcomeGroup(contextType, contextId, groupId)
       if (result?.status === 200) {
+        const parentGroupId = result.data.parent_outcome_group.id
+        onSuccess(result.data.id, parentGroupId)
         showFlashAlert({
           message: isAccount
             ? I18n.t('This group was successfully removed from this account.')
@@ -100,7 +102,8 @@ const GroupRemoveModal = ({groupId, isOpen, onCloseHandler}) => {
 GroupRemoveModal.propTypes = {
   groupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired
 }
 
 export default GroupRemoveModal

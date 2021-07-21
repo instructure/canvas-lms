@@ -50,6 +50,17 @@ const structFromGroup = (g, parentGroupId) => ({
 const getChildOutcomesCount = rootGroups =>
   rootGroups.reduce((acc, group) => acc + group.outcomesCount, 0)
 
+const formatNewGroup = g => ({
+  _id: g.id,
+  title: g.title,
+  description: g.description,
+  outcomesCount: 0,
+  childGroupsCount: 0,
+  isRootGroup: false,
+  parentGroupId: g.parent_outcome_group.id,
+  __typename: 'LearningOutcomeGroup'
+})
+
 const ensureAllGroupFields = group => ({
   __typename: 'LearningOutcomeGroup',
   childGroupsCount: null,
@@ -110,18 +121,11 @@ const useTreeBrowser = queryVariables => {
   }
 
   const clearCache = () => {
-    client.writeQuery({
-      query: GROUPS_QUERY,
-      variables: queryVariables,
-      data: {
-        groups: []
-      }
-    })
+    updateCache([])
   }
 
   const collections = useMemo(() => {
     const collectionsByParentId = getCollectionsByParentId(groups)
-
     return groups.reduce(
       (memo, g) => ({
         ...memo,
@@ -136,7 +140,19 @@ const useTreeBrowser = queryVariables => {
 
   const addGroups = groupsToAdd => {
     const newGroups = uniqBy([...groups, ...groupsToAdd], '_id')
+    updateCache(newGroups)
+  }
 
+  const addNewGroup = group => {
+    addGroups([formatNewGroup(group)])
+  }
+
+  const removeGroup = groupId => {
+    const newGroups = groups.filter(group => group._id !== groupId)
+    updateCache(newGroups)
+  }
+
+  const updateCache = newGroups => {
     client.writeQuery({
       query: GROUPS_QUERY,
       variables: queryVariables,
@@ -204,7 +220,9 @@ const useTreeBrowser = queryVariables => {
     addGroups,
     addLoadedGroups,
     clearCache,
-    loadedGroups
+    loadedGroups,
+    addNewGroup,
+    removeGroup
   }
 }
 
@@ -224,7 +242,9 @@ export const useManageOutcomes = collection => {
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
-    clearCache
+    clearCache,
+    addNewGroup,
+    removeGroup
   } = useTreeBrowser({
     collection
   })
@@ -262,7 +282,9 @@ export const useManageOutcomes = collection => {
     rootId,
     selectedGroupId,
     selectedParentGroupId,
-    clearCache
+    clearCache,
+    addNewGroup,
+    removeGroup
   }
 }
 
@@ -407,7 +429,8 @@ export const useGroupMoveModal = groupId => {
     collections,
     rootId,
     clearCache,
-    queryCollections: treeBrowserQueryCollection
+    queryCollections: treeBrowserQueryCollection,
+    addNewGroup
   } = useManageOutcomes('groupMoveModal')
 
   const queryCollections = ({id}) => {
@@ -435,6 +458,7 @@ export const useGroupMoveModal = groupId => {
     isLoading,
     collections,
     queryCollections,
-    rootId
+    rootId,
+    addNewGroup
   }
 }

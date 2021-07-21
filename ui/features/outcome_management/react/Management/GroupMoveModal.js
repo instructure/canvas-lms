@@ -28,7 +28,14 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 
-const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHandler}) => {
+const GroupMoveModal = ({
+  groupId,
+  groupTitle,
+  parentGroupId,
+  isOpen,
+  onCloseHandler,
+  onGroupCreated
+}) => {
   const [targetGroup, setTargetGroup] = useState(null)
   const [moveOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)
 
@@ -91,6 +98,7 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroupId, isOpen, onCloseHand
             groupId={groupId}
             parentGroupId={parentGroupId}
             setTargetGroup={setTargetGroup}
+            onGroupCreated={onGroupCreated}
           />
         </View>
       </Modal.Body>
@@ -117,7 +125,8 @@ GroupMoveModal.propTypes = {
   groupTitle: PropTypes.string.isRequired,
   parentGroupId: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  onGroupCreated: PropTypes.func.isRequired
 }
 
 export default GroupMoveModal

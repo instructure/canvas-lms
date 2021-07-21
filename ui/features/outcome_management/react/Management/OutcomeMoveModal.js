@@ -29,7 +29,7 @@ import {MOVE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 import {outcomeShape} from './shapes'
 
-const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) => {
+const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler, onGroupCreated}) => {
   const [targetGroup, setTargetGroup] = useState(null)
   const count = Object.keys(outcomes).length
   const outcomeTitle = Object.values(outcomes)[0]?.title
@@ -131,7 +131,7 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}) 
               }
             )}
           </Text>
-          <TargetGroupSelector setTargetGroup={setTargetGroup} />
+          <TargetGroupSelector setTargetGroup={setTargetGroup} onGroupCreated={onGroupCreated} />
         </View>
       </Modal.Body>
       <Modal.Footer>
@@ -156,7 +156,8 @@ OutcomeMoveModal.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onCleanupHandler: PropTypes.func.isRequired
+  onCleanupHandler: PropTypes.func.isRequired,
+  onGroupCreated: PropTypes.func.isRequired
 }
 
 export default OutcomeMoveModal

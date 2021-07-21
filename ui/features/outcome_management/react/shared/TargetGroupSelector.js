@@ -29,9 +29,10 @@ import {useGroupMoveModal} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup}) => {
+const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup, onGroupCreated}) => {
   const {contextType, contextId, rootOutcomeGroup} = useCanvasContext()
-  const {error, isLoading, collections, queryCollections, rootId} = useGroupMoveModal(groupId)
+  const {error, isLoading, collections, queryCollections, rootId, addNewGroup} =
+    useGroupMoveModal(groupId)
 
   const onCreateGroupHandler = async groupName => {
     try {
@@ -41,7 +42,9 @@ const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup}) => {
       // the FlashAlert and change this to add the newly created group to the Tree browser
       // or the new responsive designs. The FlashAlert is merely for verification that
       // the save to the API was successful.
-      await addOutcomeGroup(contextType, contextId, rootOutcomeGroup.id, groupName)
+      const newGroup = await addOutcomeGroup(contextType, contextId, rootOutcomeGroup.id, groupName)
+      addNewGroup(newGroup.data)
+      onGroupCreated(newGroup.data) // NOTE: This updates the TreeBrowser on the LHS of the Manage screen
       showFlashAlert({
         message: I18n.t('"%{groupName}" has been created.', {groupName}),
         type: 'success'
@@ -106,7 +109,8 @@ const TargetGroupSelector = ({groupId, parentGroupId, setTargetGroup}) => {
 TargetGroupSelector.propTypes = {
   groupId: PropTypes.string,
   parentGroupId: PropTypes.string,
-  setTargetGroup: PropTypes.func.isRequired
+  setTargetGroup: PropTypes.func.isRequired,
+  onGroupCreated: PropTypes.func.isRequired
 }
 
 export default TargetGroupSelector
