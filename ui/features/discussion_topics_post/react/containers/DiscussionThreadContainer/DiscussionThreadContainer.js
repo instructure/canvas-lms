@@ -41,7 +41,6 @@ import {View} from '@instructure/ui-view'
 import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
-  addReplyToSubentries,
   addReplyToDiscussion,
   resolveAuthorRoles
 } from '../../utils'
@@ -90,8 +89,7 @@ export const DiscussionThreadContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, props.discussionEntry.id, newDiscussionEntry)
-    addReplyToSubentries(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
+    addReplyToDiscussionEntry(cache, PER_PAGE, sort, newDiscussionEntry, window.ENV?.course_id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {

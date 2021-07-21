@@ -19,7 +19,6 @@
 import {
   addReplyToDiscussion,
   addReplyToDiscussionEntry,
-  addReplyToSubentries,
   getSpeedGraderUrl
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -54,8 +53,7 @@ export const IsolatedViewContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
 
     addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(cache, newDiscussionEntry.parent.id, newDiscussionEntry)
-    addReplyToSubentries(
+    addReplyToDiscussionEntry(
       cache,
       ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       newDiscussionEntry,

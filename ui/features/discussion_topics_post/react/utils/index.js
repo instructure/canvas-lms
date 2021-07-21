@@ -69,34 +69,7 @@ export const addReplyToDiscussion = (cache, discussionTopicGraphQLId) => {
   }
 }
 
-export const addReplyToDiscussionEntry = (cache, discussionEntryGraphQLId, newDiscussionEntry) => {
-  const options = {
-    id: discussionEntryGraphQLId,
-    fragment: DiscussionEntry.fragment,
-    fragmentName: 'DiscussionEntry'
-  }
-  const data = JSON.parse(JSON.stringify(cache.readFragment(options)))
-
-  if (data) {
-    // On nested-replies we don't have rootEntryParticipantCounts or a last reply.
-    if (data.rootEntryParticipantCounts) {
-      data.rootEntryParticipantCounts.unreadCount += 1
-      data.rootEntryParticipantCounts.repliesCount += 1
-      data.lastReply = {
-        createdAt: newDiscussionEntry.createdAt,
-        __typename: 'DiscussionEntry'
-      }
-    }
-
-    data.subentriesCount += 1
-
-    cache.writeFragment({
-      ...options,
-      data
-    })
-  }
-}
-export const addReplyToSubentries = (cache, perPage, newDiscussionEntry, courseID) => {
+export const addReplyToDiscussionEntry = (cache, perPage, newDiscussionEntry, courseID) => {
   try {
     const options = {
       query: DISCUSSION_SUBENTRIES_QUERY,
