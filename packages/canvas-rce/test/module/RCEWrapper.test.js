@@ -576,6 +576,17 @@ describe('RCEWrapper', () => {
         instance.insertImage({})
         contentInsertion.insertImage.restore()
       })
+
+      it("removes TinyMCE's caret &nbsp; when element is returned from content insertion", () => {
+        const container = document.createElement('div')
+        container.innerHTML = '<div><img src="image.jpg" alt="test" />&nbsp;</div>'
+        const element = container.querySelector('img')
+        const removeSpy = sinon.spy(element.nextSibling, 'remove')
+        sinon.stub(contentInsertion, 'insertImage').returns(element)
+        instance.insertImage({})
+        contentInsertion.insertImage.restore()
+        assert(removeSpy.called)
+      })
     })
 
     describe('insert media', () => {

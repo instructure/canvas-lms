@@ -498,7 +498,13 @@ class RCEWrapper extends React.Component {
 
   insertImage(image) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertImage(editor, image)
+    let element = contentInsertion.insertImage(editor, image)
+
+    // Removes TinyMCE's caret &nbsp; text if exists.
+    if (element?.nextSibling?.data?.trim() === '') {
+      element.nextSibling.remove()
+    }
+
     if (element && element.complete) {
       this.contentInserted(element)
     } else if (element) {
