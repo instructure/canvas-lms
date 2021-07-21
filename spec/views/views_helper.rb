@@ -31,3 +31,82 @@ def view_portfolio(portfolio=@portfolio, current_user=@user)
   assign(:portfolio, portfolio)
   assign(:current_user, current_user)
 end
+
+RSpec.shared_context 'lti_layout_spec_helper' do
+  before :each do
+    allow(ActionController).to receive(:flash).with(any_args).and_return(true)
+    allow(User).to receive(:default_avatar_fallback).and_return("http://localhost/avatar.png")
+    allow(ctrl).to receive(:session).and_return({})
+    allow(ctrl).to receive(:named_context_url).with(any_args).and_return("https://example.com/accounts/1")
+    allow(ctrl).to receive(:request).and_return(request)
+    allow(ctrl).to receive(:response).and_return(response)
+    allow(ctrl).to receive(:_response).and_return(response)
+
+    ctrl.instance_variable_set(:@response, response)
+    ctrl.instance_variable_set(:@_response, response)
+    ctrl.instance_variable_set(:@context, tool.context)
+
+    allow(tag).to receive(:new_tab).and_return(true)
+    allow(tag).to receive(:quiz_lti).and_return true
+    allow(tool).to receive(:login_or_launch_url).with(any_args).and_return('https://example.com')
+    allow(tool).to receive(:use_1_3?).and_return(true)
+    allow(ContextExternalTool).to receive(:find_external_tool).with(any_args).and_return(tool)
+  end
+
+  let(:request) { LtiLayoutSpecHelper.create_request }
+  let(:response) { LtiLayoutSpecHelper.create_response }
+
+  # The controller variable needs to NOT be named "controller." View specs,
+  # and controller specs, automatically insert a method called controller
+  # that returns a dummy controller. If you want to use an *actual* controller,
+  # it should be named something else to avoid problems. Therefore, in your
+  # test, call ctrl.render instead of the built-in render method, which calls
+  # render on the dummy controller.
+  let(:ctrl) { LtiLayoutSpecHelper.create_controller }
+  let(:tool) { LtiLayoutSpecHelper.create_tool }
+  let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
+
+  module LtiLayoutSpecHelper
+    def self.create_tag(tool)
+      tag = ContentTag.create!({
+        title: 'Test',
+        content_id: tool.id,
+        content_type: 'ContextExternalTool',
+        tag_type: 'context_module',
+        context_type: 'Account',
+        context_id: Account.default.id,
+        root_account_id: Account.default,
+        url: 'https://example.com'
+      })
+      tag
+    end
+
+    def self.create_tool
+      dev_key = DeveloperKey.create
+      course = Course.create
+      tool = ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: 'Quizzes 2')
+      tool
+    end
+
+    def self.create_request
+      ActionDispatch::Request.new({
+        "rack.input" => StringIO.new(""),
+        "HTTP_HOST" => 'example.com',
+        "HTTP_ACCEPT" => 'text/html',
+        "REQUEST_METHOD" => 'GET',
+        "action_dispatch.request.parameters" => {
+          "display" => "full_width"
+        }
+      })
+    end
+
+    def self.create_response
+      ActionDispatch::TestResponse.new
+    end
+
+    def self.create_controller
+      ApplicationController.new
+    end
+  end
+end
+
