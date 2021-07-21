@@ -36,7 +36,7 @@ export function Alert({...props}) {
   const singleDueDate = useMemo(
     () => (
       <Flex.Item padding="x-small" shouldGrow align="start">
-        <Text weight="light" size="small">
+        <Text weight="normal" size="small">
           {props.dueAtDisplayText}
         </Text>
       </Flex.Item>
@@ -146,7 +146,7 @@ export function Alert({...props}) {
         ? multipleDueDates
         : singleDueDate}
       <Flex.Item shouldShrink padding="x-small" align="end">
-        <Text weight="light" size="small">
+        <Text weight="normal" size="small">
           {I18n.t(
             {
               one: 'This is a graded discussion: %{count} point possible',
