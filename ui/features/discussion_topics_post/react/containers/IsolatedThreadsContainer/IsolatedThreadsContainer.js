@@ -32,10 +32,6 @@ import {UPDATE_DISCUSSION_ENTRY} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 
 export const IsolatedThreadsContainer = props => {
-  const subentriesCount = props.discussionEntry.subentriesCount
-  const actualSubentriesCount = props.discussionEntry.discussionSubentriesConnection.nodes.length
-  const hasMoreReplies = actualSubentriesCount < subentriesCount
-
   return (
     <div
       style={{
@@ -44,7 +40,7 @@ export const IsolatedThreadsContainer = props => {
       }}
       data-testid="isolated-view-children"
     >
-      {hasMoreReplies && (
+      {props.hasMoreOlderReplies && (
         <div
           style={{
             marginBottom: `1.5rem`
@@ -81,7 +77,8 @@ IsolatedThreadsContainer.propTypes = {
   showOlderReplies: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  highlightEntryId: PropTypes.string
+  highlightEntryId: PropTypes.string,
+  hasMoreOlderReplies: PropTypes.bool
 }
 
 export default IsolatedThreadsContainer
