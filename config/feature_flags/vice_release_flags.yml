@@ -18,12 +18,12 @@ confetti_for_valid_links:
 react_discussions_post:
   state: hidden
   beta: true
-  display_name: Discussions Redesign
+  display_name: Discussions/Announcements Redesign
   description: |-
-    This feature enhances the Canvas experience within Discussions.
-    When this flag is enabled, early access to ongoing improvements
-    will be displayed automatically with every release.
-    For full details, please see the Discussions Redesign user group
+    This feature enhances the Canvas experience within Discussions and Announcements.
+    When this flag is enabled, early access to ongoing improvements will be
+    displayed automatically with every release. For full details,
+    please see the Discussions/Announcements Redesign user group 
     in the Canvas Community.
   applies_to: Course
 
