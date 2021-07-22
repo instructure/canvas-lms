@@ -30,6 +30,18 @@ describe MessageBus do
     MessageBus.reset!
   end
 
+  describe ".reset!" do
+    it "still nils out the client, even if the client is closed already" do
+      client = MessageBus.client
+      allow(client).to receive(:close) do
+        raise ::Pulsar::Error::AlreadyClosed
+      end
+      expect{ MessageBus.reset! }.to_not raise_error
+      new_client = MessageBus.client
+      expect(new_client).to_not eq(client)
+    end
+  end
+
   it "can send messages and then later receive messages" do
     topic_name = "lazily-created-topic-#{SecureRandom.hex(16)}"
     subscription_name = "subscription-#{SecureRandom.hex(4)}"
