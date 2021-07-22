@@ -158,11 +158,11 @@ describe Types::LearningOutcomeGroupType do
 
   describe '#outcomes_count' do
     it 'returns the total outcomes at the nested outcome groups' do
-      expect(outcome_group_type.resolve("outcomesCount")).to eq 2
+      expect(outcome_group_type.resolve("outcomesCount")).to eq 0
     end
 
     it "accepts search_query in outcomes_count" do
-      expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
+      expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 0
     end
   end
 
