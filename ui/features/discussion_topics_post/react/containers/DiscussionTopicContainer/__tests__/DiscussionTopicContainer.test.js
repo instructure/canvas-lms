@@ -452,6 +452,21 @@ describe('DiscussionTopicContainer', () => {
     )
   })
 
+  it('Renders an alert if announcement will post in the future', () => {
+    const farInTheFuture = {
+      property: '3000-01-01T13:40:50Z',
+      expectedText: 'This announcement will not be visible until Jan 1, 3000 1:40pm.'
+    } // change values in this object on the year 3000
+    const props = {
+      discussionTopic: Discussion.mock({
+        isAnnouncement: true,
+        delayedPostAt: farInTheFuture.property
+      })
+    }
+    const container = setup(props)
+    expect(container.getByText(farInTheFuture.expectedText)).toBeTruthy()
+  })
+
   it('should not render author if author is null', async () => {
     const props = {discussionTopic: Discussion.mock({author: null})}
     const container = setup(props)

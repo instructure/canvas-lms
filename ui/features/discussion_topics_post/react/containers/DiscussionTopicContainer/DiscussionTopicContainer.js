@@ -69,6 +69,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     props.discussionTopic.permissions?.readAsAdmin && assignmentOverrides.length > 0
   )
 
+  const isAnnouncementDelayed =
+    props.discussionTopic.isAnnouncement &&
+    props.discussionTopic.delayedPostAt &&
+    Date.parse(props.discussionTopic.delayedPostAt) > Date.now()
+
   const defaultDateSet =
     !!props.discussionTopic.assignment?.dueAt ||
     !!props.discussionTopic.assignment?.lockAt ||
@@ -251,6 +256,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
             </AlertFRD>
           </View>
         )}
+      {isAnnouncementDelayed && (
+        <AlertFRD renderCloseButtonLabel="Close">
+          {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
+            delayedPostAt: DateHelper.formatDatetimeForDiscussions(
+              props.discussionTopic.delayedPostAt
+            )
+          })}
+        </AlertFRD>
+      )}
       {!searchTerm && (
         <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
           <Flex as="div" direction="column" data-testid="discussion-topic-container">

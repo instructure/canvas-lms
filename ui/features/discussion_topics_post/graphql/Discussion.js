@@ -42,6 +42,7 @@ export const Discussion = {
       requireInitialPost
       initialPostRequiredForCurrentUser
       isSectionSpecific
+      isAnnouncement
       discussionType
       allowRating
       onlyGradersCanRate
@@ -95,6 +96,7 @@ export const Discussion = {
     requireInitialPost: bool,
     initialPostRequiredForCurrentUser: bool,
     isSectionSpecific: bool,
+    isAnnouncement: bool,
     discussionType: string,
     allowRating: bool,
     onlyGradersCanRate: bool,
@@ -130,6 +132,7 @@ export const Discussion = {
     requireInitialPost = false,
     initialPostRequiredForCurrentUser = false,
     isSectionSpecific = false,
+    isAnnouncement = false,
     discussionType = 'threaded',
     allowRating = true,
     onlyGradersCanRate = false,
@@ -168,6 +171,7 @@ export const Discussion = {
     requireInitialPost,
     initialPostRequiredForCurrentUser,
     isSectionSpecific,
+    isAnnouncement,
     discussionType,
     allowRating,
     onlyGradersCanRate,
