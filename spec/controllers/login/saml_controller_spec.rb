@@ -93,6 +93,26 @@ describe Login::SamlController do
     expect(response).to redirect_to(login_url)
   end
 
+  it "doesn't allow deleted users" do
+    account = account_with_saml
+    user_with_pseudonym(active_all: 1, account: account)
+    @user.update!(workflow_state: 'deleted')
+
+    response = SAML2::Response.new
+    response.issuer = SAML2::NameID.new('saml_entity')
+    response.assertions << (assertion = SAML2::Assertion.new)
+    assertion.subject = SAML2::Subject.new
+    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [response, nil]
+    )
+    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response).to redirect_to(login_url)
+  end
+
   it "wont support logout via login endpoint" do
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [SAML2::LogoutRequest.new,nil]
