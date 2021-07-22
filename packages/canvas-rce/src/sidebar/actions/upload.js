@@ -247,6 +247,31 @@ export function createMediaServerSession() {
   }
 }
 
+export function uploadToButtonsAndIconsFolder(svg) {
+  return (_dispatch, getState) => {
+    const {source, jwt, host, contextId, contextType} = getState()
+    const svgAsFile = new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'})
+    const fileMetaProps = {
+      file: {
+        name: svg.name,
+        type: 'image/svg+xml'
+      },
+      name: svg.name
+    }
+
+    return source
+      .fetchButtonsAndIconsFolder({jwt, host, contextId, contextType})
+      .then(({folders}) => {
+        fileMetaProps.parentFolderId = folders[0].id
+        return source
+          .preflightUpload(fileMetaProps, {host, contextId, contextType})
+          .then(results => {
+            return source.uploadFRD(svgAsFile, results)
+          })
+      })
+  }
+}
+
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
     const editorComponent = bridge.activeEditor()

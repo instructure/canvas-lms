@@ -29,6 +29,7 @@ class Folder < ActiveRecord::Base
   end
   include Workflow
 
+  BUTTONS_AND_ICONS_UNIQUE_TYPE = "buttons and icons"
   ROOT_FOLDER_NAME = "course files"
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"
@@ -343,6 +344,10 @@ class Folder < ActiveRecord::Base
       end
     end
     folder
+  end
+
+  def self.buttons_and_icons_folder(context)
+    unique_folder(context, BUTTONS_AND_ICONS_UNIQUE_TYPE, ->{ t("Buttons and Icons") })
   end
 
   MEDIA_TYPE = "media"

@@ -633,6 +633,14 @@ class FoldersController < ApplicationController
     end
   end
 
+  def buttons_and_icons_folder
+    require_context
+    if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+      @folder = Folder.buttons_and_icons_folder(@context)
+      render json: folder_json(@folder, @current_user, session)
+    end
+  end
+
   # @API Get uploaded media folder for user
   # @subtopic Folders
   # Returns the details for a designated upload folder that the user has rights to

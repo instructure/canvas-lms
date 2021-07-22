@@ -41,6 +41,7 @@ describe('<PreviewSection />', () => {
         height="218px"
         viewBox="0 0 218 218"
         width="218px"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <svg
           fill="none"

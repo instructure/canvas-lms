@@ -262,6 +262,11 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
+  fetchButtonsAndIconsFolder(props) {
+    const uri = this.uriFor('folders/buttons_and_icons', props)
+    return this.fetchPage(uri)
+  }
+
   fetchMediaFolder(props) {
     let uri
     if (props.contextType === 'user') {

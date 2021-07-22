@@ -64,7 +64,8 @@ export function buildSvgContainer(settings) {
     fill: 'none',
     width: `${containerWidth}px`,
     height: `${containerHeight}px`,
-    viewBox: `0 0 ${containerWidth} ${containerHeight}`
+    viewBox: `0 0 ${containerWidth} ${containerHeight}`,
+    xmlns: 'http://www.w3.org/2000/svg'
   })
 }
 

@@ -317,7 +317,8 @@ describe('sources/api', () => {
       onError.reset()
     })
 
-    const subject = () => apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
+    const subject = () =>
+      apiSource.fetchBookmarkedData(fetchFunction, properties, onSuccess, onError)
 
     it('calls the "fetchFunction", passing "properties"', () => {
       subject().then(() => {
@@ -342,6 +343,34 @@ describe('sources/api', () => {
           sinon.assert.calledOnce(onError)
         })
       })
+    })
+  })
+
+  describe('fetchButtonsAndIconsFolder', () => {
+    let folders
+
+    beforeEach(() => {
+      folders = [{id: 24}]
+      const body = {folders}
+      sinon.stub(apiSource, 'fetchPage').returns(Promise.resolve(body))
+    })
+
+    afterEach(() => {
+      apiSource.fetchPage.restore()
+    })
+
+    it('calls fetchPage with the proper params', () => {
+      return apiSource
+        .fetchButtonsAndIconsFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/buttons_and_icons?contextType=course&contextId=22'
+          )
+        })
     })
   })
 

@@ -22,6 +22,8 @@ import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/upload'
 import * as filesActions from '../../../src/sidebar/actions/files'
 import * as imagesActions from '../../../src/sidebar/actions/images'
+import {buildSvg} from '../../../src/rce/plugins/instructure_buttons/svg'
+import {DEFAULT_SETTINGS} from '../../../src/rce/plugins/instructure_buttons/svg/constants'
 import {spiedStore} from './utils'
 import Bridge from '../../../src/bridge'
 import K5Uploader from '@instructure/k5uploader'
@@ -37,6 +39,12 @@ describe('Upload data actions', () => {
   const results = {id: 47}
   const file = {url: 'http://canvas.test/files/17/download', thumbnail_url: 'thumbnailurl'}
   const successSource = {
+    fetchButtonsAndIconsFolder() {
+      return Promise.resolve({
+        folders: [{id: 2, name: 'Buttons and Icons', parentId: 1}]
+      })
+    },
+
     fetchFolders() {
       return Promise.resolve({
         folders: [{id: 1, name: 'course files', parentId: null}]
@@ -63,9 +71,7 @@ describe('Upload data actions', () => {
       return Promise.resolve({media_object: {media_id: 2}})
     },
 
-    preflightUpload() {
-      return Promise.resolve(results)
-    },
+    preflightUpload: sinon.stub().returns(Promise.resolve(results)),
 
     uploadFRD: sinon.stub(),
 
@@ -89,8 +95,7 @@ describe('Upload data actions', () => {
   }
 
   function setupState(props) {
-    const {host, jwt, source} = {...defaults, ...props}
-    return {host, jwt, source}
+    return {...defaults, ...props}
   }
 
   describe('fetchFolders', () => {
@@ -194,6 +199,49 @@ describe('Upload data actions', () => {
       const file = {}
       actions.setUsageRights(successSource, file, results)
       sinon.assert.notCalled(successSource.setUsageRights)
+    })
+  })
+
+  describe('uploadToButtonsAndIconsFolder', () => {
+    let baseState, svg
+
+    beforeEach(() => {
+      baseState = setupState({contextId: 101, contextType: 'course'})
+      svg = {name: 'button.svg', domElement: buildSvg(DEFAULT_SETTINGS)}
+    })
+
+    it('dispatches a preflightUpload with the proper parentFolderId set', () => {
+      const store = spiedStore(baseState)
+
+      const fileMetaProps = {
+        file: {name: svg.name, type: 'image/svg+xml'},
+        name: svg.name,
+        parentFolderId: 2
+      }
+
+      const canvasProps = {
+        host: 'http://host:port',
+        contextId: 101,
+        contextType: 'course'
+      }
+
+      return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
+        assert.deepEqual(baseState.source.preflightUpload.firstCall.args, [
+          fileMetaProps,
+          canvasProps
+        ])
+      })
+    })
+
+    it('dispatches uploadFRD with the svg domElement', () => {
+      const store = spiedStore(baseState)
+
+      return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
+        assert.deepEqual(baseState.source.uploadFRD.firstCall.args, [
+          new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'}),
+          results
+        ])
+      })
     })
   })
 

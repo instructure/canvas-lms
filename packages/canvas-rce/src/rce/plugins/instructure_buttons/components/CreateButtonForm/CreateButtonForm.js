@@ -24,6 +24,7 @@ import {DEFAULT_SETTINGS} from '../../svg/constants'
 import {PreviewSection} from './PreviewSection'
 import {ShapeSection} from './ShapeSection'
 import {ColorSection} from './ColorSection'
+import {Footer} from './Footer'
 import {ImageSection} from './ImageSection'
 import {TextSection} from './TextSection'
 
@@ -40,6 +41,7 @@ export const CreateButtonForm = ({editor}) => {
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
       <ImageSection editor={editor} settings={settings} onChange={dispatch} />
+      <Footer settings={settings} />
     </View>
   )
 }
