@@ -106,10 +106,16 @@ module MessageBus
   def self.send_one_message(namespace, topic_name, message)
     retries = 0
     Bundler.require(:pulsar)
+    rescuable_pulsar_errors = [
+      ::Pulsar::Error::AlreadyClosed,
+      ::Pulsar::Error::ConnectError,
+      ::Pulsar::Error::ServiceUnitNotReady,
+      ::Pulsar::Error::Timeout
+    ]
     begin
       producer = producer_for(namespace, topic_name)
       producer.send(message)
-    rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError, ::Pulsar::Error::ServiceUnitNotReady => ex
+    rescue *rescuable_pulsar_errors => ex
       # We'll retry this exactly one time.  Sometimes
       # when a pulsar broker restarts, we have connections
       # that already knew about that broker get into a state where
@@ -120,8 +126,8 @@ module MessageBus
       # the problem, and we should let the error raise.
       retries += 1
       raise ex if retries > 1
-      Rails.logger.info "[AUA] Pulsar timeout during message send, retrying..."
-      InstStatsd::Statsd.increment("aua_logging.warning.timeout_retry")
+      Rails.logger.info "[AUA] Pulsar failure during message send, retrying..."
+      CanvasErrors.capture_exception(:aua_log_compaction, ex, :warn)
       self.reset!
       retry
     end
