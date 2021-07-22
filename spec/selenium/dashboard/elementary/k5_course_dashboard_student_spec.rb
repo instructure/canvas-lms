@@ -74,6 +74,12 @@ describe "student k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
+    it 'has an empty state graphic when there is no subject home content' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(empty_subject_home).to be_displayed
+    end
+
     it 'displays modules empty state if no published module exists' do
       get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
