@@ -21,7 +21,6 @@
 require 'graphql_custom_connections'
 
 class CanvasSchema < GraphQL::Schema
-  include ApolloFederation::Schema
   use GraphQL::Execution::Interpreter
 
   query Types::QueryType

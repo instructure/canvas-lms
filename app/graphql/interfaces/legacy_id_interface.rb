@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Interfaces::LegacyIDInterface
-  include Interfaces::BaseInterface
+  include GraphQL::Schema::Interface
 
   field :_id, ID, "legacy canvas id", method: :id, null: false
 end

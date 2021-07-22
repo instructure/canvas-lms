@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Interfaces::ModuleItemInterface
-  include Interfaces::BaseInterface
-
+  include GraphQL::Schema::Interface
   description "An item that can be in context modules"
 
   field :modules, [Types::ModuleType], null: true
