@@ -53,18 +53,13 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
   }
 
   const checkbox = (
-    <Flex.Item size={isMobileView ? '' : '5rem'} alignSelf="end">
+    <Flex.Item size={isMobileView ? '' : '6.75rem'} alignSelf="end">
       <div
         style={{
-          padding: isMobileView
-            ? '0'
-            : description && addedOutcome
-            ? '1.2815rem 0 0 0'
-            : description
-            ? '1.2815rem 0 0 1rem'
-            : addedOutcome
-            ? '0.313rem 0 0 0'
-            : '0.313rem 0 0 1rem'
+          padding: isMobileView ? '0' : description ? '1.2815rem 0 0' : '0.313rem 0 0',
+          marginRight: isMobileView ? '-0.5rem' : '0',
+          display: 'flex',
+          flexFlow: 'row-reverse nowrap'
         }}
       >
         <Button
