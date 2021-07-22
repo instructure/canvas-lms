@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {graphql} from 'msw'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
@@ -205,7 +205,7 @@ describe('IsolatedViewContainer', () => {
                     message: '<p>Get riggity riggity wrecked son</p>'
                   })
                 ],
-                pageInfo: PageInfo.mock(),
+                pageInfo: PageInfo.mock({hasPreviousPage: false}),
                 __typename: 'DiscussionSubentriesConnection'
               }
             })
@@ -215,6 +215,38 @@ describe('IsolatedViewContainer', () => {
     )
 
     fireEvent.click(showOlderRepliesButton)
+
+    await waitFor(() => expect(queryByText('Show older replies')).toBeNull())
+
+    expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+  })
+
+  it('should not show "Show older replies" button initially if hasPreviousPage is false', async () => {
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    id: '1337',
+                    _id: '1337',
+                    message: '<p>Get riggity riggity wrecked son</p>'
+                  })
+                ],
+                pageInfo: PageInfo.mock({hasPreviousPage: false}),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    const {findByText, queryByText} = setup(defaultProps())
+
+    await waitFor(() => expect(queryByText('Show older replies')).toBeNull())
 
     expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
   })

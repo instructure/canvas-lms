@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  addReplyToDiscussion,
-  addReplyToDiscussionEntry,
-  getSpeedGraderUrl
-} from '../../utils'
+import {addReplyToDiscussion, addReplyToDiscussionEntry, getSpeedGraderUrl} from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
@@ -40,14 +36,13 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const [hasMoreOlderReplies, setHasMoreOlderReplies] = useState(true)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -203,10 +198,6 @@ export const IsolatedViewContainer = props => {
         courseID: window.ENV?.course_id
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
-        if (fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes?.length < PER_PAGE) {
-          setHasMoreOlderReplies(false)
-        }
-
         return {
           legacyNode: {
             ...previousResult.legacyNode,
@@ -316,7 +307,10 @@ export const IsolatedViewContainer = props => {
               }}
               goToTopic={props.goToTopic}
               highlightEntryId={props.highlightEntryId}
-              hasMoreOlderReplies={hasMoreOlderReplies}
+              hasMoreOlderReplies={
+                isolatedEntry.data?.legacyNode?.discussionSubentriesConnection?.pageInfo
+                  ?.hasPreviousPage
+              }
             />
           )}
         </>
