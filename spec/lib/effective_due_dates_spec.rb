@@ -381,589 +381,622 @@ describe Course do
         @assignment1.save!
       end
 
-      it 'ignores inactive overrides' do
-        override = @assignment1.assignment_overrides.create!(due_at: 5.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student2)
-        override.destroy!
+      context 'when adhoc (student) overrides apply' do
+        it 'ignores inactive overrides' do
+          override = @assignment1.assignment_overrides.create!(due_at: 5.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student2)
+          override.destroy!
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
 
-      it 'ignores noop overrides' do
-        @assignment1.assignment_overrides.create!(set_type: 'Noop')
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
+        it 'includes overrides with null due dates' do
+          override = @assignment1.assignment_overrides.create!(due_at: nil, due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student3)
 
-      it 'includes overrides with null due dates' do
-        override = @assignment1.assignment_overrides.create!(due_at: nil, due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student3)
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student3.id => {
-              due_at: nil,
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student3.id => {
+                due_at: nil,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'includes overrides without due_at_overridden, and uses the due_at from the assignment' do
-        override = @assignment1.assignment_overrides.create!(due_at: nil)
-        override.assignment_override_students.create!(user: @student3)
+        it 'includes overrides without due_at_overridden, and uses the due_at from the assignment' do
+          override = @assignment1.assignment_overrides.create!(due_at: nil)
+          override.assignment_override_students.create!(user: @student3)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@assignment1.due_at)
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@assignment1.due_at)
+        end
 
-      it 'uses the due_at from the assignment when the assignment is only visible to overrides and no overrides for the student have due_at_overridden' do
-        @assignment1.update!(due_at: @now)
-        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
-        override.assignment_override_students.create!(user: @student3)
+        it 'uses the due_at from the assignment when the assignment is only visible to overrides and no overrides for the student have due_at_overridden' do
+          @assignment1.update!(due_at: @now)
+          override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+          override.assignment_override_students.create!(user: @student3)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+        end
 
-      it 'uses the due_at from the assignment when the assignment is visible to everyone and no overrides for the student have due_at_overridden' do
-        @assignment1.update!(only_visible_to_overrides: false, due_at: @now)
-        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
-        override.assignment_override_students.create!(user: @student3)
+        it 'uses the due_at from the assignment when the assignment is visible to everyone and no overrides for the student have due_at_overridden' do
+          @assignment1.update!(only_visible_to_overrides: false, due_at: @now)
+          override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+          override.assignment_override_students.create!(user: @student3)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(@now)
+        end
 
-      it 'does not consider the due_at from overrides without due_at_overridden when the override due_at is nil' do
-        override = @assignment1.assignment_overrides.create!(due_at: nil)
-        override.assignment_override_students.create!(user: @student3)
+        it 'does not consider the due_at from overrides without due_at_overridden when the override due_at is nil' do
+          override = @assignment1.assignment_overrides.create!(due_at: nil)
+          override.assignment_override_students.create!(user: @student3)
 
-        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
-        student_in_section(section, user: @student3)
-        section_override = @assignment1.assignment_overrides.create!(
-          due_at: 1.day.from_now(@now),
-          due_at_overridden: true,
-          set: section
-        )
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student3)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
+        end
 
-      it 'does not consider the due_at from overrides without due_at_overridden even if the due date is more lenient than other dates' do
-        override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
-        override.assignment_override_students.create!(user: @student3)
+        it 'does not consider the due_at from overrides without due_at_overridden even if the due date is more lenient than other dates' do
+          override = @assignment1.assignment_overrides.create!(due_at: 2.days.from_now(@now))
+          override.assignment_override_students.create!(user: @student3)
 
-        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
-        student_in_section(section, user: @student3)
-        section_override = @assignment1.assignment_overrides.create!(
-          due_at: 1.day.from_now(@now),
-          due_at_overridden: true,
-          set: section
-        )
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student3)
+          @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
-      end
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash[@assignment1.id][@student3.id][:due_at]).to eq(1.day.from_now(@now))
+        end
 
-      it 'applies adhoc overrides' do
-        override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
+        it 'applies adhoc overrides' do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 3.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'ignores soft-deleted adhoc overrides' do
-        override = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
-        override_student = override.assignment_override_students.create!(user: @student1)
-        override_student.update!(workflow_state: 'deleted')
+        it 'does not unassign students with adhoc overrides when they are deactivated' do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+          @student1_enrollment.deactivate
 
-        override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
+            }
+          })
+        end
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 3.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
+        it 'does not unassign students with adhoc overrides when they are concluded' do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+          @student1_enrollment.conclude
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
+            }
+          })
+        end
+
+        it 'ignores soft-deleted adhoc overrides' do
+          override = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
+          override_student = override.assignment_override_students.create!(user: @student1)
+          override_student.update!(workflow_state: 'deleted')
+
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq(expected)
-      end
+          expect(result).to eq(expected)
+        end
 
-      it 'correctly matches adhoc overrides for different assignments' do
-        @assignment2.only_visible_to_overrides = true
-        @assignment2.save!
-        override2 = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override2.assignment_override_students.create!(user: @student1)
-        override1 = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
-        override1.assignment_override_students.create!(user: @student1)
+        it 'correctly matches adhoc overrides for different assignments' do
+          @assignment2.only_visible_to_overrides = true
+          @assignment2.save!
+          override2 = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override2.assignment_override_students.create!(user: @student1)
+          override1 = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
+          override1.assignment_override_students.create!(user: @student1)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 7.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override1.id,
-              override_source: 'ADHOC'
-            }
-          },
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 3.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override2.id,
-              override_source: 'ADHOC'
-            }
-          }
-        }
-        expect(result).to eq expected
-      end
-
-      it 'correctly matches adhoc overrides for different students' do
-        override1 = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
-        override1.assignment_override_students.create!(user: @student1)
-        override2 = @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true)
-        override2.assignment_override_students.create!(user: @student2)
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 7.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override1.id,
-              override_source: 'ADHOC'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 7.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override1.id,
+                override_source: 'ADHOC'
+              }
             },
-            @student2.id => {
-              due_at: 1.day.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override2.id,
-              override_source: 'ADHOC'
+            @assignment2.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override2.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'applies group overrides' do
-        group_with_user(user: @student3, active_all: true)
-        @group.users << @student2
-        override = @assignment1.assignment_overrides.create!(
-          due_at: 4.days.from_now(@now),
-          due_at_overridden: true,
-          set: @group
-        )
+        it 'correctly matches adhoc overrides for different students' do
+          override1 = @assignment1.assignment_overrides.create!(due_at: 7.days.from_now(@now), due_at_overridden: true)
+          override1.assignment_override_students.create!(user: @student1)
+          override2 = @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true)
+          override2.assignment_override_students.create!(user: @student2)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'Group'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'Group'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 7.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override1.id,
+                override_source: 'ADHOC'
+              },
+              @student2.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override2.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'ignores overrides for soft-deleted groups' do
-        group_with_user(user: @student3, active_all: true)
-        @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
-        @group.destroy!
+        it 'uses assigned date instead of submission date even if submission was late' do
+          override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+          @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
+          @assignment1.submissions.find_by!(user: @student1).update!(
+            submitted_at: 1.week.from_now(@now),
+            submission_type: 'online_text_entry'
+          )
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
-
-      it 'only applies group overrides to students that have accepted the group invitation' do
-        group
-        @group.add_user(@student1, 'rejected')
-        @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
-
-      it 'applies section overrides' do
-        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
-        student_in_section(section, user: @student2)
-        student_in_section(section, user: @student1)
-        override = @assignment1.assignment_overrides.create!(
-          due_at: 1.day.from_now(@now),
-          due_at_overridden: true,
-          set: section
-        )
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 1.day.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'CourseSection'
-            },
-            @student2.id => {
-              due_at: 1.day.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'CourseSection'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'ignores section overrides for TAs' do
-        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
-        ta_in_section(section, user: @student2)
-        @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+        it 'prioritizes the override due date if it exists over the Everyone Else date' do
+          override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
-
-      it 'ignores overrides for soft-deleted sections' do
-        section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
-        student_in_section(section, user: @student2)
-        @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
-        section.destroy!
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
-
-      it 'ignores not-assigned students with existing graded submissions' do
-        @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expect(result).to be_empty
-      end
-
-      it 'uses assigned date instead of submission date even if submission was late' do
-        override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
-        @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
-        @assignment1.submissions.find_by!(user: @student1).update!(
-          submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry'
-        )
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        result = edd.to_hash
-        expected = {
-          @assignment1.id => {
-            @student1.id => {
-              due_at: 3.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: 3.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'prioritizes the override due date if it exists over the Everyone Else date' do
-        override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
+        # this might look like a strange test to have, but it is a result of how we are joining different tables in sql.
+        it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
+          override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
+          @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
+          @assignment2.submissions.find_by!(user: @student1).update!(
+            submitted_at: 1.week.from_now(@now),
+            submission_type: 'online_text_entry'
+          )
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 3.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: 3.days.ago(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              }
             }
           }
-        }
-        expect(result).to eq expected
+          expect(result).to eq expected
+        end
       end
 
-      # this might look like a strange test to have, but it is a result of how we are joining different tables in sql.
-      it 'prioritizes the override due date even if it is earlier than the Everyone Else date and the student has a graded submission that does not qualify' do
-        override = @assignment2.assignment_overrides.create!(due_at: 3.days.ago(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
-        @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
-        @assignment2.submissions.find_by!(user: @student1).update!(
-          submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry'
-        )
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
+      context 'when group overrides apply' do
+        it 'applies group overrides' do
+          group_with_user(user: @student3, active_all: true)
+          @group.users << @student2
+          override = @assignment1.assignment_overrides.create!(
+            due_at: 4.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 3.days.ago(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'Group'
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'Group'
+              }
             }
           }
-        }
-        expect(result).to eq expected
+          expect(result).to eq expected
+        end
+
+        it 'ignores overrides for soft-deleted groups' do
+          group_with_user(user: @student3, active_all: true)
+          @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
+          @group.destroy!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
+
+        it 'only applies group overrides to students that have accepted the group invitation' do
+          group
+          @group.add_user(@student1, 'rejected')
+          @assignment1.assignment_overrides.create!(due_at: 4.days.from_now(@now), due_at_overridden: true, set: @group)
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
+
+        it 'does not unassign students in the assigned group when they are deactivated' do
+          group_with_user(user: @student1, active_all: true)
+          override = @assignment1.assignment_overrides.create!(
+            due_at: 4.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+          @student1_enrollment.deactivate
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'Group'
+              }
+            }
+          })
+        end
+
+        it 'does not unassign students in the assigned group when they are concluded' do
+          group_with_user(user: @student1, active_all: true)
+          override = @assignment1.assignment_overrides.create!(
+            due_at: 4.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+          @student1_enrollment.conclude
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'Group'
+              }
+            }
+          })
+        end
       end
 
-      it 'prioritizes the Everyone Else due date if it exists over the submission NULL date' do
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
-        @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
-        @assignment2.submissions.find_by!(user: @student1).update!(
-          submitted_at: 1.week.from_now(@now),
-          submission_type: 'online_text_entry'
-        )
+      context 'when section overrides apply' do
+        it 'applies section overrides' do
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student2)
+          student_in_section(section, user: @student1)
+          override = @assignment1.assignment_overrides.create!(
+            due_at: 1.day.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          result = edd.to_hash
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'CourseSection'
+              },
+              @student2.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'CourseSection'
+              }
             }
           }
-        }
-        expect(result).to eq expected
+          expect(result).to eq expected
+        end
+
+        it 'ignores section overrides for TAs' do
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          ta_in_section(section, user: @student2)
+          @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
+
+        it 'ignores overrides for soft-deleted sections' do
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student2)
+          @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+          section.destroy!
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
+
+        it 'unassigns students in the assigned section when they are deactivated' do
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+          @student1_enrollment.deactivate
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
+
+        it 'does not unassign students in the assigned section when they are concluded' do
+          section = CourseSection.create!(name: 'My Awesome Section', course: @test_course)
+          student_in_section(section, user: @student1)
+          override = @assignment1.assignment_overrides.create!(due_at: 1.day.from_now(@now), due_at_overridden: true, set: section)
+          @student1_enrollment.conclude
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'CourseSection'
+              }
+            }
+          })
+        end
       end
 
-      it 'ignores not-assigned students with ungraded submissions' do
-        @assignment1.all_submissions.find_by!(user: @student1).update!(
-          submission_type: 'online_text_entry',
-          workflow_state: 'submitted'
-        )
+      context 'when multiple override types apply' do
+        it 'picks the due date that gives the student the most amount of time to submit' do
+          # adhoc
+          override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd.to_hash).to eq({})
-      end
+          # group
+          group_with_user(user: @student1, active_all: true)
+          group_override = @assignment2.assignment_overrides.create!(
+            due_at: 6.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
 
-      it 'picks the due date that gives the student the most amount of time to submit' do
-        # adhoc
-        override = @assignment2.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
+          # everyone else
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
 
-        # group
-        group_with_user(user: @student1, active_all: true)
-        group_override = @assignment2.assignment_overrides.create!(
-          due_at: 6.days.from_now(@now),
-          due_at_overridden: true,
-          set: @group
-        )
-
-        # everyone else
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 6.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: group_override.id,
-              override_source: 'Group'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: 6.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: group_override.id,
+                override_source: 'Group'
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              }
             }
           }
-        }
-        expect(result).to eq expected
-      end
+          expect(result).to eq expected
+        end
 
-      it 'treats null due dates as the most permissive due date for a student' do
-        # adhoc
-        override = @assignment2.assignment_overrides.create!(due_at: nil, due_at_overridden: true)
-        override.assignment_override_students.create!(user: @student1)
+        it 'treats null due dates as the most permissive due date for a student' do
+          # adhoc
+          override = @assignment2.assignment_overrides.create!(due_at: nil, due_at_overridden: true)
+          override.assignment_override_students.create!(user: @student1)
 
-        # group
-        group_with_user(user: @student1, active_all: true)
-        @assignment2.assignment_overrides.create!(due_at: 6.days.from_now(@now), due_at_overridden: true, set: @group)
+          # group
+          group_with_user(user: @student1, active_all: true)
+          @assignment2.assignment_overrides.create!(due_at: 6.days.from_now(@now), due_at_overridden: true, set: @group)
 
-        # everyone else
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
+          # everyone else
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
 
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: nil,
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: override.id,
-              override_source: 'ADHOC'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: nil,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: override.id,
+                override_source: 'ADHOC'
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: 'Everyone Else'
+              }
             }
           }
-        }
-        expect(result).to eq expected
+          expect(result).to eq expected
+        end
       end
 
-      it 'returns all students in the course if the assignment is assigned to everybody' do
-        @assignment2.due_at = 4.days.from_now(@now)
-        @assignment2.save!
-
-        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
-        result = edd.to_hash
-        expected = {
-          @assignment2.id => {
-            @student1.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student2.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            },
-            @student3.id => {
-              due_at: 4.days.from_now(@now),
-              grading_period_id: nil,
-              in_closed_grading_period: false,
-              override_id: nil,
-              override_source: 'Everyone Else'
-            }
-          }
-        }
-        expect(result).to eq expected
+      context 'when noop overrides apply' do
+        it 'ignores noop overrides' do
+          @assignment1.assignment_overrides.create!(set_type: 'Noop')
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq({})
+        end
       end
 
       context 'with grading periods' do
@@ -1456,6 +1489,97 @@ describe Course do
             expect(result).to eq expected
           end
         end
+      end
+
+      it 'ignores not-assigned students with existing graded submissions' do
+        @assignment1.grade_student(@student1, grade: 5, grader: @teacher)
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        result = edd.to_hash
+        expect(result).to be_empty
+      end
+
+      it 'prioritizes the Everyone Else due date if it exists over the submission NULL date' do
+        @assignment2.due_at = 4.days.from_now(@now)
+        @assignment2.save!
+        @assignment2.grade_student(@student1, grade: 5, grader: @teacher)
+        @assignment2.submissions.find_by!(user: @student1).update!(
+          submitted_at: 1.week.from_now(@now),
+          submission_type: 'online_text_entry'
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+        result = edd.to_hash
+        expected = {
+          @assignment2.id => {
+            @student1.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            },
+            @student2.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            },
+            @student3.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            }
+          }
+        }
+        expect(result).to eq expected
+      end
+
+      it 'ignores not-assigned students with ungraded submissions' do
+        @assignment1.all_submissions.find_by!(user: @student1).update!(
+          submission_type: 'online_text_entry',
+          workflow_state: 'submitted'
+        )
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+        expect(edd.to_hash).to eq({})
+      end
+
+      it 'returns all students in the course if the assignment is assigned to everybody' do
+        @assignment2.due_at = 4.days.from_now(@now)
+        @assignment2.save!
+
+        edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+        result = edd.to_hash
+        expected = {
+          @assignment2.id => {
+            @student1.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            },
+            @student2.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            },
+            @student3.id => {
+              due_at: 4.days.from_now(@now),
+              grading_period_id: nil,
+              in_closed_grading_period: false,
+              override_id: nil,
+              override_source: 'Everyone Else'
+            }
+          }
+        }
+        expect(result).to eq expected
       end
     end
   end
