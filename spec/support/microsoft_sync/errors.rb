@@ -76,4 +76,34 @@ module MicrosoftSync::Matchers
       matchers_that_failed.map(&:failure_message).join("\n")
     end
   end
+
+  RSpec::Matchers.define :raise_microsoft_sync_public_error do |error_class, public_message|
+    match do |actual|
+      @matcher = raise_error(error_class) do |e|
+        expect(e).to be_a_microsoft_sync_public_error(public_message)
+      end
+      @matcher.matches?(actual)
+    end
+
+    failure_message { @matcher.failure_message }
+
+    def supports_block_expectations?
+      true
+    end
+  end
+
+  RSpec::Matchers.define :raise_microsoft_sync_graceful_cancel_error do |error_class, public_message|
+    match do |actual|
+      @matcher = raise_error(error_class) do |e|
+        expect(e).to be_a_microsoft_sync_graceful_cancel_error(public_message)
+      end
+      @matcher.matches?(actual)
+    end
+
+    failure_message { @matcher.failure_message }
+
+    def supports_block_expectations?
+      true
+    end
+  end
 end

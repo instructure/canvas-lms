@@ -174,24 +174,19 @@ describe MicrosoftSync::SyncerSteps do
 
   shared_examples_for 'max of members enrollment reached' do |max_members|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to \
-        raise_error(MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached) do |err|
-        expect(err).to be_a_microsoft_sync_graceful_cancel_error(
-          "Microsoft 365 allows a maximum of #{(max_members || 25000).to_s(:delimited)} " \
-          'members in a team.'
-        )
-      end
+      klass = MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
+      msg =
+        "Microsoft 365 allows a maximum of #{(max_members || 25000).to_s(:delimited)} " \
+        'members in a team.'
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
   end
 
   shared_examples_for 'max of owners enrollment reached' do |max_owners|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to \
-        raise_error(MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached) do |error|
-        expect(error).to be_a_microsoft_sync_graceful_cancel_error(
-          "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
-        )
-      end
+      klass = MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached
+      msg = "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
   end
 
@@ -290,11 +285,9 @@ describe MicrosoftSync::SyncerSteps do
         let(:education_class_ids) { [group.ms_group_id || 'someid', 'newid3'] }
 
         it 'raises a descriptive Graceful Cancel Error' do
-          expect { subject }.to raise_error(described_class::MultipleEducationClasses) do |e|
-            expect(e).to be_a_microsoft_sync_graceful_cancel_error(
-              'Multiple Microsoft education classes already exist for the course.'
-            )
-          end
+          klass = described_class::MultipleEducationClasses
+          msg = 'Multiple Microsoft education classes already exist for the course.'
+          expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
         end
       end
 
@@ -302,12 +295,11 @@ describe MicrosoftSync::SyncerSteps do
         it 'raises a graceful cleanup error with a end-user-friendly message' do
           expect(MicrosoftSync::GraphServiceHelpers).to_not receive(:new)
           expect(syncer_steps).to_not receive(:ensure_class_group_exists)
-          expect { subject }.to raise_error(described_class::TenantMissingOrSyncDisabled) do |e|
-            expect(e).to be_a_microsoft_sync_graceful_cancel_error(
-              'Tenant missing or sync disabled. ' \
-              'Check the Microsoft sync integration settings for the course and account.'
-            )
-          end
+          klass = described_class::TenantMissingOrSyncDisabled
+          msg = 
+            'Tenant missing or sync disabled. ' \
+            'Check the Microsoft sync integration settings for the course and account.'
+          expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
         end
       end
 
@@ -638,11 +630,9 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no local owners (course teacher enrollments)' do
       it 'raises a graceful exit error informing the user' do
         expect(diff).to receive(:local_owners).and_return Set.new
-        expect { subject }.to raise_error(described_class::MissingOwners) do |error|
-          expect(error).to be_a_microsoft_sync_graceful_cancel_error(
-            /no users corresponding to the instructors of the Canvas course could be found/
-          )
-        end
+        klass = described_class::MissingOwners
+        msg = /no users corresponding to the instructors of the Canvas course could be found/
+        expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
       end
     end
 

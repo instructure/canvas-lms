@@ -20,7 +20,7 @@
 require_relative '../../spec_helper'
 require 'httparty'
 
-# See also be_a_microsoft_public_error matcher in support/microsoft_sync/errors.rb
+# See also be_a_microsoft_sync_public_error matcher in support/microsoft_sync/errors.rb
 describe MicrosoftSync::Errors do
   class MicrosoftSync::TestErrorNotPublic < StandardError; end
 
