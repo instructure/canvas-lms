@@ -34,6 +34,7 @@ import {
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
+import theme from '@instructure/canvas-theme'
 
 export const IsolatedThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -90,15 +91,17 @@ export const IsolatedThreadsContainer = props => {
   return (
     <div
       style={{
-        marginLeft: `6.0rem`,
-        paddingRight: '0.75rem'
+        marginLeft: '4.25rem',
+        paddingRight: theme.variables.spacing.small,
+        paddingBottom: theme.variables.spacing.xLarge
       }}
       data-testid="isolated-view-children"
     >
       {props.hasMoreOlderReplies && (
         <div
           style={{
-            marginBottom: `1.5rem`
+            marginBottom: theme.variables.spacing.medium,
+            paddingLeft: theme.variables.spacing.medium
           }}
         >
           <ShowOlderRepliesButton onClick={props.showOlderReplies} />
@@ -241,6 +244,7 @@ const IsolatedThreadContainer = props => {
               threadActions={threadActions}
               isEditing={isEditing}
               isIsolatedView
+              padding="small 0 small medium"
               onCancel={() => {
                 setIsEditing(false)
               }}
@@ -248,7 +252,7 @@ const IsolatedThreadContainer = props => {
             />
           </Flex.Item>
           {!entry.deleted && (
-            <Flex.Item align="stretch">
+            <Flex.Item align="stretch" padding="small 0 0 0">
               <ThreadActions
                 id={entry.id}
                 isUnread={!entry.read}

@@ -89,7 +89,7 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <View as="div" margin="medium none none none">
+    <View as="div" margin="small none none none">
       {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer

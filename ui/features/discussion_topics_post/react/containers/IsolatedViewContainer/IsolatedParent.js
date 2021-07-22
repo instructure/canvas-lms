@@ -87,9 +87,9 @@ export const IsolatedParent = props => {
       {props.discussionEntry.parent && (
         <div
           style={{
-            paddingLeft: '0.50rem',
-            paddingRight: '0.50rem',
-            paddingBottom: '0.50rem'
+            paddingLeft: theme.variables.spacing.xSmall,
+            paddingRight: theme.variables.spacing.xSmall,
+            paddingBottom: theme.variables.spacing.xSmall
           }}
         >
           <BackButton
@@ -100,9 +100,8 @@ export const IsolatedParent = props => {
       <div
         style={{
           marginLeft: theme.variables.spacing.medium,
-          paddingLeft: '0.75rem',
-          paddingRight: '0.75rem',
-          paddingBottom: '0.375rem'
+          paddingRight: theme.variables.spacing.small,
+          paddingBottom: theme.variables.spacing.xxSmall
         }}
       >
         <Highlight isHighlighted={props.isHighlighted}>
@@ -113,6 +112,7 @@ export const IsolatedParent = props => {
                 isIsolatedView
                 threadActions={threadActions}
                 isEditing={isEditing}
+                padding="small 0 medium small"
                 onCancel={() => {
                   setIsEditing(false)
                 }}
@@ -125,7 +125,7 @@ export const IsolatedParent = props => {
               />
             </Flex.Item>
             {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
+              <Flex.Item align="stretch" padding="small 0 0 0">
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}

@@ -302,46 +302,46 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           </View>
         )}
       {!searchTerm && (
-        <Flex as="div" direction="column" data-testid="discussion-topic-container">
-          <Flex.Item>
-            <View
-              as="div"
-              borderWidth="small"
-              borderRadius="medium"
-              borderStyle="solid"
-              borderColor="primary"
-            >
-              {isGraded(discussionTopicData.assignment) && (
-                <View as="div" padding="none medium none">
-                  <Alert
-                    dueAtDisplayText={discussionTopicData.dueAt}
-                    pointsPossible={discussionTopicData.pointsPossible}
-                    assignmentOverrides={
-                      singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
-                    }
-                    canSeeMultipleDueDates={canSeeMultipleDueDates}
-                  />
-                  {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
-                    assessmentRequest => (
-                      <PeerReview
-                        key={assessmentRequest._id}
-                        dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
-                          props.discussionTopic.assignment.peerReviews?.dueAt
-                        )}
-                        revieweeName={assessmentRequest.user.displayName}
-                        reviewLinkUrl={getReviewLinkUrl(
-                          ENV.course_id,
-                          props.discussionTopic.assignment._id,
-                          assessmentRequest.user._id
-                        )}
-                        workflowState={assessmentRequest.workflowState}
-                      />
-                    )
-                  )}
-                </View>
-              )}
+        <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
+          <Flex as="div" direction="column" data-testid="discussion-topic-container">
+            <Flex.Item>
+              <View
+                as="div"
+                borderWidth="small"
+                borderRadius="medium"
+                borderStyle="solid"
+                borderColor="primary"
+              >
+                {isGraded(discussionTopicData.assignment) && (
+                  <View as="div" padding="none medium none">
+                    <Alert
+                      dueAtDisplayText={discussionTopicData.dueAt}
+                      pointsPossible={discussionTopicData.pointsPossible}
+                      assignmentOverrides={
+                        singleOverrideWithNoDefault ? [] : discussionTopicData.assignmentOverrides
+                      }
+                      canSeeMultipleDueDates={canSeeMultipleDueDates}
+                    />
+                    {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
+                      assessmentRequest => (
+                        <PeerReview
+                          key={assessmentRequest._id}
+                          dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                            props.discussionTopic.assignment.peerReviews?.dueAt
+                          )}
+                          revieweeName={assessmentRequest.user.displayName}
+                          reviewLinkUrl={getReviewLinkUrl(
+                            ENV.course_id,
+                            props.discussionTopic.assignment._id,
+                            assessmentRequest.user._id
+                          )}
+                          workflowState={assessmentRequest.workflowState}
+                        />
+                      )
+                    )}
+                  </View>
+                )}
 
-              <Highlight isHighlighted={props.isHighlighted}>
                 <Flex direction="column">
                   <Flex.Item>
                     <Flex
@@ -350,7 +350,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       padding="medium small none"
                       alignItems="start"
                     >
-                      <Flex.Item shouldShrink shouldGrow>
+                      <Flex.Item shouldShrink shouldGrow padding="0 0 medium 0">
                         <PostMessage
                           hasAuthor={hasAuthor}
                           authorName={discussionTopicData.authorName}
@@ -437,10 +437,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     )}
                   </Flex.Item>
                 </Flex>
-              </Highlight>
-            </View>
-          </Flex.Item>
-        </Flex>
+              </View>
+            </Flex.Item>
+          </Flex>
+        </Highlight>
       )}
       <DirectShareUserModal {...directShareUserModalProps} />
       <DirectShareCourseTray {...directShareCourseTrayProps} />

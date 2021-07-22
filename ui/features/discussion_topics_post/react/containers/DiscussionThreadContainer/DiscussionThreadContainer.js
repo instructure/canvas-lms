@@ -291,7 +291,7 @@ export const DiscussionThreadContainer = props => {
   return (
     <>
       <Highlight isHighlighted={highlightEntry}>
-        <div style={{marginLeft: marginDepth, paddingLeft: '0.75rem'}} ref={threadRef}>
+        <div style={{marginLeft: marginDepth}} ref={threadRef}>
           <Flex>
             <Flex.Item shouldShrink shouldGrow>
               <PostMessageContainer
@@ -303,6 +303,7 @@ export const DiscussionThreadContainer = props => {
                   setIsEditing(false)
                 }}
                 onSave={onUpdate}
+                padding="small 0 small medium"
                 discussionRoles={resolveAuthorRoles(
                   props?.discussionTopic?.author?.id === props?.discussionEntry?.author?.id &&
                     !!props?.discussionTopic?.author?.id &&
@@ -313,7 +314,7 @@ export const DiscussionThreadContainer = props => {
               />
             </Flex.Item>
             {!props.discussionEntry.deleted && (
-              <Flex.Item align="stretch">
+              <Flex.Item align="stretch" padding="small 0 0 0">
                 <ThreadActions
                   id={props.discussionEntry.id}
                   isUnread={!props.discussionEntry.read}

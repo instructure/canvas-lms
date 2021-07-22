@@ -54,7 +54,7 @@ export function PostMessage({...props}) {
   })
 
   return (
-    <Flex padding="0 0 medium 0">
+    <Flex>
       <Flex.Item align="start">
         {props.isUnread && (
           <div
@@ -80,7 +80,7 @@ export function PostMessage({...props}) {
           <Avatar
             name={props.authorName}
             src={props.avatarUrl}
-            margin="0 small 0 0"
+            margin="0 0 0 0"
             data-testid="author_avatar"
           />
         )}
