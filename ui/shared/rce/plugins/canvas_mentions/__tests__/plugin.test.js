@@ -251,7 +251,7 @@ describe('pluginDefinition', () => {
         editor.selection.select(editor.dom.select('#mentions-marker')[0])
       })
 
-      function examplesForMentionNavigationEvents() {
+      function examplesForMentionEvents() {
         it('prevents default', () => {
           subject()
           expect(preventDefault).toHaveBeenCalled()
@@ -274,7 +274,7 @@ describe('pluginDefinition', () => {
           global.postMessage = jest.fn()
         })
 
-        examplesForMentionNavigationEvents()
+        examplesForMentionEvents()
       })
 
       describe('and the key pressed was "down"', () => {
@@ -283,7 +283,18 @@ describe('pluginDefinition', () => {
           global.postMessage = jest.fn()
         })
 
-        examplesForMentionNavigationEvents()
+        examplesForMentionEvents()
+      })
+
+      describe('and the key pressed was "enter"', () => {
+        beforeEach(() => {
+          which = KEY_CODES.enter
+          global.postMessage = jest.fn()
+
+          editor.dom.select('#mentions-marker')[0]?.setAttribute('aria-activedescendant', '#foo')
+        })
+
+        examplesForMentionEvents()
       })
 
       describe('with the key down for a "backspace" deleting the trigger character', () => {

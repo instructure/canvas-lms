@@ -22,6 +22,7 @@ export const TRUSTED_MESSAGE_ORIGIN = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
 
 export const NAVIGATION_MESSAGE = 'mentions.NavigationEvent'
 export const INPUT_CHANGE_MESSAGE = 'mentions.InputChangeEvent'
+export const SELECTION_MESSAGE = 'mentions.SelectionEvent'
 
 export const KEY_CODES = {
   backspace: 8,
@@ -32,5 +33,6 @@ export const KEY_CODES = {
 
 export const KEY_NAMES = {
   [KEY_CODES.up]: 'UpArrow',
-  [KEY_CODES.down]: 'DownArrow'
+  [KEY_CODES.down]: 'DownArrow',
+  [KEY_CODES.enter]: 'Enter'
 }

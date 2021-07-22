@@ -168,9 +168,9 @@ describe('events', () => {
     })
 
     describe('with mentions suggestion navigation events', () => {
-      let expectedMessageType
+      let expectedValue, expectedMessageType
 
-      function examplesForMentionsNavigationEvents() {
+      function examplesForMentionsEvents() {
         it('does not make the body editable', () => {
           subject()
           expect(makeBodyEditable).not.toHaveBeenCalled()
@@ -186,8 +186,8 @@ describe('events', () => {
           expect(global.postMessage).toHaveBeenCalledTimes(2)
           expect(global.postMessage).toHaveBeenCalledWith(
             {
-              messageType: 'mentions.NavigationEvent',
-              value: expectedMessageType
+              messageType: expectedMessageType,
+              value: expectedValue
             },
             'https://canvas.instructure.com'
           )
@@ -197,23 +197,45 @@ describe('events', () => {
       describe('when the key is "up"', () => {
         beforeEach(() => {
           event.which = 38
+
           event.preventDefault = jest.fn()
           global.postMessage = jest.fn()
-          expectedMessageType = 'UpArrow'
+
+          expectedValue = 'UpArrow'
+          expectedMessageType = 'mentions.NavigationEvent'
         })
 
-        examplesForMentionsNavigationEvents()
+        examplesForMentionsEvents()
       })
 
       describe('when the key is "down"', () => {
         beforeEach(() => {
           event.which = 40
+
           event.preventDefault = jest.fn()
           global.postMessage = jest.fn()
-          expectedMessageType = 'DownArrow'
+
+          expectedValue = 'DownArrow'
+          expectedMessageType = 'mentions.NavigationEvent'
         })
 
-        examplesForMentionsNavigationEvents()
+        examplesForMentionsEvents()
+      })
+
+      describe('when the key is "enter"', () => {
+        beforeEach(() => {
+          event.which = 13
+
+          event.preventDefault = jest.fn()
+          global.postMessage = jest.fn()
+
+          expectedValue = 'Enter'
+          expectedMessageType = 'mentions.SelectionEvent'
+
+          onActiveDescendantChange('#foo', editor)
+        })
+
+        examplesForMentionsEvents()
       })
     })
   })
@@ -261,6 +283,16 @@ describe('events', () => {
       })
 
       it('does not broadcast the message', () => {
+        subject()
+        expect(global.postMessage).not.toHaveBeenCalled()
+        expect(global.postMessage).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when the "enter" key is pressed', () => {
+      beforeEach(() => (event.which = 13))
+
+      it('does not broadcast an input change method', () => {
         subject()
         expect(global.postMessage).not.toHaveBeenCalled()
         expect(global.postMessage).not.toHaveBeenCalled()

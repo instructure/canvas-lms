@@ -19,14 +19,29 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import {makeBodyEditable} from './contentEditable'
 import {MARKER_SELECTOR, MARKER_ID, KEY_CODES} from './constants'
-import broadcastMessage, {inputChangeMessage, navigationMessage} from './broadcastMessage'
 import MentionDropdown from './components/MentionAutoComplete/MentionDropdown'
+import broadcastMessage, {
+  inputChangeMessage,
+  navigationMessage,
+  selectionMessage
+} from './broadcastMessage'
 
 function shouldRestoreFromKeyEvent(event, editor) {
   const {which} = event
 
   // Enter key was pressed
-  if (which === KEY_CODES.enter) return true
+  if (which === KEY_CODES.enter) {
+    const activeDescendant = editor.dom
+      .select(MARKER_SELECTOR)[0]
+      ?.getAttribute('aria-activedescendant')
+
+    // If an active descendant is present, the user currently
+    // has a user in the mentions suggestion component active.
+    //
+    // In this case, "enter" should select the user from the
+    // list, not restore editability to the tinymce body
+    return activeDescendant === '' || !activeDescendant
+  }
 
   // Nothing but a backspace key press can restore
   // body editability at this point
@@ -44,7 +59,7 @@ function isMentionsNavigationEvent(event, editor) {
 
   if (!inMentionsMarker(editor)) return false
 
-  return which === KEY_CODES.up || which === KEY_CODES.down
+  return which === KEY_CODES.up || which === KEY_CODES.down || which === KEY_CODES.enter
 }
 
 function inMentionsMarker(editor) {
@@ -99,6 +114,7 @@ export const onKeyDown = e => {
   // mentions marker?
   if (!inMentionsMarker(editor) || shouldRestoreFromKeyEvent(e, editor)) {
     makeBodyEditable(editor, MARKER_SELECTOR)
+    return
   }
 
   // Should the event control the mentions suggestion
@@ -108,7 +124,8 @@ export const onKeyDown = e => {
     e.preventDefault()
 
     // Broadcast the event to mentions components
-    broadcastMessage(navigationMessage(e), [editor.getWin(), window])
+    const message = e.which === KEY_CODES.enter ? selectionMessage(e) : navigationMessage(e)
+    broadcastMessage(message, [editor.getWin(), window])
   }
 }
 
@@ -127,6 +144,9 @@ export const onKeyUp = e => {
   // Navigation messages are broadcast on key down.
   // Prevent message duplication by returning early
   if (isMentionsNavigationEvent(e, editor)) return
+
+  // "Enter" indicates a selection, not an input change
+  if (e.which === KEY_CODES.enter) return
 
   if (inMentionsMarker(editor)) {
     broadcastMessage(inputChangeMessage(editor.selection.getNode().innerHTML), [

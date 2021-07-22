@@ -20,7 +20,8 @@ import {
   KEY_NAMES,
   TRUSTED_MESSAGE_ORIGIN,
   NAVIGATION_MESSAGE,
-  INPUT_CHANGE_MESSAGE
+  INPUT_CHANGE_MESSAGE,
+  SELECTION_MESSAGE
 } from './constants'
 
 /**
@@ -47,6 +48,10 @@ export function navigationMessage(event) {
  */
 export function inputChangeMessage(value) {
   return {messageType: INPUT_CHANGE_MESSAGE, value}
+}
+
+export function selectionMessage(event) {
+  return {messageType: SELECTION_MESSAGE, value: KEY_NAMES[event.which] || event.which}
 }
 
 /**
