@@ -34,6 +34,10 @@ class Token
     jwt_payload[:sub]
   end
 
+  def account_uuid
+    jwt_payload[:acct]
+  end
+
   def canvas_domain
     jwt_payload[:canvas_domain]
   end
@@ -70,9 +74,9 @@ class Token
   class << self
     private :new
 
-    def for_user(user_uuid, canvas_domain: nil, real_user_uuid: nil, real_user_shard_id: nil)
-      if user_uuid.blank?
-        raise ArgumentError, "Must provide user uuid"
+    def for_user(user_uuid: nil, account_uuid: nil, canvas_domain: nil, real_user_uuid: nil, real_user_shard_id: nil)
+      if user_uuid.blank? || account_uuid.blank?
+        raise ArgumentError, "Must provide user uuid and account uuid"
       end
 
       now = Time.now.to_i
@@ -81,6 +85,7 @@ class Token
         iat: now,
         exp: now + 1.hour.to_i,
         sub: user_uuid,
+        acct: account_uuid,
       }
       payload[:canvas_domain] = canvas_domain if canvas_domain
       payload[:masq_sub] = real_user_uuid if real_user_uuid

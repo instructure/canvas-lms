@@ -51,7 +51,7 @@ describe InstAccessTokensController do
     end
 
     it "doesn't allow using an InstAccess token to generate an InstAccess token" do
-      token = InstAccess::Token.for_user(user.uuid).to_unencrypted_token_string
+      token = InstAccess::Token.for_user(user_uuid: user.uuid, account_uuid: user.account.uuid).to_unencrypted_token_string
       request.headers['Authorization'] = "Bearer #{token}"
       get 'create', format: 'json'
       expect(response.status).to eq(403)

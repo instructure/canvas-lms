@@ -514,7 +514,7 @@ describe "API Authentication", type: :request do
     end
 
     it "allows API access with a valid InstAccess token" do
-      token = InstAccess::Token.for_user(@user.uuid).to_unencrypted_token_string
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
       get "/api/v1/courses", headers: {
         'HTTP_AUTHORIZATION' => "Bearer #{token}"
       }
@@ -526,7 +526,8 @@ describe "API Authentication", type: :request do
       user = @user
       real_user = user_with_pseudonym
       token = InstAccess::Token.for_user(
-        user.uuid,
+        user_uuid: user.uuid,
+        account_uuid: user.account.uuid,
         real_user_uuid: real_user.uuid,
         real_user_shard_id: real_user.shard.id
       ).to_unencrypted_token_string
@@ -541,7 +542,7 @@ describe "API Authentication", type: :request do
     end
 
     it "errors if the InstAccess token is expired" do
-      token = InstAccess::Token.for_user(@user.uuid).to_unencrypted_token_string
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
       Timecop.travel(3601) do
         get "/api/v1/courses", headers: {
           'HTTP_AUTHORIZATION' => "Bearer #{token}"
@@ -552,7 +553,7 @@ describe "API Authentication", type: :request do
     end
 
     it "requires an active pseudonym" do
-      token = InstAccess::Token.for_user(@user.uuid).to_unencrypted_token_string
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
       @user.pseudonym.destroy
       get "/api/v1/courses", headers: {
         'HTTP_AUTHORIZATION' => "Bearer #{token}"

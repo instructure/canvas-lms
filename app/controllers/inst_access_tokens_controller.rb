@@ -59,7 +59,8 @@ class InstAccessTokensController < ApplicationController
     increment_request_cost(Setting.get("inst_access_token_additional_request_cost", "200").to_i)
 
     token = InstAccess::Token.for_user(
-      @current_user.uuid,
+      user_uuid: @current_user.uuid,
+      account_uuid: @domain_root_account.uuid,
       canvas_domain: request.env['HTTP_HOST'],
       real_user_uuid: @real_current_user&.uuid,
       real_user_shard_id: @real_current_user&.shard&.id,

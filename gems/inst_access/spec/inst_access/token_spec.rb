@@ -29,7 +29,7 @@ describe InstAccess::Token do
   let(:encryption_priv_key) { encryption_keypair.to_s }
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
-  let(:a_token) { described_class.for_user('user-uuid') }
+  let(:a_token) { described_class.for_user(user_uuid: 'user-uuid', account_uuid: 'acct-uuid') }
   let(:unencrypted_token) do
     InstAccess.with_config(signing_key: signing_priv_key) do
       a_token.to_unencrypted_token_string
@@ -59,20 +59,32 @@ describe InstAccess::Token do
   end
 
   describe ".for_user" do
-    it "blows up without a user" do
+    it "blows up without a user uuid" do
       expect do
-        described_class.for_user('')
+        described_class.for_user(user_uuid: '', account_uuid: 'acct-uuid')
       end.to raise_error(ArgumentError)
     end
 
-    it "creates an instance for the given user uuid" do
-      id = described_class.for_user('user-uuid')
+    it "blows up without an account uuid" do
+      expect do
+        described_class.for_user(user_uuid: 'user-uuid', account_uuid: '')
+      end.to raise_error(ArgumentError)
+    end
+
+    it "creates an instance for the given uuids" do
+      id = described_class.for_user(user_uuid: 'user-uuid', account_uuid: 'acct-uuid')
       expect(id.user_uuid).to eq('user-uuid')
       expect(id.masquerading_user_uuid).to be_nil
     end
 
     it "accepts other details" do
-      id = described_class.for_user('user-uuid', canvas_domain: 'z.instructure.com', real_user_uuid: 'masq-id', real_user_shard_id: 5)
+      id = described_class.for_user(
+        user_uuid: 'user-uuid',
+        account_uuid: 'acct-uuid',
+        canvas_domain: 'z.instructure.com',
+        real_user_uuid: 'masq-id',
+        real_user_shard_id: 5
+      )
       expect(id.canvas_domain).to eq('z.instructure.com')
       expect(id.masquerading_user_uuid).to eq('masq-id')
       expect(id.masquerading_user_shard_id).to eq(5)
@@ -81,7 +93,7 @@ describe InstAccess::Token do
 
   context "without being configured" do
     it "#to_token_string blows up" do
-      id = described_class.for_user('user-uuid')
+      id = described_class.for_user(user_uuid: 'user-uuid', account_uuid: 'acct-uuid')
       expect do
         id.to_token_string
       end.to raise_error(InstAccess::ConfigError)
@@ -102,7 +114,7 @@ describe InstAccess::Token do
     end
 
     it "#to_token_string blows up" do
-      id = described_class.for_user('user-uuid')
+      id = described_class.for_user(user_uuid: 'user-uuid', account_uuid: 'acct-uuid')
       expect do
         id.to_token_string
       end.to raise_error(InstAccess::ConfigError)
