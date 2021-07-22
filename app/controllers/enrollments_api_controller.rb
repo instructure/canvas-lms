@@ -485,6 +485,7 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
+      enrollments = enrollments.joins(:user).order(User.sortable_name_order_by_clause)
       collection =
         if use_bookmarking
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
