@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addReplyToDiscussion, addReplyToDiscussionEntry, getSpeedGraderUrl} from '../../utils'
+import {
+  updateDiscussionTopicRepliesCount,
+  addReplyToDiscussionEntry,
+  getSpeedGraderUrl
+} from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
@@ -46,15 +50,17 @@ export const IsolatedViewContainer = props => {
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+    const variables = {
+      discussionEntryID: newDiscussionEntry.parent.id,
+      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      sort: 'asc',
+      courseID: window.ENV?.course_id,
+      relativeEntryId: props?.relativeEntryId,
+      includeRelativeEntry: !!props?.relativeEntryId
+    }
 
-    addReplyToDiscussion(cache, props.discussionTopic.id)
-    addReplyToDiscussionEntry(
-      cache,
-      ISOLATED_VIEW_INITIAL_PAGE_SIZE,
-      newDiscussionEntry,
-      window.ENV?.course_id,
-      props.relativeEntryId
-    )
+    updateDiscussionTopicRepliesCount(cache, props.discussionTopic.id)
+    addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {

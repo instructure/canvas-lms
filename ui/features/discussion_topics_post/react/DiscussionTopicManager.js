@@ -171,7 +171,11 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
-        currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+        if (variables.sort === 'desc') {
+          currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
+        } else {
+          currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
+        }
 
         cache.writeQuery({...options, data: currentDiscussion})
       }
