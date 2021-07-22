@@ -1,4 +1,7 @@
 {
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "Open de pretty HTML-editor"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "Toegankelijkheidscontrole"
     },
@@ -10,6 +13,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "CC/ondertiteling toevoegen"
+    },
+    "add_image_60b2de07": {
+        "message": "Afbeelding toevoegen"
     },
     "add_to_do_7537af64": {
         "message": "To-do-lijst toevoegen"
@@ -37,6 +43,9 @@
     },
     "all_4321c3a1": {
         "message": "Alle"
+    },
+    "all_apps_a50dea49": {
+        "message": "Alle apps"
     },
     "all_day_fb42c4fc": {
         "message": "De hele dag"
@@ -119,6 +128,9 @@
     "attributes_963ba262": {
         "message": "Kenmerken"
     },
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "Audio- en video-opname wordt niet ondersteund; gebruik een andere browser."
+    },
     "audio_player_for_title_20cc70d": {
         "message": "Audio-speler voor { title }"
     },
@@ -134,6 +146,27 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Begin van je To-do-historie"
     },
+    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+        "message": "Hieronder is een voorbeeld van hoe cursisten hun planning zullen zien"
+    },
+    "button_color_608a0242": {
+        "message": "Knopkleur"
+    },
+    "button_outline_cf14f071": {
+        "message": "Knopomtrek"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Knopomtrekgrootte"
+    },
+    "button_shape_dbecb573": {
+        "message": "Knopvorm"
+    },
+    "button_size_20f5fce1": {
+        "message": "Knopgrootte"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Knoppen en pictogrammen"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -143,9 +176,6 @@
     "calendar_event_89aadc1c": {
         "message": "Gebeurtenis op kalender"
     },
-    "cancel_caeb1e68": {
-        "message": "Annuleren"
-    },
     "canvas_planner_98ed106": {
         "message": "Canvas planner"
     },
@@ -154,6 +184,9 @@
     },
     "choose_usage_rights_33683854": {
         "message": "Gebruiksrechten kiezen..."
+    },
+    "circle_484abe63": {
+        "message": "Cirkel"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "ongeordende lijst omcirkelen"
@@ -166,6 +199,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Verwijder geselecteerd bestand: { filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "Klik of schuif-klik voor de HTML-editor."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikken om { imageName } in te sluiten"
@@ -197,6 +233,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Inklappen om te verbergen { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Kleur { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -221,11 +260,17 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {Ontbrekend item # verbergen}\n  other {Ontbrekende items # verbergen}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# item geladen}\n  other {# items geladen}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
         "message": "{ count, plural,\n    one {Toon # voltooid item}\n  other {Toon # voltooide items}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+        "message": "{ count, plural,\n    one {Ontbrekend item # tonen}\n  other {Ontbrekende items # tonen}\n}"
     },
     "course_8a63b4a3": {
         "message": "Cursus"
@@ -253,6 +298,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } TO-DO"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "Knop en pictogram maken"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licentie:"
@@ -416,6 +464,9 @@
     "error_loading_grades_e0b38f4d": {
         "message": "Fout bij laden van cijfers"
     },
+    "error_loading_items_5218438e": {
+        "message": "Fout bij het laden van items"
+    },
     "error_loading_more_items_3f109d9f": {
         "message": "Fout bij het laden van meer items"
     },
@@ -424,6 +475,9 @@
     },
     "excused_cf8792eb": {
         "message": "Vrijgesteld"
+    },
+    "expand_preview_by_default_2abbf9f8": {
+        "message": "Uitvouwvoorbeeld is standaard"
     },
     "expand_to_see_types_f5d29352": {
         "message": "Uitklappen om te bekijken { types }"
@@ -436,6 +490,21 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra groot"
+    },
+    "extra_small_9ae33252": {
+        "message": "Extra klein"
+    },
+    "failed_peeking_into_your_future_e95b9306": {
+        "message": "Gluren in de toekomst is mislukt"
+    },
+    "failed_peeking_into_your_past_5bec2323": {
+        "message": "Gluren in het verleden is mislukt"
+    },
+    "failed_saving_changes_on_name_1e100ad": {
+        "message": "Opslaan van wijzigingen op { name } is mislukt."
+    },
+    "failed_to_delete_name_bdd7b810": {
+        "message": "Verwijderen van { name } is mislukt."
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "Kan To Do-lijst niet sluiten"
@@ -554,6 +623,24 @@
     "height_69b03e15": {
         "message": "Hoogte"
     },
+    "hexagon_d8468e0d": {
+        "message": "Zeshoek"
+    },
+    "hide_description_bfb5502e": {
+        "message": "Beschrijving verbergen"
+    },
+    "hide_title_description_caf092ef": {
+        "message": "Beschrijving van { title } verbergen"
+    },
+    "home_351838cd": {
+        "message": "Startpagina"
+    },
+    "html_code_editor_fd967a44": {
+        "message": "HTML-code-editor"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML-editor"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Ik heb toestemming gekregen om dit bestand te gebruiken."
     },
@@ -601,6 +688,12 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } voltooid(e) { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "jump_to_navigation_toolbar_2952cd8b": {
+        "message": "Naar navigatiewerkbalk springen"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Naar vandaag springen"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Sneltoetsen"
@@ -704,6 +797,9 @@
     "my_grades_98834476": {
         "message": "Mijn cijfers"
     },
+    "my_images_427f9b0c": {
+        "message": "Mijn afbeeldingen"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigeer door het menu of de werkbalk"
     },
@@ -737,6 +833,9 @@
     "no_grade_3b4d7f3e": {
         "message": "Geen cijfer"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Er is geen voorbeeld voor dit bestand beschikbaar."
+    },
     "no_results_940393cf": {
         "message": "Geen resultaten."
     },
@@ -745,6 +844,12 @@
     },
     "no_results_found_for_term_1564c08e": {
         "message": "Geen resultaten gevonden voor { term }."
+    },
+    "none_3b5e34d2": {
+        "message": "Geen"
+    },
+    "nothing_due_this_week_d45c9ef9": {
+        "message": "Niets in te leveren deze week"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Momenteel niets"
@@ -770,11 +875,17 @@
     "numpoints_points_8621a43b": {
         "message": "{ numPoints } punten"
     },
+    "octagon_e48be9f": {
+        "message": "Achthoek"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Open dit dialoogvenster met sneltoetsen"
+    },
+    "open_title_application_fd624fc5": {
+        "message": "{ title } applicatie openen"
     },
     "opportunities_popup_f6703842": {
         "message": "mogelijkheden popup"
@@ -824,8 +935,17 @@
     "preformatted_d0670862": {
         "message": "Voorgeformatteerd"
     },
+    "pretty_html_editor_28748756": {
+        "message": "Pretty HTML-editor"
+    },
     "preview_53003fd2": {
         "message": "Voorbeeld"
+    },
+    "preview_in_overlay_ed772c46": {
+        "message": "Voorbeeld in overlay"
+    },
+    "preview_inline_9787330": {
+        "message": "Voorbeeld inline"
     },
     "previous_month_bb1e3c84": {
         "message": "Vorige maand"
@@ -860,6 +980,9 @@
     "record_upload_media_5fdce166": {
         "message": "Media opnemen/uploaden"
     },
+    "redo_363c58b7": {
+        "message": "Opnieuw"
+    },
     "reminder_date_4564d12d": {
         "message": "Herinnering: { date }"
     },
@@ -868,6 +991,9 @@
     },
     "replies_4a8577c8": {
         "message": "Antwoorden"
+    },
+    "resize_ec83d538": {
+        "message": "Grootte wijzigen"
     },
     "restore_auto_save_deccd84b": {
         "message": "Automatisch opslaan herstellen?"
@@ -878,8 +1004,17 @@
     "right_to_left_9cfb092a": {
         "message": "Rechts-links"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
+    },
     "save_11a80ec3": {
         "message": "Opslaan"
+    },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Opgeslagen knoppen en pictogrammen"
+    },
+    "schedule_preview_3bcda153": {
+        "message": "Planningsvoorbeeld"
     },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Scroll omhoog om je geschiedenis weer te geven!"
@@ -898,6 +1033,9 @@
     },
     "selected_274ce24f": {
         "message": "Geselecteerd"
+    },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "Shift-O om de pretty HTML-editor te openen."
     },
     "show_all_ae37d610": {
         "message": "Alles tonen"
@@ -947,8 +1085,14 @@
     "sort_by_e75f9e3e": {
         "message": "Sorteren op"
     },
+    "square_511eb3b3": {
+        "message": "Vierkant"
+    },
     "square_unordered_list_b15ce93b": {
         "message": "vierkante ongeordende lijst"
+    },
+    "star_8d156e09": {
+        "message": "Ster"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } tot { endDate }"
@@ -986,6 +1130,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Ondersteunde bestandstypen: SRT of WebVTT"
     },
+    "switch_to_the_html_editor_146dfffd": {
+        "message": "Overschakelen naar de HTML-editor"
+    },
+    "switch_to_the_rich_text_editor_63c1ecf6": {
+        "message": "Overschakelen naar de Rich Text Editor"
+    },
     "syllabus_f191f65b": {
         "message": "Syllabus"
     },
@@ -1010,8 +1160,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Op het materiaal is een uitzondering van toepassing, bijvoorbeeld redelijk gebruik, het recht om te citeren of andere toepasselijke wetgeving op het auteursrecht"
     },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Er zijn geen punten gekoppeld aan dit item."
+    },
+    "there_is_nothing_planned_for_today_e09bfc8c": {
+        "message": "Er is niets gepland voor vandaag."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
@@ -1046,6 +1202,9 @@
     "today_at_date_8ac30d6": {
         "message": "Vandaag om { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "{ summary } groep omschakelen"
+    },
     "tomorrow_9a6c9a00": {
         "message": "Morgen"
     },
@@ -1060,6 +1219,9 @@
     },
     "tray_839df38a": {
         "message": "Houder"
+    },
+    "triangle_6072304e": {
+        "message": "Driehoek"
     },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "typ Ctrl+F9 om opties voor afbeeldingen te openen. { text }"
@@ -1094,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Media uploaden/opnemen"
     },
+    "uploading_closed_captions_subtitles_failed_bc093f3": {
+        "message": "Uploaden van bijschriften/ondertiteling is mislukt."
+    },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "geordende lijst op hoofdletters alfabet"
     },
@@ -1111,6 +1276,15 @@
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Gebruik de pijltoetsen om door opties te navigeren."
+    },
+    "use_arrow_keys_to_select_a_shape_c8eb57ed": {
+        "message": "Gebruik pijltoetsen om een vorm te selecteren."
+    },
+    "use_arrow_keys_to_select_a_size_699a19f4": {
+        "message": "Gebruik pijltoetsen om een grootte te selecteren."
+    },
+    "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
+        "message": "Gebruik pijltoetsen om een omtrekgrootte te selecteren."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Gebruikt door schermlezers om de inhoud van een afbeelding te beschrijven"
@@ -1145,8 +1319,26 @@
     "view_ba339f93": {
         "message": "Bekijken"
     },
+    "view_description_30446afc": {
+        "message": "Beschrijving bekijken"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Sneltoetsen bekijken"
+    },
+    "view_next_week_7f61f755": {
+        "message": "Volgende week bekijken"
+    },
+    "view_predefined_colors_92f5db39": {
+        "message": "Voorgedefinieerde kleuren bekijken"
+    },
+    "view_previous_week_6f83849f": {
+        "message": "Vorige week bekijken"
+    },
+    "view_title_description_67940918": {
+        "message": "{ title } beschrijving bekijken"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "Navigatie van wekelijkse planning"
     },
     "width_492fec76": {
         "message": "Breedte"

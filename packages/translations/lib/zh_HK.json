@@ -1,4 +1,7 @@
 {
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "存取美觀 HTML 編輯器"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "可訪問性檢查器"
     },
@@ -10,6 +13,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "添加副本/字幕"
+    },
+    "add_image_60b2de07": {
+        "message": "添加影像"
     },
     "add_to_do_7537af64": {
         "message": "添加到待辦事項"
@@ -37,6 +43,9 @@
     },
     "all_4321c3a1": {
         "message": "全部"
+    },
+    "all_apps_a50dea49": {
+        "message": "所有應用程式"
     },
     "all_day_fb42c4fc": {
         "message": "全天"
@@ -119,6 +128,9 @@
     "attributes_963ba262": {
         "message": "屬性"
     },
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "不支援音訊和視訊錄製；請使用不同的瀏覽器。"
+    },
     "audio_player_for_title_20cc70d": {
         "message": "{ title } 的音訊播放器"
     },
@@ -134,6 +146,27 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "開始您的待辦事項歷程紀錄"
     },
+    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+        "message": "下面是學生看到的排程的範例"
+    },
+    "button_color_608a0242": {
+        "message": "按鈕顏色"
+    },
+    "button_outline_cf14f071": {
+        "message": "按鈕提綱"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "按鈕提綱大小"
+    },
+    "button_shape_dbecb573": {
+        "message": "按鈕形狀"
+    },
+    "button_size_20f5fce1": {
+        "message": "按鈕大小"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "按鈕和圖示"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -143,9 +176,6 @@
     "calendar_event_89aadc1c": {
         "message": "行事曆活動"
     },
-    "cancel_caeb1e68": {
-        "message": "取消"
-    },
     "canvas_planner_98ed106": {
         "message": "Canvas 手冊"
     },
@@ -154,6 +184,9 @@
     },
     "choose_usage_rights_33683854": {
         "message": "選擇使用權限…"
+    },
+    "circle_484abe63": {
+        "message": "圓形"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "圓形無序清單"
@@ -166,6 +199,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "清除所選擇的檔案：{ filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "點擊或按住 Shift 點擊調出 html 編輯器。"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "按一下以嵌入 { imageName }"
@@ -197,6 +233,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "收起以隱藏 { types }"
     },
+    "color_color_eb64b08": {
+        "message": "顏色 { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "電腦"
     },
@@ -221,11 +260,17 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# 機會}\n    one {# 機會}\n  other {# 機會}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {隱藏 # 個缺失項目}\n  other {隱藏 # 個缺失項目}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# 個項目已載入}\n  other {# 個項目已載入}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
         "message": "{ count, plural,\n    one {顯示 # 個已完成項目}\n  other {顯示 # 個已完成項目}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+        "message": "{ count, plural,\n    one {顯示 # 個缺失項目}\n  other {顯示 # 個缺失項目}\n}"
     },
     "course_8a63b4a3": {
         "message": "課程"
@@ -253,6 +298,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } 待辦事項"
+    },
+    "create_button_and_icon_5c089934": {
+        "message": "建立按鈕和圖示"
     },
     "creative_commons_license_725584ae": {
         "message": "創意共享授權："
@@ -416,6 +464,9 @@
     "error_loading_grades_e0b38f4d": {
         "message": "載入成績時發生錯誤"
     },
+    "error_loading_items_5218438e": {
+        "message": "載入項目時發生錯誤"
+    },
     "error_loading_more_items_3f109d9f": {
         "message": "載入更多項目時發生錯誤"
     },
@@ -424,6 +475,9 @@
     },
     "excused_cf8792eb": {
         "message": "已免除"
+    },
+    "expand_preview_by_default_2abbf9f8": {
+        "message": "預設為展開預覽"
     },
     "expand_to_see_types_f5d29352": {
         "message": "展開以查看 { types }"
@@ -436,6 +490,21 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "超大"
+    },
+    "extra_small_9ae33252": {
+        "message": "超小"
+    },
+    "failed_peeking_into_your_future_e95b9306": {
+        "message": "無法窺視您的未來"
+    },
+    "failed_peeking_into_your_past_5bec2323": {
+        "message": "無法窺視您的過去"
+    },
+    "failed_saving_changes_on_name_1e100ad": {
+        "message": "無法儲存對 { name } 的變更。"
+    },
+    "failed_to_delete_name_bdd7b810": {
+        "message": "無法刪除 { name }。"
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "未能刪除待辦事項"
@@ -554,6 +623,24 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "hexagon_d8468e0d": {
+        "message": "六邊形"
+    },
+    "hide_description_bfb5502e": {
+        "message": "隱藏描述"
+    },
+    "hide_title_description_caf092ef": {
+        "message": "隱藏 { title } 描述"
+    },
+    "home_351838cd": {
+        "message": "首頁"
+    },
+    "html_code_editor_fd967a44": {
+        "message": "Html 代碼編輯器"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML 編輯器"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "我已經獲得了該文檔的使用權限。"
     },
@@ -601,6 +688,12 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } 已完成 { items, plural,\n     =1 { 個項目}\n  other { 個項目}\n}"
+    },
+    "jump_to_navigation_toolbar_2952cd8b": {
+        "message": "跳轉到導航工具欄"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "跳轉到今天"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "鍵盤快速鍵"
@@ -704,6 +797,9 @@
     "my_grades_98834476": {
         "message": "我的成績"
     },
+    "my_images_427f9b0c": {
+        "message": "我的影像"
+    },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "導航整個選單或工具欄"
     },
@@ -737,6 +833,9 @@
     "no_grade_3b4d7f3e": {
         "message": "無評分"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "本檔案不支援預覽。"
+    },
     "no_results_940393cf": {
         "message": "無結果。"
     },
@@ -745,6 +844,12 @@
     },
     "no_results_found_for_term_1564c08e": {
         "message": "找不到 { term } 的結果。"
+    },
+    "none_3b5e34d2": {
+        "message": "無"
+    },
+    "nothing_due_this_week_d45c9ef9": {
+        "message": "無本週截止事項"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "未有內容"
@@ -770,11 +875,17 @@
     "numpoints_points_8621a43b": {
         "message": "{ numPoints } 分"
     },
+    "octagon_e48be9f": {
+        "message": "八邊形"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*只顯示最近的評分期。"
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "開啟此鍵盤快速鍵對話方塊"
+    },
+    "open_title_application_fd624fc5": {
+        "message": "開啟 { title } 應用程式"
     },
     "opportunities_popup_f6703842": {
         "message": "機會彈出視窗"
@@ -824,8 +935,17 @@
     "preformatted_d0670862": {
         "message": "已預先格式化"
     },
+    "pretty_html_editor_28748756": {
+        "message": "美觀 HTML 編輯器"
+    },
     "preview_53003fd2": {
         "message": "預覽"
+    },
+    "preview_in_overlay_ed772c46": {
+        "message": "覆蓋預覽"
+    },
+    "preview_inline_9787330": {
+        "message": "預覽內嵌"
     },
     "previous_month_bb1e3c84": {
         "message": "上個月"
@@ -860,6 +980,9 @@
     "record_upload_media_5fdce166": {
         "message": "錄製/上傳媒體"
     },
+    "redo_363c58b7": {
+        "message": "重做"
+    },
     "reminder_date_4564d12d": {
         "message": "提醒：{ date }"
     },
@@ -868,6 +991,9 @@
     },
     "replies_4a8577c8": {
         "message": "回覆"
+    },
+    "resize_ec83d538": {
+        "message": "調校大小"
     },
     "restore_auto_save_deccd84b": {
         "message": "還原自動儲存？"
@@ -878,8 +1004,17 @@
     "right_to_left_9cfb092a": {
         "message": "右至左"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "很遺憾，美觀 HTML 編輯器無法用鍵盤存取。在這裡存取原始 HTML 編輯器。"
+    },
     "save_11a80ec3": {
         "message": "儲存"
+    },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "儲存的按鈕和圖示"
+    },
+    "schedule_preview_3bcda153": {
+        "message": "排程預覽"
     },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "向上捲動以查看您的歷程記錄！"
@@ -898,6 +1033,9 @@
     },
     "selected_274ce24f": {
         "message": "已選擇"
+    },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "按 Shift-O 開啟美觀 HTML 編輯器。"
     },
     "show_all_ae37d610": {
         "message": "全部顯示"
@@ -947,8 +1085,14 @@
     "sort_by_e75f9e3e": {
         "message": "排序依據"
     },
+    "square_511eb3b3": {
+        "message": "正方形"
+    },
     "square_unordered_list_b15ce93b": {
         "message": "方形無序清單"
+    },
+    "star_8d156e09": {
+        "message": "星形"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } 至 { endDate }"
@@ -986,6 +1130,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "支援的檔案類型：SRT 或 WebVTT"
     },
+    "switch_to_the_html_editor_146dfffd": {
+        "message": "切換到 html 編輯器"
+    },
+    "switch_to_the_rich_text_editor_63c1ecf6": {
+        "message": "切換到多種格式的文字編輯器"
+    },
     "syllabus_f191f65b": {
         "message": "課程大綱"
     },
@@ -1010,8 +1160,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "可能有適用於此資料的例外情況 - 如：合理使用、引用權，或適用版權法下的其他情況"
     },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "美觀 HTML 編輯器無法用鍵盤存取。按 ShiftO 開啟原始 HTML 編輯器。"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "沒有與此項目關聯的分數。"
+    },
+    "there_is_nothing_planned_for_today_e09bfc8c": {
+        "message": "今天沒有任何規劃項目。"
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "雖然您的影片在瀏覽器中有正確的標題，但我們無法在資料庫中將其更新。"
@@ -1046,6 +1202,9 @@
     "today_at_date_8ac30d6": {
         "message": "今天 { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "切換 { summary } 群組"
+    },
     "tomorrow_9a6c9a00": {
         "message": "明天"
     },
@@ -1060,6 +1219,9 @@
     },
     "tray_839df38a": {
         "message": "收集箱"
+    },
+    "triangle_6072304e": {
+        "message": "三角形"
     },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "輸入 Control F9 以存取影像選項。{ text }"
@@ -1094,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "上傳/錄製媒體"
     },
+    "uploading_closed_captions_subtitles_failed_bc093f3": {
+        "message": "上傳隱藏圖片說明/字幕失敗。"
+    },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "大寫字母有序清單"
     },
@@ -1111,6 +1276,15 @@
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "使用箭頭鍵導航選項。"
+    },
+    "use_arrow_keys_to_select_a_shape_c8eb57ed": {
+        "message": "使用箭頭鍵選擇形狀。"
+    },
+    "use_arrow_keys_to_select_a_size_699a19f4": {
+        "message": "使用箭頭鍵選擇大小。"
+    },
+    "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
+        "message": "使用箭頭鍵選擇提綱大小。"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "由螢幕讀取器使用以描述影像的內容"
@@ -1145,8 +1319,26 @@
     "view_ba339f93": {
         "message": "檢視"
     },
+    "view_description_30446afc": {
+        "message": "檢視描述"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "檢視鍵盤快速鍵"
+    },
+    "view_next_week_7f61f755": {
+        "message": "檢視下一周"
+    },
+    "view_predefined_colors_92f5db39": {
+        "message": "檢視預定義的顏色"
+    },
+    "view_previous_week_6f83849f": {
+        "message": "檢視上一周"
+    },
+    "view_title_description_67940918": {
+        "message": "檢視 { title } 描述"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "每週排程導航工具"
     },
     "width_492fec76": {
         "message": "寬度"
