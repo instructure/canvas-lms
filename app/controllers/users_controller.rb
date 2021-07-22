@@ -1898,6 +1898,10 @@ class UsersController < ApplicationController
   #   Only Available Pronouns set on the root account are allowed
   #   Adding and changing pronouns must be enabled on the root account.
   #
+  # @argument user[event] [String, "suspend"|"unsuspend"]
+  #   suspends or unsuspends all logins for this user that the calling user
+  #   has permission to
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
@@ -1935,7 +1939,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.concat([:time_zone, :locale])
+      managed_attributes.concat([:time_zone, :locale, :event])
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
@@ -1996,6 +2000,17 @@ class UsersController < ApplicationController
     end
 
     @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
+
+    if (event = user_params.delete(:event)) && %w[suspend unsuspend].include?(event) &&
+      @user != @current_user
+      @user.pseudonyms.active.shard(@user).each do |p|
+        next unless p.grants_right?(@current_user, :delete)
+        next if p.active? && event == 'unsuspend'
+        next if p.suspended? && event == 'suspend'
+
+        p.update!(workflow_state: event == 'suspend' ? 'suspended' : 'active')
+      end
+    end
 
     respond_to do |format|
       if @user.update(user_params)
@@ -2820,7 +2835,7 @@ class UsersController < ApplicationController
     end
 
     if @pseudonym.nil?
-      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      @pseudonym = @context.pseudonyms.active_only.by_unique_id(params[:pseudonym][:unique_id]).first
       # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
       @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
     end

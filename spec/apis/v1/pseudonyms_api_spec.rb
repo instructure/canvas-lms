@@ -47,7 +47,8 @@ describe PseudonymsController, type: :request do
             'sis_user_id' => p.sis_user_id,
             'unique_id' => p.unique_id,
             'user_id' => p.user_id,
-            'created_at' => p.created_at
+            'created_at' => p.created_at,
+            'workflow_state' => 'active',
           }
         end)
       end
@@ -90,6 +91,16 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, @user_path, @user_path_options)
         expect(json.count).to eql 2
         expect(json.map{|j| j['id']}.include?(to_delete.id)).to be_falsey
+      end
+
+      it "includes suspended pseudonyms" do
+        to_suspend = @student.pseudonyms.create!(:unique_id => "to-delete@example.com")
+        to_suspend.update!(workflow_state: 'suspended')
+
+        json = api_call(:get, @user_path, @user_path_options)
+        expect(json.count).to eq 1
+        expect(json.first['id']).to eq to_suspend.id
+        expect(json.first['workflow_state']).to eq 'suspended'
       end
     end
 
@@ -145,7 +156,8 @@ describe PseudonymsController, type: :request do
           'integration_id' => nil,
           'unique_id'   => 'test@example.com',
           'user_id'     => @student.id,
-          'created_at' => json['created_at']
+          'created_at' => json['created_at'],
+          'workflow_state' => 'active',
         })
       end
 
@@ -258,9 +270,26 @@ describe PseudonymsController, type: :request do
           'integration_id' => nil,
           'unique_id' => 'student+new@example.com',
           'user_id' => @student.id,
-          'created_at' => @student.pseudonym.created_at.iso8601
+          'created_at' => @student.pseudonym.created_at.iso8601,
+          'workflow_state' => 'active',
         })
         expect(@student.pseudonym.reload.valid_password?('password123')).to be_truthy
+      end
+
+      it 'can suspend the pseudonym' do
+        json = api_call(:put, @path, @path_options, { login: { workflow_state: 'suspended' } })
+        expect(json['workflow_state']).to eq 'suspended'
+      end
+
+      it 'can suspend the pseudonym and alter attributes' do
+        json = api_call(:put, @path, @path_options, { login: { workflow_state: 'suspended', sis_user_id: 'new-12345' } })
+        expect(json['workflow_state']).to eq 'suspended'
+        expect(json['sis_user_id']).to eq 'new-12345'
+      end
+
+      it 'ignores invalid workflow states' do
+        raw_api_call(:put, @path, @path_options, { login: { workflow_state: 'bogus' } })
+        expect(response.code).to eql '400'
       end
 
       it "should return 400 if the unique_id already exists" do
@@ -408,7 +437,8 @@ describe PseudonymsController, type: :request do
           "authentication_provider_id" => nil,
           'id' => pseudonym.id,
           'user_id' => @student.id,
-          'created_at' => pseudonym.created_at.iso8601
+          'created_at' => pseudonym.created_at.iso8601,
+          'workflow_state' => 'deleted',
         })
       end
 

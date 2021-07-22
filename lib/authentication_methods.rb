@@ -149,9 +149,7 @@ module AuthenticationMethods
 
     if token_string
       @access_token = AccessToken.authenticate(token_string)
-      if !@access_token
-        raise AccessTokenError
-      end
+      raise AccessTokenError unless @access_token
 
       account = access_token_account(@domain_root_account, @access_token)
       raise AccessTokenError unless @access_token.authorized_for_account?(account)
@@ -160,10 +158,10 @@ module AuthenticationMethods
       @real_current_user = @access_token.real_user
       @real_current_pseudonym = SisPseudonym.for(@real_current_user, @domain_root_account, type: :implicit, require_sis: false) if @real_current_user
       @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
+      @current_pseudonym = nil if (@current_pseudonym&.suspended? && !@real_current_pseudonym) || @real_current_pseudonym&.suspended?
 
-      unless @current_user && @current_pseudonym
-        raise AccessTokenError
-      end
+      raise AccessTokenError unless @current_user && @current_pseudonym
+
       validate_scopes
       @access_token.used!
 
@@ -190,7 +188,7 @@ module AuthenticationMethods
     load_pseudonym_from_jwt
     load_pseudonym_from_access_token unless @current_pseudonym.present?
 
-    if !@current_pseudonym
+    unless @current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
       else
@@ -211,11 +209,8 @@ module AuthenticationMethods
             session_refreshed_at < invalid_before
 
             logger.info "[AUTH] Invalidating session: Session created before user logged out."
-            destroy_session
-            @current_pseudonym = nil
-            if api_request? || request.format.json?
-              raise LoggedOutError
-            end
+            invalidate_session
+            return
           end
 
           if @current_pseudonym &&
@@ -223,12 +218,14 @@ module AuthenticationMethods
             @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
             logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
-            destroy_session
-            @current_pseudonym = nil
+            invalidate_session
+            return
+          end
 
-            raise LoggedOutError if api_request? || request.format.json?
-
-            redirect_to_login
+          if @current_pseudonym.suspended?
+            logger.info "[AUTH] Invalidating session: Pseudonym is suspended."
+            invalidate_session
+            return
           end
         end
       end
@@ -417,5 +414,14 @@ module AuthenticationMethods
     keys.each { |k| saved[k] = session[k] if session[k] }
     reset_session
     saved.each_pair { |k, v| session[k] = v }
+  end
+
+  def invalidate_session
+    destroy_session
+    @current_pseudonym = nil
+
+    raise LoggedOutError if api_request? || request.format.json?
+
+    redirect_to_login
   end
 end

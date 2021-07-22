@@ -112,6 +112,13 @@ describe Login::CanvasController do
     expect(session[:sentinel]).to be_nil
   end
 
+  it "doesn't allow suspended users" do
+    @pseudonym.update!(workflow_state: 'suspended')
+    post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    assert_status(400)
+    expect(response).to render_template(:new)
+  end
+
   it "persists the auth provider if the feature flag is enabled" do
     Account.default.enable_feature!(:persist_inferred_authentication_providers)
     post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}

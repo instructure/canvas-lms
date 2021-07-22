@@ -1948,6 +1948,18 @@ describe "Users API", type: :request do
         api_call(:put, @path, @path_options, {:user => {:name => "Other Name"}}) # only send in the name
         expect(@student.reload.sortable_name).to eq "Name, Other" # should auto sync
       end
+
+      it "can suspend all pseudonyms" do
+        api_call(:put, @path, @path_options, { user: { event: "suspend" }})
+        expect(@student.pseudonym.reload).to be_suspended
+      end
+
+      it "can unsuspend all pseudonyms" do
+        @student.pseudonym.update!(workflow_state: 'suspended')
+        api_call(:put, @path, @path_options, { user: { event: "unsuspend" }})
+        expect(@student.pseudonym.reload).to be_active
+      end
+
     end
 
     context "non-account-admin user" do
