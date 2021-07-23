@@ -858,6 +858,12 @@ describe MicrosoftSync::SyncerSteps do
           expect(diff).to have_received(:set_local_member).with(students[2].id, 'StudentEnrollment')
         end
 
+        it 'ignores StudentViewEnrollment (fake) enrollments' do
+          Enrollment.where(course: course, user: students[0]).update_all(type: 'StudentViewEnrollment')
+          subject
+          expect(diff).to_not have_received(:set_local_member).with(students[0].id, anything)
+        end
+
         it_behaves_like 'a step that executes a diff' do
           # the latter it_behaves_like must be inside this one because 'a step
           # that executes a diff' makes the diff return actions. We need actions

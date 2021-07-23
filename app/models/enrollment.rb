@@ -1573,6 +1573,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def sync_microsoft_group
+    return if self.type == 'StudentViewEnrollment'
     return unless self.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
     return unless self.root_account.settings[:microsoft_sync_enabled]
 

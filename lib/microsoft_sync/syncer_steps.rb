@@ -363,7 +363,7 @@ module MicrosoftSync
       mappings.each { |user_id, aad_id| diff.set_member_mapping(user_id, aad_id) }
 
       users_with_mappings = mappings.map(&:first)
-      enrollments = Enrollment.active
+      enrollments = Enrollment.active.not_fake
         .where(course: course, user_id: users_with_mappings)
         .pluck(:user_id, :type)
       enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
