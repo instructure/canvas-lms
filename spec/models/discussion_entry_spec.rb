@@ -116,6 +116,22 @@ describe DiscussionEntry do
     end
   end
 
+  context "reply preview" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:student) { student_in_course(active_all: true) }
+
+    it "should mark include_reply_preview as true" do
+      entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
+      entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
+      entry.save!
+      expect(entry.include_reply_preview).to be true
+      expect(entry.message).to eql("<p>only this should stay</p>")
+    end
+  end
+
   context "entry notifications" do
     before :once do
       course_with_teacher(:active_all => true)
