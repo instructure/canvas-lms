@@ -44,6 +44,52 @@
 # like the shard id or event account id.
 module MessageBus
 
+  mattr_accessor :logger, :on_work_unit_end
+  mattr_reader :max_mem_queue_size_lambda, :worker_process_interval_lambda
+
+  ##
+  # MessageBus has an in-memory queueing feature
+  # to prevent writes the could be async from taking
+  # up request/response time when writing to a struggling
+  # pulsar instance.  Use a lambda for this attribute to
+  # make it so this library can use whatever config
+  # access path you want to read the max size out of.
+  #
+  # Expected return value from the lambda is an integer.
+  # If the queue grows to this size, further attempts
+  # to push messages will exhibit backpressure
+  # by throwing errors.
+  #
+  # you would generally set this in a rails initializer
+  def self.max_mem_queue_size=(size_lambda)
+    @max_mem_queue_size_lambda = size_lambda
+  end
+
+  def self.max_mem_queue_size
+    @max_mem_queue_size_lambda.call
+  end
+
+  ##
+  # MessageBus has an in-memory queueing feature
+  # to prevent writes the could be async from taking
+  # up request/response time when writing to a struggling
+  # pulsar instance.  Use a lambda for this attribute to
+  # make it so this library can use whatever config
+  # access path you want to read the max size out of.
+  #
+  # Expected return value from the lambda is an integer.
+  # The asynchronous producer worker will sleep
+  # for this many seconds in between publication runs.
+  #
+  # you would generally set this in a rails initializer
+  def self.worker_process_interval=(interval_lambda)
+    @worker_process_interval_lambda = interval_lambda
+  end
+
+  def self.worker_process_interval
+    @worker_process_interval_lambda.call
+  end
+
   ##
   # Use this when you want to write messages to a topic.
   # The returned object is a pulsar-client producer
@@ -92,7 +138,13 @@ module MessageBus
   ##
   # send_one_message is a convenience method for when you aren't trying
   # to standup a client and stream many messages through, but just
-  # need to dispatch ONE THING.
+  # need to dispatch ONE THING.  If you don't care too much about strict ordering
+  # (because the in-memory queue used may put messages that error on transmission
+  #  back at the end if the FIFO queue) you can use this helper to have most
+  # retries taken care of for you.
+  #
+  # If strict ordering is important, you are probably better off using ".producer_for"
+  # and handling the error cases yourself for now.
   #
   # "namespace" and "topic_name" are exactly like their counterparts
   # documented in the ".producer_for" method, and are passed through
@@ -104,33 +156,7 @@ module MessageBus
   # transform it to json before passing it as the message to this
   # method.
   def self.send_one_message(namespace, topic_name, message)
-    retries = 0
-    Bundler.require(:pulsar)
-    rescuable_pulsar_errors = [
-      ::Pulsar::Error::AlreadyClosed,
-      ::Pulsar::Error::ConnectError,
-      ::Pulsar::Error::ServiceUnitNotReady,
-      ::Pulsar::Error::Timeout
-    ]
-    begin
-      producer = producer_for(namespace, topic_name)
-      producer.send(message)
-    rescue *rescuable_pulsar_errors => ex
-      # We'll retry this exactly one time.  Sometimes
-      # when a pulsar broker restarts, we have connections
-      # that already knew about that broker get into a state where
-      # they just timeout or fail instead of reconfiguring.  Often this can
-      # be cleared by just rebooting the process, but that's overkill.
-      # If we hit a timeout, we will try one time to dump all the client
-      # context and reconnect.  If we get a timeout again, that is NOT
-      # the problem, and we should let the error raise.
-      retries += 1
-      raise ex if retries > 1
-      Rails.logger.info "[AUA] Pulsar failure during message send, retrying..."
-      CanvasErrors.capture_exception(:aua_log_compaction, ex, :warn)
-      self.reset!
-      retry
-    end
+    production_worker.push(namespace, topic_name, message)
   end
 
   ##
@@ -294,51 +320,84 @@ module MessageBus
   end
 
   def self.reset!
-    close_and_reset_cached_connections!
     connection_mutex.synchronize do
-      begin
-        @client&.close()
-      rescue ::Pulsar::Error::AlreadyClosed
-        # we need to make sure the client actually gets cleared out if the close fails,
-        # otherwise we'll keep trying to use it
-        Rails.logger.warn("while resetting, closing client was found to already be closed")
-      end
-      @client = nil
+      close_and_reset_cached_connections!
+      flush_message_bus_client!
     end
-    @config_cache = nil
   end
 
+  def self.process_all_and_reset!
+    production_worker.stop!
+    @production_worker = nil
+    @launched_pid = nil
+    reset!
+  end
+
+  # Internal: worker object (in a thread) for
+  # sending out message that are written to the message bus
+  # with the `send_one_message` method.
+  def self.production_worker
+    if !@launched_pid || @launched_pid != Process.pid
+      if @launched_pid
+        logger.warn "Starting new MessageBus worker thread due to fork."
+      end
+
+      @production_worker = MessageBus::AsyncProducer.new
+      @launched_pid = Process.pid
+    end
+    @production_worker
+  end
+
+  ##
+  # Internal: drop all instance variable state for talking to pulsar.
+  # This appears to be useful to get over the hump when a maintenance event
+  # redistributes brokers among hosts in the pulsar cluster.
+  # Only should be invoked within a successfully obtained connection mutex, which is
+  # why it's private and only invoked by the ".reset!" method.
+  def self.flush_message_bus_client!
+    begin
+      @client&.close()
+    rescue ::Pulsar::Error::AlreadyClosed
+      # we need to make sure the client actually gets cleared out if the close fails,
+      # otherwise we'll keep trying to use it
+      Rails.logger.warn("while resetting, closing client was found to already be closed")
+    end
+    @client = nil
+    @config_cache = nil
+  end
+  private_class_method :flush_message_bus_client!
+
+  ##
+  # Internal: closes all producers and consumers in the process pool.
+  # This should only be called within a successfully obtained connection mutex, which is
+  # why it's private and only invoked by the ".reset!" method.
   def self.close_and_reset_cached_connections!
-    connection_mutex.synchronize do
-      return if @connection_pool.blank?
+    return if @connection_pool.blank?
 
-      @connection_pool.each do |_thread_id, thread_conn_pool|
-        if thread_conn_pool['producers'].present?
-          thread_conn_pool['producers'].each do |_namespace, topic_map|
-            topic_map.each do |topic, producer|
-              producer.close()
-            rescue Pulsar::Error::AlreadyClosed
-              Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
-            end
-          end
-        end
-
-        if thread_conn_pool['consumers'].present?
-          thread_conn_pool['consumers'].each do |_namespace, topic_map|
-            topic_map.each do |topic, subscription_map|
-              subscription_map.each do |sub_name, consumer|
-                begin
-                  consumer.close()
-                rescue Pulsar::Error::AlreadyClosed
-                  Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
-                end
-              end
-            end
+    @connection_pool.each do |_thread_id, thread_conn_pool|
+      if thread_conn_pool['producers'].present?
+        thread_conn_pool['producers'].each do |_namespace, topic_map|
+          topic_map.each do |topic, producer|
+            producer.close()
+          rescue Pulsar::Error::AlreadyClosed
+            Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
           end
         end
       end
-      @connection_pool = nil
+
+      next unless thread_conn_pool['consumers'].present?
+
+      thread_conn_pool['consumers'].each do |_namespace, topic_map|
+        topic_map.each do |topic, subscription_map|
+          subscription_map.each do |sub_name, consumer|
+            consumer.close()
+          rescue Pulsar::Error::AlreadyClosed
+            Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
+          end
+        end
+      end
     end
+    @connection_pool = nil
   end
   private_class_method :close_and_reset_cached_connections!
 
