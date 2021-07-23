@@ -26,6 +26,31 @@ module K5ImportantDatesSectionPageObject
   def add_override_selector
     "#add_due_date"
   end
+
+  def calendar_add_selector
+    "#create_new_event_link"
+  end
+
+  def calendar_edit_dialog_selector
+    "#edit-event"
+  end
+
+  def calendar_event_more_options_selector
+    "a:contains('More Options')"
+  end
+
+  def calendar_event_submit_button_selector
+    ".event-details-footer button[type='submit']"
+  end
+
+  def calendar_for_subject_selector
+    ".context_id"
+  end
+
+  def calendar_mark_important_dates_selector
+    "#calendar_event_important_dates"
+  end
+
   def date_field_selector
     ".date_field[data-date-type='due_at']"
   end
@@ -54,6 +79,10 @@ module K5ImportantDatesSectionPageObject
     "[data-testid='important-date-subject']"
   end
 
+  def important_dates_block_selector
+    "#important_dates"
+  end
+
   def important_dates_title_selector
     "h2:contains('Important Dates')"
   end
@@ -80,6 +109,30 @@ module K5ImportantDatesSectionPageObject
     fln(link_text)
   end
 
+  def calendar_add
+    f(calendar_add_selector)
+  end
+
+  def calendar_edit_dialog
+    f(calendar_edit_dialog_selector)
+  end
+
+  def calendar_event_submit_button
+    f(calendar_event_submit_button_selector)
+  end
+
+  def calendar_event_more_options_button
+    fj(calendar_event_more_options_selector)
+  end
+
+  def calendar_for_subject
+    f(calendar_for_subject_selector)
+  end
+
+  def calendar_mark_important_dates
+    f(calendar_mark_important_dates_selector)
+  end
+
   def date_field
     ff(date_field_selector)
   end
@@ -94,6 +147,10 @@ module K5ImportantDatesSectionPageObject
 
   def important_date_subject
     f(important_date_subject_selector)
+  end
+
+  def important_dates_block
+    f(important_dates_block_selector)
   end
 
   def important_dates_title
@@ -114,6 +171,14 @@ module K5ImportantDatesSectionPageObject
 
   #----------------------- Actions & Methods -------------------------
 
+  def calendar_dialog_exists?
+    element_exists?(calendar_edit_dialog_selector)
+  end
+
+  def calendar_mark_important_dates_exists?
+    element_exists?(calendar_mark_important_dates_selector)
+  end
+
   def important_date_icon_exists?(icon_name)
     element_exists?(important_date_icon_selector(icon_name))
   end
@@ -127,6 +192,27 @@ module K5ImportantDatesSectionPageObject
   end
 
   #----------------------- Click Items -------------------------------
+
+
+  def click_calendar_add
+    calendar_add.click
+  end
+
+  def click_calendar_event_more_options_button
+    calendar_event_more_options_button.click
+  end
+
+  def click_calendar_event_submit_button
+    calendar_event_submit_button.click
+  end
+
+  def click_calendar_mark_important_dates
+    calendar_mark_important_dates.click
+  end
+
+  def click_calendar_subject(subject_name)
+    click_option(calendar_for_subject, subject_name)
+  end
 
   def click_add_override
     add_override.click
@@ -144,5 +230,6 @@ module K5ImportantDatesSectionPageObject
 
 
   #----------------------------Element Management---------------------#
+
 
 end
