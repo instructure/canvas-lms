@@ -87,7 +87,7 @@ describe('TargetGroupSelector', () => {
     expect(getByText('Account folder 0')).toBeInTheDocument()
   })
 
-  it('calls setTargetGroup with the selected group object', async () => {
+  it('calls setTargetGroup with the selected group object and ancestors ids', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
       mocks: [...smallOutcomeTree('Account')]
     })
@@ -96,11 +96,14 @@ describe('TargetGroupSelector', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 0'))
     expect(setTargetGroupMock).toHaveBeenCalledWith({
-      collections: [],
-      id: '100',
-      name: 'Account folder 0',
-      parentGroupId: '1',
-      isRootGroup: false
+      targetAncestorsIds: ['100', '1'],
+      targetGroup: {
+        collections: [],
+        id: '100',
+        name: 'Account folder 0',
+        parentGroupId: '1',
+        isRootGroup: false
+      }
     })
   })
 

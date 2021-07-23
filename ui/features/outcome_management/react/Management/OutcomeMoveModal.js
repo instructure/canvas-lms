@@ -29,8 +29,16 @@ import {MOVE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from 'react-apollo'
 import {outcomeShape} from './shapes'
 
-const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler, onGroupCreated}) => {
+const OutcomeMoveModal = ({
+  outcomes,
+  isOpen,
+  onCloseHandler,
+  onCleanupHandler,
+  onGroupCreated,
+  onSuccess
+}) => {
   const [targetGroup, setTargetGroup] = useState(null)
+  const [targetAncestorsIds, setTargetAncestorsIds] = useState([])
   const count = Object.keys(outcomes).length
   const outcomeTitle = Object.values(outcomes)[0]?.title
   const [moveOutcomeLinks] = useMutation(MOVE_OUTCOME_LINKS)
@@ -51,6 +59,12 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler, o
         const errorMessage = result.data?.moveOutcomeLinks?.errors?.[0]?.message
         if (movedOutcomeLinkIds.length === 0) throw new Error(errorMessage)
         if (movedOutcomeLinkIds.length !== count) throw new Error()
+
+        onSuccess({
+          movedOutcomeLinkIds,
+          groupId: targetGroup.id,
+          targetAncestorsIds
+        })
 
         showFlashAlert({
           message: I18n.t(
@@ -132,9 +146,13 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler, o
             )}
           </Text>
           <TargetGroupSelector
-            setTargetGroup={setTargetGroup}
-            onGroupCreated={onGroupCreated}
             modalName="outcomeMoveModal"
+            // eslint-disable-next-line no-shadow
+            setTargetGroup={({targetGroup, targetAncestorsIds}) => {
+              setTargetGroup(targetGroup)
+              setTargetAncestorsIds(targetAncestorsIds)
+            }}
+            onGroupCreated={onGroupCreated}
           />
         </View>
       </Modal.Body>
@@ -161,7 +179,12 @@ OutcomeMoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
-  onGroupCreated: PropTypes.func.isRequired
+  onGroupCreated: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func
+}
+
+OutcomeMoveModal.defaultProps = {
+  onSuccess: () => {}
 }
 
 export default OutcomeMoveModal

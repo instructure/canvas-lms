@@ -138,9 +138,10 @@ describe('OutcomeMoveModal', () => {
     expect(getByText('Move').closest('button')).toBeEnabled()
   })
 
-  it('displays flash confirmation if move outcomes request succeeds', async () => {
+  it('displays flash confirmation and calls onSuccess if move outcomes request succeeds', async () => {
+    const onSuccess = jest.fn()
     const {getByText} = render(
-      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
+      <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
         mocks: [...smallOutcomeTree('Account'), moveOutcomeMock()]
       }
@@ -155,6 +156,11 @@ describe('OutcomeMoveModal', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '2 outcomes have been moved to "Account folder 1".',
       type: 'success'
+    })
+    expect(onSuccess).toHaveBeenCalledWith({
+      movedOutcomeLinkIds: ['1', '2'],
+      groupId: '101',
+      targetAncestorsIds: ['101', '1']
     })
   })
 

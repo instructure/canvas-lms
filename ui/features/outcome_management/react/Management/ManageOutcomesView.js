@@ -180,7 +180,7 @@ const ManageOutcomesView = ({
           {outcomes?.edges?.map(
             ({
               canUnlink,
-              id: linkId,
+              _id: linkId,
               group: {_id: parentGroupId, title: parentGroupTitle},
               node: {_id, title, description, canEdit}
             }) => (
@@ -215,6 +215,7 @@ ManageOutcomesView.propTypes = {
     outcomes: PropTypes.shape({
       edges: PropTypes.arrayOf(
         PropTypes.shape({
+          _id: PropTypes.string.isRequired,
           canUnlink: PropTypes.bool.isRequired,
           node: PropTypes.shape({
             _id: PropTypes.string.isRequired,

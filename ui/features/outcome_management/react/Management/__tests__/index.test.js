@@ -29,6 +29,7 @@ import {
   deleteOutcomeMock,
   groupDetailMocks,
   groupMocks,
+  moveOutcomeMock,
   updateOutcomeGroupMock
 } from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
@@ -260,7 +261,7 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       // Remove Modal
       fireEvent.click(getByText('Remove Group'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
     })
   })
@@ -513,6 +514,102 @@ describe('OutcomeManagementPanel', () => {
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
       expect(queryByText('Move 2 Outcomes?')).not.toBeInTheDocument()
     })
+
+    it('removes outcomes from the list if moving to group outside the selected group', async () => {
+      const {getByText, getByRole, getAllByText, queryByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...defaultMocks,
+          moveOutcomeMock({
+            groupId: '201'
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
+      await act(async () => jest.runOnlyPendingTimers())
+      // Move Outcomes Multi Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+    })
+
+    it('keeps outcomes in the list if moving to the selected group', async () => {
+      const {getByText, getByRole, getAllByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...defaultMocks,
+          moveOutcomeMock({
+            groupId: '200'
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
+      await act(async () => jest.runOnlyPendingTimers())
+      // Move Outcomes Multi Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    })
+
+    it('keeps outcomes in the list if moving to a children group of the selected group', async () => {
+      const {getByText, getByRole, getAllByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...defaultMocks,
+          ...groupMocks({groupId: '200'}),
+          ...groupDetailMocks({
+            groupId: '300',
+            contextType: 'Course',
+            contextId: '2',
+            withMorePage: false
+          }),
+          moveOutcomeMock({
+            groupId: '300'
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      // OutcomeManagementPanel Group Tree Browser
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      fireEvent.click(getAllByText('Move')[getAllByText('Move').length - 1])
+      await act(async () => jest.runOnlyPendingTimers())
+      // Move Outcomes Multi Modal
+      fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Group 200 folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(within(getByRole('dialog')).getByText('Move'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+    })
   })
 
   describe('Moving a group', () => {
@@ -677,7 +774,7 @@ describe('OutcomeManagementPanel', () => {
 
     const clickWithinMobileSelect = async selectNode => {
       fireEvent.click(selectNode)
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
     }
 
     it('renders the action drilldown', async () => {

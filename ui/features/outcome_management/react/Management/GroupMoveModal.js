@@ -99,7 +99,8 @@ const GroupMoveModal = ({
           <TargetGroupSelector
             groupId={groupId}
             parentGroupId={parentGroupId}
-            setTargetGroup={setTargetGroup}
+            // eslint-disable-next-line no-shadow
+            setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
             onGroupCreated={onGroupCreated}
             modalName="groupMoveModal"
           />

@@ -91,7 +91,7 @@ export const FIND_GROUP_OUTCOMES = gql`
             endCursor
           }
           edges {
-            id
+            _id
             node {
               ... on LearningOutcome {
                 _id
@@ -131,7 +131,7 @@ export const SEARCH_GROUP_OUTCOMES = gql`
           }
           edges {
             canUnlink
-            id
+            _id
             node {
               ... on LearningOutcome {
                 _id

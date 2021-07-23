@@ -30,6 +30,18 @@ import {useTargetGroupSelector} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
+const getAncestorsIds = (targetGroup, collections) => {
+  const ids = []
+  let group = targetGroup && collections[targetGroup.id]
+
+  while (group) {
+    ids.push(group.id)
+    group = collections[group.parentGroupId]
+  }
+
+  return ids
+}
+
 const TargetGroupSelector = ({
   groupId,
   parentGroupId,
@@ -93,7 +105,11 @@ const TargetGroupSelector = ({
       groupId && (groupId === selectedGroupObject.id || selectedGroupObject.id === parentGroupId)
         ? null
         : selectedGroupObject
-    setTargetGroup(targetGroup)
+
+    setTargetGroup({
+      targetGroup,
+      targetAncestorsIds: getAncestorsIds(targetGroup, collections)
+    })
   }
 
   return (

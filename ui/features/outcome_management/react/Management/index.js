@@ -128,7 +128,7 @@ const OutcomeManagementPanel = () => {
 
   const outcomeMenuHandler = useCallback(
     (linkId, action) => {
-      const edge = group.outcomes.edges.find(edgeEl => edgeEl.id === linkId)
+      const edge = group.outcomes.edges.find(edgeEl => edgeEl._id === linkId)
       setSelectedOutcome({linkId, canUnlink: edge.canUnlink, ...edge.node})
       if (action === 'remove') {
         openOutcomeRemoveModal()
@@ -141,6 +141,14 @@ const OutcomeManagementPanel = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [group]
   )
+
+  // After move outcomes, remove from list if the target group isn't
+  // the selected group or isn't children of the selected group
+  const onSuccessMoveOutcomes = ({movedOutcomeLinkIds, targetAncestorsIds}) => {
+    if (!targetAncestorsIds.includes(selectedGroupId)) {
+      removeLearningOutcomes(movedOutcomeLinkIds, false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -323,6 +331,7 @@ const OutcomeManagementPanel = () => {
                 onCloseHandler={onCloseOutcomeMoveModal}
                 onCleanupHandler={onCloseOutcomeMoveModal}
                 onGroupCreated={addNewGroup}
+                onSuccess={onSuccessMoveOutcomes}
               />
             </>
           )}
@@ -356,6 +365,7 @@ const OutcomeManagementPanel = () => {
             isOpen={isOutcomesMoveModalOpen}
             onCloseHandler={closeOutcomesMoveModal}
             onCleanupHandler={onCloseOutcomesMoveModal}
+            onSuccess={onSuccessMoveOutcomes}
           />
         </>
       )}

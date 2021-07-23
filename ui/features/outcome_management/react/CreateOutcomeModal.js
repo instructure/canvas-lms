@@ -69,8 +69,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     onCloseHandler()
   }
 
-  const handleSetTargetGroup = group => {
-    setSelectedGroupId(group?.id)
+  const handleSetTargetGroup = ({targetGroup}) => {
+    setSelectedGroupId(targetGroup?.id)
   }
 
   const onCreateOutcomeHandler = () => {
