@@ -22,6 +22,15 @@ require 'spec_helper'
 describe MessageBus do
   TEST_MB_NAMESPACE = "test-only"
 
+  around(:each) do |example|
+    old_interval = MessageBus.worker_process_interval_lambda
+    # let's not waste time with queue throttling in tests
+    MessageBus.worker_process_interval = -> { 0.01 }
+    example.run
+  ensure
+    MessageBus.worker_process_interval = old_interval unless old_interval.nil?
+  end
+
   before(:each) do
     skip("pulsar config required to test") unless MessageBus.enabled?
   end
@@ -67,6 +76,7 @@ describe MessageBus do
       original_producer_for.call(namespace, topic_name)
     end
     MessageBus.send_one_message(TEST_MB_NAMESPACE, topic_name, {test_my_key: "test_my_val"}.to_json)
+    MessageBus.production_worker.stop! # make sure we actually get through shipping the messages
     consumer = MessageBus.consumer_for(TEST_MB_NAMESPACE, topic_name, subscription_name)
     msg = consumer.receive(1000)
     consumer.acknowledge(msg)
