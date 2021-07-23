@@ -57,7 +57,7 @@ module Types
       argument :search_query, String, required: false
     end
     def outcomes_count(**args)
-      learning_outcome_group_children_service.total_outcomes(object.id, args)
+      0
     end
 
     field :outcomes, Types::ContentTagConnection, null: false do
