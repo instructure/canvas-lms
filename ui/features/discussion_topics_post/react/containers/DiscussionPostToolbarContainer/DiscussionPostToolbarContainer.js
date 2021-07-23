@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Discussion} from '../../../graphql/Discussion'
+import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import React, {useContext} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
-import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
-import PropTypes from 'prop-types'
 
 export const DiscussionPostToolbarContainer = props => {
   const {filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
@@ -73,7 +73,7 @@ export const DiscussionPostToolbarContainer = props => {
 }
 
 DiscussionPostToolbarContainer.propTypes = {
-  discussionTopic: PropTypes.object
+  discussionTopic: Discussion.shape
 }
 
 export default DiscussionPostToolbarContainer

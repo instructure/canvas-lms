@@ -17,6 +17,7 @@
  */
 
 import {Button, IconButton} from '@instructure/ui-buttons'
+import {ChildTopic} from '../../../graphql/ChildTopic'
 import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -33,11 +34,11 @@ import PropTypes from 'prop-types'
 
 import React, {useContext, useCallback, useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {SearchContext} from '../../utils/constants'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {SearchContext} from '../../utils/constants'
 
 export const getMenuConfig = props => {
   const options = {
@@ -186,7 +187,7 @@ export const DiscussionPostToolbar = props => {
 export default DiscussionPostToolbar
 
 DiscussionPostToolbar.propTypes = {
-  childTopics: PropTypes.array,
+  childTopics: PropTypes.arrayOf(ChildTopic.shape),
   selectedView: PropTypes.string,
   sortDirection: PropTypes.string,
   onSearchChange: PropTypes.func,
