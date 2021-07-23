@@ -52,6 +52,9 @@ module Api::V1::Course
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
+    settings[:banner_image_url] = course.banner_image_url
+    settings[:banner_image_id] = course.banner_image_id
+    settings[:banner_image] = course.banner_image
     settings[:course_color] = course.course_color
 
     settings

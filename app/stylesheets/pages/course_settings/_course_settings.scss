@@ -326,6 +326,9 @@ ul.user_list div.enrollment_type.pending {
     & > div:nth-of-type(2) {
       flex: 4;
     }
+    & > div {
+      padding-#{direction(right)}: 10px;
+    }
     .form-label label {
       font-weight: bold;
     }
@@ -351,9 +354,6 @@ ul.user_list div.enrollment_type.pending {
       input {
         margin-#{direction(right)}: 0.25rem;
       }
-    }
-    div {
-      padding-#{direction(right)}: 10px;
     }
   }
   .tall-row {

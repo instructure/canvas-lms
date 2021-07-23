@@ -207,11 +207,12 @@ export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
+  bannerImageUrl,
+  cardImageUrl,
   color,
   courseOverview,
   defaultTab,
   id,
-  imageUrl,
   loadAllOpportunities,
   name,
   timeZone,
@@ -300,7 +301,7 @@ export function K5Course({
         )}
         <CourseHeaderHero
           name={name}
-          image={imageUrl}
+          image={bannerImageUrl || cardImageUrl}
           backgroundColor={color || DEFAULT_COURSE_COLOR}
           shouldShrink={shouldShrink}
         />
@@ -402,11 +403,12 @@ K5Course.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
+  bannerImageUrl: PropTypes.string,
+  cardImageUrl: PropTypes.string,
   canManage: PropTypes.bool,
   canReadAsAdmin: PropTypes.bool.isRequired,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
-  imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
   courseOverview: PropTypes.string,
   hideFinalGrades: PropTypes.bool.isRequired,

@@ -162,23 +162,35 @@ afterEach(() => {
 
 describe('K-5 Subject Course', () => {
   describe('Tabs Header', () => {
-    it('displays a huge version of the course image if set', () => {
-      const imageUrl = 'https://example.com/path/to/image.png'
-      const {getByTestId} = render(<K5Course {...defaultProps} imageUrl={imageUrl} />)
+    const bannerImageUrl = 'https://example.com/path/to/banner.jpeg'
+    const cardImageUrl = 'https://example.com/path/to/image.png'
+
+    it('displays a huge version of the course banner image if set', () => {
+      const {getByTestId} = render(
+        <K5Course {...defaultProps} bannerImageUrl={bannerImageUrl} cardImageUrl={cardImageUrl} />
+      )
       const hero = getByTestId('k5-course-header-hero')
 
       expect(hero).toBeInTheDocument()
-      expect(hero.style.getPropertyValue('background-image')).toBe(`url(${imageUrl})`)
+      expect(hero.style.getPropertyValue('background-image')).toBe(`url(${bannerImageUrl})`)
     })
 
-    it('displays the course color if one is set but no course image is set', () => {
+    it('displays a huge version of the course card image if set and no banner image is set', () => {
+      const {getByTestId} = render(<K5Course {...defaultProps} cardImageUrl={cardImageUrl} />)
+      const hero = getByTestId('k5-course-header-hero')
+
+      expect(hero).toBeInTheDocument()
+      expect(hero.style.getPropertyValue('background-image')).toBe(`url(${cardImageUrl})`)
+    })
+
+    it('displays the course color if one is set but no course images are set', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} color="#bb8" />)
       const hero = getByTestId('k5-course-header-hero')
 
       expect(hero.style.getPropertyValue('background-color')).toBe('rgb(187, 187, 136)')
     })
 
-    it('displays a gray background on the hero header if no course color or image is set', () => {
+    it('displays a gray background on the hero header if no course color or images are set', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} />)
       const hero = getByTestId('k5-course-header-hero')
 

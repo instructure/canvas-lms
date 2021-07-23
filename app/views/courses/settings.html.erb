@@ -108,13 +108,25 @@
     <div class="coursesettings">
       <% if @context.feature_enabled?(:course_card_images) %>
       <div class="form-row">
-        <div class="form-label"><%= f.blabel :image, :en => "Image" %></div>
+        <div class="form-label">
+          <% if @context.elementary_enabled? %>
+            <%= f.blabel :card_image, :en => "Card Image" %>
+          <% else %>
+            <%= f.blabel :image, :en => "Image" %>
+          <% end %>
+        </div>
         <div>
           <div class="CourseImageSelector__Container"></div>
         </div>
       </div>
       <% end %>
       <% if @context.elementary_enabled? %>
+        <div class="form-row">
+          <div class="form-label"><%= f.blabel :banner_image, :en => "Wide Banner Image" %></div>
+          <div>
+            <div id="course_banner_image_selector_container"></div>
+          </div>
+        </div>
         <div class="form-row">
           <div class="form-label nobr"><%= f.blabel :course_color, :en => "Color" %></div>
           <div>

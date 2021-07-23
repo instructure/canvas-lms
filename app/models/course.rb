@@ -259,6 +259,7 @@ class Course < ActiveRecord::Base
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
+  validate :validate_banner_image
   validate :validate_default_view
   validate :validate_template
   validate :validate_not_on_siteadmin
@@ -450,6 +451,24 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def validate_banner_image
+    if self.banner_image_url.present? && self.banner_image_id.present?
+      self.errors.add(:banner_image, t("banner_image_url and banner_image_id cannot both be set."))
+      false
+    elsif self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)
+      true
+    elsif self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url)
+      true
+    else
+      if self.banner_image_id.present?
+        self.errors.add(:banner_image_id, t("banner_image_id is not a valid ID"))
+      elsif self.banner_image_url.present?
+        self.errors.add(:banner_image_url, t("banner_image_url is not a valid URL"))
+      end
+      false
+    end
+  end
+
   def validate_course_image
     if self.image_url.present? && self.image_id.present?
       self.errors.add(:image, t("image_url and image_id cannot both be set."))
@@ -513,6 +532,16 @@ class Course < ActiveRecord::Base
       end
     elsif self.image_url
       self.image_url
+    end
+  end
+
+  def banner_image
+    @banner_image ||= if self.banner_image_id.present?
+      self.shard.activate do
+        self.attachments.active.where(id: self.banner_image_id).take&.public_download_url(1.week)
+      end
+    elsif self.banner_image_url
+      self.banner_image_url
     end
   end
 
@@ -3270,6 +3299,8 @@ class Course < ActiveRecord::Base
   add_setting :newquizzes_engine_selected
   add_setting :image_id
   add_setting :image_url
+  add_setting :banner_image_id
+  add_setting :banner_image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false

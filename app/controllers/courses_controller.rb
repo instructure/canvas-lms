@@ -2109,6 +2109,7 @@ class CoursesController < ApplicationController
                    name: @context.name,
                    long_name: "#{@context.name} - #{@context.short_name}",
                    image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
+                   banner_image_url: @context.elementary_subject_course? ? @context.banner_image : nil,
                    color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
                    front_page_title: @context&.wiki&.front_page&.title,
@@ -2693,6 +2694,10 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course image url and course image
   #   ID are both set to nil
   #
+  # @argument course[remove_banner_image] [Boolean]
+  #   If this option is set to true, the course banner image url and course
+  #   banner image ID are both set to nil
+  #
   # @argument course[blueprint] [Boolean]
   #   Sets the course as a blueprint course.
   #
@@ -2917,34 +2922,8 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:course][:image_url] && params[:course][:image_id]
-        respond_to do |format|
-          format.json { render :json => {message: "You cannot provide both an image_url and a image_id."}, :status => :bad_request }
-          return
-        end
-      end
-
-      if params[:course][:image_url]
-        @course.image_url = params[:course][:image_url]
-        @course.image_id = nil
-      end
-
-      if params[:course][:image_id]
-        if @course.attachments.active.where(id: params[:course][:image_id]).exists?
-          @course.image_id = params[:course][:image_id]
-          @course.image_url = nil
-        else
-          respond_to do |format|
-            format.json { render :json => {message: "The image_id is not a valid course file id."}, :status => :bad_request }
-            return
-          end
-        end
-      end
-
-      if params[:course][:remove_image]
-        @course.image_url = nil
-        @course.image_id = nil
-      end
+      update_image(params, "image")
+      update_image(params, "banner_image")
 
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
@@ -3020,6 +2999,37 @@ class CoursesController < ApplicationController
       else
         render_update_failure
       end
+    end
+  end
+
+  def update_image(params, setting_name)
+    if params[:course][:"#{setting_name}_url"] && params[:course][:"#{setting_name}_id"]
+      respond_to do |format|
+        format.json { render :json => {message: "You cannot provide both an #{setting_name}_url and a #{setting_name}_id."}, :status => :bad_request }
+        return
+      end
+    end
+
+    if params[:course][:"#{setting_name}_url"]
+      @course.send("#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
+      @course.send("#{setting_name}_id=", nil)
+    end
+
+    if params[:course][:"#{setting_name}_id"]
+      if @course.attachments.active.where(id: params[:course][:"#{setting_name}_id"]).exists?
+        @course.send("#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
+        @course.send("#{setting_name}_url=", nil)
+      else
+        respond_to do |format|
+          format.json { render :json => {message: "The image_id is not a valid course file id."}, :status => :bad_request }
+          return
+        end
+      end
+    end
+
+    if params[:course][:"remove_#{setting_name}"]
+      @course.send("#{setting_name}_url=", nil)
+      @course.send("#{setting_name}_id=", nil)
     end
   end
 
