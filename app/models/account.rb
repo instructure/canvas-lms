@@ -2126,6 +2126,13 @@ class Account < ActiveRecord::Base
   end
   handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
+  def clear_k5_cache
+    User.of_account(self).find_in_batches do |users|
+      User.clear_cache_keys(users.pluck(:id), :k5_user)
+    end
+  end
+  handle_asynchronously :clear_k5_cache, priority: Delayed::LOW_PRIORITY, :max_attempts => 1
+
   def process_external_integration_keys(params_keys, current_user, keys = ExternalIntegrationKey.indexed_keys_for(self))
     return unless params_keys
 
