@@ -28,7 +28,7 @@ import {
   IconArrowOpenDownLine,
   IconArrowOpenEndSolid,
   IconArrowOpenDownSolid,
-  IconAddLine
+  IconAddSolid
 } from '@instructure/ui-icons'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeDescription from './Management/OutcomeDescription'
@@ -66,7 +66,7 @@ const FindOutcomeItem = ({id, title, description, isAdded, onAddClickHandler}) =
           interaction={addedOutcome ? 'disabled' : 'enabled'}
           size="small"
           margin={isMobileView ? '0' : '0 x-small 0 0'}
-          renderIcon={IconAddLine}
+          renderIcon={IconAddSolid}
           onClick={onButtonClick}
         >
           {buttonMessage}
