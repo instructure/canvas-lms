@@ -132,18 +132,61 @@ describe('FindOutcomesModal', () => {
   }
 
   const itBehavesLikeATreeBrowser = () => {
-    const openMobileSelect = async selectNode => {
+    const clickWithinMobileSelect = async selectNode => {
       if (isMobileView) {
         fireEvent.click(selectNode)
         await act(async () => jest.runAllTimers())
       }
     }
 
+    it('clears selected outcome group for the outcomes view after closing and reopening', async () => {
+      const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      fireEvent.click(getByText('Root Account Outcome Group 0'))
+      await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
+      fireEvent.click(getByText('Done'))
+      render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
+      await act(async () => jest.runAllTimers())
+      render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
+      await act(async () => jest.runAllTimers())
+      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+    })
+
+    it('debounces the search string entered by the user', async () => {
+      const {getByText, getByLabelText, queryByText} = render(
+        <FindOutcomesModal {...defaultProps()} />,
+        {
+          mocks: [...findModalMocks(), ...findOutcomesMocks()]
+        }
+      )
+      await act(async () => jest.runAllTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      fireEvent.click(getByText('Root Account Outcome Group 0'))
+      await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('25 Outcomes')).toBeInTheDocument()
+      const input = getByLabelText('Search field')
+      fireEvent.change(input, {target: {value: 'mathemati'}})
+      await act(async () => jest.advanceTimersByTime(100))
+      expect(getByText('25 Outcomes')).toBeInTheDocument()
+      fireEvent.change(input, {target: {value: 'mathematic'}})
+      await act(async () => jest.advanceTimersByTime(300))
+      expect(getByText('25 Outcomes')).toBeInTheDocument()
+      fireEvent.change(input, {target: {value: 'mathematics'}})
+      await act(async () => jest.advanceTimersByTime(500))
+      expect(getByText('15 Outcomes')).toBeInTheDocument()
+    })
+
     describe('within an account context', () => {
       it('renders Account Standards groups for non root accounts', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
         await act(async () => jest.runAllTimers())
-        await openMobileSelect(queryByText('Groups'))
+        await clickWithinMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('Account Standards'))
         await act(async () => jest.runAllTimers())
         expect(getByText('Root Account Outcome Group 0')).toBeInTheDocument()
@@ -163,7 +206,7 @@ describe('FindOutcomesModal', () => {
         contextType: 'Course'
       })
       await act(async () => jest.runAllTimers())
-      await openMobileSelect(queryByText('Groups'))
+      await clickWithinMobileSelect(queryByText('Groups'))
       fireEvent.click(getByText('Account Standards'))
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Course Account Outcome Group'))
@@ -173,6 +216,27 @@ describe('FindOutcomesModal', () => {
         type: 'error',
         srOnly: false
       })
+    })
+
+    it('should not disable search input and clear search button if there are no results', async () => {
+      const {getByText, getByLabelText, queryByTestId, queryByText} = render(
+        <FindOutcomesModal {...defaultProps()} />,
+        {
+          mocks: [...findModalMocks(), ...findOutcomesMocks()]
+        }
+      )
+      await act(async () => jest.runAllTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      fireEvent.click(getByText('Root Account Outcome Group 0'))
+      await clickWithinMobileSelect(queryByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('25 Outcomes')).toBeInTheDocument()
+      const input = getByLabelText('Search field')
+      fireEvent.change(input, {target: {value: 'no results'}})
+      await act(async () => jest.advanceTimersByTime(500))
+      expect(getByLabelText('Search field')).toBeEnabled()
+      expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
     })
 
     describe('global standards', () => {
@@ -191,7 +255,7 @@ describe('FindOutcomesModal', () => {
           mocks: findModalMocks({includeGlobalRootGroup: true})
         })
         await act(async () => jest.runAllTimers())
-        await openMobileSelect(queryByText('Groups'))
+        await clickWithinMobileSelect(queryByText('Groups'))
         fireEvent.click(getByText('State Standards'))
         await act(async () => jest.runAllTimers())
       })
@@ -214,62 +278,6 @@ describe('FindOutcomesModal', () => {
     })
     itBehavesLikeAModal()
     itBehavesLikeATreeBrowser()
-
-    // TODO: move into shared tests after OUT-4483 is completed
-    it('debounces the search string entered by the user', async () => {
-      const {getByText, getByLabelText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        mocks: [...findModalMocks(), ...findOutcomesMocks()]
-      })
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      const input = getByLabelText('Search field')
-      fireEvent.change(input, {target: {value: 'mathemati'}})
-      await act(async () => jest.advanceTimersByTime(100))
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      fireEvent.change(input, {target: {value: 'mathematic'}})
-      await act(async () => jest.advanceTimersByTime(300))
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      fireEvent.change(input, {target: {value: 'mathematics'}})
-      await act(async () => jest.advanceTimersByTime(500))
-      expect(getByText('15 Outcomes')).toBeInTheDocument()
-    })
-
-    it('clears selected outcome group for the outcomes view after closing and reopening', async () => {
-      const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
-      fireEvent.click(getByText('Done'))
-      render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
-      await act(async () => jest.runAllTimers())
-      render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
-      await act(async () => jest.runAllTimers())
-      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
-    })
-
-    it('should not disable search input and clear search button if there are no results', async () => {
-      const {getByText, getByLabelText, queryByTestId} = render(
-        <FindOutcomesModal {...defaultProps()} />,
-        {
-          mocks: [...findModalMocks(), ...findOutcomesMocks()]
-        }
-      )
-      await act(async () => jest.runAllTimers())
-      fireEvent.click(getByText('Account Standards'))
-      fireEvent.click(getByText('Root Account Outcome Group 0'))
-      await act(async () => jest.runAllTimers())
-      expect(getByText('25 Outcomes')).toBeInTheDocument()
-      const input = getByLabelText('Search field')
-      fireEvent.change(input, {target: {value: 'no results'}})
-      await act(async () => jest.advanceTimersByTime(500))
-      expect(getByLabelText('Search field')).toBeEnabled()
-      expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
-    })
 
     it('renders the tree browser with correct counts', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
@@ -298,12 +306,31 @@ describe('FindOutcomesModal', () => {
     })
 
     it('does not render the TreeBrowser', async () => {
-      const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />, {
-        isMobileView: true
-      })
+      const {queryByTestId} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
       const treeBrowser = queryByTestId('groupsColumnRef')
       expect(treeBrowser).not.toBeInTheDocument()
+    })
+
+    it('does not render the list of outcomes until the action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await fireEvent.click(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      fireEvent.click(getByText('Root Account Outcome Group 0'))
+      await act(async () => jest.runAllTimers())
+      expect(queryByText('All Root Account Outcome Group 0 Outcomes')).not.toBeInTheDocument()
+      fireEvent.click(getByText('View 0 Outcomes'))
+      await act(async () => jest.runAllTimers())
+      expect(getByText('All Root Account Outcome Group 0 Outcomes')).toBeInTheDocument()
+    })
+
+    it('renders the billboard until an action link is clicked', async () => {
+      const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />)
+      await act(async () => jest.runAllTimers())
+      await fireEvent.click(queryByText('Groups'))
+      fireEvent.click(getByText('Account Standards'))
+      expect(getByText('Select a group to reveal outcomes here.')).toBeInTheDocument()
     })
   })
 })

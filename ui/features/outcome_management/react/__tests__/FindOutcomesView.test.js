@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent, within} from '@testing-library/react'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import FindOutcomesView from '../FindOutcomesView'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
@@ -267,5 +268,19 @@ describe('FindOutcomesView', () => {
     rerender(<FindOutcomesView {...defaultProps({loading: true, searchString: 'rtltest'})} />)
     expect(within(getByTestId('group-name-ltr')).getByText('rtltest')).toBeTruthy()
     expect(within(getByTestId('search-string-ltr')).getByText('State Standards')).toBeTruthy()
+  })
+
+  describe('mobile view', () => {
+    const mobileRender = children =>
+      render(
+        <OutcomesContext.Provider value={{env: {isMobileView: true}}}>
+          {children}
+        </OutcomesContext.Provider>
+      )
+
+    it('does not render the group name', () => {
+      const {queryByText} = mobileRender(<FindOutcomesView {...defaultProps()} />)
+      expect(queryByText('State Standards')).not.toBeInTheDocument()
+    })
   })
 })

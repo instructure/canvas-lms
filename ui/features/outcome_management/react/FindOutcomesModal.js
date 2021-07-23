@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
@@ -40,6 +40,8 @@ import GroupActionDrillDown from './shared/GroupActionDrillDown'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {isMobileView, isCourse} = useCanvasContext()
+  const [showOutcomesView, setShowOutcomesView] = useState(false)
+  const [scrollContainer, setScrollContainer] = useState(null)
   const {
     rootId,
     isLoading,
@@ -89,11 +91,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
+      mobileScrollContainer={scrollContainer}
     />
   )
 
   const renderGroupNavigation = (
-    <View as="div" padding={isMobileView ? 'x-small 0 0 0' : '0'}>
+    <View as="div" padding={isMobileView ? 'small small x-small' : '0'}>
       {isLoading ? (
         <div style={{textAlign: 'center', paddingTop: '2rem'}}>
           <Spinner renderTitle={I18n.t('Loading')} size="large" />
@@ -114,6 +117,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
           collections={collections}
           rootId={rootId}
           loadedGroups={loadedGroups}
+          setShowOutcomesView={setShowOutcomesView}
         />
       ) : (
         <TreeBrowser onCollectionToggle={toggleGroupId} collections={collections} rootId={rootId} />
@@ -180,7 +184,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               overflowX="auto"
               elementRef={setRightColumnRef}
             >
-              {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
+              {selectedGroupId && selectedGroupId !== ACCOUNT_FOLDER_ID ? (
                 findOutcomesView
               ) : (
                 <FindOutcomesBillboard />
@@ -188,8 +192,20 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             </Flex.Item>
           </Flex>
         ) : (
-          renderGroupNavigation
-          // TODO Add in `findOutcomesView` with OUT-4483
+          <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
+            <div
+              style={{
+                flex: '1 0 24rem',
+                position: 'relative',
+                overflow: 'auto',
+                height: '100%'
+              }}
+              ref={setScrollContainer}
+            >
+              {renderGroupNavigation}
+              {showOutcomesView ? findOutcomesView : isLoading ? null : <FindOutcomesBillboard />}
+            </div>
+          </div>
         )}
       </Modal.Body>
       <Modal.Footer>
