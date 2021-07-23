@@ -233,7 +233,7 @@ const FindOutcomesView = ({
             <View as="div" data-testid="find-outcome-items-list">
               {outcomes?.edges?.length === 0 && searchString && !loading && (
                 <View as="div" textAlign="center" margin="small 0 0">
-                  <Text color="secondary">{I18n.t('The search returned no results')}</Text>
+                  <Text color="primary">{I18n.t('The search returned no results.')}</Text>
                 </View>
               )}
 

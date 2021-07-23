@@ -127,7 +127,7 @@ describe('FindOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
@@ -140,7 +140,7 @@ describe('FindOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 
   it('calls onClearHandler on click on clear search button', () => {

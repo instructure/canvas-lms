@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!OutcomeManagement'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import OutcomeGroupHeader from './OutcomeGroupHeader'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,6 +31,7 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import {Flex} from '@instructure/ui-flex'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
+import SVGWrapper from '@canvas/svg-wrapper'
 
 const ManageOutcomesView = ({
   outcomeGroup,
@@ -116,11 +118,24 @@ const ManageOutcomesView = ({
           </Heading>
         </View>
         <View as="div" data-testid="outcome-items-list">
-          {outcomes?.edges?.length === 0 && searchString && !loading && (
-            <View as="div" textAlign="center" margin="small 0 0">
-              <Text color="secondary">{I18n.t('The search returned no results')}</Text>
-            </View>
-          )}
+          {outcomes?.edges?.length === 0 &&
+            !loading &&
+            (searchString ? (
+              <View as="div" textAlign="center" margin="small 0 0">
+                <Text color="primary">{I18n.t('The search returned no results.')}</Text>
+              </View>
+            ) : (
+              <View as="div" textAlign="center" margin="large 0 0">
+                <PresentationContent>
+                  <div data-testid="no-outcomes-svg">
+                    <SVGWrapper url="/images/outcomes/no_outcomes.svg" />
+                  </div>
+                </PresentationContent>
+                <View as="div" padding="small 0 0">
+                  <Text color="primary">{I18n.t('There are no outcomes in this group.')}</Text>
+                </View>
+              </View>
+            ))}
           {outcomes?.edges?.map(
             ({canUnlink, id: linkId, node: {_id, title, description, canEdit}}) => (
               <ManageOutcomeItem

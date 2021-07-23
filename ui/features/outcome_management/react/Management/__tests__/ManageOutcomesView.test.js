@@ -160,8 +160,26 @@ describe('ManageOutcomesView', () => {
     expect(getByTestId('search-loading')).toBeInTheDocument()
   })
 
+  it('render a message when the group has no outcomes', () => {
+    const {getByText, getByTestId} = render(
+      <ManageOutcomesView
+        {...defaultProps({
+          outcomeGroup: {
+            _id: '1',
+            title: 'Group Title',
+            outcomesCount: 0,
+            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
+          },
+          searchString: ''
+        })}
+      />
+    )
+    expect(getByTestId('no-outcomes-svg')).toBeInTheDocument()
+    expect(getByText('There are no outcomes in this group.')).toBeInTheDocument()
+  })
+
   it('render a message when search does not return any result', () => {
-    const {queryByText} = render(
+    const {getByText} = render(
       <ManageOutcomesView
         {...defaultProps({
           outcomeGroup: {
@@ -173,7 +191,7 @@ describe('ManageOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).toBeInTheDocument()
+    expect(getByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
@@ -190,7 +208,7 @@ describe('ManageOutcomesView', () => {
         })}
       />
     )
-    expect(queryByText('The search returned no results')).not.toBeInTheDocument()
+    expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 
   it('calls load more when hasNextPage is true and scroll reaches the infinite scroll threshold', () => {
