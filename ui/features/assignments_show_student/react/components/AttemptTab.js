@@ -20,7 +20,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {friendlyTypeName, getCurrentSubmissionType, isSubmitted} from '../helpers/SubmissionHelpers'
+import {friendlyTypeName, isSubmitted} from '../helpers/SubmissionHelpers'
 import {
   IconAttachMediaLine,
   IconLinkLine,
@@ -239,7 +239,7 @@ export default class AttemptTab extends Component {
     }
 
     const submissionType = isSubmitted(submission)
-      ? getCurrentSubmissionType(submission, assignment)
+      ? submission.submissionType
       : this.props.activeSubmissionType
 
     const multipleSubmissionTypes = assignment.submissionTypes.length > 1
