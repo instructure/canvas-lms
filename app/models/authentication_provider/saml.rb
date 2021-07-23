@@ -103,6 +103,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   before_validation :set_saml_defaults
   before_validation :download_metadata
+
+  validate :validate_urls
+
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
     if ap.new_record?
@@ -131,6 +134,20 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def set_saml_defaults
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+
+  def validate_urls
+    begin
+      URI(log_in_url) if log_in_url
+    rescue URI::InvalidURIError
+      errors.add(:log_out_url, t("Log in URL is not a valid URI"))
+    end
+
+    begin
+      URI(log_out_url) if log_out_url
+    rescue URI::InvalidURIError
+      errors.add(:log_out_url, t("Log out URL is not a valid URI"))
+    end
   end
 
   def download_metadata

@@ -689,7 +689,8 @@ class ContextModule < ActiveRecord::Base
         # of the added item fails, no orphaned resource link is created
         added_item.associated_asset = context.lti_resource_links.new(
           custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
-          context_external_tool: content
+          context_external_tool: content,
+          lookup_uuid: params[:lti_resource_link_lookup_uuid]
         )
       end
       added_item.save

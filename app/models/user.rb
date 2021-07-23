@@ -1205,7 +1205,6 @@ class User < ActiveRecord::Base
     can :read_as_admin and
     can :manage and
     can :manage_content and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete and
@@ -2698,25 +2697,26 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
-    granular_admin = course.root_account.feature_enabled?(:granular_permissions_manage_users)
     return false if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
 
-    if granular_admin
+    # we intend on keeping this role override in tandem with add/remove students to course
+    # so short-circuit if it's enabled, else we might return false prematurely
+    # depending on the state of :granular_permissions_manage_users feature flag
+    if course.grants_right?(self, session, :manage_students)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
+        return true
+      end
+    end
+
+    if course.root_account.feature_enabled?(:granular_permissions_manage_users)
       return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
       return true if type == 'TaEnrollment' && course.grants_right?(self, session, :add_ta_to_course)
       return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
       return true if type == 'StudentEnrollment' && course.grants_right?(self, session, :add_student_to_course)
       return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
-    else
-      if type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
-        return true
-      end
-      if course.grants_right?(self, session, :manage_students)
-        if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
-          return true
-        end
-      end
+    elsif type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
+      return true
     end
     false
   end

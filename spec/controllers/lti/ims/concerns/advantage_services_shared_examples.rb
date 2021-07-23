@@ -94,7 +94,7 @@ shared_examples_for "advantage services" do
     context 'with unbound developer key' do
       let(:before_send_request) do
         -> {
-          developer_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::OFF_STATE
+          developer_key.developer_key_account_bindings.first.update! workflow_state: 'off'
         }
       end
 

@@ -35,6 +35,11 @@ describe('DiscussionPostToolbar', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('collapseToggle')).toBeNull()
     })
+
+    it('should not render clear search button by default', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('clear-search-button')).toBeNull()
+    })
   })
 
   describe('Search Field', () => {

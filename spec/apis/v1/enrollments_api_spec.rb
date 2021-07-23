@@ -98,6 +98,41 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
       end
 
+      it "does not allow enrolling a student view student" do
+        c2 = Account.default.courses.create!
+        user = c2.student_view_student
+
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id                            => user.id,
+              :type                               => 'StudentEnrollment',
+              :enrollment_state                   => 'active',
+              :course_section_id                  => @section.id,
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
+            }
+          }, {}, expected_status: 400
+          expect(@section.enrollments.count).to eq 0
+      end
+
+      it "does not allow enrolling a user as a student view student" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id                            => @unenrolled_user.id,
+              :type                               => 'StudentViewEnrollment',
+              :enrollment_state                   => 'active',
+              :course_section_id                  => @section.id,
+              :limit_privileges_to_course_section => true,
+              :start_at                           => nil,
+              :end_at                             => nil
+            }
+          }, {}, expected_status: 400
+          expect(@section.enrollments.count).to eq 0
+      end
+
       it "accepts sis_section_id" do
         @section.update_attribute(:sis_source_id, 'sis_id')
         json = api_call :post, @path, @path_options,
@@ -135,6 +170,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should be unauthorized for users without add_student_to_course permission (granular)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
         json = api_call :post, @path, @path_options,
                         {

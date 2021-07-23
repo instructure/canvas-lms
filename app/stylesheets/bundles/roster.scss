@@ -62,7 +62,7 @@
   li {
     @include name_bubbles;
     clear: direction(left);
-    margin-top: $ic-sp/2;
+    margin-top: $ic-sp*0.5;
   }
 }
 

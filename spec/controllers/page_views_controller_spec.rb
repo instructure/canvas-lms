@@ -69,6 +69,12 @@ describe PageViewsController do
       dates = CSV.parse(response.body, :headers => true).map { |row| row['created_at'] }
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
     end
+
+    it "errors if end_time is before start_time" do
+      get 'index', params: { user_id: @user.id, start_time: '2021-07-04', end_time: '2021-07-03'}, format: 'csv'
+      expect(response.status).to eq 400
+      expect(response.body).to eq 'end_time must be after start_time'
+    end
   end
 
   context "with db page views" do

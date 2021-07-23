@@ -54,16 +54,11 @@ const previewableMimeTypes = {
   'application/vnd.ms-powerpoint': [1, 1]
 }
 
-$.filePreviewsEnabled = function() {
-  return !(INST.disableCrocodocPreviews && INST.disableGooglePreviews)
-}
-
 // check to see if a file of a certan mimeType is previewable inline in the browser by either scribd or googleDocs
 // ex: $.isPreviewable("application/mspowerpoint")  -> true
 //     $.isPreviewable("application/rtf", 'google') -> false
 $.isPreviewable = function(mimeType, service) {
   return (
-    $.filePreviewsEnabled() &&
     previewableMimeTypes[mimeType] &&
     (!service ||
       (!INST['disable' + $.capitalize(service) + 'Previews'] &&
@@ -107,7 +102,7 @@ $.fn.loadDocPreview = function(options) {
       }
     }
 
-    if (!INST.disableCrocodocPreviews && opts.crocodoc_session_url) {
+    if (opts.crocodoc_session_url) {
       const sanitizedUrl = sanitizeUrl(opts.crocodoc_session_url)
       var iframe = $('<iframe/>', {
         src: sanitizedUrl,
@@ -199,7 +194,7 @@ $.fn.loadDocPreview = function(options) {
           }
         })
       }
-    } else if ($.filePreviewsEnabled()) {
+    } else {
       // else fall back with a message that the document can't be viewed inline
       if (opts.attachment_preview_processing) {
         $this.html(

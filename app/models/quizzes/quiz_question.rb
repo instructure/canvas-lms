@@ -107,7 +107,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       in_data
     end
 
-    if data[:regrade_option].present?
+    if valid_regrade_option?(data[:regrade_option])
       update_question_regrade(data[:regrade_option], data[:regrade_user])
     end
 
@@ -237,6 +237,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   private
+
+  def valid_regrade_option?(option)
+    Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.include?(option)
+  end
 
   def update_question_regrade(regrade_option, regrade_user)
     regrade = Quizzes::QuizRegrade.where(quiz_id: quiz.id, quiz_version: quiz.version_number).first_or_initialize

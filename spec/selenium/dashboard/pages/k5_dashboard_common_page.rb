@@ -65,6 +65,10 @@ module K5DashboardCommonPageObject
     )
   end
 
+  def create_calendar_event(course, calendar_event_title, start_at)
+    course.calendar_events.create!(title: calendar_event_title, start_at: start_at)
+  end
+
   def create_course_module(workflow_state = 'active')
     @module_title = "Course Module"
     @course_module = @subject_course.context_modules.create!(:name => @module_title, :workflow_state => workflow_state)
@@ -195,7 +199,7 @@ module K5DashboardCommonPageObject
     )
     @subject_course = @course
   end
-  
+
   def turn_on_learning_mastery_gradebook
     @subject_course.enable_feature!(:student_outcome_gradebook)
   end

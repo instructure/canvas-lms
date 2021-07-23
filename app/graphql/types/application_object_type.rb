@@ -20,6 +20,10 @@
 
 module Types
   class ApplicationObjectType < GraphQL::Schema::Object
+    include ApolloFederation::Object
+
+    field_class BaseField
+
     # this is using graphql-ruby's built-in authorization framework
     #
     # we are purposely not using it anywhere else in the app for performance

@@ -37,6 +37,7 @@ export const SubmissionDraft = {
       meetsTextEntryCriteria
       meetsUploadCriteria
       meetsUrlCriteria
+      meetsStudentAnnotationCriteria
       url
     }
     ${MediaObject.fragment}
@@ -54,6 +55,7 @@ export const SubmissionDraft = {
     meetsTextEntryCriteria: bool.isRequired,
     meetsUploadCriteria: bool.isRequired,
     meetsUrlCriteria: bool.isRequired,
+    meetsStudentAnnotationCriteria: bool.isRequired,
     url: string
   })
 }
@@ -69,6 +71,7 @@ export const DefaultMocks = {
     meetsTextEntryCriteria: false,
     meetsUploadCriteria: false,
     meetsUrlCriteria: false,
+    meetsStudentAnnotationCriteria: false,
     url: null
   })
 }

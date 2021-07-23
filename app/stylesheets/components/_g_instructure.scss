@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "pages/turnitin.scss";
 @import "base/environment";
 
@@ -321,13 +323,13 @@
     .todo-details__title,
     .event-details__title {
       + * {
-        margin-top: $ic-sp / 4;
+        margin-top: $ic-sp * 0.25;
       }
     }
 
     .todo-details__context,
     .event-details__context {
-      margin-bottom: $ic-sp / 4;
+      margin-bottom: $ic-sp * 0.25;
     }
   }
   .events_list {
@@ -376,7 +378,7 @@ table.summary {
     text-align: direction(left);
   }
   th, td, caption {
-    padding: $ic-sp/2;
+    padding: $ic-sp*0.5;
   }
   thead th, caption {
     font-weight: bold;
@@ -708,15 +710,15 @@ $wizard-bg-color: $ic-color-dark;
       }
 
       i[class^=icon-] {
-        width: ($wizard-icon-size + $ic-sp * 4) / 2;
-        height: ($wizard-icon-size + $ic-sp * 4) / 2;
+        width: ($wizard-icon-size + $ic-sp * 4) * 0.5;
+        height: ($wizard-icon-size + $ic-sp * 4) * 0.5;
         background: $wizard-bg-color;
         border-radius: 100%;
-        font-size: $wizard-icon-size / 2;
+        font-size: $wizard-icon-size * 0.5;
         &:before {
-          font-size: ($wizard-icon-size - $ic-sp) / 2;
+          font-size: ($wizard-icon-size - $ic-sp) * 0.5;
           color: $ic-color-light;
-          line-height: ($wizard-icon-size + $ic-sp * 4) / 2;
+          line-height: ($wizard-icon-size + $ic-sp * 4) * 0.5;
         }
         @include breakpoint(desktop) {
           width: $wizard-icon-size + $ic-sp * 4;
@@ -837,7 +839,7 @@ $wizard-bg-color: $ic-color-dark;
             background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
             background-size: 16px 16px;
             line-height: 1.2;
-            border-#{direction(left)}: ($ic-sp / 3) solid transparent;
+            border-#{direction(left)}: math.div($ic-sp, 3) solid transparent;
             @include breakpoint(desktop) {
               background-position: ($ic-sp * 2) 50%;
               background-size: ($ic-sp * 2) ($ic-sp * 2);
@@ -909,7 +911,7 @@ $wizard-bg-color: $ic-color-dark;
         }
         @include breakpoint(tablet) {
           max-width: 600px;
-          border-radius: $ic-sp / 2;
+          border-radius: $ic-sp * 0.5;
           padding: $ic-sp * 3;
         }
 

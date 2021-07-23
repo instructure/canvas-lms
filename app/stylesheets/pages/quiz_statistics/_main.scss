@@ -60,7 +60,7 @@
       border-radius: 4px;
 
       & + button {
-        margin-left: $whitespace / 2;
+        margin-left: $whitespace * 0.5;
       }
 
       &.active, &:hover {

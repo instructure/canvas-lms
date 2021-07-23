@@ -16,21 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
+import theme from '@instructure/canvas-theme'
 
 export function Highlight({...props}) {
-  const attrs = {}
-  const highlightTestId = {}
+  const highlightRef = useRef()
 
-  attrs.paddingBottom = '0.125rem'
-  if (props.isHighlighted) {
-    attrs.backgroundColor = 'rgba(0, 142, 226, 0.1)'
-    highlightTestId['data-testid'] = 'isHighlighted'
-  }
+  useEffect(() => {
+    if (props.isHighlighted && highlightRef.current) {
+      setTimeout(() => highlightRef.current?.scrollIntoView({behavior: 'smooth'}), 0)
+    }
+  }, [props.isHighlighted, highlightRef])
 
   return (
-    <div style={{...attrs}} {...highlightTestId}>
+    <div
+      style={{paddingBottom: theme.variables.spacing.xxxSmall}}
+      className={classNames({'highlight-fadeout': props.isHighlighted})}
+      data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
+      ref={highlightRef}
+    >
       {props.children}
     </div>
   )

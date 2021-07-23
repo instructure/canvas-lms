@@ -29,10 +29,20 @@ export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
   const {searchTerm, filter} = useContext(SearchContext)
 
+  const authorId = props.discussionEntry?.author?._id
+  const editorId = props.discussionEntry?.editor?._id
+  const editorName = props.discussionEntry?.editor?.displayName
+  const editedTimingDisplay = DateHelper.formatDatetimeForDiscussions(
+    props.discussionEntry.updatedAt
+  )
+
+  const wasEdited =
+    !!editorId && props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
+
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
-      ? props.discussionEntry.editor.name
-      : props.discussionEntry.author.name
+      ? props.discussionEntry.editor.displayName
+      : props.discussionEntry.author.displayName
     return (
       <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
         <ThreadingToolbar>{props.threadActions}</ThreadingToolbar>
@@ -41,12 +51,16 @@ export const PostMessageContainer = props => {
   } else {
     return (
       <PostMessage
-        authorName={props.discussionEntry.author.name}
+        authorName={props.discussionEntry.author.displayName}
+        editorName={wasEdited && editorId !== authorId ? editorName : null}
+        editedTimingDisplay={wasEdited ? editedTimingDisplay : null}
         avatarUrl={props.discussionEntry.author.avatarUrl}
+        isIsolatedView={props.isIsolatedView}
         lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
           props.discussionEntry.lastReply?.createdAt
         )}
         timingDisplay={createdAt}
+        showCreatedAsTooltip={wasEdited}
         message={props.discussionEntry.message}
         isUnread={!props.discussionEntry.read}
         isEditing={props.isEditing}
@@ -55,7 +69,13 @@ export const PostMessageContainer = props => {
         isForcedRead={props.discussionEntry.forcedReadState}
         discussionRoles={props?.discussionRoles}
       >
-        <ThreadingToolbar searchTerm={searchTerm} filter={filter}>
+        <ThreadingToolbar
+          searchTerm={searchTerm}
+          filter={filter}
+          discussionEntry={props.discussionEntry}
+          onOpenIsolatedView={props.onOpenIsolatedView}
+          isIsolatedView={props.isIsolatedView}
+        >
           {props.threadActions}
         </ThreadingToolbar>
       </PostMessage>
@@ -68,7 +88,9 @@ PostMessageContainer.propTypes = {
   threadActions: PropTypes.arrayOf(PropTypes.object),
   isEditing: PropTypes.bool,
   onCancel: PropTypes.func,
-  onSave: PropTypes.func
+  onSave: PropTypes.func,
+  isIsolatedView: PropTypes.bool,
+  onOpenIsolatedView: PropTypes.func
 }
 
 PostMessageContainer.defaultProps = {

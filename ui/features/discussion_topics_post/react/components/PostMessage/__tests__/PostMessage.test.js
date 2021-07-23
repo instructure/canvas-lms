@@ -19,8 +19,23 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {PostMessage} from '../PostMessage'
+import {SearchContext} from '../../../utils/constants'
 
 const setup = props => {
+  if (props?.searchTerm) {
+    return render(
+      <SearchContext.Provider value={{searchTerm: props.searchTerm}}>
+        <PostMessage
+          hasAuthor
+          authorName="Foo Bar"
+          timingDisplay="Jan 1 2000"
+          message="Posts are fun"
+          title="Thoughts"
+          {...props}
+        />
+      </SearchContext.Provider>
+    )
+  }
   return render(
     <PostMessage
       hasAuthor
@@ -82,6 +97,39 @@ describe('PostMessage', () => {
     })
   })
 
+  describe('search highlighting', () => {
+    it('should not highlight text if no search term is present', () => {
+      const {queryAllByTestId} = setup()
+      expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
+    })
+
+    it('should highlight search terms in message', () => {
+      const {queryAllByTestId} = setup({searchTerm: 'Posts'})
+      expect(queryAllByTestId('highlighted-search-item').length).toBe(1)
+    })
+
+    it('should highlight terms in author name', () => {
+      const {queryAllByTestId} = setup({searchTerm: 'Foo'})
+      expect(queryAllByTestId('highlighted-search-item').length).toBe(1)
+    })
+
+    it('should highlight multiple terms in postmessage', () => {
+      const {queryAllByTestId} = setup({
+        searchTerm: 'here',
+        message: 'a longer message with multiple highlights here and here'
+      })
+      expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+    })
+
+    it('highlighting should be case-insensitive', () => {
+      const {queryAllByTestId} = setup({
+        searchTerm: 'here',
+        message: 'a longer message with multiple highlights Here and here'
+      })
+      expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+    })
+  })
+
   describe('post header', () => {
     it('renders the correct post info', () => {
       const {queryByText, queryByTestId} = setup({
@@ -91,8 +139,34 @@ describe('PostMessage', () => {
       })
       expect(queryByText('Author Name')).toBeTruthy()
       expect(queryByText('Timing Display')).toBeTruthy()
-      expect(queryByText(', last reply Apr 12 2:35pm')).toBeTruthy()
+      expect(queryByText('Last reply Apr 12 2:35pm')).toBeTruthy()
       expect(queryByTestId('pill-container')).toBeFalsy()
+      expect(queryByText(/Edited/)).toBeFalsy()
+      expect(queryByTestId('created-tooltip')).toBeFalsy()
+    })
+
+    it('prepends edited info with comma if !showCreatedAsTooltip', () => {
+      const {getByText, queryByText, queryByTestId} = setup({
+        timingDisplay: 'create time',
+        editedTimingDisplay: 'edit time',
+        editorName: 'Edi Tor'
+      })
+      expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
+      expect(queryByTestId('created-tooltip')).toBeFalsy()
+      expect(queryByText('Created create time')).toBeFalsy()
+    })
+
+    it('renders the created tooltip if showCreatedAsTooltip', () => {
+      const {getByText, getAllByText, getByTestId} = setup({
+        timingDisplay: 'create time',
+        showCreatedAsTooltip: true,
+        editedTimingDisplay: 'edit time',
+        editorName: 'Edi Tor'
+      })
+      expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
+      expect(getByTestId('created-tooltip')).toBeTruthy()
+      // one for the screenreader, the other for the tooltip
+      expect(getAllByText('Created create time').length).toEqual(2)
     })
 
     it('renders the correct pill if provided', () => {

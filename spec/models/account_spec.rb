@@ -875,6 +875,34 @@ describe Account do
     expect(manual.grants_right?(@user, :create_courses)).to eq false
   end
 
+  it "does not allow create courses for student view students" do
+    a = Account.default
+    a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
+
+    manual = a.manually_created_courses_account
+    course = manual.courses.create!
+    user = course.student_view_student
+
+    expect(a.grants_right?(user, :create_courses)).to eq false
+    expect(manual.grants_right?(user, :create_courses)).to eq false
+  end
+
+
+  it "does not allow create courses for student view students (granular permissions)" do
+    a = Account.default
+    a.settings = { :no_enrollments_can_create_courses => true }
+    a.save!
+    a.enable_feature!(:granular_permissions_manage_courses)
+
+    manual = a.manually_created_courses_account
+    course = manual.courses.create!
+    user = course.student_view_student
+
+    expect(a.grants_right?(user, :create_courses)).to eq false
+    expect(manual.grants_right?(user, :create_courses)).to eq false
+  end
+
   it "should correctly return sub-accounts as options" do
     a = Account.default
     sub = Account.create!(:name => 'sub', :parent_account => a)

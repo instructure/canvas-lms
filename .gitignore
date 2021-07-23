@@ -17,6 +17,7 @@
 /.ruby-version
 /app/views/info/styleguide.html.erb
 /config/*.yml
+/config/credentials.yml.enc
 !/config/credentials.test.yml
 /config/environments/*-local.rb
 /config/locales/generated/

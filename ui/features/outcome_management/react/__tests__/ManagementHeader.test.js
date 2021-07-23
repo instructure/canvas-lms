@@ -27,9 +27,12 @@ jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/outcomes/react/ImportOutcomesModal')
 jest.useFakeTimers()
 
-const render = (children, {isMobileView = false, renderer = rtlRender} = {}) => {
+const render = (
+  children,
+  {isMobileView = false, canManage = true, canImport = true, renderer = rtlRender} = {}
+) => {
   return renderer(
-    <OutcomesContext.Provider value={{env: {isMobileView}}}>
+    <OutcomesContext.Provider value={{env: {isMobileView, canManage, canImport}}}>
       <MockedProvider mocks={[]}>{children}</MockedProvider>
     </OutcomesContext.Provider>
   )
@@ -38,6 +41,8 @@ const render = (children, {isMobileView = false, renderer = rtlRender} = {}) => 
 describe('ManagementHeader', () => {
   const defaultProps = (props = {}) => ({
     handleFileDrop: () => {},
+    canManage: true,
+    canImport: true,
     ...props
   })
 
@@ -55,6 +60,52 @@ describe('ManagementHeader', () => {
     expect(getByText('Import')).toBeInTheDocument()
     expect(getByText('Create')).toBeInTheDocument()
     expect(getByText('Find')).toBeInTheDocument()
+  })
+
+  describe('User does not have manage_outcomes permissions', () => {
+    it('Create button does not appear', () => {
+      const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(queryByText('Create')).not.toBeInTheDocument()
+    })
+
+    it('Find button does not appear', () => {
+      const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(queryByText('Find')).not.toBeInTheDocument()
+    })
+
+    it('Import button does appear if user has import_outcomes permissions', () => {
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(getByText('Import')).toBeInTheDocument()
+    })
+  })
+
+  describe('User does not have import_outcomes permissions', () => {
+    it('Import button does not appear', () => {
+      const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canImport: false
+      })
+      expect(queryByText('Import')).not.toBeInTheDocument()
+    })
+
+    it('Create button does appear if user has manage_outcomes permissions', () => {
+      const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canImport: false
+      })
+      expect(queryByText('Create')).toBeInTheDocument()
+    })
+
+    it('Find button does appear if user has manage_outcomes permissions', () => {
+      const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
+        canManage: true
+      })
+      expect(getByText('Find')).toBeInTheDocument()
+    })
   })
 
   it('calls showImportOutcomesModal when click on Import', () => {
@@ -87,12 +138,43 @@ describe('ManagementHeader', () => {
       expect(getByText('Add')).toBeInTheDocument()
     })
 
+    it("doesnt render the Add button if user can't import or manage outcomes", () => {
+      const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true,
+        canManage: false,
+        canImport: false
+      })
+      expect(queryByText('Add')).not.toBeInTheDocument()
+    })
+
     it('renders the Menu Items', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true
       })
       fireEvent.click(getByText('Add'))
       expect(getByText('Import')).toBeInTheDocument()
+      expect(getByText('Create')).toBeInTheDocument()
+      expect(getByText('Find')).toBeInTheDocument()
+    })
+
+    it('only renders Import Menu Item if user only has import permissions', () => {
+      const {getByText, queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true,
+        canManage: false
+      })
+      fireEvent.click(getByText('Add'))
+      expect(getByText('Import')).toBeInTheDocument()
+      expect(queryByText('Create')).not.toBeInTheDocument()
+      expect(queryByText('Find')).not.toBeInTheDocument()
+    })
+
+    it('only renders Create and Find Menu Items if user only has manage permissions', () => {
+      const {getByText, queryByText} = render(<ManagementHeader {...defaultProps()} />, {
+        isMobileView: true,
+        canImport: false
+      })
+      fireEvent.click(getByText('Add'))
+      expect(queryByText('Import')).not.toBeInTheDocument()
       expect(getByText('Create')).toBeInTheDocument()
       expect(getByText('Find')).toBeInTheDocument()
     })

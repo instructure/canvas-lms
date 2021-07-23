@@ -168,6 +168,7 @@ class ApplicationController < ActionController::Base
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: (@context.blank? || @context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
+          use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user&.prefers_high_contrast?,
@@ -263,7 +264,7 @@ class ApplicationController < ActionController::Base
 
   def add_to_js_env(hash, jsenv, overwrite)
     hash.each do |k,v|
-      if jsenv[k] && !overwrite
+      if jsenv[k] && jsenv[k] != v && !overwrite
         raise "js_env key #{k} is already taken"
       else
         jsenv[k] = v
@@ -404,6 +405,7 @@ class ApplicationController < ActionController::Base
   helper_method :set_master_course_js_env_data
 
   def load_blueprint_courses_ui
+    return if js_env[:BLUEPRINT_COURSES_DATA]
     return unless @context && @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
 
     is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
@@ -2099,8 +2101,6 @@ class ApplicationController < ActionController::Base
         !!CanvasKaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
-      elsif feature == :crocodoc
-        !!Canvas::Crocodoc.config
       elsif feature == :vericite
         Canvas::Plugin.find(:vericite).try(:enabled?)
       elsif feature == :lockdown_browser

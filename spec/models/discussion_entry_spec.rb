@@ -58,6 +58,16 @@ describe DiscussionEntry do
     expect(topic.discussion_entries.active.length).to eq 1
   end
 
+  it "should check both feature flags for the legacy boolean" do
+    @course = course_model
+    Account.site_admin.enable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+    Account.site_admin.enable_feature!(:isolated_view)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be false
+    @course.disable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+  end
+
   it "should preserve parent_id if valid" do
     course_factory
     entry = topic.discussion_entries.create!

@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/stub-env",
+  "version": "1.0.0",
+  "description": "Stub window.ENV in test",
+  "author": "Ahmad Amireh <ahmad@instructure.com>",
+  "private": true,
+  "main": "./index.js"
+}

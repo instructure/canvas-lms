@@ -52,7 +52,12 @@ const possibleStates = {
     value: 3,
     title: <Text transform="uppercase">{I18n.t('Review Feedback')}</Text>,
     subtitle: submission => {
-      const {submittedAt} = submission
+      const {attempt, submittedAt} = submission
+
+      if (attempt === 0) {
+        return null
+      }
+
       if (submittedAt == null) {
         return I18n.t('This assignment is complete!')
       }
@@ -93,6 +98,7 @@ export default function SubmissionWorkflowTracker({submission}) {
   }
 
   const {state, valueMax} = currentWorkflowState({submission})
+  const subtitle = renderStateText(submission, state.subtitle)
   return (
     <div
       className="assignment-student-submission-tracker"
@@ -117,9 +123,11 @@ export default function SubmissionWorkflowTracker({submission}) {
           >
             {renderStateText(submission, state.title)}
           </Text>
-          <Text as="div" data-testid="submission-workflow-tracker-subtitle">
-            {renderStateText(submission, state.subtitle)}
-          </Text>
+          {subtitle && (
+            <Text as="div" data-testid="submission-workflow-tracker-subtitle">
+              {subtitle}
+            </Text>
+          )}
         </Flex.Item>
       </Flex>
     </div>

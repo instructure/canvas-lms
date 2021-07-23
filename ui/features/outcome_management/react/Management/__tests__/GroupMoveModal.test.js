@@ -205,4 +205,34 @@ describe('GroupMoveModal', () => {
       type: 'error'
     })
   })
+
+  it('doesnt show child groups of groupId even if it is loaded before (clear cache)', async () => {
+    const RANDOM_GROUP_ID = '102'
+    const GROUP_ID = '100'
+
+    let r = render(
+      <GroupMoveModal {...defaultProps({parentGroupId: '101', groupId: RANDOM_GROUP_ID})} />,
+      {
+        mocks: [...smallOutcomeTree()]
+      }
+    )
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(r.getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(r.getByText('Account folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(r.queryByText('Group 100 folder 0')).toBeInTheDocument()
+    r.unmount()
+
+    r = render(<GroupMoveModal {...defaultProps({parentGroupId: '101', groupId: GROUP_ID})} />, {
+      mocks: [...smallOutcomeTree()]
+    })
+
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(r.getByText('Root account folder'))
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(r.getByText('Account folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(r.queryByText('Group 100 folder 0')).not.toBeInTheDocument()
+  })
 })

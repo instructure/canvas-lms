@@ -134,10 +134,12 @@
     <div class="control-group">
       <div class="controls" style="text-align:start; margin-left:0">
         {{#if isTopic}}
-          <div><label class="checkbox short-label" for="threaded">
-            {{checkbox "threaded"}}
-            {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
-          </label></div>
+          {{#unless react_discussions_post}}
+            <div><label class="checkbox short-label" for="threaded">
+              {{checkbox "threaded"}}
+              {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
+            </label></div>
+          {{/unless}}
         {{/if}}
         {{#if contextIsCourse}}
           {{#if isAnnouncement}}

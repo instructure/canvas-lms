@@ -48,7 +48,8 @@ const uploadMediaTranslations = {
     REMOVE_FILE: 'Remove {lang} closed captions',
     ADD_NEW_CAPTION_OR_SUBTITLE: formatMessage('Add another'),
     ADDED_CAPTION: 'Captions for {lang} added',
-    DELETED_CAPTION: 'Deleted captions for {lang}'
+    DELETED_CAPTION: 'Deleted captions for {lang}',
+    PROGRESS_LABEL: formatMessage('Uploading')
   },
 
   SelectStrings: {

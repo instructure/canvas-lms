@@ -23,16 +23,41 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 
 import formatMessage from '../../../../../../format-message'
-import {UploadModal} from './UploadModal'
+import {UploadFile} from '../../../../shared/Upload/UploadFile'
 
-export const MyImages = () => {
+export const MyImages = props => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  function handleFileUpload(
+    editor,
+    accept,
+    selectedPanel,
+    uploadData,
+    storeProps,
+    source,
+    onDismiss
+  ) {
+    // TODO: add the upload logic
+    onDismiss()
+  }
+
   return (
-    <View as="div" padding="small 0">
+    <View as="div" id="buttons-tray-images-section" padding="small 0">
       <Button onClick={() => setIsModalOpen(true)} renderIcon={IconAddLine}>
         {formatMessage('Add Image')}
       </Button>
-      <UploadModal onDismiss={() => setIsModalOpen(false)} open={isModalOpen} />
+
+      {isModalOpen && (
+        <UploadFile
+          accept="image/*"
+          editor={props.editor}
+          label={formatMessage('Add Image')}
+          onSubmit={handleFileUpload}
+          onDismiss={() => setIsModalOpen(false)}
+          panels={['COMPUTER', 'UNSPLASH', 'URL']}
+          requireA11yAttributes={false}
+        />
+      )}
     </View>
   )
 }

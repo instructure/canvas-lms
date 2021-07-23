@@ -63,6 +63,22 @@ describe K5Mode do
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
+
+      context 'that is also a student' do
+        before :each do
+          @course.enroll_user(@teacher, 'StudentEnrollment')
+        end
+
+        it_behaves_like ':show_left_side'
+
+        it 'should set k5 variables' do
+          get :index, params: { course_id: @course.id }
+          expect(assigns(:k5_details_view)).to eq(false)
+          expect(assigns(:show_left_side)).to eq(true)
+          expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+          expect(assigns(:js_bundles).flatten).to include(:k5_theme)
+        end
+      end
     end
 
     context 'student' do

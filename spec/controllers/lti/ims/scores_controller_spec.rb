@@ -748,6 +748,15 @@ module Lti::Ims
           end
           it_behaves_like 'a bad request'
         end
+
+        context 'when submission_type is online_upload but no content_items are included' do
+          let(:params_overrides) do
+            super().merge(
+              Lti::Result::AGS_EXT_SUBMISSION => { submission_type: 'online_upload' }
+            )
+          end
+          it_behaves_like 'an unprocessable entity'
+        end
       end
     end
   end

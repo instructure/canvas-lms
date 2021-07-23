@@ -70,7 +70,7 @@
       color: $ic-font-color-dark;
       white-space: nowrap;
       min-width: 180px;
-      padding: $ic-sp/2 $ic-sp;
+      padding: $ic-sp*0.5 $ic-sp;
 
       & i[class*=icon-]:before,
       & i[class^=icon-]:before { margin-#{direction(right)}: 8px; }
@@ -94,7 +94,7 @@
     &.ui-menu-item--helper-text {
       color: $ic-font-color--subdued;
       padding: 0 $ic-sp;
-      margin: $ic-sp/2 0;
+      margin: $ic-sp*0.5 0;
     }
   }
 

@@ -77,6 +77,8 @@ describe('OutcomeManagement', () => {
 
     it('calls showImportOutcomesModal after a file is uploaded', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      window.ENV.PERMISSIONS.manage_outcomes = true
+      window.ENV.PERMISSIONS.import_outcomes = true
       const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
       const {getByText, getByLabelText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>

@@ -98,16 +98,4 @@ class JwtsController < ApplicationController
       status: 400
     )
   end
-
-  private
-
-  def require_non_jwt_auth
-    if @authenticated_with_jwt
-      render(
-        json: {error: "cannot generate a JWT when authorized by a JWT"},
-        status: 403
-      )
-    end
-  end
-
 end

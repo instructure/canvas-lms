@@ -27,35 +27,100 @@ describe 'assignments' do
   include AssignmentsCommon
 
   context 'as a student' do
+    context 'past locked' do
+      before(:once) do
+        Account.default.enable_feature!(:assignments_2_student)
+        course_with_student(course: @course, active_all: true)
+        @assignment = @course.assignments.create!(
+          name: 'locked_assignment',
+          due_at: 5.days.ago,
+          unlock_at: 10.days.ago,
+          lock_at: 3.days.ago,
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+      end
 
-    before(:once) do
-      Account.default.enable_feature!(:assignments_2_student)
-      course_with_student(course: @course, active_all: true)
-      @assignment = @course.assignments.create!(
-        name: 'locked_assignment',
-        due_at: 5.days.ago,
-        lock_at: 3.days.ago
-      )
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
+
+      it 'shows locked image' do
+        expect(StudentAssignmentPageV2.assignment_locked_image).to be_displayed
+      end
+
+      it 'shows details toggle' do
+        expect(StudentAssignmentPageV2.details_toggle).to be_displayed
+      end
     end
 
-    before(:each) do
-      user_session(@student)
-      StudentAssignmentPageV2.visit(@course, @assignment)
+    context 'future locked' do
+      before(:once) do
+        Account.default.enable_feature!(:assignments_2_student)
+        course_with_student(course: @course, active_all: true)
+        @assignment = @course.assignments.create!(
+          name: 'locked_assignment',
+          due_at: 5.days.from_now,
+          unlock_at:3.days.from_now,
+          lock_at: 10.days.from_now,
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
+
+      it 'shows future locked image' do
+        expect(StudentAssignmentPageV2.assignment_future_locked_image).to be_displayed
+      end
+
+      it 'does not show details container' do
+        expect(f("#content")).to_not include_text("Details")
+      end
     end
 
-    xit 'should show locked image' do
-      skip('Unskip in COMMS-2074')
-      expect(StudentAssignmentPageV2.assignment_locked_image).to be_displayed
-    end
+    context 'prerequisite locked' do
+      before(:once) do
+        Account.default.enable_feature!(:assignments_2_student)
+        course_with_student(course: @course, active_all: true)
+        module1 = @course.context_modules.create!(name: "First Module")
+        module2 = @course.context_modules.create!(name: "Second Module")
+        assignment1 = @course.assignments.create!(
+          name: 'prereq_assignment',
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+        @assignment2 = @course.assignments.create!(
+          name: 'locked_assignment',
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+        tag = module1.add_item(type: 'assignment', id: assignment1.id)
+        module2.add_item(type: 'assignment', id: @assignment2.id)
+        module1.update!(completion_requirements: [{id: tag.id, type: 'must_submit'}])
+        module2.update!(prerequisites: [{id: module1.id, name: module1.name, type: 'context_module'}])
+      end
 
-    xit 'should show locked stepper' do
-      skip('Unskip in COMMS-2074')
-      expect(StudentAssignmentPageV2.lock_icon).to be_displayed
-    end
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment2)
+      end
 
-    xit 'a locked assignment should not show details container' do
-      skip('Unskip in COMMS-2074')
-      expect(f("#content")).not_to contain_css StudentAssignmentPageV2.details_toggle_css
+      it 'shows prerequisite locked image' do
+        expect(StudentAssignmentPageV2.assignment_prerequisite_locked_image).to be_displayed
+      end
+
+      it 'does not show details container' do
+        expect(f("#content")).to_not include_text("Details")
+      end
+
+      it 'links to modules page' do
+        expect(StudentAssignmentPageV2.modules_link).to be_displayed
+      end
     end
   end
 end

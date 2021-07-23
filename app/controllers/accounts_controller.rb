@@ -1106,9 +1106,7 @@ class AccountsController < ApplicationController
             @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
             @account.root_account.save!
             # Invalidate the cached k5 settings for all users in the account
-            User.of_account(@account.root_account).find_in_batches do |users|
-              User.clear_cache_keys(users.pluck(:id), :k5_user)
-            end
+            @account.root_account.clear_k5_cache
           end
         end
 

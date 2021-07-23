@@ -74,7 +74,8 @@ class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
 end
 
 module Interfaces::SubmissionInterface
-  include GraphQL::Schema::Interface
+  include Interfaces::BaseInterface
+
   description 'Types for submission or submission history'
 
   class LatePolicyStatusType < Types::BaseEnum

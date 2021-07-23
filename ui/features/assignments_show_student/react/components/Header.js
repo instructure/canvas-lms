@@ -53,7 +53,10 @@ class Header extends React.Component {
   }
 
   state = {
-    commentsTrayOpen: false
+    commentsTrayOpen:
+      this.props.submission &&
+      this.props.submission.unreadCommentCount &&
+      this.props.submission.unreadCommentCount !== 0
   }
 
   isSubmissionLate = () => {
@@ -136,7 +139,9 @@ class Header extends React.Component {
         <Flex as="div" direction="column" alignItems="end">
           <Flex.Item>
             <Text size="small">
-              {I18n.t('Attempt %{attempt} Score:', {attempt: submission.attempt})}
+              {submission.attempt === 0
+                ? I18n.t('Offline Score:')
+                : I18n.t('Attempt %{attempt} Score:', {attempt: submission.attempt})}
             </Text>
           </Flex.Item>
 

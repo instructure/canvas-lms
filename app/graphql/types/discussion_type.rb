@@ -76,6 +76,11 @@ module Types
       load_association(:assignment)
     end
 
+    field :attachment, Types::FileType, null: true
+    def attachment
+      load_association(:attachment)
+    end
+
     field :root_topic, Types::DiscussionType, null: true
     def root_topic
       load_association(:root_topic)

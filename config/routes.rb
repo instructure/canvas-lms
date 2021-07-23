@@ -2198,6 +2198,10 @@ CanvasRails::Application.routes.draw do
       post 'jwts/refresh', action: :refresh
     end
 
+    scope(controller: :inst_ids) do
+      post 'inst_ids', action: :create
+    end
+
     scope(controller: :gradebook_settings) do
       put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
     end
@@ -2531,6 +2535,9 @@ CanvasRails::Application.routes.draw do
         get "/#{prefix}/feature_flags/:feature", action: :show
       end
     end
+
+    # LTI Access Tokens (Site Admin only)
+    get 'advantage_token', controller: 'lti/token', action: :advantage_access_token, as: :lti_advantage_token_site_admin
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

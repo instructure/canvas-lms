@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "base/environment";
 @import "components/ui.selectmenu";
 @import "components/conditional_release";
@@ -537,7 +539,7 @@ body.responsive_awareness .span4.discussion-header__metadata {
 
   @if $use_high_contrast { color: $ic-font-color-dark; }
   transition: border-color 0.2s;
-  padding: $ic-sp/2 $ic-sp;
+  padding: $ic-sp*0.5 $ic-sp;
   &:hover, &:focus {
     color: #444;
     text-decoration: none;
@@ -710,7 +712,7 @@ body.responsive_awareness .span4.discussion-header__metadata {
 
 .headerBar__subscribe,
 .headerBar__controls {
-  margin: $ic-sp / 3 0;
+  margin: math.div($ic-sp, 3) 0;
 
   @include breakpoint(desktop) {
     margin: 0;

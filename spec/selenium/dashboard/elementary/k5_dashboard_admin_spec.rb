@@ -57,7 +57,7 @@ describe "admin k5 dashboard" do
       options = dashboard_options
       expect(options.length).to be 2
       expect(options[0].text).to eq('Classic View')
-      expect(options[1].text).to eq('Elementary View')
+      expect(options[1].text).to eq('Homeroom View')
 
       options[0].click
       wait_for_ajaximations

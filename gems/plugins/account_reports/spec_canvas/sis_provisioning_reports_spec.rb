@@ -32,6 +32,7 @@ describe "Default Account Reports" do
     @user2 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
                                  :name => 'Michael Bolton', :account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_02"
+    @user.update(pronouns: 'she_her')
     @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user3 = user_with_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
@@ -377,10 +378,6 @@ describe "Default Account Reports" do
         expect(@report.should_add_pronouns?).to eq(false)
       end
 
-      it 'should evaluate to false when disabled via Setting' do
-        Setting.set('enable_sis_export_pronouns', 'false')
-        expect(@report.should_add_pronouns?).to eq(false)
-      end
     end
 
     describe "Users" do
@@ -426,8 +423,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["users"] = true
         parsed = read_report("sis_export_csv", {params: parameters, order: 0})
-        expect(parsed.first.last).to eq 'human/being'
-        expect(parsed).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
+        expect(parsed.shift.last).to eq 'human/being'
+        expect(parsed.shift.last).to eq 'She/Her'
+        expect(parsed).to eq([@user3, @user4].map { |u| expected_user(u) })
       end
 
       it "should run sis report on a sub_account" do

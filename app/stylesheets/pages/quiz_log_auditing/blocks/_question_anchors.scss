@@ -21,7 +21,7 @@
 }
 
 .ic-QuestionAnchors__Anchor {
-  margin-left: $whitespace / 2;
+  margin-left: $whitespace * 0.5;
 
   &:visited {
     color: $visitedLinkFg;

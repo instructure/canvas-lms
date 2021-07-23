@@ -672,6 +672,32 @@ describe Group do
       @group.users << @student = student_in_course(:course => @course).user
     end
 
+    describe 'TAB_CONFERENCES' do
+      context 'when WebConferences are enabled' do
+        before do
+          allow(WebConference).to receive(:plugins).and_return(
+            [
+              web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
+              web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
+              web_conference_plugin_mock("broken_plugin", {:foor => :bar})
+            ]
+          )
+        end
+
+        it 'returns the plugin names' do
+          tabs = @group.tabs_available(@user)
+          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Formerly Conferences)")
+        end
+      end
+
+      context 'when WebConferences are not enabled' do
+        it "returns Conferences" do
+          tabs = @group.tabs_available(@user)
+          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
+        end
+      end
+    end
+
     it "should let members see everything" do
       expect(@group.tabs_available(@student).map{|t|t[:id]}).to eql [
         Group::TAB_HOME,

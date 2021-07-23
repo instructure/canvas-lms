@@ -20,7 +20,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {friendlyTypeName, getCurrentSubmissionType} from '../helpers/SubmissionHelpers'
+import {friendlyTypeName, getCurrentSubmissionType, isSubmitted} from '../helpers/SubmissionHelpers'
 import {
   IconAttachMediaLine,
   IconLinkLine,
@@ -117,8 +117,7 @@ export default class AttemptTab extends Component {
   }
 
   renderFileAttempt = () => {
-    return this.props.submission.state === 'graded' ||
-      this.props.submission.state === 'submitted' ? (
+    return isSubmitted(this.props.submission) ? (
       <Suspense fallback={<LoadingIndicator />}>
         <FilePreview
           key={this.props.submission.attempt}
@@ -131,10 +130,7 @@ export default class AttemptTab extends Component {
   }
 
   renderTextAttempt = context => {
-    const readOnly =
-      !context.allowChangesToSubmission ||
-      ['submitted', 'graded'].includes(this.props.submission.state)
-
+    const readOnly = !context.allowChangesToSubmission || isSubmitted(this.props.submission)
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
@@ -179,7 +175,11 @@ export default class AttemptTab extends Component {
   renderStudentAnnotationAttempt = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
-        <StudentAnnotationAttempt submission={this.props.submission} />
+        <StudentAnnotationAttempt
+          submission={this.props.submission}
+          assignment={this.props.assignment}
+          createSubmissionDraft={this.props.createSubmissionDraft}
+        />
       </Suspense>
     )
   }
@@ -204,7 +204,7 @@ export default class AttemptTab extends Component {
   renderSubmissionTypeSelector() {
     // because we are currently allowing only a single submission type
     // you should never need to change types after submitting
-    if (this.props.submission.state === 'graded' || this.props.submission.state === 'submitted') {
+    if (isSubmitted(this.props.submission)) {
       return null
     }
 
@@ -238,8 +238,8 @@ export default class AttemptTab extends Component {
       return <LockedAssignment assignment={assignment} />
     }
 
-    const submissionType = ['submitted', 'graded'].includes(submission.state)
-      ? getCurrentSubmissionType(submission)
+    const submissionType = isSubmitted(submission)
+      ? getCurrentSubmissionType(submission, assignment)
       : this.props.activeSubmissionType
 
     const multipleSubmissionTypes = assignment.submissionTypes.length > 1

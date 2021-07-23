@@ -93,7 +93,8 @@ const OutcomeManagementPanel = () => {
     rootId,
     selectedGroupId,
     selectedParentGroupId
-  } = useManageOutcomes(true)
+  } = useManageOutcomes('OutcomeManagementPanel')
+
   const {group, loading, loadMore} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString
@@ -113,6 +114,10 @@ const OutcomeManagementPanel = () => {
   const onCloseOutcomeRemoveModal = () => {
     closeOutcomeRemoveModal()
     setSelectedOutcome(null)
+  }
+  const onCloseOutcomesRemoveModal = () => {
+    closeOutcomesRemoveModal()
+    clearSelectedOutcomes()
   }
   const onCloseOutcomeMoveModal = () => {
     closeOutcomeMoveModal()
@@ -177,6 +182,7 @@ const OutcomeManagementPanel = () => {
   }
 
   const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
+  const canManage = ENV.PERMISSIONS?.manage_outcomes
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -257,19 +263,21 @@ const OutcomeManagementPanel = () => {
                     onSearchClearHandler={onSearchClearHandler}
                     loadMore={loadMore}
                     scrollContainer={scrollContainer}
-                    isRootGroup={selectedGroupId === rootId}
+                    isRootGroup={collections[selectedGroupId]?.isRootGroup}
                   />
                 )}
               </View>
             </Flex.Item>
           </Flex>
           <hr style={{margin: '0 0 7px'}} />
-          <ManageOutcomesFooter
-            selected={selectedOutcomes}
-            selectedCount={selectedOutcomesCount}
-            onRemoveHandler={openOutcomesRemoveModal}
-            onMoveHandler={openOutcomesMoveModal}
-          />
+          {canManage && (
+            <ManageOutcomesFooter
+              selected={selectedOutcomes}
+              selectedCount={selectedOutcomesCount}
+              onRemoveHandler={openOutcomesRemoveModal}
+              onMoveHandler={openOutcomesMoveModal}
+            />
+          )}
           {selectedGroupId && (
             <>
               <GroupRemoveModal
@@ -292,6 +300,7 @@ const OutcomeManagementPanel = () => {
                     outcomes={selectedOutcomeObj}
                     isOpen={isOutcomeRemoveModalOpen}
                     onCloseHandler={onCloseOutcomeRemoveModal}
+                    onCleanupHandler={onCloseOutcomeRemoveModal}
                   />
                   <OutcomeEditModal
                     outcome={selectedOutcome}
@@ -328,6 +337,7 @@ const OutcomeManagementPanel = () => {
                 outcomes={selectedOutcomes}
                 isOpen={isOutcomesRemoveModalOpen}
                 onCloseHandler={closeOutcomesRemoveModal}
+                onCleanupHandler={onCloseOutcomesRemoveModal}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomes}

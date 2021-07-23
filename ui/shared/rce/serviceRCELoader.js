@@ -213,7 +213,8 @@ const RCELoader = {
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
       use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor,
-      use_rce_buttons_and_icons: !!window.ENV?.FEATURES?.rce_buttons_and_icons
+      use_rce_buttons_and_icons: !!window.ENV?.FEATURES?.rce_buttons_and_icons,
+      use_rce_a11y_checker_notifications: !!window.ENV?.use_rce_a11y_checker_notifications
     }
   }
 }

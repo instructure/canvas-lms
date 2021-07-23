@@ -975,8 +975,6 @@ export default class EditView extends ValidatedFormView
       annotatedDocumentUsageRights = @getAnnotatedDocumentUsageRights()
       if annotatedDocumentUsageRights.use_justification == 'choose'
         errors['usage_rights_use_justification'] = [{message: I18n.t('You must set document usage rights')}]
-      if annotatedDocumentUsageRights.legal_copyright == ''
-        errors['usage_rights_legal_copyright'] = [{message: I18n.t('You must set document copyright holder')}]
 
     errors
 

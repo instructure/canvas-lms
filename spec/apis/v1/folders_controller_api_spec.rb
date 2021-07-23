@@ -29,11 +29,6 @@ describe "Folders API", type: :request do
     @folders_path_options = { :controller => "folders", :action => "api_index", :format => "json", :id => @root.id.to_param }
   end
 
-  before :each do
-    # granular permissions disabled by default
-    @root.course.root_account.disable_feature!(:granular_permissions_course_files)
-  end
-
   describe "#index" do
     context "with folders" do
       before(:once) do
@@ -150,7 +145,7 @@ describe "Folders API", type: :request do
       expect(json['folders_url'].ends_with?("/api/v1/folders/#{@root.id}/folders")).to eq true
     end
 
-    it "should return unauthorized error" do
+    it "should return unauthorized error if requestor is not permitted to view folder" do
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course, :hidden => true)
       course_with_student(:course => @course)
       raw_api_call(:get, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "show", :id => @f1.id.to_param), {})
@@ -228,90 +223,6 @@ describe "Folders API", type: :request do
         expect(json['id']).to eq @root.id
       end
     end
-
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-        @root.sub_folders.create!(name: 'folder1', context: @course)
-        @root.sub_folders.create!(name: 'folder2', context: @course, workflow_state: 'hidden')
-        Attachment.create!(
-          filename: 'test1.txt',
-          display_name: 'test1.txt',
-          uploaded_data: StringIO.new('file'),
-          folder: @root,
-          context: @course
-        )
-        Attachment.create!(
-          filename: 'test2.txt',
-          display_name: 'test2.txt',
-          uploaded_data: StringIO.new('file'),
-          folder: @root,
-          context: @course
-        ).update_attribute(:file_state, 'hidden')
-      end
-
-      it "should show if the user can upload files to the folder" do
-        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
-        expect(json["can_upload"]).to be true
-        student_in_course(course: @course)
-        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
-        expect(json["can_upload"]).to be false
-      end
-
-      it "should return unauthorized error if requestor is not permitted to view hidden folders" do
-        @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course, :hidden => true)
-        course_with_student(:course => @course)
-        raw_api_call(:get, @folders_path + "/#{@f1.id}", @folders_path_options.merge(:action => "show", :id => @f1.id.to_param), {})
-        expect(response.code).to eq "401"
-      end
-
-      it "should 404 for no folder found" do
-        raw_api_call(:get, @folders_path + "/0", @folders_path_options.merge(:action => "show", :id => "0"))
-        assert_status(404)
-      end
-
-      it "should 404 for deleted folder" do
-        f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-        f1.destroy
-        raw_api_call(:get, @folders_path + "/#{f1.id}", @folders_path_options.merge(:action => "show", :id => f1.id.to_param))
-        assert_status(404)
-      end
-
-      it "should get the root folder for a course" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/root", @folders_path_options.
-          merge(:action => "show", :course_id => @course.id.to_param, :id => 'root'), {})
-        expect(json['id']).to eq @root.id
-      end
-
-      it "should get a folder in a context" do
-        @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/#{@f1.id}", @folders_path_options.
-          merge(:action => "show", :course_id => @course.id.to_param, :id => @f1.id.to_param), {})
-        expect(json['id']).to eq @f1.id
-      end
-
-      it "should 404 for a folder in a different context" do
-        group_model(:context => @course)
-        group_root = Folder.root_folders(@group).first
-        api_call(:get, "/api/v1/courses/#{@course.id}/folders/#{group_root.id}", @folders_path_options.
-          merge(:action => "show", :course_id => @course.id.to_param, :id => group_root.id.to_param), {}, {}, :expected_status => 404)
-      end
-
-      it "should get the root folder for a user" do
-        @root = Folder.root_folders(@user).first
-        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/root", @folders_path_options.
-          merge(:action => "show", :user_id => @user.id.to_param, :id => 'root'), {})
-        expect(json['id']).to eq @root.id
-      end
-
-      it "should get the root folder for a group" do
-        group_model(:context => @course)
-        @root = Folder.root_folders(@group).first
-        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/root", @folders_path_options.
-          merge(:action => "show", :group_id => @group.id.to_param, :id => 'root'), {})
-        expect(json['id']).to eq @root.id
-      end
-    end
   end
 
   describe "#media_folder" do
@@ -346,45 +257,6 @@ describe "Folders API", type: :request do
         merge(:action => "media_folder", :group_id => @group.id.to_param).except(:id), {})
       folder = @group.folders.where(:name => "Uploaded Media").first
       expect(json['id']).to eq folder.id
-    end
-
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-      end
-
-      it "should create a media folder for a course" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
-          merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
-        folder = @course.folders.where(:name => "Uploaded Media").first
-        expect(folder.unique_type).to eq Folder::MEDIA_TYPE
-        expect(json['id']).to eq folder.id
-        expect(json['hidden']).to be_truthy
-
-        # get the same one twice
-        json2 = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
-          merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
-        expect(json2['id']).to eq folder.id
-      end
-
-      it "should create a folder in the user's root if user doesn't have upload rights" do
-        course_with_student(:course => @course, :active_all => true)
-        @me = @student
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.
-          merge(:action => "media_folder", :course_id => @course.id.to_param).except(:id), {})
-        expect(@course.folders.where(:name => "Uploaded Media").first).to be_nil
-        folder = @user.folders.where(:name => "Uploaded Media").first
-        expect(json['id']).to eq folder.id
-        expect(json['can_upload']).to eq true
-      end
-
-      it "should create a media folder for a group" do
-        group_model(:context => @course)
-        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/media", @folders_path_options.
-          merge(:action => "media_folder", :group_id => @group.id.to_param).except(:id), {})
-        folder = @group.folders.where(:name => "Uploaded Media").first
-        expect(json['id']).to eq folder.id
-      end
     end
   end
 
@@ -446,65 +318,30 @@ describe "Folders API", type: :request do
       expect(@f1.workflow_state).to eq 'visible'
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_delete permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_delete',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_delete permission" do
-        it "should delete an empty folder" do
-          @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-          api_call(:delete, @folders_path + "/#{@f1.id}",
-                   @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
-                   {}, {:expected_status => 200})
-        end
-
-        it "will not delete a submissions folder" do
-          user_model
-          api_call_as_user(@user, :delete, @folders_path + "/#{@user.submissions_folder.id}",
-                           @folders_path_options.merge(:action => "api_destroy", :id => @user.submissions_folder.to_param),
-                           {:force => true}, {}, {:expected_status => 401})
-        end
+      it "should disallow deleting an empty folder" do
+        @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
+        api_call(:delete, @folders_path + "/#{@f1.id}",
+                 @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
+                 {}, {:expected_status => 401})
       end
 
-      context "as teacher without manage_files_delete permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_delete',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow deleting an empty folder" do
-          @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-          api_call(:delete, @folders_path + "/#{@f1.id}",
-                   @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
-                   {}, {:expected_status => 401})
-        end
-
-        it "should disallow deleting folders with contents with force flag" do
-          @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-          @f2 = @f1.sub_folders.create!(:name => "folder2", :context => @course)
-          api_call(:delete, @folders_path + "/#{@f1.id}",
-                   @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
-                   {:force => true}, {:expected_status => 401})
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should return unauthorized error" do
-          @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
-          raw_api_call(:delete, @folders_path + "/#{@f1.id}",
-                       @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
-                       {}, {:expected_status => 401})
-        end
+      it "should disallow deleting folders with contents with force flag" do
+        @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
+        @f2 = @f1.sub_folders.create!(:name => "folder2", :context => @course)
+        api_call(:delete, @folders_path + "/#{@f1.id}",
+                 @folders_path_options.merge(:action => "api_destroy", :id => @f1.id.to_param),
+                 {:force => true}, {:expected_status => 401})
       end
     end
   end
@@ -647,60 +484,22 @@ describe "Folders API", type: :request do
                :expected_status => 401)
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_add permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_add',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_add permission" do
-        it "should create by folder path in course context" do
-          api_call(:post, "/api/v1/courses/#{@course.id}/folders",
-                   @folders_path_options.merge(:course_id => @course.id.to_param),
-                   {:name => "sub1", :parent_folder_path => "subfolder/path"},
-                   {}, :expected_status => 200)
-        end
-
-        it "should create by folder id in group context" do
-          group_model(:context => @course)
-          @root = Folder.root_folders(@group).first
-          @f1 = @root.sub_folders.create!(:name => "folder1", :context => @group)
-
-          api_call(:post, "/api/v1/groups/#{@group.id}/folders",
-                   @folders_path_options.merge(:group_id => @group.id.to_param),
-                   { :name => "sub1", :locked => 'true', :parent_folder_id => @f1.id.to_param},
-                   {}, :expected_status => 200)
-        end
-      end
-
-      context "as teacher without manage_files_add permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_add',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow creating by folder path in course context" do
-          api_call(:post, "/api/v1/courses/#{@course.id}/folders",
-                   @folders_path_options.merge(:course_id => @course.id.to_param),
-                   {:name => "sub1", :parent_folder_path => "subfolder/path"},
-                   {}, :expected_status => 401)
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should return unauthorized error" do
-          api_call(:post, "/api/v1/courses/#{@course.id}/folders",
-                   @folders_path_options.merge(:course_id => @course.id.to_param),
-                   { :name => "sub1"}, {}, :expected_status => 401)
-        end
+      it "should disallow creating by folder path in course context" do
+        api_call(:post, "/api/v1/courses/#{@course.id}/folders",
+                 @folders_path_options.merge(:course_id => @course.id.to_param),
+                 {:name => "sub1", :parent_folder_path => "subfolder/path"},
+                 {}, :expected_status => 401)
       end
     end
   end
@@ -741,48 +540,22 @@ describe "Folders API", type: :request do
                {:parent_folder_id => sub_folder.to_param}, {}, {:expected_status => 401})
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_edit permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_edit',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_edit permission" do
-        it "should update" do
-          @sub2 = @root.sub_folders.create!(:name => "sub2", :context => @course)
-          api_call(:put, @update_url, @folders_path_options,
-                   {:name => "new name", :parent_folder_id => @sub2.id.to_param},
-                   {}, :expected_status => 200)
-        end
-      end
-
-      context "as teacher without manage_files_edit permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_edit',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow modifying a folder" do
-          @sub2 = @root.sub_folders.create!(:name => "sub2", :context => @course)
-          api_call(:put, @update_url, @folders_path_options,
-                   {:name => "new name", :parent_folder_id => @sub2.id.to_param},
-                   {}, :expected_status => 401)
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should return unauthorized error" do
-          api_call(:put, @update_url, @folders_path_options, {:name => "new name"},
-                   {}, :expected_status => 401)
-        end
+      it "should disallow modifying a folder" do
+        @sub2 = @root.sub_folders.create!(:name => "sub2", :context => @course)
+        api_call(:put, @update_url, @folders_path_options,
+                 {:name => "new name", :parent_folder_id => @sub2.id.to_param},
+                 {}, :expected_status => 401)
       end
     end
   end
@@ -807,47 +580,21 @@ describe "Folders API", type: :request do
                { :name => "with_path.txt" }, {}, { :expected_status => 401 })
     end
 
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
+    context "as teacher without manage_files_add permission" do
+      before do
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: 'manage_files_add',
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
       end
 
-      context "as teacher having manage_files_add permission" do
-        it "should create a file in the correct folder" do
-          api_call(:post, "/api/v1/folders/#{@root.id}/files",
-                   {:controller => "folders", :action => "create_file", :format => "json", :folder_id => @root.id.to_param},
-                   {:name => "with_path.txt"}, {}, {:expected_status => 200})
-        end
-      end
-
-      context "as teacher without manage_files_add permission" do
-        before do
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-          RoleOverride.create!(
-            permission: 'manage_files_add',
-            enabled: false,
-            role: teacher_role,
-            account: @course.root_account
-          )
-        end
-
-        it "should disallow creating a file in the correct folder" do
-          api_call(:post, "/api/v1/folders/#{@root.id}/files",
-                   {:controller => "folders", :action => "create_file", :format => "json", :folder_id => @root.id.to_param},
-                   {:name => "with_path.txt"}, {}, {:expected_status => 401})
-        end
-      end
-
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should return unauthorized error" do
-          api_call(:post, "/api/v1/folders/#{@root.id}/files",
-                   {:controller => "folders", :action => "create_file", :format => "json", :folder_id => @root.id.to_param},
-                   {:name => "with_path.txt"}, {}, {:expected_status => 401})
-        end
+      it "should disallow creating a file in the correct folder" do
+        api_call(:post, "/api/v1/folders/#{@root.id}/files",
+                 {:controller => "folders", :action => "create_file", :format => "json", :folder_id => @root.id.to_param},
+                 {:name => "with_path.txt"}, {}, {:expected_status => 401})
       end
     end
   end
@@ -902,34 +649,6 @@ describe "Folders API", type: :request do
           api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 404 })
         end
       end
-
-      context 'with granular permissions enabled' do
-        before :each do
-          @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-
-          @folder = @course.folders.create! parent_folder: @root_folder, name: 'a folder'
-          @sub_folder = @course.folders.create! parent_folder: @folder, name: 'locked subfolder', locked: true
-          @path = [@folder.name, @sub_folder.name].join('/')
-          @request_path += "/#{URI.encode(@path)}"
-          @params_hash.merge!(full_path: @path)
-        end
-
-        it "should check permissions" do
-          user_factory
-          api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 401 })
-        end
-
-        it "should return a list of path components" do
-          teacher_in_course
-          json = api_call(:get, @request_path, @params_hash)
-          expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id, @sub_folder.id]
-        end
-
-        it "should not traverse hidden or locked paths for students" do
-          student_in_course
-          api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 404 })
-        end
-      end
     end
 
     context "group" do
@@ -949,23 +668,6 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
         expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id]
       end
-
-      context 'with granular permissions enabled' do
-        before :each do
-          @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-        end
-
-        it "should accept an empty path" do
-          json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/", @params_hash)
-          expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id]
-        end
-
-        it "should accept a non-empty path" do
-          @folder = @group.folders.create! parent_folder: @root_folder, name: 'some folder'
-          json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
-          expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id]
-        end
-      end
     end
 
     context "user" do
@@ -984,23 +686,6 @@ describe "Folders API", type: :request do
         @folder = @user.folders.create! parent_folder: @root_folder, name: 'some folder'
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
         expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id]
-      end
-
-      context 'with granular permissions enabled' do
-        before :each do
-          @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-        end
-
-        it "should accept an empty path" do
-          json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/", @params_hash)
-          expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id]
-        end
-
-        it "should accept a non-empty path" do
-          @folder = @user.folders.create! parent_folder: @root_folder, name: 'some folder'
-          json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
-          expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id]
-        end
       end
     end
   end
@@ -1024,13 +709,13 @@ describe "Folders API", type: :request do
       expect(json['message']).to include 'source_folder_id'
     end
 
-    it "should require :manage_files permission on the source context" do
-      @source_context.enroll_student(@user, enrollment_state: 'active')
-      @dest_context.enroll_teacher(@user, enrollment_state: 'active')
-      api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_folder?source_folder_id=#{@source_folder.id}",
-               @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_folder_id: @source_folder.to_param),
-               {}, {}, {expected_status: 401})
-    end
+    it "should require any manage_files permissions on the source context" do
+        @source_context.enroll_student(@user, enrollment_state: 'active')
+        @dest_context.enroll_teacher(@user, enrollment_state: 'active')
+        api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_folder?source_folder_id=#{@source_folder.id}",
+                 @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_folder_id: @source_folder.to_param),
+                 {}, {}, {expected_status: 401})
+      end
 
     it "should require :create permission on the destination folder" do
       @source_context.enroll_teacher(@user, enrollment_state: 'active')
@@ -1051,20 +736,6 @@ describe "Folders API", type: :request do
       contents = copy.active_file_attachments.to_a
       expect(contents.size).to eq 1
       expect(contents.first.root_attachment).to eq @file
-    end
-
-    context 'with granular permissions enabled' do
-      before :each do
-        @file.root_account.enable_feature!(:granular_permissions_course_files)
-      end
-
-      it "should require any manage_files permissions on the source context" do
-        @source_context.enroll_student(@user, enrollment_state: 'active')
-        @dest_context.enroll_teacher(@user, enrollment_state: 'active')
-        api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_folder?source_folder_id=#{@source_folder.id}",
-                 @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_folder_id: @source_folder.to_param),
-                 {}, {}, {expected_status: 401})
-      end
     end
 
     context "within context" do
@@ -1168,37 +839,6 @@ describe "Folders API", type: :request do
       json = api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
                       @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))
       expect(json['url']).not_to include 'verifier='
-    end
-
-    context 'with granular permissions enabled' do
-      before :each do
-        @source_file.root_account.enable_feature!(:granular_permissions_course_files)
-      end
-
-      it "should require :download permission on the source file" do
-        @user = @dest_context.teachers.first
-        api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
-                 @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param),
-                 {}, {}, {expected_status: 401})
-        expect(@dest_folder.active_file_attachments).not_to be_exists
-      end
-
-      it "should require :manage_files permission on the destination context" do
-        api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
-                 @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param),
-                 {}, {}, {expected_status: 401})
-        expect(@dest_folder.active_file_attachments).not_to be_exists
-      end
-
-      it "should copy a file" do
-        @dest_context.enroll_teacher @user, enrollment_state: 'active'
-        json = api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
-                        @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))
-        file = Attachment.find(json['id'])
-        expect(file.folder).to eq(@dest_folder)
-        expect(file.root_attachment).to eq(@source_file)
-        expect(json['url']).to include 'verifier='
-      end
     end
 
     context "within context" do
@@ -1336,56 +976,6 @@ describe "Folders API", type: :request do
     end
 
     context "user" do
-      it "should list all folders owned by a user including subfolders" do
-        user_factory(active_all: true)
-        make_folders_in_context @user
-        json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
-                        {:controller => "folders", :action => "list_all_folders", :format => "json", :user_id => @user.id.to_param})
-        res = json.map{|f| f['name']}
-        expect(res).to eq %w{folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked my\ files}
-      end
-    end
-
-    context 'with granular permissions enabled' do
-      before :each do
-        @root.course.root_account.enable_feature!(:granular_permissions_course_files)
-        course_with_teacher(active_all: true)
-        student_in_course(active_all: true)
-        make_folders_in_context @course
-      end
-
-      it "should list all folders in a course including subfolders" do
-        @user = @teacher
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
-                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param})
-        res = json.map{|f| f['name']}
-        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
-      end
-
-      it "should not show hidden and locked files to unauthorized users" do
-        @user = @student
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
-                        {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param})
-        res = json.map{|f| f['name']}
-        expect(res).to eq %w{course\ files folder1 folder2 folder2.1 folder2.1.1}
-      end
-
-      it "should return a 401 for unauthorized users" do
-        @user = user_factory(active_all: true)
-        api_call(:get, "/api/v1/courses/#{@course.id}/folders",
-                 {:controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param},
-                 {}, {}, {:expected_status => 401})
-      end
-
-      it "should list all folders in a group including subfolders" do
-        group_with_user(active_all: true)
-        make_folders_in_context @group
-        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders",
-                        {:controller => "folders", :action => "list_all_folders", :format => "json", :group_id => @group.id.to_param})
-        res = json.map{|f| f['name']}
-        expect(res).to eq %w{files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked}
-      end
-
       it "should list all folders owned by a user including subfolders" do
         user_factory(active_all: true)
         make_folders_in_context @user

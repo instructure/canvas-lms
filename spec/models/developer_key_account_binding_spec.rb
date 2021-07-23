@@ -44,7 +44,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     end
 
     let(:params) { { visible: true } }
-    let(:workflow_state) { described_class::ON_STATE }
+    let(:workflow_state) { 'on' }
 
     before do
       dev_keys = []
@@ -60,17 +60,17 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
       it { is_expected.to be_empty }
     end
 
-    context 'with visible dev keys but no ON_STATE keys' do
-      let(:workflow_state) { described_class::ALLOW_STATE }
+    context 'with visible dev keys but no "on" keys' do
+      let(:workflow_state) { 'allow' }
 
       it { is_expected.to be_empty }
     end
 
-    context 'with visible dev keys in ON_STATE but no tool_configurations' do
+    context 'with visible dev keys in "on" but no tool_configurations' do
       it { is_expected.to be_empty }
     end
 
-    context 'with visible dev keys in ON_STATE and tool_configurations' do
+    context 'with visible dev keys in "on" and tool_configurations' do
       let(:first_key) { DeveloperKey.first }
       before do
         first_key.create_tool_configuration! settings: settings
@@ -120,9 +120,8 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
       it 'does not allow invalid workflow states' do
         dev_key_binding.workflow_state = 'invalid_state'
         dev_key_binding.validate
-        expect(dev_key_binding.errors.keys).to match_array(
-          [:workflow_state]
-        )
+        # it automatically flips it to the default state
+        expect(dev_key_binding.workflow_state).to eq 'off'
       end
 
       it 'defaults to "off"' do
@@ -157,7 +156,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         before { site_admin_binding.update!(workflow_state: 'on') }
 
         context 'when the new workflow state is "off"' do
-          let(:workflow_state) { DeveloperKeyAccountBinding::OFF_STATE }
+          let(:workflow_state) { 'off' }
 
           it 'disables associated external tools' do
             expect(site_admin_key).to receive(:disable_external_tools!)
@@ -166,7 +165,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         end
 
         context 'when the new workflow state is "on"' do
-          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+          let(:workflow_state) { 'on' }
 
           it 'does not disable associated external tools' do
             expect(site_admin_key).not_to receive(:disable_external_tools!)
@@ -175,7 +174,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         end
 
         context 'when the new workflow state is "allow"' do
-          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+          let(:workflow_state) { 'allow' }
 
           it 'restores associated external tools' do
             expect(site_admin_key).to receive(:restore_external_tools!)
@@ -188,7 +187,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         before { site_admin_binding.update!(workflow_state: 'off') }
 
         context 'when the new workflow state is "on"' do
-          let(:workflow_state) { DeveloperKeyAccountBinding::ON_STATE }
+          let(:workflow_state) { 'on' }
 
           it 'enables external tools' do
             expect(site_admin_key).not_to receive(:disable_external_tools!)
@@ -197,7 +196,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
         end
 
         context 'when the new workflow state is "allow"' do
-          let(:workflow_state) { DeveloperKeyAccountBinding::ALLOW_STATE }
+          let(:workflow_state) { 'allow' }
 
           it 'restores associated external tools' do
             expect(site_admin_key).to receive(:restore_external_tools!)

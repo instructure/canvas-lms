@@ -178,7 +178,7 @@
 }
 // group switcher within left sub-nav
 .al-trigger--within-left-menu {
-  margin: direction-sides(0 0 $ic-sp $ic-sp/2);
+  margin: direction-sides(0 0 $ic-sp $ic-sp*0.5);
 
   &.ui-menu-item {
     max-width: 200px; //override the kyle menu width for this instance

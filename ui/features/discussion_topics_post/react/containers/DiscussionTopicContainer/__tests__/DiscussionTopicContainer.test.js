@@ -41,11 +41,12 @@ const discussionTopicMock = {
     id: 'VXNlci0x',
     title: 'Discussion Topic One',
     author: {
-      name: 'Chawn Neal',
+      displayName: 'Chawn Neal',
       avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
     message: '<p> This is the Discussion Topic. </p>',
     postedAt: '2021-04-05T13:40:50Z',
+    updatedAt: '2021-05-07T13:40:50Z',
     subscribed: true,
     published: true,
     canUnpublish: true,
@@ -77,11 +78,13 @@ describe('DiscussionTopicContainer', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const assignMock = jest.fn()
+  const openMock = jest.fn()
   let liveRegion = null
 
   beforeAll(() => {
     delete window.location
     window.location = {assign: assignMock}
+    window.open = openMock
     window.ENV = {
       context_asset_string: 'course_1',
       course_id: '1',
@@ -108,6 +111,7 @@ describe('DiscussionTopicContainer', () => {
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
     assignMock.mockClear()
+    openMock.mockClear()
     server.resetHandlers()
   })
 
@@ -252,7 +256,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Open in Speedgrader'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'))
+      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337'), '_blank')
     })
   })
 
@@ -364,10 +368,6 @@ describe('DiscussionTopicContainer', () => {
     const kebob = await container.findByTestId('discussion-post-menu-trigger')
     fireEvent.click(kebob)
 
-    await waitFor(() => {
-      expect(tinymce.editors[0]).toBeDefined()
-    })
-
     const sendToButton = await container.findByText('Send To...')
     fireEvent.click(sendToButton)
     expect(await container.findByText('Send to:')).toBeTruthy()
@@ -400,15 +400,16 @@ describe('DiscussionTopicContainer', () => {
     })
   })
 
+  it('renders an attachment if it exists', async () => {
+    const container = setup({discussionTopic: {...defaultTopic}})
+    await waitFor(() => expect(container.getByText('288777.jpeg')).toBeInTheDocument())
+  })
+
   it('renders a reply button if user has reply permission true', async () => {
     const container = setup({discussionTopic: {...defaultTopic}})
     await waitFor(() =>
       expect(container.getByText('This is a Discussion Topic Message')).toBeInTheDocument()
     )
-
-    await waitFor(() => {
-      expect(tinymce.editors[0]).toBeDefined()
-    })
 
     expect(await container.findByTestId('discussion-topic-reply')).toBeInTheDocument()
   })
@@ -431,22 +432,6 @@ describe('DiscussionTopicContainer', () => {
 
     await waitFor(() => expect(container.queryByTestId('discussion-topic-reply')).toBeNull())
     defaultTopic.permissions.reply = true
-  })
-
-  it('should find "Super Group" group name', async () => {
-    const container = setup({discussionTopic: {...defaultTopic}})
-    expect(await container.queryByText('Super Group')).toBeFalsy()
-    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
-    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
-  })
-
-  it('should show groups menu when discussion has no child topics but has sibling topics', async () => {
-    // defaultTopic has a root topic which has a child topic named Super Group
-    // we are only removing the child topic from defaultTopic itself, not its root topic
-    const container = setup({discussionTopic: {...defaultTopic, childTopics: null}})
-    expect(await container.queryByText('Super Group')).toBeFalsy()
-    fireEvent.click(await container.queryByTestId('groups-menu-btn'))
-    await waitFor(() => expect(container.queryByText('Super Group')).toBeTruthy())
   })
 
   it('should not render group menu button when there is child topics but no group set', async () => {
@@ -541,7 +526,59 @@ describe('DiscussionTopicContainer', () => {
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
-    expect(container.getByText('You must post before seeing replies.')).toBeInTheDocument()
+    waitFor(() =>
+      expect(container.queryByText('You must post before seeing replies.')).toBeInTheDocument()
+    )
+  })
+
+  it('should not render author if author is null', async () => {
+    const props = {discussionTopic: Discussion.mock({author: null})}
+    const container = setup(props)
+    const pillContainer = container.queryAllByTestId('pill-Author')
+    expect(pillContainer).toEqual([])
+  })
+
+  it('should render editedBy if editor is different from author', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: {
+          id: 'vfx5000',
+          _id: '99',
+          displayName: 'Eddy Tor',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    }
+    const container = setup(props)
+    expect(container.getByText(`Edited by Eddy Tor Apr 22 6:41pm`)).toBeInTheDocument()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
+  })
+
+  it('should render plain edited if author is editor', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: {
+          id: 'abc3244',
+          _id: '1',
+          name: 'Charles Xavier',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    }
+    const container = setup(props)
+    expect(container.getByText(`Edited Apr 22 6:41pm`)).toBeInTheDocument()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
+  })
+
+  it('should not render edited info if no editor', async () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        editor: null
+      })
+    }
+    const container = setup(props)
+    expect(container.queryByText(/Edited /)).toBeFalsy()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
   describe('Peer Reviews', () => {

@@ -59,6 +59,7 @@ class Enrollment < ActiveRecord::Base
   validate :valid_role?
   validate :valid_course?
   validate :valid_section?
+  validate :not_student_view
 
   # update bulk destroy if changing or adding an after save
   before_save :assign_uuid
@@ -109,6 +110,13 @@ class Enrollment < ActiveRecord::Base
   def valid_section?
     unless deleted? || course_section.active?
       self.errors.add(:course_section_id, "is not a valid section")
+    end
+  end
+
+  def not_student_view
+    if type != 'StudentViewEnrollment' && (new_record? || association(:user).loaded?) &&
+      user.fake_student?
+      self.errors.add(:user_id, "cannot add a student view student in a regular role")
     end
   end
 

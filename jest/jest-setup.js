@@ -25,7 +25,9 @@ filterUselessConsoleMessages(console)
 require('jest-fetch-mock').enableFetchMocks()
 
 window.scroll = () => {}
-window.ENV = {}
+window.ENV = {
+  use_rce_enhancements: true
+}
 
 Enzyme.configure({adapter: new Adapter()})
 
@@ -75,8 +77,8 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
     }
   }).install()
 
-  const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin')
-    .default
+  const setupRavenConsoleLoggingPlugin =
+    require('../ui/boot/initializers/setupRavenConsoleLoggingPlugin').default
   setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console-jest'})
 }
 

@@ -42,10 +42,16 @@ describe('OutcomeManagementPanel', () => {
   beforeEach(() => {
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    window.ENV = {
+      PERMISSIONS: {
+        manage_outcomes: true
+      }
+    }
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    window.ENV = null
   })
 
   const groupDetailDefaultProps = {
@@ -60,10 +66,15 @@ describe('OutcomeManagementPanel', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = accountMocks({childGroupsCount: 0})} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      canManage = true,
+      mocks = accountMocks({childGroupsCount: 0})
+    } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, canManage}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -204,6 +215,16 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(within(getByRole('menu')).getByText('Remove'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Remove Group?')).toBeInTheDocument()
+  })
+
+  it('hides the "Outcome Group Menu" for the root group', async () => {
+    const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Root course folder'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
   })
 
   describe('Moving a group', () => {
@@ -384,8 +405,8 @@ describe('OutcomeManagementPanel', () => {
       contextType: 'Course',
       contextId: '2',
       mocks: [
-        ...courseMocks({childGroupsCount: 2, canEdit: false}),
-        ...groupMocks({groupId: '200', canEdit: false}),
+        ...courseMocks({childGroupsCount: 2}),
+        ...groupMocks({groupId: '200'}),
         ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2', canEdit: false})
       ]
     })
@@ -491,6 +512,23 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
       expect(queryByText('Move 2 Outcomes?')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('can_manage permissions are false', () => {
+    beforeEach(() => {
+      window.ENV = {
+        PERMISSIONS: {
+          manage_outcomes: false
+        }
+      }
+    })
+
+    it('ManageOutcomesFooter is not displayed', async () => {
+      const {queryByTestId} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
   })
 })

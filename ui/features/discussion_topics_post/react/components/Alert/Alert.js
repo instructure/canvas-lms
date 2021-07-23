@@ -36,7 +36,7 @@ export function Alert({...props}) {
   const singleDueDate = useMemo(
     () => (
       <Flex.Item padding="x-small" shouldGrow align="start">
-        <Text weight="light" size="small">
+        <Text weight="normal" size="small">
           {props.dueAtDisplayText}
         </Text>
       </Flex.Item>
@@ -52,6 +52,7 @@ export function Alert({...props}) {
           onClick={() => {
             setDueDateTrayOpen(true)
           }}
+          data-testid="show-due-dates-button"
         >
           <Text>
             {I18n.t('Show Due Dates (%{dueDateCount})', {
@@ -101,7 +102,7 @@ export function Alert({...props}) {
                   </Grid.Col>
                 </Grid.Row>
                 {props.assignmentOverrides.map(item => (
-                  <Grid.Row key={item.id}>
+                  <Grid.Row key={item.id} data-testid="assignment-override-row">
                     <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
                       <Text size="medium">
                         {item.dueAt
@@ -145,7 +146,7 @@ export function Alert({...props}) {
         ? multipleDueDates
         : singleDueDate}
       <Flex.Item shouldShrink padding="x-small" align="end">
-        <Text weight="light" size="small">
+        <Text weight="normal" size="small">
           {I18n.t(
             {
               one: 'This is a graded discussion: %{count} point possible',

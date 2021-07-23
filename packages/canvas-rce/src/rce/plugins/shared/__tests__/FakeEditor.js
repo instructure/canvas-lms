@@ -21,12 +21,12 @@ export default class FakeEditor {
     this.id = textareaId
     this._$container = null
     this.rceWrapper = {}
+    this.callbacks = {}
 
     this._selectedNode = null
 
     this._collapsed = false
 
-    this.execCommand = () => {}
     this.getContainer = () => this._$container
     this.isHidden = () => false
     this.getContent = () => this._$container.innerHTML
@@ -35,6 +35,17 @@ export default class FakeEditor {
         this._$container.innerHTML = content
       }
     }
+
+    this.execCommand = (command, userInterface, value) => {
+      switch (command) {
+        case 'mceInsertContent':
+          const newNode = document.createElement('div')
+          newNode.innerHTML = value
+          this.getBody().appendChild(newNode.firstChild)
+      }
+    }
+
+    this.getBody = () => this.getContainer().firstChild
 
     this.selection = {
       getNode: () => this._selectedNode,
@@ -49,13 +60,24 @@ export default class FakeEditor {
         $temp.innerHTML = contentString
         this._selectedNode = this.$container.appendChild($temp.firstChild)
       },
-
+      setAnchorOffset: offset => {
+        this._anchorOffset = offset
+      },
+      setRng: range => {
+        this._range = range
+      },
+      getRng: () => this._range,
       collapse: () => (this._collapsed = true),
       isCollapsed: () => this._collapsed,
       select: node => (this._selectedNode = node),
+      setCursorLocation: () => {},
       getSel: () => {
         return {
-          anchorNode: this._selectedNode
+          anchorNode: {
+            ...this._selectedNode,
+            wholeText: this._selectedNode?.textContent
+          },
+          anchorOffset: this._anchorOffset
         }
       }
     }
@@ -93,8 +115,8 @@ export default class FakeEditor {
       replace: (newelem, oldelem) => {
         return oldelem.parentNode.replaceChild(newelem, oldelem)
       },
-      select: (selector) => this._$container.querySelectorAll(selector),
-      remove: (elem) => elem.remove()
+      select: selector => this._$container.querySelectorAll(selector),
+      remove: elem => elem.remove()
     }
     this.initialize()
   }
@@ -128,5 +150,14 @@ export default class FakeEditor {
     this._$container.focus()
   }
 
-  fire(_eventName, _args) {}
+  fire(eventName, ...args) {
+    const cb = this.callbacks[eventName]
+    if (typeof cb === 'function') {
+      cb(...args)
+    }
+  }
+
+  on(eventName, callback) {
+    this.callbacks[eventName] = callback
+  }
 }

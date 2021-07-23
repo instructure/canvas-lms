@@ -38,6 +38,8 @@ module MicrosoftSync
     PAGINATED_NEXT_LINK_KEY = '@odata.nextLink'
     PAGINATED_VALUE_KEY = 'value'
 
+    DEFAULT_N_INTERMITTENT_RETRIES = 1
+
     class ApplicationNotAuthorizedForTenant < StandardError
       include Errors::GracefulCancelErrorMixin
     end
@@ -56,19 +58,28 @@ module MicrosoftSync
       end
     end
 
-    def initialize(tenant)
+    def initialize(tenant, extra_statsd_tags)
       @tenant = tenant
+      @extra_statsd_tags = extra_statsd_tags
     end
+
+    attr_reader :extra_statsd_tags
 
     # Example options: body (hash for JSON), query (hash of query string), headers (hash),
     # quota (array of integers [read_quota_points, write_quota_points]; will be adjusted
     # if $selected query param is used.)
     # Options except for quota are passed thru to HTTParty.
-    def request(method, path, quota: nil, **options)
+    #
+    # If check_for_expected_response is given, a block can be passed to check for expected
+    # responses before raising an error based on the code. If the block returns non-falsey,
+    # the value is returned, and an "expected" statsd metric is incremented.
+    # This is useful if there are non-200s expected and you don't want to raise an error /
+    # count those these as errors in the stats.
+    def request(method, path,
+                quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES, **options,
+                &check_for_expected_response)
       statsd_tags = statsd_tags_for_request(method, path)
       increment_statsd_quota_points(quota, options, statsd_tags)
-
-      Rails.logger.info("MicrosoftSync::GraphClient: #{method} #{path}")
 
       response = Canvas.timeout_protection("microsoft_sync_graph", raise_on_timeout: true) do
         InstStatsd::Statsd.time("#{STATSD_PREFIX}.time", tags: statsd_tags) do
@@ -76,14 +87,26 @@ module MicrosoftSync
         end
       end
 
+      if check_for_expected_response && (result = check_for_expected_response.call(response))
+        log_and_increment(method, path, statsd_tags, :expected, response.code)
+        return result
+      end
+
       raise_error_if_bad_response(response)
 
       result = response.parsed_response
-      InstStatsd::Statsd.increment(statsd_name, tags: statsd_tags)
+      log_and_increment(method, path, statsd_tags, :success, response.code)
       result
     rescue => error
-      statsd_tags[:status_code] = response&.code&.to_s || 'unknown'
-      InstStatsd::Statsd.increment(statsd_name(error), tags: statsd_tags)
+      response_code = response&.code&.to_s || error.class.name.tr(':', '_')
+
+      if intermittent_non_throttled?(error) && retries > 0
+        retries -= 1
+        log_and_increment(method, path, statsd_tags, :retried, response_code)
+        retry
+      end
+
+      log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
       raise
     end
 
@@ -121,8 +144,9 @@ module MicrosoftSync
     # the response. Other non-2xx responses cause a BatchRequestFailed error.
     # Returns a list of ids of the requests that were ignored.
     def run_batch(endpoint_name, requests, quota:, &response_should_be_ignored)
-      Rails.logger.info("MicrosoftSync::GraphClient: batch of #{requests.count} #{endpoint_name}")
-      increment_statsd_quota_points(quota, {}, msft_endpoint: "batch_#{endpoint_name}")
+      Rails.logger.info("MicrosoftSync::GraphService: batch of #{requests.count} #{endpoint_name}")
+      tags = extra_statsd_tags.merge(msft_endpoint: "batch_#{endpoint_name}")
+      increment_statsd_quota_points(quota, {}, tags)
 
       response =
         begin
@@ -131,6 +155,9 @@ module MicrosoftSync
           # The main request may return a 424 if any subrequests fail (esp. if throttled).
           # Regardless, we handle subrequests failures below.
           e.response.parsed_response
+        rescue
+          increment_batch_statsd_counters_unknown_error(endpoint_name, requests.count)
+          raise
         end
 
       grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
@@ -173,6 +200,10 @@ module MicrosoftSync
       HTTParty.send(method, url, options)
     end
 
+    def intermittent_non_throttled?(error)
+      Errors::INTERMITTENT.any?{|klass| error.is_a?(klass)} && !error.is_a?(Errors::Throttled)
+    end
+
     def raise_error_if_bad_response(response)
       if application_not_authorized_response?(response)
         raise ApplicationNotAuthorizedForTenant
@@ -207,9 +238,9 @@ module MicrosoftSync
       # Strip https, hostname, "v1.0"
       path = path_or_url.gsub(%r{^https?://[^/]*/[^/]*/}, '')
 
-      {
+      extra_statsd_tags.merge(
         msft_endpoint: InstStatsd::Statsd.escape("#{method.to_s.downcase}_#{path.split('/').first}")
-      }
+      )
     end
 
     def application_not_authorized_response?(response)
@@ -222,14 +253,22 @@ module MicrosoftSync
       )
     end
 
-    def statsd_name(error=nil)
-      name = case error
-             when nil then 'success'
-             when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
-             when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
-             else 'error'
-             end
-      "#{STATSD_PREFIX}.#{name}"
+    def statsd_name_for_error(error)
+      case error
+      when MicrosoftSync::Errors::HTTPNotFound then 'notfound'
+      when MicrosoftSync::Errors::HTTPTooManyRequests then 'throttled'
+      when *MicrosoftSync::Errors::INTERMITTENT then 'intermittent'
+      else 'error'
+      end
+    end
+
+    def log_and_increment(request_method, request_path, statsd_tags, outcome, status_code)
+      Rails.logger.info(
+        "MicrosoftSync::GraphServiceHttp: #{request_method} #{request_path} -- #{status_code}, #{outcome}"
+      )
+      InstStatsd::Statsd.increment(
+        "#{STATSD_PREFIX}.#{outcome}", tags: statsd_tags.merge(status_code: status_code.to_s)
+      )
     end
 
     # -- Helpers for expand_options():
@@ -266,10 +305,15 @@ module MicrosoftSync
     def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
       responses_grouped_by_type.each do |type, responses|
         responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
-          tags = {msft_endpoint: endpoint_name, status: code}
+          tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: code)
           InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
       end
+    end
+
+    def increment_batch_statsd_counters_unknown_error(endpoint_name, count)
+      tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: 'unknown')
+      InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.error", count, tags: tags)
     end
   end
 end

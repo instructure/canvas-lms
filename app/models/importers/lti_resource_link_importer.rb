@@ -41,9 +41,24 @@ module Importers
         next if updated
 
         create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)
+        update_resource_link_for_context_module_context(lti_resource_link, migration)
       end
 
       true
+    end
+
+    # Some resource links are tied to ContextModule's items, which are stored as ContentTags.
+    # These resource links will already have been created by the context_module importer with the
+    # appropriate lookup_uuid, they just need to be updated to use the custom params of the old
+    # matching Lti::ResourceLink.
+    def self.update_resource_link_for_context_module_context(lti_resource_link, migration)
+      existing_resource_link = migration.context.lti_resource_links.find_by(lookup_uuid: lti_resource_link[:lookup_uuid])
+      # If this isn't a resource link that already exists, it won't be for a context module.
+      return unless existing_resource_link
+
+      existing_resource_link.custom =
+        Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link[:custom])
+      existing_resource_link.save
     end
 
     def self.create_or_update_resource_link_for_a_course_context(lti_resource_link, migration)

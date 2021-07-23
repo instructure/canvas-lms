@@ -101,32 +101,32 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
     fixtures.innerHTML = ''
   })
 
-  test('recognizes that there are no changed assignments when the grades are the same', () => {
+  test('recognizes that there are no changed assignments when the grades are the same', async () => {
     const uploadedGradebook = {
       ...defaultUploadedGradebook,
       original_submissions: [{assignment_id: '73', gradeable: true, score: '0.0', user_id: '1'}]
     }
     const waitForProcessingStub = sinon
       .stub(waitForProcessing, 'waitForProcessing')
-      .returns($.Deferred().resolve(uploadedGradebook))
+      .resolves(uploadedGradebook)
 
-    gradebook_uploads.handleThingsNeedingToBeResolved()
+    await gradebook_uploads.handleThingsNeedingToBeResolved()
     $('#gradebook_importer_resolution_section').submit()
     strictEqual($('#no_changes_detected:visible').length, 1)
 
     waitForProcessingStub.restore()
   })
 
-  test('recognizes that there are changed assignments when original grade was ungraded', () => {
+  test('recognizes that there are changed assignments when original grade was ungraded', async () => {
     const uploadedGradebook = {
       ...defaultUploadedGradebook,
       original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}]
     }
     const waitForProcessingStub = sinon
       .stub(waitForProcessing, 'waitForProcessing')
-      .returns($.Deferred().resolve(uploadedGradebook))
+      .resolves(uploadedGradebook)
 
-    gradebook_uploads.handleThingsNeedingToBeResolved()
+    await gradebook_uploads.handleThingsNeedingToBeResolved()
     $('#gradebook_importer_resolution_section').submit()
     strictEqual($('#no_changes_detected:visible').length, 0)
 
@@ -249,7 +249,7 @@ QUnit.module('override score changes', hooks => {
     gridStub.restore()
   })
 
-  const initGradebook = function(uploadedGradebook = defaultUploadedGradebook) {
+  const initGradebook = function (uploadedGradebook = defaultUploadedGradebook) {
     gradebook_uploads.init(uploadedGradebook)
   }
 

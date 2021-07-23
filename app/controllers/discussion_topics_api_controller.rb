@@ -703,7 +703,6 @@ class DiscussionTopicsApiController < ApplicationController
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
       quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
     if @entry.save
-      @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
 
       assignment_id = @topic.assignment_id

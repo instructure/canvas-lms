@@ -18,6 +18,7 @@
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {Assignment} from './Assignment'
+import {Attachment} from './Attachment'
 import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
@@ -52,6 +53,9 @@ export const Discussion = {
         unreadCount
         repliesCount
       }
+      attachment {
+        ...Attachment
+      }
       assignment {
         ...Assignment
       }
@@ -71,6 +75,7 @@ export const Discussion = {
         ...RootTopic
       }
     }
+    ${Attachment.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
     ${Section.fragment}
@@ -103,6 +108,7 @@ export const Discussion = {
     }),
     author: User.shape,
     editor: User.shape,
+    attachment: Attachment.shape,
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
@@ -136,8 +142,9 @@ export const Discussion = {
       repliesCount: 56,
       __typename: 'DiscussionEntryCounts'
     },
-    author = User.mock({_id: '1', name: 'Charles Xavier'}),
-    editor = User.mock({_id: '1', name: 'Charles Xavier'}),
+    author = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    editor = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    attachment = Attachment.mock(),
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
     courseSections = [Section.mock()],
@@ -171,6 +178,7 @@ export const Discussion = {
     entryCounts,
     author,
     editor,
+    attachment,
     assignment,
     permissions,
     courseSections,

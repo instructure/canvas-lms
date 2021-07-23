@@ -608,14 +608,14 @@ describe 'Student reports' do
       @at1 = AccessToken.create!(
         user: @user1,
         developer_key: DeveloperKey.default,
-        expires_at: 2.hours.ago
+        permanent_expires_at: 2.hours.ago
       )
       @user1.destroy
 
       @at2 = AccessToken.create!(
         user: @user2,
         developer_key: DeveloperKey.default,
-        expires_at: 2.hours.from_now
+        permanent_expires_at: 2.hours.from_now
       )
 
       @at2.update_attribute(:last_used_at, 2.hours.ago)
@@ -623,7 +623,7 @@ describe 'Student reports' do
       @at3 = AccessToken.create!(
         user: @user3,
         developer_key: DeveloperKey.default,
-        expires_at: nil
+        permanent_expires_at: nil
       )
     end
 
@@ -632,9 +632,9 @@ describe 'Student reports' do
       expect(parsed).to eq_stringified_array [
         [@user3.id, "Astley, Rick", @at3.token_hint.gsub(/.+~/, ''), 'never',
          'never', DeveloperKey.default.id, "User-Generated"],
-        [@user2.id, "Bolton, Michael", @at2.token_hint.gsub(/.+~/, ''), @at2.expires_at.iso8601,
+        [@user2.id, "Bolton, Michael", @at2.token_hint.gsub(/.+~/, ''), @at2.permanent_expires_at.iso8601,
          @at2.last_used_at.iso8601, DeveloperKey.default.id, "User-Generated"],
-        [@user1.id, "Clair, John St.", @at1.token_hint.gsub(/.+~/, ''), @at1.expires_at.iso8601,
+        [@user1.id, "Clair, John St.", @at1.token_hint.gsub(/.+~/, ''), @at1.permanent_expires_at.iso8601,
          'never', DeveloperKey.default.id, "User-Generated"]
       ]
     end

@@ -18,6 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {graphql} from 'msw'
@@ -33,6 +34,8 @@ describe('IsolatedViewContainer', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const onOpenIsolatedView = jest.fn()
+  const goToTopic = jest.fn()
+  const onClose = jest.fn()
 
   beforeAll(() => {
     // eslint-disable-next-line no-undef
@@ -76,10 +79,13 @@ describe('IsolatedViewContainer', () => {
   }
 
   const defaultProps = overrides => ({
+    discussionTopic: Discussion.mock(),
     discussionEntryId: '1',
     open: true,
-    onClose: () => {},
+    onClose,
     onOpenIsolatedView,
+    goToTopic,
+    setHighlightEntryId: jest.fn(),
     ...overrides
   })
 
@@ -97,6 +103,71 @@ describe('IsolatedViewContainer', () => {
     fireEvent.click(backButton)
 
     expect(onOpenIsolatedView).toHaveBeenCalledWith('77', false)
+  })
+
+  it('should go to root reply when clicking Go To Parent', async () => {
+    server.use(
+      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+        return res.once(
+          ctx.data({
+            legacyNode: DiscussionEntry.mock({
+              discussionSubentriesConnection: {
+                nodes: [
+                  DiscussionEntry.mock({
+                    _id: '50',
+                    id: '50',
+                    message: '<p>This is the child reply</p>',
+                    rootEntry: DiscussionEntry.mock({id: '70'})
+                  })
+                ],
+                pageInfo: PageInfo.mock(),
+                __typename: 'DiscussionSubentriesConnection'
+              }
+            })
+          })
+        )
+      })
+    )
+
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[1]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[1])
+
+    const goToParentButton = await findByText('Go To Parent')
+    expect(goToParentButton).toBeInTheDocument()
+    fireEvent.click(goToParentButton)
+
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('70', false)
+  })
+
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from parent)', async () => {
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[0]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[0])
+
+    const goToTopicButton = await findByText('Go To Topic')
+    expect(goToTopicButton).toBeInTheDocument()
+    fireEvent.click(goToTopicButton)
+
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  it('calls the onCloseIsolatedView callback when clicking Go To Topic (from child)', async () => {
+    const {findAllByTestId, findByText} = setup(defaultProps())
+
+    const threadActionsMenus = await findAllByTestId('thread-actions-menu')
+    expect(threadActionsMenus[1]).toBeInTheDocument()
+    fireEvent.click(threadActionsMenus[1])
+
+    const goToTopicButton = await findByText('Go To Topic')
+    expect(goToTopicButton).toBeInTheDocument()
+    fireEvent.click(goToTopicButton)
+
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('should not render a back button', async () => {
@@ -221,5 +292,11 @@ describe('IsolatedViewContainer', () => {
     const replyButtons = await findAllByTestId('threading-toolbar-reply')
     fireEvent.click(replyButtons[0])
     expect(setRCEOpen).toHaveBeenCalledWith(true)
+  })
+
+  it('highlights an entry', async () => {
+    const {findByTestId} = setup(defaultProps({highlightEntryId: '50'}))
+
+    expect(await findByTestId('isHighlighted')).toBeInTheDocument()
   })
 })

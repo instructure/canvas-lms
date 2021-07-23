@@ -86,7 +86,10 @@ export default function generator({borders, colors, forms, shadows, spacing, typ
     canvasFormElementLabelColor: colors.textDarkest,
     canvasFormElementLabelMargin: `0 0 ${spacing.small} 0`,
     canvasFormElementLabelFontSize: typography.fontSizeMedium,
-    canvasFormElementLabelFontWeight: typography.fontWeightBold
+    canvasFormElementLabelFontWeight: typography.fontWeightBold,
+
+    // a11y button badge
+    canvasBadgeBackgroundColor: colors.backgroundWarning
   }
   vars.tinySplitButtonChevronHoverBackground = darken(vars.toolbarButtonHoverBackground, 10)
   return vars

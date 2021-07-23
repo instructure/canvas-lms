@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext} from 'react'
 
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
@@ -27,10 +27,32 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
+import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {Heading} from '@instructure/ui-heading'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
+import {SearchContext} from '../../utils/constants'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {InlineList} from '@instructure/ui-list'
 
 export function PostMessage({...props}) {
+  const {searchTerm} = useContext(SearchContext)
+
+  let editText = null
+  if (props.editedTimingDisplay) {
+    editText = props.editorName
+      ? I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
+          editorName: props.editorName,
+          editedTimingDisplay: props.editedTimingDisplay
+        })
+      : I18n.t('Edited %{editedTimingDisplay}', {
+          editedTimingDisplay: props.editedTimingDisplay
+        })
+  }
+
+  const createdTooltip = I18n.t('Created %{timingDisplay}', {
+    timingDisplay: props.timingDisplay
+  })
+
   return (
     <Flex padding="0 0 medium 0">
       <Flex.Item align="start">
@@ -76,9 +98,13 @@ export function PostMessage({...props}) {
                     padding="xx-small none xx-small none"
                   >
                     {props.hasAuthor && (
-                      <View padding="none small none none">
+                      <View padding="none small none small">
                         <Text weight="bold" data-testid="author_name">
-                          {props.authorName}
+                          <SearchSpan
+                            isIsolatedView={props.isIsolatedView}
+                            searchTerm={searchTerm}
+                            text={props.authorName}
+                          />
                         </Text>
                       </View>
                     )}
@@ -94,29 +120,62 @@ export function PostMessage({...props}) {
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
-              <Flex.Item shouldShrink>
-                <View display="inline-flex" padding="none small none none">
-                  <Text color="secondary" size="small">
-                    {props.timingDisplay}
-                  </Text>
-                  <Text color="secondary" size="small">
-                    {!!props.lastReplyAtDisplayText &&
-                      I18n.t(', last reply %{lastReplyAtDisplayText}', {
-                        lastReplyAtDisplayText: props.lastReplyAtDisplayText
-                      })}
-                  </Text>
-                </View>
-              </Flex.Item>
+              {props.timingDisplay && (
+                <Flex.Item shouldShrink padding="0 0 0 small">
+                  <InlineList>
+                    {!props.showCreatedAsTooltip && (
+                      <InlineList.Item>
+                        <Text color="primary" size="small">
+                          {props.timingDisplay}
+                        </Text>
+                      </InlineList.Item>
+                    )}
+                    {props.showCreatedAsTooltip && !!editText ? (
+                      <InlineList.Item data-testid="created-tooltip">
+                        <Tooltip renderTip={createdTooltip}>
+                          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+                          <span tabIndex="0">
+                            <Text color="primary" size="small">
+                              {editText}
+                            </Text>
+                          </span>
+                          <ScreenReaderContent>{createdTooltip}</ScreenReaderContent>
+                        </Tooltip>
+                      </InlineList.Item>
+                    ) : (
+                      !!editText && (
+                        <InlineList.Item>
+                          <Text color="primary" size="small">
+                            {editText}
+                          </Text>
+                        </InlineList.Item>
+                      )
+                    )}
+                    {!!props.lastReplyAtDisplayText && (
+                      <InlineList.Item>
+                        <Text color="primary" size="small">
+                          {I18n.t(`Last reply %{lastReplyAtDisplayText}`, {
+                            lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                          })}
+                        </Text>
+                      </InlineList.Item>
+                    )}
+                  </InlineList>
+                </Flex.Item>
+              )}
             </Flex>
           </Flex.Item>
-          <Flex.Item overflowY="hidden">
+          <Flex.Item padding={props.hasAuthor ? 'small' : '0 small small small'} overflowY="hidden">
             <>
               {props.title && (
                 <>
                   <Heading level="h1">
                     <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
                   </Heading>
-                  <View as="div" margin="medium none">
+                  <View
+                    as="div"
+                    margin={props.hasAuthor ? 'medium none medium none' : '0 0 medium 0'}
+                  >
                     <Text size="x-large">{props.title}</Text>
                   </View>
                 </>
@@ -132,7 +191,11 @@ export function PostMessage({...props}) {
                 </View>
               ) : (
                 <>
-                  <div dangerouslySetInnerHTML={{__html: props.message}} />
+                  <SearchSpan
+                    isIsolatedView={props.isIsolatedView}
+                    searchTerm={searchTerm}
+                    text={props.message}
+                  />
                   <View display="block" margin="small none none none">
                     {props.children}
                   </View>
@@ -160,6 +223,10 @@ PostMessage.propTypes = {
    */
   avatarUrl: PropTypes.string,
   /**
+   * Name of person who last edited
+   */
+  editorName: PropTypes.string,
+  /**
    * Children to be directly rendered below the PostMessage
    */
   children: PropTypes.node,
@@ -167,6 +234,13 @@ PostMessage.propTypes = {
    * Last Reply Date if there are discussion replies
    */
   lastReplyAtDisplayText: PropTypes.string,
+  /**
+   * Denotes time of last edit.
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
+   */
+  editedTimingDisplay: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
@@ -206,11 +280,14 @@ PostMessage.propTypes = {
    * Marks whether an unread message has a forcedReadState
    */
   isForcedRead: PropTypes.bool,
-  postUtilities: PropTypes.node
+  postUtilities: PropTypes.node,
+  isIsolatedView: PropTypes.bool,
+  showCreatedAsTooltip: PropTypes.bool
 }
 
 PostMessage.defaultProps = {
-  hasAuthor: true
+  hasAuthor: true,
+  isIsolatedView: false
 }
 
 export default PostMessage

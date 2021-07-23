@@ -1720,7 +1720,6 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and
     can :attach_submission_comment_files and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete
@@ -3116,7 +3115,7 @@ class Assignment < ActiveRecord::Base
     self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
-      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
+      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
       DueDateCacher.recompute(self, update_grades: true)
     end
@@ -3128,7 +3127,8 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
-      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
+      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading? ||
+      will_save_change_to_anonymous_grading? || saved_change_to_anonymous_grading?
   end
 
   def update_due_date_smart_alerts
@@ -3418,6 +3418,10 @@ class Assignment < ActiveRecord::Base
   def anonymous_grader_identities_by_anonymous_id
     # Response looks like: { anonymous_id => { id: anonymous_id, name: anonymous_name } }
     @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
+  end
+
+  def instructor_selectable_states_by_provisional_grade_id
+    @instructor_selectable_states_by_provisional_grade_id ||= instructor_selectable_states
   end
 
   def moderated_grader_limit_reached?
@@ -3829,5 +3833,15 @@ class Assignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+  end
+
+  def instructor_selectable_states
+    return {} unless moderated_grading?
+
+    states = ['inactive', 'completed', 'deleted', 'invited']
+    active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
+    provisional_grades.each_with_object({}) do |provisional_grade, hash|
+      hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
+    end
   end
 end

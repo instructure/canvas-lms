@@ -58,7 +58,7 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  scope :active, -> { not_deleted.where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
+  scope :active, -> { not_deleted.where("permanent_expires_at IS NULL OR permanent_expires_at>?", Time.now.utc) }
   scope :not_deleted, -> { where(:workflow_state => "active") }
 
   TOKEN_SIZE = 64
@@ -66,9 +66,10 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
   before_create :generate_refresh_token
 
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
   def destroy
     return true if deleted?
+
     self.workflow_state = 'deleted'
     run_callbacks(:destroy) { save! }
   end
@@ -83,7 +84,7 @@ class AccessToken < ActiveRecord::Base
       token.send("#{token_key}=", hashed_tokens.first)
       token.save!
     end
-    token = nil unless token.try(:usable?, token_key)
+    token = nil unless token&.usable?(token_key)
     token
   end
 
@@ -108,20 +109,11 @@ class AccessToken < ActiveRecord::Base
   end
 
   def usable?(token_key = :crypted_token)
-    # true if
-    # developer key is usable AND
-    # there is a user id AND
-    # its not expired OR Its a refresh token
-    # since you need a refresh token to
-    # refresh expired tokens
+    return false if expired?
 
     if !developer_key_id || developer_key&.usable?
-      # we are a stand alone token, or a token with an active developer key
-      # make sure we
-      #   - have a user id
-      #   - its a refresh token
-      #     - If we aren't a refresh token. make sure we aren't expired
-      return true if user_id && (token_key == :crypted_refresh_token || !expired?)
+      return false if token_key != :crypted_refresh_token && needs_refresh?
+      return true if user_id
     end
     false
   end
@@ -132,6 +124,7 @@ class AccessToken < ActiveRecord::Base
 
   def authorized_for_account?(target_account)
     return true unless developer_key
+
     developer_key.authorized_for_account?(target_account)
   end
 
@@ -141,13 +134,17 @@ class AccessToken < ActiveRecord::Base
 
   def used!
     if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
-      self.last_used_at = DateTime.now.utc
+      self.last_used_at = Time.now.utc
       self.save
     end
   end
 
   def expired?
-    (manually_created? || developer_key&.auto_expire_tokens) && expires_at && expires_at < DateTime.now.utc
+    !!(permanent_expires_at && permanent_expires_at < Time.now.utc)
+  end
+
+  def needs_refresh?
+    expires_at && expires_at < Time.now.utc
   end
 
   def token=(new_token)
@@ -164,15 +161,7 @@ class AccessToken < ActiveRecord::Base
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
-      # all reasons to _not_ expire the token
-      if manually_created? ||
-        expires_at_changed? ||
-        !developer_key&.auto_expire_tokens ||
-        scopes == ['/auth/userinfo']
-        # do nothing
-      else
-        self.expires_at = DateTime.now.utc + 1.hour
-      end
+      self.expires_at = Time.now.utc + 1.hour if developer_key&.auto_expire_tokens
     end
   end
 
@@ -181,28 +170,16 @@ class AccessToken < ActiveRecord::Base
     @plaintext_refresh_token = new_token
   end
 
-  def generate_refresh_token(overwrite=false)
-    if overwrite || !self.crypted_refresh_token
-      self.refresh_token = CanvasSlug.generate(nil, TOKEN_SIZE)
-    end
-  end
-
-  def regenerate_refresh_token=(val)
-    if val == '1' && !protected_token?
-      generate_refresh_token(true)
-    end
+  def generate_refresh_token
+    self.refresh_token = CanvasSlug.generate(nil, TOKEN_SIZE) unless crypted_refresh_token
   end
 
   def clear_plaintext_refresh_token!
     @plaintext_refresh_token = nil
   end
 
-  def protected_token?
-    !manually_created?
-  end
-
   def regenerate=(val)
-    if val == '1' && !protected_token?
+    if val == '1' && manually_created?
       generate_token(true)
     end
   end
@@ -213,7 +190,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def visible_token
-    if protected_token?
+    if !manually_created?
       nil
     elsif full_token
       full_token

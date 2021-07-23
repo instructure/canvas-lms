@@ -138,7 +138,7 @@ const ImportantDates = ({
       <View as="div" padding="medium">
         <Flex margin="small 0" alignItems="center">
           <Flex.Item shouldGrow shouldShrink>
-            <Heading as="h3" level="h4" margin="small 0">
+            <Heading as="h2" level="h4" margin="small 0">
               {I18n.t('Important Dates')}
             </Heading>
           </Flex.Item>

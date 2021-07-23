@@ -137,6 +137,25 @@ describe('ContentTabs', () => {
     })
   })
 
+  describe('the submission type is student_annotation', () => {
+    it('renders the canvadocs iframe', async () => {
+      const assignmentAndSubmission = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['student_annotation']}
+      })
+      const props = {
+        ...assignmentAndSubmission,
+        createSubmissionDraft: jest.fn().mockResolvedValue({})
+      }
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
+    })
+  })
+
   describe('the submission type is online_text_entry', () => {
     beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
@@ -182,11 +201,27 @@ describe('ContentTabs', () => {
           })
         })
 
-        it('renders as read-only if the submission has been graded', async () => {
+        it('does not render as read-only if the submission has been graded pre-submission', async () => {
           const props = await mockAssignmentAndSubmission({
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
-              state: 'graded'
+              state: 'graded',
+              attempt: 0
+            }
+          })
+
+          await renderAttemptTab(props)
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(false)
+          })
+        })
+
+        it('renders as read-only if the submission has been graded post-submission', async () => {
+          const props = await mockAssignmentAndSubmission({
+            Assignment: {submissionTypes: ['online_text_entry']},
+            Submission: {
+              state: 'graded',
+              attempt: 1
             }
           })
 
@@ -228,21 +263,6 @@ describe('ContentTabs', () => {
           })
         })
       })
-    })
-  })
-
-  describe('the submission type is student_annotation', () => {
-    it('renders the student annotation tab', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['student_annotation']}
-      })
-
-      const {getByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
-      expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
     })
   })
 
@@ -325,16 +345,30 @@ describe('ContentTabs', () => {
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
 
-    it('does not render the selector if the submission state is graded', async () => {
+    it('does not render the selector if the student is graded post-submission', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         Submission: {
-          state: 'graded'
+          state: 'graded',
+          attempt: 1
         }
       })
       const {queryByTestId} = render(<AttemptTab {...props} />)
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
+    })
+
+    it('renders the selector if the student is graded pre-submission', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
+        Submission: {
+          state: 'graded',
+          attempt: 0
+        }
+      })
+      const {queryByTestId} = render(<AttemptTab {...props} />)
+
+      expect(queryByTestId('submission-type-selector')).toBeInTheDocument()
     })
 
     it('does not render the selector if the context indicates the submission cannot be modified', async () => {

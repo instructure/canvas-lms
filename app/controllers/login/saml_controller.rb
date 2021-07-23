@@ -152,7 +152,10 @@ class Login::SamlController < ApplicationController
       session[:session_index] = assertion.authn_statements.first&.session_index
       session[:login_aac] = aac.id
 
-      if relay_state.present? && (uri = URI.parse(relay_state) rescue nil)
+      if relay_state.present? &&
+        (uri = URI.parse(relay_state) rescue nil) &&
+        uri.path &&
+        (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
         if uri.host
           # allow relay_state's to other (trusted) domains, by tacking on a session token
           target_account = Account.find_by_domain(uri.host)

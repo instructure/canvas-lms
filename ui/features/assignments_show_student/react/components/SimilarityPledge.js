@@ -35,7 +35,14 @@ function eulaHTML(eulaUrl) {
 export default function SimilarityPledge(props) {
   const {eulaUrl, pledgeText} = props
   const label = eulaUrl ? (
-    <Text dangerouslySetInnerHTML={{__html: eulaHTML(eulaUrl)}} />
+    <span>
+      <Text dangerouslySetInnerHTML={{__html: eulaHTML(eulaUrl)}} />
+      {!!pledgeText && (
+        <div>
+          <Text>{pledgeText}</Text>
+        </div>
+      )}
+    </span>
   ) : (
     <Text>{pledgeText}</Text>
   )

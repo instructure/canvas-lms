@@ -184,7 +184,7 @@ describe Enrollment do
 
     it "should return the sis enrollment type otherwise" do
       c = Account.default.courses.create!
-      e = TaEnrollment.create(course: c)
+      e = TaEnrollment.new(course: c)
       expect(e.sis_role).to eq 'ta'
     end
   end

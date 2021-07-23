@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@use "sass:math";
+
 @import "../blocks/event_stream";
 @import "../blocks/question_anchors";
 @import "./ic_quiz_inspector/question_inspector";
@@ -50,7 +52,7 @@
 
     input[type="checkbox"] {
       margin-top: -1px;
-      margin-right: $whitespace / 3;
+      margin-right: math.div($whitespace, 3);
     }
   }
 }

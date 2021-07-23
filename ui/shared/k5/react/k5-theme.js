@@ -73,7 +73,9 @@ export const theme = {
     h3FontSize: '1.25rem',
     h3FontWeight: typography.fontWeightBold,
     h4FontSize: '1.25rem',
-    h4FontWeight: typography.fontWeightBold
+    h4FontWeight: typography.fontWeightBold,
+    h5FontSize: '1rem',
+    h5FontWeight: typography.fontWeightNormal
   },
   [Tabs.Tab.theme]: {
     fontSize: '1.25rem'

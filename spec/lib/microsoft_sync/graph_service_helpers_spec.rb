@@ -20,13 +20,13 @@
 require_relative '../../spec_helper'
 
 describe MicrosoftSync::GraphServiceHelpers do
-  subject { described_class.new('mytenant123') }
+  subject { described_class.new('mytenant123', extra_tag: 'abc') }
 
   let(:graph_service) { double('GraphService') }
 
   before do
     allow(MicrosoftSync::GraphService).to \
-      receive(:new).with('mytenant123').and_return(graph_service)
+      receive(:new).with('mytenant123', extra_tag: 'abc').and_return(graph_service)
   end
 
   describe '#list_education_classes_for_course' do

@@ -35,8 +35,8 @@
     @include fontSize($ic-font-size--small);
     overflow: hidden;
     border-bottom: 1px solid $ic-border-light;
-    padding-bottom: $ic-sp / 2;
-    margin: 0 0 $ic-sp / 2;
+    padding-bottom: $ic-sp * 0.5;
+    margin: 0 0 $ic-sp * 0.5;
     font-weight: bold;
   }
   .shared-space {
@@ -56,7 +56,7 @@
 
 #right-side .right-side-list {
   @include reset-list;
-  margin: -($ic-sp / 2) 0 $ic-sp;
+  margin: -($ic-sp * 0.5) 0 $ic-sp;
   li {
     a {
       @include fontSize($ic-font-size--xsmall);
@@ -119,7 +119,7 @@
   }
   .recent_feedback_title {
     line-height: 1.3;
-    margin-bottom: $ic-sp/4;
+    margin-bottom: $ic-sp*0.25;
   }
   .recent_feedback_comment {
     color: $gray-light;

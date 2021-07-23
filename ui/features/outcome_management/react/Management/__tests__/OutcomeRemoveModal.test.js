@@ -41,18 +41,23 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
 
 describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
+  let onCleanupHandlerMock
+  let showFlashAlertSpy
   let cache
 
   const defaultProps = (props = {}) => ({
     outcomes: outcomesGenerator(1, 1),
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
+    onCleanupHandler: onCleanupHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     cache = createCache()
     onCloseHandlerMock = jest.fn()
+    onCleanupHandlerMock = jest.fn()
+    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -82,12 +87,12 @@ describe('OutcomeRemoveModal', () => {
       expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
     })
 
-    it('calls onCloseHandler on Remove button click', async () => {
+    it('calls onCleanupHandler on Remove button click', async () => {
       const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
         mocks: [deleteOutcomeMock()]
       })
       fireEvent.click(getByText('Remove Outcome'))
-      expect(onCloseHandlerMock).toHaveBeenCalled()
+      expect(onCleanupHandlerMock).toHaveBeenCalled()
     })
 
     it('calls onCloseHandler on Cancel button click', () => {
@@ -97,9 +102,8 @@ describe('OutcomeRemoveModal', () => {
     })
 
     it('calls onCloseHandler on Close (X) button click', () => {
-      const {getAllByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
-      const closeBtn = getAllByText('Close')[getAllByText('Close').length - 1]
-      fireEvent.click(closeBtn)
+      const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />)
+      fireEvent.click(getByText('Close'))
       expect(onCloseHandlerMock).toHaveBeenCalled()
     })
 
@@ -121,7 +125,6 @@ describe('OutcomeRemoveModal', () => {
 
     describe('deletes outcome', () => {
       it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock()]
         })
@@ -135,7 +138,6 @@ describe('OutcomeRemoveModal', () => {
       })
 
       it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           contextType: 'Course',
           mocks: [deleteOutcomeMock()]
@@ -150,7 +152,6 @@ describe('OutcomeRemoveModal', () => {
       })
 
       it('displays flash confirmation with proper message if delete request fails', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock({failResponse: true})]
         })
@@ -158,14 +159,13 @@ describe('OutcomeRemoveModal', () => {
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message:
-              'An error occurred while removing the outcome: GraphQL error: Could not find associated outcome in this context',
+              'An error occurred while removing the outcome: GraphQL error: Could not find associated outcome in this context.',
             type: 'error'
           })
         })
       })
 
       it('displays flash confirmation with proper message if delete request fails because it is aligned with content', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock({failAlignedContentMutation: true})]
         })
@@ -173,14 +173,13 @@ describe('OutcomeRemoveModal', () => {
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message:
-              'An error occurred while removing the outcome: Outcome cannot be removed because it is aligned to content',
+              'An error occurred while removing the outcome: cannot be deleted because it is aligned to content.',
             type: 'error'
           })
         })
       })
 
       it('displays flash confirmation with proper message if delete mutation fails', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock({failMutation: true})]
         })
@@ -194,7 +193,6 @@ describe('OutcomeRemoveModal', () => {
       })
 
       it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock({failMutationNoErrMsg: true})]
         })
@@ -233,7 +231,7 @@ describe('OutcomeRemoveModal', () => {
       expect(queryByText('Remove Outcome?')).not.toBeInTheDocument()
     })
 
-    it('calls onCloseHandler on Remove button click', async () => {
+    it('calls onCleanupHandler on Remove button click', async () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
@@ -245,7 +243,7 @@ describe('OutcomeRemoveModal', () => {
         }
       )
       fireEvent.click(getByText('Remove Outcomes'))
-      expect(onCloseHandlerMock).toHaveBeenCalled()
+      expect(onCleanupHandlerMock).toHaveBeenCalled()
     })
 
     it('calls onCloseHandler on Cancel button click', () => {
@@ -372,6 +370,131 @@ describe('OutcomeRemoveModal', () => {
           'The outcomes that you have selected cannot be removed because they are aligned to content in this course.'
         )
       ).toBeInTheDocument()
+    })
+
+    describe('deletes outcomes', () => {
+      it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: '2 outcomes were successfully removed from this account.',
+            type: 'success'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            contextType: 'Course',
+            isCourse: true,
+            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: '2 outcomes were successfully removed from this course.',
+            type: 'success'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request fails', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2'], failResponse: true})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message:
+              'An error occurred while removing 2 outcomes: GraphQL error: Could not find associated outcome in this context.',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete mutation fails', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2'], failMutation: true})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'An error occurred while removing 2 outcomes.',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2'], failMutationNoErrMsg: true})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'An error occurred while removing 2 outcomes.',
+            type: 'error'
+          })
+        })
+      })
+
+      it('displays flash generic error if remove outcomes mutation partially succeeds', async () => {
+        const {getByText} = render(
+          <OutcomeRemoveModal
+            {...defaultProps({
+              outcomes: outcomesGenerator(1, 2, true)
+            })}
+          />,
+          {
+            mocks: [deleteOutcomeMock({ids: ['1', '2'], partialSuccess: true})]
+          }
+        )
+        fireEvent.click(getByText('Remove Outcomes'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: 'An error occurred while removing 2 outcomes.',
+            type: 'error'
+          })
+        })
+      })
     })
   })
 })

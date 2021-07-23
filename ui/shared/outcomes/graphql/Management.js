@@ -20,14 +20,16 @@ import axios from '@canvas/axios'
 import pluralize from 'str-pluralize'
 import {gql} from '@canvas/apollo'
 
+export const groupFields = `
+  _id
+  title
+  outcomesCount
+  childGroupsCount
+`
+
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
-    _id
-    title
-    description
-    outcomesCount
-    childGroupsCount
-    canEdit
+    ${groupFields}
   }
 `
 
@@ -83,24 +85,20 @@ export const FIND_GROUP_OUTCOMES = gql`
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
-        description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
           }
           edges {
-            canUnlink
             id
             node {
               ... on LearningOutcome {
                 _id
                 description
                 title
-                displayName
                 isImported(
                   targetContextType: $outcomesContextType
                   targetContextId: $outcomesContextId
@@ -128,7 +126,6 @@ export const SEARCH_GROUP_OUTCOMES = gql`
         description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
@@ -195,8 +192,8 @@ export const CREATE_LEARNING_OUTCOME = gql`
 `
 
 export const DELETE_OUTCOME_LINKS = gql`
-  mutation DeleteOutcomeLinks($ids: [ID!]!) {
-    deleteOutcomeLinks(input: {ids: $ids}) {
+  mutation DeleteOutcomeLinks($input: DeleteOutcomeLinksInput!) {
+    deleteOutcomeLinks(input: $input) {
       deletedOutcomeLinkIds
       errors {
         attribute

@@ -21,10 +21,11 @@ import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, number, oneOf, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
-import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Badge} from '@instructure/ui-badge'
+import {ApplyTheme} from '@instructure/ui-themeable'
 
 import {Text} from '@instructure/ui-text'
 import {SVGIcon} from '@instructure/ui-svg-images'
@@ -53,8 +54,16 @@ StatusBar.propTypes = {
   onA11yChecker: func.isRequired,
   onFullscreen: func.isRequired,
   use_rce_pretty_html_editor: bool,
+  use_rce_a11y_checker_notifications: bool,
   preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
-  readOnly: bool
+  readOnly: bool,
+  a11yBadgeColor: string,
+  a11yErrorsCount: number
+}
+
+StatusBar.defaultProps = {
+  a11yBadgeColor: '#FC5E13',
+  a11yErrorsCount: 0
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -112,9 +121,11 @@ export default function StatusBar(props) {
     }
     // adding a delay before including the HTML Editor description to wait the focus moves to the RCE
     // and prevent JAWS from reading the aria-describedby element when switching back to RCE view
-    setTimeout(() => {
+    const timerid = setTimeout(() => {
       setIncludeEdtrDesc(props.use_rce_pretty_html_editor && !isHtmlView())
     }, 100)
+
+    return () => clearTimeout(timerid)
   }, [props.editorView]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function preferredHtmlEditor() {
@@ -159,6 +170,42 @@ export default function StatusBar(props) {
     return <View data-testid="whole-status-bar-path">{renderPathString(props)}</View>
   }
 
+  function renderA11yButton() {
+    const a11y = formatMessage('Accessibility Checker')
+    const button = (
+      <IconButton
+        data-btn-id="rce-a11y-btn"
+        color="primary"
+        title={a11y}
+        tabIndex={tabIndexForBtn('rce-a11y-btn')}
+        onClick={event => {
+          event.target.focus()
+          props.onA11yChecker()
+        }}
+        onFocus={() => setFocusedBtnId('rce-a11y-btn')}
+        screenReaderLabel={a11y}
+        withBackground={false}
+        withBorder={false}
+      >
+        <IconA11yLine />
+      </IconButton>
+    )
+    if (!props.use_rce_a11y_checker_notifications || props.a11yErrorsCount <= 0) {
+      return button
+    }
+    return (
+      <ApplyTheme
+        theme={{
+          [Badge.theme]: {colorPrimary: props.a11yBadgeColor}
+        }}
+      >
+        <Badge count={props.a11yErrorsCount} countUntil={100}>
+          {button}
+        </Badge>
+      </ApplyTheme>
+    )
+  }
+
   function renderHtmlEditorMessage() {
     if (!props.use_rce_pretty_html_editor) return null
 
@@ -198,7 +245,6 @@ export default function StatusBar(props) {
   function renderIconButtons() {
     if (isHtmlView()) return null
     const kbshortcut = formatMessage('View keyboard shortcuts')
-    const a11y = formatMessage('Accessibility Checker')
     return (
       <View display="inline-block" padding="0 x-small">
         <IconButton
@@ -217,24 +263,7 @@ export default function StatusBar(props) {
         >
           <IconKeyboardShortcutsLine />
         </IconButton>
-        {props.readOnly || (
-          <IconButton
-            data-btn-id="rce-a11y-btn"
-            color="primary"
-            title={a11y}
-            tabIndex={tabIndexForBtn('rce-a11y-btn')}
-            onClick={event => {
-              event.target.focus()
-              props.onA11yChecker()
-            }}
-            onFocus={() => setFocusedBtnId('rce-a11y-btn')}
-            screenReaderLabel={a11y}
-            withBackground={false}
-            withBorder={false}
-          >
-            <IconA11yLine />
-          </IconButton>
-        )}
+        {props.readOnly || renderA11yButton()}
       </View>
     )
   }

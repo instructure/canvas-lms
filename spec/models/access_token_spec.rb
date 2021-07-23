@@ -28,7 +28,7 @@ describe AccessToken do
 
       it "new access tokens shouldnt have an expiration" do
         at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
-        expect(at.expires_at).to eq nil
+        expect(at.permanent_expires_at).to eq nil
       end
 
       it "should authenticate valid token" do
@@ -38,9 +38,9 @@ describe AccessToken do
 
       it "shouldn't authenticate expired tokens" do
         at = AccessToken.create!(
-            :user => user_model,
-            :developer_key => DeveloperKey.default,
-            :expires_at => 2.hours.ago
+          user: user_model,
+          developer_key: DeveloperKey.default,
+          permanent_expires_at: 2.hours.ago
         )
         expect(AccessToken.authenticate(at.full_token)).to be nil
       end
@@ -104,7 +104,7 @@ describe AccessToken do
     end
 
     it "should not authenticate expired tokens" do
-      @at.update_attribute(:expires_at, 2.hours.ago)
+      @at.update!(permanent_expires_at: 2.hours.ago)
       expect(AccessToken.authenticate(@token_string)).to be_nil
     end
 
@@ -113,7 +113,7 @@ describe AccessToken do
     end
 
     it "should authenticate expired tokens by the refresh token" do
-      @at.update_attribute(:expires_at, 2.hours.ago)
+      @at.update!(expires_at: 2.hours.ago)
       expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
     end
   end
@@ -140,17 +140,21 @@ describe AccessToken do
     end
 
     it "Shouldn't be usable if expired" do
-      @at.update_attribute(:expires_at, 2.hours.ago)
+      @at.update!(permanent_expires_at: 2.hours.ago)
       expect(@at.usable?).to eq false
     end
 
-    it "Should be usable if expired, but requesting with a refresh_token" do
-      @at.update_attribute(:expires_at, 2.hours.ago)
+    it "Shouldn't be usable if it needs refreshed" do
+      @at.update!(expires_at: 2.hours.ago)
+      expect(@at.usable?).to eq false
+    end
+
+    it "Should be usable if it needs refreshed, but requesting with a refresh_token" do
+      @at.update!(expires_at: 2.hours.ago)
       expect(@at.usable?(:crypted_refresh_token)).to eq true
     end
 
     it "Shouldn't be usable if dev key isn't active" do
-
       dk = DeveloperKey.create!(account: account_model)
       dk.deactivate
       @at.developer_key = dk
@@ -160,7 +164,6 @@ describe AccessToken do
     end
 
     it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
-
       dk = DeveloperKey.create!(account: account_model)
       dk.deactivate
       @at.developer_key = dk
@@ -227,13 +230,6 @@ describe AccessToken do
 
     it "should not match if token has less scopes then requested" do
       expect(token.scoped_to?(['user_profile'])).to eq false
-    end
-
-    it "doesn't expire /auth/userinfo scope, even for auto expiring developer key" do
-      dk = DeveloperKey.create!
-      expect(dk.auto_expire_tokens).to eq true
-      token = AccessToken.create!(developer_key: dk, scopes: ['/auth/userinfo'])
-      expect(token.expires_at).to eq nil
     end
 
     it "does not validate scopes if the workflow state is deleted" do
@@ -465,7 +461,7 @@ describe AccessToken do
 
   describe "regenerate_access_token" do
     before :once do
-      # default developer keys no lponger regenerate expirations
+      # default developer keys no longer regenerate expirations
       key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
       @at = AccessToken.create!(:user => user_model, :developer_key => key)
       @token_string = @at.full_token
@@ -473,11 +469,11 @@ describe AccessToken do
     end
 
     it "should regenerate the token" do
-      allow(DateTime).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+      allow(Time).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00+00:00'))
 
-      @at.update_attribute(:expires_at, 2.hours.ago)
+      @at.update!(expires_at: 2.hours.ago)
       @at.regenerate_access_token
-      expect(@at.expires_at.to_i).to be((DateTime.now.utc + 1.hour).to_i)
+      expect(@at.expires_at.to_i).to be((Time.now.utc + 1.hour).to_i)
     end
   end
 

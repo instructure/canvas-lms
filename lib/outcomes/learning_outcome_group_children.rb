@@ -32,10 +32,6 @@ module Outcomes
       @context = context
     end
 
-    def total_subgroups(learning_outcome_group_id)
-      children_ids(learning_outcome_group_id).length
-    end
-
     def total_outcomes(learning_outcome_group_id, args={})
       if args == {} && improved_outcomes_management?
         cache_key = total_outcomes_cache_key(learning_outcome_group_id)
@@ -83,10 +79,10 @@ module Outcomes
       learning_outcome_groups_ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
 
       relation = ContentTag.active.learning_outcome_links.
-        where(associated_asset_id: learning_outcome_groups_ids).
-        joins(:learning_outcome_content)
+        where(associated_asset_id: learning_outcome_groups_ids)
 
       if args[:search_query]
+        relation = relation.joins(:learning_outcome_content)
         relation = add_search_query(relation, args[:search_query])
       end
 
@@ -167,7 +163,7 @@ module Outcomes
     end
 
     def context_asset_string
-      (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
+     @_context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
     end
 
     def improved_outcomes_management?

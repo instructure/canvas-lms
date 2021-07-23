@@ -63,7 +63,7 @@ function InfoText({repliesCount, unreadCount}) {
 
   return infoText.length > 0 ? (
     <View padding="0 x-small 0 0">
-      <Text weight="light" size="small" data-testid="replies-counter">
+      <Text weight="normal" size="small" data-testid="replies-counter">
         {infoText.join(', ')}
       </Text>
     </View>

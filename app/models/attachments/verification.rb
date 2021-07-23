@@ -105,7 +105,7 @@ class Attachments::Verification
   # Returns a boolean
   def valid_verifier_for_permission?(verifier, permission, session = {})
     # Support for legacy verifiers.
-    if verifier == attachment.uuid
+    if ActiveSupport::SecurityUtils.secure_compare(verifier, attachment.uuid)
       InstStatsd::Statsd.increment("attachments.legacy_verifier_success")
       return true
     elsif verifier.length == attachment.uuid.length && attachment.related_attachments.where(uuid: verifier).exists?

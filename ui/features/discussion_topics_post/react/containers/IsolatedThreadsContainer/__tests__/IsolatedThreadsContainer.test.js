@@ -18,13 +18,14 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
+import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {PageInfo} from '../../../../graphql/PageInfo'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
 describe('IsolatedThreadsContainer', () => {
@@ -61,7 +62,8 @@ describe('IsolatedThreadsContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const defaultProps = () => ({
+  const defaultProps = overrides => ({
+    discussionTopic: Discussion.mock(),
     discussionEntry: DiscussionEntry.mock({
       discussionSubentriesConnection: {
         nodes: [
@@ -74,7 +76,8 @@ describe('IsolatedThreadsContainer', () => {
         pageInfo: PageInfo.mock(),
         __typename: 'DiscussionSubentriesConnection'
       }
-    })
+    }),
+    ...overrides
   })
 
   const setup = props => {
@@ -95,5 +98,61 @@ describe('IsolatedThreadsContainer', () => {
   it('should render sub-entries in the correct order', async () => {
     const container = setup(defaultProps())
     expect(await container.findByText('This is the child reply')).toBeInTheDocument()
+  })
+
+  describe('thread actions menu', () => {
+    it('allows toggling the unread state of an entry', async () => {
+      const onToggleUnread = jest.fn()
+      const {findByTestId, findAllByTestId} = setup(defaultProps({onToggleUnread}))
+
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      const markAsRead = await findByTestId('markAsUnread')
+      fireEvent.click(markAsRead)
+
+      expect(onToggleUnread).toHaveBeenCalled()
+    })
+
+    it('only shows the delete option if you have permission', async () => {
+      const props = defaultProps({onDelete: jest.fn()})
+      props.discussionEntry.discussionSubentriesConnection.nodes[0].permissions.delete = false
+      const {queryByTestId, findAllByTestId} = setup(props)
+
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      expect(queryByTestId('delete')).toBeNull()
+    })
+
+    it('allows deleting an entry', async () => {
+      const onDelete = jest.fn()
+      const {getByTestId, findAllByTestId} = setup(defaultProps({onDelete}))
+
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      fireEvent.click(getByTestId('delete'))
+
+      expect(onDelete).toHaveBeenCalled()
+    })
+
+    it('only shows the speed grader option if you have permission', async () => {
+      const props = defaultProps({onOpenInSpeedGrader: jest.fn()})
+      props.discussionTopic.permissions.speedGrader = false
+      const {queryByTestId, findAllByTestId} = setup(props)
+
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      expect(queryByTestId('inSpeedGrader')).toBeNull()
+    })
+
+    it('allows opening an entry in speedgrader', async () => {
+      const onOpenInSpeedGrader = jest.fn()
+      const {getByTestId, findAllByTestId} = setup(defaultProps({onOpenInSpeedGrader}))
+
+      const threadActionsMenu = await findAllByTestId('thread-actions-menu')
+      fireEvent.click(threadActionsMenu[0])
+      fireEvent.click(getByTestId('inSpeedGrader'))
+
+      expect(onOpenInSpeedGrader).toHaveBeenCalled()
+    })
   })
 })

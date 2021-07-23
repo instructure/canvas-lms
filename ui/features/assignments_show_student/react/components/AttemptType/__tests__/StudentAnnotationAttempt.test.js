@@ -33,39 +33,79 @@ async function makeProps(overrides) {
 }
 
 describe('StudentAnnotationAttempt', () => {
-  it('renders an iframe for canvadocs', async () => {
-    const props = await makeProps({})
-    const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
-    expect(getByTestId('canvadocs-iframe')).toBeInTheDocument()
-  })
-})
+  describe('when fetching canvadocs session fails', () => {
+    beforeEach(() => {
+      jest.spyOn(axios, 'post').mockRejectedValue({})
+    })
 
-describe('when fetching canvadocs session fails', () => {
-  beforeEach(() => {
-    jest.spyOn(axios, 'post').mockRejectedValue({})
-  })
-
-  it('displays an error message', async () => {
-    const props = await makeProps({})
-    const {getByText} = render(<StudentAnnotationAttempt {...props} />)
-    await waitFor(() => {
-      expect(getByText('There was an error loading the document.')).toBeInTheDocument()
+    it('displays an error message', async () => {
+      const props = await makeProps({})
+      const {getByText} = render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(getByText('There was an error loading the document.')).toBeInTheDocument()
+      })
     })
   })
-})
 
-describe('when fetching canvadocs session success', () => {
-  beforeEach(() => {
-    jest
-      .spyOn(axios, 'post')
-      .mockResolvedValue({data: {canvadocs_session_url: 'CANVADOCS_SESSION_URL'}})
-  })
+  describe('when fetching canvadocs session succeeds', () => {
+    beforeEach(() => {
+      jest
+        .spyOn(axios, 'post')
+        .mockResolvedValue({data: {canvadocs_session_url: 'CANVADOCS_SESSION_URL'}})
+    })
 
-  it('sets the url of the iframe', async () => {
-    const props = await makeProps({})
-    const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
-    await waitFor(() => {
-      expect(getByTestId('canvadocs-iframe').src).toEqual('http://localhost/CANVADOCS_SESSION_URL')
+    it('renders an iframe for canvadocs', async () => {
+      const props = await makeProps({})
+      const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(getByTestId('canvadocs-iframe')).toBeInTheDocument()
+      })
+    })
+
+    it('sets the url of the iframe', async () => {
+      const props = await makeProps({})
+      const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(getByTestId('canvadocs-iframe').src).toEqual(
+          'http://localhost/CANVADOCS_SESSION_URL'
+        )
+      })
+    })
+
+    it('creates a submission draft when submission is unsubmitted', async () => {
+      const props = await makeProps({
+        Submission: {
+          state: 'unsubmitted'
+        }
+      })
+      render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).toHaveBeenCalled()
+      })
+    })
+
+    it('does not create a submission draft when submission is submitted', async () => {
+      const props = await makeProps({
+        Submission: {
+          state: 'submitted'
+        }
+      })
+      render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+      })
+    })
+
+    it('does not create a submission draft when submission is graded', async () => {
+      const props = await makeProps({
+        Submission: {
+          state: 'graded'
+        }
+      })
+      render(<StudentAnnotationAttempt {...props} />)
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+      })
     })
   })
 })

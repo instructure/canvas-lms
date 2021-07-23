@@ -95,8 +95,8 @@ const translateTabId = id => {
   return TAB_IDS.HOME
 }
 
-const toRenderTabs = tabs =>
-  tabs.reduce((acc, {id, hidden}) => {
+const toRenderTabs = (tabs, hasSyllabusBody) => {
+  const activeTabs = tabs.reduce((acc, {id, hidden}) => {
     if (hidden) return acc
     const renderId = translateTabId(id)
     const renderTab = COURSE_TABS.find(tab => tab.id === renderId)
@@ -105,6 +105,11 @@ const toRenderTabs = tabs =>
     }
     return acc
   }, [])
+  if (hasSyllabusBody && !activeTabs.some(tab => tab.id === TAB_IDS.RESOURCES)) {
+    activeTabs.push(COURSE_TABS.find(tab => tab.id === TAB_IDS.RESOURCES))
+  }
+  return activeTabs
+}
 
 export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   return (
@@ -224,9 +229,10 @@ export function K5Course({
   settingsPath,
   latestAnnouncement,
   pagesPath,
-  hasWikiPages
+  hasWikiPages,
+  hasSyllabusBody
 }) {
-  const renderTabs = toRenderTabs(tabs)
+  const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
@@ -397,7 +403,8 @@ K5Course.propTypes = {
   settingsPath: PropTypes.string.isRequired,
   latestAnnouncement: PropTypes.object,
   pagesPath: PropTypes.string.isRequired,
-  hasWikiPages: PropTypes.bool.isRequired
+  hasWikiPages: PropTypes.bool.isRequired,
+  hasSyllabusBody: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

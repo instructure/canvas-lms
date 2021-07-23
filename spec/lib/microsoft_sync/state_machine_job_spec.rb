@@ -255,8 +255,8 @@ module MicrosoftSync
         expect(steps_object).to receive(:step_initial).and_return StateMachineJob::COMPLETE
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
         subject.send(:run, nil, nil)
-        expect(InstStatsd::Statsd).to \
-          have_received(:increment).with('microsoft_sync.smj.complete', tags: {})
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.smj.complete', tags: {microsoft_sync_step: 'step_initial'})
       end
 
       describe 'retry counting' do
@@ -277,7 +277,7 @@ module MicrosoftSync
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             'microsoft_sync.smj.retry',
             tags: {
-              microsoft_sync_step: 'step_initial', category: 'MicrosoftSync::Errors::PublicError'
+              microsoft_sync_step: 'step_initial', category: 'MicrosoftSync__Errors__PublicError'
             }
           )
         end
@@ -311,7 +311,7 @@ module MicrosoftSync
               raise_error(Errors::PublicError)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.smj.final_retry',
-              tags: {microsoft_sync_step: 'step_initial', category: 'MicrosoftSync::Errors::PublicError'}
+              tags: {microsoft_sync_step: 'step_initial', category: 'MicrosoftSync__Errors__PublicError'}
             )
           end
 
@@ -523,7 +523,7 @@ module MicrosoftSync
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.smj.failure',
               tags: {
-                microsoft_sync_step: 'step_second', category: 'MicrosoftSync::Errors::PublicError'
+                microsoft_sync_step: 'step_second', category: 'MicrosoftSync__Errors__PublicError'
               }
             )
           end
@@ -555,7 +555,7 @@ module MicrosoftSync
               'microsoft_sync.smj.cancel',
               tags: {
                 microsoft_sync_step: 'step_initial',
-                category: 'MicrosoftSync::GracefulCancelTestError'
+                category: 'MicrosoftSync__GracefulCancelTestError'
               }
             )
           end

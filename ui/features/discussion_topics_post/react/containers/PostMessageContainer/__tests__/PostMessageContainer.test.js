@@ -35,6 +35,47 @@ describe('PostMessageContainer', () => {
     expect(container).toBeTruthy()
   })
 
+  it('should display edited by if editor is different to author', () => {
+    const container = setup(
+      defaultProps({
+        editor: {
+          id: 'vfx5000',
+          _id: '99',
+          displayName: 'Eddy Tor',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    )
+    expect(container.getByTestId('created-tooltip')).toBeTruthy()
+    // one for the screenreader, the other for the tooltip
+    expect(container.getAllByText('Created Feb 8 8:35pm').length).toEqual(2)
+    expect(container.getByText('Edited by Eddy Tor Apr 13 4pm')).toBeInTheDocument()
+  })
+
+  it('should display plain edited if author is editor', () => {
+    const container = setup(
+      defaultProps({
+        editor: {
+          id: 'wqe54678',
+          _id: '2',
+          displayName: 'Hank McCoy',
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        }
+      })
+    )
+    expect(container.getByText('Edited Apr 13 4pm')).toBeInTheDocument()
+  })
+
+  it('should not display edit info when no editor', () => {
+    const container = setup(
+      defaultProps({
+        editor: null
+      })
+    )
+    expect(container.queryByText(/Edited/)).toBeNull()
+    expect(container.queryByTestId('created-tooltip')).toBeFalsy()
+  })
+
   it('displays deletion info if delete', () => {
     const {queryByText} = setup(defaultProps({deleted: true}))
     expect(queryByText('Deleted by Hank Mccoy')).toBeTruthy()

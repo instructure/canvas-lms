@@ -575,11 +575,11 @@ TEXT
         </tr>
         <tr>
           <td>
-            <%= f.blabel :expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
+            <%= f.blabel :permanent_expires_at, en: "Expires", id: "token_expires_at_accessible_label" %>
           </td>
           <td>
             <div>
-              <%= f.text_field :expires_at,
+              <%= f.text_field :permanent_expires_at,
                                class: "expires_field datetime_field",
                                style: "width: 120px;",
                                "aria-labelledby" => "token_expires_at_accessible_label",

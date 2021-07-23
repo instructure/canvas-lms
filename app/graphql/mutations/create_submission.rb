@@ -57,7 +57,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
     submission_type = input[:submission_type]
     submission_params = {
-      annotatable_attachment_id: input[:annotatable_attachment_id],
+      annotatable_attachment_id: assignment.annotatable_attachment_id,
       attachments: [],
       body: '',
       require_submission_type_is_valid: true,
@@ -67,7 +67,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
 
     case submission_type
     when 'student_annotation'
-      if input[:annotatable_attachment_id].blank?
+      if assignment.annotatable_attachment_id.blank?
         return validation_error(I18n.t('Student Annotation submissions require an annotatable_attachment_id to submit'))
       end
     when 'media_recording'

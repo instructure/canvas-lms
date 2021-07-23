@@ -205,6 +205,15 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s].sort
   end
 
+  it "has an attachment" do
+    a = attachment_model
+    discussion.attachment = a
+    discussion.save!
+
+    expect(discussion_type.resolve("attachment { _id }")).to eq discussion.attachment.id.to_s
+    expect(discussion_type.resolve("attachment { displayName }")).to eq discussion.attachment.display_name
+  end
+
   it "has a group_set" do
     expect(discussion_type.resolve('groupSet { name }')).to eq discussion.group_category&.name
   end

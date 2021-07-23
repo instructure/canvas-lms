@@ -134,3 +134,15 @@ span .mention {
 ul[data-cid='InlineList'] > li[data-cid='InlineListItem'] > span::after{
   color: $tiara;
 }
+
+.highlight-fadeout {
+  background-color: rgba(0, 142, 226, 0.1);
+  animation: fadeout 2s forwards;
+  animation-delay: 4s;
+}
+
+@keyframes fadeout {
+  to {
+    background-color: rgba(0, 0, 0 ,0);
+  }
+}
