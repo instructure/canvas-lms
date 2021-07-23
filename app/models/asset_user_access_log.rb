@@ -124,6 +124,9 @@ class AssetUserAccessLog
     topic_name = message_bus_topic_name(root_account)
     msg = log_values.to_json
     MessageBus.send_one_message(PULSAR_NAMESPACE, topic_name, msg)
+  rescue ::MessageBus::MemoryQueueFullError => e
+    Rails.logger.warn("[AUA LOG] Write failed due to throughput: #{topic_name} , #{msg}")
+    CanvasErrors.capture_exception(:asset_user_access_logs, e, :warn)
   end
 
   def self.message_bus_topic_name(root_account)
@@ -343,9 +346,9 @@ class AssetUserAccessLog
         CanvasErrors.capture_exception(:aua_log_compaction, e, :info)
         early_exit = true
         break
-      rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError, ::Pulsar::Error::AlreadyClosed => ex
+      rescue ::Pulsar::Error::Timeout, ::Pulsar::Error::ConnectError, ::Pulsar::Error::AlreadyClosed => e
         connect_attempts += 1
-        CanvasErrors.capture_exception(:aua_log_compaction, ex, :warn)
+        CanvasErrors.capture_exception(:aua_log_compaction, e, :warn)
         if connect_attempts >= 2
           # treat it like a runtime timeout, reschedule the job
           # and let it try again.
