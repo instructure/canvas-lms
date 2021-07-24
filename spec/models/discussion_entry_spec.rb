@@ -101,18 +101,17 @@ describe DiscussionEntry do
 
   context "mentions" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @mentioned_student = @student
-      student_in_course(:active_all => true)
-      @topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      course_with_teacher(active_all: true)
     end
 
+    let(:student) { student_in_course(active_all: true).user }
+    let(:mentioned_student) { student_in_course(active_all: true).user }
+
     it 'should create on entry save' do
-      entry = @topic.discussion_entries.new(user: @student)
-      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{@mentioned_student.id} class=mention>@#{@mentioned_student.short_name}</span> what's up dude</p>")
+      entry = topic.discussion_entries.new(user: student)
+      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
-      expect(entry.mentions.take.user_id).to eq @mentioned_student.id
+      expect(entry.mentions.take.user_id).to eq mentioned_student.id
     end
   end
 
