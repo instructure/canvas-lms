@@ -20,19 +20,19 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {debounce} from 'lodash'
 import {Flex} from '@instructure/ui-flex'
-import {FormFieldGroup} from '@instructure/ui-form-field'
 import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
 import I18n from 'i18n!discussions_posts'
 import {
   IconArrowDownLine,
   IconArrowUpLine,
-  IconCircleArrowUpLine,
   IconSearchLine,
   IconTroubleLine
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
 import React, {useContext, useCallback, useMemo} from 'react'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SearchContext} from '../../utils/constants'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -96,91 +96,134 @@ export const DiscussionPostToolbar = props => {
   }, [handleClear, searchTerm])
 
   return (
-    <View maxWidth="56.875em">
-      <Flex width="100%">
-        <Flex.Item align="start" shouldGrow>
-          <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Discussion Actions')}</ScreenReaderContent>}
-            vAlign="middle"
-            layout="columns"
-          >
-            {props.childTopics && <GroupsMenu width="10px" childTopics={props.childTopics} />}
-            <TextInput
-              data-testid="search-filter"
-              onChange={handleChange}
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>
-              }
-              value={searchTerm}
-              renderBeforeInput={<IconSearchLine inline={false} />}
-              renderAfterInput={clearButton}
-              placeholder={I18n.t('Search entries or author...')}
-              shouldNotWrap
-              width="308px"
-            />
+    <Responsive
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          direction: 'column',
+          dividingMargin: '0 0 small 0',
+          search: {
+            shouldGrow: true,
+            width: null
+          },
+          filter: {
+            shouldGrow: true,
+            shouldShrink: true,
+            width: null
+          }
+        },
+        desktop: {
+          direction: 'row',
+          dividingMargin: '0 small 0 0',
+          search: {
+            shouldGrow: false,
+            width: '308px'
+          },
+          filter: {
+            shouldGrow: false,
+            shouldShrink: false,
+            width: '120px'
+          }
+        }
+      }}
+      render={responsiveProps => (
+        <View maxWidth="56.875em">
+          <Flex width="100%" direction={responsiveProps.direction}>
+            <Flex.Item margin={responsiveProps.dividingMargin}>
+              <Flex>
+                {/* Groups */}
+                {props.childTopics && (
+                  <Flex.Item margin="0 small 0 0" overflowY="hidden" overflowX="hidden">
+                    <GroupsMenu width="10px" childTopics={props.childTopics} />
+                  </Flex.Item>
+                )}
+                {/* Search */}
+                <Flex.Item
+                  overflowY="hidden"
+                  overflowX="hidden"
+                  shouldGrow={responsiveProps.search.shouldGrow}
+                >
+                  <TextInput
+                    data-testid="search-filter"
+                    onChange={handleChange}
+                    renderLabel={
+                      <ScreenReaderContent>
+                        {I18n.t('Search entries or author')}
+                      </ScreenReaderContent>
+                    }
+                    value={searchTerm}
+                    renderBeforeInput={<IconSearchLine inline={false} />}
+                    renderAfterInput={clearButton}
+                    placeholder={I18n.t('Search entries or author...')}
+                    shouldNotWrap
+                    width={responsiveProps.search.width}
+                  />
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
 
-            <SimpleSelect
-              renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
-              defaultValue={props.selectedView}
-              onChange={props.onViewFilter}
-              width="120px"
-            >
-              <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                {Object.entries(getMenuConfig(props)).map(([viewOption, viewOptionLabel]) => (
-                  <SimpleSelect.Option id={viewOption} key={viewOption} value={viewOption}>
-                    {viewOptionLabel.call()}
-                  </SimpleSelect.Option>
-                ))}
-              </SimpleSelect.Group>
-            </SimpleSelect>
-
-            <Tooltip
-              renderTip={
-                props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')
-              }
-              width="78px"
-              data-testid="sortButtonTooltip"
-            >
-              <Button
-                onClick={props.onSortClick}
-                renderIcon={
-                  props.sortDirection === 'desc' ? (
-                    <IconArrowDownLine data-testid="DownArrow" />
-                  ) : (
-                    <IconArrowUpLine data-testid="UpArrow" />
-                  )
-                }
-                data-testid="sortButton"
-              >
-                {I18n.t('Sort')}
-                <ScreenReaderContent>
-                  {props.sortDirection === 'asc'
-                    ? I18n.t('Sorted by Ascending')
-                    : I18n.t('Sorted by Descending')}
-                </ScreenReaderContent>
-              </Button>
-            </Tooltip>
-          </FormFieldGroup>
-        </Flex.Item>
-        <Flex.Item align="end">
-          <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Checkbox examples')}</ScreenReaderContent>}
-            vAlign="middle"
-            layout="columns"
-          >
-            <Button
-              onClick={() => {
-                window.scrollTo(0, 0)
-              }}
-              renderIcon={<IconCircleArrowUpLine />}
-              data-testid="topButton"
-            >
-              {I18n.t('Top')}
-            </Button>
-          </FormFieldGroup>
-        </Flex.Item>
-      </Flex>
-    </View>
+            <Flex.Item>
+              <Flex>
+                {/* Filter */}
+                <Flex.Item
+                  margin="0 small 0 0"
+                  overflowY="hidden"
+                  overflowX="hidden"
+                  shouldGrow={responsiveProps.filter.shouldGrow}
+                  shouldShrink={responsiveProps.filter.shouldShrink}
+                >
+                  <SimpleSelect
+                    renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
+                    defaultValue={props.selectedView}
+                    onChange={props.onViewFilter}
+                    width={responsiveProps.filter.width}
+                  >
+                    <SimpleSelect.Group renderLabel={I18n.t('View')}>
+                      {Object.entries(getMenuConfig(props)).map(([viewOption, viewOptionLabel]) => (
+                        <SimpleSelect.Option id={viewOption} key={viewOption} value={viewOption}>
+                          {viewOptionLabel.call()}
+                        </SimpleSelect.Option>
+                      ))}
+                    </SimpleSelect.Group>
+                  </SimpleSelect>
+                </Flex.Item>
+                {/* Sort */}
+                <Flex.Item overflowY="hidden" overflowX="hidden">
+                  <Tooltip
+                    renderTip={
+                      props.sortDirection === 'desc'
+                        ? I18n.t('Newest First')
+                        : I18n.t('Oldest First')
+                    }
+                    width="78px"
+                    data-testid="sortButtonTooltip"
+                  >
+                    <Button
+                      onClick={props.onSortClick}
+                      renderIcon={
+                        props.sortDirection === 'desc' ? (
+                          <IconArrowDownLine data-testid="DownArrow" />
+                        ) : (
+                          <IconArrowUpLine data-testid="UpArrow" />
+                        )
+                      }
+                      data-testid="sortButton"
+                    >
+                      {I18n.t('Sort')}
+                      <ScreenReaderContent>
+                        {props.sortDirection === 'asc'
+                          ? I18n.t('Sorted by Ascending')
+                          : I18n.t('Sorted by Descending')}
+                      </ScreenReaderContent>
+                    </Button>
+                  </Tooltip>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+          </Flex>
+        </View>
+      )}
+    />
   )
 }
 

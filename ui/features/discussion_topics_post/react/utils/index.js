@@ -145,3 +145,17 @@ export const replyCountText = (repliesCount, unreadCount) => {
 
   return infoText.join(', ')
 }
+
+export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
+  const querySizes = {}
+  if (mobile) {
+    querySizes.mobile = {maxWidth: '768px'}
+  }
+  if (tablet) {
+    querySizes.tablet = {minWidth: '768px'}
+  }
+  if (desktop) {
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+  }
+  return querySizes
+}

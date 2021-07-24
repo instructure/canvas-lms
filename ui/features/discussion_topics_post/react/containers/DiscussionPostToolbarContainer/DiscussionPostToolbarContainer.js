@@ -54,21 +54,19 @@ export const DiscussionPostToolbarContainer = props => {
   }
 
   return (
-    <div style={{position: 'sticky', top: 0, zIndex: 10, marginTop: '-24px'}}>
-      <View as="div" padding="medium 0" background="primary">
-        <DiscussionPostToolbar
-          childTopics={getGroupsMenuTopics()}
-          selectedView={filter}
-          sortDirection={sort}
-          isCollapsedReplies
-          onSearchChange={onSearchChange}
-          onViewFilter={onViewFilter}
-          onSortClick={onSortClick}
-          onCollapseRepliesToggle={() => {}}
-          onTopClick={() => {}}
-        />
-      </View>
-    </div>
+    <View as="div" padding="0 0 medium 0" background="primary">
+      <DiscussionPostToolbar
+        childTopics={getGroupsMenuTopics()}
+        selectedView={filter}
+        sortDirection={sort}
+        isCollapsedReplies
+        onSearchChange={onSearchChange}
+        onViewFilter={onViewFilter}
+        onSortClick={onSortClick}
+        onCollapseRepliesToggle={() => {}}
+        onTopClick={() => {}}
+      />
+    </View>
   )
 }
 
