@@ -23218,9 +23218,9 @@ is:
       Við einhverjar aðstæður frumstillist eldra RCE ekki þar sem tinymce hefur ekki bætt
       ritistilfelli á innri lista þegar RCE krefst þess.
   underline_all_links_description: |-
-      Undirstrika tengla sýnir tengla í yfirlitsvalmyndum, skjáborði og síðuhliðarstikum sem
-      *undirstrikaðan texta*. Þessi eiginleikavalkostur á ekki við um tengla myndaða af notanda í
-      fjölbreytt efni ritlinum, sem undirstrikar alltaf tengla fyrir notendur.
+      Undirstrikaðir tenglar sýna tengla í leiðarstýringarvalmyndum, Stjórnborðinu og hliðarvalmynd síðu sem
+      *undirstrikaðan texta*. Þessi eiginleiki á ekki við um notenda-útbúna tengla í efni í
+      Rich Content ritli sem undirstrikar alltaf tengla fyrir alla notendur.
   underline_links_e7cf9b4f: "Undirstrika tengla"
   undo_a7be8fef: "Hætta við"
   undo_remove_course_association_name_68eb4037: "Afturkalla tenginguna við að fjarlægja námskeið %{name}"
