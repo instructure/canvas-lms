@@ -1920,7 +1920,7 @@ sv:
   add_trigger_bc1a0fae: "Lägg till Trigger"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Lägg till användare via e-postadresser, Inloggnings ID, eller SIS ID"
   add_user_e73e8e50: "Lägg till användare"
-  add_user_s_by_b2549f89: "Lägg till användare efter"
+  add_user_s_by_b2549f89: "Lägg till användare med hjälp av"
   add_users_b10c7fb1: "Lägg till användare"
   add_users_to_name_b8109bbb: "Lägg till användare till %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Lägg till dina uppgifter.  Du kan antingen göra en lång lista eller dela upp dem i grupper – och till och med specificera varje uppgiftsgrupps vikt."
@@ -5768,7 +5768,7 @@ sv:
   common_timezones_2b00baba: "Vanliga tidszoner"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Kommunicera kursmål"
-  communicate_grading_expectations_484a1f01: "Kommunicera bedömningsförväntningar"
+  communicate_grading_expectations_484a1f01: "Kommunicera vad som krävs för att uppnå ett visst omdöme"
   communicate_to_your_students_exactly_what_will_be__57a679c5: |-
       Kommunicera till dina studenter exakt vad som kommer att krävas
       av dem under kursen i kronologisk ordning. Generera en
@@ -7106,8 +7106,8 @@ sv:
       other: "%{count} kurser bearbetade"
     course: Kurs
     course_format: 
-      blended: Blandad
-      not_set: "Inte inställd"
+      blended: Blanded
+      not_set: "Inget alternativ valt"
       on_campus: "På campus"
       online: Online
     course_not_found: "Kursen hittades inte"
@@ -13165,7 +13165,7 @@ sv:
   in_closed_grading_period_dc717846: "I stängd omdömesperiod"
   in_less_than_a_minute_c8595a28: "om mindre än en minut"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "För att slutföra processen kommer du att omdirigeras till en inloggningssida där du måste logga in med ditt barns inloggningsuppgifter."
-  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "För att importera en stor mängd lärandemål på en gång, eller för att uppdatera dina befintliga lärandemål, *använd dig av CSV-formatet*."
+  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "För att importera en stor mängd lärandemål på en gång eller för att uppdatera befintliga lärandemål, kan du *använda dig av en fil i CSV-format*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Genomgång av produkten med hållpunkter för lärare"
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Genomgång av produkten med hållpunkter föradministratörer, lärare och studenter"
   in_progress_13b9e26f: pågår
@@ -16649,7 +16649,7 @@ sv:
   moodle_formula_warning_title: "Möjliga svar måste genereras på nytt för formulärfrågor"
   more_cf9cc661: Mer
   more_courses_5ebbe998: "Fler kurser"
-  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Canvas gör det dessutom möjligt för dig att lägga till lärandemål i dina bedömningsmatriser så att du kan utvärdera måluppfyllelse när du bedömer uppgifter. När du har ställt in dina lärandemål klickar du på Hantera matriser för att börja använda dem för bedömning."
+  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Dessutom gör Canvas det möjligt att koppla lärandemål till dina bedömningsmatriser så att du kan utvärdera måluppfyllelse när du bedömer uppgifter. När du i så fall har lagt in dina lärandemål klickar du på Matriser för att kunna koppla dem och därefter använda dem för bedömning."
   more_info_at_course_name_56dc8c10: "Mer information på %{course_name}"
   more_info_at_url_41b4764b: "Mer information på %{url}"
   more_info_at_web_address_dba7e187: "Mer information på %{web_address}"
@@ -16899,9 +16899,9 @@ sv:
   new_analytics_api_access_7eec1ead: "API-åtkomst för New Analytics"
   new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
-      New Analytics är ett interaktivt verktyg som hjälper dig och dina studenter att bättre
-          spåra prestanda och aktivitet i kursen. Upptäck vilka studenter som har öppnat
-          sidor och resurser, och deltagit i uppgifter – och vilka studenter som kan behöva
+      New Analytics är ett verktyg som hjälper dig att se hur studenterna presterar
+          och hur deras aktivitet ser ut i kursen. Få en överblick över vilka studenter som har öppnat
+          innehåll och resurser, genomfört uppgifter – och vilka studenter som kanske kan behöva
           lite mer uppmuntran.
   new_analytics_tutorial_tray_2511a34a: "Självstudiefält för New Analytics"
   new_annotations_66932016: "Nya annoteringar"
@@ -17879,7 +17879,7 @@ sv:
         main: 
           manage: 
             description: "*Här skapas lärandemålen för att följa måluppfyllelsen i kurs/ämne. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på \"Ny\" för att skapa ett nytt lärandemål, eller \"Ny grupp\" för att skapa en ny grupp att organisera målen i. \"Hitta-knappen\" låter dig använda lärandemålen som skapats av din organisation. Medan du skapar och använder lärandemålen kan du använda panelen till vänster för att navigera bland dessa. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemålen i dina matriser så att du kan räkna måluppfyllelse i dina uppgifter. När du är färdig med dina lärandemål trycker du på \"Hantera matriser\" för att börja använda lärandemål när du bedömmer.*"
-            title: "Ställa in lärandemål"
+            title: "Lägg in lärandemål"
     mastery_error: "Måste vara högre eller samma som 0"
     missing_outcome: "Kunde inte hitta lärandemålen"
     new_outcome_group: "Ny grupp för Lärandemål"
@@ -21593,11 +21593,11 @@ sv:
   rubrics_and_speedgrader_ececaed4: "Rubriker och SpeedGrader"
   rubrics_b5ef369b: Matriser
   rubrics_can_show_students_your_expectations_for_as_3382da64: |-
-      Matriser kan visa studenter dina förväntningar på uppgiftens kvalitet
-          och hur de poängsätts. Matriser kan kopplas till
-          uppgifter, diskussioner och quiz. Använd en matris endast för bedömning
-          eller skapa en matris utan poängsättning för bedömningsbaserad och
-          lärandemålsbaserad bedömning utan poäng. Lärandemål kan läggas till som kriterieobjekt
+      Matriser kan vara ett sätt att synliggöra för studenten vad som krävs
+          för att få ett visst omdöme på kursen. Matriser kan kopplas till
+          uppgifter, diskussioner och quiz. Använd en matris för att ge bedömning
+          eller skapa en matris utan poäng för att ge bedömning- och
+          lärandemålsbaserad återkoppling. Lärandemål kan läggas till som kriterieobjekt
           i matriser.
   rubrics_in_course_navigation_539ea536: "Matriser i kursnavigering"
   rubrics_speedgrader_a6ebec57: "Matriser, SpeedGrader"
@@ -25605,7 +25605,7 @@ sv:
     quiz_regrade: 
       got_it: "Okej, jag förstår"
   track_individual_student_and_class_progress_c13cf2d1: "Spåra individuella studenters och klassers framsteg"
-  track_student_performance_and_activity_a92a2a8b: "Spåra studentprestanda och aktivitet"
+  track_student_performance_and_activity_a92a2a8b: "Överblicka studenternas aktivitet och prestationer"
   treat_ungraded_as_0_d38c2b41: "Betrakta icke-bedömd som 0"
   tree_browser: 
     folder_tree_instructions: "Använd upp och ner pilarna för att navigera genom trädet. Tryck höger för att förstora mapparna, vänster för att minska, och enter för att välja de markerade föremålen."
