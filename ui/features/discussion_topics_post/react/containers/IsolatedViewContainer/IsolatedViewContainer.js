@@ -168,7 +168,7 @@ export const IsolatedViewContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: discussionEntry.rootEntry?.id || discussionEntry.id,
+        parentEntryId: discussionEntry.id,
         message
       }
     })
