@@ -145,8 +145,10 @@ if ENV['ENABLE_AXE_SELENIUM'] == '1'
     config.driver = lambda { SeleniumDriverSetup.driver }
     config.skip = [:'color-contrast', :'duplicate-id']
     config.rules = [:wcag2a, :wcag2aa, :section508]
-    config.serialize_output = true
-    config.serialize_prefix = 'log/results/stormbreaker_results'
+    if ENV['RSPEC_PROCESSES']
+      config.serialize_output = true
+      config.serialize_prefix = 'log/results/stormbreaker_results'
+    end
   end
 end
 
