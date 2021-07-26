@@ -239,8 +239,7 @@ class RoleOverridesController < ApplicationController
   #         add_course_template          -- Course Templates - add
   #         delete_course_template       -- Course Templates - delete
   #         edit_course_template         -- Course Templates - edit
-  #     Manage Courses granular permissions
-  #         manage_courses_admin         -- Manage Courses - manage / update
+  #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
   #     manage_feature_flags             -- Feature Previews - enable / disable
   #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
@@ -273,6 +272,7 @@ class RoleOverridesController < ApplicationController
   #     generate_observer_pairing_code   -- [ tado] Users - Generate observer pairing codes for students
   #     import_outcomes                  -- [ TaDo] Learning Outcomes - import
   #     lti_add_edit                     -- [ TAD ] LTI - add / edit / delete
+  #     manage_account_banks             -- [ td  ] Item Banks - manage account
   #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete
