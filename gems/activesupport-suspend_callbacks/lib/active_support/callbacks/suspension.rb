@@ -88,6 +88,11 @@ module ActiveSupport::Callbacks
       val
     end
 
+    def any_suspensions_active?(kind)
+      (suspended_callbacks_defined? && suspended_callbacks.any_registered?(kind)) ||
+        suspended_callback_ancestor&.any_suspensions_active?(kind)
+    end
+
     def suspended_callback_ancestor
       unless defined?(@suspended_callback_ancestor)
         @suspended_callback_ancestor = is_a?(Class) ? superclass : self.class
@@ -122,71 +127,58 @@ module ActiveSupport::Callbacks
       end
 
       def filter_callbacks(callbacks)
+        # short-circuit re-allocating the chain if no suspensions are active
+        return callbacks unless any_suspensions_active?(callbacks.name)
+
         filtered = ActiveSupport::Callbacks::CallbackChain.new(callbacks.name, callbacks.config)
         callbacks.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, callbacks.name, cb.kind) }
         filtered
       end
 
-      # these are copy/paste, except wrapping in a filter_callbacks
-      if ActiveSupport::VERSION::STRING < '5.1'
-        # [ActiveSupport 4.2 and 5.0]
-        def __run_callbacks__(callbacks, &block)
-          callbacks = filter_callbacks(callbacks)
+      # this are copy/paste, except wrapping in a filter_callbacks
+      def run_callbacks(kind)
+        callbacks = filter_callbacks(__callbacks[kind.to_sym])
 
-          if callbacks.empty?
-            yield if block_given?
-          else
-            runner = callbacks.compile
-            e = Filters::Environment.new(self, false, nil, block)
-            runner.call(e).value
-          end
-        end
-      else
-        # [ActiveSupport 5.1]
-        def run_callbacks(kind)
-          callbacks = filter_callbacks(__callbacks[kind.to_sym])
+        if callbacks.empty?
+          yield if block_given?
+        else
+          env = Filters::Environment.new(self, false, nil)
+          next_sequence = callbacks.compile
 
-          if callbacks.empty?
-            yield if block_given?
-          else
-            env = Filters::Environment.new(self, false, nil)
-            next_sequence = callbacks.compile
-
-            invoke_sequence = Proc.new do
-              skipped = nil
-              while true
-                current = next_sequence
-                current.invoke_before(env)
-                if current.final?
-                  env.value = !env.halted && (!block_given? || yield)
-                elsif current.skip?(env)
-                  (skipped ||= []) << current
-                  next_sequence = next_sequence.nested
-                  next
-                else
-                  next_sequence = next_sequence.nested
-                  begin
-                    target, block, method, *arguments = current.expand_call_template(env, invoke_sequence)
-                    target.send(method, *arguments, &block)
-                  ensure
-                    next_sequence = current
-                  end
+          invoke_sequence = Proc.new do
+            skipped = nil
+            while true
+              current = next_sequence
+              current.invoke_before(env)
+              if current.final?
+                env.value = !env.halted && (!block_given? || yield)
+              elsif current.skip?(env)
+                (skipped ||= []) << current
+                next_sequence = next_sequence.nested
+                next
+              else
+                next_sequence = next_sequence.nested
+                begin
+                  target, block, method, *arguments = current.expand_call_template(env, invoke_sequence)
+                  target.send(method, *arguments, &block)
+                ensure
+                  next_sequence = current
                 end
-                current.invoke_after(env)
-                skipped.pop.invoke_after(env) while skipped && skipped.first
-                break env.value
               end
+              current.invoke_after(env)
+              skipped.pop.invoke_after(env) while skipped && skipped.first
+              break env.value
             end
+          end
 
-            # Common case: no 'around' callbacks defined
-            if next_sequence.final?
-              next_sequence.invoke_before(env)
-              env.value = !env.halted && (!block_given? || yield)
-              next_sequence.invoke_after(env)
-              env.value
-            else
-              invoke_sequence.call
-            end
+          # Common case: no 'around' callbacks defined
+          if next_sequence.final?
+            next_sequence.invoke_before(env)
+            env.value = !env.halted && (!block_given? || yield)
+            next_sequence.invoke_after(env)
+            env.value
+          else
+            invoke_sequence.call
           end
         end
       end

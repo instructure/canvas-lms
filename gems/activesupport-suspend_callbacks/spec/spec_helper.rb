@@ -30,6 +30,8 @@ rescue LoadError => e
   puts "Error: #{e}"
 end
 
+require 'byebug'
+
 require "active_support/callbacks/suspension"
 
 RSpec.configure do |config|
