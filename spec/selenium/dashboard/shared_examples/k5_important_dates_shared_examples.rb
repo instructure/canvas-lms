@@ -62,8 +62,6 @@ shared_examples_for 'k5 important dates' do
   end
 
   it 'only shows no dates panda when important dates is not set for assignment' do
-    get "/"
-
     assignment_title = "Electricity Homework"
     due_at = 2.days.from_now(Time.zone.now)
     create_dated_assignment(@subject_course, assignment_title, due_at)
@@ -139,5 +137,18 @@ shared_examples_for 'k5 important dates' do
     get "/"
 
     expect(no_important_dates_image).to be_displayed
+  end
+
+  it 'shows a specific color icon when color is set for subject' do
+    assignment_title = "Electricity Homework"
+    due_at = 2.days.from_now(Time.zone.now)
+    assignment = create_dated_assignment(@subject_course, assignment_title, due_at)
+    assignment.update!(important_dates: true)
+    new_color = '#07AB99'
+    @subject_course.update!(course_color: new_color)
+
+    get "/"
+
+    expect(hex_value_for_color(assignment_icon, 'color')).to eq(new_color)
   end
 end

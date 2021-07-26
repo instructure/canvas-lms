@@ -18,13 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../../helpers/color_common'
 
 module K5ImportantDatesSectionPageObject
+  include ColorCommon
 
   #------------------------- Selectors --------------------------
 
   def add_override_selector
     "#add_due_date"
+  end
+
+  def assignment_icon_selector
+    "[data-testid='date-icon-wrapper']"
   end
 
   def calendar_add_selector
@@ -103,6 +109,10 @@ module K5ImportantDatesSectionPageObject
 
   def add_override
     f(add_override_selector)
+  end
+
+  def assignment_icon
+    f(assignment_icon_selector)
   end
 
   def assignment_link(link_text)
