@@ -445,7 +445,7 @@ describe('OutcomeManagementPanel', () => {
   })
 
   describe('Moving a group', () => {
-    it('show parent group in the RHS when moving a group succeeds', async () => {
+    it.skip('show parent group in the RHS when moving a group succeeds', async () => {
       const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
         ...groupDetailDefaultProps,
         mocks: [
@@ -501,7 +501,7 @@ describe('OutcomeManagementPanel', () => {
     })
   })
 
-  it('shows move group modal if move option from group menu is selected', async () => {
+  it.skip('shows move group modal if move option from group menu is selected', async () => {
     const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
     })
@@ -514,7 +514,7 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Where would you like to move this group?')).toBeInTheDocument()
   })
 
-  it('shows edit group modal if edit option from group menu is selected', async () => {
+  it.skip('shows edit group modal if edit option from group menu is selected', async () => {
     const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
     })
