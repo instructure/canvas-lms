@@ -34,7 +34,7 @@ import {
   UPDATE_DISCUSSION_ENTRY
 } from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
-import theme from '@instructure/canvas-theme'
+import {View} from '@instructure/ui-view'
 
 export const IsolatedThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -89,26 +89,19 @@ export const IsolatedThreadsContainer = props => {
   }
 
   return (
-    <div
-      style={{
-        marginLeft: '4.25rem',
-        paddingRight: theme.variables.spacing.small,
-        paddingBottom: theme.variables.spacing.xLarge
-      }}
+    <View
+      display="inline-block"
+      margin="0 0 0 xx-large"
+      padding="0 small x-large small"
       data-testid="isolated-view-children"
     >
       {props.hasMoreOlderReplies && (
-        <div
-          style={{
-            marginBottom: theme.variables.spacing.medium,
-            paddingLeft: theme.variables.spacing.medium
-          }}
-        >
+        <View margin="0 0 medium 0" padding="0 0 0 medium">
           <ShowMoreRepliesButton
             onClick={props.showOlderReplies}
             buttonText={I18n.t('Show older replies')}
           />
-        </div>
+        </View>
       )}
       {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
         <IsolatedThreadContainer
@@ -125,16 +118,15 @@ export const IsolatedThreadsContainer = props => {
           isHighlighted={entry.id === props.highlightEntryId}
         />
       ))}
-      {false && (
-        <div
-          style={{
-            marginBottom: `1.5rem`
-          }}
-        >
-          <ShowMoreRepliesButton onClick={() => {}} buttonText={I18n.t('Show newer replies')} />
-        </div>
+      {props.hasMoreNewerReplies && (
+        <View margin="0 0 medium 0" padding="0 0 0 medium">
+          <ShowMoreRepliesButton
+            onClick={props.showNewerReplies}
+            buttonText={I18n.t('Show newer replies')}
+          />
+        </View>
       )}
-    </div>
+    </View>
   )
 }
 
@@ -146,10 +138,12 @@ IsolatedThreadsContainer.propTypes = {
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   showOlderReplies: PropTypes.func,
+  showNewerReplies: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  hasMoreOlderReplies: PropTypes.bool
+  hasMoreOlderReplies: PropTypes.bool,
+  hasMoreNewerReplies: PropTypes.bool
 }
 
 export default IsolatedThreadsContainer
@@ -201,11 +195,11 @@ const IsolatedThreadContainer = props => {
     }
   })
 
-  const onUpdate = newMesssage => {
+  const onUpdate = newMessage => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: entry._id,
-        message: newMesssage
+        message: newMessage
       }
     })
   }

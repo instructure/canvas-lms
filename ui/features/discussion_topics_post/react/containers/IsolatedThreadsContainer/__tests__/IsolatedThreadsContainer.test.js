@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
@@ -111,6 +111,24 @@ describe('IsolatedThreadsContainer', () => {
     props.discussionTopic.entriesTotalPages = 1
     const {queryByTestId} = setup(props)
     expect(queryByTestId('pagination')).toBeNull()
+  })
+
+  describe('show more replies buttons', () => {
+    it('clicking show older replies button calls showOlderReplies()', async () => {
+      const showOlderReplies = jest.fn()
+      const container = setup(defaultProps({hasMoreOlderReplies: true, showOlderReplies}))
+      const showOlderRepliesButton = await container.findByTestId('show-more-replies-button')
+      fireEvent.click(showOlderRepliesButton)
+      await waitFor(() => expect(showOlderReplies).toHaveBeenCalled())
+    })
+
+    it('clicking show newer replies button calls showNewerReplies()', async () => {
+      const showNewerReplies = jest.fn()
+      const container = setup(defaultProps({hasMoreNewerReplies: true, showNewerReplies}))
+      const showNewerRepliesButton = await container.findByTestId('show-more-replies-button')
+      fireEvent.click(showNewerRepliesButton)
+      await waitFor(() => expect(showNewerReplies).toHaveBeenCalled())
+    })
   })
 
   describe('thread actions menu', () => {

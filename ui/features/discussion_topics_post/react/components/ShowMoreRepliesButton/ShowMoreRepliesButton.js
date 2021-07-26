@@ -39,6 +39,9 @@ ShowMoreRepliesButton.propTypes = {
    * Behavior for showing more replies.
    */
   onClick: PropTypes.func,
+  /**
+   * Text to be displayed on the button.
+   */
   buttonText: PropTypes.string.isRequired
 }
 

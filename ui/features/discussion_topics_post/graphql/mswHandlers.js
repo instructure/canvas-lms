@@ -97,8 +97,8 @@ export const handlers = [
             discussionSubentriesConnection: {
               nodes: [
                 DiscussionEntry.mock({
-                  _id: '50',
-                  id: '50',
+                  _id: '51',
+                  id: '51',
                   message: '<p>This is the search result child reply</p>'
                 })
               ],

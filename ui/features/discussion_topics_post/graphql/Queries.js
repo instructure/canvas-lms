@@ -95,6 +95,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
     $relativeEntryId: ID
     $includeRelativeEntry: Boolean
+    $beforeRelativeEntry: Boolean
   ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
@@ -115,6 +116,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
           sortOrder: $sort
           relativeEntryId: $relativeEntryId
           includeRelativeEntry: $includeRelativeEntry
+          beforeRelativeEntry: $beforeRelativeEntry
         ) {
           nodes {
             ...DiscussionEntry
