@@ -16,35 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import React from 'react'
 import {PostMessage} from '../PostMessage'
+import React from 'react'
+import {render} from '@testing-library/react'
 import {SearchContext} from '../../../utils/constants'
+import {User} from '../../../../graphql/User'
 
-const setup = props => {
-  if (props?.searchTerm) {
-    return render(
-      <SearchContext.Provider value={{searchTerm: props.searchTerm}}>
-        <PostMessage
-          hasAuthor
-          authorName="Foo Bar"
-          timingDisplay="Jan 1 2000"
-          message="Posts are fun"
-          title="Thoughts"
-          {...props}
-        />
-      </SearchContext.Provider>
-    )
-  }
+const setup = (props, {searchTerm = ''} = {}) => {
   return render(
-    <PostMessage
-      hasAuthor
-      authorName="Foo Bar"
-      timingDisplay="Jan 1 2000"
-      message="Posts are fun"
-      title="Thoughts"
-      {...props}
-    />
+    <SearchContext.Provider value={{searchTerm}}>
+      <PostMessage
+        author={User.mock()}
+        timingDisplay="Jan 1 2000"
+        message="Posts are fun"
+        title="Thoughts"
+        {...props}
+      />
+    </SearchContext.Provider>
   )
 }
 
@@ -75,7 +63,7 @@ describe('PostMessage', () => {
   })
 
   it('Should not display author name and avatar when author is null', () => {
-    const {queryByTestId} = setup({hasAuthor: false})
+    const {queryByTestId} = setup({author: null})
 
     expect(queryByTestId('author_name')).toBeNull()
     expect(queryByTestId('author_avatar')).toBeNull()
@@ -92,7 +80,7 @@ describe('PostMessage', () => {
     it('displays when isUnread is true', () => {
       const {queryByText, rerender} = setup()
       expect(queryByText('Unread post')).toBeFalsy()
-      rerender(<PostMessage authorName="foo" timingDisplay="foo" message="foo" isUnread />)
+      rerender(<PostMessage timingDisplay="foo" message="foo" isUnread />)
       expect(queryByText('Unread post')).toBeTruthy()
     })
   })
@@ -104,28 +92,28 @@ describe('PostMessage', () => {
     })
 
     it('should highlight search terms in message', () => {
-      const {queryAllByTestId} = setup({searchTerm: 'Posts'})
+      const {queryAllByTestId} = setup({}, {searchTerm: 'Posts'})
       expect(queryAllByTestId('highlighted-search-item').length).toBe(1)
     })
 
     it('should highlight terms in author name', () => {
-      const {queryAllByTestId} = setup({searchTerm: 'Foo'})
+      const {queryAllByTestId} = setup({}, {searchTerm: 'Hank'})
       expect(queryAllByTestId('highlighted-search-item').length).toBe(1)
     })
 
     it('should highlight multiple terms in postmessage', () => {
-      const {queryAllByTestId} = setup({
-        searchTerm: 'here',
-        message: 'a longer message with multiple highlights here and here'
-      })
+      const {queryAllByTestId} = setup(
+        {message: 'a longer message with multiple highlights here and here'},
+        {searchTerm: 'here'}
+      )
       expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
     })
 
     it('highlighting should be case-insensitive', () => {
-      const {queryAllByTestId} = setup({
-        searchTerm: 'here',
-        message: 'a longer message with multiple highlights Here and here'
-      })
+      const {queryAllByTestId} = setup(
+        {message: 'a longer message with multiple highlights Here and here'},
+        {searchTerm: 'here'}
+      )
       expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
     })
   })
@@ -133,7 +121,7 @@ describe('PostMessage', () => {
   describe('post header', () => {
     it('renders the correct post info', () => {
       const {queryByText, queryByTestId} = setup({
-        authorName: 'Author Name',
+        author: User.mock({displayName: 'Author Name'}),
         timingDisplay: 'Timing Display',
         lastReplyAtDisplayText: 'Apr 12 2:35pm'
       })
@@ -149,7 +137,7 @@ describe('PostMessage', () => {
       const {getByText, queryByText, queryByTestId} = setup({
         timingDisplay: 'create time',
         editedTimingDisplay: 'edit time',
-        editorName: 'Edi Tor'
+        editor: User.mock({displayName: 'Edi Tor', _id: '1337'})
       })
       expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
       expect(queryByTestId('created-tooltip')).toBeFalsy()
@@ -161,7 +149,7 @@ describe('PostMessage', () => {
         timingDisplay: 'create time',
         showCreatedAsTooltip: true,
         editedTimingDisplay: 'edit time',
-        editorName: 'Edi Tor'
+        editor: User.mock({displayName: 'Edi Tor', _id: '1337'})
       })
       expect(getByText('Edited by Edi Tor edit time')).toBeTruthy()
       expect(getByTestId('created-tooltip')).toBeTruthy()

@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
+import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
+import {SearchContext} from '../../utils/constants'
+import {SearchSpan} from '../SearchSpan/SearchSpan'
+import {User} from '../../../graphql/User'
 
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
@@ -26,11 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
-import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {Heading} from '@instructure/ui-heading'
-import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
-import {SearchContext} from '../../utils/constants'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {InlineList} from '@instructure/ui-list'
 
@@ -38,15 +39,17 @@ export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
 
   let editText = null
-  if (props.editedTimingDisplay) {
-    editText = props.editorName
-      ? I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
-          editorName: props.editorName,
-          editedTimingDisplay: props.editedTimingDisplay
-        })
-      : I18n.t('Edited %{editedTimingDisplay}', {
-          editedTimingDisplay: props.editedTimingDisplay
-        })
+  if (props.editedTimingDisplay && props.editedTimingDisplay !== props.timingDisplay) {
+    if (props.editor && props.editor?._id !== props.author?._id) {
+      editText = I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
+        editorName: props.editor.displayName,
+        editedTimingDisplay: props.editedTimingDisplay
+      })
+    } else {
+      editText = I18n.t('Edited %{editedTimingDisplay}', {
+        editedTimingDisplay: props.editedTimingDisplay
+      })
+    }
   }
 
   const createdTooltip = I18n.t('Created %{timingDisplay}', {
@@ -76,10 +79,10 @@ export function PostMessage({...props}) {
             />
           </div>
         )}
-        {props.hasAuthor && (
+        {props.author && (
           <Avatar
-            name={props.authorName}
-            src={props.avatarUrl}
+            name={props.author.displayName}
+            src={props.author.avatarUrl}
             margin="0 0 0 0"
             data-testid="author_avatar"
           />
@@ -97,18 +100,18 @@ export function PostMessage({...props}) {
                     shouldShrink
                     padding="xx-small none xx-small none"
                   >
-                    {props.hasAuthor && (
+                    {props.author && (
                       <View padding="none small none small">
                         <Text weight="bold" data-testid="author_name">
                           <SearchSpan
                             isIsolatedView={props.isIsolatedView}
                             searchTerm={searchTerm}
-                            text={props.authorName}
+                            text={props.author.displayName}
                           />
                         </Text>
                       </View>
                     )}
-                    {props.discussionRoles?.length > 0 && (
+                    {props.author && props.discussionRoles?.length > 0 && (
                       <RolePillContainer
                         discussionRoles={props.discussionRoles}
                         data-testid="pill-container"
@@ -165,17 +168,14 @@ export function PostMessage({...props}) {
               )}
             </Flex>
           </Flex.Item>
-          <Flex.Item padding={props.hasAuthor ? 'small' : '0 small small small'} overflowY="hidden">
+          <Flex.Item padding={props.author ? 'small' : '0 small small small'} overflowY="hidden">
             <>
               {props.title && (
                 <>
                   <Heading level="h1">
                     <ScreenReaderContent>Discussion Topic: {props.title}</ScreenReaderContent>
                   </Heading>
-                  <View
-                    as="div"
-                    margin={props.hasAuthor ? 'medium none medium none' : '0 0 medium 0'}
-                  >
+                  <View as="div" margin={props.author ? 'medium none medium none' : '0 0 medium 0'}>
                     <Text size="x-large">{props.title}</Text>
                   </View>
                 </>
@@ -211,21 +211,13 @@ export function PostMessage({...props}) {
 
 PostMessage.propTypes = {
   /**
-   * Boolean to define if the PostMessage has an author or not.
+   * Object containing the author information
    */
-  hasAuthor: PropTypes.bool,
+  author: User.shape,
   /**
-   * Display name for the author of the message
+   * Object container the editor information
    */
-  authorName: PropTypes.string.isRequired,
-  /**
-   * Source url for the user's avatar
-   */
-  avatarUrl: PropTypes.string,
-  /**
-   * Name of person who last edited
-   */
-  editorName: PropTypes.string,
+  editor: User.shape,
   /**
    * Children to be directly rendered below the PostMessage
    */
@@ -286,7 +278,6 @@ PostMessage.propTypes = {
 }
 
 PostMessage.defaultProps = {
-  hasAuthor: true,
   isIsolatedView: false
 }
 

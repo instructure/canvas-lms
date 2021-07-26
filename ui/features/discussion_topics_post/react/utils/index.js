@@ -17,7 +17,6 @@
  */
 
 import {Discussion} from '../../graphql/Discussion'
-import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {ISOLATED_VIEW_INITIAL_PAGE_SIZE} from './constants'
 import I18n from 'i18n!discussion_topics_post'
@@ -96,7 +95,7 @@ export const addReplyToDiscussionEntry = (cache, perPage, newDiscussionEntry, co
 }
 
 export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
-  if (isAuthor) {
+  if (isAuthor && discussionRoles) {
     return discussionRoles.concat('Author')
   }
   return discussionRoles

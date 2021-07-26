@@ -30,15 +30,9 @@ export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
   const {searchTerm, filter} = useContext(SearchContext)
 
-  const authorId = props.discussionEntry?.author?._id
-  const editorId = props.discussionEntry?.editor?._id
-  const editorName = props.discussionEntry?.editor?.displayName
-  const editedTimingDisplay = DateHelper.formatDatetimeForDiscussions(
-    props.discussionEntry.updatedAt
-  )
-
   const wasEdited =
-    !!editorId && props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
+    !!props.discussionEntry?.editor?._id &&
+    props.discussionEntry.createdAt !== props.discussionEntry.updatedAt
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
@@ -55,10 +49,11 @@ export const PostMessageContainer = props => {
     return (
       <Flex padding={props.padding}>
         <PostMessage
-          authorName={props.discussionEntry.author.displayName}
-          editorName={wasEdited && editorId !== authorId ? editorName : null}
-          editedTimingDisplay={wasEdited ? editedTimingDisplay : null}
-          avatarUrl={props.discussionEntry.author.avatarUrl}
+          author={props.discussionEntry.author}
+          editor={props.discussionEntry.editor}
+          editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
+            props.discussionEntry.updatedAt
+          )}
           isIsolatedView={props.isIsolatedView}
           lastReplyAtDisplayText={DateHelper.formatDatetimeForDiscussions(
             props.discussionEntry.lastReply?.createdAt

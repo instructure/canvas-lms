@@ -72,7 +72,7 @@ describe('PostMessageContainer', () => {
         editor: null
       })
     )
-    expect(container.queryByText(/Edited/)).toBeNull()
+    expect(container.queryByText(/Edited by/)).toBeNull()
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
