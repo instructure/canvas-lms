@@ -168,6 +168,14 @@ module MicrosoftSync
             raise_error(described_class::InternalError, /A job is waiting to be retried/)
         end
       end
+
+      context 'when canceled in an IRB session' do
+        it "doesn't leave state as pending" do
+          expect(steps_object).to receive(:step_initial).and_raise(IRB::Abort)
+          expect { subject.run_synchronously }.to raise_error(IRB::Abort)
+          expect(state_record.reload.workflow_state).to eq('errored')
+        end
+      end
     end
 
     describe '#run_later' do
