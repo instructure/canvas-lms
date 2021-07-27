@@ -45,6 +45,7 @@ const TrayTextArea = ({onAdd, isAdding}) => {
         placeholder={I18n.t('Write something...')}
         label={I18n.t('Add comment to library')}
         resize="vertical"
+        data-testid="comment-library-text-area"
       />
       <View as="div" textAlign="end" padding="small 0 small small">
         <Button
@@ -52,6 +53,7 @@ const TrayTextArea = ({onAdd, isAdding}) => {
           onClick={() => onAdd(text)}
           interaction={text.length > 0 && !isAdding ? 'enabled' : 'disabled'}
           renderIcon={isAdding ? '' : IconAddLine}
+          data-testid="add-to-library-button"
         >
           {isAdding ? I18n.t('Adding to Library') : I18n.t('Add to Library')}
         </Button>

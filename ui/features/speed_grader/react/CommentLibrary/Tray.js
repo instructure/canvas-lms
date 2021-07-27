@@ -73,6 +73,7 @@ const Tray = ({
                   withBackground={false}
                   elementRef={el => (closeButtonRef.current = el)}
                   onClick={() => setIsOpen(false)}
+                  data-testid="close-comment-library-button"
                 />
               </div>
               <View display="inline-block" margin="0 auto">
@@ -94,7 +95,10 @@ const Tray = ({
                   </Text>
                 </View>
               </PresentationContent>
-              <div style={{display: 'inline-block', float: 'right'}}>
+              <div
+                style={{display: 'inline-block', float: 'right'}}
+                data-testid="comment-suggestions-when-typing"
+              >
                 <Checkbox
                   label={
                     <ScreenReaderContent>
@@ -110,7 +114,7 @@ const Tray = ({
               </div>
             </View>
           </Flex.Item>
-          <Flex.Item size="65vh" shouldGrow>
+          <Flex.Item size="65vh" shouldGrow data-testid="library-comment-area">
             {comments.map((commentItem, index) => {
               const shouldFocus =
                 removedItemIndex !== null && index === Math.max(removedItemIndex - 1, 0)

@@ -56,6 +56,7 @@ const CommentEditView = ({comment, id, updateComment, onClose}) => {
         placeholder={I18n.t('Write something...')}
         label={<ScreenReaderContent>{I18n.t('Edit comment')}</ScreenReaderContent>}
         resize="vertical"
+        data-testid="comment-library-edit-text-area"
       />
       <Flex justifyItems="end">
         <Flex.Item margin="xxx-small 0 0 xxx-small">
@@ -69,6 +70,7 @@ const CommentEditView = ({comment, id, updateComment, onClose}) => {
             color="primary"
             onClick={handleSave}
             interaction={allowSave ? 'enabled' : 'disabled'}
+            data-testid="comment-library-edit-save-button"
           >
             {I18n.t('Save')}
           </Button>

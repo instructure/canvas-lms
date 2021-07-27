@@ -93,6 +93,7 @@ const Suggestions = ({
                     selected={false}
                     key={result._id}
                     onSelect={_e => setComment(result.comment)}
+                    data-testid="comment-suggestion"
                   >
                     <TruncateText as="span" maxLines={3}>
                       {result.comment}
