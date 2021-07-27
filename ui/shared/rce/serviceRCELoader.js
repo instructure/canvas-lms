@@ -209,7 +209,7 @@ const RCELoader = {
       languages,
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       ltiTools: window.INST?.editorButtons,
-      autosave,
+      autosave: tinyMCEInitOptions.autosave || autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
       use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor,

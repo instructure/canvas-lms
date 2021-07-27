@@ -937,7 +937,10 @@ $(function() {
   setTimeout(function() {
     $('.question_holder textarea.question_input').each(function() {
       $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++)
-      RichContentEditor.loadNewEditor($(this), {manageParent: true})
+      RichContentEditor.loadNewEditor($(this), {
+        manageParent: true,
+        autosave: {enabled: false}
+      })
     })
   }, 2000)
 
