@@ -130,12 +130,25 @@ describe AssignmentsHelper do
       allow(self).to receive(:can_do).and_return true
     end
 
+    let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
+
+    it "returns a hidden button when passed true for hidden" do
+      button = assignment_submission_button(@assignment, @student, submission, true)
+      hidden_regex = /display: none/
+      expect(hidden_regex.match?(button)).to be true
+    end
+
+    it "returns a visible button when passed false for hidden" do
+      button = assignment_submission_button(@assignment, @student, submission, false)
+      hidden_regex = /display: none/
+      expect(hidden_regex.match?(button)).to be false
+    end
+
     context "the submission has 0 attempts left" do
       it "returns a disabled button" do
         @assignment.update_attribute(:allowed_attempts, 2)
-        submission = @assignment.submissions.find_by!(user_id: @student)
         submission.update_attribute(:attempt, 2)
-        button = assignment_submission_button(@assignment, @student, submission)
+        button = assignment_submission_button(@assignment, @student, submission, false)
         expect(button["disabled"]).to eq("disabled")
       end
     end
@@ -143,9 +156,8 @@ describe AssignmentsHelper do
     context "the submission has > 0 attempts left" do
       it "returns an enabled button" do
         @assignment.update_attribute(:allowed_attempts, 2)
-        submission = @assignment.submissions.find_by!(user_id: @student)
         submission.update_attribute(:attempt, 1)
-        button = assignment_submission_button(@assignment, @student, submission)
+        button = assignment_submission_button(@assignment, @student, submission, false)
         expect(button["disabled"]).to be_nil
       end
     end
@@ -155,7 +167,7 @@ describe AssignmentsHelper do
         @assignment.update_attribute(:allowed_attempts, -1)
         submission = @assignment.submissions.find_by!(user_id: @student)
         submission.update_attribute(:attempt, 3)
-        button = assignment_submission_button(@assignment, @student, submission)
+        button = assignment_submission_button(@assignment, @student, submission, false)
         expect(button["disabled"]).to be_nil
       end
     end
