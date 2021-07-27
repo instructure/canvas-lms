@@ -180,4 +180,6 @@ describe "teacher k5 dashboard important dates" do
 
   # Shared examples for Important Dates on K5 Dashboard
   it_behaves_like 'k5 important dates'
+
+  it_behaves_like 'k5 important dates calendar picker', :teacher
 end
