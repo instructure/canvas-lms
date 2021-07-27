@@ -1339,11 +1339,18 @@ rubricEditing.init = function() {
       ) {
         skipPointsUpdate = true
       } else if (data['rubric_association[use_for_grading]'] == '1') {
-        const assignmentPoints = numberHelper.parse(
+        let assignmentPoints = numberHelper.parse(
           $(
             '#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible'
           ).text()
         )
+        if (Number.isNaN(assignmentPoints)) {
+          // For N.Q assignments, we show the rubric from the assignment edit screen instead of
+          // the show screen used for other assignments.
+          assignmentPoints = numberHelper.parse(
+            $('#edit_assignment_header input[id="assignment_points_possible"]').val()
+          )
+        }
         const rubricPoints = parseFloat(data.points_possible)
         if (
           assignmentPoints != null &&
