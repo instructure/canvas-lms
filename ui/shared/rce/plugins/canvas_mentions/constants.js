@@ -18,6 +18,8 @@
 
 export const MARKER_ID = 'mentions-marker'
 export const MARKER_SELECTOR = `span#${MARKER_ID}`
+export const MENTION_MENU_ID = 'mention-menu'
+export const MENTION_MENU_SELECTOR = 'span#mention-menu'
 export const TRUSTED_MESSAGE_ORIGIN = ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
 
 export const NAVIGATION_MESSAGE = 'mentions.NavigationEvent'

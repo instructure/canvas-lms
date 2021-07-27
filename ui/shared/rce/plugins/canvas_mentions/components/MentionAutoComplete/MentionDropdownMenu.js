@@ -47,7 +47,8 @@ const MentionDropdownMenu = ({
       {
         name: 'flip',
         options: {
-          flipVariations: false
+          flipVariations: false,
+          fallbackPlacements: ['bottom', 'bottom-end', 'bottom-start']
         }
       }
     ]
@@ -135,5 +136,9 @@ MentionDropdownMenu.proptypes = {
   /**
    * Callback for selecting an item
    */
-  onSelect: PropTypes.func
+  onSelect: PropTypes.func,
+  /**
+   * ID of selected user
+   */
+  selectedUser: PropTypes.string
 }

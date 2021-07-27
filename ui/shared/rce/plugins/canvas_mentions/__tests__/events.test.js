@@ -85,6 +85,9 @@ describe('events', () => {
       })
 
       it('mounts the dropdown component', () => {
+        jest.spyOn(document, 'querySelector').mockImplementation(() => {
+          return false
+        })
         subject()
         expect(ReactDOM.render).toHaveBeenCalled()
       })

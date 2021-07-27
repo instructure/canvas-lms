@@ -18,7 +18,14 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import {makeBodyEditable} from './contentEditable'
-import {MARKER_SELECTOR, MARKER_ID, KEY_CODES} from './constants'
+
+import {
+  MARKER_SELECTOR,
+  MARKER_ID,
+  MENTION_MENU_ID,
+  MENTION_MENU_SELECTOR,
+  KEY_CODES
+} from './constants'
 import MentionDropdown from './components/MentionAutoComplete/MentionDropdown'
 import broadcastMessage, {
   inputChangeMessage,
@@ -86,9 +93,12 @@ export const onSetContent = e => {
   // If content being set is the marker, load the menu
   // react component
   if (e.content.includes(MARKER_ID)) {
-    const elm = document.createElement('div')
-    document.body.appendChild(elm)
-    ReactDom.render(<MentionDropdown rceRef={editor.getBody()} />, elm)
+    if (!document.querySelector(MENTION_MENU_SELECTOR)) {
+      const elm = document.createElement('span')
+      elm.id = MENTION_MENU_ID
+      document.body.appendChild(elm)
+      ReactDom.render(<MentionDropdown rceRef={editor.getBody()} />, elm)
+    }
   }
 }
 
