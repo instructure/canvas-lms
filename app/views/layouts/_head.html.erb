@@ -21,6 +21,9 @@
   <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <% if Setting.get('disable_lato_extended', false) == 'false' %>
+    <link rel="preload" href="<%=font_url_for("/fonts/lato/extended/Lato-Regular.woff2")%>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<%=font_url_for("/fonts/lato/extended/Lato-Bold.woff2")%>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<%=font_url_for("/fonts/lato/extended/Lato-Italic.woff2")%>" as="font" type="font/woff2" crossorigin>
     <%= stylesheet_link_tag(css_url_for('lato_extended')) %>
   <% else %>
     <%= stylesheet_link_tag(css_url_for('lato')) %>

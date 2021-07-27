@@ -336,6 +336,7 @@
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently --raw \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
+    "build:css:compressed": "SASS_STYLE=compressed brandable_css",
     "build:css:watch": "brandable_css --watch",
     "build:js": "yarn run webpack-development",
     "build:js:watch": "yarn run webpack",

@@ -237,7 +237,7 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
-    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users
+    :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

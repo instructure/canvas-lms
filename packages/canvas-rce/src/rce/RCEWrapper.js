@@ -270,6 +270,8 @@ class RCEWrapper extends React.Component {
     plugins: PropTypes.arrayOf(PropTypes.string),
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
+    maxInitRenderedRCEs: PropTypes.number,
+    // feature flag related props
     use_rce_pretty_html_editor: PropTypes.bool,
     use_rce_buttons_and_icons: PropTypes.bool,
     use_rce_a11y_checker_notifications: PropTypes.bool
@@ -280,7 +282,8 @@ class RCEWrapper extends React.Component {
     languages: [{id: 'en', label: 'English'}],
     autosave: {enabled: false},
     highContrastCSS: [],
-    ltiTools: []
+    ltiTools: [],
+    maxInitRenderedRCEs: -1
   }
 
   static skinCssInjected = false
@@ -300,6 +303,7 @@ class RCEWrapper extends React.Component {
     this.indicator = false
 
     this._elementRef = React.createRef()
+    this._editorPlaceholderRef = React.createRef()
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
 
@@ -309,6 +313,11 @@ class RCEWrapper extends React.Component {
     if (!Number.isNaN(ht)) {
       ht = `${ht}px`
     }
+
+    const currentRCECount = document.querySelectorAll('.rce-wrapper').length
+    const maxInitRenderedRCEs = Number.isNaN(props.maxInitRenderedRCEs)
+      ? RCEWrapper.defaultProps.maxInitRenderedRCEs
+      : props.maxInitRenderedRCEs
 
     this.state = {
       path: [],
@@ -325,8 +334,13 @@ class RCEWrapper extends React.Component {
         headerDisp: 'static',
         isTinyFullscreen: false
       },
-      a11yErrorsCount: 0
+      a11yErrorsCount: 0,
+      shouldShowEditor:
+        typeof IntersectionObserver === 'undefined' ||
+        maxInitRenderedRCEs <= 0 ||
+        currentRCECount < maxInitRenderedRCEs
     }
+    this.pendingEventHandlers = []
 
     // Get top 2 favorited LTI Tools
     this.ltiToolFavorites =
@@ -603,6 +617,15 @@ class RCEWrapper extends React.Component {
   existingContentToLinkIsImg() {
     const editor = this.mceInstance()
     return contentInsertion.existingContentToLinkIsImg(editor)
+  }
+
+  // since we may defer rendering tinymce, queue up any tinymce event handlers
+  tinymceOn(tinymceEventName, handler) {
+    if (this.state.shouldShowEditor) {
+      this.mceInstance().on(tinymceEventName, handler)
+    } else {
+      this.pendingEventHandlers.push({name: tinymceEventName, handler})
+    }
   }
 
   mceInstance() {
@@ -1334,12 +1357,15 @@ class RCEWrapper extends React.Component {
   }
 
   componentWillUnmount() {
-    window.clearTimeout(this.blurTimer)
-    if (!this._destroyCalled) {
-      this.destroy()
+    if (this.state.shouldShowEditor) {
+      window.clearTimeout(this.blurTimer)
+      if (!this._destroyCalled) {
+        this.destroy()
+      }
+      this._elementRef.current.removeEventListener('keydown', this.handleKey, true)
+      this.mutationObserver?.disconnect()
+      this.intersectionObserver?.disconnect()
     }
-    this._elementRef.current.removeEventListener('keydown', this.handleKey, true)
-    this.observer?.disconnect()
   }
 
   wrapOptions(options = {}) {
@@ -1555,6 +1581,46 @@ class RCEWrapper extends React.Component {
   }
 
   componentDidMount() {
+    if (this.state.shouldShowEditor) {
+      this.editorReallyDidMount()
+    } else {
+      this.intersectionObserver = new IntersectionObserver(
+        entries => {
+          const entry = entries[0]
+          if (entry.isIntersecting || entry.intersectionRatio > 0) {
+            this.setState({shouldShowEditor: true})
+          }
+        },
+        // initialize the RCE when it gets close to entering the viewport
+        {root: null, rootMargin: '200px 0px', threshold: 0.0}
+      )
+      this.intersectionObserver.observe(this._editorPlaceholderRef.current)
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.shouldShowEditor) {
+      if (!prevState.shouldShowEditor) {
+        this.editorReallyDidMount()
+        this.intersectionObserver?.disconnect()
+      } else {
+        this.registerTextareaChange()
+        if (prevState.editorView !== this.state.editorView) {
+          this.setEditorView(this.state.editorView)
+          this.focusCurrentView()
+        }
+        if (prevProps.readOnly !== this.props.readOnly) {
+          this.mceInstance().mode.set(this.props.readOnly ? 'readonly' : 'design')
+        }
+      }
+    }
+  }
+
+  editorReallyDidMount() {
+    const myTiny = this.mceInstance()
+    this.pendingEventHandlers.forEach(e => {
+      myTiny.on(e.name, e.handler)
+    })
     this.registerTextareaChange()
     this._elementRef.current.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
@@ -1574,27 +1640,16 @@ class RCEWrapper extends React.Component {
     // my portal will be the last one in the doc because tinyumce appends them
     const tinymce_floating_toolbar_portal = portals[portals.length - 1]
     if (tinymce_floating_toolbar_portal) {
-      this.observer = new MutationObserver((mutationList, _observer) => {
+      this.mutationObserver = new MutationObserver((mutationList, _observer) => {
         mutationList.forEach(mutation => {
           if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
             this.handleFocusEditor(new Event('focus', {target: mutation.target}))
           }
         })
       })
-      this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
+      this.mutationObserver.observe(tinymce_floating_toolbar_portal, {childList: true})
     }
     bridge.renderEditor(this)
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    this.registerTextareaChange()
-    if (prevState.editorView !== this.state.editorView) {
-      this.setEditorView(this.state.editorView)
-      this.focusCurrentView()
-    }
-    if (prevProps.readOnly !== this.props.readOnly) {
-      this.mceInstance().mode.set(this.props.readOnly ? 'readonly' : 'design')
-    }
   }
 
   setEditorView(view) {
@@ -1682,6 +1737,18 @@ class RCEWrapper extends React.Component {
   render() {
     const {trayProps, ...mceProps} = this.props
 
+    if (!this.state.shouldShowEditor) {
+      return (
+        <div
+          ref={this._editorPlaceholderRef}
+          style={{
+            width: `${this.props.editorOptions.width}px`,
+            height: `${this.props.editorOptions.height}px`,
+            border: '1px solid grey'
+          }}
+        />
+      )
+    }
     return (
       <div
         key={this.id}

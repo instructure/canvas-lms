@@ -7,6 +7,7 @@ paths:
   file_checksums: public/dist/brandable_css/brandable_css_file_checksums.json
   output_dir: public/dist/brandable_css
   browsers_yml: config/browsers.yml
+  rev_manifest: public/dist/rev-manifest.json
 
 indices:
   handlebars:
