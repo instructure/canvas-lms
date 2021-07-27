@@ -82,7 +82,7 @@ export const DiscussionEdit = props => {
               plugins: getPlugins()
             }}
             height={300}
-            defaultContent={props.value}
+            defaultContent={props.replyPreview + props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
           />
         </span>
@@ -125,12 +125,15 @@ DiscussionEdit.propTypes = {
   value: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  isEdit: PropTypes.bool
+  isEdit: PropTypes.bool,
+  replyPreview: PropTypes.string
 }
 
 DiscussionEdit.defaultProps = {
   show: true,
-  isEdit: false
+  isEdit: false,
+  replyPreview: '',
+  value: ''
 }
 
 export default DiscussionEdit

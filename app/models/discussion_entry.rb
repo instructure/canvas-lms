@@ -195,6 +195,17 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def quoted_reply_html
+    "<div class=\"reply_preview\" data-discussion-reply-preview=\"1\">
+      <blockquote cite=\"#\">
+        <span>
+          <strong>#{user.short_name}</strong> #{created_at.iso8601}
+        </span>
+        #{message}
+      </blockquote>
+    </div>"
+  end
+
   def plaintext_message=(val)
     self.message = format_message(val).first
   end

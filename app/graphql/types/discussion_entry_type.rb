@@ -38,7 +38,26 @@ module Types
 
     field :message, String, null: true
     def message
-      object.deleted? ? nil : object.message
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry).then do |parent|
+          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
+            parent.quoted_reply_html + object.message
+          end
+        end
+      else
+        object.message
+      end
+    end
+
+    field :reply_preview, String, null:true
+    def reply_preview
+      if Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:user).then do
+          object.quoted_reply_html
+        end
+      end
     end
 
     field :read, Boolean, null: false

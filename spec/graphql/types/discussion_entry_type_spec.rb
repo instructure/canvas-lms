@@ -57,6 +57,11 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve("discussionTopic { _id }")).to eq discussion_entry.discussion_topic.id.to_s
   end
 
+  it 'returns the quoted reply html for reply preview' do
+    Account.site_admin.enable_feature!(:isolated_view)
+    expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
+  end
+
   it 'allows querying for discussion subentries' do
     de = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
 
@@ -164,4 +169,5 @@ describe Types::DiscussionEntryType do
     sub_entry_type = GraphQLTypeTester.new(de, current_user: @teacher)
     expect(sub_entry_type.resolve('rootEntry { _id }')).to eq discussion_entry.id.to_s
   end
+
 end
