@@ -128,6 +128,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when launched as an assignment by a student"
       when 'EDITOR_GUARD'
         "when the tool is launched from the editor_button placement"
+      when 'FILE_UPLOAD_GUARD'
+        "when the tool is used to upload a file as an assignment submission"
       end
 
     end.compact
