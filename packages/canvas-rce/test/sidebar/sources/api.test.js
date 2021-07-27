@@ -284,6 +284,43 @@ describe('sources/api', () => {
       })
     })
 
+    describe('fetchFilesForFolder()', () => {
+      let bookmark, props
+
+      const subject = () => apiSource.fetchFilesForFolder(props, bookmark)
+
+      beforeEach(() => {
+        props = {host: 'canvas.rce', filesUrl: 'https://canvas.rce/api/files/2'}
+        bookmark = undefined
+      })
+
+      afterEach(() => apiSource.apiFetch.reset())
+
+      it('makes a request to the files api with given host and folder ID', () => {
+        subject()
+        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2?', {
+          Authorization: 'Bearer theJWT'
+        })
+      })
+
+      describe('with perPage set', () => {
+        beforeEach(() => {
+          props.perPage = 50
+        })
+
+        it('includes the "per_page" query param', () => {
+          subject()
+          sinon.assert.calledWith(
+            apiSource.apiFetch,
+            'https://canvas.rce/api/files/2?per_page=50',
+            {
+              Authorization: 'Bearer theJWT'
+            }
+          )
+        })
+      })
+    })
+
     describe('with a provided bookmark', () => {
       beforeEach(() => (bookmark = 'https://canvas.rce/api/folders/2?page=2'))
 

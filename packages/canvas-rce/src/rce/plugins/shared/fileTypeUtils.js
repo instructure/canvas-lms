@@ -80,8 +80,10 @@ export function mediaPlayerURLFromFile(file) {
   }
 
   if (isAudioOrVideo(content_type)) {
-    if (file.media_entry_id && file.media_entry_id !== 'maybe') {
-      return `/media_objects_iframe/${file.media_entry_id}?type=${type}`
+    const mediaEntryId = file.media_entry_id || file.embed?.id
+
+    if (mediaEntryId && mediaEntryId !== 'maybe') {
+      return `/media_objects_iframe/${mediaEntryId}?type=${type}`
     }
 
     const parsed_url = parse(file.url || file.href, true)

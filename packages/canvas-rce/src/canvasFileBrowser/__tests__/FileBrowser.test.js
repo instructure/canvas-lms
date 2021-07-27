@@ -17,31 +17,11 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import FileBrowser from '../FileBrowser'
+import {apiSource} from './filesHelpers'
 
 jest.mock('../natcompare', () => ({strings: a => a}))
-
-// TODO: remove mock once files are fetched via RCS
-jest.mock('axios', () => ({get: () => Promise.resolve({ headers: {}, data: []})}))
-
-const folderFor = (context, overrides, bookmark) => ({
-  folders: [
-    {
-      id: 26,
-      parentId: null,
-      name: `${context.type} files`,
-      filesUrl: 'http://rce.canvas.docker/api/files/26',
-      foldersUrl: 'http://rce.canvas.docker/api/folders/26',
-      lockedForUser: false,
-      contextType: context.type,
-      contextId: context.id,
-      canUpload: true,
-      ...overrides
-    }
-  ],
-  bookmark
-})
 
 const defaultProps = overrides => ({
   allowedUpload: true,
@@ -54,19 +34,8 @@ const defaultProps = overrides => ({
     type: 'course',
     id: 1
   },
-  source: {
-    fetchRootFolder: jest.fn().mockImplementation(({contextType}) => {
-      if (contextType === 'course') {
-        return Promise.resolve(folderFor({type: 'course', id: 1}, {id: 26}))
-      } else {
-        return Promise.resolve(folderFor({type: 'user', id: 2}, {id: 277}))
-      }
-    }),
-    fetchSubFolders: jest.fn().mockResolvedValue(),
-    fetchBookmarkedData: jest.fn().mockImplementation(() => {
-      return Promise.resolve(folderFor({type: 'course', id: 1}), {parentId: 26})
-    })
-  },
+  contentTypes: ['**'],
+  source: apiSource(),
   ...overrides
 })
 
@@ -94,10 +63,19 @@ describe('FileBrowser', () => {
       expect(folder).toBeInTheDocument()
     })
 
-    it('fetches root folder data', async () => {
+    it('fetches root user folder data', async () => {
       const {getByText} = subject(props)
       await waitFor(() => getByText('My files'))
       expect(props.source.fetchBookmarkedData).toHaveBeenCalled()
+    })
+
+    it('fetches root user folder files', async () => {
+      const {getByText} = subject(props)
+      const folder = await waitFor(() => getByText('My files'))
+
+      fireEvent.click(folder)
+      const file = await waitFor(() => getByText('its-working-its-working.jpg'))
+      expect(file).toBeInTheDocument()
     })
 
     describe('when "useContextAssets" is true', () => {
@@ -113,6 +91,23 @@ describe('FileBrowser', () => {
         const {getByText} = subject(props)
         const folder = await waitFor(() => getByText('My files'))
         expect(folder).toBeInTheDocument()
+      })
+
+      it('fetches and renders the context root folder', async () => {
+        const {getByText} = subject(props)
+        const folder = await waitFor(() => getByText('Course files'))
+        fireEvent.click(folder)
+        const file = await waitFor(() => getByText('its-working-its-working.jpg'))
+        expect(file).toBeInTheDocument()
+      })
+
+      it('fetches root user folder files', async () => {
+        const {getByText} = subject(props)
+        const folder = await waitFor(() => getByText('My files'))
+
+        fireEvent.click(folder)
+        const file = await waitFor(() => getByText('its-working-its-working.jpg'))
+        expect(file).toBeInTheDocument()
       })
     })
   })
