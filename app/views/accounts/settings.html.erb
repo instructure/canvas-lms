@@ -429,9 +429,15 @@
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
-                    <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
                     <td>
-                      <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/>
+                      <label><%= t("Name:") %>
+                        <input type="text" class="name" value="<%= name %>"/>
+                      </label>
+                    </td>
+                    <td>
+                      <label><%= t("Filter:") %>
+                        <input type="text" class="value" value="<%= filter %>" maxlength="255"/>
+                      </label>
                       <button
                         type="button"
                         class="Button Button--icon-action delete_filter_link"
