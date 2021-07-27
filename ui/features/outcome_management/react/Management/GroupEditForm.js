@@ -53,6 +53,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
               size="medium"
               shouldReturnFocus
               shouldCloseOnDocumentClick={false}
+              data-testid="outcome-management-edit-modal"
             >
               <Modal.Body>
                 <Flex as="div" alignItems="start" padding="small 0" height="7rem">

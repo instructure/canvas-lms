@@ -255,7 +255,8 @@ export const groupDetailMocks = ({
   contextId = '1',
   outcomeIsImported = false,
   searchQuery = '',
-  withMorePage = true
+  withMorePage = true,
+  groupDescription = 'Group Description'
 } = {}) => [
   {
     request: {
@@ -272,7 +273,7 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           title,
-          description: '',
+          description: `${groupDescription} 1`,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -325,7 +326,7 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           title,
-          description: '',
+          description: `${groupDescription} 2`,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -379,7 +380,7 @@ export const groupDetailMocks = ({
         group: {
           _id: groupId,
           title,
-          description: '',
+          description: `${groupDescription} 3`,
           outcomesCount: 0,
           outcomes: {
             pageInfo: {
@@ -432,7 +433,7 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
+          description: `${groupDescription} 4`,
           title,
           outcomesCount: 2,
           outcomes: {
@@ -497,7 +498,7 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
+          description: `${groupDescription} 5`,
           title,
           outcomesCount: 2,
           outcomes: {
@@ -562,7 +563,7 @@ export const groupDetailMocks = ({
       data: {
         group: {
           _id: groupId,
-          description: '',
+          description: `${groupDescription} 6`,
           title,
           outcomesCount: 1,
           outcomes: {

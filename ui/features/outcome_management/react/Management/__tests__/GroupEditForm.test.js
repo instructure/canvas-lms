@@ -46,13 +46,23 @@ describe('GroupEditForm', () => {
     expect(getByLabelText('Group Description')).toBeInTheDocument()
   })
 
-  it('renders form with initial data', () => {
+  it('renders form with initial title', () => {
     const initialValues = {
       title: 'The Group Name',
       description: 'The Group Description'
     }
     const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     expect(getByDisplayValue('The Group Name')).toBeInTheDocument()
+  })
+
+  it('renders form with initial description', () => {
+    const initialValues = {
+      title: 'The Group Name',
+      description: 'The Group Description'
+    }
+
+    const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
+    expect(getByDisplayValue('The Group Description')).toBeInTheDocument()
   })
 
   it('calls onSubmit when submission', () => {

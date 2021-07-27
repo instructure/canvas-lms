@@ -227,6 +227,7 @@ const OutcomeRemoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler}
       shouldReturnFocus
       onDismiss={onCloseHandler}
       shouldCloseOnDocumentClick={false}
+      data-testid="outcome-management-remove-modal"
     >
       <Modal.Body overflow="scroll">
         <View as="div">

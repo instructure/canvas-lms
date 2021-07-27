@@ -62,6 +62,7 @@ describe('OutcomeManagementPanel', () => {
       ...groupMocks({groupId: '200'}),
       ...groupDetailMocks({
         title: 'Course folder 0',
+        description: 'Course folder 0 group description',
         groupId: '200',
         contextType: 'Course',
         contextId: '2',
@@ -403,6 +404,28 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('Remove Outcomes?')).toBeInTheDocument()
     })
+
+    it('outcome names are passed to the remove modal when using bulk remove', async () => {
+      const {getByText, getAllByText, getByRole, getByTestId, getAllByTestId} = render(
+        <OutcomeManagementPanel />,
+        {
+          ...groupDetailDefaultProps
+        }
+      )
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      const itemOneTitle = getAllByTestId('outcome-management-item-title')[0].textContent
+      const itemTwoTitle = getAllByTestId('outcome-management-item-title')[1].textContent
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      fireEvent.click(getByRole('button', {name: /remove/i}))
+      await act(async () => jest.runOnlyPendingTimers())
+      const removeModal = getByTestId('outcome-management-remove-modal')
+      expect(within(removeModal).getByText('Remove Outcomes?')).toBeInTheDocument()
+      expect(within(removeModal).getByText(itemOneTitle)).toBeInTheDocument()
+      expect(within(removeModal).getByText(itemTwoTitle)).toBeInTheDocument()
+    })
   })
 
   describe('Bulk move outcomes', () => {
@@ -535,5 +558,33 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.click(within(getByRole('menu')).getByText('Edit'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Edit Group')).toBeInTheDocument()
+  })
+
+  it('shows selected group title within edit group modal', async () => {
+    const {getByText, getByRole, getByTestId} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    const editModal = getByTestId('outcome-management-edit-modal')
+    expect(within(editModal).getByDisplayValue('Course folder 0')).toBeInTheDocument()
+  })
+
+  it('shows selected group description within edit group modal', async () => {
+    const {getByText, getByRole, getByTestId} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Outcome Group Menu'))
+    fireEvent.click(within(getByRole('menu')).getByText('Edit'))
+    await act(async () => jest.runOnlyPendingTimers())
+    const editModal = getByTestId('outcome-management-edit-modal')
+    expect(within(editModal).getByText('Group Description 4')).toBeInTheDocument()
   })
 })
