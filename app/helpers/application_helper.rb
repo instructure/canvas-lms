@@ -304,6 +304,11 @@ module ApplicationHelper
     File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
+  def font_url_for(nominal_font_href)
+    cache = BrandableCSS.font_path_cache()
+    cache[nominal_font_href] || nominal_font_href
+  end
+
   def brand_variable(variable_name)
     BrandableCSS.brand_variable_value(variable_name, active_brand_config)
   end

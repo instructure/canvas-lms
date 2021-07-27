@@ -168,6 +168,12 @@ RCE.propTypes = {
   // array of lti tools available to the user
   // {id, favorite} are all that's required, ther fields are ignored
   ltiTools: ltiToolsPropType,
+  // if the rce_limit_init_render_on_page flag is on, this
+  // is the maximum number of RCEs that will render on page load.
+  // Any more than this will be deferred until it is nearly
+  // scrolled into view.
+  // if isNaN or <=0, render them all
+  maxInitRenderedRCEs: number,
   // name:value pairs of attributes to add to the textarea
   // tinymce creates as the backing store of the RCE
   mirroredAttrs: objectOf(string),
@@ -201,6 +207,7 @@ RCE.defaultProps = {
   instRecordDisabled: false,
   language: 'en',
   liveRegion: () => document.getElementById('flash_screenreader_holder'),
+  maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
   use_rce_pretty_html_editor: true,
