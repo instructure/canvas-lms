@@ -490,7 +490,7 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
       await act(async () => jest.runAllTimers())
-      expect(getByText('2 "Course folder 0" Outcomes')).toBeInTheDocument()
+      expect(getByText('2 Outcomes')).toBeInTheDocument()
     })
   })
 
