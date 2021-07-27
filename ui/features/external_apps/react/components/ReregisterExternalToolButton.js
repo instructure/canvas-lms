@@ -78,6 +78,7 @@ export default class ReregisterExternalToolButton extends React.Component {
           handleInstall={this.handleReregistration}
           registrationUrl={this.props.tool.reregistration_url}
           reregistration
+          toolName={this.props.tool.name || I18n.t('Tool Content')}
         />
       </Modal.Body>
     </Modal>

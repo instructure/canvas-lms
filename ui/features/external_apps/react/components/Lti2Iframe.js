@@ -26,7 +26,8 @@ export default class Lti2Iframe extends React.Component {
     reregistration: PropTypes.bool,
     registrationUrl: PropTypes.string,
     handleInstall: PropTypes.func.isRequired,
-    hideComponent: PropTypes.bool
+    hideComponent: PropTypes.bool,
+    toolName: PropTypes.string.isRequired
   }
 
   state = {
@@ -120,7 +121,7 @@ export default class Lti2Iframe extends React.Component {
             src={this.getLaunchUrl()}
             name="lti2_registration_frame"
             className="tool_launch"
-            title={I18n.t('Tool Content')}
+            title={this.props.toolName}
             style={this.state.iframeStyle}
             ref={e => {
               this.iframe = e
