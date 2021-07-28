@@ -42,6 +42,7 @@ import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
+import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 
 const NoOutcomesBillboard = () => {
   const {isCourse} = useCanvasContext()
@@ -256,7 +257,7 @@ const OutcomeManagementPanel = () => {
               }}
             >
               <View as="div" padding="x-small none none x-small">
-                {selectedGroupId && (
+                {selectedGroupId ? (
                   <ManageOutcomesView
                     key={selectedGroupId}
                     outcomeGroup={group}
@@ -272,6 +273,8 @@ const OutcomeManagementPanel = () => {
                     scrollContainer={scrollContainer}
                     isRootGroup={collections[selectedGroupId]?.isRootGroup}
                   />
+                ) : (
+                  <ManageOutcomesBillboard />
                 )}
               </View>
             </Flex.Item>
