@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,28 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DynamoConnection < GraphQL::Pagination::Connection
-  def cursor_for(item)
-    encode(item[items.sort_key])
-  end
-
-  def has_next_page
-    !!items.query.last_evaluated_key
-  end
-
-  def has_previous_page
-    false
-  end
-
-  def nodes
-    first ?
-      sliced_nodes.limit(first) :
-      sliced_nodes
-  end
-
-  private
-
-  def sliced_nodes
-    items.after(after ? decode(after) : nil)
+module Types
+  class NotificationPreferencesContextType < Types::BaseEnum
+    graphql_name 'NotificationPreferencesContextType'
+    description 'Context types that can be associated with notification preferences'
+    value 'Course'
+    value 'Account'
   end
 end

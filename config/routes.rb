@@ -2199,7 +2199,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :inst_access_tokens) do
-      post 'inst_access_token', action: :create
+      post 'inst_access_tokens', action: :create
     end
 
     scope(controller: :gradebook_settings) do

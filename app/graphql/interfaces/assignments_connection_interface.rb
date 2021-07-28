@@ -5,7 +5,7 @@ module Interfaces::AssignmentsConnectionInterface
 
   class AssignmentFilterInputType < Types::BaseInputObject
     graphql_name "AssignmentFilter"
-    argument :gradingPeriodId, ID, <<~DESC, required: false
+    argument :grading_period_id, ID, <<~DESC, required: false
       only return assignments for the given grading period. Defaults to
       the current grading period. Pass `null` to return all assignments
       (irrespective of the assignment's grading period)

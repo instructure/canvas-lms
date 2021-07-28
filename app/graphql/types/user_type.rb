@@ -18,13 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPreferencesContextType < Types::BaseEnum
-  graphql_name 'NotificationPreferencesContextType'
-  description 'Context types that can be associated with notification preferences'
-  value 'Course'
-  value 'Account'
-end
-
 module Types
   class UserType < ApplicationObjectType
     #

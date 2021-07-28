@@ -79,7 +79,7 @@ describe Types::LearningOutcomeGroupType do
     root_group = course.root_outcome_group
 
     query = <<~GQL
-      outcomes() {
+      outcomes {
         nodes {
           ... on LearningOutcome {
             isImported(targetContextType: "Course", targetContextId: #{course.id})

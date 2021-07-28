@@ -89,7 +89,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         #{"accountId: #{account_id}" if account_id}
       )" if context_type && (course_id || account_id)}
       notificationPreferences {
-        sendScoresInEmails(courseId: #{course_id})
+        sendScoresInEmails#{"(courseId: #{course_id})" if course_id}
         sendObservedNamesInNotifications
         readPrivacyNoticeDate
         channels {

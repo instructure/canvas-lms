@@ -18,22 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'graphql_custom_connections'
-
 class CanvasSchema < GraphQL::Schema
-  use GraphQL::Execution::Interpreter
-
   query Types::QueryType
   mutation Types::MutationType
 
   use GraphQL::Batch
 
+  connections.add(Array, PatchedArrayConnection)
+  connections.add(DynamoQuery, DynamoConnection)
+
   def self.id_from_object(obj, type_def, ctx)
     case obj
     when MediaObject
-      GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.media_id)
+      GraphQL::Schema::UniqueWithinType.encode(type_def.graphql_name, obj.media_id)
     else
-      GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.id)
+      GraphQL::Schema::UniqueWithinType.encode(type_def.graphql_name, obj.id)
     end
   end
 
@@ -43,7 +42,7 @@ class CanvasSchema < GraphQL::Schema
     GraphQLNodeLoader.load(type, id, ctx)
   end
 
-  def self.resolve_type(type, obj, _ctx)
+  def self.resolve_type(abstract_type, obj, _ctx)
     case obj
     when Account then Types::AccountType
     when Course then Types::CourseType
@@ -77,7 +76,7 @@ class CanvasSchema < GraphQL::Schema
     when LearningOutcome then Types::LearningOutcomeType
     when OutcomeFriendlyDescription then Types::OutcomeFriendlyDescriptionType
     when ContentTag
-      if type&.name == "ModuleItemInterface"
+      if abstract_type&.graphql_name == "ModuleItemInterface"
         case obj.content_type
         when "ContextModuleSubHeader" then Types::ModuleSubHeaderType
         when "ExternalUrl" then Types::ExternalUrlType
