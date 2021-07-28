@@ -85,16 +85,14 @@ if (document.getElementById('tab-features')) {
 
 $(() => navView.render())
 
-if (ENV.COURSE_IMAGES_ENABLED) {
-  ReactDOM.render(
-    <CourseImageSelector
-      store={configureStore(initialState)}
-      courseId={ENV.COURSE_ID}
-      setting="image"
-    />,
-    $('.CourseImageSelector__Container')[0]
-  )
-}
+ReactDOM.render(
+  <CourseImageSelector
+    store={configureStore(initialState)}
+    courseId={ENV.COURSE_ID}
+    setting="image"
+  />,
+  $('.CourseImageSelector__Container')[0]
+)
 
 const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
 if (bannerImageContainer) {

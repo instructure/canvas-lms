@@ -1433,7 +1433,6 @@ class CoursesController < ApplicationController
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
-      course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_permissions = {
         can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
@@ -1467,8 +1466,7 @@ class CoursesController < ApplicationController
         COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_COLORS_ENABLED: @context.elementary_enabled?,
-        COURSE_IMAGES_ENABLED: course_card_images_enabled,
-        use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
+        use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
         STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect{|term| term[:enrollment_type]=="StudentEnrollment"}&.slice(:start_at,:end_at),
         DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at,:end_at),
@@ -2108,7 +2106,7 @@ class CoursesController < ApplicationController
                    id: @context.id.to_s,
                    name: @context.name,
                    long_name: "#{@context.name} - #{@context.short_name}",
-                   image_url: @context.feature_enabled?(:course_card_images) ? @context.image : nil,
+                   image_url: @context.image,
                    banner_image_url: @context.elementary_subject_course? ? @context.banner_image : nil,
                    color: @context.elementary_subject_course? ? @context.course_color : nil,
                    pages_url: polymorphic_url([@context, :wiki_pages]),

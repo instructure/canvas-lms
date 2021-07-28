@@ -293,8 +293,6 @@ module Types
       course cards)
     DOC
     def image_url
-      return nil unless course.feature_enabled?('course_card_images')
-
       if course.image_url.present?
         course.image_url
       elsif course.image_id.present?

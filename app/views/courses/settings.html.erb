@@ -106,7 +106,6 @@
     <% opts[:disabled] = 'disabled' unless can_manage %>
     <%= form_for @context, :html => opts do |f| %>
     <div class="coursesettings">
-      <% if @context.feature_enabled?(:course_card_images) %>
       <div class="form-row">
         <div class="form-label">
           <% if @context.elementary_enabled? %>
@@ -119,7 +118,6 @@
           <div class="CourseImageSelector__Container"></div>
         </div>
       </div>
-      <% end %>
       <% if @context.elementary_enabled? %>
         <div class="form-row">
           <div class="form-label">

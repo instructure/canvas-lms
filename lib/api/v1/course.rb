@@ -147,7 +147,7 @@ module Api::V1::Course
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
 
-      hash['image_download_url'] = course.image if includes.include?('course_image') && course.feature_enabled?('course_card_images')
+      hash['image_download_url'] = course.image if includes.include?('course_image')
       hash['concluded'] = course.concluded? if includes.include?('concluded')
       apply_master_course_settings(hash, course, user)
       if course.root_account.feature_enabled?(:course_templates)

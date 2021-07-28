@@ -58,13 +58,6 @@ conditional_release:
   root_opt_in: true
   custom_transition_proc: conditional_release_transition_hook
   after_state_change_proc: conditional_release_after_change_hook
-course_card_images:
-  state: allowed
-  display_name: Enable Dashboard Images for Courses
-  description: Allow course images to be assigned to a course and used on the dashboard
-    cards.
-  applies_to: Course
-  root_opt_in: true
 disable_alert_timeouts:
   state: allowed
   display_name:
