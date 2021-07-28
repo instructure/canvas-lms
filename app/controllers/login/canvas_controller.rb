@@ -125,9 +125,9 @@ class Login::CanvasController < ApplicationController
     end
 
     # If the user is registered and logged in, redirect them to their dashboard page
-    if found
+    if found && (user = pseudonym.login_assertions_for_user)
       # Call for some cleanups that should be run when a user logs in
-      user = pseudonym.login_assertions_for_user
+      
       ap = pseudonym.authentication_provider
 
       session[:login_aac] ||= ap.id

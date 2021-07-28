@@ -21,6 +21,10 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard_grades_page'
 
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {PresentationContent} from '@instructure/ui-a11y-content'
+
 import {fetchGrades, fetchGradesForGradingPeriod} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
@@ -67,7 +71,7 @@ export const overrideCourseGradingPeriods = (
 export const GradesPage = ({visible, currentUserRoles}) => {
   const [courses, setCourses] = useState(null)
   const [gradingPeriods, setGradingPeriods] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [selectedGradingPeriodId, selectGradingPeriodId] = useState('')
   const [specificPeriodGrades, setSpecificPeriodGrades] = useState([])
 
@@ -131,25 +135,42 @@ export const GradesPage = ({visible, currentUserRoles}) => {
       aria-hidden={!visible}
     >
       {hasStudentRole && (
-        <LoadingWrapper
-          isLoading={loading && gradingPeriods.length === 0}
-          width="20rem"
-          height="5.7rem"
-          margin="none none medium"
-          screenReaderLabel={I18n.t('Loading grading periods...')}
-        >
-          {gradingPeriods.length > 1 && (
-            <GradingPeriodSelect
-              gradingPeriods={gradingPeriods}
-              handleSelectGradingPeriod={handleSelectGradingPeriod}
-              selectedGradingPeriodId={selectedGradingPeriodId}
-            />
+        <>
+          <LoadingWrapper
+            id="grading-periods"
+            isLoading={loading && gradingPeriods.length === 0}
+            width="20rem"
+            height="4.4rem"
+            margin="0"
+            screenReaderLabel={I18n.t('Loading grading periods...')}
+          >
+            {gradingPeriods.length > 1 && (
+              <GradingPeriodSelect
+                gradingPeriods={gradingPeriods}
+                handleSelectGradingPeriod={handleSelectGradingPeriod}
+                selectedGradingPeriodId={selectedGradingPeriodId}
+              />
+            )}
+          </LoadingWrapper>
+          {(selectedCourses?.length > 0 || loading) && (
+            <>
+              <View as="div" margin="small 0">
+                <Text as="div" size="small">
+                  {I18n.t('Totals are calculated based only on graded assignments.')}
+                </Text>
+              </View>
+              <PresentationContent>
+                <hr />
+              </PresentationContent>
+            </>
           )}
-        </LoadingWrapper>
+        </>
       )}
       <LoadingWrapper
+        id="grades"
         isLoading={loading}
-        skeletonsCount={selectedCourses?.length || 3}
+        skeletonsNum={selectedCourses?.length} // null is passed until the courses are loaded
+        defaultSkeletonsNum={3}
         width="100%"
         height="8.5rem"
         margin="none none medium"

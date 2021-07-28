@@ -25,6 +25,8 @@ export const outcomeGroupShape = PropTypes.shape({
 })
 
 export const outcomeShape = PropTypes.shape({
-  _id: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired
+  _id: PropTypes.string.isRequired,
+  linkId: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  canUnlink: PropTypes.bool.isRequired
 })

@@ -175,6 +175,9 @@ module CC::Importer::Standard
           }.compact
         end
       end
+      if meta_doc.at_css("annotatable_attachment_migration_id")
+        assignment[:annotatable_attachment_migration_id] = get_node_val(meta_doc, "annotatable_attachment_migration_id")
+      end
       assignment
     end
 

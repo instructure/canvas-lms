@@ -41,10 +41,45 @@ module AuthenticationMethods
     request.session[:user_id]
   end
 
+  def load_pseudonym_from_inst_access_token(token_string)
+    return false unless InstAccess::Token.is_token?(token_string)
+
+    begin
+      token = InstAccess::Token.from_token_string(token_string)
+    rescue InstAccess::InvalidToken, # token didn't pass signature verification
+           InstAccess::TokenExpired # token passed signature verification, but is expired
+      raise AccessTokenError
+    rescue InstAccess::ConfigError => exception
+      # InstAccess isn't configured. A human should fix that, but this method
+      # should recover gracefully.
+      Canvas::Errors.capture_exception(:inst_access, exception, :warn)
+      return true
+    end
+
+    @current_user = User.find_by(uuid: token.user_uuid)
+    @current_pseudonym = SisPseudonym.for(
+      @current_user, @domain_root_account, type: :implicit, require_sis: false
+    )
+    raise AccessTokenError unless @current_user && @current_pseudonym
+
+    if token.masquerading_user_uuid && token.masquerading_user_shard_id
+      Shard.lookup(token.masquerading_user_shard_id).activate do
+        @real_current_user = User.find_by!(uuid: token.masquerading_user_uuid)
+        @real_current_pseudonym = SisPseudonym.for(
+          @real_current_user, @domain_root_account, type: :implicit, require_sis: false
+        )
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+      end
+    end
+    @authenticated_with_jwt = true
+  end
+
   def load_pseudonym_from_jwt
     return unless api_request?
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
+    return if load_pseudonym_from_inst_access_token(token_string)
+
     begin
       services_jwt = Canvas::Security::ServicesJwt.new(token_string)
       @current_user = User.find(services_jwt.user_global_id)
@@ -55,7 +90,7 @@ module AuthenticationMethods
       if services_jwt.masquerading_user_global_id
         @real_current_user = User.find(services_jwt.masquerading_user_global_id)
         @real_current_pseudonym = SisPseudonym.for(@real_current_user, @domain_root_account, type: :implicit, require_sis: false)
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
     rescue JSON::JWT::InvalidFormat,       # definitely not a JWT
@@ -158,10 +193,7 @@ module AuthenticationMethods
     masked_authenticity_token # ensure that the cookie is set
 
     load_pseudonym_from_jwt
-
-    unless @current_pseudonym.present?
-      load_pseudonym_from_access_token
-    end
+    load_pseudonym_from_access_token unless @current_pseudonym.present?
 
     if !@current_pseudonym
       if @policy_pseudonym_id
@@ -305,6 +337,15 @@ module AuthenticationMethods
     end
   end
   protected :require_user
+
+  def require_non_jwt_auth
+    if @authenticated_with_jwt
+      render(
+        json: {error: "cannot generate a JWT when authorized by a JWT"},
+        status: 403
+      )
+    end
+  end
 
   def clean_return_to(url)
     return nil if url.blank?

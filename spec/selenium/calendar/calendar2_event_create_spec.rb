@@ -19,10 +19,12 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
+require_relative '../../helpers/k5_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+  include K5Common
 
   before(:once) do
     Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
@@ -211,6 +213,21 @@ describe "calendar2" do
 
         num_rows = ff(".show_if_using_sections .row_header").length
         expect(num_rows).to be_equal(num_sections)
+      end
+
+      it "should create an event with an important date in a k5 subject" do
+        Account.site_admin.enable_feature!(:important_dates)
+        toggle_k5_setting(@course.account)
+
+        get '/calendar2'
+        wait_for_ajaximations
+        f('#create_new_event_link').click
+        replace_content(f('#calendar_event_title'), 'important event')
+        click_option(f('.context_id'), @course.name)
+        f('#calendar_event_important_dates').click
+        f('.event-details-footer button[type="submit"]').click
+        wait_for_ajaximations
+        expect(@course.calendar_events.last.important_dates).to be_truthy
       end
     end
   end

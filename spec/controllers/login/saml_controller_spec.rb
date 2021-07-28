@@ -93,6 +93,26 @@ describe Login::SamlController do
     expect(response).to redirect_to(login_url)
   end
 
+  it "doesn't allow deleted users" do
+    account = account_with_saml
+    user_with_pseudonym(active_all: 1, account: account)
+    @user.update!(workflow_state: 'deleted')
+
+    response = SAML2::Response.new
+    response.issuer = SAML2::NameID.new('saml_entity')
+    response.assertions << (assertion = SAML2::Assertion.new)
+    assertion.subject = SAML2::Subject.new
+    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [response, nil]
+    )
+    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response).to redirect_to(login_url)
+  end
+
   it "wont support logout via login endpoint" do
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [SAML2::LogoutRequest.new,nil]
@@ -252,97 +272,90 @@ describe Login::SamlController do
     expect(response.location).to match(/example.com\/logout/)
   end
 
-  it "appends a session token if we're redirecting to a trusted account" do
-    account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+  context "with relay state" do
+    before do
+      account = account_with_saml
+      user_with_pseudonym(active_all: 1, account: account)
+      allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      session[:return_to] = '/courses/1'
+    end
 
-    saml_response = SAML2::Response.new
-    saml_response.issuer = SAML2::NameID.new('saml_entity')
-    saml_response.assertions << (assertion = SAML2::Assertion.new)
-    assertion.subject = SAML2::Subject.new
-    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
-    assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
-    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [saml_response, "https://otheraccount/courses/1"]
-    )
-    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+    let(:saml_response) do
+      saml_response = SAML2::Response.new
+      saml_response.issuer = SAML2::NameID.new('saml_entity')
+      saml_response.assertions << (assertion = SAML2::Assertion.new)
+      assertion.subject = SAML2::Subject.new
+      assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+      assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
+      saml_response
+    end
 
-    account2 = double()
-    expect(Account).to receive(:find_by_domain).and_return(account2)
-    expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
+    it "appends a session token if we're redirecting to a trusted account" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "https://otheraccount/courses/1"]
+      )
 
-    post :create, params: {:SAMLResponse => "foo", :RelayState => "https://otheraccount/courses/1"}
-    expect(response).to be_redirect
-    expect(response.location).to match(%r{^https://otheraccount/courses/1\?session_token=})
-  end
+      account2 = double()
+      expect(Account).to receive(:find_by_domain).and_return(account2)
+      expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
 
-  it "ignores empty string relay state" do
-    account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "https://otheraccount/courses/1"}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://otheraccount/courses/1\?session_token=})
+    end
 
-    saml_response = SAML2::Response.new
-    saml_response.issuer = SAML2::NameID.new('saml_entity')
-    saml_response.assertions << (assertion = SAML2::Assertion.new)
-    assertion.subject = SAML2::Subject.new
-    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
-    assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
-    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [saml_response, ""]
-    )
-    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+    it "ignores empty string" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, ""]
+      )
 
-    session[:return_to] = '/courses/1'
-    post :create, params: {:SAMLResponse => "foo", :RelayState => ""}
-    expect(response).to be_redirect
-    expect(response.location).to match(%r{/courses/1$})
-  end
+      post :create, params: {:SAMLResponse => "foo", :RelayState => ""}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/1$})
+    end
 
-  it "ignores relative path relay state" do
-    account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+    it "ignores relative path" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "None"]
+      )
 
-    saml_response = SAML2::Response.new
-    saml_response.issuer = SAML2::NameID.new('saml_entity')
-    saml_response.assertions << (assertion = SAML2::Assertion.new)
-    assertion.subject = SAML2::Subject.new
-    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
-    assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
-    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [saml_response, "None"]
-    )
-    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "None"}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/1$})
+    end
 
-    session[:return_to] = '/courses/1'
-    post :create, params: {:SAMLResponse => "foo", :RelayState => "None"}
-    expect(response).to be_redirect
-    expect(response.location).to match(%r{/courses/1$})
-  end
+    it "ignores non-path URIs" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "https:mem:abc"]
+      )
 
-  it "disallows redirects to non-trusted accounts" do
-    account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "https:mem:abc"}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/1$})
+    end
 
-    saml_response = SAML2::Response.new
-    saml_response.issuer = SAML2::NameID.new('saml_entity')
-    saml_response.assertions << (assertion = SAML2::Assertion.new)
-    assertion.subject = SAML2::Subject.new
-    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
-    assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
-    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [saml_response, "https://otheraccount/courses/1"]
-    )
-    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+    it "ignores non-HTTP" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "javascript:///"]
+      )
 
-    account2 = double()
-    expect(Account).to receive(:find_by_domain).and_return(nil)
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "javascript:///"}
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{/courses/1$})
+    end
 
-    post :create, params: {:SAMLResponse => "foo", :RelayState => "https://otheraccount/courses/1"}
-    expect(response).to be_redirect
-    expect(response.location).not_to match(/session_token/)
+    it "disallows redirects to non-trusted accounts" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "https://otheraccount/courses/1"]
+      )
+
+      expect(Account).to receive(:find_by_domain).and_return(nil)
+
+      post :create, params: {:SAMLResponse => "foo", :RelayState => "https://otheraccount/courses/1"}
+      expect(response).to be_redirect
+      expect(response.location).not_to match(/session_token/)
+    end
   end
 
   context "multiple authorization configs" do

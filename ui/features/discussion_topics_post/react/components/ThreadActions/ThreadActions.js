@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React, {useMemo} from 'react'
+import React, {useMemo, useContext} from 'react'
 
 import {Menu} from '@instructure/ui-menu'
 import {
@@ -33,32 +33,36 @@ import {
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import {SearchContext} from '../../utils/constants'
 
 // Reason: <Menu> in v6 of InstUI requires a ref to bind too or errors
 // are produced by the menu causing the page to scroll all over the place
 export const ThreadActions = props => {
+  const {searchTerm} = useContext(SearchContext)
   const menuItems = useMemo(() => {
     return getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
   return (
     <>
-      <Menu
-        placement="bottom"
-        key={`threadActionMenu-${props.id}`}
-        trigger={
-          <IconButton
-            size="small"
-            screenReaderLabel={I18n.t('Manage Discussion')}
-            renderIcon={IconMoreLine}
-            withBackground={false}
-            withBorder={false}
-            data-testid="thread-actions-menu"
-          />
-        }
-      >
-        {menuItems}
-      </Menu>
+      {!searchTerm && (
+        <Menu
+          placement="bottom"
+          key={`threadActionMenu-${props.id}`}
+          trigger={
+            <IconButton
+              size="small"
+              screenReaderLabel={I18n.t('Manage Discussion')}
+              renderIcon={IconMoreLine}
+              withBackground={false}
+              withBorder={false}
+              data-testid="thread-actions-menu"
+            />
+          }
+        >
+          {menuItems}
+        </Menu>
+      )}
     </>
   )
 }

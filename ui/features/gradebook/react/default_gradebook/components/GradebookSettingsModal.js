@@ -21,7 +21,7 @@ import {bool, func, shape, string} from 'prop-types'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!gradebook'
 
@@ -92,6 +92,7 @@ export default class GradebookSettingsModal extends React.Component {
     locale: string.isRequired,
     onClose: func.isRequired,
     onEntered: func,
+    gradebookIsEditable: bool.isRequired,
     gradedLateSubmissionsExist: bool.isRequired,
     onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
@@ -117,7 +118,8 @@ export default class GradebookSettingsModal extends React.Component {
     coursePostPolicy: {
       postManually: this.props.postPolicies && this.props.postPolicies.coursePostPolicy.postManually
     },
-    processingRequests: false
+    processingRequests: false,
+    selectedTab: 'tab-panel-late'
   }
 
   onFetchLatePolicySuccess = ({data}) => {
@@ -213,9 +215,7 @@ export default class GradebookSettingsModal extends React.Component {
   }
 
   handleCourseSettingsChange = courseSettings => {
-    this.setState({
-      courseSettings: {...this.state.courseSettings, ...courseSettings}
-    })
+    this.setState(state => ({courseSettings: {...state, ...courseSettings}}))
   }
 
   isUpdateButtonEnabled = () => {
@@ -246,8 +246,13 @@ export default class GradebookSettingsModal extends React.Component {
     })
   }
 
+  changeTab(_ev, {id}) {
+    this.setState({selectedTab: id})
+  }
+
   render() {
     const includeAdvancedTab = this.props.courseFeatures.finalGradeOverrideEnabled
+    const tab = this.state.selectedTab
 
     return (
       <Modal
@@ -261,35 +266,49 @@ export default class GradebookSettingsModal extends React.Component {
       >
         <Modal.Body>
           <View as="div" height={MODAL_CONTENTS_HEIGHT}>
-            <TabList defaultSelectedIndex={0}>
-              <TabList.Panel title={I18n.t('Late Policies')}>
+            <Tabs onRequestTabChange={this.changeTab.bind(this)}>
+              <Tabs.Panel
+                renderTitle={I18n.t('Late Policies')}
+                id="tab-panel-late"
+                isSelected={tab === 'tab-panel-late'}
+              >
                 <LatePoliciesTabPanel
                   latePolicy={this.state.latePolicy}
                   changeLatePolicy={this.changeLatePolicy}
                   locale={this.props.locale}
                   showAlert={this.props.gradedLateSubmissionsExist}
+                  gradebookIsEditable={this.props.gradebookIsEditable}
                 />
-              </TabList.Panel>
+              </Tabs.Panel>
 
               {this.props.postPolicies != null && (
-                <TabList.Panel title={I18n.t('Grade Posting Policy')}>
+                <Tabs.Panel
+                  renderTitle={I18n.t('Grade Posting Policy')}
+                  id="tab-panel-post"
+                  isSelected={tab === 'tab-panel-post'}
+                >
                   <GradePostingPolicyTabPanel
                     anonymousAssignmentsPresent={this.props.anonymousAssignmentsPresent}
                     onChange={this.changePostPolicy}
                     settings={this.state.coursePostPolicy}
+                    gradebookIsEditable={this.props.gradebookIsEditable}
                   />
-                </TabList.Panel>
+                </Tabs.Panel>
               )}
 
               {includeAdvancedTab && (
-                <TabList.Panel title={I18n.t('Advanced')}>
+                <Tabs.Panel
+                  renderTitle={I18n.t('Advanced')}
+                  id="tab-panel-advanced"
+                  isSelected={tab === 'tab-panel-advanced'}
+                >
                   <AdvancedTabPanel
                     courseSettings={this.state.courseSettings}
                     onCourseSettingsChange={this.handleCourseSettingsChange}
                   />
-                </TabList.Panel>
+                </Tabs.Panel>
               )}
-            </TabList>
+            </Tabs>
           </View>
         </Modal.Body>
 

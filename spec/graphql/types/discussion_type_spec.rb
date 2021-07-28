@@ -134,6 +134,22 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
+  it "returns if the current user requires an inital post" do
+    discussion.update!(require_initial_post: true)
+    student_in_course(active_all: true)
+    discussion.discussion_entries.create!(message: 'other student entry', user: @student)
+
+    student_in_course(active_all: true)
+    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
+
+    expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq true
+    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 0
+
+    discussion.discussion_entries.create!(message: 'Here is my entry', user: @student)
+    expect(type_with_student.resolve('initialPostRequiredForCurrentUser')).to eq false
+    expect(type_with_student.resolve('rootDiscussionEntriesConnection { nodes { message } }').count).to eq 2
+  end
+
   it 'allows querying for entry counts' do
     3.times { discussion.discussion_entries.create!(message: "sub entry", user: @teacher) }
     discussion.discussion_entries.take.destroy
@@ -187,6 +203,15 @@ RSpec.shared_examples "DiscussionType" do
     discussion.context_module_tags.create!(context_module: module1, context: discussion.course, tag_type: 'context_module')
     discussion.context_module_tags.create!(context_module: module2, context: discussion.course, tag_type: 'context_module')
     expect(discussion_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s].sort
+  end
+
+  it "has an attachment" do
+    a = attachment_model
+    discussion.attachment = a
+    discussion.save!
+
+    expect(discussion_type.resolve("attachment { _id }")).to eq discussion.attachment.id.to_s
+    expect(discussion_type.resolve("attachment { displayName }")).to eq discussion.attachment.display_name
   end
 
   it "has a group_set" do
@@ -326,5 +351,15 @@ describe Types::DiscussionType do
   context "group discussion" do
     let_once(:discussion) { group_discussion_assignment.child_topics.take }
     include_examples "DiscussionType"
+  end
+
+  context "announcement" do
+    let(:discussion) { announcement_model(delayed_post_at: 1.day.from_now) }
+    let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
+
+    it 'allows querying for is_announcement and delayed_post_at' do
+      expect(discussion_type.resolve('isAnnouncement')).to eq discussion.is_announcement
+      expect(discussion_type.resolve('delayedPostAt')).to eq discussion.delayed_post_at&.iso8601
+    end
   end
 end

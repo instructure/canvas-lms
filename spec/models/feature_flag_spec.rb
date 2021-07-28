@@ -187,5 +187,15 @@ describe FeatureFlag do
       expect(log.context_type).to eq("Account")
       expect(log.context_id).to eq(t_root_account.id)
     end
+
+    it "can be logged by a null user" do
+      flag = t_root_account.feature_flags.build(feature: 'root_account_feature', state: 'allowed')
+      flag.current_user = nil
+      flag.save!
+      logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
+      expect(logs.size).to eq(1)
+      rec = logs.first
+      expect(rec.user_id).to be_nil
+    end
   end
 end

@@ -37,6 +37,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs from '@canvas/k5/react/K5Tabs'
@@ -53,6 +54,7 @@ import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStu
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import EmptyModules from './EmptyModules'
+import EmptyHome from './EmptyHome'
 
 const HERO_HEIGHT_PX = 400
 
@@ -93,8 +95,8 @@ const translateTabId = id => {
   return TAB_IDS.HOME
 }
 
-const toRenderTabs = tabs =>
-  tabs.reduce((acc, {id, hidden}) => {
+const toRenderTabs = (tabs, hasSyllabusBody) => {
+  const activeTabs = tabs.reduce((acc, {id, hidden}) => {
     if (hidden) return acc
     const renderId = translateTabId(id)
     const renderTab = COURSE_TABS.find(tab => tab.id === renderId)
@@ -103,6 +105,11 @@ const toRenderTabs = tabs =>
     }
     return acc
   }, [])
+  if (hasSyllabusBody && !activeTabs.some(tab => tab.id === TAB_IDS.RESOURCES)) {
+    activeTabs.push(COURSE_TABS.find(tab => tab.id === TAB_IDS.RESOURCES))
+  }
+  return activeTabs
+}
 
 export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   return (
@@ -141,7 +148,13 @@ export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
   )
 }
 
-export function CourseHeaderOptions({settingsPath, showStudentView, studentViewPath, canManage}) {
+export function CourseHeaderOptions({
+  settingsPath,
+  showStudentView,
+  studentViewPath,
+  canManage,
+  courseContext
+}) {
   return (
     <View
       id="k5-course-header-options"
@@ -159,7 +172,9 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
               href={settingsPath}
               renderIcon={<IconEditSolid />}
             >
-              {I18n.t('Manage Subject')}
+              <AccessibleContent alt={I18n.t('Manage Subject: %{courseContext}', {courseContext})}>
+                {I18n.t('Manage Subject')}
+              </AccessibleContent>
             </Button>
           </Flex.Item>
         )}
@@ -180,6 +195,14 @@ export function CourseHeaderOptions({settingsPath, showStudentView, studentViewP
   )
 }
 
+CourseHeaderOptions.propTypes = {
+  settingsPath: PropTypes.string.isRequired,
+  showStudentView: PropTypes.bool.isRequired,
+  studentViewPath: PropTypes.string.isRequired,
+  canManage: PropTypes.bool.isRequired,
+  courseContext: PropTypes.string.isRequired
+}
+
 export function K5Course({
   assignmentsDueToday,
   assignmentsMissing,
@@ -192,7 +215,6 @@ export function K5Course({
   loadAllOpportunities,
   name,
   timeZone,
-  locale,
   canManage = false,
   plannerEnabled = false,
   hideFinalGrades,
@@ -205,9 +227,12 @@ export function K5Course({
   outcomeProficiency,
   tabs,
   settingsPath,
-  latestAnnouncement
+  latestAnnouncement,
+  pagesPath,
+  hasWikiPages,
+  hasSyllabusBody
 }) {
-  const renderTabs = toRenderTabs(tabs)
+  const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
   const plannerInitialized = usePlanner({
@@ -235,7 +260,23 @@ export function K5Course({
       modulesRef.current.style.display =
         currentTab === TAB_IDS.MODULES && (modulesExist || canManage) ? 'block' : 'none'
     }
+    // Rails only takes care of the url without the hash in the request.referer, so to keep the navigation after loading or leaving
+    // the student view mode, we need to add the tab hash portion to the links href to the maintain the navigation after redirections
+    const resetStudentBtn = document.querySelector('a.leave_student_view[data-method="delete"]')
+    const leaveStudentModeBtn = document.querySelector('a.reset_test_student[data-method="delete"]')
+    if (resetStudentBtn) {
+      resetStudentBtn.href = addCurrentTabSegment(resetStudentBtn.href)
+    }
+    if (leaveStudentModeBtn) {
+      leaveStudentModeBtn.href = addCurrentTabSegment(leaveStudentModeBtn.href)
+    }
   }, [currentTab, modulesExist, canManage])
+
+  const addCurrentTabSegment = url => {
+    const currentTabUrlSegment = window.location.hash
+    const baseUrl = url.split('#')[0]
+    return baseUrl + currentTabUrlSegment
+  }
 
   const courseHeader = sticky => {
     const extendedViewport = window.innerHeight + 180
@@ -252,7 +293,8 @@ export function K5Course({
             canManage={canManage}
             settingsPath={settingsPath}
             showStudentView={showStudentView}
-            studentViewPath={studentViewPath}
+            studentViewPath={`${studentViewPath + window.location.hash}`}
+            courseContext={name}
           />
         )}
         <CourseHeaderHero
@@ -272,6 +314,7 @@ export function K5Course({
       onTabChange={handleTabChange}
       tabs={renderTabs}
       tabsRef={setTabsRef}
+      courseContext={name}
     >
       {sticky => courseHeader(sticky)}
     </K5Tabs>
@@ -305,12 +348,21 @@ export function K5Course({
             {...announcementDetails}
           />
         )}
-        {currentTab === TAB_IDS.HOME && <OverviewPage content={courseOverview} />}
+        {currentTab === TAB_IDS.HOME &&
+          (courseOverview || courseOverview?.length === 0 ? (
+            <OverviewPage content={courseOverview} />
+          ) : (
+            <EmptyHome
+              pagesPath={pagesPath}
+              hasWikiPages={hasWikiPages}
+              courseName={name}
+              userIsInstructor={userIsInstructor}
+            />
+          ))}
         <SchedulePage
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
-          locale={locale}
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
         />
@@ -332,7 +384,7 @@ export function K5Course({
             cardsSettled
             visible={currentTab === TAB_IDS.RESOURCES}
             showStaff={false}
-            filterToHomerooms={false}
+            isSingleCourse
           />
         )}
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
@@ -349,13 +401,12 @@ K5Course.propTypes = {
   loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
-  locale: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  courseOverview: PropTypes.string.isRequired,
+  courseOverview: PropTypes.string,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   userIsStudent: PropTypes.bool.isRequired,
@@ -366,7 +417,10 @@ K5Course.propTypes = {
   outcomeProficiency: outcomeProficiencyShape,
   tabs: PropTypes.arrayOf(PropTypes.object).isRequired,
   settingsPath: PropTypes.string.isRequired,
-  latestAnnouncement: PropTypes.object
+  latestAnnouncement: PropTypes.object,
+  pagesPath: PropTypes.string.isRequired,
+  hasWikiPages: PropTypes.bool.isRequired,
+  hasSyllabusBody: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

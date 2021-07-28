@@ -25,6 +25,7 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
   include DatadogRumHelper
+  include NewQuizzesFeaturesHelper
 
   def context_user_name_display(user)
     name = user.try(:short_name) || user.try(:name)
@@ -332,11 +333,21 @@ module ApplicationHelper
     stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
+  def quiz_lti_tab?(tab)
+    if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+      return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
+    end
+
+    false
+  end
+
   def sortable_tabs
     tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account, :course_subject_tabs => @context.try(:elementary_subject_course?))
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
         Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
+      elsif (quiz_lti_tab?(tab) rescue false)
+        new_quizzes_navigation_placements_enabled?(@context)
       elsif (tab[:id] == @context.class::TAB_COLLABORATIONS_NEW rescue false)
         @context.feature_enabled?(:new_collaborations)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
@@ -494,7 +505,6 @@ module ApplicationHelper
     {
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
-      :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -1265,10 +1275,13 @@ module ApplicationHelper
 
   def prefetch_xhr(url, id: nil, options: {})
     id ||= url
+    # these are the same defaults set in js-utils/src/prefetched_xhrs.js as "defaultFetchOptions"
+    # and it would be nice to combine them so that they don't have to be copied here.
     opts = {
       credentials: 'same-origin',
       headers: {
-        Accept: 'application/json+canvas-string-ids, application/json'
+        Accept: 'application/json+canvas-string-ids, application/json',
+        'X-Requested-With' => 'XMLHttpRequest'
       }
     }.deep_merge(options)
     javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"

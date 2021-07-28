@@ -2365,6 +2365,15 @@ describe GradebooksController do
         expect(js_env[:grading_type]).to eq('percent')
       end
 
+      it 'includes instructor selectable states keyed by provisional_grade_id' do
+        @assignment.update!(moderated_grading: true, grader_count: 2)
+        @assignment.create_moderation_grader(@teacher, occupy_slot: true)
+        submission = @assignment.submissions.first
+        provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 1)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env[:instructor_selectable_states]).to have_key provisional_grade.id
+      end
+
       it 'includes anonymous identities keyed by anonymous_id' do
         @assignment.update!(moderated_grading: true, grader_count: 2)
         anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id

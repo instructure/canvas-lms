@@ -17,17 +17,31 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
+
 import ManageOutcomeItem from '../ManageOutcomeItem'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {MockedProvider} from '@apollo/react-testing'
+
+const render = (
+  children,
+  {canManage = true, isAdmin = true, contextType = 'Account', renderer = rtlRender} = {}
+) => {
+  return renderer(
+    <OutcomesContext.Provider value={{env: {canManage, isAdmin, contextType}}}>
+      <MockedProvider mocks={[]}>{children}</MockedProvider>
+    </OutcomesContext.Provider>
+  )
+}
 
 describe('ManageOutcomeItem', () => {
   let onMenuHandlerMock
   let onCheckboxHandlerMock
   const defaultProps = (props = {}) => ({
-    id: '1',
+    _id: '1',
+    linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
-    isFirst: false,
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,
@@ -52,7 +66,7 @@ describe('ManageOutcomeItem', () => {
 
   it('does not render component if title prop not passed', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({title: null})} />)
-    expect(queryByTestId('outcome-with-bottom-border')).not.toBeInTheDocument()
+    expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
   it('handles click on checkbox', () => {
@@ -62,11 +76,16 @@ describe('ManageOutcomeItem', () => {
     expect(onCheckboxHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('passes item id to checkbox onClick handler', () => {
+  it('passes selected outcome obj to checkbox onClick handler', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     const checkbox = getByText('Select outcome')
     fireEvent.click(checkbox)
-    expect(onCheckboxHandlerMock).toHaveBeenCalledWith('1')
+    expect(onCheckboxHandlerMock).toHaveBeenCalledWith({
+      _id: '1',
+      linkId: '2',
+      title: 'Outcome Title',
+      canUnlink: true
+    })
   })
 
   it('displays right pointing caret when description is truncated', () => {
@@ -97,16 +116,6 @@ describe('ManageOutcomeItem', () => {
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
-  it('displays bottom border when isFirst prop is false', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps()} />)
-    expect(queryByTestId('outcome-with-bottom-border')).toBeInTheDocument()
-  })
-
-  it('displays both top and bottom border when isFirst prop is true', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({isFirst: true})} />)
-    expect(queryByTestId('outcome-with-top-bottom-border')).toBeInTheDocument()
-  })
-
   it('displays disabled caret button with "not-allowed" cursor if no description', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
@@ -121,7 +130,7 @@ describe('ManageOutcomeItem', () => {
     fireEvent.click(getByText('Outcome Menu'))
     fireEvent.click(getByText('Remove'))
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
-    expect(onMenuHandlerMock.mock.calls[0][0]).toBe('1')
+    expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
   })
 
@@ -133,34 +142,34 @@ describe('ManageOutcomeItem', () => {
       expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
     })
 
+    it('hides checkboxes', () => {
+      const {queryByText} = render(
+        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+      )
+      expect(queryByText('Select outcome')).not.toBeInTheDocument()
+    })
+
     describe('with manage_outcomes permission', () => {
-      beforeEach(() => {
-        window.ENV = {
-          ROOT_OUTCOME_GROUP: {
-            context_type: 'Course'
-          },
-          PERMISSIONS: {
-            manage_outcomes: true
-          },
-          current_user_roles: ['admin']
-        }
-      })
-
-      afterEach(() => {
-        window.ENV = null
-      })
-
       it('renders the kebab menu if the user is an admin within the course context', () => {
         const {getByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: true,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(getByText('Outcome Menu')).toBeInTheDocument()
       })
 
       it('does not render the kebab menu if the user is not an admin', () => {
-        window.ENV.current_user_roles = []
         const {queryByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
+          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
+          {
+            isAdmin: false,
+            canManage: true,
+            contextType: 'Course'
+          }
         )
         expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
       })

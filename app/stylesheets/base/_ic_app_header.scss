@@ -235,7 +235,7 @@ button.ic-app-header__menu-list-link {
   line-height: 1.8rem;
   margin-top: -0.9rem;
   @include fontSize($ic-font-size--xsmall);
-  border-radius: $ic-border-radius / 2;
+  border-radius: $ic-border-radius * 0.5;
   color: $ic-color-light;
   white-space: nowrap;
 
@@ -358,7 +358,7 @@ body.primary-nav-expanded {
     display: block;
     line-height: 1.4;
     border-radius: 0;
-    margin: $ic-sp/4 0 0;
+    margin: $ic-sp*0.25 0 0;
     padding: 0;
     background: transparent;
     color: var(--ic-brand-global-nav-menu-item__text-color);
@@ -387,7 +387,7 @@ body.primary-nav-expanded {
   border: 0;
   padding: 0.01em 0 0;
   min-width: 0;
-  margin: direction-sides(0 0 $spacing-width/2 0);
+  margin: direction-sides(0 0 $spacing-width*0.5 0);
 }
 
 .ic-HelpDialog__form-actions {

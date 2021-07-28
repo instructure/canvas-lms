@@ -256,6 +256,8 @@ module DatesOverridable
       else
         if due_date = self.overridden_for(user).due_at
           hash[:due_date] = due_date
+        elsif (due_date = all_due_dates.dig(0, :due_at))
+          hash[:due_date] = due_date
         end
       end
       hash

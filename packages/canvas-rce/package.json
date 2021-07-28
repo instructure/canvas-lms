@@ -64,6 +64,7 @@
     "@instructure/ui-a11y-content": "7",
     "@instructure/ui-alerts": "7",
     "@instructure/ui-avatar": "7",
+    "@instructure/ui-badge": "7",
     "@instructure/ui-billboard": "7",
     "@instructure/ui-buttons": "7",
     "@instructure/ui-checkbox": "7",
@@ -83,6 +84,7 @@
     "@instructure/ui-motion": "7",
     "@instructure/ui-overlays": "7",
     "@instructure/ui-pagination": "7",
+    "@instructure/ui-popover": "7",
     "@instructure/ui-radio-input": "7",
     "@instructure/ui-react-utils": "7",
     "@instructure/ui-simple-select": "7",
@@ -138,7 +140,7 @@
     "@babel/register": "7",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/translations": ">=1",
-    "@instructure/ui-babel-preset": "6",
+    "@instructure/ui-babel-preset": "7",
     "@testing-library/dom": "^7",
     "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^11",
@@ -180,5 +182,8 @@
     "webpack-merge": "^5",
     "webpack-nano": "^1",
     "webpack-plugin-serve": "^1"
+  },
+  "resolutions": {
+    "format-message-estree-util": "../packages/format-message-estree-util"
   }
 }

@@ -975,8 +975,6 @@ export default class EditView extends ValidatedFormView
       annotatedDocumentUsageRights = @getAnnotatedDocumentUsageRights()
       if annotatedDocumentUsageRights.use_justification == 'choose'
         errors['usage_rights_use_justification'] = [{message: I18n.t('You must set document usage rights')}]
-      if annotatedDocumentUsageRights.legal_copyright == ''
-        errors['usage_rights_legal_copyright'] = [{message: I18n.t('You must set document copyright holder')}]
 
     errors
 
@@ -1036,7 +1034,8 @@ export default class EditView extends ValidatedFormView
     return params['return_to'] if returnToHelper.isValid(params['return_to'])
     useCancelLocation = @assignment.showBuildButton() && @preventBuildNavigation
     return @locationAfterCancel(deparam()) if useCancelLocation
-    @model.get 'html_url'
+    htmlUrl = @model.get 'html_url'
+    if @assignment.showBuildButton() then "#{htmlUrl}?display=full_width" else htmlUrl
 
   redirectAfterCancel: ->
     location = @locationAfterCancel(deparam())

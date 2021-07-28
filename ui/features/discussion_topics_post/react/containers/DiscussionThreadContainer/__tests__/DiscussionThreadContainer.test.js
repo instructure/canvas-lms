@@ -18,8 +18,11 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
-import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
+import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
+import {DiscussionEntryPermissions} from '../../../../graphql/DiscussionEntryPermissions'
+import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
+import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
@@ -33,10 +36,10 @@ describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
-  const assignMock = jest.fn()
+  const openMock = jest.fn()
   beforeAll(() => {
     delete window.location
-    window.location = {assign: assignMock}
+    window.open = openMock
     window.ENV = {
       course_id: '1'
     }
@@ -50,7 +53,7 @@ describe('DiscussionThreadContainer', () => {
     server.resetHandlers()
     onFailureStub.mockClear()
     onSuccessStub.mockClear()
-    assignMock.mockClear()
+    openMock.mockClear()
   })
 
   afterAll(() => {
@@ -59,50 +62,15 @@ describe('DiscussionThreadContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const defaultProps = ({discussionEntryOverrides = {}, assignment = undefined} = {}) => {
-    return {
-      discussionEntry: {
-        _id: '49',
-        id: '49',
-        createdAt: '2021-04-05T13:40:50-06:00',
-        updatedAt: '2021-04-05T13:40:50-06:00',
-        deleted: false,
-        message: '<p>This is the parent reply</p>',
-        ratingCount: null,
-        ratingSum: null,
-        rating: false,
-        read: true,
-        subentriesCount: 1,
-        rootEntryParticipantCounts: {
-          unreadCount: 1,
-          repliesCount: 1
-        },
-        author: {
-          _id: '1',
-          id: 'VXNlci0x',
-          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-          name: 'Matthew Lemon'
-        },
-        editor: null,
-        lastReply: {
-          createdAt: '2021-04-05T13:41:42-06:00'
-        },
-        permissions: {
-          attach: true,
-          create: true,
-          delete: true,
-          rate: true,
-          read: true,
-          reply: true,
-          update: true,
-          viewRating: true,
-          speedGrader: true
-        },
-        ...discussionEntryOverrides
-      },
-      assignment
-    }
-  }
+  const defaultProps = ({
+    discussionEntryOverrides = {},
+    discussionOverrides = {},
+    propOverrides = {}
+  } = {}) => ({
+    discussionTopic: Discussion.mock(discussionOverrides),
+    discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
+    ...propOverrides
+  })
 
   const setup = props => {
     return render(
@@ -122,46 +90,17 @@ describe('DiscussionThreadContainer', () => {
   })
 
   it('should not render reply button if reply permission is false', () => {
-    const {queryByTestId} = setup({
-      discussionEntry: DiscussionEntry.mock({permissions: {reply: false}})
-    })
+    const {queryByTestId} = setup(
+      defaultProps({
+        discussionEntryOverrides: {permissions: DiscussionEntryPermissions.mock({reply: false})}
+      })
+    )
     expect(queryByTestId('threading-toolbar-reply')).toBeFalsy()
   })
 
   it('should render reply button if reply permission is true', () => {
     const {queryByTestId} = setup(defaultProps())
     expect(queryByTestId('threading-toolbar-reply')).toBeTruthy()
-  })
-
-  it('should render expand when nested replies are present', () => {
-    const {getByTestId} = setup(defaultProps())
-    expect(getByTestId('expand-button')).toBeTruthy()
-  })
-
-  it('should expand replies when expand button is clicked', () => {
-    const {getByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-  })
-
-  it('should collapse replies when expand button is clicked', async () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('expand-button'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
-  })
-
-  it('should collapse replies when collapse button is clicked', () => {
-    const {getByTestId, queryByTestId} = setup(defaultProps())
-    fireEvent.click(getByTestId('expand-button'))
-    expect(getByTestId('collapse-replies')).toBeTruthy()
-
-    fireEvent.click(getByTestId('collapse-replies'))
-
-    expect(queryByTestId('collapse-replies')).toBeNull()
   })
 
   describe('delete permission', () => {
@@ -267,28 +206,22 @@ describe('DiscussionThreadContainer', () => {
 
   describe('SpeedGrader', () => {
     it('Should be able to open SpeedGrader when speedGrader permission is true', async () => {
-      const {getByTestId} = setup(
-        defaultProps({
-          assignment: {
-            _id: '1337',
-            dueAt: '2021-04-05T13:40:50Z',
-            pointsPossible: 5
-          }
-        })
-      )
+      const {getByTestId} = setup(defaultProps())
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(assignMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1337', '1'))
+        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1', '2'), `_blank`)
       })
     })
 
     it('Should not be able to open SpeedGrader if is speedGrader permission is false', () => {
-      const {getByTestId, queryByTestId} = setup({
-        discussionEntry: DiscussionEntry.mock({permissions: {speedGrader: false}})
-      })
+      const {getByTestId, queryByTestId} = setup(
+        defaultProps({
+          discussionOverrides: {permissions: DiscussionPermissions.mock({speedGrader: false})}
+        })
+      )
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(queryByTestId('inSpeedGrader')).toBeNull()
@@ -297,15 +230,72 @@ describe('DiscussionThreadContainer', () => {
 
   describe('Go to Buttons', () => {
     it('Should call scrollTo when go to topic is pressed', async () => {
-      window.scrollTo = jest.fn()
-      const {getByTestId} = setup(defaultProps())
+      const goToTopic = jest.fn()
+      const {getByTestId} = setup(defaultProps({propOverrides: {goToTopic}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       fireEvent.click(getByTestId('toTopic'))
 
       await waitFor(() => {
-        expect(window.scrollTo.mock.calls.length).toBe(1)
+        expect(goToTopic.mock.calls.length).toBe(1)
       })
+    })
+  })
+
+  describe('Expand-Button', () => {
+    it('should render expand when nested replies are present', () => {
+      const {getByTestId} = setup(defaultProps())
+      expect(getByTestId('expand-button')).toBeTruthy()
+    })
+
+    it('should expand replies when expand button is clicked', () => {
+      const {getByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+    })
+
+    it('should collapse replies when expand button is clicked', async () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('expand-button'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
+    it('should collapse replies when collapse button is clicked', () => {
+      const {getByTestId, queryByTestId} = setup(defaultProps())
+      fireEvent.click(getByTestId('expand-button'))
+      expect(getByTestId('collapse-replies')).toBeTruthy()
+
+      fireEvent.click(getByTestId('collapse-replies'))
+
+      expect(queryByTestId('collapse-replies')).toBeNull()
+    })
+
+    it('pluralizes reply message correctly when there is only a single reply', async () => {
+      const {getByText} = setup(defaultProps())
+      expect(getByText('1 reply, 1 unread')).toBeTruthy()
+    })
+
+    it('pluralizes replies message correctly when there are multiple replies', async () => {
+      const {getByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
+        })
+      )
+      expect(getByText('2 replies, 1 unread')).toBeTruthy()
+    })
+
+    it('does not display unread count if it is 0', async () => {
+      const {queryByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+        })
+      )
+      expect(queryByText('2 replies, 0 unread')).toBeFalsy()
+      expect(queryByText('2 replies')).toBeTruthy()
     })
   })
 })

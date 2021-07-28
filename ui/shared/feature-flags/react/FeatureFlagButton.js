@@ -30,7 +30,6 @@ import {
 import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {Popover} from '@instructure/ui-popover'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from './ConfirmationDialog'
@@ -55,7 +54,6 @@ function removeFlag(flagName) {
 function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
-  const popoverEl = useRef(null)
   const enclosingDivEl = useRef(null)
   const mustRefocus = useRef(false)
   const effectiveFlag = updatedFlag || featureFlag
@@ -112,12 +110,6 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
 
   const transitions = flagUtils.buildTransitions(effectiveFlag, allowsDefaults)
 
-  function hidePopover() {
-    if (popoverEl.current) {
-      popoverEl.current.hide()
-    }
-  }
-
   function refocusOnButtonIfNecessary() {
     if (mustRefocus.current && enclosingDivEl.current) {
       const button = enclosingDivEl.current.querySelector('button')
@@ -130,18 +122,11 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
 
   useEffect(refocusOnButtonIfNecessary)
 
-  // The popover is lifted out of Menu to prevent stupid scrolling to the top of the page
   return (
     <div ref={enclosingDivEl} title={description}>
       <Flex direction="row">
-        <Popover
-          placement="bottom center"
-          on={['click']}
-          shouldContainFocus
-          shouldReturnFocus
-          // This ensures we don't get the funky scroll behavior (i don't know why, but it works)
-          shouldRenderOffscreen
-          renderTrigger={
+        <Menu
+          trigger={
             <IconButton
               interaction={isReadonly || apiBusy ? 'disabled' : 'enabled'}
               size="medium"
@@ -153,50 +138,44 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
               {isEnabled ? IconPublishSolid : IconTroubleLine}
             </IconButton>
           }
-          ref={popoverEl}
         >
-          <Menu placement="bottom center" defaultShow>
+          <Menu.Item
+            value={transitions.enabled}
+            selected={isSelected(transitions.enabled) || isSelected('allowed_on')}
+            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.enabled)}
+            onSelect={() => {
+              updateFlag(transitions.enabled)
+            }}
+            type="checkbox"
+          >
+            {I18n.t('Enabled')}
+          </Menu.Item>
+          <Menu.Item
+            value={transitions.disabled}
+            selected={isSelected(transitions.disabled) || isSelected('allowed')}
+            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.disabled)}
+            onSelect={() => {
+              updateFlag(transitions.disabled)
+            }}
+            type="checkbox"
+          >
+            {I18n.t('Disabled')}
+          </Menu.Item>
+          {allowsDefaults ? <Menu.Separator /> : null}
+          {allowsDefaults ? (
             <Menu.Item
-              value={transitions.enabled}
-              selected={isSelected(transitions.enabled) || isSelected('allowed_on')}
-              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.enabled)}
+              value={transitions.lock}
+              selected={isLocked}
+              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.lock)}
               onSelect={() => {
-                hidePopover()
-                updateFlag(transitions.enabled)
+                updateFlag(transitions.lock)
               }}
               type="checkbox"
             >
-              {I18n.t('Enabled')}
+              {I18n.t('Lock')}
             </Menu.Item>
-            <Menu.Item
-              value={transitions.disabled}
-              selected={isSelected(transitions.disabled) || isSelected('allowed')}
-              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.disabled)}
-              onSelect={() => {
-                hidePopover()
-                updateFlag(transitions.disabled)
-              }}
-              type="checkbox"
-            >
-              {I18n.t('Disabled')}
-            </Menu.Item>
-            {allowsDefaults ? <Menu.Separator /> : null}
-            {allowsDefaults ? (
-              <Menu.Item
-                value={transitions.lock}
-                selected={isLocked}
-                disabled={flagUtils.transitionLocked(effectiveFlag, transitions.lock)}
-                onSelect={() => {
-                  hidePopover()
-                  updateFlag(transitions.lock)
-                }}
-                type="checkbox"
-              >
-                {I18n.t('Lock')}
-              </Menu.Item>
-            ) : null}
-          </Menu>
-        </Popover>
+          ) : null}
+        </Menu>
         <Flex direction="column" margin="none none none xx-small">
           {allowsDefaults && (
             <Flex.Item size="24px">

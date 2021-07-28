@@ -285,7 +285,6 @@ describe ProfileController do
     end
 
     it "should 404 if user has only student enrollments" do
-      skip("LS-1997 failing on not found exception that it should be looking for")
       user_session(@student)
       get 'content_shares', params: {user_id: @student.id}
       expect(response).to be_not_found

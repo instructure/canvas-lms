@@ -42,7 +42,6 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "should throw 404 error without a valid context id" do
-      #controller.use_rails_error_handling!
       get 'index', params: {:course_id => 'notvalid'}
       assert_status(404)
     end
@@ -542,15 +541,22 @@ describe AssignmentsController do
         get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
         expect(env[:GRADERS].map {|grader| grader[:id].to_s}).not_to include(@other_teacher.id.to_s)
       end
+
+      it "sets selectable to false when the grader is removed from the course" do
+        user_session(account_admin_user)
+        @assignment.moderation_graders.create!(anonymous_id: "other", user: grader_1)
+        grader_1.enrollments.first.destroy
+        get :show_moderate, params: {course_id: @course.id, assignment_id: @assignment.id}
+        expect(env[:GRADERS].first['grader_selectable']).to be(false)
+      end
     end
   end
 
   describe "GET 'show'" do
     it "should return 404 on non-existant assignment" do
-      #controller.use_rails_error_handling!
       user_session(@student)
 
-      get 'show', params: {:course_id => @course.id, :id => Assignment.maximum(:id) + 100}
+      get 'show', params: {course_id: @course.id, id: Assignment.maximum(:id) + 100}
       assert_status(404)
     end
 
@@ -1298,6 +1304,11 @@ describe AssignmentsController do
           end
         end
       end
+
+      it "sets can_manage_groups permissions in the ENV" do
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PERMISSIONS]).to include can_manage_groups: true
+      end
     end
   end
 
@@ -1569,7 +1580,7 @@ describe AssignmentsController do
       user_session(@student)
       course2 = Account.default.courses.create!
       group2 = course2.assignment_groups.create!(name: 'group2')
-      post 'create', params: {:course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}}
+      post 'create', params: {course_id: @course.id, assignment: {title: "some assignment", assignment_group_id: group2.to_param}}
       expect(response).to be_not_found
     end
 
@@ -1579,6 +1590,11 @@ describe AssignmentsController do
       a.save!
       post 'create', params: {:course_id => @course.id, :assignment => {:title => "some assignment"}}
       expect(assigns[:assignment]).to be_post_to_sis
+    end
+
+    it "sets important_dates if provided" do
+      post 'create', params: {:course_id => @course.id, :assignment => {:important_dates => true}}
+      expect(assigns[:assignment].important_dates).to be true
     end
   end
 
@@ -1660,6 +1676,12 @@ describe AssignmentsController do
       root_folder = Folder.root_folders(@course).first
       get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ROOT_FOLDER_ID]).to eq root_folder.id
+    end
+
+    it "sets can_manage_groups permissions in the ENV" do
+      user_session(@teacher)
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:PERMISSIONS]).to eq can_manage_groups: true
     end
 
     it "should require authorization" do

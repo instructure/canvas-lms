@@ -80,7 +80,7 @@
     }
 
     &::-webkit-slider-thumb {
-      margin-top: -$range-input-handle-size/4;
+      margin-top: -$range-input-handle-size*0.25;
     }
 
     &:focus,
@@ -100,7 +100,7 @@
     }
 
     @include range-input-track-selector {
-      height: $range-input-handle-size/2;
+      height: $range-input-handle-size*0.5;
       border-radius: 5px;
       background: $range-input-slider-color;
       border-color: transparent;
@@ -117,7 +117,7 @@
     &::-ms-fill-lower {
       background: $range-input-slider-color;
 
-      border-radius: $range-input-handle-size/2;
+      border-radius: $range-input-handle-size*0.5;
     }
 
     &::-ms-tooltip {
@@ -127,7 +127,7 @@
 
   // Label text
   .RangeInput__label {
-    margin: 0 0 $ic-sp/2;
+    margin: 0 0 $ic-sp*0.5;
     display: block;
     line-height: 1.3;
     color: $range-input-label-color;

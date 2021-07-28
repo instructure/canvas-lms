@@ -85,10 +85,19 @@ store.fetchWithDetails = function(tool) {
   }
 }
 
-store.togglePlacement = function({tool, placement, onSuccess = () => {}, onError = () => {}}) {
+store.togglePlacements = function({tool, placements, onSuccess = () => {}, onError = () => {}}) {
+  const data = {
+    // include this always, since it will only change for
+    // 1.1 tools toggling default placements
+    not_selectable: tool.not_selectable
+  }
+  for (const p of placements) {
+    data[p] = {enabled: tool[p].enabled}
+  }
+
   $.ajax({
     url: `/api/v1/${tool.context.toLowerCase()}s/${tool.context_id}/external_tools/${tool.app_id}`,
-    data: {[placement]: {enabled: tool[placement].enabled}},
+    data,
     type: 'PUT',
     success: onSuccess.bind(this),
     error: onError.bind(this)

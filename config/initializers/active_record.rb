@@ -54,7 +54,7 @@ class ActiveRecord::Base
 
       if transaction_index
         # we wrap a transaction around controller actions, so try to see if this call came from that
-        if wrap_index && (transaction_index..wrap_index).all?{|i| stacktrace[i].match?(/transaction|mon_synchronize/)}
+        if wrap_index && (transaction_index..wrap_index).all?{|i| stacktrace[i].match?(/transaction|synchronize/)}
           false
         else
           # check if this is being run through an after_transaction_commit since the last transaction
@@ -71,7 +71,7 @@ class ActiveRecord::Base
 
     def vacuum
       GuardRail.activate(:deploy) do
-        connection.execute("VACUUM ANALYZE #{quoted_table_name}")
+        connection.vacuum(table_name, analyze: true)
       end
     end
   end
@@ -426,7 +426,7 @@ class ActiveRecord::Base
       # Johnson, Bob sorting before Johns, Jimmy
       unless @collkey&.key?(Shard.current.database_server.id)
         @collkey ||= {}
-        @collkey[Shard.current.database_server.id] = connection.extension_installed?(:pg_collkey)
+        @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
       end
       if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
         "(#{col} COLLATE #{collation})"
@@ -665,17 +665,11 @@ class ActiveRecord::Base
 
     start ||= current_xlog_location
     GuardRail.activate(:secondary) do
-      diff_fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_wal_lsn_diff" :
-        "pg_xlog_location_diff"
-      fn = connection.send(:postgresql_version) >= 100000 ?
-        "pg_last_wal_replay_lsn()" :
-        "pg_last_xlog_replay_location()"
       # positive == first value greater, negative == second value greater
-      # SELECT pg_xlog_location_diff(<START>, pg_last_xlog_replay_location())
-      start_time = Time.now
-      while connection.select_value("SELECT #{diff_fn}(#{connection.quote(start)}, #{fn})").to_i >= 0
-        return false if timeout && Time.now > start_time + timeout
+      start_time = Time.now.utc
+      while connection.wal_lsn_diff(start, :last_replay) >= 0
+        return false if timeout && Time.now.utc > start_time + timeout
+
         sleep 0.1
       end
     end
@@ -769,30 +763,373 @@ module ActiveRecord
 end
 
 module UsefulFindInBatches
-  def find_in_batches(start: nil, strategy: nil, **kwargs, &block)
-    # prefer copy unless we're in a transaction (which would be bad,
-    # because we might open a separate connection in the block, and not
-    # see the contents of our current transaction)
-    if connection.open_transactions == 0 && !start && eager_load_values.empty? && !ActiveRecord::Base.in_migration && !strategy || strategy == :copy
-      self.activate { |r| r.find_in_batches_with_copy(**kwargs, &block) }
-    elsif strategy == :pluck_ids
-      self.activate { |r| r.find_in_batches_with_pluck_ids(**kwargs, &block) }
-    elsif should_use_cursor? && !start && eager_load_values.empty? && !strategy || strategy == :cursor
-      self.activate { |r| r.find_in_batches_with_cursor(**kwargs, &block) }
-    elsif find_in_batches_needs_temp_table? && !strategy || strategy == :temp_table
-      if start
-        raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key")
+  # add the strategy param
+  def find_each(start: nil, finish: nil, **kwargs)
+    if block_given?
+      find_in_batches(start: start, finish: finish, **kwargs) do |records|
+        records.each { |record| yield record }
       end
-      unless eager_load_values.empty?
-        raise ArgumentError.new("GROUP and ORDER are incompatible with `eager_load`, as is an explicit select without the primary key")
-      end
-      self.activate { |r| r.find_in_batches_with_temp_table(**kwargs, &block) }
     else
-      super(start: start, **kwargs, &block)
+      enum_for(:find_each, start: start, finish: finish, **kwargs) do
+        relation = self
+        apply_limits(relation, start, finish).size
+      end
+    end
+  end
+
+  # add the strategy param
+  def find_in_batches(batch_size: 1000, start: nil, finish: nil, **kwargs)
+    relation = self
+    unless block_given?
+      return to_enum(:find_in_batches, start: start, finish: finish, batch_size: batch_size, **kwargs) do
+        total = apply_limits(relation, start, finish).size
+        (total - 1).div(batch_size) + 1
+      end
+    end
+
+    in_batches(of: batch_size, start: start, finish: finish, load: true, **kwargs) do |batch|
+      yield batch.to_a
+    end
+  end
+
+  def in_batches(strategy: nil, start: nil, finish: nil, **kwargs, &block)
+    unless block_given?
+      return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
+    end
+
+    strategy ||= infer_in_batches_strategy
+
+    if strategy == :id
+      raise ArgumentError, "GROUP BY is incompatible with :id batches strategy" unless group_values.empty?
+
+      return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, **kwargs, &block) }
+    end
+
+    kwargs.delete(:error_on_ignore)
+    activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
+  end
+
+  def infer_in_batches_strategy
+    strategy ||= :copy if in_batches_can_use_copy?
+    strategy ||= :cursor if in_batches_can_use_cursor?
+    strategy ||= :temp_table if in_batches_needs_temp_table?
+    strategy || :id
+  end
+
+  private
+
+  def in_batches_can_use_copy?
+    connection.open_transactions == 0 && eager_load_values.empty? && !ActiveRecord::Base.in_migration
+  end
+
+  def in_batches_can_use_cursor?
+    eager_load_values.empty? && (GuardRail.environment == :secondary || connection.readonly?)
+  end
+
+  def in_batches_needs_temp_table?
+    order_values.any? ||
+      group_values.any? ||
+      select_values.to_s =~ /DISTINCT/i ||
+      distinct_value ||
+      in_batches_select_values_necessitate_temp_table?
+  end
+
+  def in_batches_select_values_necessitate_temp_table?
+    return false if select_values.blank?
+
+    selects = select_values.flat_map { |sel| sel.to_s.split(",").map(&:strip) }
+    id_keys = [primary_key, "*", "#{table_name}.#{primary_key}", "#{table_name}.*"]
+    id_keys.all? { |k| !selects.include?(k) }
+  end
+
+  def in_batches_with_cursor(of: 1000, start: nil, finish: nil, load: false)
+    klass.transaction do
+      relation = apply_limits(clone, start, finish)
+      relation.skip_query_cache!
+      unless load
+        relation = relation.except(:select).select(primary_key)
+      end
+      sql = relation.to_sql
+      cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+      connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
+
+      loop do
+        if load
+          records = connection.uncached { klass.find_by_sql("FETCH FORWARD #{of} FROM #{cursor}") }
+          ids = records.map(&:id)
+          preload_associations(records)
+          yielded_relation = where(primary_key => ids).preload(includes_values + preload_values)
+          yielded_relation.send(:load_records, records)
+        else
+          ids = connection.uncached { connection.select_values("FETCH FORWARD #{of} FROM #{cursor}") }
+          yielded_relation = where(primary_key => ids).preload(includes_values + preload_values)
+          yielded_relation = yielded_relation.extending(BatchWithColumnsPreloaded).set_values(ids)
+        end
+
+        break if ids.empty?
+
+        yield yielded_relation
+
+        break if ids.size < of
+      end
+    ensure
+      unless $!.is_a?(ActiveRecord::StatementInvalid)
+        connection.execute("CLOSE #{cursor}")
+      end
+    end
+  end
+
+  def in_batches_with_copy(of: 1000, start: nil, finish: nil, load: false)
+    limited_query = limit(0).to_sql
+
+    relation = self
+    relation_for_copy = apply_limits(relation, start, finish)
+    unless load
+      relation_for_copy = relation_for_copy.except(:select).select(primary_key)
+    end
+    full_query = "COPY (#{relation_for_copy.to_sql}) TO STDOUT"
+    conn = connection
+    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
+    pool = conn.pool
+    # remove the connection from the pool so that any queries executed
+    # while we're running this will get a new connection
+    pool.remove(conn)
+
+    checkin = -> do
+      pool&.restore_connection(conn)
+      pool = nil
+    end
+
+    # make sure to log _something_, even if the dbtime is totally off
+    conn.send(:log, full_query, "#{klass.name} Load") do
+      decoder = if load
+        # set up all our metadata based on a dummy query (COPY doesn't return any metadata)
+        result = conn.raw_connection.exec(limited_query)
+        type_map = conn.raw_connection.type_map_for_results.build_column_map(result)
+        # see PostgreSQLAdapter#exec_query
+        types = {}
+        fields = result.fields
+        fields.each_with_index do |fname, i|
+          ftype = result.ftype i
+          fmod  = result.fmod i
+          types[fname] = conn.send(:get_oid_type, ftype, fmod, fname)
+        end
+
+        column_types = types.dup
+        columns_hash.each_key { |k| column_types.delete k }
+
+        PG::TextDecoder::CopyRow.new(type_map: type_map)
+      else
+        pkey_oid = columns_hash[primary_key].sql_type_metadata.oid
+        # this is really dumb that we have to manually search through this, but
+        # PG::TypeMapByOid doesn't have a direct lookup method
+        coder = conn.raw_connection.type_map_for_results.coders.find { |c| c.oid == pkey_oid }
+
+        PG::TextDecoder::CopyRow.new(type_map: PG::TypeMapByColumn.new([coder]))
+      end
+
+      rows = []
+
+      build_relation = -> do
+        if load
+          records = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
+          ids = records.map(&:id)
+          yielded_relation = relation.where(primary_key => ids)
+          preload_associations(records)
+          yielded_relation.send(:load_records, records)
+        else
+          ids = rows.map(&:first)
+          yielded_relation = relation.where(primary_key => ids)
+          yielded_relation = yielded_relation.extending(BatchWithColumnsPreloaded).set_values(ids)
+        end
+        yielded_relation
+      end
+
+      conn.raw_connection.copy_data(full_query, decoder) do
+        while (row = conn.raw_connection.get_copy_data)
+          rows << row
+          if rows.size == of
+            yield build_relation.call
+            rows = []
+          end
+        end
+      end
+      # return the connection now, in case there was only 1 batch, we can avoid a separate connection if the block needs it
+      checkin.call
+
+      unless rows.empty?
+        yield build_relation.call
+      end
+    end
+    nil
+  ensure
+    # put the connection back in the pool for reuse
+    checkin&.call
+  end
+
+  # in some cases we're doing a lot of work inside
+  # the yielded block, and holding open a transaction
+  # or even a connection while we do all that work can
+  # be a problem for the database, especially if a lot
+  # of these are happening at once.  This strategy
+  # makes one query to hold onto all the IDs needed for the
+  # iteration (make sure they'll fit in memory, or you could be sad)
+  # and yields the objects in batches in the same order as the scope specified
+  # so the DB connection can be fully recycled during each block.
+  def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, load: false)
+    relation = apply_limits(self, start, finish)
+    all_object_ids = relation.pluck(:id)
+    current_order_values = order_values
+    all_object_ids.in_groups_of(of) do |id_batch|
+      object_batch = klass.unscoped.where(id: id_batch).order(current_order_values).preload(includes_values + preload_values)
+      yield object_batch
+    end
+  end
+
+  def in_batches_with_temp_table(of: 1000, start: nil, finish: nil, load: false, ignore_transaction: false)
+    Shard.current.database_server.unguard do
+      can_do_it = ignore_transaction ||
+        Rails.env.production? ||
+        ActiveRecord::Base.in_migration ||
+        GuardRail.environment == :deploy ||
+        (!Rails.env.test? && connection.open_transactions > 0) ||
+        ActiveRecord::Base.in_transaction_in_test?
+      unless can_do_it
+        raise ArgumentError, "in_batches with temp_table probably won't work outside a migration
+             and outside a transaction. Unfortunately, it's impossible to automatically
+             determine a better way to do it that will work correctly. You can try
+             switching to secondary first (then switching to primary if you modify anything
+             inside your loop), wrapping in a transaction (but be wary of locking records
+             for the duration of your query if you do any writes in your loop), or not
+             forcing in_batches to use a temp table (avoiding custom selects,
+             group, or order)."
+      end
+
+      relation = apply_limits(self, start, finish)
+      sql = relation.to_sql
+      table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
+      table = table[-63..-1] if table.length > 63
+
+      remaining = connection.update("CREATE TEMPORARY TABLE #{table} AS #{sql}")
+
+      begin
+        return if remaining.zero?
+
+        if remaining > of
+          begin
+            old_proc = connection.raw_connection.set_notice_processor {}
+            index = if (select_values.empty? || select_values.any? { |v| v.to_s == primary_key.to_s }) && order_values.empty?
+              connection.execute(%{CREATE INDEX "temp_primary_key" ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})})
+              primary_key.to_s
+            else
+              connection.execute "ALTER TABLE #{table} ADD temp_primary_key SERIAL PRIMARY KEY"
+              'temp_primary_key'
+            end
+          ensure
+            connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+          end
+        end
+
+        klass.unscoped do
+          batch_relation = klass.from(table).select("*").limit(of).preload(includes_values + preload_values)
+          batch_relation = batch_relation.order(Arel.sql(connection.quote_column_name(index))) if index
+          yielded_relation = batch_relation
+          loop do
+            yield yielded_relation
+
+            remaining -= of
+            break if remaining <= 0
+
+            last_value = if yielded_relation.loaded?
+              yielded_relation.last[index]
+            else
+              yielded_relation.offset(of - 1).limit(1).pluck(index).first
+            end
+            break if last_value.nil?
+
+            yielded_relation = batch_relation.where("#{connection.quote_column_name(index)} > ?", last_value)
+          end
+        end
+      ensure
+        if !$!.is_a?(ActiveRecord::StatementInvalid) || connection.open_transactions == 0
+          connection.execute "DROP TABLE #{table}"
+        end
+      end
     end
   end
 end
 ActiveRecord::Relation.prepend(UsefulFindInBatches)
+
+module UsefulBatchEnumerator
+  def initialize(strategy: nil, **kwargs)
+    @strategy = strategy
+    @kwargs = kwargs.except(:relation)
+    super(**kwargs.slice(:of, :start, :finish, :relation))
+  end
+
+  def each_record
+    return to_enum(:each_record) unless block_given?
+
+    @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs).each do |relation|
+      relation.records.each { |record| yield record }
+    end
+  end
+
+  def delete_all
+    if @strategy.nil? && (strategy = @relation.infer_in_batches_strategy) == :id
+      sum = 0
+      loop do
+        current = @relation.limit(@of).delete_all
+        sum += current
+        break unless current == @of
+      end
+      return sum
+    end
+
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs, &:delete_all)
+  end
+
+  def update_all(*args)
+    @relation.in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
+      relation.update_all(*args)
+    end
+  end
+
+  def destroy_all
+    @relation.in_batches(strategy: @strategy, load: true, **@kwargs, &:destroy_all)
+  end
+
+  def each
+    enum = @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs)
+    return enum.each { |relation| yield relation } if block_given?
+
+    enum
+  end
+
+  def pluck(*args)
+    return to_enum(:pluck, *args) unless block_given?
+
+    @relation.except(:select)
+      .select(*args)
+      .in_batches(strategy: @strategy, load: false, **@kwargs) do |relation|
+      yield relation.pluck(*args)
+    end
+  end
+end
+ActiveRecord::Batches::BatchEnumerator.prepend(UsefulBatchEnumerator)
+
+module BatchWithColumnsPreloaded
+  def set_values(values)
+    @loaded_values = values
+    self
+  end
+
+  def pluck(*args)
+    return @loaded_values if args == [primary_key.to_sym] && @loaded_values
+
+    super
+  end
+end
 
 module LockForNoKeyUpdate
   def lock(lock_type = true)
@@ -805,261 +1142,18 @@ ActiveRecord::Relation.prepend(LockForNoKeyUpdate)
 ActiveRecord::Relation.class_eval do
   def includes(*args)
     return super if args.empty? || args == [nil]
+
     raise "Use preload or eager_load instead of includes"
   end
 
   def where!(*args)
     raise "where!.not doesn't work in Rails 4.2" if args.empty?
+
     super
   end
 
-  def uniq(*args)
+  def uniq(*)
     raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
-  end
-
-  def select_values_necessitate_temp_table?
-    return false unless select_values.present?
-    selects = select_values.flat_map{|sel| sel.to_s.split(",").map(&:strip) }
-    id_keys = [primary_key, "*", "#{table_name}.#{primary_key}", "#{table_name}.*"]
-    id_keys.all?{|k| !selects.include?(k) }
-  end
-  private :select_values_necessitate_temp_table?
-
-  def find_in_batches_needs_temp_table?
-    order_values.any? ||
-      group_values.any? ||
-      select_values.to_s =~ /DISTINCT/i ||
-      distinct_value ||
-      select_values_necessitate_temp_table?
-  end
-  private :find_in_batches_needs_temp_table?
-
-  def should_use_cursor?
-    (GuardRail.environment == :secondary || connection.readonly?)
-  end
-
-  def find_in_batches_with_cursor(options = {})
-    batch_size = options[:batch_size] || 1000
-    klass.transaction do
-      begin
-        sql = to_sql
-        cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
-        connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
-        includes = includes_values + preload_values
-        klass.unscoped do
-          batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
-          while !batch.empty?
-            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
-            yield batch
-            break if batch.size < batch_size
-            batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
-          end
-        end
-      ensure
-        unless $!.is_a?(ActiveRecord::StatementInvalid)
-          connection.execute("CLOSE #{cursor}")
-        end
-      end
-    end
-  end
-
-  def find_in_batches_with_copy(options = {})
-    # implement the start option as an offset
-    return offset(options[:start]).find_in_batches_with_copy(options.merge(start: 0)) if options[:start].to_i != 0
-
-    limited_query = limit(0).to_sql
-    full_query = "COPY (#{to_sql}) TO STDOUT"
-    conn = connection
-    full_query = conn.annotate_sql(full_query) if defined?(Marginalia)
-    pool = conn.pool
-    # remove the connection from the pool so that any queries executed
-    # while we're running this will get a new connection
-    pool.remove(conn)
-
-
-    # make sure to log _something_, even if the dbtime is totally off
-    conn.send(:log, full_query, "#{klass.name} Load") do
-      # set up all our metadata based on a dummy query (COPY doesn't return any metadata)
-      result = conn.raw_connection.exec(limited_query)
-      type_map = conn.raw_connection.type_map_for_results.build_column_map(result)
-      deco = PG::TextDecoder::CopyRow.new(type_map: type_map)
-      # see PostgreSQLAdapter#exec_query
-      types = {}
-      fields = result.fields
-      fields.each_with_index do |fname, i|
-        ftype = result.ftype i
-        fmod  = result.fmod i
-        types[fname] = conn.send(:get_oid_type, ftype, fmod, fname)
-      end
-
-      column_types = types.dup
-      columns_hash.each_key { |k| column_types.delete k }
-
-      includes = includes_values + preload_values
-
-      rows = []
-      batch_size = options[:batch_size] || 1000
-
-      conn.raw_connection.copy_data(full_query, deco) do
-        while (row = conn.raw_connection.get_copy_data)
-          rows << row
-          if rows.size == batch_size
-            batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
-            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
-            yield batch
-            rows = []
-          end
-        end
-      end
-      # return the connection now, in case there was only 1 batch, we can avoid a separate connection if the block needs it
-      pool.synchronize do
-        pool.send(:adopt_connection, conn)
-        pool.checkin(conn)
-      end
-      pool = nil
-
-      unless rows.empty?
-        batch = ActiveRecord::Result.new(fields, rows, types).map { |record| instantiate(record, column_types) }
-        ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
-        yield batch
-      end
-    end
-    nil
-  ensure
-    if pool
-      # put the connection back in the pool for reuse
-      pool.synchronize do
-        pool.send(:adopt_connection, conn)
-        pool.checkin(conn)
-      end
-    end
-  end
-
-  # in some cases we're doing a lot of work inside
-  # the yielded block, and holding open a transaction
-  # or even a connection while we do all that work can
-  # be a problem for the database, especially if a lot
-  # of these are happening at once.  This strategy
-  # makes one query to hold onto all the IDs needed for the
-  # iteration (make sure they'll fit in memory, or you could be sad)
-  # and yields the objects in batches in the same order as the scope specified
-  # so the DB connection can be fully recycled during each block.
-  def find_in_batches_with_pluck_ids(options = {})
-    batch_size = options[:batch_size] || 1000
-    all_object_ids = pluck(:id)
-    current_order_values = order_values
-    all_object_ids.in_groups_of(batch_size) do |id_batch|
-      object_batch = klass.unscoped.where(id: id_batch).order(current_order_values)
-      yield object_batch
-    end
-  end
-
-  def find_in_batches_with_temp_table(options = {})
-    Shard.current.database_server.unguard do
-      can_do_it = Rails.env.production? ||
-        ActiveRecord::Base.in_migration ||
-        GuardRail.environment == :deploy ||
-        (!Rails.env.test? && connection.open_transactions > 0) ||
-        ActiveRecord::Base.in_transaction_in_test?
-      raise "find_in_batches_with_temp_table probably won't work outside a migration
-             and outside a transaction. Unfortunately, it's impossible to automatically
-             determine a better way to do it that will work correctly. You can try
-             switching to secondary first (then switching to primary if you modify anything
-             inside your loop), wrapping in a transaction (but be wary of locking records
-             for the duration of your query if you do any writes in your loop), or not
-             forcing find_in_batches to use a temp table (avoiding custom selects,
-             group, or order)." unless can_do_it
-
-      if options[:pluck]
-        pluck = Array(options[:pluck])
-        pluck_for_select = pluck.map do |column_name|
-          if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-            "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
-          else
-            column_name.to_s
-          end
-        end
-        pluck = pluck.map(&:to_s)
-      end
-      batch_size = options[:batch_size] || 1000
-      if pluck
-        sql = select(pluck_for_select).to_sql
-      else
-        sql = to_sql
-      end
-      table = "#{table_name}_find_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
-      table = table[-63..-1] if table.length > 63
-
-      rows = connection.update("CREATE TEMPORARY TABLE #{table} AS #{sql}")
-
-      begin
-        if (rows > batch_size)
-          index = "temp_primary_key"
-          begin
-            old_proc = connection.raw_connection.set_notice_processor {}
-            if pluck && pluck.any?{|p| p == primary_key.to_s}
-              connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
-              index = primary_key.to_s
-            else
-              pluck.unshift(index) if pluck
-              connection.execute "ALTER TABLE #{table}
-                               ADD temp_primary_key SERIAL PRIMARY KEY"
-            end
-          ensure
-            connection.raw_connection.set_notice_processor(&old_proc) if old_proc
-          end
-        end
-
-        includes = includes_values + preload_values
-        klass.unscoped do
-          quoted_plucks = pluck && pluck.map do |column_name|
-            # Rails 4.2 is going to try to quote them anyway but unfortunately not to the temp table, so just make it explicit
-            column_names.include?(column_name) ?
-              Arel.sql("#{connection.quote_local_table_name(table)}.#{connection.quote_column_name(column_name)}") : column_name
-          end
-
-          if pluck
-            if index
-              batch = klass.from(table).order(Arel.sql(index)).limit(batch_size).pluck(*quoted_plucks)
-            else
-              batch = klass.from(table).pluck(*quoted_plucks)
-            end
-          else
-            if index
-              sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
-              batch = klass.find_by_sql(sql)
-            else
-              batch = klass.find_by_sql("SELECT * FROM #{table}")
-            end
-          end
-
-          while rows > 0
-            rows -= batch.size
-
-            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
-            yield batch
-            break if rows <= 0 || batch.size < batch_size
-
-            if pluck
-              last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
-              batch = klass.from(table).order(Arel.sql(index)).where("#{index} > ?", last_value).limit(batch_size).pluck(*quoted_plucks)
-            else
-              last_value = batch.last[index]
-              sql = "SELECT *
-                 FROM #{table}
-                 WHERE #{index} > #{last_value}
-                 ORDER BY #{index} ASC
-                 LIMIT #{batch_size}"
-              batch = klass.find_by_sql(sql)
-            end
-          end
-        end
-      ensure
-        if !$!.is_a?(ActiveRecord::StatementInvalid) || connection.open_transactions == 0
-          connection.execute "DROP TABLE #{table}"
-        end
-      end
-    end
   end
 
   def polymorphic_where(args)
@@ -1280,7 +1374,7 @@ ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
 module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
-      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      scope = except(:select).select(primary_key)
       return unscoped.where(primary_key => scope).delete_all
     end
     super
@@ -1288,7 +1382,7 @@ module UpdateAndDeleteAllWithLimit
 
   def update_all(updates, *args)
     if limit_value || offset_value
-      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      scope = except(:select).select(primary_key)
       return unscoped.where(primary_key => scope).update_all(updates)
     end
     super
@@ -1593,7 +1687,11 @@ end
 
 if CANVAS_RAILS6_0
   module UnscopeCallbacks
-    def run_callbacks(*args)
+    def run_callbacks(kind)
+      # no callbacks, or it's the Switchman initialize callback that is safe for scoping; avoid
+      # all the object allocations of creating a new scope
+      return super if __callbacks[kind].empty? || kind == :initialize && __callbacks[kind].send(:chain).length == 1
+
       # in rails 6.1, we can get rid of this entire monkeypatch
       scope = self.class.current_scope&.clone || self.class.default_scoped
       scope = scope.klass.unscoped
@@ -1820,6 +1918,28 @@ module ConnectionWithMaxRuntime
   end
 end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)
+
+module RestoreConnectionConnectionPool
+  def restore_connection(conn)
+    synchronize do
+      adopt_connection(conn)
+      # check if a new connection was checked out in the meantime, and check it back in
+      if (old_conn = @thread_cached_conns[connection_cache_key(current_thread)]) && old_conn != conn
+        # this is just the necessary parts of #checkin
+        old_conn.lock.synchronize do
+          old_conn._run_checkin_callbacks do
+            old_conn.expire
+          end
+
+          @available.add old_conn
+        end
+      end
+      @thread_cached_conns[connection_cache_key(current_thread)] = conn
+    end
+  end
+end
+ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(RestoreConnectionConnectionPool)
+
 
 module MaxRuntimeConnectionPool
   def max_runtime

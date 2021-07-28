@@ -573,14 +573,9 @@ class DiscussionTopicsController < ApplicationController
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
       PERMISSIONS: {
-        manage_files:
-          @context.grants_any_right?(
-            @current_user,
-            session,
-            :manage_files,
-            *RoleOverride::GRANULAR_FILE_PERMISSIONS
-          )
-      }
+        manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+      },
+      REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -637,16 +632,21 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def show
+    @topic = @context.all_discussion_topics.find(params[:id])
+    # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
+    @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
     # Render updated Post UI if feature flag is enabled
-    if @context.feature_enabled?(:react_discussions_post)
-      @topic = @context.all_discussion_topics.find(params[:id])
+    if @context.feature_enabled?(:react_discussions_post) && (!@topic.for_group_discussion? || @context.grants_right?(@current_user, session, :read_as_admin))
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       js_env({
                course_id: params[:course_id],
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
-               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu)
+               discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+               rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
+               isolated_view: Account.site_admin.feature_enabled?(:isolated_view)
              })
       js_bundle :discussion_topics_post
       css_bundle :discussions_index
@@ -655,7 +655,6 @@ class DiscussionTopicsController < ApplicationController
     end
 
     parent_id = params[:parent_id]
-    @topic = @context.all_discussion_topics.find(params[:id])
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
     @assignment = if @topic.for_assignment?
       AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user)
@@ -685,8 +684,6 @@ class DiscussionTopicsController < ApplicationController
       end
     else
       @headers = !params[:headless]
-      # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
@@ -731,7 +728,7 @@ class DiscussionTopicsController < ApplicationController
             if @context.is_a?(Course) && @topic.is_section_specific
               user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
                                              course_id: @context).not_fake.active_or_pending_by_date_ignoring_access.
-                                             group(:course_section_id).count
+                group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
                 cs.attributes.slice(*%w{id name}).merge(:user_count => user_counts[cs.id] || 0)
               end
@@ -765,7 +762,7 @@ class DiscussionTopicsController < ApplicationController
                     !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
                 :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                     !@topic.locked_for?(@current_user, :check_policies => true),
+                  !@topic.locked_for?(@current_user, :check_policies => true),
                 # Can moderate any topic
                 :MODERATE         => user_can_moderate
               },
@@ -848,7 +845,6 @@ class DiscussionTopicsController < ApplicationController
                 content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), {:title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed")})
               end
             end
-
 
             render stream: can_stream_template?
           end
@@ -1501,12 +1497,7 @@ class DiscussionTopicsController < ApplicationController
   def set_default_usage_rights(attachment)
     return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     return unless @context.try(:usage_rights_required?)
-    return if @context.grants_any_right?(
-      @current_user,
-      session,
-      :manage_files,
-      *RoleOverride::GRANULAR_FILE_PERMISSIONS
-    )
+    return if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
     attachment.usage_rights = @context.usage_rights.find_or_create_by(
       use_justification:'own_copyright',

@@ -18,6 +18,8 @@
 
 // Styles for Dashboard Card Component
 
+@use "sass:math";
+
 @import "base/environment";
 @import "components/ic-badge";
 
@@ -173,7 +175,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .ic-DashboardCard__header-subtitle {
   line-height: 1.3;
   padding: 0;
-  margin-top: $ic-sp/3;
+  margin-top: math.div($ic-sp, 3);
 }
 
 .ic-DashboardCard__header-term {

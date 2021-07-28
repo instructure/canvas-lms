@@ -30,7 +30,7 @@ function selectProps(override = {}) {
   return {
     id: 'sel1',
     label: 'Choose one',
-    value: {undefined},
+    value: undefined,
     onChange: () => {},
     translatedStrings: {
       USE_ARROWS: 'Use arrow keys to navigate options.',
@@ -38,6 +38,7 @@ function selectProps(override = {}) {
       LIST_EXPANDED: 'List expanded.',
       OPTION_SELECTED: '{option} selected.'
     },
+    liveRegion: () => liveRegion,
     ...override
   }
 }

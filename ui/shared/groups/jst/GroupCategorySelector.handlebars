@@ -78,8 +78,10 @@
           </select>
         </div>
         <div>
-          <button class="Button" type="button" id="create_group_category_id" {{disabledIf inClosedGradingPeriod}}
-            {{disabledIf groupCategoryIdDisabled}}>
+          <button class="Button" type="button" id="create_group_category_id"
+            {{disabledIf inClosedGradingPeriod}}
+            {{disabledIf groupCategoryIdDisabled}}
+            {{disabledIf cannotManageGroups}}>
             {{#t}}New Group Category{{/t}}
           </button>
         </div>

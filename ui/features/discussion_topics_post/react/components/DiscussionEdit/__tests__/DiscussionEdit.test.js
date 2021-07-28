@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {DiscussionEdit} from '../DiscussionEdit'
 import {render, fireEvent} from '@testing-library/react'
 
@@ -37,17 +36,6 @@ const defaultProps = ({
 })
 
 describe('DiscussionEdit', () => {
-  beforeEach(() => {
-    RichContentEditor.loadNewEditor = jest.fn()
-    RichContentEditor.callOnRCE = jest.fn()
-    RichContentEditor.closeRCE = jest.fn()
-    RichContentEditor.destroyRCE = jest.fn()
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   describe('Rendering', () => {
     it('should render', () => {
       const component = setup(defaultProps())

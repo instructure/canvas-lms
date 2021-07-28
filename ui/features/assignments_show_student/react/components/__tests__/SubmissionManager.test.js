@@ -28,9 +28,9 @@ import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
+import TextEntry from '../AttemptType/TextEntry'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 // Mock the RCE so we can test text entry submissions without loading the whole
@@ -46,6 +46,12 @@ function renderInContext(overrides = {}, children) {
 }
 
 describe('SubmissionManager', () => {
+  beforeAll(() => {
+    window.ENV.use_rce_enhancements = true
+    window.INST = window.INST || {}
+    window.INST.editorButtons = []
+  })
+
   it('renders the AttemptTab', async () => {
     const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
@@ -496,6 +502,21 @@ describe('SubmissionManager', () => {
       expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
     })
 
+    it('is not rendered if the student has been graded before submitting', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {
+          ...SubmissionMocks.graded,
+          attempt: 0
+        }
+      })
+      const {queryByRole} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+    })
+
     it('is not rendered if excused', async () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {...SubmissionMocks.excused}
@@ -796,9 +817,17 @@ describe('SubmissionManager', () => {
   })
 
   describe('saving text entry drafts', () => {
-    let editorContent
-    let fakeEditor
+    beforeAll(async () => {
+      // This gets the lazy loaded components loaded before our specs.
+      // otherwise, the first one (at least) will fail.
+      const {unmount} = render(<TextEntry submission={{state: 'unsubmitted'}} />)
+      await waitFor(() => {
+        expect(tinymce.editors[0]).toBeDefined()
+      })
+      unmount()
+    })
 
+    let fakeEditor
     const renderTextAttempt = async ({mocks = []} = {}) => {
       const submission = {
         attempt: 1,
@@ -826,35 +855,24 @@ describe('SubmissionManager', () => {
       )
 
       // Wait for callbacks to fire and the "editor" to be loaded
-      await waitFor(() => {
-        expect(fakeEditor).not.toBeUndefined()
-      })
+      await waitFor(
+        () => {
+          expect(tinymce?.editors[0]).toBeDefined()
+        },
+        {timeout: 4000}
+      )
+      fakeEditor = tinymce.editors[0]
       return result
     }
 
     beforeEach(async () => {
       jest.useFakeTimers()
-
-      jest.spyOn(RichContentEditor, 'callOnRCE').mockImplementation(() => editorContent)
-      jest.spyOn(RichContentEditor, 'loadNewEditor').mockImplementation((_textarea, options) => {
-        fakeEditor = {
-          focus: () => {},
-          getBody: () => {},
-          getContent: jest.fn(() => editorContent),
-          mode: {
-            set: jest.fn()
-          },
-          setContent: jest.fn(content => {
-            editorContent = content
-          }),
-          selection: {
-            collapse: () => {},
-            select: () => {}
-          }
-        }
-
-        options.tinyOptions.init_instance_callback(fakeEditor)
-      })
+      tinymce.editors = []
+      fakeEditor = undefined
+      const alert = document.createElement('div')
+      alert.id = 'flash_screenreader_holder'
+      alert.setAttribute('role', 'alert')
+      document.body.appendChild(alert)
     })
 
     afterEach(async () => {
@@ -863,13 +881,13 @@ describe('SubmissionManager', () => {
     })
 
     it('shows a "Saving Draft" label when the contents of a text entry have started changing', async () => {
-      const {getByText} = await renderTextAttempt()
+      const {findByText} = await renderTextAttempt()
       act(() => {
         fakeEditor.setContent('some edited draft text')
         jest.advanceTimersByTime(500)
       })
 
-      expect(getByText('Saving Draft')).toBeInTheDocument()
+      expect(await findByText('Saving Draft')).toBeInTheDocument()
     })
 
     it('disables the Submit Assignment button while allegedly saving the draft', async () => {

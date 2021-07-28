@@ -33,10 +33,17 @@ export default class InfiniteScroll extends React.Component {
 
   componentDidMount() {
     this.pageLoaded = this.props.pageStart
+    if (this.props.scrollContainer) {
+      this.scrollContainer = this.props.scrollContainer
+    }
     this.attachScrollListener()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    if (prevProps.scrollContainer !== this.props.scrollContainer) {
+      this.detachScrollListener()
+      this.scrollContainer = this.props.scrollContainer
+    }
     this.attachScrollListener()
   }
 
@@ -58,23 +65,47 @@ export default class InfiniteScroll extends React.Component {
       topPosition(this.node) + this.node.offsetHeight - scrollTop - window.innerHeight <
       Number(this.props.threshold)
     ) {
-      this.detachScrollListener()
-      // call loadMore after detachScrollListener to allow
-      // for non-async loadMore functions
-      this.props.loadMore((this.pageLoaded += 1))
+      this.loadMore()
     }
+  }
+
+  handleElementScroll = () => {
+    const {scrollTop, scrollHeight, clientHeight} = this.scrollContainer
+
+    if (scrollTop + clientHeight >= scrollHeight - Number(this.props.threshold)) {
+      this.loadMore()
+    }
+  }
+
+  loadMore = () => {
+    this.detachScrollListener()
+    // call loadMore after detachScrollListener to allow
+    // for non-async loadMore functions
+    this.props.loadMore((this.pageLoaded += 1))
   }
 
   attachScrollListener() {
     if (!this.props.hasMore) return
-    window.addEventListener('scroll', this.handleWindowScroll)
-    window.addEventListener('resize', this.handleWindowScroll)
-    this.handleWindowScroll()
+
+    if (this.scrollContainer) {
+      this.scrollContainer.addEventListener('scroll', this.handleElementScroll)
+      window.addEventListener('resize', this.handleElementScroll)
+      this.handleElementScroll()
+    } else {
+      window.addEventListener('scroll', this.handleWindowScroll)
+      window.addEventListener('resize', this.handleWindowScroll)
+      this.handleWindowScroll()
+    }
   }
 
   detachScrollListener() {
-    window.removeEventListener('scroll', this.handleWindowScroll)
-    window.removeEventListener('resize', this.handleWindowScroll)
+    if (this.scrollContainer) {
+      window.removeEventListener('resize', this.handleElementScroll)
+      this.scrollContainer.removeEventListener('scroll', this.handleElementScroll)
+    } else {
+      window.removeEventListener('resize', this.handleWindowScroll)
+      window.removeEventListener('scroll', this.handleWindowScroll)
+    }
   }
 
   componentWillUnmount() {

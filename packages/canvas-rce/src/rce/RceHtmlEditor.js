@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {func, string} from 'prop-types'
-import formatMessage from 'format-message'
+import formatMessage from '../format-message'
 import {CodeEditor} from '@instructure/ui-code-editor'
 import beautify from 'js-beautify'
 
@@ -63,6 +63,11 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
   const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
 
   useEffect(() => {
+    setCode(beautify.html(props.code, {inline: inline_elems}))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     // INSTUI sets the CodeEditor's surrounding label's
     // display inline-block so it doesn't fill the width
     // of its container unless there's wide content.
@@ -96,10 +101,6 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
     editor.style.margin = '0'
     editor.style.border = '0'
   }, [props.height, editorRef])
-
-  useEffect(() => {
-    setCode(beautify.html(props.code, {inline: inline_elems}))
-  }, [props.code])
 
   const isFocused = useRef(false)
 

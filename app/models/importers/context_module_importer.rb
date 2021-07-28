@@ -300,7 +300,8 @@ module Importers
             :type => 'context_external_tool',
             :indent => hash[:indent].to_i,
             :url => external_tool_url,
-            :id => external_tool_id
+            :id => external_tool_id,
+            :lti_resource_link_lookup_uuid => hash[:lti_resource_link_lookup_uuid]
           }, existing_item, :position => context_module.migration_position)
         end
       elsif resource_class == Quizzes::Quiz

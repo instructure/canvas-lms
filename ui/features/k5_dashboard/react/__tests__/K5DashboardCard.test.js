@@ -32,9 +32,7 @@ const defaultContext = {
   loadingAnnouncements: false,
   loadingOpportunities: false,
   isStudent: true,
-  subjectAnnouncements: [],
-  switchToMissingItems: jest.fn(),
-  switchToToday: jest.fn()
+  subjectAnnouncements: []
 }
 
 const defaultProps = {
@@ -113,14 +111,14 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it('displays a link to the schedule tab if any assignments are due today', async () => {
-    const {findByText} = render(
+    const {findByRole} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsDueToday: {test: 3}}}>
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
-    const link = await findByText('3 due today')
-    link.click()
-    expect(defaultContext.switchToToday).toHaveBeenCalled()
+    const link = await findByRole('link', {name: 'View 3 items due today for course test course'})
+    expect(link).toBeInTheDocument()
+    expect(link.getAttribute('href')).toMatch('/courses/test?focusTarget=today#schedule')
   })
 
   it('displays "Nothing else due" if all assignments due today are completed', async () => {
@@ -136,14 +134,14 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it('displays a link to the schedule tab if any assignments are missing', async () => {
-    const {findByText} = render(
+    const {findByRole} = render(
       <K5DashboardContext.Provider value={{...defaultContext, assignmentsMissing: {test: 2}}}>
         <K5DashboardCard {...defaultProps} />
       </K5DashboardContext.Provider>
     )
-    const link = await findByText('2 missing')
-    link.click()
-    expect(defaultContext.switchToMissingItems).toHaveBeenCalled()
+    const link = await findByRole('link', {name: 'View 2 missing items for course test course'})
+    expect(link).toBeInTheDocument()
+    expect(link.getAttribute('href')).toMatch('/courses/test?focusTarget=missing-items#schedule')
   })
 
   it("doesn't display anything in the assignment links section if the user is not a student", async () => {
@@ -175,14 +173,7 @@ describe('LatestAnnouncementLink', () => {
 describe('AssignmentLinks', () => {
   it('renders loading skeleton while loading', () => {
     const {getByText, queryByText} = render(
-      <AssignmentLinks
-        loading
-        color="red"
-        courseName="test"
-        switchToMissingItems={jest.fn()}
-        switchToToday={jest.fn()}
-        numMissing={2}
-      />
+      <AssignmentLinks id="1" loading color="red" courseName="test" numMissing={2} />
     )
     expect(getByText('Loading missing assignments link')).toBeInTheDocument()
     expect(queryByText('2 missing')).not.toBeInTheDocument()

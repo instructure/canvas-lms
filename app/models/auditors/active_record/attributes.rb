@@ -20,19 +20,18 @@
 module Auditors::ActiveRecord
   module Attributes
     def fetch(key)
-      send(key.to_sym)
+      self[key]
     end
 
     def [](key)
       if key.to_s == 'attributes'
         self
       else
-        fetch(key)
+        # this works because we expect this module to be included
+        # in AR models, which allow you to use the square bracket
+        # interface for attribute access
+        super
       end
-    end
-
-    def []=(key, value)
-      send("#{key}=".to_sym, value)
     end
   end
 end

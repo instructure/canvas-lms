@@ -28,7 +28,7 @@ describe 'Eportfolio Reports' do
     @account1 = Account.default
     @account2 = Account.create(name: 'Root Account 2')
     @sub_account = Account.create(parent_account: @account1, name: 'Sub Account')
-    user_with_pseudonym1 = user_with_pseudonym(account: @account2, active_user: true)
+    user_with_pseudonym1 = user_with_pseudonym(account: @account2, active_user: true, sis_user_id: 'user1_eportfolio_sis_id')
     user_with_pseudonym2 = user_with_pseudonym(active_user: true)
     user_with_enrollment = course_with_student(active_all: true).user
     pseudonym(user_with_enrollment, account: @account1)
@@ -40,6 +40,17 @@ describe 'Eportfolio Reports' do
   it 'should be scoped to proper root account' do
     parsed = read_report(@type, { order: 1, account: @account2 })
     expect(parsed.length).to eq 1
+  end
+
+  it 'should include login info' do
+    parsed = read_report(@type, { order: 1, account: @account2 })
+    expect(parsed.first).to include('user1_eportfolio_sis_id')
+  end
+
+  it 'should not raise error when login is deleted' do
+    Pseudonym.where(sis_user_id: 'user1_eportfolio_sis_id').update_all(workflow_state: 'deleted')
+    parsed = read_report(@type, { order: 1, account: @account2 })
+    expect(parsed.first).to include('user1_eportfolio_sis_id')
   end
 
   it 'should run on a sub account' do

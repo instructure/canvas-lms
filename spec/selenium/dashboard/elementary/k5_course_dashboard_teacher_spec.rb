@@ -19,12 +19,20 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_grades_tab_page'
+require_relative '../pages/k5_modules_tab_page'
+require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../courses/pages/course_settings_page'
 
 describe "teacher k5 course dashboard" do
   include_context "in-process server selenium tests"
-  include K5PageObject
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5GradesTabPageObject
+  include K5ModulesTabPageObject
+  include K5ResourceTabPageObject
   include K5Common
   include CourseSettingsPage
 
@@ -78,6 +86,13 @@ describe "teacher k5 course dashboard" do
       expect(manage_button).to be_displayed
     end
 
+    it 'has an empty state graphic when there is no subject home content' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(empty_subject_home).to be_displayed
+      expect(manage_home_button).to be_displayed
+    end
+
     it 'opens the course setting path when manage subject button is clicked' do
       get "/courses/#{@subject_course.id}#home"
 
@@ -90,6 +105,16 @@ describe "teacher k5 course dashboard" do
       get "/courses/#{@subject_course.id}/settings"
 
       expect(important_info_link).to include_text("Important Info")
+    end
+
+    it 'goes to acting student course home when student view button is clicked' do
+      get "/courses/#{@subject_course.id}#modules"
+
+      expect(student_view_button).to be_displayed
+
+      click_student_view_button
+
+      expect(leave_student_view).to include_text("Leave Student View")
     end
   end
 
@@ -148,7 +173,7 @@ describe "teacher k5 course dashboard" do
       pink_color = '#DF6B91'
 
       expect(element_value_for_attr(selected_color_input, "value")).to eq(pink_color)
-      expect(hex_value_for_color(course_color_preview)).to eq(pink_color)
+      expect(hex_value_for_color(course_color_preview, 'background-color')).to eq(pink_color)
     end
 
     it 'allows for hex color to be input', ignore_js_errors: true do
@@ -159,7 +184,7 @@ describe "teacher k5 course dashboard" do
       input_color_hex_value(new_color)
       wait_for_new_page_load(submit_form('#course_form'))
 
-      expect(hex_value_for_color(course_color_preview)).to eq(new_color)
+      expect(hex_value_for_color(course_color_preview, 'background-color')).to eq(new_color)
     end
 
     it 'shows the course color selection on the course header' do
@@ -168,7 +193,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}#home"
 
-      expect(hex_value_for_color(dashboard_header)).to eq(new_color)
+      expect(hex_value_for_color(dashboard_header, 'background-color')).to eq(new_color)
     end
   end
 
@@ -201,7 +226,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}"
 
-      expect(k5_tablist).to include_text("Schedule\nHome\nGrades\nModules\nResources")
+      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
     end
 
     it 'has tabs that are hidden from the subject page' do
@@ -211,7 +236,7 @@ describe "teacher k5 course dashboard" do
 
       get "/courses/#{@subject_course.id}"
 
-      expect(k5_tablist).to include_text("Schedule\nGrades\nModules\nResources")
+      expect(k5_tablist).to include_text("Math Schedule\nSchedule\nMath Grades\nGrades\nMath Modules\nModules\nMath Resources\nResources")
     end
 
     it 'has ltis that are rearranged in new order on the resources page' do
@@ -237,13 +262,22 @@ describe "teacher k5 course dashboard" do
     end
   end
 
+  context 'course grades tab' do
+    it 'shows image and view grades button for teacher' do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(empty_grades_image).to be_displayed
+      expect(view_grades_button(@subject_course.id)).to be_displayed
+    end
+  end
+
   context 'course resources tab' do
     it 'shows the Important Info for subject resources tab' do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
       create_lti_resource("fake LTI")
       get "/courses/#{@subject_course.id}#resources"
-      
+
       expect(important_info_content).to include_text(important_info_text)
     end
   end

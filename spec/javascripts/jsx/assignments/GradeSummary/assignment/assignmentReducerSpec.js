@@ -88,6 +88,11 @@ QUnit.module('GradeSummary assignmentReducer()', suiteHooks => {
       setReleaseGradesStatus(AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE)
       equal(getReleaseGradesStatus(), 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE')
     })
+
+    test('optionally sets the "release grades" status to "selected grades from unavailable graders"', () => {
+      setReleaseGradesStatus(AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS)
+      equal(getReleaseGradesStatus(), 'SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS')
+    })
   })
 
   QUnit.module('when handling "SET_UNMUTE_ASSIGNMENT_STATUS"', () => {

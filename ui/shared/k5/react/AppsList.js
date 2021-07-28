@@ -24,24 +24,9 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
 import K5AppLink, {AppShape} from './K5AppLink'
-import LoadingSkeleton from './LoadingSkeleton'
+import LoadingWrapper from './LoadingWrapper'
 
-const AppsList = ({isLoading, apps}) => {
-  const skeletons = []
-  for (let i = 0; i < 3; i++) {
-    skeletons.push(
-      <View
-        key={`skeleton-${i}`}
-        display="inline-block"
-        width="16em"
-        height="2.875em"
-        margin="small"
-      >
-        <LoadingSkeleton width="100%" height="100%" screenReaderLabel={I18n.t('Loading apps...')} />
-      </View>
-    )
-  }
-
+const AppsList = ({isLoading, apps, courseId}) => {
   return (
     <View as="section">
       {(isLoading || apps.length > 0) && (
@@ -49,14 +34,30 @@ const AppsList = ({isLoading, apps}) => {
           {I18n.t('Student Applications')}
         </Heading>
       )}
-      {isLoading ? skeletons : apps.map(app => <K5AppLink key={app.id} app={app} />)}
+      <LoadingWrapper
+        id={`apps-${courseId || 'dashboard'}`}
+        isLoading={isLoading}
+        display="inline-block"
+        skeletonsNum={apps.length}
+        // apps.length is 0 when mounting, setting an initial skeletons number will avoid
+        // showing an empty page when loading
+        defaultSkeletonsNum={3}
+        width="16em"
+        height="2.875em"
+        screenReaderLabel={I18n.t('Loading apps...')}
+      >
+        {apps?.map(app => (
+          <K5AppLink key={app.id} app={app} />
+        ))}
+      </LoadingWrapper>
     </View>
   )
 }
 
 AppsList.propTypes = {
   isLoading: PropTypes.bool,
-  apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired
+  apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired,
+  courseId: PropTypes.string
 }
 
 export default AppsList

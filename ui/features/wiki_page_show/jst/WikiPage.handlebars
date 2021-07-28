@@ -15,7 +15,7 @@
         {{#unless course_home}}
           {{#if front_page}}
             <div class="front-page">
-              <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
+              <span class="front-page label">{{#t 'labels.front_page'}}{{frontPageText}}{{/t}}</span>
             </div>
           {{/if}}
         {{/unless}}
@@ -69,7 +69,7 @@
                   {{/if}}
                   {{#unless front_page}}
                     {{#if CAN.UPDATE_CONTENT}}
-                      <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+                      <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}</a></li>
                     {{/if}}
                   {{/unless}}
                   {{#if CAN.DIRECT_SHARE}}

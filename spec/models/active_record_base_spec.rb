@@ -69,114 +69,131 @@ describe ActiveRecord::Base do
     end
   end
 
-  describe "find in batches" do
+  describe "in batches" do
     before :once do
       @c1 = course_factory(:name => 'course1', :active_course => true)
       @c2 = course_factory(:name => 'course2', :active_course => true)
-      u1 = user_factory(:name => 'user1', :active_user => true)
-      u2 = user_factory(:name => 'user2', :active_user => true)
-      u3 = user_factory(:name => 'user3', :active_user => true)
-      @e1 = @c1.enroll_student(u1, :enrollment_state => 'active')
-      @e2 = @c1.enroll_student(u2, :enrollment_state => 'active')
-      @e3 = @c1.enroll_student(u3, :enrollment_state => 'active')
-      @e4 = @c2.enroll_student(u1, :enrollment_state => 'active')
-      @e5 = @c2.enroll_student(u2, :enrollment_state => 'active')
-      @e6 = @c2.enroll_student(u3, :enrollment_state => 'active')
+      @u1 = user_factory(name: 'userC', active_user: true)
+      @u2 = user_factory(name: 'userB', active_user: true)
+      @u3 = user_factory(name: 'userA', active_user: true)
+      @e1 = @c1.enroll_student(@u1, :enrollment_state => 'active')
+      @e2 = @c1.enroll_student(@u2, :enrollment_state => 'active')
+      @e3 = @c1.enroll_student(@u3, :enrollment_state => 'active')
+      @e4 = @c2.enroll_student(@u1, :enrollment_state => 'active')
+      @e5 = @c2.enroll_student(@u2, :enrollment_state => 'active')
+      @e6 = @c2.enroll_student(@u3, :enrollment_state => 'active')
     end
 
-    it "should raise an error when not in a transaction" do
-      expect { User.all.find_in_batches_with_temp_table }.to raise_error /find_in_batches_with_temp_table probably won't work/
+    shared_examples_for "batches" do
+      def do_batches(relation, **kwargs)
+        result = []
+        extra = defined?(extra_kwargs) ? extra_kwargs : {}
+        relation.in_batches(**kwargs.reverse_merge(extra).reverse_merge(strategy: strategy)) do |batch|
+          result << (block_given? ? (yield batch) : batch.to_a)
+        end
+        result
+      end
+
+      it "supports start" do
+        expect(do_batches(Enrollment, start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
+      end
+
+      it "supports finish" do
+        expect(do_batches(Enrollment, finish: @e3.id)).to eq [[@e1, @e2, @e3]]
+      end
+
+      it "supports start and finish with a small batch size" do
+        expect(do_batches(Enrollment, of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
+      end
+
+      it "respects order" do
+        expect(do_batches(User.order(:name), of: 2)).to eq [[@u3, @u2], [@u1]]
+      end
+
+      it "handles a batch size the exact size of the query" do
+        expect(do_batches(User.order(:id), of: 3)).to eq [[@u1, @u2, @u3]]
+      end
+
+      it "preloads" do
+        Account.default.courses.create!
+        a = do_batches(Account.where(id: Account.default).preload(:courses)).flatten.first
+        expect(a.courses.loaded?).to eq true
+      end
+
+      it "handles pluck" do
+        expect do
+          expect(do_batches(User.order(:id), of: 3, load: false) { |r| r.pluck(:id) }).to eq [[@u1.id, @u2.id, @u3.id]]
+        end.not_to change(User.connection_pool.connections, :length)
+        # even with :copy, a new connection should not be taken out (i.e. to satisfy an "actual" query for the pluck)
+      end
     end
 
-    it "should find all enrollments from course join in batches" do
-      e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id").
-                        joins(:enrollments).order("e_id asc")
-      batch_size = 2
-      es = []
-      Course.transaction do
-        e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
-          expect(batch.size).to eq batch_size
-          batch.each do |r|
-            es << r["e_id"].to_i
+    context "with temp_table" do
+      let(:strategy) { :temp_table }
+      let(:extra_kwargs) { { ignore_transaction: true } }
+
+      include_examples "batches"
+
+      it "raises an error when not in a transaction" do
+        expect { User.all.find_in_batches(strategy: :temp_table) {} }.to raise_error(ArgumentError)
+      end
+
+      it "finds all enrollments from course join" do
+        e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id")
+          .joins(:enrollments).order("e_id asc")
+        batch_size = 2
+        es = []
+        Course.transaction do
+          e.find_in_batches(strategy: :temp_table, batch_size: batch_size) do |batch|
+            expect(batch.size).to eq batch_size
+            batch.each do |r|
+              es << r["e_id"].to_i
+            end
+          end
+        end
+        expect(es.length).to eq 6
+        expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
+      end
+    end
+
+    context "with cursor" do
+      let(:strategy) { :cursor }
+
+      include_examples "batches"
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "properly transposes across multiple shards" do
+          u1 = User.create!
+          u2 = @shard1.activate { User.create! }
+          User.transaction do
+            users = []
+            User.preload(:pseudonyms).where(id: [u1, u2]).find_each(strategy: :cursor) do |u|
+              users << u
+            end
+            expect(users.sort).to eq [u1, u2].sort
           end
         end
       end
-      expect(es.length).to eq 6
-      expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
-    it "should pluck" do
-      scope = Course.where(id: [@c1, @c2])
-      cs = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
-          cs.concat(batch)
-        end
-      end
-      expect(cs.sort).to eq [@c1.id, @c2.id].sort
-    end
+    context "with copy" do
+      let(:strategy) { :copy }
+      let(:extra_kwargs) { { load: true } }
 
-    it "should multi-column pluck" do
-      scope = Course.where(id: [@c1, @c2])
-      cs = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
-          cs.concat(batch)
-        end
-      end
-      expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
-    end
+      include_examples "batches"
 
-    it "should pluck with join" do
-      scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
-      es = []
-      Course.transaction do
-        scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
-          es.concat(batch)
-        end
-      end
-      expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
-    end
-
-    it "should honor preload when using a cursor" do
-      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
-      Account.default.courses.create!
-      Account.transaction do
-        Account.where(:id => Account.default).preload(:courses).find_each do |a|
-          expect(a.courses.loaded?).to be_truthy
-        end
+      it "works with load: false" do
+        User.in_batches(strategy: :copy) { |r| expect(r.to_a).to eq [@u1, @u2, @u3] }
       end
     end
 
-    it "should not use a cursor when start is passed" do
-      skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
-      Account.transaction do
-        expect(Account).to receive(:find_in_batches_with_cursor).never
-        Account.where(:id => Account.default).find_each(start: 0) do
-        end
-      end
-    end
-
-    it "should raise an error when start is used with group" do
-      expect {
-        Account.group(:id).find_each(start: 0) do
-        end
-      }.to raise_error(ArgumentError)
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "properly transposes a cursor query across multiple shards" do
-        u1 = User.create!
-        u2 = @shard1.activate { User.create! }
-        User.transaction do
-          users = []
-          User.preload(:pseudonyms).where(id: [u1, u2]).find_each do |u|
-            users << u
-          end
-          expect(users.sort).to eq [u1, u2].sort
-        end
+    context "with id" do
+      it "should raise an error when start is used with group" do
+        expect do
+          Account.group(:id).find_each(strategy: :id, start: 0) {}
+        end.to raise_error(ArgumentError)
       end
     end
   end
@@ -539,6 +556,26 @@ describe ActiveRecord::Base do
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
+      u1 = User.create!(name: 'a')
+      u2 = User.create!(name: 'a')
+      User.from(<<-SQL)
+        (WITH duplicates AS (
+          SELECT users.*,
+              ROW_NUMBER() OVER(PARTITION BY users.name
+                                    ORDER BY users.created_at DESC)
+                                    AS dup_count
+          FROM #{User.quoted_table_name}
+          )
+        SELECT *
+        FROM duplicates
+        WHERE dup_count > 1) AS users
+      SQL
+        .limit(1).delete_all
+      expect { User.find(u1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(User.find(u2.id)).to eq u2
+    end
+
     it "does offset too" do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
@@ -548,6 +585,15 @@ describe ActiveRecord::Base do
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
       p3.reload
+    end
+  end
+
+  describe "#in_batches.delete_all" do
+    it "just does a single query, instead of an ordered select and then delete" do
+      u = User.create!
+      expect(User.connection).to receive(:exec_query).once.and_call_original
+      expect(User.where(id: u.id).in_batches.delete_all).to eq 1
+      expect { User.find(u.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

@@ -17,8 +17,13 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!LearningMasteryGradebook'
 import ProficiencyFilter from './ProficiencyFilter'
+import Gradebook from './Gradebook'
+import useRollups from './hooks/useRollups'
 
 const getRatings = () => {
   const ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
@@ -34,8 +39,29 @@ const getRatings = () => {
   ]
 }
 
-const LearningMastery = () => {
-  return <ProficiencyFilter ratings={getRatings()} />
+const renderLoader = () => (
+  <View width="100%" display="block" textAlign="center">
+    <Spinner size="large" renderTitle={I18n.t('Loading')} />
+  </View>
+)
+
+const LearningMastery = ({courseId}) => {
+  const {isLoading, students, outcomes, rollups} = useRollups({courseId})
+
+  return (
+    <>
+      <ProficiencyFilter ratings={getRatings()} />
+      {isLoading ? (
+        renderLoader()
+      ) : (
+        <Gradebook courseId={courseId} outcomes={outcomes} students={students} rollups={rollups} />
+      )}
+    </>
+  )
+}
+
+LearningMastery.propTypes = {
+  courseId: PropTypes.string.isRequired
 }
 
 export default LearningMastery

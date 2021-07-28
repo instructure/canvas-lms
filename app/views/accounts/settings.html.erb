@@ -83,10 +83,7 @@
       <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
     <% end %>
     <% if can_do(@context, @current_user, :view_feature_flags) %>
-      <li><a href="#tab-features" id="tab-features-link">
-          <%= t(:feature_options, "Feature Options") %>
-        </a>
-      </li>
+      <li><a href="#tab-features" id="tab-features-link"><%= t("Feature Previews") %></a></li>
     <% end %>
     <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
       <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
@@ -140,7 +137,7 @@
               <% if @account.shard.database_server.maintenance_window_start_hour %>
               <tr>
                 <td></td>
-                <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @account.shard.database_server } %> </td>
+                <td> <%= render partial: 'shared/maintenance_window', locals: { database_server: @account.shard.database_server, local_zone: @account.default_time_zone } %> </td>
               </tr>
               <% end %>
               <%= f.fields_for :settings do |settings| %>
@@ -800,7 +797,7 @@ acknowledge that you have read and agreed to the
                 limit(Setting.get('max_visible_course_templates', 25).to_i).
                 order(Course.best_unicode_collation_key('courses.name')).
                 pluck(:name, :id)
-              if @account.course_template_id && !visible_templates.find { |_, id| @account.course_template_id }
+              if @account.course_template_id && !visible_templates.find { |_, id| @account.course_template_id == id }
                 visible_templates.unshift([@account.course_template.name, @account.course_template_id])
               end
               options.concat(visible_templates)
@@ -966,7 +963,7 @@ acknowledge that you have read and agreed to the
             <p>
               <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
               <br/>
-              <%= settings.label :outgoing_email_default_name_option_custom_name, :en => 'Name:' %>
+              <%= settings.label :outgoing_email_default_name, :en => 'Name:' %>
               <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
             </p>
           </div>

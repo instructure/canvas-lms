@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
+import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
 import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import {HIGHLIGHT_TIMEOUT, PER_PAGE, SearchContext} from './utils/constants'
 import I18n from 'i18n!discussion_topics_post'
+import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
-import {PER_PAGE, SearchContext} from './utils/constants'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
-import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const getOptimisticResponse = text => {
   return {
@@ -56,7 +58,8 @@ const getOptimisticResponse = text => {
           id: 'PLACEHOLDER',
           _id: ENV.current_user.id,
           avatarUrl: ENV.current_user.avatar_image_url,
-          name: ENV.current_user.display_name,
+          displayName: ENV.current_user.display_name,
+          courseRoles: [],
           __typename: 'User'
         },
         editor: null,
@@ -70,9 +73,11 @@ const getOptimisticResponse = text => {
           reply: false,
           update: false,
           viewRating: false,
-          speedGrader: false,
           __typename: 'DiscussionEntryPermissions'
         },
+        rootEntry: null,
+        discussionTopic: null,
+        parent: null,
         __typename: 'DiscussionEntry'
       },
       errors: null,
@@ -86,7 +91,7 @@ const DiscussionTopicManager = props => {
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
-  const value = {
+  const searchContext = {
     searchTerm,
     setSearchTerm,
     filter,
@@ -97,6 +102,49 @@ const DiscussionTopicManager = props => {
     setPageNumber
   }
 
+  const goToTopic = () => {
+    setSearchTerm('')
+    closeIsolatedView()
+    setIsTopicHighlighted(true)
+  }
+
+  // Isolated View State
+  const [isolatedEntryId, setIsolatedEntryId] = useState(null)
+  const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
+  const [editorExpanded, setEditorExpanded] = useState(false)
+
+  // Highlight State
+  const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
+  const [highlightEntryId, setHighlightEntryId] = useState(null)
+  const [relativeEntryId, setRelativeEntryId] = useState(null)
+
+  useEffect(() => {
+    if (isTopicHighlighted) {
+      setTimeout(() => {
+        setIsTopicHighlighted(false)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [isTopicHighlighted])
+
+  useEffect(() => {
+    if (highlightEntryId) {
+      setTimeout(() => {
+        setHighlightEntryId(null)
+      }, HIGHLIGHT_TIMEOUT)
+    }
+  }, [highlightEntryId])
+
+  const openIsolatedView = (discussionEntryId, withRCE, relativeId = null) => {
+    setIsolatedEntryId(discussionEntryId)
+    setIsolatedViewOpen(true)
+    setEditorExpanded(withRCE)
+    setRelativeEntryId(relativeId)
+  }
+
+  const closeIsolatedView = () => {
+    setIsolatedViewOpen(false)
+  }
+
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const variables = {
     discussionID: props.discussionTopicId,
@@ -105,16 +153,11 @@ const DiscussionTopicManager = props => {
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
     filter,
-    sort
+    sort,
+    courseID: window.ENV?.course_id
   }
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {variables})
-
-  useEffect(() => {
-    if (!discussionTopicQuery.error && !discussionTopicQuery.loading) {
-      discussionTopicQuery.refetch()
-    }
-  }, [discussionTopicQuery, filter, searchTerm, sort])
 
   const updateCache = (cache, result) => {
     try {
@@ -162,28 +205,50 @@ const DiscussionTopicManager = props => {
   }
 
   return (
-    <>
-      <SearchContext.Provider value={value}>
-        <DiscussionTopicContainer
+    <SearchContext.Provider value={searchContext}>
+      <DiscussionPostToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
+      <DiscussionTopicContainer
+        discussionTopic={discussionTopicQuery.data.legacyNode}
+        createDiscussionEntry={text => {
+          createDiscussionEntry({
+            variables: {
+              discussionTopicId: ENV.discussion_topic_id,
+              message: text
+            },
+            optimisticResponse: getOptimisticResponse(text)
+          })
+        }}
+        isHighlighted={isTopicHighlighted}
+      />
+      {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
+      (searchTerm || filter === 'unread') ? (
+        <NoResultsFound />
+      ) : (
+        <DiscussionThreadsContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          createDiscussionEntry={text => {
-            createDiscussionEntry({
-              variables: {
-                discussionTopicId: ENV.discussion_topic_id,
-                message: text
-              },
-              optimisticResponse: getOptimisticResponse(text)
-            })
+          onOpenIsolatedView={(discussionEntryId, withRCE, relativeId) => {
+            setHighlightEntryId(relativeId)
+            openIsolatedView(discussionEntryId, withRCE, relativeId)
           }}
+          goToTopic={goToTopic}
         />
-        {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
-        (searchTerm || filter === 'unread') ? (
-          <NoResultsFound />
-        ) : (
-          <DiscussionThreadsContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
-        )}
-      </SearchContext.Provider>
-    </>
+      )}
+      {ENV.isolated_view && isolatedEntryId && (
+        <IsolatedViewContainer
+          relativeEntryId={relativeEntryId}
+          discussionTopic={discussionTopicQuery.data.legacyNode}
+          discussionEntryId={isolatedEntryId}
+          open={isolatedViewOpen}
+          RCEOpen={editorExpanded}
+          setRCEOpen={setEditorExpanded}
+          onClose={closeIsolatedView}
+          onOpenIsolatedView={openIsolatedView}
+          goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
+          setHighlightEntryId={setHighlightEntryId}
+        />
+      )}
+    </SearchContext.Provider>
   )
 }
 

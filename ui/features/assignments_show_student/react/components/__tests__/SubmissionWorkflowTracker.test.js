@@ -41,6 +41,18 @@ describe('when a submission is graded', () => {
         'Submitted on Jun 1, 2021 7:27pm'
       )
     })
+
+    it('does not render a subtitle if the student has not submitted', async () => {
+      const submission = await mockSubmission({
+        Submission: {
+          ...SubmissionMocks.graded,
+          attempt: 0
+        }
+      })
+
+      const {queryByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+      expect(queryByTestId('submission-workflow-tracker-subtitle')).not.toBeInTheDocument()
+    })
   })
 
   it('renders as "Submitted" when the grade is not visible', async () => {

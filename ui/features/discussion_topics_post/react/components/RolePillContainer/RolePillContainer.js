@@ -38,7 +38,7 @@ export function RolePillContainer({...props}) {
           {baseRolesToDisplay.map(baseRole => {
             return (
               <Flex padding="none small none none" key={baseRole}>
-                <Pill>{roleName(baseRole)}</Pill>
+                <Pill data-testid={`pill-${roleName(baseRole)}`}>{roleName(baseRole)}</Pill>
               </Flex>
             )
           })}
@@ -65,9 +65,7 @@ function roleName(baseRole) {
 }
 
 function sortDiscussionRoles(roleNameArray) {
-  if (roleNameArray === null || roleNameArray === undefined) {
-    return []
-  }
+  roleNameArray = Array.isArray(roleNameArray) ? roleNameArray : []
 
   roleNameArray.sort((roleNameA, roleNameB) => {
     const roleASortScore = ROLE_HIERARCHY.indexOf(roleNameA)

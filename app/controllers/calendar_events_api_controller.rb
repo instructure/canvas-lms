@@ -179,6 +179,11 @@ require 'atom'
 #         "group": {
 #           "description": "If the event is a group-level reservation, this will contain the group participant JSON (refer to the Groups API).",
 #           "type": "string"
+#         },
+#         "important_dates": {
+#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -266,6 +271,11 @@ require 'atom'
 #         "assignment_overrides": {
 #           "description": "The list of AssignmentOverrides that apply to this event (See the Assignments API). This information is useful for determining which students or sections this assignment-due event applies to.",
 #           "$ref": "AssignmentOverride"
+#         },
+#         "important_dates": {
+#           "description": "Boolean indicating whether this has important dates. Only present if the Important Dates feature flag is enabled",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -310,6 +320,10 @@ class CalendarEventsApiController < ApplicationController
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
+  # @argument important_dates [Boolean]
+  #   Defaults to false
+  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
+  #   feature flag to be turned on or it will be ignored.
   #
   # @returns [CalendarEvent]
   def index
@@ -351,6 +365,10 @@ class CalendarEventsApiController < ApplicationController
   # @argument exclude_submission_types[] [Array]
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
+  # @argument important_dates [Boolean]
+  #   Defaults to false
+  #   If true, only events with important dates set to true will be returned. This requires the Important Dates
+  #   feature flag to be turned on or it will be ignored.
   #
   # @returns [CalendarEvent]
   def user_index
@@ -1063,6 +1081,7 @@ class CalendarEventsApiController < ApplicationController
   def get_options(codes, user = @current_user)
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
+    @important_dates = Account.site_admin.feature_enabled?(:important_dates) && value_to_boolean(params[:important_dates])
     if !@all_events && !@undated
       validate_dates
       @start_date ||= Time.zone.now.beginning_of_day
@@ -1093,7 +1112,7 @@ class CalendarEventsApiController < ApplicationController
       codes.each do |c|
         unless pertinent_context_codes.include?(c)
           context = Context.find_by_asset_string(c)
-          @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth  || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
+          @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
           @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
         end
       end
@@ -1147,6 +1166,7 @@ class CalendarEventsApiController < ApplicationController
         scope = scope.where(submission_types: submission_types)
       end
       scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
+      scope = scope.with_important_dates if @important_dates
 
       last_scope = scope
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
@@ -1228,6 +1248,7 @@ class CalendarEventsApiController < ApplicationController
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
     end
+    scope = scope.with_important_dates if @important_dates
     scope
   end
 

@@ -158,11 +158,12 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     end
 
     it 'should clean up expired autosaved entries', ignore_js_errors: true do
-      Setting.set('rce_auto_save_max_age_ms', 1)
       get '/'
       driver.local_storage.clear
-      driver.local_storage[autosave_key(@teacher.id, 'http://some/url', 'id')] = make_autosave_entry('anything')
-      # assuming it takes > 1ms to load so ^that entry expires
+      Timecop.freeze(2.hours.ago) do
+        driver.local_storage[autosave_key(@teacher.id, 'http://some/url', 'id')] = make_autosave_entry('anything')
+      end
+
       create_announcement
       saved_content = driver.local_storage[autosave_key(@teacher.id, 'http://some/url', 'id')]
       expect(saved_content).to be_nil

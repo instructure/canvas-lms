@@ -311,6 +311,29 @@ module Types
 
       comments
     end
+
+    field :course_roles, [String], null: true do
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :role_types, [String], "Return only requested base role types", required: false
+      argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
+    end
+    def course_roles(course_id: nil, role_types: nil, built_in_only: true)
+      # The discussion only role "Author" will be handled with a front-end check because graphql 
+      # currently does not support type inheritance. If graphql starts supporting type inheritance
+      # this field can be replaced by a discussionAuthor type that inherits from User type and
+      # contains a discussionRoles field
+
+      return [] if course_id.nil?
+
+      course_roles = []
+
+      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object).then do |roles|
+        roles.each do |role|
+          course_roles.push(role[:type])
+        end
+        course_roles
+      end
+    end
   end
 end
 

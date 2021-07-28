@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Button} from '@instructure/ui-buttons'
+import {ChildTopic} from '../../../graphql/ChildTopic'
+import {getGroupDiscussionUrl} from '../../utils'
 import I18n from 'i18n!discussion_posts'
+import {IconGroupLine} from '@instructure/ui-icons'
+import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
-import {Button} from '@instructure/ui-buttons'
-import {IconGroupLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Menu} from '@instructure/ui-menu'
-import {getGroupDiscussionUrl} from '../../utils'
 
 export const GroupsMenu = ({...props}) => {
   const menuItems = useMemo(
@@ -57,5 +58,5 @@ GroupsMenu.propTypes = {
   /**
    * Link to discussions RSS feed
    */
-  childTopics: PropTypes.array.isRequired
+  childTopics: PropTypes.arrayOf(ChildTopic.shape).isRequired
 }

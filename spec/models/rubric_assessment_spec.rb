@@ -22,6 +22,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssessment do
+
   before :once do
     assignment_model
     @teacher = user_factory(active_all: true)
@@ -32,6 +33,92 @@ describe RubricAssessment do
     @course.enroll_user(@observer, 'ObserverEnrollment', {:associated_user_id => @student.id})
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+  end
+
+  describe "related_group_submissions_and_assessments" do
+
+    def assess_using_rubric(rubric, rubric_params, rubric_association_params)
+      association = rubric.update_with_association(
+        @user,
+        rubric_params,
+        @course,
+        rubric_association_params
+      )
+
+      assessment = association.assess({
+        user: @student,
+        assessor: @teacher,
+        artifact: @assignment.find_or_create_submission(@student),
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            points: 5,
+            comments: "comments",
+          }
+        }
+      })
+      [association, assessment.related_group_submissions_and_assessments.first[:rubric_assessments]]
+    end
+
+    before(:once) do
+      @assessment = @association.assess({
+        user: @student,
+        assessor: @teacher,
+        artifact: @assignment.find_or_create_submission(@student),
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: {
+            points: 5,
+            comments: "comments",
+          }
+        }
+      })
+    end
+
+    it "uses the current rubric association" do
+      # assess using another rubric
+      r_association, r_assessments = assess_using_rubric(
+        @course.rubrics.build,
+        {
+          title: "Some Rubric1",
+          criteria: {
+            "0": {
+              learning_outcome_id: "",
+              ratings: {
+                "0": {
+                  points:"5",
+                  id: "blank",
+                  description: "Full Marks"
+                },
+                "1": {
+                  points: "0",
+                  id: "blank_2",
+                  description:"No Marks"
+                }
+              },
+              points: "5",
+              long_description: "",
+              id: "",
+              description: "Description of criterion"
+            }
+          },
+          points_possible: "5",
+          free_form_criterion_comments: "0"
+        }.with_indifferent_access,
+        {
+          association_object: @assignment,
+          hide_score_total: "0",
+          use_for_grading: "1",
+          purpose: "grading",
+          update_if_existing:"1"
+        }.with_indifferent_access
+      )
+
+      expect(r_assessments.count).to eq 1
+      expect(r_assessments.first["rubric_assessment"]["rubric_association_id"]).to eq(r_association.id)
+    end
+
+
   end
 
   describe "active_rubric_association?" do
@@ -251,6 +338,7 @@ describe RubricAssessment do
       end
 
       it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
         expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome_result.create')
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym

@@ -104,9 +104,6 @@
     "attributes_963ba262": {
         "message": "Атрибути"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Запис аудіо та відео не доступний"
-    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
     },
@@ -121,9 +118,6 @@
     },
     "calendar_event_89aadc1c": {
         "message": "Календарна подія"
-    },
-    "cancel_caeb1e68": {
-        "message": "Скасувати"
     },
     "canvas_planner_98ed106": {
         "message": "Планувальник Canvas"
@@ -173,10 +167,16 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
     },
     "course_8a63b4a3": {
@@ -266,9 +266,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Перетягніть файл сюди"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Перетягніть файл сюди"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
     },
@@ -353,6 +350,12 @@
     "group_navigation_99f191a": {
         "message": "Навігація групи"
     },
+    "home_351838cd": {
+        "message": "На домашню сторінку"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML-редактор"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Я отримав дозвіл на використання цього файлу."
     },
@@ -391,6 +394,9 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Перейти на Сьогодні"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Гарячі клавіши"
@@ -491,8 +497,14 @@
     "no_grade_3b4d7f3e": {
         "message": "Оцінка відсутня"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Попередній перегляд  для цього файлу недоступний."
+    },
     "no_results_940393cf": {
         "message": "Результати відсутні."
+    },
+    "none_3b5e34d2": {
+        "message": "Ніхто"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Зараз нічого"
@@ -578,9 +590,6 @@
     "record_upload_media_5fdce166": {
         "message": "Запис/завантаження медіа"
     },
-    "recording_98da6bda": {
-        "message": "Запис"
-    },
     "reminder_date_4564d12d": {
         "message": "Нагадування: { date }"
     },
@@ -614,8 +623,8 @@
     "size_b30e1077": {
         "message": "Розмір"
     },
-    "start_over_f7552aa9": {
-        "message": "Почати з початку"
+    "star_8d156e09": {
+        "message": "Помітити зіркою"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } до { endDate }"
@@ -695,14 +704,14 @@
     "upload_media_ce31135a": {
         "message": "Завантажити медіа контент"
     },
+    "uploading_19e8a4e7": {
+        "message": "Завантаження"
+    },
     "url_22a5f3b8": {
         "message": "URL"
     },
     "usage_right_ff96f3e2": {
         "message": "Права використання:"
-    },
-    "video_player_b371005": {
-        "message": "Відеопрогравач"
     },
     "view_ba339f93": {
         "message": "Вигляд"

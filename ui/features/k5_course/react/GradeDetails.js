@@ -25,7 +25,9 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 
+import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {
@@ -71,6 +73,8 @@ const GradeDetails = ({
       [selectedGradingPeriodId]
     ),
     error: setError,
+    // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
+    forceResult: loadingGradingPeriods ? [] : undefined,
     fetchAllPages: true,
     params: {
       include: ['assignments', 'submission', 'read_state'],
@@ -88,6 +92,8 @@ const GradeDetails = ({
       [currentUser]
     ),
     error: setError,
+    // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
+    forceResult: loadingGradingPeriods ? [] : undefined,
     params: {
       user_id: currentUser.id,
       ...gradingPeriodParam
@@ -101,20 +107,31 @@ const GradeDetails = ({
     }
   }, [error, courseName])
 
-  const gradeSkeletons = []
-  for (let i = 0; i < NUM_GRADE_SKELETONS; i++) {
-    gradeSkeletons.push(
-      <Table.Row key={`grade-skeleton-${i}`}>
-        <Table.Cell colSpan={4}>
-          <LoadingSkeleton
-            height="2.5em"
-            width="100%"
-            screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
-          />
-        </Table.Cell>
-      </Table.Row>
-    )
-  }
+  const gradeRowSkeleton = props => (
+    <Table.Row {...props}>
+      <Table.Cell colSpan={4}>
+        <LoadingSkeleton
+          height="2.5em"
+          width="100%"
+          screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
+        />
+      </Table.Cell>
+    </Table.Row>
+  )
+
+  const gradesDetailsTable = content => (
+    <Table caption={I18n.t('Grades for %{courseName}', {courseName})} margin="medium 0">
+      <Table.Head>
+        <Table.Row>
+          <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
+          <Table.ColHeader id="dueDate">{I18n.t('Due Date')}</Table.ColHeader>
+          <Table.ColHeader id="assignmentGroup">{I18n.t('Assignment Group')}</Table.ColHeader>
+          <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>{content}</Table.Body>
+    </Table>
+  )
 
   return !loadingAssignmentGroups && grades?.length === 0 ? (
     <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
@@ -122,70 +139,76 @@ const GradeDetails = ({
     <>
       {showTotals && (
         <>
-          {loadingTotalGrade || loadingGradingPeriods ? (
-            <LoadingSkeleton
-              height="1.8em"
-              width="10em"
-              margin="medium 0 small"
-              screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
-            />
-          ) : (
-            totalGrade && (
-              <Heading data-testid="grades-total" level="h2" margin="medium 0 small">
+          <LoadingWrapper
+            id="total-grades"
+            isLoading={loadingTotalGrade || loadingGradingPeriods}
+            height="1.8em"
+            width="10em"
+            margin="medium 0 0"
+            screenReaderLabel={I18n.t('Loading total grade for %{courseName}', {courseName})}
+          >
+            {totalGrade && (
+              <Heading data-testid="grades-total" level="h2" margin="medium 0 0">
                 <AccessibleContent
                   alt={I18n.t('%{courseName} Total: %{grade}', {courseName, grade: totalGrade})}
                 >
                   {I18n.t('Total: %{grade}', {grade: totalGrade})}
                 </AccessibleContent>
               </Heading>
-            )
-          )}
-          {loadingAssignmentGroups || loadingGradingPeriods ? (
-            <LoadingSkeleton
-              height="1.5em"
-              width="18em"
-              screenReaderLabel={I18n.t('Loading assignment group totals')}
-            />
-          ) : (
-            <ToggleDetails
-              data-testid="assignment-group-toggle"
-              summary={
-                <AccessibleContent
-                  alt={I18n.t("View %{courseName}'s Assignment Group Totals", {courseName})}
-                >
-                  {I18n.t('View Assignment Group Totals')}
-                </AccessibleContent>
-              }
-            >
-              {assignmentGroupTotals.map(group => (
-                <Text
-                  data-testid="assignment-group-totals"
-                  as="div"
-                  margin="small 0"
-                  key={group.id}
-                >
-                  {I18n.t('%{groupName}: %{score}', {groupName: group.name, score: group.score})}
-                </Text>
-              ))}
-            </ToggleDetails>
-          )}
+            )}
+          </LoadingWrapper>
+          <View as="div" margin="x-small 0">
+            <Text as="div" size="small">
+              {I18n.t('Totals are calculated based only on graded assignments.')}
+            </Text>
+          </View>
+          <LoadingWrapper
+            id="assignment-groups"
+            isLoading={loadingAssignmentGroups || loadingGradingPeriods}
+            margin="none"
+            height="1.5em"
+            width="18em"
+            screenReaderLabel={I18n.t('Loading assignment group totals')}
+          >
+            {assignmentGroupTotals && (
+              <ToggleDetails
+                data-testid="assignment-group-toggle"
+                summary={
+                  <AccessibleContent
+                    alt={I18n.t("View %{courseName}'s Assignment Group Totals", {courseName})}
+                  >
+                    {I18n.t('View Assignment Group Totals')}
+                  </AccessibleContent>
+                }
+              >
+                {assignmentGroupTotals.map(group => (
+                  <Text
+                    data-testid="assignment-group-totals"
+                    as="div"
+                    margin="small 0"
+                    key={group.id}
+                  >
+                    {I18n.t('%{groupName}: %{score}', {groupName: group.name, score: group.score})}
+                  </Text>
+                ))}
+              </ToggleDetails>
+            )}
+          </LoadingWrapper>
         </>
       )}
-      <Table caption={I18n.t('Grades for %{courseName}', {courseName})} margin="medium 0">
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="assignment">{I18n.t('Assignment')}</Table.ColHeader>
-            <Table.ColHeader id="dueDate">{I18n.t('Due Date')}</Table.ColHeader>
-            <Table.ColHeader id="assignmentGroup">{I18n.t('Assignment Group')}</Table.ColHeader>
-            <Table.ColHeader id="score">{I18n.t('Score')}</Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {loadingAssignmentGroups || loadingGradingPeriods
-            ? gradeSkeletons
-            : grades.map(assignment => <GradeRow key={assignment.id} {...assignment} />)}
-        </Table.Body>
-      </Table>
+      <LoadingWrapper
+        id={`course-${courseId}-grades`}
+        isLoading={loadingAssignmentGroups || loadingGradingPeriods}
+        skeletonsNum={grades.length}
+        defaultSkeletonsNum={NUM_GRADE_SKELETONS}
+        renderCustomSkeleton={gradeRowSkeleton}
+        renderSkeletonsContainer={gradesDetailsTable}
+        renderLoadedContainer={gradesDetailsTable}
+      >
+        {grades.map(assignment => (
+          <GradeRow key={assignment.id} {...assignment} />
+        ))}
+      </LoadingWrapper>
     </>
   )
 }

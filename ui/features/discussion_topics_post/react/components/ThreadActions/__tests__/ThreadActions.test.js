@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {ThreadActions} from '../ThreadActions'
+import {SearchContext} from '../../../utils/constants'
 
 const defaultRequiredProps = {
   id: '1',
@@ -74,6 +75,16 @@ describe('ThreadActions', () => {
     expect(queryByText('Edit')).toBeFalsy()
     expect(queryByText('Delete')).toBeFalsy()
     expect(queryByText('Open in SpeedGrader')).toBeFalsy()
+  })
+
+  it('should not render when search term is present', () => {
+    const {queryByTestId} = render(
+      <SearchContext.Provider value={{searchTerm: 'searchTerm'}}>
+        <ThreadActions {...defaultRequiredProps} />
+      </SearchContext.Provider>
+    )
+    const menu = queryByTestId('thread-actions-menu')
+    expect(menu).toBeNull()
   })
 
   describe('menu options', () => {

@@ -217,13 +217,29 @@ class UserList
     associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
-      Pseudonym.active.
-          select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state').
-          joins(:user => :communication_channels).
-          where("communication_channels.workflow_state='active' AND LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase}, account_ids).
-          map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
+      
+      pseudos = Pseudonym.active
+          .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
+          .joins(:user => :communication_channels)
+          .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase}, account_ids)
+      pseudos = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
+          pseudos.merge(CommunicationChannel.unretired)
+        else
+          pseudos.merge(CommunicationChannel.active)
+        end
+
+      pseudos.map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
         addresses.each do |address|
+          # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
+          if address[:workflow_state] == 'unconfirmed' && login[:workflow_state] == 'active'
+            address.delete(:user_id)
+            address.delete(:details)
+            address.delete(:shard)
+          end
+          # if we've seen an active, and this one is unconfirmed, skip it
+          next if address[:workflow_state] == 'active' && login[:workflow_state] == 'unconfirmed'
+
           # ccs are not unique; just error out on duplicates
           # we're in a bit of a pickle if open registration is disabled, and there are conflicting
           # e-mails, but none of them are from a pseudonym

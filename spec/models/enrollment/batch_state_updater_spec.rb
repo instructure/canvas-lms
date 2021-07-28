@@ -197,7 +197,7 @@ describe "Enrollment::BatchStateUpdater" do
       autosave_associated_records_for_root_account
       autosave_associated_records_for_sis_pseudonym
       autosave_associated_records_for_user
-      before_save_collection_association
+      around_save_collection_association
       broadcast_notifications
       cancel_future_appointments
       clear_email_caches

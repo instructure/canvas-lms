@@ -35,14 +35,14 @@ module NewQuizzesFeaturesHelper
     @context.root_account.feature_enabled?(:migrate_to_new_quizzes_by_default) || new_quizzes_require_migration?
   end
 
-  def new_quizzes_navigation_placements_enabled?
-    Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks) && @context.feature_enabled?(:quizzes_next)
+  def new_quizzes_navigation_placements_enabled?(context = @context)
+    Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks) && context.feature_enabled?(:quizzes_next)
   end
 
   module_function
 
   def new_quizzes_enabled?(context = @context)
-      context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present? && !new_quizzes_require_migration?(context)
+    context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present? && !new_quizzes_require_migration?(context)
   end
 
   def new_quizzes_require_migration?(context = @context)

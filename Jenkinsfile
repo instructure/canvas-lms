@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-final static FILES_CHANGED_STAGE = 'Detect Files Changed'
 final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
 final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
 final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
@@ -29,22 +28,13 @@ def buildParameters = [
   string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
   string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
   string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
+  string(name: 'GERRIT_PATCHSET_REVISION', value: "${env.GERRIT_PATCHSET_REVISION}"),
   string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
   string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
   string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
   string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}"),
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
-]
-
-def dockerDevFiles = [
-  '^docker-compose/',
-  '^script/common/',
-  '^script/canvas_update',
-  '^docker-compose.yml',
-  '^Dockerfile$',
-  '^lib/tasks/',
-  'Jenkinsfile.docker-smoke'
 ]
 
 def getSummaryUrl() {
@@ -316,10 +306,6 @@ pipeline {
             return
           }
 
-          reportToSplunk('is_kubernetes', [
-            'value': configuration.isKubernetesEnabled(),
-          ])
-
           maybeSlackSendRetrigger()
 
           def buildSummaryReportHooks = [
@@ -379,27 +365,10 @@ pipeline {
                 .timeout(2)
                 .execute { rebaseStage() }
 
-              extendedStage(FILES_CHANGED_STAGE)
+              extendedStage(filesChangedStage.STAGE_NAME)
                 .obeysAllowStages(false)
                 .timeout(2)
-                .execute { stageConfig ->
-                  stageConfig.value('dockerDevFiles', git.changedFiles(dockerDevFiles, 'HEAD^'))
-                  stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
-                  stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
-                  stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
-
-                  dir(env.LOCAL_WORKDIR) {
-                    stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
-                  }
-
-                  // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
-                  // https://issues.jenkins.io/browse/JENKINS-52750
-                  if (env.GERRIT_PROJECT != 'canvas-lms') {
-                    sh "rm -vrf $LOCAL_WORKDIR@tmp"
-                  }
-
-                  distribution.stashBuildScripts()
-                }
+                .execute(filesChangedStage.&call)
 
               extendedStage('Build Docker Image (Pre-Merge)')
                 .obeysAllowStages(false)
@@ -434,12 +403,12 @@ pipeline {
               }
             }
 
-            extendedStage("${FILES_CHANGED_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(FILES_CHANGED_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
+            extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
 
               extendedStage('Local Docker Dev Build')
                 .hooks(buildSummaryReportHooks)
-                .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('dockerDevFiles'))
+                .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasDockerDevFiles(buildConfig))
                 .queue(nestedStages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
 
               parallel(nestedStages)
@@ -457,37 +426,25 @@ pipeline {
               parallel(nestedStages)
             }
 
-            extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
+            extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               extendedStage('Linters - Dependency Check')
-                .hooks([onNodeAcquired: lintersStage.&setupNode])
-                .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+                .nodeRequirements(label: 'canvas-docker', podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
                 .required(configuration.isChangeMerged())
-                .execute(lintersStage.&dependencyCheckStage)
+                .execute(dependencyCheckStage.queueTestStage())
 
               extendedStage('Linters')
-                .hooks([onNodeAcquired: lintersStage.&setupNode, onNodeReleasing: lintersStage.&tearDownNode])
-                .nodeRequirements(label: 'canvas-docker', podTemplate: libraryResource('/pod_templates/docker_base.yml'), container: 'docker')
+                .hooks([onNodeReleasing: lintersStage.tearDownNode()])
+                .nodeRequirements(label: 'canvas-docker', podTemplate: lintersStage.nodeRequirementsTemplate())
                 .required(!configuration.isChangeMerged())
-                .execute { stageConfig, buildConfig ->
+                .execute {
                   def nestedStages = [:]
 
-                  extendedStage('Linters - Code')
-                    .queue(nestedStages, lintersStage.&codeStage)
-
-                  extendedStage('Linters - Master Bouncer')
-                    .required(env.MASTER_BOUNCER_RUN == '1')
-                    .queue(nestedStages, lintersStage.&masterBouncerStage)
-
-                  extendedStage('Linters - Webpack')
-                    .queue(nestedStages, lintersStage.&webpackStage)
-
-                  extendedStage('Linters - Yarn')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('yarnFiles'))
-                    .queue(nestedStages, lintersStage.&yarnStage)
-
-                  extendedStage('Linters - Groovy')
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && buildConfig[FILES_CHANGED_STAGE].value('groovyFiles'))
-                    .queue(nestedStages, lintersStage.&groovyStage)
+                  callableWithDelegate(lintersStage.codeStage(nestedStages))()
+                  callableWithDelegate(lintersStage.featureFlagStage(nestedStages, buildConfig))()
+                  callableWithDelegate(lintersStage.groovyStage(nestedStages, buildConfig))()
+                  callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
+                  callableWithDelegate(lintersStage.webpackStage(nestedStages))()
+                  callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 
                   parallel(nestedStages)
                 }
@@ -498,7 +455,7 @@ pipeline {
 
               extendedStage('CDC Schema Check')
                 .hooks(buildSummaryReportHooks)
-                .required(buildConfig[FILES_CHANGED_STAGE].value('migrationFiles'))
+                .required(filesChangedStage.hasMigrationFiles(buildConfig))
                 .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
                   string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                 ])
@@ -513,7 +470,7 @@ pipeline {
 
               extendedStage('Flakey Spec Catcher')
                 .hooks(buildSummaryReportHooks)
-                .required(!configuration.isChangeMerged() && buildConfig[FILES_CHANGED_STAGE].value('specFiles') || configuration.forceFailureFSC() == '1')
+                .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
                 .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                   string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                   string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),

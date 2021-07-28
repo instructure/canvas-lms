@@ -20,6 +20,7 @@ import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import gql from 'graphql-tag'
 import {PageInfo} from './PageInfo'
+import {User} from './User'
 
 export const DISCUSSION_QUERY = gql`
   query GetDiscussionQuery(
@@ -30,10 +31,20 @@ export const DISCUSSION_QUERY = gql`
     $rootEntries: Boolean
     $filter: DiscussionFilterType
     $sort: DiscussionSortOrderType
+    $courseID: ID
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
+        editor {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        author {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
         discussionEntriesConnection(
           after: $page
           first: $perPage
@@ -44,6 +55,14 @@ export const DISCUSSION_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
+            editor {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            author {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
           }
           pageInfo {
             ...PageInfo
@@ -58,6 +77,7 @@ export const DISCUSSION_QUERY = gql`
       }
     }
   }
+  ${User.fragment}
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
@@ -66,16 +86,48 @@ export const DISCUSSION_QUERY = gql`
 export const DISCUSSION_SUBENTRIES_QUERY = gql`
   query GetDiscussionSubentriesQuery(
     $discussionEntryID: ID!
-    $page: String
-    $perPage: Int
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
     $sort: DiscussionSortOrderType
+    $courseID: ID
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment"]
+    $relativeEntryId: ID
+    $includeRelativeEntry: Boolean
+    $beforeRelativeEntry: Boolean
   ) {
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
         ...DiscussionEntry
-        discussionSubentriesConnection(after: $page, first: $perPage, sortOrder: $sort) {
+        editor {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        author {
+          ...User
+          courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+        }
+        discussionSubentriesConnection(
+          after: $after
+          before: $before
+          first: $first
+          last: $last
+          sortOrder: $sort
+          relativeEntryId: $relativeEntryId
+          includeRelativeEntry: $includeRelativeEntry
+          beforeRelativeEntry: $beforeRelativeEntry
+        ) {
           nodes {
             ...DiscussionEntry
+            editor {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            author {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
           }
           pageInfo {
             ...PageInfo
@@ -84,6 +136,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
       }
     }
   }
+  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
 `

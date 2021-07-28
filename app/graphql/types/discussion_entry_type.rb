@@ -38,7 +38,26 @@ module Types
 
     field :message, String, null: true
     def message
-      object.deleted? ? nil : object.message
+      if object.deleted?
+        nil
+      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:parent_entry).then do |parent|
+          Loaders::AssociationLoader.for(DiscussionEntry, :user).load(parent).then do
+            parent.quoted_reply_html + object.message
+          end
+        end
+      else
+        object.message
+      end
+    end
+
+    field :reply_preview, String, null:true
+    def reply_preview
+      if Account.site_admin.feature_enabled?(:isolated_view)
+        load_association(:user).then do
+          object.quoted_reply_html
+        end
+      end
     end
 
     field :read, Boolean, null: false
@@ -82,11 +101,17 @@ module Types
 
     field :discussion_subentries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :sort_order, DiscussionSortOrderType, required: false
+      argument :relative_entry_id, ID, required: false
+      argument :before_relative_entry, Boolean, required: false
+      argument :include_relative_entry, Boolean, required: false
     end
-    def discussion_subentries_connection(sort_order: :asc)
+    def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
-        sort_order: sort_order
+        sort_order: sort_order,
+        relative_entry_id: relative_entry_id,
+        before_relative_entry: before_relative_entry,
+        include_relative_entry: include_relative_entry
       ).load(object)
     end
 
@@ -118,6 +143,11 @@ module Types
           discussion_entry: object
         }
       end
+    end
+
+    field :root_entry, Types::DiscussionEntryType, null: true
+    def root_entry
+      load_association(:root_entry)
     end
   end
 end

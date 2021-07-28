@@ -56,4 +56,9 @@ describe('Expansion', () => {
     expect(queryByText('Expand discussion thread')).toBeFalsy()
     expect(queryByText('Collapse discussion thread')).toBeTruthy()
   })
+
+  it('displays as readonly if isReadOnly is true', () => {
+    const {getByText} = setup({isExpanded: false, isReadOnly: true, expandText: '4 replies'})
+    expect(getByText('4 replies').closest('button').hasAttribute('disabled')).toBeTruthy()
+  })
 })

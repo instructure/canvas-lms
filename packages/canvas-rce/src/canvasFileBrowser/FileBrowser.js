@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import formatMessage from 'format-message'
+import formatMessage from '../format-message'
 import _ from 'lodash'
 import $ from 'jquery'
 import axios from 'axios'
@@ -58,7 +58,7 @@ class FileBrowser extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      collections: {0: {collections: []}},
+      collections: {0: {id: 0, collections: []}},
       items: {},
       openFolders: [],
       uploadFolder: null,

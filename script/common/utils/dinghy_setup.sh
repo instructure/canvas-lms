@@ -5,8 +5,11 @@ source script/common/utils/common.sh
 DINGHY_MEMORY='8192'
 DINGHY_CPUS='4'
 DINGHY_DISK='150'
+DINGHY_DEPRECATION_MESSAGE="WARNING: Dinghy is currently deprecated, we suggest to use mutagen instead.
+For further information check the confluence page: https://instructure.atlassian.net/wiki/spaces/CE/pages/4334256157/Canvas+LMS+docker+dev+Installation+Update"
 
 function create_dinghy_vm {
+  warning_message $DINGHY_DEPRECATION_MESSAGE
   if ! dinghy status | grep -q 'not created'; then
     # make sure DOCKER_MACHINE_NAME is set
     eval "$(dinghy env)"

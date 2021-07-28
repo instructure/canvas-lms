@@ -112,10 +112,9 @@
       {{#if ENV.USAGE_RIGHTS_REQUIRED }}
         {{#if ENV.PERMISSIONS.manage_files }}
         <div class="control-group" style="margin-left: -75px">
-          <label class="control-label"
-            for="usage_rights_control">
+          <div class="control-label" style="font-size: 14px; line-height: 20px; margin-bottom: 5px">
             {{#t}}Set usage rights{{/t}}
-          </label>
+          </div>
           <div class="controls">
             <div id="usage_rights_control" />
             <div id="usage_rights_modal" />
@@ -134,10 +133,12 @@
     <div class="control-group">
       <div class="controls" style="text-align:start; margin-left:0">
         {{#if isTopic}}
-          <div><label class="checkbox short-label" for="threaded">
-            {{checkbox "threaded"}}
-            {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
-          </label></div>
+          {{#unless react_discussions_post}}
+            <div><label class="checkbox short-label" for="threaded">
+              {{checkbox "threaded"}}
+              {{#t "allow_threaded_replies"}}Allow threaded replies{{/t}}
+            </label></div>
+          {{/unless}}
         {{/if}}
         {{#if contextIsCourse}}
           {{#if isAnnouncement}}

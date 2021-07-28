@@ -52,6 +52,7 @@ describe('GradesPage', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    localStorage.clear()
   })
 
   describe('without grading periods', () => {
@@ -121,8 +122,9 @@ describe('GradesPage', () => {
       )
       await waitFor(() => expect(getByText('Students see their grades here.')).toBeInTheDocument())
       expect(getByTestId('empty-grades-panda')).toBeInTheDocument()
-      const gradebookButton = getByRole('link', {name: 'View Gradebook'})
+      const gradebookButton = getByRole('link', {name: 'View History Gradebook'})
       expect(gradebookButton).toBeInTheDocument()
+      expect(getByText('View Gradebook')).toBeInTheDocument()
       expect(gradebookButton.href).toContain('/courses/12/gradebook')
       expect(queryByText('Assignment')).not.toBeInTheDocument()
     })
@@ -192,6 +194,14 @@ describe('GradesPage', () => {
         const {findByText} = render(<GradesPage {...getProps()} />)
         expect(await findByText('Total: 84.60% (B)')).toBeInTheDocument()
       })
+
+      it('shows a message explaining how totals are calculated if totals are shown', async () => {
+        const {findByText, getByText} = render(<GradesPage {...getProps()} />)
+        expect(await findByText('Total: 89.39%')).toBeInTheDocument()
+        expect(
+          getByText('Totals are calculated based only on graded assignments.')
+        ).toBeInTheDocument()
+      })
     })
   })
 
@@ -202,7 +212,7 @@ describe('GradesPage', () => {
         `${ASSIGNMENT_GROUPS_URL}&grading_period_id=2`,
         JSON.stringify(MOCK_ASSIGNMENT_GROUPS)
       )
-      fetchMock.get(`${ENROLLMENTS_URL}?grading_period_id=2`, JSON.stringify(MOCK_ENROLLMENTS))
+      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=2`, JSON.stringify(MOCK_ENROLLMENTS))
     })
 
     it('shows a grading period select when grading periods are returned', async () => {
@@ -226,7 +236,7 @@ describe('GradesPage', () => {
       fetchMock.get(`${ASSIGNMENT_GROUPS_URL}&grading_period_id=1`, [], {
         overwriteRoutes: true
       })
-      fetchMock.get(`${ENROLLMENTS_URL}?grading_period_id=1`, JSON.stringify(MOCK_ENROLLMENTS), {
+      fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=1`, JSON.stringify(MOCK_ENROLLMENTS), {
         overwriteRoutes: true
       })
       const {getByText, findByText, queryByText} = render(<GradesPage {...getProps()} />)
@@ -251,6 +261,17 @@ describe('GradesPage', () => {
       await waitFor(() => expect(getByText('WWII Report')).toBeInTheDocument())
       expect(queryByText('Total: 89.39%')).not.toBeInTheDocument()
       expect(queryByText('View Assignment Group Totals')).not.toBeInTheDocument()
+    })
+
+    it('waits for grading periods to load before firing other requests', async () => {
+      const {getByText, getAllByText} = render(<GradesPage {...getProps()} />)
+      expect(getAllByText('Loading grades for History')[0]).toBeInTheDocument()
+      expect(getByText('Loading total grade for History')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText('WWII Report')).toBeInTheDocument()
+        expect(getByText('Total: 89.39%')).toBeInTheDocument()
+      })
+      expect(fetchMock.calls().length).toBe(3)
     })
   })
 

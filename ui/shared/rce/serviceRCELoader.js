@@ -18,42 +18,11 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import {refreshFn as refreshToken} from './jwt'
 import editorOptions from './editorOptions'
 import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
-import splitAssetString from '@canvas/util/splitAssetString'
+import getRCSProps from './getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
-
-function getTrayProps() {
-  if (!ENV.context_asset_string) {
-    return null
-  }
-  let [contextType, contextId] = splitAssetString(ENV.context_asset_string, false)
-  const userId = ENV.current_user_id
-  const containingContext = {contextType, contextId, userId}
-
-  // set in rich_content.rb if user has :manage_files right
-  // though comment says it may (eventually) be in the jwt
-  // TODO: look into that.
-  const canUploadFiles = !ENV.use_rce_enhancements || ENV.RICH_CONTENT_CAN_UPLOAD_FILES
-  if (!canUploadFiles || contextType === 'account') {
-    contextId = userId
-    contextType = 'user'
-  }
-
-  return {
-    canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
-    containingContext, // this will remain constant
-    contextType, // these will change via the UI
-    contextId,
-    filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
-    host: ENV.RICH_CONTENT_APP_HOST,
-    jwt: ENV.JWT,
-    refreshToken: refreshToken(ENV.JWT),
-    themeUrl: ENV.active_brand_config_json_url
-  }
-}
 
 let loadingPromise
 
@@ -82,7 +51,7 @@ const RCELoader = {
       return
     }
 
-    const props = getTrayProps()
+    const props = getRCSProps()
 
     this.loadRCE(RCE => {
       RCE.renderSidebarIntoDiv(target, props, remoteSidebar => {
@@ -224,9 +193,7 @@ const RCELoader = {
     // the autosave property in RCEWrapper to reasonable values
     const autosave = {
       enabled: ENV.use_rce_enhancements && ENV.rce_auto_save,
-      rce_auto_save_max_age_ms: Number.isNaN(ENV.rce_auto_save_max_age_ms)
-        ? 3600000
-        : ENV.rce_auto_save_max_age_ms
+      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
     }
 
     return {
@@ -238,14 +205,16 @@ const RCELoader = {
       onBlur: tinyMCEInitOptions.onBlur,
       textareaClassName: textarea.className,
       textareaId: textarea.id,
-      trayProps: getTrayProps(),
+      trayProps: getRCSProps(),
       languages,
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
+      ltiTools: window.INST?.editorButtons,
       autosave,
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
       use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor,
-      use_rce_buttons_and_icons: !!window.ENV?.FEATURES?.rce_buttons_and_icons
+      use_rce_buttons_and_icons: !!window.ENV?.FEATURES?.rce_buttons_and_icons,
+      use_rce_a11y_checker_notifications: !!window.ENV?.use_rce_a11y_checker_notifications
     }
   }
 }

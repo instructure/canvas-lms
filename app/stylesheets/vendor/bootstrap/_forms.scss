@@ -81,7 +81,7 @@ input[type="color"],
   display: inline-block;
   height: $baseLineHeight;
   padding: 8px;
-  margin-bottom: $baseLineHeight / 2;
+  margin-bottom: $baseLineHeight * 0.5;
   @include fontSize($baseFontSize);
   line-height: $baseLineHeight;
   color: $ic-font-color-dark;
@@ -427,7 +427,7 @@ This is the standard form actions button bar at the bottom of every content form
 
 .help-block {
   display: block; // account for any element using help-block
-  margin-bottom: $baseLineHeight / 2;
+  margin-bottom: $baseLineHeight * 0.5;
 }
 
 .help-inline {
@@ -645,7 +645,7 @@ input.search-query {
 
 // Margin to space out fieldsets
 .control-group {
-  margin-bottom: $baseLineHeight / 2;
+  margin-bottom: $baseLineHeight * 0.5;
 }
 
 // Legend collapses margin, so next element is responsible for spacing
@@ -686,7 +686,7 @@ legend + .control-group {
   select,
   textarea {
     + .help-block {
-      margin-top: $baseLineHeight / 2;
+      margin-top: $baseLineHeight * 0.5;
     }
   }
   // Move over buttons in .form-actions to align with .controls

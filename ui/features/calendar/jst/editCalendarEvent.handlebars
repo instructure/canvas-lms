@@ -85,6 +85,13 @@
         </td>
       </tr>
     </table>
+    <div id="important_dates">
+      <label class="label_with_checkbox" for="calendar_event_important_dates">
+        <input type="checkbox" id="calendar_event_important_dates" style="margin: 0" {{#if important_dates}}checked{{/if}} />
+        {{#t}}Mark as Important Date{{/t}}
+        <span style="display: block"><small>{{#t}}Show event on homeroom sidebar{{/t}}</small></span>
+      </label>
+    </div>
   </div>
   <div class="popover-links-holder event-details-footer pull-right">
     <a href="#" class="event_button btn btn-secondary more_options_link">{{#t "links.more_options"}}More Options{{/t}}</a>

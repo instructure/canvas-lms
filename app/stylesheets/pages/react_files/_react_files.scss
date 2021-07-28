@@ -20,6 +20,8 @@
 // you should put it in its own css file named after
 // the React Component you're using it in.
 
+@use "sass:math";
+
 $ef-thumbnail-size: 36px;
 
 
@@ -28,6 +30,8 @@ $ef-thumbnail-size: 36px;
     display: none;
   }
 }
+
+$max-default-border: 5px;
 
 body.files {
   .ic-Layout-contentMain { padding-top: 0; }
@@ -78,7 +82,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-search-form {
-  margin-bottom: $ic-sp/2;
+  margin-bottom: $ic-sp*0.5;
   @include breakpoint(desktop) {
     margin-bottom: 0;
     flex: 0 0 $ic-sp*31;
@@ -107,7 +111,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  > * { margin-#{direction(left)}: $ic-sp/3; }
+  > * { margin-#{direction(left)}: math.div($ic-sp, 3); }
 }
 
 .ef-main{
@@ -146,8 +150,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     }
 
     .ef-folder-header{
-      padding-top: $ic-sp/3;
-      padding-bottom: $ic-sp/3;
+      padding-top: math.div($ic-sp, 3);
+      padding-bottom: math.div($ic-sp, 3);
 
       &:hover{
         background-color: #f2f2f2;
@@ -190,7 +194,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
-  padding: $ic-sp/3;
+  padding: math.div($ic-sp, 3);
 }
 
 .ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
@@ -244,7 +248,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-big-icon-container {
-  margin-#{direction(right)}: $ic-sp/2;
+  margin-#{direction(right)}: $ic-sp*0.5;
   flex: 0 0 $ef-thumbnail-size;
 }
 
@@ -264,11 +268,11 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-name-col{
+  padding: $max-default-border;
   flex: 8;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding-#{direction(right)}: $ic-sp/2;
   box-sizing: border-box;
   a {
     @if $use_high_contrast { @extend .ef-plain-link; }
@@ -281,7 +285,11 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   overflow: hidden;
 }
 
-.ef-name-col__text {
+.ef-name-col__link {
+  margin: $max-default-border;
+}
+
+.ef-modified-by-col .ef-plain-link {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -300,6 +308,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-modified-by-col{
   flex: 3;
+  padding: $max-default-border;
   @include hideForPhone;
 }
 
@@ -346,13 +355,13 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-edit-name-form {
   position: relative;
-  margin: 0 $ic-sp/3;
+  margin: 0 math.div($ic-sp, 3);
   flex: 1;
 }
 
 .ef-edit-name-form__button {
-  padding-#{direction(left)}: $ic-sp/2;
-  padding-#{direction(right)}: $ic-sp/2;
+  padding-#{direction(left)}: $ic-sp*0.5;
+  padding-#{direction(right)}: $ic-sp*0.5;
 }
 
 .ef-footer {
@@ -439,8 +448,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 // the lock
 .ef-main {
   .lock-icon {  // align it with the adjacent buttons
-    margin-#{direction(right)}: $ic-sp/2;
-    padding-top: $ic-sp/2;
+    margin-#{direction(right)}: $ic-sp*0.5;
+    padding-top: $ic-sp*0.5;
     &.lock-icon button.unlocked {
       color:  $ic-color-icon-disabled;
     }

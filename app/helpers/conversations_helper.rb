@@ -138,7 +138,7 @@ module ConversationsHelper
       domain_root_account_id ||= @domain_root_account.id
       media_comment_id ||= params[:media_comment_id]
       media_comment_type ||= params[:media_comment_type]
-      user_note = params[:user_note] if user_note.nil?
+      user_note = value_to_boolean(params[:user_note]) if user_note.nil?
     end
     [
       current_user,

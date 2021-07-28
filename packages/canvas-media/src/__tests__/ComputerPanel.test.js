@@ -53,8 +53,8 @@ const uploadMediaTranslations = {
   }
 }
 
-function renderPanel(overrideProps = {}) {
-  return render(
+function createPanel(overrideProps) {
+  return (
     <ComputerPanel
       theFile={null}
       setFile={() => {}}
@@ -71,6 +71,10 @@ function renderPanel(overrideProps = {}) {
   )
 }
 
+function renderPanel(overrideProps = {}) {
+  return render(createPanel(overrideProps))
+}
+
 describe('UploadMedia: ComputerPanel', () => {
   it('shows a failure message if the file is rejected', () => {
     const notAMediaFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
@@ -84,42 +88,29 @@ describe('UploadMedia: ComputerPanel', () => {
     expect(getByText('Invalid File')).toBeVisible()
   })
 
-  it('accepts video files', () => {
+  it('shows an editable text input for title if a valid file is added', async () => {
     const aFile = new File(['foo'], 'foo.mov', {
       type: 'video/quicktime'
     })
-    const {getByLabelText, queryByText} = renderPanel()
+    const setFile = file =>
+      rerender(
+        createPanel({
+          setFile,
+          theFile: file,
+          hasUploadedFile: true
+        })
+      )
+    const {rerender, getByLabelText, getByPlaceholderText} = renderPanel({setFile})
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
         files: [aFile]
       }
     })
-    expect(queryByText('Invalid File')).toBeNull()
-  })
-
-  it('clears error messages if a valid file is added', () => {
-    const notAMediaFile = new File(['foo'], 'foo.txt', {
-      type: 'text/plain'
-    })
-    const aMediaFile = new File(['foo'], 'foo.mov', {
-      type: 'video/quicktime'
-    })
-    const {getByLabelText, getByText, queryByText} = renderPanel()
-    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
-    fireEvent.change(dropZone, {
-      target: {
-        files: [notAMediaFile]
-      }
-    })
-    expect(getByText('Invalid File')).toBeVisible()
-    fireEvent.change(dropZone, {
-      target: {
-        files: [aMediaFile]
-      }
-    })
-
-    expect(queryByText('Invalid File')).toBeNull()
+    const titleInput = getByPlaceholderText('File name')
+    expect(titleInput.value).toEqual('foo.mov')
+    fireEvent.change(titleInput, {target: {value: 'Awesome video'}})
+    expect(titleInput.value).toEqual('Awesome video')
   })
 
   describe('file preview', () => {

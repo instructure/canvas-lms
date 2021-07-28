@@ -33,8 +33,11 @@ import {
   getTotalGradeStringFromEnrollments,
   fetchImportantInfos,
   parseAnnouncementDetails,
-  groupAnnouncementsByHomeroom
+  groupAnnouncementsByHomeroom,
+  groupImportantDates
 } from '../utils'
+
+import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
@@ -695,5 +698,81 @@ describe('groupAnnouncementsByHomeroom', () => {
     })
     expect(groupAnnouncementsByHomeroom(announcements, [])).toEqual(emptyGroups)
     expect(groupAnnouncementsByHomeroom()).toEqual(emptyGroups)
+  })
+})
+
+describe('groupImportantDates', () => {
+  const mountainTime = 'America/Denver'
+  const kathmanduTime = 'Asia/Kathmandu'
+
+  it('combines assignments and events into sorted array with items grouped by date bucket', () => {
+    const items = groupImportantDates(MOCK_ASSIGNMENTS, MOCK_EVENTS, mountainTime)
+    expect(items.length).toBe(3)
+    expect(items[0].date).toBe('2021-06-30T06:00:00.000Z')
+    expect(items[1].date).toBe('2021-07-02T06:00:00.000Z')
+    expect(items[2].date).toBe('2021-07-04T06:00:00.000Z')
+    expect(items[0].items[0].id).toBe('99')
+    expect(items[1].items[0].id).toBe('assignment_175')
+    expect(items[2].items[0].id).toBe('assignment_176')
+    expect(items[2].items[1].id).toBe('assignment_177')
+  })
+
+  it('groups items into date buckets correctly for different timezones', () => {
+    const items = groupImportantDates(MOCK_ASSIGNMENTS, MOCK_EVENTS, kathmanduTime)
+    expect(items.length).toBe(4)
+    expect(items[0].date).toBe('2021-06-29T18:15:00.000Z')
+    expect(items[1].date).toBe('2021-07-01T18:15:00.000Z')
+    expect(items[2].date).toBe('2021-07-03T18:15:00.000Z')
+    expect(items[3].date).toBe('2021-07-04T18:15:00.000Z')
+    expect(items[0].items[0].id).toBe('99')
+    expect(items[1].items[0].id).toBe('assignment_175')
+    expect(items[2].items[0].id).toBe('assignment_176')
+    expect(items[3].items[0].id).toBe('assignment_177')
+  })
+
+  it('returns an empty array if no items are received', () => {
+    const items = groupImportantDates([], [], mountainTime)
+    expect(items).toEqual([])
+  })
+
+  it('still works if only assignments are passed', () => {
+    const items = groupImportantDates(MOCK_ASSIGNMENTS, [], mountainTime)
+    expect(items.length).toBe(2)
+    expect(items[0].items[0].id).toBe('assignment_175')
+  })
+
+  it('still works if only events are passed', () => {
+    const items = groupImportantDates([], MOCK_EVENTS, kathmanduTime)
+    expect(items.length).toBe(1)
+    expect(items[0].items[0].id).toBe('99')
+  })
+
+  it('uses default color if item does not supply a context_color', () => {
+    const items = groupImportantDates([MOCK_ASSIGNMENTS[0]], [], mountainTime)
+    expect(items[0].items[0].color).toBe('#394B58')
+  })
+
+  it('renames variables properly for assignment types', () => {
+    const items = groupImportantDates([MOCK_ASSIGNMENTS[1]], [], mountainTime)
+    const assignment = items[0].items[0]
+    expect(assignment.id).toBe('assignment_176')
+    expect(assignment.title).toBe('History Discussion')
+    expect(assignment.context).toBe('History')
+    expect(assignment.color).toBe('#CCCCCC')
+    expect(assignment.type).toBe('discussion_topic')
+    expect(assignment.url).toBe('http://localhost:3000/courses/31/assignments/176')
+    expect(assignment.start).toBe('2021-07-04T11:30:00Z')
+  })
+
+  it('renames variables properly for event types', () => {
+    const items = groupImportantDates([], MOCK_EVENTS, mountainTime)
+    const event = items[0].items[0]
+    expect(event.id).toBe('99')
+    expect(event.title).toBe('Morning Yoga')
+    expect(event.context).toBe('History')
+    expect(event.color).toBe('#CCCCCC')
+    expect(event.type).toBe('event')
+    expect(event.url).toBe('http://localhost:3000/calendar?event_id=99&include_contexts=course_30')
+    expect(event.start).toBe('2021-06-30T07:00:00Z')
   })
 })

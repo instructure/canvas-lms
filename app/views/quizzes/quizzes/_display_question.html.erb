@@ -88,9 +88,12 @@
                 !point_value_for_input(user_answer, question).nan? &&
                 round_if_whole(point_value_for_input(user_answer, question).round(2)) || ''
               %>" />
+            <label class="screenreader-only" for="question_score_<%= hash_get(question, :id) %>_visible"><%= t(:question_score, 'Question Score') %></label>
             <input class="question_input"
               placeholder="--"
               data-question-id="<%= hash_get(question, :id) %>"
+              name="question_score_<%= hash_get(question, :id) %>_visible"
+              id="question_score_<%= hash_get(question, :id) %>_visible"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
                 render_score(point_value_for_input(user_answer, question)) || ''
@@ -431,8 +434,10 @@
       <% if (hash_get(user_answer, :more_comments) && comment_get(user_answer, :more_comments).present?) || (editable && question_type && question_type.entry_type != "none") %>
         <div class="quiz_comment">
           <% if editable %>
-            <span style="font-size: 0.8em;"><%= before_label(:additional_comments, "Additional Comments") %></span>
-            <textarea name="question_comment_<%= hash_get(question, :id) %>" style="display: block; width: auto; margin-<%= direction('left') %>: 5px; margin-<%= direction('right') %>: 5px; height: 50px;"><%= comment_get(user_answer, :more_comments) || "" %></textarea>
+              <label for="question_comment_<%= hash_get(question, :id) %>">
+                <span style="font-size: 0.8em;"><%= before_label(:additional_comments, "Additional Comments") %></span>
+              </label>
+              <textarea id="question_comment_<%= hash_get(question, :id) %>" name="question_comment_<%= hash_get(question, :id) %>" style="display: block; width: auto; margin-<%= direction('left') %>: 5px; margin-<%= direction('right') %>: 5px; height: 50px;"><%= comment_get(user_answer, :more_comments) || "" %></textarea>
           <% else %>
             <%= comment_get(user_answer, :more_comments) %>
           <% end %>

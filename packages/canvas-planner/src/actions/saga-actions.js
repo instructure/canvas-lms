@@ -70,7 +70,7 @@ export const mergeWeekItems =
   (dispatch, getState) => {
     dispatch(LA.gotPartialWeekDays(itemsToDays(newWeekItems), response))
     const state = getState()
-    weekStart ||= state.weeklyDashboard.weekStart
+    weekStart = weekStart || state.weeklyDashboard.weekStart
     const completeDays = extractCompleteDays(
       state.loading.partialWeekDays,
       state.loading.allWeekItemsLoaded,

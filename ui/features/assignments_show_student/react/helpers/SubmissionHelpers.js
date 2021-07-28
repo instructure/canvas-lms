@@ -18,16 +18,6 @@
 
 import I18n from 'i18n!assignments_2_submission_helpers'
 
-export function getCurrentSubmissionType(submission) {
-  if (submission.url !== null) {
-    return 'online_url'
-  } else if (submission.body !== null && submission.body !== '') {
-    return 'online_text_entry'
-  } else if (submission.attachments.length !== 0) {
-    return 'online_upload'
-  }
-}
-
 export function friendlyTypeName(type) {
   switch (type) {
     case 'media_recording':
@@ -38,9 +28,15 @@ export function friendlyTypeName(type) {
       return I18n.t('Upload')
     case 'online_url':
       return I18n.t('Web URL')
+    case 'student_annotation':
+      return I18n.t('Annotation')
     default:
       throw new Error('submission type not yet supported in A2')
   }
+}
+
+export function isSubmitted({state, attempt}) {
+  return state === 'submitted' || (state === 'graded' && attempt !== 0)
 }
 
 export function multipleTypesDrafted(submission) {

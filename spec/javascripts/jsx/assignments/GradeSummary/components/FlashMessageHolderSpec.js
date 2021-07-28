@@ -21,11 +21,11 @@ import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
-import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
-import FlashMessageHolder from 'ui/features/assignment_grade_summary/react/components/FlashMessageHolder.js'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
+import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
+import FlashMessageHolder from 'ui/features/assignment_grade_summary/react/components/FlashMessageHolder'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
 
 /* eslint-disable qunit/no-identical-names */
 

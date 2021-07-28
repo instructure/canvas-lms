@@ -20,14 +20,15 @@
 // handlebars-tasks gem.  We need to run handlebars source through basic
 // compilation to extract i18nliner scopes, and then we wrap the resulting
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
-// i18n object if it needs one, and any brandableCss variant stuff it needs.
+// i18n object if it needs one.
 const Handlebars = require('handlebars')
 const {pick} = require('lodash')
 const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
-const {allFingerprintsFor} = require('brandable_css/lib/main')
 const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
 const nodePath = require('path')
+const { contriveId, config: brandableCSSConfig } = require('@instructure/brandable_css')
+const loaderUtils = require('loader-utils')
 require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 
 // In this main file, we do a bunch of stuff to monkey-patch the default behavior of
@@ -103,24 +104,13 @@ const buildCssReference = (path, name) => {
     return ''
   }
 
-  const cached = allFingerprintsFor(`${bundle}.scss`)
-  const firstVariant = Object.keys(cached)[0]
-
-  if (!firstVariant) {
-    return ''
-  }
-
-  const options = cached[firstVariant].includesNoVariables
-    ? // there is no branding / high contrast specific variables in this file,
-      // all users will use the same file.
-      JSON.stringify(pick(cached[firstVariant], 'combinedChecksum', 'includesNoVariables'))
-    : // Spit out all the combinedChecksums into the compiled js file and use brandableCss.getCssVariant()
-      // at runtime to determine which css variant to load, based on the user & account's settings
-      `${JSON.stringify(getCombinedChecksums(cached))}[brandableCss.getCssVariant()]`
-
   return `
     import brandableCss from '@canvas/brandable-css';
-    brandableCss.loadStylesheet('${bundle}', ${options});
+
+    brandableCss.loadStylesheetForJST({
+      id: '${contriveId(bundle, brandableCSSConfig.indices.handlebars.keysz)}',
+      bundle: '${bundle}'
+    });
   `
 }
 
@@ -150,12 +140,16 @@ const emitPartialRegistration = (path, resourceName) => {
 
 function i18nLinerHandlebarsLoader(source) {
   this.cacheable()
+  const options = loaderUtils.getOptions(this) || {}
   const name = resourceName(this.resourcePath)
   const dependencies = []
 
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  const cssRegistration = buildCssReference(this.resourcePath, name)
+  const cssRegistration = options.injectBrandableStylesheet !== false ?
+    buildCssReference(this.resourcePath, name) :
+    ''
+  ;
 
   const partials = findReferencedPartials(source)
   const partialRequirements = partials.map(x => nodePath.resolve(rootDir, x))
@@ -187,10 +181,11 @@ function i18nLinerHandlebarsLoader(source) {
 
 module.exports = i18nLinerHandlebarsLoader
 
-module.exports.compile = (source, path) => {
+module.exports.compile = (source, path, query) => {
   const context = {
     cacheable: () => {},
-    resourcePath: path
+    resourcePath: path,
+    query
   }
   return i18nLinerHandlebarsLoader.call(context, source)
 }

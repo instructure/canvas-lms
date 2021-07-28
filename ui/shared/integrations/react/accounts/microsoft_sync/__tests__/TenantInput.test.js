@@ -52,11 +52,16 @@ describe('TenantInput', () => {
         {
           text: 'error message!',
           type: 'error'
+        },
+        {
+          text: 'hint message!',
+          type: 'hint'
         }
       ]
     })
 
     expect(container.getByText(/error message/i)).toBeInTheDocument()
+    expect(container.getByText(/hint message/i)).toBeInTheDocument()
   })
 
   it('renders the provided tenant', () => {

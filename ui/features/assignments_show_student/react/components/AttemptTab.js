@@ -20,12 +20,13 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {friendlyTypeName, getCurrentSubmissionType} from '../helpers/SubmissionHelpers'
+import {friendlyTypeName, isSubmitted} from '../helpers/SubmissionHelpers'
 import {
   IconAttachMediaLine,
   IconLinkLine,
   IconUploadLine,
-  IconTextLine
+  IconTextLine,
+  IconAnnotateLine
 } from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -42,12 +43,14 @@ const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
 const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
 const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
 const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
+const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,
   online_text_entry: IconTextLine,
   online_upload: IconUploadLine,
-  online_url: IconLinkLine
+  online_url: IconLinkLine,
+  student_annotation: IconAnnotateLine
 }
 
 function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
@@ -91,7 +94,6 @@ export default class AttemptTab extends Component {
     activeSubmissionType: string,
     assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
-    editingDraft: bool,
     onContentsChanged: func,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
@@ -115,8 +117,7 @@ export default class AttemptTab extends Component {
   }
 
   renderFileAttempt = () => {
-    return this.props.submission.state === 'graded' ||
-      this.props.submission.state === 'submitted' ? (
+    return isSubmitted(this.props.submission) ? (
       <Suspense fallback={<LoadingIndicator />}>
         <FilePreview
           key={this.props.submission.attempt}
@@ -129,10 +130,7 @@ export default class AttemptTab extends Component {
   }
 
   renderTextAttempt = context => {
-    const readOnly =
-      !context.allowChangesToSubmission ||
-      ['submitted', 'graded'].includes(this.props.submission.state)
-
+    const readOnly = !context.allowChangesToSubmission || isSubmitted(this.props.submission)
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
@@ -174,6 +172,18 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderStudentAnnotationAttempt = () => {
+    return (
+      <Suspense fallback={<LoadingIndicator />}>
+        <StudentAnnotationAttempt
+          submission={this.props.submission}
+          assignment={this.props.assignment}
+          createSubmissionDraft={this.props.createSubmissionDraft}
+        />
+      </Suspense>
+    )
+  }
+
   renderByType(submissionType, context) {
     switch (submissionType) {
       case 'media_recording':
@@ -184,6 +194,8 @@ export default class AttemptTab extends Component {
         return this.renderFileAttempt()
       case 'online_url':
         return this.renderUrlAttempt()
+      case 'student_annotation':
+        return this.renderStudentAnnotationAttempt()
       default:
         throw new Error('submission type not yet supported in A2')
     }
@@ -192,7 +204,7 @@ export default class AttemptTab extends Component {
   renderSubmissionTypeSelector() {
     // because we are currently allowing only a single submission type
     // you should never need to change types after submitting
-    if (this.props.submission.state === 'graded' || this.props.submission.state === 'submitted') {
+    if (isSubmitted(this.props.submission)) {
       return null
     }
 
@@ -204,7 +216,7 @@ export default class AttemptTab extends Component {
 
         <Flex>
           {this.props.assignment.submissionTypes.map(type => (
-            <Flex.Item as="div" key={type} margin="0 medium 0 0">
+            <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
               <SubmissionTypeButton
                 displayName={friendlyTypeName(type)}
                 icon={iconsByType[type]}
@@ -226,8 +238,8 @@ export default class AttemptTab extends Component {
       return <LockedAssignment assignment={assignment} />
     }
 
-    const submissionType = ['submitted', 'graded'].includes(submission.state)
-      ? getCurrentSubmissionType(submission)
+    const submissionType = isSubmitted(submission)
+      ? submission.submissionType
       : this.props.activeSubmissionType
 
     const multipleSubmissionTypes = assignment.submissionTypes.length > 1

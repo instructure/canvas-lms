@@ -221,6 +221,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def sync_placements!(placements)
+    self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
     placements_to_delete = Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) - placements
     if placements_to_delete.any?

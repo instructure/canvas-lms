@@ -924,9 +924,36 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context 'display_type == "in_nav_context"' do
+          before do
+            tool.settings[:assignment_selection] = { "display_type" => "in_nav_context" }
+            tool.save!
+          end
+
+          it 'does not display the assignment lti header' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:prepend_template]).to be_blank
+          end
+
+          it 'does display the assignment edit sidebar' do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:append_template]).to be_present
+          end
+        end
+
         it 'gives priority to the "display" parameter' do
           expect(Lti::AppUtil).to receive(:display_template).with('borderless')
           controller.params['display'] = 'borderless'
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+        end
+
+        it 'overrides the configured display_type for the quiz_lti in module context when feature flag is on' do
+          Account.site_admin.enable_feature!(:new_quizzes_in_module_progression)
+          allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
+          module1 = course.context_modules.create!(name: 'Module 1')
+          content_tag.context.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')
+
+          expect(Lti::AppUtil).to receive(:display_template).with('in_nav_context')
           controller.send(:content_tag_redirect, course, content_tag, nil)
         end
 
@@ -2047,7 +2074,8 @@ describe ApplicationController do
 
   describe "k5_user? helper" do
     before :once do
-      course_with_student :active_all => true
+      course_with_teacher :active_all => true
+      student_in_course :context => @course
       toggle_k5_setting(@course.account)
     end
 
@@ -2066,8 +2094,29 @@ describe ApplicationController do
       end
     end
 
+    it "caches the eligibility computation at the request level" do
+      RequestCache.enable do
+        expect(@controller).to receive(:k5_disabled?).once
+        expect(@controller.send(:k5_user?)).to eq true
+        expect(@controller.send(:k5_user?)).to eq true
+      end
+    end
+
     it "returns true if associated with a k5 account" do
       expect(@controller.send(:k5_user?)).to be_truthy
+    end
+
+    it "returns true if enrolled in a subaccount of a k5 account" do
+      sub = Account.create!(parent_account_id: @course.account)
+      course_factory(account: sub)
+      student_in_course(active_all: true)
+      @controller.instance_variable_set(:@current_user, @student)
+      expect(@controller.send(:k5_user?)).to eq true
+    end
+
+    it "returns false if all k5 enrollments are concluded" do
+      @student.enrollments.where(course_id: @course.id).take.complete
+      expect(@controller.send(:k5_user?)).to eq false
     end
 
     it "returns false if not associated with a k5 account" do
@@ -2076,6 +2125,35 @@ describe ApplicationController do
       @course.root_account.settings[:k5_accounts] = []
       @course.root_account.save!
       expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns false if a teacher or admin has opted-out of the k5 dashboard" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns true for an admin without enrollments" do
+      account_admin_user(account: @account)
+      user_session(@admin)
+      @controller.instance_variable_set(:@current_user, @admin)
+      expect(@controller.send(:k5_user?)).to eq true
+    end
+
+    it "ignores the disabled preference if check_disabled = false" do
+      @teacher.preferences[:elementary_dashboard_disabled] = true
+      @teacher.save!
+      user_session(@teacher)
+      @controller.instance_variable_set(:@current_user, @teacher)
+      expect(@controller.send(:k5_user?, false)).to be_truthy
+    end
+
+    it "returns true even if a student has opted-out of the k5 dashboard" do
+      @student.preferences[:elementary_dashboard_disabled] = true
+      @student.save!
+      expect(@controller.send(:k5_user?)).to be_truthy
     end
 
     it "returns false if no current user" do

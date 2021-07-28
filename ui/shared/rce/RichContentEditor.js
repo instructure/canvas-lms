@@ -171,6 +171,26 @@ const RichContentEditor = {
    *     the element's siblings, so when the RCE is rendered into the
    *     container it doesn't wipe out other parts of the DOM
    *
+   *   optionsToMerge (Array<string>)
+   *     Sometimes it is desirable to _merge_ custom tinymce configuration with
+   *     the default values rather than completely _overwriting_ those defaults.
+   *
+   *     When this is desired, set "optionsToMerge" to an array of the config
+   *     keys you wish to have merged rather than overwritten. For example:
+   *
+   *     ```
+   *      loadNewEditor(textarea, {
+   *        optionsToMerge: ['plugins'],
+   *        tinyOptions: {
+   *          plugins: ['canvas_mentions']
+   *        }
+   *      }, cb)
+   *     ```
+   *
+   *     This example will merge `tinyOptions.plugins` with the list of default
+   *     plugins rather than overriding them.
+   *
+   *
    * Be sure to call RichContentEditor.closeRCE(target) if the user cleanly exits the page
    *
    * @public

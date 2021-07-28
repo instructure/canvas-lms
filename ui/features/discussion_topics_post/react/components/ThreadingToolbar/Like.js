@@ -22,36 +22,49 @@ import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 
 export function Like({...props}) {
   return (
     <CondensedButton
-      renderIcon={
-        props.isLiked ? (
-          <IconLikeSolid data-testid="liked-icon" />
-        ) : (
-          <IconLikeLine data-testid="not-liked-icon" />
-        )
-      }
       onClick={props.onClick}
       withBackground={false}
       color="primary"
       data-testid="like-button"
       interaction={props.interaction}
     >
-      <ScreenReaderContent>
-        {props.isLiked
-          ? I18n.t('Unlike post from %{author}', {author: props.authorName})
-          : I18n.t('Like post from %{author}', {author: props.authorName})}
-      </ScreenReaderContent>
-      {props.likeCount > 0 && (
-        <>
-          <PresentationContent>{props.likeCount}</PresentationContent>
-          <ScreenReaderContent>
-            {I18n.t('Like count: %{count}', {count: props.likeCount})}
-          </ScreenReaderContent>
-        </>
-      )}
+      <Flex>
+        <Flex.Item>
+          {props.isLiked ? (
+            <>
+              <IconLikeSolid data-testid="liked-icon" size="x-small" />
+              <ScreenReaderContent>
+                {I18n.t('Unlike post from %{author}', {author: props.authorName})}
+              </ScreenReaderContent>
+            </>
+          ) : (
+            <>
+              <IconLikeLine data-testid="not-liked-icon" size="x-small" />
+              <ScreenReaderContent>
+                {I18n.t('Like post from %{author}', {author: props.authorName})}
+              </ScreenReaderContent>
+            </>
+          )}
+        </Flex.Item>
+        {props.likeCount > 0 && (
+          <Flex.Item padding="0 0 0 xx-small">
+            <PresentationContent>
+              <Text weight="bold" data-testid="like-count">
+                {props.likeCount}
+              </Text>
+            </PresentationContent>
+            <ScreenReaderContent>
+              {I18n.t('Like count: %{count}', {count: props.likeCount})}
+            </ScreenReaderContent>
+          </Flex.Item>
+        )}
+      </Flex>
     </CondensedButton>
   )
 }

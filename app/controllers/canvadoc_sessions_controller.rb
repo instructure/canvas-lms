@@ -55,7 +55,10 @@ class CanvadocSessionsController < ApplicationController
       return render json: {error: "No annotations associated with that submission_attempt"}, status: :bad_request
     end
 
-    render json: {canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission)}
+    render json: {
+      annotation_context_launch_id: annotation_context.launch_id,
+      canvadocs_session_url: canvadocs_session_url(@current_user, annotation_context, submission, true)
+    }
   end
 
   # @API Document Previews
@@ -85,6 +88,7 @@ class CanvadocSessionsController < ApplicationController
       if opts[:enable_annotations]
         # Docviewer only cares about the enrollment type when we're doing annotations
         opts[:enrollment_type] = blob["enrollment_type"]
+        opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
         assignment = submission.assignment

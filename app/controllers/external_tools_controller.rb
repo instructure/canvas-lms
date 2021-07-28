@@ -601,6 +601,13 @@ class ExternalToolsController < ApplicationController
                           can_launch = tool.visible_with_permission_check?(selection_type, @current_user, @context, session)
                           raise Lti::Errors::UnauthorizedError unless can_launch
                           adapter.generate_post_payload
+                        elsif selection_type == 'assignment_selection' && assignment&.external_tool_tag&.content_id == tool.id
+                          adapter.generate_post_payload_for_assignment(
+                            assignment,
+                            lti_grade_passback_api_url(tool),
+                            blti_legacy_grade_passback_api_url(tool),
+                            lti_turnitin_outcomes_placement_url(tool.id)
+                          )
                         else
                           adapter.generate_post_payload
                         end
@@ -757,7 +764,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument account_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "in_nav_context", "borderless", or "default"
   #
   # @argument user_navigation[url] [String]
   #   The url of the external tool for user navigation
@@ -810,7 +817,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument course_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "full_width_in_context", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "in_nav_context", "borderless", or "default"
   #
   # @argument editor_button[url] [String]
   #   The url of the external tool

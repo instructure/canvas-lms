@@ -594,6 +594,24 @@ describe AccountsController do
           expect(@root_account.settings[:k5_accounts].length).to be 1
         end
       end
+
+      it "clears the cached k5_user value for all users when the setting is changed" do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
+        user_session(@user)
+        enable_cache(:redis_cache_store) do
+          Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            "cached!"
+          end
+          post 'update', params: toggle_k5_params(@account.id, true)
+          run_jobs
+          other_value = "something else"
+          cached_value = Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @user, batched_keys: [:k5_user]) do
+            other_value # only takes this value if the cache key is empty - i.e., its been cleared
+          end
+          expect(cached_value).to eq other_value
+        end
+      end
     end
 
     describe "quotas" do
@@ -889,17 +907,6 @@ describe AccountsController do
         expect(assigns.dig(:js_env, :TOOL_CONFIGURATION_SHOW_URL)).to eq(
           "http://test.host/api/lti/accounts/#{account.id}/developer_keys/:developer_key_id/tool_configuration"
         )
-      end
-
-      it 'defaults new feature flags to false' do
-        get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(false)
-      end
-
-      it 'passes on correct value for new feature flags ui' do
-        Account.site_admin.enable_feature!(:new_features_ui)
-        get 'settings', params: {account_id: account.id}
-        expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end
 
       it 'sets microsoft sync values' do

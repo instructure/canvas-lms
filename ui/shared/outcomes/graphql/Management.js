@@ -20,14 +20,16 @@ import axios from '@canvas/axios'
 import pluralize from 'str-pluralize'
 import {gql} from '@canvas/apollo'
 
+export const groupFields = `
+  _id
+  title
+  outcomesCount
+  childGroupsCount
+`
+
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
-    _id
-    title
-    description
-    outcomesCount
-    childGroupsCount
-    canEdit
+    ${groupFields}
   }
 `
 
@@ -83,22 +85,20 @@ export const FIND_GROUP_OUTCOMES = gql`
     group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
       ... on LearningOutcomeGroup {
         _id
-        description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
             endCursor
           }
           edges {
+            id
             node {
               ... on LearningOutcome {
                 _id
                 description
                 title
-                displayName
                 isImported(
                   targetContextType: $outcomesContextType
                   targetContextId: $outcomesContextId
@@ -126,7 +126,6 @@ export const SEARCH_GROUP_OUTCOMES = gql`
         description
         title
         outcomesCount(searchQuery: $searchQuery)
-        canEdit
         outcomes(searchQuery: $searchQuery, first: 10, after: $outcomesCursor) {
           pageInfo {
             hasNextPage
@@ -134,6 +133,7 @@ export const SEARCH_GROUP_OUTCOMES = gql`
           }
           edges {
             canUnlink
+            id
             node {
               ... on LearningOutcome {
                 _id
@@ -191,6 +191,18 @@ export const CREATE_LEARNING_OUTCOME = gql`
   }
 `
 
+export const DELETE_OUTCOME_LINKS = gql`
+  mutation DeleteOutcomeLinks($input: DeleteOutcomeLinksInput!) {
+    deleteOutcomeLinks(input: $input) {
+      deletedOutcomeLinkIds
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 export const UPDATE_LEARNING_OUTCOME = gql`
   mutation UpdateLearningOutcome($input: UpdateLearningOutcomeInput!) {
     updateLearningOutcome(input: $input) {
@@ -208,28 +220,42 @@ export const UPDATE_LEARNING_OUTCOME = gql`
   }
 `
 
-export const updateOutcomeGroup = (contextType, contextId, groupId, group) =>
-  axios.put(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
-    group
-  )
+export const MOVE_OUTCOME_LINKS = gql`
+  mutation MoveOutcomeLinks($input: MoveOutcomeLinksInput!) {
+    moveOutcomeLinks(input: $input) {
+      movedOutcomeLinkIds
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const UPDATE_LEARNING_OUTCOME_GROUP = gql`
+  mutation UpdateLearningOutcomeGroup($input: UpdateLearningOutcomeGroupInput!) {
+    updateLearningOutcomeGroup(input: $input) {
+      learningOutcomeGroup {
+        _id
+        title
+        description
+        vendorGuid
+        parentOutcomeGroup {
+          _id
+          title
+        }
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
 
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
-  )
-
-export const removeOutcome = (contextType, contextId, groupId, outcomeId) =>
-  axios.delete(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${groupId}/outcomes/${outcomeId}`
-  )
-
-export const moveOutcomeGroup = (contextType, contextId, groupId, newParentGroupId) =>
-  axios.put(
-    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`,
-    {parent_outcome_group_id: newParentGroupId}
   )
 
 export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) => {
@@ -240,17 +266,3 @@ export const addOutcomeGroup = (contextType, contextId, parentGroupId, title) =>
     {title}
   )
 }
-
-export const moveOutcome = (
-  contextType,
-  contextId,
-  outcomeId,
-  oldParentGroupId,
-  newParentGroupId
-) =>
-  axios.put(
-    `/api/v1/${pluralize(
-      contextType
-    ).toLowerCase()}/${contextId}/outcome_groups/${newParentGroupId}/outcomes/${outcomeId}`,
-    {move_from: oldParentGroupId}
-  )

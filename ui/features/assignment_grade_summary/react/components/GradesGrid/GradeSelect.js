@@ -19,13 +19,14 @@
 import React, {Component} from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import I18n from 'i18n!assignment_grade_summary'
 
 import numberHelper from '@canvas/i18n/numberHelper'
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 
 const NO_SELECTION = 'no-selection'
+const NO_SELECTION_LABEL = '–'
 
 function filterOptions(options, filterText) {
   const exactMatches = []
@@ -57,7 +58,8 @@ function optionsForGraders(graders, grades) {
       options.push({
         gradeInfo,
         label: `${I18n.n(gradeInfo.score)} (${grader.graderName})`,
-        value: gradeInfo.graderId
+        value: gradeInfo.graderId,
+        disabled: !grader.graderSelectable
       })
     }
   }
@@ -82,6 +84,35 @@ function customGradeOptionFromProps({finalGrader, grades}) {
   return null
 }
 
+// for the future author, the behavior of this widget is intended to double as
+// both a select menu and a text input widget. The text input provided by the
+// user is also intended to double as both a filter for the menu options as well
+// as a value for a custom/provisional grade that gets morphed into a menu
+// option if they choose it (either by selecting the menu option or by pressing
+// RETURN).
+//
+// While SimpleSelect takes us a long way, we still need to tune it. That's why
+// you'll see me making some imperative calls to its internal APIs, it's not
+// because I necessarily hate you. This was still a lot cheaper than building
+// off of the underlying Select component, which takes a ton of work.
+class TypableSimpleSelect extends SimpleSelect {
+  componentDidUpdate(prevProps) {
+    if (this.props.value !== prevProps.value) {
+      const option = this.getOption('value', this.props.value)
+
+      if (option) {
+        this.setState({
+          inputValue: option.props.children,
+          selectedOptionId: option.props.id
+        })
+      }
+      else { // let the text the user is typing go through
+        this.setState({ selectedOptionId: '' })
+      }
+    }
+  }
+};
+
 export default class GradeSelect extends Component {
   static propTypes = {
     disabledCustomGrade: bool.isRequired,
@@ -98,7 +129,6 @@ export default class GradeSelect extends Component {
     grades: shape({}).isRequired,
     onClose: func,
     onOpen: func,
-    onPositioned: func,
     onSelect: func,
     selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
     studentId: string.isRequired,
@@ -109,7 +139,6 @@ export default class GradeSelect extends Component {
     finalGrader: null,
     onClose() {},
     onOpen() {},
-    onPositioned() {},
     onSelect() {},
     selectProvisionalGradeStatus: null
   }
@@ -133,6 +162,9 @@ export default class GradeSelect extends Component {
     this.handleChange = this.handleChange.bind(this)
     this.handleClose = this.handleClose.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.filterAndBuildCustomOption = this.filterAndBuildCustomOption.bind(this)
+    this.discardCustomOption = this.discardCustomOption.bind(this)
+    this.acceptCustomOption = this.acceptCustomOption.bind(this)
 
     this.state = this.constructor.createStateFromProps(props)
   }
@@ -153,7 +185,7 @@ export default class GradeSelect extends Component {
 
     var selectedOption = options.find(option => option.gradeInfo.selected)
     if (!selectedOption) {
-      selectedOption = {gradeInfo: {}, label: '–', value: NO_SELECTION}
+      selectedOption = {gradeInfo: {}, label: NO_SELECTION_LABEL, value: NO_SELECTION}
       options.unshift(selectedOption)
     }
 
@@ -161,7 +193,6 @@ export default class GradeSelect extends Component {
       customGradeOption,
       graderOptions,
       options,
-      selectedOption
     }
   }
 
@@ -182,9 +213,6 @@ export default class GradeSelect extends Component {
       selectedOption == null ||
       selectedOption.value === NO_SELECTION
     ) {
-      setTimeout(() => {
-        this.$input.value = this.state.selectedOption.label
-      })
       return
     }
 
@@ -220,58 +248,110 @@ export default class GradeSelect extends Component {
   }
 
   handleInputChange(event, value) {
-    const cleanValue = event == null ? '' : value.trim()
-    const options = filterOptions(this.state.graderOptions, cleanValue)
-    const score = numberHelper.parse(cleanValue)
+    if (this.select && this.canInputCustomGrades()) {
+      this.select.setState/*[1]*/({ inputValue: event.target.value }, () => {
+        this.filterAndBuildCustomOption()
+      })
+      // [1] yuck yes, a proper solution would be built on top of the underlying
+      //     Select and not SimpleSelect with proper time investment
+    }
+  }
+
+  filterAndBuildCustomOption() {
+    const input = this.getInputBuffer()
+
+    if (!input) {
+      return this.setState(this.constructor.createStateFromProps(this.props))
+    }
+
+    const options = filterOptions(this.state.graderOptions, input)
+    const score = numberHelper.parse(input)
 
     let customGradeOption = customGradeOptionFromProps(this.props)
 
+    // both filter and a custom grade entry
     if (!Number.isNaN(score)) {
-      let gradeInfo = customGradeOption ? customGradeOption.gradeInfo : {}
-      gradeInfo = {
-        ...gradeInfo,
+      customGradeOption = buildCustomGradeOption({
+        ...customGradeOption?.gradeInfo,
         graderId: this.props.finalGrader.graderId,
         score,
         studentId: this.props.studentId
-      }
-      customGradeOption = buildCustomGradeOption(gradeInfo)
+      })
     }
 
-    if (customGradeOption) {
-      options.push(customGradeOption)
-    }
+    this.setState({
+      customGradeOption,
+      options: customGradeOption ? options.concat([customGradeOption]) : options
+    })
+  }
 
-    this.setState({customGradeOption, options})
+  discardCustomOption() {
+    return this.setState(this.constructor.createStateFromProps(this.props))
+  }
+
+  getInputBuffer() {
+    const input = this.select && this.select.state.inputValue.trim()
+
+    if (input && input.length && input !== NO_SELECTION_LABEL) {
+      return input
+    }
+    else {
+      return null
+    }
+  }
+
+  acceptCustomOption() {
+    // selecting all the text when the input widget is focused makes it easier
+    // for the user to just type in the provisional grade (or filter), because
+    // the normal Home/End behavior is hijacked by the InstUI select components
+    // and the fact that back-spacing can also produce strange results when you
+    // filter down to 1 option.....
+    this.$input.select()
+  }
+
+  canInputCustomGrades() {
+    return !this.props.disabledCustomGrade && this.props.onSelect
+  }
+
+  getSelectedOption() {
+    return this.state.options.find(x => x.gradeInfo.selected)
   }
 
   render() {
     const readOnly = !this.props.onSelect
 
     return (
-      <Select
+      <TypableSimpleSelect
         aria-readonly={readOnly || this.props.selectProvisionalGradeStatus === STARTED}
         editable={!(this.props.disabledCustomGrade || readOnly)}
-        filter={options => options}
         inputRef={this.bindMenu}
-        label={
+        renderLabel={
           <ScreenReaderContent>
             {I18n.t('Grade for %{studentName}', {studentName: this.props.studentName})}
           </ScreenReaderContent>
         }
         onChange={this.handleChange}
-        onClose={this.handleClose}
         onInputChange={this.handleInputChange}
-        onOpen={this.props.onOpen}
-        onPositioned={this.props.onPositioned}
+        onFocus={this.acceptCustomOption}
+        onBlur={this.discardCustomOption}
+        onShowOptions={this.props.onOpen}
+        onHideOptions={this.handleClose}
         ref={this.bindSelect}
-        selectedOption={this.state.selectedOption}
+        value={this.getSelectedOption()?.value || null}
       >
         {this.state.options.map(gradeOption => (
-          <option key={gradeOption.value} value={gradeOption.value}>
+          <SimpleSelect.Option
+            isDisabled={gradeOption.disabled}
+            key={gradeOption.value}
+            id={gradeOption.value}
+            value={gradeOption.value}
+          >
             {gradeOption.label}
-          </option>
+          </SimpleSelect.Option>
         ))}
-      </Select>
+      </TypableSimpleSelect>
     )
   }
 }
+
+export { NO_SELECTION_LABEL }

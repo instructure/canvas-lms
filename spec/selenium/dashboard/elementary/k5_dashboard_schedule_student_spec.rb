@@ -19,12 +19,16 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_schedule_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 dashboard schedule" do
   include_context "in-process server selenium tests"
-  include K5PageObject
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5ScheduleTabPageObject
   include K5Common
   include GradebookSetup
 
@@ -47,6 +51,63 @@ describe "student k5 dashboard schedule" do
       wait_for_ajaximations
 
       expect(today_header).to be_displayed
+    end
+  end
+
+  context 'student events and todos' do
+    let(:title) { "Student Todo" }
+
+    before :once do
+      @student.planner_notes.create!(todo_date: Time.zone.now, title: title)
+    end
+
+    it 'shows student todo in modal when todo title selected' do
+      get "/#schedule"
+
+      expect(todo_edit_pencil).to be_displayed
+
+      click_todo_edit_pencil
+
+      expect(todo_editor_modal).to be_displayed
+    end
+
+    it 'provide close without edit button', ignore_js_errors: true do
+      get "/#schedule"
+
+      click_todo_edit_pencil
+      wait_for_ajaximations
+      new_title = "New Title"
+      update_todo_title(title, new_title)
+      click_close_editor_modal_button
+
+      expect(todo_item).to include_text(title)
+    end
+
+    it 'updates student todo with modal' do
+      get "/#schedule"
+
+      click_todo_edit_pencil
+      new_title = "New Student Todo"
+      update_todo_title(title, new_title)
+      click_todo_save_button
+      expect(wait_for_no_such_element { todo_editor_modal }).to be_truthy
+      expect(todo_item).to include_text(new_title)
+    end
+  end
+
+  context 'student-created events' do
+    it 'shows student-created calender event info when selected' do
+      title = "Student Event"
+      @student.calendar_events.create!(title: title, start_at: Time.zone.now)
+
+      get "/#schedule"
+
+      click_todo_item
+
+      expect(calendar_event_modal).to be_displayed
+
+      click_close_calendar_event_modal
+      expect(wait_for_no_such_element { calendar_event_modal }).to be_truthy
     end
   end
 
@@ -191,6 +252,18 @@ describe "student k5 dashboard schedule" do
 
       expect(items_missing_exists?).to be_truthy
     end
+
+    it 'has todo capabilities for specific student course', custom_timeout: 20 do
+      title = "Student Course Todo"
+      @student.planner_notes.create!(todo_date: Time.zone.now, title: title, course_id: @subject_course.id)
+
+      get "/courses/#{@subject_course.id}#schedule"
+
+      scroll_to_element(todo_item)
+      click_todo_item
+
+      expect(todo_editor_modal).to be_displayed
+    end
   end
 
   context 'course-scoped schedule tab excluded items' do
@@ -224,7 +297,7 @@ describe "student k5 dashboard schedule" do
 
       get "/#schedule"
 
-      expect(hex_value_for_color(planner_assignment_header)).to eq(new_color)
+      expect(hex_value_for_color(planner_assignment_header, 'background-color')).to eq(new_color)
     end
   end
 end

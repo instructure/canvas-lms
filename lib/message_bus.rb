@@ -44,6 +44,52 @@
 # like the shard id or event account id.
 module MessageBus
 
+  mattr_accessor :logger, :on_work_unit_end
+  mattr_reader :max_mem_queue_size_lambda, :worker_process_interval_lambda
+
+  ##
+  # MessageBus has an in-memory queueing feature
+  # to prevent writes the could be async from taking
+  # up request/response time when writing to a struggling
+  # pulsar instance.  Use a lambda for this attribute to
+  # make it so this library can use whatever config
+  # access path you want to read the max size out of.
+  #
+  # Expected return value from the lambda is an integer.
+  # If the queue grows to this size, further attempts
+  # to push messages will exhibit backpressure
+  # by throwing errors.
+  #
+  # you would generally set this in a rails initializer
+  def self.max_mem_queue_size=(size_lambda)
+    @max_mem_queue_size_lambda = size_lambda
+  end
+
+  def self.max_mem_queue_size
+    @max_mem_queue_size_lambda.call
+  end
+
+  ##
+  # MessageBus has an in-memory queueing feature
+  # to prevent writes the could be async from taking
+  # up request/response time when writing to a struggling
+  # pulsar instance.  Use a lambda for this attribute to
+  # make it so this library can use whatever config
+  # access path you want to read the max size out of.
+  #
+  # Expected return value from the lambda is an integer.
+  # The asynchronous producer worker will sleep
+  # for this many seconds in between publication runs.
+  #
+  # you would generally set this in a rails initializer
+  def self.worker_process_interval=(interval_lambda)
+    @worker_process_interval_lambda = interval_lambda
+  end
+
+  def self.worker_process_interval
+    @worker_process_interval_lambda.call
+  end
+
   ##
   # Use this when you want to write messages to a topic.
   # The returned object is a pulsar-client producer
@@ -51,16 +97,66 @@ module MessageBus
   # and will respond to the "send" method accepting a payload to
   # transmit.
   #
+  # "namespace" should be an underscore delimited string.  Don't
+  # use slashes, it will be confusing for constructing the entire
+  # topic url.  A good example of a valid namespace might be "asset_user_access_log".
+  # You don't need tons of these, and they should have been created in pulsar
+  # already as part of your pulsar state management. Namespaces are NOT created lazily
+  # so if you try to send a namespace that doesn't exist yet, it will error.
+  #
+  # "topic_name" is also a string without slashes.  Conventionally you'll want some kind of
+  # prefix for the TYPE of topic this is, and some kind of partition key as the suffix.
+  # An example might be "#{PULSAR_TOPIC_PREFIX}-#{root_account.uuid}" from the AUA subsystem
+  # which evaluates to something like "view-increments-2yQwasdfm3dcNeoasdf4PYy9sgsasdf3qzasdf".
+  # by using a partition key, you can make sure messages are being bucketed according to
+  # how they're going to be processed which means one topic doesn't have to handle all messages
+  # of a given type.  Topics are lazily created on pulsar, you don't have to do any
+  # other work to make sure they're instantiated ahead of time.
+  # Don't worry about prepending an environment like "production-" if you've seen that
+  # before, that's taken care of internally in this library by reading the environment state.
+  #
   # "force_fresh:", if you pass true, will make sure we authenticate
   # and build a new producer rather than using a process-cached one,
   # even if such a producer is available.
+  #
+  # WARNING: If you're using a long-lived producer directly, be aware
+  # of the timeout issue that's being handled in the "send_one_message"
+  # method below.  Rarely, operational changes on the pulsar side can put
+  # producers into a state where they repeatedly timeout.  You may need to
+  # catch that error and rebuild your producer from a fresh client if/when
+  # that happens.
   def self.producer_for(namespace, topic_name, force_fresh: false)
-    check_conn_pool(["producers", namespace, topic_name], force_fresh: force_fresh) do
+    ns = MessageBus::Namespace.build(namespace)
+    check_conn_pool(["producers", ns.to_s, topic_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
       ::MessageBus::CaCert.ensure_presence!(self.config)
-      topic = self.topic_url(namespace, topic_name)
+      topic = self.topic_url(ns, topic_name)
       self.client.create_producer(topic)
     end
+  end
+
+  ##
+  # send_one_message is a convenience method for when you aren't trying
+  # to standup a client and stream many messages through, but just
+  # need to dispatch ONE THING.  If you don't care too much about strict ordering
+  # (because the in-memory queue used may put messages that error on transmission
+  #  back at the end if the FIFO queue) you can use this helper to have most
+  # retries taken care of for you.
+  #
+  # If strict ordering is important, you are probably better off using ".producer_for"
+  # and handling the error cases yourself for now.
+  #
+  # "namespace" and "topic_name" are exactly like their counterparts
+  # documented in the ".producer_for" method, and are passed through
+  # to that method.
+  #
+  # "message" should be a string object, often serialized json
+  # will be the preferred structure.  This method performs no transformation on the
+  # message for you, so if you have a hash and want to send it as json,
+  # transform it to json before passing it as the message to this
+  # method.
+  def self.send_one_message(namespace, topic_name, message)
+    production_worker.push(namespace, topic_name, message)
   end
 
   ##
@@ -73,10 +169,11 @@ module MessageBus
   # and build a new consumer rather than using a process-cached one,
   # even if such a consumer is available.
   def self.consumer_for(namespace, topic_name, subscription_name, force_fresh: false)
-    check_conn_pool(["consumers", namespace, topic_name, subscription_name], force_fresh: force_fresh) do
+    ns = MessageBus::Namespace.build(namespace)
+    check_conn_pool(["consumers", ns.to_s, topic_name, subscription_name], force_fresh: force_fresh) do
       Bundler.require(:pulsar)
       ::MessageBus::CaCert.ensure_presence!(self.config)
-      topic = topic_url(namespace, topic_name)
+      topic = topic_url(ns, topic_name)
       consumer_config = Pulsar::ConsumerConfiguration.new({})
       consumer_config.subscription_initial_position = :earliest
       self.client.subscribe(topic, subscription_name, consumer_config)
@@ -84,6 +181,7 @@ module MessageBus
   end
 
   def self.topic_url(namespace, topic_name, app_env=Canvas.environment)
+    ns = MessageBus::Namespace.build(namespace)
     app_env = (app_env || "development").downcase
     conf_hash = self.config
     # by using the application env in the topic name, we can
@@ -91,7 +189,7 @@ module MessageBus
     # like test/beta/edge whatever and not have to provision
     # other overhead to separate them or deal with the confusion of shared
     # data in a single topic.
-    "persistent://#{conf_hash['PULSAR_TENANT']}/#{namespace}/#{app_env}-#{topic_name}"
+    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns.to_s}/#{app_env}-#{topic_name}"
   end
 
   ##
@@ -155,7 +253,11 @@ module MessageBus
 
         # if we're forcing fresh, we want to close our existing
         # connections as politely as possible
-        cached_object.close()
+        begin
+          cached_object.close()
+        rescue ::Pulsar::Error::AlreadyClosed
+          Rails.logger.warn("evicting an already-closed pulsar topic client for #{path}")
+        end
       end
       object_to_cache = yield
       current_level = @connection_pool
@@ -176,6 +278,7 @@ module MessageBus
   def self.client
     return @client if @client
 
+    Bundler.require(:pulsar)
     conf_hash = self.config
     token_vault_path = conf_hash['PULSAR_TOKEN_VAULT_PATH']
     if token_vault_path.present?
@@ -217,39 +320,84 @@ module MessageBus
   end
 
   def self.reset!
-    close_and_reset_cached_connections!
     connection_mutex.synchronize do
-      @client&.close()
-      @client = nil
+      close_and_reset_cached_connections!
+      flush_message_bus_client!
     end
-    @config_cache = nil
   end
 
+  def self.process_all_and_reset!
+    production_worker.stop!
+    @production_worker = nil
+    @launched_pid = nil
+    reset!
+  end
+
+  # Internal: worker object (in a thread) for
+  # sending out message that are written to the message bus
+  # with the `send_one_message` method.
+  def self.production_worker
+    if !@launched_pid || @launched_pid != Process.pid
+      if @launched_pid
+        logger.warn "Starting new MessageBus worker thread due to fork."
+      end
+
+      @production_worker = MessageBus::AsyncProducer.new
+      @launched_pid = Process.pid
+    end
+    @production_worker
+  end
+
+  ##
+  # Internal: drop all instance variable state for talking to pulsar.
+  # This appears to be useful to get over the hump when a maintenance event
+  # redistributes brokers among hosts in the pulsar cluster.
+  # Only should be invoked within a successfully obtained connection mutex, which is
+  # why it's private and only invoked by the ".reset!" method.
+  def self.flush_message_bus_client!
+    begin
+      @client&.close()
+    rescue ::Pulsar::Error::AlreadyClosed
+      # we need to make sure the client actually gets cleared out if the close fails,
+      # otherwise we'll keep trying to use it
+      Rails.logger.warn("while resetting, closing client was found to already be closed")
+    end
+    @client = nil
+    @config_cache = nil
+  end
+  private_class_method :flush_message_bus_client!
+
+  ##
+  # Internal: closes all producers and consumers in the process pool.
+  # This should only be called within a successfully obtained connection mutex, which is
+  # why it's private and only invoked by the ".reset!" method.
   def self.close_and_reset_cached_connections!
-    connection_mutex.synchronize do
-      return if @connection_pool.blank?
+    return if @connection_pool.blank?
 
-      @connection_pool.each do |_thread_id, thread_conn_pool|
-        if thread_conn_pool['producers'].present?
-          thread_conn_pool['producers'].each do |_namespace, topic_map|
-            topic_map.each do |_topic, producer|
-              producer.close()
-            end
-          end
-        end
-
-        if thread_conn_pool['consumers'].present?
-          thread_conn_pool['consumers'].each do |_namespace, topic_map|
-            topic_map.each do |_topic, subscription_map|
-              subscription_map.each do |_sub_name, consumer|
-                consumer.close()
-              end
-            end
+    @connection_pool.each do |_thread_id, thread_conn_pool|
+      if thread_conn_pool['producers'].present?
+        thread_conn_pool['producers'].each do |_namespace, topic_map|
+          topic_map.each do |topic, producer|
+            producer.close()
+          rescue Pulsar::Error::AlreadyClosed
+            Rails.logger.warn("while resetting, closing an already-closed pulsar producer for #{topic}")
           end
         end
       end
-      @connection_pool = nil
+
+      next unless thread_conn_pool['consumers'].present?
+
+      thread_conn_pool['consumers'].each do |_namespace, topic_map|
+        topic_map.each do |topic, subscription_map|
+          subscription_map.each do |sub_name, consumer|
+            consumer.close()
+          rescue Pulsar::Error::AlreadyClosed
+            Rails.logger.warn("while resetting, closing an already-closed pulsar subscription (#{sub_name}) to #{topic}")
+          end
+        end
+      end
     end
+    @connection_pool = nil
   end
   private_class_method :close_and_reset_cached_connections!
 

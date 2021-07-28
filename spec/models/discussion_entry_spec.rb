@@ -58,6 +58,16 @@ describe DiscussionEntry do
     expect(topic.discussion_entries.active.length).to eq 1
   end
 
+  it "should check both feature flags for the legacy boolean" do
+    @course = course_model
+    Account.site_admin.enable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+    Account.site_admin.enable_feature!(:isolated_view)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be false
+    @course.disable_feature!(:react_discussions_post)
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
+  end
+
   it "should preserve parent_id if valid" do
     course_factory
     entry = topic.discussion_entries.create!
@@ -91,18 +101,33 @@ describe DiscussionEntry do
 
   context "mentions" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @mentioned_student = @student
-      student_in_course(:active_all => true)
-      @topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
+      course_with_teacher(active_all: true)
     end
 
+    let(:student) { student_in_course(active_all: true).user }
+    let(:mentioned_student) { student_in_course(active_all: true).user }
+
     it 'should create on entry save' do
-      entry = @topic.discussion_entries.new(user: @student)
-      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{@mentioned_student.id} class=mention>@#{@mentioned_student.short_name}</span> what's up dude</p>")
+      entry = topic.discussion_entries.new(user: student)
+      allow(entry).to receive(:message).and_return("<p>hello <span data-mention=#{mentioned_student.id} class=mention>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect{entry.save!}.to change{entry.mentions.count}.from(0).to(1)
-      expect(entry.mentions.take.user_id).to eq @mentioned_student.id
+      expect(entry.mentions.take.user_id).to eq mentioned_student.id
+    end
+  end
+
+  context "reply preview" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:student) { student_in_course(active_all: true) }
+
+    it "should mark include_reply_preview as true" do
+      entry = topic.discussion_entries.create!(user: @student, include_reply_preview: false)
+      entry.message = "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>"
+      entry.save!
+      expect(entry.include_reply_preview).to be true
+      expect(entry.message).to eql("<p>only this should stay</p>")
     end
   end
 

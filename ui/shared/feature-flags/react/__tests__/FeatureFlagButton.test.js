@@ -17,7 +17,8 @@
 //  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 
 import FeatureFlagButton from '../FeatureFlagButton'
@@ -49,6 +50,7 @@ describe('feature_flags::FeatureFlagButton', () => {
       <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} />
     )
     expect(container.querySelector('svg[name="IconUnlock"]')).toBeInTheDocument()
+    userEvent.click(container.querySelector('button'))
     expect(getByText('Lock')).toBeInTheDocument()
   })
 
@@ -57,6 +59,7 @@ describe('feature_flags::FeatureFlagButton', () => {
       <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} disableDefaults />
     )
     expect(container.querySelector('svg[name="IconUnlock"]')).not.toBeInTheDocument()
+    userEvent.click(container.querySelector('button'))
     expect(queryByText('Lock')).not.toBeInTheDocument()
   })
 
@@ -69,7 +72,8 @@ describe('feature_flags::FeatureFlagButton', () => {
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
-    fireEvent.click(getByText('Enabled'))
+    userEvent.click(container.querySelector('button'))
+    userEvent.click(getByText('Enabled'))
     await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
 
     expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
@@ -84,7 +88,8 @@ describe('feature_flags::FeatureFlagButton', () => {
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
-    fireEvent.click(getByText('Disabled'))
+    userEvent.click(container.querySelector('button'))
+    userEvent.click(getByText('Disabled'))
     await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()
@@ -100,7 +105,8 @@ describe('feature_flags::FeatureFlagButton', () => {
       </div>
     )
     container.querySelector('#ff-test-button-enclosing-div').focus()
-    fireEvent.click(getByText('Enabled'))
+    userEvent.click(container.querySelector('button'))
+    userEvent.click(getByText('Enabled'))
     await waitFor(() =>
       expect(container.querySelector('svg[name="IconPublish"]')).toBeInTheDocument()
     )

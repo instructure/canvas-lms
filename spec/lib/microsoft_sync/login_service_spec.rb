@@ -80,6 +80,7 @@ describe MicrosoftSync::LoginService do
           it 'increments a statsd metric' do
             expect(InstStatsd::Statsd).to \
               receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '200'})
+              .and_call_original
             subject
           end
         end
@@ -91,6 +92,7 @@ describe MicrosoftSync::LoginService do
           it 'increments a statsd metric and raises an HTTPInvalidStatus' do
             expect(InstStatsd::Statsd).to \
               receive(:increment).with('microsoft_sync.login_service', tags: {status_code: '401'})
+              .and_call_original
             expect { subject }.to raise_error(
               MicrosoftSync::Errors::HTTPInvalidStatus,
               /Login service returned 401 for tenant mytenant/
@@ -112,10 +114,9 @@ describe MicrosoftSync::LoginService do
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do
-            expect { subject }.to raise_error do |e|
-              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
-              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-            end
+            klass = MicrosoftSync::LoginService::TenantDoesNotExist
+            msg = /tenant does not exist/
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
           end
         end
 
@@ -126,10 +127,9 @@ describe MicrosoftSync::LoginService do
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do
-            expect { subject }.to raise_error do |e|
-              expect(e).to be_a(MicrosoftSync::LoginService::TenantDoesNotExist)
-              expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelErrorMixin)
-            end
+            klass = MicrosoftSync::LoginService::TenantDoesNotExist
+            msg = /tenant does not exist/
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
           end
         end
 
@@ -152,6 +152,7 @@ describe MicrosoftSync::LoginService do
           expect(HTTParty).to receive(:post).and_raise error
           expect(InstStatsd::Statsd).to \
             receive(:increment).with('microsoft_sync.login_service', tags: {status_code: 'error'})
+            .and_call_original
           expect { subject }.to raise_error(error)
         end
       end

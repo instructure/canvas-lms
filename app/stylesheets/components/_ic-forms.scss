@@ -171,6 +171,8 @@ element to make the checkboxes display inline.
 ```
 */
 
+@use "sass:math";
+
 $ic-Input-border: lighten($ic-color-dark, 65);
 @if $use_high_contrast { $ic-Input-border: $ic-color-dark; }
 
@@ -250,11 +252,11 @@ input[type="tel"], input[type="color"], .uneditable-input {
     }
 
     // If a form message follows the input, bump it up a bit to overlap with the input
-    ~ .ic-Form-message { transform: translate3d(0,-$ic-sp/3,0); }
+    ~ .ic-Form-message { transform: translate3d(0,math.div(-$ic-sp, 3),0); }
 
     // Focus then moves the form message out of the way
     &:focus {
-      ~ .ic-Form-message { transform: translate3d(0,$ic-sp/2,0); }
+      ~ .ic-Form-message { transform: translate3d(0,$ic-sp*0.5,0); }
     }
 
     // Disabled state
@@ -326,7 +328,7 @@ select.ic-Input {
       .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio),
       .ic-Checkbox-group {
         flex: 1;
-        margin: 0 $ic-sp/2;
+        margin: 0 $ic-sp*0.5;
         &:first-child { margin-#{direction(left)}: 0; }
         &:last-child { margin-#{direction(right)}: 0; }
 
@@ -458,8 +460,8 @@ select.ic-Input {
     position: absolute;
     pointer-events: none;
     border-color: rgba(white, 0);
-    border-width: $ic-sp/2;
-    margin-#{direction(left)}: -($ic-sp/2);
+    border-width: $ic-sp*0.5;
+    margin-#{direction(left)}: -($ic-sp*0.5);
     box-sizing: border-box;
   }
 
@@ -539,7 +541,7 @@ form.ic-Form-group { margin: 0; }
 
     > .ic-Input,
     > .ic-Input-group {
-      margin: 0 $ic-sp/3;
+      margin: 0 math.div($ic-sp, 3);
       flex: 1;
       &:first-child { margin-#{direction(left)}: 0; }
       &:last-child { margin-#{direction(right)}: 0; }
@@ -550,7 +552,7 @@ form.ic-Form-group { margin: 0; }
 .ic-Label {
   box-sizing: border-box;
   user-select: none;
-  margin: 0 0 $ic-sp/2;
+  margin: 0 0 $ic-sp*0.5;
   display: block;
   line-height: $ic-label-line-height;
   font-weight: bold;
@@ -580,7 +582,7 @@ form.ic-Form-group { margin: 0; }
     margin-bottom: $ic-sp*1.75;
 
     .ic-Legend {
-      margin-bottom: $ic-sp/2;
+      margin-bottom: $ic-sp*0.5;
       font-weight: bold;
       @include fontSize($ic-font-size--small);
       border-bottom: none;
@@ -597,7 +599,7 @@ form.ic-Form-group { margin: 0; }
   box-sizing: border-box;
   width: 100%;
   border: none;
-  padding: 0 0 $ic-sp/2;
+  padding: 0 0 $ic-sp*0.5;
   margin: 0 0 $ic-sp*2;
   @include fontSize(18px);
   line-height: $ic-label-line-height;
@@ -614,7 +616,7 @@ form.ic-Form-group { margin: 0; }
     margin: 0;
     position: relative;
     z-index: 1;
-    padding: direction-sides($ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset);
+    padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
 
@@ -753,7 +755,7 @@ form.ic-Form-group { margin: 0; }
     margin-bottom: 0;
     position: relative;
     z-index: 1;
-    padding: direction-sides($ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset);
+    padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
 
@@ -868,7 +870,7 @@ form.ic-Form-group { margin: 0; }
     border: 1px solid $ic-Input-border;
     display: flex;
     align-items: center;
-    padding: $ic-sp/2 ($ic-sp - 4);
+    padding: $ic-sp*0.5 ($ic-sp - 4);
 
     &:first-child {
       border-#{direction(right)}: none;
@@ -924,7 +926,7 @@ form.ic-Form-group { margin: 0; }
       }
       > .Button,
       > .btn,
-      > .ui-button { margin-#{direction(left)}: $ic-sp/4; }
+      > .ui-button { margin-#{direction(left)}: $ic-sp*0.25; }
     }
 
     .ic-Action-header__Primary + .ic-Action-header__Secondary {
@@ -940,7 +942,7 @@ form.ic-Form-group { margin: 0; }
 }
 
 .ic-Action-header__Primary {
-  margin-bottom: $ic-sp/2;
+  margin-bottom: $ic-sp*0.5;
 }
 
 .ic-Form-action-box {
@@ -951,9 +953,9 @@ form.ic-Form-group { margin: 0; }
   @include breakpoint(desktop) { margin-bottom: $ic-sp; }
 
   .ic-Form-control {
-    margin-bottom: $ic-sp/2;
+    margin-bottom: $ic-sp*0.5;
     @include breakpoint(desktop) {
-      margin: 0 $ic-sp/3;
+      margin: 0 math.div($ic-sp, 3);
       flex: 1;
       &:first-child { margin-#{direction(left)}: 0; }
       &:last-of-type { margin-#{direction(right)}: 0; }
@@ -981,7 +983,7 @@ form.ic-Form-group { margin: 0; }
 .ic-Form-help-text {
   @include fontSize(12px);
   display: block;
-  margin-top: $ic-sp/2;
+  margin-top: $ic-sp*0.5;
   color: $ic-font-color--subdued;
   width: 100%;
   line-height: 1.5;

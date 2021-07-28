@@ -485,11 +485,12 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
+      enrollments = enrollments.joins(:user).order(User.sortable_name_order_by_clause)
       collection =
         if use_bookmarking
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
             {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
-          BookmarkedCollection.wrap(bookmarker, enrollments)
+          ShardedBookmarkedCollection.build(bookmarker, enrollments)
         else
           enrollments
         end
@@ -919,10 +920,9 @@ class EnrollmentsApiController < ApplicationController
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
-      approved_accounts = user.associated_root_accounts.shard(user).inject([]) do |accounts, ra|
-        accounts << ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
-        accounts
-      end
+      approved_accounts = user.associated_root_accounts.map do |ra|
+        ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
+      end.compact
 
       # if there aren't any ids in approved_accounts, then the user doesn't have
       # permissions.

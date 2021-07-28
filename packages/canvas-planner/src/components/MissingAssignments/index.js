@@ -22,7 +22,6 @@ import {connect} from 'react-redux'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 
-import {colors} from '@instructure/canvas-theme'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {themeable} from '@instructure/ui-themeable'
@@ -147,10 +146,6 @@ export class MissingAssignments extends PureComponent {
               {getMissingItemsText(expanded, items.length)}
             </View>
           }
-          theme={{
-            textColor: colors.textBrand,
-            iconColor: colors.brand
-          }}
         >
           <View as="div" borderWidth="small none none none">
             {items.map(opp => (

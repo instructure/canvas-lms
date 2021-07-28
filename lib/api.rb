@@ -520,7 +520,6 @@ module Api
     # checking on the context first can improve performance when checking many attachments for admins
     context&.grants_any_right?(
       user,
-      :manage_files,
       :read_as_admin,
       *RoleOverride::GRANULAR_FILE_PERMISSIONS
     ) || attachment&.grants_right?(user, nil, :download)

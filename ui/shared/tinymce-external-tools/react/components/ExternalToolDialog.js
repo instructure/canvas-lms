@@ -48,7 +48,7 @@ export default class ExternalToolDialog extends React.Component {
       removeEventListener: PropTypes.func.isRequired,
       confirm: PropTypes.func.isRequired,
       dispatchEvent: PropTypes.func.isRequired,
-      height: PropTypes.number.isRequired,
+      innerHeight: PropTypes.number.isRequired,
       $: PropTypes.func.isRequired
     }).isRequired,
     editor: PropTypes.shape({
@@ -159,7 +159,7 @@ export default class ExternalToolDialog extends React.Component {
     const {open, button, form, infoAlert, iframeLoaded} = this.state
     const {iframeAllowances, win} = this.props
     const label = I18n.t('embed_from_external_tool', 'Embed content from External Tool')
-    const frameHeight = Math.max(Math.min(win.height - 100, 550), 100)
+    const frameHeight = Math.max(Math.min(win.innerHeight - 100, 550), 100)
     const Overlay = button.use_tray ? ExternalToolDialogTray : ExternalToolDialogModal
     return (
       <>

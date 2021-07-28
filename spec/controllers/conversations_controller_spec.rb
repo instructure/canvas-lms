@@ -514,6 +514,11 @@ describe ConversationsController do
         @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
 
+      it "should _not_ create user notes if asked not to" do
+        post 'create', params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: '0' }
+        @students.each{|x| expect(x.user_notes.size).to be(0)}
+      end
+
       it "should include the domain root account in the user note" do
         post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
         note = UserNote.last

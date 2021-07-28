@@ -48,8 +48,8 @@ describe('Like', () => {
   })
 
   it('does not display a like count below 1', () => {
-    const {queryByText} = setup({likeCount: 0})
-    expect(queryByText('Like count: 0')).toBeFalsy()
+    const {queryByTestId} = setup({likeCount: 0})
+    expect(queryByTestId('like-count')).toBeFalsy()
   })
 
   it('indicates like status', () => {

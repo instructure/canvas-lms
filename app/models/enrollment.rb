@@ -59,6 +59,7 @@ class Enrollment < ActiveRecord::Base
   validate :valid_role?
   validate :valid_course?
   validate :valid_section?
+  validate :not_student_view
 
   # update bulk destroy if changing or adding an after save
   before_save :assign_uuid
@@ -109,6 +110,13 @@ class Enrollment < ActiveRecord::Base
   def valid_section?
     unless deleted? || course_section.active?
       self.errors.add(:course_section_id, "is not a valid section")
+    end
+  end
+
+  def not_student_view
+    if type != 'StudentViewEnrollment' && (new_record? || association(:user).loaded?) &&
+      user.fake_student?
+      self.errors.add(:user_id, "cannot add a student view student in a regular role")
     end
   end
 
@@ -1258,6 +1266,8 @@ class Enrollment < ActiveRecord::Base
     where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')") }
   scope :not_inactive_by_date_ignoring_access, -> { joins(:enrollment_state).
     where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')") }
+  scope :new_or_active_by_date, -> { joins(:enrollment_state).
+    where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active', 'creation_pending')") }
 
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
@@ -1566,6 +1576,6 @@ class Enrollment < ActiveRecord::Base
     return unless self.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
     return unless self.root_account.settings[:microsoft_sync_enabled]
 
-    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_sync
+    MicrosoftSync::Group.not_deleted.find_by(course_id: course_id)&.enqueue_future_partial_sync self
   end
 end

@@ -17,14 +17,9 @@
  */
 
 import {bool, func} from 'prop-types'
-import React from 'react'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
+import React, {createRef} from 'react'
+import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import LoadingIndicator from '@canvas/loading-indicator'
-
-// This is the interval (in ms) at which we check for changes to the text
-// content
-const checkForChangesIntervalMS = 250
 
 // This is how long we wait to see that changes have stopped before actually
 // saving the draft
@@ -38,18 +33,15 @@ export default class TextEntry extends React.Component {
     readOnly: bool
   }
 
-  state = {
-    editorLoaded: false,
-    renderingEditor: false
-  }
-
   _isMounted = false
+
+  _isInitted = false
 
   _saveDraftTimer = null
 
-  _checkForChangesTimer = null
-
   _lastSavedContent = null
+
+  _rceRef = createRef()
 
   getDraftBody = () => {
     const {submission} = this.props
@@ -72,10 +64,6 @@ export default class TextEntry extends React.Component {
 
   componentDidMount() {
     this._isMounted = true
-
-    if (!this.state.editorLoaded) {
-      this.loadRCE()
-    }
   }
 
   componentDidUpdate(prevProps) {
@@ -93,78 +81,39 @@ export default class TextEntry extends React.Component {
       this._lastSavedContent = body
 
       if (!this.props.readOnly) {
-        this.handleEditorIframeFocus()
-        this.handleEditorFocus()
+        this._rceRef.current.focus()
       }
     }
   }
 
   componentWillUnmount() {
     this._isMounted = false
-
-    if (this.state.editorLoaded) {
-      this.unloadRCE()
-    }
-  }
-
-  // Note: I believe there's a bug in tinymce, that
-  // if you set focus:true to give the editor focus on init,
-  // then the internal bookkeeping doesn't know it has focus
-  // and it does not handle the focusout event correctly.
-  // Start w/o focus, then give it focus after initialization
-  // in this.handleRCEInit
-  loadRCE() {
-    this.setState({editorLoaded: true, renderingEditor: true}, () => {
-      RichContentEditor.loadNewEditor(this._textareaRef, {
-        focus: false,
-        manageParent: false,
-        tinyOptions: {
-          init_instance_callback: this.handleRCEInit,
-          height: 300
-        },
-        onFocus: this.handleEditorFocus,
-        onBlur: () => {}
-      })
-    })
-  }
-
-  unloadRCE() {
-    const documentContent = document.getElementById('content')
-    if (documentContent) {
-      const editorIframe = documentContent.querySelector('[id^="random_editor"]')
-      if (editorIframe) {
-        editorIframe.removeEventListener('focus', this.handleEditorIframeFocus)
-      }
-    }
-    if (this._textareaRef) {
-      RichContentEditor.destroyRCE(this._textareaRef)
-    }
-    this._textareaRef = null
-    this.setState({editorLoaded: false, renderingEditor: false})
-
-    clearInterval(this._checkForChangesTimer)
     clearTimeout(this._saveDraftTimer)
   }
 
-  checkForChanges = () => {
+  checkForChanges = newContent => {
     // The idea here:
-    // - Every time this function is called (currently several times a second),
+    // - Every time this function is called (currently when the RCE content changes),
     //   check whether the contents of the editor have changed, assuming we're
     //   in a state where we care about changes.
     // - If we see changes, call the onContentsChanged prop, and schedule a
     //   timer to actually save the draft. Further changes to the content will
     //   cancel/re-schedule this timer, so that we only actually save the draft
     //   after the user has stopped making changes for some time.
+    if (!this._isInitted) {
+      return
+    }
+
     const {submission} = this.props
 
     const isNewAttempt = submission.submissionDraft == null && submission.state === 'unsubmitted'
     // If read-only *or* this is a brand new attempt with no content,
     // we don't want to save a draft, so don't bother comparing
-    if (this.props.readOnly || (this._tinyeditor.getContent() === '' && isNewAttempt)) {
+    if (this.props.readOnly || (isNewAttempt && newContent === '')) {
       return
     }
 
-    const editorContents = this._tinyeditor.getContent()
+    const editorContents = newContent
     if (this._lastSavedContent !== editorContents) {
       this._lastSavedContent = editorContents
 
@@ -177,6 +126,12 @@ export default class TextEntry extends React.Component {
     }
   }
 
+  // Note: I believe there's a bug in tinymce, that
+  // if you set focus:true to give the editor focus on init,
+  // then the internal bookkeeping doesn't know it has focus
+  // and it does not handle the focusout event correctly.
+  // Start w/o focus, then give it focus after initialization
+  // in this.handleRCEInit
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
     tinyeditor.mode.set(this.props.readOnly ? 'readonly' : 'design')
@@ -184,21 +139,11 @@ export default class TextEntry extends React.Component {
     const draftBody = this.getDraftBody()
     tinyeditor.setContent(draftBody)
     this._lastSavedContent = draftBody
-    this._checkForChangesTimer = setInterval(this.checkForChanges, checkForChangesIntervalMS)
 
-    const documentContent = document.getElementById('content')
-    if (documentContent) {
-      const editorIframe = documentContent.querySelector('[id^="random_editor"]')
-      if (editorIframe) {
-        editorIframe.addEventListener('focus', this.handleEditorIframeFocus)
-        this._tinyeditor.focus()
-      }
+    if (!this.props.readOnly) {
+      this._rceRef.current.focus()
     }
-    this.setState({renderingEditor: false})
-  }
-
-  handleEditorIframeFocus = _event => {
-    this._tinyeditor.focus()
+    this._isInitted = true
   }
 
   handleEditorFocus = _event => {
@@ -207,12 +152,8 @@ export default class TextEntry extends React.Component {
     this._tinyeditor.selection.collapse(false)
   }
 
-  setTextareaRef = el => {
-    this._textareaRef = el
-  }
-
   getRCEText = () => {
-    return RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
+    return this._rceRef.current?.getCode()
   }
 
   saveSubmissionDraft = async ({attempt, rceText}) => {
@@ -229,12 +170,23 @@ export default class TextEntry extends React.Component {
   render() {
     return (
       <div data-testid="text-editor">
-        {this.state.renderingEditor && <LoadingIndicator />}
         <span>
-          <textarea
-            defaultValue={this.getDraftBody()}
+          <CanvasRce
+            ref={this._rceRef}
+            autosave={false}
+            defaultContent={this.getDraftBody()}
+            editorOptions={{
+              focus: false
+            }}
+            height={300}
             readOnly={this.props.readOnly}
-            ref={this.setTextareaRef}
+            textareaId="textentry_text"
+            onFocus={this.handleEditorFocus}
+            onBlur={() => {}}
+            onInit={this.handleRCEInit}
+            onContentChange={content => {
+              this.checkForChanges(content)
+            }}
           />
         </span>
       </div>

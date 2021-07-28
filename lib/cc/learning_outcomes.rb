@@ -64,6 +64,7 @@ module CC
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
         group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
+        group_node.source_outcome_group_id group.source_outcome_group_id if group.source_outcome_group_id.present?
 
         group_node.learningOutcomes do |lo_node|
           process_outcome_group_content(lo_node, group, force_export)

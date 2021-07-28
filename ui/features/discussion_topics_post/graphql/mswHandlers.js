@@ -20,6 +20,7 @@ import {graphql} from 'msw'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
+import {User} from './User'
 
 // helper function that filters out undefined values in objects before assigning
 const mswAssign = (target, ...objects) => {
@@ -73,6 +74,15 @@ export const handlers = [
         })
       )
     }
+    if (req.body.variables.courseID > 0) {
+      return res(
+        ctx.data({
+          legacyNode: Discussion.mock({
+            author: User.mock({courseRoles: ['TeacherEnrollment', 'TaEnrollment'], id: 'role-user'})
+          })
+        })
+      )
+    }
     return res(
       ctx.data({
         legacyNode: Discussion.mock()
@@ -80,6 +90,25 @@ export const handlers = [
     )
   }),
   graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
+    if (req.body.variables.includeRelativeEntry) {
+      return res(
+        ctx.data({
+          legacyNode: DiscussionEntry.mock({
+            discussionSubentriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  _id: '51',
+                  id: '51',
+                  message: '<p>This is the search result child reply</p>'
+                })
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionSubentriesConnection'
+            }
+          })
+        })
+      )
+    }
     if (req.body.variables.sort === 'asc') {
       return res(
         ctx.data({
@@ -102,6 +131,7 @@ export const handlers = [
     return res(
       ctx.data({
         legacyNode: DiscussionEntry.mock({
+          rootEntry: DiscussionEntry.mock({_id: 32}),
           discussionSubentriesConnection: {
             nodes: [
               DiscussionEntry.mock({
@@ -216,18 +246,21 @@ export const handlers = [
     )
   }),
   graphql.mutation('UpdateDiscussionEntry', (req, res, ctx) => {
-    ctx.data({
-      updateDiscussionEntry: {
-        discussionTopic: mswAssign(
-          {...DiscussionEntry.mock()},
-          {
-            id: req.body.variables.discussionEntryId,
-            message: req.body.variables.message
-          }
-        ),
-        __typename: 'UpdateDiscussionEntryPayload'
-      }
-    })
+    return res(
+      ctx.data({
+        updateDiscussionEntry: {
+          discussionEntry: mswAssign(
+            {...DiscussionEntry.mock()},
+            {
+              id: req.body.variables.discussionEntryId,
+              message: req.body.variables.message
+            }
+          ),
+          errors: null,
+          __typename: 'UpdateDiscussionEntryPayload'
+        }
+      })
+    )
   }),
   graphql.mutation('UpdateDiscussionEntriesReadState', (req, res, ctx) => {
     const discussionEntries = req.variables.discussionEntryIds.map(id => ({

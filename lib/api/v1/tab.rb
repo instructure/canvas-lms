@@ -21,6 +21,7 @@
 module Api::V1::Tab
   include Api::V1::Json
   include Api::V1::ExternalTools::UrlHelpers
+  include NewQuizzesFeaturesHelper
 
   def tabs_available_json(context, user, session, includes = [], precalculated_permissions: nil)
     json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map { |tab|
@@ -84,6 +85,14 @@ module Api::V1::Tab
     end
   end
 
+  def quiz_lti_tab?(tab)
+    if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+      return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
+    end
+
+    false
+  end
+
   def context_tabs(context, user, precalculated_permissions: nil, session: nil)
     new_collaborations_enabled = context.feature_enabled?(:new_collaborations)
 
@@ -108,6 +117,8 @@ module Api::V1::Tab
         tab[:href] && tab[:label] && new_collaborations_enabled
       elsif (tab[:id] == context.class::TAB_CONFERENCES rescue false)
         tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
+      elsif (quiz_lti_tab?(tab) rescue false)
+        tab[:href] && tab[:label] && new_quizzes_navigation_placements_enabled?(context)
       else
         tab[:href] && tab[:label]
       end

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {defaultSettings} from '../CreateButtonForm'
+import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {ShapeSection} from '../ShapeSection'
 
 function selectOption(button, option) {
@@ -38,14 +38,14 @@ function selectOption(button, option) {
 describe('<ShapeSection />', () => {
   it('changes the button shape', () => {
     const onChange = jest.fn()
-    render(<ShapeSection settings={{...defaultSettings, shape: 'circle'}} onChange={onChange} />)
+    render(<ShapeSection settings={{...DEFAULT_SETTINGS, shape: 'circle'}} onChange={onChange} />)
     selectOption(/button shape/i, /triangle/i)
     expect(onChange).toHaveBeenCalledWith({shape: 'triangle'})
   })
 
   it('changes the button size', () => {
     const onChange = jest.fn()
-    render(<ShapeSection settings={{...defaultSettings, size: 'small'}} onChange={onChange} />)
+    render(<ShapeSection settings={{...DEFAULT_SETTINGS, size: 'small'}} onChange={onChange} />)
     selectOption(/button size/i, /extra small/i)
     expect(onChange).toHaveBeenCalledWith({size: 'x-small'})
   })

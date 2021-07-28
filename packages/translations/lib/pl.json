@@ -1,4 +1,7 @@
 {
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "Uzyskaj dostęp do ulepszonego edytora HTML"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "Kontrola dostępności"
     },
@@ -10,6 +13,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "Dodaj CC/napisy"
+    },
+    "add_image_60b2de07": {
+        "message": "Dodaj zdjęcie"
     },
     "add_to_do_7537af64": {
         "message": "Dodaj listę zadań"
@@ -37,6 +43,9 @@
     },
     "all_4321c3a1": {
         "message": "Wszystkie"
+    },
+    "all_apps_a50dea49": {
+        "message": "Wszystkie aplikacje"
     },
     "all_day_fb42c4fc": {
         "message": "Cały dzień"
@@ -119,8 +128,8 @@
     "attributes_963ba262": {
         "message": "Właściwości"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "Nagrania audio i wideo nie są dostępne."
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "Nagrywanie dźwięku i wideo nie jest obsługiwane; użyj innej przeglądarki."
     },
     "audio_player_for_title_20cc70d": {
         "message": "Odtwarzacz audio dla { title }"
@@ -137,6 +146,27 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Początek historii listy zadań"
     },
+    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+        "message": "Poniżej znajduje się przykład tego, jak uczestnicy widź swój harmonogram"
+    },
+    "button_color_608a0242": {
+        "message": "Kolor przycisku"
+    },
+    "button_outline_cf14f071": {
+        "message": "Obramowanie przycisku"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "Rozmiar obramowania przycisku"
+    },
+    "button_shape_dbecb573": {
+        "message": "Kształt przycisku"
+    },
+    "button_size_20f5fce1": {
+        "message": "Rozmiar przycisku"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "Przycisk i ikony"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -146,9 +176,6 @@
     "calendar_event_89aadc1c": {
         "message": "Wydarzenie w kalendarzu"
     },
-    "cancel_caeb1e68": {
-        "message": "Anuluj"
-    },
     "canvas_planner_98ed106": {
         "message": "Planer Canvas"
     },
@@ -157,6 +184,9 @@
     },
     "choose_usage_rights_33683854": {
         "message": "Wybierz prawa użytkowania..."
+    },
+    "circle_484abe63": {
+        "message": "Okrąg"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "oznacz nieuporządkowaną listę"
@@ -169,6 +199,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "Usuń wybrany plik: { filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "Kliknij lub naciśnij Shift i kliknij, aby otworzyć edytor html."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Kliknij, aby osadzić { imageName }"
@@ -200,6 +233,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Kliknij, aby ukryć { types }"
     },
+    "color_color_eb64b08": {
+        "message": "Kolor { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "Komputer"
     },
@@ -224,11 +260,17 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {Ukryj # brakujący element}\n  other {Ukryj # brakujące elementy}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# element przesłany}\n  other {# elementów przesłanych}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
         "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+        "message": "{ count, plural,\n    one {Pokaż # brakujący element}\n  other {Pokaż # brakujące elementy}\n}"
     },
     "course_8a63b4a3": {
         "message": "Kurs"
@@ -257,11 +299,11 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } LISTA ZADAŃ"
     },
+    "create_button_and_icon_5c089934": {
+        "message": "Utwórz przycisk i ikonę"
+    },
     "creative_commons_license_725584ae": {
         "message": "Licencja Creative Commons:"
-    },
-    "current_volume_level_c55ab825": {
-        "message": "Bieżący poziom głośności"
     },
     "custom_6979cd81": {
         "message": "Niestandardowe"
@@ -359,9 +401,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "Przeciągnij plik tutaj"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "Przeciągnij plik tutaj"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Przeciągnij i upuść lub kliknij, aby przeglądać komputer"
     },
@@ -425,17 +464,20 @@
     "error_loading_grades_e0b38f4d": {
         "message": "Błąd podczas wczytywania ocen"
     },
+    "error_loading_items_5218438e": {
+        "message": "Błąd podczas wczytywania elementów"
+    },
     "error_loading_more_items_3f109d9f": {
         "message": "Błąd podczas wczytywania dodatkowych elementów"
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Błąd podczas wczytywania wcześniejszych elementów"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "Błąd podczas przesyłania nagrania wideo/audio"
-    },
     "excused_cf8792eb": {
         "message": "Usprawiedliwiony"
+    },
+    "expand_preview_by_default_2abbf9f8": {
+        "message": "Domyślnie rozwiń podgląd"
     },
     "expand_to_see_types_f5d29352": {
         "message": "Rozszerz, aby zobaczyć { types }"
@@ -448,6 +490,21 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "Wyjątkowo duże"
+    },
+    "extra_small_9ae33252": {
+        "message": "Bardzo małe"
+    },
+    "failed_peeking_into_your_future_e95b9306": {
+        "message": "Nie udało się zaglądnąć w Twoją przyszłość"
+    },
+    "failed_peeking_into_your_past_5bec2323": {
+        "message": "Nie udało się zaglądnąć w Twoją przeszłość"
+    },
+    "failed_saving_changes_on_name_1e100ad": {
+        "message": "Nie udało się zapisać zmian w { name }."
+    },
+    "failed_to_delete_name_bdd7b810": {
+        "message": "Nie udało się usunąć { name }."
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "Nie udało się usunąć zadań"
@@ -463,9 +520,6 @@
     },
     "feedback_6dcc1991": {
         "message": "Informacje zwrotne"
-    },
-    "file_name_8fd421ff": {
-        "message": "Nazwa pliku"
     },
     "file_upload_failed_af22dd91": {
         "message": "Niepowodzenie przesyłania pliku."
@@ -490,9 +544,6 @@
     },
     "files_index_af7c662b": {
         "message": "Wykaz plików"
-    },
-    "finish_bc343002": {
-        "message": "Zakończ"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Pasek opcji koncentracji na elemencie"
@@ -572,6 +623,24 @@
     "height_69b03e15": {
         "message": "Wysokość"
     },
+    "hexagon_d8468e0d": {
+        "message": "Sześciobok"
+    },
+    "hide_description_bfb5502e": {
+        "message": "Ukryj opis"
+    },
+    "hide_title_description_caf092ef": {
+        "message": "Ukryj opis { title }"
+    },
+    "home_351838cd": {
+        "message": "Strona główna"
+    },
+    "html_code_editor_fd967a44": {
+        "message": "edytor kodu html"
+    },
+    "html_editor_fb2ab713": {
+        "message": "Edytor HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Mam uprawnienie do korzystania z tego pliku."
     },
@@ -620,6 +689,12 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
     },
+    "jump_to_navigation_toolbar_2952cd8b": {
+        "message": "Przeskocz do paska nawigacji"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "Przejdź do dnia dzisiejszego"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Skróty klawiaturowe"
     },
@@ -640,15 +715,6 @@
     },
     "links_14b70841": {
         "message": "Łącza"
-    },
-    "list_collapsed_9ac35920": {
-        "message": "Lista zwinięta."
-    },
-    "list_collapsed_dde87718": {
-        "message": "Lista zwinięta"
-    },
-    "list_expanded_efec2d0": {
-        "message": "Rozszerzono listę."
     },
     "load_more_35d33c7": {
         "message": "Wczytaj więcej"
@@ -686,9 +752,6 @@
     "loading_grades_c842c887": {
         "message": "Wczytywanie ocen"
     },
-    "loading_media_f3455841": {
-        "message": "Wczytywanie danych"
-    },
     "loading_past_items_ca499e75": {
         "message": "Wczytywanie wcześniejszych elementów"
     },
@@ -713,9 +776,6 @@
     "medium_5a8e9ead": {
         "message": "Średni"
     },
-    "mic_a7f3d311": {
-        "message": "Mikrofon"
-    },
     "miscellaneous_e9818229": {
         "message": "Różne"
     },
@@ -736,6 +796,9 @@
     },
     "my_grades_98834476": {
         "message": "Moje oceny"
+    },
+    "my_images_427f9b0c": {
+        "message": "Moje obrazy"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Przejdź w menu lub na pasku narzędzi"
@@ -770,6 +833,9 @@
     "no_grade_3b4d7f3e": {
         "message": "Brak oceny"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "Nie ma możliwości podglądu tego pliku."
+    },
     "no_results_940393cf": {
         "message": "Brak wyników."
     },
@@ -779,8 +845,11 @@
     "no_results_found_for_term_1564c08e": {
         "message": "Nie znaleziono wyników dla { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "Brak wideo"
+    "none_3b5e34d2": {
+        "message": "Brak"
+    },
+    "nothing_due_this_week_d45c9ef9": {
+        "message": "Brak terminów w tym tygodniu"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Brak bieżących elementów"
@@ -806,17 +875,20 @@
     "numpoints_points_8621a43b": {
         "message": "{ numPoints } punkty"
     },
+    "octagon_e48be9f": {
+        "message": "Ośmiobok"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Pokazano tylko najnowszy okres oceniania."
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Otwórz to okno dialogowe skrótów klawiatury"
     },
+    "open_title_application_fd624fc5": {
+        "message": "Otwórz aplikację { title }"
+    },
     "opportunities_popup_f6703842": {
         "message": "okienko wyskakujące z okazjami"
-    },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "Wybrano { option }. Lista zwinięta."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Opcjonalnie: Dodaj kurs"
@@ -842,9 +914,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Akapit"
     },
-    "pause_12af3bb4": {
-        "message": "Pauza"
-    },
     "peer_review_74f26a13": {
         "message": "Recenzja drugiego uczestnika"
     },
@@ -853,12 +922,6 @@
     },
     "people_b4ebb13c": {
         "message": "Ludzie"
-    },
-    "play_1a47eaa7": {
-        "message": "Odtwórz"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "Zezwól Canvas na łączenie się z kamerą sieciową i mikrofonem."
     },
     "points_bceb5005": {
         "message": "punkty"
@@ -872,11 +935,17 @@
     "preformatted_d0670862": {
         "message": "Wstępnie formatowane"
     },
+    "pretty_html_editor_28748756": {
+        "message": "Ulepszony edytor HTML"
+    },
     "preview_53003fd2": {
         "message": "Podgląd"
     },
-    "preview_a3f8f854": {
-        "message": "PODGLĄD"
+    "preview_in_overlay_ed772c46": {
+        "message": "Podgląd w nakładce"
+    },
+    "preview_inline_9787330": {
+        "message": "Wbudowany pogląd"
     },
     "previous_month_bb1e3c84": {
         "message": "Poprzedni miesiąc"
@@ -905,17 +974,14 @@
     "raw_html_editor_e3993e41": {
         "message": "Edytor HTML bez formatowania"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "Nie udało się odczytać pliku multimediów. Przerywanie..."
-    },
     "record_7c9448b": {
         "message": "Nagraj"
     },
     "record_upload_media_5fdce166": {
         "message": "Utwórz/prześlij pliki multimedialne"
     },
-    "recording_98da6bda": {
-        "message": "Nagranie"
+    "redo_363c58b7": {
+        "message": "Cofnij"
     },
     "reminder_date_4564d12d": {
         "message": "Przypomnienie: { date }"
@@ -926,6 +992,9 @@
     "replies_4a8577c8": {
         "message": "Odpowiedzi"
     },
+    "resize_ec83d538": {
+        "message": "Zmień rozmiar"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Przywrócić automatycznie zapisaną zawartość?"
     },
@@ -935,8 +1004,17 @@
     "right_to_left_9cfb092a": {
         "message": "Prawa-lewa"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "Niestety ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Tutaj możesz uzyskać dostęp do edytor HTML bez formatowania."
+    },
     "save_11a80ec3": {
         "message": "Zapisz"
+    },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "Zapisane Przycisk i ikony"
+    },
+    "schedule_preview_3bcda153": {
+        "message": "Zaplanuj podgląd"
     },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Przewiń w górę, aby wyświetlić historię!"
@@ -950,14 +1028,14 @@
     "search_term_b2d2235": {
         "message": "Wyszukiwany termin"
     },
-    "select_app_3d08035a": {
-        "message": "Wybierz aplikację"
-    },
     "select_language_7c93a900": {
         "message": "Wybierz język"
     },
     "selected_274ce24f": {
         "message": "Wybrano"
+    },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "Naciśnij Shift-O, aby otworzyć ulepszony edytor HTML."
     },
     "show_all_ae37d610": {
         "message": "Pokaż wszystko"
@@ -989,9 +1067,6 @@
     "something_went_wrong_89195131": {
         "message": "Coś poszło nie tak."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "Wystąpił problem z dostępem do kamery sieciowej lub mikrofonu."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
     },
@@ -1010,14 +1085,14 @@
     "sort_by_e75f9e3e": {
         "message": "Sortuj wg"
     },
+    "square_511eb3b3": {
+        "message": "Kwadrat"
+    },
     "square_unordered_list_b15ce93b": {
         "message": "prostokątna nieuporządkowana lista"
     },
-    "start_over_f7552aa9": {
-        "message": "Rozpocznij ponownie"
-    },
-    "start_recording_9a65141a": {
-        "message": "Rozpocznij nagrywanie"
+    "star_8d156e09": {
+        "message": "Gwiazdka"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } do { endDate }"
@@ -1055,11 +1130,11 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Obsługiwane typy plików: SRT lub WebVTT"
     },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "Przełącz na edytor nieprzetworzonego HTML"
+    "switch_to_the_html_editor_146dfffd": {
+        "message": "Przełącz się do edytora html"
     },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "Przełącz na edytor przetworzonego HTML"
+    "switch_to_the_rich_text_editor_63c1ecf6": {
+        "message": "Przełącz na edytor tekstu sformatowanego"
     },
     "syllabus_f191f65b": {
         "message": "Program"
@@ -1085,8 +1160,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materiały są objęte wyjątkowymi zasadami, np. zasadami dozwolonego użytku, prawa do cytowania lub innymi obowiązującymi przepisami prawa autorskiego"
     },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "Ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Naciśnij Shift O, aby otworzyć edytor html bez formatowania."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Brak punktów powiązanych z tym elementem."
+    },
+    "there_is_nothing_planned_for_today_e09bfc8c": {
+        "message": "Nie ma planów na dzisiaj."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Chociaż nagranie wideo będzie mieć prawidłowy tytuł w przeglądarce, nie udało się go zaktualizować w bazie danych."
@@ -1121,6 +1202,9 @@
     "today_at_date_8ac30d6": {
         "message": "Dziś o godz. { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "Przełącz grupę { summary }"
+    },
     "tomorrow_9a6c9a00": {
         "message": "Jutro"
     },
@@ -1136,6 +1220,9 @@
     "tray_839df38a": {
         "message": "Zasobnik"
     },
+    "triangle_6072304e": {
+        "message": "Trójkąt"
+    },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "Wpisz Control F9, aby uzyskać dostęp do opcji obrazu. { text }"
     },
@@ -1150,9 +1237,6 @@
     },
     "unpublished_dfd8801": {
         "message": "nieopublikowane"
-    },
-    "untitled_16aa4f2b": {
-        "message": "Bez tytułu"
     },
     "upload_document_253f0478": {
         "message": "Prześlij dokument"
@@ -1172,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "Przekaż/zapisz pliki multimedialne"
     },
+    "uploading_closed_captions_subtitles_failed_bc093f3": {
+        "message": "Przesyłanie napisów/napisów dla niesłyszących nie powiodło się."
+    },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "uporządkowana lista alfabetyczna, duże litery"
     },
@@ -1189,6 +1276,15 @@
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Użyj klawiszy strzałek do nawigowania po opcjach."
+    },
+    "use_arrow_keys_to_select_a_shape_c8eb57ed": {
+        "message": "Użyj klawiszy strzałek, aby wybrać kształt."
+    },
+    "use_arrow_keys_to_select_a_size_699a19f4": {
+        "message": "Użyj klawiszy strzałek, aby wybrać rozmiar."
+    },
+    "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
+        "message": "Użyj klawiszy strzałek, aby wybrać rozmiar obramowania."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Używane przez czytniki ekranu do opisania zawartości obrazu"
@@ -1208,17 +1304,11 @@
     "user_media_14fbf656": {
         "message": "Multimedia użytkownika"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "Przesłano nagranie wideo/audio"
-    },
     "video_options_24ef6e5d": {
         "message": "Opcje wideo"
     },
     "video_options_tray_3b9809a5": {
         "message": "Panel opcji wideo"
-    },
-    "video_player_b371005": {
-        "message": "Odtwarzacz wideo"
     },
     "video_player_for_9e7d373b": {
         "message": "Odtwarzacz wideo dla "
@@ -1229,11 +1319,26 @@
     "view_ba339f93": {
         "message": "Wyświetl"
     },
+    "view_description_30446afc": {
+        "message": "Wyświetl opis"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Wyświetl skróty klawiszowe"
     },
-    "webcam_fe91b20f": {
-        "message": "Kamera sieciowa"
+    "view_next_week_7f61f755": {
+        "message": "Wyświetl kolejny tydzień"
+    },
+    "view_predefined_colors_92f5db39": {
+        "message": "Wybierz uprzednio zdefiniowane kolory"
+    },
+    "view_previous_week_6f83849f": {
+        "message": "Wyświetl poprzedni tydzień"
+    },
+    "view_title_description_67940918": {
+        "message": "Wyświetl opis { title }"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "Nawigacja po harmonogramie tygodnia"
     },
     "width_492fec76": {
         "message": "Szerokość"
@@ -1267,8 +1372,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Przewinięto do pierwszej listy zadań!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Kamera sieciowa może być już w użyciu."
     }
 }

@@ -16,14 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 
+import {buildSvg} from '../../svg'
+
 export const PreviewSection = ({settings}) => {
+  const wrapper = useRef(null)
+
+  useEffect(() => {
+    const svg = buildSvg(settings, {isPreview: true})
+    appendSvg(svg, wrapper.current)
+  }, [settings])
+
   return (
     <Flex as="section" direction="column">
-      <Flex.Item padding="small">{JSON.stringify(settings, null, 2)}</Flex.Item>
+      <Flex.Item padding="0 small small">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+          ref={wrapper}
+        />
+      </Flex.Item>
     </Flex>
   )
+}
+
+/**
+ * Remove the node contents and append the svg element.
+ */
+function appendSvg(svg, node) {
+  if (!node) return
+  while (node.firstChild) {
+    node.removeChild(node.lastChild)
+  }
+  node.appendChild(svg)
 }

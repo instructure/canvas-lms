@@ -806,12 +806,6 @@ class CoursesController < ApplicationController
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
-     if params_for_create.key?(:grade_passback_setting)
-       grade_passback_setting = params_for_create.delete(:grade_passback_setting)
-       return unless authorized_action?(@course, @current_user, :manage_grades)
-       update_grade_passback_setting(grade_passback_setting)
-     end
-
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
         @sub_account = @account.find_child(sub_account_id)
       end
@@ -864,6 +858,11 @@ class CoursesController < ApplicationController
 
       if apply_assignment_group_weights
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
+      end
+
+      if params_for_create.key?(:grade_passback_setting)
+        grade_passback_setting = params_for_create.delete(:grade_passback_setting)
+        update_grade_passback_setting(grade_passback_setting)
       end
 
       changes = changed_settings(@course.changes, @course.settings)
@@ -1471,7 +1470,6 @@ class CoursesController < ApplicationController
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
-        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
         STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect{|term| term[:enrollment_type]=="StudentEnrollment"}&.slice(:start_at,:end_at),
         DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at,:end_at),
         COURSE_DATES: {:start_at => @context.start_at,:end_at => @context.conclude_at},
@@ -2093,11 +2091,16 @@ class CoursesController < ApplicationController
         @course_home_view = "k5_dashboard" if @context.elementary_subject_course?
         @course_home_view = "announcements" if @context.elementary_homeroom_course?
 
-        if @context.grants_right?(@current_user, session, :read_announcements)
+        # Only compute all this for k5 subjects
+        if @context.elementary_subject_course? && @context.grants_right?(@current_user, session, :read_announcements)
           start_date = 14.days.ago.beginning_of_day
           end_date = start_date + 28.days
-          latest_announcement = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
-            .ordered_between(start_date, end_date).limit(1).first
+          scope = Announcement.where(:context_type => 'Course', :context_id => @context.id, :workflow_state => 'active')
+            .ordered_between(start_date, end_date)
+          unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+            scope = scope.visible_to_student_sections(@current_user)
+          end
+          latest_announcement = scope.limit(1).first
         end
 
         js_env({
@@ -2119,7 +2122,9 @@ class CoursesController < ApplicationController
                    show_student_view: can_do(@context, @current_user, :use_student_view),
                    student_view_path: course_student_view_path(course_id: @context, redirect_to_referer: 1),
                    settings_path: course_settings_path(@context.id),
-                   latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session)
+                   latest_announcement: latest_announcement && discussion_topic_api_json(latest_announcement, @context, @current_user, session),
+                   has_wiki_pages: @context.wiki_pages.not_deleted.exists?,
+                   has_syllabus_body: @context.syllabus_body.present?
                  }
                })
 
@@ -2224,7 +2229,7 @@ class CoursesController < ApplicationController
           )
 
           js_bundle :k5_course, :context_modules
-          css_bundle :k5_dashboard, :content_next, :context_modules2, :grade_summary
+          css_bundle :k5_common, :k5_course, :content_next, :context_modules2, :grade_summary
         when 'announcements'
           js_bundle :announcements
           css_bundle :announcements_index
@@ -3561,12 +3566,6 @@ class CoursesController < ApplicationController
     permissions_to_precalculate = [:read_sis, :manage_sis]
     if includes.include?('tabs')
       permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-
-      # TODO: move granular file permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-      # after :manage_files gets removed from role overrides
-      if @domain_root_account.feature_enabled?(:granular_permissions_course_files)
-        permissions_to_precalculate += RoleOverride::GRANULAR_FILE_PERMISSIONS
-      end
 
       # TODO: move granular user permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
       # when removing :granular_permissions_manage_users flag

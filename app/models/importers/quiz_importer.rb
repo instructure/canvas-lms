@@ -277,6 +277,8 @@ module Importers
         end
       end
 
+      item.generate_quiz_data if hash[:available] || item.published?
+
       if hash[:available]
         item.workflow_state = 'available'
         item.published_at = Time.now
@@ -284,8 +286,6 @@ module Importers
         item.workflow_state = 'unpublished'
         item.assignment.workflow_state = 'unpublished' if item.assignment
       end
-
-      item.generate_quiz_data if item.published?
 
       if hash[:assignment_group_migration_id]
         if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
@@ -346,7 +346,7 @@ module Importers
         end
       end
 
-      hash[:questions].each_with_index do |question, i|
+      !migration.quizzes_next_banks_migration? && hash[:questions].each_with_index do |question, i|
         case question[:question_type]
         when "question_reference"
           if aq = (question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])

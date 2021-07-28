@@ -22,20 +22,20 @@ import FindOutcomeItem from '../FindOutcomeItem'
 
 describe('FindOutcomeItem', () => {
   let onMenuHandlerMock
-  let onCheckboxHandlerMock
+  let onAddClickHandlerMock
   const defaultProps = (props = {}) => ({
     id: '1',
     title: 'Outcome Title',
     description: 'Outcome Description',
-    isChecked: false,
+    isAdded: false,
     onMenuHandler: onMenuHandlerMock,
-    onCheckboxHandler: onCheckboxHandlerMock,
+    onAddClickHandler: onAddClickHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
-    onCheckboxHandlerMock = jest.fn()
+    onAddClickHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -49,19 +49,31 @@ describe('FindOutcomeItem', () => {
 
   it('does not render component if title prop not passed', () => {
     const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({title: null})} />)
-    expect(queryByTestId('outcome-with-bottom-border')).not.toBeInTheDocument()
+    expect(queryByTestId('outcome-management-item')).not.toBeInTheDocument()
   })
 
-  it('handles click on toggle', () => {
+  it('if outcome has not been added, add button should be enabled with Add as the text', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Add outcome'))
-    expect(onCheckboxHandlerMock).toHaveBeenCalledTimes(1)
+    expect(getByText('Add')).toBeInTheDocument()
+    expect(getByText('Add').closest('button')).not.toBeDisabled()
   })
 
-  it('passes item id to toggle handler', () => {
+  it('if outcome has been added, add button should be disabled with Added as the text', () => {
+    const {getByText} = render(<FindOutcomeItem {...defaultProps({isAdded: true})} />)
+    expect(getByText('Added')).toBeInTheDocument()
+    expect(getByText('Added').closest('button')).toBeDisabled()
+  })
+
+  it('handles click on add button handler', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Add outcome'))
-    expect(onCheckboxHandlerMock).toHaveBeenCalledWith('1')
+    fireEvent.click(getByText('Add'))
+    expect(onAddClickHandlerMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('passes item id to add button handler', () => {
+    const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
+    fireEvent.click(getByText('Add'))
+    expect(onAddClickHandlerMock).toHaveBeenCalledWith('1')
   })
 
   it('displays right pointing caret when description is collapsed', () => {

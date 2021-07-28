@@ -21,6 +21,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
+import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
@@ -88,15 +89,16 @@ export const DiscussionThreadsContainer = props => {
   }
 
   return (
-    <View as="div" margin="medium none none none">
+    <View as="div" margin="small none none none">
       {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer
             key={`discussion-thread-${thread.id}`}
-            assignment={discussionTopic?.assignment}
             discussionEntry={thread}
-            discussionTopicGraphQLId={discussionTopic.id}
+            discussionTopic={discussionTopic}
             markAsRead={markAsRead}
+            onOpenIsolatedView={props.onOpenIsolatedView}
+            goToTopic={props.goToTopic}
           />
         )
       })}
@@ -114,7 +116,9 @@ export const DiscussionThreadsContainer = props => {
 }
 
 DiscussionThreadsContainer.propTypes = {
-  discussionTopic: Discussion.shape
+  discussionTopic: Discussion.shape,
+  onOpenIsolatedView: PropTypes.func,
+  goToTopic: PropTypes.func
 }
 
 export default DiscussionThreadsContainer

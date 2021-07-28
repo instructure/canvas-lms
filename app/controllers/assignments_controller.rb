@@ -98,7 +98,7 @@ class AssignmentsController < ApplicationController
   def render_a2_student_view?
     @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      !@context_enrollment&.observer? && !@assignment.submission_types.include?('student_annotation')
+      !@context_enrollment&.observer?
   end
 
   def render_a2_student_view
@@ -297,6 +297,7 @@ class AssignmentsController < ApplicationController
         permissions = {
           context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
           assignment: @assignment.rights_status(@current_user, session, :update, :submit),
+          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
         }
 
         @similarity_pledge = pledge_text
@@ -644,6 +645,7 @@ class AssignmentsController < ApplicationController
       end
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+
       hash = {
         ROOT_FOLDER_ID: Folder.root_folders(@context).first&.id,
         ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
@@ -660,6 +662,9 @@ class AssignmentsController < ApplicationController
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
+        PERMISSIONS: {
+          can_manage_groups: @context.grants_right?(@current_user, session, :manage_groups)
+        },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
           Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2
@@ -864,19 +869,19 @@ class AssignmentsController < ApplicationController
   end
 
   def strong_assignment_params
-    params.require(:assignment).
-      permit(:title, :name, :description, :due_at, :points_possible,
-        :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-        :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-        :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-        :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-        :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-        :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-        :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
-        :omit_from_final_grade, :intra_group_peer_reviews,
-        :allowed_extensions => strong_anything,
-        :turnitin_settings => strong_anything,
-        :integration_data => strong_anything)
+    params.require(:assignment)
+      .permit(:title, :name, :description, :due_at, :points_possible,
+              :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
+              :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
+              :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
+              :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
+              :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
+              :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
+              :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
+              :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
+              :allowed_extensions => strong_anything,
+              :turnitin_settings => strong_anything,
+              :integration_data => strong_anything)
   end
 
   def get_assignment_group(assignment_params)

@@ -163,9 +163,7 @@ class RoleOverride < ActiveRecord::Base
     },
     manage_courses_admin: {
       label: lambda { t('Manage account level course actions') },
-      label_v2: lambda { t('Admin - manage / update') },
-      group: 'manage_courses',
-      group_label: lambda { t('Manage Courses') },
+      label_v2: lambda { t('Courses - manage / update') },
       available_to: %w[AccountAdmin AccountMembership],
       true_for: ['AccountAdmin'],
       account_only: true,
@@ -222,6 +220,21 @@ class RoleOverride < ActiveRecord::Base
       account_allows:
         lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
     },
+    manage_courses_reset: {
+      label: lambda { t('Reset courses') },
+      label_v2: lambda { t('Courses - reset') },
+      group: 'manage_courses',
+      group_label: lambda { t('Manage Courses') },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin],
+      account_allows:
+        lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+    },
     manage_courses_delete: {
       label: lambda { t('Delete courses') },
       label_v2: lambda { t('Courses - delete') },
@@ -231,7 +244,6 @@ class RoleOverride < ActiveRecord::Base
         AccountAdmin
         AccountMembership
         TeacherEnrollment
-        TaEnrollment
         DesignerEnrollment
       ],
       true_for: %w[AccountAdmin],
@@ -278,13 +290,13 @@ class RoleOverride < ActiveRecord::Base
     },
     :view_feature_flags => {
       :label => lambda { t("View feature settings at an account level") },
-      :label_v2 => lambda { t("Feature Options - view") },
+      :label_v2 => lambda { t("Feature Previews - view") },
       :true_for => %w(AccountAdmin),
       :available_to => %w(AccountAdmin AccountMembership)
     },
     :manage_feature_flags => {
       :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
-      :label_v2 => lambda { t("Feature Options - enable / disable") },
+      :label_v2 => lambda { t("Feature Previews - enable / disable") },
       :true_for => %w(AccountAdmin),
       :available_to => %w(AccountAdmin AccountMembership)
     },
@@ -460,7 +472,7 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [ 'AccountAdmin' ]
      },
-     # deprecated; replaced by manage_courses_publish, :manage_courses_conclude, :manage_courses_delete
+     # deprecated
      change_course_state: {
        label: lambda { t('permissions.change_course_state', 'Change course state') },
        label_v2: lambda { t('Course State - manage') },
@@ -606,7 +618,7 @@ class RoleOverride < ActiveRecord::Base
 
     add_teacher_to_course: {
       label: lambda { t("Add Teachers to courses") },
-      label_v2: lambda { t("Add Teachers to courses") },
+      label_v2: lambda { t("Teachers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -624,7 +636,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_teacher_from_course: {
       label: lambda { t("Remove Teachers from courses") },
-      label_v2: lambda { t("Remove Teachers from courses") },
+      label_v2: lambda { t("Teachers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -642,7 +654,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_ta_to_course: {
       label: lambda { t("Add TAs to courses") },
-      label_v2: lambda { t("Add TAs to courses") },
+      label_v2: lambda { t("TAs - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -660,7 +672,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_ta_from_course: {
       label: lambda { t("Remove TAs from courses") },
-      label_v2: lambda { t("Remove TAs from courses") },
+      label_v2: lambda { t("TAs - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -678,7 +690,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_observer_to_course: {
       label: lambda { t("Add Observers to courses") },
-      label_v2: lambda { t("Add Observers to courses") },
+      label_v2: lambda { t("Observers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -698,7 +710,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_observer_from_course: {
       label: lambda { t("Remove Observers from courses") },
-      label_v2: lambda { t("Remove Observers from courses") },
+      label_v2: lambda { t("Observers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -718,7 +730,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_designer_to_course: {
       label: lambda { t("Add Designers to courses") },
-      label_v2: lambda { t("Add Designers to courses") },
+      label_v2: lambda { t("Designers - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -736,7 +748,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_designer_from_course: {
       label: lambda { t("Remove Designers from courses") },
-      label_v2: lambda { t("Remove Designers from courses") },
+      label_v2: lambda { t("Designers - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -775,7 +787,7 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_calendar => {
       :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
-      :label_v2 => lambda { t("Course Calendar - add / edit / delete events") },
+      :label_v2 => lambda { t("Course Calendar - add / edit / delete") },
       :available_to => [
         'StudentEnrollment',
         'TaEnrollment',
@@ -814,8 +826,8 @@ class RoleOverride < ActiveRecord::Base
     },
     # Course Template account permissions
     add_course_template: {
-      label: lambda { t("Create Course Templates") },
-      label_v2: lambda { t("Create Course Templates") },
+      label: lambda { t("Course Templates - create") },
+      label_v2: lambda { t("Course Templates - create") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -824,13 +836,13 @@ class RoleOverride < ActiveRecord::Base
         "AccountAdmin"
       ],
       group: "manage_course_templates",
-      group_label: -> { t("Courses - Course Templates") },
+      group_label: -> { t("Manage Course Templates") },
       account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
       account_only: true
     },
     edit_course_template: {
-      label: lambda { t("Edit Course Templates") },
-      label_v2: lambda { t("Edit Course Templates") },
+      label: lambda { t("Course Templates - edit") },
+      label_v2: lambda { t("Course Templates - edit") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -844,8 +856,8 @@ class RoleOverride < ActiveRecord::Base
       account_only: true
     },
     delete_course_template: {
-      label: lambda { t("Delete Course Templates") },
-      label_v2: lambda { t("Delete Course Templates") },
+      label: lambda { t("Course Templates - delete") },
+      label_v2: lambda { t("Course Templates - delete") },
       available_to: [
         "AccountAdmin",
         "AccountMembership"
@@ -854,28 +866,22 @@ class RoleOverride < ActiveRecord::Base
         "AccountAdmin"
       ],
       group: "manage_course_templates",
-      group_label: -> { t("Courses - Course Templates") },
+      group_label: -> { t("Manage Course Templates") },
       account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
       account_only: true
     },
-    # legacy :manage_files permission bundle
-    manage_files: {
-      label: -> { t('Manage (add / edit / delete) course files') },
-      label_v2: -> { t('Course Files - add / edit / delete') },
+    manage_account_banks: {
+      label: lambda { t('permissions.manage_account_banks', "Manage account level item Banks") },
+      label_v2: lambda { t("Item Banks - manage account") },
       available_to: %w[
-        TaEnrollment
         DesignerEnrollment
         TeacherEnrollment
-        TeacherlessStudentEnrollment
-        ObserverEnrollment
         AccountAdmin
         AccountMembership
       ],
-      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        !a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      true_for: %w[
+        AccountAdmin
+      ],
     },
     manage_files_add: {
       label: -> { t('Add course files') },
@@ -892,10 +898,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     manage_files_edit: {
       label: -> { t('Edit course files') },
@@ -912,10 +915,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     manage_files_delete: {
       label: -> { t('Delete course files') },
@@ -932,10 +932,7 @@ class RoleOverride < ActiveRecord::Base
         AccountMembership
       ],
       true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-      acts_as_access_token_scope: true,
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_files)
-      end
+      acts_as_access_token_scope: true
     },
     :manage_grades => {
       :label => lambda { t('permissions.manage_grades', "Edit grades") },
@@ -1098,7 +1095,7 @@ class RoleOverride < ActiveRecord::Base
     },
     add_student_to_course: {
       label: lambda { t("Add Students to courses") },
-      label_v2: lambda { t("Add Students to courses") },
+      label_v2: lambda { t("Students - add") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -1118,7 +1115,7 @@ class RoleOverride < ActiveRecord::Base
     },
     remove_student_from_course: {
       label: lambda { t("Remove Students from courses") },
-      label_v2: lambda { t("Remove Students from courses") },
+      label_v2: lambda { t("Students - remove") },
       available_to: [
         "TaEnrollment",
         "DesignerEnrollment",
@@ -1171,28 +1168,7 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_wiki_create => {
       :label => lambda { t("Create pages") },
-      :label_v2 =>  lambda { t("Pages - Create") },
-      :available_to => [
-        'TaEnrollment',
-        'TeacherEnrollment',
-        'DesignerEnrollment',
-        'TeacherlessStudentEnrollment',
-        'ObserverEnrollment',
-        'AccountAdmin',
-        'AccountMembership'
-      ],
-      :true_for => [
-        'TaEnrollment',
-        'TeacherEnrollment',
-        'DesignerEnrollment',
-        'AccountAdmin'
-      ],
-      :group => 'manage_wiki',
-      :group_label => lambda { t('Manage Pages') }
-    },
-    :manage_wiki_delete => {
-      :label => lambda { t("Delete pages") },
-      :label_v2 =>  lambda { t("Pages - Delete") },
+      :label_v2 =>  lambda { t("Pages - create") },
       :available_to => [
         'TaEnrollment',
         'TeacherEnrollment',
@@ -1213,7 +1189,28 @@ class RoleOverride < ActiveRecord::Base
     },
     :manage_wiki_update => {
       :label => lambda { t("Update pages") },
-      :label_v2 =>  lambda { t("Pages - Update") },
+      :label_v2 =>  lambda { t("Pages - update") },
+      :available_to => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'AccountAdmin'
+      ],
+      :group => 'manage_wiki',
+      :group_label => lambda { t('Manage Pages') }
+    },
+    :manage_wiki_delete => {
+      :label => lambda { t("Delete pages") },
+      :label_v2 =>  lambda { t("Pages - delete") },
       :available_to => [
         'TaEnrollment',
         'TeacherEnrollment',
@@ -1595,50 +1592,68 @@ class RoleOverride < ActiveRecord::Base
     Setting.get("role_override_local_cache_ttl_seconds", "300").to_i.seconds
   end
 
-  def self.permission_for(context, permission, role_or_role_id, role_context=:role_account, no_caching=false)
-    account = context.is_a?(Account) ? context :
-      Account.new(id: context.account_id) # we can avoid a query since we're just using it for the batched keys on redis
-    permissionless_base_key = ["role_override_calculation", Shard.global_id_for(role_or_role_id)].compact.join("/")
-    full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
+  def self.permission_for(context, permission, role_or_role_id, role_context=:role_account, no_caching=false, preloaded_overrides: nil)
+    # we can avoid a query since we're just using it for the batched keys on redis
+    permissionless_base_key = ["role_override_calculation", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
+    account = context.is_a?(Account) ? context : Account.new(id: context.account_id)
     default_data = self.permissions[permission]
 
     if default_data[:account_allows] || no_caching
       # could depend on anything - can't cache (but that's okay because it's not super common)
-      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching)
+      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching, preloaded_overrides: preloaded_overrides)
     else
+      full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
       LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
         Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
             batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data)
+          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides: preloaded_overrides)
         end
       end
     end.freeze
   end
 
-  def self.uncached_overrides_for(context, role, role_context)
-    context.shard.activate do
-      accounts = context.account_chain(include_site_admin: true)
-      overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+  def self.preload_overrides(account, roles, role_context = account)
+    return Hash.new([].freeze) if roles.empty?
+
+    account.shard.activate do
+      result = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = [] } }
+
+      Shard.partition_by_shard(account.account_chain(include_site_admin: true)) do |shard_accounts|
         # skip loading from site admin if the role is not from site admin
         next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-        RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-      end
 
-      accounts.reverse!
-      overrides = overrides.group_by(&:permission)
-
-      # every context has to be represented so that we can't miss role_context below
-      overrides.each_key do |permission|
-        overrides_by_account = overrides[permission].index_by(&:context_id)
-        overrides[permission] = accounts.map do |account|
-          overrides_by_account[account.id] || RoleOverride.new(context_id: account.id, context_type: 'Account')
+        RoleOverride.where(role: roles, account: shard_accounts).each do |ro|
+          permission_hash = result[ro.permission]
+          permission_hash[ro.global_context_id] << ro
         end
+        nil
       end
-    overrides
+      result
     end
   end
 
-  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching=false)
+  def self.uncached_overrides_for(context, role, role_context, preloaded_overrides: nil, only_permission: nil)
+    context.shard.activate do
+      accounts = context.account_chain(include_site_admin: true)
+      
+      preloaded_overrides ||= preload_overrides(context, [role], role_context)
+
+      accounts.reverse!
+      overrides = {}
+
+      # every context has to be represented so that we can't miss role_context below
+      preloaded_overrides.each do |(permission, overrides_by_account)|
+        next if only_permission && permission != only_permission
+
+        overrides[permission] = accounts.map do |account|
+          overrides_by_account[account.global_id].find { |ro| ro.role_id == role.id } || RoleOverride.new(context_id: account.id, context_type: 'Account')
+        end
+      end
+      overrides
+    end
+  end
+
+  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching=false, preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
     # be explicit that we're expecting calculation to stop at the role's account rather than, say, passing in a course
@@ -1679,13 +1694,13 @@ class RoleOverride < ActiveRecord::Base
     return generated_permission if locked
 
     overrides = if no_caching
-      uncached_overrides_for(context, role, role_context)
+      uncached_overrides_for(context, role, role_context, preloaded_overrides: preloaded_overrides, only_permission: permission.to_s)
     else
       RequestCache.cache(permissionless_base_key, account) do
         LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
           Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
               batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-            uncached_overrides_for(context, role, role_context)
+            uncached_overrides_for(context, role, role_context, preloaded_overrides: preloaded_overrides)
           end
         end
       end
@@ -1729,7 +1744,7 @@ class RoleOverride < ActiveRecord::Base
 
     # there was not an override matching this context, so do a half loop
     # to set the inherited values
-    if !last_override
+    unless last_override
       generated_permission[:prior_default] = generated_permission[:enabled]
       generated_permission[:readonly] = true if generated_permission[:locked]
     end

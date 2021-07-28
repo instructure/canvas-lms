@@ -45,7 +45,40 @@ module MicrosoftSync
       end
     end
 
-    def in_slices_of(owners, members, slice_size, &_blk)
+    def additions
+      # Admins/teachers need to be both owners and members in the remote group
+      {
+        members: ((@local_members | @local_owners) - @remote_members).to_a,
+        owners: (@local_owners - @remote_owners).to_a
+      }
+    end
+
+    def additions_in_slices_of(slice_size, &blk)
+      members_to_add, owners_to_add = additions.values_at(:members, :owners)
+      self.class.in_slices_of owners_to_add, members_to_add, slice_size, &blk
+    end
+
+    def removals
+      {
+        members: @remote_members - @local_members - @local_owners,
+        owners: @remote_owners - @local_owners
+      }
+    end
+
+    def removals_in_slices_of(slice_size, &blk)
+      members_to_remove, owners_to_remove = removals.values_at(:members, :owners)
+      self.class.in_slices_of owners_to_remove, members_to_remove, slice_size, &blk
+    end
+
+    def max_enrollment_members_reached?
+      (@local_members + @local_owners).size > MAX_ENROLLMENT_MEMBERS
+    end
+
+    def max_enrollment_owners_reached?
+      @local_owners.size > MAX_ENROLLMENT_OWNERS
+    end
+
+    def self.in_slices_of(owners, members, slice_size, &_blk)
       members = members.to_a # Convert from Set so we can 'shift'
 
       owners.each_slice(slice_size) do |owners_slice|
@@ -57,27 +90,6 @@ module MicrosoftSync
       members.each_slice(slice_size) do |members_slice|
         yield(members: members_slice)
       end
-    end
-
-    def additions_in_slices_of(slice_size, &blk)
-      # Admins/teachers need to be both owners and members in the remote group
-      owners_to_add = (@local_owners - @remote_owners).to_a
-      members_to_add = ((@local_members | @local_owners) - @remote_members).to_a
-      in_slices_of owners_to_add, members_to_add, slice_size, &blk
-    end
-
-    def removals_in_slices_of(slice_size, &blk)
-      owners_to_remove = @remote_owners - @local_owners
-      members_to_remove = @remote_members - @local_members - @local_owners
-      in_slices_of owners_to_remove, members_to_remove, slice_size, &blk
-    end
-
-    def max_enrollment_members_reached?
-      (@local_members + @local_owners).size > MAX_ENROLLMENT_MEMBERS
-    end
-
-    def max_enrollment_owners_reached?
-      @local_owners.size > MAX_ENROLLMENT_OWNERS
     end
   end
 end

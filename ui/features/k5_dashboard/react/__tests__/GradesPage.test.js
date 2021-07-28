@@ -224,6 +224,12 @@ describe('GradesPage', () => {
     await waitFor(() => expect(getByText('76%')).toBeInTheDocument())
     expect(queryByText('C')).not.toBeInTheDocument()
   })
+
+  it('displays some text indicating how grades are calculated', () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
+    const {getByText} = render(<GradesPage visible currentUserRoles={['student', 'user']} />)
+    expect(getByText('Totals are calculated based only on graded assignments.')).toBeInTheDocument()
+  })
 })
 
 describe('getGradingPeriodsFromCourse', () => {

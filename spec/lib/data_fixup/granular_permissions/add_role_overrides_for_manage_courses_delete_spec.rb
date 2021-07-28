@@ -42,6 +42,22 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       @account.roles.create(name: 'Custom Admin Role2', base_role_type: 'AccountAdmin')
   end
 
+  it 'should be idempotent' do
+    create_role_override('manage_courses', @account_admin_role, enabled: false)
+
+    DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
+      base_role_type: 'AccountAdmin'
+    )
+
+    expect(RoleOverride.where(permission: 'manage_courses_delete').count).to eq 1
+
+    expect {
+      DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
+        base_role_type: 'AccountAdmin'
+      )
+    }.to_not raise_error
+  end
+
   context 'AccountAdmin' do
     it 'creates a role override that is not enabled if either base role override is not enabled' do
       create_role_override('manage_courses', @account_admin_role, enabled: true)

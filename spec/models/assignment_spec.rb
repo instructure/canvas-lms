@@ -170,6 +170,14 @@ describe Assignment do
     end
 
     describe 'update_cached_due_dates' do
+      it 'invokes DueDateCacher if anonymous_grading is changed' do
+        attrs = assignment_valid_attributes.merge(anonymous_grading: true)
+        assignment = @course.assignments.create!(attrs)
+        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+
+        assignment.update!(anonymous_grading: false)
+      end
+
       it 'invokes DueDateCacher if due_at is changed' do
         assignment = @course.assignments.new(assignment_valid_attributes)
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
@@ -636,6 +644,32 @@ describe Assignment do
 
     it 'excludes users that do not have a moderation grader record for the assignment' do
       expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key @teacher.id
+    end
+  end
+
+  describe '#instructor_states_by_provisional_grade_id' do
+    before(:once) do
+      @teacher1 = User.create!
+      @teacher2 = User.create!
+      @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2)
+      @course.enroll_teacher(@teacher1, enrollment_state: :active)
+      @course.enroll_teacher(@teacher2, enrollment_state: :active)
+      @assignment.create_moderation_grader(@teacher1, occupy_slot: true)
+      @assignment.create_moderation_grader(@teacher2, occupy_slot: true)
+      @submission = @assignment.submissions.first
+      @provisional_grade1 = @submission.find_or_create_provisional_grade!(@teacher1, score: 1)
+      @provisional_grade2 = @submission.find_or_create_provisional_grade!(@teacher2, score: 2)
+      @teacher2.enrollments.first.destroy
+    end
+
+    it 'sets active to a provisional grade from an user with active enrollment' do
+      key = @provisional_grade1.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq true
+    end
+
+    it 'sets deleted to a provisional grade from an user with inactive enrollment' do
+      key = @provisional_grade2.id
+      expect(@assignment.instructor_selectable_states_by_provisional_grade_id[key]).to eq false
     end
   end
 
@@ -1615,6 +1649,77 @@ describe Assignment do
   end
 
   describe "#representatives" do
+    context "when filtering by section" do
+      before(:once) do
+        @student_enrollment = @enrollment
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+      end
+
+      describe "concluded students" do
+        before(:once) do
+          @student_enrollment.conclude
+        end
+
+        it "excludes concluded students by default" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+
+        it "includes concluded students if the includes param has :completed" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:completed],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "excludes concluded students if the includes param does not have :completed" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:inactive],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+      end
+
+      describe "deactivated students" do
+        before(:once) do
+          @student_enrollment.deactivate
+        end
+
+        it "includes deactivated students by default" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "includes deactivated students if the includes param has :inactive" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:inactive],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).to include @initial_student
+        end
+
+        it "excludes deactivated students if the includes param does not have :inactive" do
+          representatives = @assignment.representatives(
+            user: @teacher,
+            includes: [:completed],
+            section_id: @student_enrollment.course_section_id
+          )
+          expect(representatives).not_to include @initial_student
+        end
+      end
+    end
+
     context "individual students" do
       it "sorts by sortable_name" do
         student_one = student_in_course(
@@ -3174,6 +3279,13 @@ describe Assignment do
     it "should not round scores" do
       @assignment.points_possible = 15
       expect(@assignment.interpret_grade("88.75%")).to eq 13.3125
+    end
+
+    it "should not return more than 3 decimal digits" do
+      @assignment.points_possible = 100
+      score = @assignment.interpret_grade("55%")
+      decimal_part = score.to_s.split('.')[1]
+      expect(decimal_part.length).to be <= 3
     end
 
     context "with alphanumeric grades" do
@@ -9783,6 +9895,39 @@ describe Assignment do
 
     it "returns true if the rubric association exists and is active" do
       expect(@assignment).to be_active_rubric_association
+    end
+  end
+
+  describe "#accepts_submission_type?" do
+    let(:assignment) { @course.assignments.create! }
+
+    context "when the submission_type is 'basic_lti_launch'" do
+      it "returns true if the assignment accepts external_tool submissions" do
+        assignment.update!(submission_types: "external_tool")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns true if the assignment accepts online uploads" do
+        assignment.update!(submission_types: "online_text_entry")
+        expect(assignment).to be_accepts_submission_type("basic_lti_launch")
+      end
+
+      it "returns false if the assignment accepts neither external_tool nor online-type submissions" do
+        assignment.update!(submission_types: "on_paper")
+        expect(assignment).not_to be_accepts_submission_type("basic_lti_launch")
+      end
+    end
+
+    context "when the submission_type is a non-LTI type" do
+      it "returns true if the specified type is contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).to be_accepts_submission_type("online_upload")
+      end
+
+      it "returns false if the specified type is not contained in the assignment's list of accepted types" do
+        assignment.update!(submission_types: "on_paper,online_upload")
+        expect(assignment).not_to be_accepts_submission_type("online_text_entry")
+      end
     end
   end
 

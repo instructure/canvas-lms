@@ -740,6 +740,11 @@ class Attachment < ActiveRecord::Base
     return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
+  def self.quota_available(context)
+    quota = self.get_quota(context)
+    [0, quota[:quota] - quota[:quota_used]].max
+  end
+
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
 
@@ -1240,40 +1245,8 @@ class Attachment < ActiveRecord::Base
       (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
   end
 
-  def context_root_account(user = nil)
-    # Granular Permissions
-    #
-    # The primary use case for this method is for accurately checking
-    # feature flag enablement, given a user and the calling context.
-    # We want to prefer finding the root_account through the context
-    # of the authorizing resource or fallback to the user's active
-    # pseudonym's residing account.
-    return self.context.account if self.context.is_a?(User)
-
-    self.context.try(:root_account) || user&.account
-  end
-
   set_policy do
-    #################### Begin legacy permission block #########################
-
     given do |user, session|
-      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
-      self.context&.grants_right?(user, session, :manage_files) &&
-      !self.associated_with_submission? &&
-      (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
-    end
-    can :delete and can :update
-
-    given do |user, session|
-      !context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
-      self.context&.grants_right?(user, session, :manage_files)
-    end
-    can :read and can :create and can :download and can :read_as_admin
-
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_edit) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1281,7 +1254,6 @@ class Attachment < ActiveRecord::Base
     can :read and can :update
 
     given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_delete) &&
       !self.associated_with_submission? &&
       (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
@@ -1289,7 +1261,6 @@ class Attachment < ActiveRecord::Base
     can :read and can :delete
 
     given do |user, session|
-      context_root_account(user)&.feature_enabled?(:granular_permissions_course_files) &&
       self.context&.grants_right?(user, session, :manage_files_add)
     end
     can :read and can :create and can :download and can :read_as_admin
@@ -2025,13 +1996,17 @@ class Attachment < ActiveRecord::Base
       end
 
       handle_duplicates(duplicate_handling || 'overwrite')
-    rescue Exception, Timeout::Error => e
+      nil # the rescue returns true if the file failed and is retryable, nil if successful
+    rescue StandardError => e
+      failed_retryable = false
       self.file_state = 'errored'
       self.workflow_state = 'errored'
       case e
       when CanvasHttp::TooManyRedirectsError
+        failed_retryable = true
         self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
       when CanvasHttp::InvalidResponseCodeError
+        failed_retryable = true
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
         Canvas::Errors.capture(e, clone_url_error_info(e, url))
       when CanvasHttp::RelativeUriError
@@ -2040,10 +2015,12 @@ class Attachment < ActiveRecord::Base
         # assigning all ArgumentError to InvalidUri may be incorrect
         self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
       when Timeout::Error
+        failed_retryable = true
         self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", :url => url
       when OverQuotaError
         self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
       else
+        failed_retryable = true
         self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
         Canvas::Errors.capture(e, clone_url_error_info(e, url))
       end
@@ -2054,6 +2031,7 @@ class Attachment < ActiveRecord::Base
       end
 
       self.save!
+      failed_retryable
     end
   end
 

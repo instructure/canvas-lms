@@ -89,18 +89,14 @@ describe('EditEventView', () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render()
         await waitForRender()
-        const conferencingRow = within(document.body)
-          .getByText('Conferencing:')
-          .closest('fieldset')
+        const conferencingRow = within(document.body).getByText('Conferencing:').closest('fieldset')
         expect(conferencingRow.className).toEqual('hide')
       })
 
       it('does show current conference when there is a current conference', async () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
-        const conferencingRow = within(document.body)
-          .getByText('Conferencing:')
-          .closest('fieldset')
+        const conferencingRow = within(document.body).getByText('Conferencing:').closest('fieldset')
         await waitForRender()
         expect(conferencingRow.className).not.toEqual('hide')
         expect(getByText(conferencingRow, 'FooConf')).not.toBeNull()
@@ -146,6 +142,43 @@ describe('EditEventView', () => {
       })
       view.submit(null)
       expect(view.model.save).toHaveBeenCalled()
+    })
+  })
+
+  describe('important dates section', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES = {
+        important_dates: true
+      }
+    })
+
+    it('is not shown in non-k5 contexts', () => {
+      render()
+      expect(within(document.body).queryByText('Mark as Important Date')).toBeNull()
+    })
+
+    it('is not shown if important_dates flag is off', () => {
+      window.ENV.FEATURES = {}
+      render()
+      expect(within(document.body).queryByText('Mark as Important Date')).toBeNull()
+    })
+
+    it('is shown in a k5 subject', () => {
+      window.ENV.K5_SUBJECT_COURSE = true
+      render()
+      expect(
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+      ).toBeInTheDocument()
+    })
+
+    it('is shown and checked in a k5 subject with event already marked as important', () => {
+      window.ENV.K5_SUBJECT_COURSE = true
+      render({important_dates: true})
+      const checkbox = within(document.body).getByLabelText('Mark as Important Date', {
+        exact: false
+      })
+      expect(checkbox).toBeInTheDocument()
+      expect(checkbox).toHaveAttribute('checked')
     })
   })
 })

@@ -66,6 +66,10 @@ describe('HomeroomAnnouncementsLayout', () => {
     ...overrides
   })
 
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders a view for each child passed', () => {
     const {getByText} = render(<HomeroomAnnouncementsLayout {...getProps()} />)
     expect(getByText('Homeroom - Mr. Jessie')).toBeInTheDocument()
@@ -125,7 +129,7 @@ describe('HomeroomAnnouncementsLayout', () => {
 
   it('renders loading skeletons if loading', () => {
     const {getByText, queryByText} = render(
-      <HomeroomAnnouncementsLayout {...getProps({loading: true})} />
+      <HomeroomAnnouncementsLayout {...getProps({loading: true, homeroomAnnouncements: []})} />
     )
     expect(getByText('Loading Homeroom Course Name')).toBeInTheDocument()
     expect(getByText('Loading Homeroom Announcement Title')).toBeInTheDocument()

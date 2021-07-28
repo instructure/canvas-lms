@@ -247,6 +247,7 @@ export function setup() {
         const comment_type = $('#media_media_recording').data('comment_type')
         formData['submission[media_comment_type]'] = comment_type || 'video'
         formData['submission[media_comment_id]'] = comment_id
+        formData['submission[comment]'] = ''
       } else {
         if ($('.grading_comment').val() && $('.grading_comment').val != '') {
           formData['submission[comment]'] = $('.grading_comment').val()

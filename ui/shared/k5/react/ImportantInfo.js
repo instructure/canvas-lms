@@ -26,7 +26,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconCoursesLine} from '@instructure/ui-icons'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import LoadingSkeleton from './LoadingSkeleton'
 
 export const ImportantInfoShape = {
   courseId: PropTypes.string.isRequired,
@@ -41,6 +40,7 @@ export const ImportantInfoEditHeader = ({children, canEdit, courseName, courseId
     {canEdit && (
       <Flex.Item>
         <IconButton
+          data-testid="important-info-edit"
           screenReaderLabel={I18n.t('Edit important info for %{courseName}', {
             courseName
           })}
@@ -63,17 +63,10 @@ ImportantInfoEditHeader.propTypes = {
   margin: PropTypes.string
 }
 
-const ImportantInfo = ({isLoading, showTitle = false, titleMargin, infoDetails}) => {
-  return isLoading ? (
-    <LoadingSkeleton
-      height="8em"
-      width="100%"
-      margin="small 0 0"
-      screenReaderLabel={I18n.t('Loading important info')}
-    />
-  ) : (
+const ImportantInfo = ({showTitle = false, titleMargin, infoDetails}) => {
+  return (
     <>
-      {showTitle && (
+      {showTitle && infoDetails && (
         <ImportantInfoEditHeader
           canEdit={infoDetails.canEdit}
           courseName={infoDetails.courseName}
@@ -91,14 +84,13 @@ const ImportantInfo = ({isLoading, showTitle = false, titleMargin, infoDetails})
       <div
         className="user_content"
         /* html sanitized by server */
-        dangerouslySetInnerHTML={{__html: apiUserContent.convert(infoDetails.content)}}
+        dangerouslySetInnerHTML={{__html: apiUserContent.convert(infoDetails?.content)}}
       />
     </>
   )
 }
 
 ImportantInfo.propTypes = {
-  isLoading: PropTypes.bool.isRequired,
   showTitle: PropTypes.bool,
   titleMargin: PropTypes.string,
   infoDetails: PropTypes.shape(ImportantInfoShape)

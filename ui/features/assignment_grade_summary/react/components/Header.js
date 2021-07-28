@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {arrayOf, func, oneOf, shape, string} from 'prop-types'
+import {objectOf, arrayOf, func, oneOf, shape, string, number, bool} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -30,11 +30,32 @@ import * as AssignmentActions from '../assignment/AssignmentActions'
 import GradersTable from './GradersTable/index'
 import PostToStudentsButton from './PostToStudentsButton'
 import ReleaseButton from './ReleaseButton'
+import {
+  SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
+  setReleaseGradesStatus
+} from '../assignment/AssignmentActions'
 
 /* eslint-disable no-alert */
 
 function enumeratedStatuses(actions) {
-  return [actions.FAILURE, actions.STARTED, actions.SUCCESS]
+  return [
+    actions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
+    actions.FAILURE,
+    actions.STARTED,
+    actions.SUCCESS
+  ]
+}
+
+function validGradersSelected(gradesByStudentId) {
+  return Object.values(gradesByStudentId).every(gradesByGraderId => {
+    const grades = Object.values(gradesByGraderId)
+    const selectedGrade = grades.find(grade => grade.selected)
+    if (!selectedGrade) {
+      return true
+    }
+    const graderFound = ENV.GRADERS.find(grader => selectedGrade.graderId === grader.user_id)
+    return !graderFound || graderFound.grader_selectable
+  })
 }
 
 class Header extends Component {
@@ -51,7 +72,20 @@ class Header extends Component {
     releaseGrades: func.isRequired,
     releaseGradesStatus: oneOf(enumeratedStatuses(AssignmentActions)),
     unmuteAssignment: func.isRequired,
-    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
+    unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions)),
+    provisionalGrades: objectOf(
+      objectOf(
+        shape({
+          grade: string,
+          graderId: string.isRequired,
+          id: string.isRequired,
+          score: number,
+          selected: bool.isRequired,
+          studentId: string.isRequired
+        })
+      )
+    ).isRequired,
+    setReleaseGradesStatus: func.isRequired
   }
 
   static defaultProps = {
@@ -75,6 +109,21 @@ class Header extends Component {
     }
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.provisionalGrades !== this.props.provisionalGrades) {
+      this.updateStatus(nextProps)
+    }
+  }
+
+  updateStatus = nextProps => {
+    const isValidSelection = validGradersSelected(nextProps.provisionalGrades)
+    const status = !isValidSelection ? SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS : null
+    const shouldUpdateStatus = nextProps.releaseGradesStatus !== status
+    if (shouldUpdateStatus) {
+      this.props.setReleaseGradesStatus(status)
+    }
+  }
+
   render() {
     return (
       <header>
@@ -82,6 +131,14 @@ class Header extends Component {
           <Alert margin="0 0 medium 0" variant="info">
             <Text weight="bold">{I18n.t('Attention!')}</Text>{' '}
             {I18n.t('Grades cannot be modified from this page as they have already been released.')}
+          </Alert>
+        )}
+        {this.props.releaseGradesStatus ===
+          AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS && (
+          <Alert margin="0 0 medium 0" variant="error">
+            {I18n.t(
+              'One or more grade selected was provided by a grader with inactive enrollments. Please update your selections to those provided by current graders.'
+            )}
           </Alert>
         )}
 
@@ -131,7 +188,8 @@ function mapStateToProps(state) {
     assignment,
     graders: state.context.graders,
     releaseGradesStatus,
-    unmuteAssignmentStatus
+    unmuteAssignmentStatus,
+    provisionalGrades: state.grades.provisionalGrades
   }
 }
 
@@ -140,9 +198,12 @@ function mapDispatchToProps(dispatch) {
     releaseGrades() {
       dispatch(AssignmentActions.releaseGrades())
     },
-
     unmuteAssignment() {
       dispatch(AssignmentActions.unmuteAssignment())
+    },
+
+    setReleaseGradesStatus(status) {
+      dispatch(setReleaseGradesStatus(status))
     }
   }
 }

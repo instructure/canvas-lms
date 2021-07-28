@@ -57,7 +57,7 @@
 }
 #move_question_dialog li.bank .bank_label .bank_name {
   display: block;
-  margin-#{direction(left)}: $ic-sp/2;
+  margin-#{direction(left)}: $ic-sp*0.5;
 }
 #move_question_dialog li.bank .bank_label .context_name {
   font-size: 0.8em;
@@ -83,5 +83,5 @@
 .move_question_dialog_actions {
   margin-top: $ic-sp;
   text-align: direction(right);
-  padding-bottom: $ic-sp/2;
+  padding-bottom: $ic-sp*0.5;
 }

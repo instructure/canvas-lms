@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable react/no-array-index-key */
-
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -92,13 +90,13 @@ export default class Grid extends Component {
           </thead>
 
           <tbody>
-            {this.props.rows.map((row, index) => (
+            {this.props.rows.map(row => (
               <GridRow
                 disabledCustomGrade={this.props.disabledCustomGrade}
                 finalGrader={this.props.finalGrader}
                 graders={this.props.graders}
                 grades={this.props.grades[row.studentId]}
-                key={index /* index used for performance reasons */}
+                key={row.studentId}
                 onGradeSelect={this.props.onGradeSelect}
                 row={row}
                 selectProvisionalGradeStatus={

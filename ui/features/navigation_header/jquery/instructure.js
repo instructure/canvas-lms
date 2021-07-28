@@ -26,7 +26,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/doc-previews' /* filePreviewsEnabled, loadDocPreview */
+import '@canvas/doc-previews' /* loadDocPreview */
 import {trackEvent} from '@canvas/google-analytics'
 import '@canvas/datetime' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
@@ -240,7 +240,7 @@ export function enhanceUserContent() {
             </a>`
         )
       }
-      if ($.filePreviewsEnabled() && $link.hasClass('instructure_scribd_file')) {
+      if ($link.hasClass('instructure_scribd_file')) {
         if (ENV.FEATURES?.rce_better_file_previewing) {
           if ($link.hasClass('inline_disabled')) {
             // link opens in overlay
@@ -535,89 +535,76 @@ $(function () {
       $dialog.dialog('open')
     })
   })
-  if ($.filePreviewsEnabled()) {
-    $('a.file_preview_link, a.scribd_file_preview_link').live('click', function (event) {
-      if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
-        // if any modifier keys are pressed, do the browser default thing
-        return
-      }
-      event.preventDefault()
-      const $link = $(this)
-      if ($link.attr('aria-expanded') === 'true') {
-        // close the preview by clicking the "Minimize File Preview" link
-        $link.parent().find('.hide_file_preview_link').click()
-        return
-      }
-      $link.loadingImage({image_size: 'small', horizontal: 'right!'})
-      if (ENV.FEATURES?.rce_better_file_previewing) {
-        $link.attr('aria-expanded', 'true')
-      } else {
-        $link.hide()
-      }
-      $.ajaxJSON(
-        $link
-          .attr('href')
-          .replace(/\/(download|preview)/, '') // download as part of the path
-          .replace(/wrap=1&?/, '') // wrap=1 as part of the query_string
-          .replace(/[?&]$/, ''), // any trailing chars if wrap=1 was at the end
-        'GET',
-        {},
-        data => {
-          const attachment = data && data.attachment
-          $link.loadingImage('remove')
-          if (
-            attachment &&
-            ($.isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
-          ) {
-            const $div = window.ENV?.FEATURES.rce_better_file_previewing
-              ? $(`[id="${$link.attr('aria-controls')}"]`)
-              : $link.parent().find('[role="region"][id^="preview_"]')
-            $div.css('display', 'block').loadDocPreview({
-              canvadoc_session_url: attachment.canvadoc_session_url,
-              mimeType: attachment.content_type,
-              public_url: attachment.public_url,
-              attachment_preview_processing:
-                attachment.workflow_state === 'pending_upload' ||
-                attachment.workflow_state === 'processing'
-            })
-            const $minimizeLink = $(
-              '<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' +
-                htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) +
-                '</a>'
-            ).click(event => {
-              event.preventDefault()
-              $link.attr('aria-expanded', 'false')
-              $link.show()
-              $link.focus()
-              $div.html('').css('display', 'none')
-              trackEvent('hide_embedded_content', 'hide_file_preview')
-            })
-            $div.prepend($minimizeLink)
-            if (Object.prototype.hasOwnProperty.call(event, 'originalEvent')) {
-              // Only focus this link if the open preview link was initiated by a real browser event
-              // If it was triggered by our auto_open stuff it shouldn't focus here.
-              $minimizeLink.focus()
-            }
-            trackEvent('show_embedded_content', 'show_file_preview')
+  $('a.file_preview_link, a.scribd_file_preview_link').live('click', function (event) {
+    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+      // if any modifier keys are pressed, do the browser default thing
+      return
+    }
+    event.preventDefault()
+    const $link = $(this)
+    if ($link.attr('aria-expanded') === 'true') {
+      // close the preview by clicking the "Minimize File Preview" link
+      $link.parent().find('.hide_file_preview_link').click()
+      return
+    }
+    $link.loadingImage({image_size: 'small', horizontal: 'right!'})
+    if (ENV.FEATURES?.rce_better_file_previewing) {
+      $link.attr('aria-expanded', 'true')
+    } else {
+      $link.hide()
+    }
+    $.ajaxJSON(
+      $link
+        .attr('href')
+        .replace(/\/(download|preview)/, '') // download as part of the path
+        .replace(/wrap=1&?/, '') // wrap=1 as part of the query_string
+        .replace(/[?&]$/, ''), // any trailing chars if wrap=1 was at the end
+      'GET',
+      {},
+      data => {
+        const attachment = data && data.attachment
+        $link.loadingImage('remove')
+        if (
+          attachment &&
+          ($.isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
+        ) {
+          const $div = window.ENV?.FEATURES.rce_better_file_previewing
+            ? $(`[id="${$link.attr('aria-controls')}"]`)
+            : $link.parent().find('[role="region"][id^="preview_"]')
+          $div.css('display', 'block').loadDocPreview({
+            canvadoc_session_url: attachment.canvadoc_session_url,
+            mimeType: attachment.content_type,
+            public_url: attachment.public_url,
+            attachment_preview_processing:
+              attachment.workflow_state === 'pending_upload' ||
+              attachment.workflow_state === 'processing'
+          })
+          const $minimizeLink = $(
+            '<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' +
+              htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) +
+              '</a>'
+          ).click(event => {
+            event.preventDefault()
+            $link.attr('aria-expanded', 'false')
+            $link.show()
+            $link.focus()
+            $div.html('').css('display', 'none')
+            trackEvent('hide_embedded_content', 'hide_file_preview')
+          })
+          $div.prepend($minimizeLink)
+          if (Object.prototype.hasOwnProperty.call(event, 'originalEvent')) {
+            // Only focus this link if the open preview link was initiated by a real browser event
+            // If it was triggered by our auto_open stuff it shouldn't focus here.
+            $minimizeLink.focus()
           }
-        },
-        () => {
-          $link.loadingImage('remove').hide()
+          trackEvent('show_embedded_content', 'show_file_preview')
         }
-      )
-    })
-  } else {
-    $('a.file_preview_link').live('click', event => {
-      event.preventDefault()
-      // eslint-disable-next-line no-alert
-      alert(
-        I18n.t(
-          'alerts.file_previews_disabled',
-          'File previews have been disabled for this Canvas site'
-        )
-      )
-    })
-  }
+      },
+      () => {
+        $link.loadingImage('remove').hide()
+      }
+    )
+  })
   if (ENV.FEATURES?.rce_better_file_previewing) {
     $('a.preview_in_overlay').live('click', event => {
       let target = null

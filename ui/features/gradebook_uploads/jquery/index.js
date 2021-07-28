@@ -42,7 +42,7 @@ function shouldHighlightScoreChange(oldValue, newValue) {
 
 const GradebookUploader = {
   createGeneralFormatter(attribute) {
-    return function(row, cell, value) {
+    return function (row, cell, value) {
       return value ? htmlEscape(value[attribute]) : ''
     }
   },
@@ -52,7 +52,7 @@ const GradebookUploader = {
   },
 
   createNumberFormatter(attribute) {
-    return function(row, cell, value) {
+    return function (row, cell, value) {
       return value ? GradeFormatHelper.formatGrade(value[attribute]) : ''
     }
   },
@@ -105,7 +105,7 @@ const GradebookUploader = {
     delete uploadedGradebook.missing_objects
     delete uploadedGradebook.original_submissions
 
-    $.each(uploadedGradebook.assignments, function() {
+    $.each(uploadedGradebook.assignments, function () {
       const newGrade = {
         id: this.id,
         type: 'assignments',
@@ -120,7 +120,7 @@ const GradebookUploader = {
       }
 
       if (this.grading_type !== 'letter_grade') {
-        newGrade.editorFormatter = function(grade) {
+        newGrade.editorFormatter = function (grade) {
           return GradeFormatHelper.formatGrade(grade, {defaultValue: ''})
         }
         newGrade.editorParser = GradeFormatHelper.delocalizeGrade
@@ -195,12 +195,12 @@ const GradebookUploader = {
       })
     }
 
-    $.each(uploadedGradebook.students, function(index) {
+    $.each(uploadedGradebook.students, function (index) {
       const row = {
         student: this,
         id: this.id
       }
-      $.each(this.submissions, function() {
+      $.each(this.submissions, function () {
         if (
           shouldHighlightScoreChange(this.original_grade, this.grade) &&
           (this.grade || '').toUpperCase() !== 'EX'
@@ -212,7 +212,7 @@ const GradebookUploader = {
         row[this.assignment_id] = this
         row[`${this.assignment_id}_conflicting`] = this
       })
-      $.each(this.custom_column_data, function() {
+      $.each(this.custom_column_data, function () {
         if (this.current_content !== this.new_content) {
           rowsToHighlight.push({rowIndex: index, id: `custom_col_${this.column_id}`})
         }
@@ -294,12 +294,16 @@ const GradebookUploader = {
   },
 
   handleThingsNeedingToBeResolved() {
-    const processingDfd = waitForProcessing(ENV.progress)
-    processingDfd.fail(msg => {
-      alert(msg)
-      window.location = ENV.new_gradebook_upload_path
-    })
-    processingDfd.done(uploadedGradebook => {
+    return waitForProcessing(ENV.progress)
+      .then(uploadedGradebook => {
+        processUploadedGradebook(uploadedGradebook)
+      })
+      .catch(error => {
+        alert(error.message)
+        window.location = ENV.new_gradebook_upload_path
+      })
+
+    function processUploadedGradebook(uploadedGradebook) {
       const needingReview = {}
 
       // first, figure out if there is anything that needs to be resolved
@@ -309,21 +313,19 @@ const GradebookUploader = {
 
         needingReview[thing] = []
 
-        $.each(uploadedGradebook[`${thing}s`], function() {
+        $.each(uploadedGradebook[`${thing}s`], function () {
           if (!this.previous_id) {
             needingReview[thing].push(this)
           }
         })
 
         if (needingReview[thing].length) {
-          $select.change(function() {
-            $(this)
-              .next('.points_possible_section')
-              .css({opacity: 0})
+          $select.change(function () {
+            $(this).next('.points_possible_section').css({opacity: 0})
             if ($(this).val() > 0) {
               // if the thing that was selected is an id( not ignore or add )
               $(`#${thing}_resolution_template select option`).removeAttr('disabled')
-              $(`#${thing}_resolution_template select`).each(function() {
+              $(`#${thing}_resolution_template select`).each(function () {
                 if ($(this).val() != 'ignore') {
                   $(`#${thing}_resolution_template select`)
                     .not(this)
@@ -332,13 +334,11 @@ const GradebookUploader = {
                 }
               })
             } else if ($(this).val() === 'new') {
-              $(this)
-                .next('.points_possible_section')
-                .css({opacity: 1})
+              $(this).next('.points_possible_section').css({opacity: 1})
             }
           })
 
-          $.each(uploadedGradebook.missing_objects[`${thing}s`], function() {
+          $.each(uploadedGradebook.missing_objects[`${thing}s`], function () {
             $(
               `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`
             ).appendTo($select)
@@ -358,7 +358,7 @@ const GradebookUploader = {
               .appendTo(`#gradebook_importer_resolution_section .${thing}_section table tbody`)
               .show()
               .find('input.points_possible')
-              .change(function() {
+              .change(function () {
                 const $this = $(this)
                 record.points_possible = numberHelper.parse($this.val())
                 $this.val(I18n.n(record.points_possible))
@@ -373,13 +373,13 @@ const GradebookUploader = {
 
       if (needingReview.student.length || needingReview.assignment.length) {
         // if there are things that need to be resolved, set up stuff for that form
-        $('#gradebook_importer_resolution_section').submit(function(e) {
+        $('#gradebook_importer_resolution_section').submit(function (e) {
           let returnFalse = false
           e.preventDefault()
 
           $(this)
             .find('select')
-            .each(function() {
+            .each(function () {
               if (!$(this).val()) {
                 returnFalse = true
                 $(this).errorBox(I18n.t('errors.select_an_option', 'Please select an option'))
@@ -390,7 +390,7 @@ const GradebookUploader = {
 
           $(this)
             .find('select')
-            .each(function() {
+            .each(function () {
               const $select = $(this),
                 parts = $select.attr('name').split('_'),
                 thing = parts[0],
@@ -416,7 +416,7 @@ const GradebookUploader = {
                   obj.id = obj.previous_id = val
                   if (thing === 'assignment') {
                     // find the original grade for this assignment for each student
-                    $.each(uploadedGradebook.students, function() {
+                    $.each(uploadedGradebook.students, function () {
                       const student = this
                       const submission = _.find(
                         student.submissions,
@@ -434,7 +434,7 @@ const GradebookUploader = {
                     })
                   } else if (thing === 'student') {
                     // find the original grade for each assignment for this student
-                    $.each(obj.submissions, function() {
+                    $.each(obj.submissions, function () {
                       const submission = this
                       const original_submission = _.find(
                         uploadedGradebook.original_submissions,
@@ -469,7 +469,7 @@ const GradebookUploader = {
           })
           _.each(indexes_to_delete.reverse(), index => {
             uploadedGradebook.assignments.splice(index, 1)
-            $.each(uploadedGradebook.students, function() {
+            $.each(uploadedGradebook.students, function () {
               this.submissions.splice(index, 1)
             })
           })
@@ -484,7 +484,7 @@ const GradebookUploader = {
         // if there is nothing that needs to resolved, just skip to initialize slick grid.
         GradebookUploader.init(uploadedGradebook)
       }
-    })
+    }
   },
 
   addOverrideScoreChangeColumn(labelData, gridData, gradingPeriod = null) {

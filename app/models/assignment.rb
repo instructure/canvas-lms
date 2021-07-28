@@ -1414,7 +1414,7 @@ class Assignment < ActiveRecord::Base
     case grade.to_s
     when %r{^[+-]?\d*\.?\d+%$}
       # interpret as a percentage
-      percentage = grade.to_f / 100.0
+      percentage = grade.to_f / 100.0.to_d
       points_possible.to_f * percentage
     when %r{^[+-]?\d*\.?\d+$}
       if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
@@ -1720,7 +1720,6 @@ class Assignment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and
     can :attach_submission_comment_files and
-    can :manage_files and
     can :manage_files_add and
     can :manage_files_edit and
     can :manage_files_delete
@@ -2187,6 +2186,7 @@ class Assignment < ActiveRecord::Base
         # clear out attributes from prior submissions
         if opts[:submission_type].present?
           SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }
+          homework.attachment_ids = nil
           homework.late_policy_status = nil
           homework.seconds_late_override = nil
         end
@@ -2429,7 +2429,7 @@ class Assignment < ActiveRecord::Base
 
       if section_id.present?
         students = students.joins(:enrollments).
-          where(enrollments: {course_section_id: section_id, workflow_state: :active})
+          where(enrollments: {course_section_id: section_id, workflow_state: includes + [:active]})
       end
       students.to_a
     end
@@ -2900,6 +2900,14 @@ class Assignment < ActiveRecord::Base
     type_quiz_lti.where(submission_types: "external_tool")
   }
 
+  scope :with_important_dates, -> {
+    joins("LEFT JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.assignment_id=assignments.id")
+      .where(important_dates: true)
+      .where(
+        'assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)'
+      )
+  }
+
   def overdue?
     due_at && due_at <= Time.zone.now
   end
@@ -3107,7 +3115,7 @@ class Assignment < ActiveRecord::Base
     self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
-      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
+      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
       DueDateCacher.recompute(self, update_grades: true)
     end
@@ -3119,7 +3127,8 @@ class Assignment < ActiveRecord::Base
       will_save_change_to_workflow_state? || saved_change_to_workflow_state? ||
       will_save_change_to_only_visible_to_overrides? ||
       saved_change_to_only_visible_to_overrides? ||
-      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading?
+      will_save_change_to_moderated_grading? || saved_change_to_moderated_grading? ||
+      will_save_change_to_anonymous_grading? || saved_change_to_anonymous_grading?
   end
 
   def update_due_date_smart_alerts
@@ -3411,6 +3420,10 @@ class Assignment < ActiveRecord::Base
     @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
   end
 
+  def instructor_selectable_states_by_provisional_grade_id
+    @instructor_selectable_states_by_provisional_grade_id ||= instructor_selectable_states
+  end
+
   def moderated_grader_limit_reached?
     moderated_grading? && provisional_moderation_graders.count >= grader_count
   end
@@ -3662,6 +3675,14 @@ class Assignment < ActiveRecord::Base
     (final_grader_id.nil? || final_grader_id == grader.id) && context.grants_right?(grader, :manage_grades)
   end
 
+  def accepts_submission_type?(submission_type)
+    if submission_type == "basic_lti_launch"
+      submission_types =~ /online|external_tool/
+    else
+      submission_types_array.include?(submission_type)
+    end
+  end
+
   private
 
   def set_muted
@@ -3820,5 +3841,15 @@ class Assignment < ActiveRecord::Base
     self.automatic_peer_reviews = false
     self.anonymous_peer_reviews = false
     self.intra_group_peer_reviews = false
+  end
+
+  def instructor_selectable_states
+    return {} unless moderated_grading?
+
+    states = ['inactive', 'completed', 'deleted', 'invited']
+    active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
+    provisional_grades.each_with_object({}) do |provisional_grade, hash|
+      hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
+    end
   end
 end

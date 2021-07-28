@@ -1,4 +1,7 @@
 {
+    "access_the_pretty_html_editor_37168efe": {
+        "message": "الوصول إلى محرر HTML الأنيق"
+    },
     "accessibility_checker_b3af1f6c": {
         "message": "المتحقق من إمكانية الوصول"
     },
@@ -10,6 +13,9 @@
     },
     "add_cc_subtitles_55f0394e": {
         "message": "إضافة شرح مكتوب لأحداث العرض/أشرطة الترجمة"
+    },
+    "add_image_60b2de07": {
+        "message": "إضافة صورة"
     },
     "add_to_do_7537af64": {
         "message": "إضافة قائمة مهام"
@@ -37,6 +43,9 @@
     },
     "all_4321c3a1": {
         "message": "الكل"
+    },
+    "all_apps_a50dea49": {
+        "message": "كافة التطبيقات"
     },
     "all_day_fb42c4fc": {
         "message": "طوال اليوم"
@@ -119,8 +128,8 @@
     "attributes_963ba262": {
         "message": "السمات"
     },
-    "audio_and_video_recording_is_not_available_c7173efc": {
-        "message": "التسجيل الصوتي والمرئي غير متاح."
+    "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
+        "message": "تسجيل الصوت والفيديو غير مدعوم، يرجى استخدام مستعرض مختلف."
     },
     "audio_player_for_title_20cc70d": {
         "message": "مشغل الصوت لـ { title }"
@@ -137,6 +146,27 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "بداية سجل قائمة المهام الخاصة بك"
     },
+    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+        "message": "يوجد أدناه مثال على طريقة عرض الطلاب لجداولهم"
+    },
+    "button_color_608a0242": {
+        "message": "لون الزر"
+    },
+    "button_outline_cf14f071": {
+        "message": "إطار الزر"
+    },
+    "button_outline_size_cc1d1df7": {
+        "message": "حجم إطار الزر"
+    },
+    "button_shape_dbecb573": {
+        "message": "شكل الزر"
+    },
+    "button_size_20f5fce1": {
+        "message": "حجم الزر"
+    },
+    "buttons_and_icons_e66ee12c": {
+        "message": "الأزرار والأيقونات"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -146,9 +176,6 @@
     "calendar_event_89aadc1c": {
         "message": "حدث التقويم"
     },
-    "cancel_caeb1e68": {
-        "message": "إلغاء"
-    },
     "canvas_planner_98ed106": {
         "message": "مخطِط Canvas"
     },
@@ -157,6 +184,9 @@
     },
     "choose_usage_rights_33683854": {
         "message": "اختر حقوق الاستخدام..."
+    },
+    "circle_484abe63": {
+        "message": "الدائرة"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "قائمة دائرية غير المرتبة"
@@ -169,6 +199,9 @@
     },
     "clear_selected_file_filename_2fe8a58e": {
         "message": "مسح الملف المحدد: { filename }"
+    },
+    "click_or_shift_click_for_the_html_editor_25d70bb4": {
+        "message": "انقر أو نقرة + shift للوصول إلى محرر html."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "انقر لتضمين { imageName }"
@@ -200,6 +233,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "الطي لإخفاء { types }"
     },
+    "color_color_eb64b08": {
+        "message": "اللون { color }"
+    },
     "computer_1d7dfa6f": {
         "message": "الكمبيوتر"
     },
@@ -224,11 +260,17 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# من الفرص}\n    one {# فرصة}\n  other {# من الفرص}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {إخفاء # عنصر مفقود}\n  other {إخفاء # من العناصر المفقودة}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# عنصر محمّل}\n  other {# من العناصر محمّلة}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
         "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # من العناصر المكتملة}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+        "message": "{ count, plural,\n    one {إظهار # عنصر مفقود}\n  other {إظهار # من العناصر المفقودة}\n}"
     },
     "course_8a63b4a3": {
         "message": "المساق"
@@ -257,11 +299,11 @@
     "course_to_do_bcbbab54": {
         "message": "قائمة مهام { course }"
     },
+    "create_button_and_icon_5c089934": {
+        "message": "إنشاء زر وأيقونة"
+    },
     "creative_commons_license_725584ae": {
         "message": "ترخيص المشاع الإبداعي:"
-    },
-    "current_volume_level_c55ab825": {
-        "message": "مستوى الصوت الحالي"
     },
     "custom_6979cd81": {
         "message": "مخصص"
@@ -359,9 +401,6 @@
     "drag_a_file_here_1bf656d5": {
         "message": "إفلات ملف هنا"
     },
-    "drag_a_file_here_39357b48": {
-        "message": "إفلات ملف هنا"
-    },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
     },
@@ -425,17 +464,20 @@
     "error_loading_grades_e0b38f4d": {
         "message": "خطأ أثناء تحميل الدرجات"
     },
+    "error_loading_items_5218438e": {
+        "message": "خطأ أثناء تحميل العناصر"
+    },
     "error_loading_more_items_3f109d9f": {
         "message": "حدث خطأ في تحميل المزيد من العناصر"
     },
     "error_loading_past_items_2881dbb1": {
         "message": "حدث خطأ في تحميل العناصر السابقة"
     },
-    "error_uploading_video_audio_recording_16d9730a": {
-        "message": "خطأ في تحميل تسجيل الفيديو/الصوت"
-    },
     "excused_cf8792eb": {
         "message": "معفى"
+    },
+    "expand_preview_by_default_2abbf9f8": {
+        "message": "توسيع المعاينة افتراضيًا"
     },
     "expand_to_see_types_f5d29352": {
         "message": "التوسيع لرؤية { types }"
@@ -448,6 +490,21 @@
     },
     "extra_large_b6cdf1ff": {
         "message": "كبير جداً"
+    },
+    "extra_small_9ae33252": {
+        "message": "صغير للغاية"
+    },
+    "failed_peeking_into_your_future_e95b9306": {
+        "message": "تعذر اختلاس النظر في مستقبلك"
+    },
+    "failed_peeking_into_your_past_5bec2323": {
+        "message": "تعذر اختلاس النظر في ماضيك"
+    },
+    "failed_saving_changes_on_name_1e100ad": {
+        "message": "تعذر حفظ التغييرات على { name }."
+    },
+    "failed_to_delete_name_bdd7b810": {
+        "message": "تعذر حذف { name }."
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "تعذر حذف قائمة مهام"
@@ -463,9 +520,6 @@
     },
     "feedback_6dcc1991": {
         "message": "الملاحظات"
-    },
-    "file_name_8fd421ff": {
-        "message": "اسم الملف"
     },
     "file_upload_failed_af22dd91": {
         "message": "فشل تحميل الملف"
@@ -490,9 +544,6 @@
     },
     "files_index_af7c662b": {
         "message": "فهرس الملفات"
-    },
-    "finish_bc343002": {
-        "message": "إنهاء"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "شريط أدوات خيارات عنصر التركيز"
@@ -572,6 +623,24 @@
     "height_69b03e15": {
         "message": "الارتفاع"
     },
+    "hexagon_d8468e0d": {
+        "message": "سداسي"
+    },
+    "hide_description_bfb5502e": {
+        "message": "إخفاء الوصف"
+    },
+    "hide_title_description_caf092ef": {
+        "message": "إخفاء وصف { title }"
+    },
+    "home_351838cd": {
+        "message": "الصفحة الرئيسية"
+    },
+    "html_code_editor_fd967a44": {
+        "message": "محرر التعليمات البرمجية HTML"
+    },
+    "html_editor_fb2ab713": {
+        "message": "محرر HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "لقد حصلت على إذن لاستخدام هذا الملف."
     },
@@ -620,6 +689,12 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
     },
+    "jump_to_navigation_toolbar_2952cd8b": {
+        "message": "الانتقال إلى شريط أدوات التنقل"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "ابدأ اليوم"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "اختصارات لوحة المفاتيح"
     },
@@ -640,15 +715,6 @@
     },
     "links_14b70841": {
         "message": "الارتباطات"
-    },
-    "list_collapsed_9ac35920": {
-        "message": "تم طي القائمة."
-    },
-    "list_collapsed_dde87718": {
-        "message": "تم طي القائمة"
-    },
-    "list_expanded_efec2d0": {
-        "message": "تم توسيع القائمة."
     },
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
@@ -686,9 +752,6 @@
     "loading_grades_c842c887": {
         "message": "جارٍ تحميل الدرجات"
     },
-    "loading_media_f3455841": {
-        "message": "جارٍ تحميل الوسائط"
-    },
     "loading_past_items_ca499e75": {
         "message": "جارٍ تحميل العناصر السابقة"
     },
@@ -713,9 +776,6 @@
     "medium_5a8e9ead": {
         "message": "متوسط"
     },
-    "mic_a7f3d311": {
-        "message": "الميكروفون"
-    },
     "miscellaneous_e9818229": {
         "message": "متنوعات"
     },
@@ -736,6 +796,9 @@
     },
     "my_grades_98834476": {
         "message": "درجاتي"
+    },
+    "my_images_427f9b0c": {
+        "message": "صوري"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "تنقل من خلال القائمة أو شريط الأدوات"
@@ -770,6 +833,9 @@
     "no_grade_3b4d7f3e": {
         "message": "لا توجد أي درجة"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "لا توجد معاينة متوفرة لهذا الملف."
+    },
     "no_results_940393cf": {
         "message": "لا توجد نتائج."
     },
@@ -779,8 +845,11 @@
     "no_results_found_for_term_1564c08e": {
         "message": "لم يتم العثور على نتائج لـ { term }."
     },
-    "no_video_1ed00b26": {
-        "message": "لا يوجد مقطع فيديو"
+    "none_3b5e34d2": {
+        "message": "بلا"
+    },
+    "nothing_due_this_week_d45c9ef9": {
+        "message": "لا شيء مستحق هذا الأسبوع"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "لا شيء موجود الآن"
@@ -806,17 +875,20 @@
     "numpoints_points_8621a43b": {
         "message": "{ numPoints } من النقاط"
     },
+    "octagon_e48be9f": {
+        "message": "ثماني"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*إظهار أحدث فترة تقييم فقط."
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
     },
+    "open_title_application_fd624fc5": {
+        "message": "فتح تطبيق { title }"
+    },
     "opportunities_popup_f6703842": {
         "message": "النافذة المنبثقة للفرص"
-    },
-    "option_selected_list_collapsed_e00180ff": {
-        "message": "تم تحديد { option }. تم طي القائمة."
     },
     "optional_add_course_ef0d70fc": {
         "message": "اختياري: إضافة مساق"
@@ -842,9 +914,6 @@
     "paragraph_5e5ad8eb": {
         "message": "الفقرة"
     },
-    "pause_12af3bb4": {
-        "message": "إيقاف مؤقت"
-    },
     "peer_review_74f26a13": {
         "message": "المراجعة النظيرة"
     },
@@ -853,12 +922,6 @@
     },
     "people_b4ebb13c": {
         "message": "أشخاص"
-    },
-    "play_1a47eaa7": {
-        "message": "تشغيل"
-    },
-    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
-        "message": "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
     },
     "points_bceb5005": {
         "message": "نقاط"
@@ -872,11 +935,17 @@
     "preformatted_d0670862": {
         "message": "منسق مسبقًا"
     },
+    "pretty_html_editor_28748756": {
+        "message": "محرر HTML الأنيق"
+    },
     "preview_53003fd2": {
         "message": "معاينة"
     },
-    "preview_a3f8f854": {
-        "message": "معاينة"
+    "preview_in_overlay_ed772c46": {
+        "message": "المعاينة بشكل متراكب"
+    },
+    "preview_inline_9787330": {
+        "message": "معاينة مضمّنة"
     },
     "previous_month_bb1e3c84": {
         "message": "الشهر السابق"
@@ -905,17 +974,14 @@
     "raw_html_editor_e3993e41": {
         "message": "محرر HTML الأولي"
     },
-    "reading_a_media_track_file_failed_aborting_be051b20": {
-        "message": "فشلت قراءة ملف مسار الوسائط. جارٍ الإيقاف قبل الاكتمال."
-    },
     "record_7c9448b": {
         "message": "تسجيل"
     },
     "record_upload_media_5fdce166": {
         "message": "تسجيل/تحميل الوسائط"
     },
-    "recording_98da6bda": {
-        "message": "جارٍ التسجيل"
+    "redo_363c58b7": {
+        "message": "إعادة"
     },
     "reminder_date_4564d12d": {
         "message": "التذكير: { date }"
@@ -926,6 +992,9 @@
     "replies_4a8577c8": {
         "message": "ردود"
     },
+    "resize_ec83d538": {
+        "message": "تغيير الحجم"
+    },
     "restore_auto_save_deccd84b": {
         "message": "استعادة الحفظ التلقائي؟"
     },
@@ -935,8 +1004,17 @@
     "right_to_left_9cfb092a": {
         "message": "من اليمين إلى اليسار"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
+    },
     "save_11a80ec3": {
         "message": "حفظ"
+    },
+    "saved_buttons_and_icons_8278eed2": {
+        "message": "الأزرار والأيقونات المحفوظة"
+    },
+    "schedule_preview_3bcda153": {
+        "message": "جدولة معاينة"
     },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "قم بالتمرير للأعلى للاطلاع على السجل!"
@@ -950,14 +1028,14 @@
     "search_term_b2d2235": {
         "message": "مصطلح البحث"
     },
-    "select_app_3d08035a": {
-        "message": "حدد التطبيق"
-    },
     "select_language_7c93a900": {
         "message": "اختر اللغة"
     },
     "selected_274ce24f": {
         "message": "تم التحديد"
+    },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
     },
     "show_all_ae37d610": {
         "message": "عرض الكل"
@@ -989,9 +1067,6 @@
     "something_went_wrong_89195131": {
         "message": "حدث خطأ ما."
     },
-    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
-        "message": "حدث خطأ ما أثناء الوصول إلى الميكروفون أو كاميرا الويب الخاصة بك."
-    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
     },
@@ -1010,14 +1085,14 @@
     "sort_by_e75f9e3e": {
         "message": "الفزر حسب"
     },
+    "square_511eb3b3": {
+        "message": "مربع"
+    },
     "square_unordered_list_b15ce93b": {
         "message": "قائمة مربعة غير مرتبة"
     },
-    "start_over_f7552aa9": {
-        "message": "البدء مرة أخرى"
-    },
-    "start_recording_9a65141a": {
-        "message": "بدء التسجيل"
+    "star_8d156e09": {
+        "message": "نجمة"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } إلى { endDate }"
@@ -1055,11 +1130,11 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
     },
-    "switch_to_raw_html_editor_4c9ac7de": {
-        "message": "التبديل إلي محرر html أولي"
+    "switch_to_the_html_editor_146dfffd": {
+        "message": "التبديل إلي محرر html"
     },
-    "switch_to_rich_text_editor_35822d26": {
-        "message": "التبديل إلى محرر نص منسق"
+    "switch_to_the_rich_text_editor_63c1ecf6": {
+        "message": "التبديل إلى محرر النص المنسق"
     },
     "syllabus_f191f65b": {
         "message": "المناهج"
@@ -1085,8 +1160,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "المادة خاضعة لاستثناء - مثال استخدام عادل أو حق الاقتباس أو استثناءات أخرى بموجب قوانين حقوق النشر المعمول بها"
     },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. اضغط على Shift-O لفتح محرر HTML البسيط."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "لا توجد نقاط مقترنة بهذا العنصر"
+    },
+    "there_is_nothing_planned_for_today_e09bfc8c": {
+        "message": "لا يوجد شيء مخطط اليوم."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."
@@ -1121,6 +1202,9 @@
     "today_at_date_8ac30d6": {
         "message": "اليوم الساعة { date }"
     },
+    "toggle_summary_group_413df9ac": {
+        "message": "تبديل مجموعة { summary }"
+    },
     "tomorrow_9a6c9a00": {
         "message": "غدًا"
     },
@@ -1136,6 +1220,9 @@
     "tray_839df38a": {
         "message": "العلبة"
     },
+    "triangle_6072304e": {
+        "message": "مثلث"
+    },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "اضغط على Control F9 للوصول إلى اختيارات الصورة. { text }"
     },
@@ -1150,9 +1237,6 @@
     },
     "unpublished_dfd8801": {
         "message": "غير منشور"
-    },
-    "untitled_16aa4f2b": {
-        "message": "بدون عنوان"
     },
     "upload_document_253f0478": {
         "message": "تحميل المستند"
@@ -1172,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "تحميل/تسجيل الوسائط"
     },
+    "uploading_closed_captions_subtitles_failed_bc093f3": {
+        "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
+    },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
     },
@@ -1189,6 +1276,15 @@
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
+    },
+    "use_arrow_keys_to_select_a_shape_c8eb57ed": {
+        "message": "استخدم مفاتيح الأسهم لتحديد شكل."
+    },
+    "use_arrow_keys_to_select_a_size_699a19f4": {
+        "message": "استخدم مفاتيح الأسهم لتحديد حجم."
+    },
+    "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
+        "message": "استخدم مفاتيح الأسهم لتحديد حجم الإطار."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف محتوى الصور"
@@ -1208,17 +1304,11 @@
     "user_media_14fbf656": {
         "message": "وسائط المستخدم"
     },
-    "video_audio_recording_uploaded_6af5d378": {
-        "message": "تم تحميل تسجيل الفيديو/الصوت"
-    },
     "video_options_24ef6e5d": {
         "message": "خيارات الفيديو"
     },
     "video_options_tray_3b9809a5": {
         "message": "علبة خيارات الفيديو"
-    },
-    "video_player_b371005": {
-        "message": "مشغل الفيديو"
     },
     "video_player_for_9e7d373b": {
         "message": "مشغل الفيديو لـ "
@@ -1229,11 +1319,26 @@
     "view_ba339f93": {
         "message": "عرض"
     },
+    "view_description_30446afc": {
+        "message": "عرض الوصف"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "عرض اختصارات لوحة المفاتيح"
     },
-    "webcam_fe91b20f": {
-        "message": "كاميرا الويب"
+    "view_next_week_7f61f755": {
+        "message": "عرض الأسبوع القادم"
+    },
+    "view_predefined_colors_92f5db39": {
+        "message": "عرض الألوان المحددة مسبقًا"
+    },
+    "view_previous_week_6f83849f": {
+        "message": "عرض الأسبوع السابق"
+    },
+    "view_title_description_67940918": {
+        "message": "عرض وصف { title }"
+    },
+    "weekly_schedule_navigation_6b042645": {
+        "message": "التنقل للجدول الأسبوعي"
     },
     "width_492fec76": {
         "message": "العرض"
@@ -1267,8 +1372,5 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "قد تكون كاميرا الويب الخاصة بك قيد الاستخدام بالفعل."
     }
 }

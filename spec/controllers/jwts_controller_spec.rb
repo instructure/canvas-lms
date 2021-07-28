@@ -21,8 +21,8 @@ require_relative '../spec_helper'
 
 describe JwtsController do
   include_context "JWT setup"
-  let(:token_user){ user_factory(active_user: true) }
-  let(:other_user){ user_factory(active_user: true) }
+  let(:token_user){ user_with_pseudonym }
+  let(:other_user){ user_with_pseudonym }
   let(:translate_token) do
     ->(resp){
       utf8_token_string = json_parse(resp.body)['token']
@@ -40,13 +40,6 @@ describe JwtsController do
 
     context "with valid user session" do
       before(:each){ user_session(token_user) }
-      let(:translate_token) do
-        ->(resp){
-          utf8_token_string = json_parse(resp.body)['token']
-          decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
-          return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
-        }
-      end
 
       it "generates a base64 encoded token for a user session with env var secrets" do
         post 'create', format: 'json'
@@ -62,10 +55,11 @@ describe JwtsController do
     end
 
     it "doesn't allow using a token to gen a token" do
-      token = Canvas::Security::ServicesJwt.generate({ sub: token_user.global_id })
+      token = build_wrapped_token(token_user.global_id)
       @request.headers['Authorization'] = "Bearer #{token}"
       get 'create', format: 'json'
-      expect(response.status).to_not eq(200)
+      expect(response.status).to eq(403)
+      expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
   end
 
@@ -77,10 +71,11 @@ describe JwtsController do
     end
 
     it "doesn't allow using a token to gen a token" do
-      token = Canvas::Security::ServicesJwt.generate({ sub: token_user.global_id })
+      token = build_wrapped_token(token_user.global_id)
       @request.headers['Authorization'] = "Bearer #{token}"
       get 'refresh', format: 'json'
-      expect(response.status).to_not eq(200)
+      expect(response.status).to eq(403)
+      expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
 
     context "with valid user session" do

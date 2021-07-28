@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "active_record/pg_extensions/all"
+
 class QuotedValue < String
 end
 
@@ -42,7 +44,7 @@ module PostgreSQLAdapterExtensions
 
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
-    @readonly = (select_value("SELECT pg_is_in_recovery();") == true)
+    @readonly = in_recovery?
   end
 
   def bulk_insert(table_name, records)
@@ -72,35 +74,6 @@ module PostgreSQLAdapterExtensions
       hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
       value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
     end
-  end
-
-  def add_foreign_key(from_table, to_table, delay_validation: false, if_not_exists: false, **options)
-    raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && delay_validation
-
-    # pointless if we're in a transaction
-    delay_validation = false if open_transactions > 0
-    options[:column] ||= "#{to_table.to_s.singularize}_id"
-    column = options[:column]
-
-    foreign_key_name = foreign_key_name(from_table, options)
-
-    if if_not_exists || delay_validation
-      schema = quote(shard.name)
-      valid = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}", "SCHEMA")
-      return if valid == true && if_not_exists
-    end
-
-    if delay_validation
-      options[:validate] = false
-      # NOT VALID doesn't fully work through 9.3 at least, so prime the cache to make
-      # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
-      # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
-      # query to be warm
-      execute("SELECT fk.#{column} FROM #{quote_table_name(from_table)} fk LEFT OUTER JOIN #{quote_table_name(to_table)} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
-    end
-
-    super(from_table, to_table, **options) unless valid == false
-    validate_constraint(from_table, foreign_key_name) if delay_validation
   end
 
   def set_standard_conforming_strings
@@ -200,34 +173,6 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
-  def add_index(table_name, column_name, options = {})
-    # catch a concurrent index add that fails because it already exists, and is invalid
-    if options[:algorithm] == :concurrently || options[:if_not_exists]
-      column_names = index_column_names(column_name)
-      index_name = options[:name].to_s if options.key?(:name)
-      index_name ||= index_name(table_name, column_names)
-
-      schema = shard.name
-
-      valid = select_value(<<~SQL, 'SCHEMA')
-            SELECT indisvalid
-            FROM pg_class t
-            INNER JOIN pg_index d ON t.oid = d.indrelid
-            INNER JOIN pg_class i ON d.indexrelid = i.oid
-            WHERE i.relkind = 'i'
-              AND i.relname = '#{index_name}'
-              AND t.relname = '#{table_name}'
-              AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
-            LIMIT 1
-      SQL
-      remove_index(table_name, name: index_name, algorithm: :concurrently) if valid == false && options[:algorithm] == :concurrently
-      return if options[:if_not_exists] && valid == true
-    end
-    # CANVAS_RAILS6_1: can stop doing this in Rails 6.2, when it's natively supported
-    options.delete(:if_not_exists)
-    super
-  end
-
   if CANVAS_RAILS6_0
     def remove_index(table_name, options = {})
       table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
@@ -317,42 +262,6 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def extension_installed?(extension)
-    @extensions ||= {}
-    @extensions.fetch(extension) do
-      select_value(<<~SQL)
-        SELECT nspname
-        FROM pg_extension
-          INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid
-        WHERE extname='#{extension}'
-      SQL
-    end
-  end
-
-  def extension_available?(extension)
-    select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
-  end
-
-  # temporarily adds schema to the search_path (i.e. so you can use an extension that won't work
-  # using qualified names)
-  def add_schema_to_search_path(schema)
-    if schema_search_path.split(',').include?(schema)
-      yield
-    else
-      old_search_path = schema_search_path
-      transaction(requires_new: true) do
-        self.schema_search_path += ",#{schema}"
-        yield
-        self.schema_search_path = old_search_path
-      rescue ActiveRecord::StatementInvalid, ActiveRecord::Rollback
-        # the transaction rolling back will revert the search path change;
-        # we don't need to do another query to set it
-        @schema_search_path = old_search_path
-        raise
-      end
-    end
-  end
-
   # we no longer use any triggers, so we removed hair_trigger,
   # but don't want to go modifying all the old migrations, so just
   # make them dummies
@@ -376,25 +285,6 @@ module PostgreSQLAdapterExtensions
 
   def drop_trigger(name, table, generated: false)
     execute("DROP TRIGGER IF EXISTS #{name} ON #{quote_table_name(table)};\nDROP FUNCTION IF EXISTS #{quote_table_name(name)}();\n")
-  end
-
-  # does a query first to warm the db cache, to make the actual constraint adding fast
-  def change_column_null(table, column, nullness, default = nil)
-    # no point in pre-warming the cache to avoid locking if we're already in a transaction
-    return super if nullness != false || default || open_transactions != 0
-    transaction do
-      execute("SET LOCAL enable_indexscan=false")
-      execute("SET LOCAL enable_bitmapscan=false")
-      execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL")
-      raise ActiveRecord::Rollback
-    end
-    super
-  end
-
-  def initialize_type_map(m = type_map)
-    m.register_type "pg_lsn", ActiveRecord::ConnectionAdapters::PostgreSQL::OID::SpecializedString.new(:pg_lsn)
-
-    super
   end
 
   def icu_collations
@@ -430,29 +320,6 @@ module PostgreSQLAdapterExtensions
   ensure
     @collations = nil
     I18n.locale = original_locale
-  end
-
-  def current_wal_lsn
-    unless instance_variable_defined?(:@has_wal_func)
-      @has_wal_func = select_value("SELECT true FROM pg_proc WHERE proname IN ('pg_current_wal_lsn','pg_current_xlog_location') LIMIT 1")
-    end
-    return unless @has_wal_func
-
-    if postgresql_version >= 100000
-      select_value("SELECT pg_current_wal_lsn()")
-    else
-      select_value("SELECT pg_current_xlog_location()")
-    end
-  end
-
-  def set_replica_identity(table, identity)
-    identity_clause = case identity
-                      when :default, :full, :nothing
-                        identity.to_s.upcase
-                      else
-                        "USING INDEX #{quote_column_name(identity)}"
-                      end
-    execute("ALTER TABLE #{quote_table_name(table)} REPLICA IDENTITY #{identity_clause}")
   end
 
   class AbortExceptionMatcher

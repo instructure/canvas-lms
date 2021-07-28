@@ -22,9 +22,10 @@ import {mount} from 'enzyme'
 import {
   FAILURE,
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
+  SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   STARTED
-} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
-import ReleaseButton from 'ui/features/assignment_grade_summary/react/components/ReleaseButton.js'
+} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
+import ReleaseButton from 'ui/features/assignment_grade_summary/react/components/ReleaseButton'
 
 QUnit.module('GradeSummary ReleaseButton', suiteHooks => {
   let props
@@ -146,6 +147,22 @@ QUnit.module('GradeSummary ReleaseButton', suiteHooks => {
     test('calls the onClick prop when clicked', () => {
       wrapper.find('button').simulate('click')
       strictEqual(props.onClick.callCount, 1)
+    })
+  })
+
+  QUnit.module('when there are graders with inactive enrollment', () => {
+    test('enables onClick when releaseGradesStatus is null', () => {
+      props.releaseGradesStatus = null
+      mountComponent()
+      wrapper.find('button').simulate('click')
+      strictEqual(props.onClick.callCount, 1)
+    })
+
+    test('disables onClick when releaseGradesStatus is SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS', () => {
+      props.releaseGradesStatus = SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS
+      mountComponent()
+      wrapper.find('button').simulate('click')
+      strictEqual(props.onClick.callCount, 0)
     })
   })
 })

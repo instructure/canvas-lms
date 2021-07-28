@@ -185,6 +185,7 @@ export class Grouping extends Component {
           dateStyle={item.dateStyle}
           timeZone={this.props.timeZone}
           simplifiedControls={this.props.simplifiedControls}
+          readOnly={item.readOnly}
         />
       </li>
     ))
@@ -280,7 +281,7 @@ export class Grouping extends Component {
 
   renderGroupLink() {
     if (this.props.singleCourseView) return null
-    if (!this.props.title) {
+    if (!this.props.title || this.props.items[0].readOnly) {
       return (
         <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>
           {this.renderGroupLinkBackground()}

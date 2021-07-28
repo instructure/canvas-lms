@@ -1666,6 +1666,25 @@ describe Quizzes::QuizzesController do
         end
       end
     end
+
+    it "creates assignment with important dates when site admin flag enabled" do
+      Account.site_admin.enable_feature!(:important_dates)
+
+      user_session(@teacher)
+      ag = @course.assignment_groups.create! name: 'teh group'
+      post 'create', params: {
+        course_id: @course.id,
+        quiz: {
+          title: 'important dates quiz',
+          quiz_type: 'assignment',
+          assignment_group_id: ag.id
+        },
+        important_dates: true
+      }
+      expect(assigns[:quiz]).not_to be_nil
+      expect(assigns[:quiz].assignment.important_dates).to be true
+      expect(response).to be_successful
+    end
   end
 
   describe "PUT 'update'" do
@@ -1792,6 +1811,19 @@ describe Quizzes::QuizzesController do
             expect(response).to be_redirect
             expect(flash[:error]).to match(/failed to update/)
             expect(@quiz.reload.title).not_to eq 'overrides'
+          end
+
+          it 'saves important dates with site admin flag enabled' do
+            Account.site_admin.enable_feature!(:important_dates)
+
+            post 'update', params: {
+              course_id: @course.id,
+              id: @quiz.id,
+              important_dates: true
+            }
+            expect(response).to be_redirect
+            expect(flash[:error]).to be_nil
+            expect(@quiz.reload.assignment.important_dates).to be true
           end
         end
       end

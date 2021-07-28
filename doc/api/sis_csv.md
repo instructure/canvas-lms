@@ -188,12 +188,9 @@ LDAP), this will be their username from the remote system.</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
-<p>Setting the password will in most cases log the user out of Canvas. If
-the user has managed to change their password in Canvas they will not be
-affected by this.  This latter case would happen if your institution
-transitioned from using Canvas authentication to a SSO solution.
-For this reason it is important to not set this if you are using LDAP or an
-SSO protocol.</p>
+<p>Setting the password will in most cases log the user out of Canvas. The
+password can only be set one time. If the password has been set by the user
+or a previous sis import, it will not be changed.</p>
 </td>
 </tr>
 <tr>
@@ -710,8 +707,7 @@ enrollments.csv
 <td>✓&#42;</td>
 <td></td>
 <td>student, teacher, ta, observer, designer, or a custom role defined
-by the account</td>
-</tr>
+by the account. When using a custom role, the name is case sensitive.</td></tr>
 <tr>
 <td>role_id</td>
 <td>text</td>
@@ -1095,7 +1091,8 @@ admins.csv
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>AccountAdmin, or a custom role defined by the account</td>
+<td>AccountAdmin, or a custom role defined by the account.
+ When using a custom role, the name is case sensitive.</td>
 </tr>
 <tr>
 <td>status</td>
@@ -1175,12 +1172,9 @@ LDAP), this will be their username from the remote system.</td>
 <td><p>If the account is configured to use LDAP or an SSO protocol then
 this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
-<p>Setting the password will in most cases log the user out of Canvas. If
-the user has managed to change their password in Canvas they will not be
-affected by this.  This latter case would happen if your institution
-transitioned from using Canvas authentication to a SSO solution.
-For this reason it is important to not set this if you are using LDAP or an
-SSO protocol.</p>
+<p>Setting the password will in most cases log the user out of Canvas. The
+password can only be set one time. If the password has been set by the user
+or a previous sis import, it will not be changed.</p>
 </td>
 </tr>
 <tr>

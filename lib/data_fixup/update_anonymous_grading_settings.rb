@@ -24,7 +24,7 @@ module DataFixup::UpdateAnonymousGradingSettings
       where("courses.id >= ? AND courses.id <= ?", start_at, end_at).
       where(feature_flags: {feature: 'anonymous_grading', state: 'on'})
 
-    courses_to_disable.find_each(start: 0) do |course|
+    courses_to_disable.find_each(strategy: :id) do |course|
       course.assignments.except(:order).
         where.not(anonymous_grading: true).
         in_batches.update_all(anonymous_grading: true)
@@ -42,7 +42,7 @@ module DataFixup::UpdateAnonymousGradingSettings
       where("accounts.id >= ? AND accounts.id <= ?", start_at, end_at).
       where(feature_flags: {feature: 'anonymous_grading', state: 'on'})
 
-    accounts_to_disable.find_each(start: 0) do |account|
+    accounts_to_disable.find_each(strategy: :id) do |account|
       # If an account has the feature flag forced to ON, we need to get all
       # the courses belonging to that account and every account below it.
       # That said, we don't actually need do any work on said courses (since

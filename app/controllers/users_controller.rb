@@ -390,6 +390,7 @@ class UsersController < ApplicationController
   def api_index
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
+
     search_term = params[:search_term].presence
     page_opts = {}
     if search_term
@@ -482,12 +483,24 @@ class UsersController < ApplicationController
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
+    # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
+    @current_user.reload
+    k5_disabled = k5_disabled?
+    k5_user = k5_user?(false)
+    js_env({K5_USER: k5_user && !k5_disabled}, true)
+
+    if k5_user?
+      # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
+      active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
+      js_env({HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all?{|c| c.tab_hidden?(Course::TAB_GRADES) }})
+    end
+
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
-        :custom_colors => @current_user.custom_colors,
+        :custom_colors => @current_user.custom_colors
       },
       :STUDENT_PLANNER_ENABLED => planner_enabled?,
       :STUDENT_PLANNER_COURSES => planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
@@ -496,7 +509,10 @@ class UsersController < ApplicationController
       :PERMISSIONS => {
         :create_courses_as_admin => @current_user.roles(@domain_root_account).include?('admin'),
         :create_courses_as_teacher => @domain_root_account.grants_right?(@current_user, session, :create_courses)
-      }
+      },
+      :CAN_ENABLE_K5_DASHBOARD => k5_disabled && k5_user,
+      :SELECTED_CONTEXT_CODES => @current_user.get_preference(:selected_calendar_contexts),
+      :SELECTED_CONTEXTS_LIMIT => @domain_root_account.settings[:calendar_contexts_limit] || 10
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -507,8 +523,7 @@ class UsersController < ApplicationController
     end
 
     if k5_user?
-      css_bundle :k5_dashboard
-      css_bundle :dashboard_card
+      css_bundle :k5_common, :k5_dashboard, :dashboard_card
       js_bundle :k5_dashboard
     else
       css_bundle :dashboard
@@ -1276,12 +1291,19 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
       includes = api_show_includes
-
       # would've preferred to pass User.with_last_login as the collection to
       # api_find but the implementation of that scope appears to be incompatible
       # with what api_find does
       if includes.include?('last_login')
-        @user.last_login = User.with_last_login.find(@user.id).read_attribute(:last_login)
+        pseudonyms =
+          SisPseudonym.for(
+            @user,
+            @domain_root_account,
+            type: :implicit,
+            require_sis: false,
+            include_all_pseudonyms: true
+          )
+        @user.last_login = pseudonyms.max_by(&:current_login_at).current_login_at
       end
 
       render json: user_json(@user, @current_user, session, includes, @domain_root_account),
@@ -1528,7 +1550,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled).freeze
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled).freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1549,6 +1571,10 @@ class UsersController < ApplicationController
   #
   # @argument comment_library_suggestions_enabled [Boolean]
   #   If true, suggestions within the comment library will be shown.
+  #
+  # @argument elementary_dashboard_disabled [Boolean]
+  #   If true, will display the user's preferred class Canvas dashboard
+  #   view instead of the canvas for elementary view.
   #
   # @example_request
   #

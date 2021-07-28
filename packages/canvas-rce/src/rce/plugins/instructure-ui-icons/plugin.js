@@ -135,11 +135,18 @@ tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
 
     buttons: {
       src: `
-        <svg width="18" height="18" viewBox="0 0 1920 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="53.4444" y="53.4444" width="796.64" height="796.64" stroke="#2D3B45" stroke-width="106.889" fill="none"/>
-          <circle cx="1468.24" cy="451.765" r="398.32" stroke="#2D3B45" stroke-width="106.889" fill="none"/>
-          <path d="M817.067 1069.91L451.777 1800.49L86.4873 1069.91L817.067 1069.91Z" stroke="#2D3B45" stroke-width="106.889" fill="none"/>
-          <path d="M1471.29 1861.78L1069.92 1661.09V1275.38L1468.24 1076.22L1866.56 1275.38V1713.55L1471.29 1861.78Z" stroke="#2D3B45" stroke-width="106.889" fill="none"/>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
+          <g fill="#2D3B45" clip-path="url(#clip0)">
+            <path fill-rule="evenodd" d="M.999993 11l.000001 6H6.99999v-6H.999993zm-.99999933 7H7.99999v-8H-.00000668l3.5e-7 8zM4 7c1.65685 0 3-1.34315 3-3S5.65685 1 4 1 1 2.34315 1 4s1.34315 3 3 3zm0 1c2.20914 0 4-1.79086 4-4S6.20914 0 4 0-3e-7 1.79086-3e-7 4 1.79086 8 4 8z" clip-rule="evenodd"/>
+            <path d="M12.5 10h1v8h-1v-8z"/>
+            <path d="M17 13.5v1H9v-1h8z"/>
+            <path fill-rule="evenodd" d="M13 0L8.66987 7.5h8.66023L13 0zm0 2l-2.5981 4.5h5.1962L13 2z" clip-rule="evenodd"/>
+          </g>
+          <defs>
+            <clipPath id="clip0">
+              <path fill="white" d="M0 0h18v18H0z"/>
+            </clipPath>
+          </defs>
         </svg>
       `
     }

@@ -18,6 +18,7 @@
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {Assignment} from './Assignment'
+import {Attachment} from './Attachment'
 import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
@@ -39,7 +40,9 @@ export const Discussion = {
       updatedAt
       postedAt
       requireInitialPost
+      initialPostRequiredForCurrentUser
       isSectionSpecific
+      isAnnouncement
       discussionType
       allowRating
       onlyGradersCanRate
@@ -51,11 +54,8 @@ export const Discussion = {
         unreadCount
         repliesCount
       }
-      author {
-        ...User
-      }
-      editor {
-        ...User
+      attachment {
+        ...Attachment
       }
       assignment {
         ...Assignment
@@ -76,7 +76,7 @@ export const Discussion = {
         ...RootTopic
       }
     }
-    ${User.fragment}
+    ${Attachment.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}
     ${Section.fragment}
@@ -94,7 +94,9 @@ export const Discussion = {
     updatedAt: string,
     postedAt: string,
     requireInitialPost: bool,
+    initialPostRequiredForCurrentUser: bool,
     isSectionSpecific: bool,
+    isAnnouncement: bool,
     discussionType: string,
     allowRating: bool,
     onlyGradersCanRate: bool,
@@ -108,6 +110,7 @@ export const Discussion = {
     }),
     author: User.shape,
     editor: User.shape,
+    attachment: Attachment.shape,
     assignment: Assignment.shape,
     permissions: DiscussionPermissions.shape,
     courseSections: arrayOf(Section.shape),
@@ -127,7 +130,9 @@ export const Discussion = {
     updatedAt = '2021-04-22T12:41:56-06:00',
     postedAt = '2020-11-23T11:40:44-07:00',
     requireInitialPost = false,
+    initialPostRequiredForCurrentUser = false,
     isSectionSpecific = false,
+    isAnnouncement = false,
     discussionType = 'threaded',
     allowRating = true,
     onlyGradersCanRate = false,
@@ -140,8 +145,9 @@ export const Discussion = {
       repliesCount: 56,
       __typename: 'DiscussionEntryCounts'
     },
-    author = User.mock({_id: '1', name: 'Charles Xavier'}),
-    editor = User.mock({_id: '1', name: 'Charles Xavier'}),
+    author = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    editor = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    attachment = Attachment.mock(),
     assignment = Assignment.mock(),
     permissions = DiscussionPermissions.mock(),
     courseSections = [Section.mock()],
@@ -163,7 +169,9 @@ export const Discussion = {
     updatedAt,
     postedAt,
     requireInitialPost,
+    initialPostRequiredForCurrentUser,
     isSectionSpecific,
+    isAnnouncement,
     discussionType,
     allowRating,
     onlyGradersCanRate,
@@ -174,6 +182,7 @@ export const Discussion = {
     entryCounts,
     author,
     editor,
+    attachment,
     assignment,
     permissions,
     courseSections,

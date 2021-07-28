@@ -28,6 +28,8 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
   argument :target_context_id, ID, required: true
   argument :target_context_type, String, required: true
 
+  field :progress, Types::ProgressType, null: true
+
   VALID_CONTEXTS = %w[Account Course].freeze
 
   def resolve(input:)
@@ -83,12 +85,12 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
       # If optional source context provided, then check that
       # matches the group's context
+      source_context ||= group.context
       if source_context && source_context != group.context
         raise GraphQL::ExecutionError, I18n.t('source context does not match group context')
       end
 
       # source has to be global or in an associated account
-      source_context = group.context
       unless !source_context || target_context.associated_accounts.include?(source_context)
         raise GraphQL::ExecutionError, I18n.t('invalid context for group')
       end
@@ -98,8 +100,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         raise GraphQL::ExecutionError, I18n.t('cannot import a root group')
       end
 
-      # TODO: OUT-4153 Import group into context
-      return {}
+      return process_job(source_context: source_context, group: group, target_context: target_context)
     elsif (outcome_id = input[:outcome_id].presence)
       # Import the selected outcome into the given context
 
@@ -113,13 +114,189 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         )
       end
 
-      # TODO: OUT-4153 Import outcomes into context
-      return {}
+      return process_job(source_context: source_context, outcome_id: outcome_id, target_context: target_context)
     end
 
     validation_error(
       I18n.t('Either groupId or outcomeId values are required')
     )
+  end
+
+  class << self
+    def execute(progress, source_context, group, outcome_id, target_context)
+      if outcome_id
+        import_single_outcome(progress, source_context, outcome_id, target_context)
+      else
+        import_group(progress, group, target_context)
+      end
+    end
+
+    private
+
+    def import_single_outcome(progress, source_context, outcome_id, target_context)
+      source_outcome_group = get_outcome_group(outcome_id, source_context)
+      unless source_outcome_group
+        progress.message = I18n.t(
+          "Could not import Learning Outcome %{outcome_id} because it doesn't belong to any group",
+          outcome_id: outcome_id.to_s
+        )
+        progress.save!
+        progress.fail
+        return
+      end
+      target_group = make_group_structure(source_outcome_group, target_context, progress)
+      target_group.add_outcome(LearningOutcome.find(outcome_id))
+    end
+
+    def import_group(progress, group, target_context)
+      target_group = make_group_structure(group, target_context, progress)
+      target_group.sync_source_group
+    end
+
+    def make_group_structure(source_group, target_context, progress)
+      source_context = source_group.context
+      ancestors_to_be_imported_map = get_ancestors_to_be_imported_map(source_group, target_context, source_context)
+      source_target_groups_map = import_groups(ancestors_to_be_imported_map, target_context, progress)
+      source_target_groups_map[source_group.id]
+    end
+
+    def get_outcome_group(outcome_id, context)
+      links = ContentTag.learning_outcome_links.active.where(content_id: outcome_id)
+      link = context ? links.find_by(context: context) : links.find_by(context_type: 'LearningOutcomeGroup')
+      link&.associated_asset
+    end
+
+    # returns a hash where the key is the id of the group that must be added
+    # and the values are the ids of its ancestors that must be added as well
+    # It also pushes the group id that was imported before
+    def get_ancestors_to_be_imported_map(group, target_context, source_context)
+      group_ids = [group.id]
+
+      # In the target context, look for top-level groups that were previously imported
+      # from the source context, excluding the current group being imported,
+      # and then get their source group ids.
+      group_ids_from_source_in_target = target_context.root_outcome_group
+        .child_outcome_groups
+        .active
+        .where(
+          source_outcome_group_id: LearningOutcomeGroup
+            .active
+            .where(context: source_context)
+            .where.not(id: group_ids)
+        )
+        .pluck(:source_outcome_group_id)
+
+      ancestors_map = get_group_ancestors(group_ids + group_ids_from_source_in_target)
+
+      # now push to group_ids only groups that has the same ancestor as the
+      # group that we're importing
+      group_ids_from_source_in_target.each do |group_id_from_source_in_target|
+
+        # if the first ancestor matches, they belong to the same ancestor
+        if ancestors_map[group_id_from_source_in_target].first == ancestors_map[group.id].first
+          group_ids << group_id_from_source_in_target
+        end
+      end
+
+      ancestors_to_be_imported_map = ancestors_map.slice(*group_ids)
+
+      # If only one group must be imported
+      common_ancestors = if group_ids.size == 1
+        # duplicating here because we'll pop common_ancestors later and we don't want
+        # to pop in the ancestors_to_be_imported_map
+        ancestors_to_be_imported_map.values.first.dup
+      else
+        ancestors_to_be_imported_map.values.inject do |p1, p2|
+          p1 & p2
+        end
+      end
+
+      # the first common ancestor must be imported
+      common_ancestors.pop
+
+      ancestors_to_be_imported_map.transform_values do |ancestors|
+        ancestors - common_ancestors
+      end
+    end
+
+    # Returns a hash with the group_id as the key and
+    # an ancestor list as the value
+    # Example: If you have this folder structure like
+    #   Root Group -> Group A -> Group B
+    #   Root Group -> Group A -> Group C
+    # and call with [Group_B_ID, Group_C_ID] argument
+    # will result in
+    # {
+    #   Group_B_ID: [Group_A_ID, Group_B_ID],
+    #   Group_C_ID: [Group_A_ID, Group_C_ID],
+    # }
+    def get_group_ancestors(ids)
+      LearningOutcomeGroup.where(id: ids).each_with_object({}) do |group, hash|
+        hash[group.id] = group.ancestor_ids
+
+        # remove nil and remove root outcome group
+        hash[group.id].pop(2)
+
+        hash[group.id].reverse!
+      end
+    end
+
+    def import_groups(ancestors_to_be_imported_map, target_context, progress)
+      source_target_groups_map = {}
+
+      groups_hash = LearningOutcomeGroup.where(id: ancestors_to_be_imported_map.values.flatten.uniq).to_a.index_by(&:id)
+
+      total = ancestors_to_be_imported_map.values.size
+      i = 0
+
+      target_root_outcome_group = target_context.root_outcome_group
+
+      ancestors_to_be_imported_map.each do |_, ancestors_ids|
+        destination_parent_group = target_root_outcome_group
+        ancestors_ids.each do |gid|
+          unless source_target_groups_map[gid]
+            source_group = groups_hash[gid]
+            source_target_groups_map[gid] = copy_or_get_existing_group!(
+              source_group, destination_parent_group, target_context
+            )
+          end
+
+          destination_parent_group = source_target_groups_map[gid]
+
+          progress.update_completion!(i * 50 / total)
+          i += 1
+        end
+      end
+
+      source_target_groups_map
+    end
+
+    def copy_or_get_existing_group!(source_group, destination_parent_group, context)
+      # check if we have the group as a root group
+      if (group = context.root_outcome_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
+        group.learning_outcome_group_id = destination_parent_group.id
+        group.workflow_state = "active"
+        group.save!
+        return group
+      end
+
+      # check if we already have the group inside the destination parent group
+      if (group = destination_parent_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
+        unless group.workflow_state == "active"
+          group.workflow_state = "active"
+          group.save!
+        end
+        return group
+      end
+
+      group = source_group.clone
+      group.learning_outcome_group_id = destination_parent_group.id
+      group.source_outcome_group_id = source_group.id
+      group.context = context
+      group.save!
+
+      group
+    end
   end
 
   private
@@ -128,6 +305,28 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     raise NameError unless VALID_CONTEXTS.include? context_type
 
     context_type.constantize
+  end
+
+  def process_job(source_context:, target_context:, group: nil, outcome_id: nil)
+    progress = target_context.progresses.new(tag: "import_outcomes", user: current_user)
+
+    if progress.save
+      progress.process_job(
+        self.class,
+        :execute,
+        {
+          strand: "import_outcomes_#{target_context.class.name.downcase}_#{target_context.id}_#{context[:domain_root_account].global_id}"
+        },
+        source_context,
+        group,
+        outcome_id,
+        target_context
+      )
+
+      {progress: progress}
+    else
+      raise GraphQL::ExecutionError, I18n.t("Error importing outcomes")
+    end
   end
 end
 

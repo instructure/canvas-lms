@@ -581,7 +581,7 @@ describe CommunicationChannel do
           assert_path_type
           autosave_associated_records_for_pseudonym
           autosave_associated_records_for_user
-          before_save_collection_association
+          around_save_collection_association
           broadcast_notifications
           clear_user_email_cache
           consider_building_pseudonym

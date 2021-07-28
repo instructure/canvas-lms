@@ -1631,7 +1631,8 @@ describe CoursesController do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_bundles].flatten).to include :k5_course
         expect(assigns[:js_bundles].flatten).to include :k5_theme
-        expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+        expect(assigns[:css_bundles].flatten).to include :k5_common
+        expect(assigns[:css_bundles].flatten).to include :k5_course
         expect(assigns[:css_bundles].flatten).to include :k5_theme
         expect(assigns[:js_env][:K5_USER]).to be_truthy
       end
@@ -1694,7 +1695,26 @@ describe CoursesController do
         bundle = assigns[:js_bundles].select { |b| b.include? :announcements }
         expect(bundle.size).to eq 1
       end
+
+      it "sets COURSE.has_syllabus_body to true when syllabus exists" do
+        @course.syllabus_body = "Welcome"
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_truthy
+      end
+
+      it "sets COURSE.has_syllabus_body to false when syllabus does not exist" do
+        @course.syllabus_body = nil
+        @course.save!
+        user_session(@student)
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:has_syllabus_body]).to be_falsey
+      end
     end
+
 
     it 'sets COURSE.student_outcome_gradebook_enabled when feature is on' do
       @course.enable_feature!(:student_outcome_gradebook)
@@ -1705,7 +1725,7 @@ describe CoursesController do
     end
 
     context 'COURSE.latest_announcement' do
-      it 'is set with most recent visible announcement' do
+      let_once(:announcement1) do
         Announcement.create!(
           :title => "Hello students",
           :message => "Welcome to the grind",
@@ -1714,6 +1734,9 @@ describe CoursesController do
           :workflow_state => "published",
           :posted_at => 1.hour.ago
         )
+      end
+
+      let_once(:announcement2) do
         Announcement.create!(
           :title => "Hidden",
           :message => "You shouldn't see me",
@@ -1721,23 +1744,26 @@ describe CoursesController do
           :context => @course,
           :workflow_state => "post_delayed"
         )
-        user_session(@student)
+      end
 
+      before :once do
+        toggle_k5_setting(@course.account)
+      end
+
+      before :each do
+        user_session(@student)
+      end
+
+      it 'is set with most recent visible announcement' do
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
         expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
       end
 
       it 'is set to nil if there are no recent (within 2 weeks) announcements' do
-        Announcement.create!(
-          :title => "Hello students",
-          :message => "Welcome to the grind",
-          :user => @teacher,
-          :context => @course,
-          :workflow_state => "published",
-          :posted_at => 3.weeks.ago
-        )
-        user_session(@student)
+        announcement1.posted_at = 3.weeks.ago
+        announcement1.save!
+        announcement2.destroy
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:latest_announcement]).to be_nil
@@ -1745,18 +1771,26 @@ describe CoursesController do
 
       it "is set to nil if there's announcements but user doesn't have :read_announcements" do
         @course.account.role_overrides.create!(permission: :read_announcements, role: student_role, enabled: false)
-        Announcement.create!(
-          :title => "New Announcement",
-          :message => "You shouldn't see this one without :read_announcements",
-          :user => @teacher,
-          :context => @course,
-          :workflow_state => "published",
-          :posted_at => 1.hour.ago
-        )
-        user_session(@student)
 
         get 'show', params: {:id => @course.id}
         expect(assigns[:js_env][:COURSE][:latest_announcement]).to be_nil
+      end
+
+      it "only shows announcements visible to student sections" do
+        secret_section = CourseSection.create!(name: 'Secret Section', course: @course)
+        Announcement.create!(
+          :title => "For the other section only",
+          :message => "Hello",
+          :user => @teacher,
+          :context => @course,
+          :workflow_state => "published",
+          :posted_at => 1.minute.ago,
+          :is_section_specific => true,
+          :course_sections => [secret_section]
+        )
+
+        get 'show', params: {:id => @course.id}
+        expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
       end
     end
   end
@@ -1956,6 +1990,18 @@ describe CoursesController do
       expect(json['public_syllabus']).to be true
       expect(json['is_public_to_auth_users']).to be true
       expect(json['public_syllabus_to_auth']).to be true
+    end
+
+    it "should set grade_passback_setting" do
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          grade_passback_setting: 'nightly_sync',
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(Course.find(json['id']).grade_passback_setting).to eq 'nightly_sync'
     end
 
     it "should NOT allow visibility to be set when we don't have permission" do
@@ -3006,11 +3052,11 @@ describe CoursesController do
       expect(@course.reload).to be_deleted
     end
 
-    it "should only allow teachers to reset if granted :manage_courses_delete (granular permissions)" do
+    it "should only allow teachers to reset if granted :manage_courses_reset (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
         role: teacher_role,
-        permission: 'manage_courses_delete',
+        permission: 'manage_courses_reset',
         enabled: true
       )
       user_session(@teacher)
@@ -3039,7 +3085,7 @@ describe CoursesController do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
         role: teacher_role,
-        permission: 'manage_courses_delete',
+        permission: 'manage_courses_reset',
         enabled: true
       )
       MasterCourses::MasterTemplate.set_as_master_course(@course)
@@ -3060,7 +3106,7 @@ describe CoursesController do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
         role: teacher_role,
-        permission: 'manage_courses_delete',
+        permission: 'manage_courses_reset',
         enabled: true
       )
       user_session(@teacher)

@@ -19,14 +19,23 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_grades_tab_page'
+require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
+require_relative '../pages/k5_important_dates_section_page'
+require_relative '../shared_examples/k5_important_dates_shared_examples'
 
 describe "student k5 dashboard" do
   include_context "in-process server selenium tests"
-  include K5PageObject
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5GradesTabPageObject
+  include K5ResourceTabPageObject
   include K5Common
   include GradebookSetup
+  include K5ImportantDatesSectionPageObject
 
   before :once do
     student_setup
@@ -63,6 +72,18 @@ describe "student k5 dashboard" do
       expect(announcement_content_text(announcement_content)).to be_displayed
     end
 
+    it 'opens up the announcement when announcement title is clicked' do
+      announcement_title = "Happy Monday!"
+      announcement = new_announcement(@homeroom_course, announcement_title, "Let's get to work")
+
+      get "/"
+
+      click_announcement_title(announcement_title)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}")
+    end
+
     it 'shows no announcement creation button when there are no announcements' do
       get "/"
 
@@ -85,30 +106,41 @@ describe "student k5 dashboard" do
 
   context 'dashboard cards' do
     it 'shows 1 assignment due today' do
-      @subject_course.assignments.create!(
-        title: 'assignment three',
-        grading_type: 'points',
-        points_possible: 10,
-        due_at: Time.zone.today,
-        submission_types: 'online_text_entry'
-      )
+      create_dated_assignment(@subject_course, 'assignment three', Time.zone.today, 10)
 
       get "/"
 
-      expect(subject_items_due(@subject_course_title, '1 due today')).to be_displayed
+      expect(subject_items_due(@subject_course_title)).to include_text('1 due today')
+    end
+
+    it 'navigates to the planner for subject when due today is clicked', custom_timeout: 30 do
+      create_dated_assignment(@subject_course, 'assignment three', Time.zone.today, 10)
+
+      get "/"
+
+      expect(element_value_for_attr(subject_items_due(@subject_course_title), "href")).to include("/courses/#{@subject_course.id}?focusTarget=today#schedule")
+
+      click_duetoday_subject_item(@subject_course_title)
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}#schedule")
     end
 
     it 'shows 1 assignment missing today' do
-      @subject_course.assignments.create!(
-        title: 'assignment three',
-        grading_type: 'points',
-        points_possible: 10,
-        due_at: 3.days.ago,
-        submission_types: 'online_text_entry'
-      )
+      create_dated_assignment(@subject_course, 'assignment three', 3.days.ago, 10)
+
       get "/"
 
-      expect(subject_items_missing(@subject_course_title, 1)).to be_displayed
+      expect(subject_items_missing(@subject_course_title)).to include_text('1 missing')
+    end
+
+    it 'navigates to the planner for subject when assignment missing clicked' do
+      create_dated_assignment(@subject_course, 'assignment three', 3.days.ago, 10)
+
+      get "/"
+
+      expect(subject_items_missing(@subject_course_title).attribute("href")).to include("/courses/#{@subject_course.id}?focusTarget=missing-items#schedule")
+
+      click_missing_subject_item(@subject_course_title)
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}#schedule")
     end
 
     it 'shows subject course on dashboard' do
@@ -138,30 +170,18 @@ describe "student k5 dashboard" do
     end
 
     it 'shows no assignments due today' do
-      @subject_course.assignments.create!(
-        title: 'assignment three',
-        grading_type: 'points',
-        points_possible: 10,
-        due_at: 1.week.from_now(Time.zone.now),
-        submission_types: 'online_text_entry'
-      )
+      create_dated_assignment(@subject_course, 'assignment three', 1.week.from_now(Time.zone.now), 10)
 
       get "/"
 
-      expect(subject_items_due(@subject_course_title, 'Nothing due today')).to be_displayed
+      expect(nothing_due(@subject_course_title)).to be_displayed
     end
   end
 
   context 'schedule tab' do
     it 'dashboard tabs are sticky when scrolling down on planner view' do
       5.times do
-        @subject_course.assignments.create!(
-          title: 'old assignment',
-          grading_type: 'points',
-          points_possible: 10,
-          due_at: 1.week.from_now(Time.zone.now),
-          submission_types: 'online_text_entry'
-        )
+        create_dated_assignment(@subject_course, 'old assignment', 1.week.from_now(Time.zone.now), 10)
       end
 
       get "/"
@@ -327,6 +347,22 @@ describe "student k5 dashboard" do
       get "/#resources"
       expect(important_info_content).to include_text(important_info_text)
     end
+
+    it 'shows the Important Info multiple homerooms for the main resources tab' do
+      important_info_text1 = "Show me what you can do"
+      important_info_text2 = "More homeroom info"
+      create_important_info_content(@homeroom_course, important_info_text1)
+
+      course_with_student(active_all: true, user: @student, course_name: "Second Homeroom")
+      second_homeroom_course = Course.last
+      second_homeroom_course.update!(homeroom_course: true)
+      create_important_info_content(second_homeroom_course, important_info_text2)
+
+      get "/#resources"
+
+      expect(important_info_text_list[0]).to eq(important_info_text1)
+      expect(important_info_text_list[1]).to eq(important_info_text2)
+    end
   end
 
   context 'homeroom dashboard resource panel LTI resources' do
@@ -358,4 +394,30 @@ describe "student k5 dashboard" do
       expect(course_list.count).to eq(2)
     end
   end
+
+  context 'important dates panel' do
+    before :once do
+      Account.site_admin.enable_feature!(:important_dates)
+    end
+
+    it 'shows the important date for student with override', ignore_js_errors: true do
+      assignment_title = "Electricity Homework"
+      due_at = 2.days.ago(Time.zone.now)
+      assignment = create_dated_assignment(@subject_course, assignment_title, due_at)
+      assignment.update!(important_dates: true)
+      override = assignment_override_model(:assignment => assignment)
+      student_due_at = 2.days.from_now(Time.zone.now)
+      override.override_due_at(student_due_at)
+      override.save!
+      override_student = override.assignment_override_students.build
+      override_student.user = @student
+      override_student.save!
+
+      get "/"
+
+      expect(important_date_link).to include_text(assignment_title)
+    end
+  end
+
+  it_behaves_like 'k5 important dates'
 end

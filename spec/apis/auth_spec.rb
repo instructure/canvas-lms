@@ -31,12 +31,11 @@ describe "API Authentication", type: :request do
   before :each do
     @client_id = @key.id
     @client_secret = @key.api_key
-    consider_all_requests_local(false)
     enable_forgery_protection
   end
 
-  after do
-    consider_all_requests_local(true)
+  around do |example|
+    consider_all_requests_local(false, &example)
   end
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
@@ -503,6 +502,64 @@ describe "API Authentication", type: :request do
           expect(json['access_token']).to be_nil
         end
       end
+    end
+  end
+
+  describe "InstAccess tokens" do
+    include_context "InstAccess setup"
+
+    before :once do
+      user_obj = user_with_pseudonym
+      course_with_teacher(user: user_obj)
+    end
+
+    it "allows API access with a valid InstAccess token" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "allows API access for a masquerading user" do
+      user = @user
+      real_user = user_with_pseudonym
+      token = InstAccess::Token.for_user(
+        user_uuid: user.uuid,
+        account_uuid: user.account.uuid,
+        real_user_uuid: real_user.uuid,
+        real_user_shard_id: real_user.shard.id
+      ).to_unencrypted_token_string
+
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+      expect(assigns['current_user']).to eq user
+      expect(assigns['real_current_user']).to eq real_user
+    end
+
+    it "errors if the InstAccess token is expired" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      Timecop.travel(3601) do
+        get "/api/v1/courses", headers: {
+          'HTTP_AUTHORIZATION' => "Bearer #{token}"
+        }
+        assert_status(401)
+        expect(response.body).to match(/Invalid access token/)
+      end
+    end
+
+    it "requires an active pseudonym" do
+      token = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: @user.account.uuid).to_unencrypted_token_string
+      @user.pseudonym.destroy
+      get "/api/v1/courses", headers: {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(401)
+      expect(response.body).to match(/Invalid access token/)
     end
   end
 

@@ -92,9 +92,6 @@
     "calendar_event_89aadc1c": {
         "message": "אירוע יומן"
     },
-    "cancel_caeb1e68": {
-        "message": "ביטול"
-    },
     "canvas_planner_98ed106": {
         "message": "מתכנן קנבס"
     },
@@ -131,10 +128,16 @@
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# הזדמנויות}\n    one {הזדמנות #}\n  other {# הזדמנויות}\n}"
     },
+    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+        "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    },
+    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
     },
     "course_8a63b4a3": {
@@ -293,6 +296,12 @@
     "group_navigation_99f191a": {
         "message": "ניווט בקבוצה"
     },
+    "home_351838cd": {
+        "message": "דף הבית"
+    },
+    "html_editor_fb2ab713": {
+        "message": "עורך HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "קיבלתי הרשאות להשתמש בקובץ זה"
     },
@@ -331,6 +340,9 @@
     },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "jump_to_today_254ccf41": {
+        "message": "עבור להיום"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "קיצורי מקלדת"
@@ -428,8 +440,14 @@
     "no_grade_3b4d7f3e": {
         "message": "ללא ציון"
     },
+    "no_preview_is_available_for_this_file_f940114a": {
+        "message": "אין תצוגה מקדימה לקובץ זה"
+    },
     "no_results_940393cf": {
         "message": "אין תוצאות"
+    },
+    "none_3b5e34d2": {
+        "message": "אף אחד"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "אין כלום לעכשיו"
@@ -509,9 +527,6 @@
     "record_7c9448b": {
         "message": "הקלטה"
     },
-    "recording_98da6bda": {
-        "message": "מקליט"
-    },
     "reminder_date_4564d12d": {
         "message": "תזכורת: { date }"
     },
@@ -545,8 +560,8 @@
     "size_b30e1077": {
         "message": "גודל"
     },
-    "start_over_f7552aa9": {
-        "message": "התחל/י מהתחלה"
+    "star_8d156e09": {
+        "message": "הוספת כוכבית"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } ל { endDate }"
@@ -629,14 +644,14 @@
     "upload_media_ce31135a": {
         "message": "העלאת מדיה"
     },
+    "uploading_19e8a4e7": {
+        "message": "מעלה"
+    },
     "url_22a5f3b8": {
         "message": "כתובת דף אינטרנט"
     },
     "usage_right_ff96f3e2": {
         "message": "זכויות שימוש"
-    },
-    "video_player_b371005": {
-        "message": "נגן הוידאו"
     },
     "view_ba339f93": {
         "message": "תצוגה"

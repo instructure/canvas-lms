@@ -22,8 +22,6 @@ require 'spec_helper'
 
 describe ActiveSupport::Callbacks::Suspension do
   before do
-    @rails2 = rails2 = ActiveSupport::VERSION::STRING < '3'
-
     @class = Class.new do
       include ActiveSupport::Callbacks
       include ActiveSupport::Callbacks::Suspension
@@ -34,35 +32,17 @@ describe ActiveSupport::Callbacks::Suspension do
 
       def publish; end
 
-      if rails2
-        define_callbacks :before_save, :after_save, :before_update
-        before_save :validate
-        after_save :publish
-        before_update :validate
+      define_callbacks :save, :update
+      set_callback :save, :before, :validate
+      set_callback :save, :after, :publish
+      set_callback :update, :before, :validate
 
-        def save
-          return unless run_callbacks(:before_save) { |result, _| result == false }
-          persist
-          run_callbacks(:after_save) { |result, _| result == false }
-        end
+      def save
+        run_callbacks(:save) { persist }
+      end
 
-        def update
-          return unless run_callbacks(:before_update) { |result, _| result == false }
-          persist
-        end
-      else
-        define_callbacks :save, :update
-        set_callback :save, :before, :validate
-        set_callback :save, :after, :publish
-        set_callback :update, :before, :validate
-
-        def save
-          run_callbacks(:save) { persist }
-        end
-
-        def update
-          run_callbacks(:update) { persist }
-        end
+      def update
+        run_callbacks(:update) { persist }
       end
     end
     @instance = @class.new
@@ -88,19 +68,13 @@ describe ActiveSupport::Callbacks::Suspension do
 
     it "should only suspend callbacks of the given kind" do
       expect(@instance).to receive(:validate).once
-      if @rails2
-        @instance.suspend_callbacks(kind: :before_save) { @instance.update }
-      else
-        @instance.suspend_callbacks(kind: :save) { @instance.update }
-      end
+      @instance.suspend_callbacks(kind: :save) { @instance.update }
     end
 
-    unless @rails2
-      it "should only suspend callbacks of the given type" do
-        expect(@instance).to receive(:validate).never
-        expect(@instance).to receive(:publish).once
-        @instance.suspend_callbacks(type: :before) { @instance.save }
-      end
+    it "should only suspend callbacks of the given type" do
+      expect(@instance).to receive(:validate).never
+      expect(@instance).to receive(:publish).once
+      @instance.suspend_callbacks(type: :before) { @instance.save }
     end
   end
 
@@ -148,11 +122,11 @@ describe ActiveSupport::Callbacks::Suspension do
       expect(instance).to receive(:validate).never
       expect(instance).to receive(:publish).never
       # only suspends :validate from save
-      instance.suspend_callbacks(:validate, kind: (@rails2 ? :before_save : :save)) do
+      instance.suspend_callbacks(:validate, kind: :save) do
         # only suspends :publish
         subclass.suspend_callbacks(:publish) do
           # only suspends :validate from update
-          @class.suspend_callbacks(kind: (@rails2 ? :before_update : :update)) do
+          @class.suspend_callbacks(kind: :update) do
             # trigger (absent suspensions) all three
             instance.save
             instance.update

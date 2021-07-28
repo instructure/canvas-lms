@@ -19,11 +19,19 @@
 
 require_relative '../../common'
 require_relative '../pages/k5_dashboard_page'
+require_relative '../pages/k5_dashboard_common_page'
+require_relative '../pages/k5_grades_tab_page'
+require_relative '../pages/k5_modules_tab_page'
+require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 
 describe "student k5 course dashboard" do
   include_context "in-process server selenium tests"
-  include K5PageObject
+  include K5DashboardPageObject
+  include K5DashboardCommonPageObject
+  include K5GradesTabPageObject
+  include K5ModulesTabPageObject
+  include K5ResourceTabPageObject
   include K5Common
 
   before :once do
@@ -66,6 +74,12 @@ describe "student k5 course dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
+    it 'has an empty state graphic when there is no subject home content' do
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(empty_subject_home).to be_displayed
+    end
+
     it 'displays modules empty state if no published module exists' do
       get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
@@ -89,6 +103,18 @@ describe "student k5 course dashboard" do
       expect(course_dashboard_title).to include_text("Science")
       expect(announcement_title(announcement_heading)).to be_displayed
       expect(announcement_content_text(announcement_content)).to be_displayed
+    end
+
+    it 'opens up the announcement when announcement title is clicked' do
+      announcement_title = "Happy Monday!"
+      announcement = new_announcement(@subject_course, announcement_title, "Let's get to work")
+
+      get "/courses/#{@subject_course.id}"
+
+      click_announcement_title(announcement_title)
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include("/courses/#{@subject_course.id}/discussion_topics/#{announcement.id}")
     end
 
     it 'does not display old announcements on the Home tab' do

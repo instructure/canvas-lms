@@ -41,9 +41,9 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
         id: '1105'
       },
       GRADERS: [
-        {grader_name: 'Charlie Xi', id: '4502', user_id: '1103'},
-        {grader_name: 'Adam Jones', id: '4503', user_id: '1101'},
-        {grader_name: 'Betty Ford', id: '4501', user_id: '1102'}
+        {grader_name: 'Charlie Xi', id: '4502', user_id: '1103', grader_selectable: true},
+        {grader_name: 'Adam Jones', id: '4503', user_id: '1101', grader_selectable: true},
+        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false}
       ]
     })
   })
@@ -155,6 +155,16 @@ QUnit.module('GradeSummary getEnv()', suiteHooks => {
       test('camel-cases .graderName', () => {
         const graderNames = getEnv().graders.map(grader => grader.graderName)
         deepEqual(graderNames, ['Adam Jones', 'Betty Ford', 'Charlie Xi'])
+      })
+
+      test('includes .graderSelectable', () => {
+        const graders = getEnv().graders
+
+        const deletedGrader = graders.find(grader => grader.graderName === 'Betty Ford')
+        strictEqual(deletedGrader.graderSelectable, false)
+
+        const activeGrader = graders.find(grader => grader.graderName === 'Adam Jones')
+        strictEqual(activeGrader.graderSelectable, true)
       })
     })
 

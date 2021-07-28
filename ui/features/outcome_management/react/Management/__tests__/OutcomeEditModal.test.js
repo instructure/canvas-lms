@@ -64,7 +64,8 @@ describe('OutcomeEditModal', () => {
     failMutation = false.message,
     env = {
       contextType: 'Account',
-      contextId: '1'
+      contextId: '1',
+      friendlyDescriptionFF: true
     }
   } = {}) => {
     const mocks = [
@@ -102,10 +103,11 @@ describe('OutcomeEditModal', () => {
     expect(queryByText('Edit Outcome')).not.toBeInTheDocument()
   })
 
-  it('calls onCloseHandler on Save button click', () => {
+  it('calls onCloseHandler on Save button click', async () => {
     const {getByLabelText, getByText} = renderWithProvider()
     fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
     fireEvent.click(getByText('Save'))
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
@@ -154,15 +156,17 @@ describe('OutcomeEditModal', () => {
     expect(getByTestId('name-input')).toBeInTheDocument()
     expect(getByTestId('display-name-input')).toBeInTheDocument()
     expect(getByTestId('description-input')).toBeInTheDocument()
-    expect(getByTestId('alternate-description-input')).toBeInTheDocument()
+    expect(getByTestId('friendly-description-input')).toBeInTheDocument()
   })
 
   it('Hides forms elements when editing in different context', () => {
-    const {queryByTestId} = renderWithProvider({env: {contextType: 'Course', contextId: '1'}})
+    const {queryByTestId} = renderWithProvider({
+      env: {contextType: 'Course', contextId: '1', friendlyDescriptionFF: true}
+    })
     expect(queryByTestId('name-input')).not.toBeInTheDocument()
     expect(queryByTestId('display-name-input')).not.toBeInTheDocument()
     expect(queryByTestId('description-input')).not.toBeInTheDocument()
-    expect(queryByTestId('alternate-description-input')).toBeInTheDocument()
+    expect(queryByTestId('friendly-description-input')).toBeInTheDocument()
   })
 
   describe('updates the outcome', () => {
@@ -195,11 +199,11 @@ describe('OutcomeEditModal', () => {
     })
   })
 
-  describe('updates the alternate description', () => {
-    it('updates only alternate description if only alternate description is changed', async () => {
+  describe('updates the friendly description', () => {
+    it('updates only friendly description if only friendly description is changed', async () => {
       const {getByText, getByLabelText} = renderWithProvider()
-      fireEvent.change(getByLabelText('Alternative description (for parent/student display)'), {
-        target: {value: 'Updated alternate description'}
+      fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
+        target: {value: 'Updated friendly description'}
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
@@ -209,10 +213,10 @@ describe('OutcomeEditModal', () => {
       })
     })
 
-    it('handles altenate description update failure', async () => {
+    it('handles friendly description update failure', async () => {
       const {getByText, getByLabelText} = renderWithProvider({failResponse: true})
-      fireEvent.change(getByLabelText('Alternative description (for parent/student display)'), {
-        target: {value: 'Updated alternate description'}
+      fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
+        target: {value: 'Updated friendly description'}
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
@@ -222,12 +226,41 @@ describe('OutcomeEditModal', () => {
       })
     })
 
-    it('shows error message below alternate description field if alternate description > 255 characters', () => {
+    it('shows error message below friendly description field if friendly description > 255 characters', () => {
       const {getByText, getByLabelText} = renderWithProvider()
-      fireEvent.change(getByLabelText('Alternative description (for parent/student display)'), {
+      fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
         target: {value: 'a'.repeat(256)}
       })
       expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+    })
+  })
+
+  describe('with Friendly Description Feature Flag disabled', () => {
+    it('does not display Friendly Description field in modal', async () => {
+      const {queryByLabelText} = renderWithProvider({
+        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false}
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(
+        queryByLabelText('Friendly description (for parent/student display)')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not call friendly description mutation when updating outcome', async () => {
+      RichContentEditor.callOnRCE.mockReturnValue('Updated description')
+      const {getByText, getByLabelText} = renderWithProvider({
+        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
+        // mock setFriendlyDescription mutation to throw an error
+        failResponse: true
+      })
+      fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
+      fireEvent.click(getByText('Save'))
+      await act(async () => jest.runOnlyPendingTimers())
+      // if setFriendlyDescription mutation is called the expectation below will fail
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'This outcome was successfully updated.',
+        type: 'success'
+      })
     })
   })
 })

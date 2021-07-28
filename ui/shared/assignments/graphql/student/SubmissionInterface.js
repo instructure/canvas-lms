@@ -48,6 +48,7 @@ export const SubmissionInterface = {
         ...SubmissionDraft
       }
       submissionStatus
+      submissionType
       submittedAt
       unreadCommentCount
       url
@@ -73,6 +74,7 @@ export const SubmissionInterface = {
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
+    submissionType: string,
     submittedAt: string,
     unreadCommentCount: number.isRequired,
     url: string
@@ -96,6 +98,7 @@ export const DefaultMocks = {
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',
+    submissionType: null,
     submittedAt: null,
     unreadCommentCount: 0,
     url: null

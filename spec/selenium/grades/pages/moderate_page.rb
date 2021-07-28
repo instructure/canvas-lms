@@ -147,7 +147,7 @@ class ModeratePage
     end
 
     def grade_input_dropdown_list(student)
-      ff("ul##{grade_input(student).attribute('aria-controls')} li")
+      ff("ul##{grade_input(student).attribute('aria-controls')} li span[role='option']")
     end
 
     def grade_input_dropdown(student)

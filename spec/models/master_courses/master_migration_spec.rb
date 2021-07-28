@@ -1487,6 +1487,32 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
+    it "should use current version of quiz after import if quiz was published on the copy_to" do
+      @copy_to = course_factory
+      @copy_to.enroll_student(User.create!, enrollment_state: 'active')
+      @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!(allowed_attempts: 3)
+      qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+
+      run_master_migration
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_quiz.publish!
+      copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+
+      new_master_text = "some mastery text"
+      qd = qq.question_data
+      qd['question_text'] = new_master_text
+      qq.question_data = qd
+      qq.save!
+
+      run_master_migration # re-copy all the content
+
+      expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
+      expect(copied_quiz.reload.quiz_data).to include(hash_including("question_text" => new_master_text))
+    end
+
     it "should handle graded quizzes/discussions/etc better" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

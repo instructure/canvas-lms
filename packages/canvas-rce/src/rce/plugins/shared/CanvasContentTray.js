@@ -386,19 +386,17 @@ export default function CanvasContentTray(props) {
             >
               <Flex.Item padding="medium" shadow="above">
                 <Flex margin="none none medium none">
-                  <Flex.Item grow shrink>
+                  <Flex.Item shouldgrow shouldshrink>
                     <Heading level="h2">{formatMessage('Add')}</Heading>
                   </Flex.Item>
 
                   <Flex.Item>
                     <CloseButton
-                      placement="static"
-                      variant="icon"
+                      placement="end"
                       onClick={handleDismissTray}
                       data-testid="CloseButton_ContentTray"
-                    >
-                      {formatMessage('Close')}
-                    </CloseButton>
+                      screenReaderLabel={formatMessage('Close')}
+                    />
                   </Flex.Item>
                 </Flex>
 
@@ -419,8 +417,8 @@ export default function CanvasContentTray(props) {
               </Flex.Item>
 
               <Flex.Item
-                grow
-                shrink
+                shouldgrow
+                shouldshrink
                 margin="xx-small xxx-small 0"
                 elementRef={el => (scrollingAreaRef.current = el)}
               >

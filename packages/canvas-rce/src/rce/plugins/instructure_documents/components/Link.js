@@ -115,7 +115,7 @@ export default function Link(props) {
         tabIndex="0"
         aria-describedby={props.describedByID}
         elementRef={elementRef}
-        background="default"
+        background="primary"
         borderWidth="0 0 small 0"
         padding="x-small"
         width="100%"

@@ -93,6 +93,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     })
     json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
+    json.frontPageText = ENV.K5_SUBJECT_COURSE ? 'Subject Home' : 'Front Page'
     return json
   }
 

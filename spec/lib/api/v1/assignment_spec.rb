@@ -577,7 +577,7 @@ describe "Api::V1::Assignment" do
     end
   end
 
-  describe 'when the assignment has one student submission' do
+  describe 'Updating submission type' do
     let(:user) { user_model }
     let(:course) { course_factory }
     let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
@@ -588,16 +588,79 @@ describe "Api::V1::Assignment" do
       )
     end
 
-    it 'should not update the submission_types field' do
-      assignment.submit_homework(student, :body => "my homework")
+    context 'when the assignment does not have student submissions' do
+      it 'should allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 0
+        expect(assignment.submission_types).to eq 'none'
 
-      expect(assignment.submissions.having_submission.count).to eq 1
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
 
-      response = api.update_api_assignment(assignment, assignment_update_params, user)
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'on_paper'
+      end
+    end
 
-      expect(response).to eq :ok
-      expect(assignment.name).to eq 'Edited name'
-      expect(assignment.submission_types).to eq 'none'
+    context 'when an assignment with submission type other than "online_quiz" has one student submission' do
+      before do
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      it 'should allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'on_paper'
+      end
+    end
+
+    context 'when an assignment with submission type "online - text entry" has one student submission' do
+      before do
+        assignment.update!(submission_types: 'online_text_entry')
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          name: 'Edited name',
+          submission_types: ['online_url','online_upload']
+        )
+      end
+
+      it 'should allow updating the submission entry options' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'online_url,online_upload'
+      end
+    end
+
+    context 'when an assignment with submission type "online_quiz" has one student submission' do
+      before do
+        assignment.update!(submission_types: 'online_quiz')
+        assignment.submit_homework(student, :body => "my homework")
+      end
+
+      it 'should not allow updating the submission_types field' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.submission_types).to eq 'online_quiz'
+      end
+
+      it 'should allow updating other fields' do
+        expect(assignment.submissions.having_submission.count).to eq 1
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.name).to eq 'Edited name'
+      end
     end
   end
 end

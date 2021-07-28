@@ -53,8 +53,8 @@ export default class UploadMedia extends React.Component {
     rcsConfig: shape({
       contextId: string,
       contextType: string,
-      origin: string.isRequired,
-      headers: shape({Authorization: string.isRequired})
+      origin: string,
+      headers: shape({Authorization: string})
     }),
     onStartUpload: func,
     onUploadComplete: func,
@@ -82,16 +82,19 @@ export default class UploadMedia extends React.Component {
     } else if (props.tabs.record) {
       defaultSelectedPanel = 1
     }
+    if (props.computerFile) {
+      props.computerFile.title = props.computerFile.name
+    }
 
     this.state = {
-      hasUploadedFile: false,
+      hasUploadedFile: !!props.computerFile,
       uploading: false,
       progress: 0,
       selectedPanel: defaultSelectedPanel,
       computerFile: props.computerFile || null,
       subtitles: [],
       recordedFile: null,
-      modalBodySize: {width: undefined, height: undefined}
+      modalBodySize: {width: NaN, height: NaN}
     }
 
     this.modalBodyRef = React.createRef()
@@ -122,6 +125,15 @@ export default class UploadMedia extends React.Component {
         break
       default:
         throw new Error('Selected Panel is invalid') // Should never get here
+    }
+  }
+
+  submitEnabled = () => {
+    switch (this.state.selectedPanel) {
+      case PANELS.COMPUTER:
+        return this.isReady() && !!this.state.computerFile?.title
+      default:
+        return this.isReady()
     }
   }
 
@@ -161,18 +173,25 @@ export default class UploadMedia extends React.Component {
     this.props.onDismiss && this.props.onDismiss()
   }
 
+  componentDidMount() {
+    this.setBodySize(this.state)
+  }
+
   componentDidUpdate(_prevProps, prevState) {
+    this.setBodySize(prevState)
+  }
+
+  setBodySize(state) {
     if (this.modalBodyRef.current) {
       // eslint-disable-next-line react/no-find-dom-node
       const thebody = ReactDOM.findDOMNode(this.modalBodyRef.current)
       const modalBodySize = thebody.getBoundingClientRect()
       modalBodySize.height -= px('3rem') // leave room for the tabs
       if (
-        modalBodySize.width !== prevState.modalBodySize.width ||
-        modalBodySize.height !== prevState.modalBodySize.height
+        modalBodySize.width !== state.modalBodySize.width ||
+        modalBodySize.height !== state.modalBodySize.height
       ) {
         if (modalBodySize.width > 0 && modalBodySize.height > 0) {
-          // eslint-disable-next-line react/no-did-update-set-state
           this.setState({modalBodySize})
         }
       }
@@ -277,9 +296,9 @@ export default class UploadMedia extends React.Component {
             e.preventDefault()
             this.handleSubmit()
           }}
-          variant="primary"
+          color="primary"
           type="submit"
-          disabled={!this.isReady()}
+          interaction={this.submitEnabled() ? 'enabled' : 'disabled'}
         >
           {SUBMIT_TEXT}
         </Button>
@@ -300,9 +319,12 @@ export default class UploadMedia extends React.Component {
         liveRegion={this.props.liveRegion}
       >
         <Modal.Header>
-          <CloseButton onClick={this.onModalClose} offset="medium" placement="end">
-            {CLOSE_TEXT}
-          </CloseButton>
+          <CloseButton
+            onClick={this.onModalClose}
+            offset="medium"
+            placement="end"
+            screenReaderLabel={CLOSE_TEXT}
+          />
           <Heading>{UPLOAD_MEDIA_LABEL}</Heading>
         </Modal.Header>
         <Modal.Body ref={this.modalBodyRef}>{this.renderModalBody()}</Modal.Body>

@@ -115,7 +115,13 @@ export const GradesPage = ({
   )
 
   if (!userIsStudent) {
-    return <GradesEmptyPage userIsInstructor={userIsInstructor} courseId={courseId} />
+    return (
+      <GradesEmptyPage
+        userIsInstructor={userIsInstructor}
+        courseId={courseId}
+        courseName={courseName}
+      />
+    )
   } else if (showLearningMasteryGradebook) {
     return (
       <Tabs

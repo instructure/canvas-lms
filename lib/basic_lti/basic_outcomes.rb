@@ -35,6 +35,9 @@ module BasicLTI
       end
     end
 
+    # gives instfs about 7 hours to have an outage and eventually take the file
+    MAX_ATTEMPTS=10
+
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
@@ -123,7 +126,7 @@ module BasicLTI
       end
 
       def user_enrollment_active?(assignment, user)
-        user.student_enrollments.active_or_pending_by_date.where(course_id: assignment.context_id).any?
+        assignment.context.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
       end
 
       def to_xml
@@ -245,7 +248,10 @@ module BasicLTI
           submission_hash[:submission_type] = 'external_tool'
         end
 
-        if raw_score
+        if assignment.grading_type == "pass_fail" && (raw_score || new_score)
+          submission_hash[:grade] = ((raw_score || new_score) > 0 ? 'pass' : 'fail')
+          submission_hash[:grader_id] = -tool.id
+        elsif raw_score
           submission_hash[:grade] = raw_score
           submission_hash[:grader_id] = -tool.id
         elsif new_score
@@ -259,13 +265,14 @@ module BasicLTI
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
 
-        submitted_at = submission_submitted_at
-        submitted_at_date = submitted_at.present? ? Time.zone.parse(submitted_at) : nil
-        if submitted_at.present? && submitted_at_date.nil?
+        xml_submitted_at = submission_submitted_at
+        submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
+        if xml_submitted_at.present? && submitted_at.nil?
           error_message = I18n.t('Invalid timestamp - timestamp not parseable')
-        elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + 1.minute
+        elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
           error_message = I18n.t('Invalid timestamp - timestamp in future')
         end
+        submission_hash[:submitted_at] = submitted_at || Time.zone.now
 
         if error_message
           self.code_major = 'failure'
@@ -285,23 +292,19 @@ to because the assignment has no points possible.
         else
           if attachment
             job_options = {
-              :priority => Delayed::HIGH_PRIORITY,
-              :max_attempts => 1,
-              :n_strand => Attachment.clone_url_strand(url)
+              priority: Delayed::HIGH_PRIORITY,
+              n_strand: Attachment.clone_url_strand(url)
             }
 
             delay(**job_options).fetch_attachment_and_save_submission(
               url,
               attachment,
-              tool,
               submission_hash,
               assignment,
-              user,
-              new_score,
-              raw_score
+              user
             )
           else
-            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
+            create_homework_submission submission_hash, assignment, user
           end
         end
 
@@ -311,34 +314,15 @@ to because the assignment has no points possible.
       end
       # rubocop:enable Metrics/PerceivedComplexity, Metrics/MethodLength
 
-      # rubocop:disable Metrics/ParameterLists
-      def create_homework_submission(tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date=nil)
-        if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
-          @submission = assignment.submit_homework(user, submission_hash.clone)
-        end
+      def create_homework_submission(submission_hash, assignment, user)
+        @submission = assignment.submit_homework(user, submission_hash.clone) if submission_hash[:submission_type].present?
+        @submission = assignment.grade_student(user, submission_hash).first if submission_hash[:grade].present?
 
-        if new_score || raw_score
-          submission_hash[:grade] = (new_score > 0 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
-          submission_hash[:grader_id] = -tool.id
-          @submission = assignment.grade_student(user, submission_hash).first
-          if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
-            @submission.submitted_at = Time.zone.now
-          end
-        end
-
-        if submitted_at_date.present?
-          @submission.submitted_at = submitted_at_date
-        end
-
-        if @submission
-          @submission.attempt -= 1 if @submission.attempt.try(:'>', 0) && @submission.submitted_at_changed?
-          @submission.save
-        else
+        unless @submission
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
         end
       end
-      # rubocop:enable Metrics/ParameterLists
 
       def handle_delete_result(tool, assignment, user)
         assignment.grade_student(user, :grade => nil, grader_id: -tool.id)
@@ -362,9 +346,30 @@ to because the assignment has no points possible.
       end
 
       # rubocop:disable Metrics/ParameterLists
-      def fetch_attachment_and_save_submission(url, attachment, tool, submission_hash, assignment, user, new_score, raw_score)
-        attachment.clone_url(url, 'rename', true)
-        create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score
+      def fetch_attachment_and_save_submission(url, attachment, submission_hash, assignment, user, attempt_number=0)
+        failed_retryable = attachment.clone_url(url, 'rename', true)
+        if failed_retryable && ((attempt_number += 1) < MAX_ATTEMPTS)
+          # Exits out of the first job and creates a second one so that the run_at time won't hold back
+          # the entire n_strand. Also creates it in a different strand for retries, so we shouldn't block
+          # any incoming uploads.
+          job_options = {
+            priority: Delayed::HIGH_PRIORITY,
+            # because inst-jobs only takes 2 items from an array to make a string strand
+            # name and this uses 3
+            n_strand: (Attachment.clone_url_strand(url) << 'failed').join('/'),
+            run_at: Time.now.utc + (attempt_number ** 4) + 5
+          }
+          delay(**job_options).fetch_attachment_and_save_submission(
+            url,
+            attachment,
+            submission_hash,
+            assignment,
+            user,
+            attempt_number
+          )
+        else
+          create_homework_submission submission_hash, assignment, user
+        end
       end
       # rubocop:enable Metrics/ParameterLists
 

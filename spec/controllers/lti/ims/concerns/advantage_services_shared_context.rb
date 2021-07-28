@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../../../lti_1_3_tool_configuration_spec_helper.rb')
+require 'spec_helper'
+require 'lti_1_3_tool_configuration_spec_helper'
 
 shared_context 'advantage services context' do
   include_context 'lti_1_3_tool_configuration_spec_helper'
@@ -29,7 +29,7 @@ shared_context 'advantage services context' do
   end
   let_once(:developer_key) do
     dk = DeveloperKey.create!(account: root_account)
-    dk.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE
+    dk.developer_key_account_bindings.first.update! workflow_state: 'on'
     dk
   end
   let(:access_token_scopes) do
@@ -103,6 +103,7 @@ shared_context 'advantage services context' do
   def apply_headers
     request.headers['Authorization'] = "Bearer #{access_token_jwt}" if access_token_jwt
     request.headers['Content-Type'] = content_type if content_type.present?
+    request
   end
 
   def send_http
@@ -111,7 +112,9 @@ shared_context 'advantage services context' do
 
   def send_request
     apply_headers
-    send_http
+    response = send_http
+    run_jobs
+    response
   end
 
   def expect_empty_response

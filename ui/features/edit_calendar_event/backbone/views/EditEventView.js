@@ -66,7 +66,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'location_name',
         'location_address',
         'duplicate',
-        'web_conference'
+        'web_conference',
+        'important_dates'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -108,6 +109,11 @@ export default class EditCalendarEventView extends Backbone.View {
         $e.val(value)
         if (key === 'duplicate') {
           this.enableDuplicateFields($e.val())
+        }
+        if (key === 'important_dates') {
+          this.$el
+            .find('#calendar_event_important_dates')
+            .prop('checked', picked_params[key] === 'true')
         }
         return $e.change()
       })
@@ -224,10 +230,7 @@ export default class EditCalendarEventView extends Backbone.View {
     RichContentEditor.callOnRCE($('textarea[name=description]'), 'toggle')
     // hide the clicked link, and show the other toggle link.
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    return $(event.currentTarget)
-      .siblings('a')
-      .andSelf()
-      .toggle()
+    return $(event.currentTarget).siblings('a').andSelf().toggle()
   }
 
   updateRemoveChildEvents(e) {
@@ -254,7 +257,7 @@ export default class EditCalendarEventView extends Backbone.View {
     if ($('#use_section_dates').prop('checked')) {
       const dialog = new MissingDateDialogView({
         validationFn() {
-          const $fields = $('[name*=start_date]:visible').filter(function() {
+          const $fields = $('[name*=start_date]:visible').filter(function () {
             return $(this).val() === ''
           })
           if ($fields.length > 0) {
@@ -264,10 +267,7 @@ export default class EditCalendarEventView extends Backbone.View {
           }
         },
         labelFn(input) {
-          return $(input)
-            .parents('.date_start_end_row')
-            .prev('label')
-            .text()
+          return $(input).parents('.date_start_end_row').prev('label').text()
         },
         success: $dialog => {
           $dialog.dialog('close')
@@ -323,6 +323,7 @@ export default class EditCalendarEventView extends Backbone.View {
     const result = super.toJSON(...arguments)
     result.use_rce_enhancements = ENV.use_rce_enhancements
     result.recurringEventLimit = 200
+    result.k5_subject = ENV.K5_SUBJECT_COURSE && ENV.FEATURES?.important_dates
     return result
   }
 
@@ -365,6 +366,8 @@ export default class EditCalendarEventView extends Backbone.View {
         append_iterator: this.$el.find('#append_iterator').is(':checked')
       }
     }
+
+    data.important_dates = this.$el.find('#calendar_event_important_dates').prop('checked')
     return data
   }
 

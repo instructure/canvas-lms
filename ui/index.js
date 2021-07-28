@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './boot/initializers/setWebpackCdnHost.js'
+import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
-import './boot/index.js'
+import './boot'
 
 // true modules that we use in this file
 import $ from 'jquery'
@@ -35,24 +35,24 @@ import loadBundle from 'bundles-generated'
 import 'translations/_core_en'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
-import './boot/initializers/ajax_errors.js'
-import './boot/initializers/activateKeyClicks.js'
-import './boot/initializers/activateTooltips.js'
+import './boot/initializers/ajax_errors'
+import './boot/initializers/activateKeyClicks'
+import './boot/initializers/activateTooltips'
 
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
 
 const readinessTargets = [
-  ['asyncInitializers',false],
-  ['deferredBundles',false],
+  ['asyncInitializers', false],
+  ['deferredBundles', false],
+  ['localePolyfills', false]
 ]
 const advanceReadiness = target => {
   const entry = readinessTargets.find(x => x[0] === target)
 
   if (!entry) {
     throw new Error(`Invalid readiness target -- "${target}"`)
-  }
-  else if (entry[1]) {
+  } else if (entry[1]) {
     throw new Error(`Target already marked ready -- "${target}"`)
   }
 
@@ -77,25 +77,23 @@ window.bundles.forEach(loadBundle)
 
 if (ENV.csp)
   // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/setupCSP.js').then(({default: setupCSP}) =>
-    setupCSP(window.document)
-  )
-if (ENV.INCOMPLETE_REGISTRATION) import('./boot/initializers/warnOnIncompleteRegistration.js')
-if (ENV.badge_counts) import('./boot/initializers/showBadgeCounts.js')
+  import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
+if (ENV.INCOMPLETE_REGISTRATION) import('./boot/initializers/warnOnIncompleteRegistration')
+if (ENV.badge_counts) import('./boot/initializers/showBadgeCounts')
 
 $('html').removeClass('scripts-not-loaded')
 
 $('.help_dialog_trigger').click(event => {
   event.preventDefault()
   // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/enableHelpDialog.js').then(({default: helpDialog}) => helpDialog.open())
+  import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
 })
 
 // Backbone routes
 $('body').on(
   'click',
   '[data-pushstate]',
-  preventDefault(function() {
+  preventDefault(function () {
     Backbone.history.navigate($(this).attr('href'), true)
   })
 )
@@ -107,23 +105,38 @@ if (
   splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
 ) {
   // eslint-disable-next-line promise/catch-or-return
-  import('./features/new_user_tutorial/index').then(
-    ({default: initializeNewUserTutorials}) => {
-      initializeNewUserTutorials()
-    }
-  )
+  import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
+    initializeNewUserTutorials()
+  })
 }
 
 ;(window.requestIdleCallback || window.setTimeout)(() => {
-  import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse.js').then(() =>
+  // eslint-disable-next-line promise/catch-or-return
+  import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse').then(() =>
     advanceReadiness('asyncInitializers')
   )
 })
 
+// Load Intl polyfills if necessary given the ENV.LOCALE. Advance the readiness
+// state whether that worked or not.
+
+/* eslint-disable no-console */
+import('intl-polyfills')
+  .then(im => im.loadAllLocalePolyfills(ENV.LOCALE))
+  .catch(e => {
+    console.error(
+      `Problem loading locale polyfill for ${ENV.LOCALE}, falling back to ${e.result.locale}`
+    )
+    console.error(e.message)
+  })
+  .then(() => advanceReadiness('localePolyfills'))
+/* eslint-enable no-console */
+
 ready(() => {
-  Promise.all(
-    (window.deferredBundles || []).map(loadBundle)
-  ).then(() => advanceReadiness('deferredBundles'))
+  // eslint-disable-next-line promise/catch-or-return
+  Promise.all((window.deferredBundles || []).map(loadBundle)).then(() =>
+    advanceReadiness('deferredBundles')
+  )
 
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't

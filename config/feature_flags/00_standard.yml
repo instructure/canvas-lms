@@ -108,7 +108,9 @@ duplicate_modules:
 embedded_release_notes:
   state: allowed_on
   display_name: Embedded Release Notes
-  description: Shows Instructure-provided release notes in the help menu for all users (filtered by user role)
+  description: Show Instructure-provided release notes filtered by user role in the
+       Help Menu. Available to users with admin, teacher (instructor), and observer
+       roles. Applicable features for student roles are included in observer notes.
   applies_to: Account
 encrypted_sourcedids:
   state: allowed
@@ -169,6 +171,11 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+important_dates:
+  state: hidden
+  display_name: Important Dates
+  description: Enables important dates to be applied to assignments, calendar events, and others.
+  applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
   state: allowed
   display_name: Include Byte-Order Mark in compatible spreadsheet exports
@@ -223,13 +230,6 @@ new_collaborations:
   applies_to: Course
   root_opt_in: true
   touch_context: true
-new_features_ui:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: New Feature Flags
-  description: This feature creates a SiteAdmin Release Flag tab to be able to release
-    features to users through the UI. It also reworks the UI for the old Feature Options
-    tabs.
 new_gradebook_plagiarism_indicator:
   state: hidden
   applies_to: RootAccount
@@ -246,7 +246,7 @@ new_sis_integrations:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-      Settings. The Post to SIS feature option has been incorporated into this new
+      Settings. The Post to SIS feature preview has been incorporated into this new
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true
@@ -407,7 +407,7 @@ underline_all_links:
     wrapper: <span class="feature-detail-underline">\1</span>
     underline_all_links_description: |-
       Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
-      *underlined text*. This feature option does not apply to user-generated content links in the
+      *underlined text*. This feature does not apply to user-generated content links in the
       Rich Content Editor, which always underlines links for all users.
   applies_to: User
 use_semi_colon_field_separators_in_gradebook_exports:

@@ -31,10 +31,19 @@ class ContextController < ApplicationController
 
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])
+
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
         self.extend TextHelper
-        @media_object = @context.media_objects.where(media_id: params[:id], media_type: params[:type]).first_or_initialize
+
+        # The MediaObject will be created on the current shard,
+        # not the @context's shard.
+        @media_object = MediaObject.where(
+          media_id: params[:id],
+          media_type: params[:type],
+          context: @context
+        ).first_or_initialize
+
         @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
@@ -265,17 +274,8 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      if params[:id] !~ Api::ID_REGEX
-        # TODO: stop generating an error report and fix the bad input
+      raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
 
-        env_stuff = Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
-        Canvas::Errors.capture('invalid_user_id', {
-          message: "invalid user_id in ContextController::roster_user",
-          current_user_id: @current_user.id,
-          current_user_name: @current_user.sortable_name
-        }.merge(env_stuff))
-        raise ActiveRecord::RecordNotFound
-      end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)

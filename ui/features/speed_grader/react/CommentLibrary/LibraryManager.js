@@ -53,7 +53,14 @@ function persistCheckbox(state) {
     )
 }
 
-const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, commentAreaText}) => {
+const LibraryManager = ({
+  setComment,
+  courseId,
+  setFocusToTextArea,
+  userId,
+  commentAreaText,
+  suggestionsRef
+}) => {
   const abortController = useRef()
   const [removedItemIndex, setRemovedItemIndex] = useState(null)
   const [showSuggestions, setShowSuggestions] = useState(ENV.comment_library_suggestions_enabled)
@@ -113,7 +120,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
     [setComment, setFocusToTextArea]
   )
 
-  const [deleteComment] = useMutation(DELETE_COMMENT_MUTATION, {
+  const [deleteComment, {loading: isDeletingComment}] = useMutation(DELETE_COMMENT_MUTATION, {
     update: (cache, result) => {
       const removedIndex = removeDeletedCommentFromCache(cache, result, userId)
       setRemovedItemIndex(removedIndex)
@@ -191,7 +198,7 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
       onAddComment={handleAddComment}
       onDeleteComment={id => deleteComment({variables: {id}})}
       isAddingComment={isAddingComment}
-      removedItemIndex={removedItemIndex}
+      removedItemIndex={isDeletingComment ? null : removedItemIndex}
       showSuggestions={showSuggestions}
       setShowSuggestions={checked => handleShowSuggestions(checked)}
       searchResults={
@@ -201,6 +208,8 @@ const LibraryManager = ({setComment, courseId, setFocusToTextArea, userId, comme
       }
       setFocusToTextArea={setFocusToTextArea}
       updateComment={updateComment}
+      suggestionsRef={suggestionsRef}
+      setRemovedItemIndex={setRemovedItemIndex}
     />
   )
 }
@@ -210,7 +219,8 @@ LibraryManager.propTypes = {
   courseId: PropTypes.string.isRequired,
   setFocusToTextArea: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
-  commentAreaText: PropTypes.string.isRequired
+  commentAreaText: PropTypes.string.isRequired,
+  suggestionsRef: PropTypes.object
 }
 
 export default LibraryManager

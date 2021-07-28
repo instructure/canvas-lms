@@ -2,14 +2,14 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile`
 
-ARG RUBY=2.6-p6.0.4
+ARG RUBY=2.7
 
 FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
 ENV APP_HOME /usr/src/app/
-ENV RAILS_ENV production
+ENV RAILS_ENV development
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
@@ -54,6 +54,10 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        autoconf \
        automake \
+       git \
+       build-essential \
+       python2 \
+       python-is-python2 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 

@@ -36,7 +36,6 @@ ready(() => {
         name={ENV.COURSE.name}
         plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
         timeZone={ENV.TIMEZONE}
-        locale={ENV.LOCALE}
         courseOverview={ENV.COURSE.course_overview}
         userIsStudent={ENV.COURSE.is_student}
         userIsInstructor={ENV.COURSE.is_instructor}
@@ -50,6 +49,9 @@ ready(() => {
         tabs={ENV.TABS}
         settingsPath={ENV.COURSE.settings_path}
         latestAnnouncement={ENV.COURSE.latest_announcement}
+        pagesPath={ENV.COURSE.pages_url}
+        hasWikiPages={ENV.COURSE.has_wiki_pages}
+        hasSyllabusBody={ENV.COURSE.has_syllabus_body}
       />,
       courseContainer
     )

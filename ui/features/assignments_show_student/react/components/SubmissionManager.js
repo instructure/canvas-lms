@@ -29,6 +29,7 @@ import {
 import {Flex} from '@instructure/ui-flex'
 import {
   friendlyTypeName,
+  isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts
 } from '../helpers/SubmissionHelpers'
@@ -135,7 +136,11 @@ function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}
   }
 
   return (
-    <Button color="secondary" onClick={() => handleCancelDraft(deleteDraftMutation)}>
+    <Button
+      data-testid="cancel-attempt-button"
+      color="secondary"
+      onClick={() => handleCancelDraft(deleteDraftMutation)}
+    >
       {I18n.t('Cancel Attempt %{attempt}', {attempt})}
     </Button>
   )
@@ -285,6 +290,13 @@ export default class SubmissionManager extends Component {
           })
         }
         break
+      case 'student_annotation':
+        if (this.props.submission.submissionDraft) {
+          await this.submitToGraphql(submitMutation, {
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
       default:
         throw new Error('submission type not yet supported in A2')
     }
@@ -298,7 +310,7 @@ export default class SubmissionManager extends Component {
     return (
       context.allowChangesToSubmission &&
       !assignment.lockInfo.isLocked &&
-      (submission.state === 'graded' || submission.state === 'submitted') &&
+      isSubmitted(submission) &&
       submission.gradingStatus !== 'excused' &&
       context.latestSubmission.state !== 'unsubmitted' &&
       (allowedAttempts == null || submission.attempt < allowedAttempts)
@@ -484,7 +496,11 @@ export default class SubmissionManager extends Component {
         render: context => {
           const {attempt} = context.latestSubmission
           return (
-            <Button color="primary" onClick={context.showDraftAction}>
+            <Button
+              data-testid="back-to-attempt-button"
+              color="primary"
+              onClick={context.showDraftAction}
+            >
               {I18n.t('Back to Attempt %{attempt}', {attempt})}
             </Button>
           )
@@ -495,7 +511,11 @@ export default class SubmissionManager extends Component {
         shouldRender: context => this.shouldRenderNewAttempt(context),
         render: context => {
           return (
-            <Button color="primary" onClick={context.startNewAttemptAction}>
+            <Button
+              data-testid="try-again-button"
+              color="primary"
+              onClick={context.startNewAttemptAction}
+            >
               {I18n.t('Try Again')}
             </Button>
           )
@@ -532,8 +552,8 @@ export default class SubmissionManager extends Component {
     let activeTypeMeetsCriteria = false
     switch (this.state.activeSubmissionType) {
       case 'media_recording':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
-          ?.meetsMediaRecordingCriteria
+        activeTypeMeetsCriteria =
+          this.props.submission?.submissionDraft?.meetsMediaRecordingCriteria
         break
       case 'online_text_entry':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
@@ -543,6 +563,10 @@ export default class SubmissionManager extends Component {
         break
       case 'online_url':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
+        break
+      case 'student_annotation':
+        activeTypeMeetsCriteria =
+          this.props.submission?.submissionDraft?.meetsStudentAnnotationCriteria
     }
 
     return (

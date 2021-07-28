@@ -110,6 +110,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           }
           interaction={canManage ? 'enabled' : 'disabled'}
           isInline
+          width="350px"
           value={selectedApplicabilityValue}
           onChange={(e, {value}) => {
             if (value !== 'course') {

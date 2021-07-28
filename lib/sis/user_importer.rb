@@ -150,9 +150,13 @@ module SIS
               next
             end
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
-              message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
+              if @batch.options[:update_sis_id_if_login_claimed]
+                pseudo.sis_user_id = user_row.user_id
+              else
+                message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              end
             end
             if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
               !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)

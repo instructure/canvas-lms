@@ -1121,6 +1121,20 @@ function renderDeleteAttachmentLink($submission_file, attachment) {
   }
 }
 
+function allowsReassignment(submission) {
+  const reassignableTypes = [
+    'media_recording',
+    'online_text_entry',
+    'online_upload',
+    'online_url',
+    'student_annotation'
+  ]
+
+  return (
+    submission.cached_due_date != null && reassignableTypes.includes(submission.submission_type)
+  )
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -2303,13 +2317,7 @@ EG = {
 
       $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
-      if (
-        !!currentSubmission.cached_due_date &&
-        currentSubmission.submission_type &&
-        (currentSubmission.submission_type === 'media_recording' ||
-          (currentSubmission.submission_type.startsWith('online_') &&
-            currentSubmission.submission_type !== 'online_quiz'))
-      ) {
+      if (allowsReassignment(currentSubmission)) {
         $reassign_assignment.show()
       } else {
         $reassign_assignment.hide()
@@ -2561,7 +2569,7 @@ EG = {
         })
       )
     } else if ($.isPreviewable(attachment.content_type, 'google')) {
-      if (!INST.disableCrocodocPreviews) $no_annotation_warning.show()
+      $no_annotation_warning.show()
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]
       previewOptions = $.extend(previewOptions, {
@@ -2972,7 +2980,8 @@ EG = {
       method,
       formData,
       () => formSuccess(EG.currentStudent.id),
-      data => formError(data, EG.currentStudent.id)
+      data => formError(data, EG.currentStudent.id),
+      {skipDefaultError: true}
     )
   },
 
@@ -3471,6 +3480,8 @@ EG = {
       errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.')
     } else if (errorCode === 'PROVISIONAL_GRADE_MODIFY_SELECTED') {
       errorMessage = I18n.t('The grade you entered has been selected and can no longer be changed.')
+    } else if (errorCode === 'ASSIGNMENT_LOCKED') {
+      errorMessage = I18n.t('This assignment is locked and cannot be reassigned.')
     } else {
       errorMessage = I18n.t('An error occurred updating this assignment.')
     }

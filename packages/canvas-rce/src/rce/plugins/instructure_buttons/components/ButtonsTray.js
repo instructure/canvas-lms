@@ -27,22 +27,22 @@ import {getTrayHeight} from '../../shared/trayUtils'
 import {CreateButtonForm} from './CreateButtonForm'
 import {SavedButtonList} from './SavedButtonList'
 
-const TITLE = {
-  create: formatMessage('Buttons and Icons'),
-  list: formatMessage('Saved Buttons and Icons')
-}
-
-export function ButtonsTray({onUnmount, type}) {
+export function ButtonsTray({editor, onUnmount, type}) {
   const [isOpen, setIsOpen] = useState(true)
+
+  const title =
+    type === 'create'
+      ? formatMessage('Buttons and Icons')
+      : formatMessage('Saved Buttons and Icons')
+
   return (
     <Tray
       data-mce-component
-      label={TITLE[type]}
+      label={title}
       onDismiss={() => setIsOpen(false)}
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldCloseOnDocumentClick
       shouldContainFocus
       shouldReturnFocus
       size="regular"
@@ -51,7 +51,7 @@ export function ButtonsTray({onUnmount, type}) {
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
             <Flex.Item grow shrink>
-              <Heading as="h2">{TITLE[type]}</Heading>
+              <Heading as="h2">{title}</Heading>
             </Flex.Item>
 
             <Flex.Item>
@@ -63,7 +63,7 @@ export function ButtonsTray({onUnmount, type}) {
         </Flex.Item>
 
         <Flex.Item as="content" padding="small">
-          {type === 'create' ? <CreateButtonForm /> : <SavedButtonList />}
+          {type === 'create' ? <CreateButtonForm editor={editor} /> : <SavedButtonList />}
         </Flex.Item>
       </Flex>
     </Tray>

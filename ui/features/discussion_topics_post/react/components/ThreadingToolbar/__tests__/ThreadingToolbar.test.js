@@ -32,4 +32,40 @@ describe('PostToolbar', () => {
     expect(getByText('First')).toBeTruthy()
     expect(getByText('Second')).toBeTruthy()
   })
+
+  it('renders "Go to Reply" button when search term is not ""', () => {
+    window.ENV.isolated_view = true
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="asdf">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
+  })
+
+  it('renders "Go to Reply" button when filter is set to unread', () => {
+    window.ENV.isolated_view = true
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="" filter="unread">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
+  })
+
+  it('should not render go to reply button when isIsolatedView prop is true', () => {
+    window.ENV.isolated_view = true
+    const {queryByText} = render(
+      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView>
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(queryByText('Go to Reply')).toBeNull()
+  })
 })

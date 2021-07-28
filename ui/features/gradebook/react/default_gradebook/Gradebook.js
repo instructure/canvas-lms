@@ -2083,6 +2083,7 @@ class Gradebook {
       courseSettings: this.courseSettings,
       gradedLateSubmissionsExist: this.options.graded_late_submissions_exist,
       locale: this.options.locale,
+      gradebookIsEditable: this.options.gradebook_is_editable,
       onClose: () => {
         return this.gradebookSettingsModalButton.focus()
       },

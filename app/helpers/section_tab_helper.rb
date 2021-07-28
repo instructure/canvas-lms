@@ -24,7 +24,9 @@ module SectionTabHelper
     manage_admin_users
     manage_assignments
     manage_content
-    manage_files
+    manage_files_add
+    manage_files_edit
+    manage_files_delete
     manage_grades
     manage_students
     moderate_forum
@@ -112,7 +114,7 @@ module SectionTabHelper
           elsif tab_is?(tab, 'TAB_CONFERENCES')
             !WebConference.config(context: @context)
           elsif quiz_lti_tab?(tab)
-            !new_quizzes_navigation_placements_enabled?
+            !new_quizzes_navigation_placements_enabled?(context)
           end
         end
       end

@@ -29,6 +29,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 import {Day, Grouping, PlannerItem} from '@instructure/canvas-planner'
 
@@ -50,6 +51,7 @@ const baseFont = {
 const base = {
   typography: {
     ...baseFont.typography,
+    fontSizeXSmall: '0.875rem',
     fontSizeSmall: '1rem',
     fontSizeMedium: '1.125rem',
     fontSizeLarge: '1.5rem',
@@ -71,7 +73,9 @@ export const theme = {
     h3FontSize: '1.25rem',
     h3FontWeight: typography.fontWeightBold,
     h4FontSize: '1.25rem',
-    h4FontWeight: typography.fontWeightBold
+    h4FontWeight: typography.fontWeightBold,
+    h5FontSize: '1rem',
+    h5FontWeight: typography.fontWeightNormal
   },
   [Tabs.Tab.theme]: {
     fontSize: '1.25rem'
@@ -92,6 +96,10 @@ export const theme = {
   },
   [IconButton.theme]: {
     iconSizeMedium: '1.5rem'
+  },
+  [ToggleDetails.theme]: {
+    iconColor: colors.brand,
+    textColor: colors.textBrand
   }
 }
 

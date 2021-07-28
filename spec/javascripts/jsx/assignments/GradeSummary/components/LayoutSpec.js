@@ -19,11 +19,12 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
+import fakeENV from 'helpers/fakeENV'
 
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
-import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions.js'
-import Layout from 'ui/features/assignment_grade_summary/react/components/Layout.js'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
+import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
+import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
+import Layout from 'ui/features/assignment_grade_summary/react/components/Layout'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
 
 QUnit.module('GradeSummary Layout', suiteHooks => {
   let store
@@ -54,6 +55,13 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         {graderId: '1102', graderName: 'Mr. Keating'}
       ]
     }
+
+    fakeENV.setup({
+      GRADERS: [
+        {grader_name: 'Miss Frizzle', id: '4502', user_id: '1101', grader_selectable: true},
+        {grader_name: 'Mr. Keating', id: '4503', user_id: '1102', grader_selectable: true}
+      ]
+    })
 
     sinon
       .stub(StudentActions, 'loadStudents')
@@ -99,7 +107,10 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     let students
 
     hooks.beforeEach(() => {
-      students = [{id: '1111', displayName: 'Adam Jones'}, {id: '1112', displayName: 'Betty Ford'}]
+      students = [
+        {id: '1111', displayName: 'Adam Jones'},
+        {id: '1112', displayName: 'Betty Ford'}
+      ]
     })
 
     test('renders the GradesGrid', () => {
@@ -128,7 +139,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       ]
       store.dispatch(StudentActions.addStudents(students))
       grades = [
-        {grade: 'A', graderId: '1101', id: '4601', score: 10, selected: false, studentId: '1111'}
+        {grade: 'A', graderId: '1101', id: '1101', score: 10, selected: false, studentId: '1111'}
       ]
       store.dispatch(GradeActions.addProvisionalGrades(grades))
       wrapper.update()

@@ -5029,6 +5029,29 @@ describe 'Submissions API', type: :request do
       s1 = @student1.submissions.first
       expect(s1.grade).to be_nil
     end
+
+    it "will not enqueue jobs for deleted assignments" do
+      @a1.destroy
+      grade_data = {
+        :grade_data => {
+          @student1.id => { :posted_grade => '75%'},
+          @student2.id => { :posted_grade => '95%'}
+        }
+      }
+
+      json = api_call(:post,
+        "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+      assert_status(400)
+      run_jobs
+      expect(Submission.count).to eq(2)
+      s1 = @student1.submissions.first
+      expect(s1.grade).to be_nil
+      s2 = @student2.submissions.first
+      expect(s2.grade).to be_nil
+    end
   end
 
   describe "list_gradeable_students" do

@@ -44,6 +44,7 @@ const GradeSummaryShape = {
   courseColor: PropTypes.string,
   courseImage: PropTypes.string,
   currentGradingPeriodId: PropTypes.string,
+  finalGradesHidden: PropTypes.bool,
   grade: PropTypes.string,
   score: PropTypes.number
 }
@@ -84,6 +85,7 @@ export const GradeSummaryLine = ({
   courseName,
   currentGradingPeriodId,
   enrollmentType,
+  finalGradesHidden,
   grade,
   score
 }) => {
@@ -96,7 +98,7 @@ export const GradeSummaryLine = ({
       })
       isPercentage = true
     } else {
-      gradeText = currentGradingPeriodId ? I18n.t('Not Graded') : '--'
+      gradeText = finalGradesHidden || !currentGradingPeriodId ? '--' : I18n.t('Not Graded')
       score = 0
     }
   }
@@ -122,7 +124,7 @@ export const GradeSummaryLine = ({
             <Text transform="uppercase">
               <Heading as="h2" level="h3" margin="small 0">
                 <Link
-                  href={courseUrl}
+                  href={courseUrl + window.location.hash}
                   display="inline-block"
                   isWithinText={false}
                   theme={{

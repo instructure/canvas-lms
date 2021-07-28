@@ -54,6 +54,15 @@ export default class DemoOptions extends Component {
       >
         <FormFieldGroup layout="stacked" description="Configuration Options">
           <View as="div" padding="x-small" margin="0 0 small">
+            <View as="div" margin="0 0 small">
+              <Checkbox
+                label="Readonly"
+                checked={this.state.readonly}
+                onChange={event => {
+                  this.setState({readonly: event.target.checked})
+                }}
+              />
+            </View>
             <RadioInputGroup
               description="Text Direction"
               variant="simple"

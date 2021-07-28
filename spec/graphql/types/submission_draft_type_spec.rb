@@ -119,4 +119,12 @@ RSpec.describe Types::SubmissionDraftType do
     submission_draft = resolve_submission_draft
     expect(submission_draft['activeSubmissionType']).to eq('online_upload')
   end
+
+  it 'accepts student annotation as an draftable submission type' do
+    @submission_draft.active_submission_type = 'student_annotation'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['activeSubmissionType']).to eq('student_annotation')
+  end
 end

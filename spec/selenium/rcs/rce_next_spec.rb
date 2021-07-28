@@ -592,7 +592,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       context 'without manage files permissions' do
         before(:each) do
           RoleOverride.create!(
-            permission: 'manage_files',
+            permission: 'manage_files_add',
             enabled: false,
             context: @course.account,
             role: teacher_role
@@ -874,6 +874,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should guarantees an alt text when selecting decorative' do
+      skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-154')
       page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
 
@@ -886,7 +887,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_image_options_done_button
 
       in_frame rce_page_body_ifr_id do
-        expect(wiki_body_image.attribute('alt')).to eq(' ')
+        expect(wiki_body_image.attribute('alt')).to eq('')
         expect(wiki_body_image.attribute('role')).to eq('presentation')
       end
     end
@@ -914,6 +915,47 @@ describe 'RCE next tests', ignore_js_errors: true do
         click_a11y_checker_button
 
         expect(a11y_checker_tray).to be_displayed
+      end
+
+      it 'with the rce_a11y_checker_notifications flag on should show notification badge' do
+        Account.site_admin.enable_feature! :rce_a11y_checker_notifications
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
+        switch_to_editor_view
+
+        wait_for(method: nil, timeout: 5) {
+          badge_element = fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+          expect(badge_element.text).to eq '1'
+        }
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.clear
+        html_view.send_keys('test text')
+        switch_to_editor_view
+
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
+      end
+
+      it 'with the rce_a11y_checker_notifications flag off should show not notification badge' do
+        Account.site_admin.disable_feature! :rce_a11y_checker_notifications
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
+        switch_to_editor_view
+
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
       end
 
       it 'should open keyboard shortcut modal when clicking button in status bar' do
@@ -1487,6 +1529,25 @@ describe 'RCE next tests', ignore_js_errors: true do
           f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
           expect_new_page_load { submit_quiz }
           expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(quiz_content)
+        end
+
+        it 'sanitizes the HTML set in the HTML editor' do
+          get '/'
+
+          html = <<~HTML
+            <img src="/" id="test-image" onerror="alert('hello')" />
+          HTML
+
+          rce_wysiwyg_state_setup(
+            @course,
+            html,
+            html: true,
+            new_rce: true
+          )
+
+          in_frame rce_page_body_ifr_id do
+            expect(f('#test-image').attribute('onerror')).to be_nil
+          end
         end
       end
     end

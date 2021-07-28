@@ -27,11 +27,14 @@
 # in a console) `run_synchronously`. Either of these can take an initial
 # mem_state argument, which is useful if you have different flavors of jobs that
 # need to run on the same strand (and not start until the one currently
-# running/retrying has finished).
+# running/retrying has finished). IMPORTANT: if you use non-primitives in
+# initial_mem_state, deduping of backlogged jobs will not work; see
+# find_delayed_job (and its usage)
 #
 # The job runs on a strand tied to the state_record which means only one job
 # may be running at a time. In addition, if new a job is started while a job
-# is in-progress, it will be dropped (see #run)
+# is in-progress, it will be rescheduled for after the current job finishes
+# (unless another new job with the same initial_mem_state is already eneueued)
 #
 # STATES:
 # When a job is running:
@@ -77,23 +80,22 @@ module MicrosoftSync
     attr_reader :job_state_record
 
     # steps_object defines the steps of the job and has the following:
-    #   initial_step() -- string
     #   max_retries() -- for entire job
-    #   restart_job_after_inactivity() -- staleness time, after which job is
-    #     considered to be stalled and new jobs run will restart the job
-    #     instead of being ignored. should be significantly longer (by
-    #     RETRY_DELAY_INACTIVITY_BUFFER) than your longest Retry `delay_amount`
-    #   two arguments: memory_state, job_state_data.
-    #     (If you don't need all the arguments, you can also make the methods
-    #     take 0 or 1 arguments). They should return a NextStep or Retry object
-    #     or COMPLETE (see below), or you can raise an error to signal a
-    #     unretriable error.
+    #   max_delay() -- delays (`Retry`s or `DelayedNextStep`s) will be clipped
+    #     to this length of time.
     #   after_failure() -- called when a job fails (unretriable error
     #     raised, or a Retry happens past max_retries), or when a stale
     #     job is restarted. Can be used to clean up state, e.g. state stored in
     #     stash_block
     #   after_complete() -- called when a step returns COMPLETE. Note: this is
     #     run even if the state record has been deleted since we last checked.
+    #   steps methods with two arguments: memory_state, job_state_data.
+    #     (If you don't need all the arguments, you can also make the methods
+    #     take 0 or 1 arguments). The steps methods should return a NextStep or
+    #     Retry object or COMPLETE (see below), or you can raise an error to
+    #     signal a unretriable error. It is recommended you begin step methods
+    #     with `step_` to make them obvious.
+    #   step_initial(initial_memory_state, job_state_data) -- the initial step
     attr_reader :steps_object
 
     def initialize(job_state_record, steps_object)
@@ -154,14 +156,16 @@ module MicrosoftSync
       end
     end
 
-    # The max retry delay_amount will be `restart_job_after_inactivity` minus this to allow
-    # jobs time to wait in the queue
-    RETRY_DELAY_INACTIVITY_BUFFER = 5.minutes
+    # If something goes way wrong with jobs (or they are paused for some time), after this period
+    # of time we may clear the state and restart the job. See `job_is_stale?`
+    STALE_JOB_TIME = 1.day
 
-    # SEE ALSO Errors::GracefulCancelErrorMixin
+    # SEE ALSO Errors::GracefulCancelError
     # Raise an error with this mixin in your job if you want to cancel &
     # cleanup & update workflow_state, but not bubble up the error (e.g. create
     # a Delayed::Job::Failed). Can be mixed in to normal errors or `PublicError`s
+
+    INITIAL_STEP = :step_initial
 
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state=nil)
@@ -189,10 +193,11 @@ module MicrosoftSync
 
       unless step.nil?
         # Current job is not a new job, and the job state is either nil or says
-        # we're in some differnt step.
-        # This normally shouldn't happen since we prevent jobs from running at once.
-        # This could happen if a job's retry time is longer than restart_job_after_inactivity, since
-        # a new job could start over and reset the state before the continuation job runs.
+        # we're in some differnt step.  This normally shouldn't happen since we
+        # prevent jobs from running at once (see where we check for stale
+        # state/jobs and reset state below). This can happen if jobs were
+        # paused for longer than STALE_JOB_TIME and a new job in the queue
+        # comes and wipes out the state
         err = InternalError.new(
           "Job step doesn't match state: #{step.inspect} != #{step_from_job_state.inspect}. " \
           "workflow_state: #{job_state_record.workflow_state}, job_state: #{job_state.inspect}"
@@ -201,23 +206,39 @@ module MicrosoftSync
         raise err
       end
 
-      updated_at = job_state&.dig(:updated_at)
-      if updated_at && updated_at < steps_object.restart_job_after_inactivity.ago
+      currently_retrying_job = find_delayed_job(strand) do |args|
+        args&.first&.to_s == step_from_job_state.to_s
+      end
+
+      if currently_retrying_job.nil? || job_is_stale?(currently_retrying_job)
         # Trying to run a new job, old job has possibly stalled. Clean up and start over.
         statsd_increment(:stalled, step_from_job_state)
         steps_object.after_failure
         job_state_record.update!(job_state: nil)
         run_main_loop(nil, initial_mem_state, nil, synchronous)
+        return
       end
 
-      # else: Trying to run a new job while old job in-progress. Do nothing, i.e., drop this job.
+      # Else: there's a currently retrying (waiting) job; backlog this job to run after it.
+      # If there's already a backlogged job with the same initial_mem_state, this one can
+      # be dropped.
+      if find_delayed_job(strand) { |args| args == [nil, initial_mem_state] }
+        log { "Dropping duplicate job, initial_mem_state=#{initial_mem_state.inspect}" }
+      else
+        if synchronous
+          raise InternalError, 'A job is waiting to be retried; use run_later() to enqueue another'
+        end
+
+        self.delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
+          .run(nil, initial_mem_state)
+      end
     end
 
     # Only to be used from run(), which does other checks before kicking off main loop:
     def run_main_loop(current_step, initial_mem_state, job_state_data, synchronous)
       return unless job_state_record&.update_unless_deleted(workflow_state: :running)
 
-      current_step ||= steps_object.initial_step
+      current_step ||= INITIAL_STEP
       memory_state = initial_mem_state
 
       loop do
@@ -226,7 +247,7 @@ module MicrosoftSync
         begin
           result = steps_object.send(current_step.to_sym, memory_state, job_state_data)
         rescue => e
-          if e.is_a?(Errors::GracefulCancelErrorMixin)
+          if e.is_a?(Errors::GracefulCancelError)
             statsd_increment(:cancel, current_step, e)
             update_state_record_to_errored_and_cleanup(e)
             return
@@ -244,7 +265,7 @@ module MicrosoftSync
             workflow_state: :completed, job_state: nil, last_error: nil
           )
           steps_object.after_complete
-          statsd_increment(:complete)
+          statsd_increment(:complete, current_step)
           return
         when NextStep
           current_step, memory_state = result.step, result.memory_state
@@ -261,8 +282,8 @@ module MicrosoftSync
       end
     end
 
-    def statsd_increment(bucket, step=nil, error=nil)
-      tags = {category: error&.class&.name, microsoft_sync_step: step&.to_s}.compact
+    def statsd_increment(bucket, step, error=nil)
+      tags = {category: error&.class&.name&.tr(':', '_'), microsoft_sync_step: step.to_s}.compact
       InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags: tags)
     end
 
@@ -290,7 +311,7 @@ module MicrosoftSync
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.user_facing_message(error)
+      error_msg = MicrosoftSync::Errors.serialize(error)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id
@@ -325,7 +346,7 @@ module MicrosoftSync
 
     # Ensure delay amount is not too long so as to make the job look stalled:
     def clip_delay_amount(delay_amount)
-      max_delay = steps_object.restart_job_after_inactivity.to_f - RETRY_DELAY_INACTIVITY_BUFFER.to_f
+      max_delay = steps_object.max_delay.to_f
       delay_amount.to_f.clamp(0, max_delay).tap do |clipped|
         log { "Clipped delay #{delay_amount} to #{clipped}" } if clipped != delay_amount.to_f
       end
@@ -369,6 +390,29 @@ module MicrosoftSync
       log { "handle_retry #{current_step} -> #{retry_step} - #{delay_amount}" }
 
       run_with_delay(step: retry_step, delay_amount: delay_amount, synchronous: synchronous)
+    end
+
+    # Find a delayed job on the strand with arguments that match the selector
+    # IMPORTANT: To avoid unnecessary database loads of the state_record
+    # object, this uses SafeYAML to avoid instantiating objects in the YAML;
+    # this also means that the args passed into the selector will be only Ruby
+    # primitives. So if you use non-primitives in initial_mem_state, duplicate
+    # job detection won't work.
+    def find_delayed_job(strand, &args_selector)
+      Delayed::Job.where(strand: strand).find_each.find do |job|
+        job != Delayed::Worker.current_job && args_selector[
+          SafeYAML.load(job.handler, nil, raise_on_unknown_tag: false)['args']
+        ]
+      end
+    end
+
+    # In case something is really weird with jobs, this prevents us from staying in that
+    # weird state forever. A job is considered stale if its run_at time is too far in the past
+    # (if jobs are paused or bogged down, this could happen a little, but not too much) or too
+    # far in the past (past max_delay)
+    def job_is_stale?(job)
+      job && (job.run_at < STALE_JOB_TIME.ago ||
+              job.run_at > steps_object.max_delay.from_now)
     end
   end
 end

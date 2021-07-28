@@ -1077,6 +1077,53 @@ describe "Users API", type: :request do
           { include: ['last_login'], order: 'desc', search_term: 'test'})
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should take all relevant pseudonyms and return the maximum current_login_at" do
+          @shard3.activate do
+            p4 = @u.pseudonyms.create!(account: @account, unique_id: 'p4')
+            p4.current_login_at = 4.minutes.ago
+            p4.save!
+          end
+          @shard2.activate do
+            account = Account.create!
+            allow(account).to receive(:trust_exists?).and_return(true)
+            allow(account).to receive(:trusted_account_ids).and_return([@account.id])
+            course = account.courses.create!
+            course.enroll_student(@u)
+            p2 = @u.pseudonyms.create!(account: account, unique_id: 'p2')
+            p2.current_login_at = 5.minutes.ago
+            p2.save!
+            p3 = @u.pseudonyms.create!(account: account, unique_id: 'p3')
+            p3.current_login_at = 6.minutes.ago
+            p3.save!
+          end
+          @shard1.activate do
+            account = Account.create!
+            course = account.courses.create!
+            course.enroll_student(@u)
+
+            account_admin_user
+            user_session(@user)
+
+            json =
+              api_call(
+                :get,
+                "/api/v1/users/#{@u.id}",
+                {
+                  controller: 'users',
+                  action: 'api_show',
+                  id: @u.id.to_param,
+                  format: 'json'
+                },
+                { include: ['last_login'] }
+              )
+            expect(json.fetch('last_login')).to eq @p.current_login_at.iso8601
+          end
+        end
+      end
     end
 
     it "does return a next header on the last page" do

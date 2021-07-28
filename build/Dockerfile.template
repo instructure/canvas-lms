@@ -1,5 +1,5 @@
 <%= generation_message %>
-ARG RUBY=2.6-p6.0.4
+ARG RUBY=2.7
 
 <% if development? -%>
 FROM instructure/ruby-passenger:$RUBY
@@ -10,7 +10,12 @@ LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
 ENV APP_HOME /usr/src/app/
+<% if development? -%>
+ENV RAILS_ENV development
+<% else -%>
 ENV RAILS_ENV production
+ENV SASS_STYLE compressed
+<% end -%>
 ENV NGINX_MAX_UPLOAD_SIZE 10g
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
@@ -57,6 +62,10 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        autoconf \
        automake \
+       git \
+       build-essential \
+       python2 \
+       python-is-python2 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 

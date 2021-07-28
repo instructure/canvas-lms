@@ -125,6 +125,9 @@ module Canvas
       end
 
       it "reads from disk config if configured to do so" do
+        # make sure we bust the FileClient cache because if it's already been
+        # used, it won't try to re-load the `vault_contents` config file
+        Canvas::Vault::FileClient.reset!
         cred_path = "sts/testaccount/sts/canvas-shards-lookupper-test"
         creds_hash = {
           cred_path => {
@@ -134,7 +137,8 @@ module Canvas
           }
         }
         allow(described_class).to receive(:config).and_return(local_config)
-        allow(ConfigFile).to receive(:load).and_return(creds_hash)
+        allow(ConfigFile).to receive(:load).and_call_original
+        allow(ConfigFile).to receive(:load).with('vault_contents').and_return(creds_hash)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
       end

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Tray as InstuiTray} from '@instructure/ui-tray'
@@ -41,14 +41,16 @@ const Tray = ({
   removedItemIndex,
   showSuggestions,
   setShowSuggestions,
-  updateComment
+  updateComment,
+  setRemovedItemIndex
 }) => {
   const closeButtonRef = useRef(null)
   useEffect(() => {
-    if (removedItemIndex === 0 && comments.length === 0) {
+    if (removedItemIndex === 0 && comments.length === 0 && isOpen) {
       closeButtonRef.current.focus()
+      setRemovedItemIndex(null)
     }
-  }, [comments]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [removedItemIndex]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <InstuiTray
@@ -121,6 +123,7 @@ const Tray = ({
                   comment={commentItem.comment}
                   shouldFocus={shouldFocus}
                   updateComment={updateComment}
+                  setRemovedItemIndex={setRemovedItemIndex}
                 />
               )
             })}
@@ -150,7 +153,8 @@ Tray.propTypes = {
   removedItemIndex: PropTypes.number,
   showSuggestions: PropTypes.bool.isRequired,
   setShowSuggestions: PropTypes.func.isRequired,
-  updateComment: PropTypes.func.isRequired
+  updateComment: PropTypes.func.isRequired,
+  setRemovedItemIndex: PropTypes.func.isRequired
 }
 
 Tray.defaultProps = {

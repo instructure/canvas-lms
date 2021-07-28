@@ -43,6 +43,81 @@ describe Loaders::DiscussionEntryLoader do
     end
   end
 
+  describe 'relative entry' do
+    before(:once) do
+      @de5 = @discussion.discussion_entries.create!(message: 'from the future?', user: @student, created_at: 1.day.from_now)
+      @de6 = @discussion.discussion_entries.create!(message: 'that is just crazy', user: @student, created_at: 2.days.from_now)
+      # @de1 is root, and we are loading 5 replies ordered by created_at, but force them all to be children.
+      DiscussionEntry.where(id: [@de2, @de3, @de4, @de5, @de6]).update_all(parent_id: @de1.id, root_entry_id: @de1.id)
+    end
+
+    it 'get entries before relative entry including relative by default' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de3.id, @de2.id, @de4.id]
+        end
+      end
+    end
+
+    it 'sort works wih relative_entry_id' do
+      GraphQL::Batch.batch do
+        # ordered by created_at. @de3 = 2.days.ago, @de2 = 1.day.ago, @de4 = nowish
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           sort_order: :desc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de2.id, @de3.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: false,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de5.id, @de6.id]
+        end
+      end
+    end
+
+    it 'get entries after relative entry including relative entry' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(current_user: @teacher,
+                                           relative_entry_id: @de4,
+                                           before_relative_entry: false,
+                                           include_relative_entry: true,
+                                           sort_order: :asc)
+          .load(@de1).then do |discussion_entries|
+          expect(discussion_entries.map(&:id)).to eq [@de4.id, @de5.id, @de6.id]
+        end
+      end
+    end
+  end
+
+  it 'includes all entries where legacy=false for root_entries' do
+    de5 = @de4.discussion_subentries.create!(discussion_topic: @discussion, message: 'grandchild but legacy false')
+    de6 = @de4.discussion_subentries.create!(discussion_topic: @discussion, message: 'grandchild but legacy true')
+    # legacy gets set based on the feature flag state so explicitly updating the entries.
+    DiscussionEntry.where(id: de5).update_all(legacy: false, parent_id: @de4.id)
+    DiscussionEntry.where(id: de6).update_all(legacy: true, parent_id: @de4.id)
+
+    GraphQL::Batch.batch do
+      Loaders::DiscussionEntryLoader.for(
+        current_user: @teacher,
+      ).load(@de2).then { |discussion_entries|
+        expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id]
+      }
+    end
+  end
+
   it "allows querying root discussion entries only" do
     GraphQL::Batch.batch do
       Loaders::DiscussionEntryLoader.for(
@@ -73,6 +148,17 @@ describe Loaders::DiscussionEntryLoader do
           search_term: 'student'
         ).load(@discussion).then { |discussion_entries|
           expect(discussion_entries).to match [@de2]
+        }
+      end
+    end
+
+    it 'that are not deleted' do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(
+          current_user: @teacher,
+          search_term: 'goodbye'
+        ).load(@discussion).then { |discussion_entries|
+          expect(discussion_entries).to match []
         }
       end
     end

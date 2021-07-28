@@ -27,10 +27,15 @@ const defaultCourse = {
   courseName: 'Horticulture',
   currentGradingPeriodId: '1',
   enrollmentType: 'student',
+  finalGradesHidden: false,
   score: 90
 }
 
 describe('GradesSummary', () => {
+  beforeAll(() => {
+    window.location.hash = '#grades'
+  })
+
   it('displays the score as a percentage if present and grading schemes are not used', () => {
     const {getByText} = render(<GradesSummary courses={[defaultCourse]} />)
     expect(getByText('90%')).toBeInTheDocument()
@@ -80,6 +85,13 @@ describe('GradesSummary', () => {
     expect(getByText('--')).toBeInTheDocument()
   })
 
+  it('displays "--" if a course is set to hide final grades', () => {
+    const {getByText} = render(
+      <GradesSummary courses={[{...defaultCourse, score: undefined, finalGradesHidden: true}]} />
+    )
+    expect(getByText('--')).toBeInTheDocument()
+  })
+
   it('shows the course image if one is given', () => {
     const {getByTestId} = render(
       <GradesSummary courses={[{...defaultCourse, courseImage: 'http://link/to/image.jpg'}]} />
@@ -114,5 +126,10 @@ describe('GradesSummary', () => {
   it('does not render a link to the gradebook for students', () => {
     const {queryByRole} = render(<GradesSummary courses={[defaultCourse]} />)
     expect(queryByRole('link', {name: 'View Gradebook for Horticulture'})).not.toBeInTheDocument()
+  })
+
+  it('redirects to the course grades tab if the course name is clicked', () => {
+    const {getByRole} = render(<GradesSummary courses={[{...defaultCourse}]} />)
+    expect(getByRole('link', {name: 'Horticulture'}).href).toMatch('/courses/1#grades')
   })
 })

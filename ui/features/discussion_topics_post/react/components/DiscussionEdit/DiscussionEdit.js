@@ -17,20 +17,41 @@
  */
 
 import I18n from 'i18n!discussion_posts'
-import React, {useEffect} from 'react'
-import {useDiscussionRCE} from './useDiscussionRCE'
+import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
+import CanvasRce from '@canvas/rce/react/CanvasRce'
+import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 
 export const DiscussionEdit = props => {
-  const [setRCERef, getRCEText, setRCEText] = useDiscussionRCE()
+  const rceRef = useRef()
+  const [rceContent, setRceContent] = useState(false)
+  const textAreaId = useRef(`message-body-${nanoid()}`)
 
-  // Load text into RCE when Value updates
+  const rceMentionsIsEnabled = () => {
+    return !!ENV.rce_mentions_in_discussions
+  }
+
+  const getPlugins = () => {
+    const plugins = []
+
+    // Non-Editable
+    plugins.push('noneditable')
+
+    // Mentions
+    if (rceMentionsIsEnabled()) {
+      plugins.push(mentionsPluginName)
+    }
+
+    return plugins
+  }
+
   useEffect(() => {
-    setRCEText(props.value)
-  }, [props.value, setRCEText])
+    setRceContent(props.value)
+  }, [props.value, setRceContent])
 
   return (
     <div
@@ -42,7 +63,29 @@ export const DiscussionEdit = props => {
       data-testid="DiscussionEdit-container"
     >
       <View display="block">
-        <textarea ref={setRCERef} data-testid="message-body" />
+        <span>
+          <CanvasRce
+            textareaId={textAreaId.current}
+            onFocus={() => {}}
+            onBlur={() => {}}
+            onInit={() => {
+              setTimeout(() => {
+                rceRef?.current?.focus()
+              }, 1500)
+            }}
+            ref={rceRef}
+            onContentChange={content => {
+              setRceContent(content)
+            }}
+            editorOptions={{
+              focus: true,
+              plugins: getPlugins()
+            }}
+            height={300}
+            defaultContent={props.replyPreview + props.value}
+            mirroredAttrs={{'data-testid': 'message-body'}}
+          />
+        </span>
       </View>
       <Flex margin="small none none none">
         <Flex.Item shouldGrow shouldShrink textAlign="end">
@@ -51,7 +94,6 @@ export const DiscussionEdit = props => {
               if (props.onCancel) {
                 props.onCancel()
               }
-              setRCEText('')
             }}
             display="inline-block"
             color="secondary"
@@ -62,16 +104,15 @@ export const DiscussionEdit = props => {
           <Button
             onClick={() => {
               if (props.onSubmit) {
-                props.onSubmit(getRCEText())
+                props.onSubmit(rceContent)
               }
-              setRCEText('')
             }}
             display="inline-block"
             color="primary"
             margin="none none none small"
             data-testid="DiscussionEdit-submit"
           >
-            {I18n.t('Reply')}
+            {props.isEdit ? I18n.t('Save') : I18n.t('Reply')}
           </Button>
         </Flex.Item>
       </Flex>
@@ -83,11 +124,16 @@ DiscussionEdit.propTypes = {
   show: PropTypes.bool,
   value: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  isEdit: PropTypes.bool,
+  replyPreview: PropTypes.string
 }
 
 DiscussionEdit.defaultProps = {
-  show: true
+  show: true,
+  isEdit: false,
+  replyPreview: '',
+  value: ''
 }
 
 export default DiscussionEdit

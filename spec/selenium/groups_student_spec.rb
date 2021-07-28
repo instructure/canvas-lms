@@ -72,7 +72,7 @@ describe "student groups" do
       before(:each) do
         seed_students(2)
         get "/courses/#{@course.id}/groups"
-        f(".icon-plus").click
+        f('button[data-test-id="add-group-button"]').click
         wait_for_ajaximations
       end
 

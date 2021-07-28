@@ -23,10 +23,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeKebabMenu from './OutcomeKebabMenu'
-import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 
-const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler, canManage}) => (
+const OutcomeGroupHeader = ({title, minWidth, onMenuHandler, canManage, description}) => (
   <View as="div">
     <Flex as="div" alignItems="start">
       <Flex.Item size={minWidth} shouldGrow>
@@ -46,13 +45,11 @@ const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler, canMan
             canDestroy
             menuTitle={I18n.t('Outcome Group Menu')}
             onMenuHandler={onMenuHandler}
+            groupDescription={description}
           />
         </Flex.Item>
       )}
     </Flex>
-    <View as="div" padding="small 0 0">
-      <OutcomeDescription description={description} />
-    </View>
   </View>
 )
 

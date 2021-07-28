@@ -21,12 +21,12 @@ import I18n from 'i18n!account_settings_jsx_bundle'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {Tooltip} from '@instructure/ui-overlays'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import PropTypes from 'prop-types'
 import {IconInfoLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function LoginAttributeSelector(props) {
   return (
@@ -47,9 +47,6 @@ export default function LoginAttributeSelector(props) {
               renderIcon={IconInfoLine}
               withBackground={false}
               withBorder={false}
-              screenReaderLabel={I18n.t(
-                'Tooltip that contains info about the Microsoft Teams Sync Login Attribute.'
-              )}
             />
           </Tooltip>
         </Flex.Item>

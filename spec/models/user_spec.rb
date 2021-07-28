@@ -547,19 +547,6 @@ describe User do
       expect(@fake_student.reload.user_account_associations).to be_empty
     end
 
-    it "removes account associations after an enrollment concludes" do
-      subaccount1 = Account.default.sub_accounts.create!
-      subaccount2 = Account.default.sub_accounts.create!
-      course1 = course_with_student(active_all: true, account: subaccount1).course
-      course2 = course_with_student(active_all: true, account: subaccount2, user: @student).course
-      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1, subaccount2].map(&:id))
-
-      course2.complete
-      @student.update_account_associations
-      expect(@student.enrollments.where(course_id: course2).take.enrollment_state.state).to eq 'completed' # sanity check
-      expect(@student.user_account_associations.pluck(:account_id)).to match_array([Account.default, subaccount1].map(&:id))
-    end
-
     it "removes account associations for inactive/rejected enrollments" do
       subaccount1 = Account.default.sub_accounts.create!
       subaccount2 = Account.default.sub_accounts.create!
@@ -771,7 +758,7 @@ describe User do
       e.save!
 
       # only four, in the right order (type, then name), and with the top type per course
-      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
+      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eq [
         [@course5.id, 'TeacherEnrollment'],
         [@course2.id, 'TeacherEnrollment'],
         [@course3.id, 'TeacherEnrollment'],
@@ -3474,6 +3461,24 @@ describe User do
       expect(@ta.can_create_enrollment_for?(@course, nil, 'DesignerEnrollment')).to be_falsey
       expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
       expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
+    end
+
+    it "returns true if :manage_students is enabled" do
+      @course.root_account.role_overrides.create!(
+        permission: 'add_student_to_course',
+        role: ta_role,
+        enabled: false
+      )
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+    end
+
+    it "returns true if :manage_students is disabled" do
+      @course.root_account.role_overrides.create!(
+        permission: 'manage_students',
+        role: ta_role,
+        enabled: false
+      )
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
     end
   end
 

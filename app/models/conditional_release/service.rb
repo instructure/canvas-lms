@@ -32,7 +32,8 @@ module ConditionalRelease
       return env unless enabled && user
 
       cyoe_env = {}
-      cyoe_env[:assignment] = assignment_attributes(assignment) if assignment
+      assignment_unlocked = !assignment&.locked_for?(user, check_policies: true, deep_check_if_needed: true)
+      cyoe_env[:assignment] = assignment_attributes(assignment) if assignment && assignment_unlocked
       if context.is_a?(Course)
         cyoe_env[:course_id] = context.id
         cyoe_env[:stats_url] = "/api/v1/courses/#{context.id}/mastery_paths/stats"

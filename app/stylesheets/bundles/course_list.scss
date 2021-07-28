@@ -77,6 +77,6 @@
 .course-color-block:before {
   content:'\25A0';
   @include fontSize(21px);
-  padding-#{direction(right)}: $ic-sp/2;
+  padding-#{direction(right)}: $ic-sp*0.5;
   vertical-align: baseline;
 }

@@ -35,17 +35,12 @@ export const DiscussionEntry = {
       ratingSum
       rating
       read
+      replyPreview
       forcedReadState
       subentriesCount
       rootEntryParticipantCounts {
         unreadCount
         repliesCount
-      }
-      author {
-        ...User
-      }
-      editor {
-        ...User
       }
       lastReply {
         createdAt
@@ -53,8 +48,23 @@ export const DiscussionEntry = {
       permissions {
         ...DiscussionEntryPermissions
       }
+      rootEntry {
+        id
+        rootEntryParticipantCounts {
+          unreadCount
+          repliesCount
+        }
+      }
+      discussionTopic {
+        entryCounts {
+          unreadCount
+          repliesCount
+        }
+      }
+      parent {
+        id
+      }
     }
-    ${User.fragment}
     ${DiscussionEntryPermissions.fragment}
   `,
 
@@ -69,6 +79,7 @@ export const DiscussionEntry = {
     ratingSum: number,
     rating: bool,
     read: bool,
+    replyPreview: string,
     forcedReadState: bool,
     subentriesCount: number,
     author: User.shape,
@@ -80,7 +91,21 @@ export const DiscussionEntry = {
     lastReply: shape({
       createdAt: string
     }),
-    permissions: DiscussionEntryPermissions.shape
+    permissions: DiscussionEntryPermissions.shape,
+    rootEntry: shape({
+      id: string,
+      rootEntryParticipantCounts: shape({
+        unreadCount: number,
+        repliesCount: number
+      })
+    }),
+    discussionTopic: shape({
+      entryCounts: shape({
+        unreadCount: number,
+        repliesCount: number
+      })
+    }),
+    parent: shape({id: string})
   }),
 
   mock: ({
@@ -94,8 +119,9 @@ export const DiscussionEntry = {
     ratingSum = null,
     rating = false,
     read = true,
+    replyPreview = '',
     forcedReadState = false,
-    subentriesCount = 1,
+    subentriesCount = 2,
     author = User.mock(),
     editor = User.mock(),
     rootEntryParticipantCounts = {
@@ -112,6 +138,19 @@ export const DiscussionEntry = {
       nodes: [],
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionSubentriesConnection'
+    },
+    rootEntry = null,
+    discussionTopic = {
+      entryCounts: {
+        unreadCount: 2,
+        repliesCount: 56,
+        __typename: 'DiscussionEntryCounts'
+      },
+      __typename: 'Discussion'
+    },
+    parent = {
+      id: '77',
+      __typename: 'DiscussionEntry'
     }
   } = {}) => ({
     id,
@@ -124,6 +163,7 @@ export const DiscussionEntry = {
     ratingSum,
     rating,
     read,
+    replyPreview,
     forcedReadState,
     subentriesCount,
     author,
@@ -132,6 +172,9 @@ export const DiscussionEntry = {
     lastReply,
     permissions,
     discussionSubentriesConnection,
+    rootEntry,
+    discussionTopic,
+    parent,
     __typename: 'DiscussionEntry'
   })
 }

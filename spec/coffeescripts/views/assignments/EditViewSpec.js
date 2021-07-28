@@ -209,37 +209,6 @@ test('validates presence of attachment use justification when assignment has typ
   strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
 })
 
-test('validates presence of attachment legal copyright when assignment has type annotatable_attachment', function () {
-  const view = this.editView()
-  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
-  view.renderAnnotatedDocumentUsageRightsSelectBox()
-  view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['student_annotation']}
-  const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
-  strictEqual(
-    annotatedDocumentLegalCopyrightError.message,
-    'You must set document copyright holder'
-  )
-})
-
-test('validates presence of attachment use justification and legal copyright when assignment has type annotatable_attachment', function () {
-  const view = this.editView()
-  view.setAnnotatedDocument({id: '1', name: 'test.pdf', contextType: 'courses', contextId: '1'})
-  view.renderAnnotatedDocumentUsageRightsSelectBox()
-  view.$('#usageRightSelector').val('choose')
-  view.$('#copyrightHolder').val('')
-  const data = {submission_types: ['student_annotation']}
-  const errors = view.validateBeforeSave(data, {})
-  const annotatedDocumentUseJustificationError = errors.usage_rights_use_justification[0]
-  const annotatedDocumentLegalCopyrightError = errors.usage_rights_legal_copyright[0]
-  strictEqual(annotatedDocumentUseJustificationError.message, 'You must set document usage rights')
-  strictEqual(
-    annotatedDocumentLegalCopyrightError.message,
-    'You must set document copyright holder'
-  )
-})
-
 test('does not allow group assignment for large rosters', function () {
   ENV.IS_LARGE_ROSTER = true
   const view = this.editView()
@@ -1411,6 +1380,7 @@ QUnit.module('EditView: Quizzes 2', {
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
     this.view = editView({
+      html_url: 'http://foo',
       submission_types: ['external_tool'],
       is_quiz_lti_assignment: true
     })
@@ -1441,6 +1411,10 @@ test('shows the build button', function () {
 test('save routes to cancelLocation', function () {
   this.view.preventBuildNavigation = true
   equal(this.view.locationAfterSave({}), currentOrigin + '/cancel')
+})
+
+test('build adds full_width display param to normal route', function () {
+  equal(this.view.locationAfterSave({}), 'http://foo?display=full_width')
 })
 
 QUnit.module('EditView: anonymous grading', hooks => {

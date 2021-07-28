@@ -21,6 +21,7 @@ import * as AssignmentApi from './AssignmentApi'
 export const FAILURE = 'FAILURE'
 export const GRADES_ALREADY_RELEASED = 'GRADES_ALREADY_RELEASED'
 export const NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE = 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE'
+export const SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS = 'SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS'
 export const SET_RELEASE_GRADES_STATUS = 'SET_RELEASE_GRADES_STATUS'
 export const SET_UNMUTE_ASSIGNMENT_STATUS = 'SET_UNMUTE_ASSIGNMENT_STATUS'
 export const STARTED = 'STARTED'
@@ -40,7 +41,7 @@ export function updateAssignment(assignment) {
 }
 
 export function releaseGrades() {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const {assignment} = getState().assignment
 
     dispatch(setReleaseGradesStatus(STARTED))
@@ -67,7 +68,7 @@ export function releaseGrades() {
 }
 
 export function unmuteAssignment() {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const {assignment} = getState().assignment
 
     dispatch(setUnmuteAssignmentStatus(STARTED))

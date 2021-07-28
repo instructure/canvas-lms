@@ -197,13 +197,54 @@ describe MicrosoftSync::Group do
         expect(subject).to receive(:syncer_job).and_return(syncer_job)
         expect(syncer_job).to receive(:delay).with(
           singleton: "#{described_class.name}:#{subject.global_id}:enqueue_future_sync",
-          run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', 10)
+          # Using a different default value for the setting here will test the code uses the same one
+          run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', 123)
                   .to_i.minutes.from_now,
           on_conflict: :overwrite
         ).and_return(delay_double)
         expect(delay_double).to receive(:run_later).with(no_args)
 
         subject.enqueue_future_sync
+      end
+    end
+
+    context 'when the MicrosoftSync::Group is in the deleted state' do
+      it 'does not enqueue a job' do
+        subject.destroy
+        expect(subject).to_not receive(:syncer_job)
+        subject.enqueue_future_sync
+      end
+    end
+  end
+
+  describe '#enqueue_future_partial_sync' do
+    let(:delay_double) { double(:delay) }
+    let(:syncer_job) { double(:syncer_job) }
+
+    it 'upserts the sync change & enqueues a debounced (singleton and on_conflict=overwrite) job' do
+      Timecop.freeze do
+        enrollment = double(:enrollment)
+        expect(MicrosoftSync::PartialSyncChange).to receive(:upsert_for_enrollment).with(enrollment)
+
+        expect(subject).to receive(:syncer_job).and_return(syncer_job)
+        expect(syncer_job).to receive(:delay).with(
+          singleton: "#{described_class.name}:#{subject.global_id}:enqueue_future_partial_sync",
+          run_at: Setting.get('microsoft_group_enrollments_partial_syncing_debounce_minutes', 123)
+                  .to_i.minutes.from_now,
+          on_conflict: :overwrite
+        ).and_return(delay_double)
+        expect(delay_double).to receive(:run_later).with(:partial)
+
+        subject.enqueue_future_partial_sync(enrollment)
+      end
+    end
+
+    context 'when the MicrosoftSync::Group is in the deleted state' do
+      it 'does not upsert a sync change or enqueue a job' do
+        subject.destroy
+        expect(MicrosoftSync::PartialSyncChange).to_not receive(:upsert_for_enrollment)
+        expect(subject).to_not receive(:syncer_job)
+        subject.enqueue_future_partial_sync(double(:enrollment))
       end
     end
   end

@@ -471,6 +471,21 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
+  GradebookImporter::NON_ASSIGNMENT_COLUMN_HEADERS.each do |header|
+    it "does not parse assignments with name that matches #{header}" do
+      course = course_model
+      @assignment1 = course.assignments.create!(name: 'Assignment 1')
+      @assignment2 = course.assignments.create!(name: header)
+
+      importer_with_rows(
+        "Student,ID,Section,Assignment 1,#{header}",
+        'Some Student,,,,10'
+      )
+
+      expect(@gi.assignments).to eq [@assignment1]
+    end
+  end
+
   it "parses assignments correctly with existing custom columns" do
     course_model
     @assignment1 = @course.assignments.create! name: 'Assignment 1'
@@ -538,6 +553,24 @@ describe GradebookImporter do
     expect(upload.gradebook["students"][1]["name"]).to eql 'Another Student'
   end
 
+  it "parses arbitrarily ordered assignments" do
+    course = course_model
+    group1 = course.assignment_groups.create!(name: "first group", position: 1)
+    group2 = course.assignment_groups.create!(name: "second group", position: 2)
+    group3 = course.assignment_groups.create!(name: "third group", position: 3)
+
+    assignment1 = course.assignments.create!(name: "Assignment 1", assignment_group: group1)
+    assignment2 = course.assignments.create!(name: "Assignment 2", assignment_group: group2)
+    assignment3 = course.assignments.create!(name: "Assignment 3", assignment_group: group3)
+
+    importer_with_rows(
+      'Student,ID,Section,Assignment 2,Assignment 3,Assignment 1',
+      'Student 1,,,,,'
+    )
+
+    expect(@gi.assignments).to include(assignment1, assignment2, assignment3)
+  end
+
   it "does not include missing assignments if no new assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
@@ -585,7 +618,7 @@ describe GradebookImporter do
     expect(@gi.assignments.first.points_possible).to eq 20
   end
 
-  it "does not create assignments for the totals columns" do
+  it "does not create assignments for the totals columns after assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -593,6 +626,19 @@ describe GradebookImporter do
         "Points Possible,,,20,,,,,"
     )
     expect(@gi.assignments).to eq [@assignment1]
+    expect(@gi.missing_assignments).to be_empty
+  end
+
+  it "does not create assignments for arbitrarily placed totals columns" do
+    course_model
+    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment2 = @course.assignments.create!(:name => 'Assignment 2', :points_possible => 10)
+    importer_with_rows(
+        "Student,ID,Section,Final Score,Assignment 1,Current Points,Assignment 2,Final Points,Current Score,Final Grade",
+        "Points Possible,,,(read only),20,(read only),20,,,"
+    )
+    expect(@gi.assignments).to include(@assignment1, @assignment2)
+    expect(@gi.assignments.map(&:title)).to_not include('Final Score', 'Current Points')
     expect(@gi.missing_assignments).to be_empty
   end
 

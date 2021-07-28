@@ -373,35 +373,21 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
     })
 
     describe('.isDecorativeImage', () => {
-      describe('when "data-decorative" is "true" on the image element', () => {
-        beforeEach(() => {
-          $image.setAttribute('data-decorative', true)
-        })
-
+      describe('when have some attributes on the image element', () => {
         it('is true when the image has no alt text', () => {
           $image.alt = ''
           expect(getImageOptions().isDecorativeImage).toEqual(true)
         })
-      })
-
-      describe('when "data-decorative" is "false" on the image element', () => {
-        beforeEach(() => {
-          $image.setAttribute('data-decorative', false)
-        })
-
-        it('is false when the image has no alt text', () => {
-          $image.alt = ''
-          expect(getImageOptions().isDecorativeImage).toEqual(false)
-        })
 
         it('is false when the image has alt text', () => {
+          $image.alt = 'Example image'
           expect(getImageOptions().isDecorativeImage).toEqual(false)
         })
       })
 
       it('is blank when absent on the image', () => {
         $image.alt = ''
-        expect(getImageOptions().isDecorativeImage).toEqual(false)
+        expect(getImageOptions().isDecorativeImage).toEqual(true)
       })
 
       describe('when role="presentation"', () => {

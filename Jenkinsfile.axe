@@ -46,6 +46,10 @@ def getPatchsetTag() {
   (env.GERRIT_REFSPEC.contains('master')) ? "${configuration.buildRegistryPath()}:${env.GERRIT_BRANCH}" : imageTag.patchset()
 }
 
+def getResultsHTMLUrl() {
+  return "${env.BUILD_URL}/artifact/results.html"
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -109,19 +113,21 @@ pipeline {
           selector: specific(env.BUILD_NUMBER),
         )
 
-        sh """
-          docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/rspec_results/:/tmp/rspec_results \
-          -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
-          --name axe-parser \
-          web bash -c 'gem install nokogiri; gem install csv; ruby build/new-jenkins/axe_selenium_individual_results_parser.rb /tmp/rspec_results/'
-        """
+        withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
+          sh """
+            docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/rspec_results/:/tmp/rspec_results \
+            --name stormbreaker-results canvas bash -c \
+            "bundle install; bundle exec rake stormbreaker:combine_results['/tmp/rspec_results/**']"
+          """
 
-        sh 'docker cp axe-parser:/usr/src/app/axe_results.csv .'
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'axe_results.csv'
+          sh 'docker cp stormbreaker-results:/usr/src/app/results.html .'
+
+          archiveArtifacts allowEmptyArchive: true, artifacts: 'results.html'
+        }
 
         // Only alert on periodic jobs, not ones resulting from manual tests
         if (env.GERRIT_EVENT_TYPE != 'comment-added') {
-          slackSend channel: '#canvas-axe-build', message: "<$env.BUILD_URL/testReport|Latest Canvas Axe Selenium Results>"
+          slackSend channel: '#canvas-axe-build', message: "<$env.BUILD_URL/testReport|Latest Canvas Axe Selenium Results> - <${getResultsHTMLUrl()}|HTML>"
         }
       }
     }

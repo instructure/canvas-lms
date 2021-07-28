@@ -797,8 +797,16 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  # Returns an array of both the versioned originality reports (those with attachments) and
+  # text_entry_originality_reports in a sorted order. The ordering goes from least preferred
+  # report to most preferred reports, assuming there are reports that share the same submission and
+  # attachment combination. Otherwise, the ordering can be safely ignored.
+  #
+  # @return [Array<OriginalityReport>]
   def originality_reports_for_display
-    (versioned_originality_reports + text_entry_originality_reports).uniq.sort_by(&:created_at)
+    (versioned_originality_reports + text_entry_originality_reports).uniq.sort_by do |report|
+      [OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.index(report.workflow_state) || -1, report.updated_at]
+    end
   end
 
   def turnitin_assets
@@ -820,7 +828,14 @@ class Submission < ActiveRecord::Base
     requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string) unless asset_string == self.asset_string
     scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
     scope = scope.where(submission_time: version_sub.submitted_at) if version_sub
-    report = scope.find_by(attachment: requested_attachment)
+    # This ordering ensures that if multiple reports exist for this submission and attachment combo,
+    # we grab the desired report. This is the reversed ordering of
+    # OriginalityReport::PREFERRED_STATE_ORDER
+    report = scope.where(attachment: requested_attachment).order(Arel.sql("CASE
+      WHEN workflow_state = 'scored' THEN 0
+      WHEN workflow_state = 'error' THEN 1
+      WHEN workflow_state = 'pending' THEN 2
+      END"), updated_at: :desc).first
     report&.report_launch_path
   end
 
@@ -1363,9 +1378,14 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def annotation_context(attempt: nil, draft: false)
+  def annotation_context(attempt: nil, in_progress: false, draft: false)
     if draft
       canvadocs_annotation_contexts.find_or_create_by(
+        attachment_id: assignment.annotatable_attachment_id,
+        submission_attempt: nil
+      )
+    elsif in_progress
+      canvadocs_annotation_contexts.find_by(
         attachment_id: assignment.annotatable_attachment_id,
         submission_attempt: nil
       )
@@ -2608,11 +2628,16 @@ class Submission < ActiveRecord::Base
   def rubric_assessments_for_attempt(attempt: nil)
     return rubric_assessments.to_a if attempt.blank?
 
+    # If the requested attempt is 0, no attempt has actually been submitted.
+    # The submission's attempt will be nil (not 0), so we do actually want to
+    # find assessments with a nil artifact_attempt.
+    effective_attempt = attempt == 0 ? nil : attempt
+
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-      if assessment.artifact_attempt == attempt
+      if assessment.artifact_attempt == effective_attempt
         assessments_for_attempt << assessment
       else
-        version = assessment.versions.find { |v| v.model.artifact_attempt == attempt }
+        version = assessment.versions.find { |v| v.model.artifact_attempt == effective_attempt }
         assessments_for_attempt << version.model if version
       end
     end
@@ -2627,12 +2652,20 @@ class Submission < ActiveRecord::Base
 
   def self.process_bulk_update(progress, context, section, grader, grade_data)
     missing_ids = []
+    unpublished_assignment_ids = []
     graded_user_ids = Set.new
     preloaded_assignments = Assignment.find(grade_data.keys).index_by(&:id)
 
     Submission.suspend_callbacks(:touch_graders) do
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
+      unless assignment.published?
+        # if we don't bail here, the submissions will throw
+        # errors deeper in the update because you can't change grades
+        # on submissions that belong to deleted assignments
+        unpublished_assignment_ids << assignment.id
+        next
+      end
 
       scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
       if section
@@ -2702,11 +2735,20 @@ class Submission < ActiveRecord::Base
     end
     end
 
+    # make sure we don't pretend everything was fine if there were missing or
+    # bad-state records that we couldn't handle.  We don't need to throw an exception,
+    # but we do need to make the reason for lack of command compliance
+    # visible.
     if missing_ids.any?
       progress.message = "Couldn't find User(s) with API ids #{missing_ids.map{|id| "'#{id}'"}.join(", ")}"
       progress.save
       progress.fail
+    elsif unpublished_assignment_ids.any?
+      progress.message = "Some assignments are either not published or deleted and can not be graded #{unpublished_assignment_ids.map{|id| "'#{id}'"}.join(", ")}"
+      progress.save
+      progress.fail
     end
+
   ensure
     context.clear_todo_list_cache_later(:admins)
     user_ids = graded_user_ids.to_a

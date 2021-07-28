@@ -27,6 +27,8 @@ class DiscussionEntry < ActiveRecord::Base
   include HtmlTextHelper
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id
+  has_many :legacy_subentries, -> { where('legacy=true') }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
+  has_many :root_discussion_replies, -> { where('legacy=false OR legacy=true AND parent_id=root_entry_id') }, class_name: 'DiscussionEntry', foreign_key: "root_entry_id"
   has_many :discussion_subentries, -> { order(:created_at) }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
@@ -45,11 +47,14 @@ class DiscussionEntry < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
 
   before_create :infer_root_entry_id
+  before_create :populate_legacy
   before_create :set_root_account_id
+  before_save :process_reply_preview
   after_save :update_discussion
   after_save :context_module_action_later
   after_create :create_participants
   after_create :clear_planner_cache_for_participants
+  after_create :update_topic
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
   before_validation :set_depth, :on => :create
@@ -80,6 +85,16 @@ class DiscussionEntry < ActiveRecord::Base
 
   def mentioned_users
     User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+  end
+
+  def process_reply_preview
+    reply_preview = Nokogiri::HTML.fragment(message).search('[data-discussion-reply-preview]')
+    if reply_preview.present?
+      self.include_reply_preview = true
+      new_message = Nokogiri::HTML.fragment(message)
+      new_message.search('[data-discussion-reply-preview]').remove
+      self.message = new_message.to_html
+    end
   end
 
   def course_broadcast_data
@@ -180,6 +195,17 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def quoted_reply_html
+    "<div class=\"reply_preview\" data-discussion-reply-preview=\"1\">
+      <blockquote cite=\"#\">
+        <span>
+          <strong>#{user.short_name}</strong> #{created_at.iso8601}
+        </span>
+        #{message}
+      </blockquote>
+    </div>"
+  end
+
   def plaintext_message=(val)
     self.message = format_message(val).first
   end
@@ -264,6 +290,21 @@ class DiscussionEntry < ActiveRecord::Base
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
+  end
+
+  def populate_legacy
+    # TODO
+    # when this feature flag is removed, we should add a predeploy migration
+    # that changes the column default. Then just get rid of this method.
+    #
+    # class FlipLegacyDefaultOnDiscussionEntry < ActiveRecord::Migration[6.0]
+    #   tag :predeploy
+    #
+    #   def change
+    #     change_column_default :discussion_entries, :legacy, false
+    #   end
+    # end
+    self.legacy = !(context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:isolated_view))
   end
 
   def infer_root_entry_id

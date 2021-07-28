@@ -24,7 +24,14 @@ module.exports = {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
     'node_modules-version-of-react-modal': require.resolve('react-modal'),
-    '^Backbone$': '<rootDir>/public/javascripts/Backbone.js'
+    '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
+    // jest can't import the icons
+    '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
+    // redirect imports from es/rce to lib
+    '@instructure/canvas-rce/es/rce/tinyRCE': '<rootDir>/packages/canvas-rce/lib/rce/tinyRCE.js',
+    '@instructure/canvas-rce/es/rce/RCE': '<rootDir>/packages/canvas-rce/lib/rce/RCE.js',
+    // mock the tinymce-react Editor react component
+    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js'
   },
   roots: ['ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],

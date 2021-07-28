@@ -35,7 +35,8 @@ const COMMON_PROPS = {
   date: moment().hour(23).minute(59),
   dateStyle: 'due',
   points: 100,
-  status: {}
+  status: {},
+  readOnly: true
 }
 
 const ITEMS = [

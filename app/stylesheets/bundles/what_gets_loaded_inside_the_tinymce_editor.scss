@@ -101,6 +101,16 @@ iframe[data-media-id] {
   background-color: #eee;
 }
 
+/* TinyMCE noneditable plugin overrides for discussion mentions */
+.mceNonEditable.mention {
+  cursor: default;
+  background:rgba(102, 24, 157, 0.1);
+  color: #66189D;
+  border-radius: 0.25rem;
+  padding: 0.125rem;
+  height: 1.5rem;
+}
+
 /* the svg and keyframe styles are lifted from instui spinner */
 span[data-placeholder-for] {
   border: solid 1px #8b969e;

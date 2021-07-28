@@ -53,8 +53,8 @@
     // that involved a user with a given feature or experience enabled.
     FS.setUserVars({
       accountName_str: '<%=@current_user&.account.name || '?'%>',
-      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>',
-      feature_homeroom_course_bool: <%= !!(@js_env[:HOMEROOM_COURSE]) %>
+      feature_homeroom_course_bool: <%= !!(js_env&.fetch(:HOMEROOM_COURSE, false)) %>,
+      roles_str: '<%=((@current_user.try(:roles, @domain_root_account) || []) - ['user']).join(',')%>'
     })
   </script>
 <% end %>

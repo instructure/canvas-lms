@@ -151,14 +151,14 @@ Rails.application.config.after_initialize do
       # This array is effectively 1 indexed
       relevant_weeks = maintenance_window_weeks_of_month.map { |i| WeekOfMonth::Constant::WEEKS_IN_SEQUENCE[i] }
       maintenance_days = relevant_weeks.map do |ordinal|
-        Time.zone.local_to_utc(start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+        start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end + relevant_weeks.map do |ordinal|
-        Time.zone.local_to_utc((start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase))
+        (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end 
 
       next_day = maintenance_days.find { |d| d.future? }
       # Time offsets are strange
-      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours
+      start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
 
       [start_at, end_at]
@@ -166,6 +166,10 @@ Rails.application.config.after_initialize do
 
     def maintenance_window_start_hour
       Setting.get('maintenance_window_start_hour', nil)&.to_i
+    end
+
+    def maintenance_window_offset
+      Setting.get('maintenance_window_offset', '0').to_i
     end
 
     def maintenance_window_duration

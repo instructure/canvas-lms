@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useMemo} from 'react'
 import {ToggleButton} from './ToggleButton'
 
 import {Flex} from '@instructure/ui-flex'
@@ -44,22 +44,15 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {replyCountText} from '../../utils/index'
 
 function InfoText({repliesCount, unreadCount}) {
-  const infoText = []
+  const infoText = replyCountText(repliesCount, unreadCount)
 
-  if (repliesCount > 0) {
-    infoText.push(I18n.t('%{repliesCount} replies', {repliesCount}))
-  }
-
-  if (unreadCount > 0) {
-    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
-  }
-
-  return infoText.length > 0 ? (
+  return repliesCount > 0 ? (
     <View padding="0 x-small 0 0">
-      <Text weight="light" size="small" data-testid="replies-counter">
-        {infoText.join(', ')}
+      <Text weight="normal" size="small" data-testid="replies-counter">
+        {infoText}
       </Text>
     </View>
   ) : null
@@ -94,12 +87,21 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
           onClick={props.onToggleSubscription}
         />
       )}
-      {renderMenu(props)}
+      <ToolbarMenu {...props} />
     </>
   )
 }
 
-const renderMenu = props => {
+const ToolbarMenu = props => {
+  const menuConfigs = useMemo(() => {
+    return getMenuConfigs(props).map(config => {
+      return renderMenuItem(config)
+    })
+  }, [props])
+
+  if (menuConfigs.length === 0) {
+    return null
+  }
   return (
     <Menu
       trigger={
@@ -113,7 +115,7 @@ const renderMenu = props => {
         />
       }
     >
-      {getMenuConfigs(props).map(config => renderMenuItem({...config}))}
+      {menuConfigs}
     </Menu>
   )
 }
@@ -146,7 +148,7 @@ const getMenuConfigs = props => {
   }
   if (props.onCloseForComments) {
     options.push({
-      key: 'toggle-comments',
+      key: 'close-comments',
       icon: <IconLockLine />,
       label: I18n.t('Close for Comments'),
       selectionCallback: props.onCloseForComments
@@ -154,7 +156,7 @@ const getMenuConfigs = props => {
   }
   if (props.onOpenForComments) {
     options.push({
-      key: 'toggle-comments',
+      key: 'open-comments',
       icon: <IconUnlockLine />,
       label: I18n.t('Open for Comments'),
       selectionCallback: props.onOpenForComments
@@ -219,18 +221,16 @@ const getMenuConfigs = props => {
   return options
 }
 
-const renderMenuItem = ({selectionCallback, icon, label, key}) => {
-  return (
-    <Menu.Item key={key} onSelect={selectionCallback} data-testid={key}>
-      <Flex>
-        <Flex.Item>{icon}</Flex.Item>
-        <Flex.Item padding="0 0 0 xx-small">
-          <Text>{label}</Text>
-        </Flex.Item>
-      </Flex>
-    </Menu.Item>
-  )
-}
+const renderMenuItem = ({selectionCallback, icon, label, key}) => (
+  <Menu.Item onSelect={selectionCallback} key={key}>
+    <Flex>
+      <Flex.Item>{icon}</Flex.Item>
+      <Flex.Item padding="0 0 0 xx-small">
+        <Text>{label}</Text>
+      </Flex.Item>
+    </Flex>
+  </Menu.Item>
+)
 
 PostToolbar.propTypes = {
   /**

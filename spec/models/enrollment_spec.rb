@@ -184,7 +184,7 @@ describe Enrollment do
 
     it "should return the sis enrollment type otherwise" do
       c = Account.default.courses.create!
-      e = TaEnrollment.create(course: c)
+      e = TaEnrollment.new(course: c)
       expect(e.sis_role).to eq 'ta'
     end
   end
@@ -1441,7 +1441,13 @@ describe Enrollment do
       expect(Enrollment).to receive(:delay_if_production).
         with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:")).
         and_return(Enrollment)
-      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
+      # The delegation works correctly in both cases, just the introspection of the method
+      # kwargs by rspec is different between ruby versions
+      if RUBY_VERSION >= '2.7.0'
+        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id)
+      else
+        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
+      end
 
       Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
     end
@@ -3517,6 +3523,11 @@ describe Enrollment do
 
         it 'should enqueue a job' do
           expect { enroll_user }.to change { Delayed::Job.count }.by 1
+        end
+
+        it 'calls MicrosoftSync::Group#enqueue_future_partial_sync' do
+          expect_any_instance_of(MicrosoftSync::Group).to receive(:enqueue_future_partial_sync)
+          enroll_user
         end
       end
     end
