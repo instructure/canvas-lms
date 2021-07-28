@@ -347,7 +347,7 @@ export const IsolatedViewContainer = props => {
                     props.setRCEOpen(false)
                   }}
                   onCancel={() => props.setRCEOpen(false)}
-                  replyPreview={isolatedEntry.data?.legacyNode?.replyPreview}
+                  replyPreview={isolatedEntryOlderDirection.data?.legacyNode?.replyPreview}
                 />
               </View>
             )}
