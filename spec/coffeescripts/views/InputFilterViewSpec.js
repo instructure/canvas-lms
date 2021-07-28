@@ -21,15 +21,12 @@ import $ from 'jquery'
 import InputFilterView from 'backbone-input-filter-view'
 import 'helpers/jquery.simulate'
 
-let view = null
+let view
 let clock = null
 
 QUnit.module('InputFilterView', {
   setup() {
     clock = sinon.useFakeTimers()
-    view = new InputFilterView()
-    view.render()
-    view.$el.appendTo($('#fixtures'))
   },
 
   teardown() {
@@ -38,14 +35,21 @@ QUnit.module('InputFilterView', {
   }
 })
 
+function createAndRenderView(options = {}) {
+  view = new InputFilterView(options)
+  view.render()
+  view.$el.appendTo($('#fixtures'))
+}
+
 const setValue = term => (view.el.value = term)
 
-const simulateKeyup = function(opts = {}) {
-  view.$el.simulate('keyup', opts)
-  return clock.tick(view.options.onInputDelay)
+const simulateKeyup = function (inputDelay = view.options.onInputDelay) {
+  view.$el.simulate('keyup')
+  return clock.tick(inputDelay)
 }
 
 test('fires input event, sends value', () => {
+  createAndRenderView()
   const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
@@ -54,7 +58,19 @@ test('fires input event, sends value', () => {
   ok(spy.calledWith('foo'))
 })
 
+test('delays firing the event until input delay has passed', () => {
+  createAndRenderView({onInputDelay: 150})
+  const onInput = sinon.spy()
+  view.on('input', onInput)
+  setValue('foo')
+  simulateKeyup(100)
+  equal(onInput.callCount, 0)
+  clock.tick(100)
+  equal(onInput.callCount, 1)
+})
+
 test('does not fire input event if value has not changed', () => {
+  createAndRenderView()
   const spy = sinon.spy()
   view.on('input', spy)
   setValue('foo')
@@ -64,6 +80,7 @@ test('does not fire input event if value has not changed', () => {
 })
 
 test('updates the model attribute', () => {
+  createAndRenderView()
   view.model = new Backbone.Model()
   setValue('foo')
   simulateKeyup()
@@ -71,6 +88,7 @@ test('updates the model attribute', () => {
 })
 
 test('updates the collection parameter', () => {
+  createAndRenderView()
   view.collection = new Backbone.Collection()
   setValue('foo')
   simulateKeyup()
@@ -79,6 +97,7 @@ test('updates the collection parameter', () => {
 })
 
 test('gets modelAttribute from input name', () => {
+  createAndRenderView()
   const input = $('<input name="couch">').appendTo($('#fixtures'))
   view = new InputFilterView({
     el: input[0]
@@ -87,6 +106,7 @@ test('gets modelAttribute from input name', () => {
 })
 
 test('sets model attribute to empty string with empty value', () => {
+  createAndRenderView()
   view.model = new Backbone.Model()
   setValue('foo')
   simulateKeyup()
@@ -96,6 +116,7 @@ test('sets model attribute to empty string with empty value', () => {
 })
 
 test('deletes collection paramater on empty value', () => {
+  createAndRenderView()
   view.collection = new Backbone.Collection()
   setValue('foo')
   simulateKeyup()
@@ -106,6 +127,7 @@ test('deletes collection paramater on empty value', () => {
 })
 
 test('does nothing with model/collection when the value is less than the minLength', () => {
+  createAndRenderView()
   view.model = new Backbone.Model({filter: 'foo'})
   setValue('ab')
   simulateKeyup()
@@ -113,6 +135,7 @@ test('does nothing with model/collection when the value is less than the minLeng
 })
 
 test('does setParam false when the value is less than the minLength and setParamOnInvalid=true', () => {
+  createAndRenderView()
   view.model = new Backbone.Model({filter: 'foo'})
   view.options.setParamOnInvalid = true
   setValue('ab')
@@ -121,6 +144,7 @@ test('does setParam false when the value is less than the minLength and setParam
 })
 
 test('updates filter with small number', () => {
+  createAndRenderView()
   view.model = new Backbone.Model({filter: 'foo'})
   view.options.allowSmallerNumbers = false
   setValue('1')

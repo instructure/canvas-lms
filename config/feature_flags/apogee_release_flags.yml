@@ -101,3 +101,8 @@ enhanced_gradebook_filters:
   applies_to: SiteAdmin
   display_name: Enhanced Gradebook Filters
   description: Improved filtering of students and assignments in Gradebook.
+remove_gradebook_student_search_delay:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Remove Delay for Gradebook Student Search
+  description: If set, removes the delay that normally occurs when searching for students.

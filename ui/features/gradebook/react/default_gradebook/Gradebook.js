@@ -2201,9 +2201,12 @@ class Gradebook {
 
   renderSearchFilter() {
     if (!this.userFilter) {
-      this.userFilter = new InputFilterView({
-        el: '#search-filter-container input'
-      })
+      const opts = {el: '#search-filter-container input'}
+      if (this.options.remove_gradebook_student_search_delay_enabled) {
+        opts.onInputDelay = 0
+      }
+
+      this.userFilter = new InputFilterView(opts)
       this.userFilter.on('input', this.onUserFilterInput)
     }
     const disabled =
