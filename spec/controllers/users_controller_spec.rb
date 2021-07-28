@@ -2479,6 +2479,26 @@ describe UsersController do
       expect(json['errored_users'].first['existing_users'].first['user_id']).to eq existing_user.id
       expect(json['errored_users'].first['existing_users'].first['user_token']).to eq existing_user.token
     end
+
+    it 'checks for pre-existing users with unconfirmed communication channels' do
+      user = user_with_pseudonym(active_all: true, username: 'example1@example.com')
+      user.communication_channels.first.update!(workflow_state: 'unconfirmed')
+      unconfirmed_email_message =
+        "The email address provided conflicts with an existing user's email that is awaiting verification."
+
+      allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
+      course_with_teacher_logged_in(active_all: true)
+
+      user_list = [{ 'email' => 'example1@example.com' }]
+
+      post 'invite_users', params: { course_id: @course.id, users: user_list }
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body)
+      expect(json['invited_users']).to be_empty
+      expect(json['errored_users'].count).to eq 1
+      expect(json['errored_users'].first['errors'].first['message']).to include(unconfirmed_email_message)
+    end
   end
 
   describe "#user_dashboard" do
