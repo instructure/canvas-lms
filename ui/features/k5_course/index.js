@@ -29,6 +29,7 @@ ready(() => {
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}
+        canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
         currentUser={ENV.current_user}
         id={ENV.COURSE.id}
         imageUrl={ENV.COURSE.image_url}

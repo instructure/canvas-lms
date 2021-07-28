@@ -253,7 +253,7 @@
               <% if can_manage %>
                 <%= f.select :homeroom_course_id, format_options %>
               <% else %>
-                <%= (format_options.detect{|text, key| key == @context.homeroom_course_id} || format_options.first).first %>
+                <%= @homeroom_courses&.detect{|c| c.id == @context.homeroom_course_id}&.name %>
               <% end %>
               <div class="aside palign">
                 <% latest_progress = @context.progresses.where(tag: 'sync_homeroom_enrollments').last %>

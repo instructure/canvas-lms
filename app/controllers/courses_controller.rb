@@ -2222,10 +2222,13 @@ class CoursesController < ApplicationController
           css_bundle :syllabus, :tinymce
         when 'k5_dashboard'
           js_env(
-              CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
-              PERMISSIONS: { manage: @context.grants_right?(@current_user, session, :manage) },
-              STUDENT_PLANNER_ENABLED: planner_enabled?,
-              TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
+            CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+            PERMISSIONS: {
+              manage: @context.grants_right?(@current_user, session, :manage),
+              read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin)
+            },
+            STUDENT_PLANNER_ENABLED: planner_enabled?,
+            TABS: @context.tabs_available(@current_user, course_subject_tabs: true)
           )
 
           js_bundle :k5_course, :context_modules

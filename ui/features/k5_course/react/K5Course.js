@@ -152,7 +152,7 @@ export function CourseHeaderOptions({
   settingsPath,
   showStudentView,
   studentViewPath,
-  canManage,
+  canReadAsAdmin,
   courseContext
 }) {
   return (
@@ -164,7 +164,7 @@ export function CourseHeaderOptions({
       margin="0 0 medium 0"
     >
       <Flex direction="row">
-        {canManage && (
+        {canReadAsAdmin && (
           <Flex.Item shouldGrow shouldShrink>
             <Button
               id="manage-subject-btn"
@@ -199,7 +199,7 @@ CourseHeaderOptions.propTypes = {
   settingsPath: PropTypes.string.isRequired,
   showStudentView: PropTypes.bool.isRequired,
   studentViewPath: PropTypes.string.isRequired,
-  canManage: PropTypes.bool.isRequired,
+  canReadAsAdmin: PropTypes.bool.isRequired,
   courseContext: PropTypes.string.isRequired
 }
 
@@ -216,6 +216,7 @@ export function K5Course({
   name,
   timeZone,
   canManage = false,
+  canReadAsAdmin,
   plannerEnabled = false,
   hideFinalGrades,
   currentUser,
@@ -288,9 +289,9 @@ export function K5Course({
       sticky && activeTab.current === currentTab && contentHeight > extendedViewport
     return (
       <View id="k5-course-header" as="div" padding={sticky ? 'medium 0 0 0' : '0'}>
-        {(canManage || showStudentView) && (
+        {(canReadAsAdmin || showStudentView) && (
           <CourseHeaderOptions
-            canManage={canManage}
+            canReadAsAdmin={canReadAsAdmin}
             settingsPath={settingsPath}
             showStudentView={showStudentView}
             studentViewPath={`${studentViewPath + window.location.hash}`}
@@ -356,7 +357,7 @@ export function K5Course({
               pagesPath={pagesPath}
               hasWikiPages={hasWikiPages}
               courseName={name}
-              userIsInstructor={userIsInstructor}
+              canManage={canManage}
             />
           ))}
         <SchedulePage
@@ -402,6 +403,7 @@ K5Course.propTypes = {
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
   canManage: PropTypes.bool,
+  canReadAsAdmin: PropTypes.bool.isRequired,
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   imageUrl: PropTypes.string,
