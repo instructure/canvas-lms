@@ -35,6 +35,7 @@ import {
 } from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
 
 export const IsolatedThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -101,6 +102,7 @@ export const IsolatedThreadsContainer = props => {
             onClick={props.showOlderReplies}
             buttonText={I18n.t('Show older replies')}
           />
+          {false && <Spinner size="x-small" margin="0 0 0 small" />}
         </View>
       )}
       {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
@@ -124,6 +126,7 @@ export const IsolatedThreadsContainer = props => {
             onClick={props.showNewerReplies}
             buttonText={I18n.t('Show newer replies')}
           />
+          {false && <Spinner size="x-small" margin="0 0 0 small" />}
         </View>
       )}
     </View>
