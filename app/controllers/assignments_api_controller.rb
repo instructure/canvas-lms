@@ -1339,6 +1339,11 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])
+
+    if needs_grading_permission? && !@assignment.grants_right?(@current_user, :grade)
+      render_unauthorized_action and return
+    end
+
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user
@@ -1441,6 +1446,11 @@ class AssignmentsApiController < ApplicationController
     end
     # self, observer
     authorized_action(@user, @current_user, %i(read_as_parent read))
+  end
+
+  def needs_grading_permission?
+    grading_attributes = [:points_possible, :grading_type, :grading_standard_id]
+    grading_attributes.any? { |attribute| params[:assignment][attribute] != @assignment[attribute] } && @assignment.submissions.graded.exists?
   end
 
   # old_assignment is the assignement we want to copy from

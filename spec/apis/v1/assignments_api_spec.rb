@@ -3031,25 +3031,61 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "returns unauthorized for users who do not have permission" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @assignment = @course.assignments.create!({
         :name => "some assignment",
         :points_possible => 15
       })
 
-      api_call(:put,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-        {
-          :controller => 'assignments_api',
-          :action => 'update',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :id => @assignment.to_param
-        },
-        { 'points_possible' => 10 },
-        {},
-        {:expected_status => 401}
+      api_update_assignment_call(@course, @assignment, {'points_possible': 10})
+
+      expect(response.code).to eq "401"
+    end
+
+    it "allows user with grading rights to update assignment grading type" do
+      course_with_student(:active_all => true)
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
       )
+      @assignment.grade_student(@student, grade: 15, grader: @teacher)
+
+      @user = @teacher
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response).to be_successful
+      expect(@assignment.grading_type).to eq 'percent'
+    end
+
+    it "allows user to update grading_type without grading rights when no submissions have been graded" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
+      )
+
+      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
+      account_admin_user(active_all: true)
+
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response).to be_successful
+      expect(@assignment.grading_type).to eq 'percent'
+    end
+
+    it "returns unauthorized if user updates grading_type without grading rights when at least one submission has been graded" do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
+      )
+      @assignment.grade_student(@student, grade: 15, grader: @teacher)
+
+      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
+      account_admin_user(active_all: true)
+
+      api_update_assignment_call(@course, @assignment, {'grading_type': 'percent'})
+      expect(response.code).to eq "401"
     end
 
     it "should update published/unpublished" do
