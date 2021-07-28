@@ -29,10 +29,12 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
+import {showImportConfirmBox} from './ImportConfirmBox'
 import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 import useResize from '@canvas/outcomes/react/hooks/useResize'
+import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 
@@ -61,6 +63,20 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
 
+  const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
+
+  const onAddAllHandler = () => {
+    if (isCourse && !isConfirmBoxOpen) {
+      openConfirmBox()
+      // NOTE: Temp until OUT-4333 is merged
+      showImportConfirmBox({
+        count: 51,
+        onImportHandler: () => {},
+        onCloseHandler: closeConfirmBox
+      })
+    }
+  }
+
   const findOutcomesView = (
     <FindOutcomesView
       collection={collections[selectedGroupId]}
@@ -69,7 +85,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
-      onAddAllHandler={() => {}}
+      disableAddAllButton={isConfirmBoxOpen}
+      onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}
     />
@@ -111,6 +128,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       shouldReturnFocus
       size="fullscreen"
       label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (

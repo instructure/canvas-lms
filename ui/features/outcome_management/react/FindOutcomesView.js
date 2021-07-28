@@ -40,6 +40,7 @@ const FindOutcomesView = ({
   loading,
   loadMore,
   searchString,
+  disableAddAllButton,
   onChangeHandler,
   onClearHandler,
   onAddAllHandler
@@ -89,7 +90,11 @@ const FindOutcomesView = ({
         </Flex.Item>
         {searchString.length === 0 && !isRootGroup && (
           <Flex.Item>
-            <Button interaction={enabled ? 'enabled' : 'disabled'} onClick={onAddAllHandler}>
+            <Button
+              margin="x-small 0"
+              interaction={enabled && !disableAddAllButton ? 'enabled' : 'disabled'}
+              onClick={onAddAllHandler}
+            >
               {I18n.t('Add All Outcomes')}
             </Button>
           </Flex.Item>
@@ -280,6 +285,7 @@ FindOutcomesView.propTypes = {
     })
   }),
   searchString: PropTypes.string.isRequired,
+  disableAddAllButton: PropTypes.bool,
   onChangeHandler: PropTypes.func.isRequired,
   onClearHandler: PropTypes.func.isRequired,
   onAddAllHandler: PropTypes.func.isRequired,

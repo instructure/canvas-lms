@@ -54,6 +54,7 @@ describe('FindOutcomesView', () => {
     searchString: '',
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
+    disableAddAllButton: false,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
     ...props
