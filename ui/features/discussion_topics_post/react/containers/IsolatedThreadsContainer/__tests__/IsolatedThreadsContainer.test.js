@@ -113,6 +113,36 @@ describe('IsolatedThreadsContainer', () => {
     expect(queryByTestId('pagination')).toBeNull()
   })
 
+  describe('Spinners', () => {
+    it('show newer spinner when fetchingMoreNewerReplies is true', async () => {
+      const container = setup(
+        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: true})
+      )
+      await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeTruthy())
+    })
+
+    it('hide newer button spinner when fetchingMoreNewerReplies is false', async () => {
+      const container = setup(
+        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: false})
+      )
+      await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeNull())
+    })
+
+    it('show older button spinner when fetchingMoreOlderReplies is true', async () => {
+      const container = setup(
+        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: true})
+      )
+      await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeTruthy())
+    })
+
+    it('hide older button spinner when fetchingMoreOlderReplies is false', async () => {
+      const container = setup(
+        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: false})
+      )
+      await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeNull())
+    })
+  })
+
   describe('show more replies buttons', () => {
     it('clicking show older replies button calls showOlderReplies()', async () => {
       const showOlderReplies = jest.fn()

@@ -103,7 +103,14 @@ export const IsolatedThreadsContainer = props => {
             buttonText={I18n.t('Show older replies')}
             fetchingMoreReplies={props.fetchingMoreOlderReplies}
           />
-          {false && <Spinner size="x-small" margin="0 0 0 small" />}
+          {props.fetchingMoreOlderReplies && (
+            <Spinner
+              renderTitle="loading older replies"
+              data-testid="old-reply-spinner"
+              size="x-small"
+              margin="0 0 0 small"
+            />
+          )}
         </View>
       )}
       {props.discussionEntry.discussionSubentriesConnection.nodes.map(entry => (
@@ -128,7 +135,14 @@ export const IsolatedThreadsContainer = props => {
             buttonText={I18n.t('Show newer replies')}
             fetchingMoreReplies={props.fetchingMoreNewerReplies}
           />
-          {false && <Spinner size="x-small" margin="0 0 0 small" />}
+          {props.fetchingMoreNewerReplies && (
+            <Spinner
+              renderTitle="loading newer replies"
+              data-testid="new-reply-spinner"
+              size="x-small"
+              margin="0 0 0 small"
+            />
+          )}
         </View>
       )}
     </View>
