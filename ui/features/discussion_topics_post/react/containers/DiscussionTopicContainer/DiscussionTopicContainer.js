@@ -403,15 +403,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   ? () => onToggleLocked(true)
                                   : null
                               }
-                              onShareToCommons={
-                                props.discussionTopic.permissions?.manageContent &&
-                                ENV.discussion_topic_menu_tools?.length > 0
-                                  ? () =>
-                                      window.location.assign(
-                                        `${ENV.discussion_topic_menu_tools[0].base_url}&discussion_topics%5B%5D=${props.discussionTopic._id}`
-                                      )
-                                  : null
-                              }
+                              canManageContent={props.discussionTopic.permissions?.manageContent}
+                              discussionTopicId={props.discussionTopic._id}
                             />
                           }
                         >

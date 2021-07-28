@@ -48,7 +48,14 @@ describe('DiscussionTopicContainer', () => {
     window.ENV = {
       context_asset_string: 'course_1',
       course_id: '1',
-      discussion_topic_menu_tools: [{base_url: 'example.com'}]
+      discussion_topic_menu_tools: [
+        {
+          base_url: 'example.com',
+          canvas_icon_class: 'icon-commons',
+          id: '1',
+          title: 'Share to Commons'
+        }
+      ]
     }
 
     if (!document.getElementById('flash_screenreader_holder')) {

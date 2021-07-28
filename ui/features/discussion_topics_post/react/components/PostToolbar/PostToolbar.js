@@ -202,12 +202,18 @@ const getMenuConfigs = props => {
       selectionCallback: props.onAddRubric
     })
   } */
-  if (props.onShareToCommons) {
-    options.push({
-      key: 'shareToCommons',
-      icon: <IconCommonsSolid />,
-      label: I18n.t('Share to Commons'),
-      selectionCallback: props.onShareToCommons
+  if (props.canManageContent && ENV.discussion_topic_menu_tools?.length > 0) {
+    ENV.discussion_topic_menu_tools.forEach(tool => {
+      options.push({
+        key: 'lti' + tool.id,
+        icon: <i className={tool.canvas_icon_class} />,
+        label: tool.title,
+        selectionCallback: () => {
+          window.location.assign(
+            `${tool.base_url}&discussion_topics%5B%5D=${props.discussionTopicId}`
+          )
+        }
+      })
     })
   }
   if (props.onPeerReviews) {
@@ -294,10 +300,6 @@ PostToolbar.propTypes = {
    */
   onAddRubric: PropTypes.func,
   /**
-   * Callback to be fired when Share to Commons action is fired.
-   */
-  onShareToCommons: PropTypes.func,
-  /**
    * Indicate the replies count associated with the Post.
    */
   repliesCount: PropTypes.number,
@@ -316,7 +318,15 @@ PostToolbar.propTypes = {
   /**
    * Callback to be fired when Close for Comments action is fired
    */
-  onCloseForComments: PropTypes.func
+  onCloseForComments: PropTypes.func,
+  /**
+   * Verifies if user can manage content (specially, for LTI use)
+   */
+  canManageContent: PropTypes.bool,
+  /**
+   * The id of the discussion topic
+   */
+  discussionTopicId: PropTypes.string
 }
 
 PostToolbar.defaultProps = {

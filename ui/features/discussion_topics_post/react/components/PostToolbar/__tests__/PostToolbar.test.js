@@ -256,19 +256,42 @@ describe('PostToolbar', () => {
     })
 
     describe('share to commons', () => {
-      it('does not render if the callback is not provided', () => {
+      beforeAll(() => {
+        window.ENV = {
+          discussion_topic_menu_tools: [
+            {
+              base_url: 'example.com',
+              canvas_icon_class: 'icon-commons',
+              id: '1',
+              title: 'Share to Commons'
+            },
+            {
+              base_url: 'example.com',
+              canvas_icon_class: 'icon-example',
+              id: '2',
+              title: 'Share to Example'
+            }
+          ]
+        }
+      })
+
+      it('does not render if cannot manage content', () => {
         const {queryByText, getByTestId} = setup()
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(queryByText('Share to Commons')).toBeFalsy()
       })
 
-      it('calls provided callback when clicked', () => {
-        const onShareToCommonsMock = jest.fn()
-        const {getByTestId, getByText} = setup({onShareToCommons: onShareToCommonsMock})
+      it('render if can manage content', () => {
+        const {getByTestId, getByText} = setup({canManageContent: true, discussionTopicId: '1'})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onShareToCommonsMock.mock.calls.length).toBe(0)
-        fireEvent.click(getByText('Share to Commons'))
-        expect(onShareToCommonsMock.mock.calls.length).toBe(1)
+        expect(getByText('Share to Commons')).toBeTruthy()
+      })
+
+      it('render multiple LTI if can manage content', () => {
+        const {getByTestId, getByText} = setup({canManageContent: true, discussionTopicId: '1'})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Share to Commons')).toBeTruthy()
+        expect(getByText('Share to Example')).toBeTruthy()
       })
     })
   })
