@@ -96,7 +96,7 @@ export const IsolatedThreadsContainer = props => {
       data-testid="isolated-view-children"
     >
       {props.hasMoreOlderReplies && (
-        <View margin="0 0 medium 0" padding="0 0 0 medium">
+        <View padding="0 0 0 medium">
           <ShowMoreRepliesButton
             onClick={props.showOlderReplies}
             buttonText={I18n.t('Show older replies')}
@@ -119,7 +119,7 @@ export const IsolatedThreadsContainer = props => {
         />
       ))}
       {props.hasMoreNewerReplies && (
-        <View margin="0 0 medium 0" padding="0 0 0 medium">
+        <View padding="0 0 0 medium">
           <ShowMoreRepliesButton
             onClick={props.showNewerReplies}
             buttonText={I18n.t('Show newer replies')}
