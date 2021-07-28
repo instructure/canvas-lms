@@ -777,7 +777,8 @@ class ExternalToolsController < ApplicationController
   #
   # @argument user_navigation[visibility] [String, "admins"|"members"|"public"]
   #   Who will see the navigation tab. "admins" for admins, "public" or
-  #   "members" for everyone
+  #   "members" for everyone. Setting this to `null` will remove this configuration
+  #   and use the default behavior, which is "public".
   #
   # @argument course_home_sub_navigation[url] [String]
   #   The url of the external tool for right-side course home navigation menu
@@ -797,9 +798,10 @@ class ExternalToolsController < ApplicationController
   # @argument course_navigation[text] [String]
   #   The text that will show on the left-tab in the course navigation
   #
-  # @argument course_navigation[visibility] [String, "admins"|"members"]
+  # @argument course_navigation[visibility] [String, "admins"|"members"|"public"]
   #   Who will see the navigation tab. "admins" for course admins, "members" for
-  #   students, null for everyone
+  #   students, "public" for everyone. Setting this to `null` will remove this configuration
+  #   and use the default behavior, which is "public".
   #
   # @argument course_navigation[windowTarget] [String, "_blank"|"_self"]
   #   Determines how the navigation tab will be opened.

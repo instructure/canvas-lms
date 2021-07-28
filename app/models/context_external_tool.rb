@@ -157,7 +157,7 @@ class ContextExternalTool < ActiveRecord::Base
       extension_keys += custom_keys
     end
     extension_keys += {
-        :visibility => lambda{|v| %w{members admins}.include?(v)}
+        :visibility => lambda{|v| %w{members admins public}.include?(v) || v.nil?}
     }.to_a
 
     extension_keys.each do |key, validator|
@@ -190,7 +190,7 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete(:inactive_placements) if settings[:inactive_placements].empty?
     end
 
-    settings[type]
+    settings[type].compact!
   end
 
   def has_placement?(type)
