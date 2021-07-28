@@ -67,7 +67,7 @@ describe K5Mode do
 
       context 'that is also a student' do
         before :each do
-          @course.enroll_user(@teacher, 'StudentEnrollment')
+          @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
         end
 
         it_behaves_like ':show_left_side'
