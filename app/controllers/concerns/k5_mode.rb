@@ -30,7 +30,7 @@ module K5Mode
   # context is not a k5 course. Intended for use on pages that are not in a course context (like the courses index)
   def set_k5_mode(require_k5_theme: false)
     # Only students should see the details view
-    @k5_details_view = @context.try(:elementary_subject_course?) && @context.grants_right?(@current_user, :participate_as_student)
+    @k5_details_view = @context.try(:elementary_subject_course?) && !@context.grants_right?(@current_user, :read_as_admin)
     if @context.try(:elementary_subject_course?)
       @show_left_side = !@k5_details_view
     end
