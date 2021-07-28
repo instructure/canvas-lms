@@ -39,4 +39,10 @@ describe('ShowMoreRepliesButton', () => {
     fireEvent.click(getByTestId('show-more-replies-button'))
     expect(onClick.mock.calls.length).toBe(1)
   })
+
+  it('should render with disabled prop', () => {
+    const {getByTestId} = setup({onClick, buttonText: 'Click Me', fetchingMoreReplies: true})
+
+    expect(getByTestId('show-more-replies-button').getAttribute('disabled')).toBe('')
+  })
 })

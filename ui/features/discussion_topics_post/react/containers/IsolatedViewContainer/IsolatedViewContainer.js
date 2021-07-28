@@ -40,13 +40,15 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThre
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
+  const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -221,6 +223,7 @@ export const IsolatedViewContainer = props => {
         courseID: window.ENV?.course_id
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
+        setFetchingMoreOlderReplies(false)
         return {
           legacyNode: {
             ...previousResult.legacyNode,
@@ -262,6 +265,7 @@ export const IsolatedViewContainer = props => {
           ...isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes,
           ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes
         ]
+        setFetchingMoreNewerReplies(false)
         return {
           legacyNode: {
             ...previousResult.legacyNode,
@@ -367,8 +371,14 @@ export const IsolatedViewContainer = props => {
               onDelete={onDelete}
               markAsRead={markAsRead}
               onOpenInSpeedGrader={onOpenInSpeedGrader}
-              showOlderReplies={fetchOlderEntries}
-              showNewerReplies={fetchNewerEntries}
+              showOlderReplies={() => {
+                setFetchingMoreOlderReplies(true)
+                fetchOlderEntries()
+              }}
+              showNewerReplies={() => {
+                setFetchingMoreNewerReplies(true)
+                fetchNewerEntries()
+              }}
               onOpenIsolatedView={(discussionEntryId, withRCE, highlightEntryId) => {
                 props.setHighlightEntryId(highlightEntryId)
                 props.onOpenIsolatedView(discussionEntryId, withRCE)
@@ -383,6 +393,8 @@ export const IsolatedViewContainer = props => {
                 isolatedEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection
                   ?.pageInfo?.hasNextPage && !!props.relativeEntryId
               }
+              fetchingMoreOlderReplies={fetchingMoreOlderReplies}
+              fetchingMoreNewerReplies={fetchingMoreNewerReplies}
             />
           )}
         </>

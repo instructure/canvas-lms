@@ -101,6 +101,7 @@ export const IsolatedThreadsContainer = props => {
           <ShowMoreRepliesButton
             onClick={props.showOlderReplies}
             buttonText={I18n.t('Show older replies')}
+            fetchingMoreReplies={props.fetchingMoreOlderReplies}
           />
           {false && <Spinner size="x-small" margin="0 0 0 small" />}
         </View>
@@ -125,6 +126,7 @@ export const IsolatedThreadsContainer = props => {
           <ShowMoreRepliesButton
             onClick={props.showNewerReplies}
             buttonText={I18n.t('Show newer replies')}
+            fetchingMoreReplies={props.fetchingMoreNewerReplies}
           />
           {false && <Spinner size="x-small" margin="0 0 0 small" />}
         </View>
@@ -146,7 +148,9 @@ IsolatedThreadsContainer.propTypes = {
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   hasMoreOlderReplies: PropTypes.bool,
-  hasMoreNewerReplies: PropTypes.bool
+  hasMoreNewerReplies: PropTypes.bool,
+  fetchingMoreOlderReplies: PropTypes.bool,
+  fetchingMoreNewerReplies: PropTypes.bool
 }
 
 export default IsolatedThreadsContainer

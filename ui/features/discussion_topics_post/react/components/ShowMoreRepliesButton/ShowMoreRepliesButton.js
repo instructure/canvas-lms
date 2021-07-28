@@ -27,6 +27,7 @@ export function ShowMoreRepliesButton({onClick, ...props}) {
       onClick={onClick}
       color="primary"
       data-testid="show-more-replies-button"
+      interaction={props.fetchingMoreReplies ? 'disabled' : 'enabled'}
       {...props}
     >
       <Text weight="bold">{props.buttonText}</Text>
@@ -42,9 +43,14 @@ ShowMoreRepliesButton.propTypes = {
   /**
    * Text to be displayed on the button.
    */
-  buttonText: PropTypes.string.isRequired
+  buttonText: PropTypes.string.isRequired,
+  /**
+   * Boolean that controls if the button is disabled.
+   */
+  fetchingMoreReplies: PropTypes.bool
 }
 
 ShowMoreRepliesButton.defaultProps = {
-  onClick: () => {}
+  onClick: () => {},
+  fetchingMoreReplies: false
 }
