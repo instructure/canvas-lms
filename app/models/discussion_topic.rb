@@ -188,7 +188,10 @@ class DiscussionTopic < ActiveRecord::Base
       self.title = t('#discussion_topic.default_title', "No Title")
     end
 
-    self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
+    d_type = read_attribute(:discussion_type)
+    d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::SIDE_COMMENT
+    self.discussion_type = d_type
+
     @content_changed = self.message_changed? || self.title_changed?
 
     default_submission_values
