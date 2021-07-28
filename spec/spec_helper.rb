@@ -870,36 +870,40 @@ RSpec.configure do |config|
   end
 end
 
-require 'lazy_presumptuous_i18n_backend'
+require_dependency 'lazy_presumptuous_i18n_backend'
 
-class LazyPresumptuousI18nBackend
+module I18nStubs
   def stub(translations)
+    new_locales = translations.keys - I18n.config.available_locales
     @stubs = translations.with_indifferent_access
-    singleton_class.instance_eval do
-      alias_method :lookup, :lookup_with_stubs
-      alias_method :available_locales, :available_locales_with_stubs
+    unless new_locales.empty?
+      I18n.config.available_locales = I18n.config.available_locales + new_locales
     end
+    old_locale = I18n.locale
     yield
   ensure
-    singleton_class.instance_eval do
-      alias_method :lookup, :lookup_without_stubs
-      alias_method :available_locales, :available_locales_without_stubs
-    end
     @stubs = nil
+    unless new_locales.empty?
+      I18n.config.available_locales = I18n.config.available_locales - new_locales
+    end
+    I18n.locale = old_locale
   end
 
-  def lookup_with_stubs(locale, key, scope = [], options = {})
+  def lookup(locale, key, scope = [], options = {})
+    return super unless @stubs
+
     ensure_initialized
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
-    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
+    keys.inject(@stubs) { |h,k| h[k] if h.respond_to?(:key) } || super
   end
-  alias_method :lookup_without_stubs, :lookup
 
-  def available_locales_with_stubs
-    available_locales_without_stubs | @stubs.keys.map(&:to_sym)
+  def available_locales
+    return super unless @stubs
+
+    super | @stubs.keys.map(&:to_sym)
   end
-  alias_method :available_locales_without_stubs, :available_locales
 end
+LazyPresumptuousI18nBackend.prepend(I18nStubs)
 
 Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each { |file| require file }
 
