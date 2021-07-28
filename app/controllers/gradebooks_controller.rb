@@ -413,6 +413,7 @@ class GradebooksController < ApplicationController
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
+      enhanced_gradebook_filters: Account.site_admin.feature_enabled?(:enhanced_gradebook_filters),
       enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
       enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
       export_gradebook_csv_url: course_gradebook_csv_url,
@@ -465,7 +466,7 @@ class GradebooksController < ApplicationController
     }
 
     js_env({
-      GRADEBOOK_OPTIONS: gradebook_options,
+      GRADEBOOK_OPTIONS: gradebook_options
     })
   end
 
