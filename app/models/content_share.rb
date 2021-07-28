@@ -21,6 +21,7 @@
 class ContentShare < ActiveRecord::Base
   TYPE_TO_CLASS = {
     'assignment' => Assignment,
+    'attachment' => Attachment,
     'discussion_topic' => DiscussionTopic,
     'page' => WikiPage,
     'quiz' => Quizzes::Quiz,
