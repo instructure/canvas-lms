@@ -71,3 +71,13 @@ body.is-masquerading-or-student-view {
     padding-bottom: $student-footer-height + $student-view-banner-height;
   }
 }
+
+.webcam-countdown-container {
+  position: absolute;
+  inset: 0;
+
+  font-size: 10rem;
+  color: $ic-color-light;
+  line-height: 1;
+  text-shadow: $ic-color-dark 3px 3px 10px;
+}

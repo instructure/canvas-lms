@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import MoreOptions from '../MoreOptions/index'
@@ -469,4 +469,88 @@ describe('MoreOptions', () => {
       expect(selectedCanvasFiles).toEqual(['11'])
     })
   }, 10000)
+
+  describe('Webcam photo capture', () => {
+    let handleWebcamPhotoUpload
+
+    const renderComponent = async () => {
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [{}]
+        }
+      }
+      const mocks = await createGraphqlMocks(overrides)
+
+      return render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            handleWebcamPhotoUpload={handleWebcamPhotoUpload}
+            userID="1"
+          />
+        </MockedProvider>
+      )
+    }
+
+    beforeEach(() => {
+      handleWebcamPhotoUpload = jest.fn()
+      jest.useFakeTimers()
+
+      navigator.mediaDevices = {
+        getUserMedia: jest.fn().mockResolvedValue({
+          getTracks: () => [{stop: jest.fn()}]
+        })
+      }
+    })
+
+    afterEach(() => {
+      act(() => {
+        jest.runOnlyPendingTimers()
+      })
+      jest.useRealTimers()
+      delete navigator.mediaDevices
+    })
+
+    it('renders a webcam capture button if the handleWebcamPhotoUpload prop is defined', async () => {
+      const {findByRole} = await renderComponent()
+
+      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
+    })
+
+    it('shows the webcam capture view when the user clicks the button', async () => {
+      const {findByRole} = await renderComponent()
+
+      const webcamButton = await findByRole('button', {name: /Webcam/})
+      fireEvent.click(webcamButton)
+
+      const modal = await findByRole('dialog')
+      expect(modal).toContainHTML('Take a Photo via Webcam')
+    })
+
+    it('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
+      const {findByRole} = await renderComponent()
+
+      const webcamButton = await findByRole('button', {name: /Webcam/})
+      fireEvent.click(webcamButton)
+
+      const recordButton = await findByRole('button', {name: 'Take Photo'})
+      fireEvent.click(recordButton)
+
+      act(() => {
+        jest.advanceTimersByTime(10000)
+      })
+
+      const saveButton = await findByRole('button', {name: 'Save'})
+      fireEvent.click(saveButton)
+
+      expect(handleWebcamPhotoUpload).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not render a webcam capture button if the handleWebcamPhotoUpload prop is not set', async () => {
+      handleWebcamPhotoUpload = null
+      const {queryByRole} = await renderComponent()
+      expect(queryByRole('button', {name: /Webcam/})).not.toBeInTheDocument()
+    })
+  })
 })

@@ -143,6 +143,13 @@ export default class FileUpload extends Component {
     })
   }
 
+  handleWebcamPhotoUpload = async ({filename, image}) => {
+    const {blob} = image
+    blob.name = filename
+
+    await this.handleDropAccepted([blob])
+  }
+
   uploadFiles = async files => {
     // This is taken almost verbatim from the uploadFiles method in the
     // upload-file module.  Rather than calling that method, we call uploadFile
@@ -306,6 +313,7 @@ export default class FileUpload extends Component {
               assignmentID={this.props.assignment._id}
               courseID={this.props.assignment.env.courseId}
               handleCanvasFiles={this.handleCanvasFiles}
+              handleWebcamPhotoUpload={this.handleWebcamPhotoUpload}
               renderCanvasFiles
               userID={this.props.assignment.env.currentUser.id}
             />

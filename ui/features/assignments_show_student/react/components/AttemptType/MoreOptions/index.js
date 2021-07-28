@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {element, func, shape, string} from 'prop-types'
+import {bool, element, func, shape, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles/index'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -30,7 +30,9 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {useQuery} from 'react-apollo'
 import React, {useEffect, useState} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import TakePhotoUrl from '../../../../images/TakePhoto.svg'
 import {Text} from '@instructure/ui-text'
+import WebcamCapture from './WebcamCapture'
 
 import {View} from '@instructure/ui-view'
 
@@ -39,16 +41,22 @@ import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
 // An "abstract" component that renders a button allowing the user to upload a
-// file using some sort of external interface.  Clicking the button shows a
-// modal with this component's children as the contents.  By default, the
-// footer contains a single "Cancel" button that will close the modal and
-// assumes that the modal's contents will close it automatically when
-// appropriate, but you can specify your own contents, such as a Submit button,
-// by passing them as a function to the renderFooter property.
+// file via an interface supplied by the caller.
 //
-// The CanvasFileChooser and ExternalTool components are implementations of
-// this component.
-function BaseUploadTool({children, renderFooter, name, icon}) {
+// When clicked, the button will open a modal, the contents of which should be
+// specified by passing a function as the component's child. The child function
+// will be called with a "close" argument (a function that will close the modal
+// when called) and should return the modal's contents as appropriate.
+//
+// By default, the modal includes a footer with a "Cancel" button. Pass the
+// hideFooter prop to omit the footer, or pass a function in the renderFooter
+// prop to use your own rendering function. It will be called with two
+// properties, cancelButton (a component you can include in the result) and
+// closeModal (a function that will close the modal).
+//
+// The CanvasFileChooser, ExternalTool, and WebcamPhotoUpload components are
+// implementations of this component.
+function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}) {
   const [showModal, setShowModal] = useState(false)
 
   // We specify this to prevent the modal's height from changing due to its
@@ -91,9 +99,9 @@ function BaseUploadTool({children, renderFooter, name, icon}) {
     >
       {icon}
       <View as="div" margin="small 0 0">
-        <ScreenReaderContent>{I18n.t('Submit file using %{name}', {name})}</ScreenReaderContent>
+        <ScreenReaderContent>{I18n.t('Submit file using %{label}', {label})}</ScreenReaderContent>
         <Text color="brand" weight="bold" size="medium">
-          {name}
+          {label}
         </Text>
       </View>
     </Button>
@@ -108,6 +116,7 @@ function BaseUploadTool({children, renderFooter, name, icon}) {
     </Button>
   )
 
+  const modalTitle = title || label
   const modal = (
     <Modal
       as="form"
@@ -115,21 +124,23 @@ function BaseUploadTool({children, renderFooter, name, icon}) {
       open={showModal}
       onDismiss={closeModal}
       size="large"
-      label={name}
+      label={modalTitle}
       shouldCloseOnDocumentClick
     >
       <Modal.Header>
         <CloseButton placement="end" offset="medium" variant="icon" onClick={closeModal}>
           {I18n.t('Close')}
         </CloseButton>
-        <Heading>{name}</Heading>
+        <Heading>{modalTitle}</Heading>
       </Modal.Header>
-      <Modal.Body padding="0 small">
-        <div style={modalContentsStyle}>{children}</div>
+      <Modal.Body padding="0 x-small">
+        <div style={modalContentsStyle}>{children({close: closeModal})}</div>
       </Modal.Body>
-      <Modal.Footer>
-        {renderFooter ? renderFooter({cancelButton, closeModal}) : cancelButton}
-      </Modal.Footer>
+      {!hideFooter && (
+        <Modal.Footer>
+          {renderFooter ? renderFooter({cancelButton, closeModal}) : cancelButton}
+        </Modal.Footer>
+      )}
     </Modal>
   )
 
@@ -151,11 +162,15 @@ function BaseUploadTool({children, renderFooter, name, icon}) {
 }
 
 BaseUploadTool.propTypes = {
-  children: element.isRequired,
+  children: func.isRequired,
+  hideFooter: bool,
+  icon: element,
+  label: string.isRequired,
   renderFooter: func,
-  name: string.isRequired,
-  icon: element
+  title: string
 }
+
+const iconDimensions = {height: '48px', width: '48px'}
 
 function CanvasFileChooser({courseID, onFileSelect, userID}) {
   const [selectedCanvasFileID, setSelectedCanvasFileId] = useState(null)
@@ -210,9 +225,9 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
     <BaseUploadTool
       renderFooter={footerContents}
       icon=<IconFolderLine size="medium" color="brand" />
-      name={I18n.t('Files')}
+      label={I18n.t('Files')}
     >
-      {contents}
+      {() => contents}
     </BaseUploadTool>
   )
 }
@@ -220,7 +235,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
 function ExternalTool({launchUrl, tool}) {
   const icon =
     tool.settings?.iconUrl != null ? (
-      <Img alt="" src={tool.settings.iconUrl} width="48px" height="48px" />
+      <Img alt="" src={tool.settings.iconUrl} {...iconDimensions} />
     ) : (
       <IconLtiLine size="medium" color="brand" />
     )
@@ -233,8 +248,10 @@ function ExternalTool({launchUrl, tool}) {
   }
 
   return (
-    <BaseUploadTool icon={icon} name={tool.name}>
-      <iframe allow={iframeAllowances()} style={iframeStyle} src={launchUrl} title={tool.name} />
+    <BaseUploadTool icon={icon} label={tool.name}>
+      {() => (
+        <iframe allow={iframeAllowances()} style={iframeStyle} src={launchUrl} title={tool.name} />
+      )}
     </BaseUploadTool>
   )
 }
@@ -249,7 +266,27 @@ ExternalTool.propTypes = {
   launchUrl: string.isRequired
 }
 
-function MoreOptions({assignmentID, courseID, handleCanvasFiles, userID}) {
+function WebcamPhotoUpload({onPhotoTaken}) {
+  return (
+    <BaseUploadTool
+      hideFooter
+      icon=<Img alt={I18n.t('Take a Photo via Webcam')} src={TakePhotoUrl} {...iconDimensions} />
+      label={I18n.t('Webcam')}
+      title={I18n.t('Take a Photo via Webcam')}
+    >
+      {({close}) => (
+        <WebcamCapture
+          onSelectImage={params => {
+            onPhotoTaken(params)
+            close()
+          }}
+        />
+      )}
+    </BaseUploadTool>
+  )
+}
+
+function MoreOptions({assignmentID, courseID, handleCanvasFiles, handleWebcamPhotoUpload, userID}) {
   const {loading, error, data} = useQuery(EXTERNAL_TOOLS_QUERY, {
     variables: {courseID}
   })
@@ -280,7 +317,12 @@ function MoreOptions({assignmentID, courseID, handleCanvasFiles, userID}) {
     )}`
 
   return (
-    <Flex direction="row" justifyItems="center">
+    <Flex direction="row" justifyItems="center" wrap="wrap">
+      {handleWebcamPhotoUpload && (
+        <Flex.Item margin="0 x-small">
+          <WebcamPhotoUpload onPhotoTaken={handleWebcamPhotoUpload} />
+        </Flex.Item>
+      )}
       {handleCanvasFiles && (
         <Flex.Item margin="0 x-small">
           <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
@@ -299,6 +341,7 @@ MoreOptions.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
   handleCanvasFiles: func,
+  handleWebcamPhotoUpload: func,
   userID: string
 }
 
