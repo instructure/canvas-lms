@@ -190,12 +190,12 @@ class MicrosoftSync::GroupsController < ApplicationController
   end
 
   def validate_user_permissions
-    # Only users who can manage students in a course
+    # Only users who can update course settings
     # should be permitted to manage the sync group
     render_unauthorized_action unless course.grants_right?(
       @current_user,
       session,
-      :manage_students
+      :update
     )
   end
 
