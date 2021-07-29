@@ -112,11 +112,15 @@ class FeatureFlag < ActiveRecord::Base
   private
 
   def prior_flag_state(operation)
-    operation == :create ? 'nonexistant' : self.state_in_database
+    operation == :create ? "created, prior default:#{self.default_for_flag}" : self.state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? 'removed' : self.state
+    operation == :destroy ? "removed, new default: #{self.default_for_flag}" : self.state
+  end
+
+  def default_for_flag
+    Feature.definitions[self.feature]&.state || 'undefined'
   end
 
   def valid_state
