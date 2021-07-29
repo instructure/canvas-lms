@@ -171,7 +171,7 @@ class WikiPagesController < ApplicationController
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
       :wiki_index_menu_tools => wiki_index_menu_tools,
-      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
+      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}) && !@k5_details_view,
       :CAN_SET_TODO_DATE => context.grants_right?(@current_user, session, :manage_content),
       :IMMERSIVE_READER_ENABLED => context.account&.feature_enabled?(:immersive_reader_wiki_pages),
     }
