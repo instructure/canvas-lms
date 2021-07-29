@@ -164,7 +164,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def threaded?
-    self.discussion_type == DiscussionTypes::THREADED
+    self.discussion_type == DiscussionTypes::THREADED || context.feature_enabled?("react_discussions_post")
   end
   alias :threaded :threaded?
 
