@@ -19,8 +19,28 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {RolePillContainer} from '../RolePillContainer'
+import {responsiveQuerySizes} from '../../../utils'
 
+jest.mock('../../../utils')
 const discussionRoles = ['Author', 'TaEnrollment', 'TeacherEnrollment']
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 const setup = props => {
   return render(<RolePillContainer discussionRoles={discussionRoles} {...props} />)
@@ -71,6 +91,33 @@ describe('RolePillContainer', () => {
     it('Pill will render with the text', () => {
       const {queryByText} = setup({discussionRoles: ['Custom Name']})
       expect(queryByText('Custom Name')).toBeTruthy()
+    })
+  })
+
+  describe('Mobile view is respected', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('Pill will render a single mobile role', () => {
+      const {queryByTestId} = setup({
+        discussionRoles: ['TeacherEnrollment']
+      })
+      expect(queryByTestId('mobile-Teacher')).toBeTruthy()
+      expect(queryByTestId('pill-Teacher')).toBeFalsy()
+    })
+
+    it('Pill will render multiple roles correctly on mobile', () => {
+      const {queryByTestId} = setup({
+        discussionRoles: ['TeacherEnrollment', 'TaEnrollment', 'Author']
+      })
+      expect(
+        queryByTestId('mobile-Teacher') &&
+          queryByTestId('mobile-TA') &&
+          queryByTestId('mobile-Author')
+      ).toBeTruthy()
     })
   })
 })

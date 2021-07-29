@@ -99,6 +99,7 @@ export function PostMessage({...props}) {
                     shouldGrow
                     shouldShrink
                     padding="xx-small none xx-small none"
+                    display="inline-flex"
                   >
                     {props.author && (
                       <View padding="none small none small">

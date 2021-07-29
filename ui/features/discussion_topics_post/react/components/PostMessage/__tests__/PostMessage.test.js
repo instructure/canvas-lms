@@ -21,6 +21,27 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 const setup = (props, {searchTerm = ''} = {}) => {
   return render(

@@ -342,12 +342,9 @@ describe('DiscussionFullPage', () => {
     it('should render Teacher and Ta pills', async () => {
       window.ENV.course_id = 1
       const container = setup()
-      const pillContainer = await container.findAllByTestId('pill-container')
-      const teacherPill = await container.findAllByTestId('pill-Teacher')
-      const taPill = await container.findAllByTestId('pill-TA')
-      expect(pillContainer).toBeTruthy()
-      expect(teacherPill).toBeTruthy()
-      expect(taPill).toBeTruthy()
+      await waitFor(() => expect(container.queryAllByTestId('pill-container')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-Teacher')).toBeTruthy())
+      await waitFor(() => expect(container.queryAllByTestId('pill-TA')).toBeTruthy())
     })
 
     it('should not render Teacher and Ta if no course is given', async () => {
