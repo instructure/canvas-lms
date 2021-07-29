@@ -45,15 +45,21 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canDestroy, groupDescriptio
     >
       <Menu.Item value="edit">
         <IconEditLine size="x-small" />
-        <View padding="0 small">{I18n.t('Edit')}</View>
+        <View padding="0 small" data-testid="outcome-kebab-menu-edit">
+          {I18n.t('Edit')}
+        </View>
       </Menu.Item>
       <Menu.Item disabled={!canDestroy} value="remove">
         <IconTrashLine size="x-small" />
-        <View padding="0 small">{I18n.t('Remove')}</View>
+        <View padding="0 small" data-testid="outcome-kebab-menu-remove">
+          {I18n.t('Remove')}
+        </View>
       </Menu.Item>
       <Menu.Item value="move">
         <IconMoveEndLine size="x-small" />
-        <View padding="0 small">{I18n.t('Move')}</View>
+        <View padding="0 small" data-testid="outcome-kebab-menu-move">
+          {I18n.t('Move')}
+        </View>
       </Menu.Item>
       {isGroup && <Menu.Separator />}
       {isGroup && (

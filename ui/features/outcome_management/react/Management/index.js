@@ -213,15 +213,17 @@ const OutcomeManagementPanel = () => {
               <Text size="large" weight="light" fontStyle="normal">
                 {I18n.t('Outcome Groups')}
               </Text>
-              <TreeBrowser
-                onCollectionToggle={queryCollections}
-                collections={collections}
-                rootId={rootId}
-                showRootCollection
-                defaultExpandedIds={[rootId]}
-                onCreateGroup={createGroup}
-                loadedGroups={loadedGroups}
-              />
+              <View data-testid="outcomes-management-tree-browser">
+                <TreeBrowser
+                  onCollectionToggle={queryCollections}
+                  collections={collections}
+                  rootId={rootId}
+                  showRootCollection
+                  defaultExpandedIds={[rootId]}
+                  onCreateGroup={createGroup}
+                  loadedGroups={loadedGroups}
+                />
+              </View>
             </View>
           </Flex.Item>
           <Flex.Item

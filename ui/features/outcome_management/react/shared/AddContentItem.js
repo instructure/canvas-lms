@@ -72,6 +72,7 @@ const AddContentItem = ({
         margin="0 0 0 small"
         display="inline-block"
         onClick={save}
+        data-testid="outcomes-management-add-content-item"
       >
         <IconCheckSolid />
       </IconButton>

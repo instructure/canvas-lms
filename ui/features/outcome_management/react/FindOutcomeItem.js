@@ -78,6 +78,7 @@ const FindOutcomeItem = ({
             margin={isMobileView ? '0' : '0 x-small 0 0'}
             renderIcon={IconAddSolid}
             onClick={onAddHandler}
+            data-testid="add-find-outcome-item"
           >
             {isOutcomeImported ? I18n.t('Added') : I18n.t('Add')}
           </Button>
@@ -89,7 +90,12 @@ const FindOutcomeItem = ({
   if (!title) return null
 
   return (
-    <View as="div" padding={isMobileView ? 'small 0 x-small' : 'small 0'} borderWidth="0 0 small">
+    <View
+      as="div"
+      padding={isMobileView ? 'small 0 x-small' : 'small 0'}
+      borderWidth="0 0 small"
+      data-testid="find-outcome-item"
+    >
       <Flex as="div" alignItems="start">
         <Flex.Item as="div" size={isMobileView ? '' : '3rem'}>
           <Flex as="div" alignItems="start" justifyItems="center">
