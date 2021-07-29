@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Alert} from '../Alert'
+import {AssignmentDetails} from '../AssignmentDetails'
 
 import React from 'react'
 
@@ -51,7 +51,7 @@ const overrides = [
 
 const setup = props => {
   return render(
-    <Alert
+    <AssignmentDetails
       pointsPossible={7}
       dueAtDisplayText="Everyone: Due Jan 26 11:49pm"
       assignmentOverrides={[]}
@@ -61,15 +61,15 @@ const setup = props => {
   )
 }
 
-describe('Alert', () => {
+describe('AssignmentDetails', () => {
   it('displays points possible info', () => {
     const {queryByText} = setup()
-    expect(queryByText('This is a graded discussion: 7 points possible')).toBeTruthy()
+    expect(queryByText('7 points possible')).toBeTruthy()
   })
 
   it('displays correct pluralization', () => {
     const {queryByText} = setup({pointsPossible: 1})
-    expect(queryByText('This is a graded discussion: 1 point possible')).toBeTruthy()
+    expect(queryByText('1 point possible')).toBeTruthy()
   })
 
   it('displays due date when there are no overrides', () => {

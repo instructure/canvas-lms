@@ -133,9 +133,7 @@ describe('DiscussionTopicContainer', () => {
 
     expect(await container.queryByText('No Due Date')).toBeTruthy()
 
-    expect(
-      await container.queryByText('This is a graded discussion: 0 points possible')
-    ).toBeTruthy()
+    expect(await container.queryByText('0 points possible')).toBeTruthy()
   })
 
   it('renders infoText only when there are replies', async () => {
@@ -164,7 +162,7 @@ describe('DiscussionTopicContainer', () => {
       })
     })
     const gradedDiscussionInfo = await container.findByTestId('graded-discussion-info')
-    expect(gradedDiscussionInfo).toHaveTextContent('This is a graded discussion: 5 points possible')
+    expect(gradedDiscussionInfo).toHaveTextContent('5 points possible')
   })
 
   it('should be able to send to edit page when canUpdate', async () => {

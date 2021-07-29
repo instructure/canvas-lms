@@ -18,17 +18,17 @@
 
 // pass in an array of {string: text, bold: true, color: red}
 
-import {Alert} from './Alert'
+import {AssignmentDetails} from './AssignmentDetails'
 
 import React from 'react'
 
 export default {
-  title: 'Examples/Discussion Posts/Components/Alert',
-  component: Alert,
+  title: 'Examples/Discussion Posts/Components/AssignmentDetails',
+  component: AssignmentDetails,
   argTypes: {}
 }
 
-const Template = args => <Alert {...args} />
+const Template = args => <AssignmentDetails {...args} />
 
 export const SingleDueDate = Template.bind({})
 SingleDueDate.args = {

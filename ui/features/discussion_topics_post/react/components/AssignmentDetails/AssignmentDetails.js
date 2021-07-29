@@ -24,13 +24,12 @@ import DateHelper from '../../../../../shared/datetime/dateHelper'
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Tray} from '@instructure/ui-tray'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 
-export function Alert({...props}) {
+export function AssignmentDetails({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
 
   const singleDueDate = useMemo(
@@ -47,8 +46,7 @@ export function Alert({...props}) {
   const multipleDueDates = useMemo(
     () => (
       <Flex.Item padding="x-small" shouldGrow align="start">
-        <Link
-          as="button"
+        <CondensedButton
           onClick={() => {
             setDueDateTrayOpen(true)
           }}
@@ -59,7 +57,7 @@ export function Alert({...props}) {
               dueDateCount: props.assignmentOverrides.length
             })}
           </Text>
-        </Link>
+        </CondensedButton>
         <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
           <View as="div" padding="medium">
             <Flex direction="column">
@@ -149,8 +147,8 @@ export function Alert({...props}) {
         <Text weight="normal" size="small">
           {I18n.t(
             {
-              one: 'This is a graded discussion: %{count} point possible',
-              other: 'This is a graded discussion: %{count} points possible'
+              one: '%{count} point possible',
+              other: '%{count} points possible'
             },
             {
               count: props.pointsPossible
@@ -162,11 +160,11 @@ export function Alert({...props}) {
   )
 }
 
-Alert.propTypes = {
+AssignmentDetails.propTypes = {
   pointsPossible: PropTypes.number.isRequired,
   dueAtDisplayText: PropTypes.string.isRequired,
   assignmentOverrides: PropTypes.array.isRequired,
   canSeeMultipleDueDates: PropTypes.bool
 }
 
-export default Alert
+export default AssignmentDetails

@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// TODO: rename Alert component
-import {Alert} from '../../components/Alert/Alert'
+import {AssignmentDetails} from '../../components/AssignmentDetails/AssignmentDetails'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import DirectShareUserModal from '../../../../../shared/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
@@ -47,7 +46,7 @@ import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation, useApolloClient} from 'react-apollo'
 
-import {Alert as AlertFRD} from '@instructure/ui-alerts'
+import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -241,29 +240,29 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   return (
     <>
       {props.discussionTopic.initialPostRequiredForCurrentUser && (
-        <AlertFRD renderCloseButtonLabel="Close">
+        <Alert renderCloseButtonLabel="Close">
           {I18n.t('You must post before seeing replies.')}
-        </AlertFRD>
+        </Alert>
       )}
       {props.discussionTopic.permissions?.readAsAdmin &&
         props.discussionTopic.groupSet &&
         props.discussionTopic.assignment?.onlyVisibleToOverrides && (
           <View as="div" margin="none none small" width="80%" data-testid="differentiated-alert">
-            <AlertFRD renderCloseButtonLabel="Close">
+            <Alert renderCloseButtonLabel="Close">
               {I18n.t(
                 'Note: for differentiated group topics, some threads may not have any students assigned.'
               )}
-            </AlertFRD>
+            </Alert>
           </View>
         )}
       {isAnnouncementDelayed && (
-        <AlertFRD renderCloseButtonLabel="Close">
+        <Alert renderCloseButtonLabel="Close">
           {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
             delayedPostAt: DateHelper.formatDatetimeForDiscussions(
               props.discussionTopic.delayedPostAt
             )
           })}
-        </AlertFRD>
+        </Alert>
       )}
       {!searchTerm && (
         <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
@@ -278,7 +277,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               >
                 {isGraded(props.discussionTopic.assignment) && (
                   <View as="div" padding="none medium none">
-                    <Alert
+                    <AssignmentDetails
                       dueAtDisplayText={dueAt}
                       pointsPossible={props.discussionTopic.assignment.pointsPossible || 0}
                       assignmentOverrides={singleOverrideWithNoDefault ? [] : assignmentOverrides}
