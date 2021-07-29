@@ -18,11 +18,11 @@
 
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
-import LoginAttributeSelector from '../components/LoginAttributeSelector'
+import ActiveDirectoryLookupAttributeSelector from '../components/ActiveDirectoryLookupAttributeSelector'
 
-describe('LoginAttributeSelector', () => {
+describe('RemoteLookupFieldSelector', () => {
   const setup = overrides => {
-    return render(<LoginAttributeSelector {...overrides} />)
+    return render(<ActiveDirectoryLookupAttributeSelector {...overrides} />)
   }
 
   it('renders without errors', () => {
@@ -31,23 +31,29 @@ describe('LoginAttributeSelector', () => {
     expect(container.error).toBeFalsy()
   })
 
-  it('calls the specified callback on clicks', () => {
-    const changedMock = jest.fn()
-    const container = setup({attributeChangedHandler: changedMock})
+  it('calls the passed in callback on input', () => {
+    const callbackMock = jest.fn()
+    const container = setup({
+      fieldChangedHandler: callbackMock
+    })
 
-    fireEvent.click(container.getByRole('button', {name: /login attribute selector/i}))
-    fireEvent.click(container.getByText(/email/i))
+    fireEvent.click(
+      container.getByRole('button', {name: /active directory lookup attribute selector/i})
+    )
+    fireEvent.click(container.getByText(/user principal name \(upn\)/i))
 
-    expect(changedMock).toHaveBeenCalledTimes(1)
+    expect(callbackMock).toHaveBeenCalledTimes(1)
   })
 
-  it('renders the specified login attribute', () => {
-    const container = setup({selectedLoginAttribute: 'preferred_username'})
+  it('renders the specified lookup field', () => {
+    const container = setup({
+      selectedLookupField: 'mailNickname'
+    })
 
     expect(
       container.getByRole('button', {
-        name: /login attribute selector/i
+        name: /active directory lookup attribute selector/i
       }).value
-    ).toMatch(/Unique User ID/i)
+    ).toMatch(/email alias \(mailNickname\)/i)
   })
 })

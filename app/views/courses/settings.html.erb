@@ -68,7 +68,7 @@
       <% if can_do(@context, @current_user, :view_feature_flags) %>
         <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_previews', %{Feature Previews}) %></a></li>
       <% end %>
-      <% if @context.grants_right?(@current_user, session, :manage_students) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
+      <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
         <li id="integrations_tab"><a href="#tab-integrations" id="tab-integrations-link"><%= t('Integrations') %></a></li>
       <% end %>
     <% end %>
@@ -821,7 +821,7 @@
     <div id="tab-features"></div>
   <% end %>
 
-  <% if @context.grants_right?(@current_user, session, :manage_students) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
+  <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
     <div id="tab-integrations"></div>
   <% end %>
 </div><!-- end course details tab -->

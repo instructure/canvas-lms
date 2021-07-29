@@ -16,30 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextInput} from '@instructure/ui-text-input'
-import I18n from 'i18n!account_settings_jsx_bundle'
-import PropTypes from 'prop-types'
 import React from 'react'
+import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import PropTypes from 'prop-types'
+import I18n from 'i18n!account_settings_jsx_bundle'
 
-export default function TenantInput(props) {
+/**
+ * @param {Object} props
+ * @param {(event: Object, result: {value: string})} props.suffixInputHandler
+ * @param {string} props.loginAttributeSuffix
+ * @param {{text: string, type: string}[]} props.messages
+ * @returns
+ */
+const LoginAttributeSuffixInput = ({suffixInputHandler, loginAttributeSuffix, messages}) => {
   return (
     <>
       <TextInput
-        label={<ScreenReaderContent>{I18n.t('Tenant Name Input Area')}</ScreenReaderContent>}
+        label={
+          <ScreenReaderContent>{I18n.t('Login Attribute Suffix Input Area')}</ScreenReaderContent>
+        }
         type="text"
-        placeholder={I18n.t('microsoft_tenant_name%{domain}', {domain: '.onmicrosoft.com'})}
-        onChange={props.tenantInputHandler}
-        defaultValue={props.tenant}
-        messages={props.messages}
+        placeholder={I18n.t('@example.edu')}
+        onChange={suffixInputHandler}
+        defaultValue={loginAttributeSuffix}
+        messages={messages}
       />
     </>
   )
 }
 
-TenantInput.propTypes = {
-  tenantInputHandler: PropTypes.func,
-  tenant: PropTypes.string,
+LoginAttributeSuffixInput.propTypes = {
+  suffixInputHandler: PropTypes.func,
+  loginAttributeSuffix: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string,
@@ -47,3 +56,5 @@ TenantInput.propTypes = {
     })
   )
 }
+
+export default LoginAttributeSuffixInput

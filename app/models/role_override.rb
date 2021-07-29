@@ -1632,6 +1632,34 @@ class RoleOverride < ActiveRecord::Base
     end
   end
 
+  # this is a very basic PORO to represent when an actual RoleOverride
+  # doesn't exist for passing between internal methods. It's _much_
+  # faster than creating an AR object.
+  class OverrideDummy
+    attr_reader :context_id
+
+    def initialize(context_id)
+      @context_id = context_id
+    end
+
+    def new_record?
+      true
+    end
+
+    def context_type
+      'Account'
+    end
+
+    def locked?
+      false
+    end
+
+    def has_asset?(asset)
+      asset.class == Account && asset.id == context_id
+    end
+  end
+  private_constant :OverrideDummy
+
   def self.uncached_overrides_for(context, role, role_context, preloaded_overrides: nil, only_permission: nil)
     context.shard.activate do
       accounts = context.account_chain(include_site_admin: true)
@@ -1641,17 +1669,26 @@ class RoleOverride < ActiveRecord::Base
       accounts.reverse!
       overrides = {}
 
+      dummies = RequestCache.cache('role_override_dummies') do
+        Hash.new do |h, account_id|
+          h[account_id] = OverrideDummy.new(account_id)
+        end
+      end
+
       # every context has to be represented so that we can't miss role_context below
       preloaded_overrides.each do |(permission, overrides_by_account)|
         next if only_permission && permission != only_permission
 
         overrides[permission] = accounts.map do |account|
-          overrides_by_account[account.global_id].find { |ro| ro.role_id == role.id } || RoleOverride.new(context_id: account.id, context_type: 'Account')
+          overrides_by_account[account.global_id].find { |ro| ro.role_id == role.id } || dummies[account.id]
         end
       end
       overrides
     end
   end
+
+  EMPTY_ARRAY = [].freeze
+  private_constant :EMPTY_ARRAY
 
   def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching=false, preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
@@ -1710,7 +1747,7 @@ class RoleOverride < ActiveRecord::Base
     # and apply them; short-circuit once someone has locked it
     last_override = false
     hit_role_context = false
-    (overrides[permission.to_s] || []).each do |override|
+    (overrides[permission.to_s] || EMPTY_ARRAY).each do |override|
       # set the flag that we have an override for the context we're on
       last_override = override.context_id == context.id && override.context_type == context.class.base_class.name
 

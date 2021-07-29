@@ -72,6 +72,15 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
       it { is_expected.to be_unauthorized }
     end
+
+    context 'when the user has the update permission but not manage_students' do
+      before do
+        account_with_role_changes(role: teacher_role, role_changes: {manage_students: false})
+        user_session(teacher)
+      end
+
+      it { is_expected.to_not be_unauthorized }
+    end
   end
 
   shared_examples_for 'endpoints that require a release flag to be on' do

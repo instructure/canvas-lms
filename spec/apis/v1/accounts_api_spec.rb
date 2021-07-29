@@ -525,90 +525,118 @@ describe "Accounts API", type: :request do
             settings: {
               microsoft_sync_enabled: sync_enabled,
               microsoft_sync_tenant: tenant_name,
-              microsoft_sync_login_attribute: attribute
-            }.compact
+              microsoft_sync_login_attribute: attribute,
+              microsoft_sync_login_attribute_suffix: suffix,
+              microsoft_sync_remote_attribute: remote_attribute
+            }
           }
         }
       end
-      let(:update_path) { "/api/v1/accounts/#{@a1.id}" }
+      let(:expected_settings) do
+        update_sync_settings_params[:account][:settings].filter {|key, value| !value.nil? && value != '' }
+      end
+
+      let(:account) { @a1 }
+      let(:update_path) { "/api/v1/accounts/#{account.id}" }
+      # We want to make sure we have valid settings so that when we're testing for failed requests,
+      # it's actually because of the invalid setting we set, and not just cause we didn't have
+      # any settings set.
       let(:sync_enabled) { true }
       let(:tenant_name) { "canvastest2.onmicrosoft.com" }
-      let(:attribute) { "email" }
+      let(:attribute) { "sis_user_id" }
+      let(:suffix) { "@example.com" }
+      let(:remote_attribute) { "mail" }
+      let(:header_options_hash) do
+        {
+            controller: 'accounts',
+            action: 'update',
+            id: account.to_param,
+            format: 'json'
+        }
+      end
 
       before(:each) do
         user_session(@user)
       end
 
-      context 'microsoft_group_enrollments_syncing flag disabled' do
-        before(:each) { @a1.disable_feature!(:microsoft_group_enrollments_syncing)}
-
-        it "shouldn't allow editing settings" do
+      shared_examples_for 'a valid request' do
+        it "saves the settings" do
           api_call(:put, update_path, header_options_hash,
-                   update_sync_settings_params, { expected_result: 400 })
-          @a1.reload
-          expect(@a1.settings.size).to be 0
+                 update_sync_settings_params, {}, { expected_status: 200 })
+          account.reload
+          expect(account.settings).to eq expected_settings
         end
+      end
 
-        context 'subaccounts' do
+      shared_examples_for "an invalid request" do
+        it "returns a 400 and doesn't change the account settings" do
+          api_call(:put, update_path, header_options_hash,
+                   update_sync_settings_params, {}, { expected_status: 400 })
+          account.reload
+          expect(account.settings.size).to be 0
+        end
+      end
 
-          let(:update_path) { "/api/v1/accounts/#{@a2.id}" }
-          let(:header_options_hash) do
-            {
-                controller: 'accounts',
-                action: 'update',
-                id: @a2.to_param,
-                format: 'json'
-            }
-          end
+      context 'microsoft_group_enrollments_syncing flag disabled' do
+        before(:each) { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing)}
 
-          it "shouldn't allow subaccounts to edit settings" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 400 })
-            @a2.reload
-            expect(@a2.settings.size).to be 0
-          end
+        it_behaves_like 'an invalid request'
+
+        context 'subaccounts modifying settings' do
+          let(:account) { @a2 }
+
+          it_behaves_like 'an invalid request'
         end
       end
 
       context 'microsoft_group_enrollments_syncing flag enabled' do
+        before(:each) { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
 
-        before(:each) { @a1.enable_feature!(:microsoft_group_enrollments_syncing) }
-
-        context 'no tenant or login attribute provided' do
-
+        context 'no Microsoft Teams settings provided' do
           let(:tenant_name) { nil }
           let(:attribute) { nil }
+          let(:suffix) { nil }
+          let(:remote_attribute) { nil }
 
-          it "shouldn't allow enabling sync" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 400 })
-            @a1.reload
-            expect(@a1.settings.size).to be 0
+          it_behaves_like 'an invalid request'
+        end
+
+        context 'updating with valid settings' do
+          it_behaves_like 'a valid request'
+        end
+
+        context 'non-string value provided for a setting' do
+          let(:tenant_name) do
+            {
+              garbage: :input
+            }
           end
+
+          it_behaves_like 'an invalid request'
         end
 
         context 'invalid tenant name supplied' do
-
           let(:tenant_name) { '^&abcd.com' }
 
-          it "shouldn't allow enabling sync" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 400 })
-            @a1.reload
-            expect(@a1.settings.size).to be 0
-          end
+          it_behaves_like "an invalid request"
         end
 
         context 'invalid login attribute' do
-
           let(:attribute) { 'garbage' }
 
-          it "shouldn't allow invalid login attributes" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 400 })
-            @a1.reload
-            expect(@a1.settings.size).to be 0
-          end
+          it_behaves_like "an invalid request"
+        end
+
+        context 'invalid suffix' do
+          let(:suffix) { '\thello there' }
+
+          it_behaves_like "an invalid request"
+        end
+
+        context 'invalid remote attribute' do
+          let(:remote_attribute) { "not-a-valid-remote-attribute" }
+
+          it_behaves_like "an invalid request"
         end
 
         context 'non-admin user' do
@@ -617,9 +645,9 @@ describe "Accounts API", type: :request do
 
           it "can't update settings" do
             api_call_as_user(generic_user, :put, update_path, header_options_hash,
-                             update_sync_settings_params, { expected_result: 401 })
-            @a1.reload
-            expect(@a1.settings.size).to eq 0
+                             update_sync_settings_params, {}, { expected_result: 401 })
+            account.reload
+            expect(account.settings.size).to eq 0
           end
 
         end
@@ -628,97 +656,101 @@ describe "Accounts API", type: :request do
 
           let(:sync_enabled) { false }
 
-          context('no tenant or login attribute specified') do
+          context 'specifying settings' do
+            it_behaves_like 'a valid request'
+          end
+
+          context('no settings specified') do
 
             let(:tenant_name) { nil }
             let(:attribute) { nil }
+            let(:suffix) { nil }
+            let(:remote_attribute) { nil }
 
-            it "allows updating settings" do
-              api_call(:put, update_path, header_options_hash,
-                       update_sync_settings_params, { expected_result: 200 })
-              @a1.reload
-              expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
-            end
-          end
-
-          it "allows specifying a tenant or login attribute" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 200 })
-            @a1.reload
-            expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
+            it_behaves_like 'a valid request'
           end
         end
 
-        context 'admin user' do
-          it "should save valid settings and not try to delete UserMappings" do
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 200 })
-            @a1.reload
-            expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
-            expect(MicrosoftSync::UserMapping).not_to receive(:delete_old_user_mappings_later).with(@a1)
+        context "using strings for sync_enabled" do
+          let(:enabled) { "true" }
+
+          it_behaves_like 'a valid request'
+        end
+
+        MicrosoftSync::SettingsValidator::VALID_SYNC_LOGIN_ATTRIBUTES.each do |login_attr|
+          context "setting login attribute to #{login_attr}" do
+            let(:attribute) { login_attr }
+
+            it_behaves_like 'a valid request'
+          end
+        end
+
+        MicrosoftSync::SettingsValidator::VALID_SYNC_REMOTE_ATTRIBUTES.each do |remote|
+          context "setting the remote attribute to #{remote}" do
+            let(:remote_attribute) { remote }
+
+            it_behaves_like 'a valid request'
+          end
+        end
+
+        context 'empty suffix' do
+          let(:suffix) { '' }
+
+          it_behaves_like 'a valid request'
+        end
+
+        context 'account already has settings' do
+          before(:each) do
+            account.settings = {
+              microsoft_sync_enabled: true,
+              microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
+              microsoft_sync_login_attribute: 'email',
+              microsoft_sync_login_attribute_suffix: '',
+              microsoft_sync_remote_attribute: 'mail'
+            }
+            account.save!
           end
 
-          it 'should allow strings to be used for sync_enabled' do
-            update_sync_settings_params[:account][:settings][:microsoft_sync_enabled] = "true"
-            api_call(:put, update_path, header_options_hash,
-                     update_sync_settings_params, { expected_result: 200 })
-            @a1.reload
-            expect(@a1.settings[:microsoft_sync_enabled]).to be true
-            expect(@a1.settings[:microsoft_sync_tenant]).to eq tenant_name
-            expect(@a1.settings[:microsoft_sync_login_attribute]).to eq attribute
-          end
+          context 'changing settings' do
 
-          it "should allow setting the login attribute to any of the allowed attributes" do
-            %w(email sis_user_id preferred_username).each do |attribute|
-              update_sync_settings_params[:account][:settings][:microsoft_sync_login_attribute] = attribute
+            let(:tenant_name) { "testing.123.onmicrosoft.com" }
+            let(:attribute) { "sis_user_id" }
+            let(:suffix) { "@testschool.edu" }
+            let(:remote_attribute) { 'mailNickname' }
+
+            it 'tries to cleanup UserMappings' do
+              expect(MicrosoftSync::UserMapping).to receive(:delete_old_user_mappings_later).with(account)
               api_call(:put, update_path, header_options_hash,
-                       update_sync_settings_params, { expected_result: 200 })
-              @a1.reload
-              expect(@a1.settings).to eq update_sync_settings_params[:account][:settings]
-            end
-          end
-
-          context 'account already has settings' do
-
-            before(:each) do
-              @a1.settings[:microsoft_sync_enabled] = true
-              @a1.settings[:microsoft_sync_tenant] = 'canvastest2.onmicrosoft.com'
-              @a1.settings[:microsoft_sync_login_attribute] = 'email'
-              @a1.save!
+                        update_sync_settings_params, {}, { expected_status: 200 })
             end
 
-            context 'changing tenant or login attribute' do
+            it_behaves_like 'a valid request'
 
-              let(:tenant_name) { "testing.123.onmicrosoft.com" }
-              let(:attribute) { "preferred_username" }
+            context 'account has already has a suffix set' do
+              before(:each) do
+                account.settings[:microsoft_sync_login_attribute_suffix] = "@example.com"
+                account.save!
+              end
 
-              it 'tries to cleanup UserMappings' do
-                expect(MicrosoftSync::UserMapping).to receive(:delete_old_user_mappings_later).with(@a1)
-                api_call(:put, update_path, header_options_hash,
-                         update_sync_settings_params, { expected_result: 200 })
+              context 'and the request specifies a null suffix' do
+                let(:suffix) { nil }
+
+                it_behaves_like 'a valid request'
+              end
+
+              context 'and the request specifies an empty suffix' do
+                let(:suffix) { '' }
+
+                it_behaves_like 'a valid request'
               end
             end
           end
+        end
 
-          context 'subaccounts' do
+        context 'subaccounts' do
+          let(:account) { @a2 }
 
-            let(:update_path) { "/api/v1/accounts/#{@a2.id}" }
-            let(:header_options_hash) do
-              {
-                  controller: 'accounts',
-                  action: 'update',
-                  id: @a2.to_param,
-                  format: 'json'
-              }
-            end
-
-            it "should save valid settings" do
-              api_call(:put, update_path, header_options_hash,
-                       update_sync_settings_params, { expected_result: 200 })
-              @a2.reload
-              expect(@a2.settings).to eq update_sync_settings_params[:account][:settings]
-            end
-          end
+          it_behaves_like 'a valid request'
         end
       end
     end
