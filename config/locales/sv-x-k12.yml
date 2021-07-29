@@ -2929,7 +2929,7 @@ sv-x-k12:
   ascending_b3c87427: Stigande
   ask_your_instructor_a_question_a61ca5e9: "Ställ en fråga till din lärare"
   assess_and_survey_your_students_ce8172a9: "Utvärdera och överblicka dina elever"
-  assess_student_understanding_1e0b8d7f: "Bedöm eleveras förståelse"
+  assess_student_understanding_1e0b8d7f: "Mät elevernas förståelse"
   assessment_audit_d4a76709: Bedömningsrevision
   assessment_audit_events_for_creatorname_56e84e8: "Bedömningsrevisionshändelser för %{creatorName}"
   assessment_audit_tray_5dd11721: "Fack för bedömningsrevision"
@@ -4005,7 +4005,7 @@ sv-x-k12:
   blue_daf8fea9: Blå
   blueprint_5cca2ef: Modell
   blueprint_course_associations_72c9609: Kursmallsassociationer
-  blueprint_course_e16ed131: Kursmall
+  blueprint_course_e16ed131: Blueprint
   blueprint_course_id_9ee357fb: blueprint_course_id
   blueprint_course_information_term_course_10d5cf30: "Kursmallsinformation: %{term}–%{course}"
   blueprint_courses_9dd321b8: Kursmallar
@@ -4777,10 +4777,10 @@ sv-x-k12:
   canvas_for_elementary_e6f5a06f: "Canvas för Elementary"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
-      I Canvas får du hjälp att använda samarbetsteknik så att flera
-            användare kan arbeta tillsammans på samma dokument samtidigt. Skapa
-            dokument för samarbete som sparas i realtid – ändringar av
-            användare visas för alla omedelbart.
+      Canvas kan stötta kollaborativt samarbete där två eller flera
+            deltagare kan arbeta med samma dokument samtidigt. Skapa
+            samarbetsdokument som sparas i realtid – ändringar i dokumentet av en
+            användare omedelbart blir synligt för alla de andra som har åtkomst till samma dokument.
   canvas_id_f42f6ad: Canvas-ID
   canvas_insights_beta_view_4cf67797: "Canvas Insights (beta) – visa"
   canvas_introduction_video_2d81f3ad: "Canvas introduktionsvideo"
@@ -5178,7 +5178,7 @@ sv-x-k12:
   common_cartridge_name: "Common Cartridge importör"
   common_timezones_2b00baba: "Vanliga tidszoner"
   commons_ed0252fb: Commons
-  communicate_course_objectives_f457158c: "Kommunicera kursmål"
+  communicate_course_objectives_f457158c: "Kommunicera kursens mål"
   communicate_grading_expectations_484a1f01: "Kommunicera vad som krävs för att uppnå ett visst omdöme"
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       Informera dina elever om exakt vad som kommer att krävas
@@ -6905,7 +6905,7 @@ sv-x-k12:
         allow_student_discussion_topics: "Låt elever skapa diskussionsämnen"
         allow_student_forum_attachments: "Låt elever bifoga filer till diskussioner"
         allow_student_organized_groups: "Låt elever organisera sina egna grupper"
-        blueprint_course: Kursmall
+        blueprint_course: Blueprint
         conclude_at: Slutar
         course_code: Kurskod
         course_color: Färg
@@ -7343,7 +7343,7 @@ sv-x-k12:
   custom_link_details_35fd38fc: "Detaljer om anpassad länk"
   custom_reports_experimental_features_40bbfe7c: "Anpassade rapporter: Experimentella funktioner"
   customize_configuration_69c22ef3: "Anpassa konfiguration"
-  customize_course_details_26fd4afe: "Anpassa kursinformation"
+  customize_course_details_26fd4afe: "Anpassa kursinformationen"
   customize_learning_mastery_ratings_4ace142a: "Anpassa bedömningar för måluppfyllelse"
   customize_this_menu_efa72a9: "Anpassa den här menyn"
   cutoff_score_74254c89: "Godkännande gräns"
@@ -8199,11 +8199,11 @@ sv-x-k12:
     unsubscribed_hint: "Du prenumererar inte på det här ämnet. Klicka för att prenumerera."
   discussions_a5f96392: Diskussioner
   discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
-      I diskussioner kan elever och instruktörer kommunicera om
-            kursämnen när som helst. Skapa diskussioner för en bedömning, eller skapa
+      I diskussioner kan både elever och lärare kommunicera asynkront.
+            Skapa diskussioner som en del av en bedömning, eller skapa
             diskussioner så att elever kan utbyta idéer och lösa problem. Trådade
-            diskussioner är perfekta för att samordna långa djuplodande eller långvariga diskussioner
-            , medan fokuserade diskussioner passar bäst för kortlivade utbyten.
+            diskussioner är perfekta för att strukturera långa djuplodande diskussioner
+            eller diskussioner som pågår under längre tid.
   discussions_create_94dff604: "Diskussioner – skapa"
   discussions_index_menu_42591bc9: "Indexmeny för diskussioner"
   discussions_menu_f18eb4a2: Diskussionsmeny
@@ -8222,12 +8222,12 @@ sv-x-k12:
   display_course_catalog: "Visa en sökbar lista över kurser på detta konto med \"Inkludera den här kursen i publikt kursindex\" -flaggan aktiverad."
   display_filter_options_34fb6be2: "Visa filteralternativ"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
-      Visa bedömningar som
-            poäng, procenttal, fullgjord/ej fullständig eller andra metoder som matchar
-            ditt kursbedömningsschema och filtrera och ordna poster i bedömningsöversikten
-            som du vill. Tillämpa en bedömning automatiskt för saknade eller
-            sena inlämningar, och dölj bedömningar tills du redo att
-            visa dem för elever. Använd SpeedGrader för att se och bedöma inlämningar på ett enkelt sätt.
+      Du kan ge bedömningar i form av
+            poäng, procent, fullgjord/ej fullständig, eller på det sätt som matchar kursens kursbedömningsschema.
+            Bedömningsöversikten kan filtreras och du kan ställa in så att sena eller saknade inlämningar automatiskt
+            får ett visst bedömning. Bedömning kan även döljas och visas för eleven först när du är klar med din
+            bedömning av alla inlämningar.
+            Via Bedömningsöversikten kan du också nå SpeedGrader, för att den vägen läsa och bedöma inlämningar.
   display_historical_view_of_achievements_of_users_53db5938: "Visa historisk vy av användares prestationer"
   display_name_6c2cfc58: "Visa namn:"
   display_name_b80c243e: "Visa namn"
@@ -8603,8 +8603,8 @@ sv-x-k12:
   enable_anonymous_grading_of_assignments_e18f75be: "Aktivera anonym bedömning av uppgifter."
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "Aktivera funktionsflaggor på användarnivå för byte_order_mark och semi_colon_field_separator så att de kan slås på och av för lärandemålexporter."
   enable_content_security_policy_8bd0b492: "Aktivera säkerhetspolicy för Canvas-innehåll"
-  enable_course_as_a_blueprint_course_8515ffd5: "Möjliggör som valbar kursmall för andra kurser"
-  enable_course_as_a_course_template_5299afb6: "Aktivera kurser som en kursmall"
+  enable_course_as_a_blueprint_course_8515ffd5: "Möjliggör som valbar blueprint för andra kurser"
+  enable_course_as_a_course_template_5299afb6: "Möjliggör som valbar kursmall för andra kurser"
   enable_dashboard_images_for_courses_5af458b0: "Aktivera översiktsbilder för kurserna"
   enable_extra_filter_options_b52c23e6: "aktivera extra filteralternativ"
   enable_face_to_face_connection_9df19b76: "Aktivera videoanslutning"
@@ -8777,7 +8777,7 @@ sv-x-k12:
   enter_a_valid_date_46d77547: "Ange ett giltigt datum"
   enter_a_what_if_score_668c91a3: "Skriv in tänk om-resultat."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Ange ”{{ACCOUNT_DOMAIN}}” för att ersätta användarens rotkontodomän"
-  enter_and_distribute_grades_c1216df: "Ange och distribuera bedömningar"
+  enter_and_distribute_grades_c1216df: "Lägg in och publicera bedömningar"
   enter_at_least_count_characters_1c7a0b36: "Ange minst %{count} tecken"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Ange ”{{CANVAS_USER_ID}}” för att ersätta användarens unika Canvas ID"
   enter_grades_as_e113e606: "Ange omdömen som"
@@ -10864,7 +10864,7 @@ sv-x-k12:
   how_do_i_add_a_rubric_to_an_assignment_46fd097e: "Hur lägger jag till en matris till en uppgift?"
   how_do_i_add_an_announcement_in_a_course_63396bb7: "Hur lägger jag till ett meddelande i en kurs?"
   how_do_i_add_an_image_to_a_course_card_in_the_dash_c869a3d7: "Hur lägger jag till en bild i en kurs i översikten?"
-  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Hur lägger jag till uppgiftstyper, sidor och filer i modulobjekt?"
+  how_do_i_add_assignment_types_pages_and_files_as_m_c1a520a6: "Hur lägger jag till olika typer av uppgifter, sidor och filer i moduler?"
   how_do_i_add_or_edit_details_in_an_assignment_fa779906: "Hur lägger jag till eller redigerar information i en uppgift?"
   how_do_i_add_users_to_a_course_4a88efaf: "Hur lägger jag till ett användare i en kurs?"
   how_do_i_add_zoom_to_a_course_31300d74: "Hur lägger jag till Zoom i en kurs?"
@@ -10872,7 +10872,7 @@ sv-x-k12:
   how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Hur justerar jag ett lärandemål med en matris i en kurs?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Hur laddar jag upp flera filer till en kurs?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Hur ändrar jag ett kursnamn och kurskod?"
-  how_do_i_change_the_course_home_page_326cee50: "Hur gör jag ändringar på kurshemsidan?"
+  how_do_i_change_the_course_home_page_326cee50: "Hur ändrar jag vad som ska vara startsida?"
   how_do_i_conclude_a_conference_689d60dc: "Hur avslutar jag en konferens?"
   how_do_i_contact_my_instructor_184e35ed: "Hur kontaktar jag min instruktör?"
   how_do_i_copy_a_canvas_course_into_a_new_course_sh_1633c6c1: "Hur kopierar jag en Canvas-kurs in i ett nytt kursskal?"
@@ -10890,7 +10890,7 @@ sv-x-k12:
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Hur laddar jag ned elevappen och får ytterligare hjälp?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Hur redigerar jag ett meddelande i en kurs?"
   how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Hur redigerar jag kursöversikten i en kurs?"
-  how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Hur anger och redigerar jag bedömningar i bedömningsöversikten?"
+  how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Hur lägger jag in och redigerar bedömningar via bedömningsöversikten?"
   how_do_i_find_my_courses_b826e4ce: "Hur hittar jag mina kurser?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Hur importerar jag ett exportpaket för en Canvas-kurs?"
   how_do_i_import_outcomes_for_a_course_8eced1a: "Hur importerar jag ett lärandemål för en kurs?"
@@ -10899,17 +10899,17 @@ sv-x-k12:
   how_do_i_manage_and_share_the_recording_52fc2993: "Hur hanterar jag och delar inspelningen?"
   how_do_i_manage_rubrics_in_a_course_a5441fb7: "Hur hanterar jag matriser i en kurs?"
   how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Hur hanterar jag inställningar för en bedömning i New Quizzes?"
-  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Hur flyttar jag och ordnar mina filer som instruktör?"
+  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Hur flyttar jag och ordnar mina filer som lärare?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Hur tar jag bort eller ändrar ordning på en modul?"
   how_do_i_mute_and_unmute_all_participants_a7a2115b: "Hur kan jag stänga av och sätta på ljudet för alla deltagarna?"
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: "Hur publicerar jag bedömningar för en uppgift i bedömningsöversikten?"
-  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Hur publicerar eller avpublicerar jag en diskussion som instruktör?"
-  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Hur publicerar eller avpublicerar jag en modul som instruktör?"
-  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Hur publicerar eller avpublicerar jag en sida som instruktör?"
-  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Hur publicerar eller avpublicerar jag en uppgift som instruktör?"
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Hur publicerar eller avpublicerar jag en diskussion som lärare?"
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Hur publicerar eller avpublicerar jag en modul som lärare?"
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Hur publicerar eller avpublicerar jag en sida som lärare?"
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Hur publicerar eller avpublicerar jag en uppgift som lärare?"
   how_do_i_record_a_conference_e4845e7: "Hur spelar jag in en konferens?"
   how_do_i_record_a_meeting_ae3a0d4e: "Hur spelar jag in ett möte?"
-  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Hur svarar jag på en diskussion som instruktör?"
+  how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Hur svarar jag på en diskussion som lärare?"
   how_do_i_schedule_a_zoom_video_meeting_5986f068: "Hur lägger jag till ett videomöte i Zoom?"
   how_do_i_select_specific_content_as_part_of_a_cour_11fe2c8d: "Hur väljer jag specifikt innehåll som en del av en kursimport?"
   how_do_i_send_a_message_to_all_students_based_on_s_59d186d1: "Hur skickar jag ett meddelande till alla elever baserat på specifika kurskriterier i New Analytics?"
@@ -10926,17 +10926,17 @@ sv-x-k12:
   how_do_i_use_speedgrader_e18e4ca2: "Hur använder jag SpeedGrader?"
   how_do_i_use_the_announcements_index_page_94a14011: "Hur använder jag indexsidan för meddelanden?"
   how_do_i_use_the_collaborations_index_page_68ee88b5: "Hur använder jag indexsidan för samarbeten?"
-  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Hur använder jag kurshemsidan som instruktör?"
-  how_do_i_use_the_gradebook_622395dc: "Hur använder jag bedömningsöversikten som instruktör?"
+  how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Hur använder jag startsidan som lärare?"
+  how_do_i_use_the_gradebook_622395dc: "Hur använder jag bedömningsöversikten som lärare?"
   how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Hur använder jag studenternas bedömningsöversikt för lärandemål för att se lärandemålsresultat i en kurs från omdömesboken?"
   how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Hur använder jag sidan Lärandemål i en kurs?"
   how_do_i_use_the_pages_index_page_dafb986c: "Hur använder jag indexsidan för sidor?"
-  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Hur använder jag sidan för människor i en kurs som lärare?"
+  how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Hur använder jag sidan för personer i en kurs som lärare?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Hur använder jag indexsidan för quiz?"
   how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Hur använder jag kursöversikten som instruktör?"
-  how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Hur ser jag ett kontextkort för en elev i en kurs?"
+  how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Hur ser jag ett användarinformation för en elev i en kurs?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Hur visar jag analyser för en enskild elev?"
-  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Hur ser jag och sorterar diskussioner som instruktör?"
+  how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Hur får jag överblick över och sorterar diskussionsinlägg som lärare?"
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Hur ser jag uppgifter eller enskilda elever i bedömningsöversikten?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Hur ser jag information om en inlämning för en elev i SpeedGrader?"
   how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "Hur ser jag användarinformation för en registrering i en kurs?"
@@ -11700,7 +11700,7 @@ sv-x-k12:
     esc_key_notification: "Tryck på esc-knappen innan du använder tangentbordsgenvägar i när du navigerar i bedömningsöversikten."
   keyboard_shortcuts_ed1844bd: Kortkommandon
   kind_7f0a88c4: Sort
-  know_your_users_5c1323be: "Känn dina användare"
+  know_your_users_5c1323be: "Få överblick över dina deltagare"
   korean_da812d9: Koreanska
   label_3c9a991: "%{label}:"
   label_as_gradingtype_ae164bd9: "%{label}, som %{gradingType}"
@@ -12279,9 +12279,9 @@ sv-x-k12:
   make_sure_all_search_terms_are_spelled_correctly_9804cdb4: "Se till att alla söktermer har stavats rätt"
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Gör kurssammanfattningen (lista över uppgifter och händelser) alternativ i kursöversikten"
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
-      Gör din kurs till din egen! Ladda upp en bild för din
-            kurs, låt elever hantera kursinnehållsområden och dölj bedömningsinformation
-            från eleverna. Du kanske även kan ändra kursnamnet och koden.
+      Ladda upp en bild för din kurs, låt elever hantera vissa delar
+            av kursinnehållet och dölj bedömningsdetaljer för eleverna.
+            Du kan även ha behörighet att ändra kursnamnet och kurskoden.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Visar ett länkalternativ för Microsofts Avancerad läsare på wiki-sidor."
   makes_the_student_grades_page_responsive_c13e00eb: "Gör sidan för elevbedömningar interaktiv."
   making_a_copy_of_original_assignment_name_8f029a9b: "Gör en kopia av \"%{original_assignment_name}\""
@@ -15341,7 +15341,7 @@ sv-x-k12:
       Organisera och segmentera din kurs efter ämne, enhet, kapitel,
                         eller vecka. Välj moduler i följd genom att definiera kriterier och
                         förutsättningar.
-  organize_course_content_11de8958: "Ordna kursinnehåll"
+  organize_course_content_11de8958: "Strukturera kursinnehåll"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organisera epub enligt innehållstyp (förinställt är enligt modul)."
   organize_your_course_content_c3c7ed03: "Organisera ditt kursinnehåll"
   originality_report_5d461681: Originalitetsrapport
@@ -16866,7 +16866,7 @@ sv-x-k12:
       add_bank: "Lägg till frågebank"
       course_question_banks: "Kurs frågebanker"
       labels: 
-        title: Banknamn
+        title: "Namn på frågebank"
       page_title: Frågebanker
       see_bookmarked_banks: "Visa bokmärkta banker"
       user_question_banks: "Användare frågebanker"
@@ -16899,9 +16899,9 @@ sv-x-k12:
         aligned_outcomes: "Tilldela lärandemål"
       labels: 
         keep_copy: "Behåll en kopia av frågebanken"
-        new_bank_name: "Nytt banknamn"
+        new_bank_name: "Nytt namn på frågebank"
         new_question_bank: "Ny frågebank"
-        title: Banknamn
+        title: "Namn på frågebank"
       links: 
         align_outcome: "Tilldela lärandemål"
         more_questions: "fler frågor"
@@ -17380,7 +17380,7 @@ sv-x-k12:
         group_pick_count: "%{pick_count} frågor"
         group_points: "%{points} per fråga"
         headers: 
-          bank_name: Banknamn
+          bank_name: "Namn på frågebank"
         hints: 
           group_pick_count: "%{pick_count} valda än så länge"
         labels: 
@@ -20364,7 +20364,7 @@ sv-x-k12:
   stop_acting_as_user_8809a97f: "Sluta att agera som en användare"
   storage_quotas_manage_6ca14bbb: "Lagringskvoter – hantera"
   storage_used_in_mb_c75fbd9c: "använt lagringsutrymme i MB"
-  store_and_share_course_assets_82a9967c: "Lagra och dela kurstillgångar"
+  store_and_share_course_assets_82a9967c: "Ladda upp och dela kursmaterial"
   stream_items_api: 
     assessment_request_title: "Kamratresponsuppgift för %{title}"
   strip_domain_from_login_attribute_value_bb6daa88: "Rensa inloggningsattributets värde från domänen"
@@ -21025,9 +21025,9 @@ sv-x-k12:
                      (t.ex. *.instructure.com). Canvas- och Instructure-domäner inkluderas
                      automatiskt och räknas inte med i begränsningen på 50 domäner.
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
-      Kurshemsidan är det första era elever kommer att se när de öppnar
-            din kurs. Kurshemsidan kan visa aktivitetsflödet för kursdeltagande
-            , kursmodulssidan, kursuppgiftslistan, kursöversikten
+      Startsidan är det första eleverna kommer att se när de går in på kursen.
+            Startsidan kan visa kursens aktivitetsflödet,
+            kursmodulssidan, kursuppgiftslistan, kursöversikten
             eller en sida som du skapat som framsida.
   the_course_link_validator_searches_course_content__563fa215: "Kursens länkvaliderare söker igenom kursinnehållet efter ogiltiga eller onåbara länkar eller bilder."
   the_course_link_validator_searches_through_course__76f0bc63: "Kursens länkbekräftare söker igenom kursens innehåll och visar alla ogiltiga eller ej fungerade länkar den hittar. Observera att vissa länkar som är flaggade som ej fungerande kan vara otillgängliga från våra servrar och kommer fortfarande att fungera för eleverna."
@@ -21158,10 +21158,10 @@ sv-x-k12:
   the_state_parameter_is_required_ffadf213: "Delstatsparametern krävs"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fliken för elevnoteringar innehåller dokumentet för uppgiften. Flikar med flera inlämningstyper kan finnas."
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
-      I kursöversikten välkomnar du kursanvändarna och delar dina förväntningar
+      Via kursöversikten kan du välkomna kursdeltagarna och dela dina förväntningar på kursen
             med dina elever. Använd beskrivningen i kursöversikten för att förklara kursmål,
-            önskade kontaktmetoder och andra uppgifter. Eller ladda upp en PDF i en redan befintlig
-            kursöversikt. Sidan Kursöversikt kan även visa alla uppgifter och händelser
+            hur du önskar att studenterna ska kontakta dig och andra detaljer. Eller så kan du ladda upp en redan befintlig
+            kursöversikt som pdf. Sidan Kursöversikt kan även visa en sammanfattning av alla uppgifter och händelser
             i kursen.
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Synkroniseringen stötte på ett fel och slutfördes inte"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Det gick inte att aktivera inställningen Synkronisera till elevinformationssystem (SIS) för uppgiften \"%{assignment_name}\" utan ett inlämningsdatum."
@@ -22641,10 +22641,10 @@ sv-x-k12:
   upload_a_file_228b8cf9: "Ladda upp en fil"
   upload_a_picture_9f5f6e3c: "Ladda upp en bild"
   upload_and_store_course_files_or_any_other_files_y_b00cb954: |-
-      Ladda upp och lagra kursfiler, eller vilka filer som helst som du vill ha
-            tillgängliga. När du sparar tillgångar i Filer är det enkelt att infoga dem direkt i
+      Ladda upp och lagra kursfiler, eller andra filer som du vill ha
+            tillgängliga. När du sparar innehåll i Filer är det enkelt att därefter infoga dem direkt i
             moduler, uppgifter, diskussioner eller på sidor! Distribuera filer till elever
-            från din kursmapp, eller lås filer tills du är redo att låta klassen
+            från din kursmapp, eller lås filer tills du är redo att låta kursen
             ladda ned dem.
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
       Ladda upp kursfiler, kursöversikter, uppläsningar eller andra dokument.
@@ -22706,20 +22706,20 @@ sv-x-k12:
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Använd MathMan för att konvertera LaTeX till MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Använd MathMan för att konvertera LaTeX till SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
-      Använd moduler för att ändra ordning på innehållet och skapa ett linjärt flöde för
-            vad elever ska göra i kursen. Moduler kan användas för att ordningsändra
-            innehåll efter veckor, enheter eller en annan organisationsstruktur.
-            Lägg till filer, diskussioner, uppgifter och andra lärmaterial.
-            Ställ krav på fullgjorda uppgifter innan eleven kan gå vidare till en modul eller nästa
-            modulobjekt, eller lås en hel modul till ett visst datum.
+      Använd moduler för att organisera innehållet och skapa ett linjärt flöde för
+            det eleverna ska göra i kursen. Moduler kan användas för att strukturera
+            innehåll efter veckor, delar eller annan valfri indelning.
+            Lägg till filer, diskussioner, uppgifter och annat lärmaterial.
+            Ställ krav på att eleven ska ha genomfört vissa uppgifter innan hen kan gå vidare i en 
+            modul eller nästa moduldel, eller lås en hel modul till ett visst datum.
   use_new_folder_tree_in_files_bc0ea09f: "Använd nytt mappträd i filer"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Använd ny rik innehållsredigerare med förbättrat sidfält överallt"
   use_pairing_code_for_parent_sign_up_10b091f8: "Använd parningskod för föräldraregistrering"
   use_parent_account_setting_f25a721f: "Använd vårdnadshavares kontoinställning"
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
-      Använd quiz för att utmana elevernas förståelse och bedöma deras upptagning av
+      Använd quiz för att utmana elevernas insikter och bedöma deras förståelse av
             kursmaterialet. Med New Quizzes bedömningsmotor kan du skapa upp till
-            13 typer fråge- och innehållstyper. Om din institution inte aktiverat New Quizzes,
+            13 fråge- och innehållstyper. Om ditt lärosäte inte aktiverat New Quizzes,
             finns fortfarande Classic Quizzes tillgängligt.
   use_remote_service_for_notifications_9fe667c6: "Använda fjärrtjänster för aviseringar"
   use_semicolons_instead_of_commas_to_separate_field_62d24565: "Använd semikolon istället för komman för att åtskilja fält i exporter av kompatibla kalkylblad så att de kan importeras till Excel för användare på vissa platser."
@@ -23378,7 +23378,7 @@ sv-x-k12:
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Välkommen till dina kurser! För att lägga till eller ta bort en kurs i listan, klicka på \"Alla kurser\". De kurser du stjärnmarkerat visas i listan ovan."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Välkommen till dina kurser! För att anpassa listan över kurser klickar du på länken för \"alla kurser\" och favoritmarkerar kurser som ska visas."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Dina ämnen är välkomna! Klicka på länken Alla ämnen och stjärnmärk de ämnen som ska visas."
-  welcome_your_students_e1d96088: "Välkomna dina elever"
+  welcome_your_students_e1d96088: "Välkomna eleverna"
   well_below_mastery_37664bdc: "Långt under måluppfyllelse"
   welsh_42ab94b1: Walesiska
   what_are_announcements_52175539: "Vad är meddelanden?"
@@ -23388,13 +23388,13 @@ sv-x-k12:
   what_happened_322d8259: "Vad hände?"
   what_it_does_c158cc83: "DETTA GÖR FUNKTIONEN"
   what_it_does_d4debc07: "Vad den gör"
-  what_layout_options_are_available_in_the_course_ho_5d364ce3: "Vilka layoutalternativ finns tillgängliga på kurshemsidan för instruktörer?"
+  what_layout_options_are_available_in_the_course_ho_5d364ce3: "Vilka layoutalternativ finns tillgängliga för startsidan?"
   what_options_can_i_set_in_a_quiz_53522d76: "Vilka alternativ finns att ställa in i en quiz?"
   what_s_a_class_without_people_to_take_and_lead_it__4470b81a: |-
-      Vad är en lektion utan någon som leder eller deltar i den? Sidan Personer
-            visar listan över användarna i din kurs. Beroende på dina behörigheter
-            kan du lägga till elever, lärarassistenter och observatörer i
-            din kurs. Du kan även skapa elevgrupper som värdar för gruppuppgifter,
+      Sidan Personer visar listan över deltagarna i din kurs. Sidan Personer
+            visar listan över användarna i din kurs. Beroende på vilka behörigheter
+            du har kan du lägga till elever, lärarassistenter och observatörer.
+            Du kan även skapa elevgrupper med egna samarbetsytor som innehåller gruppuppgifter,
             diskussioner och filer.
   what_should_the_csv_file_look_like_985a59ac: "Hur bör CSV-filen se ut?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Vilka lagringsalternativ har jag i Zoom?"
