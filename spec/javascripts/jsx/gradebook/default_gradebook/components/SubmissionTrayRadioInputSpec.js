@@ -22,7 +22,6 @@ import SubmissionTrayRadioInput from 'ui/features/gradebook/react/default_gradeb
 import {NumberInput} from '@instructure/ui-number-input'
 
 let wrapper
-let updateSubmission
 
 function mountComponent(customProps) {
   const props = {
@@ -47,18 +46,6 @@ function numberInputContainer() {
 
 function numberInput() {
   return numberInputContainer().find(NumberInput)
-}
-
-function numberInputDescription() {
-  return numberInputContainer()
-    .find('span.NumberInput__Container.NumberInput__Container-LeftIndent')
-    .instance().textContent
-}
-
-function numberInputLabel() {
-  return numberInputContainer()
-    .find('label')
-    .instance().textContent
 }
 
 function radioInput() {
@@ -152,158 +139,6 @@ QUnit.module('SubmissionTrayRadioInput', hooks => {
       wrapper = mountComponent({value: 'late', checked: false})
       wrapper.setProps({checked: true})
       strictEqual(numberInput().length, 1)
-    })
-
-    test('the text next to the input reads "Day(s)" if the late policy interval is "day"', () => {
-      wrapper = mountComponent({value: 'late', checked: true})
-      strictEqual(numberInputDescription(), 'Days lateDay(s)')
-    })
-
-    test('the text next to the input reads "Hour(s)" if the late policy interval is "day"', () => {
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        latePolicy: {lateSubmissionInterval: 'hour'}
-      })
-      strictEqual(numberInputDescription(), 'Hours lateHour(s)')
-    })
-
-    test('the label for the input reads "Days late" if the late policy interval is "day"', () => {
-      wrapper = mountComponent({value: 'late', checked: true})
-      strictEqual(numberInputLabel(), 'Days late')
-    })
-
-    test('the label for the input reads "Hours late" if the late policy interval is "hour"', () => {
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        latePolicy: {lateSubmissionInterval: 'hour'}
-      })
-      strictEqual(numberInputLabel(), 'Hours late')
-    })
-
-    test('the default value for the input is converted to days if the late policy interval is "day"', () => {
-      // two days in seconds
-      const secondsLate = 172800
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        submission: {latePolicyStatus: 'late', secondsLate}
-      })
-      strictEqual(numberInput().props().value, '2')
-    })
-
-    test('the default value for the input is converted to hours if the late policy interval is "hour"', () => {
-      // two days in seconds
-      const secondsLate = 172800
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        latePolicy: {lateSubmissionInterval: 'hour'},
-        submission: {latePolicyStatus: 'late', secondsLate}
-      })
-      strictEqual(numberInput().props().value, '48')
-    })
-
-    test('the default value for the input is rounded to two digits after the decimal point', () => {
-      // two days and four minutes in seconds
-      const secondsLate = 173040
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        latePolicy: {lateSubmissionInterval: 'hour'},
-        submission: {latePolicyStatus: 'late', secondsLate}
-      })
-      strictEqual(numberInput().props().value, '48.07')
-    })
-
-    test('updates value when the submission changes', () => {
-      // two days and four minutes in seconds
-      const secondsLate = 173040
-      wrapper = mountComponent({
-        value: 'late',
-        checked: true,
-        latePolicy: {lateSubmissionInterval: 'hour'},
-        submission: {id: '2501', latePolicyStatus: 'late', secondsLate: 0}
-      })
-      wrapper.setProps({
-        submission: {id: '2502', latePolicyStatus: 'late', secondsLate}
-      })
-      strictEqual(numberInput().props().value, '48.07')
-    })
-
-    QUnit.module('on blur', () => {
-      test('does not call updateSubmission if the input value is an empty string', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput()
-        input.simulate('blur', {target: {value: ''}})
-        strictEqual(updateSubmission.callCount, 0)
-      })
-
-      test('does not call updateSubmission if the input value cannot be parsed as a number', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput()
-        input.simulate('blur', {target: {value: 'foo'}})
-        strictEqual(updateSubmission.callCount, 0)
-      })
-
-      test('does not call updateSubmission if the input value matches the current value', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput()
-        input.simulate('blur', {target: {value: '0'}})
-        strictEqual(updateSubmission.callCount, 0)
-      })
-
-      test('does not call updateSubmission if the parsed value (2 decimals) matches the current value', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput()
-        input.simulate('blur', {target: {value: '0.004'}})
-        strictEqual(updateSubmission.callCount, 0)
-      })
-
-      test('calls updateSubmission if the parsed value (2 decimals) differs from the current value', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput().find('input')
-        input.simulate('blur', {target: {value: '2'}})
-        strictEqual(updateSubmission.callCount, 1)
-      })
-
-      test('calls updateSubmission with latePolicyStatus set to "late"', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput().find('input')
-        input.simulate('blur', {target: {value: '2'}})
-        strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late')
-      })
-
-      test('interval is hour: calls updateSubmission with the input converted to seconds', () => {
-        wrapper = mountComponent({
-          checked: true,
-          latePolicy: {lateSubmissionInterval: 'hour'},
-          updateSubmission,
-          value: 'late'
-        })
-
-        const input = numberInput().find('input')
-        input.simulate('blur', {target: {value: '2'}})
-        const expectedSeconds = 2 * 3600
-        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
-      })
-
-      test('interval is day: calls updateSubmission with the input converted to seconds', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput().find('input')
-        input.simulate('blur', {target: {value: '2'}})
-        const expectedSeconds = 2 * 86400
-        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
-      })
-
-      test('truncates the remainder if one exists', () => {
-        wrapper = mountComponent({value: 'late', checked: true, updateSubmission})
-        const input = numberInput().find('input')
-        input.simulate('blur', {target: {value: '2.3737'}})
-        const expectedSeconds = Math.trunc(2.3737 * 86400)
-        strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
-      })
     })
   })
 })

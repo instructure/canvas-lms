@@ -18,26 +18,10 @@
 
 import React from 'react'
 import {func, number, shape, string, bool} from 'prop-types'
-import I18n from 'i18n!gradebook'
-import {View} from '@instructure/ui-view'
-import {NumberInput} from '@instructure/ui-number-input'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
 import {RadioInput} from '@instructure/ui-radio-input'
 
 import classnames from 'classnames'
-import round from 'round'
-import NumberHelper from '@canvas/i18n/numberHelper'
-
-function defaultDurationLate(interval, secondsLate) {
-  let durationLate = secondsLate / 3600
-
-  if (interval === 'day') {
-    durationLate /= 24
-  }
-
-  return round(durationLate, 2)
-}
+import TimeLateInput from '@canvas/grading/TimeLateInput'
 
 function styles({color, showNumberInput}) {
   return {
@@ -71,54 +55,9 @@ export default class SubmissionTrayRadioInput extends React.Component {
   constructor(props) {
     super(props)
 
-    const interval = props.latePolicy.lateSubmissionInterval
-    this.numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
-    this.numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
     this.radioInputClasses = classnames('SubmissionTray__RadioInput', {
       'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
     })
-
-    this.state = {
-      numberInputValue: defaultDurationLate(interval, props.submission.secondsLate)
-    }
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const idOf = submission => submission && submission.id
-    const submissionHasChanged = idOf(this.props.submission) !== idOf(nextProps.submission)
-
-    if (nextProps.submission && submissionHasChanged) {
-      const interval = nextProps.latePolicy.lateSubmissionInterval
-      this.setState({
-        numberInputValue: defaultDurationLate(interval, nextProps.submission.secondsLate)
-      })
-    }
-  }
-
-  handleNumberInputBlur = ({target: {value}}) => {
-    if (!NumberHelper.validate(value)) {
-      return
-    }
-
-    const parsedValue = NumberHelper.parse(value)
-    const roundedValue = round(parsedValue, 2)
-    if (roundedValue === this.state.numberInputValue) {
-      return
-    }
-
-    let secondsLateOverride = parsedValue * 3600
-    if (this.props.latePolicy.lateSubmissionInterval === 'day') {
-      secondsLateOverride *= 24
-    }
-
-    this.props.updateSubmission({
-      latePolicyStatus: 'late',
-      secondsLateOverride: Math.trunc(secondsLateOverride)
-    })
-  }
-
-  handleNumberInputChange = (_event, numberInputValue) => {
-    this.setState({numberInputValue})
   }
 
   handleRadioInputChange = event => {
@@ -143,28 +82,17 @@ export default class SubmissionTrayRadioInput extends React.Component {
           value={this.props.value}
         />
 
-        {showNumberInput && (
-          <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-            <NumberInput
-              value={this.state.numberInputValue.toString()}
-              disabled={this.props.disabled}
-              inline
-              label={<ScreenReaderContent>{this.numberInputLabel}</ScreenReaderContent>}
-              locale={this.props.locale}
-              min="0"
-              onBlur={this.handleNumberInputBlur}
-              onChange={this.handleNumberInputChange}
-              showArrows={false}
-              width="5rem"
-            />
-
-            <PresentationContent>
-              <View as="div" margin="0 small">
-                <Text>{this.numberInputText}</Text>
-              </View>
-            </PresentationContent>
-          </span>
-        )}
+        <TimeLateInput
+          key={(this.props.submission.id || 'none').toString()}
+          disabled={this.props.disabled}
+          lateSubmissionInterval={this.props.latePolicy.lateSubmissionInterval}
+          locale={this.props.locale}
+          secondsLate={this.props.submission.secondsLate}
+          renderLabelBefore={false}
+          onSecondsLateUpdated={this.props.updateSubmission}
+          width="5rem"
+          visible={showNumberInput}
+        />
       </div>
     )
   }
