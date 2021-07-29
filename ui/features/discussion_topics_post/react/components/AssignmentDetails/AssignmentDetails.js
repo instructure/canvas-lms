@@ -20,7 +20,6 @@ import I18n from 'i18n!discussion_posts'
 
 import PropTypes from 'prop-types'
 import React, {useMemo, useState} from 'react'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {responsiveQuerySizes} from '../../utils'
 
 import {Text} from '@instructure/ui-text'
@@ -28,8 +27,8 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
-import {Grid} from '@instructure/ui-grid'
 import {Responsive} from '@instructure/ui-responsive'
+import {DueDateTray} from '../DueDateTray/DueDateTray'
 
 export function AssignmentDetails({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
@@ -96,60 +95,7 @@ export function AssignmentDetails({...props}) {
                   {I18n.t('Due Dates')}
                 </Text>
               </Flex.Item>
-              <Grid>
-                <Grid.Row>
-                  <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                    <Text size="large" weight="bold">
-                      {I18n.t('Due At')}
-                    </Text>
-                  </Grid.Col>
-                  <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
-                    <Text size="large" weight="bold">
-                      {I18n.t('For')}
-                    </Text>
-                  </Grid.Col>
-                  <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
-                    <Text size="large" weight="bold">
-                      {I18n.t('Available From')}
-                    </Text>
-                  </Grid.Col>
-                  <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                    <Text size="large" weight="bold">
-                      {I18n.t('Until')}
-                    </Text>
-                  </Grid.Col>
-                </Grid.Row>
-                {props.assignmentOverrides.map(item => (
-                  <Grid.Row key={item.id} data-testid="assignment-override-row">
-                    <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                      <Text size="medium">
-                        {item.dueAt
-                          ? DateHelper.formatDatetimeForDiscussions(item.dueAt)
-                          : I18n.t('No Due Date')}
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col width={{small: 4, medium: 2, large: 4, xLarge: 1}}>
-                      <Text size="medium">
-                        {item.title.length < 34 ? item.title : `${item.title.slice(0, 32)}...`}
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col width={{small: 4, medium: 5, large: 3, xLarge: 6}}>
-                      <Text size="medium">
-                        {item.unlockAt
-                          ? DateHelper.formatDatetimeForDiscussions(item.unlockAt)
-                          : I18n.t('No Start Date')}
-                      </Text>
-                    </Grid.Col>
-                    <Grid.Col width={{small: 4, medium: 5, large: 2, xLarge: 6}}>
-                      <Text size="medium">
-                        {item.lockAt
-                          ? DateHelper.formatDatetimeForDiscussions(item.lockAt)
-                          : I18n.t('No End Date')}
-                      </Text>
-                    </Grid.Col>
-                  </Grid.Row>
-                ))}
-              </Grid>
+              <DueDateTray assignmentOverrides={props.assignmentOverrides} />
             </Flex>
           </View>
         </Tray>
