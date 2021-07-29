@@ -5,7 +5,7 @@ The plagiarism detection platform provides a standard way for LTI2 tool provider
 This document provides details to guide TPs toward leveraging the plagiarism detection platform. The document is divided into three sections that cover the plagiarism detection platform:
 
 #### Section 1 - Tool Registration & Webhooks
-TPs leveraging the new plagiarism detection platform must go through the standard LTI2 registration flow, with some additional steps along the way.  Canvas will automatically create a subscription on behalf of the tool for a submissions webhook, allowing the TP to be notified when a submission has been made.
+TPs leveraging the new plagiarism detection platform must go through the standard LTI2 registration flow, with some additional steps along the way.  Canvas will automatically create a subscription on behalf of the tool for a submissions webhook, allowing the TP to be notified when a submission has been made. (See <a href="webhooks_subscriptions_for_plagiarism_platform.html">Webhooks Subscriptions for Plagiarism Platform</a>.)
 
 #### Section 2 - Tool Launch
 Once registered, tools will be provided with an LTI tool placement in the Canvas assignment create/edit UI to launch a configuration page.
@@ -23,7 +23,7 @@ For additional help please see the following reference tools:
 ### 1. Tool Registration
 Canvas’ plagiarism platform requires the TP to support LTI2 and obtain a Canvas developer key. During the standard LTI2 registration flow, the TP should take the following steps:
 1. Include a JWT access token in the Authorization header of the request to get the Tool Consumer Profile (see section 1.1).
-2. Add the `Canvas.placements.similarityDetection` capability to the Tool Profile’s Resource Handler enabled capabilities (See section 1.2).
+  2. Add the `Canvas.placements.similarityDetection` capability to the Tool Profile’s Resource Handler enabled capabilities (See section 1.2).
 3. Add the `vnd.Canvas.OriginalityReport` service to the Tool Proxy’s Security Contract (see section 1.3).
 4. Add the `Security.splitSecret` capability to the Tool Proxy’s enabled capabilities (see section 1.4).
 5. Include a JWT access token in the Authorization header of the Tool Proxy create POST request (see section 1.5).
