@@ -256,7 +256,7 @@ class AuthenticationProvider < ActiveRecord::Base
       pseudonym
     end
   rescue ActiveRecord::RecordNotUnique
-    uncached do
+    self.class.uncached do
       pseudonyms.active.by_unique_id(unique_id).take!
     end
   end
