@@ -83,11 +83,6 @@
 #            "example": true,
 #            "type": "boolean"
 #          },
-#         "development": {
-#           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
-#           "example": false,
-#           "type": "boolean"
-#         },
 #         "release_notes_url": {
 #           "description": "A URL to the release notes describing the feature",
 #           "example": "http://canvas.example.com/release_notes#fancy_wickets",
