@@ -83,9 +83,10 @@ module Lti
                                                             resource_type_code: resource_type_code,
                                                             context: context)
       resource_handler = nil
-      search_contexts = context.account_chain.unshift(context)
+      search_contexts = context.account_chain.dup.unshift(context)
       search_contexts.each do |search_context|
         break if resource_handler.present?
+
         resource_handler = possible_handlers.find { |rh| rh.tool_proxy.context == search_context }
       end
       resource_handler&.find_message_by_type(message_type)
