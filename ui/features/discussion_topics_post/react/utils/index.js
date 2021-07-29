@@ -149,7 +149,7 @@ export const replyCountText = (repliesCount, unreadCount) => {
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
   if (mobile) {
-    querySizes.mobile = {maxWidth: '768px'}
+    querySizes.mobile = {maxWidth: '767px'}
   }
   if (tablet) {
     querySizes.tablet = {minWidth: '768px'}
