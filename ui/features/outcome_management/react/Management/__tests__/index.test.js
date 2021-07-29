@@ -236,7 +236,7 @@ describe('OutcomeManagementPanel', () => {
   })
 
   describe('Removing a group', () => {
-    it('Show parent group in the RHS', async () => {
+    it.skip('Show parent group in the RHS', async () => {
       // API mock
       jest.spyOn(api, 'removeOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
 
