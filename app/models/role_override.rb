@@ -1634,7 +1634,6 @@ class RoleOverride < ActiveRecord::Base
 
       preloaded_overrides ||= preload_overrides(context, [role], role_context)
 
-      accounts.reverse!
       overrides = {}
 
       dummies = RequestCache.cache('role_override_dummies') do
@@ -1647,7 +1646,7 @@ class RoleOverride < ActiveRecord::Base
       preloaded_overrides.each do |(permission, overrides_by_account)|
         next if only_permission && permission != only_permission
 
-        overrides[permission] = accounts.map do |account|
+        overrides[permission] = accounts.reverse_each.map do |account|
           overrides_by_account[account.global_id].find { |ro| ro.role_id == role.id } || dummies[account.id]
         end
       end

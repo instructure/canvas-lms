@@ -999,10 +999,11 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(self)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+    @account_chain ||= Account.account_chain(self).freeze
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+    @account_chain
   end
 
   def account_chain_ids
@@ -1365,7 +1366,7 @@ class Account < ActiveRecord::Base
   end
 
   def reload(*)
-    @account_chain = nil
+    @account_chain = @account_chain_with_site_admin = nil
     super
   end
 

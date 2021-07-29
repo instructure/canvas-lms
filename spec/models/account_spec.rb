@@ -2099,6 +2099,7 @@ describe Account do
         au = AccountUser.create!(:account => other_account, :user => @user)
         expect(cached_account_users).to eq []
         @account.update_attribute(:parent_account, other_account)
+        @account.reload
         expect(cached_account_users).to eq [au]
       end
 

@@ -1430,6 +1430,11 @@ class Course < ActiveRecord::Base
     workflow_state
   end
 
+  def reload(*)
+    @account_chain = @account_chain_with_site_admin = nil
+    super
+  end
+
   alias destroy_permanently! destroy
   def destroy
     return false if template?
@@ -1850,10 +1855,11 @@ class Course < ActiveRecord::Base
   end
 
   def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(account_id)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+    @account_chain ||= Account.account_chain(account_id).freeze
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+    @account_chain
   end
 
   def account_chain_ids
