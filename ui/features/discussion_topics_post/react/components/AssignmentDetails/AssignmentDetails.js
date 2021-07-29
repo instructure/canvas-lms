@@ -21,6 +21,7 @@ import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useMemo, useState} from 'react'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
+import {responsiveQuerySizes} from '../../utils'
 
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -28,6 +29,7 @@ import {View} from '@instructure/ui-view'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
+import {Responsive} from '@instructure/ui-responsive'
 
 export function AssignmentDetails({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
@@ -52,11 +54,31 @@ export function AssignmentDetails({...props}) {
           }}
           data-testid="show-due-dates-button"
         >
-          <Text>
-            {I18n.t('Show Due Dates (%{dueDateCount})', {
-              dueDateCount: props.assignmentOverrides.length
-            })}
-          </Text>
+          <Responsive
+            match="media"
+            query={responsiveQuerySizes({mobile: true, desktop: true})}
+            props={{
+              mobile: {
+                text: I18n.t('Due Dates (%{dueDateCount})', {
+                  dueDateCount: props.assignmentOverrides.length
+                }),
+                textSize: 'x-small',
+                textWeight: 'bold'
+              },
+              desktop: {
+                text: I18n.t('Show Due Dates (%{dueDateCount})', {
+                  dueDateCount: props.assignmentOverrides.length
+                }),
+                textSize: 'small',
+                textWeight: 'normal'
+              }
+            }}
+            render={responsiveProps => (
+              <Text weight={responsiveProps.textWeight} size={responsiveProps.textSize}>
+                {responsiveProps.text}
+              </Text>
+            )}
+          />
         </CondensedButton>
         <Tray open={dueDateTrayOpen} size="large" placement="end" label="Due Dates">
           <View as="div" padding="medium">
@@ -139,24 +161,48 @@ export function AssignmentDetails({...props}) {
   )
 
   return (
-    <Flex data-testid="graded-discussion-info">
-      {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
-        ? multipleDueDates
-        : singleDueDate}
-      <Flex.Item shouldShrink padding="x-small" align="end">
-        <Text weight="normal" size="small">
-          {I18n.t(
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          text: I18n.t(
             {
-              one: '%{count} point possible',
+              one: '1 point',
+              other: '%{count} points'
+            },
+            {
+              count: props.pointsPossible
+            }
+          ),
+          textSize: 'x-small'
+        },
+        desktop: {
+          text: I18n.t(
+            {
+              one: '1 point possible',
               other: '%{count} points possible'
             },
             {
               count: props.pointsPossible
             }
-          )}
-        </Text>
-      </Flex.Item>
-    </Flex>
+          ),
+          textSize: 'small'
+        }
+      }}
+      render={responsiveProps => (
+        <Flex data-testid="graded-discussion-info">
+          {props.canSeeMultipleDueDates && props.assignmentOverrides.length > 0
+            ? multipleDueDates
+            : singleDueDate}
+          <Flex.Item shouldShrink padding="x-small" align="end">
+            <Text weight="normal" size={responsiveProps.textSize}>
+              {responsiveProps.text}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      )}
+    />
   )
 }
 

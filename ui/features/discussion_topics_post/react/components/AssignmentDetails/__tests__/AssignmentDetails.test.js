@@ -18,9 +18,13 @@
 
 import {AssignmentDetails} from '../AssignmentDetails'
 
+import {responsiveQuerySizes} from '../../../utils/index'
+
 import React from 'react'
 
 import {fireEvent, render} from '@testing-library/react'
+
+jest.mock('../../../utils')
 
 const overrides = [
   {
@@ -49,6 +53,24 @@ const overrides = [
   }
 ]
 
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
+
 const setup = props => {
   return render(
     <AssignmentDetails
@@ -62,49 +84,74 @@ const setup = props => {
 }
 
 describe('AssignmentDetails', () => {
-  it('displays points possible info', () => {
-    const {queryByText} = setup()
-    expect(queryByText('7 points possible')).toBeTruthy()
-  })
-
-  it('displays correct pluralization', () => {
-    const {queryByText} = setup({pointsPossible: 1})
-    expect(queryByText('1 point possible')).toBeTruthy()
-  })
-
-  it('displays due date when there are no overrides', () => {
-    const {queryByText} = setup()
-    expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
-  })
-
-  it('displays "Show due dates" button when there are overrides', () => {
-    const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
-    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
-  })
-
-  it('displays tray and correctly formatted dates', async () => {
-    const {queryByText, findByText, findByTestId} = setup({
-      assignmentOverrides: overrides,
-      canSeeMultipleDueDates: true
+  describe('desktop', () => {
+    it('displays points possible info', () => {
+      const {queryByText} = setup()
+      expect(queryByText('7 points possible')).toBeTruthy()
     })
-    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
-    fireEvent.click(queryByText('Show Due Dates (3)'))
-    expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
-    expect(await findByText('Sep 4 5:59am')).toBeTruthy()
+
+    it('displays correct pluralization', () => {
+      const {queryByText} = setup({pointsPossible: 1})
+      expect(queryByText('1 point possible')).toBeTruthy()
+    })
+
+    it('displays due date when there are no overrides', () => {
+      const {queryByText} = setup()
+      expect(queryByText('Everyone: Due Jan 26 11:49pm')).toBeTruthy()
+    })
+
+    it('displays "Show due dates" button when there are overrides', () => {
+      const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+    })
+
+    it('displays tray and correctly formatted dates', async () => {
+      const {queryByText, findByText, findByTestId} = setup({
+        assignmentOverrides: overrides,
+        canSeeMultipleDueDates: true
+      })
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+      fireEvent.click(queryByText('Show Due Dates (3)'))
+      expect(await findByTestId('due-dates-tray-heading')).toBeTruthy()
+      expect(await findByText('Sep 4 5:59am')).toBeTruthy()
+    })
+
+    it('correct text is shown when a date is not set', async () => {
+      overrides[2].dueAt = null
+      overrides[2].unlockAt = null
+      overrides[2].lockAt = null
+      const {queryByText, findByText} = setup({
+        assignmentOverrides: overrides,
+        canSeeMultipleDueDates: true
+      })
+      expect(queryByText('Show Due Dates (3)')).toBeTruthy()
+      fireEvent.click(queryByText('Show Due Dates (3)'))
+      expect(await findByText('No Due Date')).toBeTruthy()
+      expect(await findByText('No Start Date')).toBeTruthy()
+      expect(await findByText('No End Date')).toBeTruthy()
+    })
   })
 
-  it('correct text is shown when a date is not set', async () => {
-    overrides[2].dueAt = null
-    overrides[2].unlockAt = null
-    overrides[2].lockAt = null
-    const {queryByText, findByText} = setup({
-      assignmentOverrides: overrides,
-      canSeeMultipleDueDates: true
+  describe('mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
     })
-    expect(queryByText('Show Due Dates (3)')).toBeTruthy()
-    fireEvent.click(queryByText('Show Due Dates (3)'))
-    expect(await findByText('No Due Date')).toBeTruthy()
-    expect(await findByText('No Start Date')).toBeTruthy()
-    expect(await findByText('No End Date')).toBeTruthy()
+
+    it('displays points possible info', () => {
+      const {queryByText} = setup()
+      expect(queryByText('7 points')).toBeTruthy()
+    })
+
+    it('displays correct pluralization', () => {
+      const {queryByText} = setup({pointsPossible: 1})
+      expect(queryByText('1 point')).toBeTruthy()
+    })
+
+    it('displays "Show due dates" button when there are overrides', () => {
+      const {queryByText} = setup({assignmentOverrides: overrides, canSeeMultipleDueDates: true})
+      expect(queryByText('Due Dates (3)')).toBeTruthy()
+    })
   })
 })

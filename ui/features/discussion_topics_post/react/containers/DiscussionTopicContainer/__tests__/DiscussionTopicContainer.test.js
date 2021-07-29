@@ -23,7 +23,12 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {getEditUrl, getSpeedGraderUrl, getPeerReviewsUrl} from '../../../utils'
+import {
+  getEditUrl,
+  getSpeedGraderUrl,
+  getPeerReviewsUrl,
+  responsiveQuerySizes
+} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -34,7 +39,7 @@ import {waitFor} from '@testing-library/dom'
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: jest.fn()
 }))
 
 describe('DiscussionTopicContainer', () => {
@@ -86,6 +91,22 @@ describe('DiscussionTopicContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
     server.listen()
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
+  })
+
+  beforeEach(() => {
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {maxWidth: '1000px'}
+    }))
   })
 
   afterEach(() => {
