@@ -35,6 +35,10 @@ describe RootAccountResolver do
         { 'root_account_id' => root_account_id }
       end
 
+      def has_attribute?(key)
+        attributes.key?(key)
+      end
+
       def self.belongs_to(relation, **opts)
       end
     end
