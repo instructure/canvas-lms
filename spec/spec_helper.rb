@@ -31,7 +31,7 @@ ENV["RAILS_ENV"] = 'test'
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
   require_relative 'coverage_tool'
-  CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
+  CoverageTool.start("RSpec:#{Process.pid}")
 end
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
@@ -58,7 +58,7 @@ require_relative 'sharding_spec_helper'
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-TestDatabaseUtils.reset_database! unless defined?(TestQueue::Runner::RSpec) # we do this in each runner
+TestDatabaseUtils.reset_database!
 BlankSlateProtection.install!
 GreatExpectations.install!
 
@@ -444,14 +444,8 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    if ENV['TEST_ENV_NUMBER'].present?
-      Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
-    end
-
     if ENV['COVERAGE'] == "1"
-      # do this in a hook so that results aren't clobbered under test-queue
-      # (it forks and changes the TEST_ENV_NUMBER)
-      simple_cov_cmd = "rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}"
+      simple_cov_cmd = "rspec:#{Process.pid}"
       puts "Starting SimpleCov command: #{simple_cov_cmd}"
       SimpleCov.command_name(simple_cov_cmd)
       SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377

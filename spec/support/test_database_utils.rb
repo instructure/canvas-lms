@@ -19,13 +19,6 @@
 
 module TestDatabaseUtils
   class << self
-    # for when we fork
-    def reconnect!
-      ::ActiveRecord::Base.configurations['test']['database'] = "canvas_test_#{ENV["TEST_ENV_NUMBER"]}"
-      ::Switchman::DatabaseServer.remove_instance_variable(:@database_servers)
-      ::ActiveRecord::Base.establish_connection(:test)
-    end
-
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
