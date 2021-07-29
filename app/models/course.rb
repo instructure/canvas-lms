@@ -1600,10 +1600,6 @@ class Course < ActiveRecord::Base
       fetch_on_enrollments("has_active_observer_enrollment", user) { enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? } }
     can :read_grades
 
-    # we need to look into removing teacherless and the permission checks
-    given { |user| available? && !template? && self.teacherless? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? } }
-    can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
-
     # Active admins (Teacher/TA/Designer)
     #################### Begin legacy permission block #########################
     given do |user|
@@ -1899,14 +1895,6 @@ class Course < ActiveRecord::Base
 
     @membership_allows ||= {}
     @membership_allows[[user.id, permission]] ||= self.cached_account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
-  end
-
-  def teacherless?
-    # TODO: I need a better test for teacherless courses... in the mean time we'll just do this
-    return false
-    @teacherless_course ||= Rails.cache.fetch(['teacherless_course', self].cache_key) do
-      !self.sis_source_id && self.teacher_enrollments.empty?
-    end
   end
 
   def grade_publishing_status_translation(status, message)

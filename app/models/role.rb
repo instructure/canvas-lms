@@ -29,7 +29,6 @@ class Role < ActiveRecord::Base
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +
     ['StudentViewEnrollment',
-     'TeacherlessStudentEnrollment',
      'NilEnrollment',
      'teacher', 'ta', 'designer', 'student', 'observer'
     ]).freeze
@@ -266,9 +265,6 @@ class Role < ActiveRecord::Base
     manageable = []
     if context.grants_right?(user, :manage_students) && !(context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context))
       manageable += ['StudentEnrollment', 'ObserverEnrollment']
-      if context.is_a?(Course) && context.teacherless?
-        manageable << 'TeacherEnrollment'
-      end
     end
     if context.grants_right?(user, :manage_admin_users)
       manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
