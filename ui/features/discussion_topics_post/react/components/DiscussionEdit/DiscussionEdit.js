@@ -20,6 +20,9 @@ import I18n from 'i18n!discussion_posts'
 import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
+import {responsiveQuerySizes} from '../../utils'
 import {View} from '@instructure/ui-view'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
@@ -87,35 +90,59 @@ export const DiscussionEdit = props => {
           />
         </span>
       </View>
-      <Flex margin="small none none none">
-        <Flex.Item shouldGrow shouldShrink textAlign="end">
-          <Button
-            onClick={() => {
-              if (props.onCancel) {
-                props.onCancel()
-              }
-            }}
-            display="inline-block"
-            color="secondary"
-            data-testid="DiscussionEdit-cancel"
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            onClick={() => {
-              if (props.onSubmit) {
-                props.onSubmit(rceContent)
-              }
-            }}
-            display="inline-block"
-            color="primary"
-            margin="none none none small"
-            data-testid="DiscussionEdit-submit"
-          >
-            {props.isEdit ? I18n.t('Save') : I18n.t('Reply')}
-          </Button>
-        </Flex.Item>
-      </Flex>
+      <Responsive
+        match="media"
+        query={responsiveQuerySizes({mobile: true, desktop: true})}
+        props={{
+          mobile: {
+            direction: 'column',
+            display: 'block',
+            margin: 'small 0 0 0'
+          },
+          desktop: {
+            direction: 'row',
+            display: 'inline-block',
+            margin: '0 0 0 small'
+          }
+        }}
+        render={responsiveProps => (
+          <Flex margin="small none none none" direction={responsiveProps.direction}>
+            <Flex.Item
+              shouldGrow
+              shouldShrink
+              textAlign="end"
+              overflowY="hidden"
+              overflowX="hidden"
+            >
+              <Button
+                onClick={() => {
+                  if (props.onCancel) {
+                    props.onCancel()
+                  }
+                }}
+                display={responsiveProps.display}
+                color="secondary"
+                data-testid="DiscussionEdit-cancel"
+              >
+                <Text size="medium">{I18n.t('Cancel')}</Text>
+              </Button>
+              <Button
+                onClick={() => {
+                  if (props.onSubmit) {
+                    props.onSubmit(rceContent)
+                  }
+                }}
+                display={responsiveProps.display}
+                color="primary"
+                margin={responsiveProps.margin}
+                data-testid="DiscussionEdit-submit"
+              >
+                <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')} </Text>
+              </Button>
+            </Flex.Item>
+          </Flex>
+        )}
+      />
     </div>
   )
 }
