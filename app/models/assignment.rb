@@ -1725,7 +1725,7 @@ class Assignment < ActiveRecord::Base
     can :manage_files_delete
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :create and can :read and can :attach_submission_comment_files
+    can :create and can :read
 
     given { |user, session| self.user_can_update?(user, session) }
     can :update

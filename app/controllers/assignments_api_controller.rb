@@ -799,7 +799,7 @@ class AssignmentsApiController < ApplicationController
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
-      scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis] && authorized_action(@context, user, :manage_assignments)
+      scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
