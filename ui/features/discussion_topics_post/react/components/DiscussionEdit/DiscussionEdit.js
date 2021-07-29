@@ -28,6 +28,7 @@ import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
+import positionCursor from './PositionCursorHook'
 
 export const DiscussionEdit = props => {
   const rceRef = useRef()
@@ -74,7 +75,8 @@ export const DiscussionEdit = props => {
             onInit={() => {
               setTimeout(() => {
                 rceRef?.current?.focus()
-              }, 1500)
+                positionCursor(rceRef)
+              }, 1000)
             }}
             ref={rceRef}
             onContentChange={content => {

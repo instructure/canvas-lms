@@ -198,7 +198,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def quoted_reply_html
-    "<div class=\"mceNonEditable\" \"reply_preview\" data-discussion-reply-preview=\"1\">
+    "<div class=\"mceNonEditable reply_preview\" data-discussion-reply-preview=\"1\">
       <blockquote cite=\"#\">
         <span>
           <strong>#{user.short_name}</strong> #{created_at.iso8601}
