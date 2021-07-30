@@ -22,6 +22,23 @@ import {fireEvent, render} from '@testing-library/react'
 import {IsolatedParent} from '../IsolatedParent'
 import React from 'react'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
 describe('IsolatedParent', () => {
   const defaultProps = ({discussionEntryOverrides = {}, overrides = {}} = {}) => ({
     discussionTopic: Discussion.mock(),
@@ -91,22 +108,22 @@ describe('IsolatedParent', () => {
     })
 
     it('displays unread and replyCount', async () => {
-      const {queryByText} = setup(
+      const {queryAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
         })
       )
-      expect(queryByText('2 replies, 1 unread')).toBeTruthy()
+      expect(queryAllByText('2 replies, 1 unread').length).toBe(2)
     })
 
     it('does not display unread count if it is 0', async () => {
-      const {queryByText} = setup(
+      const {queryAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
         })
       )
-      expect(queryByText('2 replies, 0 unread')).toBeFalsy()
-      expect(queryByText('2 replies')).toBeTruthy()
+      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 })

@@ -20,6 +20,23 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {PostToolbar} from '../PostToolbar'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
 const setup = props => {
   return render(<PostToolbar onReadAll={Function.prototype} {...props} />)
 }
@@ -27,16 +44,16 @@ const setup = props => {
 describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
-      const {queryByText} = setup({repliesCount: 1})
-      expect(queryByText('1 reply')).toBeTruthy()
+      const {queryAllByText} = setup({repliesCount: 1})
+      expect(queryAllByText('1 reply').length).toBe(2)
     })
     it('not displayed if replies = 0', () => {
-      const {queryByText} = setup({repliesCount: 0})
-      expect(queryByText('0 reply')).toBeFalsy()
+      const {queryAllByText} = setup({repliesCount: 0})
+      expect(queryAllByText('0 reply').length).toBe(0)
     })
     it('correct pluralization displayed', () => {
-      const {queryByText} = setup({repliesCount: 2})
-      expect(queryByText('2 replies')).toBeTruthy()
+      const {queryAllByText} = setup({repliesCount: 2})
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 

@@ -19,13 +19,13 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
+import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
 import {ToggleButton} from './ToggleButton'
 
 import {Flex} from '@instructure/ui-flex'
 import {
   IconBookmarkSolid,
   IconBookmarkLine,
-  IconCommonsSolid,
   IconCompleteSolid,
   IconDuplicateLine,
   IconEditLine,
@@ -43,52 +43,50 @@ import {
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-import {replyCountText} from '../../utils/index'
-
-function InfoText({repliesCount, unreadCount}) {
-  const infoText = replyCountText(repliesCount, unreadCount)
-
-  return repliesCount > 0 ? (
-    <View padding="0 x-small 0 0">
-      <Text weight="normal" size="small" data-testid="replies-counter">
-        {infoText}
-      </Text>
-    </View>
-  ) : null
-}
 
 export function PostToolbar({repliesCount, unreadCount, ...props}) {
   return (
-    <>
-      <InfoText repliesCount={repliesCount} unreadCount={unreadCount} />
+    <Flex>
+      {repliesCount > 0 && (
+        <Flex.Item margin="0 x-small 0 0">
+          <Text weight="normal" size="small">
+            <ReplyInfo replyCount={repliesCount} unreadCount={unreadCount} />
+          </Text>
+        </Flex.Item>
+      )}
       {props.onTogglePublish && (
-        <ToggleButton
-          isEnabled={props.isPublished}
-          enabledIcon={<IconCompleteSolid />}
-          disabledIcon={<IconNoSolid />}
-          enabledTooltipText={I18n.t('Unpublish')}
-          disabledTooltipText={I18n.t('Publish')}
-          enabledScreenReaderLabel={I18n.t('Published')}
-          disabledScreenReaderLabel={I18n.t('Unpublished')}
-          onClick={props.onTogglePublish}
-          interaction={props.canUnpublish ? 'enabled' : 'readonly'}
-        />
+        <Flex.Item>
+          <ToggleButton
+            isEnabled={props.isPublished}
+            enabledIcon={<IconCompleteSolid />}
+            disabledIcon={<IconNoSolid />}
+            enabledTooltipText={I18n.t('Unpublish')}
+            disabledTooltipText={I18n.t('Publish')}
+            enabledScreenReaderLabel={I18n.t('Published')}
+            disabledScreenReaderLabel={I18n.t('Unpublished')}
+            onClick={props.onTogglePublish}
+            interaction={props.canUnpublish ? 'enabled' : 'readonly'}
+          />
+        </Flex.Item>
       )}
       {props.onToggleSubscription && (
-        <ToggleButton
-          isEnabled={props.isSubscribed}
-          enabledIcon={<IconBookmarkSolid />}
-          disabledIcon={<IconBookmarkLine />}
-          enabledTooltipText={I18n.t('Unsubscribe')}
-          disabledTooltipText={I18n.t('Subscribe')}
-          enabledScreenReaderLabel={I18n.t('Subscribed')}
-          disabledScreenReaderLabel={I18n.t('Unsubscribed')}
-          onClick={props.onToggleSubscription}
-        />
+        <Flex.Item>
+          <ToggleButton
+            isEnabled={props.isSubscribed}
+            enabledIcon={<IconBookmarkSolid />}
+            disabledIcon={<IconBookmarkLine />}
+            enabledTooltipText={I18n.t('Unsubscribe')}
+            disabledTooltipText={I18n.t('Subscribe')}
+            enabledScreenReaderLabel={I18n.t('Subscribed')}
+            disabledScreenReaderLabel={I18n.t('Unsubscribed')}
+            onClick={props.onToggleSubscription}
+          />
+        </Flex.Item>
       )}
-      <ToolbarMenu {...props} />
-    </>
+      <Flex.Item>
+        <ToolbarMenu {...props} />
+      </Flex.Item>
+    </Flex>
   )
 }
 

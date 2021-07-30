@@ -34,6 +34,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {PER_PAGE, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useRef, useState} from 'react'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {useMutation, useQuery} from 'react-apollo'
@@ -42,8 +43,7 @@ import {
   getSpeedGraderUrl,
   addReplyToDiscussionEntry,
   updateDiscussionTopicRepliesCount,
-  resolveAuthorRoles,
-  replyCountText
+  resolveAuthorRoles
 } from '../../utils'
 import theme from '@instructure/canvas-theme'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
@@ -210,10 +210,12 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={replyCountText(
-          props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-          props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-        )}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         onClick={() => {
           if (ENV.isolated_view) {
             props.onOpenIsolatedView(props.discussionEntry._id, false)

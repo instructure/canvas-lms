@@ -24,10 +24,10 @@ import {Highlight} from '../../components/Highlight/Highlight'
 import {PostMessageContainer} from '../PostMessageContainer/PostMessageContainer'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
+import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {replyCountText} from '../../utils'
 
 export const IsolatedParent = props => {
   const [isEditing, setIsEditing] = useState(false)
@@ -71,10 +71,12 @@ export const IsolatedParent = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
-        expandText={replyCountText(
-          props.discussionEntry.rootEntryParticipantCounts?.repliesCount,
-          props.discussionEntry.rootEntryParticipantCounts?.unreadCount
-        )}
+        expandText={
+          <ReplyInfo
+            replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
+            unreadCount={props.discussionEntry.rootEntryParticipantCounts?.unreadCount}
+          />
+        }
         isReadOnly={!props.RCEOpen}
         isExpanded={false}
         onClick={() => props.setRCEOpen(false)}

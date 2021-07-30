@@ -32,6 +32,11 @@ import React from 'react'
 import {waitFor} from '@testing-library/dom'
 import {graphql} from 'msw'
 
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
 describe('DiscussionThreadContainer', () => {
   const server = mswServer(handlers)
   const onFailureStub = jest.fn()
@@ -43,6 +48,16 @@ describe('DiscussionThreadContainer', () => {
     window.ENV = {
       course_id: '1'
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
 
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -275,27 +290,27 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('pluralizes reply message correctly when there is only a single reply', async () => {
-      const {getByText} = setup(defaultProps())
-      expect(getByText('1 reply, 1 unread')).toBeTruthy()
+      const {getAllByText} = setup(defaultProps())
+      expect(getAllByText('1 reply, 1 unread').length).toBe(2)
     })
 
     it('pluralizes replies message correctly when there are multiple replies', async () => {
-      const {getByText} = setup(
+      const {getAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
         })
       )
-      expect(getByText('2 replies, 1 unread')).toBeTruthy()
+      expect(getAllByText('2 replies, 1 unread')).toBeTruthy()
     })
 
     it('does not display unread count if it is 0', async () => {
-      const {queryByText} = setup(
+      const {queryAllByText} = setup(
         defaultProps({
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
         })
       )
-      expect(queryByText('2 replies, 0 unread')).toBeFalsy()
-      expect(queryByText('2 replies')).toBeTruthy()
+      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
+      expect(queryAllByText('2 replies').length).toBe(2)
     })
   })
 })

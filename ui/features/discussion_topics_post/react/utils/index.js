@@ -17,7 +17,6 @@
  */
 
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
-import I18n from 'i18n!discussion_topics_post'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 
@@ -127,23 +126,6 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
     return discussionRoles.concat('Author')
   }
   return discussionRoles
-}
-
-export const replyCountText = (repliesCount, unreadCount) => {
-  const infoText = []
-
-  infoText.push(
-    I18n.t(
-      {one: '%{repliesCount} reply', other: '%{repliesCount} replies'},
-      {count: repliesCount, repliesCount}
-    )
-  )
-
-  if (unreadCount > 0) {
-    infoText.push(I18n.t('%{unreadCount} unread', {unreadCount}))
-  }
-
-  return infoText.join(', ')
 }
 
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {

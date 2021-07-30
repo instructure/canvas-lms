@@ -32,6 +32,10 @@ import React from 'react'
 import {waitFor} from '@testing-library/dom'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
 
 describe('DiscussionTopicContainer', () => {
   const server = mswServer(handlers)
@@ -57,6 +61,16 @@ describe('DiscussionTopicContainer', () => {
         }
       ]
     }
+
+    window.matchMedia = jest.fn().mockImplementation(() => {
+      return {
+        matches: true,
+        media: '',
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn()
+      }
+    })
 
     if (!document.getElementById('flash_screenreader_holder')) {
       liveRegion = document.createElement('div')
@@ -124,16 +138,14 @@ describe('DiscussionTopicContainer', () => {
       })
     })
     expect(await container.findByTestId('graded-discussion-info')).toBeTruthy()
-    expect(await container.queryByTestId('differentiated-alert')).toBeFalsy()
+    expect(container.queryByTestId('differentiated-alert')).toBeFalsy()
   })
 
   it('renders without optional props', async () => {
     const container = setup({discussionTopic: Discussion.mock({assignment: {}})})
-    expect(await container.queryByText('56 replies, 2 unread')).toBeTruthy()
-
-    expect(await container.queryByText('No Due Date')).toBeTruthy()
-
-    expect(await container.queryByText('0 points possible')).toBeTruthy()
+    expect(container.getByTestId('replies-counter')).toBeInTheDocument()
+    expect(container.getByText('No Due Date')).toBeInTheDocument()
+    expect(container.getByText('0 points possible')).toBeInTheDocument()
   })
 
   it('renders infoText only when there are replies', async () => {
