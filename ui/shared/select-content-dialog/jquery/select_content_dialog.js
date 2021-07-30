@@ -332,7 +332,7 @@ SelectContentDialog.Events = {
       if ($('#select_context_content_dialog').data('context_module_id')) {
         url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
       }
-      $dialog.find('iframe').attr('src', url)
+      $dialog.find('iframe').attr({src: url, title: tool.name})
       $(window).on('beforeunload', SelectContentDialog.beforeUnloadHandler)
     } else {
       const placements = $tool.data('tool').placements
