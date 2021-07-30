@@ -94,6 +94,8 @@ module Types
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
     def root_entry_participant_counts
+      return nil unless object.root_entry_id.nil?
+
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
     end
 
@@ -130,6 +132,8 @@ module Types
 
     field :last_reply, Types::DiscussionEntryType, null: true
     def last_reply
+      return nil unless object.root_entry_id.nil?
+
       load_association(:last_discussion_subentry)
     end
 
