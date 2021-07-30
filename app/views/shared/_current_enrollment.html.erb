@@ -20,9 +20,7 @@
 <% is_current_term ||= false %>
 <% # only show updated css in unpublished, current enrollments with FF enabled %>
 <% unpublished_course_redesign =
-  (current_enrollment.course.created? || current_enrollment.course.claimed?) &&
-  is_current_term &&
-  @domain_root_account.feature_enabled?(:unpublished_courses)
+  (current_enrollment.course.created? || current_enrollment.course.claimed?) && is_current_term
 %>
 <% unless dashboard %>
   <tr class="course-list-table-row <%='course-list-unpublished-course-row' if unpublished_course_redesign %>">

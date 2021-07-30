@@ -236,7 +236,7 @@ class ApplicationController < ActionController::Base
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
+    :responsive_awareness, :responsive_misc, :product_tours, :module_dnd, :files_dnd,
     :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [

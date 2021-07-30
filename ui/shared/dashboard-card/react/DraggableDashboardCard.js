@@ -52,14 +52,10 @@ const cardTarget = {
       published: overAssetIsPublished,
       position: overIndex
     } = props
-    if (window.ENV?.FEATURES?.unpublished_courses) {
-      if (
-        draggedAssetString !== overAssetString &&
-        draggedAssetIsPublished === overAssetIsPublished
-      ) {
-        props.moveCard(draggedAssetString, overIndex)
-      }
-    } else if (draggedAssetString !== overAssetString) {
+    if (
+      draggedAssetString !== overAssetString &&
+      draggedAssetIsPublished === overAssetIsPublished
+    ) {
       props.moveCard(draggedAssetString, overIndex)
     }
   }

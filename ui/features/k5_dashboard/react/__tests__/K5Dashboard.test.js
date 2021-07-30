@@ -160,7 +160,6 @@ const defaultEnv = {
   current_user_id: '1',
   K5_USER: true,
   FEATURES: {
-    unpublished_courses: true,
     important_dates: true
   },
   PREFERENCES: {

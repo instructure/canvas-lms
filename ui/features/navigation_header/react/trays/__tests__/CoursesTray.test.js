@@ -71,43 +71,17 @@ describe('CoursesTray', () => {
     getByText('All Courses')
   })
 
-  describe('with the unpublished_courses FF enabled', () => {
-    beforeEach(() => {
-      window.ENV = {FEATURES: {unpublished_courses: true}}
-    })
-
-    afterEach(() => {
-      window.ENV = {}
-    })
-
-    it('does not render a split dashboard for non teachers', () => {
-      const {queryByText} = render(<CoursesTray {...makeProps()} />)
-      expect(queryByText('Published Courses')).not.toBeInTheDocument()
-      expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
-    })
-
-    it('does render a split dashboard for teachers with appropriate headers', () => {
-      window.ENV = {...window.ENV, current_user_roles: ['teacher']}
-      const {getByText} = render(<CoursesTray {...makeProps()} />)
-      getByText('Published Courses')
-      getByText('Unpublished Courses')
-    })
+  it('does not render a split dashboard for non teachers', () => {
+    const {queryByText} = render(<CoursesTray {...makeProps()} />)
+    expect(queryByText('Published Courses')).not.toBeInTheDocument()
+    expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
   })
 
-  describe('with the unpublished_courses FF disabled', () => {
-    beforeEach(() => {
-      window.ENV = {current_user_roles: ['teacher']}
-    })
-
-    afterEach(() => {
-      window.ENV = {}
-    })
-
-    it('does not render a split dashboard for teachers', () => {
-      const {queryByText} = render(<CoursesTray {...makeProps()} />)
-      expect(queryByText('Published Courses')).not.toBeInTheDocument()
-      expect(queryByText('Unpublished Courses')).not.toBeInTheDocument()
-    })
+  it('does render a split dashboard for teachers with appropriate headers', () => {
+    window.ENV = {...window.ENV, current_user_roles: ['teacher']}
+    const {getByText} = render(<CoursesTray {...makeProps()} />)
+    getByText('Published Courses')
+    getByText('Unpublished Courses')
   })
 
   it('changes `Courses` to `Subjects` if k5User is set', () => {

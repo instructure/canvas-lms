@@ -18,11 +18,6 @@ responsive_misc:
   applies_to: RootAccount
   display_name: "Responsive Misc"
   description: "Collection of responsive improvements throughout Canvas"
-unpublished_courses:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Help for Unpublished Courses"
-  description: "Improved visual reminders to encourage instructors to publish courses"
 files_dnd:
   state: hidden
   applies_to: RootAccount

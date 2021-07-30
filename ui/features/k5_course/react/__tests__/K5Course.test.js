@@ -39,9 +39,7 @@ const currentUser = {
 const defaultEnv = {
   current_user: currentUser,
   K5_USER: true,
-  FEATURES: {
-    unpublished_courses: true
-  },
+  FEATURES: {},
   PREFERENCES: {
     hide_dashcard_color_overlays: false
   },

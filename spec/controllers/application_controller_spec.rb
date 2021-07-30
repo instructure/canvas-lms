@@ -314,22 +314,6 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:FEATURES][:usage_rights_discussion_topics]).to be_truthy
         end
       end
-
-      context "unpublished_courses" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          Account.default.disable_feature!(:unpublished_courses)
-          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:unpublished_courses)
-          expect(controller.js_env[:FEATURES][:unpublished_courses]).to be_truthy
-        end
-      end
     end
 
     it 'sets LTI_LAUNCH_FRAME_ALLOWANCES' do

@@ -100,10 +100,10 @@ describe "course" do
     doc = Nokogiri::HTML5(response.body)
     course_rows = doc.css('#my_courses_table tr')
     expect(course_rows.size).to eq 3
-    expect(course_rows[1].to_s).to include 'Course 1'
-    expect(course_rows[1].to_s).to_not include("href=\"/courses/#{c1.id}\"") # unpublished
-    expect(course_rows[2].to_s).to include 'Course 2'
-    expect(course_rows[2].to_s).to include("href=\"/courses/#{c2.id}\"") # published
+    expect(course_rows[2].to_s).to include 'Course 1'
+    expect(course_rows[2].to_s).to_not include("href=\"/courses/#{c1.id}\"") # unpublished
+    expect(course_rows[1].to_s).to include 'Course 2'
+    expect(course_rows[1].to_s).to include("href=\"/courses/#{c2.id}\"") # published
   end
 
   it "should not show students' nicknames to admins on the student's account profile page" do
