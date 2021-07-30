@@ -1616,7 +1616,7 @@ class RoleOverride < ActiveRecord::Base
     return Hash.new([].freeze) if roles.empty?
 
     account.shard.activate do
-      result = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = [] } }
+      result = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = {} } }
 
       Shard.partition_by_shard(account.account_chain(include_site_admin: true)) do |shard_accounts|
         # skip loading from site admin if the role is not from site admin
@@ -1624,7 +1624,7 @@ class RoleOverride < ActiveRecord::Base
 
         RoleOverride.where(role: roles, account: shard_accounts).each do |ro|
           permission_hash = result[ro.permission]
-          permission_hash[ro.global_context_id] << ro
+          permission_hash[ro.global_context_id][ro.global_role_id] = ro
         end
         nil
       end
@@ -1679,7 +1679,7 @@ class RoleOverride < ActiveRecord::Base
         next if only_permission && permission != only_permission
 
         overrides[permission] = accounts.reverse_each.map do |account|
-          overrides_by_account[account.global_id].find { |ro| ro.role_id == role.id } || dummies[account.id]
+          overrides_by_account[account.global_id][role.global_id] || dummies[account.id]
         end
       end
       overrides
