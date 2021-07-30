@@ -28,7 +28,8 @@ import {
   getPeerReviewsUrl,
   isGraded,
   getReviewLinkUrl,
-  resolveAuthorRoles
+  resolveAuthorRoles,
+  responsiveQuerySizes
 } from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
@@ -52,6 +53,8 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -416,15 +419,30 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           )}
                           {props.discussionTopic.permissions?.reply && (
                             <View as="div" padding="medium none none">
-                              <Button
-                                color="primary"
-                                onClick={() => {
-                                  setExpandedReply(!expandedReply)
+                              <Responsive
+                                match="media"
+                                query={responsiveQuerySizes({mobile: true, desktop: true})}
+                                props={{
+                                  mobile: {
+                                    display: 'block'
+                                  },
+                                  desktop: {
+                                    display: 'inline-block'
+                                  }
                                 }}
-                                data-testid="discussion-topic-reply"
-                              >
-                                {I18n.t('Reply')}
-                              </Button>
+                                render={responsiveProps => (
+                                  <Button
+                                    display={responsiveProps.display}
+                                    color="primary"
+                                    onClick={() => {
+                                      setExpandedReply(!expandedReply)
+                                    }}
+                                    data-testid="discussion-topic-reply"
+                                  >
+                                    <Text size="medium">{I18n.t('Reply')}</Text>
+                                  </Button>
+                                )}
+                              />
                             </View>
                           )}
                         </PostMessage>
