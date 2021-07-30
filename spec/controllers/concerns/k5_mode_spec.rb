@@ -37,6 +37,7 @@ describe K5Mode do
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
+    account_admin_user(account: @course.account)
     toggle_k5_setting(@course.account)
   end
 
@@ -66,7 +67,7 @@ describe K5Mode do
 
       context 'that is also a student' do
         before :each do
-          @course.enroll_user(@teacher, 'StudentEnrollment')
+          @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
         end
 
         it_behaves_like ':show_left_side'
@@ -78,6 +79,22 @@ describe K5Mode do
           expect(assigns(:css_bundles).flatten).to include(:k5_theme)
           expect(assigns(:js_bundles).flatten).to include(:k5_theme)
         end
+      end
+    end
+
+    context 'admin' do
+      before :each do
+        user_session(@admin)
+      end
+
+      it_behaves_like ':show_left_side'
+
+      it 'should set k5 variables' do
+        get :index, params: { course_id: @course.id }
+        expect(assigns(:k5_details_view)).to eq(false)
+        expect(assigns(:show_left_side)).to eq(true)
+        expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
     end
 
