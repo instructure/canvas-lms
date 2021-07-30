@@ -23,6 +23,8 @@ require_relative "../graphql_spec_helper"
 
 describe Types::DiscussionEntryType do
   let_once(:discussion_entry) { create_valid_discussion_entry }
+  let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id) }
+  let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
   let(:permissions) {
     [
@@ -67,20 +69,26 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve("replyPreview")).to eq discussion_entry.quoted_reply_html
   end
 
-  it 'allows querying for discussion subentries' do
-    de = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
+  it 'does not query for discussion subentries on non legacy entries' do
+    discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: parent.id)
+    DiscussionEntry.where(id: parent).update_all(legacy: false)
 
-    result = discussion_entry_type.resolve('discussionSubentriesConnection { nodes { message } }')
+    result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve('discussionSubentriesConnection { nodes { message } }')
+    expect(result).to be_nil
+  end
+
+  it 'allows querying for discussion subentries on legacy parents' do
+    de = sub_entry
+    result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve('discussionSubentriesConnection { nodes { message } }')
     expect(result.count).to be 1
     expect(result[0]).to eq de.message
   end
 
   it 'allows querying for discussion subentries with sort' do
-    discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: discussion_entry.id)
-    de1 = discussion_entry.discussion_topic.discussion_entries.create!(message: 'sub entry 1', user: @teacher, parent_id: discussion_entry.id)
+    de1 = sub_entry
 
-    result = discussion_entry_type.resolve('discussionSubentriesConnection(sortOrder: desc) { nodes { message } }')
-    expect(result.count).to be 2
+    result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve('discussionSubentriesConnection(sortOrder: desc) { nodes { message } }')
+    expect(result.count).to be 1
     expect(result[0]).to eq de1.message
   end
 
@@ -105,8 +113,7 @@ describe Types::DiscussionEntryType do
   end
 
   it 'does not allows querying for participant counts on non root_entries' do
-    child = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id)
-    de_type = GraphQLTypeTester.new(child, current_user: @teacher)
+    de_type = GraphQLTypeTester.new(parent, current_user: @teacher)
     expect(de_type.resolve('rootEntryParticipantCounts { unreadCount }')).to be_nil
   end
 
@@ -115,12 +122,18 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve("message")).to eq nil
   end
 
+  it 'returns nil for subentries count on non legacy non root entries' do
+    sub_entry
+    DiscussionEntry.where(id: parent).update_all(legacy: false)
+    expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve('subentriesCount')).to be_nil
+  end
+
   it 'returns subentries count' do
     4.times do |i|
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: discussion_entry.id)
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry #{i}", user: @teacher, parent_id: parent.id)
     end
 
-    expect(discussion_entry_type.resolve('subentriesCount')).to eq 4
+    expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve('subentriesCount')).to eq 4
   end
 
   it 'returns the current user permissions' do
