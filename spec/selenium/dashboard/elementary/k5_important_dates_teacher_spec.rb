@@ -47,7 +47,6 @@ describe "teacher k5 dashboard important dates" do
 
       get "/courses/#{@subject_course.id}/assignments/#{assignment.id}/edit"
 
-
       expect(mark_important_dates).to be_displayed
 
       scroll_to_element(mark_important_dates)
@@ -142,7 +141,7 @@ describe "teacher k5 dashboard important dates" do
 
       click_calendar_add
 
-      expect(important_dates_block).to have_attribute(:style, 'display: none;')
+      expect(important_dates_block).not_to be_displayed
 
       click_calendar_subject(@subject_course.name)
 
@@ -162,7 +161,7 @@ describe "teacher k5 dashboard important dates" do
       click_calendar_add
       click_calendar_subject(@subject_course.name)
 
-      expect(important_dates_block).to have_attribute(:style, 'display: none;')
+      expect(important_dates_block).not_to be_displayed
       toggle_k5_setting(@account, true)
     end
 
@@ -175,6 +174,25 @@ describe "teacher k5 dashboard important dates" do
       click_calendar_event_more_options_button
 
       expect(is_checked(calendar_mark_important_dates_selector)).to be_truthy
+    end
+
+    it 'shows Mark Important dates on Assignment Calendar tab when subject calendar selected', custom_timeout: 20 do
+      get "/calendar"
+
+      click_calendar_add
+
+      click_edit_assignment
+      expect(assignment_important_dates_block).not_to be_displayed
+
+      click_assignment_calendar_subject(@subject_course.name)
+
+      expect(calendar_assignment_mark_dates).to be_displayed
+
+      click_calendar_assignment_mark_dates
+      calendar_assignment_title.send_keys("Fresh Assignment")
+      click_calendar_assignment_modal_submit
+
+      expect(calendar_dialog_exists?).to be_falsey
     end
   end
 

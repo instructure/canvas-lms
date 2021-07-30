@@ -33,8 +33,28 @@ module K5ImportantDatesSectionPageObject
     "[data-testid='date-icon-wrapper']"
   end
 
+  def assignment_important_dates_block_selector
+    "#edit_assignment_form #important_dates"
+  end
+
   def calendar_add_selector
     "#create_new_event_link"
+  end
+
+  def calendar_assignment_mark_dates_selector
+    "#edit_assignment_form #calendar_event_important_dates"
+  end
+
+  def calendar_assignment_modal_submit_selector
+    "#edit_assignment_form .event-details-footer button[type='submit']"
+  end
+
+  def calendar_assignment_subject_selector
+    "#assignment_context"
+  end
+
+  def calendar_assignment_title_selector
+    "#edit_assignment_form #assignment_title"
   end
 
   def calendar_choose_text_selector
@@ -87,6 +107,10 @@ module K5ImportantDatesSectionPageObject
 
   def date_field_selector
     ".date_field[data-date-type='due_at']"
+  end
+
+  def edit_assignment_selector
+    ".edit_assignment_option"
   end
 
   def edit_assignment_submit_selector
@@ -151,12 +175,24 @@ module K5ImportantDatesSectionPageObject
     f(assignment_icon_selector)
   end
 
+  def assignment_important_dates_block
+    f(assignment_important_dates_block_selector)
+  end
+
   def assignment_link(link_text)
     fln(link_text)
   end
 
   def calendar_add
     f(calendar_add_selector)
+  end
+
+  def calendar_assignment_mark_dates
+    f(calendar_assignment_mark_dates_selector)
+  end
+
+  def calendar_assignment_title
+    f(calendar_assignment_title_selector)
   end
 
   def calendar_choose_text
@@ -203,12 +239,20 @@ module K5ImportantDatesSectionPageObject
     fxpath(calendar_modal_submit_selector)
   end
 
+  def calendar_assignment_modal_submit
+    f(calendar_assignment_modal_submit_selector)
+  end
+
   def calendar_picker_gear
     f(calendar_picker_gear_selector)
   end
 
   def date_field
     ff(date_field_selector)
+  end
+
+  def edit_assignment
+    f(edit_assignment_selector)
   end
 
   def important_date_icon(icon_type)
@@ -290,6 +334,10 @@ module K5ImportantDatesSectionPageObject
     calendar_add.click
   end
 
+  def click_calendar_assignment_mark_dates
+    calendar_assignment_mark_dates.click
+  end
+
   def click_calendar_event_more_options_button
     calendar_event_more_options_button.click
   end
@@ -321,6 +369,11 @@ module K5ImportantDatesSectionPageObject
     wait_for_ajaximations
   end
 
+  def click_calendar_assignment_modal_submit
+    calendar_assignment_modal_submit.click
+    wait_for_ajaximations
+  end
+
   def click_calendar_picker_gear
     calendar_picker_gear.click
   end
@@ -329,8 +382,16 @@ module K5ImportantDatesSectionPageObject
     click_option(calendar_for_subject, subject_name)
   end
 
+  def click_assignment_calendar_subject(subject_name)
+    click_option(calendar_assignment_subject_selector, subject_name)
+  end
+
   def click_add_override
     add_override.click
+  end
+
+  def click_edit_assignment
+    edit_assignment.click
   end
 
   def click_important_date_link
