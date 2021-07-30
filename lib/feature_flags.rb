@@ -110,7 +110,7 @@ module FeatureFlags
     RequestCache.cache('feature_flag_account_ids', self) do
       shard.activate do
         cache.fetch(['feature_flag_account_ids', self].cache_key) do
-          chain = account_chain(include_site_admin: true)
+          chain = account_chain(include_site_admin: true).dup
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
         end

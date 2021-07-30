@@ -365,9 +365,9 @@ class OutcomeGroupsApiController < ApplicationController
 
     account_chain =
       if @context.is_a?(Account)
-        @context.account_chain - [@context]
+        @context.account_chain[1..]
       else
-        @context.account.account_chain
+        @context.account.account_chain.dup
       end
     account_chain.map! {|a| {
         :id => a.root_outcome_group.id,

@@ -36,13 +36,13 @@ module BrandConfigHelpers
     brand_config_chain(include_self: false).find(&:brand_config_md5).try(:brand_config)
   end
 
+  private
+
   def brand_config_chain(include_self:)
-    chain = self.account_chain(include_site_admin: true)
+    chain = self.account_chain(include_site_admin: true).dup
     chain.shift unless include_self
-    chain.select!{ |a| a.shard == self.shard }
+    chain.select! { |a| a.shard == self.shard }
     ActiveRecord::Associations::Preloader.new.preload(chain, :root_account)
     chain
   end
-  private :brand_config_chain
-
 end

@@ -1688,9 +1688,7 @@ end
 if CANVAS_RAILS6_0
   module UnscopeCallbacks
     def run_callbacks(kind)
-      # no callbacks, or it's the Switchman initialize callback that is safe for scoping; avoid
-      # all the object allocations of creating a new scope
-      return super if __callbacks[kind].empty? || kind == :initialize && __callbacks[kind].send(:chain).length == 1
+      return super if __callbacks[kind].empty?
 
       # in rails 6.1, we can get rid of this entire monkeypatch
       scope = self.class.current_scope&.clone || self.class.default_scoped
