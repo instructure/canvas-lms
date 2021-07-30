@@ -26,6 +26,9 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    field :discussion_topic_id, ID, null: false
+    field :parent_id, ID, null: true
+    field :root_entry_id, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :rating, Boolean, null: true
