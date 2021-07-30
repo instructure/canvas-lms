@@ -107,6 +107,14 @@
     background-color: $ic-bg-light-neutral;
     @include breakpoint(desktop) { border-#{direction(left)}: 1px solid $ic-border-light; }
   }
+
+  .comment_author_and_date {
+    @if $use_high_contrast {
+      color: #6D696A;
+    } @else {
+      color: #888888;
+    }
+  }
 }
 
 .file-upload-submission {
