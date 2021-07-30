@@ -64,7 +64,14 @@ const ImportantDates = ({
       const savedSelected = initialSelectedContextCodes?.filter(code =>
         contexts.some(c => c.assetString === code)
       )
-      setSelectedContextCodes(savedSelected?.length ? savedSelected : defaultSelected)
+      const contextCodes = savedSelected?.length ? savedSelected : defaultSelected
+      setSelectedContextCodes(contextCodes)
+      if (contextCodes?.length === 0) {
+        // useFetchApi does not execute the loading callback if the result is forced
+        // so, we need to stop the loading effect manually when there are no contexts
+        setLoadingAssignments(false)
+        setLoadingEvents(false)
+      }
     }
   }, [contexts, initialSelectedContextCodes, selectedContextsLimit])
 
