@@ -17,7 +17,6 @@
  */
 
 .CourseImageSelector {
-  height: 146px;
   box-sizing: border-box;
   border: 1px solid $ic-border-dark;
   position: relative;
@@ -30,9 +29,12 @@
   justify-content: center;
 
   &:not(.wide) {
+    height: 146px;
     width: 262px;
   }
   &.wide {
+    aspect-ratio: 5/1;
+    height: auto;
     max-width: 562px;
   }
 }

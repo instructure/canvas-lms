@@ -329,9 +329,15 @@ ul.user_list div.enrollment_type.pending {
     & > div {
       padding-#{direction(right)}: 10px;
     }
-    .form-label label {
-      font-weight: bold;
+    .form-label {
+      & label {
+        font-weight: bold;
+      }
+      & .form-label-info {
+        margin-top: $ic-sp*0.25;
+      }
     }
+
     @media screen and (max-width: 900px) {
       &.form-row > div {
         // At smaller sizes, expand the label to be

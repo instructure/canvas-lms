@@ -122,7 +122,10 @@
       <% end %>
       <% if @context.elementary_enabled? %>
         <div class="form-row">
-          <div class="form-label"><%= f.blabel :banner_image, :en => "Wide Banner Image" %></div>
+          <div class="form-label">
+            <%= f.blabel :banner_image, :en => "Wide Banner Image" %>
+            <p class="form-label-info"><%= I18n.t("The image will be cropped to a 5:1 aspect ratio") %></p>
+          </div>
           <div>
             <div id="course_banner_image_selector_container"></div>
           </div>

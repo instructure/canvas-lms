@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
@@ -56,7 +56,8 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import EmptyModules from './EmptyModules'
 import EmptyHome from './EmptyHome'
 
-const HERO_HEIGHT_PX = 400
+const HERO_ASPECT_RATIO = 5
+const HERO_STICKY_HEIGHT_PX = 100
 
 const COURSE_TABS = [
   {
@@ -111,41 +112,52 @@ const toRenderTabs = (tabs, hasSyllabusBody) => {
   return activeTabs
 }
 
-export function CourseHeaderHero({name, image, backgroundColor, shouldShrink}) {
-  return (
+const getWindowSize = () => ({
+  width: window.innerWidth,
+  height: window.innerHeight
+})
+
+export const CourseHeaderHero = forwardRef(({backgroundColor, height, name, image}, ref) => (
+  <div
+    id="k5-course-header-hero"
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-end',
+      backgroundColor: !image && backgroundColor,
+      backgroundImage: image && `url(${image})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      borderRadius: '8px',
+      height: `${height}px`,
+      width: '100%',
+      marginBottom: '1rem'
+    }}
+    aria-hidden="true"
+    data-testid="k5-course-header-hero"
+    ref={ref}
+  >
     <div
-      id="k5-course-header-hero"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-        backgroundColor: !image && backgroundColor,
-        backgroundImage: image && `url(${image})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
-        borderRadius: '8px',
-        minHeight: shouldShrink ? '100px' : '25vh',
-        maxHeight: `${HERO_HEIGHT_PX}px`,
-        marginBottom: '1rem'
+        background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.7), transparent)',
+        borderBottomLeftRadius: '8px',
+        borderBottomRightRadius: '8px',
+        padding: '1rem'
       }}
-      aria-hidden="true"
-      data-testid="k5-course-header-hero"
     >
-      <div
-        style={{
-          background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.7), transparent)',
-          borderBottomLeftRadius: '8px',
-          borderBottomRightRadius: '8px',
-          padding: '1rem'
-        }}
-      >
-        <Heading as="h1" color="primary-inverse">
-          <TruncateText>{name}</TruncateText>
-        </Heading>
-      </div>
+      <Heading as="h1" color="primary-inverse">
+        <TruncateText>{name}</TruncateText>
+      </Heading>
     </div>
-  )
+  </div>
+))
+
+CourseHeaderHero.propTypes = {
+  backgroundColor: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  height: PropTypes.number.isRequired,
+  image: PropTypes.string
 }
 
 export function CourseHeaderOptions({
@@ -250,7 +262,10 @@ export function K5Course({
      module) based off currentTab */
   const modulesRef = useRef(null)
   const contentRef = useRef(null)
+  const headerRef = useRef(null)
+  const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
+  const [windowSize, setWindowSize] = useState(() => getWindowSize())
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
@@ -274,6 +289,14 @@ export function K5Course({
     }
   }, [currentTab, modulesExist, canManage])
 
+  useLayoutEffect(() => {
+    function updateWindowSize() {
+      setWindowSize(getWindowSize())
+    }
+    window.addEventListener('resize', updateWindowSize)
+    return () => window.removeEventListener('resize', updateWindowSize)
+  }, [])
+
   const addCurrentTabSegment = url => {
     const currentTabUrlSegment = window.location.hash
     const baseUrl = url.split('#')[0]
@@ -281,15 +304,29 @@ export function K5Course({
   }
 
   const courseHeader = sticky => {
-    const extendedViewport = window.innerHeight + 180
-    const contentHeight = document.body.scrollHeight
-    // makes sure that there is at least 180px of overflow, before shrinking the hero image
-    // this cancels the intermittent effect in the sticky prop when the window is almost
-    // the same size of the content
+    // If we don't have a ref to the header's width yet, use viewport width as a best guess
+    const headerHeight = (headerRef.current?.offsetWidth || windowSize.width) / HERO_ASPECT_RATIO
+    if (tabsRef && !tabsPaddingRef.current) {
+      tabsPaddingRef.current = tabsRef.getBoundingClientRect().bottom - headerHeight
+    }
+    // This is the vertical px by which the header will shrink when sticky
+    const headerShrinkDiff = headerRef.current ? headerHeight - HERO_STICKY_HEIGHT_PX : 0
+    // This is the vertical px by which the content overflows the viewport
+    const contentScrollOverflow = document.body.scrollHeight - windowSize.height
+    // If the window height is smaller than the height of the header, flickering and weird
+    // sticky behavior occurs. This is a hack to force the header to shrink when we get close
+    // to that size
+    const isWindowTooSmall = tabsPaddingRef.current
+      ? windowSize.height < tabsPaddingRef.current + headerHeight
+      : false
+    // Make sure that there is more vertical scroll overflow height than the header will
+    // lose when transitioning to a sticky state. Otherwise the header will flicker rapidly
+    // between sticky and non-sticky states.
     const shouldShrink =
-      sticky && activeTab.current === currentTab && contentHeight > extendedViewport
+      (sticky && activeTab.current === currentTab && contentScrollOverflow > headerShrinkDiff) ||
+      isWindowTooSmall
     return (
-      <View id="k5-course-header" as="div" padding={sticky ? 'medium 0 0 0' : '0'}>
+      <View id="k5-course-header" as="div" padding={sticky && shouldShrink ? 'medium 0 0 0' : '0'}>
         {(canReadAsAdmin || showStudentView) && (
           <CourseHeaderOptions
             canReadAsAdmin={canReadAsAdmin}
@@ -303,7 +340,8 @@ export function K5Course({
           name={name}
           image={bannerImageUrl || cardImageUrl}
           backgroundColor={color || DEFAULT_COURSE_COLOR}
-          shouldShrink={shouldShrink}
+          height={shouldShrink ? HERO_STICKY_HEIGHT_PX : headerHeight}
+          ref={headerRef}
         />
       </View>
     )
