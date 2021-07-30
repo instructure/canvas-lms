@@ -49,7 +49,7 @@ export default class Placement extends React.Component {
     'conference_selection'
   ]
 
-  canBeEither = ['assignment_selection', 'link_selection']
+  canBeEither = ['assignment_selection', 'link_selection', 'collaboration']
 
   isAlwaysDeeplinking(placementName) {
     return this.alwaysDeeplinking.includes(placementName)
