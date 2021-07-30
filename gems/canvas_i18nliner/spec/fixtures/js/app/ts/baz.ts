@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2015 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {transformSync} = require('@babel/core')
-const {compile} = require('../frontend_build/i18nLinerHandlebars')
-
-exports.process = (source, path) => {
-  const amd = compile(source, path, {
-    // brandable_css assets are not available in test
-    injectBrandableStylesheet: false
-  })
-  const cjs = transformSync(amd, {filename: path}).code
-  return cjs
-}
+define(['i18n!ts'], function (I18n) {
+    let test: string = 'test'
+    I18n.t('yay typescript')
+})

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {transformSync} = require('@babel/core')
-const {compile} = require('../frontend_build/i18nLinerHandlebars')
-
-exports.process = (source, path) => {
-  const amd = compile(source, path, {
-    // brandable_css assets are not available in test
-    injectBrandableStylesheet: false
-  })
-  const cjs = transformSync(amd, {filename: path}).code
-  return cjs
-}
+// These are special webpack-processed imports that Typescript doesn't understand
+// by default. Declaring them as wildcard modules allows TS to recognize them as
+// bare-bones interfaces with the `any` type.
+// See https://www.typescriptlang.org/docs/handbook/modules.html#wildcard-module-declarations
+declare module 'i18n!*'
+declare module '*.coffee'
+declare module '*.graphql'
+declare module '*.handlebars'
+declare module '*.svg'

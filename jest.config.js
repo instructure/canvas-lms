@@ -65,7 +65,7 @@ module.exports = {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
     '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.[jt]sx?$': 'babel-jest',
     '\\.graphql$': 'jest-raw-loader'
   }
 }

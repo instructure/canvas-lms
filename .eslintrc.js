@@ -39,10 +39,11 @@ module.exports = {
     },
     sourceType: 'module'
   },
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
 
   globals: {
     ENV: true,
+    JSX: true,
     INST: true,
     tinyMCE: true,
     tinymce: true
@@ -57,7 +58,8 @@ module.exports = {
     'lodash',
     'react',
     'react-hooks',
-    'babel'
+    'babel',
+    '@typescript-eslint'
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -186,7 +188,7 @@ module.exports = {
     'jest/no-large-snapshots': 'warn',
 
     // These are things we care about
-    'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
+    'react/jsx-filename-extension': ['error', {extensions: ['.js', 'ts', 'tsx']}],
     'no-unused-vars': [
       'error',
       {
@@ -197,7 +199,7 @@ module.exports = {
       }
     ],
     'eslint-comments/no-unused-disable': 'error',
-    'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
+    'import/extensions': ['error', 'ignorePackages', {js: 'never', ts: 'never', tsx: 'never'}],
     'import/no-commonjs': 'off', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
@@ -215,9 +217,18 @@ module.exports = {
       }
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
-    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}]
+    'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
+
+    // These are for typescript
+    semi: 'off',
+    '@typescript-eslint/semi': ['error', 'never']
   },
   settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'] // add Typescript extensions
+      }
+    },
     react: {
       version: 'detect'
     }

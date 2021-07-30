@@ -57,33 +57,33 @@ module.exports = {
   performance: skipSourcemaps
     ? false
     : {
-        // This just reflects how big the 'main' entry is at the time of writing. Every
-        // time we get it smaller we should change this to the new smaller number so it
-        // only goes down over time instead of growing bigger over time
-        maxEntrypointSize: 1240000,
-        // This is how big our biggest js bundles are at the time of writing. We should
-        // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
-        // tracking them too. Then, as we work to get all chunks smaller, we should change
-        // this number to the size of our biggest known asset and hopefully someday get
-        // to where they are all under the default value of 250000 and then remove this
-        // TODO: decrease back to 1200000 LS-1222
-        maxAssetSize: 1400000,
-        assetFilter: assetFilename => {
-          const thingsWeKnowAreWayTooBig = [
-            'assignment_edit',
-            'canvas-rce-async-chunk',
-            'canvas-rce-old-async-chunk',
-            'discussion_topic_edit',
-            'k5_dashboard',
-            'permissions',
-            'discussion_topics_post',
-          ]
-          return (
-            assetFilename.endsWith('.js') &&
-            !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
-          )
-        }
-      },
+      // This just reflects how big the 'main' entry is at the time of writing. Every
+      // time we get it smaller we should change this to the new smaller number so it
+      // only goes down over time instead of growing bigger over time
+      maxEntrypointSize: 1240000,
+      // This is how big our biggest js bundles are at the time of writing. We should
+      // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
+      // tracking them too. Then, as we work to get all chunks smaller, we should change
+      // this number to the size of our biggest known asset and hopefully someday get
+      // to where they are all under the default value of 250000 and then remove this
+      // TODO: decrease back to 1200000 LS-1222
+      maxAssetSize: 1400000,
+      assetFilter: assetFilename => {
+        const thingsWeKnowAreWayTooBig = [
+          'assignment_edit',
+          'canvas-rce-async-chunk',
+          'canvas-rce-old-async-chunk',
+          'discussion_topic_edit',
+          'k5_dashboard',
+          'permissions',
+          'discussion_topics_post',
+        ]
+        return (
+          assetFilename.endsWith('.js') &&
+          !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
+        )
+      }
+    },
   optimization: {
     // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
@@ -139,10 +139,10 @@ module.exports = {
   devtool: skipSourcemaps
     ? false
     : process.env.NODE_ENV === 'production' ||
-      process.env.COVERAGE === '1' ||
-      process.env.SENTRY_DSN
-    ? 'source-map'
-    : 'eval',
+    process.env.COVERAGE === '1' ||
+    process.env.SENTRY_DSN
+      ? 'source-map'
+      : 'eval',
 
   entry: {main: path.resolve(__dirname, '../ui/index.js')},
 
@@ -198,7 +198,7 @@ module.exports = {
       'node_modules'
     ],
 
-    extensions: ['.mjs', '.js']
+    extensions: ['.mjs', '.js', '.ts', '.tsx']
   },
 
   module: {
@@ -213,7 +213,7 @@ module.exports = {
     ],
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
         include: [
           path.resolve(__dirname, '../ui'),
           path.resolve(__dirname, '../packages/jquery-kyle-menu'),
@@ -341,24 +341,24 @@ module.exports = {
     process.env.NODE_ENV === 'test'
       ? []
       : [
-          // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-          // we load them explicitly onto the page in include_js_bundles from rails.
-          new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+        // we load them explicitly onto the page in include_js_bundles from rails.
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-          // outputs a json file so Rails knows which hash fingerprints to add
-          // to each script url and so it knows which split chunks to make a
-          // <link rel=preload ... /> for for each `js_bundle`
-          new StatsWriterPlugin({
-            filename: 'webpack-manifest.json',
-            fields: ['namedChunkGroups'],
-            transform(data) {
-              const res = {}
-              Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
-                res[key] = value.assets.filter(a => a.endsWith('.js'))
-              })
-              return JSON.stringify(res, null, 2)
-            }
-          })
-        ]
+        // outputs a json file so Rails knows which hash fingerprints to add
+        // to each script url and so it knows which split chunks to make a
+        // <link rel=preload ... /> for for each `js_bundle`
+        new StatsWriterPlugin({
+          filename: 'webpack-manifest.json',
+          fields: ['namedChunkGroups'],
+          transform(data) {
+            const res = {}
+            Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
+              res[key] = value.assets.filter(a => a.endsWith('.js'))
+            })
+            return JSON.stringify(res, null, 2)
+          }
+        })
+      ]
   )
 }
