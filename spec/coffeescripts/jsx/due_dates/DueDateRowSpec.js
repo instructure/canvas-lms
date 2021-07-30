@@ -91,7 +91,7 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
         }
       ],
       sections: {2: {name: 'section name'}},
-      students: {2: {name: 'student name'}},
+      students: {2: {name: 'student name'}, 3: {displayName: 'Nacho Libre', name: 'other student'}},
       groups: {2: {name: 'group name'}},
       dates: {},
       canDelete: false,
@@ -173,7 +173,13 @@ test('returns correct name from nameOrLoading', function() {
   equal(loading, 'Loading...')
 })
 
-test('student tokens are their proper name if loaded', function() {
+test('student tokens are displayName if loaded', function() {
+  const tokens = this.dueDateRow.tokenizedOverrides()
+  const token = tokens.find(t => t.name === 'Nacho Libre')
+  ok(!!token)
+})
+
+test('student tokens are name if loaded and displayName is not present', function() {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'student name')
   ok(!!token)
