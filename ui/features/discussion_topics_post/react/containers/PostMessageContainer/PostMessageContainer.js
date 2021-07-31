@@ -19,7 +19,7 @@
 import DateHelper from '@canvas/datetime/dateHelper'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {PostMessage} from '../../components/PostMessage/PostMessage'
+import {OldPostMessage} from '../../components/PostMessage/OldPostMessage'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
@@ -48,7 +48,7 @@ export const PostMessageContainer = props => {
   } else {
     return (
       <Flex padding={props.padding}>
-        <PostMessage
+        <OldPostMessage
           author={props.discussionEntry.author}
           editor={props.discussionEntry.editor}
           editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
@@ -77,7 +77,7 @@ export const PostMessageContainer = props => {
           >
             {props.threadActions}
           </ThreadingToolbar>
-        </PostMessage>
+        </OldPostMessage>
       </Flex>
     )
   }

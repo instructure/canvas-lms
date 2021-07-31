@@ -34,7 +34,7 @@ import {
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
-import {PostMessage} from '../../components/PostMessage/PostMessage'
+import {OldPostMessage} from '../../components/PostMessage/OldPostMessage'
 import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
@@ -315,7 +315,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                       alignItems="start"
                     >
                       <Flex.Item shouldShrink shouldGrow padding="0 0 medium 0">
-                        <PostMessage
+                        <OldPostMessage
                           author={props.discussionTopic.author}
                           timingDisplay={DateHelper.formatDatetimeForDiscussions(
                             props.discussionTopic.postedAt
@@ -445,7 +445,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               />
                             </View>
                           )}
-                        </PostMessage>
+                        </OldPostMessage>
                       </Flex.Item>
                     </Flex>
                   </Flex.Item>
