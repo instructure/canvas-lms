@@ -1256,6 +1256,9 @@
     "upload_record_media_e4207d72": {
         "message": "上传/录制媒体"
     },
+    "uploading_19e8a4e7": {
+        "message": "正在上传"
+    },
     "uploading_closed_captions_subtitles_failed_bc093f3": {
         "message": "无法上传已关闭的字幕/副标题。"
     },
