@@ -263,6 +263,7 @@ zh-Hans:
   access_token_is_valid_until_d2f048cf: 访问令牌有效期至
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: 访问令牌可用于允许其它应用程序代表您调用API。您还可生成访问令牌和*使用Canvas的开放API*以得出自己的集成。
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "使用任何 iOS 或 Android 移动设备访问您的课程和小组并在帮助菜单中查找更多信息。"
+  accessibility_checker_notifications_da5a49e6: 辅助功能检查器通知
   accessible_sidebar_menu_b30baf97: 辅助侧边栏菜单
   accordion_section_1_7888782d: "折叠面板第 1节"
   accordion_section_2_e1812997: "折叠面板第 2节"
@@ -1923,6 +1924,7 @@ zh-Hans:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "添加您的作业。您可以只列一个长列表，或者将其分为几组 - 甚至可以为每个作业组指定权重。"
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "为下列每个(没有 ID而无法被记录的栏目)添加您的Zendesk实例的自定义字段的ID："
   added_caption_1895db92: 添加的标题
+  added_e8a39b2: 已添加
   added_mastery_level_dd4792d1: 已添加掌握程度级别
   added_new_proficiency_rating_e30cab8a: 已添加新的能力等级
   adding_rss_feed_f1202567: 添加RSS源
@@ -2219,6 +2221,7 @@ zh-Hans:
   allows_user_to_access_the_files_tab_in_the_content_a5187929: 允许用户访问“内容选择器”中的“文件”选项卡。
   allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: 允许用户访问学习掌握程度评分册（如果已启用）。
   allows_user_to_access_the_manage_question_banks_li_616d45c8: 允许用户访问“测验索引”页面上的“管理题库”链接。
+  allows_user_to_access_the_navigation_tab_68efd3f: 允许用户访问“导航”选项卡。
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: 允许用户访问“课程设置”中的“导航”选项卡。允许用户访问“学生视图”（测试学生）、“复制此课程”、“重置课程内容”和“永久删除课程”按钮。允许用户在“课程详细信息”选项卡中编辑课程图像、名称、课程代码、时区、子帐户、学期和其他选项。
   allows_user_to_access_the_navigation_tab_in_course_e266d985: 允许用户访问“课程设置”中的“导航”选项卡。
   allows_user_to_access_the_people_link_in_account_n_d42a0fd4: 允许用户访问“帐户导航”中的“人员”链接。
@@ -2805,12 +2808,14 @@ zh-Hans:
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "创建此结果时出错：%{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "创建此结果时出错：%{message}。"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: 删除公告时出错。
+  an_error_occurred_while_loading_account_learning_o_29a11066: 加载帐户学习结果组时发生错误。
   an_error_occurred_while_loading_account_outcomes_8f337857: 加载帐户结果时发生错误。
   an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "加载帐户结果时发生错误：%{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "加载帐户能力等级时出错：%{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: 加载帐户能力等级时出错
   an_error_occurred_while_loading_associations_9699b3ee: 加载关联时出错
   an_error_occurred_while_loading_changes_9851b56f: 加载更改时出错
+  an_error_occurred_while_loading_course_learning_ou_c4053b06: 加载课程学习结果组时发生错误。
   an_error_occurred_while_loading_course_outcomes_320ccc44: 加载课程结果时发生错误。
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "加载课程结果时发生错误：%{error}"
   an_error_occurred_while_loading_courses_11d4571e: 加载课程时出错
@@ -2823,6 +2828,12 @@ zh-Hans:
   an_error_occurred_while_locking_announcements_8115ccd7: 锁定公告时出错。
   an_error_occurred_while_making_a_network_request_544e2b7: 发出网络请求时发生错误。
   an_error_occurred_while_migrating_405ac0b5: 迁移时出现错误。
+  an_error_occurred_while_removing_count_outcomes_15db8ce8: 
+    one: "删除 %{count} 个结果时发生错误。"
+    other: "删除 %{count} 个结果时发生错误。"
+  an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
+    one: "删除 %{count} 个结果时发生错误：%{errorMessage}。"
+    other: "删除 %{count} 个结果时发生错误：%{errorMessage}。"
   an_error_occurred_while_removing_the_outcome_e47c9553: 删除结果时发生错误。
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "删除结果时发生错误：%{message}"
   an_error_occurred_while_removing_this_group_97c8a9c: 删除此组时出错。
@@ -2867,6 +2878,7 @@ zh-Hans:
   an_outcome_import_is_currently_in_progress_11e6cb38: 目前正在导出结果。
   an_unexpected_error_has_occurred_bc608420: 发生意外错误
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "发生意外错误：查看错误报告%{id}"
+  an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "发生未知错误。检查 CSV 文件或稍后重试。"
   an_unknown_error_occurred_d77b1cdb: 未知错误出现
   an_unknown_server_error_occurred_please_try_again_f517eaf3: 发生未知的服务器错误。请重试。
   an_update_is_available_for_toolname_bba3fa2: "更新可用于%{toolName}"
@@ -3128,6 +3140,12 @@ zh-Hans:
   archive_selected_d64506ca: 已选择归档
   archived_de543437: 已归档
   are_you_sure_26795d3c: 是否确定？
+  are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
+    one: "是否确定要从该帐户中删除这 %{count} 个结果？"
+    other: "是否确定要从该帐户中删除这 %{count} 个结果？"
+  are_you_sure_that_you_want_to_remove_these_count_o_8ad349c4: 
+    one: "是否确定要从该课程中删除这 %{count} 个结果？"
+    other: "是否确定要从该课程中删除这 %{count} 个结果？"
   are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: 是否确定要从您的课程中删除该小组及其所有内容？
   are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: 是否确定要从您的帐户中删除该小组及其所有内容？
   are_you_sure_that_you_want_to_remove_this_outcome__38cdb682: 是否确定要从该帐户中删除该结果？
@@ -5229,6 +5247,7 @@ zh-Hans:
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "无法修改来自其他上下文的结果的字段：%{changes}"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "无法修改来自其他上下文的结果：%{changes}；必须在...中修改结果%{context}"
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: 无法移动作业，因为评分周期已关闭
+  cannot_remove_c0fd581d: 无法删除：
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: 无法按班级执行限定，除非小组为空且大小不受限制。
   cannot_save_new_assignment_3bda0792: 无法保存新作业
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 置换项的截止日期处在关闭评分周期内时，无法设置为只对置换项可见
@@ -5452,6 +5471,9 @@ zh-Hans:
   choose_one_submission_type_cf4eda5b: 选择一种提交类型
   choose_student_1513fcd1: "-- 选择学生 --"
   choose_the_next_mastery_path_b035b727: 选择下一个掌握路径
+  choose_up_to_count_subject_calendars_a7df06d7: 
+    one: "选择最多 %{count} 个主题日历"
+    other: "选择最多 %{count} 个主题日历"
   choose_usage_rights_33683854: 选择使用权限...
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' 不是有效的颜色。"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' 不是有效的颜色。输入有效的十六进制代码，然后再保存。"
@@ -6874,6 +6896,7 @@ zh-Hans:
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "目前找不到使用SIS ID%{user_id}登录的用户，正在跳过"
   could_not_import_learning_outcome_outcome_id_becau_662152b8: "无法导入学习结果 %{outcome_id}，原因是它不属于任何组"
   could_not_save_chosencolor_741b74ce: "无法保存 '%{chosenColor}'"
+  could_not_update_parent_group_e83c0253: 无法更新父级组
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "无法调整作业上的日期%{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: 无法查找一个更新的授权
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "无法找到 Canvas CSV 导入标题"
@@ -6902,6 +6925,10 @@ zh-Hans:
   count_associated_accounts_9a7128ed: 
     one: "%{count} 个关联帐户"
     other: "%{count} 个关联帐户"
+  count_attempts_allowed_d65a014c: 
+    one: "允许尝试 1 次"
+    other: "允许尝试 %{count} 次"
+    zero: 允许尝试任意次数
   count_attempts_d23c69a0: 
     one: "1 次尝试次数"
     other: "%{count} 次尝试次数"
@@ -6978,6 +7005,12 @@ zh-Hans:
   count_outcomes_selected_55902958: 
     one: "已选择 %{count} 个结果"
     other: "已选择 %{count} 个结果"
+  count_outcomes_were_successfully_removed_from_this_ae093b07: 
+    one: "已成功从该帐户中删除 %{count} 个结果。"
+    other: "已成功从该帐户中删除 %{count} 个结果。"
+  count_outcomes_were_successfully_removed_from_this_e7a7a325: 
+    one: "已成功从该课程中删除 %{count} 个结果。"
+    other: "已成功从该课程中删除 %{count} 个结果。"
   count_page_views_b40102b3: 
     one: "%{count} 个页面查看"
     other: "%{count} 页面视图"
@@ -7426,6 +7459,7 @@ zh-Hans:
       move_course: 移动课程
       reset_course_content_dialog_help: 重置课程内容
       section_enrollments: 班级注册
+  course_settings_course_details_1b1576b8: 课程设置（课程详情）
   course_settings_course_details_tab_allows_user_to__2eb67ad2: 课程设置（“课程详细信息”选项卡）：允许用户访问“课程设置”中的“导航”选项卡。允许用户访问“学生视图”（测试学生）、“复制此课程”、“重置课程内容”和“永久删除课程”按钮。允许用户在“课程详细信息”选项卡中编辑课程图像、名称、课程代码、时区、子帐户、学期和其他选项。
   course_settings_course_details_tab_fabf1adc: 课程设置（“课程详细信息”选项卡）
   course_settings_f6d0bbf8: 课程设置
@@ -9547,6 +9581,7 @@ zh-Hans:
       find_existing_rubric: 查找现有评分标准说明
   edit_rubric_title_104d6fd2: "编辑评价量规：%{title}"
   edit_section_name_558cc89: "编辑班级“%{name}”"
+  edit_submission_status_from_speedgrader_5e1b1cd4: "从 Speedgrader 编辑提交状态"
   edit_survey_b0d6890d: 编辑调查
   edit_term_name_29a8a322: "编辑学期%{name}"
   edit_text_27d8aa3d: "编辑 %{text}"
@@ -9564,8 +9599,10 @@ zh-Hans:
   edit_user_details_9af7819b: 编辑用户详情
   edit_when_36c1c2c8: "编辑 %{when}"
   edit_your_catalog_account_cce59310: 编辑您的帐户目录
+  edited_by_editorname_editedtimingdisplay_1ff58a2e: "，编辑人 %{editorName} %{editedTimingDisplay}"
   edited_c4fcbdbf: 已编辑：
   edited_date_b0455372: "（已编辑）%{date}"
+  edited_editedtimingdisplay_8788890e: "，编辑时间 %{editedTimingDisplay}"
   editing_permissions_for_name_3503e235: "为%{name}的编辑权限"
   editor: 
     alt_text: "替换文本:"
@@ -10571,6 +10608,7 @@ zh-Hans:
   failed_to_save_changes_errors_6920f334: "保存更改失败：%{errors}%"
   failed_to_save_dashboard_selection_32e71c72: 无法保存仪表板选择
   failed_to_save_please_try_again_later_bb7070fb: 保存失败，请稍后重试
+  failed_to_save_selected_calendars_210b5e8f: 无法保存选中的日历
   failed_to_split_users_d9759007: 无法拆分用户。
   failed_to_submit_draft_comment_1de83451: 无法提交评论草案
   failed_to_unpin_discussion_503eab82: 取消固定讨论失败
@@ -10621,6 +10659,7 @@ zh-Hans:
   feature_previews_account_settings_274440bc: 功能预览（帐户设置）
   feature_previews_enable_disable_707af910: "功能预览 - 启用/禁用"
   feature_previews_view_d3f820e4: "功能预览 - 查看"
+  feature_settings_ff2b79da: 功能设置
   featured_83f6041d: 精选
   featured_help_links_d805fe44: 特色帮助链接
   features: 
@@ -12620,6 +12659,7 @@ zh-Hans:
   hide_grades_5ff26682: 隐藏评分
   hide_grades_tray_5ed267fe: 隐藏评分托盘
   hide_groups_navigation_menu_62e8b3d0: 隐藏小组导航菜单
+  hide_important_dates_c23d2102: 隐藏重要日期
   hide_key_e8fe1e8c: 隐藏密钥
   hide_name_details_23814c37: "隐藏 %{name} 详情"
   hide_navigation_menu_f0b3e90: 隐藏导航菜单
@@ -12650,6 +12690,7 @@ zh-Hans:
   home_page_is_not_valid_2e8a25ae: 主页无效
   home_tutorial_tray_66826983: 首页教程托盘
   homeroom_12546f9c: 指导教室
+  homeroom_view_a676e270: 教室视图
   homework_submission_172e8354: 作业提交
   honduras_44052cf5: 洪都拉斯
   honduras_504_af7aa636: 洪都拉斯(+504)
@@ -12893,6 +12934,7 @@ zh-Hans:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       如果也启用 RCE 增强，
       RCE 将在您离开时自动保存您的工作
+  if_set_allows_submission_status_to_be_changed_from_156f57f: "如果设置，则允许在 Speedgrader 中更改提交状态"
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: 如果设置，评分计算器在计算总分时将忽略取消发布的匿名作业。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "如果设置，则评分册 CSV 导出者将在列标题中附加所选评分周期的标题，其值因评分周期而异。"
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: 如果设置，评分册会分批加载作业，先加载选定评分时间段的作业。
@@ -12983,6 +13025,7 @@ zh-Hans:
   if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "如果禁用此权限，用户仍可以通过Canvas App Center安装已批准的应用程序（如果已对您的机构启用）。"
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "如果启用此权限并禁用了“课程 - 查看列表”，则用户可以使用“帐户设置”中的“添加新课程”按钮添加新课程。"
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "如果启用此权限，并且如果禁用了“用户 - 查看主要电子邮件地址”，则用户将看到用作登录ID的电子邮件地址。"
+  if_this_permission_is_enabled_but_blueprint_course_ccc15486: "如果启用此权限，但未启用“模板课程 - 添加/编辑/关联/删除”，用户仍然可以同步模板课程和查看同步历史记录。"
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "如果启用此权限，则用户不需要启用“SIS数据 - 读取权限”。帐户权限会覆盖课程权限。要禁止用户在课程级别管理SIS ID，必须同时禁用“SIS数据 (SIS Data) - 管理”和“SIS数据 (SIS Data) - 读取”。要通过SIS Id向课程添加用户，还必须启用“用户 (Users) - 在课程中添加/删除学生”和/或“用户 (Users) - 在课程中添加/删除教师、课程设计者或助教”。"
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       如果启用此权限，则用户无需启用“SIS 数据 - 读取权限”。帐户权限会覆盖课程权限。如需禁止用户在课程级别管理 SIS ID，必须同时禁用“SIS 数据 - 管理”和“SIS 数据 - 读取”。
@@ -13075,6 +13118,7 @@ zh-Hans:
   import_status_b147bd27: 导入状态
   import_tutorial_tray_8b92e956: 导入教程托盘
   important_dates_304e306a: 重要日期
+  important_dates_tray_fa41a025: 重要日期托盘
   important_info_3bda6406: 重要信息
   important_info_for_course_baa4bce1: "%{course} 的重要信息"
   important_note_educational_institutions_have_an_ob_c9350304: "*重要提示：教学机构有义务使它们的内容尽可能可浏览。 Instructure 建议文字和背景颜色的比率至少为 3：1，以帮助保留文字的可读。 通过**WebAIM 色彩对比检查程序***轻松地测试您的对比度。"
@@ -13434,6 +13478,7 @@ zh-Hans:
   italian_bd3c792d: 意大利语
   italy_39_cfad867a: 意大利(+39)
   italy_daec3097: 意大利
+  item_banks_manage_account_e8040580: "项目库 - 管理帐户"
   item_cannot_be_duplicated_cebf3109: 无法复制项目
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} 类别图标，项目名称 %{item_name}"
   item_complete_d334fd43: （项目完成）
@@ -14030,9 +14075,11 @@ zh-Hans:
   locking_91f476a5: 正在锁定……
   log_in_c9e240ef: 登录
   log_in_to_submit_962106cf: 登录并提交
+  log_in_url_is_not_a_valid_uri_7b8c57ee: "登录 URL 不是有效的 URL"
   log_on_url_fc166e4c: 登录到URL
   log_out_379ba28a: 退出
   log_out_url_2605c2c1: 退出URL
+  log_out_url_is_not_a_valid_uri_6566751e: "注销 URL 不是有效的 URL"
   logged_in_user_id_5a54b1ae: 登录用户ID
   logged_out_724b3717: 已登出
   logged_out_user: "退出的用户 %{user_counter}"
@@ -16703,6 +16750,7 @@ zh-Hans:
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "多个Canvas的帐户与Clever地区 %{district_id} 的帐户相关"
   multiple_dropdowns_read_surrounding_text_f61274b3: 多个下拉菜单，阅读周围文本
   multiple_due_dates_283dd861: 多个到期日
+  multiple_due_dates_47416f7a: （多个到期日期）
   multiple_due_dates_6b0d75c6: 多个截止日期
   multiple_modules_930713d4: 多个单元
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -17571,6 +17619,7 @@ zh-Hans:
   of_students_5d1af0d2: 学生数目
   off_5385ef3f: 关
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "关 - 策略不会应用于此子帐户"
+  offline_score_8d7b4779: 线下评分：
   offline_web_export_dca67174: 离线网页导出
   ok_c47544a2: 确定
   ok_ff1b646a: 确定
@@ -17609,6 +17658,7 @@ zh-Hans:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 提交答案后，以后将无法再进行更改。无法查看上一个问题。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "一旦开始调试，将收集关于下一次尝试登录的所有信息。单击“Refresh”（刷新）以查看是否已收集更多数据，或者单击“Stop Debugging”（停止调试）以清除收集的数据并停止当前调试尝试。"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 您更改答案之后，在更新问题前需要选择一个选项。
+  one_or_more_grade_selected_was_provided_by_a_grade_58d46830: 一个或多个所选评分是由具有非活动状态注册学生的评分人提供的。请将您的选择项更新至当前评分人提供的选择项。
   one_or_more_items_are_currently_being_imported_the_186fe069: 正在导入一个或多个项目。可用项目将显示在下面的课程中。
   one_per_line_format_name_value_79647700: "每行一个。格式：名称 = 值"
   online_submission_type_annotated_document_f8b57ae1: "在线提交类型 - 注释文档"
@@ -18057,6 +18107,7 @@ zh-Hans:
   parameters_a13374ec: 参数
   parent_assignment_is_not_selected_9efb4ac1: 未选择父级作业
   parent_assignment_is_selected_6a2fbca8: 已选择父级作业
+  parent_group_not_found_in_this_context_3312dd78: 在此上下文中找不到父级组
   parent_of_a_canvas_user_afba1624: Canvas用户的家长？
   parent_references_not_found_prior_to_this_row_miss_31723438: "在此行之前找不到父级参考：%{missing}"
   parent_signup_b7c6bf0a: 家长登记
@@ -18223,6 +18274,7 @@ zh-Hans:
   please_try_again_4c3d11b4: 请重试
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 请尝试重新建立与该工具的连接，方法是再次选择作业或模块项界面中的工具并保存。
   please_upload_files_as_a_zip_5a2c799f: 请以压缩文件的形式上传文件
+  please_visit_your_modules_page_for_more_informatio_846c5e32: 请访问*模块页面*以了解更多信息。
   please_wait_2b646bc2: 请稍候。
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: 请等待我们上传和处理您的文件。
   please_wait_e6355980: 请稍候...
@@ -19009,6 +19061,7 @@ zh-Hans:
         other_services: 单击下面的任何服务以注册
         password: 密码
         password_for: 密码用于
+        permanent_expires_at: 过期
         pronoun: 代词
         pronouns: 代词
         purpose: 用途
@@ -21076,6 +21129,7 @@ zh-Hans:
   registration_url_60e0eaaa: "注册 URL"
   regular_style_checkbox_ee3d71c1: 常规式的复选框
   reinforce_student_understanding_304d18a6: 加深学生的理解
+  relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: 放松休息一下。目前没有要做的事。
   release_date_for_e2de5547: "发行日期： "
   release_grades_c68fbcc: 发布评分
   release_notes_12ca833c: 发行说明
@@ -21103,6 +21157,7 @@ zh-Hans:
   remove_conference_title_207d32c0: "删除会议：%{title}"
   remove_contact_method_ca890ba3: 移除联系方式
   remove_course_association_name_b760c502: "移除课程关联%{name}"
+  remove_d83a966c: 移除：
   remove_dates_9b9ba2f6: 删除日期
   remove_designers_from_courses_42332a57: 移除课程中的设计员
   remove_displayname_a2f31aa3: "移除 %{displayName}"
@@ -21133,12 +21188,15 @@ zh-Hans:
   remove_outcomes_5f8b601c: 
     one: 删除结果
     other: 删除结果
-  remove_outcomes_9abcc8fd: 是否删除结果？
+  remove_outcomes_9abcc8fd: 
+    one: 是否删除结果？
+    other: 是否删除结果？
   remove_placement_90862c13: "移除 %{placement}"
   remove_points_from_rubric_dcd4b585: 从评价量规中删除分数
   remove_pronouns_5ff760ff: 删除代词
   remove_pronouns_pronoun_c8b03d78: "删除代词%{pronoun}"
   remove_recipient_name_a6b83cef: "删除收件人的 %{name}"
+  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "是否删除 %{removableCount} 个结果？共 %{totalCount} 个结果。"
   remove_role_filter_label_a27b6797: "删除角色过滤器%{label}"
   remove_row_c198da5a: 移除行
   remove_row_f9d59cba: 删除行
@@ -21336,6 +21394,7 @@ zh-Hans:
       create_collaborations: 创建学生协作
       create_conferences: 创建网络会议
       manage_: 管理（添加/编辑/删除）
+      manage_account_banks: 管理帐户级项目库
       manage_account_memberships: 添加/删除帐户的其他管理员
       manage_account_settings: 管理帐户级设置
       manage_admin_users: 添加/删除课程的其他教师、课程设计者或助教
@@ -21957,6 +22016,7 @@ zh-Hans:
   select_audio_file_7d905cce: 选择音频文件
   select_by_date_range_c3af0101: 按日期范围选择
   select_calendars_d5fa50b6: 选择日历
+  select_calendars_to_retrieve_important_dates_from_26dc92b7: 选择日历以检索重要起始日期
   select_conference_provider_58c7f7fe: 选择会议提供者
   select_content: 选择内容
   select_content_checkbox: 
@@ -22040,6 +22100,7 @@ zh-Hans:
   selected_274ce24f: 已选择
   selected_all_courses_9cfef57f: 已选择所有课程
   selected_answer: 您已选择此答案。
+  selected_calendars_cc7f325b: 选中的日历
   selected_content_contains_non_lti_links_f9dfd762: "选择的内容包含非 LTI 链接。"
   selected_content_is_not_an_lti_link_11780d96: "选定的内容不是 LTI 链接。"
   selected_course_course_a581f834: "已选课程%{course}"
@@ -22989,6 +23050,7 @@ zh-Hans:
       显示选择性地允许帐户管理员发布课程的复选框
       在关联和同步蓝图课程后自动
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "在 Canvas 全局导航中显示近期浏览页面的列表"
+  show_accessibility_checker_notifications_while_edi_a7cb6449: 在编辑时显示辅助功能检查器通知。
   show_account_navigation_menu_d97270a9: 显示帐户导航菜单
   show_admin_navigation_menu_92fb579f: 显示管理员导航菜单
   show_all_artifacts_34b91a83: 显示所有学习产出
@@ -23219,6 +23281,8 @@ zh-Hans:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: 由于检索它们状态的错误，在此页面上的一些会议被隐藏。
   some_custom_columns_could_not_be_changed_because_t_88abc9be: 某些自定义栏是只读内容，因此无法更改；已忽略这些栏的更改。
   some_module_items_could_not_be_published_e4be3c0: 一些单元项目无法发布
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: 您选择的一些结果无法被删除，因为它们已对应到此帐户中的内容。是否要继续删除这些结果，而不对应？
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: 您选择的一些结果无法被删除，因为它们已对应到此课程中的内容。是否要继续删除这些结果，而不对应？
   some_settings_have_been_administratively_locked_9e3ee880: 某些设置已被管理员锁定。
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: 某些设置已被禁用，因为作业处于已关闭评分周期。
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: 一些提交的作业无法分级；这些提交作业的年级变更已忽略。
@@ -23487,6 +23551,7 @@ zh-Hans:
   student_context_card_ad59967e: 学生上下文卡片
   student_context_cards_376d2072: 学生背景卡
   student_context_cards_must_be_enabled_for_an_accou_6d8ef1ca: "必须由管理员为帐户启用学生背景卡。如果启用了“课程 - 管理/更新”，用户仍然可以通过评分册查看上下文卡片。"
+  student_context_cards_must_be_enabled_for_an_accou_9b5c635: 必须由管理员为帐户启用学生背景卡。如果未启用此权限，用户仍然可以通过评分册查看背景卡。
   student_context_cards_must_be_enabled_for_an_accou_d996afdc: "必须由管理员为帐户启用学生背景卡。如果还启用了“管理课程：管理员 - 管理/更新”，用户仍然可以通过评分册查看上下文卡片。"
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: 必须由管理员为帐户启用学生背景卡。如果未启用此权限，用户仍可通过评分册查看学生背景卡。
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: 必须由管理员为帐户启用学生背景卡。
@@ -24200,6 +24265,7 @@ zh-Hans:
   the_courses_delete_permission_affects_viewing_the__b8744b4c: "“课程 - 删除”权限影响查看“永久删除课程”按钮，该按钮仅对手动创建的课程显示。"
   the_courses_publish_permission_allows_the_user_to__30694e34: "“课程 - 发布”权限用户用户发布不含单元的课程。要发布/取消发布单元内容，还必须启用“课程内容 - 添加/编辑/删除”。"
   the_courses_reset_permission_allows_users_to_reset_29dbc267: "“课程 - 重置”权限允许用户重置 SIS 管理课程的课程内容，无论该用户是否具有“SIS 数据 - 管理”权限。"
+  the_csv_header_row_is_invalid_a8ec1787: "CSV 标题行无效。"
   the_date_is_not_valid_b6285fb5: 日期无效。
   the_discussion_entry_was_successfully_created_7cddf67b: 已成功创建讨论条目。
   the_discussion_topic_was_successfully_deleted_d8b93b70: 已成功删除讨论主题。
@@ -24298,6 +24364,12 @@ zh-Hans:
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "为用户的最新得分 %{current_user_name} 和结果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "该课程的下一可用预约已启动*%{date}*"
   the_original_quizzes_interface_fcda53bc: 原测验界面
+  the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
+    one: 您选择的结果无法被删除，因为它们已对应到此帐户中的内容。
+    other: 您选择的结果无法被删除，因为它们已对应到此帐户中的内容。
+  the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
+    one: 您选择的结果无法被删除，因为它们已对应到此课程中的内容。
+    other: 您选择的结果无法被删除，因为它们已对应到此课程中的内容。
   the_preceding_content_is_partner_provided_d753928c: 以上内容由合作伙伴提供
   the_previous_sis_batch_was_aborted_d7d89955: "上一个 SIS 批次已中止"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 该熟练程度计算方法由您的管理员设置，适用于该帐户的所有课程。
@@ -24435,6 +24507,7 @@ zh-Hans:
   there_was_an_error_setting_usage_rights_53739e1d: 设置使用权限时出错。
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: 开始保存作业日期工作时发生错误
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: 提交相似度检测服务时出现错误。联系支持人员前，请尝试重新提交文件。
+  there_was_an_error_submitting_your_attempt_fdbe9259: 尝试提交时发生错误。
   there_was_an_error_updating_this_assignment_please_59fc608d: 删除此作业时发生错误。请刷新此页面并重试。
   there_was_an_error_uploading_the_image_932fc4ce: 上传图像出现错误
   there_was_an_error_uploading_your_file_please_try__ce458566: 上传您的文件时出错。请重试。
@@ -24499,6 +24572,7 @@ zh-Hans:
   this_assignment_is_complete_5e096a06: 此作业已完成！
   this_assignment_is_currently_being_moderated_ffd280f2: 此作业目前正在核对
   this_assignment_is_currently_muted_that_means_stud_94d63139: 该作业目前已屏蔽。这意味着学生无法看到他们的评分和反馈。现在要取消屏蔽吗？
+  this_assignment_is_currently_unavailable_because_y_129792e0: 该作业目前不可用，因为您尚未完成讲师设定的先修课程。
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 这个作业被丢弃，但不会影响总计算。
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: 这个作业被免除，但不会影响总计算。
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: 此作业在此学生的已关闭评分周期中
@@ -24608,6 +24682,7 @@ zh-Hans:
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: 这是当前为该学生选择的评分。
   this_is_the_default_email_address_f3c421fb: 这是默认的电子邮件地址
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: 这是新功能预览用户界面。该界面目前是只读的。要复原旧用户界面，请点击该按钮。此操作将禁用“新功能标记”功能并刷新页面。
+  this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: 您可以在这里留下评论并查看讲师的反馈。
   this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: 您的主页完成后，您将登陆到这里。
   this_is_your_course_landing_page_33d445ec: 这是您的课程登陆页面
   this_is_your_course_landing_page_f87a920d: 这是您的课程登陆页面！
@@ -25005,6 +25080,7 @@ zh-Hans:
   to_access_the_account_settings_tab_account_level_s_9676d44b: "要访问“帐户设置”选项卡，还必须启用“帐户级设置 - 管理”。"
   to_access_the_assignments_index_page_course_conten_49d884f2: "要访问“作业”索引页面，必须启用“课程内容 - 查看”。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "要访问“作业”索引页面，必须启用“课程内容 - 查看”。要区分个别学生的作业，还必须启用“用户 - 查看列表”。"
+  to_access_the_courses_link_in_account_navigation_c_4f4a7ffc: "要访问“帐户导航”中的课程链接，还必须启用“课程 - 查看列表”。"
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "要访问帐户导航中的课程链接，必须启用“课程 - 查看列表”。"
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
       要访问帐户导航中的课程链接，必须启用“课程 - 查看列表”。
@@ -25124,6 +25200,7 @@ zh-Hans:
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "要交叉列出一个班次，还必须启用“课程班次 - 添加/编辑/删除”。要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。要允许帐户级用户删除课程，还必须启用“课程状态 - 管理”。"
   to_cross_list_a_section_courses_manage_update_and__40dfb8f8: "要交叉列示班次，还必须启用“课程 - 管理/更新”和“管理课程班次 - 编辑”。"
   to_cross_list_a_section_manage_course_sections_edi_93a73729: "要交叉列示班次，还必须启用“管理课程班次 - 编辑”。要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。要允许帐户级用户删除课程，还必须启用“课程状态 - 管理”。"
+  to_cross_list_a_section_manage_course_sections_edi_ac3d2abb: "要交叉列示班次，还必须启用“管理课程班次 - 编辑”。"
   to_cross_list_a_section_manage_courses_admin_manag_7992434e: "要交叉列出班次，还必须启用“管理课程：管理员 - 管理/更新”和“管理课程班次 - 编辑”。"
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "要交叉列出班次，还必须启用“课程 - 添加/编辑/删除”。"
   to_cross_list_sections_course_sections_edit_and_co_6db155a6: "要交叉列示班次，还必须启用“课程班次 - 编辑”和“课程 - 管理/更新”。"
@@ -25202,6 +25279,7 @@ zh-Hans:
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "要编辑页面索引页上的锁定设置，还必须启用“页面 - 更新”、“模板课程 - 添加/编辑/关联/删除”和“管理课程：管理员 - 管理/更新”。"
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "要编辑课程 SIS ID，还必须启用“课程 - 管理/更新”和“SIS 数据 - 管理”。"
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "要编辑课程SIS ID，还必须启用“管理课程：管理员 - 管理/更新”和“SIS数据 - 管理”。"
+  to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。"
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       要编辑用户详细信息、修改登录详细信息或更改用户密码，还必须启用“用户 - 管理登录详细信息”。
       要查看用户页面视图，还必须启用“统计信息 - 视图”。
@@ -25246,6 +25324,7 @@ zh-Hans:
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: "要管理关联课程，还必须启用“课程 - 查看列表”和“管理课程 - 添加”。"
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "要在“课程设置”中管理“模板课程设置”，还必须启用“课程 - 添加/编辑/删除”。"
   to_manage_course_announcements_discussions_moderat_5f02f46e: "要管理课程公告，还必须启用“讨论 - 审核”。"
+  to_manage_course_content_course_content_add_edit_d_10b420f7: "要管理课程内容，还必须启用“课程内容 - 添加/编辑/删除”。"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "要管理课程内容，必须启用“课程内容 (Course Content) - 添加/编辑/删除”。"
   to_manage_course_content_courses_manage_update_and_843edf8a: "要管理课程内容，必须启用“课程 - 管理/更新”和“课程内容 - 添加/编辑/删除”。"
   to_manage_course_content_manage_courses_admin_mana_8c627f31: "要管理课程内容，必须启用“管理课程：管理员 - 管理/更新”和“课程内容 - 添加/编辑/删除”。要查看“选择主页”和“课程设置核查清单”按钮，还必须启用“管理课程：管理员 - 管理/更新”和“课程内容 - 查看”。（教师、设计者和助教无论权限如何，都可以设置课程主页。）"
@@ -25365,6 +25444,7 @@ zh-Hans:
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: 要查看发送给Canvas用户的所有通知，请选择用户和日期范围进行搜索。
   to_view_announcements_announcements_view_must_also_75f652df: "要查看公告，还必须启用“公告 - 查看”。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
+  to_view_choose_home_page_and_course_setup_checklis_84797b4f: "要查看“选择主页”和“课程设置核查清单”按钮，还必须启用“课程内容 - 查看”。（教师、设计者和助教无论权限如何，都可以设置课程主页。）"
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "要查看“选择主页”和“课程设置核查清单”按钮，还必须启用“管理课程：管理员 - 管理/更新”和“课程内容 - 查看”。（教师、设计者和助教无论权限如何，都可以设置课程主页。）"
   to_view_choose_home_page_and_course_setup_checklis_ff2436d4: "要查看“选择主页”和“课程设置核查清单”按钮，还必须启用“课程 - 管理/更新”和“课程内容 - 查看”。（教师、设计者和助教无论权限如何，都可以设置课程主页。）"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
@@ -25395,6 +25475,7 @@ zh-Hans:
   to_view_feature_previews_for_an_account_feature_pr_805e5c46: "要查看帐户的功能预览，还必须启用“功能预览 - 启用/禁用”。"
   to_view_grades_in_a_course_courses_manage_update_a_91a2448: "要查看课程评分，还必须启用“课程 - 管理/更新”和“评分 - 查看所有评分”。"
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "要查看课程中的成绩，还必须启用“评分 - 查看所有评分”。"
+  to_view_grades_in_a_course_grades_view_all_grades__d07a67dd: "要查看课程中的评分，还必须启用“评分 - 查看所有评分”。"
   to_view_grades_in_a_course_manage_courses_admin_ma_ea4fe3a5: "要查看课程评分，还必须启用“管理课程：管理员 - 管理/更新”和“评分 - 查看”。"
   to_view_groups_users_view_list_must_also_be_enable_a4f2a6b9: "要查看小组，还必须启用“用户 (Users) - 查看列表”。"
   to_view_last_activity_and_total_activity_informati_473265d8: "要在“课程人员”页面上查看“上次活动”和“总活动”信息，还必须启用“用户 - 查看列表”。"
@@ -25687,6 +25768,9 @@ zh-Hans:
   unable_to_load_this_control_543a8271: 无法加载此控件
   unable_to_read_file_2d04b0c: 无法读取文件
   unable_to_remove_app_4293cb53: 无法删除应用程序
+  unable_to_remove_outcomes_f682e68f: 
+    one: 无法删除结果
+    other: 无法删除结果
   unable_to_save_new_discussion_topic_99239f3f: 无法保存新的讨论主题
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "无法在%{context_name}中发送消息给用户"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: 无法设置默认评分，因为至少有一个学生的该作业的截止日期处在关闭评分周期内
@@ -26586,6 +26670,7 @@ zh-Hans:
   view_grades_8d3bae6c: 查看评分
   view_grades_for_name_45aeb2f2: "查看评分%{name}"
   view_grading_history_e64bb8fe: 查看评分历史
+  view_important_dates_173c7e1b: 查看重要日期
   view_in_speedgrader_773b9d81: "查看 SpeedGrader"
   view_learning_analytics_beta_1c98a397: 查看学习分析工具(Beta)
   view_login_ids_for_users_142bbe7a: "查看用户的登录 ID"
@@ -27127,6 +27212,9 @@ zh-Hans:
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某个活动课程的进度要求。可能有些学生的进度已达到此单元以及依赖此单元的其他单元。
   you_have_completed_a_peer_review_for_name_4dd2264b: "您已完成%{name}的同学互评"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "您已经对%{person}完成了互评。谢谢"
+  you_have_count_calendars_left_f0cbcac4: 
+    one: "您还有 %{count} 个日历"
+    other: "您还有 %{count} 个日历"
   you_have_count_submissions_to_grade_6c5b511a: "您有%{count}个提交项等待评分"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: 您为此学生输入了无效的评分。检查值和评分类型，并重试。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
