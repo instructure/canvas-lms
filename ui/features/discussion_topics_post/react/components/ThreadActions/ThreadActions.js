@@ -38,30 +38,42 @@ import {Flex} from '@instructure/ui-flex'
 // are produced by the menu causing the page to scroll all over the place
 export const ThreadActions = props => {
   const menuItems = useMemo(() => {
-    return getMenuConfigs(props).map(config => renderMenuItem({...config}, props.id))
+    return getMenuConfigs({
+      onMarkAllAsRead: props.onMarkAllAsRead,
+      onMarkAllAsUnread: props.onMarkAllAsUnread,
+      isUnread: props.isUnread,
+      onToggleUnread: props.onToggleUnread,
+      goToTopic: props.goToTopic,
+      goToParent: props.goToParent,
+      onEdit: props.onEdit,
+      onDelete: props.onDelete,
+      onOpenInSpeedGrader: props.onOpenInSpeedGrader
+    }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
   return (
-    <>
-      {!props.isSearch && (
-        <Menu
-          placement="bottom"
-          key={`threadActionMenu-${props.id}`}
-          trigger={
-            <IconButton
-              size="small"
-              screenReaderLabel={I18n.t('Manage Discussion')}
-              renderIcon={IconMoreLine}
-              withBackground={false}
-              withBorder={false}
-              data-testid="thread-actions-menu"
-            />
-          }
-        >
-          {menuItems}
-        </Menu>
-      )}
-    </>
+    <Flex justifyItems="end">
+      <Flex.Item>
+        {!props.isSearch && (
+          <Menu
+            placement="bottom"
+            key={`threadActionMenu-${props.id}`}
+            trigger={
+              <IconButton
+                size="small"
+                screenReaderLabel={I18n.t('Manage Discussion')}
+                renderIcon={IconMoreLine}
+                withBackground={false}
+                withBorder={false}
+                data-testid="thread-actions-menu"
+              />
+            }
+          >
+            {menuItems}
+          </Menu>
+        )}
+      </Flex.Item>
+    </Flex>
   )
 }
 
