@@ -327,9 +327,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             assessmentRequest => (
                               <PeerReview
                                 key={assessmentRequest._id}
-                                dueAtDisplayText={DateHelper.formatDatetimeForDiscussions(
+                                dueAtDisplayText={
                                   props.discussionTopic.assignment.peerReviews?.dueAt
-                                )}
+                                }
                                 revieweeName={assessmentRequest.user.displayName}
                                 reviewLinkUrl={getReviewLinkUrl(
                                   ENV.course_id,
