@@ -21,7 +21,7 @@ import I18n from 'i18n!broken_images'
 export function attachErrorHandler(imgElement) {
   $(imgElement).on('error', e => {
     if (e.currentTarget.src) {
-      $.get(e.currentTarget.src).fail(response => {
+      $.get(e.currentTarget.src, undefined, undefined, 'text').fail(response => {
         if (response.status === 403) {
           // Replace the image with a lock image
           $(e.currentTarget).attr({
