@@ -64,7 +64,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     searchString: debouncedSearchString
   })
 
-  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
+  const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
+    useResize()
 
   const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
   const {importGroup, importGroupsStatus} = useGroupImport()
@@ -167,8 +168,12 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               height="calc(100vh - 10.25rem)"
               margin="xxx-small 0 0"
             >
+              {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div
-                data-testid="handlerRef"
+                tabIndex="0"
+                role="separator"
+                aria-orientation="vertical"
+                onKeyDown={onKeyDownHandler}
                 ref={setDelimiterRef}
                 style={{
                   width: '1vw',
@@ -178,6 +183,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
+              {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"

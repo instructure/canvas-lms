@@ -22,17 +22,62 @@ import {render, fireEvent} from '@testing-library/react'
 import * as rtlHelper from '@canvas/i18n/rtlHelper'
 
 describe('useResize', () => {
-  const TmpComponent = () => {
-    const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
-
+  const mockContainer = {
+    x: 0,
+    left: 0,
+    y: 0,
+    top: 0,
+    width: 1000,
+    height: 500,
+    right: 1000,
+    bottom: 500
+  }
+  const mockDelimiter = {
+    x: 250,
+    left: 250,
+    y: 0,
+    top: 0,
+    width: 10,
+    height: 500,
+    right: 260,
+    bottom: 500
+  }
+  const mockElement = () => {
+    Element.prototype.getBoundingClientRect = jest
+      .fn()
+      .mockReturnValueOnce(mockContainer)
+      .mockReturnValueOnce(mockDelimiter)
+      .mockReturnValueOnce(mockContainer)
+      .mockReturnValueOnce(mockDelimiter)
+      .mockReturnValueOnce(mockContainer)
+      .mockReturnValueOnce(mockDelimiter)
+  }
+  const TestComponent = () => {
+    const {
+      setContainerRef,
+      setLeftColumnRef,
+      setDelimiterRef,
+      setRightColumnRef,
+      onKeyDownHandler
+    } = useResize()
     return (
       <div ref={setContainerRef}>
         <div ref={setLeftColumnRef} data-testid="leftColumn" style={{width: '25%'}}>
           Left
         </div>
-        <div ref={setDelimiterRef} data-testid="delimiter" style={{width: '1%'}}>
+        {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
+        <div
+          tabIndex="0"
+          role="separator"
+          aria-orientation="vertical"
+          onKeyDown={onKeyDownHandler}
+          ref={setDelimiterRef}
+          data-testid="delimiter"
+          style={{width: '1%'}}
+        >
           Delimiter
         </div>
+        {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
         <div ref={setRightColumnRef} data-testid="rightColumn" style={{width: '74%'}}>
           Right
         </div>
@@ -41,66 +86,127 @@ describe('useResize', () => {
   }
 
   beforeEach(() => {
-    Element.prototype.getBoundingClientRect = jest.fn(() => {
-      return {
-        width: 1000,
-        height: 120,
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0
-      }
+    mockElement()
+  })
+
+  describe('With Mouse Navigation', () => {
+    it('resizes the panes when clicking and moving the handler', () => {
+      const {getByTestId} = render(<TestComponent />)
+      const leftColumn = getByTestId('leftColumn')
+      const rightColumn = getByTestId('rightColumn')
+      const delimiter = getByTestId('delimiter')
+      expect(leftColumn).toHaveStyle('width: 25%')
+      expect(rightColumn).toHaveStyle('width: 74%')
+      fireEvent.mouseDown(delimiter)
+      fireEvent.mouseMove(delimiter, {
+        clientX: 400
+      })
+      expect(leftColumn).toHaveStyle('width: 400px')
+      expect(rightColumn).toHaveStyle('width: 588px')
+      fireEvent.mouseMove(delimiter, {
+        clientX: 500
+      })
+      expect(leftColumn).toHaveStyle('width: 500px')
+      expect(rightColumn).toHaveStyle('width: 488px')
+      fireEvent.mouseUp(delimiter)
+      fireEvent.mouseMove(delimiter, {
+        clientX: 600
+      })
+      expect(leftColumn).toHaveStyle('width: 500px')
+      expect(rightColumn).toHaveStyle('width: 488px')
+    })
+
+    it('does not resize the pans when clicking and moving an element that is not the handler', () => {
+      const {getByTestId} = render(<TestComponent />)
+      const leftColumn = getByTestId('leftColumn')
+      const rightColumn = getByTestId('rightColumn')
+      expect(leftColumn).toHaveStyle('width: 25%')
+      expect(rightColumn).toHaveStyle('width: 74%')
+      fireEvent.mouseDown(document)
+      fireEvent.mouseMove(document, {
+        clientX: 200
+      })
+      expect(leftColumn).toHaveStyle('width: 25%')
+      expect(rightColumn).toHaveStyle('width: 74%')
+    })
+
+    it('resizes the panes properly when RTL', () => {
+      jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
+      const {getByTestId} = render(<TestComponent />)
+      const leftColumn = getByTestId('leftColumn')
+      const rightColumn = getByTestId('rightColumn')
+      const delimiter = getByTestId('delimiter')
+      expect(leftColumn).toHaveStyle('width: 25%')
+      expect(rightColumn).toHaveStyle('width: 74%')
+      fireEvent.mouseDown(delimiter)
+      fireEvent.mouseMove(delimiter, {
+        clientX: 400
+      })
+      expect(leftColumn).toHaveStyle('width: 588px')
+      expect(rightColumn).toHaveStyle('width: 400px')
     })
   })
 
-  it('resizes the panes when clicking and moving the handler', () => {
-    const {getByTestId} = render(<TmpComponent />)
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
-    fireEvent.mouseDown(getByTestId('delimiter'))
-    fireEvent.mouseMove(getByTestId('delimiter'), {
-      clientX: 400
-    })
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 392px')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 600px')
-    fireEvent.mouseMove(getByTestId('delimiter'), {
-      clientX: 500
-    })
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 492px')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 500px')
-    fireEvent.mouseUp(getByTestId('delimiter'))
-    fireEvent.mouseMove(getByTestId('delimiter'), {
-      clientX: 600
-    })
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 492px')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 500px')
-  })
-
-  it('does not resize the pans when clicking and moving an element that is not the handler', () => {
-    const {getByTestId} = render(<TmpComponent />)
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
-    fireEvent.mouseDown(document)
-    fireEvent.mouseMove(document, {
-      clientX: 200
-    })
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
-  })
-
-  it('resizes the panes properly when RTL', () => {
-    jest.spyOn(rtlHelper, 'isRTL').mockImplementation(_e => {
-      return true
+  describe('With Keyboard Only Navigation', () => {
+    it('moves delimiter to the left in small increments using ArrowLeft key', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
+      fireEvent.keyDown(getByTestId('delimiter'), {
+        key: 'ArrowLeft',
+        keyCode: 37
+      })
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 245px')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 743px')
     })
 
-    const {getByTestId} = render(<TmpComponent />)
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
-    fireEvent.mouseDown(getByTestId('delimiter'))
-    fireEvent.mouseMove(getByTestId('delimiter'), {
-      clientX: 400
+    it('moves delimiter to the right in small increments using ArrowRight key', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
+      fireEvent.keyDown(getByTestId('delimiter'), {
+        key: 'ArrowRight',
+        keyCode: 39
+      })
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 255px')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 733px')
     })
-    expect(getByTestId('leftColumn')).toHaveStyle('width: 600px')
-    expect(getByTestId('rightColumn')).toHaveStyle('width: 392px')
+
+    it('moves delimiter to the left in larger increments using PageDown key', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
+      fireEvent.keyDown(getByTestId('delimiter'), {
+        key: 'PageDown',
+        keyCode: 34
+      })
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 225px')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 763px')
+    })
+
+    it('moves delimiter to the right in larger increments using PageUp key', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
+      fireEvent.keyDown(getByTestId('delimiter'), {
+        key: 'PageUp',
+        keyCode: 33
+      })
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 275px')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 713px')
+    })
+
+    it('resizes the panes properly when RTL', () => {
+      jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
+      fireEvent.keyDown(getByTestId('delimiter'), {
+        key: 'ArrowLeft',
+        keyCode: 37
+      })
+      expect(getByTestId('leftColumn')).toHaveStyle('width: 743px')
+      expect(getByTestId('rightColumn')).toHaveStyle('width: 245px')
+    })
   })
 })

@@ -19,42 +19,43 @@
 import {useCallback, useRef} from 'react'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
-const useResize = ({minWidth = 100, margin = 8} = {}) => {
+const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} = {}) => {
   const containerRef = useRef(null)
   const delimiterRef = useRef(null)
   const leftColumnRef = useRef(null)
   const rightColumnRef = useRef(null)
+  const setDelimiterRef = ref => (delimiterRef.current = ref)
+  const setLeftColumnRef = ref => (leftColumnRef.current = ref)
+  const setRightColumnRef = ref => (rightColumnRef.current = ref)
+  const keyCodes = {
+    PAGE_UP: 33,
+    PAGE_DOWN: 34,
+    ARROW_LEFT: 37,
+    ARROW_RIGHT: 39
+  }
+  const step = {
+    [keyCodes.PAGE_UP]: largeStep,
+    [keyCodes.PAGE_DOWN]: -largeStep,
+    [keyCodes.ARROW_RIGHT]: smallStep,
+    [keyCodes.ARROW_LEFT]: -smallStep
+  }
   let isHandlerDragging = false
 
   const onMouseDown = e => {
     if (e.target === delimiterRef.current) isHandlerDragging = true
   }
+
   const onMouseUp = _e => {
     isHandlerDragging = false
   }
+
   const onMouseMove = e => {
-    if (!isHandlerDragging) return false
-
-    const containerRect = containerRef.current.getBoundingClientRect()
-    const maxLeftWidth = containerRect.width - minWidth - margin
-    const currentLeftWidth = Math.max(minWidth, e.clientX - containerRect.left - margin)
-
-    const leftWidth = Math.min(currentLeftWidth, maxLeftWidth)
-    const rightWidth = containerRect.width - leftWidth - margin
-
-    const leftColumnWidth = isRTL() ? rightWidth : leftWidth
-    const rightColumnWidth = isRTL() ? leftWidth : rightWidth
-
-    leftColumnRef.current.style.width = leftColumnWidth + 'px'
-    leftColumnRef.current.style.flexGrow = 0
-
-    rightColumnRef.current.style.width = rightColumnWidth + 'px'
-    rightColumnRef.current.style.flexGrow = 0
+    if (isHandlerDragging) {
+      handleMove(e)
+    } else {
+      return false
+    }
   }
-
-  const setDelimiterRef = ref => (delimiterRef.current = ref)
-  const setLeftColumnRef = ref => (leftColumnRef.current = ref)
-  const setRightColumnRef = ref => (rightColumnRef.current = ref)
 
   const setContainerRef = useCallback(node => {
     if (node) {
@@ -71,11 +72,38 @@ const useResize = ({minWidth = 100, margin = 8} = {}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const onKeyDownHandler = e => handleMove(e, true)
+
+  const handleMove = (e, keyboard = false) => {
+    const containerRect = containerRef.current.getBoundingClientRect()
+    const delimiterRect = delimiterRef.current.getBoundingClientRect()
+    const maxLeftWidth = containerRect.width - minWidth - margin
+    const calcLeftWidth = !keyboard
+      ? e.clientX
+      : Object.keys(step).includes(String(e.keyCode))
+      ? delimiterRect.x + step[e.keyCode]
+      : delimiterRect.x
+    const currentLeftWidth = Math.max(minWidth, calcLeftWidth - containerRect.left)
+
+    const leftWidth = Math.min(currentLeftWidth, maxLeftWidth)
+    const rightWidth = containerRect.width - leftWidth - margin
+
+    const leftColumnWidth = isRTL() ? rightWidth : leftWidth
+    const rightColumnWidth = isRTL() ? leftWidth : rightWidth
+
+    leftColumnRef.current.style.width = leftColumnWidth + 'px'
+    leftColumnRef.current.style.flexGrow = 0
+
+    rightColumnRef.current.style.width = rightColumnWidth + 'px'
+    rightColumnRef.current.style.flexGrow = 0
+  }
+
   return {
     setContainerRef,
     setDelimiterRef,
     setLeftColumnRef,
-    setRightColumnRef
+    setRightColumnRef,
+    onKeyDownHandler
   }
 }
 
