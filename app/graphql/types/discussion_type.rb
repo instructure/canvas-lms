@@ -195,8 +195,8 @@ module Types
     end
 
     field :search_entry_count, Integer, null: true do
-      argument :search_term, String, required: true
-      argument :filter, DiscussionFilterType, required: true
+      argument :search_term, String, required: false
+      argument :filter, DiscussionFilterType, required: false
     end
     def search_entry_count(**args)
       get_entries(args).then do |entries|

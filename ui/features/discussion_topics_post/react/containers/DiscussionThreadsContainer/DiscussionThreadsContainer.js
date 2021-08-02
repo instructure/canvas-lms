@@ -27,11 +27,12 @@ import {ThreadPagination} from '../../components/ThreadPagination/ThreadPaginati
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 
 export const DiscussionThreadsContainer = props => {
   const discussionTopic = props.discussionTopic
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {setPageNumber} = useContext(SearchContext)
+  const {searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
@@ -90,6 +91,7 @@ export const DiscussionThreadsContainer = props => {
 
   return (
     <View as="div" margin="small none none none">
+      {searchTerm && <SearchResultsCount resultsFound={discussionTopic.searchEntryCount} />}
       {discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
           <DiscussionThreadContainer

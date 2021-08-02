@@ -74,6 +74,7 @@ export const DISCUSSION_QUERY = gql`
           filter: $filter
           searchTerm: $searchTerm
         )
+        searchEntryCount(filter: $filter, searchTerm: $searchTerm)
       }
     }
   }

@@ -50,6 +50,7 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
+      searchEntryCount
       entryCounts {
         unreadCount
         repliesCount
@@ -104,6 +105,7 @@ export const Discussion = {
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
+    searchEntryCount: number,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number
@@ -140,6 +142,7 @@ export const Discussion = {
     subscribed = true,
     published = true,
     canUnpublish = false,
+    searchEntryCount = 3,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -189,6 +192,7 @@ export const Discussion = {
     childTopics,
     groupSet,
     rootTopic,
+    searchEntryCount,
     entriesTotalPages,
     discussionEntriesConnection,
     __typename: 'Discussion'
