@@ -89,7 +89,7 @@ const useTreeBrowser = queryVariables => {
   const {isCourse} = useCanvasContext()
   const client = useApolloClient()
   const [rootId, setRootId] = useState(ROOT_ID)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingRootGroup, setIsLoadingRootGroup] = useState(true)
   const [error, setError] = useState(null)
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
@@ -205,8 +205,8 @@ const useTreeBrowser = queryVariables => {
     setSelectedGroupId,
     error,
     setError,
-    isLoading,
-    setIsLoading,
+    isLoading: isLoadingRootGroup,
+    setIsLoading: setIsLoadingRootGroup,
     setRootId,
     rootId,
     selectedParentGroupId,
@@ -245,6 +245,14 @@ export const useManageOutcomes = collection => {
   })
 
   useEffect(() => {
+    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
+      setIsLoading(false)
+    } else if (isLoading && error) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
+
+  useEffect(() => {
     client
       .query({
         query: CHILD_GROUPS_QUERY,
@@ -255,17 +263,13 @@ export const useManageOutcomes = collection => {
       })
       .then(({data}) => {
         const rootGroup = data?.context?.rootOutcomeGroup
-        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
         addLoadedGroups([rootGroup._id])
         setRootId(rootGroup._id)
+        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -305,6 +309,14 @@ export const useFindOutcomeModal = open => {
   } = useTreeBrowser({
     collection: 'findOutcomesView'
   })
+
+  useEffect(() => {
+    if (isLoading && Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) {
+      setIsLoading(false)
+    } else if (isLoading && error) {
+      setIsLoading(false)
+    }
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
 
   const {
     search: searchString,
@@ -387,17 +399,13 @@ export const useFindOutcomeModal = open => {
           })
         ]
 
-        addGroups(groups)
-        addLoadedGroups([ACCOUNT_FOLDER_ID])
+        addLoadedGroups([ACCOUNT_FOLDER_ID, ROOT_ID])
         setRootId(ROOT_ID)
+        addGroups(groups)
       })
       .catch(err => {
         setError(err.message)
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 

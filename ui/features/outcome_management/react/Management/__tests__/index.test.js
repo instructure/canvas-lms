@@ -97,22 +97,12 @@ describe('OutcomeManagementPanel', () => {
     )
   }
 
-  it('renders the empty billboard for accounts without child groups and outcomes', async () => {
+  it('renders the tree browser for empty root groups', async () => {
     const {getByText} = render(<OutcomeManagementPanel />, {
       mocks: accountMocks({childGroupsCount: 0})
     })
     await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText(/Outcomes have not been added to this account yet/)).not.toBeNull()
-  })
-
-  it('renders the empty billboard for courses without child outcomes and groups', async () => {
-    const {getByText} = render(<OutcomeManagementPanel />, {
-      contextType: 'Course',
-      contextId: '2',
-      mocks: courseMocks({childGroupsCount: 0})
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(getByText(/Outcomes have not been added to this course yet/)).not.toBeNull()
+    expect(getByText('Root account folder')).toBeInTheDocument()
   })
 
   it('loads outcome group data for Account', async () => {

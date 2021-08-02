@@ -17,14 +17,11 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {PresentationContent} from '@instructure/ui-a11y-content'
-import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!OutcomeManagement'
-import SVGWrapper from '@canvas/svg-wrapper'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
 import useSearch from '@canvas/outcomes/react/hooks/useSearch'
@@ -44,36 +41,6 @@ import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
-
-const NoOutcomesBillboard = () => {
-  const {isCourse} = useCanvasContext()
-
-  return (
-    <div className="management-panel" data-testid="outcomeManagementPanel">
-      <Billboard
-        size="large"
-        headingLevel="h3"
-        heading={
-          isCourse
-            ? I18n.t('Outcomes have not been added to this course yet.')
-            : I18n.t('Outcomes have not been added to this account yet.')
-        }
-        message={
-          isCourse
-            ? I18n.t('Get started by finding, importing or creating your course outcomes.')
-            : I18n.t('Get started by finding, importing or creating your account outcomes.')
-        }
-        hero={
-          <div>
-            <PresentationContent>
-              <SVGWrapper url="/images/magnifying_glass.svg" />
-            </PresentationContent>
-          </div>
-        }
-      />
-    </div>
-  )
-}
 
 const OutcomeManagementPanel = () => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
@@ -193,211 +160,203 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId]?.outcomesCount > 0
-
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
-      {!hasOutcomes ? (
-        <NoOutcomesBillboard />
+      {isMobileView ? (
+        <View
+          as="div"
+          width="100%"
+          display="inline-block"
+          position="relative"
+          height="60vh"
+          overflowY="visible"
+          overflowX="auto"
+          padding="small 0 0"
+        >
+          <View as="div" padding="x-small x-small none">
+            {/* TODO: Add ManageView in OUT-4183  */}
+            <GroupActionDrillDown
+              onCollectionClick={queryCollections}
+              collections={collections}
+              rootId={rootId}
+              loadedGroups={loadedGroups}
+              setShowOutcomesView={() => {}}
+              isLoadingGroupDetail={loading}
+              outcomesCount={group?.outcomesCount}
+              showActionLinkForRoot
+            />
+            <ManageOutcomesBillboard />
+          </View>
+        </View>
       ) : (
-        <>
-          {isMobileView ? (
-            <View
-              as="div"
-              width="100%"
-              display="inline-block"
-              position="relative"
-              height="60vh"
-              overflowY="visible"
-              overflowX="auto"
-              padding="small 0 0"
-            >
-              <View as="div" padding="x-small x-small none">
-                {/* TODO: Add ManageView in OUT-4183  */}
-                <GroupActionDrillDown
-                  onCollectionClick={queryCollections}
-                  collections={collections}
-                  rootId={rootId}
-                  loadedGroups={loadedGroups}
-                  setShowOutcomesView={() => {}}
-                  isLoadingGroupDetail={loading}
-                  outcomesCount={group?.outcomesCount}
-                  showActionLinkForRoot
-                />
-                <ManageOutcomesBillboard />
-              </View>
+        <Flex elementRef={setContainerRef}>
+          <Flex.Item
+            width="33%"
+            display="inline-block"
+            position="relative"
+            height="60vh"
+            as="div"
+            overflowY="auto"
+            overflowX="hidden"
+            elementRef={setLeftColumnRef}
+          >
+            <View as="div" padding="small x-small none x-small">
+              <Text size="large" weight="light" fontStyle="normal">
+                {I18n.t('Outcome Groups')}
+              </Text>
+              <TreeBrowser
+                onCollectionToggle={queryCollections}
+                collections={collections}
+                rootId={rootId}
+                showRootCollection
+                defaultExpandedIds={[rootId]}
+              />
             </View>
-          ) : (
-            <Flex elementRef={setContainerRef}>
-              <Flex.Item
-                width="33%"
-                display="inline-block"
-                position="relative"
-                height="60vh"
-                as="div"
-                overflowY="auto"
-                overflowX="hidden"
-                elementRef={setLeftColumnRef}
-              >
-                <View as="div" padding="small x-small none x-small">
-                  <Text size="large" weight="light" fontStyle="normal">
-                    {I18n.t('Outcome Groups')}
-                  </Text>
-                  <TreeBrowser
-                    onCollectionToggle={queryCollections}
-                    collections={collections}
-                    rootId={rootId}
-                    showRootCollection
-                    defaultExpandedIds={[rootId]}
-                  />
-                </View>
-              </Flex.Item>
-              <Flex.Item
-                as="div"
-                position="relative"
-                width="1%"
-                height="60vh"
-                margin="small none none none"
-                padding="small none large none"
-                display="inline-block"
-              >
-                <div
-                  data-testid="handlerRef"
-                  ref={setDelimiterRef}
-                  style={{
-                    width: '1vw',
-                    height: '100%',
-                    cursor: 'col-resize',
-                    background:
-                      '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
-                  }}
+          </Flex.Item>
+          <Flex.Item
+            as="div"
+            position="relative"
+            width="1%"
+            height="60vh"
+            margin="small none none none"
+            padding="small none large none"
+            display="inline-block"
+          >
+            <div
+              data-testid="handlerRef"
+              ref={setDelimiterRef}
+              style={{
+                width: '1vw',
+                height: '100%',
+                cursor: 'col-resize',
+                background:
+                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+              }}
+            />
+          </Flex.Item>
+          <Flex.Item
+            as="div"
+            width="66%"
+            display="inline-block"
+            position="relative"
+            height="60vh"
+            overflowY="visible"
+            overflowX="auto"
+            elementRef={el => {
+              setRightColumnRef(el)
+              setScrollContainer(el)
+            }}
+          >
+            <View as="div" padding="x-small none none x-small">
+              {selectedGroupId && (
+                <ManageOutcomesView
+                  key={selectedGroupId}
+                  outcomeGroup={group}
+                  loading={loading}
+                  selectedOutcomes={selectedOutcomes}
+                  searchString={searchString}
+                  onSelectOutcomesHandler={toggleSelectedOutcomes}
+                  onOutcomeGroupMenuHandler={groupMenuHandler}
+                  onOutcomeMenuHandler={outcomeMenuHandler}
+                  onSearchChangeHandler={onSearchChangeHandler}
+                  onSearchClearHandler={onSearchClearHandler}
+                  loadMore={loadMore}
+                  scrollContainer={scrollContainer}
+                  isRootGroup={collections[selectedGroupId]?.isRootGroup}
                 />
-              </Flex.Item>
-              <Flex.Item
-                as="div"
-                width="66%"
-                display="inline-block"
-                position="relative"
-                height="60vh"
-                overflowY="visible"
-                overflowX="auto"
-                elementRef={el => {
-                  setRightColumnRef(el)
-                  setScrollContainer(el)
-                }}
-              >
-                <View as="div" padding="x-small none none x-small">
-                  {selectedGroupId && (
-                    <ManageOutcomesView
-                      key={selectedGroupId}
-                      outcomeGroup={group}
-                      loading={loading}
-                      selectedOutcomes={selectedOutcomes}
-                      searchString={searchString}
-                      onSelectOutcomesHandler={toggleSelectedOutcomes}
-                      onOutcomeGroupMenuHandler={groupMenuHandler}
-                      onOutcomeMenuHandler={outcomeMenuHandler}
-                      onSearchChangeHandler={onSearchChangeHandler}
-                      onSearchClearHandler={onSearchClearHandler}
-                      loadMore={loadMore}
-                      scrollContainer={scrollContainer}
-                      isRootGroup={collections[selectedGroupId]?.isRootGroup}
-                    />
-                  )}
-                </View>
-              </Flex.Item>
-            </Flex>
-          )}
-          <hr style={{margin: '0 0 7px'}} />
-          {canManage && (
-            <ManageOutcomesFooter
-              selected={selectedOutcomes}
-              selectedCount={selectedOutcomesCount}
-              onRemoveHandler={openOutcomesRemoveModal}
-              onMoveHandler={openOutcomesMoveModal}
-              onClearHandler={clearSelectedOutcomes}
+              )}
+            </View>
+          </Flex.Item>
+        </Flex>
+      )}
+      <hr style={{margin: '0 0 7px'}} />
+      {canManage && (
+        <ManageOutcomesFooter
+          selected={selectedOutcomes}
+          selectedCount={selectedOutcomesCount}
+          onRemoveHandler={openOutcomesRemoveModal}
+          onMoveHandler={openOutcomesMoveModal}
+          onClearHandler={clearSelectedOutcomes}
+        />
+      )}
+      {selectedGroupId && (
+        <>
+          <GroupRemoveModal
+            groupId={selectedGroupId}
+            isOpen={isGroupRemoveModalOpen}
+            onCloseHandler={closeGroupRemoveModal}
+            onCollectionToggle={queryCollections}
+            onSuccess={onSucessGroupRemove}
+          />
+          {!loading && (
+            <GroupMoveModal
+              groupId={selectedGroupId}
+              groupTitle={group?.title}
+              parentGroupId={selectedParentGroupId}
+              isOpen={isGroupMoveModalOpen}
+              onCloseHandler={closeGroupMoveModal}
+              onGroupCreated={addNewGroup}
+              onSuccess={() => {
+                queryCollections({
+                  id: selectedParentGroupId
+                })
+              }}
             />
           )}
-          {selectedGroupId && (
-            <>
-              <GroupRemoveModal
-                groupId={selectedGroupId}
-                isOpen={isGroupRemoveModalOpen}
-                onCloseHandler={closeGroupRemoveModal}
-                onCollectionToggle={queryCollections}
-                onSuccess={onSucessGroupRemove}
-              />
-              {!loading && (
-                <GroupMoveModal
-                  groupId={selectedGroupId}
-                  groupTitle={group?.title}
-                  parentGroupId={selectedParentGroupId}
-                  isOpen={isGroupMoveModalOpen}
-                  onCloseHandler={closeGroupMoveModal}
-                  onGroupCreated={addNewGroup}
-                  onSuccess={() => {
-                    queryCollections({
-                      id: selectedParentGroupId
-                    })
-                  }}
-                />
-              )}
-              {selectedOutcome && (
-                <>
-                  <OutcomeRemoveModal
-                    outcomes={selectedOutcomeObj}
-                    isOpen={isOutcomeRemoveModalOpen}
-                    onCloseHandler={onCloseOutcomeRemoveModal}
-                    onCleanupHandler={onCloseOutcomeRemoveModal}
-                    onRemoveLearningOutcomesHandler={removeLearningOutcomes}
-                  />
-                  <OutcomeEditModal
-                    outcome={selectedOutcome}
-                    isOpen={isOutcomeEditModalOpen}
-                    onCloseHandler={onCloseOutcomeEditModal}
-                  />
-                  <OutcomeMoveModal
-                    outcomes={selectedOutcomeObj}
-                    isOpen={isOutcomeMoveModalOpen}
-                    onCloseHandler={onCloseOutcomeMoveModal}
-                    onCleanupHandler={onCloseOutcomeMoveModal}
-                    onGroupCreated={addNewGroup}
-                  />
-                </>
-              )}
-            </>
-          )}
-          {group && (
-            <>
-              <GroupEditModal
-                outcomeGroup={group}
-                isOpen={isGroupEditModalOpen}
-                onCloseHandler={closeGroupEditModal}
-              />
-              <GroupDescriptionModal
-                outcomeGroup={group}
-                isOpen={isGroupDescriptionModalOpen}
-                onCloseHandler={closeGroupDescriptionModal}
-              />
-            </>
-          )}
-          {selectedOutcomesCount > 0 && (
+          {selectedOutcome && (
             <>
               <OutcomeRemoveModal
-                outcomes={selectedOutcomes}
-                isOpen={isOutcomesRemoveModalOpen}
-                onCloseHandler={closeOutcomesRemoveModal}
-                onCleanupHandler={onCloseOutcomesRemoveModal}
+                outcomes={selectedOutcomeObj}
+                isOpen={isOutcomeRemoveModalOpen}
+                onCloseHandler={onCloseOutcomeRemoveModal}
+                onCleanupHandler={onCloseOutcomeRemoveModal}
                 onRemoveLearningOutcomesHandler={removeLearningOutcomes}
               />
+              <OutcomeEditModal
+                outcome={selectedOutcome}
+                isOpen={isOutcomeEditModalOpen}
+                onCloseHandler={onCloseOutcomeEditModal}
+              />
               <OutcomeMoveModal
-                outcomes={selectedOutcomes}
-                isOpen={isOutcomesMoveModalOpen}
-                onCloseHandler={closeOutcomesMoveModal}
-                onCleanupHandler={onCloseOutcomesMoveModal}
+                outcomes={selectedOutcomeObj}
+                isOpen={isOutcomeMoveModalOpen}
+                onCloseHandler={onCloseOutcomeMoveModal}
+                onCleanupHandler={onCloseOutcomeMoveModal}
+                onGroupCreated={addNewGroup}
               />
             </>
           )}
+        </>
+      )}
+      {group && (
+        <>
+          <GroupEditModal
+            outcomeGroup={group}
+            isOpen={isGroupEditModalOpen}
+            onCloseHandler={closeGroupEditModal}
+          />
+          <GroupDescriptionModal
+            outcomeGroup={group}
+            isOpen={isGroupDescriptionModalOpen}
+            onCloseHandler={closeGroupDescriptionModal}
+          />
+        </>
+      )}
+      {selectedOutcomesCount > 0 && (
+        <>
+          <OutcomeRemoveModal
+            outcomes={selectedOutcomes}
+            isOpen={isOutcomesRemoveModalOpen}
+            onCloseHandler={closeOutcomesRemoveModal}
+            onCleanupHandler={onCloseOutcomesRemoveModal}
+            onRemoveLearningOutcomesHandler={removeLearningOutcomes}
+          />
+          <OutcomeMoveModal
+            outcomes={selectedOutcomes}
+            isOpen={isOutcomesMoveModalOpen}
+            onCloseHandler={closeOutcomesMoveModal}
+            onCleanupHandler={onCloseOutcomesMoveModal}
+          />
         </>
       )}
     </div>
