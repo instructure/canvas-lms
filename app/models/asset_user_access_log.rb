@@ -700,7 +700,9 @@ class AssetUserAccessLog
         intra_batch_pause = Setting.get("aua_log_compaction_batch_pause", "0.0").to_f
         batch_upper_boundary = log_id_bookmark + log_batch_size
         agg_sql = aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
-        if use_pulsar_ripcord_iterators
+        # if there ARE no root accounts that are active, aggregating according to
+        # them is pointless.  This can happen in scenarios where a system is being decomissioned.
+        if use_pulsar_ripcord_iterators && Account.root_accounts.active.exists?
           # we cannot use the standard aggregation query because of the root-account
           # partition strategy while we were using the message bus transpor layer.
           # We need to replace it with a recovery
