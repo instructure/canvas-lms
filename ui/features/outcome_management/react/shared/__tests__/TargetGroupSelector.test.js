@@ -44,6 +44,7 @@ describe('TargetGroupSelector', () => {
     parentGroupId: '1',
     setTargetGroup: setTargetGroupMock,
     onGroupCreated: onGroupCreatedMock,
+    modalName: 'groupMoveModal',
     ...props
   })
 

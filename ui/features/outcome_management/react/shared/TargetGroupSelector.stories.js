@@ -29,7 +29,8 @@ export default {
   args: {
     groupId: '2',
     parentGroupId: '1',
-    setTargetGroup: () => {}
+    setTargetGroup: () => {},
+    modalName: 'groupMoveModal'
   }
 }
 

@@ -101,6 +101,7 @@ const GroupMoveModal = ({
             parentGroupId={parentGroupId}
             setTargetGroup={setTargetGroup}
             onGroupCreated={onGroupCreated}
+            modalName="groupMoveModal"
           />
         </View>
       </Modal.Body>

@@ -131,7 +131,11 @@ const OutcomeMoveModal = ({outcomes, isOpen, onCloseHandler, onCleanupHandler, o
               }
             )}
           </Text>
-          <TargetGroupSelector setTargetGroup={setTargetGroup} onGroupCreated={onGroupCreated} />
+          <TargetGroupSelector
+            setTargetGroup={setTargetGroup}
+            onGroupCreated={onGroupCreated}
+            modalName="outcomeMoveModal"
+          />
         </View>
       </Modal.Body>
       <Modal.Footer>

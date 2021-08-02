@@ -102,7 +102,7 @@ const GROUPS_QUERY = gql`
 `
 
 const useTreeBrowser = queryVariables => {
-  const {contextType} = useCanvasContext()
+  const {isCourse} = useCanvasContext()
   const client = useApolloClient()
   const [rootId, setRootId] = useState(ROOT_ID)
   const [isLoading, setIsLoading] = useState(true)
@@ -162,11 +162,20 @@ const useTreeBrowser = queryVariables => {
     })
   }
 
-  const queryCollections = ({id}) => {
+  const queryCollections = ({
+    id,
+    parentGroupId = collections[id].parentGroupId,
+    shouldLoad = true
+  }) => {
     setSelectedGroupId(id)
-    setSelectedParentGroupId(collections[id].parentGroupId)
+    setSelectedParentGroupId(parentGroupId)
 
     if (loadedGroups.includes(id)) {
+      return
+    }
+
+    if (!shouldLoad) {
+      addLoadedGroups([id])
       return
     }
 
@@ -179,8 +188,8 @@ const useTreeBrowser = queryVariables => {
         }
       })
       .then(({data}) => {
-        addLoadedGroups([id])
         addGroups(extractGroups(data.context))
+        addLoadedGroups([id])
       })
       .catch(err => {
         setError(err.message)
@@ -190,7 +199,7 @@ const useTreeBrowser = queryVariables => {
   useEffect(() => {
     if (error) {
       const srOnlyAlert = Object.keys(collections).length === 0
-      contextType === 'Course'
+      isCourse
         ? showFlashAlert({
             message: I18n.t('An error occurred while loading course learning outcome groups.'),
             type: 'error',
@@ -238,13 +247,15 @@ export const useManageOutcomes = collection => {
     setIsLoading,
     setRootId,
     rootId,
+    setSelectedGroupId,
     selectedGroupId,
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
     clearCache,
     addNewGroup,
-    removeGroup
+    removeGroup,
+    loadedGroups
   } = useTreeBrowser({
     collection
   })
@@ -280,16 +291,18 @@ export const useManageOutcomes = collection => {
     collections,
     queryCollections,
     rootId,
+    setSelectedGroupId,
     selectedGroupId,
     selectedParentGroupId,
     clearCache,
     addNewGroup,
-    removeGroup
+    removeGroup,
+    loadedGroups
   }
 }
 
 export const useFindOutcomeModal = open => {
-  const {contextType, contextId} = useCanvasContext()
+  const {contextType, contextId, isCourse} = useCanvasContext()
   const client = useApolloClient()
   const {
     collections,
@@ -342,7 +355,7 @@ export const useFindOutcomeModal = open => {
       .then(({data}) => {
         const {context, globalRootGroup} = data
         let accounts
-        if (contextType === 'Course') {
+        if (isCourse) {
           accounts = [...context.account.parentAccountsConnection.nodes, context.account]
         } else {
           accounts = context.parentAccountsConnection.nodes
@@ -422,7 +435,7 @@ export const useFindOutcomeModal = open => {
   }
 }
 
-export const useGroupMoveModal = groupId => {
+export const useTargetGroupSelector = (groupId, collection) => {
   const {
     error,
     isLoading,
@@ -430,13 +443,16 @@ export const useGroupMoveModal = groupId => {
     rootId,
     clearCache,
     queryCollections: treeBrowserQueryCollection,
-    addNewGroup
-  } = useManageOutcomes('groupMoveModal')
+    addNewGroup,
+    selectedGroupId,
+    selectedParentGroupId,
+    loadedGroups
+  } = useManageOutcomes(collection)
 
-  const queryCollections = ({id}) => {
+  const queryCollections = ({id, parentGroupId, shouldLoad}) => {
     // Do not query for more collections if the groupId is the same as the id passed
     if (id !== groupId) {
-      treeBrowserQueryCollection({id})
+      treeBrowserQueryCollection({id, parentGroupId, shouldLoad})
     }
   }
 
@@ -459,6 +475,9 @@ export const useGroupMoveModal = groupId => {
     collections,
     queryCollections,
     rootId,
-    addNewGroup
+    addNewGroup,
+    selectedGroupId,
+    selectedParentGroupId,
+    loadedGroups
   }
 }

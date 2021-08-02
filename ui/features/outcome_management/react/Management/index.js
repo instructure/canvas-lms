@@ -189,7 +189,7 @@ const OutcomeManagementPanel = () => {
     )
   }
 
-  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId].outcomesCount > 0
+  const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId]?.outcomesCount > 0
   const canManage = ENV.PERMISSIONS?.manage_outcomes
 
   return (
