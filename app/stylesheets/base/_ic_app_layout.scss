@@ -278,10 +278,24 @@ body:not(.course-menu-expanded) {
     opacity: 1;
     transform: translate3d(0,0,0);
   }
+  &.ic-sticky-on {
+    bottom: 0;
+    padding-top: 0;
+  }
   // account for the course term showing in the left-hand sub-nav
   #section-tabs-header-subtitle {
     padding: direction-sides(0 0 $ic-sp $ic-sp);
   }
+}
+
+.ic-sticky-frame {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  padding: $ic-sp*2 0 $ic-breadcrumbs-height;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 .ic-app-nav-toggle-and-crumbs {
