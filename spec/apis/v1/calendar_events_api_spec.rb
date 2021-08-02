@@ -2466,11 +2466,19 @@ describe CalendarEventsApiController, type: :request do
 
     context 'important dates' do
       before :once do
-        @course.assignments.create(title: 'important date', due_at: DateTime.current, important_dates: true)
-        @course.assignments.create(title: 'important date without due', important_dates: true)
-        overrides_course = @course.assignments.create(title: 'important date with override dates', important_dates: true)
-        overrides_course.assignment_overrides.create(due_at_overridden: true, due_at: DateTime.current)
-        @course.assignments.create(title: 'not important date', due_at: DateTime.current)
+        @student = user_factory(active_all: true, active_state: 'active')
+        @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+        @other_student = user_factory(active_all: true, active_state: 'active')
+        @course.enroll_user(@other_student, 'StudentEnrollment', enrollment_state: 'active')
+
+        @course.assignments.create!(title: 'important date', due_at: DateTime.current, important_dates: true)
+        @course.assignments.create!(title: 'important date without due', important_dates: true)
+        overrides_assignment = @course.assignments.create!(title: 'important date with override dates', important_dates: true)
+        overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set: @course.default_section)
+        specific_overrides_assignment = @course.assignments.create!(title: 'important date with override for others', important_dates: true)
+        override = specific_overrides_assignment.assignment_overrides.create!(due_at_overridden: true, due_at: DateTime.current, set_type: 'ADHOC')
+        override.assignment_override_students.create!(user: @other_student)
+        @course.assignments.create!(title: 'not important date', due_at: DateTime.current)
       end
 
       context 'with feature enabled' do
@@ -2478,23 +2486,32 @@ describe CalendarEventsApiController, type: :request do
           Account.site_admin.enable_feature!(:important_dates)
         end
 
+        it 'should return all assignments with important dates if the user is a teacher' do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :important_dates => true
+            })
+          expect(json.size).to be 4
+          expect(json[0]['important_dates']).to be true
+        end
+
+        it 'should return assignments with dates for the user with important dates if the param is sent' do
+          json = api_call_as_user(@other_student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :important_dates => true
+            })
+          expect(json.size).to be 3
+          expect(json[0]['important_dates']).to be true
+        end
+
         it 'should return assignments with important dates if the param is sent' do
-          json = api_call(:get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
+          json = api_call_as_user(@student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
             :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
             :context_codes => ["course_#{@course.id}"], :important_dates => true
             })
           expect(json.size).to be 2
           expect(json[0]['important_dates']).to be true
         end
-      end
-
-      it 'should return all assignments if the param is sent and the site admin feature is off' do
-        Account.site_admin.disable_feature!(:important_dates)
-        json = api_call(:get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-          :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
-          :context_codes => ["course_#{@course.id}"], :important_dates => true
-          })
-        expect(json.size).to be 3
       end
     end
   end
