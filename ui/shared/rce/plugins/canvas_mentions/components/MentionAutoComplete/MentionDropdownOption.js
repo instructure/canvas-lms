@@ -44,6 +44,7 @@ const MentionDropdownOption = props => {
       onMouseLeave={() => {
         setHover(false)
       }}
+      data-testid="mention-dropdown-item"
     >
       <li
         aria-selected={props.isSelected}

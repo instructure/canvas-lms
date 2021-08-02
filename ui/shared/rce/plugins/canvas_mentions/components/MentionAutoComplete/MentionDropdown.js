@@ -72,7 +72,7 @@ const MentionMockUsers = [
   }
 ]
 
-const MentionUIManager = ({mentionData}) => {
+const MentionUIManager = ({mentionData, onActiveDescendantChange}) => {
   // Setup State
   const [menitonCordinates, setMenitonCordinates] = useState(null)
   const [focusedUser, setFocusedUser] = useState()
@@ -169,6 +169,11 @@ const MentionUIManager = ({mentionData}) => {
     }
   }
 
+  // Used to generate unique ID's for each Menu Item for ARIA compatibility
+  const generateMenuItemId = id => {
+    return `${uniqueInstanceId.current}-mention-popup-${id}`
+  }
+
   // Make us maintain a focused user when open
   useEffect(() => {
     if (!filteredOptions.includes(focusedUser)) {
@@ -176,10 +181,15 @@ const MentionUIManager = ({mentionData}) => {
     }
   }, [filteredOptions, focusedUser])
 
-  // Use Refs to expose state to plainJS Objects
+  // Keep Focus User and active decendant always up to date
   useEffect(() => {
+    if (focusedUser) {
+      onActiveDescendantChange(generateMenuItemId(focusedUser.id))
+    } else {
+      onActiveDescendantChange(null)
+    }
     focusedUserRef.current = focusedUser
-  }, [focusedUser])
+  }, [focusedUser, onActiveDescendantChange])
 
   // Window listeners handler
   useLayoutEffect(() => {
@@ -207,6 +217,10 @@ const MentionUIManager = ({mentionData}) => {
       show
       coordiantes={menitonCordinates}
       selectedUser={focusedUser?.id}
+      generateItemAria={generateMenuItemId}
+      onSelect={user => {
+        setFocusedUser(user)
+      }}
     />
   )
 }
@@ -216,12 +230,14 @@ export default MentionUIManager
 MentionUIManager.propTypes = {
   mentionData: PropTypes.array,
   rceRef: PropTypes.object,
+  onActiveDescendantChange: PropTypes.func,
   onExited: PropTypes.func,
   onSelect: PropTypes.func
 }
 
 MentionUIManager.defaultProps = {
   mentionData: MentionMockUsers,
+  onActiveDescendantChange: () => {},
   onExited: () => {},
   onSelect: () => {}
 }

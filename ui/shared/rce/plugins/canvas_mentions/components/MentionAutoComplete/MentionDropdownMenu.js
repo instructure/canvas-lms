@@ -27,7 +27,8 @@ const MentionDropdownMenu = ({
   show,
   coordiantes,
   selectedUser,
-  popupId
+  popupId,
+  generateItemAria
 }) => {
   // Variables
   const directionality = tinyMCE.activeEditor.getParam('directionality')
@@ -61,15 +62,18 @@ const MentionDropdownMenu = ({
         <MentionDropdownOption
           {...user}
           onSelect={() => {
-            onSelect(user)
+            onSelect({
+              ...user,
+              elementId: `${popupId}-mention-popup-${user.id}`
+            })
           }}
           isSelected={selectedUser === user.id}
           key={`${popupId}-mention-popup-${user.id}`}
-          id={`${popupId}-mention-popup-${user.id}`}
+          id={generateItemAria(user.id)}
         />
       )
     })
-  }, [mentionOptions, onSelect, popupId, selectedUser])
+  }, [generateItemAria, mentionOptions, onSelect, popupId, selectedUser])
 
   // Don't show if menu is empty
   if (!show || mentionOptions?.length === 0) {
@@ -140,5 +144,10 @@ MentionDropdownMenu.proptypes = {
   /**
    * ID of selected user
    */
-  selectedUser: PropTypes.string
+  selectedUser: PropTypes.string,
+  generateItemAria: PropTypes.func
+}
+
+MentionDropdownMenu.defaultProps = {
+  generateItemAria: id => `${id}`
 }

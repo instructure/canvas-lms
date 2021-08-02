@@ -97,7 +97,13 @@ export const onSetContent = e => {
       const elm = document.createElement('span')
       elm.id = MENTION_MENU_ID
       document.body.appendChild(elm)
-      ReactDom.render(<MentionDropdown rceRef={editor.getBody()} />, elm)
+      ReactDom.render(
+        <MentionDropdown
+          rceRef={editor.getBody()}
+          onActiveDescendantChange={onActiveDescendantChange}
+        />,
+        elm
+      )
     }
   }
 }

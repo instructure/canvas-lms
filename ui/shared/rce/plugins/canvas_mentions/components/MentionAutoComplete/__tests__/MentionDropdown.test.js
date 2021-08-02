@@ -15,7 +15,7 @@
 //  * You should have received a copy of the GNU Affero General Public License along
 //  * with this program. If not, see <http://www.gnu.org/licenses/>.
 //  */
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import MentionDropdown from '../MentionDropdown'
 import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
@@ -24,8 +24,8 @@ import getPosition from '../getPosition'
 
 jest.mock('../getPosition')
 
-const setup = () => {
-  return render(<MentionDropdown />)
+const setup = props => {
+  return render(<MentionDropdown {...props} />)
 }
 
 describe('Mention Dropdown', () => {
@@ -73,6 +73,24 @@ describe('Mention Dropdown', () => {
     it('should called getXYPosition on load', () => {
       setup()
       expect(getPosition.mock.calls.length).toBe(1)
+    })
+  })
+
+  describe('Callbacks', () => {
+    it('should call onActiveDescendantChange when user changes', () => {
+      const onActiveDescendantChangeMock = jest.fn()
+      const {getAllByTestId} = setup({
+        onActiveDescendantChange: onActiveDescendantChangeMock
+      })
+      // Each render has this callback fire twice use to how useEffect works
+      // with our state
+      expect(onActiveDescendantChangeMock.mock.calls.length).toBe(2)
+
+      const menuItems = getAllByTestId('mention-dropdown-item')
+      fireEvent.click(menuItems[3].querySelector('li'))
+
+      // Expect 2 re-renders per click totalling 4
+      expect(onActiveDescendantChangeMock.mock.calls.length).toBe(4)
     })
   })
 })
