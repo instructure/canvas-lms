@@ -19,6 +19,27 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {ThreadingToolbar} from '../ThreadingToolbar'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 describe('PostToolbar', () => {
   it('renders provided children', () => {
@@ -67,5 +88,24 @@ describe('PostToolbar', () => {
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('should render mobile children', () => {
+      const {queryAllByTestId} = render(
+        <ThreadingToolbar>
+          <>First</>
+          <>Second</>
+        </ThreadingToolbar>
+      )
+
+      expect(queryAllByTestId('mobile-thread-tool')).toBeTruthy()
+    })
   })
 })

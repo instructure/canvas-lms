@@ -19,6 +19,27 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {Expansion} from '../Expansion'
+import {responsiveQuerySizes} from '../../../utils'
+
+jest.mock('../../../utils')
+
+beforeAll(() => {
+  window.matchMedia = jest.fn().mockImplementation(() => {
+    return {
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn()
+    }
+  })
+})
+
+beforeEach(() => {
+  responsiveQuerySizes.mockImplementation(() => ({
+    desktop: {maxWidth: '1000px'}
+  }))
+})
 
 const setup = props => {
   return render(
@@ -60,5 +81,20 @@ describe('Expansion', () => {
   it('displays as readonly if isReadOnly is true', () => {
     const {getByText} = setup({isExpanded: false, isReadOnly: true, expandText: '4 replies'})
     expect(getByText('4 replies').closest('button').hasAttribute('disabled')).toBeTruthy()
+  })
+
+  describe('Mobile', () => {
+    beforeEach(() => {
+      responsiveQuerySizes.mockImplementation(() => ({
+        mobile: {maxWidth: '1024px'}
+      }))
+    })
+
+    it('uses mobile prop values', () => {
+      const container = setup()
+      const smallText = container.getByTestId('text-small')
+
+      expect(smallText).toBeTruthy()
+    })
   })
 })

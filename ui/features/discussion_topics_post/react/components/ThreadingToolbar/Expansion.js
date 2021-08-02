@@ -22,23 +22,46 @@ import React from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../utils'
 
 export function Expansion({...props}) {
   return (
-    <CondensedButton
-      onClick={props.onClick}
-      withBackground={false}
-      color="primary"
-      data-testid="expand-button"
-      interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-    >
-      <ScreenReaderContent>
-        {props.isExpanded
-          ? I18n.t('Collapse discussion thread')
-          : I18n.t('Expand discussion thread')}
-      </ScreenReaderContent>
-      <Text weight="bold">{props.expandText}</Text>
-    </CondensedButton>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          textSize: 'small'
+        },
+        desktop: {
+          textSize: 'medium',
+          itemSpacing: 'none'
+        }
+      }}
+      render={responsiveProps => (
+        <CondensedButton
+          onClick={props.onClick}
+          withBackground={false}
+          color="primary"
+          data-testid="expand-button"
+          interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+        >
+          <ScreenReaderContent>
+            {props.isExpanded
+              ? I18n.t('Collapse discussion thread')
+              : I18n.t('Expand discussion thread')}
+          </ScreenReaderContent>
+          <Text
+            weight="bold"
+            size={responsiveProps.textSize}
+            data-testid={`text-${responsiveProps.textSize}`}
+          >
+            {props.expandText}
+          </Text>
+        </CondensedButton>
+      )}
+    />
   )
 }
 

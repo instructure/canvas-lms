@@ -25,30 +25,63 @@ import {Like} from './Like'
 import {Expansion} from './Expansion'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
+import {Responsive} from '@instructure/ui-responsive'
+import {responsiveQuerySizes} from '../../utils'
+import {View} from '@instructure/ui-view'
 
 export function ThreadingToolbar({...props}) {
-  return (props.searchTerm || props.filter === 'unread') &&
-    ENV.isolated_view &&
-    !props.isIsolatedView ? (
-    <Link
-      as="button"
-      isWithinText={false}
-      data-testid="go-to-reply"
-      onClick={() => {
-        const isolatedId = props.discussionEntry.parent
-          ? props.discussionEntry.parent.id
-          : props.discussionEntry.id
-        props.onOpenIsolatedView(isolatedId, false, props.discussionEntry._id)
+  return (
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          itemSpacing: '0 small medium 0',
+          textSize: 'small'
+        },
+        desktop: {
+          itemSpacing: 'none',
+          textSize: 'medium'
+        }
       }}
-    >
-      <Text weight="bold">{I18n.t('Go to Reply')}</Text>
-    </Link>
-  ) : (
-    <InlineList delimiter="pipe">
-      {React.Children.map(props.children, c => (
-        <InlineList.Item key={c.props.delimiterKey}>{c}</InlineList.Item>
-      ))}
-    </InlineList>
+      render={(responsiveProps, matches) =>
+        (props.searchTerm || props.filter === 'unread') &&
+        ENV.isolated_view &&
+        !props.isIsolatedView ? (
+          <Link
+            as="button"
+            isWithinText={false}
+            data-testid="go-to-reply"
+            onClick={() => {
+              const isolatedId = props.discussionEntry.parent
+                ? props.discussionEntry.parent.id
+                : props.discussionEntry.id
+              props.onOpenIsolatedView(isolatedId, false, props.discussionEntry._id)
+            }}
+          >
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Go to Reply')}
+            </Text>
+          </Link>
+        ) : (
+          <InlineList delimiter="pipe" display="inline-flex">
+            {React.Children.map(props.children, c => (
+              <InlineList.Item
+                delimiter="pipe"
+                key={c.props.delimiterKey}
+                margin={responsiveProps.itemSpacing}
+                size={responsiveProps.textSize}
+                data-testid={
+                  matches.includes('mobile') ? 'mobile-thread-tool' : 'desktop-thread-tool'
+                }
+              >
+                <View style={{display: 'inline-flex'}}>{c}</View>
+              </InlineList.Item>
+            ))}
+          </InlineList>
+        )
+      }
+    />
   )
 }
 
