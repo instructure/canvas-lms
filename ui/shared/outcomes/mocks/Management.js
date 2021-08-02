@@ -25,7 +25,8 @@ import {
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
-  IMPORT_OUTCOMES
+  IMPORT_OUTCOMES,
+  IMPORT_OUTCOME_GROUP
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -604,7 +605,8 @@ export const findOutcomesMocks = ({
   contextId = '1',
   outcomesGroupContextId = 1,
   outcomesGroupContextType = 'Account',
-  searchQuery = 'mathematics'
+  searchQuery = 'mathematics',
+  outcomesCount = 25
 } = {}) => [
   {
     request: {
@@ -623,7 +625,7 @@ export const findOutcomesMocks = ({
           title: `Group ${groupId}`,
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
-          outcomesCount: 25,
+          outcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -1282,6 +1284,81 @@ export const updateOutcomeGroupMock = ({
     },
     result
   }
+}
+
+export const importGroupMocks = ({
+  groupId = '100',
+  progressId = '111',
+  targetContextId = '1',
+  targetContextType = 'Account',
+  failResponse = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      importOutcomes: {
+        progress: {
+          _id: progressId,
+          __typename: 'Progress'
+        },
+        errors: null,
+        __typename: 'ImportOutcomesPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: {
+      importOutcomes: null
+    },
+    errors: [
+      {
+        attribute: groupId,
+        message: 'Network error',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      importOutcomes: {
+        __typename: 'ErrorResponse',
+        progress: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  return [
+    {
+      request: {
+        query: IMPORT_OUTCOME_GROUP,
+        variables: {
+          input: {
+            groupId,
+            targetContextId,
+            targetContextType
+          }
+        }
+      },
+      result
+    }
+  ]
 }
 
 export const smallOutcomeTree = () => [

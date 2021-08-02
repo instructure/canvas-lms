@@ -37,6 +37,7 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
+import useGroupImport from '@canvas/outcomes/react/hooks/useGroupImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {isMobileView, isCourse} = useCanvasContext()
@@ -66,16 +67,18 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef} = useResize()
 
   const [isConfirmBoxOpen, openConfirmBox, closeConfirmBox] = useModal()
+  const {importGroup, importGroupsStatus} = useGroupImport()
 
   const onAddAllHandler = () => {
-    if (isCourse && !isConfirmBoxOpen) {
+    if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
       openConfirmBox()
-      // NOTE: Temp until OUT-4333 is merged
       showImportConfirmBox({
-        count: 51,
-        onImportHandler: () => {},
+        count: group.outcomesCount,
+        onImportHandler: () => importGroup(selectedGroupId),
         onCloseHandler: closeConfirmBox
       })
+    } else {
+      importGroup(selectedGroupId)
     }
   }
 
@@ -86,7 +89,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       searchString={searchString}
       onChangeHandler={updateSearch}
       onClearHandler={clearSearch}
-      disableAddAllButton={isConfirmBoxOpen}
+      disableAddAllButton={isConfirmBoxOpen || importGroupsStatus[selectedGroupId]}
       onAddAllHandler={onAddAllHandler}
       loading={loading}
       loadMore={loadMore}

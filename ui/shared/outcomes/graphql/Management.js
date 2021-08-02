@@ -266,6 +266,20 @@ export const UPDATE_LEARNING_OUTCOME_GROUP = gql`
   }
 `
 
+export const IMPORT_OUTCOME_GROUP = gql`
+  mutation ImportOutcomes($input: ImportOutcomesInput!) {
+    importOutcomes(input: $input) {
+      errors {
+        attribute
+        message
+      }
+      progress {
+        _id
+      }
+    }
+  }
+`
+
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
