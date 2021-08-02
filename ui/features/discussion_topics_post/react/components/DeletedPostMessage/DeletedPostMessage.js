@@ -19,22 +19,57 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {responsiveQuerySizes} from '../../utils'
+
+import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 export function DeletedPostMessage({...props}) {
   return (
-    <View as="div" margin="small none large">
-      <Text weight="bold">
-        {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
-      </Text>
-      <View padding="0 small">
-        <Text color="secondary">{props.timingDisplay}</Text>
-      </View>
-      <View display="block" margin="small none none none">
-        {props.children}
-      </View>
-    </View>
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      props={{
+        mobile: {
+          deletedByTextSize: 'small',
+          timestampTextSize: 'x-small'
+        },
+        desktop: {
+          deletedByTextSize: 'medium',
+          timestampTextSize: 'small'
+        }
+      }}
+      render={responsiveProps => (
+        <Flex direction="column" margin="0 0 small 0">
+          <Flex.Item>
+            <Text weight="bold" size={responsiveProps.deletedByTextSize}>
+              {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
+            </Text>
+          </Flex.Item>
+          <Flex.Item>
+            <Tooltip
+              renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
+            >
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+              <span tabIndex="0">
+                <Text size={responsiveProps.timestampTextSize}>
+                  {I18n.t('Deleted %{deletedTimingDisplay}', {
+                    deletedTimingDisplay: props.deletedTimingDisplay
+                  })}
+                </Text>
+              </span>
+            </Tooltip>
+          </Flex.Item>
+          {props.children && (
+            <Flex.Item margin="x-small 0 0 0" overflowY="hidden">
+              {props.children}
+            </Flex.Item>
+          )}
+        </Flex>
+      )}
+    />
   )
 }
 
@@ -52,7 +87,11 @@ DeletedPostMessage.propTypes = {
    * to be provided as a string of the exact text to be displayed, not a
    * timestamp to be formatted.
    */
-  timingDisplay: PropTypes.string.isRequired
+  timingDisplay: PropTypes.string.isRequired,
+  /**
+   * Display text for the deleted time.
+   */
+  deletedTimingDisplay: PropTypes.string.isRequired
 }
 
 export default DeletedPostMessage

@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 
 export const PostMessageContainer = props => {
   const createdAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.createdAt)
+  const editedAt = DateHelper.formatDatetimeForDiscussions(props.discussionEntry.updatedAt)
   const {searchTerm, filter} = useContext(SearchContext)
 
   const wasEdited =
@@ -40,7 +41,11 @@ export const PostMessageContainer = props => {
       : props.discussionEntry.author.displayName
     return (
       <Flex padding="0 0 0 medium">
-        <DeletedPostMessage deleterName={name} timingDisplay={createdAt}>
+        <DeletedPostMessage
+          deleterName={name}
+          timingDisplay={createdAt}
+          deletedTimingDisplay={editedAt}
+        >
           <ThreadingToolbar>{props.threadActions}</ThreadingToolbar>
         </DeletedPostMessage>
       </Flex>
