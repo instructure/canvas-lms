@@ -21,6 +21,14 @@
 require 'spec_helper.rb'
 
 describe AssetUserAccessLog do
+  around(:each) do |example|
+    old_interval = MessageBus.worker_process_interval_lambda
+    # let's not waste time with queue throttling in tests
+    MessageBus.worker_process_interval = -> { 0.01 }
+    example.run
+  ensure
+    MessageBus.worker_process_interval = old_interval unless old_interval.nil?
+  end
 
   def reset_message_bus_topic(topic_root_account, subscription_name)
     MessageBus.reset!
@@ -71,7 +79,7 @@ describe AssetUserAccessLog do
       end
 
       after(:each) do
-        MessageBus.reset!
+        MessageBus.process_all_and_reset!
       end
 
       it "sends any log writes to the database AND to the message bus" do
@@ -83,6 +91,7 @@ describe AssetUserAccessLog do
         AssetUserAccessLog.put_view(@asset, timestamp: dt)
         expect(AssetUserAccessLog::AuaLog4.count).to eq(1)
         record = AssetUserAccessLog::AuaLog4.last
+        MessageBus.process_all_and_reset!
         consumer = MessageBus.consumer_for(
           AssetUserAccessLog::PULSAR_NAMESPACE,
           AssetUserAccessLog.message_bus_topic_name(Account.default),
@@ -104,6 +113,7 @@ describe AssetUserAccessLog do
         reset_message_bus_topic(Account.default, subscription_name)
         AssetUserAccessLog.put_view(@asset, timestamp: dt)
         expect(AssetUserAccessLog::AuaLog1.count).to eq(0)
+        MessageBus.process_all_and_reset!
         consumer = MessageBus.consumer_for(
           AssetUserAccessLog::PULSAR_NAMESPACE,
           AssetUserAccessLog.message_bus_topic_name(Account.default),
@@ -164,6 +174,18 @@ describe AssetUserAccessLog do
         assets.each do |asset|
           AssetUserAccessLog.put_view(asset)
         end
+        # pull back if we start to grow the queue
+        if MessageBus.production_worker.queue_depth > 150
+          await_message_bus_queue!(target_depth: 75)
+        end
+      end
+      # finish applying all writes
+      await_message_bus_queue!(target_depth: 0)
+    end
+
+    def await_message_bus_queue!(target_depth: 0)
+      while MessageBus.production_worker.queue_depth > target_depth
+        sleep 0.01 # give background thread a chance to make progress
       end
     end
 
@@ -323,7 +345,7 @@ describe AssetUserAccessLog do
       end
 
       after(:each) do
-        MessageBus.reset!
+        MessageBus.process_all_and_reset!
       end
 
       it "does not choke on pre-existing un-postgres-partitioned iterator state" do
