@@ -62,19 +62,17 @@ export function AssignmentDetails({...props}) {
                 text: I18n.t('Due Dates (%{dueDateCount})', {
                   dueDateCount: props.assignmentOverrides.length
                 }),
-                textSize: 'x-small',
-                textWeight: 'bold'
+                textSize: 'x-small'
               },
               desktop: {
                 text: I18n.t('Show Due Dates (%{dueDateCount})', {
                   dueDateCount: props.assignmentOverrides.length
                 }),
-                textSize: 'small',
-                textWeight: 'normal'
+                textSize: 'small'
               }
             }}
             render={responsiveProps => (
-              <Text weight={responsiveProps.textWeight} size={responsiveProps.textSize}>
+              <Text weight="bold" size={responsiveProps.textSize}>
                 {responsiveProps.text}
               </Text>
             )}
