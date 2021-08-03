@@ -162,7 +162,7 @@ module MessageBus
         # context and reconnect.  If we get a timeout again, that is NOT
         # the problem, and we should let the error raise.
         retries += 1
-        raise ex if retries > 1
+        raise e if retries > 1
 
         Rails.logger.info "[AUA] Pulsar failure during message send, retrying..."
         CanvasErrors.capture_exception(:message_bus, e, :warn)
