@@ -103,6 +103,7 @@ class Auditors::FeatureFlag
     table :feature_flags
     record_type Auditors::FeatureFlag::Record
     read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
+    self.raise_on_error = true
 
     add_index :feature_flag do
       table :feature_flag_changes_by_feature_flag
