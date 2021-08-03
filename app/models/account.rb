@@ -1236,9 +1236,7 @@ class Account < ActiveRecord::Base
       else
         Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
             batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
-          aus = account_users_for(user)
-          aus.each{|au| au.instance_variable_set(:@association_cache, {})}
-          aus
+          account_users_for(user).each(&:clear_association_cache)
         end
       end
     end

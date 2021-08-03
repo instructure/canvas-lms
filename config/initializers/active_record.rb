@@ -1993,6 +1993,8 @@ module MaxRuntimeConnectionPool
 end
 ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
 
+ActiveRecord::Associations.send(:public, :clear_association_cache)
+
 Rails.application.config.after_initialize do
   ActiveSupport.on_load(:active_record) do
     cache = MultiCache.fetch("schema_cache")
