@@ -20,34 +20,69 @@
 
 require 'spec_helper'
 
+class VerySpecialAsycnMbTestError < StandardError
+end
+
 describe MessageBus::AsyncProducer do
+
   before(:each) do
     skip("pulsar config required to test") unless MessageBus.enabled?
   end
 
-  around(:each) do |example|
-    old_interval = MessageBus.worker_process_interval_lambda
-    old_queue_size = MessageBus.max_mem_queue_size_lambda
-    old_logger = MessageBus.logger
-    # let's not waste time with queue throttling in tests
-    MessageBus.worker_process_interval = -> { 0.01 }
-    MessageBus.max_mem_queue_size = -> { 10 }
-    MessageBus.logger = Rails.logger
-    example.run
-  ensure
-    MessageBus.worker_process_interval = old_interval unless old_interval.nil?
-    MessageBus.max_mem_queue_size_lambda = old_queue_size unless old_queue_size.nil?
-    MessageBus.logger = old_logger
-  end
+  describe "#produce_message error handling" do
+    specs_require_sharding
 
-  after(:each) do
-    MessageBus.reset!
-  end
+    before(:all) do
+      Bundler.require(:pulsar)
+      ErrorReport.delete_all
+    end
 
-  let(:producer){ MessageBus::AsyncProducer.new(start_thread: false) }
-  let(:namespace){ "test-only" }
+    it "re-raises errors correctly if they're not rescuable" do
+      producer = ::MessageBus::AsyncProducer.new(start_thread: false)
+      allow(MessageBus).to receive(:producer_for).and_raise(::Pulsar::Error::AlreadyClosed)
+      expect{ producer.send(:produce_message, 'a', 'b', 'c') }.to raise_error(::Pulsar::Error::AlreadyClosed)
+    end
+
+    it "sends error reports to contextual shard" do
+      @shard1.activate!
+      prior_err_count = ErrorReport.count
+      prior_err2_count = @shard2.activate{ ErrorReport.count }
+      producer = ::MessageBus::AsyncProducer.new(start_thread: false)
+      @shard2.activate{ producer.push('a', 'b', 'c') } # will write shard2 as shard id
+      allow(producer).to receive(:produce_message).and_raise(VerySpecialAsycnMbTestError)
+      expect(producer.queue_depth).to eq(1)
+      expect{ producer.send(:process_one_queue_item) }.to_not raise_error
+      expect(ErrorReport.count).to eq(prior_err_count)
+      @shard2.activate do
+        expect(ErrorReport.count).to eq(prior_err2_count + 1)
+      end
+    end
+  end
 
   describe "push" do
+
+    around(:each) do |example|
+      old_interval = MessageBus.worker_process_interval_lambda
+      old_queue_size = MessageBus.max_mem_queue_size_lambda
+      old_logger = MessageBus.logger
+      # let's not waste time with queue throttling in tests
+      MessageBus.worker_process_interval = -> { 0.01 }
+      MessageBus.max_mem_queue_size = -> { 10 }
+      MessageBus.logger = Rails.logger
+      example.run
+    ensure
+      MessageBus.worker_process_interval = old_interval unless old_interval.nil?
+      MessageBus.max_mem_queue_size_lambda = old_queue_size unless old_queue_size.nil?
+      MessageBus.logger = old_logger
+    end
+
+    after(:each) do
+      MessageBus.reset!
+    end
+
+    let(:producer){ MessageBus::AsyncProducer.new(start_thread: false) }
+    let(:namespace){ "test-only" }
+
     it "pushes onto the queue but does not execute" do
       topic_name = "lazily-created-topic-#{SecureRandom.hex(16)}"
       subscription_name = "subscription-#{SecureRandom.hex(4)}"
