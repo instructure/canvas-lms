@@ -79,7 +79,7 @@ export const mockThreads = {
 }
 
 export const DiscussionThreadContainer = props => {
-  const {sort} = useContext(SearchContext)
+  const {sort, searchTerm} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -347,6 +347,7 @@ export const DiscussionThreadContainer = props => {
                         }
                   }
                   goToTopic={props.goToTopic}
+                  isSearch={!!searchTerm}
                 />
               </Flex.Item>
             )}
