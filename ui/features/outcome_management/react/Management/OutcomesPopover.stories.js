@@ -24,13 +24,15 @@ export default {
   component: OutcomesPopover,
   args: {
     outcomes: [
-      {_id: 1, title: 'Outcome 1'},
-      {_id: 2, title: 'Outcome 2 Outcome Outcome Outcome'},
+      {linkId: 1, title: 'Outcome 1'},
+      {linkId: 2, title: 'Outcome 2 Outcome Outcome Outcome'},
       {
-        _id: 3,
+        linkId: 3,
         title: 'Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3'
       }
-    ]
+    ],
+    outcomeCount: 3,
+    onClearHandler: () => {}
   }
 }
 
@@ -40,7 +42,7 @@ export const Default = Template.bind({})
 export const MoreThan10 = Template.bind({})
 MoreThan10.args = {
   outcomes: new Array(20).fill(0).map((_v, i) => ({
-    _id: i,
+    linkId: i + 1,
     title: `Outcome ${i + 1}`
   }))
 }
@@ -48,7 +50,7 @@ MoreThan10.args = {
 export const ReallyLongTitles = Template.bind({})
 ReallyLongTitles.args = {
   outcomes: new Array(20).fill(0).map((_v, i) => ({
-    _id: i,
+    linkId: i + 1,
     title: `Outcome ${i + 1} `.repeat(10)
   }))
 }

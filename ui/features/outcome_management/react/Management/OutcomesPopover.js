@@ -18,6 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+import I18n from 'i18n!OutcomeManagement'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -26,13 +27,16 @@ import {Popover} from '@instructure/ui-popover'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import I18n from 'i18n!OutcomeManagement'
 import {outcomeShape} from './shapes'
 
-const OutcomesPopover = ({outcomes, outcomeCount}) => {
+const OutcomesPopover = ({outcomes, outcomeCount, onClearHandler}) => {
   const [showOutcomesList, setShowOutcomesList] = useState(false)
-  const closeOutcomeList = () => {
+  const closeOutcomesList = () => {
     setShowOutcomesList(false)
+  }
+  const closeAndClear = () => {
+    closeOutcomesList()
+    onClearHandler()
   }
 
   const themeOverrides = {
@@ -74,7 +78,7 @@ const OutcomesPopover = ({outcomes, outcomeCount}) => {
             <CloseButton
               placement="end"
               offset="small"
-              onClick={closeOutcomeList}
+              onClick={closeOutcomesList}
               screenReaderLabel={I18n.t('Close')}
             />
             <Heading margin="x-small none small none" level="h5">
@@ -92,15 +96,18 @@ const OutcomesPopover = ({outcomes, outcomeCount}) => {
               <List isUnstyled size="small" margin="none small none none">
                 {Object.values(outcomes)
                   .sort((a, b) => a.title.localeCompare(b.title, ENV.LOCALE, {numeric: true}))
-                  .map(({_id, title}, idx) => (
-                    // its ok to use index in the key as the list is static
-                    // eslint-disable-next-line react/no-array-index-key
-                    <List.Item key={`${_id}_${idx}`}>
+                  .map(({linkId, title}) => (
+                    <List.Item key={linkId}>
                       <TruncateText position="middle">{title}</TruncateText>
                     </List.Item>
                   ))}
               </List>
             </View>
+          </View>
+          <View as="div" padding="small" borderWidth="small 0 0">
+            <Link isWithinText={false} size="medium" interaction="enabled" onClick={closeAndClear}>
+              {I18n.t('Clear all')}
+            </Link>
           </View>
         </Popover.Content>
       </Popover>
@@ -110,7 +117,8 @@ const OutcomesPopover = ({outcomes, outcomeCount}) => {
 
 OutcomesPopover.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
-  outcomeCount: PropTypes.number.isRequired
+  outcomeCount: PropTypes.number.isRequired,
+  onClearHandler: PropTypes.func.isRequired
 }
 
 export default OutcomesPopover

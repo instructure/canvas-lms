@@ -288,6 +288,7 @@ const OutcomeManagementPanel = () => {
               selectedCount={selectedOutcomesCount}
               onRemoveHandler={openOutcomesRemoveModal}
               onMoveHandler={openOutcomesMoveModal}
+              onClearHandler={clearSelectedOutcomes}
             />
           )}
           {selectedGroupId && (

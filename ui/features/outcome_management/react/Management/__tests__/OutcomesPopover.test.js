@@ -23,22 +23,28 @@ import OutcomesPopover from '../OutcomesPopover'
 jest.useFakeTimers()
 
 describe('OutcomesPopover', () => {
-  const generateOutcomes = (num, canUnlink) =>
+  let onClearHandlerMock
+  const generateOutcomes = num =>
     new Array(num).fill(0).reduce(
       (acc, _curr, idx) => ({
         ...acc,
-        [idx + 1]: {_id: `${idx + 1}`, title: `Outcome ${idx + 1}`, canUnlink}
+        [idx + 1]: {
+          linkId: idx + 1,
+          title: `Outcome ${idx + 1}`
+        }
       }),
       {}
     )
 
-  const defaultProps = (numberToGenerate = 2, canUnlink = true) => ({
-    outcomes: generateOutcomes(numberToGenerate, canUnlink),
-    outcomeCount: numberToGenerate
+  const defaultProps = (numberToGenerate = 2) => ({
+    outcomes: generateOutcomes(numberToGenerate),
+    outcomeCount: numberToGenerate,
+    onClearHandler: onClearHandlerMock
   })
 
   beforeAll(() => {
     window.ENV.LOCALE = 'en'
+    onClearHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -78,10 +84,10 @@ describe('OutcomesPopover', () => {
   it('shows outcomes in alphanumerical order', async () => {
     const props = {
       outcomes: {
-        22: {_id: '22', title: 'Outcome 22', canUnlink: true},
-        1: {_id: '1', title: 'Outcome 1', canUnlink: true},
-        2: {_id: '2', title: 'Outcome 2', canUnlink: true},
-        12: {_id: '12', title: 'Outcome 12', canUnlink: true}
+        22: {linkId: '22', title: 'Outcome 22'},
+        1: {linkId: '1', title: 'Outcome 1'},
+        2: {linkId: '2', title: 'Outcome 2'},
+        12: {linkId: '12', title: 'Outcome 12'}
       },
       outcomeCount: 4
     }
@@ -94,5 +100,14 @@ describe('OutcomesPopover', () => {
     expect(outcomes[1]).toContainHTML('Outcome 2')
     expect(outcomes[2]).toContainHTML('Outcome 12')
     expect(outcomes[3]).toContainHTML('Outcome 22')
+  })
+
+  it('closes popover and calls onClearHandler when user clicks Clear all link', () => {
+    const {getByRole, getByText} = render(<OutcomesPopover {...defaultProps(2)} />)
+    const button = getByRole('button')
+    fireEvent.click(button)
+    fireEvent.click(getByText('Clear all'))
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(onClearHandlerMock).toHaveBeenCalled()
   })
 })

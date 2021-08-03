@@ -576,6 +576,40 @@ describe('OutcomeManagementPanel', () => {
     })
   })
 
+  describe('Selected outcomes popover', () => {
+    it('shows selected outcomes popover if outcomes are selected and Outcomes Selected link is clicked', async () => {
+      const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      const selectedOutcomesLink = getByText('2 Outcomes Selected')
+      fireEvent.click(selectedOutcomesLink)
+      expect(selectedOutcomesLink).not.toHaveAttribute('aria-disabled')
+      expect(selectedOutcomesLink).toHaveAttribute('aria-expanded')
+    })
+
+    it('closes popover and clears selected outcomes when Clear all link in popover is clicked', async () => {
+      const {getByText, getAllByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getAllByText('Select outcome')[0])
+      fireEvent.click(getAllByText('Select outcome')[1])
+      const selectedOutcomesLink = getByText('2 Outcomes Selected')
+      fireEvent.click(selectedOutcomesLink)
+      fireEvent.click(getByText('Clear all'))
+      expect(selectedOutcomesLink).toHaveAttribute('aria-disabled')
+      expect(selectedOutcomesLink.getAttribute('aria-expanded')).toBe('false')
+      expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
+    })
+  })
+
   describe('can_manage permissions are false', () => {
     beforeEach(() => {
       window.ENV = {
