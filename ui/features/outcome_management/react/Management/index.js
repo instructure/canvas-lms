@@ -43,6 +43,7 @@ import OutcomeRemoveModal from './OutcomeRemoveModal'
 import OutcomeEditModal from './OutcomeEditModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
+import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 
 const NoOutcomesBillboard = () => {
   const {isCourse} = useCanvasContext()
@@ -75,7 +76,7 @@ const NoOutcomesBillboard = () => {
 }
 
 const OutcomeManagementPanel = () => {
-  const {isCourse} = useCanvasContext()
+  const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {
     search: searchString,
     debouncedSearch: debouncedSearchString,
@@ -95,7 +96,8 @@ const OutcomeManagementPanel = () => {
     selectedGroupId,
     selectedParentGroupId,
     addNewGroup,
-    removeGroup
+    removeGroup,
+    loadedGroups
   } = useManageOutcomes('OutcomeManagementPanel')
 
   const {group, loading, loadMore, removeLearningOutcomes} = useGroupDetail({
@@ -192,7 +194,6 @@ const OutcomeManagementPanel = () => {
   }
 
   const hasOutcomes = Object.keys(collections).length > 1 || collections[rootId]?.outcomesCount > 0
-  const canManage = ENV.PERMISSIONS?.manage_outcomes
 
   return (
     <div className="management-panel" data-testid="outcomeManagementPanel">
@@ -200,87 +201,113 @@ const OutcomeManagementPanel = () => {
         <NoOutcomesBillboard />
       ) : (
         <>
-          <Flex elementRef={setContainerRef}>
-            <Flex.Item
-              width="33%"
-              display="inline-block"
-              position="relative"
-              height="60vh"
+          {isMobileView ? (
+            <View
               as="div"
-              overflowY="auto"
-              overflowX="hidden"
-              elementRef={setLeftColumnRef}
-            >
-              <View as="div" padding="small x-small none x-small">
-                <Text size="large" weight="light" fontStyle="normal">
-                  {I18n.t('Outcome Groups')}
-                </Text>
-                <TreeBrowser
-                  onCollectionToggle={queryCollections}
-                  collections={collections}
-                  rootId={rootId}
-                  showRootCollection
-                  defaultExpandedIds={[rootId]}
-                />
-              </View>
-            </Flex.Item>
-            <Flex.Item
-              as="div"
-              position="relative"
-              width="1%"
-              height="60vh"
-              margin="small none none none"
-              padding="small none large none"
-              display="inline-block"
-            >
-              <div
-                data-testid="handlerRef"
-                ref={setDelimiterRef}
-                style={{
-                  width: '1vw',
-                  height: '100%',
-                  cursor: 'col-resize',
-                  background:
-                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
-                }}
-              />
-            </Flex.Item>
-            <Flex.Item
-              as="div"
-              width="66%"
+              width="100%"
               display="inline-block"
               position="relative"
               height="60vh"
               overflowY="visible"
               overflowX="auto"
-              elementRef={el => {
-                setRightColumnRef(el)
-                setScrollContainer(el)
-              }}
+              padding="small 0 0"
             >
-              <View as="div" padding="x-small none none x-small">
-                {selectedGroupId ? (
-                  <ManageOutcomesView
-                    key={selectedGroupId}
-                    outcomeGroup={group}
-                    loading={loading}
-                    selectedOutcomes={selectedOutcomes}
-                    searchString={searchString}
-                    onSelectOutcomesHandler={toggleSelectedOutcomes}
-                    onOutcomeGroupMenuHandler={groupMenuHandler}
-                    onOutcomeMenuHandler={outcomeMenuHandler}
-                    onSearchChangeHandler={onSearchChangeHandler}
-                    onSearchClearHandler={onSearchClearHandler}
-                    loadMore={loadMore}
-                    scrollContainer={scrollContainer}
-                    isRootGroup={collections[selectedGroupId]?.isRootGroup}
-                  />
-                ) : (
-                  <ManageOutcomesBillboard />
-                )}
+              <View as="div" padding="x-small x-small none">
+                {/* TODO: Add ManageView in OUT-4183  */}
+                <GroupActionDrillDown
+                  onCollectionClick={queryCollections}
+                  collections={collections}
+                  rootId={rootId}
+                  loadedGroups={loadedGroups}
+                  setShowOutcomesView={() => {}}
+                  isLoadingGroupDetail={loading}
+                  outcomesCount={group?.outcomesCount}
+                  showActionLinkForRoot
+                />
+                <ManageOutcomesBillboard />
               </View>
-            </Flex.Item>
-          </Flex>
+            </View>
+          ) : (
+            <Flex elementRef={setContainerRef}>
+              <Flex.Item
+                width="33%"
+                display="inline-block"
+                position="relative"
+                height="60vh"
+                as="div"
+                overflowY="auto"
+                overflowX="hidden"
+                elementRef={setLeftColumnRef}
+              >
+                <View as="div" padding="small x-small none x-small">
+                  <Text size="large" weight="light" fontStyle="normal">
+                    {I18n.t('Outcome Groups')}
+                  </Text>
+                  <TreeBrowser
+                    onCollectionToggle={queryCollections}
+                    collections={collections}
+                    rootId={rootId}
+                    showRootCollection
+                    defaultExpandedIds={[rootId]}
+                  />
+                </View>
+              </Flex.Item>
+              <Flex.Item
+                as="div"
+                position="relative"
+                width="1%"
+                height="60vh"
+                margin="small none none none"
+                padding="small none large none"
+                display="inline-block"
+              >
+                <div
+                  data-testid="handlerRef"
+                  ref={setDelimiterRef}
+                  style={{
+                    width: '1vw',
+                    height: '100%',
+                    cursor: 'col-resize',
+                    background:
+                      '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+                  }}
+                />
+              </Flex.Item>
+              <Flex.Item
+                as="div"
+                width="66%"
+                display="inline-block"
+                position="relative"
+                height="60vh"
+                overflowY="visible"
+                overflowX="auto"
+                elementRef={el => {
+                  setRightColumnRef(el)
+                  setScrollContainer(el)
+                }}
+              >
+                <View as="div" padding="x-small none none x-small">
+                  {selectedGroupId && (
+                    <ManageOutcomesView
+                      key={selectedGroupId}
+                      outcomeGroup={group}
+                      loading={loading}
+                      selectedOutcomes={selectedOutcomes}
+                      searchString={searchString}
+                      onSelectOutcomesHandler={toggleSelectedOutcomes}
+                      onOutcomeGroupMenuHandler={groupMenuHandler}
+                      onOutcomeMenuHandler={outcomeMenuHandler}
+                      onSearchChangeHandler={onSearchChangeHandler}
+                      onSearchClearHandler={onSearchClearHandler}
+                      loadMore={loadMore}
+                      scrollContainer={scrollContainer}
+                      isRootGroup={collections[selectedGroupId]?.isRootGroup}
+                    />
+                  )}
+                </View>
+              </Flex.Item>
+            </Flex>
+          )}
           <hr style={{margin: '0 0 7px'}} />
           {canManage && (
             <ManageOutcomesFooter

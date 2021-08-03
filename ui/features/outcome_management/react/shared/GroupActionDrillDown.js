@@ -25,7 +25,7 @@ import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icon
 import {Select} from '@instructure/ui-select'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {isRTL} from '@canvas/i18n/rtlHelper'
-import {ACCOUNT_FOLDER_ID} from '@canvas/outcomes/react/treeBrowser'
+import {ACCOUNT_FOLDER_ID, ROOT_ID} from '@canvas/outcomes/react/treeBrowser'
 
 const BACK_OPTION = 'back'
 const VIEW_OPTION = 'view'
@@ -38,20 +38,28 @@ const GroupActionDrillDown = ({
   loadedGroups,
   setShowOutcomesView,
   isLoadingGroupDetail,
-  outcomesCount
+  outcomesCount,
+  showActionLinkForRoot
 }) => {
   const [selectedGroupId, setSelectedGroupId] = useState(rootId)
   const [highlightedOptionId, setHighlightedOptionId] = useState('')
   const [highlightAction, setHighlightAction] = useState(false)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [isLoadingGroup, setIsLoadingGroup] = useState(false)
-  const hasOpenedGroup = selectedGroupId !== rootId
+  const hasSelectedGroup = selectedGroupId !== rootId
   const isActionLinkHighlighted = highlightAction || VIEW_OPTION === highlightedOptionId
   const margin = isRTL() ? {marginRight: '-.75em'} : {marginLeft: '-.75em'}
+  const disableActionLink = [ACCOUNT_FOLDER_ID, ROOT_ID].includes(selectedGroupId)
 
   useEffect(() => {
-    setIsLoadingGroup(hasOpenedGroup && !loadedGroups.includes(selectedGroupId))
-  }, [hasOpenedGroup, loadedGroups, selectedGroupId])
+    setIsLoadingGroup(hasSelectedGroup && !loadedGroups.includes(selectedGroupId))
+  }, [hasSelectedGroup, loadedGroups, selectedGroupId])
+
+  useEffect(() => {
+    if (!disableActionLink && selectedGroupId === rootId) {
+      onCollectionClick({id: rootId})
+    }
+  }, [disableActionLink, selectedGroupId, rootId, onCollectionClick])
 
   useEffect(() => {
     return () => {
@@ -72,7 +80,7 @@ const GroupActionDrillDown = ({
       const parentGroupId = collections[selectedGroupId].parentGroupId
       setShowOutcomesView(false)
       setSelectedGroupId(parentGroupId)
-      if (parentGroupId !== rootId) {
+      if (![ACCOUNT_FOLDER_ID, ROOT_ID].includes(parentGroupId)) {
         onCollectionClick({id: parentGroupId})
       }
       showFlashAlert({
@@ -119,10 +127,10 @@ const GroupActionDrillDown = ({
     <Select.Group renderLabel={collections[selectedGroupId].name}>
       <Select.Option
         id={VIEW_OPTION}
-        isDisabled={selectedGroupId === ACCOUNT_FOLDER_ID}
-        isHighlighted={selectedGroupId !== ACCOUNT_FOLDER_ID ? isActionLinkHighlighted : false}
+        isDisabled={disableActionLink}
+        isHighlighted={disableActionLink ? false : isActionLinkHighlighted}
       >
-        {selectedGroupId !== ACCOUNT_FOLDER_ID && (
+        {!disableActionLink && (
           <div
             style={{
               ...margin,
@@ -162,7 +170,7 @@ const GroupActionDrillDown = ({
       onRequestHighlightOption={handleHighlightOption}
       onRequestSelectOption={handleSelect}
     >
-      {hasOpenedGroup && (
+      {hasSelectedGroup && (
         <Select.Option
           id={BACK_OPTION}
           isHighlighted={BACK_OPTION === highlightedOptionId}
@@ -171,7 +179,7 @@ const GroupActionDrillDown = ({
           {I18n.t('Back')}
         </Select.Option>
       )}
-      {hasOpenedGroup && selectedGroup}
+      {(hasSelectedGroup || showActionLinkForRoot) && selectedGroup}
       {renderSubgroups()}
     </Select>
   )
@@ -184,11 +192,13 @@ GroupActionDrillDown.propTypes = {
   loadedGroups: PropTypes.arrayOf(PropTypes.string).isRequired,
   setShowOutcomesView: PropTypes.func.isRequired,
   isLoadingGroupDetail: PropTypes.bool.isRequired,
-  outcomesCount: PropTypes.number
+  outcomesCount: PropTypes.number,
+  showActionLinkForRoot: PropTypes.bool
 }
 
 GroupActionDrillDown.defaultProps = {
-  outcomesCount: 0
+  outcomesCount: 0,
+  showActionLinkForRoot: false
 }
 
 export default GroupActionDrillDown

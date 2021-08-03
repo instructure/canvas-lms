@@ -42,6 +42,7 @@ describe('OutcomeManagementPanel', () => {
   let showFlashAlertSpy
   let defaultMocks
   let groupDetailDefaultProps
+  let isMobileView = false
 
   beforeEach(() => {
     cache = createCache()
@@ -88,7 +89,7 @@ describe('OutcomeManagementPanel', () => {
     } = {}
   ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId, canManage}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, canManage, isMobileView}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
@@ -677,5 +678,43 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     const editModal = getByTestId('outcome-management-edit-modal')
     expect(within(editModal).getByText('Group Description 4')).toBeInTheDocument()
+  })
+
+  describe('mobile', () => {
+    beforeEach(() => {
+      isMobileView = true
+    })
+
+    const clickWithinMobileSelect = async selectNode => {
+      fireEvent.click(selectNode)
+      await act(async () => jest.runAllTimers())
+    }
+
+    it('renders the action drilldown', async () => {
+      const {getByText} = render(<OutcomeManagementPanel />, {
+        mocks: accountMocks({childGroupsCount: 2})
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(getByText('Groups')).toBeInTheDocument()
+    })
+
+    it('renders the groups within the drilldown', async () => {
+      const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+        mocks: accountMocks({childGroupsCount: 2})
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      expect(getByText('Account folder 0')).toBeInTheDocument()
+      expect(getByText('Account folder 1')).toBeInTheDocument()
+    })
+
+    it('renders the action link for the root group', async () => {
+      const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+        mocks: accountMocks({childGroupsCount: 2})
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithinMobileSelect(queryByText('Groups'))
+      expect(getByText('View 0 Outcomes')).toBeInTheDocument()
+    })
   })
 })
