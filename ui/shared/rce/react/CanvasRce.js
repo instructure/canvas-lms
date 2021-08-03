@@ -23,6 +23,7 @@ import RCE from '@instructure/canvas-rce/es/rce/RCE'
 import getRCSProps from '../getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
+import loadEventListeners from '../loadEventListeners'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -86,6 +87,10 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       rce_wrapper?.destroy()
     }
   }, [rceRef])
+
+  useEffect(() => {
+    loadEventListeners()
+  }, [])
 
   return (
     <RCE

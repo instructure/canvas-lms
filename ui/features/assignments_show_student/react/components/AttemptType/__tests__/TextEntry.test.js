@@ -22,6 +22,12 @@ import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import TextEntry from '../TextEntry'
 
+jest.mock('@canvas/tinymce-external-tools/TinyMCEContentItem', () => ({
+  fromJSON: contentItem => ({
+    codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`
+  })
+}))
+
 async function makeProps(opts = {}) {
   const mockedSubmission =
     opts.submission ||
@@ -226,6 +232,63 @@ describe('TextEntry', () => {
 
       rerender(<TextEntry {...newProps} />)
       expect(fakeEditor.setContent).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('receiving messages', () => {
+    let insertCode
+
+    const fakeEvent = {
+      messageType: 'ContentDefinitelyNotReady',
+      content_items: [
+        {
+          '@type': 'LtiLinkItem',
+          linkTarget: '_blank',
+          title: 'a fake item',
+          url: 'http://localhost'
+        }
+      ]
+    }
+
+    const realEvent = {
+      messageType: 'A2ExternalContentReady',
+      content_items: [
+        {
+          '@type': 'LtiLinkItem',
+          linkTarget: '_blank',
+          title: 'first item',
+          url: 'http://localhost:3000/item1'
+        },
+        {
+          '@type': 'LtiLinkItem',
+          linkTarget: '_blank',
+          title: 'second item',
+          url: 'http://localhost:3000/item2'
+        }
+      ]
+    }
+
+    beforeEach(async () => {
+      await renderEditor()
+      // At the moment, the fake editor throws an error if we call insertCode,
+      // so we mock it out. For now this is fine since we don't actually care
+      // about the implementation (only that it was called).
+      insertCode = jest.fn()
+      fakeEditor.rceWrapper.insertCode = insertCode
+    })
+
+    it('does nothing if the message is not A2ExternalContentReady', async () => {
+      window.postMessage(fakeEvent, '*')
+      expect(insertCode).not.toHaveBeenCalled()
+    })
+
+    it('inserts a link for each content item if the message is A2ExternalContentReady', async () => {
+      window.postMessage(realEvent, '*')
+      await waitFor(() => {
+        expect(insertCode).toHaveBeenCalledTimes(2)
+        expect(insertCode).toHaveBeenNthCalledWith(1, expect.stringContaining('first item'))
+        expect(insertCode).toHaveBeenNthCalledWith(2, expect.stringContaining('second item'))
+      })
     })
   })
 

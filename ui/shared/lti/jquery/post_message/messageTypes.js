@@ -23,4 +23,4 @@ export const whitelist = [
 ]
 
 // These are handled elsewhere so ignore them
-export const ignorelist = ['LtiDeepLinkingResponse']
+export const ignorelist = ['A2ExternalContentReady', 'LtiDeepLinkingResponse']
