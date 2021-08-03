@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "New Comment for %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+  <%= t :subject, "%{user} replied to %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name, :user => asset.user.short_name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -11,13 +11,6 @@
     <%= t :link, "Click here to join the conversation" %>
   </a>
 <% end %>
-
-<p><%= t :body, "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
-
-<p>
-<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
-</p>
-
 <% if avatar_enabled? %>
   <table border="0" style="border-collapse: collapse">
     <tr height="30px">
@@ -54,6 +47,12 @@
     </a>
   </p>
 <% end %>
+
+<p><%= t :body, "%{user} replied to %{discussion_topic}, %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
+
+<p>
+<%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
+</p>
 <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
   <p><%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion." %></p>
 <% else %>
