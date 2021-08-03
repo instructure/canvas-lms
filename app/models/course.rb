@@ -1770,9 +1770,7 @@ class Course < ActiveRecord::Base
     active_enrollments = fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
       scope = self.enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
       scope = scope.where(:type => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment']) if is_unpublished
-      ens = scope.to_a
-      ens.each{|e| e.instance_variable_set(:@association_cache, {})}
-      ens
+      scope.to_a.each(&:clear_association_cache)
     end
     active_enrollments.each{|e| e.course = self} # set association so we don't requery
     active_enrollments.any? {|e| (allow_future || e.date_based_state_in_db == 'active') && e.has_permission_to?(permission) }
@@ -1858,9 +1856,7 @@ class Course < ActiveRecord::Base
     @account_users[user.global_id] ||= begin
       key = ['account_users_for_course_and_user', user.cache_key(:account_users), Account.cache_key_for_id(account_id, :account_chain)].cache_key
       Rails.cache.fetch_with_batched_keys(key, batch_object: self, batched_keys: :account_associations, skip_cache_if_disabled: true) do
-        aus = account_users_for(user)
-        aus.each{|au| au.instance_variable_set(:@association_cache, {})}
-        aus
+        account_users_for(user).each(&:clear_association_cache)
       end
     end
   end
