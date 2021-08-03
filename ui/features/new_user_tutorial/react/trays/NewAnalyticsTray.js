@@ -28,25 +28,22 @@ const NewAnalyticsTray = () => (
     image="/images/tutorial-tray-images/Panda_Analytics.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t(
           'How do I send a message to all students based on specific course criteria in New Analytics?'
         ),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162'
+        href: I18n.t('#community.instructor_message_all_criteria_new_analytics')
       },
       {
         label: I18n.t('How do I send a message to an individual student in New Analytics?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187'
+        href: I18n.t('#community.instructor_message_individual_new_analytics')
       },
       {
         label: I18n.t('How do I view analytics for an individual student?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801'
+        href: I18n.t('#community.instructor_individual_new_analytics')
       }
     ]}
   >

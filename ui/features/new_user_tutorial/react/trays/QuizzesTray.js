@@ -28,33 +28,28 @@ const QuizzesTray = () => (
     imageWidth="8rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use the Quizzes Index Page?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104'
+        href: I18n.t('#community.instructor_use_quizzes_index')
       },
       {
         label: I18n.t('How do I create an assessment using New Quizzes?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173'
+        href: I18n.t('#community.instructor_create_new_quiz')
       },
       {
         label: I18n.t('How do I manage settings for an assessment in New Quizzes?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581'
+        href: I18n.t('#community.instructor_manage_new_quizzes_settings')
       },
       {
         label: I18n.t('How do I create a quiz with individual questions?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248'
+        href: I18n.t('#community.instructor_create_quiz_questions')
       },
       {
         label: I18n.t('What options can I set in a quiz?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683'
+        href: I18n.t('#community.instructor_quiz_options')
       }
     ]}
   >

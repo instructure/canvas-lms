@@ -28,37 +28,32 @@ const GradesTray = () => (
     imageWidth="8.5rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
+      href: I18n.t('#community.instructor_guide')
     }}
     links={[
       {
         label: I18n.t('How do I use the Gradebook?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701'
+        href: I18n.t('#community.instructor_use_gradebook')
       },
       {
         label: I18n.t('How do I enter and edit grades in the Gradebook?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724'
+        href: I18n.t('#community.instructor_edit_gradebook')
       },
       {
         label: I18n.t('How do I post grades for an assignment in the Gradebook?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576'
+        href: I18n.t('#community.instructor_post_grades')
       },
       {
         label: I18n.t('How do I view assignments or students individually in the Gradebook?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247'
+        href: I18n.t('#community.instructor_gradebook_individual_view')
       },
       {
         label: I18n.t('How do I use SpeedGrader?'),
-        href: 'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13'
+        href: I18n.t('#community.basics_speedgrader')
       },
       {
         label: I18n.t('How do I view the details of a submission for a student in SpeedGrader?'),
-        href:
-          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762'
+        href: I18n.t('#community.instructor_speedgrader_submission_details')
       }
     ]}
   >

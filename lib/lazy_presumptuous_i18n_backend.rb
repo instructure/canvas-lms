@@ -127,6 +127,16 @@ class LazyPresumptuousI18nBackend
         register_translations(locale, locale_data)
       end
       log "parsing and registering #{filename} [#{data.keys.join(', ')}]"
+    elsif locale == 'community'
+      data = CSV.read(filename, headers: true)
+      csv_locales = data.headers - ["key"]
+      csv_locales.each do |csv_locale|
+        locale_data = {
+          community: data.map { |row| [row['key'].to_sym, row[csv_locale]] }.to_h
+        }
+        register_translations(csv_locale, locale_data)
+      end
+      log "parsing and registering #{filename} [#{csv_locales.join(', ')}]"
     else
       log "registering locale [#{locale}] << #{filename}"
       register_translations(locale, filename)

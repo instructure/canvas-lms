@@ -36,7 +36,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const authenticity_token = () => getCookie('_csrf_token')
 
   const link = (
-    <Link href="https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761">
+    <Link href={I18n.t('#community.new_quizzes_feature_comparison')}>
       {I18n.t('Learn more about the differences.')}
     </Link>
   )

@@ -25,7 +25,7 @@ function eventTimes(dateFormats, timeFormats) {
   dateFormats.forEach(df => {
     timeFormats.forEach(tf => {
       formats.push(() =>
-        I18n.t('#time.event', {
+        I18n.t('#time.event', '%{date} at %{time}', {
           date: I18n.lookup(`date.formats.${df}`),
           time: I18n.lookup(`time.formats.${tf}`)
         })

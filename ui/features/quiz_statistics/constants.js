@@ -90,8 +90,6 @@ export default {
 
   ATTACHMENT_ATTRS: ['created_at', 'url'],
 
-  DISCRIMINATION_INDEX_HELP_ARTICLE_URL: 'https://community.canvaslms.com/docs/DOC-13037',
-
   PROGRESS_QUEUED: 'queued',
   PROGRESS_ACTIVE: 'running',
   PROGRESS_COMPLETE: 'completed',

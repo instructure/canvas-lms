@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,18 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "utf8_cleaner"
-require "i18n"
-require "sexp_processor"
-require "ruby_parser"
-require "json"
-
 module I18nTasks
-  require "i18n_tasks/hash_extensions"
-  require "i18n_tasks/lolcalize"
-  require "i18n_tasks/utils"
-  require "i18n_tasks/i18n_import"
-  require "i18n_tasks/csv_backend"
-
-  require_relative "i18n_tasks/railtie" if defined?(Rails)
+  module CsvBackend
+    def load_csv(filename)
+      scope = File.basename(filename, '.*')
+      data = CSV.read(filename, headers: true)
+      csv_locales = data.headers - ["key"]
+      ret = {}
+      csv_locales.each do |locale|
+        ret[locale.to_sym] = {
+          scope.to_sym => data.map { |row| [row['key'].to_sym, row[locale]] }.to_h
+        }
+      end
+      ret
+    end
+  end
 end
