@@ -236,7 +236,7 @@ describe('OutcomeManagementPanel', () => {
   })
 
   describe('Removing a group', () => {
-    it.skip('Show parent group in the RHS', async () => {
+    it('Show parent group in the RHS', async () => {
       // API mock
       jest.spyOn(api, 'removeOutcomeGroup').mockImplementation(() => Promise.resolve({status: 200}))
 
@@ -246,6 +246,7 @@ describe('OutcomeManagementPanel', () => {
           ...courseMocks({childGroupsCount: 2}),
           ...groupMocks({groupId: '200'}),
           ...groupDetailMocks({
+            title: 'Course folder 0',
             groupId: '200',
             contextType: 'Course',
             contextId: '2',
@@ -264,10 +265,10 @@ describe('OutcomeManagementPanel', () => {
       // OutcomeManagementPanel Group Tree Browser
       fireEvent.click(getByText('Course folder 0'))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
       fireEvent.click(getByText('Group 200 folder 0'))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(queryByText('All Course folder 0 Outcomes')).not.toBeInTheDocument()
+      expect(queryByText('Course folder 0 Outcomes')).not.toBeInTheDocument()
       // OutcomeManagementPanel Outcome Group Kebab Menu
       fireEvent.click(getByText('Outcome Group Menu'))
       fireEvent.click(within(getByRole('menu')).getByText('Remove'))
@@ -275,7 +276,7 @@ describe('OutcomeManagementPanel', () => {
       // Remove Modal
       fireEvent.click(getByText('Remove Group'))
       await act(async () => jest.runAllTimers())
-      expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
+      expect(getByText('Course folder 0 Outcomes')).toBeInTheDocument()
     })
   })
 
