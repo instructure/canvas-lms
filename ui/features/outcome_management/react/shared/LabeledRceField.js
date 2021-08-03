@@ -16,34 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useField} from 'react-final-form'
 import PropTypes from 'prop-types'
-import {TextArea} from '@instructure/ui-text-area'
-import useRCE from '../../../features/outcome_management/react/hooks/useRCE'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import OutcomesRceField from './OutcomesRceField'
 
-const LabeledRceField = ({name, validate, ...props}) => {
+const LabeledRceField = ({name, validate, label}) => {
   const {
     input,
     meta: {touched, error, submitError}
   } = useField(name, {
-    validate,
-    beforeSubmit: () => {
-      input.onChange(getCode())
-    }
+    validate
   })
-
-  // eslint-disable-next-line no-unused-vars
-  const [textareaRef, getCode, setCode, code] = useRCE()
-
-  useEffect(() => {
-    if (code !== null) {
-      input.onChange(code)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code])
 
   let errorMessages = []
   if (touched) {
@@ -59,7 +45,8 @@ const LabeledRceField = ({name, validate, ...props}) => {
 
   return (
     <>
-      <TextArea textareaRef={textareaRef} {...props} defaultValue={input.value} />
+      <Text weight="bold">{label}</Text> <br />
+      <OutcomesRceField onChangeHandler={input.onChange} defaultContent={input.value} />
       {errorMessages.length > 0 && (
         <View as="div" margin="0 0 small">
           {errorMessages.map(err => (
@@ -75,7 +62,8 @@ const LabeledRceField = ({name, validate, ...props}) => {
 
 LabeledRceField.propTypes = {
   name: PropTypes.string.isRequired,
-  validate: PropTypes.func
+  validate: PropTypes.func,
+  label: PropTypes.string.isRequired
 }
 
 export default LabeledRceField

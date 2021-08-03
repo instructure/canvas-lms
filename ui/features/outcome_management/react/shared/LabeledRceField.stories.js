@@ -20,7 +20,7 @@ import {Button} from '@instructure/ui-buttons'
 import React from 'react'
 import {Form} from 'react-final-form'
 import LabeledRceField from './LabeledRceField'
-import {requiredValidator} from './validators/finalFormValidators'
+import {requiredValidator} from '@canvas/outcomes/react/validators/finalFormValidators'
 
 export default {
   title: 'Examples/Outcomes/LabeledRceField',

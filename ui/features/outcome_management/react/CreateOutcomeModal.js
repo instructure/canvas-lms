@@ -30,7 +30,6 @@ import {Mask} from '@instructure/ui-overlays'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
-import useRCE from './hooks/useRCE'
 import TargetGroupSelector from './shared/TargetGroupSelector'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -41,13 +40,14 @@ import {
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
+import OutcomesRceField from './shared/OutcomesRceField'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView} = useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
-  const [setRCERef, getRCECode, setRCECode] = useRCE()
+  const [description, setDescription] = useState('')
   const [showTitleError, setShowTitleError] = useState(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
@@ -66,7 +66,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
     setShowTitleError(false)
     titleChangeHandler('')
     displayNameChangeHandler('')
-    setRCECode('')
     onCloseHandler()
   }
 
@@ -83,7 +82,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
               groupId: selectedGroupId,
               title,
               displayName,
-              description: getRCECode()
+              description
             }
           }
         })
@@ -181,7 +180,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler}) => {
             </>
           )}
           <View as="div" padding="small 0 0">
-            <TextArea size="medium" label={I18n.t('Description')} textareaRef={setRCERef} />
+            <Text weight="bold">{I18n.t('Description')}</Text> <br />
+            {isOpen && <OutcomesRceField onChangeHandler={setDescription} />}
           </View>
           {friendlyDescriptionFF && (
             <View as="div" padding="small 0">

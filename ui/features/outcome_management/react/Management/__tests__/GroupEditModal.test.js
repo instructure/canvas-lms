@@ -24,15 +24,12 @@ import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {updateOutcomeGroupMock} from '@canvas/outcomes/mocks/Management'
-import useRCE from '../../hooks/useRCE'
 
-jest.mock('../../hooks/useRCE')
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
 
 describe('GroupEditModal', () => {
   let cache
-  let rceValue
   let onCloseHandlerMock
   const group = {
     _id: '100',
@@ -48,7 +45,11 @@ describe('GroupEditModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = [updateOutcomeGroupMock()]} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      mocks = [updateOutcomeGroupMock({description: group.description})]
+    } = {}
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
@@ -61,8 +62,6 @@ describe('GroupEditModal', () => {
 
   beforeEach(() => {
     cache = createCache()
-    rceValue = 'Updated description'
-    useRCE.mockReturnValue([() => {}, () => rceValue, null, null, null])
     onCloseHandlerMock = jest.fn()
     window.ENV.FEATURES = {}
   })
@@ -73,6 +72,7 @@ describe('GroupEditModal', () => {
 
   it('renders component with content', async () => {
     const {getByText} = render(<GroupEditModal {...defaultProps()} />)
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Edit Group')).toBeInTheDocument()
   })
 
@@ -81,14 +81,16 @@ describe('GroupEditModal', () => {
       mocks: [
         updateOutcomeGroupMock({
           vendorGuid: null,
-          parentOutcomeGroupId: null
+          parentOutcomeGroupId: null,
+          description: group.description
         })
       ]
     })
+    await act(async () => jest.runOnlyPendingTimers())
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'success',
@@ -97,20 +99,19 @@ describe('GroupEditModal', () => {
   })
 
   it('updates only part of group attributes and shows flash confirmation', async () => {
-    rceValue = ''
     const {getByDisplayValue, getByText} = render(<GroupEditModal {...defaultProps()} />, {
       mocks: [
         updateOutcomeGroupMock({
           vendorGuid: null,
-          description: null,
-          parentOutcomeGroupId: null
+          parentOutcomeGroupId: null,
+          description: group.description
         })
       ]
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'success',
@@ -133,14 +134,15 @@ describe('GroupEditModal', () => {
         updateOutcomeGroupMock({
           vendorGuid: null,
           parentOutcomeGroupId: null,
-          failResponse: true
+          failResponse: true,
+          description: group.description
         })
       ]
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
@@ -154,14 +156,15 @@ describe('GroupEditModal', () => {
         updateOutcomeGroupMock({
           vendorGuid: null,
           parentOutcomeGroupId: null,
-          failMutation: true
+          failMutation: true,
+          description: group.description
         })
       ]
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
@@ -175,14 +178,15 @@ describe('GroupEditModal', () => {
         updateOutcomeGroupMock({
           vendorGuid: null,
           parentOutcomeGroupId: null,
-          failMutationNoErrMsg: true
+          failMutationNoErrMsg: true,
+          description: group.description
         })
       ]
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
     fireEvent.click(getByText('Save'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',

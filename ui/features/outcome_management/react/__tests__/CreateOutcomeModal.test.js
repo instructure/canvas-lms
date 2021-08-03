@@ -31,7 +31,6 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers()
 
 describe('CreateOutcomeModal', () => {

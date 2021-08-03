@@ -23,13 +23,11 @@ import {within} from '@testing-library/dom'
 import OutcomeEditModal from '../OutcomeEditModal'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {
   updateOutcomeMocks,
   setFriendlyDescriptionOutcomeMock
 } from '@canvas/outcomes/mocks/Management'
 
-jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers()
 
 describe('OutcomeEditModal', () => {
@@ -54,7 +52,6 @@ describe('OutcomeEditModal', () => {
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
-    RichContentEditor.callOnRCE = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
@@ -66,14 +63,16 @@ describe('OutcomeEditModal', () => {
       contextType: 'Account',
       contextId: '1',
       friendlyDescriptionFF: true
-    }
+    },
+    mockOverrides = []
   } = {}) => {
     const mocks = [
       setFriendlyDescriptionOutcomeMock({
         failResponse,
         failMutation
       }),
-      ...updateOutcomeMocks()
+      ...updateOutcomeMocks({description: outcome.description}),
+      ...mockOverrides
     ]
 
     return render(
@@ -152,29 +151,35 @@ describe('OutcomeEditModal', () => {
   })
 
   it('Shows forms elements when editing in same context', () => {
-    const {getByTestId} = renderWithProvider()
+    const {getByTestId, queryByTestId} = renderWithProvider()
     expect(getByTestId('name-input')).toBeInTheDocument()
     expect(getByTestId('display-name-input')).toBeInTheDocument()
-    expect(getByTestId('description-input')).toBeInTheDocument()
     expect(getByTestId('friendly-description-input')).toBeInTheDocument()
+    expect(queryByTestId('readonly-description')).not.toBeInTheDocument()
   })
 
   it('Hides forms elements when editing in different context', () => {
-    const {queryByTestId} = renderWithProvider({
+    const {getByTestId, queryByTestId} = renderWithProvider({
       env: {contextType: 'Course', contextId: '1', friendlyDescriptionFF: true}
     })
     expect(queryByTestId('name-input')).not.toBeInTheDocument()
     expect(queryByTestId('display-name-input')).not.toBeInTheDocument()
     expect(queryByTestId('description-input')).not.toBeInTheDocument()
-    expect(queryByTestId('friendly-description-input')).toBeInTheDocument()
+    expect(getByTestId('friendly-description-input')).toBeInTheDocument()
+    expect(getByTestId('readonly-description')).toBeInTheDocument()
   })
 
   describe('updates the outcome', () => {
     it('displays flash confirmation with proper message if update request succeeds', async () => {
-      RichContentEditor.callOnRCE.mockReturnValue('Updated description')
-      const {getByText, getByLabelText} = renderWithProvider()
+      const mocks = updateOutcomeMocks({description: 'Updated description'})
+      const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
+        mockOverrides: mocks
+      })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
+      fireEvent.change(getByDisplayValue('Outcome description'), {
+        target: {value: 'Updated description'}
+      })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
@@ -184,7 +189,6 @@ describe('OutcomeEditModal', () => {
     })
 
     it('displays flash error if update request fails', async () => {
-      RichContentEditor.callOnRCE.mockReturnValue('Updated description')
       const {getByText, getByLabelText} = renderWithProvider({
         overrides: {outcome: {...outcome, _id: '2'}}
       })
@@ -247,7 +251,6 @@ describe('OutcomeEditModal', () => {
     })
 
     it('does not call friendly description mutation when updating outcome', async () => {
-      RichContentEditor.callOnRCE.mockReturnValue('Updated description')
       const {getByText, getByLabelText} = renderWithProvider({
         env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
         // mock setFriendlyDescription mutation to throw an error

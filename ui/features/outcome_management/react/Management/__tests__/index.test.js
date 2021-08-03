@@ -309,7 +309,6 @@ describe('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getAllByText('Outcome Menu')[0])
     fireEvent.click(within(getByRole('menu')).getByText('Edit'))
-    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('Edit Outcome')).toBeInTheDocument()
   })
 
@@ -317,12 +316,11 @@ describe('OutcomeManagementPanel', () => {
     const {getByText, getAllByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getAllByText('Outcome Menu')[0])
     fireEvent.click(within(getByRole('menu')).getByText('Move'))
-    await act(async () => jest.runAllTimers())
     expect(getByText('Where would you like to move this outcome?')).toBeInTheDocument()
   })
 
@@ -377,12 +375,12 @@ describe('OutcomeManagementPanel', () => {
     const {getByText, getAllByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getAllByText('Outcome Menu')[0])
     fireEvent.click(within(getByRole('menu')).getByText('Move'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Cancel'))
     expect(queryByText('Move "Outcome 1 - Course folder 0"')).not.toBeInTheDocument()
   })
@@ -407,9 +405,9 @@ describe('OutcomeManagementPanel', () => {
     const {getByText, getByLabelText, queryByTestId} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('2 Outcomes')).toBeInTheDocument()
     fireEvent.change(getByLabelText('Search field'), {target: {value: 'no matched results'}})
     await act(async () => jest.advanceTimersByTime(500))
@@ -433,9 +431,9 @@ describe('OutcomeManagementPanel', () => {
         })
       ]
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => jest.runOnlyPendingTimers())
     expect(getByText('All Course folder 0 Outcomes')).toBeInTheDocument()
     const searchInput = getByLabelText('Search field')
     fireEvent.change(searchInput, {target: {value: 'Outcome'}})
@@ -516,7 +514,7 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       // Move Outcomes Multi Modal
       fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
@@ -567,11 +565,11 @@ describe('OutcomeManagementPanel', () => {
       await act(async () => jest.runOnlyPendingTimers())
       // Move Modal
       fireEvent.click(within(getByRole('dialog')).getByText('Root course folder'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Course folder 1'))
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(within(getByRole('dialog')).getByText('Move'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.runOnlyPendingTimers())
       expect(getByText('2 Outcomes')).toBeInTheDocument()
     })
   })
