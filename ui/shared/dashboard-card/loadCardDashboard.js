@@ -29,8 +29,7 @@ export function createDashboardCards(dashboardCards, cardComponent = DashboardCa
   const Box = getDroppableDashboardCardBox()
 
   // Decide which dashboard to show based on role
-  const current_roles = window.ENV?.current_user_roles || []
-  const isTeacher = current_roles.includes('teacher')
+  const isTeacher = dashboardCards.some(card => card.enrollmentType === 'TeacherEnrollment')
 
   return (
     <Box
